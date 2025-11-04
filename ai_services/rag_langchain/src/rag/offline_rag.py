@@ -4,6 +4,20 @@ import re #Bộ dò mẫu kí tự
 from langchain import hub # Tải template prompt
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+
+my_prompt = PromptTemplate(
+    input_variables=["context", "question"],
+    template="""
+    You are a super smart assistant.
+    Use the following context to answer the question, if there aren't information in context, you can answer by your self or say you don't know
+    Do not make up information. Keep your answer as long as you can.
+
+    Context: {context}
+    Question: {question}
+    Answer:
+    """
+)
 
 class Str_OutputParser(StrOutputParser):
     def __init__(self) -> None:
@@ -24,7 +38,8 @@ class Str_OutputParser(StrOutputParser):
 class Offline_RAG:
     def __init__(self, llm) -> None:
         self.llm = llm
-        self.prompt = hub.pull("rlm/rag-prompt") # Template Prompt có sẵn
+        # self.prompt = hub.pull("rlm/rag-prompt") # Template Prompt có sẵn
+        self.prompt = my_prompt
         self.str_parser = Str_OutputParser()
 
     def get_chain(self, retriever):

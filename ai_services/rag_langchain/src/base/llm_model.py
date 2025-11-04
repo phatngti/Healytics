@@ -14,15 +14,16 @@ n4f_config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.bfloat16 # Kiểu dữ liệu tính toán
 )
 
-def get_hf_llm(model_name = "HuggingFaceTB/SmolLM-1.7B", max_new_token = 2000, **kwargs):
+def get_hf_llm(model_name = "mistralai/Mistral-7B-Instruct-v0.2", max_new_token = 2000, **kwargs):
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        # quantization_config = n4f_config,
-        torch_dtype=torch.float16,  # FP16 thay vì 4-bit
+        quantization_config = n4f_config,
+        # torch_dtype=torch.float16,  # FP16 thay vì 4-bit
         device_map="auto",
         low_cpu_mem_usage = True
     )
+    print("Model loaded on device:", next(model.parameters()).device)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     model_pipeline = pipeline(
