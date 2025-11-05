@@ -14,12 +14,12 @@ n4f_config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.bfloat16 # Kiểu dữ liệu tính toán
 )
 
-def get_hf_llm(model_name = "mistralai/Mistral-7B-Instruct-v0.2", max_new_token = 2000, **kwargs):
+def get_hf_llm(model_name = "RedHatAI/Mistral-7B-Instruct-v0.3-GPTQ-4bit", max_new_token = 2000, **kwargs):
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        quantization_config = n4f_config,
-        # torch_dtype=torch.float16,  # FP16 thay vì 4-bit
+        # quantization_config = n4f_config,
+        torch_dtype=torch.float16,  # FP16 thay vì 4-bit
         device_map="auto",
         low_cpu_mem_usage = True
     )
