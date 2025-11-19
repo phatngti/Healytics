@@ -15,6 +15,10 @@ export class AccountService {
 		return this.accountRepo.save(acc);
 	}
 
+	findByEmail(email: string) {
+		return this.accountRepo.findOneBy({ email });
+	}
+
 	findAll() {
 		return this.accountRepo.find();
 	}
