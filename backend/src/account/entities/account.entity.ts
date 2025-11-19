@@ -6,8 +6,8 @@ import {
   UpdateDateColumn,
   OneToOne,
 } from 'typeorm';
-import { Role } from './enum/role.enum';
-import { UserProfile } from './entities/user-profile.entity';
+import { Role } from '../enum/role.enum';
+import { UserProfile } from './user-profile.entity';
 
 @Entity()
 export class Account {
@@ -27,7 +27,11 @@ export class Account {
   role: Role;
 
   @OneToOne(() => UserProfile, (p) => p.account, { cascade: true, nullable: true, eager: true })
-  profile?: UserProfile;
+  userProfile?: UserProfile;
+
+  // Store arbitrary user preferences directly on the account as JSONB
+  @Column({ type: 'jsonb', nullable: true })
+  survey?: Record<string, any> | null;
 
   @Column({ default: true })
   isActive: boolean;

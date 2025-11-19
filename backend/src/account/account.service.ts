@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Account } from './account.entity';
+import { Account } from './entities/account.entity';
 import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
@@ -14,6 +14,22 @@ export class AccountService {
 	create(data: Partial<Account>) {
 		const acc = this.accountRepo.create(data);
 		return this.accountRepo.save(acc);
+	}
+
+	async getSurvey(accountId: string) {
+		const acc = await this.accountRepo.findOne({ where: { id: accountId }, select: ['id', 'survey'] as any });
+		return acc ? acc.survey : null;
+	}
+
+	async setSurvey(accountId: string, survey: Record<string, any> | null) {
+		const user = await this.accountRepo.findOneBy({ id: accountId });
+		if (!user) throw new NotFoundException('User not found');
+		user['survey'] = survey;
+		return this.accountRepo.save(user);
+	}
+
+	async clearSurvey(accountId: string) {
+		await this.accountRepo.update(accountId, { survey: null } as any);
 	}
 
 	findByEmail(email: string) {
