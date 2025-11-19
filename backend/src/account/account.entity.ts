@@ -17,6 +17,7 @@ export class Account {
   @Column({ nullable: true })
   passwordHash?: string;
 
+  //có nên thêm này vào không?
   @Column({ default: true })
   isActive: boolean;
 
