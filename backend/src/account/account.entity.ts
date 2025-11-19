@@ -17,6 +17,9 @@ export class Account {
   @Column({ nullable: true })
   passwordHash?: string;
 
+  @Column({ type: 'text', nullable: true, select: false })
+  refreshTokenHash: string | null;
+
   //có nên thêm này vào không?
   @Column({ default: true })
   isActive: boolean;

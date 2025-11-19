@@ -11,6 +11,25 @@ export class AuthService {
 
     ) {}
 
+    private async createTokensForUser(userId: string, email?: string) {
+        const payload = { sub: userId, email };
+        const accessExpires = process.env.JWT_EXPIRES_IN || '3600s';
+        const refreshExpires = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+
+        const access_token = this.jwtService.sign(payload as any, { expiresIn: accessExpires as any });
+        const refresh_token = this.jwtService.sign(payload as any, { expiresIn: refreshExpires as any });
+
+        const refreshHash = await bcrypt.hash(refresh_token, 10);
+        await this.accountService.setRefreshTokenHash(userId, refreshHash);
+
+        return {
+            access_token,
+            access_expires_in: accessExpires,
+            refresh_token,
+            refresh_expires_in: refreshExpires,
+        };
+    }
+
     async register(email: string, password: string) {
         const existing = await this.accountService.findByEmail(email);
         if (existing) {
@@ -18,8 +37,13 @@ export class AuthService {
         }
         const hash = await bcrypt.hash(password, 10);
         const user = await this.accountService.create({ email, passwordHash: hash });
-        const { passwordHash, ...rest } = user as any;
-        return rest;
+
+        const tokens = await this.createTokensForUser(user.id, user.email);
+        const { passwordHash, refreshTokenHash, ...rest } = user as any;
+        return {
+            //user: rest,
+            ...tokens,
+        };
     }
 
     async validateUser(email: string, password: string) {
@@ -32,9 +56,16 @@ export class AuthService {
     }
 
     async login(user: any) {
-        const payload = { username: user.username, sub: user.userId };
+        const userId = (user && (user.id || user.userId || user.sub)) as string;
+        const userEmail = (user && (user.email || user.username)) as string | undefined;
+        if (!userId) {
+            throw new UnauthorizedException();
+        }
+        const tokens = await this.createTokensForUser(userId, userEmail);
+        const { passwordHash, refreshTokenHash, ...rest } = user as any;
         return {
-            access_token: this.jwtService.sign(payload),
+            //user: rest,
+            ...tokens,
         };
     }
 }

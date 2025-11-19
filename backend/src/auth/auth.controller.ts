@@ -4,10 +4,11 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { LocalAuthGuard } from './local-auth.guard';
+import { AccountService } from '../account/account.service';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService, private accountService: AccountService) {}
 
     @Post('register')
     async register(@Body() dto: RegisterDto) {
@@ -25,6 +26,12 @@ export class AuthController {
     @UseGuards(LocalAuthGuard)
     @Post('logout')
     async logout(@Req() req) {
+        // revoke refresh token in DB if user present
+        try {
+            const uid = req.user?.id as string | undefined;
+            if (uid) await this.accountService.removeRefreshToken(uid);
+        } catch (_) {}
+
         return new Promise((resolve, reject) => {
             req.logout((err) => {
                 if (err) return reject(err);
@@ -32,4 +39,6 @@ export class AuthController {
             });
         });
     }
+
+
 }
