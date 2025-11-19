@@ -3,21 +3,22 @@ import { AppModule } from './app.module';
 import session = require('express-session');
 import * as passport from 'passport';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET || 'dev-secret',
-      resave: false,
-      saveUninitialized: false,
-      cookie: { secure: false },
-    }),
-  );
+  // app.use(
+  //   session({
+  //     secret: process.env.SESSION_SECRET || 'dev-secret',
+  //     resave: false,
+  //     saveUninitialized: false,
+  //     cookie: { secure: false },
+  //   }),
+  // );
 
-  // app.use(passport.initialize());
-  // app.use(passport.session());
+  app.enableCors();
+  app.use(helmet());
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 

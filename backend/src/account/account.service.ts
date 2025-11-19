@@ -28,6 +28,24 @@ export class AccountService {
 		return this.accountRepo.findOneBy({ id });
 	}
 
+	/**
+	 * Find a user including the refreshTokenHash (selected explicitly)
+	 */
+	async findOneWithRefreshHash(id: string) {
+		return this.accountRepo.findOne({
+			where: { id },
+			select: [
+				'id',
+				'email',
+				'passwordHash',
+				'refreshTokenHash',
+				'isActive',
+				'createdAt',
+				'updatedAt',
+			],
+		});
+	}
+
 	async setRefreshTokenHash(id: string, refreshTokenHash: string) {
 		const user = await this.accountRepo.findOneBy({ id });
 		if (!user) throw new NotFoundException('User not found');

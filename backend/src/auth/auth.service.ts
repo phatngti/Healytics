@@ -56,8 +56,8 @@ export class AuthService {
     }
 
     async login(user: any) {
-        const userId = (user && (user.id || user.userId || user.sub)) as string;
-        const userEmail = (user && (user.email || user.username)) as string | undefined;
+        const userId = user.id ;
+        const userEmail = user.email;
         if (!userId) {
             throw new UnauthorizedException();
         }
@@ -67,5 +67,32 @@ export class AuthService {
             //user: rest,
             ...tokens,
         };
+    }
+    
+    async refresh(refreshToken: string) {
+        if (!refreshToken) throw new UnauthorizedException('No refresh token provided');
+        let payload: any;
+        try {
+            payload = this.jwtService.verify(refreshToken);
+        } catch (e) {
+            throw new UnauthorizedException('Invalid refresh token');
+        }
+
+        const userId = payload?.sub;
+        if (!userId) throw new UnauthorizedException('Invalid token payload');
+
+        const user = await this.accountService.findOneWithRefreshHash(userId);
+        if (!user || !user.refreshTokenHash) throw new UnauthorizedException('Refresh token revoked');
+
+        const match = await bcrypt.compare(refreshToken, user.refreshTokenHash || '');
+        if (!match) {
+            // possible reuse or tampering: remove stored refresh token to revoke
+            await this.accountService.removeRefreshToken(userId).catch(() => {});
+            throw new UnauthorizedException('Refresh token does not match');
+        }
+
+        // rotate tokens
+        const tokens = await this.createTokensForUser(userId, user.email);
+        return tokens;
     }
 }
