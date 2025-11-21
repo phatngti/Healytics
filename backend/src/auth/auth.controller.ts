@@ -2,10 +2,12 @@ import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LocalAuthGuard } from './local-auth.guard';
+import { ApiBody } from '@nestjs/swagger';
 import { AccountService } from '../account/account.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Public } from './public.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { LoginDto } from './dto/login.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -16,6 +18,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @ApiBody({ type: RegisterDto })
   @Post('register')
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto.email, dto.password);
@@ -23,6 +26,7 @@ export class AuthController {
 
   @Public()
   @UseGuards(LocalAuthGuard)
+  @ApiBody({ type: LoginDto })
   @Post('login')
   async login(@Req() req) {
     // passport attaches user to req.user

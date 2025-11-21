@@ -16,10 +16,14 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
+  afterEach(async () => {
+    if (app) await app.close();
+  });
+
   it('/ (GET)', () => {
     return request(app.getHttpServer())
       .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      // root route not defined in the application; expect 404 Not Found
+      .expect(404);
   });
 });
