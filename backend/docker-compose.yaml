@@ -4,7 +4,7 @@ services:
     container_name: redis
     restart: always
     ports:
-      - "6379:6379"
+      - '6379:6379'
     command: >
       redis-server
         --appendonly yes
@@ -18,14 +18,14 @@ services:
       - services
 
   postgres:
-    image: postgres:latest
+    image: postgres:16
     container_name: postgres
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
-      POSTGRES_PASSWORD: "admin@123"
-      POSTGRES_USER: "admin"
-      POSTGRES_DB: "mydb"
+      POSTGRES_PASSWORD: 'admin@123'
+      POSTGRES_USER: 'admin'
+      POSTGRES_DB: 'mydb'
     restart: always
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -35,3 +35,7 @@ services:
 networks:
   services:
     driver: bridge
+
+volumes:
+  redisdata:
+  pgdata:
