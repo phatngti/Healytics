@@ -8,6 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Account } from './account.entity';
+import { Address } from './address.entity';
 
 @Entity()
 export class UserProfile {
@@ -39,7 +40,13 @@ export class UserProfile {
   @JoinColumn()
   account: Account;
 
-  // Preferences removed — stored directly on Account as a JSONB column
+  @OneToOne(() => Address, (address) => address.userProfile, { 
+    cascade: true, // This allows saving profile + address in one go
+    eager: true,   // This automatically fetches address when you fetch profile
+    nullable: true 
+  })
+  @JoinColumn()
+  address?: Address;
 
   // @CreateDateColumn()
   // createdAt: Date;

@@ -2,12 +2,44 @@ import { Controller, Get, Post, Body, Req, ConflictException, UseGuards } from '
 import { AccountService } from './account.service';
 import { SurveyDto } from './dto/survey.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiBody,
+  ApiResponse,
+  ApiOkResponse,
+  ApiConflictResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 
+@ApiTags('Account')
+@ApiBearerAuth()
 @Controller('account')
 @UseGuards(JwtAuthGuard)
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
   @Get('survey')
+  @ApiOperation({ summary: 'Get current user survey' })
+  @ApiOkResponse({
+    description: 'User survey',
+    schema: {
+      example: {
+        survey: {
+          demographics: { age: 34, gender: 'female', postalCode: '94107' },
+          lifestyle: { smoking: false, alcoholWeeklyUnits: 3, exercisePerWeek: 4 },
+          conditions: [
+            { name: 'hypertension', diagnosedYear: 2018 },
+            { name: 'asthma', diagnosedYear: 2010 },
+          ],
+          questionnaire: [
+            { questionId: 'q1', answer: 'yes' },
+            { questionId: 'q2', answer: 'no' },
+          ],
+          submittedAt: '2025-11-22T12:34:56.789Z',
+        },
+      },
+    },
+  })
   async getSurvey(@Req() req: any) {
     const id = req.user?.id;
     const survey = await this.accountService.getSurvey(id);
@@ -16,6 +48,30 @@ export class AccountController {
   }
 
   @Post('survey')
+  @ApiOperation({ summary: 'Create one-shot survey for current user' })
+  @ApiBody({ type: SurveyDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Survey created',
+    schema: {
+      example: {
+        survey: {
+          demographics: { age: 34, gender: 'female', postalCode: '94107' },
+          lifestyle: { smoking: false, alcoholWeeklyUnits: 3, exercisePerWeek: 4 },
+          conditions: [
+            { name: 'hypertension', diagnosedYear: 2018 },
+            { name: 'asthma', diagnosedYear: 2010 },
+          ],
+          questionnaire: [
+            { questionId: 'q1', answer: 'yes' },
+            { questionId: 'q2', answer: 'no' },
+          ],
+          submittedAt: '2025-11-22T12:34:56.789Z',
+        },
+      },
+    },
+  })
+  @ApiConflictResponse({ description: 'Survey already exists' })
   async postSurvey(@Req() req: any, @Body() dto: SurveyDto) {
     const id = req.user?.id;
     const existing = await this.accountService.getSurvey(id);
