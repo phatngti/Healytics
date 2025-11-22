@@ -1,5 +1,7 @@
 import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { AccountService } from '../account/account.service';
+import { RegisterDto } from './dto/register.dto';
+import { AuthTokensDto } from './dto/auth-tokens.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 
@@ -11,7 +13,7 @@ export class AuthService {
 
     ) {}
 
-    private async createTokensForUser(userId: string, email?: string) {
+    private async createTokensForUser(userId: string, email?: string): Promise<AuthTokensDto> {
         const payload = { sub: userId, email };
         const accessExpires = process.env.JWT_EXPIRES_IN || '3600s';
         const refreshExpires = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
@@ -27,23 +29,32 @@ export class AuthService {
             access_expires_in: accessExpires,
             refresh_token,
             refresh_expires_in: refreshExpires,
-        };
+        } as AuthTokensDto;
     }
 
-    async register(email: string, password: string) {
-        const existing = await this.accountService.findByEmail(email);
+    async register(dto: RegisterDto): Promise<AuthTokensDto> {
+        const existing = await this.accountService.findByEmail(dto.email);
         if (existing) {
             throw new ConflictException('Email already in use');
         }
-        const hash = await bcrypt.hash(password, 10);
-        const user = await this.accountService.create({ email, passwordHash: hash });
+        const hash = await bcrypt.hash(dto.password, 10);
+
+        const createData: any = { email: dto.email, passwordHash: hash };
+                if (dto.profile) {
+                    // attach profile object; Account entity has cascade on userProfile
+                    const profileData: any = { ...dto.profile };
+                    if (profileData.dateOfBirth) {
+                        // ensure date type for the entity
+                        profileData.dateOfBirth = new Date(profileData.dateOfBirth);
+                    }
+                    createData.userProfile = profileData;
+                }
+
+        const user = await this.accountService.create(createData);
 
         const tokens = await this.createTokensForUser(user.id, user.email);
         const { passwordHash, refreshTokenHash, ...rest } = user as any;
-        return {
-            //user: rest,
-            ...tokens,
-        };
+        return tokens;
     }
 
     async validateUser(email: string, password: string) {
@@ -55,21 +66,17 @@ export class AuthService {
         return rest;
     }
 
-    async login(user: any) {
+    async login(user: any): Promise<AuthTokensDto> {
         const userId = user.id ;
         const userEmail = user.email;
         if (!userId) {
             throw new UnauthorizedException();
         }
         const tokens = await this.createTokensForUser(userId, userEmail);
-        const { passwordHash, refreshTokenHash, ...rest } = user as any;
-        return {
-            //user: rest,
-            ...tokens,
-        };
+        return tokens;
     }
     
-    async refresh(refreshToken: string) {
+    async refresh(refreshToken: string): Promise<AuthTokensDto> {
         if (!refreshToken) throw new UnauthorizedException('No refresh token provided');
         let payload: any;
         try {
