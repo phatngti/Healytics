@@ -2,7 +2,8 @@ import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LocalAuthGuard } from './local-auth.guard';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import { AuthTokensDto } from './dto/auth-tokens.dto';
 import { AccountService } from '../account/account.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Public } from './public.decorator';
@@ -19,16 +20,16 @@ export class AuthController {
 
   @Public()
   @ApiBody({ type: RegisterDto })
+  @ApiCreatedResponse({ description: 'Registration returns access and refresh tokens', type: AuthTokensDto })
   @Post('register')
-  async register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto.email, dto.password);
-  }
+
 
   @Public()
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDto })
+  @ApiOkResponse({ description: 'Login returns access and refresh tokens', type: AuthTokensDto })
   @Post('login')
-  async login(@Req() req) {
+  async login(@Req() req): Promise<AuthTokensDto> {
     // passport attaches user to req.user
     return this.authService.login(req.user);
   }
@@ -54,7 +55,8 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Body('refresh_token') refresh_token: string) {
+  @ApiOkResponse({ description: 'Refresh returns new pair of tokens', type: AuthTokensDto })
+  async refresh(@Body('refresh_token') refresh_token: string): Promise<AuthTokensDto> {
     return this.authService.refresh(refresh_token);
   }
 }

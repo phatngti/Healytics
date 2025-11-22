@@ -1,5 +1,7 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, MinLength, IsOptional, ValidateNested } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { RegisterProfileDto } from './register-profile.dto';
 
 export class RegisterDto {
   @ApiProperty({ example: 'newuser@example.com', description: 'Email address for registration' })
@@ -10,4 +12,10 @@ export class RegisterDto {
   @IsNotEmpty()
   @MinLength(8)
   password: string;
+
+  @ApiPropertyOptional({ type: RegisterProfileDto, description: 'Optional profile data to create alongside the account' })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => RegisterProfileDto)
+  profile?: RegisterProfileDto;
 }
