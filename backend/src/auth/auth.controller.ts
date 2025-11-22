@@ -1,14 +1,15 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
+import { RegisterDto } from './dto/request/register.dto';
 import { LocalAuthGuard } from './local-auth.guard';
 import { ApiBody, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
-import { AuthTokensDto } from './dto/auth-tokens.dto';
+import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
+import { LogoutResponseDto } from './dto/response/logout-response.dto';
 import { AccountService } from '../account/account.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Public } from './public.decorator';
 import { ApiTags } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto } from './dto/request/login.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -23,11 +24,16 @@ export class AuthController {
   @ApiCreatedResponse({ description: 'Registration returns access and refresh tokens', type: AuthTokensDto })
   @Post('register')
 
+  async register(@Body() dto: RegisterDto): Promise<AuthTokensDto> {
+    return this.authService.register(dto);
+  }
+
 
   @Public()
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDto })
   @ApiOkResponse({ description: 'Login returns access and refresh tokens', type: AuthTokensDto })
+  @HttpCode(200)
   @Post('login')
   async login(@Req() req): Promise<AuthTokensDto> {
     // passport attaches user to req.user
@@ -35,8 +41,10 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
   @Post('logout')
-  async logout(@Req() req) {
+  @ApiOkResponse({ description: 'Logout confirmation', type: LogoutResponseDto })
+  async logout(@Req() req): Promise<LogoutResponseDto> {
     // revoke refresh token in DB if user present
     try {
       const uid = req.user?.id;
@@ -44,7 +52,7 @@ export class AuthController {
     } catch (_) {}
 
     //return req.logout();
-    return { message: 'Logged out successfully' };
+    return { message: 'Logged out successfully' } as LogoutResponseDto;
 
     // return new Promise((resolve, reject) => {
     //     req.logout((err) => {
@@ -54,6 +62,7 @@ export class AuthController {
     // });
   }
 
+  @HttpCode(200)
   @Post('refresh')
   @ApiOkResponse({ description: 'Refresh returns new pair of tokens', type: AuthTokensDto })
   async refresh(@Body('refresh_token') refresh_token: string): Promise<AuthTokensDto> {

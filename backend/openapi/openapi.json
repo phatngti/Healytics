@@ -17,7 +17,14 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "Registration returns access and refresh tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -40,8 +47,15 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "Login returns access and refresh tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -54,8 +68,15 @@
         "operationId": "AuthController_logout",
         "parameters": [],
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "Logout confirmation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -68,8 +89,15 @@
         "operationId": "AuthController_refresh",
         "parameters": [],
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "Refresh returns new pair of tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -87,41 +115,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "example": {
-                    "survey": {
-                      "demographics": {
-                        "age": 34,
-                        "gender": "female",
-                        "postalCode": "94107"
-                      },
-                      "lifestyle": {
-                        "smoking": false,
-                        "alcoholWeeklyUnits": 3,
-                        "exercisePerWeek": 4
-                      },
-                      "conditions": [
-                        {
-                          "name": "hypertension",
-                          "diagnosedYear": 2018
-                        },
-                        {
-                          "name": "asthma",
-                          "diagnosedYear": 2010
-                        }
-                      ],
-                      "questionnaire": [
-                        {
-                          "questionId": "q1",
-                          "answer": "yes"
-                        },
-                        {
-                          "questionId": "q2",
-                          "answer": "no"
-                        }
-                      ],
-                      "submittedAt": "2025-11-22T12:34:56.789Z"
-                    }
-                  }
+                  "$ref": "#/components/schemas/SurveyResponseDto"
                 }
               }
             }
@@ -156,41 +150,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "example": {
-                    "survey": {
-                      "demographics": {
-                        "age": 34,
-                        "gender": "female",
-                        "postalCode": "94107"
-                      },
-                      "lifestyle": {
-                        "smoking": false,
-                        "alcoholWeeklyUnits": 3,
-                        "exercisePerWeek": 4
-                      },
-                      "conditions": [
-                        {
-                          "name": "hypertension",
-                          "diagnosedYear": 2018
-                        },
-                        {
-                          "name": "asthma",
-                          "diagnosedYear": 2010
-                        }
-                      ],
-                      "questionnaire": [
-                        {
-                          "questionId": "q1",
-                          "answer": "yes"
-                        },
-                        {
-                          "questionId": "q2",
-                          "answer": "no"
-                        }
-                      ],
-                      "submittedAt": "2025-11-22T12:34:56.789Z"
-                    }
-                  }
+                  "$ref": "#/components/schemas/SurveyResponseDto"
                 }
               }
             }
@@ -282,6 +242,35 @@
           "password"
         ]
       },
+      "AuthTokensDto": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refresh_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...refresh"
+          },
+          "access_expires_in": {
+            "type": "string",
+            "example": "3600s",
+            "description": "Access token TTL as configured"
+          },
+          "refresh_expires_in": {
+            "type": "string",
+            "example": "7d",
+            "description": "Refresh token TTL as configured"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token",
+          "access_expires_in",
+          "refresh_expires_in"
+        ]
+      },
       "LoginDto": {
         "type": "object",
         "properties": {
@@ -302,6 +291,60 @@
           "email",
           "password"
         ]
+      },
+      "LogoutResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Logged out successfully"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "SurveyResponseDto": {
+        "type": "object",
+        "properties": {
+          "survey": {
+            "type": "object",
+            "description": "Stored survey payload or null if none",
+            "example": {
+              "demographics": {
+                "age": 34,
+                "gender": "female",
+                "postalCode": "94107"
+              },
+              "lifestyle": {
+                "smoking": false,
+                "alcoholWeeklyUnits": 3,
+                "exercisePerWeek": 4
+              },
+              "conditions": [
+                {
+                  "name": "hypertension",
+                  "diagnosedYear": 2018
+                },
+                {
+                  "name": "asthma",
+                  "diagnosedYear": 2010
+                }
+              ],
+              "questionnaire": [
+                {
+                  "questionId": "q1",
+                  "answer": "yes"
+                },
+                {
+                  "questionId": "q2",
+                  "answer": "no"
+                }
+              ],
+              "submittedAt": "2025-11-22T12:34:56.789Z"
+            }
+          }
+        }
       },
       "SurveyDto": {
         "type": "object",
@@ -340,7 +383,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2025-11-22T10:30:15.970Z"
+              "submittedAt": "2025-11-22T11:37:44.700Z"
             }
           }
         },
