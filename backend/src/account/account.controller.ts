@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Req, ConflictException, UseGuards } from '@nestjs/common';
 import { AccountService } from './account.service';
-import { SurveyDto } from './dto/survey.dto';
-import { SurveyResponseDto } from './dto/survey-response.dto';
+import { SurveyDto } from './dto/request/survey.dto';
+import { SurveyResponseDto } from './dto/response/survey-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   ApiTags,
@@ -25,7 +25,7 @@ export class AccountController {
   async getSurvey(@Req() req: any): Promise<SurveyResponseDto> {
     const id = req.user?.id;
     const survey = await this.accountService.getSurvey(id);
-    if (survey === null) return { survey: null };
+    if (survey === null) return { survey: null } as SurveyResponseDto;
     return { survey };
   }
 
