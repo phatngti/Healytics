@@ -1,0 +1,396 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registration returns access and refresh tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login returns access and refresh tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Logout confirmation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Refresh returns new pair of tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/account/survey": {
+      "get": {
+        "operationId": "AccountController_getSurvey",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "User survey",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user survey",
+        "tags": [
+          "Account"
+        ]
+      },
+      "post": {
+        "operationId": "AccountController_postSurvey",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurveyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Survey created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyResponseDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Survey already exists"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create one-shot survey for current user",
+        "tags": [
+          "Account"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "The Sync App API",
+    "description": "This a the project document",
+    "version": "0.0.1",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "RegisterProfileDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "Jane"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+1234567890"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Patient is healthy",
+            "description": "Short bio or notes"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "example": "1990-01-01",
+            "description": "Date of birth in ISO format"
+          }
+        }
+      },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "newuser@example.com",
+            "description": "Email address for registration"
+          },
+          "password": {
+            "type": "string",
+            "example": "s3cureP@ssw0rd",
+            "description": "Password (min 8 characters)"
+          },
+          "profile": {
+            "description": "Optional profile data to create alongside the account",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RegisterProfileDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AuthTokensDto": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refresh_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...refresh"
+          },
+          "access_expires_in": {
+            "type": "string",
+            "example": "3600s",
+            "description": "Access token TTL as configured"
+          },
+          "refresh_expires_in": {
+            "type": "string",
+            "example": "7d",
+            "description": "Refresh token TTL as configured"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token",
+          "access_expires_in",
+          "refresh_expires_in"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "newuser@example.com",
+            "description": "The email of the user",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "example": "s3cureP@ssw0rd",
+            "description": "The password of the user",
+            "format": "password"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "LogoutResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Logged out successfully"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "SurveyResponseDto": {
+        "type": "object",
+        "properties": {
+          "survey": {
+            "type": "object",
+            "description": "Stored survey payload or null if none",
+            "example": {
+              "demographics": {
+                "age": 34,
+                "gender": "female",
+                "postalCode": "94107"
+              },
+              "lifestyle": {
+                "smoking": false,
+                "alcoholWeeklyUnits": 3,
+                "exercisePerWeek": 4
+              },
+              "conditions": [
+                {
+                  "name": "hypertension",
+                  "diagnosedYear": 2018
+                },
+                {
+                  "name": "asthma",
+                  "diagnosedYear": 2010
+                }
+              ],
+              "questionnaire": [
+                {
+                  "questionId": "q1",
+                  "answer": "yes"
+                },
+                {
+                  "questionId": "q2",
+                  "answer": "no"
+                }
+              ],
+              "submittedAt": "2025-11-22T12:34:56.789Z"
+            }
+          }
+        }
+      },
+      "SurveyDto": {
+        "type": "object",
+        "properties": {
+          "survey": {
+            "type": "object",
+            "description": "Arbitrary survey payload. Example structure below.",
+            "example": {
+              "demographics": {
+                "age": 34,
+                "gender": "female",
+                "postalCode": "94107"
+              },
+              "lifestyle": {
+                "smoking": false,
+                "alcoholWeeklyUnits": 3,
+                "exercisePerWeek": 4
+              },
+              "conditions": [
+                {
+                  "name": "hypertension",
+                  "diagnosedYear": 2018
+                },
+                {
+                  "name": "asthma",
+                  "diagnosedYear": 2010
+                }
+              ],
+              "questionnaire": [
+                {
+                  "questionId": "q1",
+                  "answer": "yes"
+                },
+                {
+                  "questionId": "q2",
+                  "answer": "no"
+                }
+              ],
+              "submittedAt": "2025-11-22T11:37:44.700Z"
+            }
+          }
+        },
+        "required": [
+          "survey"
+        ]
+      }
+    }
+  }
+}
