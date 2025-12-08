@@ -145,6 +145,8 @@ class ApiService implements Authentication {
   Future<void> setAccessToken(String accessToken) async {
     _accessToken = accessToken;
     await Store.put(StoreKey.accessToken, accessToken);
+    final updatedAccessToken = Store.get(StoreKey.accessToken, "");
+    print('updated token $updatedAccessToken');
   }
 
   Future<void> setDeviceInfoHeader() async {
@@ -172,6 +174,7 @@ class ApiService implements Authentication {
 
   static Map<String, String> getRequestHeaders() {
     var accessToken = Store.get(StoreKey.accessToken, "");
+    print('accessToken $accessToken');
     var customHeadersStr = Store.get(StoreKey.customHeaders, "");
     var header = <String, String>{};
     if (accessToken.isNotEmpty) {
