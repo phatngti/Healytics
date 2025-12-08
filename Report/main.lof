@@ -1,0 +1,14 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces The architecture of transformers presented in the research paper "Attention is all you need" \blx@tocontentsinit {0}\cite {NIPS2017_3f5ee243}}}{7}{figure.caption.2}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces The evolutionary tree of modern LLMs traces the development of language models in recent years \blx@tocontentsinit {0}\cite {yang2023harnessing}}}{8}{figure.caption.3}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Illustration of two-stage pipeline in retrieval-augmented generation}}{18}{figure.caption.4}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces General 2-stage pipeline of retrieval-augmented generation}}{22}{figure.caption.5}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Pipeline of Knowledge graph-based retrieval-augmented generation}}{23}{figure.caption.6}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Overall of KEALLM architecture}}{25}{figure.caption.7}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

@@ -48,7 +48,7 @@ where $D_{kg}$ is the training set and $\Phi$ represents the parameters of the m
         \STATE Construct input sequence $x_k = \text{\texttt{[CLS]}} e_i \text{\texttt{[SEP}]} r_j \text{\texttt{[SEP]}} \text{\texttt{[MASK]}} \text{\texttt{[SEP]}}$.
         \STATE Obtain probability distribution $p(e|x_k) = p(\text{\texttt{[MASK]}} = e|x_k;\Phi)$ for all entities $e \in E$
         \STATE Calculate the loss $\mathcal{L}_{kn} = - \mathbb{E}_{(x_k,e_k) \sim \mathcal{D}_{kg}}\log{p(\text{\texttt{[MASK]}} = e_k|x_k;\Phi)}$
-        \STATE Update model parameters $\Phi$ using a gradient descent optimizer with learning rate $\alpha$ and the loss $\mathcal{L}_{kn}$: $\Phi \leftarrow \Phi - \alpha \nabla_\Phi\matcal{L}$
+        \STATE Update model parameters $\Phi$ using a gradient descent optimizer with learning rate $\alpha$ and the loss $\mathcal{L}_{kn}$: $\Phi \leftarrow \Phi - \alpha \nabla_\Phi\mathcal{L}$
     \ENDFOR
 \ENDFOR
 
