@@ -142,26 +142,39 @@ class RegisterFlowNotifier extends _$RegisterFlowNotifier {
     }
   }
 
-  Future<void> updateSurvey(String step, List<SurveyEntity> surveys) async {
-    final currentSurveys = state.value?.surveys ?? {};
-    final updatedSurveys = {...currentSurveys, step: surveys};
+  Future<void> updateSurvey(String stepKey, List<SurveyEntity> surveys) async {
+    if (state.value?.isRegistrationCompleted ?? false) {
+      return;
+    }
 
+    final currentSurveys = state.value?.surveys ?? {};
+    final updatedSurveys = {...currentSurveys, stepKey: surveys};
+
+    final currentStepIndex = state.value?.stepIndex == 4
+        ? 4
+        : (state.value?.stepIndex ?? 0) + 1;
     _updateState(
       (current) => current.copyWith(
         surveys: updatedSurveys,
-        stepIndex: current.stepIndex == 3 ? 4 : current.stepIndex + 1,
+        stepIndex: currentStepIndex,
+        isRegistrationCompleted: currentStepIndex == 4,
       ),
     );
     await saveProgress();
   }
 
   Future<void> completeSurvey() async {
-    if (state.value?.stepIndex == 4) {
-      final surveys = state.value?.surveys ?? <String, List<SurveyEntity>>{};
-      await ref.read(surveyUseCaseProvider).completeSurvey(surveys: surveys);
-      await saveProgress();
-      _updateState((current) => current.copyWith(isSurveyCompleted: true));
-      ref.invalidateSelf();
+    try {
+      print('isRegistrationCompleted ${state.value?.isRegistrationCompleted}');
+      if (state.value?.isRegistrationCompleted ?? false) {
+        final surveys = state.value?.surveys ?? <String, List<SurveyEntity>>{};
+        await ref.read(surveyUseCaseProvider).completeSurvey(surveys: surveys);
+        await saveProgress();
+        ref.invalidateSelf();
+      }
+    } catch (e, stack) {
+      state = AsyncError<RegisterStateData>(e, stack);
+      rethrow;
     }
   }
 
