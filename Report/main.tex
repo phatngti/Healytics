@@ -1,5 +1,8 @@
 \documentclass[a4paper]{report}
 \usepackage[fontsize=13pt]{scrextend}
+\usepackage{vntex}
+\usepackage[english]{babel}
+\usepackage{csquotes}
 \usepackage[style=ieee,sorting=none]{biblatex} %Imports biblatex package
 \AtEveryBibitem{%
   \clearfield{issn} % Remove issn
@@ -19,13 +22,10 @@
 \usepackage{titlesec}
 %new packet added
 \usepackage{a4wide,amssymb,epsfig,latexsym,multicol,array,hhline,fancyhdr}
-\usepackage{vntex}
-\usepackage[english]{babel}
 \usepackage{mathptmx}[ptm]
 \usepackage[normalem]{ulem}
-\usepackage{amsmath}
 \usepackage{lastpage}
-\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+% \usepackage[lined,boxed,commentsnumbered]{algorithm2e}
 \usepackage{enumerate}
 \usepackage{color}
 \usepackage{graphicx}							% Standard graphics package
@@ -57,9 +57,9 @@
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 
-\RestyleAlgo{ruled}
+% \RestyleAlgo{ruled}
 
-\SetKwComment{Comment}{/* }{ */}
+% \SetKwComment{Comment}{/* }{ */}
 
 \DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
 
