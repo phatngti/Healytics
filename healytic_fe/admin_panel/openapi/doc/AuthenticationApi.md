@@ -1,0 +1,173 @@
+# openapi.api.AuthenticationApi
+
+## Load the API package
+```dart
+import 'package:openapi/api.dart';
+```
+
+All URIs are relative to *http://localhost*
+
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**authControllerLogin**](AuthenticationApi.md#authcontrollerlogin) | **POST** /auth/login | 
+[**authControllerLogout**](AuthenticationApi.md#authcontrollerlogout) | **POST** /auth/logout | 
+[**authControllerRefresh**](AuthenticationApi.md#authcontrollerrefresh) | **POST** /auth/refresh | 
+[**authControllerRegister**](AuthenticationApi.md#authcontrollerregister) | **POST** /auth/register | 
+
+
+# **authControllerLogin**
+> AuthTokensDto authControllerLogin(loginDto)
+
+
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+final loginDto = LoginDto(); // LoginDto | 
+
+try {
+    final result = api_instance.authControllerLogin(loginDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerLogin: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **loginDto** | [**LoginDto**](LoginDto.md)|  | 
+
+### Return type
+
+[**AuthTokensDto**](AuthTokensDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerLogout**
+> LogoutResponseDto authControllerLogout()
+
+
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+
+try {
+    final result = api_instance.authControllerLogout();
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerLogout: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**LogoutResponseDto**](LogoutResponseDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerRefresh**
+> AuthTokensDto authControllerRefresh()
+
+
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+
+try {
+    final result = api_instance.authControllerRefresh();
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerRefresh: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**AuthTokensDto**](AuthTokensDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerRegister**
+> AuthTokensDto authControllerRegister(registerDto)
+
+
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+final registerDto = RegisterDto(); // RegisterDto | 
+
+try {
+    final result = api_instance.authControllerRegister(registerDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerRegister: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **registerDto** | [**RegisterDto**](RegisterDto.md)|  | 
+
+### Return type
+
+[**AuthTokensDto**](AuthTokensDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
