@@ -14,6 +14,8 @@ class AppTextField extends StatelessWidget {
     this.onChanged,
     this.enabled = true,
     this.initialValue,
+    this.labelStyle,
+    this.border,
   });
 
   final String fieldKey;
@@ -26,6 +28,8 @@ class AppTextField extends StatelessWidget {
   final ValueChanged<dynamic>? onChanged;
   final bool enabled;
   final String? initialValue;
+  final TextStyle? labelStyle;
+  final OutlineInputBorder? border;
 
   @override
   Widget build(BuildContext context) {
@@ -58,26 +62,39 @@ class AppTextField extends StatelessWidget {
             label: Text(
               label,
               style: enabled
-                  ? Theme.of(context).textTheme.bodyLarge
-                  : Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 1),
-                    ),
+                  ? labelStyle ?? Theme.of(context).textTheme.bodyLarge
+                  : labelStyle?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 1),
+                        ) ??
+                        Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 1),
+                        ),
             ),
             errorText: field.errorText,
-            border: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.surface.withAlpha(10),
-              ),
-            ),
+            border:
+                border ??
+                OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.surface.withAlpha(10),
+                  ),
+                ),
 
             // Style cho border khi disable (Tuỳ chọn, mặc định Flutter tự xử lý)
-            disabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outline.withAlpha(100),
-              ),
-            ),
+            disabledBorder:
+                border?.copyWith(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.outline.withAlpha(100),
+                  ),
+                ) ??
+                OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.outline.withAlpha(100),
+                  ),
+                ),
 
             suffixIcon: suffixIcon,
             constraints: const BoxConstraints(
