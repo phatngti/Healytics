@@ -82,6 +82,8 @@ class HealthSafetyStep extends HookConsumerWidget {
         FocusScope.of(context).unfocus();
 
         isLoading.value = true;
+        print('run here');
+        print('isLoading.value ${isLoading.value}');
 
         await ref
             .read(registerFlowProvider.notifier)
@@ -92,6 +94,7 @@ class HealthSafetyStep extends HookConsumerWidget {
               }).toList(),
             );
         await ref.read(registerFlowProvider.notifier).completeSurvey();
+        print('isLoading.value ${isLoading.value}');
       }
     }
 
