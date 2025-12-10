@@ -30,7 +30,7 @@
 \usepackage[framemethod=tikz]{mdframed}% For highlighting paragraph backgrounds
 \usepackage{caption,subcaption}
 
-\usepackage{lastpage}
+
 \usepackage[lined,boxed,commentsnumbered]{algorithm2e}
 \usepackage{enumerate}
 \usepackage{color}
@@ -56,15 +56,16 @@
 \usepackage{float}
 \usepackage{pdfpages}
 \usepackage{tocloft}
+
 \usepackage{appendix}
 
-\usepackage{algorithm}
-\usepackage{algorithmic}
-\renewcommand{\algorithmicrequire}{\textbf{Input:}}
-\renewcommand{\algorithmicensure}{\textbf{Output:}}
+% algorithm2e configuration (replacing algorithm/algorithmic)
+\SetKwInput{Input}{Input:}
+\SetKwInput{Output}{Output:}
 %\usepackage{pstcol} 								% PSTricks with the standard color package
 \usepackage{enumitem} % Put this in the preamble
 \usepackage[normalem]{ulem}
+\usepackage{lastpage}   % Load this LAST
 
 
 \newtheorem{theorem}{{\bf Định lý}}
@@ -77,11 +78,11 @@
 % Định nghĩa một kiểu cột X mới (L), căn lề trái (thay vì dàn đều hai bên)
 % Giúp văn bản trong các ô dài dễ đọc hơn.
 \newcolumntype{L}{>{\RaggedRight\arraybackslash}X}
-\addtocontents{toc}{\protect\thispagestyle{empty}}
+% \addtocontents{toc}{\protect\thispagestyle{empty}}
 % Remove page number in contents page. 
-\addtocontents{lof}{\protect\thispagestyle{empty}}
+% \addtocontents{lof}{\protect\thispagestyle{empty}}
 % Remove page number in list of figure page. 
-\addtocontents{lot}{\protect\thispagestyle{empty}}
+% \addtocontents{lot}{\protect\thispagestyle{empty}}
 % Remove page number in list of table page. 
 % \def\thesislayout{	% A4: 210 × 297
 % 	\geometry{
@@ -174,6 +175,9 @@ morekeywords={}
 
 \renewcommand{\headrulewidth}{0.3pt}
 \renewcommand{\footrulewidth}{0.3pt}
+
+% Apply the same footer to the plain page style (used by chapters)
+% (Moved to end of preamble)
 \setlength\parindent{0pt}
 %%%
 \setcounter{secnumdepth}{4}
@@ -203,6 +207,15 @@ morekeywords={}
 \titleformat{\chapter}[display]
 {\normalfont\huge\bfseries}{\chaptertitlename{} \thechapter}{15pt}{\Huge}
 \thesislayout
+
+% Redefine plain style for chapters and lists to have the footer
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[L]{\scriptsize  Báo cáo Đồ án chuyên ngành (CO4029) - HK1 2025 - 2026}
+  \fancyfoot[R]{\scriptsize  Trang {\thepage}/\pageref{LastPage}}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0.3pt}
+}
 
 \begin{document}
 
@@ -280,6 +293,7 @@ morekeywords={}
 {\Large TP. HỒ CHÍ MINH, 12/25 }
 \end{center}
 \end{titlepage}
+\setcounter{page}{2}
 %\thispagestyle{empty}
 \newpage
 %%%%%%%%%%%%%%%%%INTRO%%%%%%%%%%%%%%%%%%%
@@ -294,7 +308,7 @@ morekeywords={}
 \newpage
 \listoftables
 \newpage
-\setcounter{page}{1}
+% \setcounter{page}{1}
 
 %%%%%%%%%%%%%%%%%CONTENTS%%%%%%%%%%%%%%%%%%%
 \input{Contents/GioiThieu}
@@ -306,7 +320,7 @@ morekeywords={}
 
 \input{Contents/PhanTichHeThong}
 \newpage
-\input{Contents/DacTaChiTietCacUseCase}
+\input{Contents/ThietKeHeThong}
 \newpage
 % \input{Contents/PhanAI}
 % \newpage
