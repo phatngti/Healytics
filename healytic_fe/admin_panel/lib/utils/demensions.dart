@@ -143,6 +143,26 @@ class AppDimens {
 
   // --- Dimensions ---
   static const double sidebarWidth = 250.0;
+
+  // --- Text ---
+  static const double fontSizeSmall = 12.0;
+  static const double fontSizeMedium = 14.0;
+  static const double fontSizeLarge = 16.0;
+
+  static const double fontSizeExtraLarge = 18.0;
+  static const double fontSizeExtraExtraLarge = 20.0;
+  static const double fontSizeExtraExtraExtraLarge = 22.0;
+  static const double fontSizeExtraExtraExtraExtraLarge = 24.0;
+
+  static const FontWeight fontWeightLight = FontWeight.w300;
+  static const FontWeight fontWeightRegular = FontWeight.w400;
+  static const FontWeight fontWeightMedium = FontWeight.w500;
+  static const FontWeight fontWeightSemiBold = FontWeight.w600;
+  static const FontWeight fontWeightBold = FontWeight.w700;
+
+  static const double letterSpacingSmall = 0.5;
+  static const double letterSpacingMedium = 1.0;
+  static const double letterSpacingLarge = 1.5;
 }
 
 /// Extension methods on `num` (int and double) to easily create `SizedBox`,

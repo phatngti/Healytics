@@ -23,6 +23,7 @@ class AppTable extends StatefulWidget {
     this.actionButtons = false,
     required this.getTotalRows,
     required this.getData,
+    this.height,
   });
 
   final List<TableFunctionButtonWidget>? functionButtons;
@@ -36,6 +37,7 @@ class AppTable extends StatefulWidget {
   final bool actionButtons;
   final Future<int> Function() getTotalRows;
   final GetDataCallback getData;
+  final double? height;
 
   @override
   State<AppTable> createState() => _AppTableState();
@@ -43,10 +45,12 @@ class AppTable extends StatefulWidget {
 
 class _AppTableState extends State<AppTable> {
   final PaginatorController _controller = PaginatorController();
+  late int _rowsPerPage;
 
   @override
   void initState() {
     super.initState();
+    _rowsPerPage = widget.defaultRowsPerPage;
   }
 
   @override
@@ -57,6 +61,7 @@ class _AppTableState extends State<AppTable> {
 
   @override
   void dispose() {
+    _controller.dispose();
     super.dispose();
   }
 
@@ -82,106 +87,99 @@ class _AppTableState extends State<AppTable> {
       getData: widget.getData,
     );
 
-    return Stack(
-      alignment: Alignment.bottomCenter,
-      fit: StackFit.expand,
-      children: [
-        Container(
-          padding: AppDimens.paddingAllSmall,
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: AppDimens.radiusMedium,
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                blurRadius: 2,
-                offset: const Offset(0, 2),
-              ),
-            ],
+    return Container(
+      padding: AppDimens.paddingAllSmall,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onPrimary,
+        borderRadius: AppDimens.radiusLarge,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+            blurRadius: 10,
+            offset: const Offset(0, 0),
           ),
-          child: AsyncPaginatedDataTable2(
-            horizontalMargin: 20,
-            checkboxHorizontalMargin: 12,
-            columnSpacing: 0,
-            wrapInCard: false,
-            header: TableHeaderWidget(
-              functionButtons: widget.functionButtons,
-              onSearchChanged: widget.onSearchChanged,
-              buttons: widget.buttons,
-            ),
-            actions: widget.actions,
-            rowsPerPage: widget.defaultRowsPerPage,
-            availableRowsPerPage: [
-              widget.defaultRowsPerPage,
-              widget.defaultRowsPerPage * 2,
-              widget.defaultRowsPerPage * 3,
-              widget.defaultRowsPerPage * 4,
-            ],
-            // autoRowsToHeight: true,
-            minWidth: 800,
-            fit: FlexFit.loose,
-            border: TableBorder(
-              top: BorderSide(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant.withAlpha(20),
-              ),
-              bottom: BorderSide(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant.withAlpha(20),
-              ),
-              left: BorderSide(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant.withAlpha(20),
-              ),
-              right: BorderSide(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant.withAlpha(20),
-              ),
-              // verticalInside: BorderSide(color: Colors.grey[500]!),
-              horizontalInside: BorderSide(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant.withAlpha(20),
-              ),
-              borderRadius: AppDimens.radiusLarge,
-            ),
-            onRowsPerPageChanged: (value) {
-              // No need to wrap into setState, it will be called inside the widget
-              // and trigger rebuild
-              //setState(() {
-              print('Row per page changed to $value');
-              // _rowsPerPage = value!;
-              //});
-            },
-            onPageChanged: (rowIndex) {
-              print(rowIndex / widget.defaultRowsPerPage);
-            },
-            sortColumnIndex: widget.sortColumnIndex,
-            sortAscending: widget.sortAscending,
-            sortArrowIcon: Icons.keyboard_arrow_up,
-            sortArrowAnimationDuration: const Duration(milliseconds: 0),
-            onSelectAll: (select) => (),
-            controller: _controller,
-            hidePaginator: false,
-            columns: widget.columns,
-            empty: Center(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                child: const Text('No data'),
-              ),
-            ),
-            loading: _Loading(),
-            errorBuilder: (e) =>
-                _ErrorAndRetry(e.toString(), () => source.refreshDatasource()),
-            source: source,
+        ],
+      ),
+      child: AsyncPaginatedDataTable2(
+        horizontalMargin: 20,
+        checkboxHorizontalMargin: 12,
+        columnSpacing: 0,
+        wrapInCard: false,
+        header: TableHeaderWidget(
+          functionButtons: widget.functionButtons,
+          onSearchChanged: widget.onSearchChanged,
+          buttons: widget.buttons,
+        ),
+        actions: widget.actions,
+        rowsPerPage: _rowsPerPage,
+        availableRowsPerPage: {
+          _rowsPerPage,
+          widget.defaultRowsPerPage,
+          widget.defaultRowsPerPage * 2,
+          widget.defaultRowsPerPage * 3,
+          widget.defaultRowsPerPage * 4,
+        }.toList()..sort(),
+        // autoRowsToHeight: true,
+        minWidth: 800,
+        fit: FlexFit.tight,
+        border: TableBorder(
+          top: BorderSide(
+            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+          ),
+          bottom: BorderSide(
+            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+          ),
+          left: BorderSide(
+            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+          ),
+          right: BorderSide(
+            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+          ),
+          // verticalInside: BorderSide(color: Colors.grey[500]!),
+          horizontalInside: BorderSide(
+            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+          ),
+          borderRadius: AppDimens.radiusLarge,
+        ),
+        onRowsPerPageChanged: (value) {
+          if (value != null && value != _rowsPerPage) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _rowsPerPage = value;
+                  print('Row per page changed to $value');
+                });
+              }
+            });
+          }
+        },
+        onPageChanged: (rowIndex) {
+          print(rowIndex / widget.defaultRowsPerPage);
+        },
+        sortColumnIndex: widget.sortColumnIndex,
+        sortAscending: widget.sortAscending,
+        sortArrowIcon: Icons.keyboard_arrow_up,
+        sortArrowAnimationDuration: const Duration(milliseconds: 0),
+        onSelectAll: (select) => (),
+        controller: _controller,
+        hidePaginator: false,
+        columns: widget.columns,
+        empty: Center(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            child: const Text('No data'),
           ),
         ),
-      ],
+        loading: _Loading(),
+        errorBuilder: (e) =>
+            _ErrorAndRetry(e.toString(), () => source.refreshDatasource()),
+        source: source,
+      ),
     );
   }
 }

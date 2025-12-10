@@ -1,5 +1,5 @@
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
-import 'package:admin_panel/features/partner/products/presentation/product_edit/product_edit_desktop.dart';
+import 'package:admin_panel/features/partner/products/presentation/layouts/product_edit_desktop.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:admin_panel/router/routes.dart';
