@@ -29,7 +29,12 @@ class DesktopLayout extends StatelessWidget {
                   child: header,
                 ),
                 // Body
-                Expanded(child: body),
+                Expanded(
+                  child: Container(
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                    child: body,
+                  ),
+                ),
               ],
             ),
           ),

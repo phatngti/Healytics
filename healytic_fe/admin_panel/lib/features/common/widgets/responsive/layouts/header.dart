@@ -12,6 +12,7 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
     return SizedBox(
       width: double.infinity,
       child: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
         toolbarHeight: DeviceUtils.getAppBarHeight() * 0.8,
         leading: !DeviceUtils.isDesktopScreen(context)
             ? IconButton(
@@ -28,32 +29,35 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
           ),
           AppDimens.horizontalSmall,
           // Profile
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AvatarImage(name: "John Doe", radius: 14),
-              AppDimens.horizontalSmall,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "John Doe",
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
+          Padding(
+            padding: AppDimens.paddingHorizontalMedium,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AvatarImage(name: "John Doe", radius: 14),
+                AppDimens.horizontalSmall,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "John Doe",
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Admin',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(fontSize: 10),
-                  ),
-                ],
-              ),
-            ],
+                    Text(
+                      'Admin',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(fontSize: 10),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
