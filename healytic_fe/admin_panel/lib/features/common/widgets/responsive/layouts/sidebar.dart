@@ -19,6 +19,7 @@ class Sidebar extends StatelessWidget {
       shape: BeveledRectangleBorder(),
       child: Container(
         padding: AppDimens.paddingVerticalMedium,
+        color: Theme.of(context).colorScheme.onPrimary,
         child: SingleChildScrollView(
           child: Column(
             children: [

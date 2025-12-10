@@ -12,7 +12,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProductTable extends HookConsumerWidget {
-  const ProductTable({super.key});
+  const ProductTable({super.key, required this.height});
+  final double height;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,7 +35,8 @@ class ProductTable extends HookConsumerWidget {
               )
               .toList(),
     );
-    return Flexible(
+    return SizedBox(
+      height: height,
       child: AppTable(
         actionButtons: true,
         columns: columns.dataColumns(context),
