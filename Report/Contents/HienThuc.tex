@@ -1,0 +1,176 @@
+\chapter{Hiện thực}
+\section{Các công nghệ liên quan}
+
+\subsection{Mobile App Development (iOS/Android, Flutter)}
+\begin{itemize}
+    \item \textbf{Lý do chọn Flutter:} Là một framework đa nền tảng, cho phép phát triển ứng dụng cho cả iOS và Android từ một bộ mã nguồn duy nhất. Điều này giúp \textbf{tiết kiệm thời gian, chi phí} phát triển và bảo trì, đồng thời đảm bảo trải nghiệm người dùng nhất quán trên cả hai hệ điều hành. Hiệu năng của Flutter gần như tương đương với ứng dụng native.
+    \item \textbf{Kiến trúc:} Áp dụng kiến trúc Clean Architecture hoặc Riverpod Architecture để tách biệt rõ ràng các tầng logic (Data, Domain, Presentation), giúp mã nguồn dễ kiểm thử và bảo trì.
+    \item \textbf{Tính năng nổi bật}:
+    \begin{itemize}
+    \item \textbf{Impeller Rendering Engine}: Flutter biên dịch shader tùy chỉnh tại thời điểm build để đạt độ mượt 120Hz và không có JS bridge; React Native với New Architecture (Fabric + Skia) vẫn dùng cầu nối JS-to-native, bị giật khi animation nặng; Native (Metal/Vulkan) truy cập GPU trực tiếp nhưng cần tinh chỉnh riêng cho từng nền tảng.
+    
+    \item \textbf{Hot Reload Speed}: Flutter giữ trạng thái trong <100ms nhờ Dart AOT; React Native với Metro bundler reload trong ~1s nhưng mất trạng thái ở module native phức tạp; Native không có hot reload thật sự—rebuild toàn bộ mất 10s+ trong Xcode/Android Studio.
+    
+    \item \textbf{Widget/Component System}: Mô hình ``mọi thứ là widget'' của Flutter cho phép kết hợp vô hạn và UI chính xác đến từng pixel chỉ trong một ngôn ngữ (Dart); React Native dùng JSX cần thư viện bên thứ ba cho style nâng cao, dễ bất đồng bộ; Native (SwiftUI/Compose) kiểm soát hoàn toàn nhưng phải viết lại code cho iOS/Android.
+    
+    \item \textbf{Startup Time \& App Size}: Flutter khởi động lạnh <50ms nhờ AOT nhưng bundle engine ~50MB; React Native khởi động ~100ms với JS bundle, kích thước cơ bản nhỏ hơn (~30MB); Native khởi động nhanh nhất (<30ms) không có runtime nhúng.
+    
+    \item \textbf{Platform Channel/Bridge}: Kênh đồng bộ/bất đồng bộ của Flutter tích hợp API native (camera, BLE) với Dart an toàn kiểu; TurboModules của React Native giảm overhead cầu nối nhưng vẫn chỉ bất đồng bộ, khó debug; Native truy cập phần cứng trực tiếp qua SDK, độ trễ bằng 0.
+    
+    \item \textbf{Multi-Platform Code Reuse}: Flutter biên dịch thành binary native cho iOS, Android, web, desktop và nhúng với tỷ lệ tái sử dụng 90\%+; React Native mạnh trên mobile, cần React Native Web/Electron cho các nền khác (~70\% tái sử dụng); Native yêu cầu codebase Swift/Kotlin riêng, tái sử dụng <30\%.
+    
+    \item \textbf{Animation Performance}: Impeller + canvas 120Hz của Flutter cho 0 khung hình bị bỏ trong chuyển cảnh phức tạp; React Native ổn định ~60fps nhưng giật khi JS thread nặng; Native đảm bảo 120Hz với Core Animation/Compose, tốt nhất cho game.
+    
+    \item \textbf{OTA Updates}: Flutter dùng Shorebird/CodeMagic để vá lỗi tức thì không qua store; React Native dùng CodePush đẩy cập nhật JS trực tiếp; Native phải qua App Store/Google Play, chờ duyệt 1--7 ngày.
+    
+    \item \textbf{Ecosystem \& Third-Party Libs}: pub.dev của Flutter phát triển nhanh nhưng thiếu plugin niche, thường cần viết channel tùy chỉnh; React Native tận dụng npm với 2M+ package, hệ sinh thái phong phú nhất; Native dùng CocoaPods/Gradle chính thức, ổn định nhất nhưng bị khóa nền tảng.
+\end{itemize}
+\end{itemize}
+
+
+\subsection{Web/Portal Development (Partner Portal, Admin Dashboard)}
+\begin{itemize}
+    \item \textbf{Lý do chọn Next.js:} Là một framework React hàng đầu, cung cấp hiệu năng vượt trội nhờ các cơ chế render linh hoạt (Server-Side Rendering - SSR, Static Site Generation - SSG). Điều này rất quan trọng cho trang Blog/CMS để tối ưu SEO. Việc phát triển Partner Portal và Admin Dashboard với nhiều biểu đồ, bảng biểu cũng được React hỗ trợ rất tốt.
+    \item \textbf{Tính năng nổi bật}:
+    \begin{itemize}
+    \item \textbf{Server-Side Rendering (SSR) \& Static Site Generation (SSG)}: Next.js vượt trội với SSR/SSG/ISR kết hợp, tối ưu SEO và thời gian tải (<2s FCP); React cần cấu hình thủ công qua công cụ bên thứ ba như Remix, thiếu tối ưu tích hợp; Nuxt.js (Vue) tương đương với engine Nitro, khởi động lạnh ~2ms; Angular cần thư viện bổ sung cho SSR, hydration chậm; Gatsby tập trung SSG nhưng rebuild toàn site khi cập nhật, kém linh hoạt cho ứng dụng động.
+    
+    \item \textbf{React Server Components (RSC)}: Next.js tích hợp RSC nguyên bản trong App Router để xử lý logic chỉ server, giảm 50\%+ kích thước bundle và hỗ trợ streaming UI; React hỗ trợ RSC thử nghiệm nhưng thiếu khung kết nối; Remix dùng loader lồng nhau cho server fetching tương tự nhưng không phải RSC thật; Nuxt thiếu tương đương RSC, dựa vào Composition API của Vue; Angular mô phỏng qua zoneless detection nhưng gắn với MVC, kém chi tiết.
+    
+    \item \textbf{Turbopack Bundler}: Next.js dùng Turbopack (Rust) ở v15 cho HMR nhanh gấp 700 lần Webpack, ổn định dev/prod; React/Webpack chậm ~10s rebuild; Vite của Nuxt nhanh (~1s) nhưng kém tối ưu với app quy mô React lớn; Gatsby/Webpack chậm nhất cho build tăng dần; esbuild của Angular CLI nhanh nhưng thiếu edge caching như Turbopack.
+    
+    \item \textbf{App Directory \& Routing}: App Router của Next.js dùng file-based routing, hỗ trợ layout lồng nhau, route song song, interceptors mà không cần config; React Router cần thiết lập thủ công, dễ dư thừa code; Nuxt tự động routing tương tự nhưng chỉ dành cho Vue; Angular dùng module lazy-load có cấu trúc nhưng cứng nhắc, chậm với SPA; routing GraphQL của Gatsby mạnh cho static nhưng yếu với param động.
+    
+    \item \textbf{Server Actions}: Ổn định trong Next.js 15 cho mutation client-to-server trực tiếp không cần API, tăng bảo mật/hiệu suất; React không có sẵn, phải dùng custom hook; Remix cung cấp actions/loaders xử lý form nhưng dài dòng; Nuxt dùng composables tương tự nhưng kém liền mạch; Angular dùng services + NgRx để đồng bộ state, overhead nặng.
+    
+    \item \textbf{SEO \& Metadata Handling}: generateMetadata API của Next.js tự động xử lý OG tag/sitemap động, tăng 40\%+ khả năng crawl; React cần next/head hoặc React Helmet, thủ công từng trang; useHead của Nuxt tương đương, thân thiện Vue; Angular dùng Title/Meta services nhưng thiếu streaming; plugin Gatsby tối ưu SEO static nhưng khó với SEO động.
+    
+    \item \textbf{Performance \& Core Web Vitals}: Next.js đạt 90+ điểm Lighthouse nhờ ISR/edge caching, cải thiện 50--70\% FCP; React CSR thường 70--80 nếu không tinh chỉnh; Vapor Mode của Nuxt loại bỏ VDOM overhead, hiệu suất tương đương; Angular hiệu quả với doanh nghiệp nhưng hydration chậm; Gatsby xuất sắc static (giảm 95\% JS) nhưng thời gian rebuild ảnh hưởng CI/CD.
+    
+    \item \textbf{TypeScript Integration}: Next.js hỗ trợ TS zero-config với App Router suy luận kiểu, mượt mà cho codebase lớn; React TS tốt nhưng cần Create React App setup; Nuxt tự sinh type qua module; Angular là TS-first với kiểm tra nghiêm ngặt, nhưng đường cong học cao; hỗ trợ TS của Gatsby dựa plugin, không đồng nhất.
+    
+    \item \textbf{Ecosystem \& Deployment}: Next.js tận dụng 2M+ package npm + Vercel triển khai edge (zero-cold-start); hệ sinh thái React rộng nhưng phân mảnh; Nuxt có hệ sinh thái Vue gắn kết (Nuxt Hub/UI); Angular tập trung doanh nghiệp (Ivy compiler); Gatsby giàu plugin CMS nhưng phụ thuộc Vercel ít hơn Next.js.
+    
+    \item \textbf{Developer Experience (DX)}: Fast Refresh + Turbopack của Next.js giảm thời gian lặp lại xuống <1s, có AI SDK hỗ trợ prototype nhanh; HMR của React tốt nhưng thiếu routing/tối ưu tích hợp; module preset của Nuxt tăng tốc khởi tạo; Angular CLI scaffold nhanh nhưng cứng nhắc; Remix nhấn mạnh forms/actions cho DX thương mại điện tử.
+\end{itemize}
+\end{itemize}
+
+\subsection{Server/Backend (NestJS \& PostgreSQL)}
+\begin{itemize}
+    \item \textbf{Lý do chọn NestJS:} Được xây dựng trên nền tảng NodeJS và TypeScript, NestJS cung cấp một kiến trúc module hóa, có cấu trúc chặt chẽ (lấy cảm hứng từ Angular). Điều này giúp việc xây dựng các API phức tạp trở nên \textbf{dễ quản lý, bảo trì và mở rộng}. TypeScript cũng giúp giảm thiểu lỗi và tăng cường tính an toàn của mã nguồn.
+    \item \textbf{Database: PostgreSQL} là lựa chọn phù hợp nhất. PostgreSQL là hệ quản trị CSDL quan hệ mạnh mẽ, ổn định, có khả năng xử lý các truy vấn phức tạp và lượng dữ liệu lớn. Các tính năng như hỗ trợ JSONB rất hữu ích để lưu các dữ liệu có cấu trúc linh hoạt (ví dụ: cấu hình dịch vụ, câu hỏi cá nhân hóa).
+    \item \textbf{Tính năng nổi bật:}
+    \begin{itemize}
+    \item \textbf{Modular Architecture}: NestJS áp dụng cấu trúc module tính năng với @Module() để tách biệt rõ ràng, lý tưởng cho ứng dụng doanh nghiệp; Express thiếu module tích hợp, dễ dẫn đến code rối; Spring Boot có module bằng annotation nhưng dài dòng với Java; Django dùng app-based module kiểu Python, đầy đủ tính năng nhưng kém linh hoạt với hệ sinh thái JS; Fastify nhẹ, không có module gốc, cần tổ chức thủ công.
+
+    \item \textbf{Dependency Injection (DI)}: NestJS cung cấp DI phân cấp, an toàn kiểu qua @Injectable() và providers, giảm boilerplate và tăng khả năng test; Express không có DI sẵn, phải dùng thư viện như Inversify; Spring Boot với @Autowired là tiên phong nhưng nặng với cấu hình XML; Django truyền service thủ công, không có container DI thật; Fastify hỗ trợ plugin nhưng thiếu DI cấp framework.
+
+    \item \textbf{TypeScript-First Design}: NestJS được xây dựng hoàn toàn cho TypeScript với suy luận kiểu và decorator, phát hiện lỗi tại compile-time; Express hỗ trợ TS qua add-on nhưng vẫn JS-centric; Spring Boot dùng kiểu tĩnh Java, cứng nhắc hơn TS; Django là Python động, type hints chỉ là bổ sung; Fastify có type TS nhưng tích hợp không sâu, dễ lỗi runtime.
+
+    \item \textbf{Decorators \& Metadata}: NestJS dùng @Controller(), @Get(), @Body() để định nghĩa route và validation khai báo, lấy cảm hứng từ Angular; Express dùng hàm/middleware thuần, dài dòng; Spring Boot với @RestController/@RequestMapping tương tự nhưng cú pháp Java; Django dùng class-based hoặc function view, không có decorator; Fastify dùng schema route, ít metadata.
+
+    \item \textbf{Built-in Testing Support}: NestJS tích hợp @nestjs/testing cho test e2e/unit với mock và override DI sẵn; Express cần setup Jest/Supertest thủ công; Spring Boot với @SpringBootTest toàn diện nhưng khởi động JVM chậm; Django có TestCase tích hợp nhưng chỉ cho Python; Fastify test dựa plugin, nhẹ nhưng thiếu cấu trúc như Nest.
+
+    \item \textbf{Microservices \& Event-Driven}: NestJS hỗ trợ microservices nguyên bản qua @nestjs/microservices với TCP, Redis, Kafka, hybrid; Express cần setup thủ công; Spring Boot với Spring Cloud mạnh cho doanh nghiệp nhưng phức tạp; Django dùng Celery cho task, không phải microservices đầy đủ; Fastify tập trung HTTP, hạn chế về async messaging.
+
+    \item \textbf{Performance \& Adapter Flexibility}: NestJS với Fastify adapter đạt 30k+ req/s (gấp 2 Express), bộ nhớ thấp (~15\% so Express, 1/5 Spring); Express nhanh cho app nhỏ nhưng nghẽn khi scale; Spring Boot tối ưu JVM cho tải nặng nhưng latency/bộ nhớ cao; Django bị giới hạn GIL về concurrency, chậm hơn Node; Fastify đạt 33k req/s nhưng Nest thêm ~8\% overhead để có cấu trúc.
+
+    \item \textbf{Validation \& Pipes}: NestJS dùng class-validator với pipes @nestjs/class-transformer để tự động validate DTO khai báo; Express dùng Joi/express-validator thủ công; Spring Boot với @Valid và Bean Validation tương tự nhưng dùng Java bean; Django xử lý validation qua forms/serializers; Fastify schema hiệu suất cao nhưng tích hợp kém.
+
+    \item \textbf{Guards, Interceptors \& Pipes}: NestJS hỗ trợ tính năng AOP qua @UseGuards, @UseInterceptors cho auth/logging/biến đổi; Express dùng middleware chain tương tự nhưng toàn cục; Spring Boot có AOP/Interceptors mạnh cho doanh nghiệp; Django middleware tuyến tính, kém chi tiết; Fastify dùng hook nhanh nhưng chỉ hook, không có guard.
+
+    \item \textbf{Ecosystem \& Community}: NestJS tận dụng 2M+ package npm với 60k+ sao GitHub, tài liệu/plugin phát triển mạnh; Express có hệ sinh thái rộng nhưng không cấu trúc; Spring Boot trưởng thành cho doanh nghiệp (Maven/Gradle); Django mạnh về data/ML với PyPI; Fastify cộng đồng nhỏ hơn nhưng plugin hiệu suất cao.
+\end{itemize}
+\end{itemize}
+
+\subsection{Machine Learning \& Natural Language Processing (Chatbot AI)}
+
+Machine Learning (ML) và Natural Language Processing (NLP) là hai thành phần cốt lõi trong việc xây dựng hệ thống Chatbot AI. 
+
+\subsubsection{Machine Learning trong Chatbot}
+ML cho phép hệ thống học từ dữ liệu hội thoại lịch sử để cải thiện khả năng trả lời. Các kỹ thuật học máy như \textit{Supervised Learning}, \textit{Unsupervised Learning} và \textit{Deep Learning} thường được áp dụng để:
+\begin{itemize}
+    \item Phân loại ý định (Intent Classification) từ câu hỏi người dùng.
+    \item Nhận diện thực thể (Entity Recognition) để trích xuất thông tin quan trọng (tên dịch vụ, thời gian, địa điểm).
+    \item Dự đoán phản hồi phù hợp dựa trên ngữ cảnh hội thoại.
+\end{itemize}
+
+\subsubsection{Natural Language Processing (NLP)}
+NLP giúp chatbot hiểu và xử lý ngôn ngữ tự nhiên của người dùng. Các kỹ thuật phổ biến:
+\begin{itemize}
+    \item \textbf{Tokenization}: Tách văn bản thành các từ hoặc cụm từ.
+    \item \textbf{Word Embedding}: Biểu diễn ngữ nghĩa từ bằng vector (Word2Vec, GloVe, BERT).
+    \item \textbf{Sequence Modeling}: Sử dụng RNN, LSTM, Transformer để xử lý ngữ cảnh dài.
+\end{itemize}
+
+\subsubsection{Ứng dụng trong hệ thống}
+Trong đồ án này, NLP được dùng để xây dựng Chatbot AI hỗ trợ:
+\begin{itemize}
+    \item Tư vấn dịch vụ chăm sóc sức khỏe \& sắc đẹp.
+    \item Hướng dẫn đặt lịch và thanh toán.
+    \item Trả lời tự động các câu hỏi thường gặp.
+\end{itemize}
+
+
+\subsection{Recommender Systems \& Personalization}
+
+Hệ thống gợi ý (Recommender System) đóng vai trò quan trọng trong việc cá nhân hóa trải nghiệm người dùng. 
+
+\subsubsection{Các phương pháp gợi ý}
+\begin{itemize}
+    \item \textbf{Content-based Filtering}: Gợi ý dựa trên đặc trưng dịch vụ mà người dùng đã chọn trước đó.
+    \item \textbf{Collaborative Filtering}: Dựa vào hành vi của những người dùng tương tự (User-based hoặc Item-based).
+    \item \textbf{Hybrid Approach}: Kết hợp cả hai phương pháp để tăng độ chính xác.
+\end{itemize}
+
+\subsubsection{Kỹ thuật cá nhân hóa}
+\begin{itemize}
+    \item Phân cụm người dùng dựa trên hành vi sử dụng dịch vụ.
+    \item Xây dựng hồ sơ người dùng (User Profile) từ lịch sử booking, lượt đánh giá.
+    \item Sử dụng mô hình học sâu (Deep Learning) để dự đoán nhu cầu tiềm năng.
+\end{itemize}
+
+\subsubsection{Ứng dụng trong hệ thống}
+Trong đồ án, hệ thống gợi ý được dùng để:
+\begin{itemize}
+    \item Đề xuất dịch vụ phù hợp cho từng người dùng.
+    \item Cá nhân hóa thông báo và khuyến mãi.
+    \item Dự đoán xu hướng nhu cầu theo mùa hoặc thời điểm.
+\end{itemize}
+
+
+\subsection{Data Analytics \& Dashboard Visualization}
+
+Phân tích dữ liệu (Data Analytics) và trực quan hóa dashboard (Dashboard Visualization) là công cụ giúp quản trị viên và đối tác nắm bắt hiệu quả kinh doanh và chất lượng dịch vụ.
+
+\subsubsection{Data Analytics}
+Data Analytics bao gồm các bước:
+\begin{itemize}
+    \item Thu thập và tiền xử lý dữ liệu từ lịch sử booking, đánh giá người dùng.
+    \item Phân tích mô tả (Descriptive Analytics): Xác định dịch vụ được sử dụng nhiều nhất, khung giờ cao điểm.
+    \item Phân tích dự báo (Predictive Analytics): Dự đoán xu hướng sử dụng dịch vụ trong tương lai.
+\end{itemize}
+
+\subsubsection{Dashboard Visualization}
+Dashboard giúp hiển thị thông tin dưới dạng đồ thị, biểu đồ và bảng số liệu:
+\begin{itemize}
+    \item Biểu đồ đường (Line chart) theo dõi số lượng booking theo thời gian.
+    \item Biểu đồ tròn (Pie chart) phân tích tỷ lệ các loại dịch vụ.
+    \item KPI tổng hợp: Doanh thu, mức độ hài lòng, hiệu quả AI gợi ý.
+\end{itemize}
+
+\subsubsection{Ứng dụng trong hệ thống}
+\begin{itemize}
+    \item Đối tác (Partner) có thể theo dõi tình hình dịch vụ và nhân sự.
+    \item Admin có cái nhìn tổng quan để đưa ra quyết định chiến lược.
+    \item Người dùng gián tiếp hưởng lợi từ dịch vụ được tối ưu.
+\end{itemize}
+
+\subsection{Kiến trúc hiện thực}
+
+\section{Phần Software – Triển khai ứng dụng}
+\subsection{User Mobile App}
+\subsection{Partner Portal (Web/App)}
+\subsection{Admin Dashboard (Web)}
+\subsection{Tích hợp AI với hệ thống ứng dụng}
+\subsection{Bảo mật và quản lý dữ liệu}
