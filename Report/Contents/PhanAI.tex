@@ -1,0 +1,326 @@
+\section{Phần AI – Thiết kế \& Triển khai}
+\subsection{Thu thập và tiền xử lý dữ liệu}
+\begin{itemize}
+    \item Lịch sử booking và hành vi người dùng
+    \item Dữ liệu đánh giá \& phản hồi
+    \item Chuẩn hóa và lưu trữ dữ liệu
+\end{itemize}
+\subsection{NLP Chatbot AI}
+
+\subsubsection{Tổng quan}
+Hệ thống NLP Chatbot AI được thiết kế nhằm xây dựng một trợ lý hội thoại thông minh có khả năng hiểu ngữ cảnh chuyên biệt theo từng miền (domain-specific) và luôn được cập nhật dữ liệu mới thông qua cơ chế \textbf{Retrieval-Augmented Generation (RAG)}.  
+Mục tiêu chính là giúp mô hình vừa hiểu cách giao tiếp chuyên nghiệp (qua \textbf{fine-tuning}) vừa phản hồi theo thông tin thực tế mới nhất (qua \textbf{RAG}).
+
+\subsubsection{Các bước chính}
+\begin{itemize}
+    \item \textbf{Fine-tuning:} Tạo nền tảng ngữ cảnh cho mô hình. Ví dụ: giúp mô hình hiểu rằng “BP” = “Blood Pressure” và biết cách phản hồi theo phong cách chuyên nghiệp.
+    \item \textbf{RAG:} Cho phép mô hình luôn truy xuất dữ liệu mới, đảm bảo câu trả lời cập nhật và chính xác.
+\end{itemize}
+
+\subsubsection{Luồng dữ liệu chính (Data Flow)}
+
+\noindent
+\textbf{Luồng xử lý tổng thể:}
+
+\begin{verbatim}
+User hỏi
+   ↓
+LangChain (PromptManager / Agent – định dạng lại prompt, chèn ngữ cảnh, lưu memory)
+   ├──► RAG Retriever (FAISS / Chroma)
+   │        ↓
+   │     Embedding Model (encode query)
+   │        ↓
+   │     Vector DB (FAISS / Chroma)
+   │        ↓
+   │     Context A (kiến thức tĩnh)
+   │
+   └──► Database Tool (SQL / API)
+            ↓
+         Context B (dữ liệu động: đơn hàng, voucher, lịch, v.v.)
+   ↓
+Context Builder
+   - Gộp Context A + Context B + câu hỏi
+   ↓
+LLM (LLaMa / Mistral)
+   ↓
+LangChain Output Parser
+   - Chuẩn hóa format
+   ↓
+UI
+\end{verbatim}
+
+\subsubsection{Công nghệ và thành phần chính}
+\begin{itemize}
+    \item \textbf{PEFT (Parameter Efficient Fine-tuning):} Tổng hợp các phương pháp fine-tuning hiệu quả; trong đó \textbf{LoRA} là kỹ thuật phổ biến và hiệu quả nhất.
+    \item \textbf{Hugging Face:} Nền tảng để tải model và thực hiện fine-tuning bằng LoRA.
+    \item \textbf{LangChain:} Dùng để xây dựng pipeline hội thoại hoàn chỉnh:
+    \begin{itemize}
+        \item Tạo prompt động dựa trên câu hỏi người dùng.
+        \item Gọi model (qua API hoặc local).
+        \item Tích hợp công cụ: Database, RAG, truy xuất web.
+        \item Quản lý hội thoại nhiều lượt (multi-turn).
+        \item Tạo Agent reasoning tự động.
+    \end{itemize}
+\end{itemize}
+
+
+\subsubsection{Pipeline RAG chi tiết}
+Quy trình RAG bao gồm các bước sau:
+\begin{enumerate}[label=\textbf{(\alph*)}, leftmargin=2cm, itemsep=4pt]
+\item \textbf{Thu thập dữ liệu:} Bao gồm text, PDF, FAQ, transcript, blog, v.v.
+\item \textbf{Tiền xử lý:} Làm sạch HTML, loại bỏ quảng cáo, chuẩn hoá tiếng Việt (có dấu), tách câu.
+\item \textbf{Chunking:} Chia đoạn văn thành các phần nhỏ (200--500 tokens), thường sử dụng hàm \texttt{RecursiveCharacterTextSplitter} trong LangChain.
+\item \textbf{Embedding:} Mã hoá từng đoạn bằng các mô hình embedding như \texttt{text-embedding-3-small} (OpenAI) hoặc \texttt{BAAI/bge-m3} (open source).
+\item \textbf{Lưu trữ:} Lưu vector vào cơ sở dữ liệu tìm kiếm như \texttt{FAISS}, \texttt{Chroma} hoặc \texttt{Milvus}.
+\item \textbf{Truy xuất:} Khi người dùng đặt câu hỏi, hệ thống sẽ mã hoá câu hỏi thành vector, tìm kiếm các đoạn có độ tương đồng cao nhất bằng \textbf{cosine similarity} hoặc thuật toán \textbf{MMR (Maximal Marginal Relevance)}.
+\end{enumerate}
+
+
+\subsubsection{Đánh giá hiệu năng (Evaluation)}
+\begin{itemize}
+    \item \textbf{Độ chính xác câu trả lời.}
+    \item \textbf{Mức độ tự nhiên và tỷ lệ hallucination.}
+    \item \textbf{Thời gian phản hồi (response time).}
+\end{itemize}
+
+\subsubsection{Quản lý phiên bản (Version Management)}
+\begin{itemize}
+    \item Tách riêng dữ liệu RAG (kiến thức cập nhật) và dữ liệu fine-tune (hiểu ngữ cảnh).  
+    \item Ghi version rõ ràng: \texttt{rag\_v1}, \texttt{finetune\_v1}, \texttt{data\_2025\_10.json}.  
+    \item Lưu trữ và quản lý bằng Git / DVC để dễ dàng rollback.  
+\end{itemize}
+
+\subsubsection{Cấu trúc dữ liệu huấn luyện (Fine-tuning)}
+Chỉ áp dụng khi thực hiện fine-tuning, không cần cho RAG.
+
+\noindent
+\textbf{Trường hợp 1 — Câu hỏi đơn giản:}
+\begin{verbatim}
+{
+ "instruction": "Khách hỏi: Tôi bị mụn ẩn thì nên chăm sóc thế nào?",
+ "input": "",
+ "output": "Bạn nên làm sạch sâu 2 lần mỗi ngày và dùng serum chứa BHA.
+ Nếu mụn nhiều, nên chọn liệu trình Detox Skin tại spa."
+}
+\end{verbatim}
+
+\noindent
+\textbf{Trường hợp 2 — Câu hỏi có thông tin phụ (input):}
+\begin{verbatim}
+{
+ "instruction": "Khách gửi thông tin da và muốn được tư vấn.",
+ "input": "Da dầu, mụn cám, thường làm việc văn phòng, ít ra nắng.",
+ "output": "Bạn nên chọn liệu trình kiểm soát dầu, tẩy da chết nhẹ 2 lần/tuần
+ và đắp mặt nạ than hoạt tính để giảm bít tắc lỗ chân lông."
+}
+\end{verbatim}
+
+\noindent
+
+\subsubsection{So sánh mô hình}
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|p{3cm}|p{6cm}|p{6cm}|}
+\hline
+\textbf{Model} & \textbf{Ưu điểm} & \textbf{Hạn chế} \\
+\hline
+\textbf{Mistral-7B} &
+\begin{itemize}[leftmargin=*]
+    \item Nhẹ, tốc độ suy luận nhanh.
+    \item Mở nguồn, dễ triển khai và tích hợp.
+    \item Cộng đồng hỗ trợ mạnh, có nhiều tài nguyên tinh chỉnh.
+\end{itemize}
+&
+\begin{itemize}[leftmargin=*]
+    \item Hiệu năng giảm khi xử lý context dài.
+    \item Chưa tối ưu cho tiếng Việt (thiếu dữ liệu huấn luyện ngôn ngữ địa phương).
+    \item Độ chính xác thấp hơn so với các mô hình lớn hơn.
+\end{itemize}
+\\
+\hline
+\textbf{LLaMA-3 (7B–13B)} &
+\begin{itemize}[leftmargin=*]
+    \item Hiệu năng cao trong tiếng Anh và đa ngôn ngữ chính.
+    \item Tài liệu, quyền truy cập và công cụ hỗ trợ mạnh.
+    \item Dễ fine-tune cho nhiều tác vụ khác nhau.
+\end{itemize}
+&
+\begin{itemize}[leftmargin=*]
+    \item Yêu cầu phần cứng mạnh (VRAM lớn, GPU nhiều).
+    \item Cồng kềnh, khó triển khai trong môi trường hạn chế.
+    \item Hạn chế trong tiếng Việt, dễ sinh lỗi ngữ nghĩa.
+\end{itemize}
+\\
+\hline
+\textbf{PhoGPT-4B-Chat} &
+\begin{itemize}[leftmargin=*]
+    \item Tối ưu cho tiếng Việt, phản hồi tự nhiên trong hội thoại.
+    \item Nhẹ hơn các mô hình quốc tế, dễ deploy.
+    \item Phù hợp ứng dụng dịch vụ công, chăm sóc khách hàng.
+\end{itemize}
+&
+\begin{itemize}[leftmargin=*]
+    \item Hiệu năng tiếng Anh chưa cao, đặc biệt trong ngữ cảnh chuyên sâu.
+    \item Cộng đồng/tài liệu hỗ trợ còn hạn chế.
+    \item Chưa ổn định khi xử lý context rất dài.
+\end{itemize}
+\\
+\hline
+\end{tabular}
+\end{center}
+
+
+
+\subsubsection{Định hướng và triển khai}
+\begin{itemize}
+    \item Sử dụng LangChain + RAG để tạo bản demo ổn định, kiểm tra độ chính xác.  
+    \item Thu thập dữ liệu hội thoại thực tế theo domain.  
+    \item Fine-tune bằng LLaMA + LoRA.  
+    \item Tối ưu hóa pipeline cho inference và deployment.  
+\end{itemize}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Hệ thống gợi ý dịch vụ cá nhân hóa}
+
+Hệ thống gợi ý dịch vụ cá nhân hoá được xây dựng nhằm cung cấp cho người dùng các đề xuất chính xác, phù hợp với nhu cầu sức khỏe và điều kiện cá nhân. Mục tiêu của hệ thống là xử lý nhiều loại dữ liệu khác nhau (textual, categorical, numerical), chuẩn hóa chúng về một không gian biểu diễn thống nhất, sau đó sử dụng mô hình tìm kiếm vector (FAISS) để truy xuất các dịch vụ tương tự nhất.
+
+\subsubsection{Chiến lược trích xuất và chuẩn hóa đặc trưng (Feature Engineering)}
+
+Để đảm bảo khả năng hiểu ngữ nghĩa và so khớp nhu cầu của người dùng với dịch vụ, hệ thống tiến hành tách riêng từng loại dữ liệu theo pipeline như sau:
+
+\paragraph{Textual Features} \\
+Các đặc trưng dạng văn bản mang tính mô tả ngữ nghĩa sâu. Chúng được embedding trực tiếp bằng mô hình ngôn ngữ (BERT hoặc các biến thể tối ưu hơn cho lĩnh vực y tế). Các trường dữ liệu bao gồm: \\
+\begin{itemize}
+    \item \textbf{Name / Title}: tên dịch vụ, sản phẩm.
+    \item \textbf{Description / Details}: mô tả chi tiết, lợi ích, hướng dẫn sử dụng, quy trình thăm khám.
+    \item \textbf{Category / Type}: phân loại dịch vụ (y tế, dinh dưỡng, luyện tập thể thao, tư vấn tâm lý, \ldots).
+    \item \textbf{Tags / Keywords}: từ khóa đặc trưng như ``tim mạch'', ``yoga'', ``tư vấn online'', ``phục hồi chức năng'', \ldots
+\end{itemize}
+
+Các trường này sau khi embed bằng BERT sẽ thu được vector ngữ nghĩa có chiều cố định (thường từ 384 đến 768 chiều).
+
+\paragraph{Categorical Features} \\
+Các đặc trưng dạng phân loại được ánh xạ bằng One-hot Encoding hoặc Embedding học được. Các trường phổ biến:
+\begin{itemize}
+    \item \textbf{Region / Location}: khu vực cung cấp dịch vụ.
+    \item \textbf{Provider Type}: loại nhà cung cấp (bác sĩ, bệnh viện, phòng khám, trung tâm dinh dưỡng, nền tảng online).
+\end{itemize}
+
+Sau Encoder, vector categorical được nối trực tiếp (concatenate) với vector embedding từ phần text.
+
+\paragraph{Numerical / Scalar Features} \\
+Các đặc trưng dạng số được chuẩn hóa về miền \([0, 1]\). Một số thuộc tính cần chuẩn hóa ngược nhằm phản ánh ưu tiên của người dùng:
+\begin{itemize}
+    \item \textbf{Rating}: điểm đánh giá dịch vụ (scale trực tiếp).
+    \item \textbf{Cost}: chi phí dịch vụ. Giá trị này được chuẩn hóa rồi áp dụng công thức $1 - normalized\_value$ để giảm ưu tiên cho chi phí cao.
+    \item \textbf{Popularity / User Count}: số lượng người đã dùng hoặc chọn dịch vụ.
+    \item \textbf{Availability Score}: mức độ sẵn sàng (đặc biệt với các dịch vụ online có slot theo giờ).
+\end{itemize}
+
+Tất cả numeric features sau khi scale được ghép vào vector tổng.
+
+\subsubsection{Xây dựng Query Vector}
+
+Để đảm bảo hệ thống gợi ý phù hợp cho cả trang chủ và chatbot, pipeline query được thiết kế linh hoạt:
+
+\paragraph{Query Trang Chủ (Home Recommender)} \\
+
+Query được xây từ:
+\begin{itemize}
+    \item \textbf{User Profile}: lịch sử thói quen, hồ sơ sức khỏe.
+    \item \textbf{Các dịch vụ đã chọn}: tăng mức độ cá nhân hóa.
+    \item \textbf{Global Trend}: xu hướng sử dụng dịch vụ chung của toàn hệ thống.
+\end{itemize}
+
+\paragraph{Query Chatbot} \\
+Người dùng nhập một câu tự nhiên, hệ thống sẽ:
+\begin{enumerate}
+    \item \textbf{Trích xuất thực thể (Extract Entity)} bằng NER hoặc Regex đã tinh chỉnh trên tập dữ liệu y tế nhỏ.
+    \item \textbf{Phân loại thực thể}: Text / Categorical / Numerical.
+    \item \textbf{Mã hóa (Encode)}: BERT cho text, One-hot/Embedding cho categorical, scaling cho numerical.
+    \item \textbf{Ghép thành Query Vector}.
+\end{enumerate}
+
+\subsubsection{Pipeline tổng thể hệ thống gợi ý}
+
+Quy trình hoàn chỉnh từ input người dùng đến kết quả truy xuất như sau:
+
+\begin{enumerate}
+    \item \textbf{Extract Entity}:
+    \begin{itemize}
+        \item Dùng NER hoặc Regex để tách các thực thể quan trọng.
+    \end{itemize}
+
+    \item \textbf{Phân loại thực thể theo loại dữ liệu}:
+    \begin{itemize}
+        \item Textual (ví dụ: triệu chứng, bệnh lý, mô tả nhu cầu).
+        \item Categorical (provider type, khu vực).
+        \item Numerical (chi phí, số lượng, rating).
+    \end{itemize}
+
+    \item \textbf{Encode từng loại đặc trưng}:
+    \begin{itemize}
+        \item Text → BERT embedding.
+        \item Categorical → One-hot / Embedding.
+        \item Numerical → Normalize.
+    \end{itemize}
+
+    \item \textbf{Concat}: tạo vector biểu diễn thống nhất.
+
+    \item \textbf{FAISS Search}: tìm các dịch vụ có vector gần nhất trong không gian embedding.
+\end{enumerate}
+
+\subsubsection{Ví dụ minh hoạ pipeline}
+
+\textbf{Query người dùng:} ``Tư vấn online về thoái hoá đốt sống cổ, giá 1 triệu''
+
+\begin{itemize}
+    \item \textbf{Extract Entity} (NER/Regex):
+    \begin{itemize}
+        \item ``online'' → Provider Type
+        \item ``thoái hoá đốt sống cổ'' → Medical Condition (Textual)
+        \item ``1 triệu'' → Cost (Numerical)
+    \end{itemize}
+
+    \item \textbf{Mapping / Classification}:
+    \begin{itemize}
+        \item Provider Type → Categorical
+        \item Condition → Text
+        \item Money → Numerical
+    \end{itemize}
+
+    \item \textbf{Encoding}:
+    \begin{itemize}
+        \item Text → BERT
+        \item Categorical → One-hot
+        \item Numerical → Normalize
+    \end{itemize}
+
+    \item \textbf{Concat} → Query Vector → FAISS Retrieval.
+\end{itemize}
+
+Hệ thống từ đó trả về các dịch vụ phù hợp nhất dựa trên tương đồng vector.
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Smart Notification System}
+\begin{itemize}
+    \item Gửi thông báo dựa trên hành vi người dùng
+    \item Tối ưu thời điểm và nội dung thông báo
+\end{itemize}
+\subsection{Dashboard \& Business Analytics}
+\begin{itemize}
+    \item Các chỉ số đo lường hiệu quả AI
+    \item Visualization \& KPI
+\end{itemize}
+\subsection{Thử nghiệm \& đánh giá mô hình AI}
+\begin{itemize}
+    \item Metrics: Accuracy, Precision, Recall, F1-score
+    \item Case study gợi ý dịch vụ cho user thực tế
+\end{itemize}
