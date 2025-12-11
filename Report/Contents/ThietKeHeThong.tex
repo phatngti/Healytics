@@ -1,81 +1,166 @@
 \chapter{Thiết kế hệ thống}
 \section{Kiến trúc tổng thể hệ thống}
-Kiến trúc được cung cấp phân tách rõ ràng vai trò giữa Client và Server:
+\subsection{Kiến trúc N-tier}
+\textbf{N-tier Architecture} (Kiến trúc đa tầng) là mô hình thiết kế phần mềm trong đó hệ thống được chia thành các tầng (layers) riêng biệt về mặt logic và vật lý.
 \begin{itemize}
-    \item \textbf{Client (Lớp máy khách):} Gồm ứng dụng di động, cổng thông tin cho nhà cung cấp y tế và trang quản trị. Chúng chịu trách nhiệm về giao diện người dùng (UI) và trải nghiệm người dùng (UX).
-    \item \textbf{Server (Lớp máy chủ):} Là bộ não của hệ thống, xử lý toàn bộ logic nghiệp vụ, quản lý dữ liệu và giao tiếp với các dịch vụ bên thứ ba.
+    \item \textbf{Nguyên tắc cốt lõi:} "Separation of Concerns" (Phân tách mối quan tâm). Mỗi tầng đảm nhiệm một chức năng cụ thể và chỉ giao tiếp với các tầng liền kề (thường là tầng ngay bên dưới nó).
+    \item \textbf{Mục tiêu:} Giúp hệ thống dễ quản lý, dễ bảo trì, tăng tính bảo mật và khả năng mở rộng linh hoạt.
 \end{itemize}
-Điểm nổi bật của kiến trúc này là việc áp dụng mô hình \textbf{Microservices}: thay vì xây dựng một ứng dụng máy chủ nguyên khối, hệ thống được chia thành các dịch vụ nhỏ, độc lập (Authentication, Core Healthcare, AI/ML, Notification). Các thành phần như \textbf{API Gateway}, \textbf{Load Balancer}, và \textbf{Message Queue} là những yếu tố then chốt giúp các dịch vụ này hoạt động hiệu quả, có khả năng mở rộng và phục hồi tốt.
+\subsection{Kết cấu chi tiết 5 Tầng (Structure)}
+\subsubsection{Tầng 1: Presentation Layer (Client Layer)}
+Đây là tầng giao diện người dùng, nơi tương tác trực tiếp với người dùng cuối (End-user).
+\begin{itemize}
+    \item \textbf{Chức năng:} Hiển thị thông tin và thu thập hành động của người dùng (click, nhập liệu). Nó không chứa logic nghiệp vụ phức tạp mà chỉ chịu trách nhiệm về UX/UI.
+    \item \textbf{Thành phần:} Mobile App (iOS, Android, Flutter), Web App (React, Vue, Angular), hoặc Desktop App.
+    \item \textbf{Giao tiếp:} Gửi yêu cầu (Request) xuống Tầng 2 và nhận phản hồi (Response) để hiển thị.
+\end{itemize}
+\subsubsection{Tầng 2: Connection \& API Layer (Gateway)}
+Đây là "người gác cổng" (Gatekeeper) của hệ thống phía sau. Mọi yêu cầu từ Client phải đi qua đây trước khi vào hệ thống nội bộ.
+\begin{itemize}
+    \item \textbf{Chức năng:} \textbf{API Gateway:} Định tuyến (Routing) yêu cầu đến đúng service xử lý. \textbf{Security:} Xác thực (Authentication), Phân quyền (Authorization), chặn DDoS, Rate Limiting (giới hạn số lượt truy cập). \textbf{Load Balancing:} Cân bằng tải để phân phối request đều đặn.
+    \item \textbf{Công nghệ:} NGINX, Kong, AWS API Gateway, Spring Cloud Gateway.
+\end{itemize}
+\subsubsection{Tầng 3: Business Logic Layer (Server Layer - Microservices)}
+Đây là "bộ não" của hệ thống, nơi xử lý các quy trình nghiệp vụ chính. Trong kiến trúc hiện đại, tầng này thường được chia nhỏ thành các \textbf{Microservices}.
+\begin{itemize}
+    \item \textbf{Chức năng:} Xử lý tính toán, logic nghiệp vụ (ví dụ: tính toán giỏ hàng, kiểm tra tồn kho, xử lý workflow).
+    \item \textbf{Đặc điểm:} Mỗi Microservice chạy độc lập, có thể viết bằng các ngôn ngữ khác nhau (Java, Go, Python, Node.js) và giao tiếp với nhau qua HTTP/REST hoặc gRPC.
+    \item \textbf{Giao tiếp:} Nhận lệnh từ Tầng 2, gọi xuống Tầng 4 để lấy dữ liệu, hoặc gọi sang Tầng 5 để dùng dịch vụ bên ngoài.
+\end{itemize}
+\subsubsection{Tầng 4: Data Access Layer (Data \& Infrastructure Layer)}
+Tầng này chịu trách nhiệm quản lý và lưu trữ dữ liệu bền vững. Tầng Business không bao giờ truy cập trực tiếp vào file database vật lý mà phải thông qua các cơ chế của tầng này.
+\begin{itemize}
+    \item \textbf{Chức năng:}
+        \begin{itemize}
+            \item Thực hiện các thao tác CRUD (Create, Read, Update, Delete).
+            \item Trừu tượng hóa việc truy cập dữ liệu (giúp Tầng 3 không cần biết chi tiết kỹ thuật của Database).
+            \item Quản lý kết nối đến Database.
+           
+        \end{itemize}
+   \item \textbf{Thành phần:} ORM (Entity Framework, Hibernate), SQL Database (PostgreSQL, MySQL), NoSQL (MongoDB), Caching (Redis).
+    
+\end{itemize}
+\subsubsection{Tầng 5: Integration Layer (Third-Party Integrations)}
+Đây là tầng kết nối với thế giới bên ngoài, giúp hệ thống mở rộng chức năng mà không cần tự xây dựng lại từ đầu.
+\begin{itemize}
+    \item \textbf{Chức năng:}
+    \begin{itemize}
+        \item Đóng vai trò là "Adapter" để kết nối hệ thống nội bộ với các dịch vụ thuê ngoài.
+        \item Xử lý việc chuyển đổi định dạng dữ liệu để phù hợp với API của đối tác.
+    \end{itemize}
+    \item \textbf{Thành phần:}  Payment Gateway (Stripe, Momo), SMS/Email Services (Twilio, SendGrid), Maps API, AI Services.
+\end{itemize}
 
-\subsection{Lý do Chọn Kiến trúc Client-Server}
-Việc lựa chọn kiến trúc Client-Server là hoàn toàn hợp lý và gần như là tiêu chuẩn cho loại ứng dụng này vì những lý do sau:
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Quản lý dữ liệu tập trung (Centralized Data Management):} Dữ liệu y tế cực kỳ nhạy cảm và cần được quản lý một cách nhất quán, an toàn tại một nơi.
-    \item \textbf{Bảo mật và Kiểm soát truy cập (Security \& Access Control):} Cho phép triển khai các cơ chế xác thực và phân quyền (như JWT, RBAC) một cách hiệu quả tại máy chủ.
-    \item \textbf{Logic nghiệp vụ phức tạp:} Các quy trình như đặt lịch hẹn, xử lý thanh toán, đưa ra khuyến nghị y tế... đòi hỏi logic phức tạp và cần được xử lý một cách đáng tin cậy trên máy chủ.
-    \item \textbf{Khả năng mở rộng và bảo trì (Scalability \& Maintainability):} Máy chủ có thể được mở rộng để phục vụ nhiều người dùng hơn mà không cần thay đổi ứng dụng client.
-    \item \textbf{Tích hợp với bên thứ ba:} Việc kết nối với các dịch vụ ngoài được quản lý an toàn và hiệu quả từ phía máy chủ.
-\end{itemize}
+\subsection{Ưu điểm và Nhược điểm}
+\begin{table}[htbp]
+    \centering
+    \caption{Ưu điểm và Nhược điểm của Kiến trúc Layer (N-tier)}
+    \label{tab:ntier-comparison}
+    \renewcommand{\arraystretch}{1.5} % Tăng khoảng cách giữa các dòng cho dễ đọc
+    
+    % Tạo bảng với 2 cột có độ rộng bằng nhau (X)
+    \begin{tabularx}{\textwidth}{ | >{\raggedright\arraybackslash}X | >{\raggedright\arraybackslash}X | }
+        \hline
+        \textbf{Ưu điểm (Advantages)} & \textbf{Nhược điểm (Disadvantages)} \\
+        \hline
+        
+        \textbf{1. Khả năng mở rộng (Scalability):} \newline 
+        Có thể mở rộng (scale-out) từng tầng riêng biệt. Ví dụ: Nếu Business Layer quá tải, chỉ cần thêm server cho tầng này mà không cần can thiệp vào Database hay Client. 
+        & 
+        \textbf{1. Độ trễ (Latency):} \newline 
+        Hiệu năng có thể bị ảnh hưởng do dữ liệu phải di chuyển qua nhiều tầng (network hops) và các lớp bảo mật trước khi đến đích, chậm hơn so với kiến trúc nguyên khối. \\
+        \hline
+        
+        \textbf{2. Dễ bảo trì (Maintainability):} \newline 
+        Nhờ nguyên tắc "Separation of Concerns", việc sửa lỗi hoặc nâng cấp công nghệ ở một tầng ít gây ảnh hưởng đến các tầng khác (Loose Coupling). 
+        & 
+        \textbf{2. Phức tạp trong vận hành:} \newline 
+        Việc triển khai (deployment), giám sát (monitoring) và gỡ lỗi (debugging) trở nên khó khăn hơn vì hệ thống bị phân tán thành nhiều phần. \\
+        \hline
+        
+        \textbf{3. Bảo mật cao (Security):} \newline 
+        Tầng dữ liệu (Data Layer) và Business Layer được che giấu sau Gateway. Kẻ tấn công khó tiếp cận trực tiếp vào cơ sở dữ liệu. 
+        & 
+        \textbf{3. Chi phí hạ tầng cao:} \newline 
+        Yêu cầu nhiều tài nguyên server, chi phí quản lý mạng và license phần mềm để duy trì nhiều tầng riêng biệt. \\
+        \hline
+        
+        \textbf{4. Linh hoạt công nghệ:} \newline 
+        Tầng Presentation có thể dùng Flutter/React, trong khi Business Layer có thể dùng song song Java, Go hoặc Python. 
+        & 
+        \textbf{4. Tính nhất quán dữ liệu:} \newline 
+        Trong mô hình Microservices, việc đảm bảo dữ liệu đồng bộ giữa các service (Data Consistency) phức tạp hơn, cần các pattern nâng cao như Saga. \\
+        \hline
+        
+    \end{tabularx}
+\end{table}
 
 \subsection{Các Kiến trúc Thay thế và So sánh}
+\begin{table}[htbp]
+    \centering
+    \caption{\textbf{So sánh Kiến trúc N-tier với các Kiến trúc khác}}
+    \vspace{0.3cm}
+    \renewcommand{\arraystretch}{1.5} % Khoảng cách dòng
+    
+    % --- CHỈNH SỬA TỶ LỆ CỘT TẠI ĐÂY ---
+    % Tổng các hệ số hsize phải bằng 4 (số lượng cột X)
+    % Cột 1: 0.8 (Tăng lên để chứa chữ Microservices/Orchestration không bị ngắt)
+    % Cột 2: 0.6 (Giữ nguyên)
+    % Cột 3: 1.3 (Giảm nhẹ để bù cho cột 1)
+    % Cột 4: 1.3 (Giảm nhẹ để bù cho cột 1)
+    \begin{tabularx}{\textwidth}{ 
+        | >{\hsize=0.8\hsize\RaggedRight\arraybackslash}X 
+        | >{\hsize=0.6\hsize\RaggedRight\arraybackslash}X 
+        | >{\hsize=1.3\hsize\RaggedRight\arraybackslash}X 
+        | >{\hsize=1.3\hsize\RaggedRight\arraybackslash}X | }
+        
+        \hline
+        \textbf{So với} & \textbf{Tiêu chí} & \textbf{Ưu điểm N-tier} & \textbf{Nhược điểm N-tier} \\
+        \hline
 
-\subsubsection{Kiến trúc Monolithic (Nguyên khối)}
-Đây là phương pháp truyền thống, trong đó toàn bộ ứng dụng phía máy chủ được xây dựng như một khối duy nhất.
-\begin{itemize}
-    \item \textbf{Ưu điểm so với kiến trúc hiện tại:}
-    \begin{itemize}
-        \item Phát triển ban đầu đơn giản hơn.
-        \item Triển khai dễ dàng hơn (ban đầu).
-        \item Testing End-to-End đơn giản.
-    \end{itemize}
-    \item \textbf{Nhược điểm so với kiến trúc hiện tại:}
-    \begin{itemize}
-        \item Khó mở rộng, phải mở rộng toàn bộ ứng dụng.
-        \item Ràng buộc công nghệ.
-        \item Khó bảo trì khi ứng dụng lớn dần.
-        \item Quá trình triển khai chậm và rủi ro cao.
-    \end{itemize}
-\end{itemize}
+        % --- CQRS ---
+        \textbf{CQRS} & 
+        Tách biệt Đọc/Ghi & 
+        \textbf{Đơn giản:} Dùng chung model cho đọc/ghi giúp triển khai nhanh, code dễ hiểu, phù hợp đa số ứng dụng. & 
+        \textbf{Hiệu năng truy vấn:} Khó tối ưu các báo cáo phức tạp so với database chuyên dụng cho việc đọc của CQRS. \\
+        \hline
 
-\subsubsection{Kiến trúc Peer-to-Peer (P2P - Mạng ngang hàng)}
-Trong mô hình này, không có máy chủ trung tâm. Mọi máy tham gia mạng (peers) đều có vai trò như nhau.
-\begin{itemize}
-    \item \textbf{Ưu điểm so với kiến trúc hiện tại:}
-    \begin{itemize}
-        \item Khả năng phục hồi cao, không có điểm lỗi trung tâm.
-        \item Khả năng mở rộng tự nhiên.
-    \end{itemize}
-    \item \textbf{Nhược điểm so với kiến trúc hiện tại:}
-    \begin{itemize}
-        \item Bảo mật và quyền riêng tư \textbf{KÉM}, không phù hợp cho dữ liệu y tế.
-        \item Khó đảm bảo tính nhất quán dữ liệu.
-        \item Phức tạp trong việc quản lý và cập nhật.
-    \end{itemize}
-\end{itemize}
+        % --- Microservices ---
+        \textbf{Microservices} & 
+        Phạm vi triển khai & 
+        \textbf{Dễ quản lý hạ tầng:} Ít phức tạp về mạng lưới. Test tích hợp (End-to-End) dễ hơn do luồng đi thẳng. & 
+        \textbf{Khó scale cục bộ:} Phải scale cả tầng lớn thay vì từng service nhỏ. Khả năng cô lập lỗi kém hơn. \\
+        \hline
 
-\subsubsection{Kiến trúc Serverless}
-Đây là một biến thể của kiến trúc Client-Server, nơi việc quản lý máy chủ được trừu tượng hóa hoàn toàn bởi nhà cung cấp đám mây.
-\begin{itemize}
-    \item \textbf{Ưu điểm so với kiến trúc hiện tại:}
-    \begin{itemize}
-        \item Giảm chi phí vận hành, không cần quản lý máy chủ.
-        \item Chi phí tối ưu, chỉ trả tiền cho thời gian thực thi.
-        \item Tự động mở rộng.
-    \end{itemize}
-    \item \textbf{Nhược điểm so với kiến trúc hiện tại:}
-    \begin{itemize}
-        \item Có thể có độ trễ "Cold Starts".
-        \item Ràng buộc nhà cung cấp (Vendor Lock-in).
-        \item Giới hạn về tài nguyên và thời gian thực thi.
-        \item Phức tạp trong việc giám sát và gỡ lỗi.
-    \end{itemize}
-\end{itemize}
-\subsection{Kết luận và Diagram}
-Kiến trúc \textbf{Client-Server kết hợp Microservices} là một lựa chọn xuất sắc và theo đúng các tiêu chuẩn thiết kế hệ thống hiện đại. Nó giải quyết được các bài toán cốt lõi của một ứng dụng phức tạp như khả năng mở rộng, tính linh hoạt và khả năng bảo trì trong dài hạn. Mặc dù có độ phức tạp cao hơn, những lợi ích mà nó mang lại hoàn toàn xứng đáng với quy mô và tầm quan trọng của một hệ thống y tế.
+        % --- Orchestration ---
+        \textbf{Orchestration} & 
+        Quản lý quy trình & 
+        \textbf{Luồng rõ ràng:} Dễ theo dõi (trace) luồng đi từ Client xuống DB. Tốt cho tác vụ đồng bộ. & 
+        \textbf{Phình to Logic:} Dễ dẫn đến "Business Layer" quá tải khi quy trình nghiệp vụ trở nên chằng chịt. \\
+        \hline
+
+        % --- MVP ---
+        \textbf{MVP} & 
+        Phạm vi kiến trúc & 
+        \textbf{Vĩ mô:} N-tier giải quyết cấu trúc toàn hệ thống (Server/DB), trong khi MVP chỉ lo phần giao diện (UI). & 
+        \textbf{Coupling:} Nếu không khéo, logic nghiệp vụ dễ bị dính chặt vào code giao diện hơn so với MVP thuần. \\
+        \hline
+
+        % --- Event-Driven ---
+        \textbf{Event-Driven} & 
+        Giao tiếp & 
+        \textbf{Nhất quán tức thì:} Xử lý đồng bộ giúp User biết ngay kết quả (thành công/thất bại). Dễ debug. & 
+        \textbf{Chặn (Blocking):} Request phải chờ xử lý xong, dễ gây nghẽn cổ chai nếu tải cao so với xử lý ngầm. \\
+        \hline
+
+    \end{tabularx}
+\end{table}
+
+\subsection{Diagram và Kết luận}
 \begin{figure}[H]
     % Căn giữa hình ảnh
     \centering
-    \includegraphics[width=0.8\textwidth]{Images/ArchSys.png}
+    \includegraphics[width=1\textwidth]{Images/ArchSys.png}
     \vspace{10pt}
     
     % Thêm chú thích cho hình ảnh
@@ -84,7 +169,48 @@ Kiến trúc \textbf{Client-Server kết hợp Microservices} là một lựa ch
     % Đặt nhãn để tham chiếu chéo (cross-reference)
     \label{fig:sys_arch}
 \end{figure}
+Dựa trên hình ảnh \ref{fig:sys_arch}, kiến trúc tổng thể của hệ thống được thiết kế theo mô hình Microservices, chia thành 5 tầng chính (layer) với chức năng cụ thể như sau:
+\begin{enumerate}
+    \item \textbf{Client Layer (Tầng người dùng):}
+    Đây là điểm tương tác trực tiếp với người dùng cuối và quản trị viên. Tầng này bao gồm ba ứng dụng chính được phát triển trên nền tảng Flutter:
+    \begin{itemize}
+        \item \textit{User Mobile App:} Ứng dụng di động (iOS/Android) dành cho khách hàng/bệnh nhân.
+        \item \textit{Health Provider Portal:} Cổng thông tin dạng Web dành cho các nhà cung cấp dịch vụ y tế.
+        \item \textit{Admin Panel:} Trang quản trị dạng Web để vận hành hệ thống.
+    \end{itemize}
 
+    \item \textbf{Connection \& API Layer (Tầng kết nối):}
+    Đóng vai trò là cổng trung gian (Middleware) duy nhất giao tiếp giữa Client và Server.
+    \begin{itemize}
+        \item \textit{API Gateway:} Tiếp nhận toàn bộ yêu cầu (request) từ phía Client, thực hiện định tuyến (routing) đến các dịch vụ (services) phù hợp bên dưới.
+    \end{itemize}
+
+    \item \textbf{Server Layer (Tầng dịch vụ - Microservices):}
+    Trung tâm xử lý logic nghiệp vụ, được chia nhỏ thành các dịch vụ độc lập giao tiếp qua REST API hoặc WebSocket:
+    \begin{itemize}
+        \item \textit{Authentication Service:} Quản lý xác thực và phân quyền (xử lý JWT, RBAC).
+        \item \textit{Core Healthcare Service:} Xử lý các nghiệp vụ cốt lõi như đặt lịch khám, thanh toán. Dịch vụ này có khả năng công bố (publish) sự kiện.
+        \item \textit{AI/ML Service:} Cung cấp các tính năng thông minh như Chatbot và gợi ý (Recommendations), hỗ trợ giao tiếp thời gian thực qua WebSocket.
+        \item \textit{Notification Service:} Quản lý việc gửi thông báo (Push notification, Email) tới người dùng.
+    \end{itemize}
+
+    \item \textbf{Data \& Infrastructure Layer (Tầng dữ liệu và hạ tầng):}
+    Nơi lưu trữ và quản lý dữ liệu bền vững, bao gồm:
+    \begin{itemize}
+        \item \textit{PostgreSQL DB:} Cơ sở dữ liệu quan hệ cho dữ liệu nghiệp vụ chính.
+        \item \textit{Redis Cache:} Bộ nhớ đệm giúp tăng tốc độ truy xuất dữ liệu.
+        \item \textit{Cloud Storage:} Lưu trữ tài liệu, hình ảnh.
+        \item \textit{Vector DB / NoSQL:} Hỗ trợ lưu trữ dữ liệu phi cấu trúc phục vụ cho AI/ML.
+        \item \textit{Message Queue:} Hàng đợi thông điệp giúp xử lý bất đồng bộ và giao tiếp giữa các services (Event-driven).
+    \end{itemize}
+
+    \item \textbf{Third-Party Integrations (Tầng tích hợp bên thứ ba):}
+    Các dịch vụ bên ngoài được hệ thống kết nối để mở rộng tính năng:
+    \begin{itemize}
+        \item \textit{Payment Gateway:} Cổng thanh toán trực tuyến.
+        \item \textit{Push Notification Service (APNS/FCM):} Dịch vụ đẩy thông báo của Apple và Google.
+    \end{itemize}
+\end{enumerate}
 \section{Thiết kế cơ sở dữ liệu}
 \subsection{Mô tả}
 Thực thể (ERD) được cung cấp, nhằm mục đích làm rõ cấu trúc dữ liệu và các phân hệ chức năng chính của hệ thống. Mô hình dữ liệu cho thấy đây là một nền tảng công nghệ được thiết kế để kết nối ba nhóm đối tượng chính: Người dùng cuối (Khách hàng), Đối tác cung cấp dịch vụ (Partner), và Nhân viên quản trị (Employee).

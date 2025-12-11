@@ -166,8 +166,92 @@ Dashboard giúp hiển thị thông tin dưới dạng đồ thị, biểu đồ
     \item Người dùng gián tiếp hưởng lợi từ dịch vụ được tối ưu.
 \end{itemize}
 
-\subsection{Kiến trúc hiện thực}
+\section{Kiến trúc hiện thực}
+Dựa trên nền tảng logic vững chắc của bản kiến trúc trừu tượng (Abstract Architecture) Hình \ref{fig:sys_arch}, bản thiết kế hiện thực hóa (Implementation Architecture) Hình \ref{fig:imple_arch} đã cụ thể hóa các mô hình chức năng thành một hệ sinh thái công nghệ hiện đại và tối ưu hiệu năng. Vẫn tuân thủ chặt chẽ cấu trúc Microservices 5 tầng, bản thiết kế thực tế đã thay thế các khái niệm tổng quát bằng những công nghệ hàng đầu trong ngành: Hệ sinh thái Flutter đảm bảo trải nghiệm đồng nhất trên mọi nền tảng người dùng; Kong được lựa chọn làm API Gateway mạnh mẽ để điều phối luồng dữ liệu; và tầng hạ tầng dữ liệu được phân tách chuyên biệt với PostgreSQL cho nghiệp vụ cốt lõi, FAISS cho xử lý AI vector và MinIO cho lưu trữ đối tượng. Sự chuyển dịch từ trừu tượng sang thực tế này không chỉ đảm bảo tính khả thi khi triển khai mà còn tối ưu hóa khả năng mở rộng (scalability) và tính ổn định cho toàn bộ nền tảng
+\begin{figure}[H]
+    % Căn giữa hình ảnh
+    \centering
+    \includegraphics[width=1\textwidth]{Images/implement_arch.png}
+    \vspace{10pt}
+    
+    % Thêm chú thích cho hình ảnh
+    \caption{Kiến trúc hiện thực hệ thống}
+    
+    % Đặt nhãn để tham chiếu chéo (cross-reference)
+    \label{fig:imple_arch}
+\end{figure}
 
+Hệ thống được thiết kế dựa trên mô hình Microservices hiện đại, chia thành 5 tầng chính với các công nghệ cụ thể như sau:
+
+\subsection*{Tầng Giao Diện (Presentation Layer)}
+Đây là tầng tương tác trực tiếp với người dùng cuối (tương ứng với Client Layer trong bản thiết kế trừu tượng).
+
+\begin{itemize}
+    \item \textbf{Công nghệ:} Flutter.
+    \item \textbf{Mô tả:} Sử dụng Flutter làm công nghệ chủ đạo (Cross-platform) để xây dựng cả 3 ứng dụng client:
+    \begin{itemize}
+        \item \textit{User App:} Ứng dụng di động dành cho người dùng phổ thông.
+        \item \textit{Admin Panel:} Trang quản trị hệ thống.
+        \item \textit{Provider Portal:} Cổng thông tin dành cho các nhà cung cấp dịch vụ y tế/làm đẹp.
+    \end{itemize}
+    \item \textbf{Giao thức:} Các ứng dụng này giao tiếp với hệ thống backend thông qua RESTful API và WebSocket (dành cho các tính năng thời gian thực).
+\end{itemize}
+
+\subsection*{Tầng Kết Nối \& API (Connection \& API Layer)}
+Đóng vai trò là cổng vào duy nhất (Entry point) cho mọi yêu cầu từ phía Client.
+
+\begin{itemize}
+    \item \textbf{Công nghệ:} Kong API Gateway.
+    \item \textbf{Mô tả:} Thay thế cho khối "API Gateway" trừu tượng. Kong chịu trách nhiệm:
+    \begin{itemize}
+        \item Routing (định tuyến) request đến đúng microservice.
+        \item Load balancing (cân bằng tải).
+        \item Authentication/Authorization cơ bản (xác thực sơ bộ).
+        \item Rate limiting (giới hạn băng thông) để bảo vệ hệ thống.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Tầng Server \& Nghiệp Vụ (Server/Business Layer)}
+Đây là lõi của hệ thống, được triển khai theo kiến trúc Microservices.
+
+\begin{itemize}
+    \item \textbf{Hạ tầng:} Compute Engine (Google Cloud Platform - GCP). Các dịch vụ được triển khai trên các máy ảo (VM) hoặc Container chạy trên VM.
+    \item \textbf{Các dịch vụ thành phần:}
+    \begin{itemize}
+        \item \textit{Authenticate Service:} Xử lý đăng ký, đăng nhập, cấp phát token (JWT).
+        \item \textit{Core Healthcare Service:} Xử lý nghiệp vụ chính như đặt lịch hẹn (Appointments), quản lý hồ sơ y tế, thanh toán.
+        \item \textit{AI Service:} Chịu trách nhiệm về các tính năng thông minh (Chatbot, Recommendation System). Dịch vụ này giao tiếp chặt chẽ với Vector Database.
+        \item \textit{Notification Service:} Quản lý việc gửi thông báo đẩy (Push) và Email.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Tầng Dữ Liệu \& Hạ Tầng (Data \& Infrastructure Layer)}
+Tầng này lưu trữ và quản lý luồng dữ liệu, cụ thể hóa các khối database trừu tượng:
+
+\begin{itemize}
+    \item \textbf{Relational Database (SQL):} Sử dụng \textbf{PostgreSQL}. Dùng để lưu trữ dữ liệu có cấu trúc (thông tin user, đơn hàng, lịch hẹn).
+    \item \textbf{Vector Database:} Sử dụng \textbf{FAISS} (Facebook AI Similarity Search). Dùng để lưu trữ vector embeddings phục vụ cho AI Service (tìm kiếm ngữ nghĩa, gợi ý).
+    \item \textbf{Cache:} Sử dụng \textbf{Redis}. Giúp tăng tốc độ truy xuất dữ liệu thường xuyên sử dụng và giảm tải cho Database chính.
+    \item \textbf{Message Queue:} Sử dụng \textbf{RabbitMQ}. Đảm bảo giao tiếp bất đồng bộ (asynchronous) giữa các microservices (ví dụ: Core Service gửi sự kiện đến Notification Service mà không cần chờ đợi).
+    \item \textbf{Object Storage:} Sử dụng \textbf{MinIO}. Giải pháp lưu trữ đối tượng (tương thích S3) dùng để lưu trữ file tĩnh, hình ảnh, tài liệu y tế (thay thế cho khối Cloud Storage trừu tượng).
+\end{itemize}
+
+\subsection*{Tầng Tích Hợp Bên Thứ Ba (Third-Party Integrations Layer)}
+Kết nối với các dịch vụ bên ngoài để mở rộng tính năng.
+
+\begin{itemize}
+    \item \textbf{Cổng thanh toán (Payment Methods):} Tích hợp đa dạng bao gồm MoMo, Stripe (quốc tế), và VNPay (nội địa Việt Nam).
+    \item \textbf{Dịch vụ thông báo (App Notification Service):}
+    \begin{itemize}
+        \item \textit{APNs (Apple Push Notification service):} Dành riêng cho thiết bị iOS.
+        \item \textit{Firebase (FCM):} Dành cho Android và quản lý thông báo chung.
+    \end{itemize}
+\end{itemize}
+
+\vspace{1cm} % Khoảng cách một chút trước phần nhận xét
+
+\subsection*{Nhận xét tổng quan}
+Kiến trúc này rất hiện đại và phù hợp với quy mô dự án nền tảng Health/Beauty. Việc tách biệt rõ ràng giữa PostgreSQL (nghiệp vụ) và FAISS (AI) cho thấy sự đầu tư kỹ lưỡng vào hiệu năng xử lý dữ liệu thông minh. Sử dụng MinIO cũng là một giải pháp hay để tự chủ (self-hosted) việc lưu trữ dữ liệu thay vì phụ thuộc hoàn toàn vào cloud public storage đắt đỏ.
 \section{Phần Software – Triển khai ứng dụng}
 \subsection{User Mobile App}
 \subsection{Partner Portal (Web/App)}
