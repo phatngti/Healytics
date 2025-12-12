@@ -1,132 +1,165 @@
-\contentsline {chapter}{\numberline {1}Giới thiệu}{11}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Đặt vấn đề}{11}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Mục tiêu đồ án}{12}{section.1.2}%
-\contentsline {chapter}{\numberline {2}Tổng quan và cơ sở lý thuyết}{13}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Tổng quan về hệ thống chăm sóc sức khỏe và sắc đẹp}{13}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Phạm vi, đối tượng áp dụng, và các bên liên quan}{13}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Phạm vi}{13}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Các đối tượng liên quan (Stackholders)}{14}{subsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.2.3}Các hệ thống tương tự}{15}{subsection.2.2.3}%
-\contentsline {section}{\numberline {2.3}AI trong chăm sóc sức khỏe và gợi ý dịch vụ cá nhân hóa}{15}{section.2.3}%
-\contentsline {chapter}{\numberline {3}Yêu cầu về hệ thống}{16}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Yêu cầu chức năng}{16}{section.3.1}%
-\contentsline {subsection}{\numberline {3.1.1}User App}{16}{subsection.3.1.1}%
-\contentsline {subsection}{\numberline {3.1.2}Partner Portal}{17}{subsection.3.1.2}%
-\contentsline {subsection}{\numberline {3.1.3}Admin Dashboard}{19}{subsection.3.1.3}%
-\contentsline {section}{\numberline {3.2}Yêu cầu phi chức năng}{20}{section.3.2}%
-\contentsline {chapter}{\numberline {4}Phân tích hệ thống}{22}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Mô tả hệ thống tổng quan}{22}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Sơ đồ Use Case (Use Case Diagram)}{22}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Sơ đồ Use Case cho User App}{22}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Sơ đồ Use Case cho Partner Portal}{22}{subsection.4.2.2}%
-\contentsline {subsection}{\numberline {4.2.3}Sơ đồ Use Case cho Admin Dashboard}{22}{subsection.4.2.3}%
-\contentsline {subsection}{\numberline {4.2.4}Sơ đồ Use Case Tổng Thể Hệ Thống (Tích Hợp AI)}{23}{subsection.4.2.4}%
-\contentsline {section}{\numberline {4.3}Chi Tiết Use Case (Use-case Detail)}{24}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}Use Case 1: Onboarding và Cá nhân hóa Hồ sơ (User App)}{24}{subsection.4.3.1}%
-\contentsline {subsection}{\numberline {4.3.2}Use Case 2: Chatbot AI Tư vấn và Gợi ý Dịch vụ (User App)}{25}{subsection.4.3.2}%
-\contentsline {subsection}{\numberline {4.3.3}Use Case 3: Đặt lịch hẹn (Booking) (User App)}{26}{subsection.4.3.3}%
-\contentsline {subsection}{\numberline {4.3.4}Use Case 4: Trang Đăng ký Cung cấp Hồ sơ (Partner Portal)}{27}{subsection.4.3.4}%
-\contentsline {subsection}{\numberline {4.3.5}Use Case 5: Xác thực Quản lý Đối tác (Admin Dashboard)}{28}{subsection.4.3.5}%
-\contentsline {section}{\numberline {4.4}Sơ đồ luồng dữ liệu (Sequence Diagram)}{29}{section.4.4}%
-\contentsline {subsection}{\numberline {4.4.1}Onboarding \& Cá nhân hóa Hồ sơ}{29}{subsection.4.4.1}%
-\contentsline {subsection}{\numberline {4.4.2}Chatbot AI Tư vấn \& Gợi ý Dịch vụ}{30}{subsection.4.4.2}%
-\contentsline {subsection}{\numberline {4.4.3}Tìm kiếm \& Lọc Nâng cao}{31}{subsection.4.4.3}%
-\contentsline {subsection}{\numberline {4.4.4}Đặt lịch hẹn (Booking), thanh toán và đánh giá}{32}{subsection.4.4.4}%
-\contentsline {subsection}{\numberline {4.4.5}AI trong Quản trị Tương tác thông minh}{33}{subsection.4.4.5}%
-\contentsline {subsection}{\numberline {4.4.6}Trang Đăng ký Cung cấp Hồ sơ (Partner Registration)}{33}{subsection.4.4.6}%
-\contentsline {subsection}{\numberline {4.4.7}Xác thực Đối tác (Partner Verification)}{34}{subsection.4.4.7}%
-\contentsline {subsection}{\numberline {4.4.8}Quản lý Lịch hẹn (Booking Dashboard)}{35}{subsection.4.4.8}%
-\contentsline {subsection}{\numberline {4.4.9}Quản lý Dịch vụ (Service Management)}{36}{subsection.4.4.9}%
-\contentsline {subsection}{\numberline {4.4.10}Quản lý Nhân viên Phân quyền (Staff Management )}{37}{subsection.4.4.10}%
-\contentsline {section}{\numberline {4.5}Sơ đồ Activity (Activity Diagram)}{37}{section.4.5}%
-\contentsline {subsection}{\numberline {4.5.1}Luồng Onboarding và Cá nhân hóa Người dùng}{38}{subsection.4.5.1}%
-\contentsline {subsection}{\numberline {4.5.2}Luồng Chatbot AI Tư vấn \& Gợi ý Dịch vụ}{38}{subsection.4.5.2}%
-\contentsline {subsection}{\numberline {4.5.3}Quy trình Đăng ký Đối tác (Partner Registration)}{39}{subsection.4.5.3}%
-\contentsline {subsection}{\numberline {4.5.4}Luồng Đặt lịch, Thanh toán và Đánh giá}{40}{subsection.4.5.4}%
-\contentsline {subsection}{\numberline {4.5.5}Quy trình Phê duyệt Đối tác (Partner Verification)}{40}{subsection.4.5.5}%
-\contentsline {subsection}{\numberline {4.5.6}Chu trình Tự động Huấn luyện Mô hình AI}{41}{subsection.4.5.6}%
-\contentsline {subsection}{\numberline {4.5.7}Quản lý Lịch hẹn (Góc nhìn Đối tác / Dashboard)}{41}{subsection.4.5.7}%
-\contentsline {subsection}{\numberline {4.5.8}Quản lý Nhân viên \& Phân quyền}{42}{subsection.4.5.8}%
-\contentsline {section}{\numberline {4.6}Class Diagram (ERD)}{42}{section.4.6}%
-\contentsline {subsection}{\numberline {4.6.1}Mô tả}{42}{subsection.4.6.1}%
-\contentsline {subsection}{\numberline {4.6.2}Các thành phần chính và mối quan hệ}{42}{subsection.4.6.2}%
-\contentsline {subsection}{\numberline {4.6.3}Kết luận}{43}{subsection.4.6.3}%
-\contentsline {subsection}{\numberline {4.6.4}Lược đồ}{43}{subsection.4.6.4}%
-\contentsline {chapter}{\numberline {5}Thiết kế hệ thống}{44}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Kiến trúc tổng thể hệ thống}{44}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Kiến trúc N-tier}{44}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Kết cấu chi tiết 5 Tầng (Structure)}{44}{subsection.5.1.2}%
-\contentsline {subsubsection}{\numberline {5.1.2.1}Tầng 1: Presentation Layer (Client Layer)}{44}{subsubsection.5.1.2.1}%
-\contentsline {subsubsection}{\numberline {5.1.2.2}Tầng 2: Connection \& API Layer (Gateway)}{44}{subsubsection.5.1.2.2}%
-\contentsline {subsubsection}{\numberline {5.1.2.3}Tầng 3: Business Logic Layer (Server Layer - Microservices)}{44}{subsubsection.5.1.2.3}%
-\contentsline {subsubsection}{\numberline {5.1.2.4}Tầng 4: Data Access Layer (Data \& Infrastructure Layer)}{45}{subsubsection.5.1.2.4}%
-\contentsline {subsubsection}{\numberline {5.1.2.5}Tầng 5: Integration Layer (Third-Party Integrations)}{45}{subsubsection.5.1.2.5}%
-\contentsline {subsection}{\numberline {5.1.3}Ưu điểm và Nhược điểm}{45}{subsection.5.1.3}%
-\contentsline {subsection}{\numberline {5.1.4}Các Kiến trúc Thay thế và So sánh}{46}{subsection.5.1.4}%
-\contentsline {subsection}{\numberline {5.1.5}Diagram và Kết luận}{46}{subsection.5.1.5}%
-\contentsline {section}{\numberline {5.2}Thiết kế cơ sở dữ liệu}{47}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Mô tả}{47}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}Các khối chức năng chính}{47}{subsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.2.3}Kết luận}{48}{subsection.5.2.3}%
-\contentsline {subsection}{\numberline {5.2.4}Lược đồ}{49}{subsection.5.2.4}%
-\contentsline {section}{\numberline {5.3}Thiết kế UI/UX cơ bản}{50}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}Onboarding \& Sign In \& Sign up}{50}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}Survey}{51}{subsection.5.3.2}%
-\contentsline {subsection}{\numberline {5.3.3}Main pages}{52}{subsection.5.3.3}%
-\contentsline {section}{\numberline {5.4}Phần AI – Thiết kế \& Triển khai}{52}{section.5.4}%
-\contentsline {subsection}{\numberline {5.4.1}Thu thập và tiền xử lý dữ liệu}{52}{subsection.5.4.1}%
-\contentsline {subsection}{\numberline {5.4.2}NLP Chatbot AI}{53}{subsection.5.4.2}%
-\contentsline {subsubsection}{\numberline {5.4.2.1}Tổng quan}{53}{subsubsection.5.4.2.1}%
-\contentsline {subsubsection}{\numberline {5.4.2.2}Các bước chính}{53}{subsubsection.5.4.2.2}%
-\contentsline {subsubsection}{\numberline {5.4.2.3}Luồng dữ liệu chính (Data Flow)}{53}{subsubsection.5.4.2.3}%
-\contentsline {subsubsection}{\numberline {5.4.2.4}Công nghệ và thành phần chính}{54}{subsubsection.5.4.2.4}%
-\contentsline {subsubsection}{\numberline {5.4.2.5}Pipeline RAG chi tiết}{54}{subsubsection.5.4.2.5}%
-\contentsline {subsubsection}{\numberline {5.4.2.6}Đánh giá hiệu năng (Evaluation)}{54}{subsubsection.5.4.2.6}%
-\contentsline {subsubsection}{\numberline {5.4.2.7}Quản lý phiên bản (Version Management)}{54}{subsubsection.5.4.2.7}%
-\contentsline {subsubsection}{\numberline {5.4.2.8}Cấu trúc dữ liệu huấn luyện (Fine-tuning)}{54}{subsubsection.5.4.2.8}%
-\contentsline {subsubsection}{\numberline {5.4.2.9}So sánh mô hình}{55}{subsubsection.5.4.2.9}%
-\contentsline {subsubsection}{\numberline {5.4.2.10}Định hướng và triển khai}{55}{subsubsection.5.4.2.10}%
-\contentsline {subsection}{\numberline {5.4.3}Hệ thống gợi ý dịch vụ cá nhân hóa}{55}{subsection.5.4.3}%
-\contentsline {subsubsection}{\numberline {5.4.3.1}Chiến lược trích xuất và chuẩn hóa đặc trưng (Feature Engineering)}{56}{subsubsection.5.4.3.1}%
-\contentsline {paragraph}{\numberline {5.4.3.1.1}Textual Features}{56}{paragraph.5.4.3.1.1}%
-\contentsline {paragraph}{\numberline {5.4.3.1.2}Categorical Features}{56}{paragraph.5.4.3.1.2}%
-\contentsline {paragraph}{\numberline {5.4.3.1.3}Numerical / Scalar Features}{56}{paragraph.5.4.3.1.3}%
-\contentsline {subsubsection}{\numberline {5.4.3.2}Xây dựng Query Vector}{56}{subsubsection.5.4.3.2}%
-\contentsline {paragraph}{\numberline {5.4.3.2.1}Query Trang Chủ (Home Recommender)}{56}{paragraph.5.4.3.2.1}%
-\contentsline {paragraph}{\numberline {5.4.3.2.2}Query Chatbot}{56}{paragraph.5.4.3.2.2}%
-\contentsline {subsubsection}{\numberline {5.4.3.3}Pipeline tổng thể hệ thống gợi ý}{57}{subsubsection.5.4.3.3}%
-\contentsline {subsubsection}{\numberline {5.4.3.4}Ví dụ minh hoạ pipeline}{57}{subsubsection.5.4.3.4}%
-\contentsline {subsection}{\numberline {5.4.4}Smart Notification System}{57}{subsection.5.4.4}%
-\contentsline {subsection}{\numberline {5.4.5}Dashboard \& Business Analytics}{57}{subsection.5.4.5}%
-\contentsline {subsection}{\numberline {5.4.6}Thử nghiệm \& đánh giá mô hình AI}{58}{subsection.5.4.6}%
-\contentsline {chapter}{\numberline {6}Hiện thực}{59}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Các công nghệ liên quan}{59}{section.6.1}%
-\contentsline {subsection}{\numberline {6.1.1}Mobile App Development (iOS/Android, Flutter)}{59}{subsection.6.1.1}%
-\contentsline {subsection}{\numberline {6.1.2}Web/Portal Development (Partner Portal, Admin Dashboard)}{60}{subsection.6.1.2}%
-\contentsline {subsection}{\numberline {6.1.3}Server/Backend (NestJS \& PostgreSQL)}{61}{subsection.6.1.3}%
-\contentsline {subsection}{\numberline {6.1.4}Machine Learning \& Natural Language Processing (Chatbot AI)}{62}{subsection.6.1.4}%
-\contentsline {subsubsection}{\numberline {6.1.4.1}Machine Learning trong Chatbot}{62}{subsubsection.6.1.4.1}%
-\contentsline {subsubsection}{\numberline {6.1.4.2}Natural Language Processing (NLP)}{62}{subsubsection.6.1.4.2}%
-\contentsline {subsubsection}{\numberline {6.1.4.3}Ứng dụng trong hệ thống}{62}{subsubsection.6.1.4.3}%
-\contentsline {subsection}{\numberline {6.1.5}Recommender Systems \& Personalization}{62}{subsection.6.1.5}%
-\contentsline {subsubsection}{\numberline {6.1.5.1}Các phương pháp gợi ý}{62}{subsubsection.6.1.5.1}%
-\contentsline {subsubsection}{\numberline {6.1.5.2}Kỹ thuật cá nhân hóa}{63}{subsubsection.6.1.5.2}%
-\contentsline {subsubsection}{\numberline {6.1.5.3}Ứng dụng trong hệ thống}{63}{subsubsection.6.1.5.3}%
-\contentsline {subsection}{\numberline {6.1.6}Data Analytics \& Dashboard Visualization}{63}{subsection.6.1.6}%
-\contentsline {subsubsection}{\numberline {6.1.6.1}Data Analytics}{63}{subsubsection.6.1.6.1}%
-\contentsline {subsubsection}{\numberline {6.1.6.2}Dashboard Visualization}{63}{subsubsection.6.1.6.2}%
-\contentsline {subsubsection}{\numberline {6.1.6.3}Ứng dụng trong hệ thống}{63}{subsubsection.6.1.6.3}%
-\contentsline {section}{\numberline {6.2}Kiến trúc hiện thực}{63}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Phần Software – Triển khai ứng dụng}{66}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}User Mobile App}{66}{subsection.6.3.1}%
-\contentsline {subsection}{\numberline {6.3.2}Partner Portal (Web/App)}{66}{subsection.6.3.2}%
-\contentsline {subsection}{\numberline {6.3.3}Admin Dashboard (Web)}{66}{subsection.6.3.3}%
-\contentsline {subsection}{\numberline {6.3.4}Tích hợp AI với hệ thống ứng dụng}{66}{subsection.6.3.4}%
-\contentsline {subsection}{\numberline {6.3.5}Bảo mật và quản lý dữ liệu}{66}{subsection.6.3.5}%
-\contentsline {chapter}{\numberline {7}Kết luận \& Giai đoạn đồ án tốt nghiệp}{67}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Nhận xét chung}{67}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Hạn chế}{67}{section.7.2}%
-\contentsline {section}{\numberline {7.3}Giai đoạn đồ án tốt nghiệp}{68}{section.7.3}%
-\contentsline {subsection}{\numberline {7.3.1}Sơ đồ garnt giai đoạn đồ án tốt nghiệp}{68}{subsection.7.3.1}%
-\contentsline {subsection}{\numberline {7.3.2}Bảng kế hoạch \& Phân công công việc}{68}{subsection.7.3.2}%
-\contentsline {chapter}{Tài Liệu Tham Khảo}{70}{table.7.1}%
+\contentsline {chapter}{\numberline {1}Giới thiệu}{9}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Đặt vấn đề}{9}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Mục tiêu đồ án}{10}{section.1.2}%
+\contentsline {chapter}{\numberline {2}Tổng quan và cơ sở lý thuyết}{11}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Tổng quan về hệ thống chăm sóc sức khỏe và sắc đẹp}{11}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Phạm vi, đối tượng áp dụng, và các bên liên quan}{11}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Phạm vi}{11}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Các đối tượng liên quan (Stackholders)}{12}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Các hệ thống tương tự}{13}{subsection.2.2.3}%
+\contentsline {section}{\numberline {2.3}AI trong chăm sóc sức khỏe và gợi ý dịch vụ cá nhân hóa}{13}{section.2.3}%
+\contentsline {chapter}{\numberline {3}Yêu cầu về hệ thống}{14}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Yêu cầu chức năng}{14}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}User App}{14}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Partner Portal}{15}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Admin Dashboard}{17}{subsection.3.1.3}%
+\contentsline {section}{\numberline {3.2}Yêu cầu phi chức năng}{18}{section.3.2}%
+\contentsline {chapter}{\numberline {4}Phân tích hệ thống}{20}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Mô tả hệ thống tổng quan}{20}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Sơ đồ Use Case (Use Case Diagram)}{20}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Sơ đồ Use Case cho User App}{20}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Sơ đồ Use Case cho Partner Portal}{20}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Sơ đồ Use Case cho Admin Dashboard}{20}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Sơ đồ Use Case Tổng Thể Hệ Thống (Tích Hợp AI)}{21}{subsection.4.2.4}%
+\contentsline {section}{\numberline {4.3}Chi Tiết Use Case (Use-case Detail)}{22}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Use Case 1: Onboarding và Cá nhân hóa Hồ sơ (User App)}{22}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Use Case 2: Chatbot AI Tư vấn và Gợi ý Dịch vụ (User App)}{23}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Use Case 3: Đặt lịch hẹn (Booking) (User App)}{24}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Use Case 4: Trang Đăng ký Cung cấp Hồ sơ (Partner Portal)}{25}{subsection.4.3.4}%
+\contentsline {subsection}{\numberline {4.3.5}Use Case 5: Xác thực Quản lý Đối tác (Admin Dashboard)}{26}{subsection.4.3.5}%
+\contentsline {section}{\numberline {4.4}Sơ đồ luồng dữ liệu (Sequence Diagram)}{27}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Onboarding \& Cá nhân hóa Hồ sơ}{27}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Chatbot AI Tư vấn \& Gợi ý Dịch vụ}{28}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Tìm kiếm \& Lọc Nâng cao}{29}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}Đặt lịch hẹn (Booking), thanh toán và đánh giá}{30}{subsection.4.4.4}%
+\contentsline {subsection}{\numberline {4.4.5}AI trong Quản trị Tương tác thông minh}{31}{subsection.4.4.5}%
+\contentsline {subsection}{\numberline {4.4.6}Trang Đăng ký Cung cấp Hồ sơ (Partner Registration)}{31}{subsection.4.4.6}%
+\contentsline {subsection}{\numberline {4.4.7}Xác thực Đối tác (Partner Verification)}{32}{subsection.4.4.7}%
+\contentsline {subsection}{\numberline {4.4.8}Quản lý Lịch hẹn (Booking Dashboard)}{33}{subsection.4.4.8}%
+\contentsline {subsection}{\numberline {4.4.9}Quản lý Dịch vụ (Service Management)}{34}{subsection.4.4.9}%
+\contentsline {subsection}{\numberline {4.4.10}Quản lý Nhân viên Phân quyền (Staff Management )}{35}{subsection.4.4.10}%
+\contentsline {section}{\numberline {4.5}Sơ đồ Activity (Activity Diagram)}{35}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Luồng Onboarding và Cá nhân hóa Người dùng}{36}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Luồng Chatbot AI Tư vấn \& Gợi ý Dịch vụ}{36}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Quy trình Đăng ký Đối tác (Partner Registration)}{37}{subsection.4.5.3}%
+\contentsline {subsection}{\numberline {4.5.4}Luồng Đặt lịch, Thanh toán và Đánh giá}{38}{subsection.4.5.4}%
+\contentsline {subsection}{\numberline {4.5.5}Quy trình Phê duyệt Đối tác (Partner Verification)}{38}{subsection.4.5.5}%
+\contentsline {subsection}{\numberline {4.5.6}Chu trình Tự động Huấn luyện Mô hình AI}{39}{subsection.4.5.6}%
+\contentsline {subsection}{\numberline {4.5.7}Quản lý Lịch hẹn (Góc nhìn Đối tác / Dashboard)}{39}{subsection.4.5.7}%
+\contentsline {subsection}{\numberline {4.5.8}Quản lý Nhân viên \& Phân quyền}{40}{subsection.4.5.8}%
+\contentsline {section}{\numberline {4.6}Class Diagram (ERD)}{40}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Mô tả}{40}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Các thành phần chính và mối quan hệ}{40}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Kết luận}{41}{subsection.4.6.3}%
+\contentsline {subsection}{\numberline {4.6.4}Lược đồ}{41}{subsection.4.6.4}%
+\contentsline {chapter}{\numberline {5}Thiết kế hệ thống}{42}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Kiến trúc tổng thể hệ thống}{42}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Kiến trúc N-tier}{42}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Kết cấu chi tiết 5 Tầng (Structure)}{42}{subsection.5.1.2}%
+\contentsline {subsubsection}{\numberline {5.1.2.1}Tầng 1: Presentation Layer (Client Layer)}{42}{subsubsection.5.1.2.1}%
+\contentsline {subsubsection}{\numberline {5.1.2.2}Tầng 2: Connection \& API Layer (Gateway)}{42}{subsubsection.5.1.2.2}%
+\contentsline {subsubsection}{\numberline {5.1.2.3}Tầng 3: Business Logic Layer (Server Layer - Microservices)}{42}{subsubsection.5.1.2.3}%
+\contentsline {subsubsection}{\numberline {5.1.2.4}Tầng 4: Data Access Layer (Data \& Infrastructure Layer)}{43}{subsubsection.5.1.2.4}%
+\contentsline {subsubsection}{\numberline {5.1.2.5}Tầng 5: Integration Layer (Third-Party Integrations)}{43}{subsubsection.5.1.2.5}%
+\contentsline {subsection}{\numberline {5.1.3}Ưu điểm và Nhược điểm}{43}{subsection.5.1.3}%
+\contentsline {subsection}{\numberline {5.1.4}Các Kiến trúc Thay thế và So sánh}{44}{subsection.5.1.4}%
+\contentsline {subsection}{\numberline {5.1.5}Diagram và Kết luận}{44}{subsection.5.1.5}%
+\contentsline {section}{\numberline {5.2}Thiết kế cơ sở dữ liệu}{45}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Mô tả}{45}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Các khối chức năng chính}{45}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Kết luận}{46}{subsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.2.4}Lược đồ}{47}{subsection.5.2.4}%
+\contentsline {section}{\numberline {5.3}Thiết kế UI/UX cơ bản}{48}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Onboarding \& Sign In \& Sign up}{48}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Survey}{49}{subsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.3.3}Main pages}{50}{subsection.5.3.3}%
+\contentsline {section}{\numberline {5.4}Phần AI – Thiết kế}{50}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Thu thập và tiền xử lý dữ liệu}{50}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Thiết kế hệ thống RAG Chatbot}{51}{subsection.5.4.2}%
+\contentsline {subsubsection}{\numberline {5.4.2.1}Kiến trúc tổng thể}{51}{subsubsection.5.4.2.1}%
+\contentsline {subsubsection}{\numberline {5.4.2.2}Phương pháp RAG}{51}{subsubsection.5.4.2.2}%
+\contentsline {paragraph}{\numberline {5.4.2.2.1}Nguyên lý hoạt động}{51}{paragraph.5.4.2.2.1}%
+\contentsline {subsubsection}{\numberline {5.4.2.3}Quy trình xử lý tài liệu}{51}{subsubsection.5.4.2.3}%
+\contentsline {paragraph}{\numberline {5.4.2.3.1}Tải tài liệu}{51}{paragraph.5.4.2.3.1}%
+\contentsline {paragraph}{\numberline {5.4.2.3.2}Chia nhỏ văn bản}{52}{paragraph.5.4.2.3.2}%
+\contentsline {paragraph}{\numberline {5.4.2.3.3}Embedding và lưu trữ vector}{52}{paragraph.5.4.2.3.3}%
+\contentsline {subsubsection}{\numberline {5.4.2.4}Chiến lược truy xuất}{52}{subsubsection.5.4.2.4}%
+\contentsline {paragraph}{\numberline {5.4.2.4.1}Xử lý câu hỏi}{52}{paragraph.5.4.2.4.1}%
+\contentsline {paragraph}{\numberline {5.4.2.4.2}Tham số truy xuất}{52}{paragraph.5.4.2.4.2}%
+\contentsline {subsubsection}{\numberline {5.4.2.5}Mô hình ngôn ngữ và sinh văn bản}{53}{subsubsection.5.4.2.5}%
+\contentsline {paragraph}{\numberline {5.4.2.5.1}Lựa chọn mô hình}{53}{paragraph.5.4.2.5.1}%
+\contentsline {paragraph}{\numberline {5.4.2.5.2}Lượng tử hóa}{53}{paragraph.5.4.2.5.2}%
+\contentsline {subsubsection}{\numberline {5.4.2.6}Thiết kế prompt}{53}{subsubsection.5.4.2.6}%
+\contentsline {paragraph}{\numberline {5.4.2.6.1}Cấu trúc mẫu prompt}{53}{paragraph.5.4.2.6.1}%
+\contentsline {paragraph}{\numberline {5.4.2.6.2}Nguyên tắc thiết kế prompt}{53}{paragraph.5.4.2.6.2}%
+\contentsline {subsubsection}{\numberline {5.4.2.7}Xử lý đầu ra}{54}{subsubsection.5.4.2.7}%
+\contentsline {paragraph}{\numberline {5.4.2.7.1}Phân tích phản hồi}{54}{paragraph.5.4.2.7.1}%
+\contentsline {paragraph}{\numberline {5.4.2.7.2}Xử lý lỗi}{54}{paragraph.5.4.2.7.2}%
+\contentsline {subsubsection}{\numberline {5.4.2.8}Tích hợp pipeline}{54}{subsubsection.5.4.2.8}%
+\contentsline {subsection}{\numberline {5.4.3}Thiết kế hệ thống gợi ý dịch vụ cá nhân hóa}{54}{subsection.5.4.3}%
+\contentsline {subsubsection}{\numberline {5.4.3.1}Kiến trúc tổng thể}{54}{subsubsection.5.4.3.1}%
+\contentsline {subsubsection}{\numberline {5.4.3.2}Phương pháp biểu diễn đặc trưng}{55}{subsubsection.5.4.3.2}%
+\contentsline {paragraph}{\numberline {5.4.3.2.1}Textual Features}{55}{paragraph.5.4.3.2.1}%
+\contentsline {paragraph}{\numberline {5.4.3.2.2}Embedding Model}{55}{paragraph.5.4.3.2.2}%
+\contentsline {subsubsection}{\numberline {5.4.3.3}Vector Database và Similarity Search}{55}{subsubsection.5.4.3.3}%
+\contentsline {paragraph}{\numberline {5.4.3.3.1}Vector Indexing}{55}{paragraph.5.4.3.3.1}%
+\contentsline {paragraph}{\numberline {5.4.3.3.2}Similarity Measure}{55}{paragraph.5.4.3.3.2}%
+\contentsline {subsubsection}{\numberline {5.4.3.4}Query Construction}{56}{subsubsection.5.4.3.4}%
+\contentsline {paragraph}{\numberline {5.4.3.4.1}Home Recommender Query}{56}{paragraph.5.4.3.4.1}%
+\contentsline {paragraph}{\numberline {5.4.3.4.2}Chatbot Recommender Query}{56}{paragraph.5.4.3.4.2}%
+\contentsline {subsubsection}{\numberline {5.4.3.5}Ranking và Filtering}{56}{subsubsection.5.4.3.5}%
+\contentsline {paragraph}{\numberline {5.4.3.5.1}Similarity Threshold}{56}{paragraph.5.4.3.5.1}%
+\contentsline {paragraph}{\numberline {5.4.3.5.2}History Filtering}{56}{paragraph.5.4.3.5.2}%
+\contentsline {paragraph}{\numberline {5.4.3.5.3}Diversification}{56}{paragraph.5.4.3.5.3}%
+\contentsline {paragraph}{\numberline {5.4.3.5.4}Explanation Generation}{56}{paragraph.5.4.3.5.4}%
+\contentsline {subsubsection}{\numberline {5.4.3.6}Pipeline tổng thể}{56}{subsubsection.5.4.3.6}%
+\contentsline {paragraph}{\numberline {5.4.3.6.1}Offline Phase}{56}{paragraph.5.4.3.6.1}%
+\contentsline {paragraph}{\numberline {5.4.3.6.2}Online Phase - Home Recommender}{57}{paragraph.5.4.3.6.2}%
+\contentsline {paragraph}{\numberline {5.4.3.6.3}Online Phase - Chatbot Recommender}{57}{paragraph.5.4.3.6.3}%
+\contentsline {chapter}{\numberline {6}Hiện thực}{58}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Các công nghệ liên quan}{58}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Mobile App Development (iOS/Android, Flutter)}{58}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Web/Portal Development (Partner Portal, Admin Dashboard)}{59}{subsection.6.1.2}%
+\contentsline {subsection}{\numberline {6.1.3}Server/Backend (NestJS \& PostgreSQL)}{60}{subsection.6.1.3}%
+\contentsline {subsection}{\numberline {6.1.4}Hiện thực hệ thống RAG Chatbot}{61}{subsection.6.1.4}%
+\contentsline {subsubsection}{\numberline {6.1.4.1}Tổ chức mã nguồn}{61}{subsubsection.6.1.4.1}%
+\contentsline {subsubsection}{\numberline {6.1.4.2}Hiện thực xử lý tài liệu}{61}{subsubsection.6.1.4.2}%
+\contentsline {paragraph}{\numberline {6.1.4.2.1}Tải và làm sạch tài liệu}{61}{paragraph.6.1.4.2.1}%
+\contentsline {paragraph}{\numberline {6.1.4.2.2}Chia nhỏ văn bản}{61}{paragraph.6.1.4.2.2}%
+\contentsline {subsubsection}{\numberline {6.1.4.3}Hiện thực mô hình embedding}{62}{subsubsection.6.1.4.3}%
+\contentsline {subsubsection}{\numberline {6.1.4.4}Cơ sở dữ liệu vector FAISS}{62}{subsubsection.6.1.4.4}%
+\contentsline {subsubsection}{\numberline {6.1.4.5}Hiện thực bộ truy xuất}{62}{subsubsection.6.1.4.5}%
+\contentsline {subsubsection}{\numberline {6.1.4.6}Xây dựng prompt đầu vào}{62}{subsubsection.6.1.4.6}%
+\contentsline {subsubsection}{\numberline {6.1.4.7}Tích hợp mô hình ngôn ngữ}{62}{subsubsection.6.1.4.7}%
+\contentsline {subsubsection}{\numberline {6.1.4.8}Xử lý phản hồi và hậu xử lý}{63}{subsubsection.6.1.4.8}%
+\contentsline {subsubsection}{\numberline {6.1.4.9}Pipeline tổng hợp của Chatbot}{63}{subsubsection.6.1.4.9}%
+\contentsline {subsection}{\numberline {6.1.5}Triển khai hệ thống gợi ý}{63}{subsection.6.1.5}%
+\contentsline {subsubsection}{\numberline {6.1.5.1}Cấu trúc dữ liệu}{63}{subsubsection.6.1.5.1}%
+\contentsline {subsubsection}{\numberline {6.1.5.2}Offline Processing}{63}{subsubsection.6.1.5.2}%
+\contentsline {paragraph}{\numberline {6.1.5.2.1}Document Construction}{63}{paragraph.6.1.5.2.1}%
+\contentsline {paragraph}{\numberline {6.1.5.2.2}Vector Database Building}{63}{paragraph.6.1.5.2.2}%
+\contentsline {subsubsection}{\numberline {6.1.5.3}Online Processing}{64}{subsubsection.6.1.5.3}%
+\contentsline {paragraph}{\numberline {6.1.5.3.1}Home Recommender}{64}{paragraph.6.1.5.3.1}%
+\contentsline {paragraph}{\numberline {6.1.5.3.2}Chatbot Recommender}{64}{paragraph.6.1.5.3.2}%
+\contentsline {subsubsection}{\numberline {6.1.5.4}Ví dụ minh họa}{65}{subsubsection.6.1.5.4}%
+\contentsline {paragraph}{\numberline {6.1.5.4.1}Ví dụ 1: Chatbot Recommender}{65}{paragraph.6.1.5.4.1}%
+\contentsline {paragraph}{\numberline {6.1.5.4.2}Ví dụ 2: Home Recommender}{65}{paragraph.6.1.5.4.2}%
+\contentsline {subsubsection}{\numberline {6.1.5.5}Đánh giá hiệu năng}{66}{subsubsection.6.1.5.5}%
+\contentsline {paragraph}{\numberline {6.1.5.5.1}Độ phức tạp tính toán}{66}{paragraph.6.1.5.5.1}%
+\contentsline {paragraph}{\numberline {6.1.5.5.2}Memory Requirements}{66}{paragraph.6.1.5.5.2}%
+\contentsline {paragraph}{\numberline {6.1.5.5.3}Scalability}{66}{paragraph.6.1.5.5.3}%
+\contentsline {subsubsection}{\numberline {6.1.5.6}Khả năng mở rộng}{67}{subsubsection.6.1.5.6}%
+\contentsline {section}{\numberline {6.2}Kiến trúc hiện thực}{67}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Phần Software – Triển khai ứng dụng}{70}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}User Mobile App}{70}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Partner Portal (Web/App)}{70}{subsection.6.3.2}%
+\contentsline {subsection}{\numberline {6.3.3}Admin Dashboard (Web)}{70}{subsection.6.3.3}%
+\contentsline {subsection}{\numberline {6.3.4}Tích hợp AI với hệ thống ứng dụng}{70}{subsection.6.3.4}%
+\contentsline {subsection}{\numberline {6.3.5}Bảo mật và quản lý dữ liệu}{70}{subsection.6.3.5}%
+\contentsline {chapter}{\numberline {7}Kết luận \& Giai đoạn đồ án tốt nghiệp}{71}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Nhận xét chung}{71}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Hạn chế}{71}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Giai đoạn đồ án tốt nghiệp}{72}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Sơ đồ garnt giai đoạn đồ án tốt nghiệp}{72}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Bảng kế hoạch \& Phân công công việc}{72}{subsection.7.3.2}%
+\contentsline {chapter}{Tài Liệu Tham Khảo}{74}{table.7.1}%
