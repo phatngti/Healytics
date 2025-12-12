@@ -129,11 +129,12 @@ Kết quả được lưu dưới dạng danh sách JSON gồm nội dung đoạ
 
 Hệ thống sử dụng mô hình Sentence Transformers được tải từ HuggingFace. Lớp embedding thực thi các bước:
 
-\begin{enumerate}
-    \item tải mô hình vào CPU hoặc GPU tùy khả năng phần cứng;
-    \item mã hóa văn bản thành vector có kích thước cố định;
-    \item chuẩn hóa vector về đơn vị (L2 normalize) trước khi lưu vào FAISS.
-\end{enumerate}
+    \begin{enumerate}
+        \item Tải mô hình vào CPU hoặc GPU tùy theo khả năng phần cứng.
+        \item Mã hóa văn bản thành vector có kích thước cố định.
+        \item Chuẩn hóa vector về đơn vị (L2 normalize) trước khi lưu vào FAISS.
+    \end{enumerate}
+
 
 Cơ chế xử lý hàng loạt (batch encoding) được tích hợp nhằm tăng hiệu năng khi embedding số lượng lớn đoạn.
 
@@ -250,17 +251,17 @@ Mỗi service trong database chứa các trường:
 
 \subsubsection{Offline Processing}
 
-\paragraph{Document Construction} \\
+\paragraph{Document Construction}
 Mỗi service được chuyển đổi thành một document text có cấu trúc:
 
 \begin{quote}
-\texttt{Tên dịch vụ: [name]}\\
-\texttt{Mô tả: [description]}\\
-\texttt{Danh mục: [category]}\\
+\texttt{Tên dịch vụ: [name]} 
+\texttt{Mô tả: [description]} 
+\texttt{Danh mục: [category]} 
 \texttt{Từ khóa: [tag1, tag2, tag3, ...]}
 \end{quote}
 
-\paragraph{Vector Database Building} \\
+\paragraph{Vector Database Building} 
 Quá trình build vector database bao gồm:
 \begin{enumerate}
     \item Load 10 services từ \texttt{data/raw/services.json}
@@ -274,7 +275,7 @@ Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng
 
 \subsubsection{Online Processing}
 
-\paragraph{Home Recommender} \\
+\paragraph{Home Recommender}  
 
 \textbf{Input Format:}
 \begin{itemize}
@@ -314,7 +315,7 @@ Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng
     \item \texttt{total}: int - Tổng số gợi ý
 \end{itemize}
 
-\paragraph{Chatbot Recommender} \\
+\paragraph{Chatbot Recommender}  
 
 \textbf{Input Format:}
 \begin{itemize}
@@ -344,7 +345,7 @@ Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng
 
 \subsubsection{Ví dụ minh họa}
 
-\paragraph{Ví dụ 1: Chatbot Recommender} \\
+\paragraph{Ví dụ 1: Chatbot Recommender}  
 
 \textbf{Input:}
 \begin{verbatim}
@@ -391,7 +392,7 @@ Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng
 }
 \end{verbatim}
 
-\paragraph{Ví dụ 2: Home Recommender} \\
+\paragraph{Ví dụ 2: Home Recommender}  
 
 \textbf{Input:}
 \begin{verbatim}
@@ -444,7 +445,7 @@ Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng
 
 \subsubsection{Đánh giá hiệu năng}
 
-\paragraph{Độ phức tạp tính toán} \\
+\paragraph{Độ phức tạp tính toán}  
 
 \begin{itemize}
     \item \textbf{Embedding}: $O(L)$ với $L$ là độ dài query (thời gian constant cho mô hình BERT)
@@ -452,7 +453,7 @@ Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng
     \item \textbf{Total latency}: < 100ms trên GPU, < 500ms trên CPU
 \end{itemize}
 
-\paragraph{Memory Requirements} \\
+\paragraph{Memory Requirements} 
 
 \begin{itemize}
     \item \textbf{Embedding Model}: ~420MB (model weights)
@@ -460,7 +461,7 @@ Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng
     \item \textbf{Runtime Memory}: ~600MB total
 \end{itemize}
 
-\paragraph{Scalability} \\
+\paragraph{Scalability} 
 
 Hệ thống có thể scale hiệu quả:
 \begin{itemize}

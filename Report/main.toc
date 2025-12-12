@@ -62,12 +62,12 @@
 \contentsline {subsubsection}{\numberline {5.1.2.4}Tầng 4: Data Access Layer (Data \& Infrastructure Layer)}{43}{subsubsection.5.1.2.4}%
 \contentsline {subsubsection}{\numberline {5.1.2.5}Tầng 5: Integration Layer (Third-Party Integrations)}{43}{subsubsection.5.1.2.5}%
 \contentsline {subsection}{\numberline {5.1.3}Ưu điểm và Nhược điểm}{43}{subsection.5.1.3}%
-\contentsline {subsection}{\numberline {5.1.4}Các Kiến trúc Thay thế và So sánh}{44}{subsection.5.1.4}%
-\contentsline {subsection}{\numberline {5.1.5}Diagram và Kết luận}{44}{subsection.5.1.5}%
-\contentsline {section}{\numberline {5.2}Thiết kế cơ sở dữ liệu}{45}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Mô tả}{45}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}Các khối chức năng chính}{45}{subsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.2.3}Kết luận}{46}{subsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.1.4}Các Kiến trúc Thay thế và So sánh}{43}{subsection.5.1.4}%
+\contentsline {subsection}{\numberline {5.1.5}Diagram và Kết luận}{43}{subsection.5.1.5}%
+\contentsline {section}{\numberline {5.2}Thiết kế cơ sở dữ liệu}{46}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Mô tả}{46}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Các khối chức năng chính}{46}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Kết luận}{47}{subsection.5.2.3}%
 \contentsline {subsection}{\numberline {5.2.4}Lược đồ}{47}{subsection.5.2.4}%
 \contentsline {section}{\numberline {5.3}Thiết kế UI/UX cơ bản}{48}{section.5.3}%
 \contentsline {subsection}{\numberline {5.3.1}Onboarding \& Sign In \& Sign up}{48}{subsection.5.3.1}%
