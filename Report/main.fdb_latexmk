@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber main"] 1765543055.16001 "main.bcf" "main.bbl" "main" 1765550539.89941 0
-  "main.bcf" 1765550539.70885 107330 6bf24ab00f2d694dccd0e7ce0c17d29b "pdflatex"
+["biber main"] 1765560817.36162 "main.bcf" "main.bbl" "main" 1765566361.0368 0
+  "main.bcf" 1765566360.8562 107330 6bf24ab00f2d694dccd0e7ce0c17d29b "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1765550530.40655 "/Volumes/WD850X/Users/workspace/datn/Healytics/Report/main.tex" "main.pdf" "main" 1765550539.89968 0
-  "/Volumes/WD850X/Users/workspace/datn/Healytics/Report/main.tex" 1765539875.41974 9858 b0abec4946e3b8177b6fa83cdc73a8a3 ""
+["pdflatex"] 1765566350.98276 "/Volumes/WD850X/Users/workspace/datn/Healytics/Report/main.tex" "main.pdf" "main" 1765566361.03703 0
+  "/Volumes/WD850X/Users/workspace/datn/Healytics/Report/main.tex" 1765561706.92362 9858 b0abec4946e3b8177b6fa83cdc73a8a3 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/fontawesome5/fa5free0.enc" 1622837620 3083 a707712f77b073b3833e4b1334a30e99 ""
@@ -316,7 +316,7 @@
   "Contents/GioiThieu.tex" 1765372719.45414 6157 f28c4ffd18847ec4db14cb4bccef9fb0 ""
   "Contents/HienThuc.tex" 1765540426.22654 38722 3b01381ec5a6f694fc3bc8538d8f08ae ""
   "Contents/KetLuan.tex" 1765538944.18872 13054 14d3d839958af2343474163f3ba951d4 ""
-  "Contents/PhanTichHeThong.tex" 1765372719.45549 30039 26eb8875dc097b7de1269f69a7b97c02 ""
+  "Contents/PhanTichHeThong.tex" 1765566340.7103 36329 b97ce59526c9806b076e7f7fd0c244d4 ""
   "Contents/ThietKeHeThong.tex" 1765539234.83226 43757 20280c38dabae8353dde6bc31a461011 ""
   "Contents/YeuCauHeThong.tex" 1765372719.45581 21386 fb39d7765dc064b7c57cde4690d589e4 ""
   "Images/Activity/4.5.1.png" 1765372719.45632 35395 e41770e10f806a71d37447bcd74d8ee2 ""
@@ -329,7 +329,12 @@
   "Images/Activity/4.5.8.png" 1765372719.4594 23218 3c2bccbfc00c780118bd77acbd2a563c ""
   "Images/Admin_Usecase.jpg" 1765372719.45994 54065 9fb16c864bc4f701e14813355258e8b1 ""
   "Images/ArchSys.png" 1765372719.46933 82144 9cc40d3f91b010c41183a992c464aab9 ""
-  "Images/CD.png" 1765372719.47883 3514293 57fab410c52315a60b105b828d52d7f7 ""
+  "Images/ClassDiagram/class_diagram.png" 1765561697.26398 3613914 13a0cf574c2bd4bfbf347de32e56a00d ""
+  "Images/ClassDiagram/module_admin.png" 1765566086.27409 439853 a125892d21f2e1612d5a329bc0e90af8 ""
+  "Images/ClassDiagram/module_booking.png" 1765566086.29395 739111 3ab8bbd78d30d46b9763ecbdb4cd5e5f ""
+  "Images/ClassDiagram/module_communication.png" 1765566086.27762 512157 abe277d1c98fc40d6bd3b3bc332678e5 ""
+  "Images/ClassDiagram/module_partner.png" 1765566086.28915 658712 fa6f4c10318a2c5ae366ccf8b31ad01a ""
+  "Images/ClassDiagram/module_user.png" 1765566086.30098 737133 9e91600bf5271510dfe014cff568cdb3 ""
   "Images/ERD.png" 1765372719.48385 1576949 3b2ac2f02a397a86d35cf49dd0337934 ""
   "Images/Pages/chat.png" 1765372719.48524 251087 9ceb513c6302bb0828153917894b5bab ""
   "Images/Pages/home1.png" 1765372719.48604 212754 547d8d929d4408e3db40e1e224a36951 ""
@@ -369,14 +374,14 @@
   "Intro/TomTat.tex" 1765382670.02947 112 a3dfcf20fd07ad239c2697291db10fae ""
   "Outro/PhuLuc.tex" 1765372719.51786 135 c4a61eba016259a71c2518bd0fe52184 ""
   "Outro/TaiLieuThamKhao.tex" 1765372719.5181 1851 7a2ef2552f780753bf2f5f09f36f48f4 ""
-  "main.aux" 1765550539.7038 35729 2fe98b33489d11edb455779974c2931d "pdflatex"
-  "main.bbl" 1765543056.47273 466 76d65a242ec496c9b4361af646ff12cb "biber main"
-  "main.lof" 1765550539.71018 3512 68bb30790ae5e2e769921243c55d6a51 "pdflatex"
-  "main.lot" 1765550539.71021 1356 a861672d4f48c95c7d226b4f8ac5f314 "pdflatex"
-  "main.out" 1765550539.70766 29795 db3d1b40dbf120d11062b09b3b58af1b "pdflatex"
-  "main.run.xml" 1765550539.71004 2396 938f4cf68218d122bbffc682032d60b8 "pdflatex"
-  "main.tex" 1765539875.41974 9858 b0abec4946e3b8177b6fa83cdc73a8a3 ""
-  "main.toc" 1765550539.71014 17172 b181addf2342ecec5d343be8fb9281a5 "pdflatex"
+  "main.aux" 1765566360.85212 37981 8308fd2098a0c01eca113cdd6a81b4e7 "pdflatex"
+  "main.bbl" 1765560818.84021 466 76d65a242ec496c9b4361af646ff12cb "biber main"
+  "main.lof" 1765566360.85694 4149 de65d57b6b446b3e46487c3f9ab7dd0e "pdflatex"
+  "main.lot" 1765566360.85707 1356 3f1fd227e570149db4bfc119ffa24057 "pdflatex"
+  "main.out" 1765566360.85518 31940 3cce9eb0547ea8f6d72768c73be656cb "pdflatex"
+  "main.run.xml" 1765566360.85685 2396 938f4cf68218d122bbffc682032d60b8 "pdflatex"
+  "main.tex" 1765561706.92362 9858 b0abec4946e3b8177b6fa83cdc73a8a3 ""
+  "main.toc" 1765566360.85692 17879 7f3b2df304559e4e08421099131b603c "pdflatex"
   (generated)
   "main.aux"
   "main.bcf"

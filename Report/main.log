@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.8)  12 DEC 2025 21:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.8)  13 DEC 2025 02:05
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1803,7 +1803,7 @@ Package: lscape 2020/05/28 v3.02 Landscape Pages (DPC)
 )
 Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
 ))
-<Images/hcmut.png, id=525, 514.3215pt x 491.9178pt>
+<Images/hcmut.png, id=541, 514.3215pt x 491.9178pt>
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 243.
@@ -1884,7 +1884,7 @@ Package pdftex.def Info: Images/hcmut.png  used on input line 6.
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
-Package pdftex.def Info: Images/hcmut.png  used on input line 126.
+Package pdftex.def Info: Images/hcmut.png  used on input line 125.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [7])
 \tf@toc=\write6
@@ -1984,17 +1984,17 @@ Package pdftex.def Info: Images/hcmut.png  used on input line 319.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [21] (./Contents/PhanTichHeThong.tex
 Ch\uhorn \ohorn ng 4.
-<Images/User_Usecase.jpg, id=885, 1551.7975pt x 489.83pt>
+<Images/User_Usecase.jpg, id=916, 1551.7975pt x 489.83pt>
 File: Images/User_Usecase.jpg Graphic file (type jpg)
 <use Images/User_Usecase.jpg>
 Package pdftex.def Info: Images/User_Usecase.jpg  used on input line 11.
 (pdftex.def)             Requested size: 330.05322pt x 104.18279pt.
-<Images/Partner_Usecase.jpg, id=886, 1284.8pt x 377.41pt>
+<Images/Partner_Usecase.jpg, id=917, 1284.8pt x 377.41pt>
 File: Images/Partner_Usecase.jpg Graphic file (type jpg)
 <use Images/Partner_Usecase.jpg>
 Package pdftex.def Info: Images/Partner_Usecase.jpg  used on input line 27.
 (pdftex.def)             Requested size: 330.05322pt x 96.94948pt.
-<Images/Admin_Usecase.jpg, id=887, 1148.29pt x 502.87875pt>
+<Images/Admin_Usecase.jpg, id=918, 1148.29pt x 502.87875pt>
 File: Images/Admin_Usecase.jpg Graphic file (type jpg)
 <use Images/Admin_Usecase.jpg>
 Package pdftex.def Info: Images/Admin_Usecase.jpg  used on input line 43.
@@ -2004,7 +2004,7 @@ Package pdftex.def Info: Images/Admin_Usecase.jpg  used on input line 43.
 [22
 
  <./Images/User_Usecase.jpg> <./Images/Partner_Usecase.jpg>]
-<Images/Wellness_Usecase.jpg, id=893, 1284.8pt x 508.90125pt>
+<Images/Wellness_Usecase.jpg, id=924, 1284.8pt x 508.90125pt>
 File: Images/Wellness_Usecase.jpg Graphic file (type jpg)
 <use Images/Wellness_Usecase.jpg>
 Package pdftex.def Info: Images/Wellness_Usecase.jpg  used on input line 58.
@@ -2090,7 +2090,7 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 325.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [27]
-<Images/sequences/4.2.1.png, id=921, 2185.16376pt x 2000.47375pt>
+<Images/sequences/4.2.1.png, id=952, 2185.16376pt x 2000.47375pt>
 File: Images/sequences/4.2.1.png Graphic file (type png)
 <use Images/sequences/4.2.1.png>
 Package pdftex.def Info: Images/sequences/4.2.1.png  used on input line 332.
@@ -2102,7 +2102,7 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 341.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [28]
-<Images/sequences/4.2.2.png, id=927, 1479.5275pt x 2165.08875pt>
+<Images/sequences/4.2.2.png, id=958, 1479.5275pt x 2165.08875pt>
 File: Images/sequences/4.2.2.png Graphic file (type png)
 <use Images/sequences/4.2.2.png>
 Package pdftex.def Info: Images/sequences/4.2.2.png  used on input line 346.
@@ -2114,7 +2114,7 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 355.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [29 <./Images/sequences/4.2.1.png>]
-<Images/sequences/4.2.3.png, id=934, 1557.82pt x 1558.82375pt>
+<Images/sequences/4.2.3.png, id=965, 1557.82pt x 1558.82375pt>
 File: Images/sequences/4.2.3.png Graphic file (type png)
 <use Images/sequences/4.2.3.png>
 Package pdftex.def Info: Images/sequences/4.2.3.png  used on input line 360.
@@ -2126,7 +2126,7 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 369.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [30 <./Images/sequences/4.2.2.png>]
-<Images/sequences/4.2.4.png, id=941, 1902.10625pt x 3696.81125pt>
+<Images/sequences/4.2.4.png, id=972, 1902.10625pt x 3696.81125pt>
 File: Images/sequences/4.2.4.png Graphic file (type png)
 <use Images/sequences/4.2.4.png>
 Package pdftex.def Info: Images/sequences/4.2.4.png  used on input line 374.
@@ -2138,7 +2138,7 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 383.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [31 <./Images/sequences/4.2.3.png>]
-<Images/sequences/4.2.6.png, id=949, 1102.71976pt x 504.08325pt>
+<Images/sequences/4.2.6.png, id=980, 1102.71976pt x 504.08325pt>
 File: Images/sequences/4.2.6.png Graphic file (type png)
 <use Images/sequences/4.2.6.png>
 Package pdftex.def Info: Images/sequences/4.2.6.png  used on input line 389.
@@ -2150,12 +2150,12 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 398.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [32 <./Images/sequences/4.2.4.png>]
-<Images/sequences/4.2.7.png, id=956, 1961.3275pt x 2460.19125pt>
+<Images/sequences/4.2.7.png, id=987, 1961.3275pt x 2460.19125pt>
 File: Images/sequences/4.2.7.png Graphic file (type png)
 <use Images/sequences/4.2.7.png>
 Package pdftex.def Info: Images/sequences/4.2.7.png  used on input line 403.
 (pdftex.def)             Requested size: 330.05322pt x 413.98503pt.
-<Images/sequences/4.2.8.png, id=957, 2084.78876pt x 2320.67pt>
+<Images/sequences/4.2.8.png, id=988, 2084.78876pt x 2320.67pt>
 File: Images/sequences/4.2.8.png Graphic file (type png)
 <use Images/sequences/4.2.8.png>
 Package pdftex.def Info: Images/sequences/4.2.8.png  used on input line 417.
@@ -2167,7 +2167,7 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 426.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [33 <./Images/sequences/4.2.6.png> <./Images/sequences/4.2.7.png>]
-<Images/sequences/4.2.9.png, id=965, 1491.5725pt x 2338.7375pt>
+<Images/sequences/4.2.9.png, id=996, 1491.5725pt x 2338.7375pt>
 File: Images/sequences/4.2.9.png Graphic file (type png)
 <use Images/sequences/4.2.9.png>
 Package pdftex.def Info: Images/sequences/4.2.9.png  used on input line 430.
@@ -2179,7 +2179,7 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 439.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [34 <./Images/sequences/4.2.8.png>]
-<Images/sequences/4.2.10.png, id=972, 1715.40875pt x 2053.6725pt>
+<Images/sequences/4.2.10.png, id=1003, 1715.40875pt x 2053.6725pt>
 File: Images/sequences/4.2.10.png Graphic file (type png)
 <use Images/sequences/4.2.10.png>
 Package pdftex.def Info: Images/sequences/4.2.10.png  used on input line 443.
@@ -2191,7 +2191,7 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 452.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [35 <./Images/sequences/4.2.9.png>]
-<Images/sequences/4.2.11.png, id=979, 1733.47626pt x 2599.7125pt>
+<Images/sequences/4.2.11.png, id=1010, 1733.47626pt x 2599.7125pt>
 File: Images/sequences/4.2.11.png Graphic file (type png)
 <use Images/sequences/4.2.11.png>
 Package pdftex.def Info: Images/sequences/4.2.11.png  used on input line 457.
@@ -2209,12 +2209,12 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 494.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [37 <./Images/sequences/4.2.11.png>]
-<Images/Activity/4.5.1.png, id=993, 1162.3425pt x 1269.74374pt>
+<Images/Activity/4.5.1.png, id=1024, 1162.3425pt x 1269.74374pt>
 File: Images/Activity/4.5.1.png Graphic file (type png)
 <use Images/Activity/4.5.1.png>
 Package pdftex.def Info: Images/Activity/4.5.1.png  used on input line 503.
 (pdftex.def)             Requested size: 330.05322pt x 360.54387pt.
-<Images/Activity/4.5.2.png, id=994, 1691.31876pt x 1660.2025pt>
+<Images/Activity/4.5.2.png, id=1025, 1691.31876pt x 1660.2025pt>
 File: Images/Activity/4.5.2.png Graphic file (type png)
 <use Images/Activity/4.5.2.png>
 Package pdftex.def Info: Images/Activity/4.5.2.png  used on input line 519.
@@ -2226,7 +2226,7 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 528.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [38 <./Images/Activity/4.5.1.png>]
-<Images/Activity/4.5.4.png, id=1001, 2205.23875pt x 1553.805pt>
+<Images/Activity/4.5.4.png, id=1032, 2205.23875pt x 1553.805pt>
 File: Images/Activity/4.5.4.png Graphic file (type png)
 <use Images/Activity/4.5.4.png>
 Package pdftex.def Info: Images/Activity/4.5.4.png  used on input line 537.
@@ -2238,12 +2238,12 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 548.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [39 <./Images/Activity/4.5.2.png> <./Images/Activity/4.5.4.png>]
-<Images/Activity/4.5.3.png, id=1009, 1808.7575pt x 1829.83624pt>
+<Images/Activity/4.5.3.png, id=1041, 1808.7575pt x 1829.83624pt>
 File: Images/Activity/4.5.3.png Graphic file (type png)
 <use Images/Activity/4.5.3.png>
 Package pdftex.def Info: Images/Activity/4.5.3.png  used on input line 552.
 (pdftex.def)             Requested size: 330.05322pt x 333.87952pt.
-<Images/Activity/4.5.5.png, id=1010, 1973.3725pt x 1662.21pt>
+<Images/Activity/4.5.5.png, id=1042, 1973.3725pt x 1662.21pt>
 File: Images/Activity/4.5.5.png Graphic file (type png)
 <use Images/Activity/4.5.5.png>
 Package pdftex.def Info: Images/Activity/4.5.5.png  used on input line 570.
@@ -2255,12 +2255,12 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 579.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [40 <./Images/Activity/4.5.3.png>]
-<Images/Activity/4.5.6.png, id=1017, 2146.0175pt x 983.675pt>
+<Images/Activity/4.5.6.png, id=1049, 2146.0175pt x 983.675pt>
 File: Images/Activity/4.5.6.png Graphic file (type png)
 <use Images/Activity/4.5.6.png>
 Package pdftex.def Info: Images/Activity/4.5.6.png  used on input line 586.
 (pdftex.def)             Requested size: 330.05322pt x 151.28229pt.
-<Images/Activity/4.5.7.png, id=1018, 1598.97375pt x 805.0075pt>
+<Images/Activity/4.5.7.png, id=1050, 1598.97375pt x 805.0075pt>
 File: Images/Activity/4.5.7.png Graphic file (type png)
 <use Images/Activity/4.5.7.png>
 Package pdftex.def Info: Images/Activity/4.5.7.png  used on input line 604.
@@ -2272,34 +2272,89 @@ File: Images/hcmut.png Graphic file (type png)
 Package pdftex.def Info: Images/hcmut.png  used on input line 613.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [41 <./Images/Activity/4.5.5.png> <./Images/Activity/4.5.6.png>]
-<Images/Activity/4.5.8.png, id=1027, 1442.38875pt x 688.5725pt>
+<Images/Activity/4.5.8.png, id=1058, 1442.38875pt x 688.5725pt>
 File: Images/Activity/4.5.8.png Graphic file (type png)
 <use Images/Activity/4.5.8.png>
 Package pdftex.def Info: Images/Activity/4.5.8.png  used on input line 622.
 (pdftex.def)             Requested size: 330.05322pt x 157.55931pt.
+<Images/ClassDiagram/class_diagram.png, id=1059, 12443.48875pt x 3659.6725pt>
+File: Images/ClassDiagram/class_diagram.png Graphic file (type png)
+<use Images/ClassDiagram/class_diagram.png>
+Package pdftex.def Info: Images/ClassDiagram/class_diagram.png  used on input line 639.
+(pdftex.def)             Requested size: 412.56497pt x 121.2889pt.
 
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
-Package pdftex.def Info: Images/hcmut.png  used on input line 642.
+Package pdftex.def Info: Images/hcmut.png  used on input line 648.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [42 <./Images/Activity/4.5.7.png> <./Images/Activity/4.5.8.png>]
-<Images/CD.png, id=1035, 12862.0525pt x 4492.785pt>
-File: Images/CD.png Graphic file (type png)
-<use Images/CD.png>
-Package pdftex.def Info: Images/CD.png  used on input line 649.
-(pdftex.def)             Requested size: 412.56497pt x 144.10112pt.
+<Images/ClassDiagram/module_user.png, id=1067, 5950.23pt x 3036.34375pt>
+File: Images/ClassDiagram/module_user.png Graphic file (type png)
+<use Images/ClassDiagram/module_user.png>
+Package pdftex.def Info: Images/ClassDiagram/module_user.png  used on input line 657.
+(pdftex.def)             Requested size: 330.05322pt x 168.4125pt.
+LaTeX Font Info:    Trying to load font information for T5+cmtt on input line 666.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/vntex/t5cmtt.fd
+File: t5cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
+<Images/ClassDiagram/module_booking.png, id=1068, 3102.59125pt x 5269.6875pt>
+File: Images/ClassDiagram/module_booking.png Graphic file (type png)
+<use Images/ClassDiagram/module_booking.png>
+Package pdftex.def Info: Images/ClassDiagram/module_booking.png  used on input line 683.
+(pdftex.def)             Requested size: 330.05322pt x 560.53012pt.
+
+
+File: Images/hcmut.png Graphic file (type png)
+<use Images/hcmut.png>
+Package pdftex.def Info: Images/hcmut.png  used on input line 688.
+(pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
+[43 <./Images/ClassDiagram/class_diagram.png> <./Images/ClassDiagram/module_user.png>]
+
+File: Images/hcmut.png Graphic file (type png)
+<use Images/hcmut.png>
+Package pdftex.def Info: Images/hcmut.png  used on input line 695.
+(pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
+[44 <./Images/ClassDiagram/module_booking.png>]
+<Images/ClassDiagram/module_partner.png, id=1085, 3561.305pt x 4280.99374pt>
+File: Images/ClassDiagram/module_partner.png Graphic file (type png)
+<use Images/ClassDiagram/module_partner.png>
+Package pdftex.def Info: Images/ClassDiagram/module_partner.png  used on input line 709.
+(pdftex.def)             Requested size: 330.05322pt x 396.70427pt.
+
+
+File: Images/hcmut.png Graphic file (type png)
+<use Images/hcmut.png>
+Package pdftex.def Info: Images/hcmut.png  used on input line 721.
+(pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
+[45 <./Images/ClassDiagram/module_partner.png>]
+<Images/ClassDiagram/module_communication.png, id=1093, 4279.99pt x 2810.5pt>
+File: Images/ClassDiagram/module_communication.png Graphic file (type png)
+<use Images/ClassDiagram/module_communication.png>
+Package pdftex.def Info: Images/ClassDiagram/module_communication.png  used on input line 730.
+(pdftex.def)             Requested size: 330.05322pt x 216.6965pt.
+<Images/ClassDiagram/module_admin.png, id=1094, 5555.75626pt x 1927.2pt>
+File: Images/ClassDiagram/module_admin.png Graphic file (type png)
+<use Images/ClassDiagram/module_admin.png>
+Package pdftex.def Info: Images/ClassDiagram/module_admin.png  used on input line 755.
+(pdftex.def)             Requested size: 330.05322pt x 114.48015pt.
+
+
+File: Images/hcmut.png Graphic file (type png)
+<use Images/hcmut.png>
+Package pdftex.def Info: Images/hcmut.png  used on input line 766.
+(pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
+[46 <./Images/ClassDiagram/module_communication.png> <./Images/ClassDiagram/module_admin.png>])
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 322.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[43 <./Images/CD.png>] (./Contents/ThietKeHeThong.tex
+[47] (./Contents/ThietKeHeThong.tex
 Ch\uhorn \ohorn ng 5.
 
 
-[44
+[48
 
 ]
 Underfull \hbox (badness 10000) in alignment at lines 156--156
@@ -2312,8 +2367,8 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 157.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[45]
-<Images/ArchSys.png, id=1053, 1284.8pt x 619.31375pt>
+[49]
+<Images/ArchSys.png, id=1124, 1284.8pt x 619.31375pt>
 File: Images/ArchSys.png Graphic file (type png)
 <use Images/ArchSys.png>
 Package pdftex.def Info: Images/ArchSys.png  used on input line 163.
@@ -2324,14 +2379,14 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 178.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[46 <./Images/ArchSys.png>]
+[50 <./Images/ArchSys.png>]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 231.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[47]
-<Images/ERD.png, id=1071, 3334.4575pt x 1315.91624pt>
+[51]
+<Images/ERD.png, id=1143, 3334.4575pt x 1315.91624pt>
 File: Images/ERD.png Graphic file (type png)
 <use Images/ERD.png>
 Package pdftex.def Info: Images/ERD.png  used on input line 265.
@@ -2342,18 +2397,18 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 274.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[48]
-<Images/SignIn_SignUp/onboard.png, id=1077, 552.0625pt x 1084.05pt>
+[52]
+<Images/SignIn_SignUp/onboard.png, id=1149, 552.0625pt x 1084.05pt>
 File: Images/SignIn_SignUp/onboard.png Graphic file (type png)
 <use Images/SignIn_SignUp/onboard.png>
 Package pdftex.def Info: Images/SignIn_SignUp/onboard.png  used on input line 285.
 (pdftex.def)             Requested size: 132.0238pt x 259.251pt.
-<Images/SignIn_SignUp/signin.png, id=1078, 554.07pt x 1094.0875pt>
+<Images/SignIn_SignUp/signin.png, id=1150, 554.07pt x 1094.0875pt>
 File: Images/SignIn_SignUp/signin.png Graphic file (type png)
 <use Images/SignIn_SignUp/signin.png>
 Package pdftex.def Info: Images/SignIn_SignUp/signin.png  used on input line 293.
 (pdftex.def)             Requested size: 132.0238pt x 260.69989pt.
-<Images/SignIn_SignUp/signup_email.png, id=1079, 566.115pt x 1098.1025pt>
+<Images/SignIn_SignUp/signup_email.png, id=1151, 566.115pt x 1098.1025pt>
 File: Images/SignIn_SignUp/signup_email.png Graphic file (type png)
 <use Images/SignIn_SignUp/signup_email.png>
 Package pdftex.def Info: Images/SignIn_SignUp/signup_email.png  used on input line 299.
@@ -2362,12 +2417,12 @@ File: Images/SignIn_SignUp/signup_email.png Graphic file (type png)
 <use Images/SignIn_SignUp/signup_email.png>
 Package pdftex.def Info: Images/SignIn_SignUp/signup_email.png  used on input line 309.
 (pdftex.def)             Requested size: 132.0238pt x 256.07695pt.
-<Images/SignIn_SignUp/signup_otp.png, id=1080, 570.13pt x 1094.0875pt>
+<Images/SignIn_SignUp/signup_otp.png, id=1152, 570.13pt x 1094.0875pt>
 File: Images/SignIn_SignUp/signup_otp.png Graphic file (type png)
 <use Images/SignIn_SignUp/signup_otp.png>
 Package pdftex.def Info: Images/SignIn_SignUp/signup_otp.png  used on input line 315.
 (pdftex.def)             Requested size: 132.0238pt x 253.35435pt.
-<Images/SignIn_SignUp/signup_finish.png, id=1081, 558.085pt x 1098.1025pt>
+<Images/SignIn_SignUp/signup_finish.png, id=1153, 558.085pt x 1098.1025pt>
 File: Images/SignIn_SignUp/signup_finish.png Graphic file (type png)
 <use Images/SignIn_SignUp/signup_finish.png>
 Package pdftex.def Info: Images/SignIn_SignUp/signup_finish.png  used on input line 321.
@@ -2378,33 +2433,33 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 325.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[49 <./Images/ERD.png>]
-<Images/Survey/step1.png, id=1089, 509.905pt x 1001.7425pt>
+[53 <./Images/ERD.png>]
+<Images/Survey/step1.png, id=1160, 509.905pt x 1001.7425pt>
 File: Images/Survey/step1.png Graphic file (type png)
 <use Images/Survey/step1.png>
 Package pdftex.def Info: Images/Survey/step1.png  used on input line 333.
 (pdftex.def)             Requested size: 132.0238pt x 259.36165pt.
-<Images/Survey/step2.png, id=1090, 515.9275pt x 1007.765pt>
+<Images/Survey/step2.png, id=1161, 515.9275pt x 1007.765pt>
 File: Images/Survey/step2.png Graphic file (type png)
 <use Images/Survey/step2.png>
 Package pdftex.def Info: Images/Survey/step2.png  used on input line 341.
 (pdftex.def)             Requested size: 132.0238pt x 257.87624pt.
-<Images/Survey/step3.png, id=1091, 495.8525pt x 985.6825pt>
+<Images/Survey/step3.png, id=1162, 495.8525pt x 985.6825pt>
 File: Images/Survey/step3.png Graphic file (type png)
 <use Images/Survey/step3.png>
 Package pdftex.def Info: Images/Survey/step3.png  used on input line 347.
 (pdftex.def)             Requested size: 132.0238pt x 262.43791pt.
-<Images/Survey/step4.png, id=1092, 517.935pt x 991.705pt>
+<Images/Survey/step4.png, id=1163, 517.935pt x 991.705pt>
 File: Images/Survey/step4.png Graphic file (type png)
 <use Images/Survey/step4.png>
 Package pdftex.def Info: Images/Survey/step4.png  used on input line 357.
 (pdftex.def)             Requested size: 132.0238pt x 252.78307pt.
-<Images/Survey/step5.png, id=1093, 509.905pt x 1005.7575pt>
+<Images/Survey/step5.png, id=1164, 509.905pt x 1005.7575pt>
 File: Images/Survey/step5.png Graphic file (type png)
 <use Images/Survey/step5.png>
 Package pdftex.def Info: Images/Survey/step5.png  used on input line 363.
 (pdftex.def)             Requested size: 132.0238pt x 260.40117pt.
-<Images/blank_screen.png, id=1094, 394.47375pt x 855.195pt>
+<Images/blank_screen.png, id=1165, 394.47375pt x 855.195pt>
 File: Images/blank_screen.png Graphic file (type png)
 <use Images/blank_screen.png>
 Package pdftex.def Info: Images/blank_screen.png  used on input line 369.
@@ -2415,33 +2470,33 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 372.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[50 <./Images/SignIn_SignUp/onboard.png> <./Images/SignIn_SignUp/signin.png> <./Images/SignIn_SignUp/signup_email.png> <./Images/SignIn_SignUp/signup_otp.png> <./Images/SignIn_SignUp/signup_finish.png>]
-<Images/Pages/home1.png, id=1106, 505.89pt x 991.705pt>
+[54 <./Images/SignIn_SignUp/onboard.png> <./Images/SignIn_SignUp/signin.png> <./Images/SignIn_SignUp/signup_email.png> <./Images/SignIn_SignUp/signup_otp.png> <./Images/SignIn_SignUp/signup_finish.png>]
+<Images/Pages/home1.png, id=1177, 505.89pt x 991.705pt>
 File: Images/Pages/home1.png Graphic file (type png)
 <use Images/Pages/home1.png>
 Package pdftex.def Info: Images/Pages/home1.png  used on input line 381.
 (pdftex.def)             Requested size: 132.0238pt x 258.80568pt.
-<Images/Pages/home2.png, id=1107, 562.1pt x 1011.78pt>
+<Images/Pages/home2.png, id=1178, 562.1pt x 1011.78pt>
 File: Images/Pages/home2.png Graphic file (type png)
 <use Images/Pages/home2.png>
 Package pdftex.def Info: Images/Pages/home2.png  used on input line 389.
 (pdftex.def)             Requested size: 132.0238pt x 237.64482pt.
-<Images/Pages/noti.png, id=1108, 525.965pt x 981.6675pt>
+<Images/Pages/noti.png, id=1179, 525.965pt x 981.6675pt>
 File: Images/Pages/noti.png Graphic file (type png)
 <use Images/Pages/noti.png>
 Package pdftex.def Info: Images/Pages/noti.png  used on input line 395.
 (pdftex.def)             Requested size: 132.0238pt x 246.40488pt.
-<Images/Pages/profile.png, id=1109, 503.8825pt x 987.69pt>
+<Images/Pages/profile.png, id=1180, 503.8825pt x 987.69pt>
 File: Images/Pages/profile.png Graphic file (type png)
 <use Images/Pages/profile.png>
 Package pdftex.def Info: Images/Pages/profile.png  used on input line 405.
 (pdftex.def)             Requested size: 132.0238pt x 258.7827pt.
-<Images/Pages/services.png, id=1110, 505.89pt x 995.72pt>
+<Images/Pages/services.png, id=1181, 505.89pt x 995.72pt>
 File: Images/Pages/services.png Graphic file (type png)
 <use Images/Pages/services.png>
 Package pdftex.def Info: Images/Pages/services.png  used on input line 411.
 (pdftex.def)             Requested size: 132.0238pt x 259.85347pt.
-<Images/Pages/chat.png, id=1111, 513.92pt x 979.66pt>
+<Images/Pages/chat.png, id=1182, 513.92pt x 979.66pt>
 File: Images/Pages/chat.png Graphic file (type png)
 <use Images/Pages/chat.png>
 Package pdftex.def Info: Images/Pages/chat.png  used on input line 417.
@@ -2452,59 +2507,59 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 421.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[51 <./Images/Survey/step1.png> <./Images/Survey/step2.png> <./Images/Survey/step3.png> <./Images/Survey/step4.png> <./Images/Survey/step5.png> <./Images/blank_screen.png>]
+[55 <./Images/Survey/step1.png> <./Images/Survey/step2.png> <./Images/Survey/step3.png> <./Images/Survey/step4.png> <./Images/Survey/step5.png> <./Images/blank_screen.png>]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 428.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[52 <./Images/Pages/home1.png> <./Images/Pages/home2.png> <./Images/Pages/noti.png> <./Images/Pages/profile.png> <./Images/Pages/services.png> <./Images/Pages/chat.png>]
+[56 <./Images/Pages/home1.png> <./Images/Pages/home2.png> <./Images/Pages/noti.png> <./Images/Pages/profile.png> <./Images/Pages/services.png> <./Images/Pages/chat.png>]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 487.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[53]
+[57]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 552.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[54]
+[58]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 614.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[55]
+[59]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 660.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[56]
+[60]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 722.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[57]
+[61]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 770.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[58])
+[62])
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 324.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[59] (./Contents/HienThuc.tex
+[63] (./Contents/HienThuc.tex
 Ch\uhorn \ohorn ng 6.
 
 
-[60
+[64
 
 ]
 
@@ -2512,29 +2567,25 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 47.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[61]
+[65]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 74.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[62]
-LaTeX Font Info:    Trying to load font information for T5+cmtt on input line 90.
- (/usr/local/texlive/2025/texmf-dist/tex/latex/vntex/t5cmtt.fd
-File: t5cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
-)
+[66]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 130.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[63]
+[67]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 190.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[64]
+[68]
 Overfull \hbox (5.36945pt too wide) in paragraph at lines 234--235
 []\T5/ptm/b/n/10 Embedding Model\T5/ptm/m/n/10 : \T5/cmtt/m/n/10 sentence-transformers/paraphrase-multilingual-mpnet-base-v2 
  []
@@ -2545,7 +2596,7 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 252.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[65]
+[69]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ptm in TS1 encoding.
             Default family used instead on input line 290.
@@ -2555,7 +2606,7 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 320.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[66{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
+[70{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ptm in TS1 encoding.
             Default family used instead on input line 327.
@@ -2565,14 +2616,14 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 388.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[67]
+[71]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 447.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[68]
-<Images/implement_arch.png, id=1330, 789.95125pt x 694.595pt>
+[72]
+<Images/implement_arch.png, id=1400, 789.95125pt x 694.595pt>
 File: Images/implement_arch.png Graphic file (type png)
 <use Images/implement_arch.png>
 Package pdftex.def Info: Images/implement_arch.png  used on input line 488.
@@ -2583,29 +2634,29 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 497.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[69]
+[73]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 522.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[70 <./Images/implement_arch.png>])
+[74 <./Images/implement_arch.png>])
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 330.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[71]
+[75]
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 330.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[72] (./Contents/KetLuan.tex
+[76] (./Contents/KetLuan.tex
 Ch\uhorn \ohorn ng 7.
 
 
-[73
+[77
 
 ]
 Overfull \hbox (3.21191pt too wide) in alignment at lines 41--46
@@ -2671,13 +2722,13 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 157.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[74])
+[78])
 
 File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 334.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
-[75] (./Outro/TaiLieuThamKhao.tex
+[79] (./Outro/TaiLieuThamKhao.tex
 Underfull \hbox (badness 10000) in paragraph at lines 15--16
 []\T5/ptm/m/n/10 M. Fowler, ``Mi-croser-vices,'' \T5/ptm/m/it/10 mar-t-in-fowler.com\T5/ptm/m/n/10 , 2014. [On-line]. Avail-able:
  []
@@ -2694,7 +2745,7 @@ Underfull \hbox (badness 1688) in paragraph at lines 35--36
 
 )
 
-[76
+[80
 
 ] (./Outro/PhuLuc.tex) 
 enddocument/afterlastpage (AED): lastpage setting LastPage.
@@ -2704,24 +2755,24 @@ LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: DB3D1B40DBF120D11062B09B3B58AF1B;29795.
+(rerunfilecheck)             Checksum: 3CCE9EB0547EA8F6D72768C73BE656CB;31940.
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 46828 strings out of 473190
- 934356 string characters out of 5715800
- 1769952 words of memory out of 5000000
- 68854 multiletter control sequences out of 15000+600000
+ 46893 strings out of 473190
+ 936568 string characters out of 5715800
+ 1770347 words of memory out of 5000000
+ 68898 multiletter control sequences out of 15000+600000
  636777 words of font info for 120 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,25n,113p,1564b,888s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/fontawesome5/FontAwesome5Free-Solid.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmb8v.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmbi8v.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmr8v.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/times/utmri8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmri8v.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/vntex/vnr/vntt10.pfb>
-Output written on main.pdf (76 pages, 7020857 bytes).
+Output written on main.pdf (80 pages, 8936390 bytes).
 PDF statistics:
- 1545 PDF objects out of 1728 (max. 8388607)
- 1341 compressed objects within 14 object streams
- 403 named destinations out of 1000 (max. 500000)
- 1265 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1618 PDF objects out of 1728 (max. 8388607)
+ 1400 compressed objects within 14 object streams
+ 424 named destinations out of 1000 (max. 500000)
+ 1322 words of extra memory for PDF output out of 10000 (max. 10000000)
 
