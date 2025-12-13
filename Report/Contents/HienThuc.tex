@@ -566,8 +566,68 @@ Kết nối với các dịch vụ bên ngoài để mở rộng tính năng.
 \subsection*{Nhận xét tổng quan}
 Kiến trúc này rất hiện đại và phù hợp với quy mô dự án nền tảng Health/Beauty. Việc tách biệt rõ ràng giữa PostgreSQL (nghiệp vụ) và FAISS (AI) cho thấy sự đầu tư kỹ lưỡng vào hiệu năng xử lý dữ liệu thông minh. Sử dụng MinIO cũng là một giải pháp hay để tự chủ (self-hosted) việc lưu trữ dữ liệu thay vì phụ thuộc hoàn toàn vào cloud public storage đắt đỏ.
 \section{Phần Software – Triển khai ứng dụng}
-\subsection{User Mobile App}
-\subsection{Partner Portal (Web/App)}
-\subsection{Admin Dashboard (Web)}
-\subsection{Tích hợp AI với hệ thống ứng dụng}
-\subsection{Bảo mật và quản lý dữ liệu}
+% \subsection{User Mobile App}
+% \subsection{Partner Portal (Web/App)}
+% \subsection{Admin Dashboard (Web)}
+% \subsection{Tích hợp AI với hệ thống ứng dụng}
+% \subsection{Bảo mật và quản lý dữ liệu}
+Hệ thống Backend được xây dựng dựa trên \textbf{NestJS Framework}, tuân theo kiến trúc module hóa để đảm bảo tính mở rộng và bảo mật. Dưới đây là các chi tiết hiện thực cụ thể dựa trên mã nguồn thực tế.
+
+\subsection{Cấu hình và Khởi tạo hệ thống (Bootstrap \& Configuration)}
+
+Điểm khởi chạy của ứng dụng nằm tại \texttt{src/main.ts}, nơi thiết lập các cấu hình toàn cục quan trọng cho bảo mật và tài liệu hóa API:
+
+\begin{itemize}
+    \item \textbf{Bảo mật HTTP:} Tích hợp thư viện \texttt{helmet} để thiết lập các HTTP headers an toàn và kích hoạt \texttt{enableCors()} cho phép các ứng dụng Client (Mobile/Web) truy cập tài nguyên.
+    
+    \item \textbf{Kiểm soát dữ liệu đầu vào:} Sử dụng \texttt{ValidationPipe} ở mức toàn cục (\texttt{globalPipes}) với tùy chọn \texttt{whitelist: true}. Điều này giúp tự động loại bỏ các trường dữ liệu thừa không được định nghĩa trong DTO, đảm bảo tính sạch sẽ của dữ liệu trước khi vào Controller.
+    
+    \item \textbf{Tài liệu hóa API (Swagger):} Hệ thống tự động sinh tài liệu API chuẩn OpenAPI. \texttt{DocumentBuilder} được cấu hình để tạo giao diện Swagger UI tại đường dẫn \texttt{/api/docs}, hỗ trợ đội ngũ phát triển Mobile và Web tích hợp nhanh chóng.
+    
+    \item \textbf{Kết nối Cơ sở dữ liệu:} Cấu hình Database được tách biệt trong \texttt{src/config/database.config.ts}, sử dụng các biến môi trường (\texttt{process.env}) để kết nối tới PostgreSQL, đảm bảo không lộ thông tin nhạy cảm (credentials) trong mã nguồn.
+\end{itemize}
+
+\subsection{Module Xác thực và Bảo mật (Authentication \& Security)}
+
+Module \texttt{AuthModule} đóng vai trò trung tâm trong việc quản lý định danh, sử dụng kết hợp \textbf{Passport} và \textbf{JWT}.
+
+\subsubsection{Quy trình Đăng ký \& Đăng nhập}
+\begin{itemize}
+    \item \textbf{Đăng ký (\texttt{register}):} \texttt{AuthService} tiếp nhận DTO đăng ký, thực hiện băm mật khẩu (hashing) bằng thuật toán \texttt{bcrypt} trước khi lưu vào cơ sở dữ liệu. Nếu có thông tin \texttt{profile}, hệ thống sẽ khởi tạo đồng thời \texttt{Account} và \texttt{UserProfile} nhờ cơ chế \texttt{cascade: true} của TypeORM.
+    
+    \item \textbf{Đăng nhập (\texttt{login}):} Sử dụng \texttt{LocalStrategy} để xác thực email/password. Sau khi thành công, hệ thống cấp phát cặp token gồm \texttt{access\_token} (ngắn hạn) và \texttt{refresh\_token} (dài hạn).
+\end{itemize}
+
+\subsubsection{Cơ chế Bảo mật Token (JWT Strategy)}
+\begin{itemize}
+    \item \textbf{Access Token:} Được ký (sign) bằng \texttt{jwtConstants.secret}. Các request đến API được bảo vệ bởi \texttt{JwtAuthGuard}, sử dụng \texttt{JwtStrategy} để trích xuất và xác thực token từ Header (\texttt{Bearer Token}).
+    
+    \item \textbf{Refresh Token Rotation \& Hashing:} Để tăng cường bảo mật, \texttt{refresh\_token} không được lưu trực tiếp dưới dạng plain-text. Hệ thống chỉ lưu bản băm (hash) của nó vào cột \texttt{refreshTokenHash} trong bảng \texttt{Account}. Khi user yêu cầu cấp mới token (\texttt{/auth/refresh}), hệ thống so sánh token gửi lên với hash trong DB. Điều này ngăn chặn việc sử dụng lại token cũ nếu bị lộ.
+    
+    \item \textbf{Logout an toàn:} API \texttt{/auth/logout} thực hiện xóa \texttt{refreshTokenHash} trong DB, đảm bảo token cũ mất hiệu lực ngay lập tức.
+\end{itemize}
+
+\subsection{Quản lý Tài khoản và Dữ liệu Người dùng (Account Management)}
+
+Module \texttt{AccountModule} chịu trách nhiệm quản lý thông tin người dùng và các dữ liệu sức khỏe liên quan.
+
+\begin{itemize}
+    \item \textbf{Mô hình dữ liệu (Entities):}
+    \begin{itemize}
+        \item \textbf{Account:} Là thực thể lõi, chứa thông tin đăng nhập (\texttt{email}, \texttt{passwordHash}) và vai trò (\texttt{role}). Cấu trúc hỗ trợ lưu trữ dữ liệu khảo sát linh hoạt thông qua cột \texttt{survey} kiểu \texttt{jsonb}, cho phép lưu trữ các câu trả lời khảo sát sức khỏe phức tạp mà không cần thay đổi schema cứng.
+        \item \textbf{UserProfile:} Chứa thông tin cá nhân (tên, ngày sinh, bio) và liên kết 1-1 với Account. Entity này cũng hỗ trợ quan hệ với \texttt{Address} để lưu địa chỉ chi tiết.
+    \end{itemize}
+    
+    \item \textbf{Xử lý Khảo sát (Survey Feature):}
+    \texttt{AccountController} cung cấp các endpoints \texttt{GET/POST /account/survey} để Client gửi và lấy dữ liệu khảo sát. Dữ liệu này được \texttt{AccountService} lưu trực tiếp vào cột \texttt{jsonb} của user, phục vụ cho đầu vào của hệ thống AI gợi ý sau này.
+\end{itemize}
+
+\subsection{Kiến trúc DTO và Validation}
+
+Hệ thống áp dụng chặt chẽ mô hình \textbf{Data Transfer Object (DTO)} để kiểm soát dữ liệu giao tiếp:
+
+\begin{itemize}
+    \item \textbf{Validation Rules:} Sử dụng các decorator như \texttt{@IsEmail}, \texttt{@MinLength(8)} cho mật khẩu, và \texttt{@Matches} cho số điện thoại (Regex kiểm tra định dạng số Việt Nam \texttt{+84...}).
+    
+    \item \textbf{Nested Validation:} Hỗ trợ validate dữ liệu lồng nhau (ví dụ: object \texttt{profile} bên trong \texttt{register} request) thông qua \texttt{@ValidateNested} và \texttt{Type(() => RegisterProfileDto)}.
+\end{itemize}
