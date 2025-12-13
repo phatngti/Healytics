@@ -7,23 +7,16 @@
     \item \textbf{Kiến trúc:} Áp dụng kiến trúc Clean Architecture hoặc Riverpod Architecture để tách biệt rõ ràng các tầng logic (Data, Domain, Presentation), giúp mã nguồn dễ kiểm thử và bảo trì.
     \item \textbf{Tính năng nổi bật}:
     \begin{itemize}
-    \item \textbf{Impeller Rendering Engine}: Flutter biên dịch shader tùy chỉnh tại thời điểm build để đạt độ mượt 120Hz và không có JS bridge; React Native với New Architecture (Fabric + Skia) vẫn dùng cầu nối JS-to-native, bị giật khi animation nặng; Native (Metal/Vulkan) truy cập GPU trực tiếp nhưng cần tinh chỉnh riêng cho từng nền tảng.
-    
-    \item \textbf{Hot Reload Speed}: Flutter giữ trạng thái trong <100ms nhờ Dart AOT; React Native với Metro bundler reload trong ~1s nhưng mất trạng thái ở module native phức tạp; Native không có hot reload thật sự—rebuild toàn bộ mất 10s+ trong Xcode/Android Studio.
-    
-    \item \textbf{Widget/Component System}: Mô hình ``mọi thứ là widget'' của Flutter cho phép kết hợp vô hạn và UI chính xác đến từng pixel chỉ trong một ngôn ngữ (Dart); React Native dùng JSX cần thư viện bên thứ ba cho style nâng cao, dễ bất đồng bộ; Native (SwiftUI/Compose) kiểm soát hoàn toàn nhưng phải viết lại code cho iOS/Android.
-    
-    \item \textbf{Startup Time \& App Size}: Flutter khởi động lạnh <50ms nhờ AOT nhưng bundle engine ~50MB; React Native khởi động ~100ms với JS bundle, kích thước cơ bản nhỏ hơn (~30MB); Native khởi động nhanh nhất (<30ms) không có runtime nhúng.
-    
-    \item \textbf{Platform Channel/Bridge}: Kênh đồng bộ/bất đồng bộ của Flutter tích hợp API native (camera, BLE) với Dart an toàn kiểu; TurboModules của React Native giảm overhead cầu nối nhưng vẫn chỉ bất đồng bộ, khó debug; Native truy cập phần cứng trực tiếp qua SDK, độ trễ bằng 0.
-    
-    \item \textbf{Multi-Platform Code Reuse}: Flutter biên dịch thành binary native cho iOS, Android, web, desktop và nhúng với tỷ lệ tái sử dụng 90\%+; React Native mạnh trên mobile, cần React Native Web/Electron cho các nền khác (~70\% tái sử dụng); Native yêu cầu codebase Swift/Kotlin riêng, tái sử dụng <30\%.
-    
-    \item \textbf{Animation Performance}: Impeller + canvas 120Hz của Flutter cho 0 khung hình bị bỏ trong chuyển cảnh phức tạp; React Native ổn định ~60fps nhưng giật khi JS thread nặng; Native đảm bảo 120Hz với Core Animation/Compose, tốt nhất cho game.
-    
-    \item \textbf{OTA Updates}: Flutter dùng Shorebird/CodeMagic để vá lỗi tức thì không qua store; React Native dùng CodePush đẩy cập nhật JS trực tiếp; Native phải qua App Store/Google Play, chờ duyệt 1--7 ngày.
-    
-    \item \textbf{Ecosystem \& Third-Party Libs}: pub.dev của Flutter phát triển nhanh nhưng thiếu plugin niche, thường cần viết channel tùy chỉnh; React Native tận dụng npm với 2M+ package, hệ sinh thái phong phú nhất; Native dùng CocoaPods/Gradle chính thức, ổn định nhất nhưng bị khóa nền tảng.
+        \item \textbf{Impeller Rendering Engine}: Flutter biên dịch shader tùy chỉnh tại thời điểm build để đạt độ mượt 120Hz và không có JS bridge; React Native với New Architecture (Fabric + Skia) vẫn dùng cầu nối JS-to-native, bị giật khi animation nặng; Native (Metal/Vulkan) truy cập GPU trực tiếp nhưng cần tinh chỉnh riêng cho từng nền tảng.
+        \item \textbf{Hot Reload Speed}: Flutter giữ trạng thái trong <100ms nhờ Dart AOT; React Native với Metro bundler reload trong $\sim$1s nhưng mất trạng thái ở module native phức tạp; Native không có hot reload thật sự—rebuild toàn bộ mất 10s+ trong Xcode/Android Studio.
+        \item \textbf{Widget/Component System}: Mô hình ``mọi thứ là widget'' của Flutter cho phép kết hợp vô hạn và UI chính xác đến từng pixel chỉ trong một ngôn ngữ (Dart); React Native dùng JSX cần thư viện bên thứ ba cho style nâng cao, dễ bất đồng bộ; Native (SwiftUI/Compose) kiểm soát hoàn toàn nhưng phải viết lại code cho iOS/Android.
+        \item \textbf{Startup Time \& App Size}: Flutter khởi động lạnh <50ms nhờ AOT nhưng bundle engine $\sim$50MB; React Native khởi động $\sim$100ms với JS bundle, kích thước cơ bản nhỏ hơn ($\sim$30MB); Native khởi động nhanh nhất (<30ms) không có runtime nhúng.
+        \item \textbf{Platform Channel/Bridge}: Kênh đồng bộ/bất đồng bộ của Flutter tích hợp API native (camera, BLE) với Dart an toàn kiểu; TurboModules của React Native giảm overhead cầu nối nhưng vẫn chỉ bất đồng bộ, khó debug; Native truy cập phần cứng trực tiếp qua SDK, độ trễ bằng 0.
+        \item \textbf{Multi-Platform Code Reuse}: Flutter biên dịch thành binary native cho iOS, Android, web, desktop và nhúng với tỷ lệ tái sử dụng 90\%+; React Native mạnh trên mobile, cần React Native Web/Electron cho các nền khác ($\sim$70\% tái sử dụng); Native yêu cầu codebase Swift/Kotlin riêng, tái sử dụng <30\%.
+        \item \textbf{Animation Performance}: Impeller + canvas 120Hz của Flutter cho 0 khung hình bị bỏ trong chuyển cảnh phức tạp; React Native ổn định $\sim$60fps nhưng giật khi JS thread nặng; Native đảm bảo 120Hz với Core Animation/Compose, tốt nhất cho game.
+        \item \textbf{OTA Updates}: Flutter dùng Shorebird/CodeMagic để vá lỗi tức thì không qua store; React Native dùng CodePush đẩy cập nhật JS trực tiếp; Native phải qua App Store/Google Play, chờ duyệt 1--7 ngày.
+        \item \textbf{Ecosystem \& Third-Party Libs}: pub.dev của Flutter phát triển nhanh nhưng thiếu plugin niche, thường cần viết channel tùy chỉnh; React Native tận dụng npm với 2M+ package, hệ sinh thái phong phú nhất; Native dùng CocoaPods/Gradle chính thức, ổn định nhất nhưng bị khóa nền tảng.
+    \end{itemize}
 \end{itemize}
 
 
@@ -52,6 +45,7 @@
     
     \item \textbf{Developer Experience (DX)}: Fast Refresh + Turbopack của Next.js giảm thời gian lặp lại xuống <1s, có AI SDK hỗ trợ prototype nhanh; HMR của React tốt nhưng thiếu routing/tối ưu tích hợp; module preset của Nuxt tăng tốc khởi tạo; Angular CLI scaffold nhanh nhưng cứng nhắc; Remix nhấn mạnh forms/actions cho DX thương mại điện tử.
 \end{itemize}
+\end{itemize}
 
 
 \subsection{Server/Backend (NestJS \& PostgreSQL)}
@@ -79,6 +73,7 @@
     \item \textbf{Guards, Interceptors \& Pipes}: NestJS hỗ trợ tính năng AOP qua @UseGuards, @UseInterceptors cho auth/logging/biến đổi; Express dùng middleware chain tương tự nhưng toàn cục; Spring Boot có AOP/Interceptors mạnh cho doanh nghiệp; Django middleware tuyến tính, kém chi tiết; Fastify dùng hook nhanh nhưng chỉ hook, không có guard.
 
     \item \textbf{Ecosystem \& Community}: NestJS tận dụng 2M+ package npm với 60k+ sao GitHub, tài liệu/plugin phát triển mạnh; Express có hệ sinh thái rộng nhưng không cấu trúc; Spring Boot trưởng thành cho doanh nghiệp (Maven/Gradle); Django mạnh về data/ML với PyPI; Fastify cộng đồng nhỏ hơn nhưng plugin hiệu suất cao.
+\end{itemize}
 \end{itemize}
 
 
