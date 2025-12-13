@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber main"] 0 "main.bcf" "main.bbl" "main" 1765531320.59079 -1
-  "main.bcf" 1765531319 107391 91e3a80d85ad60a3b1ee4cbb76ee6395 "pdflatex"
+["biber main"] 0 "main.bcf" "main.bbl" "main" 1765531515.05095 -1
+  "main.bcf" 1765531514 107391 91e3a80d85ad60a3b1ee4cbb76ee6395 "pdflatex"
   "refs.bib" 1765472482 47399 af18d11b2cedbf0a97cd313839825fd2 ""
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1765531306.02933 "c:/Python/Healytics/Report/main.tex" "main.pdf" "main" 1765531320.59165 2
+["pdflatex"] 1765531499.84364 "c:/Python/Healytics/Report/main.tex" "main.pdf" "main" 1765531515.05174 2
   "Contents/CoSoLyThuyet.tex" 1765472481 13078 d17519065825b404cc2d89931161f7e7 ""
   "Contents/GioiThieu.tex" 1765472481 6198 f28c4ffd18847ec4db14cb4bccef9fb0 ""
   "Contents/HienThuc.tex" 1765530987 39228 4312493323ad058ccf4b9fff1733765d ""
@@ -366,13 +366,13 @@
   "c:/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1765520582 5587484 30eee748fa419a911c40b0c750dd21ba ""
   "c:/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1765520788 3635702 9202fc55c31c52e4689f5b6f64cce52c ""
   "c:/texlive/2025/texmf.cnf" 1765520552 713 e69b156964470283e0530f5060668171 ""
-  "main.aux" 1765531319 35724 126a85437a1f7497c83f55a0cedd25e4 "pdflatex"
+  "main.aux" 1765531514 35724 126a85437a1f7497c83f55a0cedd25e4 "pdflatex"
   "main.bbl" 1765525337 486 76d65a242ec496c9b4361af646ff12cb "biber main"
-  "main.lof" 1765531319 3512 26c382743206aa362390a99a95026088 "pdflatex"
-  "main.lot" 1765531319 1356 63be2edae52771f2ac31afa1aae12a06 "pdflatex"
-  "main.out" 1765531319 29795 db3d1b40dbf120d11062b09b3b58af1b "pdflatex"
+  "main.lof" 1765531514 3512 26c382743206aa362390a99a95026088 "pdflatex"
+  "main.lot" 1765531514 1356 63be2edae52771f2ac31afa1aae12a06 "pdflatex"
+  "main.out" 1765531514 29795 db3d1b40dbf120d11062b09b3b58af1b "pdflatex"
   "main.tex" 1765512873 10200 b0abec4946e3b8177b6fa83cdc73a8a3 ""
-  "main.toc" 1765531319 17170 64ab5c987b7b72bcc965149323cf3fa0 "pdflatex"
+  "main.toc" 1765531514 17170 64ab5c987b7b72bcc965149323cf3fa0 "pdflatex"
   (generated)
   "main.aux"
   "main.bcf"
