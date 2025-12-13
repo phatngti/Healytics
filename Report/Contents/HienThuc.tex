@@ -229,7 +229,7 @@ Mỗi bước đều có logging chi tiết giúp theo dõi hoạt động chatb
 Hệ thống được triển khai với cấu trúc dữ liệu rõ ràng, bao gồm:
 
 \begin{itemize}
-    \item \textbf{Services Database}: File JSON chứa 10 dịch vụ mẫu về sức khỏe
+    \item \textbf{Services Database}: File JSON chứa các dịch vụ mẫu về sức khỏe
     \item \textbf{Vector Database}: ChromaDB persistent storage tại \texttt{data/processed/vectordb/}
     \item \textbf{Embedding Model}: \texttt{sentence-transformers/paraphrase-multilingual-mpnet-base-v2}
 \end{itemize}
@@ -250,23 +250,23 @@ Mỗi service trong database chứa các trường:
 Mỗi service được chuyển đổi thành một document text có cấu trúc:
 
 \begin{quote}
-\texttt{Tên dịch vụ: [name]} 
-\texttt{Mô tả: [description]} 
-\texttt{Danh mục: [category]} 
+\texttt{Tên dịch vụ: [name]} \\
+\texttt{Mô tả: [description]} \\
+\texttt{Danh mục: [category]} \\
 \texttt{Từ khóa: [tag1, tag2, tag3, ...]}
 \end{quote}
 
 \paragraph{Vector Database Building} 
 Quá trình build vector database bao gồm:
 \begin{enumerate}
-    \item Load 10 services từ \texttt{data/raw/services.json}
-    \item Tạo 10 documents tương ứng
-    \item Embedding 10 documents thành 10 vectors (768 chiều mỗi vector)
+    \item Load các services từ \texttt{data/raw/services.json}
+    \item Tạo số lượng các documents tương ứng
+    \item Embedding các documents thành các vectors (768 chiều mỗi vector)
     \item Index vào ChromaDB với cosine similarity metric
     \item Lưu persistent tại \texttt{data/processed/vectordb/}
 \end{enumerate}
 
-Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng.
+Kích thước vector database (ví dụ với 10 services): $10 \times 768 = 7,680$ dimensions tổng cộng.
 
 \subsubsection{Online Processing}
 
@@ -340,8 +340,7 @@ Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng
 
 \subsubsection{Ví dụ minh họa}
 
-\paragraph{Ví dụ 1: Chatbot Recommender}  
-
+\paragraph{Ví dụ 1: Chatbot Recommender} 
 \textbf{Input:}
 \begin{verbatim}
 {
@@ -353,7 +352,7 @@ Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng
 \textbf{Query Processing:}
 \begin{itemize}
     \item Query embedding: 768-dim vector
-    \item Vector search: 10 services được scan
+    \item Vector search: Tất cả services được scan
     \item Top-3 services có highest cosine similarity
 \end{itemize}
 
@@ -444,7 +443,7 @@ Kích thước vector database: $10 \times 768 = 7,680$ dimensions tổng cộng
 
 \begin{itemize}
     \item \textbf{Embedding}: $O(L)$ với $L$ là độ dài query (thời gian constant cho mô hình BERT)
-    \item \textbf{Vector Search}: $O(\log N)$ với HNSW index, $N$ = 10 services
+    \item \textbf{Vector Search}: $O(\log N)$ với HNSW index, $N$ = 10 services (ví dụ với 10 service)
     \item \textbf{Total latency}: < 100ms trên GPU, < 500ms trên CPU
 \end{itemize}
 
