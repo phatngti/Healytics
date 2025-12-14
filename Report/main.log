@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.12.12)  13 DEC 2025 18:27
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.8)  13 DEC 2025 02:05
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1910,7 +1910,7 @@ Ch\uhorn \ohorn ng 2.
 
 ] (c:/texlive/2025/texmf-dist/tex/latex/fontawesome5/ufontawesomefree0.fd) (c:/texlive/2025/texmf-dist/tex/latex/fontawesome5/ufontawesomefree3.fd)
 Underfull \hbox (badness 1253) in paragraph at lines 142--142
-\TS1/ptm/m/n/8 ˆ \T5/ptm/b/n/8 T÷ v§n tø xa 
+\TS1/ptm/m/n/8 ï¿½ \T5/ptm/b/n/8 Tï¿½ vï¿½n tï¿½ xa 
  []
 
 File: Images/hcmut.png Graphic file (type png)
@@ -1978,12 +1978,12 @@ Package pdftex.def Info: Images/Wellness_Usecase.jpg  used on input line 58.
 (pdftex.def)             Requested size: 330.05322pt x 130.7271pt.
 
 Underfull \hbox (badness 10000) in paragraph at lines 94--94
-[]|\T5/ptm/b/n/10 Luçng sü ki»n
+[]|\T5/ptm/b/n/10 Luï¿½ng sï¿½ kiï¿½n
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 96--97
-[]\T5/ptm/m/n/10 Ng÷íi dòng chån ph÷ìng thùc ^^_«ng kþ (user-name/password,
+[]\T5/ptm/m/n/10 Ngï¿½ï¿½i dï¿½ng chï¿½n phï¿½ï¿½ng thï¿½c ^^_ï¿½ng kï¿½ (user-name/password,
  []
 
 
@@ -1997,7 +1997,7 @@ Package pdftex.def Info: Images/hcmut.png  used on input line 121.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [23 <./Images/Admin_Usecase.jpg> <./Images/Wellness_Usecase.jpg>]
 Underfull \hbox (badness 10000) in paragraph at lines 146--146
-[]|\T5/ptm/b/n/10 Luçng sü ki»n
+[]|\T5/ptm/b/n/10 Luï¿½ng sï¿½ kiï¿½n
  []
 
 
@@ -2011,7 +2011,7 @@ Package pdftex.def Info: Images/hcmut.png  used on input line 172.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [24]
 Underfull \hbox (badness 10000) in paragraph at lines 197--197
-[]|\T5/ptm/b/n/10 Luçng sü ki»n
+[]|\T5/ptm/b/n/10 Luï¿½ng sï¿½ kiï¿½n
  []
 
 
@@ -2025,7 +2025,7 @@ Package pdftex.def Info: Images/hcmut.png  used on input line 223.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [25]
 Underfull \hbox (badness 10000) in paragraph at lines 248--248
-[]|\T5/ptm/b/n/10 Luçng sü ki»n
+[]|\T5/ptm/b/n/10 Luï¿½ng sï¿½ kiï¿½n
  []
 
 
@@ -2039,7 +2039,7 @@ Package pdftex.def Info: Images/hcmut.png  used on input line 274.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
 [26]
 Underfull \hbox (badness 10000) in paragraph at lines 299--299
-[]|\T5/ptm/b/n/10 Luçng sü ki»n
+[]|\T5/ptm/b/n/10 Luï¿½ng sï¿½ kiï¿½n
  []
 
 
@@ -2347,32 +2347,32 @@ File: Images/hcmut.png Graphic file (type png)
 <use Images/hcmut.png>
 Package pdftex.def Info: Images/hcmut.png  used on input line 325.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
- [53 <./Images/ERD.png>]
+[53 <./Images/ERD.png>]
 <Images/Survey/step1.png, id=1160, 509.905pt x 1001.7425pt>
 File: Images/Survey/step1.png Graphic file (type png)
 <use Images/Survey/step1.png>
 Package pdftex.def Info: Images/Survey/step1.png  used on input line 333.
-(pdftex.def)             Requested size: 132.0238pt x 259.36165pt.
-<Images/Survey/step2.png, id=1161, 515.9275pt x 1007.765pt>
+(pdftex.def)             Requested size: 132.0238pt x 259.43571pt.
+<Images/Survey/step2.png, id=1161, 462.72874pt x 903.375pt>
 File: Images/Survey/step2.png Graphic file (type png)
 <use Images/Survey/step2.png>
 Package pdftex.def Info: Images/Survey/step2.png  used on input line 341.
-(pdftex.def)             Requested size: 132.0238pt x 257.87624pt.
-<Images/Survey/step3.png, id=1162, 495.8525pt x 985.6825pt>
+(pdftex.def)             Requested size: 132.0238pt x 257.74023pt.
+<Images/Survey/step3.png, id=1162, 454.69875pt x 903.375pt>
 File: Images/Survey/step3.png Graphic file (type png)
 <use Images/Survey/step3.png>
 Package pdftex.def Info: Images/Survey/step3.png  used on input line 347.
-(pdftex.def)             Requested size: 132.0238pt x 262.43791pt.
-<Images/Survey/step4.png, id=1163, 517.935pt x 991.705pt>
+(pdftex.def)             Requested size: 132.0238pt x 262.30287pt.
+<Images/Survey/step4.png, id=1163, 471.7625pt x 903.375pt>
 File: Images/Survey/step4.png Graphic file (type png)
 <use Images/Survey/step4.png>
 Package pdftex.def Info: Images/Survey/step4.png  used on input line 357.
-(pdftex.def)             Requested size: 132.0238pt x 252.78307pt.
-<Images/Survey/step5.png, id=1164, 509.905pt x 1005.7575pt>
+(pdftex.def)             Requested size: 132.0238pt x 252.80544pt.
+<Images/Survey/step5.png, id=1164, 457.71pt x 903.375pt>
 File: Images/Survey/step5.png Graphic file (type png)
 <use Images/Survey/step5.png>
 Package pdftex.def Info: Images/Survey/step5.png  used on input line 363.
-(pdftex.def)             Requested size: 132.0238pt x 260.40117pt.
+(pdftex.def)             Requested size: 132.0238pt x 260.56604pt.
 <Images/blank_screen.png, id=1165, 394.47375pt x 855.195pt>
 File: Images/blank_screen.png Graphic file (type png)
 <use Images/blank_screen.png>
@@ -2468,7 +2468,7 @@ Package pdftex.def Info: Images/hcmut.png  used on input line 47.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
  [65]
 Underfull \hbox (badness 6188) in paragraph at lines 67--68
-[]\T5/ptm/b/n/10 Microservices & Event-Driven\T5/ptm/m/n/10 : NestJS hé trñ mi-croser-vices nguy¶n b£n qua
+[]\T5/ptm/b/n/10 Microservices & Event-Driven\T5/ptm/m/n/10 : NestJS hï¿½ trï¿½ mi-croser-vices nguyï¿½n bï¿½n qua
  []
 
 File: Images/hcmut.png Graphic file (type png)
@@ -2566,17 +2566,17 @@ Overfull \hbox (3.21191pt too wide) in alignment at lines 56--59
 
 
 Underfull \hbox (badness 1205) in paragraph at lines 67--68
-[]\T5/ptm/m/n/10 Ph¥n t½ch y¶u c¦u, thi¸t lªp mæi
+[]\T5/ptm/m/n/10 Phï¿½n tï¿½ch yï¿½u cï¿½u, thiï¿½t lï¿½p mï¿½i
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 67--68
-\T5/ptm/m/n/10 tr÷íng, thi¸t k¸ ki¸n tróc v 
+\T5/ptm/m/n/10 trï¿½ï¿½ng, thiï¿½t kï¿½ kiï¿½n trï¿½c vï¿½
  []
 
 
 Underfull \hbox (badness 1077) in paragraph at lines 94--95
-[]\T5/ptm/b/n/10 Mobile App: \T5/ptm/m/n/10 Hi»n thüc T¼m ki¸m,
+[]\T5/ptm/b/n/10 Mobile App: \T5/ptm/m/n/10 Hiï¿½n thï¿½c Tï¿½m kiï¿½m,
  []
 
 
@@ -2586,22 +2586,22 @@ Underfull \hbox (badness 1430) in paragraph at lines 117--118
 
 
 Underfull \hbox (badness 2884) in paragraph at lines 119--120
-[]\T5/ptm/b/n/10 Partner/Admin Por-tals: \T5/ptm/m/n/10 X¥y düng
+[]\T5/ptm/b/n/10 Partner/Admin Por-tals: \T5/ptm/m/n/10 Xï¿½y dï¿½ng
  []
 
 
 Underfull \hbox (badness 1237) in paragraph at lines 140--141
-[]\T5/ptm/m/n/10 User Ac-cep-tance Test-ing (UAT) vîi
+[]\T5/ptm/m/n/10 User Ac-cep-tance Test-ing (UAT) vï¿½i
  []
 
 
 Underfull \hbox (badness 5985) in paragraph at lines 151--152
-[]\T5/ptm/m/n/10 Triºn khai h» thèng l¶n Pro-duc-
+[]\T5/ptm/m/n/10 Triï¿½n khai hï¿½ thï¿½ng lï¿½n Pro-duc-
  []
 
 
 Underfull \hbox (badness 3492) in paragraph at lines 151--152
-\T5/ptm/m/n/10 tion, ^^_«ng t£i ùng döng l¶n App
+\T5/ptm/m/n/10 tion, ^^_ï¿½ng tï¿½i ï¿½ng dï¿½ng lï¿½n App
  []
 
 
@@ -2631,7 +2631,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 28--29
 
 
 Underfull \hbox (badness 1688) in paragraph at lines 35--36
-[]\T5/ptm/m/n/10 BookingCare, ``N·n t£ng y t¸ sùc khäe to n di»n,'' \T5/ptm/m/it/10 book-ing-care.vn\T5/ptm/m/n/10 . [On-line]. Avail-able:
+[]\T5/ptm/m/n/10 BookingCare, ``Nï¿½n tï¿½ng y tï¿½ sï¿½c khï¿½e toï¿½n diï¿½n,'' \T5/ptm/m/it/10 book-ing-care.vn\T5/ptm/m/n/10 . [On-line]. Avail-able:
  []
 
 ) [80
@@ -2650,15 +2650,15 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 46891 strings out of 467538
- 931240 string characters out of 5423724
- 1785086 words of memory out of 5000000
- 74552 multiletter control sequences out of 15000+600000
- 705661 words of font info for 124 fonts, out of 8000000 for 9000
+ 46893 strings out of 473190
+ 936568 string characters out of 5715800
+ 1770347 words of memory out of 5000000
+ 68898 multiletter control sequences out of 15000+600000
+ 636777 words of font info for 120 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 108i,25n,126p,1537b,897s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<c:/texlive/2025/texmf-dist/fonts/type1/public/fontawesome5/FontAwesome5Free-Solid.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb><c:/texlive/2025/texmf-dist/fonts/type1/urw/symbol/usyr.pfb><c:/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmb8v.pfb><c:/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmbi8v.pfb><c:/texlive/2025/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><c:/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmr8v.pfb><c:/texlive/2025/texmf-dist/fonts/type1/urw/times/utmri8a.pfb><c:/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmri8v.pfb><c:/texlive/2025/texmf-dist/fonts/type1/vntex/vnr/vntt10.pfb>
-Output written on main.pdf (80 pages, 8936494 bytes).
+ 108i,25n,113p,1564b,888s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/fontawesome5/FontAwesome5Free-Solid.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmb8v.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmbi8v.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmr8v.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/times/utmri8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmri8v.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/vntex/vnr/vntt10.pfb>
+Output written on main.pdf (80 pages, 8936390 bytes).
 PDF statistics:
  1618 PDF objects out of 1728 (max. 8388607)
  1400 compressed objects within 14 object streams
