@@ -155,15 +155,16 @@
 \contentsline {subsubsection}{\numberline {6.1.5.6}Khả năng mở rộng}{73}{subsubsection.6.1.5.6}%
 \contentsline {section}{\numberline {6.2}Kiến trúc hiện thực}{73}{section.6.2}%
 \contentsline {section}{\numberline {6.3}Phần Software – Triển khai ứng dụng}{76}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}User Mobile App}{76}{subsection.6.3.1}%
-\contentsline {subsection}{\numberline {6.3.2}Partner Portal (Web/App)}{76}{subsection.6.3.2}%
-\contentsline {subsection}{\numberline {6.3.3}Admin Dashboard (Web)}{76}{subsection.6.3.3}%
-\contentsline {subsection}{\numberline {6.3.4}Tích hợp AI với hệ thống ứng dụng}{76}{subsection.6.3.4}%
-\contentsline {subsection}{\numberline {6.3.5}Bảo mật và quản lý dữ liệu}{76}{subsection.6.3.5}%
-\contentsline {chapter}{\numberline {7}Kết luận \& Giai đoạn đồ án tốt nghiệp}{77}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Nhận xét chung}{77}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Hạn chế}{77}{section.7.2}%
-\contentsline {section}{\numberline {7.3}Giai đoạn đồ án tốt nghiệp}{78}{section.7.3}%
-\contentsline {subsection}{\numberline {7.3.1}Sơ đồ garnt giai đoạn đồ án tốt nghiệp}{78}{subsection.7.3.1}%
-\contentsline {subsection}{\numberline {7.3.2}Bảng kế hoạch \& Phân công công việc}{78}{subsection.7.3.2}%
-\contentsline {chapter}{Tài Liệu Tham Khảo}{80}{table.7.1}%
+\contentsline {subsection}{\numberline {6.3.1}Cấu hình và Khởi tạo hệ thống (Bootstrap \& Configuration)}{76}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Module Xác thực và Bảo mật (Authentication \& Security)}{76}{subsection.6.3.2}%
+\contentsline {subsubsection}{\numberline {6.3.2.1}Quy trình Đăng ký \& Đăng nhập}{76}{subsubsection.6.3.2.1}%
+\contentsline {subsubsection}{\numberline {6.3.2.2}Cơ chế Bảo mật Token (JWT Strategy)}{76}{subsubsection.6.3.2.2}%
+\contentsline {subsection}{\numberline {6.3.3}Quản lý Tài khoản và Dữ liệu Người dùng (Account Management)}{77}{subsection.6.3.3}%
+\contentsline {subsection}{\numberline {6.3.4}Kiến trúc DTO và Validation}{77}{subsection.6.3.4}%
+\contentsline {chapter}{\numberline {7}Kết luận \& Giai đoạn đồ án tốt nghiệp}{78}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Nhận xét chung}{78}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Hạn chế}{78}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Giai đoạn đồ án tốt nghiệp}{79}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Sơ đồ garnt giai đoạn đồ án tốt nghiệp}{80}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Bảng kế hoạch \& Phân công công việc}{80}{subsection.7.3.2}%
+\contentsline {chapter}{Tài Liệu Tham Khảo}{83}{table.7.1}%
