@@ -1,11 +1,11 @@
 # Fdb version 4
-["biber main"] 1765910193.12492 "main.bcf" "main.bbl" "main" 1765911891.38197 0
-  "main.bcf" 1765911891.23463 107330 6bf24ab00f2d694dccd0e7ce0c17d29b "pdflatex"
+["biber main"] 1765910193.12492 "main.bcf" "main.bbl" "main" 1765912202.56545 0
+  "main.bcf" 1765912202.41497 107330 6bf24ab00f2d694dccd0e7ce0c17d29b "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1765911880.11959 "/Volumes/WD850X/Users/workspace/datn/Healytics/Report/main.tex" "main.pdf" "main" 1765911891.38219 0
+["pdflatex"] 1765912190.88785 "/Volumes/WD850X/Users/workspace/datn/Healytics/Report/main.tex" "main.pdf" "main" 1765912202.56567 0
   "/Volumes/WD850X/Users/workspace/datn/Healytics/Report/main.tex" 1765911507.9044 9858 b0abec4946e3b8177b6fa83cdc73a8a3 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
@@ -317,7 +317,7 @@
   "Contents/HienThuc.tex" 1765799555.0073 44942 cfc65cee29273cefca30cdf41df976de ""
   "Contents/KetLuan.tex" 1765717168.75224 13269 3dbc9e5edf2daa76b60833868c7de2b3 ""
   "Contents/PhanTichHeThong.tex" 1765566340.7103 36329 b97ce59526c9806b076e7f7fd0c244d4 ""
-  "Contents/ThietKeHeThong.tex" 1765911868.47625 50210 0778d00589ba2e8b6f03f8388677261e ""
+  "Contents/ThietKeHeThong.tex" 1765912178.85855 51060 27d194996da1585e5f5556acc326bb41 ""
   "Contents/YeuCauHeThong.tex" 1765372719.45581 21386 fb39d7765dc064b7c57cde4690d589e4 ""
   "Images/Activity/4.5.1.png" 1765372719.45632 35395 e41770e10f806a71d37447bcd74d8ee2 ""
   "Images/Activity/4.5.2.png" 1765372719.45686 51027 29213bb024320cc13df52e825325bba5 ""
@@ -370,6 +370,9 @@
   "Images/uiux/authen/signup_form1.png" 1765911196.87711 96308 604d5952542c31767b1ab4f4d5be2dc4 ""
   "Images/uiux/authen/signup_form2.png" 1765911196.87732 107442 19ef6a06703f13875da5b24561c24761 ""
   "Images/uiux/authen/signup_otp.png" 1765911196.87751 75436 270e784abc4592c60547b97ae44b2532 ""
+  "Images/uiux/checkout/carr_manager.png" 1765912131.18293 243502 8bd531b2e83c66dda7463a8db20aebba ""
+  "Images/uiux/checkout/checkout.png" 1765912131.1836 207733 58a02d49389bb6b7daffe31e6a09c067 ""
+  "Images/uiux/checkout/select_payment_method.png" 1765912131.18407 130648 a3d14f70a22b508b64aff57c5de5d379 ""
   "Images/uiux/mock_ui.drawio.png" 1765911743.26694 99256 af9cd2ee48a15decc865ee00733d5ce9 ""
   "Images/uiux/navigation/chat_box.png" 1765911196.88011 122302 6e5c3c4a771987418220eee0df76e720 ""
   "Images/uiux/navigation/chat_history.png" 1765911196.88037 280148 e5c674f3bbdf84d7495d3efe6e391ecc ""
@@ -394,14 +397,14 @@
   "Intro/TomTat.tex" 1765717168.75653 1394 ee0f1c6e9d8dc05a56f297c44192321e ""
   "Outro/PhuLuc.tex" 1765372719.51786 135 c4a61eba016259a71c2518bd0fe52184 ""
   "Outro/TaiLieuThamKhao.tex" 1765372719.5181 1851 7a2ef2552f780753bf2f5f09f36f48f4 ""
-  "main.aux" 1765911891.23112 40395 a8ceeaaccb9184aa6f9384bf82506750 "pdflatex"
+  "main.aux" 1765912202.41151 40673 f1a55d392e2fd0683c81a6bf63aa8579 "pdflatex"
   "main.bbl" 1765910212.02131 466 76d65a242ec496c9b4361af646ff12cb "biber main"
-  "main.lof" 1765911891.2352 5041 063472a4479f45e15a6ad212fddecfd0 "pdflatex"
-  "main.lot" 1765911891.23536 1356 615b45e483585924b901cb81b1c4f8c7 "pdflatex"
-  "main.out" 1765911891.23386 34163 fd6b31945a225766759ef2a72b2f9aff "pdflatex"
-  "main.run.xml" 1765911891.23512 2396 938f4cf68218d122bbffc682032d60b8 "pdflatex"
+  "main.lof" 1765912202.41552 5144 74b951e7f81e03861c3c88c01e6d04ad "pdflatex"
+  "main.lot" 1765912202.41561 1356 3f57075918b91011ec847861c4b40f3a "pdflatex"
+  "main.out" 1765912202.41421 34343 a02de423d6cf82372d87738a2310860d "pdflatex"
+  "main.run.xml" 1765912202.41544 2396 938f4cf68218d122bbffc682032d60b8 "pdflatex"
   "main.tex" 1765911507.9044 9858 b0abec4946e3b8177b6fa83cdc73a8a3 ""
-  "main.toc" 1765911891.23518 18638 0bb21154b395eb6526b6a8991b65b7a6 "pdflatex"
+  "main.toc" 1765912202.41549 18731 f3ac82126854029c7956baf02154b126 "pdflatex"
   (generated)
   "main.aux"
   "main.bcf"
