@@ -1,0 +1,1018 @@
+\chapter{Thiết kế hệ thống}
+\section{Kiến trúc tổng thể hệ thống}
+\subsection{Kiến trúc N-tier}
+\textbf{N-tier Architecture} (Kiến trúc đa tầng) là mô hình thiết kế phần mềm trong đó hệ thống được chia thành các tầng (layers) riêng biệt về mặt logic và vật lý.
+\begin{itemize}
+    \item \textbf{Nguyên tắc cốt lõi:} "Separation of Concerns" (Phân tách mối quan tâm). Mỗi tầng đảm nhiệm một chức năng cụ thể và chỉ giao tiếp với các tầng liền kề (thường là tầng ngay bên dưới nó).
+    \item \textbf{Mục tiêu:} Giúp hệ thống dễ quản lý, dễ bảo trì, tăng tính bảo mật và khả năng mở rộng linh hoạt.
+\end{itemize}
+\subsection{Kết cấu chi tiết 5 Tầng (Structure)}
+\subsubsection{Tầng 1: Presentation Layer (Client Layer)}
+Đây là tầng giao diện người dùng, nơi tương tác trực tiếp với người dùng cuối (End-user).
+\begin{itemize}
+    \item \textbf{Chức năng:} Hiển thị thông tin và thu thập hành động của người dùng (click, nhập liệu). Nó không chứa logic nghiệp vụ phức tạp mà chỉ chịu trách nhiệm về UX/UI.
+    \item \textbf{Thành phần:} Mobile App (iOS, Android, Flutter), Web App (React, Vue, Angular), hoặc Desktop App.
+    \item \textbf{Giao tiếp:} Gửi yêu cầu (Request) xuống Tầng 2 và nhận phản hồi (Response) để hiển thị.
+\end{itemize}
+\subsubsection{Tầng 2: Connection \& API Layer (Gateway)}
+Đây là "người gác cổng" (Gatekeeper) của hệ thống phía sau. Mọi yêu cầu từ Client phải đi qua đây trước khi vào hệ thống nội bộ.
+\begin{itemize}
+    \item \textbf{Chức năng:} \textbf{API Gateway:} Định tuyến (Routing) yêu cầu đến đúng service xử lý. \textbf{Security:} Xác thực (Authentication), Phân quyền (Authorization), chặn DDoS, Rate Limiting (giới hạn số lượt truy cập). \textbf{Load Balancing:} Cân bằng tải để phân phối request đều đặn.
+    \item \textbf{Công nghệ:} NGINX, Kong, AWS API Gateway, Spring Cloud Gateway.
+\end{itemize}
+\subsubsection{Tầng 3: Business Logic Layer (Server Layer - Microservices)}
+Đây là "bộ não" của hệ thống, nơi xử lý các quy trình nghiệp vụ chính. Trong kiến trúc hiện đại, tầng này thường được chia nhỏ thành các \textbf{Microservices}.
+\begin{itemize}
+    \item \textbf{Chức năng:} Xử lý tính toán, logic nghiệp vụ (ví dụ: tính toán giỏ hàng, kiểm tra tồn kho, xử lý workflow).
+    \item \textbf{Đặc điểm:} Mỗi Microservice chạy độc lập, có thể viết bằng các ngôn ngữ khác nhau (Java, Go, Python, Node.js) và giao tiếp với nhau qua HTTP/REST hoặc gRPC.
+    \item \textbf{Giao tiếp:} Nhận lệnh từ Tầng 2, gọi xuống Tầng 4 để lấy dữ liệu, hoặc gọi sang Tầng 5 để dùng dịch vụ bên ngoài.
+\end{itemize}
+\subsubsection{Tầng 4: Data Access Layer (Data \& Infrastructure Layer)}
+Tầng này chịu trách nhiệm quản lý và lưu trữ dữ liệu bền vững. Tầng Business không bao giờ truy cập trực tiếp vào file database vật lý mà phải thông qua các cơ chế của tầng này.
+\begin{itemize}
+    \item \textbf{Chức năng:}
+        \begin{itemize}
+            \item Thực hiện các thao tác CRUD (Create, Read, Update, Delete).
+            \item Trừu tượng hóa việc truy cập dữ liệu (giúp Tầng 3 không cần biết chi tiết kỹ thuật của Database).
+            \item Quản lý kết nối đến Database.
+           
+        \end{itemize}
+   \item \textbf{Thành phần:} ORM (Entity Framework, Hibernate), SQL Database (PostgreSQL, MySQL), NoSQL (MongoDB), Caching (Redis).
+    
+\end{itemize}
+\subsubsection{Tầng 5: Integration Layer (Third-Party Integrations)}
+Đây là tầng kết nối với thế giới bên ngoài, giúp hệ thống mở rộng chức năng mà không cần tự xây dựng lại từ đầu.
+\begin{itemize}
+    \item \textbf{Chức năng:}
+    \begin{itemize}
+        \item Đóng vai trò là "Adapter" để kết nối hệ thống nội bộ với các dịch vụ thuê ngoài.
+        \item Xử lý việc chuyển đổi định dạng dữ liệu để phù hợp với API của đối tác.
+    \end{itemize}
+    \item \textbf{Thành phần:}  Payment Gateway (Stripe, Momo), SMS/Email Services (Twilio, SendGrid), Maps API, AI Services.
+\end{itemize}
+
+\subsection{Ưu điểm và Nhược điểm}
+\begin{table}[htbp]
+    \centering
+    \caption{Ưu điểm và Nhược điểm của Kiến trúc Layer (N-tier)}
+    \label{tab:ntier-comparison}
+    \renewcommand{\arraystretch}{1.5} % Tăng khoảng cách giữa các dòng cho dễ đọc
+    
+    % Tạo bảng với 2 cột có độ rộng bằng nhau (X)
+    \begin{tabularx}{\textwidth}{ | >{\raggedright\arraybackslash}X | >{\raggedright\arraybackslash}X | }
+        \hline
+        \textbf{Ưu điểm (Advantages)} & \textbf{Nhược điểm (Disadvantages)} \\  
+        \hline
+        
+        \textbf{1. Khả năng mở rộng (Scalability):} \newline 
+        Có thể mở rộng (scale-out) từng tầng riêng biệt. Ví dụ: Nếu Business Layer quá tải, chỉ cần thêm server cho tầng này mà không cần can thiệp vào Database hay Client. 
+        & 
+        \textbf{1. Độ trễ (Latency):} \newline 
+        Hiệu năng có thể bị ảnh hưởng do dữ liệu phải di chuyển qua nhiều tầng (network hops) và các lớp bảo mật trước khi đến đích, chậm hơn so với kiến trúc nguyên khối. \\  
+        \hline
+        
+        \textbf{2. Dễ bảo trì (Maintainability):} \newline 
+        Nhờ nguyên tắc "Separation of Concerns", việc sửa lỗi hoặc nâng cấp công nghệ ở một tầng ít gây ảnh hưởng đến các tầng khác (Loose Coupling). 
+        & 
+        \textbf{2. Phức tạp trong vận hành:} \newline 
+        Việc triển khai (deployment), giám sát (monitoring) và gỡ lỗi (debugging) trở nên khó khăn hơn vì hệ thống bị phân tán thành nhiều phần. \\  
+        \hline
+        
+        \textbf{3. Bảo mật cao (Security):} \newline 
+        Tầng dữ liệu (Data Layer) và Business Layer được che giấu sau Gateway. Kẻ tấn công khó tiếp cận trực tiếp vào cơ sở dữ liệu. 
+        & 
+        \textbf{3. Chi phí hạ tầng cao:} \newline 
+        Yêu cầu nhiều tài nguyên server, chi phí quản lý mạng và license phần mềm để duy trì nhiều tầng riêng biệt. \\  
+        \hline
+        
+        \textbf{4. Linh hoạt công nghệ:} \newline 
+        Tầng Presentation có thể dùng Flutter/React, trong khi Business Layer có thể dùng song song Java, Go hoặc Python. 
+        & 
+        \textbf{4. Tính nhất quán dữ liệu:} \newline 
+        Trong mô hình Microservices, việc đảm bảo dữ liệu đồng bộ giữa các service (Data Consistency) phức tạp hơn, cần các pattern nâng cao như Saga. \\  
+        \hline
+        
+    \end{tabularx}
+\end{table}
+
+\subsection{Các Kiến trúc Thay thế và So sánh}
+\begin{table}[htbp]
+    \centering
+    \caption{\textbf{So sánh Kiến trúc N-tier với các Kiến trúc khác}}
+    \vspace{0.3cm}
+    \renewcommand{\arraystretch}{1.5} % Khoảng cách dòng
+    
+    % --- CHỈNH SỬA TỶ LỆ CỘT TẠI ĐÂY ---
+    % Tổng các hệ số hsize phải bằng 4 (số lượng cột X)
+    % Cột 1: 0.8 (Tăng lên để chứa chữ Microservices/Orchestration không bị ngắt)
+    % Cột 2: 0.6 (Giữ nguyên)
+    % Cột 3: 1.3 (Giảm nhẹ để bù cho cột 1)
+    % Cột 4: 1.3 (Giảm nhẹ để bù cho cột 1)
+    \begin{tabularx}{\textwidth}{ 
+        | >{\hsize=0.8\hsize\RaggedRight\arraybackslash}X 
+        | >{\hsize=0.6\hsize\RaggedRight\arraybackslash}X 
+        | >{\hsize=1.3\hsize\RaggedRight\arraybackslash}X 
+        | >{\hsize=1.3\hsize\RaggedRight\arraybackslash}X | }
+        
+        \hline
+        \textbf{So với} & \textbf{Tiêu chí} & \textbf{Ưu điểm N-tier} & \textbf{Nhược điểm N-tier} \\  
+        \hline
+
+        % --- CQRS ---
+        \textbf{CQRS} & 
+        Tách biệt Đọc/Ghi & 
+        \textbf{Đơn giản:} Dùng chung model cho đọc/ghi giúp triển khai nhanh, code dễ hiểu, phù hợp đa số ứng dụng. & 
+        \textbf{Hiệu năng truy vấn:} Khó tối ưu các báo cáo phức tạp so với database chuyên dụng cho việc đọc của CQRS. \\  
+        \hline
+
+        % --- Microservices ---
+        \textbf{Microservices} & 
+        Phạm vi triển khai & 
+        \textbf{Dễ quản lý hạ tầng:} Ít phức tạp về mạng lưới. Test tích hợp (End-to-End) dễ hơn do luồng đi thẳng. & 
+        \textbf{Khó scale cục bộ:} Phải scale cả tầng lớn thay vì từng service nhỏ. Khả năng cô lập lỗi kém hơn. \\  
+        \hline
+
+        % --- Orchestration ---
+        \textbf{Orchestration} & 
+        Quản lý quy trình & 
+        \textbf{Luồng rõ ràng:} Dễ theo dõi (trace) luồng đi từ Client xuống DB. Tốt cho tác vụ đồng bộ. & 
+        \textbf{Phình to Logic:} Dễ dẫn đến "Business Layer" quá tải khi quy trình nghiệp vụ trở nên chằng chịt. \\  
+        \hline
+
+        % --- MVP ---
+        \textbf{MVP} & 
+        Phạm vi kiến trúc & 
+        \textbf{Vĩ mô:} N-tier giải quyết cấu trúc toàn hệ thống (Server/DB), trong khi MVP chỉ lo phần giao diện (UI). & 
+        \textbf{Coupling:} Nếu không khéo, logic nghiệp vụ dễ bị dính chặt vào code giao diện hơn so với MVP thuần. \\  
+        \hline
+
+        % --- Event-Driven ---
+        \textbf{Event-Driven} & 
+        Giao tiếp & 
+        \textbf{Nhất quán tức thì:} Xử lý đồng bộ giúp User biết ngay kết quả (thành công/thất bại). Dễ debug. & 
+        \textbf{Chặn (Blocking):} Request phải chờ xử lý xong, dễ gây nghẽn cổ chai nếu tải cao so với xử lý ngầm. \\  
+        \hline
+
+    \end{tabularx}
+\end{table}
+
+\subsection{Diagram và Kết luận}
+\begin{figure}[H]
+    % Căn giữa hình ảnh
+    \centering
+    \includegraphics[width=1\textwidth]{Images/ArchSys.png}
+    \vspace{10pt}
+    
+    % Thêm chú thích cho hình ảnh
+    \caption{Kiến trúc hệ thống}
+    
+    % Đặt nhãn để tham chiếu chéo (cross-reference)
+    \label{fig:sys_arch}
+\end{figure}
+Dựa trên hình ảnh \ref{fig:sys_arch}, kiến trúc tổng thể của hệ thống được thiết kế theo mô hình Microservices, chia thành 5 tầng chính (layer) với chức năng cụ thể như sau:
+\begin{enumerate}
+    \item \textbf{Client Layer (Tầng người dùng):}
+    Đây là điểm tương tác trực tiếp với người dùng cuối và quản trị viên. Tầng này bao gồm ba ứng dụng chính được phát triển trên nền tảng Flutter:
+    \begin{itemize}
+        \item \textit{User Mobile App:} Ứng dụng di động (iOS/Android) dành cho khách hàng/bệnh nhân.
+        \item \textit{Health Provider Portal:} Cổng thông tin dạng Web dành cho các nhà cung cấp dịch vụ y tế.
+        \item \textit{Admin Panel:} Trang quản trị dạng Web để vận hành hệ thống.
+    \end{itemize}
+
+    \item \textbf{Connection \& API Layer (Tầng kết nối):}
+    Đóng vai trò là cổng trung gian (Middleware) duy nhất giao tiếp giữa Client và Server.
+    \begin{itemize}
+        \item \textit{API Gateway:} Tiếp nhận toàn bộ yêu cầu (request) từ phía Client, thực hiện định tuyến (routing) đến các dịch vụ (services) phù hợp bên dưới.
+    \end{itemize}
+
+    \item \textbf{Server Layer (Tầng dịch vụ - Microservices):}
+    Trung tâm xử lý logic nghiệp vụ, được chia nhỏ thành các dịch vụ độc lập giao tiếp qua REST API hoặc WebSocket:
+    \begin{itemize}
+        \item \textit{Authentication Service:} Quản lý xác thực và phân quyền (xử lý JWT, RBAC).
+        \item \textit{Core Healthcare Service:} Xử lý các nghiệp vụ cốt lõi như đặt lịch khám, thanh toán. Dịch vụ này có khả năng công bố (publish) sự kiện.
+        \item \textit{AI/ML Service:} Cung cấp các tính năng thông minh như Chatbot và gợi ý (Recommendations), hỗ trợ giao tiếp thời gian thực qua WebSocket.
+        \item \textit{Notification Service:} Quản lý việc gửi thông báo (Push notification, Email) tới người dùng.
+    \end{itemize}
+
+    \item \textbf{Data \& Infrastructure Layer (Tầng dữ liệu và hạ tầng):}
+    Nơi lưu trữ và quản lý dữ liệu bền vững, bao gồm:
+    \begin{itemize}
+        \item \textit{PostgreSQL DB:} Cơ sở dữ liệu quan hệ cho dữ liệu nghiệp vụ chính.
+        \item \textit{Redis Cache:} Bộ nhớ đệm giúp tăng tốc độ truy xuất dữ liệu.
+        \item \textit{Cloud Storage:} Lưu trữ tài liệu, hình ảnh.
+        \item \textit{Vector DB / NoSQL:} Hỗ trợ lưu trữ dữ liệu phi cấu trúc phục vụ cho AI/ML.
+        \item \textit{Message Queue:} Hàng đợi thông điệp giúp xử lý bất đồng bộ và giao tiếp giữa các services (Event-driven).
+    \end{itemize}
+
+    \item \textbf{Third-Party Integrations (Tầng tích hợp bên thứ ba):}
+    Các dịch vụ bên ngoài được hệ thống kết nối để mở rộng tính năng:
+    \begin{itemize}
+        \item \textit{Payment Gateway:} Cổng thanh toán trực tuyến.
+        \item \textit{Push Notification Service (APNS/FCM):} Dịch vụ đẩy thông báo của Apple và Google.
+    \end{itemize}
+\end{enumerate}
+\section{Thiết kế cơ sở dữ liệu}
+\subsection{Mô tả}
+Thực thể (ERD) được cung cấp, nhằm mục đích làm rõ cấu trúc dữ liệu và các phân hệ chức năng chính của hệ thống. Mô hình dữ liệu cho thấy đây là một nền tảng công nghệ được thiết kế để kết nối ba nhóm đối tượng chính: Người dùng cuối (Khách hàng), Đối tác cung cấp dịch vụ (Partner), và Nhân viên quản trị (Employee).
+\subsection{Các khối chức năng chính}
+ Dựa trên các thực thể và mối quan hệ trong sơ đồ, hệ thống được cấu thành từ các khối chức năng (module) chính sau:
+ \begin{itemize}
+            \item Module Quản lý Tài khoản và Phân quyền (Account Management)
+            Đây là module lõi, quản lý định danh và quyền truy cập của toàn bộ người dùng trên hệ thống.
+            \begin{itemize}
+                \item Thực thể trung tâm: \textbf{Account} lưu trữ thông tin xác thực chung
+                \item Cơ chế phân quyền: Hệ thống định nghĩa ba vai trò người dùng riêng biệt với các quyền hạn khác nhau:
+                \begin{itemize}
+                    \item User: Đối tượng sử dụng dịch vụ.
+                    \item Partner: Đối tượng cung cấp dịch vụ/sản phẩm.
+                    \item Employee: Đối tượng quản trị và vận hành nền tảng.
+                \end{itemize}
+                \item Chức năng: Cung cấp cơ chế đăng ký, đăng nhập, xác thực và phân quyền truy cập chức năng tương ứng với từng vai trò.
+            \end{itemize}
+            \item \textbf{Phân hệ Vận hành dành cho Đối tác (Partner Portal)}: 
+            Phân hệ này cung cấp một cổng quản trị toàn diện, cho phép các đối tác số hóa và quản lý hoạt động kinh doanh của mình.
+            \begin{itemize}
+                \item Quản lý Dịch vụ \& Sản phẩm (Service, Product): Cho phép đối tác khởi tạo, cấu hình giá, mô tả và phân loại các dịch vụ/sản phẩm cung cấp. Thực thể Category giúp hệ thống hóa và hỗ trợ tìm kiếm hiệu quả.
+                \item Quản lý Nhân sự (Employee của Partner): Hỗ trợ đối tác quản lý thông tin nhân viên thực hiện dịch vụ.
+                \item Quản lý Lịch trình (Schedule): Cung cấp công cụ thiết lập lịch làm việc cho cơ sở và từng nhân viên, làm cơ sở cho tính năng đặt lịch.
+            \end{itemize}
+        \item \textbf{Phân hệ Trải nghiệm Người dùng (User Experience)} Phân hệ này xây dựng luồng tương tác hoàn chỉnh cho khách hàng cuối.
+            \begin{itemize}
+                \item Đặt lịch (Booking): Là nghiệp vụ cốt lõi, liên kết các thực thể chính: User, Partner, Service, và Employee (của Partner) tại một thời điểm cụ thể. Trạng thái của lịch hẹn (ví dụ: chờ xác nhận, đã hoàn thành, đã hủy) cũng được quản lý tại đây.
+            \item Tìm kiếm và Khám phá: Cấu trúc dữ liệu cho phép người dùng truy vấn, lọc và tìm kiếm dịch vụ/đối tác dựa trên nhiều tiêu chí.
+            \item Phản hồi và Đánh giá (Feedback/Review): Sau khi sử dụng dịch vụ, người dùng có thể cung cấp phản hồi, giúp xây dựng độ tin cậy và là cơ sở để đánh giá chất lượng đối tác. 
+            \end{itemize}
+        \item \textbf{Module Tài chính và Marketing}
+        Module này tích hợp các nghiệp vụ liên quan đến giao dịch và các hoạt động thu hút người dùng.
+            \begin{itemize}
+                \item Xử lý Thanh toán (Payment): Mỗi thực thể Booking được liên kết với một giao dịch Payment, ghi nhận các thông tin về số tiền, phương thức và trạng thái thanh toán.
+                \item Quản lý Khuyến mãi (Promotion\(\)Voucher): Cung cấp chức năng tạo và quản lý các chương trình khuyến mãi. Các chương trình này có thể được áp dụng vào giao dịch Booking để điều chỉnh giá trị thanh toán cuối cùng.
+            \end{itemize}
+        \end{itemize}
+\subsection{Kết luận}
+Sơ đồ ERD mô tả một cấu trúc dữ liệu chặt chẽ và toàn diện cho một nền tảng dịch vụ đa năng. Từ phân tích trên, có thể xác định các năng lực chính của hệ thống bao gồm:
+    \begin{itemize}
+        \item Hệ thống quản lý người dùng đa vai trò với cơ chế phân quyền rõ ràng.
+        \item Nền tảng đặt lịch (booking platform) thông minh, kết nối nhu cầu của người dùng với khả năng cung ứng của đối tác.
+        \item Cổng quản trị dành cho đối tác (partner portal) để tự quản lý vận hành kinh doanh.
+        \item Cơ chế thanh toán và khuyến mãi tích hợp, hỗ trợ hoàn chỉnh vòng đời giao dịch và các hoạt động marketing.
+        \item Hệ thống thu thập phản hồi và đánh giá, đảm bảo chất lượng và tính minh bạch của nền tảng.
+    \end{itemize}
+\subsection{Lược đồ}
+\begin{figure}[H]
+    % Căn giữa hình ảnh
+    \centering
+    \includegraphics[angle=-90, width=0.6\textwidth]{Images/ERD.png}
+    \vspace{10pt}
+    
+    % Thêm chú thích cho hình ảnh
+    \caption{ER Diagram của hệ thống}
+    
+    % Đặt nhãn để tham chiếu chéo (cross-reference)
+    \label{fig:erd}
+\end{figure}
+
+
+\section{Thiết kế UI/UX cơ bản}
+
+\subsection{Mockup UI - Tổng quan giao diện}
+Sơ đồ mockup UI dưới đây thể hiện tổng quan luồng điều hướng và các màn hình chính của ứng dụng di động Healytics. Wireframe này được thiết kế để minh họa trải nghiệm người dùng từ khi đăng nhập cho đến khi sử dụng các tính năng cốt lõi của hệ thống.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/uiux/mock_ui.drawio.png}
+    \vspace{10pt}
+    \caption{Sơ đồ Mockup UI tổng quan của ứng dụng}
+    \label{fig:mockup_ui_overview}
+\end{figure}
+
+Mockup bao gồm các nhóm màn hình chính:
+\begin{itemize}
+    \item \textbf{Authentication Flow:} Luồng xác thực bao gồm các màn hình đăng nhập, đăng ký qua email, xác thực OTP và các bước điền thông tin cá nhân.
+    \item \textbf{Survey Flow:} Chuỗi các bước khảo sát thu thập thông tin sức khỏe và sở thích của người dùng để cá nhân hóa trải nghiệm.
+    \item \textbf{Main Navigation:} Các màn hình điều hướng chính bao gồm Trang chủ (Home), Khám phá dịch vụ (Explore), Thông báo (Notification), và Trang cá nhân (Profile).
+    \item \textbf{Appointment Booking:} Luồng đặt lịch hẹn khám bệnh với các bước chọn dịch vụ, thời gian, và xác nhận thông tin.
+    \item \textbf{Provider \& Service Details:} Các màn hình hiển thị thông tin chi tiết về nhà cung cấp dịch vụ y tế và các dịch vụ cụ thể.
+    \item \textbf{AI Chat Assistant:} Giao diện trợ lý AI hỗ trợ người dùng tư vấn sức khỏe thông qua hội thoại tự nhiên.
+\end{itemize}
+
+Các phần tiếp theo sẽ trình bày chi tiết thiết kế giao diện cho từng nhóm chức năng.
+
+\subsection{Authentication - Đăng nhập \& Đăng ký}
+\begin{figure}[H]
+    \centering
+    
+    % --- Hàng 1 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/authen/login.png}
+        \caption{Login Page}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/authen/signup_email.png}
+        \caption{Sign Up Email}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/authen/signup_otp.png}
+        \caption{Sign Up OTP}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/authen/signup_form1.png}
+        \caption{Sign Up Form 1}
+    \end{subfigure}
+    
+    \vspace{1em}
+    
+    % --- Hàng 2 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/authen/signup_form2.png}
+        \caption{Sign Up Form 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/authen/dashboard.png}
+        \caption{Dashboard}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    
+    \vspace{1em}
+    \caption{Giao diện Authentication}
+\end{figure}
+
+\subsection{Survey - Khảo sát người dùng}
+\begin{figure}[H]
+    \centering
+    
+    % --- Hàng 1 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/survey/survey_step1.png}
+        \caption{Survey Step 1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/survey/survey_step2.png}
+        \caption{Survey Step 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/survey/survey_step3.png}
+        \caption{Survey Step 3}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/survey/survey_step4.png}
+        \caption{Survey Step 4}
+    \end{subfigure}
+    
+    \vspace{1em}
+    
+    % --- Hàng 2 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/survey/survey_step5.png}
+        \caption{Survey Step 5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    
+    \vspace{1em}
+    \caption{Giao diện Survey}
+\end{figure}
+
+\subsection{Navigation - Các trang điều hướng chính}
+\begin{figure}[H]
+    \centering
+    
+    % --- Hàng 1 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/navigation/home_1.png}
+        \caption{Home Page 1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/navigation/home_2.png}
+        \caption{Home Page 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/navigation/explore_service.png}
+        \caption{Explore Services}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/navigation/notification.png}
+        \caption{Notification}
+    \end{subfigure}
+    
+    \vspace{1em}
+    
+    % --- Hàng 2 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/navigation/personal.png}
+        \caption{Personal Profile}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/navigation/chat_history.png}
+        \caption{Chat History}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/navigation/chat_box.png}
+        \caption{Chat Box}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    
+    \vspace{1em}
+    \caption{Giao diện Navigation}
+\end{figure}
+
+\subsection{Appointment - Đặt lịch hẹn}
+\begin{figure}[H]
+    \centering
+    
+    % --- Hàng 1 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/appointment/appointment_1.png}
+        \caption{Appointment Step 1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/appointment/appointment_2.png}
+        \caption{Appointment Step 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/appointment/appointment_3.png}
+        \caption{Appointment Step 3}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/appointment/appointment_details.png}
+        \caption{Appointment Details}
+    \end{subfigure}
+    
+    \vspace{1em}
+    
+    % --- Hàng 2 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/appointment/doctor_detail.png}
+        \caption{Doctor Detail}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/appointment/review_detail.png}
+        \caption{Review Detail}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    
+    \vspace{1em}
+    \caption{Giao diện Appointment}
+\end{figure}
+
+\subsection{Provider Service - Chi tiết dịch vụ}
+\begin{figure}[H]
+    \centering
+    
+    % --- Hàng 1 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/provider_service/provider_details.png}
+        \caption{Provider Details}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/provider_service/provider_details_2.png}
+        \caption{Provider Details 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/provider_service/service_details_1.png}
+        \caption{Service Details 1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/provider_service/service_details_2.png}
+        \caption{Service Details 2}
+    \end{subfigure}
+    
+    \vspace{1em}
+    
+    % --- Hàng 2 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/provider_service/service_details_3.png}
+        \caption{Service Details 3}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    
+    \vspace{1em}
+    \caption{Giao diện Provider Service}
+\end{figure}
+
+\subsection{AI Chat - Trợ lý AI}
+\begin{figure}[H]
+    \centering
+    
+    % --- Hàng 1 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/ai_chat/aichat_session.png}
+        \caption{AI Chat Session}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/ai_chat/aichat_box_1.png}
+        \caption{AI Chat Box 1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/ai_chat/aichat_box_2.png}
+        \caption{AI Chat Box 2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/ai_chat/aichat_box_3.png}
+        \caption{AI Chat Box 3}
+    \end{subfigure}
+    
+    \vspace{1em}
+    
+    % --- Hàng 2 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/ai_chat/aichat_box_4.png}
+        \caption{AI Chat Box 4}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/ai_chat/aichat_box_5.png}
+        \caption{AI Chat Box 5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    
+    \vspace{1em}
+    \caption{Giao diện AI Chat}
+\end{figure}
+
+\subsection{Checkout - Thanh toán}
+\begin{figure}[H]
+    \centering
+    
+    % --- Hàng 1 ---
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/checkout/carr_manager.png}
+        \caption{Cart Manager}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/checkout/checkout.png}
+        \caption{Checkout}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Images/uiux/checkout/select_payment_method.png}
+        \caption{Select Payment Method}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+    \end{subfigure}
+    
+    \vspace{1em}
+    \caption{Giao diện Checkout}
+\end{figure}
+
+\section{Phần AI – Thiết kế}
+\subsection{Thu thập và tiền xử lý dữ liệu}
+\begin{itemize}
+    \item Lịch sử booking và hành vi người dùng
+    \item Dữ liệu đánh giá \& phản hồi
+    \item Chuẩn hóa và lưu trữ dữ liệu
+\end{itemize}
+\subsection{Thiết kế hệ thống RAG Chatbot}
+
+Hệ thống RAG (Retrieval-Augmented Generation) Chatbot được thiết kế nhằm xây dựng một trợ lý hội thoại thông minh có khả năng trả lời câu hỏi dựa trên kiến thức từ tài liệu chuyên môn. Khác với các chatbot truyền thống chỉ dựa vào kiến thức được huấn luyện sẵn, hệ thống RAG kết hợp việc truy xuất thông tin từ cơ sở tri thức với khả năng sinh ngôn ngữ tự nhiên của mô hình ngôn ngữ lớn.
+
+\subsubsection{Kiến trúc tổng thể}
+
+Hệ thống RAG Chatbot được xây dựng dựa trên kiến trúc pipeline gồm các thành phần chính:
+
+\begin{itemize}
+    \item \textbf{Bộ tải tài liệu}: Thu thập và tải tài liệu từ nhiều nguồn (PDF, file văn bản)
+    \item \textbf{Xử lý văn bản}: Tiền xử lý và chia nhỏ tài liệu thành các đoạn
+    \item \textbf{Mô hình embedding}: Chuyển đổi văn bản thành biểu diễn vector
+    \item \textbf{Cơ sở dữ liệu vector}: Lưu trữ và tìm kiếm các đoạn tài liệu
+    \item \textbf{Bộ truy xuất}: Tìm kiếm ngữ cảnh liên quan từ cơ sở dữ liệu vector
+    \item \textbf{Mô hình ngôn ngữ}: Sinh câu trả lời dựa trên ngữ cảnh và câu hỏi
+    \item \textbf{Mẫu prompt}: Định dạng đầu vào cho mô hình ngôn ngữ
+    \item \textbf{Bộ xử lý đầu ra}: Xử lý và chuẩn hóa kết quả từ mô hình
+\end{itemize}
+
+\subsubsection{Phương pháp RAG}
+
+\paragraph{Nguyên lý hoạt động}  
+Phương pháp RAG giải quyết vấn đề giới hạn kiến thức của mô hình ngôn ngữ lớn bằng cách:
+
+\begin{enumerate}
+    \item \textbf{Giai đoạn truy xuất}: Khi nhận câu hỏi, hệ thống tìm kiếm các đoạn văn bản liên quan nhất từ cơ sở tri thức
+    \item \textbf{Giai đoạn bổ sung}: Kết hợp ngữ cảnh thu được với câu hỏi gốc thành một prompt đầy đủ
+    \item \textbf{Giai đoạn sinh}: Mô hình ngôn ngữ sinh câu trả lời dựa trên prompt đã được bổ sung
+\end{enumerate}
+
+Phương pháp này mang lại các lợi ích:
+\begin{itemize}
+    \item Cập nhật kiến thức mà không cần huấn luyện lại mô hình
+    \item Trả lời dựa trên nguồn thông tin cụ thể, có thể truy xuất
+    \item Giảm thiểu hiện tượng ảo giác (sinh thông tin không chính xác)
+    \item Tùy chỉnh cơ sở tri thức theo lĩnh vực cụ thể
+\end{itemize}
+
+\subsubsection{Quy trình xử lý tài liệu}
+
+\paragraph{Tải tài liệu}  
+Hệ thống hỗ trợ tải tài liệu từ nhiều định dạng:
+\begin{itemize}
+    \item \textbf{File PDF}: Bài báo khoa học, báo cáo, tài liệu hướng dẫn
+    \item \textbf{File văn bản}: Plain text, markdown
+    \item \textbf{Dữ liệu có cấu trúc}: JSON, CSV (nếu cần)
+\end{itemize}
+
+Bộ tải tài liệu sử dụng xử lý song song để tăng tốc độ khi làm việc với nhiều file.
+
+\paragraph{Chia nhỏ văn bản}  
+Tài liệu được chia nhỏ thành các đoạn với các yêu cầu:
+
+\begin{itemize}
+    \item \textbf{Kích thước đoạn}: 200-500 token, đảm bảo mỗi đoạn chứa đủ ngữ cảnh
+    \item \textbf{Chồng lấp}: Các đoạn có phần chồng lấp để tránh mất thông tin ở ranh giới
+    \item \textbf{Chia theo ngữ nghĩa}: Ưu tiên chia theo đoạn văn, câu hoàn chỉnh
+    \item \textbf{Bảo toàn metadata}: Giữ lại thông tin nguồn (tên file, số trang)
+\end{itemize}
+
+Việc chia nhỏ văn bản là bước quan trọng vì:
+\begin{itemize}
+    \item Mô hình ngôn ngữ có giới hạn cửa sổ ngữ cảnh
+    \item Các đoạn nhỏ giúp truy xuất chính xác hơn
+    \item Tìm kiếm độ tương đồng vector hiệu quả hơn với các đơn vị ngữ nghĩa
+\end{itemize}
+
+\paragraph{Embedding và lưu trữ vector}  
+Mỗi đoạn văn bản được chuyển đổi thành vector sử dụng mô hình embedding:
+
+\begin{itemize}
+    \item \textbf{Mô hình embedding}: Sentence transformers từ HuggingFace
+    \item \textbf{Số chiều vector}: 384-768 chiều tùy mô hình
+    \item \textbf{Độ đo tương đồng}: Cosine similarity
+\end{itemize}
+
+Các vector được lưu trữ trong cơ sở dữ liệu vector hỗ trợ:
+\begin{itemize}
+    \item \textbf{Tìm kiếm nhanh}: Thuật toán láng giềng gần đúng
+    \item \textbf{Lọc theo metadata}: Lọc theo nguồn, ngày tháng, danh mục
+    \item \textbf{Lưu trữ lâu dài}: Không cần xây dựng lại mỗi lần chạy
+\end{itemize}
+
+\subsubsection{Chiến lược truy xuất}
+
+\paragraph{Xử lý câu hỏi}  
+Khi nhận câu hỏi từ người dùng:
+
+\begin{enumerate}
+    \item \textbf{Embedding câu hỏi}: Câu hỏi được chuyển thành vector trong cùng không gian với tài liệu
+    \item \textbf{Tìm kiếm tương đồng}: Tìm top-K đoạn có độ tương đồng cosine cao nhất
+    \item \textbf{Sắp xếp lại} (tùy chọn): Sắp xếp lại kết quả dựa trên điểm liên quan
+\end{enumerate}
+
+\paragraph{Tham số truy xuất}  
+
+\begin{itemize}
+    \item \textbf{k (số lượng đoạn)}: Thường là 5-10 đoạn
+    \item \textbf{Loại tìm kiếm}: 
+    \begin{itemize}
+        \item \textit{Tìm kiếm tương đồng}: Tìm các vector gần nhất
+        \item \textit{MMR}: Cân bằng giữa độ liên quan và tính đa dạng
+    \end{itemize}
+    \item \textbf{Ngưỡng điểm}: Lọc bỏ các đoạn có độ tương đồng quá thấp
+\end{itemize}
+
+Bộ truy xuất đảm bảo ngữ cảnh được cung cấp cho mô hình ngôn ngữ:
+\begin{itemize}
+    \item Liên quan nhất đến câu hỏi
+    \item Đa dạng để bao phủ nhiều khía cạnh
+    \item Đủ ngắn gọn để vừa với cửa sổ ngữ cảnh
+\end{itemize}
+
+\subsubsection{Mô hình ngôn ngữ và sinh văn bản}
+
+\paragraph{Lựa chọn mô hình}  
+Hệ thống sử dụng mô hình ngôn ngữ lớn với các đặc điểm:
+
+\begin{itemize}
+    \item \textbf{Kích thước mô hình}: 3B-7B tham số (cân bằng giữa chất lượng và tốc độ)
+    \item \textbf{Cửa sổ ngữ cảnh}: 4K-8K token
+    \item \textbf{Hỗ trợ đa ngôn ngữ}: Tiếng Việt và tiếng Anh
+    \item \textbf{Được tinh chỉnh theo hướng dẫn}: Được huấn luyện để tuân theo chỉ dẫn tốt
+\end{itemize}
+
+\paragraph{Lượng tử hóa}  
+Để giảm dung lượng bộ nhớ và tăng tốc độ suy luận:
+
+\begin{itemize}
+    \item \textbf{Lượng tử hóa 4-bit}: Giảm kích thước mô hình từ ~14GB xuống ~4GB
+    \item \textbf{NF4}: Định dạng lượng tử hóa tối ưu cho mạng nơ-ron
+    \item \textbf{Lượng tử hóa kép}: Giảm thêm overhead từ các hệ số lượng tử hóa
+    \item \textbf{Kiểu dữ liệu tính toán}: bfloat16 để cân bằng độ chính xác và tốc độ
+\end{itemize}
+
+Lượng tử hóa cho phép:
+\begin{itemize}
+    \item Triển khai trên phần cứng hạn chế (GPU tiêu dùng)
+    \item Suy luận nhanh hơn 2-3 lần
+    \item Chất lượng đầu ra gần như không bị ảnh hưởng
+\end{itemize}
+
+\subsubsection{Thiết kế prompt}
+
+\paragraph{Cấu trúc mẫu prompt}  
+Prompt được thiết kế với cấu trúc rõ ràng:
+
+\begin{enumerate}
+    \item \textbf{Thông điệp hệ thống}: Định nghĩa vai trò và hành vi của trợ lý
+    \item \textbf{Phần ngữ cảnh}: Chứa tài liệu được truy xuất từ RAG
+    \item \textbf{Câu hỏi người dùng}: Câu hỏi gốc từ người dùng
+    \item \textbf{Hướng dẫn}: Chỉ dẫn cách trả lời (dựa trên ngữ cảnh, ngắn gọn, v.v.)
+\end{enumerate}
+
+\paragraph{Nguyên tắc thiết kế prompt}  
+
+\begin{itemize}
+    \item \textbf{Hướng dẫn rõ ràng}: Yêu cầu mô hình trả lời dựa trên ngữ cảnh được cung cấp
+    \item \textbf{Định dạng cụ thể}: Chỉ định định dạng đầu ra mong muốn
+    \item \textbf{Đặt ràng buộc}: Không trả lời nếu không có thông tin trong ngữ cảnh
+    \item \textbf{Chỉ định ngôn ngữ}: Xác định ngôn ngữ đầu ra (tiếng Việt/tiếng Anh)
+\end{itemize}
+
+Mẫu prompt được thiết kế để:
+\begin{itemize}
+    \item Tối ưu hóa chất lượng câu trả lời
+    \item Giảm hiện tượng ảo giác
+    \item Đảm bảo trả lời dựa trên sự thật từ tài liệu
+\end{itemize}
+
+\subsubsection{Xử lý đầu ra}
+
+\paragraph{Phân tích phản hồi}  
+Đầu ra từ mô hình ngôn ngữ cần được xử lý:
+
+\begin{enumerate}
+    \item \textbf{Trích xuất văn bản}: Lấy phần văn bản chính từ đầu ra của mô hình
+    \item \textbf{Làm sạch định dạng}: Loại bỏ các token đặc biệt, lỗi định dạng
+    \item \textbf{Kiểm tra câu trả lời}: Kiểm tra đầu ra có định dạng mong muốn
+    \item \textbf{Hậu xử lý}: Chuẩn hóa dấu câu, khoảng trắng, xuống dòng
+\end{enumerate}
+
+\paragraph{Xử lý lỗi}  
+
+\begin{itemize}
+    \item \textbf{Phản hồi rỗng}: Xử lý khi mô hình không sinh đầu ra
+    \item \textbf{Phản hồi lạc đề}: Phát hiện khi mô hình không trả lời theo ngữ cảnh
+    \item \textbf{Sinh không hoàn chỉnh}: Xử lý khi đầu ra bị cắt cụt
+    \item \textbf{Cơ chế dự phòng}: Thử lại hoặc phản hồi mặc định khi có lỗi
+\end{itemize}
+
+\subsubsection{Tích hợp pipeline}
+
+Toàn bộ các thành phần được tích hợp thành một pipeline thống nhất:
+
+\begin{equation}
+\text{Câu trả lời} = \text{LLM}(\text{Prompt}(\text{Câu hỏi}, \text{Truy xuất}(\text{Câu hỏi}, \text{CSDL vector})))
+\end{equation}
+
+Pipeline đảm bảo:
+\begin{itemize}
+    \item \textbf{Tính mô-đun}: Mỗi thành phần có thể thay đổi độc lập
+    \item \textbf{Khả năng tái sử dụng}: Các thành phần có thể dùng cho các tác vụ khác
+    \item \textbf{Dễ bảo trì}: Dễ gỡ lỗi, kiểm thử từng thành phần riêng biệt
+    \item \textbf{Khả năng mở rộng}: Có thể mở rộng với nhiều tài liệu, người dùng
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Thiết kế hệ thống gợi ý dịch vụ cá nhân hóa}
+
+Hệ thống gợi ý dịch vụ cá nhân hóa được thiết kế nhằm cung cấp cho người dùng các đề xuất chính xác, phù hợp với nhu cầu sức khỏe và điều kiện cá nhân. Khác với các hệ thống gợi ý truyền thống sử dụng collaborative filtering hoặc content-based filtering đơn thuần, hệ thống này áp dụng phương pháp \textit{semantic search} dựa trên \textit{vector embeddings} để nắm bắt ngữ nghĩa sâu của nhu cầu người dùng và đặc điểm dịch vụ.
+
+\subsubsection{Kiến trúc tổng thể}
+
+Hệ thống được thiết kế với hai luồng gợi ý chính: (1) \textbf{Home Recommender} - gợi ý trên trang chủ dựa trên hồ sơ người dùng và lịch sử tương tác, và (2) \textbf{Chatbot Recommender} - gợi ý theo ngữ cảnh từ câu hỏi tự nhiên của người dùng trong hội thoại. Kiến trúc hệ thống bao gồm các thành phần chính:
+
+    \begin{itemize}
+        \item \textbf{Services Database}: Lưu trữ thông tin chi tiết về các dịch vụ y tế
+        \item \textbf{Embedding Model}: Chuyển đổi text thành vector representations
+        \item \textbf{Vector Database}: Lưu trữ và tìm kiếm vectors hiệu quả
+        \item \textbf{Query Builder}: Xây dựng query từ user profile hoặc natural language
+        \item \textbf{Ranking Module}: Sắp xếp và lọc kết quả dựa trên relevance
+    \end{itemize}
+
+\subsubsection{Phương pháp biểu diễn đặc trưng}
+
+    \paragraph{Textual Features}  
+    Hệ thống tập trung vào việc sử dụng \textbf{textual features} và phương pháp embedding ngữ nghĩa để nắm bắt toàn bộ thông tin của dịch vụ. Quyết định này dựa trên khả năng mạnh mẽ của các mô hình embedding hiện đại trong việc nắm bắt ngữ nghĩa từ văn bản, bao gồm cả thông tin về category, tags và các thuộc tính mô tả.
+
+    Các trường dữ liệu textual được sử dụng:
+    \begin{itemize}
+        \item \textbf{Name}: tên dịch vụ, sản phẩm
+        \item \textbf{Description}: mô tả chi tiết lợi ích, hướng dẫn sử dụng, quy trình thăm khám
+        \item \textbf{Category}: phân loại dịch vụ (y tế, dinh dưỡng, thể thao, tâm lý)
+        \item \textbf{Tags}: từ khóa đặc trưng như ``tim mạch'', ``yoga'', ``tư vấn online'', ``phục hồi chức năng''
+    \end{itemize}
+
+Mỗi dịch vụ được biểu diễn dưới dạng một document có cấu trúc kết hợp tất cả các trường thông tin trên thành một văn bản thống nhất.
+
+    \paragraph{Embedding Model}  
+    Hệ thống sử dụng mô hình Sentence-BERT với các đặc điểm:
+
+    \begin{itemize}
+        \item \textbf{Multilingual support}: Hỗ trợ tốt tiếng Việt
+        \item \textbf{Semantic understanding}: Nắm bắt ý nghĩa ngữ nghĩa sâu, không chỉ matching từ khóa
+        \item \textbf{Efficient inference}: Tốc độ xử lý nhanh, phù hợp cho production
+        \item \textbf{Fixed-size output}: Vector đầu ra có kích thước cố định 768 chiều
+    \end{itemize}
+
+Mô hình embedding chuyển đổi document text thành vector representation trong không gian 768 chiều, nơi các documents có ngữ nghĩa tương tự sẽ gần nhau về mặt hình học.
+
+\subsubsection{Vector Database và Similarity Search}
+
+    \paragraph{Vector Indexing}  
+    Hệ thống sử dụng ChromaDB làm vector database với các tính năng:
+
+    \begin{itemize}
+        \item \textbf{Persistent storage}: Lưu trữ vector database trên disk
+        \item \textbf{HNSW index}: Hierarchical Navigable Small World index cho tìm kiếm nhanh
+        \item \textbf{Metadata support}: Lưu trữ metadata (service\_id, category, tags) cùng với vectors
+        \item \textbf{Cosine similarity}: Sử dụng cosine distance để đo độ tương đồng
+    \end{itemize}
+
+\paragraph{Similarity Measure}  
+Độ tương đồng giữa query và service được tính dựa trên cosine distance:
+
+\begin{equation}
+\text{distance}(u, v) = 1 - \frac{u \cdot v}{\|u\| \|v\|}
+\end{equation}
+
+Similarity score được chuyển đổi từ distance:
+
+\begin{equation}
+\text{similarity}(u, v) = 1 - \text{distance}(u, v)
+\end{equation}
+
+Với $\text{similarity} \in [0, 1]$, giá trị càng gần 1 nghĩa là hai vectors càng tương đồng về mặt ngữ nghĩa.
+
+\subsubsection{Query Construction}
+
+\paragraph{Home Recommender Query}  
+Đối với trang chủ, query được xây dựng từ nhiều nguồn thông tin về người dùng:
+
+\begin{itemize}
+    \item \textbf{Health Conditions}: Các tình trạng sức khỏe hiện tại của người dùng
+    \item \textbf{Interests}: Các lĩnh vực quan tâm (yoga, dinh dưỡng, thể thao)
+    \item \textbf{Goals}: Mục tiêu sức khỏe (giảm cân, tăng cơ, giảm stress)
+    \item \textbf{Service History}: Tags và category từ các dịch vụ đã sử dụng
+\end{itemize}
+
+Các thông tin này được kết hợp thành một query string thống nhất, sau đó được embedding để tìm kiếm trong vector space.
+
+\paragraph{Chatbot Recommender Query}  
+Đối với chatbot, người dùng nhập trực tiếp câu tự nhiên mô tả nhu cầu của mình. Hệ thống sử dụng semantic search trực tiếp mà không cần extract entities phức tạp. Query tự nhiên được embedding và tìm kiếm các services có ngữ nghĩa tương đồng nhất.
+
+\subsubsection{Ranking và Filtering}
+
+Hệ thống áp dụng các chiến lược ranking và filtering để đảm bảo chất lượng gợi ý:
+
+\paragraph{Similarity Threshold}  
+Chỉ các services có similarity score vượt ngưỡng $\theta$ mới được đề xuất:
+
+\begin{equation}
+\text{recommend}(s) = \begin{cases}
+s & \text{if } \text{similarity}(q, s) \geq \theta \\  
+\text{reject} & \text{otherwise}
+\end{cases}
+\end{equation}
+
+\paragraph{History Filtering}  
+Đối với Home Recommender, các services mà người dùng đã sử dụng sẽ được loại bỏ khỏi danh sách gợi ý để tránh lặp lại.
+
+\paragraph{Diversification}  
+Khi không có thông tin profile (người dùng mới), hệ thống áp dụng chiến lược diversification để đảm bảo các gợi ý đa dạng về category, tránh tập trung vào một nhóm dịch vụ duy nhất.
+
+\paragraph{Explanation Generation}  
+Mỗi gợi ý được đi kèm với lý do giải thích dựa trên:
+\begin{itemize}
+    \item Tags matching giữa query và service
+    \item Similarity score cao
+    \item Matching với health conditions hoặc interests của người dùng
+\end{itemize}
+
+\subsubsection{Pipeline tổng thể}
+
+\paragraph{Offline Phase}  
+\begin{enumerate}
+    \item Load danh sách services từ database
+    \item Xây dựng document cho mỗi service (kết hợp name, description, category, tags)
+    \item Embedding tất cả documents thành vectors
+    \item Index vectors vào ChromaDB với metadata
+    \item Persist vector database
+\end{enumerate}
+
+\paragraph{Online Phase - Home Recommender}  
+\begin{enumerate}
+    \item Nhận user profile và service history
+    \item Xây dựng query string từ profile
+    \item Embedding query
+    \item Tìm kiếm top-K similar services
+    \item Lọc bỏ services đã sử dụng
+    \item Áp dụng similarity threshold
+    \item Generate explanations
+    \item Trả về ranked list
+\end{enumerate}
+
+\paragraph{Online Phase - Chatbot Recommender}  
+\begin{enumerate}
+    \item Nhận natural language query
+    \item Embedding query trực tiếp
+    \item Tìm kiếm top-K similar services
+    \item Áp dụng similarity threshold
+    \item Generate explanations
+    \item Trả về ranked list
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

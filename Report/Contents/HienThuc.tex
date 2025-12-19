@@ -1,0 +1,633 @@
+\chapter{Hiện thực}
+\section{Các công nghệ liên quan}
+
+\subsection{Mobile App Development (iOS/Android, Flutter)}
+\begin{itemize}
+    \item \textbf{Lý do chọn Flutter:} Là một framework đa nền tảng, cho phép phát triển ứng dụng cho cả iOS và Android từ một bộ mã nguồn duy nhất. Điều này giúp \textbf{tiết kiệm thời gian, chi phí} phát triển và bảo trì, đồng thời đảm bảo trải nghiệm người dùng nhất quán trên cả hai hệ điều hành. Hiệu năng của Flutter gần như tương đương với ứng dụng native.
+    \item \textbf{Kiến trúc:} Áp dụng kiến trúc Clean Architecture hoặc Riverpod Architecture để tách biệt rõ ràng các tầng logic (Data, Domain, Presentation), giúp mã nguồn dễ kiểm thử và bảo trì.
+    \item \textbf{Tính năng nổi bật}:
+    \begin{itemize}
+        \item \textbf{Impeller Rendering Engine}: Flutter biên dịch shader tùy chỉnh tại thời điểm build để đạt độ mượt 120Hz và không có JS bridge; React Native với New Architecture (Fabric + Skia) vẫn dùng cầu nối JS-to-native, bị giật khi animation nặng; Native (Metal/Vulkan) truy cập GPU trực tiếp nhưng cần tinh chỉnh riêng cho từng nền tảng.
+        \item \textbf{Hot Reload Speed}: Flutter giữ trạng thái trong <100ms nhờ Dart AOT; React Native với Metro bundler reload trong $\sim$1s nhưng mất trạng thái ở module native phức tạp; Native không có hot reload thật sự—rebuild toàn bộ mất 10s+ trong Xcode/Android Studio.
+        \item \textbf{Widget/Component System}: Mô hình ``mọi thứ là widget'' của Flutter cho phép kết hợp vô hạn và UI chính xác đến từng pixel chỉ trong một ngôn ngữ (Dart); React Native dùng JSX cần thư viện bên thứ ba cho style nâng cao, dễ bất đồng bộ; Native (SwiftUI/Compose) kiểm soát hoàn toàn nhưng phải viết lại code cho iOS/Android.
+        \item \textbf{Startup Time \& App Size}: Flutter khởi động lạnh <50ms nhờ AOT nhưng bundle engine $\sim$50MB; React Native khởi động $\sim$100ms với JS bundle, kích thước cơ bản nhỏ hơn ($\sim$30MB); Native khởi động nhanh nhất (<30ms) không có runtime nhúng.
+        \item \textbf{Platform Channel/Bridge}: Kênh đồng bộ/bất đồng bộ của Flutter tích hợp API native (camera, BLE) với Dart an toàn kiểu; TurboModules của React Native giảm overhead cầu nối nhưng vẫn chỉ bất đồng bộ, khó debug; Native truy cập phần cứng trực tiếp qua SDK, độ trễ bằng 0.
+        \item \textbf{Multi-Platform Code Reuse}: Flutter biên dịch thành binary native cho iOS, Android, web, desktop và nhúng với tỷ lệ tái sử dụng 90\%+; React Native mạnh trên mobile, cần React Native Web/Electron cho các nền khác ($\sim$70\% tái sử dụng); Native yêu cầu codebase Swift/Kotlin riêng, tái sử dụng <30\%.
+        \item \textbf{Animation Performance}: Impeller + canvas 120Hz của Flutter cho 0 khung hình bị bỏ trong chuyển cảnh phức tạp; React Native ổn định $\sim$60fps nhưng giật khi JS thread nặng; Native đảm bảo 120Hz với Core Animation/Compose, tốt nhất cho game.
+        \item \textbf{OTA Updates}: Flutter dùng Shorebird/CodeMagic để vá lỗi tức thì không qua store; React Native dùng CodePush đẩy cập nhật JS trực tiếp; Native phải qua App Store/Google Play, chờ duyệt 1--7 ngày.
+        \item \textbf{Ecosystem \& Third-Party Libs}: pub.dev của Flutter phát triển nhanh nhưng thiếu plugin niche, thường cần viết channel tùy chỉnh; React Native tận dụng npm với 2M+ package, hệ sinh thái phong phú nhất; Native dùng CocoaPods/Gradle chính thức, ổn định nhất nhưng bị khóa nền tảng.
+    \end{itemize}
+\end{itemize}
+
+
+\subsection{Web/Portal Development (Partner Portal, Admin Dashboard)}
+\begin{itemize}
+    \item \textbf{Lý do chọn Flutter (Web \& Desktop):} Cho phép tái sử dụng tới 100\% business logic và UI từ ứng dụng mobile (Customer/Technician App) để xây dựng Admin Dashboard. Với sự hỗ trợ của WebAssembly (Wasm), Flutter Web mang lại trải nghiệm Single Page Application (SPA) mượt mà, đồng nhất trên mọi trình duyệt mà không cần lo lắng về sự sai lệch CSS hay DOM như các framework web truyền thống.
+    \item \textbf{Tính năng nổi bật}:
+    \begin{itemize}
+    \item \textbf{WebAssembly (Wasm) Rendering}: Flutter biên dịch sang Wasm (GC) thay vì chỉ JS thuần, giúp hiệu năng thực thi gần như Native trên trình duyệt hiện đại; React/Next.js dựa hoàn toàn vào JavaScript và DOM manipulation, dễ bị chậm khi xử lý bảng dữ liệu lớn (thousands of rows); Angular có hiệu năng tốt nhưng vẫn chịu giới hạn của JS thread; Vue/Nuxt nhẹ nhưng khó xử lý các tác vụ tính toán nặng phía client.
+    
+    \item \textbf{Unified Business Logic}: Chia sẻ hoàn toàn các model, repository, và service (Authentication, API handling) với Mobile App; React Web và React Native tuy cùng hệ sinh thái nhưng không thể chia sẻ code UI và thường phải viết lại logic điều hướng; Angular/Vue là web-only, hoàn toàn tách biệt với logic mobile; Việc dùng chung codebase giúp giảm 50\% công sức bảo trì và fix bug cho cả 3 nền tảng (Web, iOS, Android).
+    
+    \item \textbf{Pixel-Perfect UI Consistency}: Flutter vẽ UI trên một canvas (Skia/Impeller), đảm bảo Admin Dashboard hiển thị giống hệt nhau trên Chrome, Safari, hay Desktop App (Windows/macOS); Next.js/React phụ thuộc vào trình duyệt render HTML/CSS, thường gặp lỗi hiển thị khác nhau giữa các trình duyệt; CSS của Angular/Vue có thể bị conflict hoặc vỡ layout khi thay đổi độ phân giải màn hình.
+    
+    \item \textbf{Declarative Routing (GoRouter)}: Hỗ trợ deep linking, path parameters và redirection mạnh mẽ cho web, đồng thời quản lý navigation stack phức tạp của admin panel; React Router cần cấu hình thủ công nhiều; Angular Routing mạnh nhưng boilerplate code rất dài; Flutter Routing đồng bộ trạng thái URL với state của ứng dụng một cách tự nhiên.
+    
+    \item \textbf{Advanced Data Visualization}: Flutter tích hợp cực tốt với các thư viện vẽ biểu đồ (Charts) hiệu năng cao (fl\_charts, syncfusion) render trực tiếp trên canvas 60fps; Các thư viện Chart của React/Vue (D3.js, Chart.js) thao tác trên DOM/SVG, thường bị lag khi render lượng dữ liệu realtime lớn; Khả năng tùy biến visual của Flutter vượt trội hơn nhờ quyền kiểm soát từng pixel.
+    
+    \item \textbf{State Management (BLoC/Riverpod)}: Quản lý trạng thái phức tạp của Admin (đa ngôn ngữ, theme, user permissions) thống nhất, reactive và dễ test; React Context API thường gây re-render không cần thiết nếu không tối ưu (useMemo); Angular dùng RxJS mạnh nhưng đường cong học tập (learning curve) rất cao; Vuex/Pinia của Vue đơn giản nhưng khó scale cho các enterprise admin lớn.
+    
+    \item \textbf{Dart Sound Null Safety}: Hệ thống type an toàn tuyệt đối giúp ngăn chặn lỗi runtime (null reference) thường gặp khi xử lý dữ liệu API thiếu trường trong Admin Dashboard; TypeScript trong React/Next.js chỉ là lớp kiểm tra tĩnh (compile-time), vẫn có thể lỗi runtime; JavaScript thuần trong các framework cũ hoàn toàn không có bảo vệ này.
+    
+    \item \textbf{Desktop Support (Windows/macOS)}: Flutter cho phép build ra file .exe/.app native từ cùng source code web admin để nhân viên cài đặt, tận dụng phím tắt, notification hệ thống và làm việc offline; Next.js/React cần bọc trong Electron (rất nặng nề, tốn RAM); Angular/Vue không có giải pháp native chính thống, chỉ chạy trên trình duyệt.
+    
+    \item \textbf{Development Experience (DX)}: Stateful Hot Reload hoạt động trên cả Web, giúp sửa UI bảng biểu/form tức thì mà không mất dữ liệu đang nhập; HMR của Webpack (React/Vue) nhanh nhưng thường reload lại trang khi sửa logic sâu; Angular rebuild khá lâu với các dự án lớn; Công cụ Flutter DevTools giúp debug layout và network request trực quan hơn console log của trình duyệt.
+    
+    \item \textbf{Security}: Code logic được biên dịch thành main.dart.js (hoặc Wasm) minified và obfuscated mặc định, khó bị đọc trộm logic nghiệp vụ hơn so với code JS rõ ràng của React/Next.js (có thể xem qua Source tab trình duyệt); Đây là điểm cộng lớn cho các Admin Portal chứa logic tính toán doanh thu/hoa hồng nhạy cảm.
+\end{itemize}
+\end{itemize}
+
+
+\subsection{Server/Backend (NestJS \& PostgreSQL)}
+\begin{itemize}
+    \item \textbf{Lý do chọn NestJS:} Được xây dựng trên nền tảng NodeJS và TypeScript, NestJS cung cấp một kiến trúc module hóa, có cấu trúc chặt chẽ (lấy cảm hứng từ Angular). Điều này giúp việc xây dựng các API phức tạp trở nên \textbf{dễ quản lý, bảo trì và mở rộng}. TypeScript cũng giúp giảm thiểu lỗi và tăng cường tính an toàn của mã nguồn.
+    \item \textbf{Database: PostgreSQL} là lựa chọn phù hợp nhất. PostgreSQL là hệ quản trị CSDL quan hệ mạnh mẽ, ổn định, có khả năng xử lý các truy vấn phức tạp và lượng dữ liệu lớn. Các tính năng như hỗ trợ JSONB rất hữu ích để lưu các dữ liệu có cấu trúc linh hoạt (ví dụ: cấu hình dịch vụ, câu hỏi cá nhân hóa).
+    \item \textbf{Tính năng nổi bật:}
+    \begin{itemize}
+    \item \textbf{Modular Architecture}: NestJS áp dụng cấu trúc module tính năng với @Module() để tách biệt rõ ràng, lý tưởng cho ứng dụng doanh nghiệp; Express thiếu module tích hợp, dễ dẫn đến code rối; Spring Boot có module bằng annotation nhưng dài dòng với Java; Django dùng app-based module kiểu Python, đầy đủ tính năng nhưng kém linh hoạt với hệ sinh thái JS; Fastify nhẹ, không có module gốc, cần tổ chức thủ công.
+
+    \item \textbf{Dependency Injection (DI)}: NestJS cung cấp DI phân cấp, an toàn kiểu qua @Injectable() và providers, giảm boilerplate và tăng khả năng test; Express không có DI sẵn, phải dùng thư viện như Inversify; Spring Boot với @Autowired là tiên phong nhưng nặng với cấu hình XML; Django truyền service thủ công, không có container DI thật; Fastify hỗ trợ plugin nhưng thiếu DI cấp framework.
+
+    \item \textbf{TypeScript-First Design}: NestJS được xây dựng hoàn toàn cho TypeScript với suy luận kiểu và decorator, phát hiện lỗi tại compile-time; Express hỗ trợ TS qua add-on nhưng vẫn JS-centric; Spring Boot dùng kiểu tĩnh Java, cứng nhắc hơn TS; Django là Python động, type hints chỉ là bổ sung; Fastify có type TS nhưng tích hợp không sâu, dễ lỗi runtime.
+
+    \item \textbf{Decorators \& Metadata}: NestJS dùng @Controller(), @Get(), @Body() để định nghĩa route và validation khai báo, lấy cảm hứng từ Angular; Express dùng hàm/middleware thuần, dài dòng; Spring Boot với @RestController/@RequestMapping tương tự nhưng cú pháp Java; Django dùng class-based hoặc function view, không có decorator; Fastify dùng schema route, ít metadata.
+
+    \item \textbf{Built-in Testing Support}: NestJS tích hợp @nestjs/testing cho test e2e/unit với mock và override DI sẵn; Express cần setup Jest/Supertest thủ công; Spring Boot với @SpringBootTest toàn diện nhưng khởi động JVM chậm; Django có TestCase tích hợp nhưng chỉ cho Python; Fastify test dựa plugin, nhẹ nhưng thiếu cấu trúc như Nest.
+
+    \item \textbf{Microservices \& Event-Driven}: NestJS hỗ trợ microservices nguyên bản qua @nestjs/microservices với TCP, Redis, Kafka, hybrid; Express cần setup thủ công; Spring Boot với Spring Cloud mạnh cho doanh nghiệp nhưng phức tạp; Django dùng Celery cho task, không phải microservices đầy đủ; Fastify tập trung HTTP, hạn chế về async messaging.
+
+    \item \textbf{Performance \& Adapter Flexibility}: NestJS với Fastify adapter đạt 30k+ req/s (gấp 2 Express), bộ nhớ thấp (~15\% so Express, 1/5 Spring); Express nhanh cho app nhỏ nhưng nghẽn khi scale; Spring Boot tối ưu JVM cho tải nặng nhưng latency/bộ nhớ cao; Django bị giới hạn GIL về concurrency, chậm hơn Node; Fastify đạt 33k req/s nhưng Nest thêm ~8\% overhead để có cấu trúc.
+
+    \item \textbf{Validation \& Pipes}: NestJS dùng class-validator với pipes @nestjs/class-transformer để tự động validate DTO khai báo; Express dùng Joi/express-validator thủ công; Spring Boot với @Valid và Bean Validation tương tự nhưng dùng Java bean; Django xử lý validation qua forms/serializers; Fastify schema hiệu suất cao nhưng tích hợp kém.
+
+    \item \textbf{Guards, Interceptors \& Pipes}: NestJS hỗ trợ tính năng AOP qua @UseGuards, @UseInterceptors cho auth/logging/biến đổi; Express dùng middleware chain tương tự nhưng toàn cục; Spring Boot có AOP/Interceptors mạnh cho doanh nghiệp; Django middleware tuyến tính, kém chi tiết; Fastify dùng hook nhanh nhưng chỉ hook, không có guard.
+
+    \item \textbf{Ecosystem \& Community}: NestJS tận dụng 2M+ package npm với 60k+ sao GitHub, tài liệu/plugin phát triển mạnh; Express có hệ sinh thái rộng nhưng không cấu trúc; Spring Boot trưởng thành cho doanh nghiệp (Maven/Gradle); Django mạnh về data/ML với PyPI; Fastify cộng đồng nhỏ hơn nhưng plugin hiệu suất cao.
+\end{itemize}
+\end{itemize}
+
+
+
+\subsection{Hiện thực hệ thống RAG Chatbot}
+
+Phần hiện thực tập trung mô tả chi tiết quá trình xây dựng và triển khai hệ thống Chatbot tích hợp Retrieval-Augmented Generation (RAG). Khác với phần thiết kế đã trình bày ở mục trước, nội dung dưới đây mô tả trực tiếp cách các thành phần được cài đặt, cách chúng vận hành trong môi trường thực tế, cùng các cơ chế xử lý dữ liệu, truy xuất và sinh câu trả lời dựa trên mã nguồn Python của hệ thống.
+
+\subsubsection{Tổ chức mã nguồn}
+
+Hệ thống được triển khai dưới dạng một ứng dụng Python theo cấu trúc module hoá. Các thành phần được tách riêng thành nhiều file nhằm đảm bảo tính bảo trì, dễ kiểm thử và dễ mở rộng. Cấu trúc thư mục chính bao gồm:
+
+\begin{itemize}
+    \item \texttt{loaders/}: Các bộ tải tài liệu (PDF, text).
+    \item \texttt{processors/}: Bộ chia nhỏ văn bản và bộ làm sạch dữ liệu.
+    \item \texttt{embeddings/}: Mã thực thi mô hình embedding.
+    \item \texttt{vectorstore/}: Triển khai FAISS cho lưu trữ và truy vấn vector.
+    \item \texttt{retrieval/}: Bộ truy xuất top-k đoạn liên quan.
+    \item \texttt{prompt/}: Xây dựng format prompt hoàn chỉnh.
+    \item \texttt{chatbot/}: Pipeline chính kết nối truy xuất và mô hình sinh.
+\end{itemize}
+
+Việc tách thành module giúp các chức năng hoạt động độc lập và giảm rủi ro trùng lặp logic.
+
+\subsubsection{Hiện thực xử lý tài liệu}
+
+\paragraph{Tải và làm sạch tài liệu}
+
+Thành phần tải tài liệu được lập trình để quét nhiều định dạng.  
+Đối với PDF, hệ thống sử dụng bộ giải mã dựa trên PyMuPDF nhằm trích xuất nội dung văn bản theo từng trang. Sau khi tải xong, dữ liệu thô được chuyển qua lớp xử lý để loại bỏ:
+
+\begin{itemize}
+    \item ký tự thừa, ký tự xuống dòng không cần thiết;
+    \item khoảng trắng dư thừa;
+    \item các ký tự không hỗ trợ mã hoá UTF-8.
+\end{itemize}
+
+Kết quả trả về là một chuỗi văn bản sạch có thể đưa vào bước chia đoạn.
+
+\paragraph{Chia nhỏ văn bản}
+
+Khối chia nhỏ văn bản được hiện thực bằng một lớp chuyên dụng. Mã nguồn thực thi thuật toán chia theo độ dài token cố định (thường 300–400 token). Các đoạn sinh ra overlapped một phần để tránh mất ngữ nghĩa.
+
+Trong mã, bộ đếm token được thực hiện bằng tokenizer của mô hình embedding, đảm bảo số token đo được hoàn toàn trùng khớp với môi trường truy xuất và embedding.  
+Kết quả được lưu dưới dạng danh sách JSON gồm nội dung đoạn và metadata đi kèm như tên file, trang số và chỉ số đoạn.
+
+\subsubsection{Hiện thực mô hình embedding}
+
+Hệ thống sử dụng mô hình Sentence Transformers được tải từ HuggingFace. Lớp embedding thực thi các bước:
+
+    \begin{enumerate}
+        \item Tải mô hình vào CPU hoặc GPU tùy theo khả năng phần cứng.
+        \item Mã hóa văn bản thành vector có kích thước cố định.
+        \item Chuẩn hóa vector về đơn vị (L2 normalize) trước khi lưu vào FAISS.
+    \end{enumerate}
+
+
+Cơ chế xử lý hàng loạt (batch encoding) được tích hợp nhằm tăng hiệu năng khi embedding số lượng lớn đoạn.
+
+\subsubsection{Cơ sở dữ liệu vector FAISS}
+
+Vector sau khi được tạo sẽ được lưu vào chỉ mục FAISS dạng \texttt{IndexFlatIP}, tức sử dụng inner-product để tìm kiếm. Do các vector đã được chuẩn hóa, inner-product tương đương với cosine similarity.
+
+Quá trình xây dựng chỉ mục bao gồm:
+
+\begin{itemize}
+    \item khởi tạo chỉ mục rỗng;
+    \item chèn toàn bộ vector vào chỉ mục;
+    \item lưu thêm metadata tương ứng trong một bảng ánh xạ riêng.
+\end{itemize}
+
+Chỉ mục được ghi xuống đĩa để tái sử dụng ở các lần chạy sau, giảm thời gian khởi động hệ thống.
+
+\subsubsection{Hiện thực bộ truy xuất}
+
+Tại thời điểm nhận câu hỏi từ người dùng, pipeline thực hiện:
+
+\begin{enumerate}
+    \item embedding câu hỏi thành vector cùng kích thước với vector tài liệu;
+    \item gửi vector vào chỉ mục FAISS để truy vấn top-k (thường k = 5);
+    \item truy xuất lại nội dung các đoạn thông qua metadata;
+    \item xây dựng chuỗi ngữ cảnh bằng cách ghép các đoạn theo thứ tự giảm dần mức độ liên quan.
+\end{enumerate}
+
+Để tăng mức chính xác, mã nguồn có thêm bước lọc theo ngưỡng tương đồng. Nếu độ tương đồng thấp hơn mức tối thiểu, hệ thống trả về nhắc nhở rằng không tìm thấy thông tin phù hợp.
+
+\subsubsection{Xây dựng prompt đầu vào}
+
+Thành phần xây dựng prompt hiện thực đầy đủ 4 phần:
+
+\begin{itemize}
+    \item vai trò hệ thống (system role);
+    \item ngữ cảnh lấy từ RAG;
+    \item câu hỏi gốc;
+    \item hướng dẫn ràng buộc.
+\end{itemize}
+
+Mã nguồn chủ động tối ưu để tránh vượt quá giới hạn token của mô hình bằng cách:
+
+\begin{itemize}
+    \item cắt bỏ các đoạn quá dài,
+    \item ưu tiên giữ các đoạn có độ tương đồng cao nhất,
+    \item chuẩn hóa định dạng ngữ cảnh dưới dạng bullet hoặc paragraph ngắn.
+\end{itemize}
+
+\subsubsection{Tích hợp mô hình ngôn ngữ}
+
+Mô hình ngôn ngữ lớn được load trong chế độ suy luận lượng tử 4-bit, tận dụng thư viện HuggingFace Transformers kết hợp với accelerate và bitsandbytes. Thành phần hiện thực cung cấp:
+
+\begin{itemize}
+    \item cơ chế sinh văn bản theo chế độ greedy hoặc sampling;
+    \item kiểm soát tối đa token đầu ra nhằm tránh sinh tràn;
+    \item dừng sinh khi gặp các token kết thúc hoặc mẫu định dạng không hợp lệ.
+\end{itemize}
+
+Toàn bộ quá trình sinh được đóng gói thành một hàm duy nhất để dễ dàng gọi trong pipeline chatbot.
+
+\subsubsection{Xử lý phản hồi và hậu xử lý}
+
+Sau khi mô hình trả lời, hệ thống áp dụng chuỗi hậu xử lý:
+
+\begin{itemize}
+    \item loại bỏ token đặc biệt của mô hình;
+    \item chuẩn hóa xuống dòng, dấu câu;
+    \item cắt bỏ các phần nằm ngoài định dạng yêu cầu;
+    \item kiểm tra câu trả lời có bám sát ngữ cảnh hay không.
+\end{itemize}
+
+Nếu mô hình sinh câu trả lời không liên quan đến ngữ cảnh truy xuất, hệ thống tự động trả về thông báo trung tính để tránh rủi ro ảo giác.
+
+\subsubsection{Pipeline tổng hợp của Chatbot}
+
+Pipeline cuối cùng được hiện thực trong module \texttt{chatbot/service.py}. Tại đây toàn bộ các bước được kết nối theo trình tự:
+
+\begin{enumerate}
+    \item nhận câu hỏi từ người dùng;
+    \item embedding câu hỏi;
+    \item truy xuất đoạn liên quan từ FAISS;
+    \item xây dựng prompt hoàn chỉnh;
+    \item gửi prompt vào mô hình sinh;
+    \item trả về câu trả lời sau khi hậu xử lý.
+\end{enumerate}
+
+Mỗi bước đều có logging chi tiết giúp theo dõi hoạt động chatbot và hỗ trợ gỡ lỗi trong môi trường triển khai thực tế.
+
+
+
+
+\subsection{Triển khai hệ thống gợi ý}
+
+\subsubsection{Cấu trúc dữ liệu}
+
+Hệ thống được triển khai với cấu trúc dữ liệu rõ ràng, bao gồm:
+
+\begin{itemize}
+    \item \textbf{Services Database}: File JSON chứa các dịch vụ mẫu về sức khỏe
+    \item \textbf{Vector Database}: ChromaDB persistent storage tại \texttt{data/processed/vectordb/}
+    \item \textbf{Embedding Model}: \texttt{sentence-transformers/paraphrase-multilingual-mpnet-base-v2}
+\end{itemize}
+
+Mỗi service trong database chứa các trường:
+\begin{itemize}
+    \item \texttt{id}: Unique identifier (VD: SV001, SV002)
+    \item \texttt{name}: Tên dịch vụ
+    \item \texttt{description}: Mô tả chi tiết (100-200 từ)
+    \item \texttt{category}: Phân loại (y\_te, dinh\_duong, the\_thao, tam\_ly, phuc\_hoi)
+    \item \texttt{tags}: Danh sách từ khóa (4-6 tags)
+    \item \texttt{type}: Loại dịch vụ (consultation, exercise, nutrition, etc.)
+\end{itemize}
+
+\subsubsection{Offline Processing}
+
+\paragraph{Document Construction}
+Mỗi service được chuyển đổi thành một document text có cấu trúc:
+
+\begin{quote}
+\texttt{Tên dịch vụ: [name]} \\
+\texttt{Mô tả: [description]} \\
+\texttt{Danh mục: [category]} \\
+\texttt{Từ khóa: [tag1, tag2, tag3, ...]}
+\end{quote}
+
+\paragraph{Vector Database Building} 
+Quá trình build vector database bao gồm:
+\begin{enumerate}
+    \item Load các services từ \texttt{data/raw/services.json}
+    \item Tạo số lượng các documents tương ứng
+    \item Embedding các documents thành các vectors (768 chiều mỗi vector)
+    \item Index vào ChromaDB với cosine similarity metric
+    \item Lưu persistent tại \texttt{data/processed/vectordb/}
+\end{enumerate}
+
+Kích thước vector database (ví dụ với 10 services): $10 \times 768 = 7,680$ dimensions tổng cộng.
+
+\subsubsection{Online Processing}
+
+\paragraph{Home Recommender}  
+
+\textbf{Input Format:}
+\begin{itemize}
+    \item \texttt{user\_profile} (dict, optional):
+    \begin{itemize}
+        \item \texttt{health\_conditions}: List[str] - VD: ["tim mạch", "đái tháo đường"]
+        \item \texttt{interests}: List[str] - VD: ["yoga", "dinh dưỡng"]
+        \item \texttt{goals}: List[str] - VD: ["giảm cân", "kiểm soát đường huyết"]
+    \end{itemize}
+    \item \texttt{selected\_services} (List[str], optional): ["SV001", "SV003"]
+    \item \texttt{top\_k} (int): Số lượng gợi ý mong muốn (default: 5)
+\end{itemize}
+
+\textbf{Processing Pipeline:}
+\begin{enumerate}
+    \item \textbf{Query Building}: Nối tất cả elements từ health\_conditions, interests, goals, và tags từ selected\_services thành một string
+    \item \textbf{Embedding}: Query string → 768-dim vector
+    \item \textbf{Vector Search}: ChromaDB query với cosine similarity
+    \item \textbf{Filtering}: Loại bỏ services trong selected\_services, filter theo threshold (0.2)
+    \item \textbf{Ranking}: Sắp xếp theo similarity score giảm dần
+    \item \textbf{Explanation}: Generate lý do dựa trên matching tags và profile
+\end{enumerate}
+
+\textbf{Output Format:}
+\begin{itemize}
+    \item \texttt{recommendations}: List[Dict] - Danh sách services được gợi ý
+    \begin{itemize}
+        \item \texttt{service\_id}: str - VD: "SV002"
+        \item \texttt{name}: str - Tên dịch vụ
+        \item \texttt{description}: str - Mô tả đầy đủ
+        \item \texttt{category}: str - Danh mục
+        \item \texttt{tags}: List[str] - Tags
+        \item \texttt{type}: str - Loại dịch vụ
+        \item \texttt{similarity\_score}: float - Score trong [0, 1]
+        \item \texttt{reason}: str - Lý do gợi ý
+    \end{itemize}
+    \item \texttt{total}: int - Tổng số gợi ý
+\end{itemize}
+
+\paragraph{Chatbot Recommender}  
+
+\textbf{Input Format:}
+\begin{itemize}
+    \item \texttt{query} (str): Câu hỏi tự nhiên từ người dùng
+    \begin{itemize}
+        \item VD: "Tôi bị stress và lo âu, cần tìm dịch vụ giúp giảm căng thẳng"
+        \item VD: "Có khóa học yoga nào phù hợp với người đau lưng không?"
+    \end{itemize}
+    \item \texttt{top\_k} (int): Số lượng gợi ý (default: 5)
+\end{itemize}
+
+\textbf{Processing Pipeline:}
+\begin{enumerate}
+    \item \textbf{Query Embedding}: Câu query tự nhiên → 768-dim vector (không cần preprocessing)
+    \item \textbf{Vector Search}: Tìm kiếm trong ChromaDB
+    \item \textbf{Filtering}: Áp dụng similarity threshold (0.2)
+    \item \textbf{Ranking}: Sắp xếp theo similarity score
+    \item \textbf{Explanation}: Match tags trong query với tags của service
+\end{enumerate}
+
+\textbf{Output Format:}
+\begin{itemize}
+    \item \texttt{query}: str - Query gốc của người dùng
+    \item \texttt{recommendations}: List[Dict] - Giống format Home Recommender
+    \item \texttt{total}: int - Tổng số gợi ý
+\end{itemize}
+
+\subsubsection{Ví dụ minh họa}
+
+\paragraph{Ví dụ 1: Chatbot Recommender} 
+\textbf{Input:}
+\begin{verbatim}
+{
+  "query": "Tôi bị đau lưng mãn tính, cần tìm dịch vụ phục hồi",
+  "top_k": 3
+}
+\end{verbatim}
+
+\textbf{Query Processing:}
+\begin{itemize}
+    \item Query embedding: 768-dim vector
+    \item Vector search: Tất cả services được scan
+    \item Top-3 services có highest cosine similarity
+\end{itemize}
+
+\textbf{Output:}
+\begin{verbatim}
+{
+  "query": "Tôi bị đau lưng mãn tính, cần tìm dịch vụ phục hồi",
+  "recommendations": [
+    {
+      "service_id": "SV002",
+      "name": "Chương trình Yoga trị liệu",
+      "similarity_score": 0.782,
+      "reason": "Dịch vụ phù hợp vì liên quan đến: đau lưng, 
+                 phục hồi chức năng",
+      "category": "the_thao",
+      "tags": ["yoga", "phục hồi chức năng", "đau lưng", 
+               "cột sống", "trị liệu"]
+    },
+    {
+      "service_id": "SV009",
+      "name": "Massage trị liệu phục hồi",
+      "similarity_score": 0.718,
+      "reason": "Dịch vụ phù hợp vì liên quan đến: phục hồi 
+                 chức năng, đau lưng",
+      "category": "phuc_hoi",
+      "tags": ["massage", "phục hồi chức năng", "chấn thương", 
+               "vật lý trị liệu", "giảm đau"]
+    }
+  ],
+  "total": 2
+}
+\end{verbatim}
+
+\paragraph{Ví dụ 2: Home Recommender}  
+
+\textbf{Input:}
+\begin{verbatim}
+{
+  "user_profile": {
+    "health_conditions": ["tim mạch", "huyết áp cao"],
+    "interests": ["dinh dưỡng"],
+    "goals": ["giảm cholesterol", "ăn uống lành mạnh"]
+  },
+  "selected_services": ["SV001"],
+  "top_k": 3
+}
+\end{verbatim}
+
+\textbf{Query Construction:}
+\begin{itemize}
+    \item Query string: "tim mạch huyết áp cao dinh dưỡng giảm cholesterol ăn uống lành mạnh"
+    \item Query embedding: 768-dim vector
+    \item Services to filter: SV001 (already used)
+\end{itemize}
+
+\textbf{Output:}
+\begin{verbatim}
+{
+  "recommendations": [
+    {
+      "service_id": "SV003",
+      "name": "Tư vấn dinh dưỡng cá nhân hóa",
+      "similarity_score": 0.814,
+      "reason": "Gợi ý vì dịch vụ này phù hợp với sở thích 
+                 (dinh dưỡng)",
+      "category": "dinh_duong",
+      "tags": ["dinh dưỡng", "giảm cân", "tăng cân", 
+               "cá nhân hóa", "chuyên gia"]
+    },
+    {
+      "service_id": "SV005",
+      "name": "Khám sức khỏe tổng quát",
+      "similarity_score": 0.692,
+      "reason": "Gợi ý vì dịch vụ này phù hợp với tình trạng 
+                 sức khỏe (tim mạch)",
+      "category": "y_te",
+      "tags": ["khám tổng quát", "xét nghiệm", "phòng ngừa", 
+               "sức khỏe", "định kỳ"]
+    }
+  ],
+  "total": 2
+}
+\end{verbatim}
+
+\subsubsection{Đánh giá hiệu năng}
+
+\paragraph{Độ phức tạp tính toán}  
+
+\begin{itemize}
+    \item \textbf{Embedding}: $O(L)$ với $L$ là độ dài query (thời gian constant cho mô hình BERT)
+    \item \textbf{Vector Search}: $O(\log N)$ với HNSW index, $N$ = 10 services (ví dụ với 10 service)
+    \item \textbf{Total latency}: < 100ms trên GPU, < 500ms trên CPU
+\end{itemize}
+
+\paragraph{Memory Requirements} 
+
+\begin{itemize}
+    \item \textbf{Embedding Model}: ~420MB (model weights)
+    \item \textbf{Vector Database}: ~80KB (10 services × 768 dims × 4 bytes)
+    \item \textbf{Runtime Memory}: ~600MB total
+\end{itemize}
+
+\paragraph{Scalability} 
+
+Hệ thống có thể scale hiệu quả:
+\begin{itemize}
+    \item \textbf{1,000 services}: Latency < 100ms, Memory ~8MB cho vectors
+    \item \textbf{10,000 services}: Latency < 150ms, Memory ~80MB cho vectors
+    \item \textbf{100,000 services}: Latency < 200ms, Memory ~800MB cho vectors
+\end{itemize}
+
+HNSW index đảm bảo độ phức tạp $O(\log N)$ cho search, phù hợp với database lớn.
+
+\subsubsection{Khả năng mở rộng}
+
+Hệ thống được thiết kế để dễ dàng mở rộng theo các hướng:
+
+\begin{itemize}
+    \item \textbf{Incremental Updates}: Thêm services mới vào vector database mà không cần rebuild toàn bộ
+    \item \textbf{Multi-language Support}: Mô hình embedding hiện tại đã hỗ trợ 50+ ngôn ngữ
+    \item \textbf{Personalization}: Có thể thêm user embedding để cá nhân hóa sâu hơn
+    \item \textbf{Hybrid Ranking}: Kết hợp semantic search với collaborative filtering hoặc popularity scores
+    \item \textbf{Real-time Feedback}: Tích hợp user feedback để cải thiện ranking theo thời gian
+\end{itemize}
+
+
+\section{Kiến trúc hiện thực}
+Dựa trên nền tảng logic vững chắc của bản kiến trúc trừu tượng (Abstract Architecture) Hình \ref{fig:sys_arch}, bản thiết kế hiện thực hóa (Implementation Architecture) Hình \ref{fig:imple_arch} đã cụ thể hóa các mô hình chức năng thành một hệ sinh thái công nghệ hiện đại và tối ưu hiệu năng. Vẫn tuân thủ chặt chẽ cấu trúc Microservices 5 tầng, bản thiết kế thực tế đã thay thế các khái niệm tổng quát bằng những công nghệ hàng đầu trong ngành: Hệ sinh thái Flutter đảm bảo trải nghiệm đồng nhất trên mọi nền tảng người dùng; Kong được lựa chọn làm API Gateway mạnh mẽ để điều phối luồng dữ liệu; và tầng hạ tầng dữ liệu được phân tách chuyên biệt với PostgreSQL cho nghiệp vụ cốt lõi, FAISS cho xử lý AI vector và MinIO cho lưu trữ đối tượng. Sự chuyển dịch từ trừu tượng sang thực tế này không chỉ đảm bảo tính khả thi khi triển khai mà còn tối ưu hóa khả năng mở rộng (scalability) và tính ổn định cho toàn bộ nền tảng
+\begin{figure}[H]
+    % Căn giữa hình ảnh
+    \centering
+    \includegraphics[width=1\textwidth]{Images/implement_arch.png}
+    \vspace{10pt}
+    
+    % Thêm chú thích cho hình ảnh
+    \caption{Kiến trúc hiện thực hệ thống}
+    
+    % Đặt nhãn để tham chiếu chéo (cross-reference)
+    \label{fig:imple_arch}
+\end{figure}
+
+Hệ thống được thiết kế dựa trên mô hình Microservices hiện đại, chia thành 5 tầng chính với các công nghệ cụ thể như sau:
+
+\subsection*{Tầng Giao Diện (Presentation Layer)}
+Đây là tầng tương tác trực tiếp với người dùng cuối (tương ứng với Client Layer trong bản thiết kế trừu tượng).
+
+\begin{itemize}
+    \item \textbf{Công nghệ:} Flutter.
+    \item \textbf{Mô tả:} Sử dụng Flutter làm công nghệ chủ đạo (Cross-platform) để xây dựng cả 3 ứng dụng client:
+    \begin{itemize}
+        \item \textit{User App:} Ứng dụng di động dành cho người dùng phổ thông.
+        \item \textit{Admin Panel:} Trang quản trị hệ thống.
+        \item \textit{Provider Portal:} Cổng thông tin dành cho các nhà cung cấp dịch vụ y tế/làm đẹp.
+    \end{itemize}
+    \item \textbf{Giao thức:} Các ứng dụng này giao tiếp với hệ thống backend thông qua RESTful API và WebSocket (dành cho các tính năng thời gian thực).
+\end{itemize}
+
+\subsection*{Tầng Kết Nối \& API (Connection \& API Layer)}
+Đóng vai trò là cổng vào duy nhất (Entry point) cho mọi yêu cầu từ phía Client.
+
+\begin{itemize}
+    \item \textbf{Công nghệ:} Kong API Gateway.
+    \item \textbf{Mô tả:} Thay thế cho khối "API Gateway" trừu tượng. Kong chịu trách nhiệm:
+    \begin{itemize}
+        \item Routing (định tuyến) request đến đúng microservice.
+        \item Load balancing (cân bằng tải).
+        \item Authentication/Authorization cơ bản (xác thực sơ bộ).
+        \item Rate limiting (giới hạn băng thông) để bảo vệ hệ thống.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Tầng Server \& Nghiệp Vụ (Server/Business Layer)}
+Đây là lõi của hệ thống, được triển khai theo kiến trúc Microservices.
+
+\begin{itemize}
+    \item \textbf{Hạ tầng:} Compute Engine (Google Cloud Platform - GCP). Các dịch vụ được triển khai trên các máy ảo (VM) hoặc Container chạy trên VM.
+    \item \textbf{Các dịch vụ thành phần:}
+    \begin{itemize}
+        \item \textit{Authenticate Service:} Xử lý đăng ký, đăng nhập, cấp phát token (JWT).
+        \item \textit{Core Healthcare Service:} Xử lý nghiệp vụ chính như đặt lịch hẹn (Appointments), quản lý hồ sơ y tế, thanh toán.
+        \item \textit{AI Service:} Chịu trách nhiệm về các tính năng thông minh (Chatbot, Recommendation System). Dịch vụ này giao tiếp chặt chẽ với Vector Database.
+        \item \textit{Notification Service:} Quản lý việc gửi thông báo đẩy (Push) và Email.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Tầng Dữ Liệu \& Hạ Tầng (Data \& Infrastructure Layer)}
+Tầng này lưu trữ và quản lý luồng dữ liệu, cụ thể hóa các khối database trừu tượng:
+
+\begin{itemize}
+    \item \textbf{Relational Database (SQL):} Sử dụng \textbf{PostgreSQL}. Dùng để lưu trữ dữ liệu có cấu trúc (thông tin user, đơn hàng, lịch hẹn).
+    \item \textbf{Vector Database:} Sử dụng \textbf{FAISS} (Facebook AI Similarity Search). Dùng để lưu trữ vector embeddings phục vụ cho AI Service (tìm kiếm ngữ nghĩa, gợi ý).
+    \item \textbf{Cache:} Sử dụng \textbf{Redis}. Giúp tăng tốc độ truy xuất dữ liệu thường xuyên sử dụng và giảm tải cho Database chính.
+    \item \textbf{Message Queue:} Sử dụng \textbf{RabbitMQ}. Đảm bảo giao tiếp bất đồng bộ (asynchronous) giữa các microservices (ví dụ: Core Service gửi sự kiện đến Notification Service mà không cần chờ đợi).
+    \item \textbf{Object Storage:} Sử dụng \textbf{MinIO}. Giải pháp lưu trữ đối tượng (tương thích S3) dùng để lưu trữ file tĩnh, hình ảnh, tài liệu y tế (thay thế cho khối Cloud Storage trừu tượng).
+\end{itemize}
+
+\subsection*{Tầng Tích Hợp Bên Thứ Ba (Third-Party Integrations Layer)}
+Kết nối với các dịch vụ bên ngoài để mở rộng tính năng.
+
+\begin{itemize}
+    \item \textbf{Cổng thanh toán (Payment Methods):} Tích hợp đa dạng bao gồm MoMo, Stripe (quốc tế), và VNPay (nội địa Việt Nam).
+    \item \textbf{Dịch vụ thông báo (App Notification Service):}
+    \begin{itemize}
+        \item \textit{APNs (Apple Push Notification service):} Dành riêng cho thiết bị iOS.
+        \item \textit{Firebase (FCM):} Dành cho Android và quản lý thông báo chung.
+    \end{itemize}
+\end{itemize}
+
+\vspace{1cm} % Khoảng cách một chút trước phần nhận xét
+
+\subsection*{Nhận xét tổng quan}
+Kiến trúc này rất hiện đại và phù hợp với quy mô dự án nền tảng Health/Beauty. Việc tách biệt rõ ràng giữa PostgreSQL (nghiệp vụ) và FAISS (AI) cho thấy sự đầu tư kỹ lưỡng vào hiệu năng xử lý dữ liệu thông minh. Sử dụng MinIO cũng là một giải pháp hay để tự chủ (self-hosted) việc lưu trữ dữ liệu thay vì phụ thuộc hoàn toàn vào cloud public storage đắt đỏ.
+\section{Phần Software – Triển khai ứng dụng}
+% \subsection{User Mobile App}
+% \subsection{Partner Portal (Web/App)}
+% \subsection{Admin Dashboard (Web)}
+% \subsection{Tích hợp AI với hệ thống ứng dụng}
+% \subsection{Bảo mật và quản lý dữ liệu}
+Hệ thống Backend được xây dựng dựa trên \textbf{NestJS Framework}, tuân theo kiến trúc module hóa để đảm bảo tính mở rộng và bảo mật. Dưới đây là các chi tiết hiện thực cụ thể dựa trên mã nguồn thực tế.
+
+\subsection{Cấu hình và Khởi tạo hệ thống (Bootstrap \& Configuration)}
+
+Điểm khởi chạy của ứng dụng nằm tại \texttt{src/main.ts}, nơi thiết lập các cấu hình toàn cục quan trọng cho bảo mật và tài liệu hóa API:
+
+\begin{itemize}
+    \item \textbf{Bảo mật HTTP:} Tích hợp thư viện \texttt{helmet} để thiết lập các HTTP headers an toàn và kích hoạt \texttt{enableCors()} cho phép các ứng dụng Client (Mobile/Web) truy cập tài nguyên.
+    
+    \item \textbf{Kiểm soát dữ liệu đầu vào:} Sử dụng \texttt{ValidationPipe} ở mức toàn cục (\texttt{globalPipes}) với tùy chọn \texttt{whitelist: true}. Điều này giúp tự động loại bỏ các trường dữ liệu thừa không được định nghĩa trong DTO, đảm bảo tính sạch sẽ của dữ liệu trước khi vào Controller.
+    
+    \item \textbf{Tài liệu hóa API (Swagger):} Hệ thống tự động sinh tài liệu API chuẩn OpenAPI. \texttt{DocumentBuilder} được cấu hình để tạo giao diện Swagger UI tại đường dẫn \texttt{/api/docs}, hỗ trợ đội ngũ phát triển Mobile và Web tích hợp nhanh chóng.
+    
+    \item \textbf{Kết nối Cơ sở dữ liệu:} Cấu hình Database được tách biệt trong \texttt{src/config/database.config.ts}, sử dụng các biến môi trường (\texttt{process.env}) để kết nối tới PostgreSQL, đảm bảo không lộ thông tin nhạy cảm (credentials) trong mã nguồn.
+\end{itemize}
+
+\subsection{Module Xác thực và Bảo mật (Authentication \& Security)}
+
+Module \texttt{AuthModule} đóng vai trò trung tâm trong việc quản lý định danh, sử dụng kết hợp \textbf{Passport} và \textbf{JWT}.
+
+\subsubsection{Quy trình Đăng ký \& Đăng nhập}
+\begin{itemize}
+    \item \textbf{Đăng ký (\texttt{register}):} \texttt{AuthService} tiếp nhận DTO đăng ký, thực hiện băm mật khẩu (hashing) bằng thuật toán \texttt{bcrypt} trước khi lưu vào cơ sở dữ liệu. Nếu có thông tin \texttt{profile}, hệ thống sẽ khởi tạo đồng thời \texttt{Account} và \texttt{UserProfile} nhờ cơ chế \texttt{cascade: true} của TypeORM.
+    
+    \item \textbf{Đăng nhập (\texttt{login}):} Sử dụng \texttt{LocalStrategy} để xác thực email/password. Sau khi thành công, hệ thống cấp phát cặp token gồm \texttt{access\_token} (ngắn hạn) và \texttt{refresh\_token} (dài hạn).
+\end{itemize}
+
+\subsubsection{Cơ chế Bảo mật Token (JWT Strategy)}
+\begin{itemize}
+    \item \textbf{Access Token:} Được ký (sign) bằng \texttt{jwtConstants.secret}. Các request đến API được bảo vệ bởi \texttt{JwtAuthGuard}, sử dụng \texttt{JwtStrategy} để trích xuất và xác thực token từ Header (\texttt{Bearer Token}).
+    
+    \item \textbf{Refresh Token Rotation \& Hashing:} Để tăng cường bảo mật, \texttt{refresh\_token} không được lưu trực tiếp dưới dạng plain-text. Hệ thống chỉ lưu bản băm (hash) của nó vào cột \texttt{refreshTokenHash} trong bảng \texttt{Account}. Khi user yêu cầu cấp mới token (\texttt{/auth/refresh}), hệ thống so sánh token gửi lên với hash trong DB. Điều này ngăn chặn việc sử dụng lại token cũ nếu bị lộ.
+    
+    \item \textbf{Logout an toàn:} API \texttt{/auth/logout} thực hiện xóa \texttt{refreshTokenHash} trong DB, đảm bảo token cũ mất hiệu lực ngay lập tức.
+\end{itemize}
+
+\subsection{Quản lý Tài khoản và Dữ liệu Người dùng (Account Management)}
+
+Module \texttt{AccountModule} chịu trách nhiệm quản lý thông tin người dùng và các dữ liệu sức khỏe liên quan.
+
+\begin{itemize}
+    \item \textbf{Mô hình dữ liệu (Entities):}
+    \begin{itemize}
+        \item \textbf{Account:} Là thực thể lõi, chứa thông tin đăng nhập (\texttt{email}, \texttt{passwordHash}) và vai trò (\texttt{role}). Cấu trúc hỗ trợ lưu trữ dữ liệu khảo sát linh hoạt thông qua cột \texttt{survey} kiểu \texttt{jsonb}, cho phép lưu trữ các câu trả lời khảo sát sức khỏe phức tạp mà không cần thay đổi schema cứng.
+        \item \textbf{UserProfile:} Chứa thông tin cá nhân (tên, ngày sinh, bio) và liên kết 1-1 với Account. Entity này cũng hỗ trợ quan hệ với \texttt{Address} để lưu địa chỉ chi tiết.
+    \end{itemize}
+    
+    \item \textbf{Xử lý Khảo sát (Survey Feature):}
+    \texttt{AccountController} cung cấp các endpoints \texttt{GET/POST /account/survey} để Client gửi và lấy dữ liệu khảo sát. Dữ liệu này được \texttt{AccountService} lưu trực tiếp vào cột \texttt{jsonb} của user, phục vụ cho đầu vào của hệ thống AI gợi ý sau này.
+\end{itemize}
+
+\subsection{Kiến trúc DTO và Validation}
+
+Hệ thống áp dụng chặt chẽ mô hình \textbf{Data Transfer Object (DTO)} để kiểm soát dữ liệu giao tiếp:
+
+\begin{itemize}
+    \item \textbf{Validation Rules:} Sử dụng các decorator như \texttt{@IsEmail}, \texttt{@MinLength(8)} cho mật khẩu, và \texttt{@Matches} cho số điện thoại (Regex kiểm tra định dạng số Việt Nam \texttt{+84...}).
+    
+    \item \textbf{Nested Validation:} Hỗ trợ validate dữ liệu lồng nhau (ví dụ: object \texttt{profile} bên trong \texttt{register} request) thông qua \texttt{@ValidateNested} và \texttt{Type(() => RegisterProfileDto)}.
+\end{itemize}
