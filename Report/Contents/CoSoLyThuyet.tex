@@ -1,0 +1,146 @@
+\chapter{Tổng quan và cơ sở lý thuyết}
+
+\section{Tổng quan về hệ thống chăm sóc sức khỏe và sắc đẹp}
+Đề tài sẽ tập trung vào việc nghiên cứu, phân tích, thiết kế và triển khai một nền tảng di động toàn diện, cho phép người dùng tìm kiếm, nhận tư vấn và đặt lịch các dịch vụ chăm sóc sức khỏe và sắc đẹp (Spa, y học cổ truyền, trị liệu vật lý...) qua một giao diện thân thiện, được cá nhân hóa cùng với một hệ sinh thái đối tác đáng tin cậy. Mục đích chính của đề tài là đề xuất một giải pháp công nghệ ứng dụng Trí tuệ Nhân tạo (AI) nhằm nâng cao trải nghiệm và đơn giản hóa quá trình lựa chọn dịch vụ cho người dùng, đồng thời tối ưu hóa quy trình vận hành, tiếp cận khách hàng cho các nhà cung cấp. Ngoài những tính năng cơ bản, hệ thống sẽ tích hợp một số tính năng quan trọng như: Chatbot AI thông minh, có khả năng phân tích ngôn ngữ tự nhiên để hiểu vấn đề sức khỏe và gợi ý dịch vụ phù hợp; hệ thống quản lý lịch hẹn, thanh toán và đánh giá dịch vụ trực tuyến, minh bạch; quy trình xác thực đối tác nghiêm ngặt và hệ thống đánh giá khách quan từ cộng đồng để đảm bảo chất lượng; cơ sở dữ liệu tập trung để quản lý hiệu quả thông tin người dùng, đối tác, dịch vụ và các giao dịch.
+
+\section{Phạm vi, đối tượng áp dụng, và các bên liên quan}
+\subsection{Phạm vi}
+\begin{enumerate}
+    \item \textbf{Về dịch vụ:} Đề tài sẽ tập trung vào nhóm dịch vụ chăm sóc sức khỏe và sắc đẹp không xâm lấn hoặc ít xâm lấn, bao gồm: 
+    \begin{itemize}
+        \item \textbf{Spa \& Massage:}  massage thư giãn, massage trị liệu, chăm sóc da...
+        \item \textbf{Y học cổ truyền:} châm cứu, bấm huyệt, ngâm chân thảo dược...
+        \item \textbf{Vật lý trị liệu \& Phục hồi chức năng:} các bài tập, trị liệu cho các vấn đề cơ-xương-khớp.
+        \item \textit{Giới hạn:} Không bao gồm các dịch vụ y tế chuyên sâu, phẫu thuật, nha khoa, hoặc các dịch vụ cần sự chẩn đoán và kê đơn từ bác sĩ chuyên khoa. 
+    \end{itemize}
+    \item \textbf{Về công nghệ:} 
+    \begin{itemize}
+        \item Nghiên cứu và áp dụng các thuật toán Xử lý ngôn ngữ tự nhiên (NLP) cho Chatbot.
+        \item Xây dựng ứng dụng trên nền tảng di động (iOS và/hoặc Android).
+        \item Thiết kế hệ thống backend và cơ sở dữ liệu có khả năng mở rộng.
+        \item Hệ thông thống kê và mô hình hoá để dễ dàng theo dõi chiến lược kinh doanh.
+    \end{itemize}
+    \item \textbf{Về địa lý:} Giai đoạn đầu, hệ thống sẽ được triển khai thử nghiệm với các đối tác và người dùng tại một khu vực địa lý nhất định (ví dụ: TP. Hồ Chí Minh) để thu thập dữ liệu và hoàn thiện.
+
+\end{enumerate}
+\subsection{Các đối tượng liên quan (Stackholders)}
+\begin{enumerate}
+    \item \textbf{Người dùng cuối (End users)}: 
+    \begin{itemize}
+        \item Nhân viên văn phòng, người lao động trí óc thường xuyên bị căng thẳng, gặp các vấn đề về vai gáy, lưng.
+        \item Những người quan tâm đến việc chăm sóc sắc đẹp, thư giãn và nâng cao chất lượng sống.
+        \item Người gặp các vấn đề cơ-xương-khớp ở mức độ nhẹ và trung bình cần các liệu pháp hỗ trợ.
+    \end{itemize}
+    \item \textbf{Nhà cung cấp dịch vụ (Service Providers)}: 
+    \begin{itemize}
+        \item Các doanh nghiệp có quy mô vừa và nhỏ trong lĩnh vực spa, wellness, y học cổ truyền, vật lý trị liệu.
+        \item Các chuyên gia/kỹ thuật viên hành nghề tự do có chứng chỉ và muốn xây dựng thương hiệu cá nhân.
+        \item Các cơ sở muốn chuyển đổi số, tối ưu hóa quy trình quản lý lịch hẹn và mở rộng tệp khách hàng.
+    \end{itemize}
+    \item \textbf{ Bên liên quan Nội bộ (Internal Stakeholders):}
+    \begin{itemize}
+        \item \textbf{Nhà tài trợ/Chủ đầu tư (Project Sponsor/Investor):} Người cung cấp nguồn lực tài chính, quan tâm đến hiệu quả đầu tư (ROI) và sự thành công về mặt kinh doanh của dự án.
+        \item \textbf{Ban Lãnh đạo Dự án (Project Board/Steering Committee):} Nhóm các quản lý cấp cao đưa ra các quyết định chiến lược, giám sát tiến độ và gỡ bỏ các rào cản.
+        \item \textbf{Giám đốc Sản phẩm (Product Manager/Owner):} Người chịu trách nhiệm về tầm nhìn sản phẩm, xác định lộ trình phát triển và ưu tiên các tính năng trong backlog.
+        \item \textbf{Đội ngũ Marketing \& Kinh doanh (Marketing \& Business Development):} Chịu trách nhiệm xây dựng chiến lược thu hút Người dùng và Đối tác, quảng bá sản phẩm và tạo doanh thu.
+
+        \item \textbf{Đội ngũ Pháp lý \& Tuân thủ (Legal \& Compliance):} Đảm bảo nền tảng tuân thủ các quy định về bảo vệ dữ liệu người dùng (PDPA), giao dịch điện tử và các hợp đồng với Đối tác.
+        \item \textbf{Đội ngũ Hỗ trợ khách hàng (Customer Support Team):} Nhân sự trực tiếp xử lý các ticket và yêu cầu từ Người dùng và Đối tác. 
+    \end{itemize}
+
+    \item \textbf{Bên liên quan Bên ngoài (External Stakeholders): }
+    \begin{itemize}
+        \item \textbf{Cổng thanh toán (Payment Gateway Providers):} Các đối tác như MoMo, ZaloPay, VNPay. Sự ổn định của họ ảnh hưởng trực tiếp đến trải nghiệm thanh toán
+        \item \textbf{Nhà cung cấp Dịch vụ Đám mây (Cloud Service Provider):} Ví dụ: Amazon Web Services (AWS), Google Cloud Platform (GCP). Nơi hạ tầng của toàn bộ hệ thống được vận hành.
+        \item \textbf{Cơ quan Quản lý Nhà nước (Regulatory Bodies):} Có thể liên quan đến các quy định về y tế, quảng cáo dịch vụ sức khỏe và thương mại điện tử.
+    \end{itemize}
+\end{enumerate}
+\subsection{Các hệ thống tương tự}
+
+\begin{table}[H]
+\centering % Căn giữa bảng
+\footnotesize % Giảm kích thước font một chút để vừa vặn hơn
+\caption{Bảng phân tích chi tiết các hệ thống tương tự}
+\label{tab:competitor_analysis_sheet}
+
+\begin{tabularx}{\linewidth}{@{} p{3.2cm} L L L @{}}
+\toprule
+\textbf{Tiêu chí} & \textbf{ BookingCare} & \textbf{Jio Health} & \textbf{BeautyX/Sàn TMĐT} \\
+\midrule
+
+\textbf{Mô tả chi tiết \& Mô hình hoạt động} & 
+Là "cầu nối" thông tin minh bạch giữa bệnh nhân và y bác sĩ, giải quyết vấn đề quá tải và chờ đợi tại bệnh viện. Mô hình tập trung vào \textbf{độ tin cậy của thông tin} chuyên gia và đặt lịch khám chuyên sâu. & 
+Xây dựng \textbf{hệ sinh thái chăm sóc sức khỏe chủ động O2O} (Online-to-Offline), cung cấp dịch vụ liền mạch từ tư vấn online, khám tại nhà, giao thuốc đến phòng khám vật lý của riêng họ. & 
+Hoạt động như một \textbf{sàn thương mại điện tử (TMĐT)} dành cho dịch vụ làm đẹp. Mô hình kinh doanh cốt lõi là thu hút người dùng bằng \textbf{voucher và các chương trình ưu đãi, giảm giá}. \\
+\addlinespace % Thêm một chút khoảng trắng giữa các dòng cho dễ đọc
+
+\textbf{Tính năng chính (Chi tiết)} & 
+    \textbullet~\textbf{Hồ sơ bác sĩ/phòng khám chi tiết:} Kinh nghiệm, lịch làm việc, chi phí. \newline
+    \textbullet~\textbf{Đặt lịch đa dạng:} Khám chuyên khoa, gói khám tổng quát. \newline
+    \textbullet~\textbf{Tư vấn từ xa (Telemedicine):} Kết nối video với bác sĩ. \newline
+    \textbullet~\textbf{Cẩm nang y tế \& Hỏi đáp:} Xây dựng kho kiến thức lớn. &
+    \textbullet~\textbf{Tư vấn từ xa 24/7:} Video/chat và nhận đơn thuốc điện tử. \newline
+    \textbullet~\textbf{Bác sĩ tại nhà:} Khám bệnh, lấy mẫu xét nghiệm tận nơi. \newline
+    \textbullet~\textbf{Nhà thuốc trực tuyến:} Giao thuốc nhanh trong 2 giờ. \newline
+    \textbullet~\textbf{Hồ sơ y tế điện tử (EHR):} Lưu trữ tập trung dữ liệu sức khỏe. &
+    \textbullet~\textbf{Hệ thống Voucher \& Deal:} Mua ưu đãi dịch vụ trực tuyến, flash sale. \newline
+    \textbullet~\textbf{Tìm kiếm \& Lọc chi tiết:} Theo dịch vụ, giá, địa điểm, đánh giá. \newline
+    \textbullet~\textbf{Đánh giá \& Hình ảnh từ cộng đồng:} Review có hình ảnh thực tế. \newline
+    \textbullet~\textbf{Thanh toán trực tuyến.} \\
+\addlinespace
+
+\textbf{Đối tượng khách hàng} &
+    \textbullet~Người cần khám chữa bệnh cụ thể. \newline
+    \textbullet~Bệnh nhân ở các thành phố lớn tin tưởng vào thông tin bác sĩ chuyên môn. &
+    \textbullet~Gia đình, người bận rộn cần sự tiện lợi tối đa. \newline
+    \textbullet~Người cần chăm sóc sức khỏe chủ động, liên tục tại nhà. &
+    \textbullet~Người dùng nhạy cảm về giá, có hành vi "săn deal". \newline
+    \textbullet~Phụ nữ trẻ, nhân viên văn phòng có nhu cầu làm đẹp thường xuyên. \\
+\addlinespace
+
+\textbf{Công nghệ nổi bật} &
+    \textbullet~Hệ thống đặt lịch (Booking Engine). \newline
+    \textbullet~CSDL bác sĩ/chuyên khoa lớn. &
+    \textbullet~Nền tảng Telemedicine. \newline
+    \textbullet~Ứng dụng di động tích hợp sâu logistics và EHR. &
+    \textbullet~Nền tảng TMĐT (E-commerce). \newline
+    \textbullet~Hệ thống quản lý voucher và khuyến mãi. \\
+\addlinespace
+
+\textbf{Độ phổ biến \& Marketing} &
+    \textbullet~\textbf{Rất cao:} Dẫn đầu thị trường. \newline
+    \textbullet~\textbf{Marketing:} SEO (từ khóa bệnh học), hợp tác bệnh viện, báo chí. &
+    \textbullet~\textbf{Khá:} Được biết đến nhiều ở TP lớn. \newline
+    \textbullet~\textbf{Marketing:} Quảng cáo digital, tập trung vào tiện ích gia đình. &
+    \textbullet~\textbf{Trung bình:} Thị trường phân mảnh. \newline
+    \textbullet~\textbf{Marketing:} Chạy quảng cáo (Facebook, Ads), hợp tác Influencer. \\
+\addlinespace
+
+\textbf{\faCheckCircle~Ưu điểm} & 
+    \textbullet~\textbf{Uy tín thương hiệu:} Là lựa chọn mặc định, đáng tin cậy khi cần tìm bác sĩ. \newline
+    \textbullet~\textbf{Mạng lưới đối tác y tế:} Quan hệ sâu rộng với các chuyên gia đầu ngành. &
+    \textbullet~\textbf{Trải nghiệm liền mạch:
+    }Hệ sinh thái khép kín giúp giữ chân người dùng rất tốt. \newline
+    \textbullet~\textbf{Dịch vụ độc đáo:} "Bác sĩ tại nhà" là lợi thế cạnh tranh cực kỳ mạnh. &
+    \textbullet~\textbf{Tệp người dùng lớn:
+    } Có sẵn lượng lớn người dùng chủ động tìm kiếm dịch vụ làm đẹp. \newline
+    \textbullet~\textbf{Mô hình linh hoạt:} Dễ dàng mở rộng, thu hút đối tác mới. \\
+\addlinespace
+
+\textbf{\faTimesCircle~Nhược điểm} & 
+    \textbullet~\textbf{Phạm vi hẹp:} Hoàn toàn \textbf{thiếu mảng làm đẹp, spa, wellness}. \newline
+    \textbullet~\textbf{Trải nghiệm khô khan:} Giao diện chức năng, tập trung vào "bệnh", thiếu yếu tố "chăm sóc". \newline
+    \textbullet~\textbf{Không có AI tư vấn:} Tìm kiếm hoàn toàn thủ công. &
+    \textbullet~\textbf{Thiếu mảng làm đẹp:} Hoàn toàn không có dịch vụ spa, thẩm mỹ. \newline
+    \textbullet~\textbf{Chi phí vận hành cao:} Mô hình sở hữu tốn kém hơn nền tảng. \newline
+    \textbullet~\textbf{Khả năng mở rộng đối tác chậm hơn.} &
+    \textbullet~\textbf{Chất lượng không đồng đều:} Khó kiểm soát chất lượng đối tác, ảnh hưởng niềm tin. \newline
+    \textbullet~\textbf{Thiếu mảng sức khỏe trị liệu.} \newline
+    \textbullet~\textbf{Không có AI thông minh} để tư vấn và cá nhân hóa. \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{AI trong chăm sóc sức khỏe và gợi ý dịch vụ cá nhân hóa}
+

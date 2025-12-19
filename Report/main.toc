@@ -1,49 +1,175 @@
-\babel@toc {english}{}\relax 
-\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Motivation}{1}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Goals}{2}{section.1.2}%
-\contentsline {section}{\numberline {1.3}Scope}{3}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Thesis structure}{3}{section.1.4}%
-\contentsline {chapter}{\numberline {2}Theoretical Background}{5}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Cosine similarity}{5}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Transformer}{5}{section.2.2}%
-\contentsline {section}{\numberline {2.3}Large Language Models}{8}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Knowledge graph}{10}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Knowledge graph embedding}{11}{section.2.5}%
-\contentsline {subsection}{\numberline {2.5.1}Translation models}{11}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}Pretrained language models}{12}{subsection.2.5.2}%
-\contentsline {section}{\numberline {2.6}Direct preference optimization}{13}{section.2.6}%
-\contentsline {chapter}{\numberline {3}Related works}{15}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Fine-tuning Large Language Model}{15}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Retrieval-augmented generation}{16}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}In-context learning}{16}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Information retrieval}{16}{subsection.3.2.2}%
-\contentsline {subsection}{\numberline {3.2.3}Unifying retriever and Large Language Model}{17}{subsection.3.2.3}%
-\contentsline {section}{\numberline {3.3}Graph reasoning}{18}{section.3.3}%
-\contentsline {section}{\numberline {3.4}Discussion}{19}{section.3.4}%
-\contentsline {chapter}{\numberline {4}Proposed Solution}{21}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Baseline methods}{21}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Text-based retrieval augmented-generation}{21}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Knowledge graph-based retrieval-augmented generation}{22}{subsection.4.1.2}%
-\contentsline {section}{\numberline {4.2}Proposed solution: KEALLM - Knowledge Embedding Augmented Large Language Model}{24}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Architecture}{24}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Training}{26}{subsection.4.2.2}%
-\contentsline {subsubsection}{\numberline {4.2.2.1}Pretrained language model knowledge graph embedding module}{26}{subsubsection.4.2.2.1}%
-\contentsline {subsubsection}{\numberline {4.2.2.2}Supervised Fine-Tuning}{27}{subsubsection.4.2.2.2}%
-\contentsline {subsubsection}{\numberline {4.2.2.3}Direct Preference Optimization}{28}{subsubsection.4.2.2.3}%
-\contentsline {section}{\numberline {4.3}Experiment setup}{30}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}Baselines setup}{30}{subsection.4.3.1}%
-\contentsline {subsection}{\numberline {4.3.2}Data preparation}{31}{subsection.4.3.2}%
-\contentsline {subsubsection}{\numberline {4.3.2.1}Knowledge graph}{31}{subsubsection.4.3.2.1}%
-\contentsline {subsubsection}{\numberline {4.3.2.2}Training dataset for Projector module}{32}{subsubsection.4.3.2.2}%
-\contentsline {subsection}{\numberline {4.3.3}Implementation details}{33}{subsection.4.3.3}%
-\contentsline {section}{\numberline {4.4}Results and analysis}{34}{section.4.4}%
-\contentsline {chapter}{\numberline {5}Conclusion}{36}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Summary}{36}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Future Work}{36}{section.5.2}%
-\contentsline {chapter}{References}{38}{section.5.2}%
-\contentsline {chapter}{Appendix \numberline {A}Prompt setting}{45}{appendix.1.A}%
-\contentsline {section}{\numberline {A.1}NER prompt}{45}{section.1.A.1}%
-\contentsline {section}{\numberline {A.2}Text-based RAG prompt}{45}{section.1.A.2}%
-\contentsline {section}{\numberline {A.3}KG-based RAG prompt}{46}{section.1.A.3}%
-\contentsline {chapter}{Appendix \numberline {B}2024 Annual Conference of the North American Chapter of the Association for Computational Linguistics}{47}{appendix.1.B}%
+\contentsline {chapter}{\numberline {1}Giới thiệu}{11}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Đặt vấn đề}{11}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Mục tiêu đồ án}{12}{section.1.2}%
+\contentsline {chapter}{\numberline {2}Tổng quan và cơ sở lý thuyết}{13}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Tổng quan về hệ thống chăm sóc sức khỏe và sắc đẹp}{13}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Phạm vi, đối tượng áp dụng, và các bên liên quan}{13}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Phạm vi}{13}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Các đối tượng liên quan (Stackholders)}{14}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Các hệ thống tương tự}{15}{subsection.2.2.3}%
+\contentsline {section}{\numberline {2.3}AI trong chăm sóc sức khỏe và gợi ý dịch vụ cá nhân hóa}{15}{section.2.3}%
+\contentsline {chapter}{\numberline {3}Yêu cầu về hệ thống}{16}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Yêu cầu chức năng}{16}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}User App}{16}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Partner Portal}{17}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Admin Dashboard}{19}{subsection.3.1.3}%
+\contentsline {section}{\numberline {3.2}Yêu cầu phi chức năng}{20}{section.3.2}%
+\contentsline {chapter}{\numberline {4}Phân tích hệ thống}{22}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Mô tả hệ thống tổng quan}{22}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Sơ đồ Use Case (Use Case Diagram)}{22}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Sơ đồ Use Case cho User App}{22}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Sơ đồ Use Case cho Partner Portal}{22}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Sơ đồ Use Case cho Admin Dashboard}{22}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Sơ đồ Use Case Tổng Thể Hệ Thống (Tích Hợp AI)}{23}{subsection.4.2.4}%
+\contentsline {section}{\numberline {4.3}Chi Tiết Use Case (Use-case Detail)}{24}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Use Case 1: Onboarding và Cá nhân hóa Hồ sơ (User App)}{24}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Use Case 2: Chatbot AI Tư vấn và Gợi ý Dịch vụ (User App)}{25}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Use Case 3: Đặt lịch hẹn (Booking) (User App)}{26}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Use Case 4: Trang Đăng ký Cung cấp Hồ sơ (Partner Portal)}{27}{subsection.4.3.4}%
+\contentsline {subsection}{\numberline {4.3.5}Use Case 5: Xác thực Quản lý Đối tác (Admin Dashboard)}{28}{subsection.4.3.5}%
+\contentsline {section}{\numberline {4.4}Sơ đồ luồng dữ liệu (Sequence Diagram)}{29}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Onboarding \& Cá nhân hóa Hồ sơ}{29}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Chatbot AI Tư vấn \& Gợi ý Dịch vụ}{30}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Tìm kiếm \& Lọc Nâng cao}{31}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}Đặt lịch hẹn (Booking), thanh toán và đánh giá}{32}{subsection.4.4.4}%
+\contentsline {subsection}{\numberline {4.4.5}AI trong Quản trị Tương tác thông minh}{33}{subsection.4.4.5}%
+\contentsline {subsection}{\numberline {4.4.6}Trang Đăng ký Cung cấp Hồ sơ (Partner Registration)}{33}{subsection.4.4.6}%
+\contentsline {subsection}{\numberline {4.4.7}Xác thực Đối tác (Partner Verification)}{34}{subsection.4.4.7}%
+\contentsline {subsection}{\numberline {4.4.8}Quản lý Lịch hẹn (Booking Dashboard)}{35}{subsection.4.4.8}%
+\contentsline {subsection}{\numberline {4.4.9}Quản lý Dịch vụ (Service Management)}{36}{subsection.4.4.9}%
+\contentsline {subsection}{\numberline {4.4.10}Quản lý Nhân viên Phân quyền (Staff Management )}{37}{subsection.4.4.10}%
+\contentsline {section}{\numberline {4.5}Sơ đồ Activity (Activity Diagram)}{37}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Luồng Onboarding và Cá nhân hóa Người dùng}{38}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Luồng Chatbot AI Tư vấn \& Gợi ý Dịch vụ}{38}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Quy trình Đăng ký Đối tác (Partner Registration)}{39}{subsection.4.5.3}%
+\contentsline {subsection}{\numberline {4.5.4}Luồng Đặt lịch, Thanh toán và Đánh giá}{40}{subsection.4.5.4}%
+\contentsline {subsection}{\numberline {4.5.5}Quy trình Phê duyệt Đối tác (Partner Verification)}{40}{subsection.4.5.5}%
+\contentsline {subsection}{\numberline {4.5.6}Chu trình Tự động Huấn luyện Mô hình AI}{41}{subsection.4.5.6}%
+\contentsline {subsection}{\numberline {4.5.7}Quản lý Lịch hẹn (Góc nhìn Đối tác / Dashboard)}{41}{subsection.4.5.7}%
+\contentsline {subsection}{\numberline {4.5.8}Quản lý Nhân viên \& Phân quyền}{42}{subsection.4.5.8}%
+\contentsline {section}{\numberline {4.6}Lược đồ Lớp (Class Diagram)}{42}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Mô tả}{42}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Lược đồ tổng quan}{43}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Các thành phần chính và mối quan hệ}{43}{subsection.4.6.3}%
+\contentsline {subsubsection}{\numberline {4.6.3.1}Phân hệ 1: Quản lý Người dùng \& Bảo mật (Identity \& Access Management)}{43}{subsubsection.4.6.3.1}%
+\contentsline {subsubsection}{\numberline {4.6.3.2}Phân hệ 2: Nghiệp vụ cốt lõi - Đặt lịch \& Thanh toán (Core Business)}{44}{subsubsection.4.6.3.2}%
+\contentsline {subsubsection}{\numberline {4.6.3.3}Phân hệ 3: Đối tác \& Vận hành dịch vụ (Partner Operations)}{45}{subsubsection.4.6.3.3}%
+\contentsline {subsubsection}{\numberline {4.6.3.4}Phân hệ 4: Thông báo \& Tương tác (Communication)}{46}{subsubsection.4.6.3.4}%
+\contentsline {subsubsection}{\numberline {4.6.3.5}Phân hệ 5: Quản trị hệ thống (Administration)}{46}{subsubsection.4.6.3.5}%
+\contentsline {chapter}{\numberline {5}Thiết kế hệ thống}{48}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Kiến trúc tổng thể hệ thống}{48}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Kiến trúc N-tier}{48}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Kết cấu chi tiết 5 Tầng (Structure)}{48}{subsection.5.1.2}%
+\contentsline {subsubsection}{\numberline {5.1.2.1}Tầng 1: Presentation Layer (Client Layer)}{48}{subsubsection.5.1.2.1}%
+\contentsline {subsubsection}{\numberline {5.1.2.2}Tầng 2: Connection \& API Layer (Gateway)}{48}{subsubsection.5.1.2.2}%
+\contentsline {subsubsection}{\numberline {5.1.2.3}Tầng 3: Business Logic Layer (Server Layer - Microservices)}{48}{subsubsection.5.1.2.3}%
+\contentsline {subsubsection}{\numberline {5.1.2.4}Tầng 4: Data Access Layer (Data \& Infrastructure Layer)}{49}{subsubsection.5.1.2.4}%
+\contentsline {subsubsection}{\numberline {5.1.2.5}Tầng 5: Integration Layer (Third-Party Integrations)}{49}{subsubsection.5.1.2.5}%
+\contentsline {subsection}{\numberline {5.1.3}Ưu điểm và Nhược điểm}{49}{subsection.5.1.3}%
+\contentsline {subsection}{\numberline {5.1.4}Các Kiến trúc Thay thế và So sánh}{50}{subsection.5.1.4}%
+\contentsline {subsection}{\numberline {5.1.5}Diagram và Kết luận}{50}{subsection.5.1.5}%
+\contentsline {section}{\numberline {5.2}Thiết kế cơ sở dữ liệu}{51}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Mô tả}{51}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Các khối chức năng chính}{51}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Kết luận}{52}{subsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.2.4}Lược đồ}{53}{subsection.5.2.4}%
+\contentsline {section}{\numberline {5.3}Thiết kế UI/UX cơ bản}{54}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Mockup UI - Tổng quan giao diện}{54}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Authentication - Đăng nhập \& Đăng ký}{55}{subsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.3.3}Survey - Khảo sát người dùng}{56}{subsection.5.3.3}%
+\contentsline {subsection}{\numberline {5.3.4}Navigation - Các trang điều hướng chính}{57}{subsection.5.3.4}%
+\contentsline {subsection}{\numberline {5.3.5}Appointment - Đặt lịch hẹn}{58}{subsection.5.3.5}%
+\contentsline {subsection}{\numberline {5.3.6}Provider Service - Chi tiết dịch vụ}{59}{subsection.5.3.6}%
+\contentsline {subsection}{\numberline {5.3.7}AI Chat - Trợ lý AI}{60}{subsection.5.3.7}%
+\contentsline {subsection}{\numberline {5.3.8}Checkout - Thanh toán}{61}{subsection.5.3.8}%
+\contentsline {section}{\numberline {5.4}Phần AI – Thiết kế}{61}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Thu thập và tiền xử lý dữ liệu}{61}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Thiết kế hệ thống RAG Chatbot}{61}{subsection.5.4.2}%
+\contentsline {subsubsection}{\numberline {5.4.2.1}Kiến trúc tổng thể}{61}{subsubsection.5.4.2.1}%
+\contentsline {subsubsection}{\numberline {5.4.2.2}Phương pháp RAG}{62}{subsubsection.5.4.2.2}%
+\contentsline {paragraph}{\numberline {5.4.2.2.1}Nguyên lý hoạt động}{62}{paragraph.5.4.2.2.1}%
+\contentsline {subsubsection}{\numberline {5.4.2.3}Quy trình xử lý tài liệu}{62}{subsubsection.5.4.2.3}%
+\contentsline {paragraph}{\numberline {5.4.2.3.1}Tải tài liệu}{62}{paragraph.5.4.2.3.1}%
+\contentsline {paragraph}{\numberline {5.4.2.3.2}Chia nhỏ văn bản}{62}{paragraph.5.4.2.3.2}%
+\contentsline {paragraph}{\numberline {5.4.2.3.3}Embedding và lưu trữ vector}{62}{paragraph.5.4.2.3.3}%
+\contentsline {subsubsection}{\numberline {5.4.2.4}Chiến lược truy xuất}{63}{subsubsection.5.4.2.4}%
+\contentsline {paragraph}{\numberline {5.4.2.4.1}Xử lý câu hỏi}{63}{paragraph.5.4.2.4.1}%
+\contentsline {paragraph}{\numberline {5.4.2.4.2}Tham số truy xuất}{63}{paragraph.5.4.2.4.2}%
+\contentsline {subsubsection}{\numberline {5.4.2.5}Mô hình ngôn ngữ và sinh văn bản}{63}{subsubsection.5.4.2.5}%
+\contentsline {paragraph}{\numberline {5.4.2.5.1}Lựa chọn mô hình}{63}{paragraph.5.4.2.5.1}%
+\contentsline {paragraph}{\numberline {5.4.2.5.2}Lượng tử hóa}{63}{paragraph.5.4.2.5.2}%
+\contentsline {subsubsection}{\numberline {5.4.2.6}Thiết kế prompt}{63}{subsubsection.5.4.2.6}%
+\contentsline {paragraph}{\numberline {5.4.2.6.1}Cấu trúc mẫu prompt}{63}{paragraph.5.4.2.6.1}%
+\contentsline {paragraph}{\numberline {5.4.2.6.2}Nguyên tắc thiết kế prompt}{64}{paragraph.5.4.2.6.2}%
+\contentsline {subsubsection}{\numberline {5.4.2.7}Xử lý đầu ra}{64}{subsubsection.5.4.2.7}%
+\contentsline {paragraph}{\numberline {5.4.2.7.1}Phân tích phản hồi}{64}{paragraph.5.4.2.7.1}%
+\contentsline {paragraph}{\numberline {5.4.2.7.2}Xử lý lỗi}{64}{paragraph.5.4.2.7.2}%
+\contentsline {subsubsection}{\numberline {5.4.2.8}Tích hợp pipeline}{64}{subsubsection.5.4.2.8}%
+\contentsline {subsection}{\numberline {5.4.3}Thiết kế hệ thống gợi ý dịch vụ cá nhân hóa}{64}{subsection.5.4.3}%
+\contentsline {subsubsection}{\numberline {5.4.3.1}Kiến trúc tổng thể}{65}{subsubsection.5.4.3.1}%
+\contentsline {subsubsection}{\numberline {5.4.3.2}Phương pháp biểu diễn đặc trưng}{65}{subsubsection.5.4.3.2}%
+\contentsline {paragraph}{\numberline {5.4.3.2.1}Textual Features}{65}{paragraph.5.4.3.2.1}%
+\contentsline {paragraph}{\numberline {5.4.3.2.2}Embedding Model}{65}{paragraph.5.4.3.2.2}%
+\contentsline {subsubsection}{\numberline {5.4.3.3}Vector Database và Similarity Search}{65}{subsubsection.5.4.3.3}%
+\contentsline {paragraph}{\numberline {5.4.3.3.1}Vector Indexing}{65}{paragraph.5.4.3.3.1}%
+\contentsline {paragraph}{\numberline {5.4.3.3.2}Similarity Measure}{66}{paragraph.5.4.3.3.2}%
+\contentsline {subsubsection}{\numberline {5.4.3.4}Query Construction}{66}{subsubsection.5.4.3.4}%
+\contentsline {paragraph}{\numberline {5.4.3.4.1}Home Recommender Query}{66}{paragraph.5.4.3.4.1}%
+\contentsline {paragraph}{\numberline {5.4.3.4.2}Chatbot Recommender Query}{66}{paragraph.5.4.3.4.2}%
+\contentsline {subsubsection}{\numberline {5.4.3.5}Ranking và Filtering}{66}{subsubsection.5.4.3.5}%
+\contentsline {paragraph}{\numberline {5.4.3.5.1}Similarity Threshold}{66}{paragraph.5.4.3.5.1}%
+\contentsline {paragraph}{\numberline {5.4.3.5.2}History Filtering}{66}{paragraph.5.4.3.5.2}%
+\contentsline {paragraph}{\numberline {5.4.3.5.3}Diversification}{66}{paragraph.5.4.3.5.3}%
+\contentsline {paragraph}{\numberline {5.4.3.5.4}Explanation Generation}{66}{paragraph.5.4.3.5.4}%
+\contentsline {subsubsection}{\numberline {5.4.3.6}Pipeline tổng thể}{67}{subsubsection.5.4.3.6}%
+\contentsline {paragraph}{\numberline {5.4.3.6.1}Offline Phase}{67}{paragraph.5.4.3.6.1}%
+\contentsline {paragraph}{\numberline {5.4.3.6.2}Online Phase - Home Recommender}{67}{paragraph.5.4.3.6.2}%
+\contentsline {paragraph}{\numberline {5.4.3.6.3}Online Phase - Chatbot Recommender}{67}{paragraph.5.4.3.6.3}%
+\contentsline {chapter}{\numberline {6}Hiện thực}{68}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Các công nghệ liên quan}{68}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Mobile App Development (iOS/Android, Flutter)}{68}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Web/Portal Development (Partner Portal, Admin Dashboard)}{69}{subsection.6.1.2}%
+\contentsline {subsection}{\numberline {6.1.3}Server/Backend (NestJS \& PostgreSQL)}{70}{subsection.6.1.3}%
+\contentsline {subsection}{\numberline {6.1.4}Hiện thực hệ thống RAG Chatbot}{71}{subsection.6.1.4}%
+\contentsline {subsubsection}{\numberline {6.1.4.1}Tổ chức mã nguồn}{71}{subsubsection.6.1.4.1}%
+\contentsline {subsubsection}{\numberline {6.1.4.2}Hiện thực xử lý tài liệu}{71}{subsubsection.6.1.4.2}%
+\contentsline {paragraph}{\numberline {6.1.4.2.1}Tải và làm sạch tài liệu}{71}{paragraph.6.1.4.2.1}%
+\contentsline {paragraph}{\numberline {6.1.4.2.2}Chia nhỏ văn bản}{71}{paragraph.6.1.4.2.2}%
+\contentsline {subsubsection}{\numberline {6.1.4.3}Hiện thực mô hình embedding}{72}{subsubsection.6.1.4.3}%
+\contentsline {subsubsection}{\numberline {6.1.4.4}Cơ sở dữ liệu vector FAISS}{72}{subsubsection.6.1.4.4}%
+\contentsline {subsubsection}{\numberline {6.1.4.5}Hiện thực bộ truy xuất}{72}{subsubsection.6.1.4.5}%
+\contentsline {subsubsection}{\numberline {6.1.4.6}Xây dựng prompt đầu vào}{72}{subsubsection.6.1.4.6}%
+\contentsline {subsubsection}{\numberline {6.1.4.7}Tích hợp mô hình ngôn ngữ}{73}{subsubsection.6.1.4.7}%
+\contentsline {subsubsection}{\numberline {6.1.4.8}Xử lý phản hồi và hậu xử lý}{73}{subsubsection.6.1.4.8}%
+\contentsline {subsubsection}{\numberline {6.1.4.9}Pipeline tổng hợp của Chatbot}{73}{subsubsection.6.1.4.9}%
+\contentsline {subsection}{\numberline {6.1.5}Triển khai hệ thống gợi ý}{73}{subsection.6.1.5}%
+\contentsline {subsubsection}{\numberline {6.1.5.1}Cấu trúc dữ liệu}{73}{subsubsection.6.1.5.1}%
+\contentsline {subsubsection}{\numberline {6.1.5.2}Offline Processing}{74}{subsubsection.6.1.5.2}%
+\contentsline {paragraph}{\numberline {6.1.5.2.1}Document Construction}{74}{paragraph.6.1.5.2.1}%
+\contentsline {paragraph}{\numberline {6.1.5.2.2}Vector Database Building}{74}{paragraph.6.1.5.2.2}%
+\contentsline {subsubsection}{\numberline {6.1.5.3}Online Processing}{74}{subsubsection.6.1.5.3}%
+\contentsline {paragraph}{\numberline {6.1.5.3.1}Home Recommender}{74}{paragraph.6.1.5.3.1}%
+\contentsline {paragraph}{\numberline {6.1.5.3.2}Chatbot Recommender}{75}{paragraph.6.1.5.3.2}%
+\contentsline {subsubsection}{\numberline {6.1.5.4}Ví dụ minh họa}{75}{subsubsection.6.1.5.4}%
+\contentsline {paragraph}{\numberline {6.1.5.4.1}Ví dụ 1: Chatbot Recommender}{75}{paragraph.6.1.5.4.1}%
+\contentsline {paragraph}{\numberline {6.1.5.4.2}Ví dụ 2: Home Recommender}{76}{paragraph.6.1.5.4.2}%
+\contentsline {subsubsection}{\numberline {6.1.5.5}Đánh giá hiệu năng}{77}{subsubsection.6.1.5.5}%
+\contentsline {paragraph}{\numberline {6.1.5.5.1}Độ phức tạp tính toán}{77}{paragraph.6.1.5.5.1}%
+\contentsline {paragraph}{\numberline {6.1.5.5.2}Memory Requirements}{77}{paragraph.6.1.5.5.2}%
+\contentsline {paragraph}{\numberline {6.1.5.5.3}Scalability}{77}{paragraph.6.1.5.5.3}%
+\contentsline {subsubsection}{\numberline {6.1.5.6}Khả năng mở rộng}{77}{subsubsection.6.1.5.6}%
+\contentsline {section}{\numberline {6.2}Kiến trúc hiện thực}{77}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Phần Software – Triển khai ứng dụng}{80}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Cấu hình và Khởi tạo hệ thống (Bootstrap \& Configuration)}{80}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Module Xác thực và Bảo mật (Authentication \& Security)}{80}{subsection.6.3.2}%
+\contentsline {subsubsection}{\numberline {6.3.2.1}Quy trình Đăng ký \& Đăng nhập}{80}{subsubsection.6.3.2.1}%
+\contentsline {subsubsection}{\numberline {6.3.2.2}Cơ chế Bảo mật Token (JWT Strategy)}{80}{subsubsection.6.3.2.2}%
+\contentsline {subsection}{\numberline {6.3.3}Quản lý Tài khoản và Dữ liệu Người dùng (Account Management)}{81}{subsection.6.3.3}%
+\contentsline {subsection}{\numberline {6.3.4}Kiến trúc DTO và Validation}{81}{subsection.6.3.4}%
+\contentsline {chapter}{\numberline {7}Kết luận \& Giai đoạn đồ án tốt nghiệp}{82}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Nhận xét chung}{82}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Hạn chế}{82}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Giai đoạn đồ án tốt nghiệp}{83}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Sơ đồ garnt giai đoạn đồ án tốt nghiệp}{84}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Bảng kế hoạch \& Phân công công việc}{84}{subsection.7.3.2}%
+\contentsline {chapter}{Tài Liệu Tham Khảo}{87}{table.7.1}%
