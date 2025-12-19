@@ -1,16 +1,16 @@
 # Fdb version 4
-["biber main"] 1766165546.56396 "main.bcf" "main.bbl" "main" 1766165613.23903 0
-  "main.bcf" 1766165612 107391 91e3a80d85ad60a3b1ee4cbb76ee6395 "pdflatex"
+["biber main"] 1766165806.96048 "main.bcf" "main.bbl" "main" 1766165917.48318 0
+  "main.bcf" 1766165916 107391 91e3a80d85ad60a3b1ee4cbb76ee6395 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1766165577.23611 "c:/Users/TGDD-ASUS/Documents/HK251/DATA/BTL/Healytics/Report/main.tex" "main.pdf" "main" 1766165613.23998 0
+["pdflatex"] 1766165892.16506 "c:/Users/TGDD-ASUS/Documents/HK251/DATA/BTL/Healytics/Report/main.tex" "main.pdf" "main" 1766165917.48412 0
   "Contents/CoSoLyThuyet.tex" 1765338478 12932 d17519065825b404cc2d89931161f7e7 ""
   "Contents/GioiThieu.tex" 1765338478 6157 f28c4ffd18847ec4db14cb4bccef9fb0 ""
   "Contents/HienThuc.tex" 1765884512 45575 cfc65cee29273cefca30cdf41df976de ""
   "Contents/KetLuan.tex" 1765696635 13457 3dbc9e5edf2daa76b60833868c7de2b3 ""
-  "Contents/PhanTichHeThong.tex" 1766165483 40082 b51bb3b0583f959cf6c095a0b8b1a245 ""
+  "Contents/PhanTichHeThong.tex" 1766165882 39975 df4a5bf9ac2b5df5b087567d4ea79f60 ""
   "Contents/ThietKeHeThong.tex" 1766161843 52078 27d194996da1585e5f5556acc326bb41 ""
   "Contents/YeuCauHeThong.tex" 1765338478 21386 fb39d7765dc064b7c57cde4690d589e4 ""
   "Images/Activity/4.5.1.png" 1765338478 35395 234b9d8ba1ac712a5b06371ad5d9d070 ""
@@ -393,14 +393,14 @@
   "e:/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1765181795 5587484 88d9c586ce01a846a0246fe21fa702a7 ""
   "e:/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1765182313 3635721 41f4a03f8a52a95709481e98fac7a5fb ""
   "e:/texlive/2025/texmf.cnf" 1765181757 713 e69b156964470283e0530f5060668171 ""
-  "main.aux" 1766165612 40673 3e803738f0dd278a8f6572c6fc4e49b9 "pdflatex"
-  "main.bbl" 1766165549 486 76d65a242ec496c9b4361af646ff12cb "biber main"
-  "main.lof" 1766165612 5144 3430ec59cc9c5a0ae6bb700245412b76 "pdflatex"
-  "main.lot" 1766165612 1356 551b18c395c83466a4edb4379ebd4697 "pdflatex"
-  "main.out" 1766165612 34343 a02de423d6cf82372d87738a2310860d "pdflatex"
-  "main.run.xml" 1766165612 2396 938f4cf68218d122bbffc682032d60b8 "pdflatex"
+  "main.aux" 1766165916 40673 3e803738f0dd278a8f6572c6fc4e49b9 "pdflatex"
+  "main.bbl" 1766165810 486 76d65a242ec496c9b4361af646ff12cb "biber main"
+  "main.lof" 1766165916 5144 3430ec59cc9c5a0ae6bb700245412b76 "pdflatex"
+  "main.lot" 1766165916 1356 551b18c395c83466a4edb4379ebd4697 "pdflatex"
+  "main.out" 1766165916 34343 a02de423d6cf82372d87738a2310860d "pdflatex"
+  "main.run.xml" 1766165916 2396 938f4cf68218d122bbffc682032d60b8 "pdflatex"
   "main.tex" 1765511822 10200 b0abec4946e3b8177b6fa83cdc73a8a3 ""
-  "main.toc" 1766165612 18731 4dbf9c1e438170863ceccd9e5a77e35a "pdflatex"
+  "main.toc" 1766165916 18731 4dbf9c1e438170863ceccd9e5a77e35a "pdflatex"
   (generated)
   "main.aux"
   "main.bcf"

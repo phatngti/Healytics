@@ -1,19 +1,19 @@
 \chapter{Phân tích hệ thống}
 \section{Mô tả hệ thống tổng quan}
 
-Hệ thống HEALYTICS được xây dựng nhằm số hóa và tối ưu hóa quy trình tư vấn, gợi ý và đặt lịch các dịch vụ chăm sóc sức khỏe và sắc đẹp (Wellness). Mục tiêu của hệ thống là hỗ trợ người dùng tiếp cận đúng dịch vụ phù hợp với nhu cầu cá nhân, đồng thời cung cấp công cụ giúp các đối tác cung cấp dịch vụ quản lý và vận hành hiệu quả, minh bạch.
+Hệ thống HEALYTICS được xây dựng nhằm số hóa và tối ưu hóa quy trình tư vấn, gợi ý và đặt lịch các dịch vụ chăm sóc sức khỏe và sắc đẹp (Wellness). Mục tiêu của hệ thống là hỗ trợ người dùng tiếp cận đúng dịch vụ phù hợp với nhu cầu cá nhân, đồng thời cung cấp công cụ giúp các đối tác cung cấp dịch vụ quản lý và vận hành hiệu quả, minh bạch. \\
 
-Về mặt tổng thể, hệ thống được thiết kế theo mô hình đa phân hệ, bao gồm ba phân hệ chính:
+Về mặt tổng thể, hệ thống được thiết kế theo mô hình đa phân hệ, bao gồm ba phân hệ chính: \\
 
 \begin{itemize}
-    \item \textbf{User App}: Phân hệ phục vụ người dùng cuối, cho phép người dùng đăng ký tài khoản, thực hiện khảo sát nhu cầu, tương tác với chatbot AI, nhận các gợi ý dịch vụ cá nhân hóa, đặt lịch hẹn và thực hiện thanh toán. Phân hệ này tập trung vào trải nghiệm người dùng và không xử lý các logic nghiệp vụ phức tạp.
+    \item \textbf{User App}: Phân hệ phục vụ người dùng cuối, cho phép người dùng đăng ký tài khoản, thực hiện khảo sát nhu cầu, tương tác với chatbot AI, nhận các gợi ý dịch vụ cá nhân hóa, đặt lịch hẹn và thực hiện thanh toán. Phân hệ này tập trung vào trải nghiệm người dùng.
     
-    \item \textbf{Partner Portal}: Phân hệ dành cho các đối tác cung cấp dịch vụ như phòng khám, trung tâm thể thao, spa hoặc huấn luyện viên cá nhân. Đối tác sử dụng phân hệ này để quản lý thông tin dịch vụ, lịch làm việc của nhân viên, xác nhận lịch hẹn, theo dõi doanh thu và quản lý các chương trình khuyến mãi.
+    \item \textbf{Partner Portal}: Phân hệ dành cho các đối tác cung cấp dịch vụ như phòng khám, spa,... Đối tác sử dụng phân hệ này để quản lý thông tin dịch vụ, lịch làm việc của nhân viên, xác nhận lịch hẹn, theo dõi doanh thu và quản lý các chương trình khuyến mãi.
     
     \item \textbf{Admin Dashboard}: Phân hệ quản trị trung tâm, cho phép quản trị viên kiểm duyệt đối tác, giám sát hoạt động toàn hệ thống, quản lý tài chính tổng thể, điều phối các chiến dịch marketing và xử lý các vấn đề rủi ro phát sinh.
 \end{itemize}
 
-Một điểm nổi bật của hệ thống là việc tích hợp \textbf{trí tuệ nhân tạo (AI)}, bao gồm chatbot tư vấn và hệ thống gợi ý dịch vụ cá nhân hóa. AI đóng vai trò hỗ trợ người dùng diễn đạt nhu cầu dưới dạng ngôn ngữ tự nhiên, phân tích ngữ nghĩa và đề xuất các dịch vụ phù hợp dựa trên hồ sơ sức khỏe và lịch sử tương tác của người dùng.
+Một điểm nổi bật của hệ thống là việc tích hợp \textbf{trí tuệ nhân tạo (AI)}, bao gồm chatbot tư vấn và hệ thống gợi ý dịch vụ cá nhân hóa. AI đóng vai trò hỗ trợ người dùng diễn đạt nhu cầu dưới dạng ngôn ngữ tự nhiên, phân tích ngữ nghĩa và đề xuất các dịch vụ phù hợp dựa trên hồ sơ sức khỏe và lịch sử tương tác của người dùng. \\
 
 Các phân hệ trong hệ thống tương tác với nhau thông qua hệ thống API tập trung, đảm bảo tính phân tách rõ ràng về trách nhiệm, đồng thời nâng cao khả năng mở rộng, bảo trì và phát triển trong tương lai. Trên cơ sở mô tả tổng quan này, các sơ đồ phân tích ở các mục tiếp theo như sơ đồ Use Case, Sequence Diagram và Activity Diagram sẽ làm rõ chi tiết các kịch bản tương tác giữa các tác nhân và hệ thống.
 

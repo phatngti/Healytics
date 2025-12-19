@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.12.8)  20 DEC 2025 00:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.12.8)  20 DEC 2025 00:38
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1953,6 +1953,21 @@ Package pdftex.def Info: Images/hcmut.png  used on input line 319.
 (pdftex.def)             Requested size: 28.44864pt x 28.44792pt.
  [21] (./Contents/PhanTichHeThong.tex
 Ch\uhorn \ohorn ng 4.
+
+Underfull \hbox (badness 10000) in paragraph at lines 4--5
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6--7
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--17
+
+ []
+
 <Images/User_Usecase.jpg, id=965, 1551.7975pt x 489.83pt>
 File: Images/User_Usecase.jpg Graphic file (type jpg)
 <use Images/User_Usecase.jpg>
@@ -2824,7 +2839,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  108i,25n,126p,1571b,897s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <e:/texlive/2025/texmf-dist/fonts/type1/public/fontawesome5/FontAwesome5Free-Solid.pfb><e:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><e:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><e:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><e:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><e:/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb><e:/texlive/2025/texmf-dist/fonts/type1/urw/symbol/usyr.pfb><e:/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmb8v.pfb><e:/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmbi8v.pfb><e:/texlive/2025/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><e:/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmr8v.pfb><e:/texlive/2025/texmf-dist/fonts/type1/urw/times/utmri8a.pfb><e:/texlive/2025/texmf-dist/fonts/type1/vntex/urwvn/utmri8v.pfb><e:/texlive/2025/texmf-dist/fonts/type1/vntex/vnr/vntt10.pfb>
-Output written on main.pdf (88 pages, 15316463 bytes).
+Output written on main.pdf (88 pages, 15316341 bytes).
 PDF statistics:
  1756 PDF objects out of 2073 (max. 8388607)
  1483 compressed objects within 15 object streams
