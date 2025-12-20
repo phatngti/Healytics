@@ -1,8 +1,9 @@
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/router/partner_routes.dart' as partner;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:admin_panel/router/routes.dart';
+import 'package:admin_panel/router/admin_routes.dart' as admin;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -12,12 +13,17 @@ final List<Map<String, dynamic>> providerSlideMenuItems = [
   {
     "icon": Icons.admin_panel_settings_outlined,
     "label": 'Dashboard',
-    "route": DashboardRoute().location,
+    "route": partner.DashboardRoute().location,
   },
   {
     "icon": Icons.production_quantity_limits_outlined,
     "label": 'Products',
-    "route": ProductHomeRoute().location,
+    "route": partner.ProductHomeRoute().location,
+  },
+  {
+    "icon": Icons.admin_panel_settings_outlined,
+    "label": 'Employee',
+    "route": partner.EmployeeHomeRoute().location,
   },
 ];
 
@@ -25,12 +31,12 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
   {
     "icon": Icons.admin_panel_settings_outlined,
     "label": 'Dashboard',
-    "route": AdminDashboardRoute().location,
+    "route": admin.AdminDashboardRoute().location,
   },
   {
     "icon": Icons.production_quantity_limits_outlined,
     "label": 'Provider',
-    "route": PartnerManagerRoute().location,
+    "route": admin.PartnerManagerRoute().location,
   },
 ];
 
@@ -69,7 +75,7 @@ GoRouter router(Ref ref) {
   return GoRouter(
     initialLocation: initialLocation,
     debugLogDiagnostics: true,
-    routes: $appRoutes,
+    routes: [...admin.$appRoutes, ...partner.$appRoutes],
     refreshListenable: notifier,
     redirect: redirect,
   );

@@ -4,7 +4,7 @@ import 'package:admin_panel/features/common/widgets/button/button.dart';
 import 'package:admin_panel/features/common/widgets/input/text_field.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/common/widgets/toast.dart';
-import 'package:admin_panel/router/routes.dart';
+import 'package:admin_panel/router/admin_routes.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
 import 'package:flutter/material.dart';

@@ -1,6 +1,8 @@
 import 'package:admin_panel/features/partner/products/datasource/remote_datasource.dart';
+import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/product.repository.dart';
+import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -28,10 +30,10 @@ class ProductImplementRepository implements ProductRepository {
     return products
         .map(
           (product) => DataRow(
-            key: ValueKey<int>(product.id),
+            key: ValueKey<int>(product.id.value),
             onSelectChanged: (value) {
               if (value != null) {
-                setRowSelection(ValueKey<int>(product.id), value);
+                setRowSelection(ValueKey<int>(product.id.value), value);
               }
             },
             cells: [
@@ -52,13 +54,23 @@ class ProductImplementRepository implements ProductRepository {
   }
 
   @override
-  Future<ProductEntity> getProductById(int id) {
+  Future<Product> getProductById(ProductId id) {
     return remoteDataSource.getProductById(id);
   }
 
   @override
-  Future<void> updateProduct(ProductEntity product) {
-    return remoteDataSource.updateProduct(product);
+  Future<Product> createProduct(CreateProductRequest request) {
+    return remoteDataSource.createProduct(request);
+  }
+
+  @override
+  Future<void> updateProduct(UpdateProductRequest request) {
+    return remoteDataSource.updateProduct(request);
+  }
+
+  @override
+  Future<void> deleteProduct(ProductId id) {
+    return remoteDataSource.deleteProduct(id);
   }
 }
 

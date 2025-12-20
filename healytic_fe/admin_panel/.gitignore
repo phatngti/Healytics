@@ -27,11 +27,21 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
 /build/
 /coverage/
+pubspec.lock
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+*.config.dart
+*.gr.dart
 
 # Symbolication related
 app.*.symbols
@@ -43,3 +53,73 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android specific
+/android/.gradle/
+/android/local.properties
+/android/key.properties
+/android/*.jks
+/android/*.keystore
+/android/app/google-services.json
+
+# iOS/macOS specific
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/Generated.xcconfig
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/macos/Pods/
+**/macos/.symlinks/
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+**/macos/Flutter/ephemeral/
+
+# Web specific
+/web/favicon.png
+lib/generated_plugin_registrant.dart
+
+# Windows specific
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugin_registrant.h
+**/windows/flutter/generated_plugins.cmake
+
+# Linux specific
+**/linux/flutter/generated_plugin_registrant.cc
+**/linux/flutter/generated_plugin_registrant.h
+**/linux/flutter/generated_plugins.cmake
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Firebase
+firebase_options.dart
+google-services.json
+GoogleService-Info.plist
+
+# Credentials and secrets
+*.pem
+*.p12
+*.key
+secrets.json
+credentials.json
+
+# Test and coverage
+coverage/
+.test_coverage.dart
+lcov.info
+
+# Logs and crash reports
+*.log
+crash_log.txt
+*.stackdump
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Node modules (if using any Node.js tooling)
+node_modules/
+package-lock.json
+yarn.lock
