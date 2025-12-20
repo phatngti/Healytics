@@ -1,6 +1,6 @@
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/products/presentation/layouts/product_add_desktop.dart';
-import 'package:admin_panel/router/routes.dart';
+import 'package:admin_panel/router/partner_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

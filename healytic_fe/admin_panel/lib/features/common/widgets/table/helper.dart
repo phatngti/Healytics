@@ -25,11 +25,14 @@ class TableColumns {
                   Icon(column.prefixIcon),
                   AppDimens.horizontalSmall,
                 ],
-                Text(
-                  column.label,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                Flexible(
+                  child: Text(
+                    column.label,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
@@ -58,23 +61,37 @@ class AppDataTableSource extends AsyncDataTableSource {
 
   AppDataTableSource({required this.getTotalRows, required this.getData});
 
+  bool _mounted = true;
+
+  @override
+  // ignore: must_call_super
+  void dispose() {
+    _mounted = false;
+    // super.dispose();
+  }
+
   @override
   Future<AsyncRowsResponse> getRows(int startingAt, int count) async {
+    if (!_mounted) return AsyncRowsResponse(0, []);
     if (_cachedRows.containsKey(startingAt)) {
       final cached = _cachedRows[startingAt]!;
       if (cached.length >= count) {
         final totalRows = await getTotalRows();
+        if (!_mounted) return AsyncRowsResponse(0, []);
         return AsyncRowsResponse(totalRows, cached.take(count).toList());
       }
 
       final totalRows = await getTotalRows();
+      if (!_mounted) return AsyncRowsResponse(0, []);
       if (cached.length < count && startingAt + cached.length == totalRows) {
         return AsyncRowsResponse(totalRows, cached);
       }
     }
 
     final totalRows = await getTotalRows();
+    if (!_mounted) return AsyncRowsResponse(0, []);
     final rows = await getData(setRowSelection, startingAt, count);
+    if (!_mounted) return AsyncRowsResponse(0, []);
     _cachedRows[startingAt] = rows;
     return AsyncRowsResponse(totalRows, rows);
   }

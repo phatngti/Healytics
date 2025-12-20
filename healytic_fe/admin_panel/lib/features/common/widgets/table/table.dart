@@ -43,30 +43,55 @@ class AppTable extends StatefulWidget {
   State<AppTable> createState() => _AppTableState();
 }
 
-class _AppTableState extends State<AppTable> {
-  final PaginatorController _controller = PaginatorController();
+class _AppTableState extends State<AppTable>
+    with AutomaticKeepAliveClientMixin {
   late int _rowsPerPage;
+  late AppDataTableSource _source;
+  bool _isDisposed = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
+
     _rowsPerPage = widget.defaultRowsPerPage;
+    _source = AppDataTableSource(
+      getTotalRows: widget.getTotalRows,
+      getData: widget.getData,
+    );
   }
 
   @override
-  void didChangeDependencies() {
-    // initState is to early to access route options, context is invalid at that stage
-    super.didChangeDependencies();
+  void didUpdateWidget(covariant AppTable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Recreate source if callbacks changed
+    if (oldWidget.getTotalRows != widget.getTotalRows ||
+        oldWidget.getData != widget.getData) {
+      _source.dispose();
+      _source = AppDataTableSource(
+        getTotalRows: widget.getTotalRows,
+        getData: widget.getData,
+      );
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _isDisposed = true;
+    _source.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+
+    if (_isDisposed) {
+      return const SizedBox.shrink();
+    }
+
     // Last ppage example uses extra API call to get the number of items in datasource
     final columns = widget.columns;
     if (widget.actionButtons) {
@@ -81,11 +106,6 @@ class _AppTableState extends State<AppTable> {
         ),
       );
     }
-
-    final source = AppDataTableSource(
-      getTotalRows: widget.getTotalRows,
-      getData: widget.getData,
-    );
 
     return Container(
       padding: AppDimens.paddingAllSmall,
@@ -165,7 +185,7 @@ class _AppTableState extends State<AppTable> {
         sortArrowIcon: Icons.keyboard_arrow_up,
         sortArrowAnimationDuration: const Duration(milliseconds: 0),
         onSelectAll: (select) => (),
-        controller: _controller,
+
         hidePaginator: false,
         columns: widget.columns,
         empty: Center(
@@ -177,8 +197,8 @@ class _AppTableState extends State<AppTable> {
         ),
         loading: _Loading(),
         errorBuilder: (e) =>
-            _ErrorAndRetry(e.toString(), () => source.refreshDatasource()),
-        source: source,
+            _ErrorAndRetry(e.toString(), () => _source.refreshDatasource()),
+        source: _source,
       ),
     );
   }
@@ -234,7 +254,7 @@ class __LoadingState extends State<_Loading> {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: Colors.white.withAlpha(128),
+      color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
       // at first show shade, if loading takes longer than 0,5s show spinner
       child: FutureBuilder(
         future: Future.delayed(const Duration(milliseconds: 500), () => true),
@@ -246,14 +266,20 @@ class __LoadingState extends State<_Loading> {
                     padding: const EdgeInsets.all(7),
                     width: 150,
                     height: 50,
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.black,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
-                        Text('Loading..'),
+                        Text(
+                          'Loading..',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
                       ],
                     ),
                   ),
