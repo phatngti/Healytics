@@ -1,7 +1,10 @@
+import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
 import 'package:flutter/material.dart';
 
 abstract class ProductRepository {
+  /// Get paginated list of products for table display
   Future<List<DataRow>> getProducts(
     void Function(LocalKey, bool) setRowSelection,
     int startingAt,
@@ -10,9 +13,18 @@ abstract class ProductRepository {
     bool? sortedAsc,
   );
 
+  /// Get total count of products
   Future<int> getTotalRows();
 
-  Future<ProductEntity> getProductById(int id);
+  /// Get a single product by ID
+  Future<Product> getProductById(ProductId id);
 
-  Future<void> updateProduct(ProductEntity product);
+  /// Create a new product
+  Future<Product> createProduct(CreateProductRequest request);
+
+  /// Update an existing product
+  Future<void> updateProduct(UpdateProductRequest request);
+
+  /// Delete a product by ID
+  Future<void> deleteProduct(ProductId id);
 }

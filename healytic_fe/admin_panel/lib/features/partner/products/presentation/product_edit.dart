@@ -1,8 +1,9 @@
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/products/presentation/layouts/product_edit_desktop.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
-import 'package:admin_panel/router/routes.dart';
+import 'package:admin_panel/router/partner_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -17,13 +18,13 @@ class ProductEditScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveWrapper(
       useLayout: true,
-      desktop: ProductDetailsContent(productId: productId),
+      desktop: ProductDetailsContent(productId: ProductId(productId)),
     );
   }
 }
 
 class ProductDetailsContent extends HookConsumerWidget {
-  final int productId;
+  final ProductId productId;
 
   const ProductDetailsContent({super.key, required this.productId});
 
@@ -31,7 +32,7 @@ class ProductDetailsContent extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final productNotifier = ref.read(productProvider.notifier);
     final formKey = useMemoized(() => GlobalKey<FormState>());
-    final product = useState<ProductEntity?>(null);
+    final product = useState<Product?>(null);
     final isLoading = useState(true);
     final isEditing = useState(false);
 
@@ -74,15 +75,25 @@ class ProductDetailsContent extends HookConsumerWidget {
 
     Future<void> onSave() async {
       if (formKey.currentState!.validate()) {
-        final updatedProduct = product.value!.copyWith(
+        // Create update request with only changed fields
+        final request = UpdateProductRequest(
+          id: product.value!.id,
           name: nameController.text,
           price: double.parse(priceController.text),
           description: descriptionController.text,
           category: categoryController.text,
           image: imageController.text,
         );
-        await productNotifier.updateProduct(updatedProduct);
-        product.value = updatedProduct; // Update local state
+        await productNotifier.updateProduct(request);
+
+        // Update local state with new values
+        product.value = product.value!.copyWith(
+          name: nameController.text,
+          price: double.parse(priceController.text),
+          description: descriptionController.text,
+          category: categoryController.text,
+          image: imageController.text,
+        );
         isEditing.value = false; // Exit edit mode
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

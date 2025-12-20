@@ -24,6 +24,8 @@ class AppSelectionField<T> extends StatelessWidget {
     this.contentPadding,
     this.style,
     this.icon,
+    this.isRequired = false,
+    this.uppercaseLabel = true,
   });
 
   final String fieldKey;
@@ -45,6 +47,8 @@ class AppSelectionField<T> extends StatelessWidget {
   final EdgeInsetsGeometry? contentPadding;
   final TextStyle? style;
   final Widget? icon;
+  final bool isRequired;
+  final bool uppercaseLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -60,19 +64,40 @@ class AppSelectionField<T> extends StatelessWidget {
         onChanged: onChanged,
         enabled: enabled,
         builder: (FormFieldState<T> field) {
+          // Define the label color matching HTML #618961
+          const labelColor = Color(0xFF618961);
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (label != null)
-                Text(
-                  label!,
-                  style:
-                      labelStyle?.copyWith(fontWeight: FontWeight.w600) ??
-                      Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+              if (label != null && label!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: uppercaseLabel ? label!.toUpperCase() : label,
+                          style:
+                              labelStyle ??
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: labelColor,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                        ),
+                        if (isRequired)
+                          const TextSpan(
+                            text: ' *',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
-              2.verticalSpace,
               InputDecorator(
                 decoration: InputDecoration(
                   isDense: true,
@@ -91,18 +116,14 @@ class AppSelectionField<T> extends StatelessWidget {
                   filled: true,
                   fillColor: enabled
                       ? Theme.of(context).colorScheme.surface
-                      : Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.12),
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
                   errorText: field.errorText,
                   border:
                       border ??
                       OutlineInputBorder(
                         borderRadius: AppDimens.radiusSmall,
                         borderSide: BorderSide(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surfaceBright.withAlpha(100),
+                          color: Theme.of(context).colorScheme.outline,
                         ),
                       ),
                   enabledBorder:
@@ -110,9 +131,7 @@ class AppSelectionField<T> extends StatelessWidget {
                       OutlineInputBorder(
                         borderRadius: AppDimens.radiusSmall,
                         borderSide: BorderSide(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.outline.withAlpha(100),
+                          color: Theme.of(context).colorScheme.outline,
                         ),
                       ),
                   focusedBorder:

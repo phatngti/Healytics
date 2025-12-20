@@ -13,42 +13,42 @@ part of 'product.entity.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$ProductEntity {
+mixin _$Product {
 
- int get id; String get name; double get price; String get description; String get image; String get category; bool get selected;
-/// Create a copy of ProductEntity
+ ProductId get id; String get name; double get price; String get description; String get image; String get category;
+/// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$ProductEntityCopyWith<ProductEntity> get copyWith => _$ProductEntityCopyWithImpl<ProductEntity>(this as ProductEntity, _$identity);
+$ProductCopyWith<Product> get copyWith => _$ProductCopyWithImpl<Product>(this as Product, _$identity);
 
-  /// Serializes this ProductEntity to a JSON map.
+  /// Serializes this Product to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.description, description) || other.description == description)&&(identical(other.image, image) || other.image == image)&&(identical(other.category, category) || other.category == category)&&(identical(other.selected, selected) || other.selected == selected));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Product&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.description, description) || other.description == description)&&(identical(other.image, image) || other.image == image)&&(identical(other.category, category) || other.category == category));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,price,description,image,category,selected);
+int get hashCode => Object.hash(runtimeType,id,name,price,description,image,category);
 
 @override
 String toString() {
-  return 'ProductEntity(id: $id, name: $name, price: $price, description: $description, image: $image, category: $category, selected: $selected)';
+  return 'Product(id: $id, name: $name, price: $price, description: $description, image: $image, category: $category)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $ProductEntityCopyWith<$Res>  {
-  factory $ProductEntityCopyWith(ProductEntity value, $Res Function(ProductEntity) _then) = _$ProductEntityCopyWithImpl;
+abstract mixin class $ProductCopyWith<$Res>  {
+  factory $ProductCopyWith(Product value, $Res Function(Product) _then) = _$ProductCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, double price, String description, String image, String category, bool selected
+ ProductId id, String name, double price, String description, String image, String category
 });
 
 
@@ -56,33 +56,32 @@ $Res call({
 
 }
 /// @nodoc
-class _$ProductEntityCopyWithImpl<$Res>
-    implements $ProductEntityCopyWith<$Res> {
-  _$ProductEntityCopyWithImpl(this._self, this._then);
+class _$ProductCopyWithImpl<$Res>
+    implements $ProductCopyWith<$Res> {
+  _$ProductCopyWithImpl(this._self, this._then);
 
-  final ProductEntity _self;
-  final $Res Function(ProductEntity) _then;
+  final Product _self;
+  final $Res Function(Product) _then;
 
-/// Create a copy of ProductEntity
+/// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? price = null,Object? description = null,Object? image = null,Object? category = null,Object? selected = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? price = null,Object? description = null,Object? image = null,Object? category = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as ProductId,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as double,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
 as String,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String,selected: null == selected ? _self.selected : selected // ignore: cast_nullable_to_non_nullable
-as bool,
+as String,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [ProductEntity].
-extension ProductEntityPatterns on ProductEntity {
+/// Adds pattern-matching-related methods to [Product].
+extension ProductPatterns on Product {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -95,10 +94,10 @@ extension ProductEntityPatterns on ProductEntity {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ProductEntity value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _Product value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ProductEntity() when $default != null:
+case _Product() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -117,10 +116,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ProductEntity value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _Product value)  $default,){
 final _that = this;
 switch (_that) {
-case _ProductEntity():
+case _Product():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -138,10 +137,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ProductEntity value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _Product value)?  $default,){
 final _that = this;
 switch (_that) {
-case _ProductEntity() when $default != null:
+case _Product() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -159,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  double price,  String description,  String image,  String category,  bool selected)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ProductId id,  String name,  double price,  String description,  String image,  String category)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ProductEntity() when $default != null:
-return $default(_that.id,_that.name,_that.price,_that.description,_that.image,_that.category,_that.selected);case _:
+case _Product() when $default != null:
+return $default(_that.id,_that.name,_that.price,_that.description,_that.image,_that.category);case _:
   return orElse();
 
 }
@@ -180,10 +179,10 @@ return $default(_that.id,_that.name,_that.price,_that.description,_that.image,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  double price,  String description,  String image,  String category,  bool selected)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ProductId id,  String name,  double price,  String description,  String image,  String category)  $default,) {final _that = this;
 switch (_that) {
-case _ProductEntity():
-return $default(_that.id,_that.name,_that.price,_that.description,_that.image,_that.category,_that.selected);case _:
+case _Product():
+return $default(_that.id,_that.name,_that.price,_that.description,_that.image,_that.category);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +199,10 @@ return $default(_that.id,_that.name,_that.price,_that.description,_that.image,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  double price,  String description,  String image,  String category,  bool selected)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ProductId id,  String name,  double price,  String description,  String image,  String category)?  $default,) {final _that = this;
 switch (_that) {
-case _ProductEntity() when $default != null:
-return $default(_that.id,_that.name,_that.price,_that.description,_that.image,_that.category,_that.selected);case _:
+case _Product() when $default != null:
+return $default(_that.id,_that.name,_that.price,_that.description,_that.image,_that.category);case _:
   return null;
 
 }
@@ -214,52 +213,51 @@ return $default(_that.id,_that.name,_that.price,_that.description,_that.image,_t
 /// @nodoc
 @JsonSerializable()
 
-class _ProductEntity implements ProductEntity {
-  const _ProductEntity({required this.id, required this.name, required this.price, required this.description, required this.image, required this.category, this.selected = false});
-  factory _ProductEntity.fromJson(Map<String, dynamic> json) => _$ProductEntityFromJson(json);
+class _Product implements Product {
+  const _Product({required this.id, required this.name, required this.price, required this.description, required this.image, required this.category});
+  factory _Product.fromJson(Map<String, dynamic> json) => _$ProductFromJson(json);
 
-@override final  int id;
+@override final  ProductId id;
 @override final  String name;
 @override final  double price;
 @override final  String description;
 @override final  String image;
 @override final  String category;
-@override@JsonKey() final  bool selected;
 
-/// Create a copy of ProductEntity
+/// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$ProductEntityCopyWith<_ProductEntity> get copyWith => __$ProductEntityCopyWithImpl<_ProductEntity>(this, _$identity);
+_$ProductCopyWith<_Product> get copyWith => __$ProductCopyWithImpl<_Product>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$ProductEntityToJson(this, );
+  return _$ProductToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProductEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.description, description) || other.description == description)&&(identical(other.image, image) || other.image == image)&&(identical(other.category, category) || other.category == category)&&(identical(other.selected, selected) || other.selected == selected));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Product&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.description, description) || other.description == description)&&(identical(other.image, image) || other.image == image)&&(identical(other.category, category) || other.category == category));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,price,description,image,category,selected);
+int get hashCode => Object.hash(runtimeType,id,name,price,description,image,category);
 
 @override
 String toString() {
-  return 'ProductEntity(id: $id, name: $name, price: $price, description: $description, image: $image, category: $category, selected: $selected)';
+  return 'Product(id: $id, name: $name, price: $price, description: $description, image: $image, category: $category)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$ProductEntityCopyWith<$Res> implements $ProductEntityCopyWith<$Res> {
-  factory _$ProductEntityCopyWith(_ProductEntity value, $Res Function(_ProductEntity) _then) = __$ProductEntityCopyWithImpl;
+abstract mixin class _$ProductCopyWith<$Res> implements $ProductCopyWith<$Res> {
+  factory _$ProductCopyWith(_Product value, $Res Function(_Product) _then) = __$ProductCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, double price, String description, String image, String category, bool selected
+ ProductId id, String name, double price, String description, String image, String category
 });
 
 
@@ -267,25 +265,24 @@ $Res call({
 
 }
 /// @nodoc
-class __$ProductEntityCopyWithImpl<$Res>
-    implements _$ProductEntityCopyWith<$Res> {
-  __$ProductEntityCopyWithImpl(this._self, this._then);
+class __$ProductCopyWithImpl<$Res>
+    implements _$ProductCopyWith<$Res> {
+  __$ProductCopyWithImpl(this._self, this._then);
 
-  final _ProductEntity _self;
-  final $Res Function(_ProductEntity) _then;
+  final _Product _self;
+  final $Res Function(_Product) _then;
 
-/// Create a copy of ProductEntity
+/// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? price = null,Object? description = null,Object? image = null,Object? category = null,Object? selected = null,}) {
-  return _then(_ProductEntity(
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? price = null,Object? description = null,Object? image = null,Object? category = null,}) {
+  return _then(_Product(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as ProductId,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as double,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
 as String,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String,selected: null == selected ? _self.selected : selected // ignore: cast_nullable_to_non_nullable
-as bool,
+as String,
   ));
 }
 

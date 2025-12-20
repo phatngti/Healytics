@@ -8,12 +8,15 @@ class AppTextField extends StatelessWidget {
     required this.fieldKey,
     required this.label,
     this.suffixIcon,
+    this.prefixIcon,
     this.validator,
     this.obscureText = false,
     this.controller,
     this.onEditingComplete,
     this.onChanged,
     this.enabled = true,
+    this.readOnly = false,
+    this.onTap,
     this.initialValue,
     this.labelStyle,
     this.border,
@@ -29,18 +32,23 @@ class AppTextField extends StatelessWidget {
     this.maxLines,
     this.style,
     this.contentPadding,
+    this.isRequired = false,
+    this.uppercaseLabel = true,
   });
 
   final String fieldKey;
   final String label;
 
   final Widget? suffixIcon;
+  final Widget? prefixIcon; // Add prefixIcon field
   final String? Function(dynamic)? validator;
   final bool obscureText;
   final TextEditingController? controller;
   final VoidCallback? onEditingComplete;
   final ValueChanged<dynamic>? onChanged;
   final bool enabled;
+  final bool readOnly; // Add readOnly
+  final VoidCallback? onTap; // Add onTap
   final String? initialValue;
   final TextStyle? labelStyle;
   final OutlineInputBorder? border;
@@ -56,6 +64,8 @@ class AppTextField extends StatelessWidget {
   final int? maxLines;
   final TextStyle? style;
   final EdgeInsetsGeometry? contentPadding;
+  final bool isRequired;
+  final bool uppercaseLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -70,18 +80,40 @@ class AppTextField extends StatelessWidget {
         autovalidateMode: AutovalidateMode.onUserInteraction,
         onChanged: onChanged,
         builder: (FormFieldState<dynamic> field) {
+          // Define the label color matching HTML #618961
+          const labelColor = Color(0xFF618961);
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style:
-                    labelStyle?.copyWith(fontWeight: FontWeight.w600) ??
-                    Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
+              if (label.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: uppercaseLabel ? label.toUpperCase() : label,
+                          style:
+                              labelStyle ??
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: labelColor,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                        ),
+                        if (isRequired)
+                          const TextSpan(
+                            text: ' *',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                      ],
                     ),
-              ),
-              2.verticalSpace,
+                  ),
+                ),
               TextFormField(
                 key: key,
                 initialValue: controller != null
@@ -93,7 +125,8 @@ class AppTextField extends StatelessWidget {
                 maxLines: maxLines ?? 1,
                 onEditingComplete: onEditingComplete,
                 style: style,
-
+                readOnly: readOnly, // Pass readOnly
+                onTap: onTap, // Pass onTap
                 // --- FIX 1: Logic Enable/Disable ---
                 enabled: enabled, // Chặn tương tác người dùng
                 decoration: InputDecoration(
@@ -114,9 +147,7 @@ class AppTextField extends StatelessWidget {
                   filled: true, // Bắt buộc phải có để hiển thị fillColor
                   fillColor: enabled
                       ? Theme.of(context).colorScheme.surface
-                      : Theme.of(context).colorScheme.onSurface.withValues(
-                          alpha: 0.12,
-                        ), // Màu xám nhẹ khi disable
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
 
                   errorText: field.errorText,
                   border:
@@ -124,9 +155,7 @@ class AppTextField extends StatelessWidget {
                       OutlineInputBorder(
                         borderRadius: AppDimens.radiusSmall,
                         borderSide: BorderSide(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surfaceBright.withAlpha(100),
+                          color: Theme.of(context).colorScheme.outline,
                         ),
                       ),
                   enabledBorder:
@@ -134,9 +163,7 @@ class AppTextField extends StatelessWidget {
                       OutlineInputBorder(
                         borderRadius: AppDimens.radiusSmall,
                         borderSide: BorderSide(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.outline.withAlpha(100),
+                          color: Theme.of(context).colorScheme.outline,
                         ),
                       ),
                   focusedBorder:
@@ -162,6 +189,7 @@ class AppTextField extends StatelessWidget {
                   hoverColor: Theme.of(context).colorScheme.surface,
 
                   suffixIcon: suffixIcon,
+                  prefixIcon: prefixIcon, // Use prefixIcon here
                   constraints: const BoxConstraints(
                     maxHeight: double.infinity,
                     maxWidth: double.infinity,
