@@ -2,46 +2,46 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Sơ đồ Use Case cho User App}}{22}{figure.caption.4}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Sơ đồ Use Case cho Partner Portal}}{22}{figure.caption.5}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Sơ đồ Use Case cho User App}}{23}{figure.caption.4}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Sơ đồ Use Case cho Partner Portal}}{23}{figure.caption.5}%
 \contentsline {figure}{\numberline {4.3}{\ignorespaces Sơ đồ Use Case cho Admin Dashboard}}{23}{figure.caption.6}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Sơ đồ Use Case Tổng Thể Hệ Thống (Tích Hợp AI)}}{23}{figure.caption.7}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Đăng ký và cá nhân hoá}}{29}{figure.caption.13}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Chatbot AI \& Tư vấn}}{30}{figure.caption.14}%
-\contentsline {figure}{\numberline {4.7}{\ignorespaces Tìm kiếm \& Lọc Nâng cao}}{31}{figure.caption.15}%
-\contentsline {figure}{\numberline {4.8}{\ignorespaces Đặt lịch hẹn (Booking), thanh toán và đánh giá}}{32}{figure.caption.16}%
-\contentsline {figure}{\numberline {4.9}{\ignorespaces AI trong Quản trị Tương tác thông minh}}{33}{figure.caption.17}%
-\contentsline {figure}{\numberline {4.10}{\ignorespaces Trang Đăng ký Cung cấp Hồ sơ (Partner Registration)}}{33}{figure.caption.18}%
-\contentsline {figure}{\numberline {4.11}{\ignorespaces Cổng thông tin Chờ duyệt}}{34}{figure.caption.19}%
-\contentsline {figure}{\numberline {4.12}{\ignorespaces Quản lý lịch hẹn}}{35}{figure.caption.20}%
-\contentsline {figure}{\numberline {4.13}{\ignorespaces Quản lý Dịch vụ (Service Management)}}{36}{figure.caption.21}%
-\contentsline {figure}{\numberline {4.14}{\ignorespaces Quản lý Nhân viên (Staff Management)}}{37}{figure.caption.22}%
-\contentsline {figure}{\numberline {4.15}{\ignorespaces Sơ đồ hoạt động Onboarding \& Cá nhân hóa Hồ sơ Người dùng}}{38}{figure.caption.23}%
-\contentsline {figure}{\numberline {4.16}{\ignorespaces Sơ đồ hoạt động Chatbot AI Tư vấn \& Gợi ý Dịch vụ}}{39}{figure.caption.24}%
-\contentsline {figure}{\numberline {4.17}{\ignorespaces Sơ đồ hoạt động Quy trình Đăng ký Đối tác}}{39}{figure.caption.25}%
-\contentsline {figure}{\numberline {4.18}{\ignorespaces Sơ đồ hoạt động Đặt lịch, Thanh toán \& Đánh giá}}{40}{figure.caption.26}%
-\contentsline {figure}{\numberline {4.19}{\ignorespaces Sơ đồ hoạt động Quy trình Phê duyệt Đối tác}}{41}{figure.caption.27}%
-\contentsline {figure}{\numberline {4.20}{\ignorespaces Sơ đồ hoạt động Chu trình Tự động Huấn luyện Mô hình AI}}{41}{figure.caption.28}%
-\contentsline {figure}{\numberline {4.21}{\ignorespaces Sơ đồ hoạt động Quản lý Lịch hẹn (Góc nhìn Đối tác / Dashboard)}}{42}{figure.caption.29}%
-\contentsline {figure}{\numberline {4.22}{\ignorespaces Sơ đồ hoạt động Quản lý Nhân viên \& Phân quyền}}{42}{figure.caption.30}%
-\contentsline {figure}{\numberline {4.23}{\ignorespaces Class Diagram của hệ thống}}{43}{figure.caption.31}%
-\contentsline {figure}{\numberline {4.24}{\ignorespaces Sơ đồ lớp phân hệ Quản lý Người dùng}}{43}{figure.caption.32}%
-\contentsline {figure}{\numberline {4.25}{\ignorespaces Sơ đồ lớp phân hệ Đặt lịch \& Thanh toán}}{44}{figure.caption.33}%
-\contentsline {figure}{\numberline {4.26}{\ignorespaces Sơ đồ lớp phân hệ Đối tác}}{45}{figure.caption.35}%
-\contentsline {figure}{\numberline {4.27}{\ignorespaces Sơ đồ lớp phân hệ Thông báo}}{46}{figure.caption.37}%
-\contentsline {figure}{\numberline {4.28}{\ignorespaces Sơ đồ lớp phân hệ Quản trị}}{46}{figure.caption.39}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Sơ đồ Use Case Tổng Thể Hệ Thống (Tích Hợp AI)}}{24}{figure.caption.7}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Đăng ký và cá nhân hoá}}{30}{figure.caption.13}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Chatbot AI \& Tư vấn}}{31}{figure.caption.14}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Tìm kiếm \& Lọc Nâng cao}}{32}{figure.caption.15}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Đặt lịch hẹn (Booking), thanh toán và đánh giá}}{33}{figure.caption.16}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces AI trong Quản trị Tương tác thông minh}}{34}{figure.caption.17}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Trang Đăng ký Cung cấp Hồ sơ (Partner Registration)}}{34}{figure.caption.18}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Cổng thông tin Chờ duyệt}}{35}{figure.caption.19}%
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Quản lý lịch hẹn}}{36}{figure.caption.20}%
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Quản lý Dịch vụ (Service Management)}}{37}{figure.caption.21}%
+\contentsline {figure}{\numberline {4.14}{\ignorespaces Quản lý Nhân viên (Staff Management)}}{38}{figure.caption.22}%
+\contentsline {figure}{\numberline {4.15}{\ignorespaces Sơ đồ hoạt động Onboarding \& Cá nhân hóa Hồ sơ Người dùng}}{39}{figure.caption.23}%
+\contentsline {figure}{\numberline {4.16}{\ignorespaces Sơ đồ hoạt động Chatbot AI Tư vấn \& Gợi ý Dịch vụ}}{40}{figure.caption.24}%
+\contentsline {figure}{\numberline {4.17}{\ignorespaces Sơ đồ hoạt động Quy trình Đăng ký Đối tác}}{40}{figure.caption.25}%
+\contentsline {figure}{\numberline {4.18}{\ignorespaces Sơ đồ hoạt động Đặt lịch, Thanh toán \& Đánh giá}}{41}{figure.caption.26}%
+\contentsline {figure}{\numberline {4.19}{\ignorespaces Sơ đồ hoạt động Quy trình Phê duyệt Đối tác}}{42}{figure.caption.27}%
+\contentsline {figure}{\numberline {4.20}{\ignorespaces Sơ đồ hoạt động Chu trình Tự động Huấn luyện Mô hình AI}}{42}{figure.caption.28}%
+\contentsline {figure}{\numberline {4.21}{\ignorespaces Sơ đồ hoạt động Quản lý Lịch hẹn (Góc nhìn Đối tác / Dashboard)}}{43}{figure.caption.29}%
+\contentsline {figure}{\numberline {4.22}{\ignorespaces Sơ đồ hoạt động Quản lý Nhân viên \& Phân quyền}}{43}{figure.caption.30}%
+\contentsline {figure}{\numberline {4.23}{\ignorespaces Class Diagram của hệ thống}}{44}{figure.caption.31}%
+\contentsline {figure}{\numberline {4.24}{\ignorespaces Sơ đồ lớp phân hệ Quản lý Người dùng}}{44}{figure.caption.32}%
+\contentsline {figure}{\numberline {4.25}{\ignorespaces Sơ đồ lớp phân hệ Đặt lịch \& Thanh toán}}{45}{figure.caption.33}%
+\contentsline {figure}{\numberline {4.26}{\ignorespaces Sơ đồ lớp phân hệ Đối tác}}{46}{figure.caption.35}%
+\contentsline {figure}{\numberline {4.27}{\ignorespaces Sơ đồ lớp phân hệ Thông báo}}{47}{figure.caption.37}%
+\contentsline {figure}{\numberline {4.28}{\ignorespaces Sơ đồ lớp phân hệ Quản trị}}{47}{figure.caption.39}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Kiến trúc hệ thống}}{50}{figure.caption.43}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces ER Diagram của hệ thống}}{53}{figure.caption.44}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Sơ đồ Mockup UI tổng quan của ứng dụng}}{54}{figure.caption.45}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces Giao diện Authentication}}{55}{figure.caption.46}%
-\contentsline {figure}{\numberline {5.5}{\ignorespaces Giao diện Survey}}{56}{figure.caption.47}%
-\contentsline {figure}{\numberline {5.6}{\ignorespaces Giao diện Navigation}}{57}{figure.caption.48}%
-\contentsline {figure}{\numberline {5.7}{\ignorespaces Giao diện Appointment}}{58}{figure.caption.49}%
-\contentsline {figure}{\numberline {5.8}{\ignorespaces Giao diện Provider Service}}{59}{figure.caption.50}%
-\contentsline {figure}{\numberline {5.9}{\ignorespaces Giao diện AI Chat}}{60}{figure.caption.51}%
-\contentsline {figure}{\numberline {5.10}{\ignorespaces Giao diện Checkout}}{61}{figure.caption.52}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Kiến trúc hệ thống}}{51}{figure.caption.43}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces ER Diagram của hệ thống}}{54}{figure.caption.44}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Sơ đồ Mockup UI tổng quan của ứng dụng}}{55}{figure.caption.45}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Giao diện Authentication}}{56}{figure.caption.46}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Giao diện Survey}}{57}{figure.caption.47}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Giao diện Navigation}}{58}{figure.caption.48}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Giao diện Appointment}}{59}{figure.caption.49}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Giao diện Provider Service}}{60}{figure.caption.50}%
+\contentsline {figure}{\numberline {5.9}{\ignorespaces Giao diện AI Chat}}{61}{figure.caption.51}%
+\contentsline {figure}{\numberline {5.10}{\ignorespaces Giao diện Checkout}}{62}{figure.caption.52}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Kiến trúc hiện thực hệ thống}}{78}{figure.caption.53}%
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Kiến trúc hiện thực hệ thống}}{79}{figure.caption.53}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {7.1}{\ignorespaces Grantt chart giai đoạn đồ án tốt nghiệp}}{84}{figure.caption.54}%
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Grantt chart giai đoạn đồ án tốt nghiệp}}{85}{figure.caption.54}%
