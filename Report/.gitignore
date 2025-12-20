@@ -1,32 +1,32 @@
-# LaTeX auxiliary files
-*.aux
-*.bbl
-*.blg
-*.fdb_latexmk
-*.fls
-*.log
-*.out
-*.toc
-*.lof
-*.lot
-*.synctex.gz
-*.synctex(busy)
+# # LaTeX auxiliary files
+# *.aux
+# *.bbl
+# *.blg
+# *.fdb_latexmk
+# *.fls
+# *.log
+# *.out
+# *.toc
+# *.lof
+# *.lot
+# *.synctex.gz
+# *.synctex(busy)
 
-# Generated PDF (uncomment if you want to track it)
-*.pdf
+# # Generated PDF (uncomment if you want to track it)
+# *.pdf
 
-# Other LaTeX temp files
-*.nav
-*.snm
-*.vrb
-*.bcf
-*.run.xml
-*-blx.bib
-*.idx
-*.ilg
-*.ind
-*.lol
-*.glg
-*.glo
-*.gls
-*.ist
+# # Other LaTeX temp files
+# *.nav
+# *.snm
+# *.vrb
+# *.bcf
+# *.run.xml
+# *-blx.bib
+# *.idx
+# *.ilg
+# *.ind
+# *.lol
+# *.glg
+# *.glo
+# *.gls
+# *.ist
