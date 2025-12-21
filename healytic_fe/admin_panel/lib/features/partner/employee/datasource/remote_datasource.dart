@@ -130,21 +130,21 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       const Duration(seconds: 1),
       () => EmployeeEntity(
         id: id,
-        fullName: request.name,
-        displayName: request.name,
-        avatar: 'https://i.pravatar.cc/150?img=${id.value % 70}',
-        role: 'Staff',
-        position: 'Staff',
+        fullName: '${request.firstName} ${request.lastName}',
+        displayName: '${request.firstName} ${request.lastName}',
+        avatar: request.avatar ?? '',
+        role: 'Staff', // Default, as role is not in request
+        position: request.jobTitle,
         rating: 0.0,
         reviewCount: 0,
-        status: 'Active',
-        branch: 'Branch 1',
+        status: request.status,
+        branch: request.branch,
         email: request.email,
-        phone: '',
-        address: '',
-        city: '',
-        state: '',
-        country: 'Vietnam',
+        phone: request.phone,
+        address: '', // Address not in request
+        city: '', // City not in request
+        state: '', // State not in request
+        country: '', // Country not in request
       ),
     );
   }

@@ -12,9 +12,9 @@ abstract class UpdateProductRequest with _$UpdateProductRequest {
   const factory UpdateProductRequest({
     required ProductId id,
     String? name,
-    double? price,
+    double? basePrice,
     String? description,
-    String? image,
+    List<String>? images,
     String? category,
   }) = _UpdateProductRequest;
 

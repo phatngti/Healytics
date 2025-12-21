@@ -137,11 +137,51 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
   }
 }
 
-class _ImageThumbnail extends StatelessWidget {
+class _ImageThumbnail extends StatefulWidget {
   const _ImageThumbnail({required this.image, required this.onRemove});
 
   final dynamic image;
   final VoidCallback onRemove;
+
+  @override
+  State<_ImageThumbnail> createState() => _ImageThumbnailState();
+}
+
+class _ImageThumbnailState extends State<_ImageThumbnail> {
+  Uint8List? _imageBytes;
+  bool _isLoading = true;
+  bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  Future<void> _loadImage() async {
+    if (widget.image is XFile) {
+      try {
+        final bytes = await (widget.image as XFile).readAsBytes();
+        if (mounted) {
+          setState(() {
+            _imageBytes = bytes;
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _hasError = true;
+            _isLoading = false;
+          });
+        }
+      }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +205,7 @@ class _ImageThumbnail extends StatelessWidget {
           top: -8,
           right: -8,
           child: GestureDetector(
-            onTap: onRemove,
+            onTap: widget.onRemove,
             child: Container(
               width: 24,
               height: 24,
@@ -197,8 +237,47 @@ class _ImageThumbnail extends StatelessWidget {
   }
 
   Widget _buildImage(BuildContext context) {
-    if (image is String) {
-      final String imagePath = image as String;
+    // Handle loading state
+    if (_isLoading) {
+      return Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      );
+    }
+
+    // Handle error state
+    if (_hasError) {
+      return Center(
+        child: Icon(
+          Icons.broken_image_outlined,
+          size: 40,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      );
+    }
+
+    // Handle XFile with loaded bytes
+    if (widget.image is XFile && _imageBytes != null) {
+      return Image.memory(
+        _imageBytes!,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Center(
+            child: Icon(
+              Icons.broken_image_outlined,
+              size: 40,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          );
+        },
+      );
+    }
+
+    // Handle String paths
+    if (widget.image is String) {
+      final String imagePath = widget.image as String;
       if (imagePath.startsWith('http') ||
           imagePath.startsWith('https') ||
           imagePath.startsWith('blob:')) {
@@ -217,9 +296,6 @@ class _ImageThumbnail extends StatelessWidget {
         );
       } else {
         if (kIsWeb) {
-          // On web, we can't use Image.file. If it's not a network/blob URL,
-          // it might be an asset or we can't display it.
-          // Assuming it might be a network image without http prefix or just fallback.
           return Image.network(
             imagePath,
             fit: BoxFit.cover,
@@ -248,37 +324,8 @@ class _ImageThumbnail extends StatelessWidget {
           },
         );
       }
-    } else if (image is XFile) {
-      if (kIsWeb) {
-        return Image.network(
-          (image as XFile).path,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Center(
-              child: Icon(
-                Icons.broken_image_outlined,
-                size: 40,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            );
-          },
-        );
-      } else {
-        return Image.file(
-          File((image as XFile).path),
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Center(
-              child: Icon(
-                Icons.broken_image_outlined,
-                size: 40,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            );
-          },
-        );
-      }
     }
+
     return const SizedBox();
   }
 }

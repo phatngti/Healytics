@@ -19,11 +19,39 @@ extension type const ProductId(int value) implements int {
 abstract class Product with _$Product {
   const factory Product({
     required ProductId id,
+
+    // General Information
     required String name,
-    required double price,
     required String description,
-    required String image,
+    @Default('service') String productType,
+
+    // Pricing & Inventory
+    required double basePrice,
+    double? salePrice,
+    double? costPerItem,
+    String? sku,
+    String? barcode,
+    int? stockQuantity,
+
+    // Visibility
+    @Default('draft') String status,
+    @Default(true) bool onlineStore,
+
+    // Organization
     required String category,
+    @Default([]) List<String> tags,
+    String? vendor,
+
+    // Operations & Scheduling
+    int? duration,
+    int? buffer,
+    int? capacity,
+    int? leadTime,
+    @Default('any') String staffAllocation,
+    @Default([]) List<String> staffIds,
+
+    // Media
+    @Default([]) List<String> images,
   }) = _Product;
 
   factory Product.fromJson(Map<String, dynamic> json) =>

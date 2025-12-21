@@ -8,8 +8,19 @@ part 'update_employee.request.g.dart';
 abstract class UpdateEmployeeRequest with _$UpdateEmployeeRequest {
   const factory UpdateEmployeeRequest({
     required EmployeeId id,
-    required String name,
+    required String fullName,
+    required String displayName,
+    required String avatar,
+    required String role,
+    required String position,
+    required String status,
+    required String branch,
     required String email,
+    required String phone,
+    required String address,
+    required String city,
+    required String state,
+    required String country,
     String? password,
   }) = _UpdateEmployeeRequest;
 

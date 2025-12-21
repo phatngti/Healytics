@@ -75,7 +75,6 @@ app.*.map.json
 
 # Web specific
 /web/favicon.png
-lib/generated_plugin_registrant.dart
 
 # Windows specific
 **/windows/flutter/generated_plugin_registrant.cc
