@@ -6,7 +6,7 @@ import multiprocessing
 
 # Các module trong LangChain dùng để đọc và xử lý tài liệu
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 def remove_non_utf8_characters(text: str) -> str:
     """Xóa các ký tự không nằm trong bảng mã UTF-8 (thường là lỗi khi đọc PDF)."""

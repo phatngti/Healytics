@@ -1,9 +1,29 @@
 #offline_rag.py
 # XÂY DỰNG PIPELINE RAG "OFFLINE"
 import re #Bộ dò mẫu kí tự
-from langchain import hub # Tải template prompt
+# from langchain_hub import hub # Tải template prompt
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+
+phi3_prompt = PromptTemplate(
+    template="""
+        <|system|>
+        You are a helpful assistant. Use the context to answer the user.
+        <|end|>
+
+        <|user|>
+        Context:
+        {context}
+
+        Question:
+        {question}
+        <|end|>
+
+        <|assistant|>
+    """,
+    input_variables=["context", "question"]
+)
 
 class Str_OutputParser(StrOutputParser):
     def __init__(self) -> None:
@@ -24,7 +44,8 @@ class Str_OutputParser(StrOutputParser):
 class Offline_RAG:
     def __init__(self, llm) -> None:
         self.llm = llm
-        self.prompt = hub.pull("rlm/rag-prompt") # Template Prompt có sẵn
+        # self.prompt = hub.pull("rlm/rag-prompt") # Template Prompt có sẵn
+        self.prompt = phi3_prompt
         self.str_parser = Str_OutputParser()
 
     def get_chain(self, retriever):
