@@ -1,0 +1,142 @@
+[
+  {
+    "id": "SV001",
+    "name": "Tư vấn tim mạch trực tuyến",
+    "description": "Dịch vụ tư vấn sức khỏe tim mạch với bác sĩ chuyên khoa. Bao gồm đánh giá nguy cơ bệnh tim mạch, tư vấn chế độ dinh dưỡng phòng ngừa, hướng dẫn tập luyện an toàn cho người có vấn đề về tim. Tư vấn trực tuyến tiện lợi, tiết kiệm thời gian.",
+    "category": "y_te",
+    "tags": [
+      "tim mạch",
+      "tư vấn online",
+      "phòng ngừa",
+      "bác sĩ chuyên khoa"
+    ],
+    "type": "consultation"
+  },
+  {
+    "id": "SV002",
+    "name": "Chương trình Yoga trị liệu",
+    "description": "Khóa học Yoga chuyên biệt dành cho người có vấn đề về cột sống, đau lưng mãn tính. Bài tập được thiết kế bởi chuyên gia vật lý trị liệu kết hợp giáo viên Yoga có chứng chỉ quốc tế. Giúp giảm đau, tăng cường sức mạnh cơ bắp và cải thiện tư thế.",
+    "category": "the_thao",
+    "tags": [
+      "yoga",
+      "phục hồi chức năng",
+      "đau lưng",
+      "cột sống",
+      "trị liệu"
+    ],
+    "type": "exercise"
+  },
+  {
+    "id": "SV003",
+    "name": "Tư vấn dinh dưỡng cá nhân hóa",
+    "description": "Chương trình tư vấn dinh dưỡng riêng biệt dựa trên tình trạng sức khỏe, mục tiêu cá nhân và phong cách sống. Bao gồm phân tích thành phần cơ thể, lập kế hoạch ăn uống chi tiết, theo dõi tiến độ hàng tuần với chuyên gia dinh dưỡng.",
+    "category": "dinh_duong",
+    "tags": [
+      "dinh dưỡng",
+      "giảm cân",
+      "tăng cân",
+      "cá nhân hóa",
+      "chuyên gia"
+    ],
+    "type": "nutrition"
+  },
+  {
+    "id": "SV004",
+    "name": "Tâm lý trị liệu căng thẳng",
+    "description": "Liệu trình tâm lý điều trị căng thẳng, lo âu và trầm cảm nhẹ. Sử dụng phương pháp CBT (Cognitive Behavioral Therapy) kết hợp mindfulness. Buổi tư vấn 1-1 với nhà tâm lý lâm sàng có kinh nghiệm, bảo mật tuyệt đối.",
+    "category": "tam_ly",
+    "tags": [
+      "tâm lý",
+      "căng thẳng",
+      "lo âu",
+      "trầm cảm",
+      "CBT",
+      "mindfulness"
+    ],
+    "type": "mental_health"
+  },
+  {
+    "id": "SV005",
+    "name": "Khám sức khỏe tổng quát",
+    "description": "Gói khám sức khỏe định kỳ toàn diện bao gồm xét nghiệm máu, siêu âm, đo điện tim, chụp X-quang ngực. Phát hiện sớm các bệnh lý tim mạch, đái tháo đường, ung thư. Kết quả trong 24h với bác sĩ tư vấn trực tiếp.",
+    "category": "y_te",
+    "tags": [
+      "khám tổng quát",
+      "xét nghiệm",
+      "phòng ngừa",
+      "sức khỏe",
+      "định kỳ"
+    ],
+    "type": "checkup"
+  },
+  {
+    "id": "SV006",
+    "name": "Lớp học thiền định mindfulness",
+    "description": "Khóa học 8 tuần về thiền định chánh niệm (mindfulness) giúp giảm stress, cải thiện tập trung và nâng cao chất lượng giấc ngủ. Hướng dẫn bởi giáo viên có chứng chỉ MBSR. Bài tập thực hành hàng ngày và nhóm hỗ trợ online.",
+    "category": "tam_ly",
+    "tags": [
+      "thiền",
+      "mindfulness",
+      "giảm stress",
+      "tập trung",
+      "giấc ngủ"
+    ],
+    "type": "mental_health"
+  },
+  {
+    "id": "SV007",
+    "name": "Chương trình gym cá nhân hóa",
+    "description": "Lịch tập gym được thiết kế riêng theo mục tiêu (tăng cơ, giảm mỡ, tăng sức bền). Bao gồm buổi đánh giá thể lực ban đầu, lịch tập chi tiết 12 tuần, video hướng dẫn động tác, theo dõi tiến độ với huấn luyện viên cá nhân.",
+    "category": "the_thao",
+    "tags": [
+      "gym",
+      "tăng cơ",
+      "giảm mỡ",
+      "huấn luyện viên",
+      "cá nhân hóa"
+    ],
+    "type": "exercise"
+  },
+  {
+    "id": "SV008",
+    "name": "Tư vấn đái tháo đường",
+    "description": "Chương trình quản lý đái tháo đường toàn diện với bác sĩ nội tiết. Bao gồm hướng dẫn theo dõi đường huyết, kế hoạch ăn uống cho người tiểu đường, tư vấn sử dụng thuốc và insulin, phòng ngừa biến chứng.",
+    "category": "y_te",
+    "tags": [
+      "đái tháo đường",
+      "nội tiết",
+      "đường huyết",
+      "biến chứng",
+      "quản lý bệnh"
+    ],
+    "type": "disease_management"
+  },
+  {
+    "id": "SV009",
+    "name": "Massage trị liệu phục hồi",
+    "description": "Liệu trình massage trị liệu chuyên sâu cho người chấn thương thể thao, đau cơ mãn tính, hoặc sau phẫu thuật. Kỹ thuật massage y học kết hợp vật lý trị liệu, giúp giảm đau, tăng lưu thông máu và phục hồi chức năng vận động.",
+    "category": "phuc_hoi",
+    "tags": [
+      "massage",
+      "phục hồi chức năng",
+      "chấn thương",
+      "vật lý trị liệu",
+      "giảm đau"
+    ],
+    "type": "rehabilitation"
+  },
+  {
+    "id": "SV010",
+    "name": "Kế hoạch ăn kiêng Keto",
+    "description": "Chương trình ăn kiêng Keto (low-carb, high-fat) được cá nhân hóa để giảm cân và cải thiện sức khỏe chuyển hóa. Bao gồm thực đơn 30 ngày, công thức nấu ăn, danh sách mua sắm, và hướng dẫn chuyển đổi an toàn vào chế độ Keto.",
+    "category": "dinh_duong",
+    "tags": [
+      "keto",
+      "low-carb",
+      "giảm cân",
+      "chuyển hóa",
+      "thực đơn"
+    ],
+    "type": "nutrition"
+  }
+]
