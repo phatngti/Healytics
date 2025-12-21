@@ -27,4 +27,10 @@ abstract class EmployeeRepository {
 
   /// Delete an employee by ID
   Future<void> deleteEmployee(EmployeeId id);
+
+  /// Get list of employees as entities (for selection widgets)
+  Future<List<EmployeeEntity>> getEmployeesList({
+    required int startingAt,
+    required int count,
+  });
 }

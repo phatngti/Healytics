@@ -82,6 +82,14 @@ class EmployeeImplementRepository implements EmployeeRepository {
   Future<void> deleteEmployee(EmployeeId id) {
     return remoteDataSource.deleteEmployee(id);
   }
+
+  @override
+  Future<List<EmployeeEntity>> getEmployeesList({
+    required int startingAt,
+    required int count,
+  }) {
+    return remoteDataSource.getEmployees(startingAt, count, null, null);
+  }
 }
 
 @riverpod

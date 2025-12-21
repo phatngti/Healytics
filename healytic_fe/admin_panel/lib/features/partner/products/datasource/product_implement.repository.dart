@@ -38,9 +38,15 @@ class ProductImplementRepository implements ProductRepository {
             },
             cells: [
               DataCell(Center(child: Text(product.name))),
-              DataCell(Center(child: Text(product.price.toString()))),
+              DataCell(Center(child: Text(product.basePrice.toString()))),
               DataCell(Center(child: Text(product.description))),
-              DataCell(Center(child: Text(product.image))),
+              DataCell(
+                Center(
+                  child: Text(
+                    product.images.isNotEmpty ? product.images[0] : '',
+                  ),
+                ),
+              ),
               DataCell(Center(child: Text(product.category))),
             ],
           ),

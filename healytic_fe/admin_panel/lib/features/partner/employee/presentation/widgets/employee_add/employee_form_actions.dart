@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/common/widgets/button/button.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeFormActions extends StatelessWidget {
@@ -17,47 +18,23 @@ class EmployeeFormActions extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        OutlinedButton(
+        AppButton(
+          buttonType: ButtonType.outline,
           onPressed: isLoading ? null : onCancel,
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.grey.shade700,
-            side: BorderSide(color: Colors.grey.shade300),
-            backgroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
           child: const Text(
             'Cancel',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         const SizedBox(width: 16),
-        ElevatedButton.icon(
+        AppButton(
+          buttonType: ButtonType.elevated,
           onPressed: isLoading ? null : onSubmit,
-          icon: isLoading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : const Icon(Icons.check, size: 20),
-          label: Text(
+          isLoading: isLoading,
+          icon: const Icon(Icons.check, size: 20),
+          child: Text(
             isLoading ? 'Creating...' : 'Create Employee',
             style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: const Color(0xFF111811),
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 4,
           ),
         ),
       ],
