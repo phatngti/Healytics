@@ -8,74 +8,132 @@
     \item \textbf{Tính năng nổi bật}:
     \begin{itemize}
         \item \textbf{Impeller Rendering Engine}: Flutter biên dịch shader tùy chỉnh tại thời điểm build để đạt độ mượt 120Hz và không có JS bridge; React Native với New Architecture (Fabric + Skia) vẫn dùng cầu nối JS-to-native, bị giật khi animation nặng; Native (Metal/Vulkan) truy cập GPU trực tiếp nhưng cần tinh chỉnh riêng cho từng nền tảng.
-        \item \textbf{Hot Reload Speed}: Flutter giữ trạng thái trong <100ms nhờ Dart AOT; React Native với Metro bundler reload trong $\sim$1s nhưng mất trạng thái ở module native phức tạp; Native không có hot reload thật sự—rebuild toàn bộ mất 10s+ trong Xcode/Android Studio.
+        \item \textbf{Hot Reload Speed}: Flutter giữ trạng thái trong $<$100ms nhờ Dart AOT; React Native với Metro bundler reload trong $\sim$1s nhưng mất trạng thái ở module native phức tạp; Native không có hot reload thật sự—rebuild toàn bộ mất 10s+ trong Xcode/Android Studio.
         \item \textbf{Widget/Component System}: Mô hình ``mọi thứ là widget'' của Flutter cho phép kết hợp vô hạn và UI chính xác đến từng pixel chỉ trong một ngôn ngữ (Dart); React Native dùng JSX cần thư viện bên thứ ba cho style nâng cao, dễ bất đồng bộ; Native (SwiftUI/Compose) kiểm soát hoàn toàn nhưng phải viết lại code cho iOS/Android.
-        \item \textbf{Startup Time \& App Size}: Flutter khởi động lạnh <50ms nhờ AOT nhưng bundle engine $\sim$50MB; React Native khởi động $\sim$100ms với JS bundle, kích thước cơ bản nhỏ hơn ($\sim$30MB); Native khởi động nhanh nhất (<30ms) không có runtime nhúng.
+        \item \textbf{Startup Time \& App Size}: Flutter khởi động lạnh $<$50ms nhờ AOT nhưng bundle engine $\sim$50MB; React Native khởi động $\sim$100ms với JS bundle, kích thước cơ bản nhỏ hơn ($\sim$30MB); Native khởi động nhanh nhất ($<$30ms) không có runtime nhúng.
         \item \textbf{Platform Channel/Bridge}: Kênh đồng bộ/bất đồng bộ của Flutter tích hợp API native (camera, BLE) với Dart an toàn kiểu; TurboModules của React Native giảm overhead cầu nối nhưng vẫn chỉ bất đồng bộ, khó debug; Native truy cập phần cứng trực tiếp qua SDK, độ trễ bằng 0.
-        \item \textbf{Multi-Platform Code Reuse}: Flutter biên dịch thành binary native cho iOS, Android, web, desktop và nhúng với tỷ lệ tái sử dụng 90\%+; React Native mạnh trên mobile, cần React Native Web/Electron cho các nền khác ($\sim$70\% tái sử dụng); Native yêu cầu codebase Swift/Kotlin riêng, tái sử dụng <30\%.
+        \item \textbf{Multi-Platform Code Reuse}: Flutter biên dịch thành binary native cho iOS, Android, web, desktop và nhúng với tỷ lệ tái sử dụng 90\%+; React Native mạnh trên mobile, cần React Native Web/Electron cho các nền khác ($\sim$70\% tái sử dụng); Native yêu cầu codebase Swift/Kotlin riêng, tái sử dụng $<$30\%.
         \item \textbf{Animation Performance}: Impeller + canvas 120Hz của Flutter cho 0 khung hình bị bỏ trong chuyển cảnh phức tạp; React Native ổn định $\sim$60fps nhưng giật khi JS thread nặng; Native đảm bảo 120Hz với Core Animation/Compose, tốt nhất cho game.
         \item \textbf{OTA Updates}: Flutter dùng Shorebird/CodeMagic để vá lỗi tức thì không qua store; React Native dùng CodePush đẩy cập nhật JS trực tiếp; Native phải qua App Store/Google Play, chờ duyệt 1--7 ngày.
         \item \textbf{Ecosystem \& Third-Party Libs}: pub.dev của Flutter phát triển nhanh nhưng thiếu plugin niche, thường cần viết channel tùy chỉnh; React Native tận dụng npm với 2M+ package, hệ sinh thái phong phú nhất; Native dùng CocoaPods/Gradle chính thức, ổn định nhất nhưng bị khóa nền tảng.
     \end{itemize}
 \end{itemize}
 
-
+% -----------------------------------------------------------------
+% PHẦN 2: WEB/PORTAL
+% -----------------------------------------------------------------
 \subsection{Web/Portal Development (Partner Portal, Admin Dashboard)}
 \begin{itemize}
     \item \textbf{Lý do chọn Flutter (Web \& Desktop):} Cho phép tái sử dụng tới 100\% business logic và UI từ ứng dụng mobile (Customer/Technician App) để xây dựng Admin Dashboard. Với sự hỗ trợ của WebAssembly (Wasm), Flutter Web mang lại trải nghiệm Single Page Application (SPA) mượt mà, đồng nhất trên mọi trình duyệt mà không cần lo lắng về sự sai lệch CSS hay DOM như các framework web truyền thống.
     \item \textbf{Tính năng nổi bật}:
     \begin{itemize}
-    \item \textbf{WebAssembly (Wasm) Rendering}: Flutter biên dịch sang Wasm (GC) thay vì chỉ JS thuần, giúp hiệu năng thực thi gần như Native trên trình duyệt hiện đại; React/Next.js dựa hoàn toàn vào JavaScript và DOM manipulation, dễ bị chậm khi xử lý bảng dữ liệu lớn (thousands of rows); Angular có hiệu năng tốt nhưng vẫn chịu giới hạn của JS thread; Vue/Nuxt nhẹ nhưng khó xử lý các tác vụ tính toán nặng phía client.
-    
-    \item \textbf{Unified Business Logic}: Chia sẻ hoàn toàn các model, repository, và service (Authentication, API handling) với Mobile App; React Web và React Native tuy cùng hệ sinh thái nhưng không thể chia sẻ code UI và thường phải viết lại logic điều hướng; Angular/Vue là web-only, hoàn toàn tách biệt với logic mobile; Việc dùng chung codebase giúp giảm 50\% công sức bảo trì và fix bug cho cả 3 nền tảng (Web, iOS, Android).
-    
-    \item \textbf{Pixel-Perfect UI Consistency}: Flutter vẽ UI trên một canvas (Skia/Impeller), đảm bảo Admin Dashboard hiển thị giống hệt nhau trên Chrome, Safari, hay Desktop App (Windows/macOS); Next.js/React phụ thuộc vào trình duyệt render HTML/CSS, thường gặp lỗi hiển thị khác nhau giữa các trình duyệt; CSS của Angular/Vue có thể bị conflict hoặc vỡ layout khi thay đổi độ phân giải màn hình.
-    
-    \item \textbf{Declarative Routing (GoRouter)}: Hỗ trợ deep linking, path parameters và redirection mạnh mẽ cho web, đồng thời quản lý navigation stack phức tạp của admin panel; React Router cần cấu hình thủ công nhiều; Angular Routing mạnh nhưng boilerplate code rất dài; Flutter Routing đồng bộ trạng thái URL với state của ứng dụng một cách tự nhiên.
-    
-    \item \textbf{Advanced Data Visualization}: Flutter tích hợp cực tốt với các thư viện vẽ biểu đồ (Charts) hiệu năng cao (fl\_charts, syncfusion) render trực tiếp trên canvas 60fps; Các thư viện Chart của React/Vue (D3.js, Chart.js) thao tác trên DOM/SVG, thường bị lag khi render lượng dữ liệu realtime lớn; Khả năng tùy biến visual của Flutter vượt trội hơn nhờ quyền kiểm soát từng pixel.
-    
-    \item \textbf{State Management (BLoC/Riverpod)}: Quản lý trạng thái phức tạp của Admin (đa ngôn ngữ, theme, user permissions) thống nhất, reactive và dễ test; React Context API thường gây re-render không cần thiết nếu không tối ưu (useMemo); Angular dùng RxJS mạnh nhưng đường cong học tập (learning curve) rất cao; Vuex/Pinia của Vue đơn giản nhưng khó scale cho các enterprise admin lớn.
-    
-    \item \textbf{Dart Sound Null Safety}: Hệ thống type an toàn tuyệt đối giúp ngăn chặn lỗi runtime (null reference) thường gặp khi xử lý dữ liệu API thiếu trường trong Admin Dashboard; TypeScript trong React/Next.js chỉ là lớp kiểm tra tĩnh (compile-time), vẫn có thể lỗi runtime; JavaScript thuần trong các framework cũ hoàn toàn không có bảo vệ này.
-    
-    \item \textbf{Desktop Support (Windows/macOS)}: Flutter cho phép build ra file .exe/.app native từ cùng source code web admin để nhân viên cài đặt, tận dụng phím tắt, notification hệ thống và làm việc offline; Next.js/React cần bọc trong Electron (rất nặng nề, tốn RAM); Angular/Vue không có giải pháp native chính thống, chỉ chạy trên trình duyệt.
-    
-    \item \textbf{Development Experience (DX)}: Stateful Hot Reload hoạt động trên cả Web, giúp sửa UI bảng biểu/form tức thì mà không mất dữ liệu đang nhập; HMR của Webpack (React/Vue) nhanh nhưng thường reload lại trang khi sửa logic sâu; Angular rebuild khá lâu với các dự án lớn; Công cụ Flutter DevTools giúp debug layout và network request trực quan hơn console log của trình duyệt.
-    
-    \item \textbf{Security}: Code logic được biên dịch thành main.dart.js (hoặc Wasm) minified và obfuscated mặc định, khó bị đọc trộm logic nghiệp vụ hơn so với code JS rõ ràng của React/Next.js (có thể xem qua Source tab trình duyệt); Đây là điểm cộng lớn cho các Admin Portal chứa logic tính toán doanh thu/hoa hồng nhạy cảm.
+        \item \textbf{WebAssembly (Wasm) Rendering}: Flutter biên dịch sang Wasm (GC) thay vì chỉ JS thuần, giúp hiệu năng thực thi gần như Native trên trình duyệt hiện đại; React/Next.js dựa hoàn toàn vào JavaScript và DOM manipulation, dễ bị chậm khi xử lý bảng dữ liệu lớn (thousands of rows); Angular có hiệu năng tốt nhưng vẫn chịu giới hạn của JS thread; Vue/Nuxt nhẹ nhưng khó xử lý các tác vụ tính toán nặng phía client.
+        
+        \item \textbf{Unified Business Logic}: Chia sẻ hoàn toàn các model, repository, và service (Authentication, API handling) với Mobile App; React Web và React Native tuy cùng hệ sinh thái nhưng không thể chia sẻ code UI và thường phải viết lại logic điều hướng; Angular/Vue là web-only, hoàn toàn tách biệt với logic mobile; Việc dùng chung codebase giúp giảm 50\% công sức bảo trì và fix bug cho cả 3 nền tảng (Web, iOS, Android).
+        
+        \item \textbf{Pixel-Perfect UI Consistency}: Flutter vẽ UI trên một canvas (Skia/Impeller), đảm bảo Admin Dashboard hiển thị giống hệt nhau trên Chrome, Safari, hay Desktop App (Windows/macOS); Next.js/React phụ thuộc vào trình duyệt render HTML/CSS, thường gặp lỗi hiển thị khác nhau giữa các trình duyệt; CSS của Angular/Vue có thể bị conflict hoặc vỡ layout khi thay đổi độ phân giải màn hình.
+        
+        \item \textbf{Declarative Routing (GoRouter)}: Hỗ trợ deep linking, path parameters và redirection mạnh mẽ cho web, đồng thời quản lý navigation stack phức tạp của admin panel; React Router cần cấu hình thủ công nhiều; Angular Routing mạnh nhưng boilerplate code rất dài; Flutter Routing đồng bộ trạng thái URL với state của ứng dụng một cách tự nhiên.
+        
+        \item \textbf{Advanced Data Visualization}: Flutter tích hợp cực tốt với các thư viện vẽ biểu đồ (Charts) hiệu năng cao (fl\_charts, syncfusion) render trực tiếp trên canvas 60fps; Các thư viện Chart của React/Vue (D3.js, Chart.js) thao tác trên DOM/SVG, thường bị lag khi render lượng dữ liệu realtime lớn; Khả năng tùy biến visual của Flutter vượt trội hơn nhờ quyền kiểm soát từng pixel.
+        
+        \item \textbf{State Management (BLoC/Riverpod)}: Quản lý trạng thái phức tạp của Admin (đa ngôn ngữ, theme, user permissions) thống nhất, reactive và dễ test; React Context API thường gây re-render không cần thiết nếu không tối ưu (useMemo); Angular dùng RxJS mạnh nhưng đường cong học tập (learning curve) rất cao; Vuex/Pinia của Vue đơn giản nhưng khó scale cho các enterprise admin lớn.
+        
+        \item \textbf{Dart Sound Null Safety}: Hệ thống type an toàn tuyệt đối giúp ngăn chặn lỗi runtime (null reference) thường gặp khi xử lý dữ liệu API thiếu trường trong Admin Dashboard; TypeScript trong React/Next.js chỉ là lớp kiểm tra tĩnh (compile-time), vẫn có thể lỗi runtime; JavaScript thuần trong các framework cũ hoàn toàn không có bảo vệ này.
+        
+        \item \textbf{Desktop Support (Windows/macOS)}: Flutter cho phép build ra file .exe/.app native từ cùng source code web admin để nhân viên cài đặt, tận dụng phím tắt, notification hệ thống và làm việc offline; Next.js/React cần bọc trong Electron (rất nặng nề, tốn RAM); Angular/Vue không có giải pháp native chính thống, chỉ chạy trên trình duyệt.
+        
+        \item \textbf{Development Experience (DX)}: Stateful Hot Reload hoạt động trên cả Web, giúp sửa UI bảng biểu/form tức thì mà không mất dữ liệu đang nhập; HMR của Webpack (React/Vue) nhanh nhưng thường reload lại trang khi sửa logic sâu; Angular rebuild khá lâu với các dự án lớn; Công cụ Flutter DevTools giúp debug layout và network request trực quan hơn console log của trình duyệt.
+        
+        \item \textbf{Security}: Code logic được biên dịch thành main.dart.js (hoặc Wasm) minified và obfuscated mặc định, khó bị đọc trộm logic nghiệp vụ hơn so với code JS rõ ràng của React/Next.js (có thể xem qua Source tab trình duyệt); Đây là điểm cộng lớn cho các Admin Portal chứa logic tính toán doanh thu/hoa hồng nhạy cảm.
+    \end{itemize}
 \end{itemize}
-\end{itemize}
 
+% -----------------------------------------------------------------
+% PHẦN 3: CƠ SỞ HẠ TẦNG (GỘP BACKEND, DB, BROKER, CACHE)
+% -----------------------------------------------------------------
+\subsection{Cơ sở hạ tầng Backend (Backend Infrastructure)}
 
+Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, lưu trữ dữ liệu và đảm bảo hiệu năng cho toàn bộ hệ thống. Kiến trúc được chia thành các tầng chuyên biệt: Application Server, Database, Message Broker và Caching.
 
-\subsection{Server/Backend (NestJS \& PostgreSQL)}
+\subsubsection{Application Server (NestJS)}
 \begin{itemize}
     \item \textbf{Lý do chọn NestJS:} Được xây dựng trên nền tảng NodeJS và TypeScript, NestJS cung cấp một kiến trúc module hóa, có cấu trúc chặt chẽ (lấy cảm hứng từ Angular). Điều này giúp việc xây dựng các API phức tạp trở nên \textbf{dễ quản lý, bảo trì và mở rộng}. TypeScript cũng giúp giảm thiểu lỗi và tăng cường tính an toàn của mã nguồn.
-    \item \textbf{Database: PostgreSQL} là lựa chọn phù hợp nhất. PostgreSQL là hệ quản trị CSDL quan hệ mạnh mẽ, ổn định, có khả năng xử lý các truy vấn phức tạp và lượng dữ liệu lớn. Các tính năng như hỗ trợ JSONB rất hữu ích để lưu các dữ liệu có cấu trúc linh hoạt (ví dụ: cấu hình dịch vụ, câu hỏi cá nhân hóa).
     \item \textbf{Tính năng nổi bật:}
     \begin{itemize}
-    \item \textbf{Modular Architecture}: NestJS áp dụng cấu trúc module tính năng với @Module() để tách biệt rõ ràng, lý tưởng cho ứng dụng doanh nghiệp; Express thiếu module tích hợp, dễ dẫn đến code rối; Spring Boot có module bằng annotation nhưng dài dòng với Java; Django dùng app-based module kiểu Python, đầy đủ tính năng nhưng kém linh hoạt với hệ sinh thái JS; Fastify nhẹ, không có module gốc, cần tổ chức thủ công.
-
-    \item \textbf{Dependency Injection (DI)}: NestJS cung cấp DI phân cấp, an toàn kiểu qua @Injectable() và providers, giảm boilerplate và tăng khả năng test; Express không có DI sẵn, phải dùng thư viện như Inversify; Spring Boot với @Autowired là tiên phong nhưng nặng với cấu hình XML; Django truyền service thủ công, không có container DI thật; Fastify hỗ trợ plugin nhưng thiếu DI cấp framework.
-
-    \item \textbf{TypeScript-First Design}: NestJS được xây dựng hoàn toàn cho TypeScript với suy luận kiểu và decorator, phát hiện lỗi tại compile-time; Express hỗ trợ TS qua add-on nhưng vẫn JS-centric; Spring Boot dùng kiểu tĩnh Java, cứng nhắc hơn TS; Django là Python động, type hints chỉ là bổ sung; Fastify có type TS nhưng tích hợp không sâu, dễ lỗi runtime.
-
-    \item \textbf{Decorators \& Metadata}: NestJS dùng @Controller(), @Get(), @Body() để định nghĩa route và validation khai báo, lấy cảm hứng từ Angular; Express dùng hàm/middleware thuần, dài dòng; Spring Boot với @RestController/@RequestMapping tương tự nhưng cú pháp Java; Django dùng class-based hoặc function view, không có decorator; Fastify dùng schema route, ít metadata.
-
-    \item \textbf{Built-in Testing Support}: NestJS tích hợp @nestjs/testing cho test e2e/unit với mock và override DI sẵn; Express cần setup Jest/Supertest thủ công; Spring Boot với @SpringBootTest toàn diện nhưng khởi động JVM chậm; Django có TestCase tích hợp nhưng chỉ cho Python; Fastify test dựa plugin, nhẹ nhưng thiếu cấu trúc như Nest.
-
-    \item \textbf{Microservices \& Event-Driven}: NestJS hỗ trợ microservices nguyên bản qua @nestjs/microservices với TCP, Redis, Kafka, hybrid; Express cần setup thủ công; Spring Boot với Spring Cloud mạnh cho doanh nghiệp nhưng phức tạp; Django dùng Celery cho task, không phải microservices đầy đủ; Fastify tập trung HTTP, hạn chế về async messaging.
-
-    \item \textbf{Performance \& Adapter Flexibility}: NestJS với Fastify adapter đạt 30k+ req/s (gấp 2 Express), bộ nhớ thấp (~15\% so Express, 1/5 Spring); Express nhanh cho app nhỏ nhưng nghẽn khi scale; Spring Boot tối ưu JVM cho tải nặng nhưng latency/bộ nhớ cao; Django bị giới hạn GIL về concurrency, chậm hơn Node; Fastify đạt 33k req/s nhưng Nest thêm ~8\% overhead để có cấu trúc.
-
-    \item \textbf{Validation \& Pipes}: NestJS dùng class-validator với pipes @nestjs/class-transformer để tự động validate DTO khai báo; Express dùng Joi/express-validator thủ công; Spring Boot với @Valid và Bean Validation tương tự nhưng dùng Java bean; Django xử lý validation qua forms/serializers; Fastify schema hiệu suất cao nhưng tích hợp kém.
-
-    \item \textbf{Guards, Interceptors \& Pipes}: NestJS hỗ trợ tính năng AOP qua @UseGuards, @UseInterceptors cho auth/logging/biến đổi; Express dùng middleware chain tương tự nhưng toàn cục; Spring Boot có AOP/Interceptors mạnh cho doanh nghiệp; Django middleware tuyến tính, kém chi tiết; Fastify dùng hook nhanh nhưng chỉ hook, không có guard.
-
-    \item \textbf{Ecosystem \& Community}: NestJS tận dụng 2M+ package npm với 60k+ sao GitHub, tài liệu/plugin phát triển mạnh; Express có hệ sinh thái rộng nhưng không cấu trúc; Spring Boot trưởng thành cho doanh nghiệp (Maven/Gradle); Django mạnh về data/ML với PyPI; Fastify cộng đồng nhỏ hơn nhưng plugin hiệu suất cao.
+        \item \textbf{Modular Architecture}: NestJS áp dụng cấu trúc module tính năng với @Module() để tách biệt rõ ràng, lý tưởng cho ứng dụng doanh nghiệp; Express thiếu module tích hợp, dễ dẫn đến code rối; Spring Boot có module bằng annotation nhưng dài dòng với Java; Django dùng app-based module kiểu Python, đầy đủ tính năng nhưng kém linh hoạt với hệ sinh thái JS; Fastify nhẹ, không có module gốc, cần tổ chức thủ công.
+        
+        \item \textbf{Dependency Injection (DI)}: NestJS cung cấp DI phân cấp, an toàn kiểu qua @Injectable() và providers, giảm boilerplate và tăng khả năng test; Express không có DI sẵn, phải dùng thư viện như Inversify; Spring Boot với @Autowired là tiên phong nhưng nặng với cấu hình XML; Django truyền service thủ công, không có container DI thật; Fastify hỗ trợ plugin nhưng thiếu DI cấp framework.
+        
+        \item \textbf{TypeScript-First Design}: NestJS được xây dựng hoàn toàn cho TypeScript với suy luận kiểu và decorator, phát hiện lỗi tại compile-time; Express hỗ trợ TS qua add-on nhưng vẫn JS-centric; Spring Boot dùng kiểu tĩnh Java, cứng nhắc hơn TS; Django là Python động, type hints chỉ là bổ sung; Fastify có type TS nhưng tích hợp không sâu, dễ lỗi runtime.
+        
+        \item \textbf{Decorators \& Metadata}: NestJS dùng @Controller(), @Get(), @Body() để định nghĩa route và validation khai báo, lấy cảm hứng từ Angular; Express dùng hàm/middleware thuần, dài dòng; Spring Boot với @RestController/@RequestMapping tương tự nhưng cú pháp Java; Django dùng class-based hoặc function view, không có decorator; Fastify dùng schema route, ít metadata.
+        
+        \item \textbf{Built-in Testing Support}: NestJS tích hợp @nestjs/testing cho test e2e/unit với mock và override DI sẵn; Express cần setup Jest/Supertest thủ công; Spring Boot với @SpringBootTest toàn diện nhưng khởi động JVM chậm; Django có TestCase tích hợp nhưng chỉ cho Python; Fastify test dựa plugin, nhẹ nhưng thiếu cấu trúc như Nest.
+        
+        \item \textbf{Microservices \& Event-Driven}: NestJS hỗ trợ microservices nguyên bản qua @nestjs/microservices với TCP, Redis, Kafka, hybrid; Express cần setup thủ công; Spring Boot với Spring Cloud mạnh cho doanh nghiệp nhưng phức tạp; Django dùng Celery cho task, không phải microservices đầy đủ; Fastify tập trung HTTP, hạn chế về async messaging.
+        
+        \item \textbf{Performance \& Adapter Flexibility}: NestJS với Fastify adapter đạt 30k+ req/s (gấp 2 Express), bộ nhớ thấp ($\sim$15\% so Express, 1/5 Spring); Express nhanh cho app nhỏ nhưng nghẽn khi scale; Spring Boot tối ưu JVM cho tải nặng nhưng latency/bộ nhớ cao; Django bị giới hạn GIL về concurrency, chậm hơn Node; Fastify đạt 33k req/s nhưng Nest thêm $\sim$8\% overhead để có cấu trúc.
+        
+        \item \textbf{Validation \& Pipes}: NestJS dùng class-validator với pipes @nestjs/class-transformer để tự động validate DTO khai báo; Express dùng Joi/express-validator thủ công; Spring Boot với @Valid và Bean Validation tương tự nhưng dùng Java bean; Django xử lý validation qua forms/serializers; Fastify schema hiệu suất cao nhưng tích hợp kém.
+        
+        \item \textbf{Guards, Interceptors \& Pipes}: NestJS hỗ trợ tính năng AOP qua @UseGuards, @UseInterceptors cho auth/logging/biến đổi; Express dùng middleware chain tương tự nhưng toàn cục; Spring Boot có AOP/Interceptors mạnh cho doanh nghiệp; Django middleware tuyến tính, kém chi tiết; Fastify dùng hook nhanh nhưng chỉ hook, không có guard.
+        
+        \item \textbf{Ecosystem \& Community}: NestJS tận dụng 2M+ package npm với 60k+ sao GitHub, tài liệu/plugin phát triển mạnh; Express có hệ sinh thái rộng nhưng không cấu trúc; Spring Boot trưởng thành cho doanh nghiệp (Maven/Gradle); Django mạnh về data/ML với PyPI; Fastify cộng đồng nhỏ hơn nhưng plugin hiệu suất cao.
+    \end{itemize}
 \end{itemize}
+
+\subsubsection{Database Management (PostgreSQL)}
+\begin{itemize}
+    \item \textbf{Lý do chọn PostgreSQL:} Là hệ quản trị cơ sở dữ liệu quan hệ (RDBMS) mã nguồn mở tiên tiến nhất, nổi tiếng với độ ổn định, tuân thủ chuẩn ACID tuyệt đối và khả năng mở rộng mạnh mẽ. PostgreSQL đóng vai trò là ``nguồn chân lý'' (source of truth) cho toàn bộ dữ liệu nghiệp vụ quan trọng (User, Booking, Payment). Khả năng hỗ trợ JSONB giúp hệ thống linh hoạt như NoSQL nhưng vẫn giữ được tính chặt chẽ của SQL.
+    \item \textbf{Tính năng nổi bật}:
+    \begin{itemize}
+        \item \textbf{Advanced JSONB Support}: PostgreSQL lưu trữ JSON dưới dạng nhị phân (Binary JSON), cho phép đánh index và query sâu vào thuộc tính JSON cực nhanh; MySQL hỗ trợ JSON nhưng lưu dạng text, hiệu năng query thấp hơn và hạn chế về hàm xử lý; MongoDB (NoSQL) mạnh về JSON nhưng thiếu tính năng transaction và JOIN phức tạp giữa các bảng quan hệ.
+        
+        \item \textbf{MVCC (Multi-Version Concurrency Control)}: PostgreSQL xử lý đồng thời tốt hơn nhờ cơ chế MVCC, người đọc không chặn người ghi và ngược lại; MySQL (InnoDB) sử dụng gap-locking dễ gây ra deadlock khi tải cao hoặc query phức tạp; SQL Server dùng cơ chế locking truyền thống thường tốn chi phí quản lý lock (lock escalation).
+        
+        \item \textbf{Geospatial Extensions (PostGIS)}: PostgreSQL có PostGIS - tiêu chuẩn vàng cho dữ liệu địa lý, tối ưu cho việc tìm kiếm spa/bác sĩ ``gần đây''; MySQL có hỗ trợ Spatial nhưng tính năng hạn chế và thuật toán chưa tối ưu bằng; MongoDB hỗ trợ GeoJSON nhưng không mạnh bằng PostGIS về các phép toán hình học phức tạp.
+        
+        \item \textbf{Extensibility \& Custom Types}: Cho phép tự định nghĩa kiểu dữ liệu, hàm và operator tùy chỉnh (ví dụ: tạo kiểu dữ liệu riêng cho tiền tệ hoặc khoảng thời gian); MySQL và SQL Server khá cứng nhắc, chỉ hỗ trợ các kiểu dữ liệu chuẩn; Oracle hỗ trợ mạnh nhưng chi phí bản quyền cực kỳ đắt đỏ.
+        
+        \item \textbf{Reliability \& ACID Compliance}: Đảm bảo toàn vẹn dữ liệu tuyệt đối kể cả khi hệ thống crash, cơ chế Write-Ahead Logging (WAL) rất tin cậy; MongoDB (trước v4.0) từng gặp vấn đề về mất dữ liệu và transaction; MySQL (MyISAM cũ) không hỗ trợ transaction, InnoDB hỗ trợ nhưng cấu hình phức tạp để đạt độ an toàn tương đương Postgres.
+    \end{itemize}
 \end{itemize}
+
+\subsubsection{Message Broker (RabbitMQ)}
+\begin{itemize}
+    \item \textbf{Lý do chọn RabbitMQ:} Đóng vai trò trung gian xử lý các tác vụ bất đồng bộ (gửi email, push notification, xử lý thanh toán) để giảm tải cho API server chính. RabbitMQ hỗ trợ giao thức AMQP chuẩn công nghiệp, cung cấp khả năng routing (định tuyến) bản tin cực kỳ linh hoạt và độ tin cậy cao, đảm bảo không mất task quan trọng.
+    \item \textbf{Tính năng nổi bật}:
+    \begin{itemize}
+        \item \textbf{Flexible Routing (Exchanges \& Queues)}: RabbitMQ hỗ trợ Direct, Topic, Fanout, Header exchanges cho phép định tuyến message phức tạp (ví dụ: chỉ gửi noti cho user VIP); Kafka hoạt động dựa trên Partition và Topic log, client phải tự lọc dữ liệu, mô hình ``dumb pipe, smart endpoint''; Redis Pub/Sub chỉ là broadcast đơn giản, không có routing logic phức tạp.
+        
+        \item \textbf{Message Delivery Acknowledgement}: Hỗ trợ cơ chế Ack/Nack xác nhận đã xử lý xong task, nếu worker chết task sẽ được trả lại hàng đợi (Re-queue); Redis Pub/Sub là ``fire and forget'', nếu subscriber offline thì mất tin; ActiveMQ cũ hơn, cấu hình phức tạp và nặng nề hơn cho các microservices hiện đại.
+        
+        \item \textbf{Low Latency for Individual Messages}: RabbitMQ tối ưu cho độ trễ thấp trên từng message lẻ, phù hợp cho transaction tức thì (OTP, booking confirmation); Kafka tối ưu cho Throughput (thông lượng) cực lớn (Big Data streaming) nhưng độ trễ cao hơn do cơ chế batching; Amazon SQS độ trễ biến thiên và tốn chi phí trên từng request.
+        
+        \item \textbf{User Interface (Management Plugin)}: Cung cấp giao diện web trực quan tích hợp sẵn để giám sát queue, connection, và tốc độ tiêu thụ message real-time; Kafka cần cài thêm công cụ bên thứ 3 (như Kafka UI, Conduktor) phức tạp; Redis CLI chỉ thao tác dòng lệnh, khó giám sát trực quan luồng dữ liệu.
+        
+        \item \textbf{Push Model}: RabbitMQ chủ động đẩy (push) message tới consumer giúp xử lý task ngay lập tức; Kafka sử dụng Pull model (consumer phải định kỳ hỏi server), có thể gây trễ nếu cấu hình polling interval không tốt; REST API (đồng bộ) dễ gây nghẽn (blocking) user thread nếu tác vụ xử lý lâu.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Caching \& In-Memory Store (Redis)}
+\begin{itemize}
+    \item \textbf{Lý do chọn Redis:} Là kho lưu trữ dữ liệu trong bộ nhớ (In-memory) với hiệu năng siêu tốc ($<$1ms). Redis được sử dụng để Cache dữ liệu hay truy xuất (danh sách dịch vụ, banner), lưu trữ Session người dùng và quản lý các dữ liệu tạm thời (như giỏ hàng chưa thanh toán).
+    \item \textbf{Tính năng nổi bật}:
+    \begin{itemize}
+        \item \textbf{Rich Data Structures}: Redis hỗ trợ Hash, List, Set, Sorted Set (dùng cho Leaderboard/Ranking), Bitmap; Memcached chỉ hỗ trợ Key-Value chuỗi đơn giản, không thao tác được trên cấu trúc dữ liệu; Cơ sở dữ liệu truyền thống (Postgres/MySQL) lưu trên đĩa cứng, tốc độ chậm hơn hàng nghìn lần so với RAM của Redis.
+        
+        \item \textbf{Persistence (RDB \& AOF)}: Cho phép lưu trạng thái từ RAM xuống ổ cứng định kỳ để phục hồi khi server khởi động lại; Memcached hoàn toàn không có persistence, mất điện là mất sạch cache; Ehcache (Java) lưu được xuống đĩa nhưng cấu hình phức tạp và chỉ dành cho JVM, không đa ngôn ngữ như Redis.
+        
+        \item \textbf{Performance}: Có thể xử lý hàng triệu request/giây với độ trễ sub-millisecond nhờ mô hình đơn luồng (single-threaded) loại bỏ context switch; Database query thường mất 10--50ms; Local Variable Cache (trong code Node/Go) nhanh nhất nhưng không đồng bộ được giữa nhiều server (scale horizontally).
+        
+        \item \textbf{TTL (Time To Live)}: Tự động xóa dữ liệu sau một khoảng thời gian (hết hạn Session, Cache invalidation) chính xác tới từng giây; Việc tự implement logic hết hạn trong SQL Database (cronjob quét bảng) rất tốn tài nguyên và không chính xác; Cookie phía client không an toàn và giới hạn dung lượng (4KB).
+        
+        \item \textbf{Distributed Locking}: Redis cung cấp cơ chế Redlock để xử lý khóa phân tán, ngăn chặn trường hợp 2 user cùng đặt 1 bác sĩ tại cùng 1 giờ (Race condition); ZooKeeper cũng làm được nhưng quá nặng nề để triển khai chỉ cho việc locking; Dùng Transaction của Database có thể gây chậm toàn hệ thống do giữ connection lâu.
+    \end{itemize}
+\end{itemize}
+
 
 
 
