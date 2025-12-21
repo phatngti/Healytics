@@ -60,7 +60,7 @@ class ProductDetailsContent extends HookConsumerWidget {
 
     final nameController = useTextEditingController(text: product.value!.name);
     final priceController = useTextEditingController(
-      text: product.value!.price.toString(),
+      text: product.value!.basePrice.toString(),
     );
     final descriptionController = useTextEditingController(
       text: product.value!.description,
@@ -69,7 +69,7 @@ class ProductDetailsContent extends HookConsumerWidget {
       text: product.value!.category,
     );
     final imageController = useTextEditingController(
-      text: product.value!.image,
+      text: product.value!.images.isNotEmpty ? product.value!.images[0] : '',
     );
     final statusController = useTextEditingController(text: 'active');
 
@@ -79,20 +79,20 @@ class ProductDetailsContent extends HookConsumerWidget {
         final request = UpdateProductRequest(
           id: product.value!.id,
           name: nameController.text,
-          price: double.parse(priceController.text),
+          basePrice: double.parse(priceController.text),
           description: descriptionController.text,
           category: categoryController.text,
-          image: imageController.text,
+          images: [imageController.text],
         );
         await productNotifier.updateProduct(request);
 
         // Update local state with new values
         product.value = product.value!.copyWith(
           name: nameController.text,
-          price: double.parse(priceController.text),
+          basePrice: double.parse(priceController.text),
           description: descriptionController.text,
           category: categoryController.text,
-          image: imageController.text,
+          images: [imageController.text],
         );
         isEditing.value = false; // Exit edit mode
         if (context.mounted) {
@@ -106,10 +106,12 @@ class ProductDetailsContent extends HookConsumerWidget {
     void onCancel() {
       // Reset controllers to original values
       nameController.text = product.value!.name;
-      priceController.text = product.value!.price.toString();
+      priceController.text = product.value!.basePrice.toString();
       descriptionController.text = product.value!.description;
       categoryController.text = product.value!.category;
-      imageController.text = product.value!.image;
+      imageController.text = product.value!.images.isNotEmpty
+          ? product.value!.images[0]
+          : '';
 
       context.goNamed(ProductHomeRoute.name);
     }

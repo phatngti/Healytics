@@ -80,9 +80,6 @@ class AppTextField extends StatelessWidget {
         autovalidateMode: AutovalidateMode.onUserInteraction,
         onChanged: onChanged,
         builder: (FormFieldState<dynamic> field) {
-          // Define the label color matching HTML #618961
-          const labelColor = Color(0xFF618961);
-
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -97,7 +94,6 @@ class AppTextField extends StatelessWidget {
                           style:
                               labelStyle ??
                               Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: labelColor,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.5,
                               ),

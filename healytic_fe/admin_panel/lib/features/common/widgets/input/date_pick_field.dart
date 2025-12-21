@@ -19,6 +19,7 @@ class AppDatePickField extends StatelessWidget {
     this.hintText,
     this.style,
     this.hintStyle,
+    this.labelStyle,
   });
 
   final String fieldKey;
@@ -35,10 +36,11 @@ class AppDatePickField extends StatelessWidget {
   final TextStyle? style;
   final TextStyle? hintStyle;
 
+  final TextStyle? labelStyle;
+
   @override
   Widget build(BuildContext context) {
     // Define the label color matching HTML #618961
-    const labelColor = Color(0xFF618961);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,11 +53,12 @@ class AppDatePickField extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: uppercaseLabel ? label.toUpperCase() : label,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: labelColor,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
+                    style:
+                        labelStyle ??
+                        Theme.of(context).textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                   ),
                   if (isRequired)
                     const TextSpan(
