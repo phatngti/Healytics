@@ -10,7 +10,7 @@ from src.base.llm_model import get_hf_llm
 from src.rag.main import build_rag_chain, InputQA, OutputQA
 
 # Khởi tạo mô hình ngôn ngữ
-llm = get_hf_llm(temperature=0.9)  # temperature cao => câu trả lời sáng tạo hơn
+llm = get_hf_llm(temperature=0.2)  # temperature cao => câu trả lời sáng tạo hơn
 
 # Thư mục chứa dữ liệu RAG (PDF, tài liệu, v.v.)
 genai_docs = "./data_source/generative_ai"
