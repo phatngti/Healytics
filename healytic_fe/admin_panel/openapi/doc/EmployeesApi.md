@@ -112,7 +112,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **employeesControllerFindAll**
-> List<Object> employeesControllerFindAll()
+> List<Object> employeesControllerFindAll(role)
 
 Get all employees
 
@@ -127,9 +127,10 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = EmployeesApi();
+final role = role_example; // String | 
 
 try {
-    final result = api_instance.employeesControllerFindAll();
+    final result = api_instance.employeesControllerFindAll(role);
     print(result);
 } catch (e) {
     print('Exception when calling EmployeesApi->employeesControllerFindAll: $e\n');
@@ -137,7 +138,10 @@ try {
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **role** | **String**|  | [optional] 
 
 ### Return type
 

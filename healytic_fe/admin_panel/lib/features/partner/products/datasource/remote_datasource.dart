@@ -1,9 +1,12 @@
 import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
+import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
+
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:admin_openapi/api.dart';
 
 part 'remote_datasource.g.dart';
 
@@ -24,6 +27,8 @@ abstract class ProductRemoteDataSource {
   Future<void> updateProduct(UpdateProductRequest request);
 
   Future<void> deleteProduct(ProductId id);
+
+  Future<List<CategoryEntity>> getCategories();
 }
 
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
@@ -31,230 +36,235 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   ProductRemoteDataSourceImpl({required this.apiService});
 
+  ProductsApi get _productsApi => apiService.productsApi;
+  CategoriesApi get _categoriesApi => apiService.categoriesApi;
+
+  @override
+  Future<List<CategoryEntity>> getCategories() async {
+    final response = await _categoriesApi.categoriesControllerFindAll();
+
+    if (response == null) {
+      return [];
+    }
+
+    return response.map((e) {
+      final map = e as Map<String, dynamic>;
+      return CategoryEntity.fromJson(map);
+    }).toList();
+  }
+
   @override
   Future<List<Product>> getProducts(
     int startingAt,
     int count,
     String? sortedBy,
     bool? sortedAsc,
-  ) {
-    // return apiService.productApi.productControllerGetProducts(
-    //   startingAt,
-    //   count,
-    //   sortedBy,
-    //   sortedAsc,
-    // );
-
-    return Future.delayed(
-      const Duration(milliseconds: 500),
-      () => [
-        Product(
-          id: ProductId(1),
-          name: 'Product 1',
-          basePrice: 100,
-          description: 'Description 1',
-          category: 'Category 1',
-        ),
-        Product(
-          id: ProductId(2),
-          name: 'Product 2',
-          basePrice: 200,
-          description: 'Description 2',
-          category: 'Category 2',
-        ),
-        Product(
-          id: ProductId(3),
-          name: 'Product 3',
-          basePrice: 300,
-          description: 'Description 3',
-          category: 'Category 3',
-        ),
-        Product(
-          id: ProductId(4),
-          name: 'Product 4',
-          basePrice: 400,
-          description: 'Description 4',
-          category: 'Category 4',
-        ),
-        Product(
-          id: ProductId(5),
-          name: 'Product 5',
-          basePrice: 500,
-          description: 'Description 5',
-          category: 'Category 5',
-        ),
-        Product(
-          id: ProductId(6),
-          name: 'Product 6',
-          basePrice: 600,
-          description: 'Description 6',
-          category: 'Category 6',
-        ),
-        Product(
-          id: ProductId(7),
-          name: 'Product 7',
-          basePrice: 700,
-          description: 'Description 7',
-          category: 'Category 7',
-        ),
-        Product(
-          id: ProductId(8),
-          name: 'Product 8',
-          basePrice: 800,
-          description: 'Description 8',
-          category: 'Category 8',
-        ),
-        Product(
-          id: ProductId(9),
-          name: 'Product 9',
-          basePrice: 900,
-          description: 'Description 9',
-          category: 'Category 9',
-        ),
-        Product(
-          id: ProductId(10),
-          name: 'Product 10',
-          basePrice: 1000,
-          description: 'Description 10',
-          category: 'Category 10',
-        ),
-        Product(
-          id: ProductId(11),
-          name: 'Product 11',
-          basePrice: 1100,
-          description: 'Description 11',
-          category: 'Category 11',
-        ),
-        Product(
-          id: ProductId(12),
-          name: 'Product 12',
-          basePrice: 1200,
-          description: 'Description 12',
-          category: 'Category 12',
-        ),
-        Product(
-          id: ProductId(13),
-          name: 'Product 13',
-          basePrice: 1300,
-          description: 'Description 13',
-          category: 'Category 13',
-        ),
-        Product(
-          id: ProductId(14),
-          name: 'Product 14',
-          basePrice: 1400,
-          description: 'Description 14',
-          category: 'Category 14',
-        ),
-        Product(
-          id: ProductId(15),
-          name: 'Product 15',
-          basePrice: 1500,
-          description: 'Description 15',
-          category: 'Category 15',
-        ),
-        Product(
-          id: ProductId(16),
-          name: 'Product 16',
-          basePrice: 1600,
-          description: 'Description 16',
-          category: 'Category 16',
-        ),
-        Product(
-          id: ProductId(17),
-          name: 'Product 17',
-          basePrice: 1700,
-          description: 'Description 17',
-          category: 'Category 17',
-        ),
-        Product(
-          id: ProductId(18),
-          name: 'Product 18',
-          basePrice: 1800,
-          description: 'Description 18',
-          category: 'Category 18',
-        ),
-        Product(
-          id: ProductId(19),
-          name: 'Product 19',
-          basePrice: 1900,
-          description: 'Description 19',
-          category: 'Category 19',
-        ),
-        Product(
-          id: ProductId(20),
-          name: 'Product 20',
-          basePrice: 2000,
-          description: 'Description 20',
-          category: 'Category 20',
-        ),
-      ].asMap().values.toList().sublist(startingAt, startingAt + count),
+  ) async {
+    // TODO: Replace 'default' with actual merchantId from auth/store
+    final response = await _productsApi.productsControllerFindAll(
+      // merchantId: 'default',
     );
+
+    if (response == null) {
+      return [];
+    }
+
+    final products = response.map((item) {
+      return _mapToProduct(item as Map<String, dynamic>);
+    }).toList();
+
+    // Local pagination since API doesn't support it yet
+    if (startingAt >= products.length) return [];
+    int end = startingAt + count;
+    if (end > products.length) end = products.length;
+
+    return products.sublist(startingAt, end);
   }
 
   @override
-  Future<int> getTotalRows() {
-    return Future.delayed(const Duration(seconds: 2), () => 20);
-  }
-
-  @override
-  Future<Product> getProductById(ProductId id) {
-    return Future.delayed(
-      const Duration(seconds: 1),
-      () => Product(
-        id: id,
-        name: 'Product ${id.value}',
-        basePrice: 100.0 * id.value,
-        description: 'Description ${id.value}',
-        category: 'Category ${id.value}',
-      ),
+  Future<int> getTotalRows() async {
+    // TODO: Replace 'default' with actual merchantId from auth/store
+    final response = await _productsApi.productsControllerFindAll(
+      // merchantId: 'default',
     );
+    return response?.length ?? 0;
   }
 
   @override
-  Future<Product> createProduct(CreateProductRequest request) {
-    // print request
-    print(request);
-    // TODO: Implement actual API call
-    return Future.delayed(
-      const Duration(seconds: 1),
-      () => Product(
-        id: ProductId(DateTime.now().millisecondsSinceEpoch),
-        name: request.name,
-        basePrice: request.basePrice,
-        salePrice: request.salePrice,
-        costPerItem: request.costPerItem,
+  Future<Product> getProductById(ProductId id) async {
+    final response = await _productsApi.productsControllerFindOne(
+      id.value.toString(),
+    );
+
+    if (response == null) {
+      throw Exception('Product not found');
+    }
+
+    return _mapToProduct(response as Map<String, dynamic>);
+  }
+
+  @override
+  Future<Product> createProduct(CreateProductRequest request) async {
+    final typeEnum = _mapProductType(request.productType);
+
+    CreatePhysicalDetailsDto? physicalDetails;
+    if (typeEnum == CreateProductDtoTypeEnum.physical) {
+      physicalDetails = CreatePhysicalDetailsDto(
         sku: request.sku,
         barcode: request.barcode,
         stockQuantity: request.stockQuantity,
-        status: request.status,
-        onlineStore: request.onlineStore,
-        description: request.description,
-        productType: request.productType,
-        category: request.category,
-        tags: request.tags,
-        vendor: request.vendor,
-        duration: request.duration,
-        buffer: request.buffer,
-        capacity: request.capacity,
-        leadTime: request.leadTime,
-        staffAllocation: request.staffAllocation,
-        staffIds: request.staffIds,
-        images: request.images,
-      ),
+        costPerItem: request.costPerItem,
+      );
+    }
+
+    CreateServiceDefinitionDto? serviceDefinition;
+    if (typeEnum == CreateProductDtoTypeEnum.service) {
+      serviceDefinition = CreateServiceDefinitionDto(
+        durationMinutes: request.duration ?? 60,
+        bufferMinutes: request.buffer,
+        maxCapacity: request.capacity,
+        minLeadTimeHours: request.leadTime,
+        staffAssignmentType: _mapStaffAssignment(request.staffAllocation),
+      );
+    }
+
+    final dto = CreateProductDto(
+      name: request.name,
+      description: request.description,
+      categoryId: request.category,
+      slug: request.name.toLowerCase().replaceAll(RegExp(r'\s+'), '-'),
+      type: typeEnum,
+      basePrice: request.basePrice,
+      salePrice: request.salePrice,
+      status: _mapStatus(request.status),
+      isVisibleOnline: request.onlineStore,
+      vendorName: request.vendor,
+      physicalDetails: physicalDetails,
+      serviceDefinition: serviceDefinition,
+      media: request.images.asMap().entries.map((entry) {
+        return CreateProductMediaDto(
+          url: entry.value,
+          mediaType: CreateProductMediaDtoMediaTypeEnum.image,
+          isThumbnail: entry.key == 0,
+          sortOrder: entry.key,
+        );
+      }).toList(),
+    );
+
+    final response = await _productsApi.productsControllerCreate(dto);
+
+    if (response == null) {
+      throw Exception('Failed to create product');
+    }
+
+    return _mapToProduct(response as Map<String, dynamic>);
+  }
+
+  @override
+  Future<void> updateProduct(UpdateProductRequest request) async {
+    final dto = UpdateProductDto(
+      name: request.name,
+      basePrice: request.basePrice,
+      description: request.description,
+      categoryId: request.category,
+      media:
+          request.images?.asMap().entries.map((entry) {
+            return CreateProductMediaDto(
+              url: entry.value,
+              mediaType: CreateProductMediaDtoMediaTypeEnum.image,
+              isThumbnail: entry.key == 0,
+              sortOrder: entry.key,
+            );
+          }).toList() ??
+          [],
+    );
+
+    await _productsApi.productsControllerUpdate(
+      request.id.value.toString(),
+      dto,
     );
   }
 
   @override
-  Future<void> updateProduct(UpdateProductRequest request) {
-    // TODO: Implement actual API call
-    return Future.delayed(const Duration(seconds: 1));
+  Future<void> deleteProduct(ProductId id) async {
+    await _productsApi.productsControllerRemove(id.value.toString());
   }
 
-  @override
-  Future<void> deleteProduct(ProductId id) {
-    // TODO: Implement actual API call
-    return Future.delayed(const Duration(seconds: 1));
+  Product _mapToProduct(Map<String, dynamic> json) {
+    final physical = json['physicalDetails'] as Map<String, dynamic>?;
+    final service = json['serviceDefinition'] as Map<String, dynamic>?;
+    final category = json['category'] as Map<String, dynamic>?;
+
+    return Product(
+      id: ProductId(int.tryParse(json['id']?.toString() ?? '0') ?? 0),
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      basePrice: double.tryParse(json['basePrice']?.toString() ?? '0') ?? 0.0,
+      salePrice: double.tryParse(json['salePrice']?.toString() ?? '0'),
+      productType: json['type']?.toString().toLowerCase() ?? 'service',
+      status: json['status']?.toString().toLowerCase() ?? 'draft',
+      category: CategoryEntity(
+        id: category?['id']?.toString() ?? '',
+        name: category?['name']?.toString() ?? '',
+        slug: category?['slug']?.toString() ?? '',
+      ),
+      onlineStore: json['isVisibleOnline'] as bool? ?? false,
+      vendor: json['vendorName']?.toString(),
+      images:
+          (json['media'] as List<dynamic>?)
+              ?.map((m) => m['url']?.toString() ?? '')
+              .where((s) => s.isNotEmpty)
+              .toList() ??
+          [],
+
+      // Physical details
+      sku: physical?['sku']?.toString(),
+      barcode: physical?['barcode']?.toString(),
+      stockQuantity: int.tryParse(physical?['stockQuantity']?.toString() ?? ''),
+      costPerItem: double.tryParse(physical?['costPerItem']?.toString() ?? ''),
+
+      // Service details
+      duration: int.tryParse(service?['durationMinutes']?.toString() ?? ''),
+      buffer: int.tryParse(service?['bufferMinutes']?.toString() ?? ''),
+      capacity: int.tryParse(service?['maxCapacity']?.toString() ?? ''),
+      leadTime: int.tryParse(service?['minLeadTimeHours']?.toString() ?? ''),
+      staffAllocation:
+          service?['staffAssignmentType']?.toString().toLowerCase() ?? 'any',
+    );
+  }
+
+  CreateProductDtoTypeEnum _mapProductType(String type) {
+    switch (type.toLowerCase()) {
+      case 'physical':
+        return CreateProductDtoTypeEnum.physical;
+      case 'service':
+      default:
+        return CreateProductDtoTypeEnum.service;
+    }
+  }
+
+  CreateProductDtoStatusEnum _mapStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return CreateProductDtoStatusEnum.active;
+      case 'archived':
+        return CreateProductDtoStatusEnum.archived;
+      case 'draft':
+      default:
+        return CreateProductDtoStatusEnum.draft;
+    }
+  }
+
+  CreateServiceDefinitionDtoStaffAssignmentTypeEnum? _mapStaffAssignment(
+    String assignment,
+  ) {
+    switch (assignment.toLowerCase()) {
+      case 'specific':
+        return CreateServiceDefinitionDtoStaffAssignmentTypeEnum.specific;
+      case 'any':
+      default:
+        return CreateServiceDefinitionDtoStaffAssignmentTypeEnum.any;
+    }
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'product.entity.freezed.dart';
@@ -38,7 +39,7 @@ abstract class Product with _$Product {
     @Default(true) bool onlineStore,
 
     // Organization
-    required String category,
+    required CategoryEntity category,
     @Default([]) List<String> tags,
     String? vendor,
 

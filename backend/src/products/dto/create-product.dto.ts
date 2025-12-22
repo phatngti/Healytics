@@ -118,10 +118,7 @@ export class CreateServiceDefinitionDto {
 
 // Main Product DTO
 export class CreateProductDto {
-  @ApiProperty({ example: 'uuid-merchant-id' })
-  @IsUUID()
-  @IsNotEmpty()
-  merchantId: string;
+
 
   @ApiPropertyOptional({ example: 'uuid-category-id' })
   @IsUUID()

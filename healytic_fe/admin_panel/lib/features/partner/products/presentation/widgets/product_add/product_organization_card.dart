@@ -1,5 +1,6 @@
 import 'package:admin_panel/features/common/widgets/input/selection_field.dart';
 import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,7 +31,7 @@ class _ProductOrganizationCardState
   late String? _category;
   late List<String> _tags;
   final TextEditingController _tagController = TextEditingController();
-  List<CategoryItem> _categories = [];
+  List<CategoryEntity> _categories = [];
   bool _isLoadingCategories = true;
 
   @override
@@ -132,7 +133,7 @@ class _ProductOrganizationCardState
                         child: CircularProgressIndicator(),
                       ),
                     )
-                  : AppSelectionField(
+                  : AppSelectionField<String>(
                       fieldKey: 'category',
                       hintText: 'Select category...',
                       initialValue: _category,

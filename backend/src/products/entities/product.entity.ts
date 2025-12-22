@@ -18,13 +18,12 @@ import { ServiceDefinition } from './service-definition.entity';
 import { ProductPhysicalDetails } from './product-physical-details.entity';
 
 @Entity('products')
-@Index('IDX_PRODUCT_MERCHANT_SLUG', ['merchantId', 'slug'])
+@Index('IDX_PRODUCT_MERCHANT_SLUG', ['slug'])
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'merchant_id', type: 'uuid' })
-  merchantId: string;
+
 
   @Column({ name: 'category_id', type: 'uuid', nullable: true })
   categoryId: string | null;

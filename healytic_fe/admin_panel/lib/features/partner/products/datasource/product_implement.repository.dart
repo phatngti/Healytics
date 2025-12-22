@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/partner/products/datasource/remote_datasource.dart';
+import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/product.repository.dart';
@@ -47,7 +48,7 @@ class ProductImplementRepository implements ProductRepository {
                   ),
                 ),
               ),
-              DataCell(Center(child: Text(product.category))),
+              DataCell(Center(child: Text(product.category.name))),
             ],
           ),
         )
@@ -77,6 +78,11 @@ class ProductImplementRepository implements ProductRepository {
   @override
   Future<void> deleteProduct(ProductId id) {
     return remoteDataSource.deleteProduct(id);
+  }
+
+  @override
+  Future<List<CategoryEntity>> getCategories() {
+    return remoteDataSource.getCategories();
   }
 }
 

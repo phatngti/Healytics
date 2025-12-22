@@ -1,5 +1,6 @@
 import 'package:admin_panel/features/partner/employee/datasource/remote_datasource.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.repository.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
@@ -75,8 +76,13 @@ class EmployeeImplementRepository implements EmployeeRepository {
   }
 
   @override
-  Future<EmployeeEntity> createEmployee(CreateEmployeeRequest request) {
-    return remoteDataSource.createEmployee(request);
+  Future<EmployeeEntity> createDoctor(CreateDoctorRequest request) {
+    return remoteDataSource.createDoctor(request);
+  }
+
+  @override
+  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request) {
+    return remoteDataSource.createTherapist(request);
   }
 
   @override
@@ -95,6 +101,14 @@ class EmployeeImplementRepository implements EmployeeRepository {
     required int count,
   }) {
     return remoteDataSource.getEmployees(startingAt, count, null, null);
+  }
+
+  @override
+  Future<List<EmployeeEntity>> getEmployeesByRole({
+    required String role,
+    int? limit,
+  }) {
+    return remoteDataSource.getEmployeesByRole(role: role, limit: limit);
   }
 }
 

@@ -13,7 +13,6 @@ part of openapi.api;
 class CreateProductDto {
   /// Returns a new [CreateProductDto] instance.
   CreateProductDto({
-    required this.merchantId,
     this.categoryId,
     required this.name,
     required this.slug,
@@ -29,8 +28,6 @@ class CreateProductDto {
     this.physicalDetails,
     this.serviceDefinition,
   });
-
-  String merchantId;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -119,7 +116,6 @@ class CreateProductDto {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is CreateProductDto &&
-    other.merchantId == merchantId &&
     other.categoryId == categoryId &&
     other.name == name &&
     other.slug == slug &&
@@ -138,7 +134,6 @@ class CreateProductDto {
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (merchantId.hashCode) +
     (categoryId == null ? 0 : categoryId!.hashCode) +
     (name.hashCode) +
     (slug.hashCode) +
@@ -155,11 +150,10 @@ class CreateProductDto {
     (serviceDefinition == null ? 0 : serviceDefinition!.hashCode);
 
   @override
-  String toString() => 'CreateProductDto[merchantId=$merchantId, categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, vendorName=$vendorName, media=$media, physicalDetails=$physicalDetails, serviceDefinition=$serviceDefinition]';
+  String toString() => 'CreateProductDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, vendorName=$vendorName, media=$media, physicalDetails=$physicalDetails, serviceDefinition=$serviceDefinition]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'merchantId'] = this.merchantId;
     if (this.categoryId != null) {
       json[r'categoryId'] = this.categoryId;
     } else {
@@ -236,7 +230,6 @@ class CreateProductDto {
       }());
 
       return CreateProductDto(
-        merchantId: mapValueOfType<String>(json, r'merchantId')!,
         categoryId: mapValueOfType<String>(json, r'categoryId'),
         name: mapValueOfType<String>(json, r'name')!,
         slug: mapValueOfType<String>(json, r'slug')!,
@@ -298,7 +291,6 @@ class CreateProductDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'merchantId',
     'name',
     'slug',
     'type',
