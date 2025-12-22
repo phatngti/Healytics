@@ -1,8 +1,8 @@
-# openapi.model.LogoutResponseDto
+# admin_openapi.model.LogoutResponseDto
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:admin_openapi/api.dart';
 ```
 
 ## Properties

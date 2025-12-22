@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/network/logging_client.dart';
+import 'package:admin_panel/core/utils/browser_storage.dart';
 import 'package:admin_panel/core/utils/url_helper.dart';
 import 'package:admin_panel/core/utils/user_agent.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -16,6 +18,7 @@ class ApiService implements Authentication {
   late ApiClient _apiClient;
   late AuthenticationApi authenticateApi;
   late AccountApi accountApi;
+  late EmployeesApi employeesApi;
 
   ApiService() {
     // The below line ensures that the api clients are initialized when the service is instantiated
@@ -43,7 +46,8 @@ class ApiService implements Authentication {
   }
 
   dynamic setEndpoint(String endPoint) {
-    _apiClient = ApiClient(basePath: endPoint, authentication: this);
+    _apiClient = ApiClient(basePath: endPoint, authentication: this)
+      ..client = LoggingClient(Client());
     _setUserAgentHeader();
 
     if (_accessToken != null) {
@@ -51,6 +55,7 @@ class ApiService implements Authentication {
     }
     authenticateApi = AuthenticationApi(_apiClient);
     accountApi = AccountApi(_apiClient);
+    employeesApi = EmployeesApi(_apiClient);
   }
 
   Future<void> _setUserAgentHeader() async {
@@ -145,8 +150,7 @@ class ApiService implements Authentication {
   Future<void> setAccessToken(String accessToken) async {
     _accessToken = accessToken;
     await Store.put(StoreKey.accessToken, accessToken);
-    final updatedAccessToken = Store.get(StoreKey.accessToken, "");
-    print('updated token $updatedAccessToken');
+    setBrowserItem('access_token', accessToken);
   }
 
   Future<void> setDeviceInfoHeader() async {
@@ -174,7 +178,9 @@ class ApiService implements Authentication {
 
   static Map<String, String> getRequestHeaders() {
     var accessToken = Store.get(StoreKey.accessToken, "");
-    print('accessToken $accessToken');
+    if (accessToken.isEmpty) {
+      accessToken = getBrowserItem('access_token') ?? "";
+    }
     var customHeadersStr = Store.get(StoreKey.customHeaders, "");
     var header = <String, String>{};
     if (accessToken.isNotEmpty) {

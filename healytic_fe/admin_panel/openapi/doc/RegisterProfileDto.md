@@ -1,8 +1,8 @@
-# openapi.model.RegisterProfileDto
+# admin_openapi.model.RegisterProfileDto
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:admin_openapi/api.dart';
 ```
 
 ## Properties

@@ -1,10 +1,14 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
+import { EmployeesModule } from './employees/employees.module';
+import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './products/products.module';
 import databaseConfig from './config/database.config';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { LoggingMiddleware } from './common/middleware/logging.middleware';
 
 @Module({
   imports: [
@@ -32,12 +36,20 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     }),
     AuthModule,
     AccountModule,
+    EmployeesModule,
+    CategoriesModule,
+    ProductsModule,
   ],
   providers: [
-  {
-    provide: 'APP_GUARD',
-    useClass: JwtAuthGuard,
-  },
-],
+    {
+      provide: 'APP_GUARD',
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // Apply logging middleware to all routes
+    consumer.apply(LoggingMiddleware).forRoutes('*');
+  }
+}
