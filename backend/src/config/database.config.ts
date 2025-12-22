@@ -7,6 +7,8 @@ export default registerAs('database', () => ({
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  synchronize: true,
+  // synchronize: false,
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/../../migrations/scripts/*{.ts,.js}'],
+  // migrationsRun: false,
 }));

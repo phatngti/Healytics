@@ -35,13 +35,15 @@ class EmployeeNotifier extends _$EmployeeNotifier {
     bool? sortAscending,
   }) async {
     final repo = ref.read(employeeRepositoryProvider);
-    return repo.getEmployees(
+    final result = await repo.getEmployees(
       setRowSelection,
       startingAt,
       count,
       search,
       sortAscending,
     );
+
+    return result;
   }
 
   Future<void> deleteEmployee(EmployeeId id) async {

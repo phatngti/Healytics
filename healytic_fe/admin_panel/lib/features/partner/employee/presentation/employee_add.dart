@@ -4,6 +4,7 @@ import 'package:admin_panel/features/partner/employee/presentation/layouts/emplo
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 
 class EmployeeAddScreen extends ConsumerStatefulWidget {
   const EmployeeAddScreen({super.key});
@@ -26,7 +27,9 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         emergencyContactName: values['contact_name']?.toString().trim() ?? '',
         emergencyContactPhone: values['contact_phone']?.toString().trim() ?? '',
         jobTitle: values['job_title']?.toString().trim() ?? '',
-        employeeId: values['employee_id']?.toString().trim() ?? '',
+        employeeId: values['employee_id']?.toString().trim().isNotEmpty == true
+            ? values['employee_id'].toString().trim()
+            : const Uuid().v4(),
         employmentType: values['employment_type']?.toString() ?? 'Full-Time',
         startDate: values['start_date']?.toString() ?? '',
         skills:
@@ -42,7 +45,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         schedule: [], // TODO: Parse schedule from values
         avatar: 'https://i.pravatar.cc/150?u=${values['email_address']}',
         status: 'Active',
-        branch: 'Main Branch',
+        branch: const Uuid().v4(),
         password: 'password123',
       );
 

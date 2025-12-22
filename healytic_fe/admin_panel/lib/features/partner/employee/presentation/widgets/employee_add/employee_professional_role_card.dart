@@ -1,9 +1,8 @@
-import 'dart:math';
-
 import 'package:admin_panel/features/common/widgets/input/date_pick_field.dart';
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/common/widgets/input/text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class EmployeeProfessionalRoleCard extends StatefulWidget {
   const EmployeeProfessionalRoleCard({super.key});
@@ -143,10 +142,8 @@ class _EmployeeProfessionalRoleCardState
                   label: 'Employee ID',
                   controller: _employeeIdController,
                   onGenerate: () {
-                    final random = Random();
-                    final id = 1000 + random.nextInt(9000);
                     setState(() {
-                      _employeeIdController.text = 'EMPL-$id';
+                      _employeeIdController.text = const Uuid().v4();
                     });
                   },
                 ),

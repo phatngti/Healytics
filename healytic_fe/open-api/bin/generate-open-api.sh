@@ -7,6 +7,7 @@ BASE_DIR=/Volumes/WD850X/Users/workspace/datn/Healytics/healytic_fe/
 function generate_dart {
   local OUTPUT_DIR=$1
   local SWAGGER_FILE=$2
+  local PUB_NAME=${3:-openapi}  # Default to 'openapi' if not provided
   rm -rf $OUTPUT_DIR
   mkdir -p $OUTPUT_DIR
   
@@ -19,8 +20,8 @@ function generate_dart {
 
   cd ../../
   
-  # Generate Client
-  npx --yes @openapitools/openapi-generator-cli generate -g dart -i $SWAGGER_FILE -o $OUTPUT_DIR -t $BASE_DIR/open-api/templates/mobile
+  # Generate Client with custom package name
+  npx --yes @openapitools/openapi-generator-cli generate -g dart -i $SWAGGER_FILE -o $OUTPUT_DIR -t $BASE_DIR/open-api/templates/mobile --additional-properties pubName=$PUB_NAME
   
   # Post generate patches
   # Don't include analysis_options.yaml for the generated openapi files
@@ -30,20 +31,20 @@ function generate_dart {
 
 function user_app {
   echo "Generating for user_app..."
-  generate_dart $BASE_DIR/user_app/openapi $BASE_DIR/open-api/user_apis.json
+  generate_dart $BASE_DIR/user_app/openapi $BASE_DIR/open-api/user_apis.json user_openapi
 }
 
 function admin_panel {
   echo "Generating for admin_panel..."
-  generate_dart $BASE_DIR/admin_panel/openapi $BASE_DIR/open-api/admin_apis.json
+  generate_dart $BASE_DIR/admin_panel/openapi $BASE_DIR/open-api/admin_apis.json admin_openapi
 }
 
 # requires server to be built
 # npm run sync:open-api --prefix=../server
 
-if [[ $1 == 'user_app' ]]; then
+if [[ $1 == 'user' ]]; then
   user_app
-elif [[ $1 == 'admin_panel' ]]; then
+elif [[ $1 == 'admin' ]]; then
   admin_panel
 else
   user_app

@@ -1,8 +1,8 @@
-# openapi.api.AuthenticationApi
+# user_openapi.api.AuthenticationApi
 
 ## Load the API package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 ```
 
 All URIs are relative to *http://localhost*
@@ -22,7 +22,7 @@ Method | HTTP request | Description
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
 final loginDto = LoginDto(); // LoginDto | 
@@ -63,7 +63,7 @@ No authorization required
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
 
@@ -100,7 +100,7 @@ No authorization required
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
 
@@ -137,7 +137,7 @@ No authorization required
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
 final registerDto = RegisterDto(); // RegisterDto | 
