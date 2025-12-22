@@ -212,34 +212,42 @@ class _ErrorAndRetry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-    child: Container(
-      padding: const EdgeInsets.all(10),
-      height: 80,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Oops! $errorMessage',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.error,
+    child: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Oops! $errorMessage',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.error,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
-          TextButton(
-            onPressed: retry,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.refresh, color: Theme.of(context).colorScheme.error),
-                Text(
-                  'Retry',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: retry,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.refresh,
                     color: Theme.of(context).colorScheme.error,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  Text(
+                    'Retry',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );

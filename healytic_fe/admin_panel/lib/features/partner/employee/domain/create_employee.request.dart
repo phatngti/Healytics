@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'create_employee.request.freezed.dart';
 part 'create_employee.request.g.dart';
@@ -25,7 +26,7 @@ abstract class CreateEmployeeRequest with _$CreateEmployeeRequest {
     String? licenseUrl,
     String? idCardUrl,
     @Default('Active') String status,
-    @Default('Main Branch') String branch,
+    @Default('') String branch,
     @Default('password123') String password,
   }) = _CreateEmployeeRequest;
 

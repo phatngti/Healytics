@@ -30,14 +30,22 @@ class EmployeeImplementRepository implements EmployeeRepository {
     return employees
         .map(
           (employee) => DataRow(
-            key: ValueKey<int>(employee.id.value),
+            key: ValueKey<String>(employee.id.value),
             onSelectChanged: (value) {
               if (value != null) {
-                setRowSelection(ValueKey<int>(employee.id.value), value);
+                setRowSelection(ValueKey<String>(employee.id.value), value);
               }
             },
             cells: [
-              DataCell(Center(child: Text(employee.id.value.toString()))),
+              DataCell(
+                Center(
+                  child: Text(
+                    employee.id.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
               DataCell(
                 Center(
                   child: CircleAvatar(
@@ -46,12 +54,10 @@ class EmployeeImplementRepository implements EmployeeRepository {
                 ),
               ),
               DataCell(Center(child: Text(employee.fullName))),
-              DataCell(Center(child: Text(employee.role))),
               DataCell(Center(child: Text(employee.position))),
               DataCell(Center(child: Text(employee.rating.toStringAsFixed(1)))),
               DataCell(Center(child: Text(employee.reviewCount.toString()))),
               DataCell(Center(child: Text(employee.status))),
-              DataCell(Center(child: Text(employee.branch))),
             ],
           ),
         )

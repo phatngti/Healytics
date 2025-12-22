@@ -36,14 +36,16 @@ export class UserProfile {
   @Column({ default: false })
   isUsed: boolean;
 
-  @OneToOne(() => Account, (account) => account.userProfile, { onDelete: 'CASCADE' })
+  @OneToOne(() => Account, (account) => account.userProfile, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   account: Account;
 
-  @OneToOne(() => Address, (address) => address.userProfile, { 
+  @OneToOne(() => Address, (address) => address.userProfile, {
     cascade: true, // This allows saving profile + address in one go
-    eager: true,   // This automatically fetches address when you fetch profile
-    nullable: true 
+    eager: true, // This automatically fetches address when you fetch profile
+    nullable: true,
   })
   @JoinColumn()
   address?: Address;
