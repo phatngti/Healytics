@@ -1,6 +1,7 @@
 import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 import 'package:admin_openapi/api.dart';
@@ -21,11 +22,18 @@ abstract class EmployeeRemoteDataSource {
 
   Future<EmployeeEntity> getEmployeeById(EmployeeId id);
 
-  Future<EmployeeEntity> createEmployee(CreateEmployeeRequest request);
+  Future<EmployeeEntity> createDoctor(CreateDoctorRequest request);
+
+  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request);
 
   Future<void> updateEmployee(UpdateEmployeeRequest request);
 
   Future<void> deleteEmployee(EmployeeId id);
+
+  Future<List<EmployeeEntity>> getEmployeesByRole({
+    required String role,
+    int? limit,
+  });
 }
 
 class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
@@ -84,29 +92,6 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   }
 
   @override
-  Future<EmployeeEntity> createEmployee(CreateEmployeeRequest request) async {
-    final dto = CreateEmployeeDto(
-      employeeCode: request.employeeId,
-      fullName: '${request.firstName} ${request.lastName}',
-      displayName: '${request.firstName} ${request.lastName}',
-      email: request.email,
-      phone: request.phone,
-      avatarUrl: request.avatar,
-      dob: request.dateOfBirth,
-      gender: _mapGender(request.gender),
-      role: _mapRole(request.jobTitle),
-      status: _mapStatus(request.status),
-      branchId: request.branch,
-    );
-
-    final response = await _employeesApi.employeesControllerCreate(dto);
-    if (response == null) {
-      throw Exception('Failed to create employee');
-    }
-    return _mapToEmployeeEntity(response as Map<String, dynamic>);
-  }
-
-  @override
   Future<void> updateEmployee(UpdateEmployeeRequest request) async {
     final dto = UpdateEmployeeDto(
       fullName: request.fullName,
@@ -128,6 +113,73 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   @override
   Future<void> deleteEmployee(EmployeeId id) async {
     await _employeesApi.employeesControllerRemove(id.value.toString());
+  }
+
+  @override
+  Future<EmployeeEntity> createDoctor(CreateDoctorRequest request) async {
+    final profile = DoctorProfileDto(
+      title: request.title,
+      medicalLicense: request.medicalLicense,
+      experienceYears: request.experienceYears,
+      consultationFee: request.consultationFee,
+      specializations: request.specializations,
+      education: request.education,
+      certifications: request.certifications,
+    );
+
+    final dto = CreateDoctorDto(
+      employeeCode: request.employeeCode,
+      fullName: request.fullName,
+      displayName: request.displayName,
+      email: request.email,
+      phone: request.phone,
+      avatarUrl: request.avatarUrl,
+      dob: request.dob,
+      gender: _mapDoctorGender(request.gender),
+      status: CreateDoctorDtoStatusEnum.ACTIVE,
+      branchId: request.branchId,
+      profile: profile,
+    );
+
+    final response = await _employeesApi.employeesControllerCreateDoctor(dto);
+    if (response == null) {
+      throw Exception('Failed to create doctor');
+    }
+    return _mapToEmployeeEntity(response as Map<String, dynamic>);
+  }
+
+  @override
+  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request) async {
+    final profile = TherapistProfileDto(
+      level: _mapTherapistLevel(request.level),
+      type: request.type,
+      strengthLevel: _mapStrengthLevel(request.strengthLevel),
+      commissionRate: request.commissionRate,
+      healthCheckDate: request.healthCheckDate,
+      skills: request.skills,
+    );
+
+    final dto = CreateTherapistDto(
+      employeeCode: request.employeeCode,
+      fullName: request.fullName,
+      displayName: request.displayName,
+      email: request.email,
+      phone: request.phone,
+      avatarUrl: request.avatarUrl,
+      dob: request.dob,
+      gender: _mapTherapistGender(request.gender),
+      status: CreateTherapistDtoStatusEnum.ACTIVE,
+      branchId: request.branchId,
+      profile: profile,
+    );
+
+    final response = await _employeesApi.employeesControllerCreateTherapist(
+      dto,
+    );
+    if (response == null) {
+      throw Exception('Failed to create therapist');
+    }
+    return _mapToEmployeeEntity(response as Map<String, dynamic>);
   }
 
   // Helper method to map API response to EmployeeEntity
@@ -152,48 +204,23 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     );
   }
 
-  // Helper method to map gender string to CreateEmployeeDtoGenderEnum
-  CreateEmployeeDtoGenderEnum? _mapGender(String gender) {
-    switch (gender.toUpperCase()) {
-      case 'MALE':
-        return CreateEmployeeDtoGenderEnum.MALE;
-      case 'FEMALE':
-        return CreateEmployeeDtoGenderEnum.FEMALE;
-      case 'OTHER':
-        return CreateEmployeeDtoGenderEnum.OTHER;
-      default:
-        return null;
-    }
-  }
+  @override
+  Future<List<EmployeeEntity>> getEmployeesByRole({
+    required String role,
+    int? limit,
+  }) async {
+    // Since API doesn't support filtering by role yet, we fetch all and filter locally
+    final allEmployees = await getEmployees(0, 1000, null, null);
 
-  // Helper method to map role/job title to CreateEmployeeDtoRoleEnum
-  CreateEmployeeDtoRoleEnum _mapRole(String role) {
-    switch (role.toUpperCase()) {
-      case 'DOCTOR':
-        return CreateEmployeeDtoRoleEnum.DOCTOR;
-      case 'THERAPIST':
-        return CreateEmployeeDtoRoleEnum.THERAPIST;
-      case 'RECEPTIONIST':
-        return CreateEmployeeDtoRoleEnum.RECEPTIONIST;
-      case 'MANAGER':
-        return CreateEmployeeDtoRoleEnum.MANAGER;
-      default:
-        return CreateEmployeeDtoRoleEnum.RECEPTIONIST; // Default fallback
-    }
-  }
+    final filtered = allEmployees.where((e) {
+      return e.role.toUpperCase() == role.toUpperCase();
+    }).toList();
 
-  // Helper method to map status to CreateEmployeeDtoStatusEnum
-  CreateEmployeeDtoStatusEnum? _mapStatus(String status) {
-    switch (status.toUpperCase()) {
-      case 'ACTIVE':
-        return CreateEmployeeDtoStatusEnum.ACTIVE;
-      case 'INACTIVE':
-        return CreateEmployeeDtoStatusEnum.INACTIVE;
-      case 'ON_LEAVE':
-        return CreateEmployeeDtoStatusEnum.ON_LEAVE;
-      default:
-        return CreateEmployeeDtoStatusEnum.ACTIVE;
+    if (limit != null && filtered.length > limit) {
+      return filtered.sublist(0, limit);
     }
+
+    return filtered;
   }
 
   // Helper method to map role to UpdateEmployeeDtoRoleEnum
@@ -221,6 +248,68 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         return UpdateEmployeeDtoStatusEnum.INACTIVE;
       case 'ON_LEAVE':
         return UpdateEmployeeDtoStatusEnum.ON_LEAVE;
+      default:
+        return null;
+    }
+  }
+
+  // Helper method to map gender for Doctor DTO
+  CreateDoctorDtoGenderEnum? _mapDoctorGender(String? gender) {
+    if (gender == null) return null;
+    switch (gender.toUpperCase()) {
+      case 'MALE':
+        return CreateDoctorDtoGenderEnum.MALE;
+      case 'FEMALE':
+        return CreateDoctorDtoGenderEnum.FEMALE;
+      case 'OTHER':
+        return CreateDoctorDtoGenderEnum.OTHER;
+      default:
+        return null;
+    }
+  }
+
+  // Helper method to map gender for Therapist DTO
+  CreateTherapistDtoGenderEnum? _mapTherapistGender(String? gender) {
+    if (gender == null) return null;
+    switch (gender.toUpperCase()) {
+      case 'MALE':
+        return CreateTherapistDtoGenderEnum.MALE;
+      case 'FEMALE':
+        return CreateTherapistDtoGenderEnum.FEMALE;
+      case 'OTHER':
+        return CreateTherapistDtoGenderEnum.OTHER;
+      default:
+        return null;
+    }
+  }
+
+  // Helper method to map therapist level
+  TherapistProfileDtoLevelEnum? _mapTherapistLevel(String? level) {
+    if (level == null) return null;
+    switch (level.toUpperCase()) {
+      case 'JUNIOR':
+        return TherapistProfileDtoLevelEnum.JUNIOR;
+      case 'SENIOR':
+        return TherapistProfileDtoLevelEnum.SENIOR;
+      case 'MASTER':
+        return TherapistProfileDtoLevelEnum.MASTER;
+      default:
+        return null;
+    }
+  }
+
+  // Helper method to map strength level
+  TherapistProfileDtoStrengthLevelEnum? _mapStrengthLevel(
+    String? strengthLevel,
+  ) {
+    if (strengthLevel == null) return null;
+    switch (strengthLevel.toUpperCase()) {
+      case 'SOFT':
+        return TherapistProfileDtoStrengthLevelEnum.SOFT;
+      case 'MEDIUM':
+        return TherapistProfileDtoStrengthLevelEnum.MEDIUM;
+      case 'STRONG':
+        return TherapistProfileDtoStrengthLevelEnum.STRONG;
       default:
         return null;
     }

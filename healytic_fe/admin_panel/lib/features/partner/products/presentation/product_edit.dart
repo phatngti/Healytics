@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
+import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/layouts/product_edit_desktop.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
@@ -66,7 +67,7 @@ class ProductDetailsContent extends HookConsumerWidget {
       text: product.value!.description,
     );
     final categoryController = useTextEditingController(
-      text: product.value!.category,
+      text: product.value!.category.name,
     );
     final imageController = useTextEditingController(
       text: product.value!.images.isNotEmpty ? product.value!.images[0] : '',
@@ -91,7 +92,11 @@ class ProductDetailsContent extends HookConsumerWidget {
           name: nameController.text,
           basePrice: double.parse(priceController.text),
           description: descriptionController.text,
-          category: categoryController.text,
+          category: CategoryEntity(
+            id: product.value!.category.id,
+            name: categoryController.text,
+            slug: product.value!.category.slug,
+          ),
           images: [imageController.text],
         );
         isEditing.value = false; // Exit edit mode
@@ -108,7 +113,7 @@ class ProductDetailsContent extends HookConsumerWidget {
       nameController.text = product.value!.name;
       priceController.text = product.value!.basePrice.toString();
       descriptionController.text = product.value!.description;
-      categoryController.text = product.value!.category;
+      categoryController.text = product.value!.category.name;
       imageController.text = product.value!.images.isNotEmpty
           ? product.value!.images[0]
           : '';

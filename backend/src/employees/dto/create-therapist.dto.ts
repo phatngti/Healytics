@@ -106,6 +106,7 @@ export class CreateTherapistDto {
   branchId?: string;
 
   @ApiProperty({ type: TherapistProfileDto, description: 'Therapist profile information' })
+  @IsNotEmpty()
   @ValidateNested()
   @Type(() => TherapistProfileDto)
   profile: TherapistProfileDto;

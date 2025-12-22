@@ -1,11 +1,13 @@
 import 'package:admin_panel/features/common/widgets/button/back_button.dart';
 import 'package:admin_panel/features/common/widgets/button/button.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/doctor_fields_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_contact_info_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_documents_certifications_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_professional_role_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_profile_image_card.dart';
-import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_skills_services_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_work_schedule_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/therapist_fields_card.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -22,11 +24,20 @@ class EmployeeAddDesktop extends StatefulWidget {
 
 class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
   final _formKey = GlobalKey<FormBuilderState>();
+  EmployeeRole _selectedRole = EmployeeRole.therapist;
 
   void _handleSubmit() {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       widget.onSubmit?.call(_formKey.currentState!.value);
     }
+  }
+
+  void _handleRoleChanged(EmployeeRole role) {
+    // Reset all form fields when switching role
+    _formKey.currentState?.reset();
+    setState(() {
+      _selectedRole = role;
+    });
   }
 
   @override
@@ -55,7 +66,12 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
                     const SizedBox(width: 340, child: _LeftColumn()),
                     AppDimens.horizontalLarge,
                     // Right Column - Role, Skills, Schedule
-                    const Expanded(child: _RightColumn()),
+                    Expanded(
+                      child: _RightColumn(
+                        selectedRole: _selectedRole,
+                        onRoleChanged: _handleRoleChanged,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -89,7 +105,7 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
                       AppBackButton(onTap: widget.onCancel ?? () {}),
                       AppDimens.horizontalMedium,
                       Text(
-                        'Create Employee',
+                        'Create ${_selectedRole.displayName}',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -116,7 +132,7 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
                               color: colorScheme.onPrimary,
                             ),
                             const SizedBox(width: 8),
-                            const Text('Create Employee'),
+                            Text('Create ${_selectedRole.displayName}'),
                           ],
                         ),
                       ),
@@ -148,19 +164,32 @@ class _LeftColumn extends StatelessWidget {
 }
 
 class _RightColumn extends StatelessWidget {
-  const _RightColumn();
+  final EmployeeRole selectedRole;
+  final ValueChanged<EmployeeRole> onRoleChanged;
+
+  const _RightColumn({required this.selectedRole, required this.onRoleChanged});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        EmployeeProfessionalRoleCard(),
+        EmployeeProfessionalRoleCard(
+          key: ValueKey(selectedRole), // Rebuild when role changes
+          initialRole: selectedRole,
+          onRoleChanged: onRoleChanged,
+        ),
         AppDimens.verticalMedium,
-        EmployeeSkillsServicesCard(),
+        // Conditionally show role-specific fields
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: selectedRole == EmployeeRole.therapist
+              ? const TherapistFieldsCard(key: ValueKey('therapist'))
+              : const DoctorFieldsCard(key: ValueKey('doctor')),
+        ),
         AppDimens.verticalMedium,
-        EmployeeDocumentsCertificationsCard(),
+        const EmployeeDocumentsCertificationsCard(),
         AppDimens.verticalMedium,
-        EmployeeWorkScheduleCard(),
+        const EmployeeWorkScheduleCard(),
       ],
     );
   }

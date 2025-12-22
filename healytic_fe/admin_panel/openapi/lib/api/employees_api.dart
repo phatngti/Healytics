@@ -123,7 +123,11 @@ class EmployeesApi {
   /// Get all employees
   ///
   /// Note: This method returns the HTTP [Response].
-  Future<Response> employeesControllerFindAllWithHttpInfo() async {
+  ///
+  /// Parameters:
+  ///
+  /// * [String] role:
+  Future<Response> employeesControllerFindAllWithHttpInfo({ String? role, }) async {
     // ignore: prefer_const_declarations
     final path = r'/employees';
 
@@ -133,6 +137,10 @@ class EmployeesApi {
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
+
+    if (role != null) {
+      queryParams.addAll(_queryParams('', 'role', role));
+    }
 
     const contentTypes = <String>[];
 
@@ -149,8 +157,12 @@ class EmployeesApi {
   }
 
   /// Get all employees
-  Future<List<Object>?> employeesControllerFindAll() async {
-    final response = await employeesControllerFindAllWithHttpInfo();
+  ///
+  /// Parameters:
+  ///
+  /// * [String] role:
+  Future<List<Object>?> employeesControllerFindAll({ String? role, }) async {
+    final response = await employeesControllerFindAllWithHttpInfo( role: role, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

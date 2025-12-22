@@ -26,7 +26,7 @@ export class ProductsService {
     const { media, physicalDetails, serviceDefinition, ...productData } = createProductDto;
 
     // 1. Create Product
-    const product = this.productRepository.create(productData);
+    const product = this.productRepository.create({...productData, currency: 'VND'});
     const savedProduct = await this.productRepository.save(product);
 
     // 2. Create Media if provided
@@ -68,13 +68,7 @@ export class ProductsService {
     });
   }
 
-  findByMerchant(merchantId: string): Promise<Product[]> {
-    return this.productRepository.find({
-      where: { merchantId },
-      relations: ['category', 'media', 'physicalDetails', 'serviceDefinition'],
-      order: { createdAt: 'DESC' },
-    });
-  }
+
 
   async findOne(id: string): Promise<Product> {
     const product = await this.productRepository.findOne({

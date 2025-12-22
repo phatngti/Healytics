@@ -51,11 +51,8 @@ export class ProductsController {
     description: 'Return all products.',
     type: [Product],
   })
-  @ApiQuery({ name: 'merchantId', required: false, type: String, description: 'Filter by merchant ID' })
-  findAll(@Query('merchantId') merchantId?: string) {
-    if (merchantId) {
-      return this.productsService.findByMerchant(merchantId);
-    }
+
+  findAll() {
     return this.productsService.findAll();
   }
 

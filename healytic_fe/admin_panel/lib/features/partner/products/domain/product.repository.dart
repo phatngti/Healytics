@@ -1,4 +1,6 @@
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
+import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
+
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
 import 'package:flutter/material.dart';
@@ -27,4 +29,6 @@ abstract class ProductRepository {
 
   /// Delete a product by ID
   Future<void> deleteProduct(ProductId id);
+
+  Future<List<CategoryEntity>> getCategories();
 }

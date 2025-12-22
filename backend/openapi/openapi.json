@@ -352,7 +352,22 @@
     "/employees": {
       "get": {
         "operationId": "EmployeesController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DOCTOR",
+                "THERAPIST",
+                "RECEPTIONIST",
+                "MANAGER"
+              ]
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Return all employees.",
@@ -763,17 +778,7 @@
       },
       "get": {
         "operationId": "ProductsController_findAll",
-        "parameters": [
-          {
-            "name": "merchantId",
-            "required": false,
-            "in": "query",
-            "description": "Filter by merchant ID",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Return all products.",
@@ -1189,7 +1194,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2025-12-22T15:04:06.653Z"
+              "submittedAt": "2025-12-22T18:39:45.311Z"
             }
           }
         },
@@ -1851,10 +1856,6 @@
       "CreateProductDto": {
         "type": "object",
         "properties": {
-          "merchantId": {
-            "type": "string",
-            "example": "uuid-merchant-id"
-          },
           "categoryId": {
             "type": "string",
             "example": "uuid-category-id"
@@ -1933,7 +1934,6 @@
           }
         },
         "required": [
-          "merchantId",
           "name",
           "slug",
           "type"
@@ -1946,10 +1946,6 @@
       "UpdateProductDto": {
         "type": "object",
         "properties": {
-          "merchantId": {
-            "type": "string",
-            "example": "uuid-merchant-id"
-          },
           "categoryId": {
             "type": "string",
             "example": "uuid-category-id"

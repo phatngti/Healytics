@@ -16,6 +16,7 @@ class ProductOperationsCard extends ConsumerStatefulWidget {
 
 class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
   String _staffAllocation = 'any';
+  String _staffRole = 'DOCTOR'; // Default role
   List<EmployeeEntity> _selectedStaff = [];
   List<EmployeeEntity> _allStaff = [];
   bool _isLoadingStaff = true;
@@ -30,7 +31,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
     try {
       final staff = await ref
           .read(productProvider.notifier)
-          .getStaffForProduct();
+          .getStaffForProduct(role: _staffRole);
       if (mounted) {
         setState(() {
           _allStaff = staff;
@@ -135,7 +136,12 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                     const SizedBox(height: 12),
                     _buildStaffAllocationOptions(context),
                     const SizedBox(height: 16),
-                    _buildStaffSelector(context),
+                    // Only show staff selector if "Specific Staff" is selected
+                    if (_staffAllocation == 'specific') ...[
+                      _buildStaffRoleSelector(context),
+                      const SizedBox(height: 16),
+                      _buildStaffSelector(context),
+                    ],
                     AppDimens.verticalMedium,
                     Divider(color: colorScheme.outlineVariant),
                     AppDimens.verticalMedium,
@@ -213,6 +219,60 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildStaffRoleSelector(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Staff Role',
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _buildRoleChip(context, 'Doctor', 'DOCTOR'),
+            const SizedBox(width: 8),
+            _buildRoleChip(context, 'Therapist', 'THERAPIST'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRoleChip(BuildContext context, String label, String value) {
+    final isSelected = _staffRole == value;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (bool selected) {
+        if (selected && _staffRole != value) {
+          setState(() {
+            _staffRole = value;
+            _isLoadingStaff = true;
+            // Clear selected staff when role changes since they likely won't match
+            _selectedStaff = [];
+          });
+          _updateFormBuilderStaff();
+          _loadStaff();
+        }
+      },
+      checkmarkColor: isSelected ? colorScheme.onPrimary : null,
+      selectedColor: colorScheme.primary,
+      labelStyle: TextStyle(
+        color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+      backgroundColor: colorScheme.surfaceContainerLow,
+      side: BorderSide(
+        color: isSelected ? Colors.transparent : colorScheme.outlineVariant,
+      ),
     );
   }
 

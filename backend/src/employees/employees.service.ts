@@ -5,6 +5,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { Employee } from './entities/employee.entity';
 import { DoctorProfile } from './entities/doctor-profile.entity';
 import { TherapistProfile } from './entities/therapist-profile.entity';
@@ -87,8 +88,16 @@ export class EmployeesService {
     return this.findOne(savedEmployee.id);
   }
 
-  findAll(): Promise<Employee[]> {
+  findAll(query?: GetEmployeesQueryDto): Promise<Employee[]> {
+    const { role } = query || {};
+    const where: any = {};
+
+    if (role) {
+      where.role = role;
+    }
+
     return this.employeeRepository.find({
+      where,
       relations: ['doctorProfile', 'therapistProfile'],
     });
   }

@@ -13,7 +13,6 @@ part of openapi.api;
 class UpdateProductDto {
   /// Returns a new [UpdateProductDto] instance.
   UpdateProductDto({
-    this.merchantId,
     this.categoryId,
     this.name,
     this.slug,
@@ -29,14 +28,6 @@ class UpdateProductDto {
     this.physicalDetails,
     this.serviceDefinition,
   });
-
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? merchantId;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -137,7 +128,6 @@ class UpdateProductDto {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is UpdateProductDto &&
-    other.merchantId == merchantId &&
     other.categoryId == categoryId &&
     other.name == name &&
     other.slug == slug &&
@@ -156,7 +146,6 @@ class UpdateProductDto {
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (merchantId == null ? 0 : merchantId!.hashCode) +
     (categoryId == null ? 0 : categoryId!.hashCode) +
     (name == null ? 0 : name!.hashCode) +
     (slug == null ? 0 : slug!.hashCode) +
@@ -173,15 +162,10 @@ class UpdateProductDto {
     (serviceDefinition == null ? 0 : serviceDefinition!.hashCode);
 
   @override
-  String toString() => 'UpdateProductDto[merchantId=$merchantId, categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, vendorName=$vendorName, media=$media, physicalDetails=$physicalDetails, serviceDefinition=$serviceDefinition]';
+  String toString() => 'UpdateProductDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, vendorName=$vendorName, media=$media, physicalDetails=$physicalDetails, serviceDefinition=$serviceDefinition]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.merchantId != null) {
-      json[r'merchantId'] = this.merchantId;
-    } else {
-      json[r'merchantId'] = null;
-    }
     if (this.categoryId != null) {
       json[r'categoryId'] = this.categoryId;
     } else {
@@ -270,7 +254,6 @@ class UpdateProductDto {
       }());
 
       return UpdateProductDto(
-        merchantId: mapValueOfType<String>(json, r'merchantId'),
         categoryId: mapValueOfType<String>(json, r'categoryId'),
         name: mapValueOfType<String>(json, r'name'),
         slug: mapValueOfType<String>(json, r'slug'),

@@ -16,11 +16,6 @@ void main() {
   // final instance = CreateProductDto();
 
   group('test CreateProductDto', () {
-    // String merchantId
-    test('to test the property `merchantId`', () async {
-      // TODO
-    });
-
     // String categoryId
     test('to test the property `categoryId`', () async {
       // TODO

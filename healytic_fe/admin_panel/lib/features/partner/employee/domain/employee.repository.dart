@@ -1,4 +1,5 @@
-import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +20,11 @@ abstract class EmployeeRepository {
   /// Get a single employee by ID
   Future<EmployeeEntity> getEmployeeById(EmployeeId id);
 
-  /// Create a new employee
-  Future<EmployeeEntity> createEmployee(CreateEmployeeRequest request);
+  /// Create a new doctor employee
+  Future<EmployeeEntity> createDoctor(CreateDoctorRequest request);
+
+  /// Create a new therapist employee
+  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request);
 
   /// Update an existing employee
   Future<void> updateEmployee(UpdateEmployeeRequest request);
@@ -32,5 +36,11 @@ abstract class EmployeeRepository {
   Future<List<EmployeeEntity>> getEmployeesList({
     required int startingAt,
     required int count,
+  });
+
+  /// Get employees filtered by role (e.g., DOCTOR, THERAPIST)
+  Future<List<EmployeeEntity>> getEmployeesByRole({
+    required String role,
+    int? limit,
   });
 }

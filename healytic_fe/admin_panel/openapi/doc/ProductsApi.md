@@ -65,7 +65,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsControllerFindAll**
-> List<Object> productsControllerFindAll(merchantId)
+> List<Object> productsControllerFindAll()
 
 Get all products
 
@@ -80,10 +80,9 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = ProductsApi();
-final merchantId = merchantId_example; // String | Filter by merchant ID
 
 try {
-    final result = api_instance.productsControllerFindAll(merchantId);
+    final result = api_instance.productsControllerFindAll();
     print(result);
 } catch (e) {
     print('Exception when calling ProductsApi->productsControllerFindAll: $e\n');
@@ -91,10 +90,7 @@ try {
 ```
 
 ### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **merchantId** | **String**| Filter by merchant ID | [optional] 
+This endpoint does not need any parameter.
 
 ### Return type
 

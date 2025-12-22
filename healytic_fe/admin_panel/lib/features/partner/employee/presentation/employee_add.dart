@@ -1,9 +1,12 @@
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
 import 'package:admin_panel/features/partner/employee/presentation/layouts/employee_add_desktop.dart';
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
+import 'package:admin_panel/router/partner_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 class EmployeeAddScreen extends ConsumerStatefulWidget {
@@ -16,46 +19,24 @@ class EmployeeAddScreen extends ConsumerStatefulWidget {
 class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   Future<void> _handleSubmit(Map<String, dynamic> values) async {
     try {
-      // Map form values to CreateEmployeeRequest
-      final request = CreateEmployeeRequest(
-        firstName: values['first_name']?.toString().trim() ?? '',
-        lastName: values['last_name']?.toString().trim() ?? '',
-        email: values['email_address']?.toString().trim() ?? '',
-        phone: values['phone_number']?.toString().trim() ?? '',
-        dateOfBirth: values['date_of_birth']?.toString() ?? '',
-        gender: values['gender']?.toString() ?? '',
-        emergencyContactName: values['contact_name']?.toString().trim() ?? '',
-        emergencyContactPhone: values['contact_phone']?.toString().trim() ?? '',
-        jobTitle: values['job_title']?.toString().trim() ?? '',
-        employeeId: values['employee_id']?.toString().trim().isNotEmpty == true
-            ? values['employee_id'].toString().trim()
-            : const Uuid().v4(),
-        employmentType: values['employment_type']?.toString() ?? 'Full-Time',
-        startDate: values['start_date']?.toString() ?? '',
-        skills:
-            (values['skill_set'] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            [],
-        services:
-            (values['performable_services'] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            [],
-        schedule: [], // TODO: Parse schedule from values
-        avatar: 'https://i.pravatar.cc/150?u=${values['email_address']}',
-        status: 'Active',
-        branch: const Uuid().v4(),
-        password: 'password123',
-      );
+      final role =
+          values['employee_role']?.toString().toUpperCase() ?? 'THERAPIST';
 
-      await ref.read(employeeProvider.notifier).createEmployee(request);
+      if (role == 'DOCTOR') {
+        await _createDoctor(values);
+      } else {
+        await _createTherapist(values);
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Employee created successfully')),
+          SnackBar(
+            content: Text(
+              '${role == 'DOCTOR' ? 'Doctor' : 'Therapist'} created successfully',
+            ),
+          ),
         );
-        Navigator.of(context).pop();
+        context.goNamed(EmployeeHomeRoute.name);
       }
     } catch (e) {
       if (mounted) {
@@ -67,6 +48,93 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         );
       }
     }
+  }
+
+  Future<void> _createDoctor(Map<String, dynamic> values) async {
+    // Parse name from first_name and last_name fields
+    final firstName = values['first_name']?.toString().trim() ?? '';
+    final lastName = values['last_name']?.toString().trim() ?? '';
+    final fullName = '$firstName $lastName'.trim();
+
+    // Parse specializations and education from comma-separated strings
+    final specializations = _parseCommaSeparatedList(
+      values['specializations']?.toString(),
+    );
+    final education = _parseCommaSeparatedList(values['education']?.toString());
+
+    final request = CreateDoctorRequest(
+      employeeCode:
+          values['employee_id']?.toString().trim() ??
+          const Uuid().v4().substring(0, 8).toUpperCase(),
+      fullName: fullName.isNotEmpty ? fullName : 'New Doctor',
+      displayName: fullName.isNotEmpty ? fullName : null,
+      email: values['email_address']?.toString().trim() ?? '',
+      phone: values['phone_number']?.toString().trim(),
+      avatarUrl: 'https://i.pravatar.cc/150?u=${values['email_address']}',
+      dob: values['date_of_birth']?.toString(),
+      gender: values['gender']?.toString().toUpperCase(),
+      branchId: null, // TODO: Add branch selection
+      title: values['medical_title']?.toString().trim(),
+      medicalLicense: values['medical_license']?.toString().trim() ?? '',
+      experienceYears: int.tryParse(
+        values['experience_years']?.toString() ?? '',
+      ),
+      consultationFee: double.tryParse(
+        values['consultation_fee']?.toString() ?? '',
+      ),
+      specializations: specializations,
+      education: education,
+    );
+
+    await ref.read(employeeProvider.notifier).createDoctor(request);
+  }
+
+  Future<void> _createTherapist(Map<String, dynamic> values) async {
+    // Parse name from first_name and last_name fields
+    final firstName = values['first_name']?.toString().trim() ?? '';
+    final lastName = values['last_name']?.toString().trim() ?? '';
+    final fullName = '$firstName $lastName'.trim();
+
+    // Parse skills from comma-separated string
+    final skills = _parseCommaSeparatedList(values['skills']?.toString());
+
+    // Map therapist level
+    String? level = values['therapist_level']?.toString();
+    if (level != null) {
+      level = level.toUpperCase();
+    }
+
+    final request = CreateTherapistRequest(
+      employeeCode:
+          values['employee_id']?.toString().trim() ??
+          const Uuid().v4().substring(0, 8).toUpperCase(),
+      fullName: fullName.isNotEmpty ? fullName : 'New Therapist',
+      displayName: fullName.isNotEmpty ? fullName : null,
+      email: values['email_address']?.toString().trim() ?? '',
+      phone: values['phone_number']?.toString().trim(),
+      avatarUrl: 'https://i.pravatar.cc/150?u=${values['email_address']}',
+      dob: values['date_of_birth']?.toString(),
+      gender: values['gender']?.toString().toUpperCase(),
+      branchId: null, // TODO: Add branch selection
+      level: level,
+      type: values['therapist_type']?.toString(),
+      strengthLevel: values['strength_level']?.toString(),
+      commissionRate:
+          double.tryParse(values['commission_rate']?.toString() ?? '') ?? 0,
+      healthCheckDate: values['health_check_date']?.toString(),
+      skills: skills,
+    );
+
+    await ref.read(employeeProvider.notifier).createTherapist(request);
+  }
+
+  List<String> _parseCommaSeparatedList(String? value) {
+    if (value == null || value.isEmpty) return [];
+    return value
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
   }
 
   void _handleCancel() {

@@ -8,7 +8,6 @@ import 'package:admin_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**merchantId** | **String** |  | [optional] 
 **categoryId** | **String** |  | [optional] 
 **name** | **String** |  | [optional] 
 **slug** | **String** |  | [optional] 
