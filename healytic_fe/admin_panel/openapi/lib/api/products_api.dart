@@ -71,12 +71,7 @@ class ProductsApi {
   /// Get all products
   ///
   /// Note: This method returns the HTTP [Response].
-  ///
-  /// Parameters:
-  ///
-  /// * [String] merchantId:
-  ///   Filter by merchant ID
-  Future<Response> productsControllerFindAllWithHttpInfo({ String? merchantId, }) async {
+  Future<Response> productsControllerFindAllWithHttpInfo() async {
     // ignore: prefer_const_declarations
     final path = r'/products';
 
@@ -86,10 +81,6 @@ class ProductsApi {
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
-
-    if (merchantId != null) {
-      queryParams.addAll(_queryParams('', 'merchantId', merchantId));
-    }
 
     const contentTypes = <String>[];
 
@@ -106,13 +97,8 @@ class ProductsApi {
   }
 
   /// Get all products
-  ///
-  /// Parameters:
-  ///
-  /// * [String] merchantId:
-  ///   Filter by merchant ID
-  Future<List<Object>?> productsControllerFindAll({ String? merchantId, }) async {
-    final response = await productsControllerFindAllWithHttpInfo( merchantId: merchantId, );
+  Future<List<Object>?> productsControllerFindAll() async {
+    final response = await productsControllerFindAllWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

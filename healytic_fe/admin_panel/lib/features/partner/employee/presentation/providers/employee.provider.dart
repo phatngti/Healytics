@@ -1,7 +1,8 @@
 import 'package:admin_panel/features/common/widgets/table/helper.dart';
 import 'package:admin_panel/features/partner/employee/datasource/employee_implement.repository.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -61,8 +62,18 @@ class EmployeeNotifier extends _$EmployeeNotifier {
     return repo.getEmployeeById(id);
   }
 
-  Future<void> createEmployee(CreateEmployeeRequest request) async {
+  Future<EmployeeEntity> createDoctor(CreateDoctorRequest request) async {
     final repo = ref.read(employeeRepositoryProvider);
-    await repo.createEmployee(request);
+    return repo.createDoctor(request);
+  }
+
+  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request) async {
+    final repo = ref.read(employeeRepositoryProvider);
+    return repo.createTherapist(request);
+  }
+
+  Future<List<EmployeeEntity>> getEmployeesByRole(String role) async {
+    final repo = ref.read(employeeRepositoryProvider);
+    return repo.getEmployeesByRole(role: role);
   }
 }

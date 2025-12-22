@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,6 +21,7 @@ import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
+import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { Employee } from './entities/employee.entity';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
@@ -61,8 +63,8 @@ export class EmployeesController {
     description: 'Return all employees.',
     type: [Employee],
   })
-  findAll() {
-    return this.employeesService.findAll();
+  findAll(@Query() query: GetEmployeesQueryDto) {
+    return this.employeesService.findAll(query);
   }
 
   @Get(':id')

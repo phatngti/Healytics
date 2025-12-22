@@ -111,6 +111,7 @@ export class CreateDoctorDto {
   branchId?: string;
 
   @ApiProperty({ type: DoctorProfileDto, description: 'Doctor profile information' })
+  @IsNotEmpty()
   @ValidateNested()
   @Type(() => DoctorProfileDto)
   profile: DoctorProfileDto;

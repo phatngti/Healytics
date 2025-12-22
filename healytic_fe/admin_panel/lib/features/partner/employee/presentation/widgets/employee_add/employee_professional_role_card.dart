@@ -1,11 +1,21 @@
 import 'package:admin_panel/features/common/widgets/input/date_pick_field.dart';
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/role_toggle_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:uuid/uuid.dart';
 
 class EmployeeProfessionalRoleCard extends StatefulWidget {
-  const EmployeeProfessionalRoleCard({super.key});
+  final ValueChanged<EmployeeRole>? onRoleChanged;
+  final EmployeeRole initialRole;
+
+  const EmployeeProfessionalRoleCard({
+    super.key,
+    this.onRoleChanged,
+    this.initialRole = EmployeeRole.therapist,
+  });
 
   @override
   State<EmployeeProfessionalRoleCard> createState() =>
@@ -16,23 +26,31 @@ class _EmployeeProfessionalRoleCardState
     extends State<EmployeeProfessionalRoleCard> {
   late final TextEditingController _employeeIdController;
   late final TextEditingController _jobTitleController;
-  late final TextEditingController _employmentTypeController;
   bool _isExpanded = true;
+  late EmployeeRole _selectedRole;
 
   @override
   void initState() {
     super.initState();
-    _employeeIdController = TextEditingController(text: 'EMP-2051');
+    _employeeIdController = TextEditingController(
+      text: const Uuid().v4().substring(0, 8).toUpperCase(),
+    );
     _jobTitleController = TextEditingController();
-    _employmentTypeController = TextEditingController();
+    _selectedRole = widget.initialRole;
   }
 
   @override
   void dispose() {
     _employeeIdController.dispose();
     _jobTitleController.dispose();
-    _employmentTypeController.dispose();
     super.dispose();
+  }
+
+  void _handleRoleChanged(EmployeeRole role) {
+    setState(() {
+      _selectedRole = role;
+    });
+    widget.onRoleChanged?.call(role);
   }
 
   @override
@@ -123,14 +141,48 @@ class _EmployeeProfessionalRoleCardState
         border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Role Toggle Selector
+          Text(
+            'Select Role Type',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          RoleToggleSelector(
+            selectedRole: _selectedRole,
+            onRoleChanged: _handleRoleChanged,
+          ),
+          // Hidden field to store role in form
+          FormBuilderField<String>(
+            name: 'employee_role',
+            initialValue: _selectedRole.apiValue,
+            builder: (field) {
+              // Update field when selection changes
+              if (field.value != _selectedRole.apiValue) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  field.didChange(_selectedRole.apiValue);
+                });
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+          const SizedBox(height: 24),
+          const Divider(),
+          const SizedBox(height: 24),
+          // Common fields
           Row(
             children: [
               Expanded(
                 child: _buildTextField(
                   context,
                   label: 'Job Title',
-                  placeholder: 'e.g. Senior Massage Therapist',
+                  placeholder: _selectedRole == EmployeeRole.doctor
+                      ? 'e.g. Senior Dermatologist'
+                      : 'e.g. Senior Massage Therapist',
                   isRequired: true,
                   controller: _jobTitleController,
                 ),
@@ -143,7 +195,10 @@ class _EmployeeProfessionalRoleCardState
                   controller: _employeeIdController,
                   onGenerate: () {
                     setState(() {
-                      _employeeIdController.text = const Uuid().v4();
+                      _employeeIdController.text = const Uuid()
+                          .v4()
+                          .substring(0, 8)
+                          .toUpperCase();
                     });
                   },
                 ),

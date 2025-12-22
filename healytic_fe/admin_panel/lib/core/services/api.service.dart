@@ -19,6 +19,8 @@ class ApiService implements Authentication {
   late AuthenticationApi authenticateApi;
   late AccountApi accountApi;
   late EmployeesApi employeesApi;
+  late ProductsApi productsApi;
+  late CategoriesApi categoriesApi;
 
   ApiService() {
     // The below line ensures that the api clients are initialized when the service is instantiated
@@ -56,6 +58,8 @@ class ApiService implements Authentication {
     authenticateApi = AuthenticationApi(_apiClient);
     accountApi = AccountApi(_apiClient);
     employeesApi = EmployeesApi(_apiClient);
+    productsApi = ProductsApi(_apiClient);
+    categoriesApi = CategoriesApi(_apiClient);
   }
 
   Future<void> _setUserAgentHeader() async {

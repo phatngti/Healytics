@@ -19,7 +19,7 @@ _Product _$ProductFromJson(Map<String, dynamic> json) => _Product(
   stockQuantity: (json['stockQuantity'] as num?)?.toInt(),
   status: json['status'] as String? ?? 'draft',
   onlineStore: json['onlineStore'] as bool? ?? true,
-  category: json['category'] as String,
+  category: CategoryEntity.fromJson(json['category'] as Map<String, dynamic>),
   tags:
       (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
@@ -50,7 +50,7 @@ Map<String, dynamic> _$ProductToJson(_Product instance) => <String, dynamic>{
   'stockQuantity': instance.stockQuantity,
   'status': instance.status,
   'onlineStore': instance.onlineStore,
-  'category': instance.category,
+  'category': instance.category.toJson(),
   'tags': instance.tags,
   'vendor': instance.vendor,
   'duration': instance.duration,

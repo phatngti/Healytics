@@ -23,8 +23,6 @@ class ProductAddDesktop extends ConsumerStatefulWidget {
 
 class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
   List<dynamic> _currentImages = [];
-  String _productType = 'service';
-  bool _showStockQuantity = false;
   String _status = 'draft';
   String? _category;
 
@@ -53,15 +51,7 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                     flex: 2,
                     child: Column(
                       children: [
-                        ProductGeneralInfoCard(
-                          initialProductType: _productType,
-                          onProductTypeChanged: (type) {
-                            setState(() {
-                              _productType = type;
-                              _showStockQuantity = type == 'physical';
-                            });
-                          },
-                        ),
+                        const ProductGeneralInfoCard(),
                         AppDimens.verticalMedium,
                         ProductMediaCard(
                           initialImages: _currentImages,
@@ -72,9 +62,9 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                           },
                         ),
                         AppDimens.verticalMedium,
-                        ProductPricingCard(
-                          showStockQuantity: _showStockQuantity,
-                        ),
+                        const ProductPricingCard(),
+                        AppDimens.verticalMedium,
+                        const ProductResourcesCard(),
                       ],
                     ),
                   ),
@@ -101,8 +91,6 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                             });
                           },
                         ),
-                        AppDimens.verticalMedium,
-                        const ProductResourcesCard(),
                         AppDimens.verticalMedium,
                         const ProductOperationsCard(),
                       ],

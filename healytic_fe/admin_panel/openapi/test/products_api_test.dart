@@ -26,7 +26,7 @@ void main() {
 
     // Get all products
     //
-    //Future<List<Object>> productsControllerFindAll({ String merchantId }) async
+    //Future<List<Object>> productsControllerFindAll() async
     test('test productsControllerFindAll', () async {
       // TODO
     });

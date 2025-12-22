@@ -19,7 +19,7 @@ mixin _$Product {
  String get name; String get description; String get productType;// Pricing & Inventory
  double get basePrice; double? get salePrice; double? get costPerItem; String? get sku; String? get barcode; int? get stockQuantity;// Visibility
  String get status; bool get onlineStore;// Organization
- String get category; List<String> get tags; String? get vendor;// Operations & Scheduling
+ CategoryEntity get category; List<String> get tags; String? get vendor;// Operations & Scheduling
  int? get duration; int? get buffer; int? get capacity; int? get leadTime; String get staffAllocation; List<String> get staffIds;// Media
  List<String> get images;
 /// Create a copy of Product
@@ -54,11 +54,11 @@ abstract mixin class $ProductCopyWith<$Res>  {
   factory $ProductCopyWith(Product value, $Res Function(Product) _then) = _$ProductCopyWithImpl;
 @useResult
 $Res call({
- ProductId id, String name, String description, String productType, double basePrice, double? salePrice, double? costPerItem, String? sku, String? barcode, int? stockQuantity, String status, bool onlineStore, String category, List<String> tags, String? vendor, int? duration, int? buffer, int? capacity, int? leadTime, String staffAllocation, List<String> staffIds, List<String> images
+ ProductId id, String name, String description, String productType, double basePrice, double? salePrice, double? costPerItem, String? sku, String? barcode, int? stockQuantity, String status, bool onlineStore, CategoryEntity category, List<String> tags, String? vendor, int? duration, int? buffer, int? capacity, int? leadTime, String staffAllocation, List<String> staffIds, List<String> images
 });
 
 
-
+$CategoryEntityCopyWith<$Res> get category;
 
 }
 /// @nodoc
@@ -86,7 +86,7 @@ as String?,stockQuantity: freezed == stockQuantity ? _self.stockQuantity : stock
 as int?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,onlineStore: null == onlineStore ? _self.onlineStore : onlineStore // ignore: cast_nullable_to_non_nullable
 as bool,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String,tags: null == tags ? _self.tags : tags // ignore: cast_nullable_to_non_nullable
+as CategoryEntity,tags: null == tags ? _self.tags : tags // ignore: cast_nullable_to_non_nullable
 as List<String>,vendor: freezed == vendor ? _self.vendor : vendor // ignore: cast_nullable_to_non_nullable
 as String?,duration: freezed == duration ? _self.duration : duration // ignore: cast_nullable_to_non_nullable
 as int?,buffer: freezed == buffer ? _self.buffer : buffer // ignore: cast_nullable_to_non_nullable
@@ -98,7 +98,16 @@ as List<String>,images: null == images ? _self.images : images // ignore: cast_n
 as List<String>,
   ));
 }
-
+/// Create a copy of Product
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CategoryEntityCopyWith<$Res> get category {
+  
+  return $CategoryEntityCopyWith<$Res>(_self.category, (value) {
+    return _then(_self.copyWith(category: value));
+  });
+}
 }
 
 
@@ -180,7 +189,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ProductId id,  String name,  String description,  String productType,  double basePrice,  double? salePrice,  double? costPerItem,  String? sku,  String? barcode,  int? stockQuantity,  String status,  bool onlineStore,  String category,  List<String> tags,  String? vendor,  int? duration,  int? buffer,  int? capacity,  int? leadTime,  String staffAllocation,  List<String> staffIds,  List<String> images)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ProductId id,  String name,  String description,  String productType,  double basePrice,  double? salePrice,  double? costPerItem,  String? sku,  String? barcode,  int? stockQuantity,  String status,  bool onlineStore,  CategoryEntity category,  List<String> tags,  String? vendor,  int? duration,  int? buffer,  int? capacity,  int? leadTime,  String staffAllocation,  List<String> staffIds,  List<String> images)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Product() when $default != null:
 return $default(_that.id,_that.name,_that.description,_that.productType,_that.basePrice,_that.salePrice,_that.costPerItem,_that.sku,_that.barcode,_that.stockQuantity,_that.status,_that.onlineStore,_that.category,_that.tags,_that.vendor,_that.duration,_that.buffer,_that.capacity,_that.leadTime,_that.staffAllocation,_that.staffIds,_that.images);case _:
@@ -201,7 +210,7 @@ return $default(_that.id,_that.name,_that.description,_that.productType,_that.ba
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ProductId id,  String name,  String description,  String productType,  double basePrice,  double? salePrice,  double? costPerItem,  String? sku,  String? barcode,  int? stockQuantity,  String status,  bool onlineStore,  String category,  List<String> tags,  String? vendor,  int? duration,  int? buffer,  int? capacity,  int? leadTime,  String staffAllocation,  List<String> staffIds,  List<String> images)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ProductId id,  String name,  String description,  String productType,  double basePrice,  double? salePrice,  double? costPerItem,  String? sku,  String? barcode,  int? stockQuantity,  String status,  bool onlineStore,  CategoryEntity category,  List<String> tags,  String? vendor,  int? duration,  int? buffer,  int? capacity,  int? leadTime,  String staffAllocation,  List<String> staffIds,  List<String> images)  $default,) {final _that = this;
 switch (_that) {
 case _Product():
 return $default(_that.id,_that.name,_that.description,_that.productType,_that.basePrice,_that.salePrice,_that.costPerItem,_that.sku,_that.barcode,_that.stockQuantity,_that.status,_that.onlineStore,_that.category,_that.tags,_that.vendor,_that.duration,_that.buffer,_that.capacity,_that.leadTime,_that.staffAllocation,_that.staffIds,_that.images);case _:
@@ -221,7 +230,7 @@ return $default(_that.id,_that.name,_that.description,_that.productType,_that.ba
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ProductId id,  String name,  String description,  String productType,  double basePrice,  double? salePrice,  double? costPerItem,  String? sku,  String? barcode,  int? stockQuantity,  String status,  bool onlineStore,  String category,  List<String> tags,  String? vendor,  int? duration,  int? buffer,  int? capacity,  int? leadTime,  String staffAllocation,  List<String> staffIds,  List<String> images)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ProductId id,  String name,  String description,  String productType,  double basePrice,  double? salePrice,  double? costPerItem,  String? sku,  String? barcode,  int? stockQuantity,  String status,  bool onlineStore,  CategoryEntity category,  List<String> tags,  String? vendor,  int? duration,  int? buffer,  int? capacity,  int? leadTime,  String staffAllocation,  List<String> staffIds,  List<String> images)?  $default,) {final _that = this;
 switch (_that) {
 case _Product() when $default != null:
 return $default(_that.id,_that.name,_that.description,_that.productType,_that.basePrice,_that.salePrice,_that.costPerItem,_that.sku,_that.barcode,_that.stockQuantity,_that.status,_that.onlineStore,_that.category,_that.tags,_that.vendor,_that.duration,_that.buffer,_that.capacity,_that.leadTime,_that.staffAllocation,_that.staffIds,_that.images);case _:
@@ -255,7 +264,7 @@ class _Product implements Product {
 @override@JsonKey() final  String status;
 @override@JsonKey() final  bool onlineStore;
 // Organization
-@override final  String category;
+@override final  CategoryEntity category;
  final  List<String> _tags;
 @override@JsonKey() List<String> get tags {
   if (_tags is EqualUnmodifiableListView) return _tags;
@@ -320,11 +329,11 @@ abstract mixin class _$ProductCopyWith<$Res> implements $ProductCopyWith<$Res> {
   factory _$ProductCopyWith(_Product value, $Res Function(_Product) _then) = __$ProductCopyWithImpl;
 @override @useResult
 $Res call({
- ProductId id, String name, String description, String productType, double basePrice, double? salePrice, double? costPerItem, String? sku, String? barcode, int? stockQuantity, String status, bool onlineStore, String category, List<String> tags, String? vendor, int? duration, int? buffer, int? capacity, int? leadTime, String staffAllocation, List<String> staffIds, List<String> images
+ ProductId id, String name, String description, String productType, double basePrice, double? salePrice, double? costPerItem, String? sku, String? barcode, int? stockQuantity, String status, bool onlineStore, CategoryEntity category, List<String> tags, String? vendor, int? duration, int? buffer, int? capacity, int? leadTime, String staffAllocation, List<String> staffIds, List<String> images
 });
 
 
-
+@override $CategoryEntityCopyWith<$Res> get category;
 
 }
 /// @nodoc
@@ -352,7 +361,7 @@ as String?,stockQuantity: freezed == stockQuantity ? _self.stockQuantity : stock
 as int?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,onlineStore: null == onlineStore ? _self.onlineStore : onlineStore // ignore: cast_nullable_to_non_nullable
 as bool,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String,tags: null == tags ? _self._tags : tags // ignore: cast_nullable_to_non_nullable
+as CategoryEntity,tags: null == tags ? _self._tags : tags // ignore: cast_nullable_to_non_nullable
 as List<String>,vendor: freezed == vendor ? _self.vendor : vendor // ignore: cast_nullable_to_non_nullable
 as String?,duration: freezed == duration ? _self.duration : duration // ignore: cast_nullable_to_non_nullable
 as int?,buffer: freezed == buffer ? _self.buffer : buffer // ignore: cast_nullable_to_non_nullable
@@ -365,7 +374,16 @@ as List<String>,
   ));
 }
 
-
+/// Create a copy of Product
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CategoryEntityCopyWith<$Res> get category {
+  
+  return $CategoryEntityCopyWith<$Res>(_self.category, (value) {
+    return _then(_self.copyWith(category: value));
+  });
+}
 }
 
 // dart format on
