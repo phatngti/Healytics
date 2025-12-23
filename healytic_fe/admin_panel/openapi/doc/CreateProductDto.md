@@ -19,6 +19,7 @@ Name | Type | Description | Notes
 **status** | **String** |  | [optional] 
 **isVisibleOnline** | **bool** |  | [optional] 
 **vendorName** | **String** |  | [optional] 
+**employeeIds** | **List<String>** |  | [optional] [default to const []]
 **media** | [**List<CreateProductMediaDto>**](CreateProductMediaDto.md) | Product media (images/videos) | [optional] [default to const []]
 **physicalDetails** | [**CreatePhysicalDetailsDto**](CreatePhysicalDetailsDto.md) | Physical product details (required if type is physical) | [optional] 
 **serviceDefinition** | [**CreateServiceDefinitionDto**](CreateServiceDefinitionDto.md) | Service definition (required if type is service) | [optional] 

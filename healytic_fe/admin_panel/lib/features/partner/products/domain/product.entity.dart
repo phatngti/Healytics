@@ -5,9 +5,9 @@ part 'product.entity.freezed.dart';
 part 'product.entity.g.dart';
 
 /// Type-safe value object for Product IDs
-extension type const ProductId(int value) implements int {
-  factory ProductId.fromJson(dynamic json) => ProductId(json as int);
-  int toJson() => value;
+extension type const ProductId(String value) implements String {
+  factory ProductId.fromJson(dynamic json) => ProductId(json.toString());
+  String toJson() => value;
 }
 
 /// Pure domain model representing a Product

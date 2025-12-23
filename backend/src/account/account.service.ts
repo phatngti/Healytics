@@ -65,6 +65,7 @@ export class AccountService {
         'createdAt',
         'updatedAt',
       ],
+      relations: ['userProfile'],
     });
   }
 

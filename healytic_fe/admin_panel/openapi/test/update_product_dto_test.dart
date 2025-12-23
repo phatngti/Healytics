@@ -71,6 +71,11 @@ void main() {
       // TODO
     });
 
+    // List<String> employeeIds (default value: const [])
+    test('to test the property `employeeIds`', () async {
+      // TODO
+    });
+
     // Product media (images/videos)
     // List<CreateProductMediaDto> media (default value: const [])
     test('to test the property `media`', () async {

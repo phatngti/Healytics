@@ -16,6 +16,7 @@ abstract class UpdateProductRequest with _$UpdateProductRequest {
     String? description,
     List<String>? images,
     String? category,
+    List<String>? staffIds,
   }) = _UpdateProductRequest;
 
   factory UpdateProductRequest.fromJson(Map<String, dynamic> json) =>

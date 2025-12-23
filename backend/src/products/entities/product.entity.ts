@@ -16,6 +16,7 @@ import { ProductMedia } from './product-media.entity';
 import { ProductStatus } from '../enums/product-status.enum';
 import { ServiceDefinition } from './service-definition.entity';
 import { ProductPhysicalDetails } from './product-physical-details.entity';
+import { ServiceEmployeeEligibility } from './service-employee-eligibility.entity';
 
 @Entity('products')
 @Index('IDX_PRODUCT_MERCHANT_SLUG', ['slug'])
@@ -85,4 +86,11 @@ export class Product {
     eager: false,
   })
   serviceDefinition: ServiceDefinition | null;
+
+  @OneToMany(
+    () => ServiceEmployeeEligibility,
+    (eligibility) => eligibility.product,
+    { cascade: true },
+  )
+  serviceEmployeeEligibilities: ServiceEmployeeEligibility[];
 }

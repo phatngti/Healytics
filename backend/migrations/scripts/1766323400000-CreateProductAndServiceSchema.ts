@@ -168,7 +168,6 @@ export class CreateProductAndServiceSchema1766323400000 implements MigrationInte
                 { name: "buffer_minutes", type: "int", default: 0 },
                 { name: "max_capacity", type: "int", default: 1 },
                 { name: "min_lead_time_hours", type: "int", default: 0 },
-                { name: "availability_mode", type: "varchar", length: "50", default: "'business_hours'" },
                 { name: "staff_assignment_type", type: "varchar", length: "20", default: "'any'" } // any, specific
             ]
         }), true);

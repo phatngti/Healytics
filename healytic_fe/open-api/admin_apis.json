@@ -959,6 +959,133 @@
           "products"
         ]
       }
+    },
+    "/s3/presign": {
+      "post": {
+        "operationId": "S3Controller_preSign",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string",
+                    "example": "example.png"
+                  },
+                  "contentType": {
+                    "type": "string",
+                    "example": "image/png"
+                  }
+                },
+                "required": [
+                  "fileName",
+                  "contentType"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The presigned url has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uploadUrl": {
+                      "type": "string"
+                    },
+                    "key": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get presigned upload url",
+        "tags": [
+          "S3"
+        ]
+      }
+    },
+    "/s3/{key}": {
+      "get": {
+        "operationId": "S3Controller_getFileUrl",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "description": "File key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return the file url.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get file url",
+        "tags": [
+          "S3"
+        ]
+      },
+      "delete": {
+        "operationId": "S3Controller_deleteFile",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "description": "File key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file has been successfully deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "File deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Delete file",
+        "tags": [
+          "S3"
+        ]
+      }
     }
   },
   "info": {
@@ -1194,7 +1321,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2025-12-22T18:26:28.315Z"
+              "submittedAt": "2025-12-23T12:23:07.714Z"
             }
           }
         },
@@ -1832,14 +1959,6 @@
             "type": "number",
             "example": 2
           },
-          "availabilityMode": {
-            "type": "string",
-            "enum": [
-              "business_hours",
-              "custom"
-            ],
-            "example": "business_hours"
-          },
           "staffAssignmentType": {
             "type": "string",
             "enum": [
@@ -1908,6 +2027,16 @@
           "vendorName": {
             "type": "string",
             "example": "Vendor XYZ"
+          },
+          "employeeIds": {
+            "example": [
+              "uuid-1",
+              "uuid-2"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "media": {
             "description": "Product media (images/videos)",
@@ -1998,6 +2127,16 @@
           "vendorName": {
             "type": "string",
             "example": "Vendor XYZ"
+          },
+          "employeeIds": {
+            "example": [
+              "uuid-1",
+              "uuid-2"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "media": {
             "description": "Product media (images/videos)",

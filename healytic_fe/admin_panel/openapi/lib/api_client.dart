@@ -216,6 +216,14 @@ class ApiClient {
           return RegisterDto.fromJson(value);
         case 'RegisterProfileDto':
           return RegisterProfileDto.fromJson(value);
+        case 'S3ControllerDeleteFile200Response':
+          return S3ControllerDeleteFile200Response.fromJson(value);
+        case 'S3ControllerGetFileUrl200Response':
+          return S3ControllerGetFileUrl200Response.fromJson(value);
+        case 'S3ControllerPreSign201Response':
+          return S3ControllerPreSign201Response.fromJson(value);
+        case 'S3ControllerPreSignRequest':
+          return S3ControllerPreSignRequest.fromJson(value);
         case 'SurveyDto':
           return SurveyDto.fromJson(value);
         case 'SurveyResponseDto':

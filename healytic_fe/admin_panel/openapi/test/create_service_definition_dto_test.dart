@@ -37,11 +37,6 @@ void main() {
       // TODO
     });
 
-    // String availabilityMode
-    test('to test the property `availabilityMode`', () async {
-      // TODO
-    });
-
     // String staffAssignmentType
     test('to test the property `staffAssignmentType`', () async {
       // TODO
