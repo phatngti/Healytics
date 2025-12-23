@@ -15,16 +15,22 @@ n4f_config = BitsAndBytesConfig(
 )
 
 # 24GB --> 8GB
-def get_hf_llm(model_name = "microsoft/Phi-3-mini-4k-instruct", max_new_token = 300, **kwargs):
+# def get_hf_llm(model_name = "microsoft/Phi-3-mini-4k-instruct", max_new_token = 300, **kwargs):
+
+def get_hf_llm(model_name = "meta-llama/Llama-3.2-3B-Instruct", max_new_token = 300, **kwargs):
+     
+    # hf_token = "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" // Model Llama_8B
+    hf_token = "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" # Model Llama_3B
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         quantization_config = n4f_config,
         # torch_dtype=torch.float16,  # FP16 thay vì 4-bit
         low_cpu_mem_usage = True,
+        token=hf_token,
     )
 
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, token=hf_token)
 
     model_pipeline = pipeline(
         "text-generation",
