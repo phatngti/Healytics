@@ -1,5 +1,5 @@
 """
-Home Recommender Endpoint - không dùng LangChain
+Home Recommender Endpoint
 Backend có thể gọi hàm recommend_for_home() để lấy gợi ý cho trang chủ
 """
 import sys

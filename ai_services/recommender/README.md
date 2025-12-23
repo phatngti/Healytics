@@ -37,6 +37,7 @@ recommender_system/
 ├── create_sample_data.py
 ├── build_vectordb.py
 ├── main.py
+├── app.py                          # Demo UI Streamlit
 └── requirements.txt
 ```
 
@@ -64,6 +65,10 @@ python build_vectordb.py
 
 ```bash
 python main.py
+```
+
+```bash
+streamlit run app.py
 ```
 
 ##  Cách sử dụng
