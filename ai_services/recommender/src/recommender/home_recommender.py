@@ -45,7 +45,7 @@ class HomeRecommender:
         
         recommendations = []
         for doc, score in results_with_score:
-            service_id = doc.metadata.get("service_id")
+            service_id = doc['metadata']['service_id'] 
             
             # Skip nếu đã sử dụng
             if service_id in selected_ids:
