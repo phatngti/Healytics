@@ -5,7 +5,6 @@ import {
   JoinColumn,
   PrimaryColumn,
 } from 'typeorm';
-import { AvailabilityMode } from '@/products/enums/availability-mode.enum';
 import { StaffAssignmentType } from '@/products/enums/staff-assignment-type.enum';
 import { Product } from './product.entity';
 
@@ -25,9 +24,6 @@ export class ServiceDefinition {
 
   @Column({ name: 'min_lead_time_hours', type: 'int', default: 0 })
   minLeadTimeHours: number;
-
-  @Column({ name: 'availability_mode', length: 50, default: AvailabilityMode.BUSINESS_HOURS })
-  availabilityMode: AvailabilityMode;
 
   @Column({ name: 'staff_assignment_type', length: 20, default: StaffAssignmentType.ANY })
   staffAssignmentType: StaffAssignmentType;

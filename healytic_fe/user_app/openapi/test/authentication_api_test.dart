@@ -22,6 +22,16 @@ void main() {
       // TODO
     });
 
+    //Future<AuthTokensDto> authControllerLoginAdmin(AdminLoginDto adminLoginDto) async
+    test('test authControllerLoginAdmin', () async {
+      // TODO
+    });
+
+    //Future<AuthTokensDto> authControllerLoginUser(LoginDto loginDto) async
+    test('test authControllerLoginUser', () async {
+      // TODO
+    });
+
     //Future<LogoutResponseDto> authControllerLogout() async
     test('test authControllerLogout', () async {
       // TODO
@@ -34,6 +44,11 @@ void main() {
 
     //Future<AuthTokensDto> authControllerRegister(RegisterDto registerDto) async
     test('test authControllerRegister', () async {
+      // TODO
+    });
+
+    //Future<AuthTokensDto> authControllerRegisterUser(RegisterDto registerDto) async
+    test('test authControllerRegisterUser', () async {
       // TODO
     });
 

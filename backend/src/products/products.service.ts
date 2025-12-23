@@ -7,6 +7,7 @@ import { Product } from './entities/product.entity';
 import { ProductMedia } from './entities/product-media.entity';
 import { ProductPhysicalDetails } from './entities/product-physical-details.entity';
 import { ServiceDefinition } from './entities/service-definition.entity';
+import { ServiceEmployeeEligibility } from './entities/service-employee-eligibility.entity';
 import { ProductType } from './enums/product-type.enum';
 
 @Injectable()
@@ -20,13 +21,21 @@ export class ProductsService {
     private readonly physicalDetailsRepository: Repository<ProductPhysicalDetails>,
     @InjectRepository(ServiceDefinition)
     private readonly serviceDefinitionRepository: Repository<ServiceDefinition>,
+    @InjectRepository(ServiceEmployeeEligibility)
+    private readonly serviceEmployeeEligibilityRepository: Repository<ServiceEmployeeEligibility>,
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    const { media, physicalDetails, serviceDefinition, ...productData } = createProductDto;
+    const { media, physicalDetails, serviceDefinition, employeeIds, ...productData } = createProductDto;
 
     // 1. Create Product
-    const product = this.productRepository.create({...productData, currency: 'VND'});
+    const cleanedProductData = Object.fromEntries(
+      Object.entries(productData).filter(([_, v]) => v != null),
+    );
+    const product = this.productRepository.create({
+      ...cleanedProductData,
+      currency: 'VND',
+    });
     const savedProduct = await this.productRepository.save(product);
 
     // 2. Create Media if provided
@@ -58,12 +67,31 @@ export class ProductsService {
       await this.serviceDefinitionRepository.save(definition);
     }
 
+    // 5. Assign Employees if provided
+    if (employeeIds && employeeIds.length > 0) {
+      const qualifications = employeeIds.map((employeeId) =>
+        this.serviceEmployeeEligibilityRepository.create({
+          productId: savedProduct.id,
+          employeeId,
+          isPrimary: false,
+        }),
+      );
+      await this.serviceEmployeeEligibilityRepository.save(qualifications);
+    }
+
     return this.findOne(savedProduct.id);
   }
 
   findAll(): Promise<Product[]> {
     return this.productRepository.find({
-      relations: ['category', 'media', 'physicalDetails', 'serviceDefinition'],
+      relations: [
+        'category',
+        'media',
+        'physicalDetails',
+        'serviceDefinition',
+        'serviceEmployeeEligibilities',
+        'serviceEmployeeEligibilities.employee',
+      ],
       order: { createdAt: 'DESC' },
     });
   }
@@ -73,7 +101,14 @@ export class ProductsService {
   async findOne(id: string): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { id },
-      relations: ['category', 'media', 'physicalDetails', 'serviceDefinition'],
+      relations: [
+        'category',
+        'media',
+        'physicalDetails',
+        'serviceDefinition',
+        'serviceEmployeeEligibilities',
+        'serviceEmployeeEligibilities.employee',
+      ],
     });
 
     if (!product) {
@@ -86,7 +121,14 @@ export class ProductsService {
   async findBySlug(slug: string): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { slug },
-      relations: ['category', 'media', 'physicalDetails', 'serviceDefinition'],
+      relations: [
+        'category',
+        'media',
+        'physicalDetails',
+        'serviceDefinition',
+        'serviceEmployeeEligibilities',
+        'serviceEmployeeEligibilities.employee',
+      ],
     });
 
     if (!product) {

@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { EmployeesModule } from './employees/employees.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
+import { S3Module } from './s3/s3.module';
 import databaseConfig from './config/database.config';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
@@ -39,6 +40,7 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
     EmployeesModule,
     CategoriesModule,
     ProductsModule,
+    S3Module,
   ],
   providers: [
     {

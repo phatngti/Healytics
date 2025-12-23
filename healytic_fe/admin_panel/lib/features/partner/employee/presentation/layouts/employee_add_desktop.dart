@@ -8,9 +8,11 @@ import 'package:admin_panel/features/partner/employee/presentation/widgets/emplo
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_profile_image_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_work_schedule_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/therapist_fields_card.dart';
+import 'package:admin_panel/router/partner_routes.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:go_router/go_router.dart';
 
 class EmployeeAddDesktop extends StatefulWidget {
   final VoidCallback? onCancel;
@@ -102,7 +104,13 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
                 children: [
                   Row(
                     children: [
-                      AppBackButton(onTap: widget.onCancel ?? () {}),
+                      AppBackButton(
+                        onTap:
+                            widget.onCancel ??
+                            () {
+                              context.goNamed(EmployeeHomeRoute.name);
+                            },
+                      ),
                       AppDimens.horizontalMedium,
                       Text(
                         'Create ${_selectedRole.displayName}',

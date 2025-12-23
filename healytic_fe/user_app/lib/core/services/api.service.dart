@@ -6,11 +6,11 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
-import 'package:openapi/api.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/utils/url_helper.dart';
 import 'package:user_app/core/utils/user_agent.dart';
+import 'package:user_openapi/api.dart';
 
 class ApiService implements Authentication {
   late ApiClient _apiClient;

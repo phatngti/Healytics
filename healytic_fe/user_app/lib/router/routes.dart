@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:user_app/features/bot_chat/bot_chat_page.dart';
 import 'package:user_app/features/common/adaptive_root_scraffold/adaptive_root_scraffold.dart';
-import 'package:user_app/features/home/home_update_page.dart';
+import 'package:user_app/features/home/presentation/home_page.dart';
 import 'package:user_app/features/notifications/notifications_page.dart';
 import 'package:user_app/features/onboarding/lottie_splash_screen.dart';
 import 'package:user_app/features/onboarding/onboard.dart';

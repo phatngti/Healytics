@@ -91,6 +91,9 @@ Class | Method | HTTP request | Description
 *ProductsApi* | [**productsControllerFindOne**](doc//ProductsApi.md#productscontrollerfindone) | **GET** /products/{id} | Get a product by id
 *ProductsApi* | [**productsControllerRemove**](doc//ProductsApi.md#productscontrollerremove) | **DELETE** /products/{id} | Delete a product
 *ProductsApi* | [**productsControllerUpdate**](doc//ProductsApi.md#productscontrollerupdate) | **PATCH** /products/{id} | Update a product
+*S3Api* | [**s3ControllerDeleteFile**](doc//S3Api.md#s3controllerdeletefile) | **DELETE** /s3/{key} | Delete file
+*S3Api* | [**s3ControllerGetFileUrl**](doc//S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file url
+*S3Api* | [**s3ControllerPreSign**](doc//S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload url
 
 
 ## Documentation For Models
@@ -111,6 +114,10 @@ Class | Method | HTTP request | Description
  - [LogoutResponseDto](doc//LogoutResponseDto.md)
  - [RegisterDto](doc//RegisterDto.md)
  - [RegisterProfileDto](doc//RegisterProfileDto.md)
+ - [S3ControllerDeleteFile200Response](doc//S3ControllerDeleteFile200Response.md)
+ - [S3ControllerGetFileUrl200Response](doc//S3ControllerGetFileUrl200Response.md)
+ - [S3ControllerPreSign201Response](doc//S3ControllerPreSign201Response.md)
+ - [S3ControllerPreSignRequest](doc//S3ControllerPreSignRequest.md)
  - [SurveyDto](doc//SurveyDto.md)
  - [SurveyResponseDto](doc//SurveyResponseDto.md)
  - [TherapistProfileDto](doc//TherapistProfileDto.md)

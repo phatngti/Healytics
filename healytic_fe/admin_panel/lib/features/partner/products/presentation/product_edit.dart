@@ -11,7 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProductEditScreen extends StatelessWidget {
-  final int productId;
+  final String productId;
 
   const ProductEditScreen({super.key, required this.productId});
 

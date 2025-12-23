@@ -26,16 +26,17 @@ import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { ADMIN_ROLES } from '@/auth/constants/role-groups';
+import { Public } from '@/auth/decorators/public.decorator';
 
 @ApiTags('products')
 @ApiBearerAuth()
 @Controller('products')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(...ADMIN_ROLES)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
+  @Roles(...ADMIN_ROLES)
   @ApiOperation({ summary: 'Create a new product' })
   @ApiCreatedResponse({
     description: 'The product has been successfully created.',
@@ -46,17 +47,18 @@ export class ProductsController {
   }
 
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Get all products' })
   @ApiOkResponse({
     description: 'Return all products.',
     type: [Product],
   })
-
   findAll() {
     return this.productsService.findAll();
   }
 
   @Get(':id')
+  @Public()
   @ApiOperation({ summary: 'Get a product by id' })
   @ApiOkResponse({
     description: 'Return the product.',
@@ -68,6 +70,7 @@ export class ProductsController {
   }
 
   @Get('slug/:slug')
+  @Public()
   @ApiOperation({ summary: 'Get a product by slug' })
   @ApiOkResponse({
     description: 'Return the product.',
@@ -79,6 +82,7 @@ export class ProductsController {
   }
 
   @Patch(':id')
+  @Roles(...ADMIN_ROLES)
   @ApiOperation({ summary: 'Update a product' })
   @ApiOkResponse({
     description: 'The product has been successfully updated.',
@@ -93,6 +97,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @Roles(...ADMIN_ROLES)
   @ApiOperation({ summary: 'Delete a product' })
   @ApiOkResponse({ description: 'The product has been successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Product not found.' })

@@ -49,8 +49,20 @@ class EmployeeImplementRepository implements EmployeeRepository {
               ),
               DataCell(
                 Center(
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(employee.avatar),
+                  child: ClipOval(
+                    child: employee.avatar.isNotEmpty
+                        ? Image.network(
+                            employee.avatar,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const CircleAvatar(
+                                child: Icon(Icons.person),
+                              );
+                            },
+                          )
+                        : const CircleAvatar(child: Icon(Icons.person)),
                   ),
                 ),
               ),

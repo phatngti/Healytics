@@ -18,6 +18,7 @@ class ProductTable extends HookConsumerWidget {
 
   // Column definitions
   static const List<Map<String, dynamic>> _columnDefinitions = [
+    {'label': 'ID'},
     {'label': 'Name', 'prefixIcon': Icons.person},
     {'label': 'Price'},
     {'label': 'Description'},
@@ -44,12 +45,9 @@ class ProductTable extends HookConsumerWidget {
   ];
 
   void _onEditProduct(BuildContext context, LocalKey? key) {
-    final id = int.tryParse(key?.toCleanString() ?? '');
-    if (id != null) {
-      context.goNamed(
-        ProductDetailsRoute.name,
-        pathParameters: {'id': id.toString()},
-      );
+    final id = key?.toCleanString();
+    if (id != null && id.isNotEmpty) {
+      context.goNamed(ProductDetailsRoute.name, pathParameters: {'id': id});
     }
   }
 

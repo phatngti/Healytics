@@ -16,7 +16,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductType } from '@/products/enums/product-type.enum';
 import { ProductStatus } from '@/products/enums/product-status.enum';
 import { MediaType } from '@/products/enums/media-type.enum';
-import { AvailabilityMode } from '@/products/enums/availability-mode.enum';
 import { StaffAssignmentType } from '@/products/enums/staff-assignment-type.enum';
 
 // Nested DTOs
@@ -105,11 +104,6 @@ export class CreateServiceDefinitionDto {
   @Min(0)
   minLeadTimeHours?: number;
 
-  @ApiPropertyOptional({ enum: AvailabilityMode, example: AvailabilityMode.BUSINESS_HOURS })
-  @IsEnum(AvailabilityMode)
-  @IsOptional()
-  availabilityMode?: AvailabilityMode;
-
   @ApiPropertyOptional({ enum: StaffAssignmentType, example: StaffAssignmentType.ANY })
   @IsEnum(StaffAssignmentType)
   @IsOptional()
@@ -180,6 +174,12 @@ export class CreateProductDto {
   @IsOptional()
   @MaxLength(100)
   vendorName?: string;
+
+  @ApiPropertyOptional({ example: ['uuid-1', 'uuid-2'] })
+  @IsArray()
+  @IsUUID(undefined, { each: true })
+  @IsOptional()
+  employeeIds?: string[];
 
   // Nested objects
   @ApiPropertyOptional({ type: [CreateProductMediaDto], description: 'Product media (images/videos)' })

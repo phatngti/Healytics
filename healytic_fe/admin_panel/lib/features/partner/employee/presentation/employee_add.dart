@@ -70,7 +70,9 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
       displayName: fullName.isNotEmpty ? fullName : null,
       email: values['email_address']?.toString().trim() ?? '',
       phone: values['phone_number']?.toString().trim(),
-      avatarUrl: 'https://i.pravatar.cc/150?u=${values['email_address']}',
+      avatarUrl:
+          values['avatar_url']?.toString() ??
+          'https://i.pravatar.cc/150?u=${values['email_address']}',
       dob: values['date_of_birth']?.toString(),
       gender: values['gender']?.toString().toUpperCase(),
       branchId: null, // TODO: Add branch selection
@@ -112,7 +114,9 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
       displayName: fullName.isNotEmpty ? fullName : null,
       email: values['email_address']?.toString().trim() ?? '',
       phone: values['phone_number']?.toString().trim(),
-      avatarUrl: 'https://i.pravatar.cc/150?u=${values['email_address']}',
+      avatarUrl:
+          values['avatar_url']?.toString() ??
+          'https://i.pravatar.cc/150?u=${values['email_address']}',
       dob: values['date_of_birth']?.toString(),
       gender: values['gender']?.toString().toUpperCase(),
       branchId: null, // TODO: Add branch selection
@@ -138,7 +142,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   }
 
   void _handleCancel() {
-    Navigator.of(context).pop();
+    context.goNamed(EmployeeHomeRoute.name);
   }
 
   @override

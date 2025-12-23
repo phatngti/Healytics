@@ -1,31 +1,33 @@
+import 'package:admin_panel/core/providers/s3.provider.dart';
 import 'package:admin_panel/features/common/widgets/images/multi_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'dart:typed_data';
 
-class ProductMediaCard extends StatelessWidget {
+class ProductMediaCard extends ConsumerStatefulWidget {
   final List<dynamic> initialImages;
-  final ValueChanged<List<dynamic>> onImagesChanged;
 
-  const ProductMediaCard({
-    super.key,
-    this.initialImages = const [],
-    required this.onImagesChanged,
-  });
+  const ProductMediaCard({super.key, this.initialImages = const []});
 
+  @override
+  ConsumerState<ProductMediaCard> createState() => _ProductMediaCardState();
+}
+
+class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Hidden FormBuilder field to store image URLs
-        FormBuilderField<List<dynamic>>(
-          name: 'product_images',
-          initialValue: initialImages,
-          builder: (field) => const SizedBox.shrink(),
-        ),
-        Container(
+    return FormBuilderField<List<dynamic>>(
+      name: 'product_images',
+      initialValue: widget.initialImages,
+      builder: (FormFieldState<List<dynamic>> field) {
+        final currentImages = field.value ?? [];
+
+        return Container(
           decoration: BoxDecoration(
             color: colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
@@ -71,7 +73,7 @@ class ProductMediaCard extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        _showAddFromUrlDialog(context);
+                        _showAddFromUrlDialog(context, field);
                       },
                       child: Text(
                         'Add from URL',
@@ -88,61 +90,155 @@ class ProductMediaCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(24),
                 child: ImageUploadWidget(
-                  initialImages: initialImages.whereType<String>().toList(),
+                  initialImages: currentImages.whereType<String>().toList(),
                   onImagesChanged: (images) {
-                    onImagesChanged(images);
-                    // Update FormBuilder field
-                    FormBuilder.of(
-                      context,
-                    )?.fields['product_images']?.didChange(images);
+                    field.didChange(images);
+                  },
+                  onUpload: (XFile file) async {
+                    // Upload file to S3 and return the URL
+                    final key = await ref
+                        .read(s3ServiceProvider)
+                        .uploadFile(file);
+                    if (key != null) {
+                      final url = await ref
+                          .read(s3ServiceProvider)
+                          .getFileUrl(key);
+                      if (url != null) {
+                        return url;
+                      }
+                      return key;
+                    }
+                    throw Exception('Upload failed');
                   },
                 ),
               ),
             ],
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 
-  void _showAddFromUrlDialog(BuildContext parentContext) {
+  void _showAddFromUrlDialog(
+    BuildContext parentContext,
+    FormFieldState<List<dynamic>> field,
+  ) {
     final urlController = TextEditingController();
     final colorScheme = Theme.of(parentContext).colorScheme;
+    bool isLoading = false;
 
     showDialog(
       context: parentContext,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Image from URL'),
-        content: TextField(
-          controller: urlController,
-          decoration: InputDecoration(
-            hintText: 'Enter image URL...',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (urlController.text.isNotEmpty) {
-                // Add URL to images
-                final newImages = [...initialImages, urlController.text];
-                onImagesChanged(newImages);
-                // Update FormBuilder field
-                FormBuilder.of(
-                  parentContext,
-                )?.fields['product_images']?.didChange(newImages);
-                Navigator.pop(context);
-              }
-            },
-            style: FilledButton.styleFrom(backgroundColor: colorScheme.primary),
-            child: const Text('Add'),
-          ),
-        ],
-      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Add Image from URL'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: urlController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter image URL...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      enabled: !isLoading,
+                    ),
+                  ),
+                  if (isLoading) ...[
+                    const SizedBox(height: 16),
+                    const CircularProgressIndicator(),
+                  ],
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isLoading ? null : () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                FilledButton(
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          if (urlController.text.isNotEmpty) {
+                            setState(() {
+                              isLoading = true;
+                            });
+
+                            try {
+                              final url = urlController.text;
+                              final uri = Uri.parse(url);
+                              final response = await http.get(uri);
+
+                              if (response.statusCode == 200) {
+                                final Uint8List bytes = response.bodyBytes;
+                                final String fileName =
+                                    uri.pathSegments.isNotEmpty
+                                    ? uri.pathSegments.last
+                                    : 'image_from_url.jpg';
+
+                                final xFile = XFile.fromData(
+                                  bytes,
+                                  name: fileName,
+                                );
+
+                                // Upload file to S3
+                                final key = await ref
+                                    .read(s3ServiceProvider)
+                                    .uploadFile(xFile);
+
+                                if (key != null) {
+                                  final r2Url = await ref
+                                      .read(s3ServiceProvider)
+                                      .getFileUrl(key);
+
+                                  if (r2Url != null && parentContext.mounted) {
+                                    // Add URL to images
+                                    final currentImages = field.value ?? [];
+                                    final newImages = [...currentImages, r2Url];
+                                    field.didChange(newImages);
+                                    Navigator.pop(context);
+                                  } else {
+                                    throw Exception('Failed to get file URL');
+                                  }
+                                } else {
+                                  throw Exception('Upload returned null key');
+                                }
+                              } else {
+                                throw Exception(
+                                  'Failed to download image: ${response.statusCode}',
+                                );
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Error: $e'),
+                                    backgroundColor: colorScheme.error,
+                                  ),
+                                );
+                              }
+                            } finally {
+                              if (context.mounted) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }
+                            }
+                          }
+                        },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                  ),
+                  child: const Text('Add'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

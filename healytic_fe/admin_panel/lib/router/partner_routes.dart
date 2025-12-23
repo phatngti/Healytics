@@ -81,7 +81,7 @@ class ProductHomeRoute extends GoRouteData with $ProductHomeRoute {
 class ProductDetailsRoute extends GoRouteData with $ProductDetailsRoute {
   const ProductDetailsRoute({required this.id});
   static const name = "provider-product-details";
-  final int id;
+  final String id;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {

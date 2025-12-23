@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/common/button/button.dart';
 import 'package:user_app/features/common/indicator/linear_indicator.dart';
@@ -68,10 +69,10 @@ class HealthSafetyStep extends HookConsumerWidget {
       if (next.value?.isSurveyCompleted == true &&
           next.hasValue &&
           !next.isLoading) {
-        if (context.mounted) {
-          // Navigate to the next screen or show success message
-          SignInRoute().push(context);
-        }
+        // if (context.mounted) {
+        //   // Navigate to the next screen or show success message
+        //   SignInRoute().push(context);
+        // }
       }
       isLoading.value = false;
     });
@@ -82,8 +83,6 @@ class HealthSafetyStep extends HookConsumerWidget {
         FocusScope.of(context).unfocus();
 
         isLoading.value = true;
-        print('run here');
-        print('isLoading.value ${isLoading.value}');
 
         await ref
             .read(registerFlowProvider.notifier)
@@ -94,7 +93,10 @@ class HealthSafetyStep extends HookConsumerWidget {
               }).toList(),
             );
         await ref.read(registerFlowProvider.notifier).completeSurvey();
-        print('isLoading.value ${isLoading.value}');
+
+        if (context.mounted) {
+          context.goNamed(SignInRoute.name);
+        }
       }
     }
 
