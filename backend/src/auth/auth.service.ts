@@ -10,6 +10,7 @@ import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@/account/enum/role.enum';
+import { UserProfile } from '@/account/entities/user-profile.entity';
 
 // Roles allowed for admin/partner login
 const ADMIN_ROLES: Role[] = [Role.ADMIN, Role.HEALTH_PARTNER, Role.EMPLOYEE];
@@ -28,15 +29,23 @@ export class AuthService {
     userId: string,
     email?: string,
     role?: Role,
+    profile?: UserProfile,
   ): Promise<AuthTokensDto> {
-    const payload = { sub: userId, email, role };
+    const payload: any = { sub: userId, email, role };
+    
+    if (profile) {
+      payload.firstName = profile.firstName;
+      payload.lastName = profile.lastName;
+      payload.profileCompleted = profile.profileCompleted;
+    }
+
     const accessExpires = process.env.JWT_EXPIRES_IN || '3600s';
     const refreshExpires = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
-    const access_token = this.jwtService.sign(payload as any, {
+    const access_token = this.jwtService.sign(payload, {
       expiresIn: accessExpires as any,
     });
-    const refresh_token = this.jwtService.sign(payload as any, {
+    const refresh_token = this.jwtService.sign(payload, {
       expiresIn: refreshExpires as any,
     });
 
@@ -76,7 +85,12 @@ export class AuthService {
     }
 
     const user = await this.accountService.create(createData);
-    const tokens = await this.createTokensForUser(user.id, user.email, user.role);
+    const tokens = await this.createTokensForUser(
+      user.id,
+      user.email,
+      user.role,
+      user.userProfile,
+    );
     return tokens;
   }
 
@@ -134,7 +148,7 @@ export class AuthService {
       );
     }
 
-    return this.createTokensForUser(userId, userEmail, userRole);
+    return this.createTokensForUser(userId, userEmail, userRole, user.userProfile);
   }
 
   /**
@@ -161,7 +175,7 @@ export class AuthService {
       );
     }
 
-    return this.createTokensForUser(userId, userEmail, userRole);
+    return this.createTokensForUser(userId, userEmail, userRole, user.userProfile);
   }
 
   /**
@@ -177,7 +191,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    return this.createTokensForUser(userId, userEmail, userRole);
+    return this.createTokensForUser(userId, userEmail, userRole, user.userProfile);
   }
 
   /**
@@ -211,7 +225,12 @@ export class AuthService {
     }
 
     // Rotate tokens
-    const tokens = await this.createTokensForUser(userId, user.email, user.role);
+    const tokens = await this.createTokensForUser(
+      userId,
+      user.email,
+      user.role,
+      user.userProfile,
+    );
     return tokens;
   }
 

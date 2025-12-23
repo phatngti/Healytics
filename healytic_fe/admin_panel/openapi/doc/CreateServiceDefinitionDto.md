@@ -12,7 +12,6 @@ Name | Type | Description | Notes
 **bufferMinutes** | **num** |  | [optional] 
 **maxCapacity** | **num** |  | [optional] 
 **minLeadTimeHours** | **num** |  | [optional] 
-**availabilityMode** | **String** |  | [optional] 
 **staffAssignmentType** | **String** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

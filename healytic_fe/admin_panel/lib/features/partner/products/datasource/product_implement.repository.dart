@@ -31,21 +31,44 @@ class ProductImplementRepository implements ProductRepository {
     return products
         .map(
           (product) => DataRow(
-            key: ValueKey<int>(product.id.value),
+            key: ValueKey<String>(product.id.value),
             onSelectChanged: (value) {
               if (value != null) {
-                setRowSelection(ValueKey<int>(product.id.value), value);
+                setRowSelection(ValueKey<String>(product.id.value), value);
               }
             },
             cells: [
+              DataCell(
+                Center(
+                  child: Text(
+                    product.id.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
               DataCell(Center(child: Text(product.name))),
               DataCell(Center(child: Text(product.basePrice.toString()))),
               DataCell(Center(child: Text(product.description))),
               DataCell(
                 Center(
-                  child: Text(
-                    product.images.isNotEmpty ? product.images[0] : '',
-                  ),
+                  child:
+                      product.images.isNotEmpty && product.images[0].isNotEmpty
+                      ? SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: Image.network(
+                            product.images[0],
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.broken_image, size: 24),
+                          ),
+                        )
+                      : const SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: Icon(Icons.image_not_supported, size: 24),
+                        ),
                 ),
               ),
               DataCell(Center(child: Text(product.category.name))),

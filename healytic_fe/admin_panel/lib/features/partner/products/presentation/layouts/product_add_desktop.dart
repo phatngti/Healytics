@@ -22,7 +22,6 @@ class ProductAddDesktop extends ConsumerStatefulWidget {
 }
 
 class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
-  List<dynamic> _currentImages = [];
   String _status = 'draft';
   String? _category;
 
@@ -53,14 +52,7 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                       children: [
                         const ProductGeneralInfoCard(),
                         AppDimens.verticalMedium,
-                        ProductMediaCard(
-                          initialImages: _currentImages,
-                          onImagesChanged: (images) {
-                            setState(() {
-                              _currentImages = images;
-                            });
-                          },
-                        ),
+                        const ProductMediaCard(),
                         AppDimens.verticalMedium,
                         const ProductPricingCard(),
                         AppDimens.verticalMedium,

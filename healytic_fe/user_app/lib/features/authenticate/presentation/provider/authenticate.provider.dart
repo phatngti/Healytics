@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:openapi/api.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/core/utils/error_message_code.dart';
 import 'package:user_app/features/authenticate/datasource/repository_implement.dart';
 import 'package:user_app/features/authenticate/domain/authenticate.entity.dart';
+import 'package:user_openapi/api.dart';
 
 part 'authenticate.provider.freezed.dart';
 part 'authenticate.provider.g.dart';
@@ -32,8 +32,6 @@ class AuthenticateNotifier extends _$AuthenticateNotifier {
           .read(authenticateRepositoryProvider)
           .login(email: email, password: password);
       state = AsyncData(AuthenticateStateData(authenticate: authenticate));
-      print('authenticate: ${authenticate.toJson()}');
-      debugPrint('authenticate: ${authenticate.toJson()}');
     } on ApiException catch (e) {
       state = AsyncError<AuthenticateStateData>(
         errorMessageCode(e.code),

@@ -26,16 +26,17 @@ import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { ADMIN_ROLES } from '@/auth/constants/role-groups';
+import { Public } from '@/auth/decorators/public.decorator';
 
 @ApiTags('categories')
 @ApiBearerAuth()
 @Controller('categories')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(...ADMIN_ROLES)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
+  @Roles(...ADMIN_ROLES)
   @ApiOperation({ summary: 'Create a new category' })
   @ApiCreatedResponse({
     description: 'The category has been successfully created.',
@@ -46,6 +47,7 @@ export class CategoriesController {
   }
 
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Get all categories' })
   @ApiOkResponse({
     description: 'Return all categories.',
@@ -60,6 +62,7 @@ export class CategoriesController {
   }
 
   @Get(':id')
+  @Public()
   @ApiOperation({ summary: 'Get a category by id' })
   @ApiOkResponse({
     description: 'Return the category.',
@@ -71,6 +74,7 @@ export class CategoriesController {
   }
 
   @Get('slug/:slug')
+  @Public()
   @ApiOperation({ summary: 'Get a category by slug' })
   @ApiOkResponse({
     description: 'Return the category.',
@@ -82,6 +86,7 @@ export class CategoriesController {
   }
 
   @Patch(':id')
+  @Roles(...ADMIN_ROLES)
   @ApiOperation({ summary: 'Update a category' })
   @ApiOkResponse({
     description: 'The category has been successfully updated.',
@@ -96,6 +101,7 @@ export class CategoriesController {
   }
 
   @Delete(':id')
+  @Roles(...ADMIN_ROLES)
   @ApiOperation({ summary: 'Delete a category' })
   @ApiOkResponse({ description: 'The category has been successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Category not found.' })

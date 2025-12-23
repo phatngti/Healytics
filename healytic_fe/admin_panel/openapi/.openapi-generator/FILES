@@ -24,6 +24,11 @@ doc/LogoutResponseDto.md
 doc/ProductsApi.md
 doc/RegisterDto.md
 doc/RegisterProfileDto.md
+doc/S3Api.md
+doc/S3ControllerDeleteFile200Response.md
+doc/S3ControllerGetFileUrl200Response.md
+doc/S3ControllerPreSign201Response.md
+doc/S3ControllerPreSignRequest.md
 doc/SurveyDto.md
 doc/SurveyResponseDto.md
 doc/TherapistProfileDto.md
@@ -37,6 +42,7 @@ lib/api/authentication_api.dart
 lib/api/categories_api.dart
 lib/api/employees_api.dart
 lib/api/products_api.dart
+lib/api/s3_api.dart
 lib/api_client.dart
 lib/api_exception.dart
 lib/api_helper.dart
@@ -61,6 +67,10 @@ lib/model/login_dto.dart
 lib/model/logout_response_dto.dart
 lib/model/register_dto.dart
 lib/model/register_profile_dto.dart
+lib/model/s3_controller_delete_file200_response.dart
+lib/model/s3_controller_get_file_url200_response.dart
+lib/model/s3_controller_pre_sign201_response.dart
+lib/model/s3_controller_pre_sign_request.dart
 lib/model/survey_dto.dart
 lib/model/survey_response_dto.dart
 lib/model/therapist_profile_dto.dart
@@ -89,6 +99,11 @@ test/logout_response_dto_test.dart
 test/products_api_test.dart
 test/register_dto_test.dart
 test/register_profile_dto_test.dart
+test/s3_api_test.dart
+test/s3_controller_delete_file200_response_test.dart
+test/s3_controller_get_file_url200_response_test.dart
+test/s3_controller_pre_sign201_response_test.dart
+test/s3_controller_pre_sign_request_test.dart
 test/survey_dto_test.dart
 test/survey_response_dto_test.dart
 test/therapist_profile_dto_test.dart

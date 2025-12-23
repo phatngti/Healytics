@@ -139,6 +139,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       status: _mapStatus(request.status),
       isVisibleOnline: request.onlineStore,
       vendorName: request.vendor,
+      employeeIds: request.staffIds,
       physicalDetails: physicalDetails,
       serviceDefinition: serviceDefinition,
       media: request.images.asMap().entries.map((entry) {
@@ -167,6 +168,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       basePrice: request.basePrice,
       description: request.description,
       categoryId: request.category,
+      employeeIds: request.staffIds ?? [],
       media:
           request.images?.asMap().entries.map((entry) {
             return CreateProductMediaDto(
@@ -196,7 +198,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     final category = json['category'] as Map<String, dynamic>?;
 
     return Product(
-      id: ProductId(int.tryParse(json['id']?.toString() ?? '0') ?? 0),
+      id: ProductId(json['id']?.toString() ?? ''),
       name: json['name']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       basePrice: double.tryParse(json['basePrice']?.toString() ?? '0') ?? 0.0,
