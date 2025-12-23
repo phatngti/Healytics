@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+.venv/
+env/
+healytics_env/
+
+# Vector DB / Chroma
+*.sqlite3
+chroma/
+vectordb/
+
+# Data generated
+data/processed/
