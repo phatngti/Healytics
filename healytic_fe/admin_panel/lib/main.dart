@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -23,15 +21,6 @@ void main() async {
 Future<void> initApp() async {
   // await EasyLocalization.ensureInitialized();
   await initializeDateFormatting('vi');
-
-  if (kReleaseMode && Platform.isAndroid) {
-    try {
-      await FlutterDisplayMode.setHighRefreshRate();
-      debugPrint('High refresh rate set');
-    } catch (e) {
-      debugPrint('Failed to set high refresh rate: $e');
-    }
-  }
 
   final log = Logger("PlayErrorLogger");
 
