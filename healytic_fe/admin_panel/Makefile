@@ -9,7 +9,7 @@ translate:
 
 
 run:
-	flutter run -d chrome --wasm
+	flutter run -d chrome --wasm --release
 
 run-default:
 	flutter run -d chrome

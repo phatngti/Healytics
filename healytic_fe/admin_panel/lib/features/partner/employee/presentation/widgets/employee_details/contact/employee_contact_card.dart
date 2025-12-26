@@ -3,7 +3,14 @@ import 'package:flutter/material.dart';
 import 'employee_contact_item.dart';
 
 class EmployeeContactCard extends StatelessWidget {
-  const EmployeeContactCard({super.key});
+  final String email;
+  final String phone;
+
+  const EmployeeContactCard({
+    super.key,
+    required this.email,
+    required this.phone,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -58,18 +65,18 @@ class EmployeeContactCard extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                const EmployeeContactItem(
+                EmployeeContactItem(
                   icon: Icons.mail_outline,
                   label: 'Email Address',
-                  value: 'sarah.j@spa.com',
-                  isLink: true,
+                  value: email.isNotEmpty ? email : 'Not provided',
+                  isLink: email.isNotEmpty,
                 ),
                 const SizedBox(height: 20),
-                const EmployeeContactItem(
+                EmployeeContactItem(
                   icon: Icons.phone_outlined,
                   label: 'Phone Number',
-                  value: '+1 555-0199',
-                  isLink: true,
+                  value: phone.isNotEmpty ? phone : 'Not provided',
+                  isLink: phone.isNotEmpty,
                 ),
                 Divider(height: 32, color: colorScheme.outlineVariant),
                 EmployeeContactItem(
@@ -77,57 +84,8 @@ class EmployeeContactCard extends StatelessWidget {
                   iconColor: Colors.red,
                   iconBgColor: Colors.red.shade50,
                   label: 'Emergency Contact',
-                  value: 'Michael Jenkins',
-                  subtitle: '+1 555-0122 (Husband)',
-                ),
-                Divider(height: 32, color: colorScheme.outlineVariant),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'DATE OF BIRTH',
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Apr 12, 1989',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'GENDER',
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Female',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  value: 'Not available',
+                  subtitle: 'No emergency contact on file',
                 ),
               ],
             ),

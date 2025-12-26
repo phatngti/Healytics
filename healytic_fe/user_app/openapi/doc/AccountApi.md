@@ -1,8 +1,8 @@
-# openapi.api.AccountApi
+# user_openapi.api.AccountApi
 
 ## Load the API package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 ```
 
 All URIs are relative to *http://localhost*
@@ -20,7 +20,7 @@ Get current user survey
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 // TODO Configure HTTP Bearer authorization: bearer
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -63,7 +63,7 @@ Create one-shot survey for current user
 
 ### Example
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 // TODO Configure HTTP Bearer authorization: bearer
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');

@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
+import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/layouts/product_edit_desktop.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
@@ -10,7 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProductEditScreen extends StatelessWidget {
-  final int productId;
+  final String productId;
 
   const ProductEditScreen({super.key, required this.productId});
 
@@ -60,16 +61,16 @@ class ProductDetailsContent extends HookConsumerWidget {
 
     final nameController = useTextEditingController(text: product.value!.name);
     final priceController = useTextEditingController(
-      text: product.value!.price.toString(),
+      text: product.value!.basePrice.toString(),
     );
     final descriptionController = useTextEditingController(
       text: product.value!.description,
     );
     final categoryController = useTextEditingController(
-      text: product.value!.category,
+      text: product.value!.category.name,
     );
     final imageController = useTextEditingController(
-      text: product.value!.image,
+      text: product.value!.images.isNotEmpty ? product.value!.images[0] : '',
     );
     final statusController = useTextEditingController(text: 'active');
 
@@ -79,20 +80,24 @@ class ProductDetailsContent extends HookConsumerWidget {
         final request = UpdateProductRequest(
           id: product.value!.id,
           name: nameController.text,
-          price: double.parse(priceController.text),
+          basePrice: double.parse(priceController.text),
           description: descriptionController.text,
           category: categoryController.text,
-          image: imageController.text,
+          images: [imageController.text],
         );
         await productNotifier.updateProduct(request);
 
         // Update local state with new values
         product.value = product.value!.copyWith(
           name: nameController.text,
-          price: double.parse(priceController.text),
+          basePrice: double.parse(priceController.text),
           description: descriptionController.text,
-          category: categoryController.text,
-          image: imageController.text,
+          category: CategoryEntity(
+            id: product.value!.category.id,
+            name: categoryController.text,
+            slug: product.value!.category.slug,
+          ),
+          images: [imageController.text],
         );
         isEditing.value = false; // Exit edit mode
         if (context.mounted) {
@@ -106,10 +111,12 @@ class ProductDetailsContent extends HookConsumerWidget {
     void onCancel() {
       // Reset controllers to original values
       nameController.text = product.value!.name;
-      priceController.text = product.value!.price.toString();
+      priceController.text = product.value!.basePrice.toString();
       descriptionController.text = product.value!.description;
-      categoryController.text = product.value!.category;
-      imageController.text = product.value!.image;
+      categoryController.text = product.value!.category.name;
+      imageController.text = product.value!.images.isNotEmpty
+          ? product.value!.images[0]
+          : '';
 
       context.goNamed(ProductHomeRoute.name);
     }

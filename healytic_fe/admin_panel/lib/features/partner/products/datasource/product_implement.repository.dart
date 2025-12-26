@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/partner/products/datasource/remote_datasource.dart';
+import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/product.repository.dart';
@@ -30,18 +31,47 @@ class ProductImplementRepository implements ProductRepository {
     return products
         .map(
           (product) => DataRow(
-            key: ValueKey<int>(product.id.value),
+            key: ValueKey<String>(product.id.value),
             onSelectChanged: (value) {
               if (value != null) {
-                setRowSelection(ValueKey<int>(product.id.value), value);
+                setRowSelection(ValueKey<String>(product.id.value), value);
               }
             },
             cells: [
+              DataCell(
+                Center(
+                  child: Text(
+                    product.id.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
               DataCell(Center(child: Text(product.name))),
-              DataCell(Center(child: Text(product.price.toString()))),
+              DataCell(Center(child: Text(product.basePrice.toString()))),
               DataCell(Center(child: Text(product.description))),
-              DataCell(Center(child: Text(product.image))),
-              DataCell(Center(child: Text(product.category))),
+              DataCell(
+                Center(
+                  child:
+                      product.images.isNotEmpty && product.images[0].isNotEmpty
+                      ? SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: Image.network(
+                            product.images[0],
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.broken_image, size: 24),
+                          ),
+                        )
+                      : const SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: Icon(Icons.image_not_supported, size: 24),
+                        ),
+                ),
+              ),
+              DataCell(Center(child: Text(product.category.name))),
             ],
           ),
         )
@@ -71,6 +101,11 @@ class ProductImplementRepository implements ProductRepository {
   @override
   Future<void> deleteProduct(ProductId id) {
     return remoteDataSource.deleteProduct(id);
+  }
+
+  @override
+  Future<List<CategoryEntity>> getCategories() {
+    return remoteDataSource.getCategories();
   }
 }
 

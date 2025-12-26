@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:openapi/api.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/core/providers/api.provider.dart';
 import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/authenticate/domain/authenticate.entity.dart';
+import 'package:user_openapi/api.dart';
 
 part 'remote_datasource.g.dart';
 
@@ -37,10 +38,10 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
     // 1. Decode lấy dữ liệu (Payload)
     Map<String, dynamic> decodedToken = JwtDecoder.decode(response.accessToken);
     var basicInfo = BasicInfoEntity(email: decodedToken['email'] as String);
-    if (decodedToken['profile'] != null) {
+    debugPrint('decodedToken: $decodedToken');
+    if (decodedToken['firstName'] != null && decodedToken['lastName'] != null) {
       basicInfo = basicInfo.copyWith(
-        name:
-            ('${decodedToken['profile']['firstName']} ${decodedToken['profile']['lastName']}'),
+        name: ('${decodedToken['firstName']} ${decodedToken['lastName']}'),
       );
     }
 

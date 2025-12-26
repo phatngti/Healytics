@@ -1,8 +1,8 @@
-# openapi.model.SurveyDto
+# user_openapi.model.SurveyDto
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 ```
 
 ## Properties

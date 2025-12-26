@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
 class EmployeeRoleBranchSection extends StatelessWidget {
-  const EmployeeRoleBranchSection({super.key});
+  final String role;
+  final String status;
+  final String branch;
+
+  const EmployeeRoleBranchSection({
+    super.key,
+    required this.role,
+    required this.status,
+    required this.branch,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,57 +23,8 @@ class EmployeeRoleBranchSection extends StatelessWidget {
           spacing: 12,
           runSpacing: 8,
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.spa, size: 14, color: Color(0xFF13EC13)),
-                  const SizedBox(width: 4),
-                  Text(
-                    'THERAPIST',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: const Color(0xFF13EC13),
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: colorScheme.outlineVariant),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.green,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Active',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Colors.green.shade700,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _RoleBadge(role: role),
+            _StatusBadge(status: status),
           ],
         ),
         const SizedBox(height: 12),
@@ -78,7 +38,7 @@ class EmployeeRoleBranchSection extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'Downtown Spa & Wellness',
+              branch.isNotEmpty ? branch : 'No branch assigned',
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
@@ -87,5 +47,128 @@ class EmployeeRoleBranchSection extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _RoleBadge extends StatelessWidget {
+  final String role;
+
+  const _RoleBadge({required this.role});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final roleConfig = _getRoleConfig(role);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(roleConfig.icon, size: 14, color: roleConfig.color),
+          const SizedBox(width: 4),
+          Text(
+            role.toUpperCase(),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: roleConfig.color,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  ({IconData icon, Color color}) _getRoleConfig(String role) {
+    switch (role.toUpperCase()) {
+      case 'DOCTOR':
+        return (icon: Icons.medical_services, color: Colors.blue);
+      case 'THERAPIST':
+        return (icon: Icons.spa, color: const Color(0xFF13EC13));
+      case 'RECEPTIONIST':
+        return (icon: Icons.person, color: Colors.orange);
+      case 'MANAGER':
+        return (icon: Icons.admin_panel_settings, color: Colors.purple);
+      default:
+        return (icon: Icons.work, color: Colors.grey);
+    }
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final String status;
+
+  const _StatusBadge({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusConfig = _getStatusConfig(status);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: statusConfig.color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            statusConfig.label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: statusConfig.textColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  ({String label, Color color, Color textColor}) _getStatusConfig(
+    String status,
+  ) {
+    switch (status.toUpperCase()) {
+      case 'ACTIVE':
+        return (
+          label: 'Active',
+          color: Colors.green,
+          textColor: Colors.green.shade700,
+        );
+      case 'INACTIVE':
+        return (
+          label: 'Inactive',
+          color: Colors.grey,
+          textColor: Colors.grey.shade700,
+        );
+      case 'ON_LEAVE':
+        return (
+          label: 'On Leave',
+          color: Colors.orange,
+          textColor: Colors.orange.shade700,
+        );
+      default:
+        return (
+          label: status,
+          color: Colors.grey,
+          textColor: Colors.grey.shade700,
+        );
+    }
   }
 }

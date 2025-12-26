@@ -1,6 +1,8 @@
 import 'package:admin_panel/features/common/widgets/table/helper.dart';
 import 'package:admin_panel/features/partner/employee/datasource/employee_implement.repository.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -34,13 +36,15 @@ class EmployeeNotifier extends _$EmployeeNotifier {
     bool? sortAscending,
   }) async {
     final repo = ref.read(employeeRepositoryProvider);
-    return repo.getEmployees(
+    final result = await repo.getEmployees(
       setRowSelection,
       startingAt,
       count,
       search,
       sortAscending,
     );
+
+    return result;
   }
 
   Future<void> deleteEmployee(EmployeeId id) async {
@@ -56,5 +60,20 @@ class EmployeeNotifier extends _$EmployeeNotifier {
   Future<EmployeeEntity> getEmployeeById(EmployeeId id) async {
     final repo = ref.read(employeeRepositoryProvider);
     return repo.getEmployeeById(id);
+  }
+
+  Future<EmployeeEntity> createDoctor(CreateDoctorRequest request) async {
+    final repo = ref.read(employeeRepositoryProvider);
+    return repo.createDoctor(request);
+  }
+
+  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request) async {
+    final repo = ref.read(employeeRepositoryProvider);
+    return repo.createTherapist(request);
+  }
+
+  Future<List<EmployeeEntity>> getEmployeesByRole(String role) async {
+    final repo = ref.read(employeeRepositoryProvider);
+    return repo.getEmployeesByRole(role: role);
   }
 }
