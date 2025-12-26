@@ -48,18 +48,20 @@ class EmailFormScreen extends HookConsumerWidget {
     useListenable(emailController);
 
     // 2. QUAN TRỌNG: Logic sync dữ liệu từ Provider vào Controller (giữ nguyên của bạn)
-    useEffect(() {
-      final newValue =
-          (asyncState.hasValue ? asyncState.requireValue.user?.email : null) ??
-          '';
-      if (emailController.text != newValue) {
-        emailController.value = emailController.value.copyWith(
-          text: newValue,
-          selection: TextSelection.collapsed(offset: newValue.length),
-        );
-      }
-      return null;
-    }, [asyncState.hasValue ? asyncState.requireValue.user?.email : null]);
+    // 2. LOGIC SYNC: Removed to prevent resetting value while typing.
+    // Initial value is handled by useTextEditingController.
+    // useEffect(() {
+    //   final newValue =
+    //       (asyncState.hasValue ? asyncState.requireValue.user?.email : null) ??
+    //       '';
+    //   if (emailController.text != newValue) {
+    //     emailController.value = emailController.value.copyWith(
+    //       text: newValue,
+    //       selection: TextSelection.collapsed(offset: newValue.length),
+    //     );
+    //   }
+    //   return null;
+    // }, [asyncState.hasValue ? asyncState.requireValue.user?.email : null]);
 
     Future<void> submit() async {
       if (formKey.currentState?.saveAndValidate() ?? false) {

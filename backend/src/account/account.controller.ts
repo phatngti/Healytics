@@ -1,8 +1,19 @@
-import { Controller, Get, Post, Body, Req, ConflictException, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  ConflictException,
+  UseGuards,
+} from '@nestjs/common';
 import { AccountService } from './account.service';
 import { SurveyDto } from './dto/request/survey.dto';
 import { SurveyResponseDto } from './dto/response/survey-response.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '@/auth/guards/roles.guard';
+import { Roles } from '@/auth/decorators/roles.decorator';
+import { ALL_ROLES } from '@/auth/constants/role-groups';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -16,7 +27,8 @@ import {
 @ApiTags('Account')
 @ApiBearerAuth()
 @Controller('account')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(...ALL_ROLES)
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
   @Get('survey')
@@ -32,9 +44,16 @@ export class AccountController {
   @Post('survey')
   @ApiOperation({ summary: 'Create one-shot survey for current user' })
   @ApiBody({ type: SurveyDto })
-  @ApiResponse({ status: 201, description: 'Survey created', type: SurveyResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Survey created',
+    type: SurveyResponseDto,
+  })
   @ApiConflictResponse({ description: 'Survey already exists' })
-  async postSurvey(@Req() req: any, @Body() dto: SurveyDto): Promise<SurveyResponseDto> {
+  async postSurvey(
+    @Req() req: any,
+    @Body() dto: SurveyDto,
+  ): Promise<SurveyResponseDto> {
     const id = req.user?.id;
     const existing = await this.accountService.getSurvey(id);
     if (existing !== null) throw new ConflictException('Survey already exists');

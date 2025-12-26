@@ -13,7 +13,7 @@ class OtpUseCase {
   // Sends a verification code to the provided email address.
   Future<void> sendOTP({required String email}) async {
     if (email.isEmpty || !email.contains('@')) {
-      throw Exception("Email cannot be empty");
+      throw Exception("Invalid email address");
     }
     return await _repository.sendVerificationCode(email: email);
   }

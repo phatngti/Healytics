@@ -1,4 +1,3 @@
-import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -52,6 +51,7 @@ class AppSelectionField<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return SizedBox(
       width: width,
       height: height,
@@ -64,9 +64,6 @@ class AppSelectionField<T> extends StatelessWidget {
         onChanged: onChanged,
         enabled: enabled,
         builder: (FormFieldState<T> field) {
-          // Define the label color matching HTML #618961
-          const labelColor = Color(0xFF618961);
-
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -81,7 +78,6 @@ class AppSelectionField<T> extends StatelessWidget {
                           style:
                               labelStyle ??
                               Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: labelColor,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.5,
                               ),
@@ -98,84 +94,63 @@ class AppSelectionField<T> extends StatelessWidget {
                     ),
                   ),
                 ),
-              InputDecorator(
+              DropdownButtonFormField<T>(
+                value: items.any((e) => e.value == field.value)
+                    ? field.value
+                    : null,
+                items: items,
+                onChanged: enabled
+                    ? (value) {
+                        field.didChange(value);
+                        if (onChanged != null) {
+                          onChanged!(value);
+                        }
+                      }
+                    : null,
+                style: style ?? Theme.of(context).textTheme.bodyMedium,
+                icon: icon ?? const Icon(Icons.keyboard_arrow_down_rounded),
+                isDense: true,
+                isExpanded: true,
+                alignment: AlignmentDirectional.centerStart,
                 decoration: InputDecoration(
-                  isDense: true,
-                  contentPadding:
-                      contentPadding ??
-                      EdgeInsets.symmetric(
-                        vertical: AppDimens.paddingVerticalSmall.top * 1.5,
-                        horizontal: AppDimens.paddingHorizontalSmall.left,
-                      ),
                   hintText: hintText,
                   hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                   ),
                   filled: true,
                   fillColor: enabled
-                      ? Theme.of(context).colorScheme.surface
-                      : Theme.of(context).colorScheme.surfaceContainerHighest,
+                      ? colorScheme.surface
+                      : colorScheme.surfaceContainerHighest,
                   errorText: field.errorText,
                   border:
                       border ??
                       OutlineInputBorder(
-                        borderRadius: AppDimens.radiusSmall,
-                        borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: colorScheme.outline),
                       ),
                   enabledBorder:
                       enabledBorder ??
                       OutlineInputBorder(
-                        borderRadius: AppDimens.radiusSmall,
-                        borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: colorScheme.outline),
                       ),
                   focusedBorder:
                       focusedBorder ??
                       OutlineInputBorder(
-                        borderRadius: AppDimens.radiusSmall,
-                        borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: colorScheme.primary),
                       ),
                   disabledBorder:
                       disabledBorder ??
                       OutlineInputBorder(
-                        borderRadius: AppDimens.radiusSmall,
+                        borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.outline.withAlpha(100),
+                          color: colorScheme.outline.withAlpha(100),
                         ),
                       ),
-                  hoverColor: Theme.of(context).colorScheme.surface,
-                ),
-                isEmpty:
-                    field.value == null ||
-                    !items.any((e) => e.value == field.value),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<T>(
-                    value: items.any((e) => e.value == field.value)
-                        ? field.value
-                        : null,
-                    items: items,
-                    onChanged: enabled
-                        ? (value) {
-                            field.didChange(value);
-                            if (onChanged != null) {
-                              onChanged!(value);
-                            }
-                          }
-                        : null,
-                    style: style ?? Theme.of(context).textTheme.bodyMedium,
-                    icon: icon ?? const Icon(Icons.keyboard_arrow_down_rounded),
-                    isDense: true,
-                    isExpanded: true,
-                  ),
+                  contentPadding:
+                      contentPadding ??
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 ),
               ),
             ],

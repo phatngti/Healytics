@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:openapi/api.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/providers/api.provider.dart';
@@ -7,6 +6,7 @@ import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/survey_entity.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/user_entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:user_openapi/api.dart';
 
 part 'register_remote_datasource.g.dart';
 

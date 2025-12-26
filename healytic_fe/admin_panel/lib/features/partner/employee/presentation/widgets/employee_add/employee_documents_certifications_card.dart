@@ -170,14 +170,12 @@ class _EmployeeDocumentsCertificationsCardState
   }
 
   Widget _buildRequiredDocuments(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'REQUIRED DOCUMENTS',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: const Color(0xFF618961),
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
           ),
@@ -435,7 +433,6 @@ class _EmployeeDocumentsCertificationsCardState
         Text(
           'ADDITIONAL DOCUMENTS',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: const Color(0xFF618961),
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
           ),

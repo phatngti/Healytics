@@ -1,0 +1,96 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
+import { ProductType } from '../enums/product-type.enum';
+import { Category } from '@/categories/entities/category.entity';
+import { ProductMedia } from './product-media.entity';
+import { ProductStatus } from '../enums/product-status.enum';
+import { ServiceDefinition } from './service-definition.entity';
+import { ProductPhysicalDetails } from './product-physical-details.entity';
+import { ServiceEmployeeEligibility } from './service-employee-eligibility.entity';
+
+@Entity('products')
+@Index('IDX_PRODUCT_MERCHANT_SLUG', ['slug'])
+export class Product {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+
+
+  @Column({ name: 'category_id', type: 'uuid', nullable: true })
+  categoryId: string | null;
+
+  @Column({ length: 255 })
+  name: string;
+
+  @Column({ length: 255, unique: true })
+  slug: string;
+
+  @Column({ type: 'text', nullable: true })
+  description: string | null;
+
+  @Column({ length: 50 })
+  type: ProductType;
+
+  // Pricing
+  @Column({ name: 'base_price', type: 'decimal', precision: 15, scale: 2, default: 0 })
+  basePrice: number;
+
+  @Column({ name: 'sale_price', type: 'decimal', precision: 15, scale: 2, nullable: true })
+  salePrice: number | null;
+
+  @Column({ length: 3, default: 'VND' })
+  currency: string;
+
+  // Status & Visibility
+  @Column({ length: 20, default: ProductStatus.DRAFT })
+  status: ProductStatus;
+
+  @Column({ name: 'is_visible_online', default: false })
+  isVisibleOnline: boolean;
+
+  @Column({ type: 'varchar', name: 'vendor_name', length: 100, nullable: true })
+  vendorName: string | null;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  // Relations
+  @ManyToOne(() => Category, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'category_id' })
+  category: Category | null;
+
+  @OneToMany(() => ProductMedia, (media) => media.product, { cascade: true })
+  media: ProductMedia[];
+
+  @OneToOne(() => ProductPhysicalDetails, (details) => details.product, {
+    cascade: true,
+    eager: false,
+  })
+  physicalDetails: ProductPhysicalDetails | null;
+
+  @OneToOne(() => ServiceDefinition, (definition) => definition.product, {
+    cascade: true,
+    eager: false,
+  })
+  serviceDefinition: ServiceDefinition | null;
+
+  @OneToMany(
+    () => ServiceEmployeeEligibility,
+    (eligibility) => eligibility.product,
+    { cascade: true },
+  )
+  serviceEmployeeEligibilities: ServiceEmployeeEligibility[];
+}

@@ -1,8 +1,8 @@
-# openapi.model.AuthTokensDto
+# user_openapi.model.AuthTokensDto
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 ```
 
 ## Properties

@@ -174,7 +174,6 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
                   child: Text(
                     'DAY',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: const Color(0xFF618961),
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
                     ),
@@ -186,7 +185,6 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
                     child: Text(
                       'STATUS',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: const Color(0xFF618961),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
                       ),
@@ -199,7 +197,6 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
                     child: Text(
                       'SHIFT HOURS',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: const Color(0xFF618961),
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
                       ),

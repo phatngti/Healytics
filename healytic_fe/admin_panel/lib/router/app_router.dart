@@ -46,8 +46,8 @@ GoRouter router(Ref ref) {
   String initialLocation = '/'; // Rõ ràng và an toàn hơn
 
   String? redirect(BuildContext context, GoRouterState state) {
-    final isLoggedIn = true;
-    final role = "provider";
+    final isLoggedIn = Store.get(StoreKey.accessToken, "").isNotEmpty;
+    final role = Store.get(StoreKey.role, "");
     final path = state.uri.path;
 
     final isPublicRoute =

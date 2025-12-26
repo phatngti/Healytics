@@ -30,14 +30,37 @@ part 'auth/http_bearer_auth.dart';
 
 part 'api/account_api.dart';
 part 'api/authentication_api.dart';
+part 'api/categories_api.dart';
+part 'api/employees_api.dart';
+part 'api/products_api.dart';
+part 'api/s3_api.dart';
 
+part 'model/admin_login_dto.dart';
 part 'model/auth_tokens_dto.dart';
+part 'model/create_category_dto.dart';
+part 'model/create_doctor_dto.dart';
+part 'model/create_doctor_profile_dto.dart';
+part 'model/create_physical_details_dto.dart';
+part 'model/create_product_dto.dart';
+part 'model/create_product_media_dto.dart';
+part 'model/create_service_definition_dto.dart';
+part 'model/create_therapist_dto.dart';
+part 'model/create_therapist_profile_dto.dart';
+part 'model/doctor_profile_dto.dart';
 part 'model/login_dto.dart';
 part 'model/logout_response_dto.dart';
 part 'model/register_dto.dart';
 part 'model/register_profile_dto.dart';
+part 'model/s3_controller_delete_file200_response.dart';
+part 'model/s3_controller_get_file_url200_response.dart';
+part 'model/s3_controller_pre_sign201_response.dart';
+part 'model/s3_controller_pre_sign_request.dart';
 part 'model/survey_dto.dart';
 part 'model/survey_response_dto.dart';
+part 'model/therapist_profile_dto.dart';
+part 'model/update_category_dto.dart';
+part 'model/update_employee_dto.dart';
+part 'model/update_product_dto.dart';
 
 
 /// An [ApiClient] instance that uses the default values obtained from
