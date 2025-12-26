@@ -122,7 +122,6 @@ class EmployeeContactInfoCard extends StatelessWidget {
                 Text(
                   'EMERGENCY CONTACT',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: const Color(0xFF618961),
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
                   ),

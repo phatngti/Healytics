@@ -20,12 +20,10 @@ class EmployeeManagementTable extends HookConsumerWidget {
     {'label': 'ID'},
     {'label': 'Avatar'},
     {'label': 'Full Name'},
-    {'label': 'Role'},
     {'label': 'Position'},
     {'label': 'Rating'},
     {'label': 'Review Count'},
     {'label': 'Status'},
-    {'label': 'Branch'},
     {'label': 'Actions'},
   ];
 
@@ -48,12 +46,9 @@ class EmployeeManagementTable extends HookConsumerWidget {
   ];
 
   void _onEditEmployee(BuildContext context, LocalKey? key) {
-    final id = int.tryParse(key?.toCleanString() ?? '');
+    final id = key?.toCleanString();
     if (id != null) {
-      context.goNamed(
-        EmployeeDetailsRoute.name,
-        pathParameters: {'id': id.toString()},
-      );
+      context.goNamed(EmployeeDetailsRoute.name, pathParameters: {'id': id});
     }
   }
 

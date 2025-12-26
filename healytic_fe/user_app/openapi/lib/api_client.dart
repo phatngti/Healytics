@@ -182,8 +182,32 @@ class ApiClient {
           return valueString == 'true' || valueString == '1';
         case 'DateTime':
           return value is DateTime ? value : DateTime.tryParse(value);
+        case 'Object':
+          return value;
+        case 'AdminLoginDto':
+          return AdminLoginDto.fromJson(value);
         case 'AuthTokensDto':
           return AuthTokensDto.fromJson(value);
+        case 'CreateCategoryDto':
+          return CreateCategoryDto.fromJson(value);
+        case 'CreateDoctorDto':
+          return CreateDoctorDto.fromJson(value);
+        case 'CreateDoctorProfileDto':
+          return CreateDoctorProfileDto.fromJson(value);
+        case 'CreatePhysicalDetailsDto':
+          return CreatePhysicalDetailsDto.fromJson(value);
+        case 'CreateProductDto':
+          return CreateProductDto.fromJson(value);
+        case 'CreateProductMediaDto':
+          return CreateProductMediaDto.fromJson(value);
+        case 'CreateServiceDefinitionDto':
+          return CreateServiceDefinitionDto.fromJson(value);
+        case 'CreateTherapistDto':
+          return CreateTherapistDto.fromJson(value);
+        case 'CreateTherapistProfileDto':
+          return CreateTherapistProfileDto.fromJson(value);
+        case 'DoctorProfileDto':
+          return DoctorProfileDto.fromJson(value);
         case 'LoginDto':
           return LoginDto.fromJson(value);
         case 'LogoutResponseDto':
@@ -192,10 +216,26 @@ class ApiClient {
           return RegisterDto.fromJson(value);
         case 'RegisterProfileDto':
           return RegisterProfileDto.fromJson(value);
+        case 'S3ControllerDeleteFile200Response':
+          return S3ControllerDeleteFile200Response.fromJson(value);
+        case 'S3ControllerGetFileUrl200Response':
+          return S3ControllerGetFileUrl200Response.fromJson(value);
+        case 'S3ControllerPreSign201Response':
+          return S3ControllerPreSign201Response.fromJson(value);
+        case 'S3ControllerPreSignRequest':
+          return S3ControllerPreSignRequest.fromJson(value);
         case 'SurveyDto':
           return SurveyDto.fromJson(value);
         case 'SurveyResponseDto':
           return SurveyResponseDto.fromJson(value);
+        case 'TherapistProfileDto':
+          return TherapistProfileDto.fromJson(value);
+        case 'UpdateCategoryDto':
+          return UpdateCategoryDto.fromJson(value);
+        case 'UpdateEmployeeDto':
+          return UpdateEmployeeDto.fromJson(value);
+        case 'UpdateProductDto':
+          return UpdateProductDto.fromJson(value);
         default:
           dynamic match;
           if (value is List && (match = _regList.firstMatch(targetType)?.group(1)) != null) {

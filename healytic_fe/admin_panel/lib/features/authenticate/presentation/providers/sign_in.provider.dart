@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/authenticate/domain/authenticate.entity.dart';
+import 'package:admin_panel/features/authenticate/datasource/repository_implement.dart';
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -16,17 +17,15 @@ class SignInProvider extends _$SignInProvider {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final request = SignInRequestEntity(email: email, password: password);
-      await Future.delayed(const Duration(seconds: 2));
-      // return await ref.read(authenticateRepositoryProvider).login(request);
+      final response = await ref
+          .read(authenticateRepositoryProvider)
+          .login(request, role);
 
       // Save role to store
       await Store.put(StoreKey.role, role);
+      await Store.put(StoreKey.accessToken, response.accessToken);
 
-      return SignInResponseEntity(
-        accessToken: 'access_token',
-        refreshToken: 'refresh_token',
-        role: role,
-      );
+      return response;
     });
   }
 }

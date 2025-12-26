@@ -13,8 +13,11 @@ class AuthenticateRepositoryImplement implements AuthenticateRepository {
   }) : _remoteDatasource = remoteDatasource;
 
   @override
-  Future<SignInResponseEntity> login(SignInRequestEntity request) async {
-    return _remoteDatasource.login(request);
+  Future<SignInResponseEntity> login(
+    SignInRequestEntity request,
+    String role,
+  ) async {
+    return _remoteDatasource.login(request, role);
   }
 }
 

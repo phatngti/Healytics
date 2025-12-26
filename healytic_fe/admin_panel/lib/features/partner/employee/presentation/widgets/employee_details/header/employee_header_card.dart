@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +7,9 @@ import 'employee_role_branch_section.dart';
 import 'employee_stats_actions_section.dart';
 
 class EmployeeHeaderCard extends StatelessWidget {
-  const EmployeeHeaderCard({super.key});
+  final EmployeeEntity employee;
+
+  const EmployeeHeaderCard({super.key, required this.employee});
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +25,20 @@ class EmployeeHeaderCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const EmployeeAvatarSection(),
+          EmployeeAvatarSection(
+            avatar: employee.avatar,
+            fullName: employee.fullName,
+            displayName: employee.displayName,
+            employeeId: employee.id,
+          ),
           AppDimens.horizontalLarge,
-          const Expanded(child: EmployeeRoleBranchSection()),
+          Expanded(
+            child: EmployeeRoleBranchSection(
+              role: employee.role,
+              status: employee.status,
+              branch: employee.branch,
+            ),
+          ),
           const EmployeeStatsActionsSection(),
         ],
       ),

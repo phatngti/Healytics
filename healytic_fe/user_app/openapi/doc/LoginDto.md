@@ -1,8 +1,8 @@
-# openapi.model.LoginDto
+# user_openapi.model.LoginDto
 
 ## Load the model package
 ```dart
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 ```
 
 ## Properties

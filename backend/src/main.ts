@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from '@/common/filters/all-exceptions.filter';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -21,6 +22,7 @@ async function bootstrap() {
   app.use(helmet());
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   if (process.env.NODE_ENV == 'development') {
     const options = new DocumentBuilder()
@@ -31,10 +33,10 @@ async function bootstrap() {
       .addBearerAuth()
       .build();
     const document = SwaggerModule.createDocument(app, options);
-    const openapiPath = __dirname + '/../openapi/';
+    const openapiPath = __dirname + '/../../openapi/';
     // 2. Write the file to the root directory
     if (!fs.existsSync(openapiPath)) {
-      fs.mkdirSync(openapiPath);
+      fs.mkdirSync(openapiPath, { recursive: true });
     }
     fs.writeFileSync(
       openapiPath + 'openapi.json',

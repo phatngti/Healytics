@@ -8,7 +8,7 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: lines_longer_than_80_chars
 
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 import 'package:test/test.dart';
 
 
@@ -19,6 +19,16 @@ void main() {
   group('tests for AuthenticationApi', () {
     //Future<AuthTokensDto> authControllerLogin(LoginDto loginDto) async
     test('test authControllerLogin', () async {
+      // TODO
+    });
+
+    //Future<AuthTokensDto> authControllerLoginAdmin(AdminLoginDto adminLoginDto) async
+    test('test authControllerLoginAdmin', () async {
+      // TODO
+    });
+
+    //Future<AuthTokensDto> authControllerLoginUser(LoginDto loginDto) async
+    test('test authControllerLoginUser', () async {
       // TODO
     });
 
@@ -34,6 +44,11 @@ void main() {
 
     //Future<AuthTokensDto> authControllerRegister(RegisterDto registerDto) async
     test('test authControllerRegister', () async {
+      // TODO
+    });
+
+    //Future<AuthTokensDto> authControllerRegisterUser(RegisterDto registerDto) async
+    test('test authControllerRegisterUser', () async {
       // TODO
     });
 

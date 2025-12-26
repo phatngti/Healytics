@@ -2,9 +2,9 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'employee.entity.freezed.dart';
 part 'employee.entity.g.dart';
 
-extension type const EmployeeId(int value) implements int {
-  factory EmployeeId.fromJson(dynamic json) => EmployeeId(json as int);
-  int toJson() => value;
+extension type const EmployeeId(String value) implements String {
+  factory EmployeeId.fromJson(dynamic json) => EmployeeId(json as String);
+  String toJson() => value;
 }
 
 @Freezed(toJson: true)
