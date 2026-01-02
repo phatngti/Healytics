@@ -1,15 +1,14 @@
+import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeRoleBranchSection extends StatelessWidget {
   final String role;
   final String status;
-  final String branch;
 
   const EmployeeRoleBranchSection({
     super.key,
     required this.role,
     required this.status,
-    required this.branch,
   });
 
   @override
@@ -35,13 +34,6 @@ class EmployeeRoleBranchSection extends StatelessWidget {
               Icons.storefront,
               size: 20,
               color: colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              branch.isNotEmpty ? branch : 'No branch assigned',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -85,17 +77,22 @@ class _RoleBadge extends StatelessWidget {
   }
 
   ({IconData icon, Color color}) _getRoleConfig(String role) {
-    switch (role.toUpperCase()) {
-      case 'DOCTOR':
-        return (icon: Icons.medical_services, color: Colors.blue);
-      case 'THERAPIST':
-        return (icon: Icons.spa, color: const Color(0xFF13EC13));
-      case 'RECEPTIONIST':
-        return (icon: Icons.person, color: Colors.orange);
-      case 'MANAGER':
-        return (icon: Icons.admin_panel_settings, color: Colors.purple);
-      default:
-        return (icon: Icons.work, color: Colors.grey);
+    try {
+      final roleEnum = EmployeeRole.values.firstWhere(
+        (e) => e.apiValue == role.toUpperCase(),
+      );
+      switch (roleEnum) {
+        case EmployeeRole.doctor:
+          return (icon: Icons.medical_services, color: Colors.blue);
+        case EmployeeRole.therapist:
+          return (icon: Icons.spa, color: const Color(0xFF13EC13));
+        case EmployeeRole.receptionist:
+          return (icon: Icons.person, color: Colors.orange);
+        case EmployeeRole.manager:
+          return (icon: Icons.admin_panel_settings, color: Colors.purple);
+      }
+    } catch (_) {
+      return (icon: Icons.work, color: Colors.grey);
     }
   }
 }

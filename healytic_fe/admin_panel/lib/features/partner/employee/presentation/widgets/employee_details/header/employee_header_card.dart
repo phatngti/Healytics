@@ -36,7 +36,6 @@ class EmployeeHeaderCard extends StatelessWidget {
             child: EmployeeRoleBranchSection(
               role: employee.role,
               status: employee.status,
-              branch: employee.branch,
             ),
           ),
           const EmployeeStatsActionsSection(),

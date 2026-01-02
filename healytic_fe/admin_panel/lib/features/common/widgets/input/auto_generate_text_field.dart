@@ -1,11 +1,9 @@
-import 'package:admin_panel/features/common/widgets/button/button.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+part of 'form_field_builders.dart';
 
 /// A text field widget with an auto-generate button.
 /// Used for fields like Employee ID that can be auto-generated.
-class AppAutoGenerateTextField extends StatelessWidget {
-  const AppAutoGenerateTextField({
+class _AppAutoGenerateTextField extends StatelessWidget {
+  const _AppAutoGenerateTextField({
     super.key,
     required this.fieldKey,
     required this.label,

@@ -1,9 +1,7 @@
-import 'package:admin_panel/utils/demensions.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+part of 'form_field_builders.dart';
 
-class AppTextField extends StatelessWidget {
-  const AppTextField({
+class _AppTextField extends StatelessWidget {
+  const _AppTextField({
     super.key,
     required this.fieldKey,
     required this.label,
@@ -34,6 +32,7 @@ class AppTextField extends StatelessWidget {
     this.contentPadding,
     this.isRequired = false,
     this.uppercaseLabel = true,
+    this.suffix,
   });
 
   final String fieldKey;
@@ -41,6 +40,7 @@ class AppTextField extends StatelessWidget {
 
   final Widget? suffixIcon;
   final Widget? prefixIcon; // Add prefixIcon field
+  final Widget? suffix;
   final String? Function(dynamic)? validator;
   final bool obscureText;
   final TextEditingController? controller;
@@ -185,7 +185,8 @@ class AppTextField extends StatelessWidget {
                   hoverColor: Theme.of(context).colorScheme.surface,
 
                   suffixIcon: suffixIcon,
-                  prefixIcon: prefixIcon, // Use prefixIcon here
+                  prefixIcon: prefixIcon,
+                  suffix: suffix,
                   constraints: const BoxConstraints(
                     maxHeight: double.infinity,
                     maxWidth: double.infinity,

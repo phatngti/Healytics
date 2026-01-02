@@ -1,6 +1,8 @@
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 import 'package:admin_panel/features/partner/employee/presentation/layouts/employee_add_desktop.dart';
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
 import 'package:admin_panel/router/partner_routes.dart';
@@ -20,9 +22,10 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   Future<void> _handleSubmit(Map<String, dynamic> values) async {
     try {
       final role =
-          values['employee_role']?.toString().toUpperCase() ?? 'THERAPIST';
+          values['employee_role']?.toString().toUpperCase() ??
+          EmployeeRole.therapist.apiValue;
 
-      if (role == 'DOCTOR') {
+      if (role == EmployeeRole.doctor.apiValue) {
         await _createDoctor(values);
       } else {
         await _createTherapist(values);
@@ -32,7 +35,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${role == 'DOCTOR' ? 'Doctor' : 'Therapist'} created successfully',
+              '${role == EmployeeRole.doctor.apiValue ? 'Doctor' : 'Therapist'} created successfully',
             ),
           ),
         );
@@ -97,8 +100,22 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
     final lastName = values['last_name']?.toString().trim() ?? '';
     final fullName = '$firstName $lastName'.trim();
 
-    // Parse skills from comma-separated string
-    final skills = _parseCommaSeparatedList(values['skills']?.toString());
+    // Determine therapist type
+    final type =
+        values['therapist_type']?.toString() ?? TherapistType.massage.apiValue;
+
+    // Parse skills based on type
+    List<String> skills = [];
+    final skillsKey = type == TherapistType.spa.apiValue
+        ? 'spa_skills'
+        : 'massage_skills';
+    final rawSkills = values[skillsKey];
+
+    if (rawSkills is List) {
+      skills = rawSkills.map((e) => e.toString()).toList();
+    } else if (rawSkills is String) {
+      skills = _parseCommaSeparatedList(rawSkills);
+    }
 
     // Map therapist level
     String? level = values['therapist_level']?.toString();
@@ -121,7 +138,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
       gender: values['gender']?.toString().toUpperCase(),
       branchId: null, // TODO: Add branch selection
       level: level,
-      type: values['therapist_type']?.toString(),
+      type: type,
       strengthLevel: values['strength_level']?.toString(),
       commissionRate:
           double.tryParse(values['commission_rate']?.toString() ?? '') ?? 0,
