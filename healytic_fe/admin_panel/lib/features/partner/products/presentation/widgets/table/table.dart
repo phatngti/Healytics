@@ -3,6 +3,7 @@ import 'package:admin_panel/features/common/widgets/button/button.dart';
 import 'package:admin_panel/features/common/widgets/table/function_button.dart';
 import 'package:admin_panel/features/common/widgets/table/helper.dart';
 import 'package:admin_panel/features/common/widgets/table/table.dart';
+
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:admin_panel/utils/demensions.dart';
@@ -19,11 +20,10 @@ class ProductTable extends HookConsumerWidget {
   // Column definitions
   static const List<Map<String, dynamic>> _columnDefinitions = [
     {'label': 'ID'},
-    {'label': 'Name', 'prefixIcon': Icons.person},
-    {'label': 'Price'},
-    {'label': 'Description'},
     {'label': 'Image'},
     {'label': 'Category'},
+    {'label': 'Name'},
+    {'label': 'Price'},
   ];
 
   TableColumns get _columns => TableColumns(
@@ -43,6 +43,67 @@ class ProductTable extends HookConsumerWidget {
     (icon: Icons.edit, onPressed: (key) => _onEditProduct(context, key)),
     (icon: Icons.delete, onPressed: (key) => _onDeleteProduct(key)),
   ];
+
+  Future<List<DataRow>> _getData(
+    WidgetRef ref,
+    SetRowSelectionCallback setRowSelection,
+    int startingAt,
+    int count,
+  ) async {
+    final products = await ref
+        .read(productProvider.notifier)
+        .getProducts(
+          startingAt: startingAt,
+          count: count,
+          search: null,
+          sortAscending: false,
+        );
+
+    return products.map((product) {
+      return DataRow(
+        key: ValueKey<String>(product.id.value),
+        onSelectChanged: (value) {
+          if (value != null) {
+            setRowSelection(ValueKey<String>(product.id.value), value);
+          }
+        },
+        cells: [
+          DataCell(
+            Center(
+              child: Text(
+                product.id.value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+          DataCell(
+            Center(
+              child: product.images.isNotEmpty && product.images[0].isNotEmpty
+                  ? SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Image.network(
+                        product.images[0],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.broken_image, size: 24),
+                      ),
+                    )
+                  : const SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Icon(Icons.image_not_supported, size: 24),
+                    ),
+            ),
+          ),
+          DataCell(Center(child: Text(product.category.name))),
+          DataCell(Center(child: Text(product.name))),
+          DataCell(Center(child: Text(product.basePrice.toString()))),
+        ],
+      );
+    }).toList();
+  }
 
   void _onEditProduct(BuildContext context, LocalKey? key) {
     final id = key?.toCleanString();
@@ -179,15 +240,7 @@ class ProductTable extends HookConsumerWidget {
         columns: _columns.dataColumns(context),
         getTotalRows: () => ref.read(productProvider.notifier).getTotalRows(),
         getData: (setRowSelection, startingAt, count) async {
-          final rows = await ref
-              .read(productProvider.notifier)
-              .getProducts(
-                setRowSelection: setRowSelection,
-                startingAt: startingAt,
-                count: count,
-                search: null,
-                sortAscending: false,
-              );
+          final rows = await _getData(ref, setRowSelection, startingAt, count);
           // Add action button cells to each row
           final actionButtons = _buildRowActionButtons(context);
           if (actionButtons.isNotEmpty) {

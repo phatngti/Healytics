@@ -1,4 +1,5 @@
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
+
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
@@ -106,7 +107,8 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
           Row(
             children: [
               Expanded(
-                child: AppTextField(
+                child: FormFieldBuilders.buildTextField(
+                  context,
                   fieldKey: 'medical_title',
                   label: 'Medical Title',
                   hintText: 'e.g. BS CKI, Thạc sĩ',
@@ -114,12 +116,13 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
               ),
               AppDimens.horizontalLarge,
               Expanded(
-                child: AppTextField(
+                child: FormFieldBuilders.buildTextField(
+                  context,
                   fieldKey: 'medical_license',
                   label: 'Medical License ID',
                   hintText: 'e.g. CCHN-00123',
                   isRequired: true,
-                  prefixIcon: const Icon(Icons.badge_outlined, size: 20),
+                  prefixIcon: Icons.badge_outlined,
                 ),
               ),
             ],
@@ -128,7 +131,8 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
           Row(
             children: [
               Expanded(
-                child: AppTextField(
+                child: FormFieldBuilders.buildTextField(
+                  context,
                   fieldKey: 'experience_years',
                   label: 'Years of Experience',
                   hintText: '0',
@@ -137,38 +141,45 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
               ),
               AppDimens.horizontalLarge,
               Expanded(
-                child: AppTextField(
+                child: FormFieldBuilders.buildTextField(
+                  context,
                   fieldKey: 'consultation_fee',
                   label: 'Consultation Fee',
-                  hintText: '0.00',
+                  hintText: '00%',
                   keyboardType: TextInputType.number,
-                  prefixIcon: const Padding(
-                    padding: EdgeInsets.only(left: 12, right: 4),
-                    child: Text(
-                      '\$',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
+                  suffixIcon: Icon(Icons.percent, size: 20),
                 ),
               ),
             ],
           ),
           AppDimens.verticalMedium,
-          AppTextField(
+          FormFieldBuilders.buildMultiSelectChipField(
+            context,
             fieldKey: 'specializations',
             label: 'Specializations',
-            hintText: 'e.g. Dermatology, Cosmetic Surgery (comma separated)',
-            maxLines: 2,
+            availableOptions: const {
+              'cardiology': 'Cardiology',
+              'dermatology': 'Dermatology',
+              'orthopedics': 'Orthopedics',
+              'pediatrics': 'Pediatrics',
+              'neurology': 'Neurology',
+            },
+            searchHint: 'Search or add specialization...',
+            allowCreate: true,
+            width: double.infinity,
           ),
           AppDimens.verticalMedium,
-          AppTextField(
+          FormFieldBuilders.buildDropdownField(
+            context,
             fieldKey: 'education',
-            label: 'Education History',
-            hintText: 'e.g. University of Medicine - Doctor of Medicine',
-            maxLines: 2,
+            label: 'Education',
+            items: const [
+              'Doctor of Medicine',
+              'Master of Medicine',
+              'Bachelor of Medicine',
+              'Associate Degree',
+              'Other',
+            ],
           ),
         ],
       ),

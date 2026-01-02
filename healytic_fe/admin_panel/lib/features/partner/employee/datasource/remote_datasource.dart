@@ -5,6 +5,8 @@ import 'package:admin_panel/features/partner/employee/domain/create_therapist.re
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 import 'package:admin_openapi/api.dart';
+import 'package:admin_panel/core/entities/store.entity.dart';
+import 'package:admin_panel/core/models/store.model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -194,13 +196,19 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       rating: double.tryParse(json['rating']?.toString() ?? '0.0') ?? 0.0,
       reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
       status: json['status']?.toString() ?? 'ACTIVE',
-      branch: json['branchId']?.toString() ?? '',
       email: json['email']?.toString() ?? '',
       phone: json['phone']?.toString() ?? '',
       address: '', // Not available from API
       city: '', // Not available from API
       state: '', // Not available from API
       country: '', // Not available from API
+      licenseUrl: json['licenseUrl']?.toString(),
+      idCardUrl: json['idCardUrl']?.toString(),
+      documents:
+          (json['documents'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
     );
   }
 
@@ -316,8 +324,166 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   }
 }
 
+class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
+  @override
+  Future<List<EmployeeEntity>> getEmployees(
+    int startingAt,
+    int count,
+    String? sortedBy,
+    bool? sortedAsc,
+  ) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return List.generate(
+      count,
+      (index) => EmployeeEntity(
+        id: EmployeeId('mock-id-${startingAt + index}'),
+        fullName: 'Mock Employee ${startingAt + index}',
+        displayName: 'MockEmp ${startingAt + index}',
+        avatar: 'https://i.pravatar.cc/150?u=${startingAt + index}',
+        role: index % 2 == 0 ? 'DOCTOR' : 'THERAPIST',
+        position: index % 2 == 0 ? 'Doctor' : 'Therapist',
+        rating: 4.5,
+        reviewCount: 10 + index,
+        status: 'ACTIVE',
+        email: 'mock${startingAt + index}@example.com',
+        phone: '1234567890',
+        address: '123 Mock St',
+        city: 'Mock City',
+        state: 'Mock State',
+        country: 'Mock Country',
+        licenseUrl:
+            'https://pub-58a545087a6b4221b1b0dab10d8d3517.r2.dev/main%20(3).pdf',
+      ),
+    );
+  }
+
+  @override
+  Future<int> getTotalRows() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return 100;
+  }
+
+  @override
+  Future<EmployeeEntity> getEmployeeById(EmployeeId id) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return EmployeeEntity(
+      id: id,
+      fullName: 'Mock Employee ${id.value}',
+      displayName: 'MockEmp ${id.value}',
+      avatar: 'https://i.pravatar.cc/150?u=${id.value}',
+      role: 'DOCTOR',
+      position: 'Doctor',
+      rating: 4.8,
+      reviewCount: 50,
+      status: 'ACTIVE',
+      email: 'mock${id.value}@example.com',
+      phone: '1234567890',
+      address: '123 Mock St',
+      city: 'Mock City',
+      state: 'Mock State',
+      country: 'Mock Country',
+      licenseUrl:
+          'https://pub-58a545087a6b4221b1b0dab10d8d3517.r2.dev/main%20(3).pdf',
+      idCardUrl:
+          'https://pub-58a545087a6b4221b1b0dab10d8d3517.r2.dev/main%20(3).pdf',
+      documents: [
+        'https://pub-58a545087a6b4221b1b0dab10d8d3517.r2.dev/main%20(3).pdf',
+      ],
+    );
+  }
+
+  @override
+  Future<EmployeeEntity> createDoctor(CreateDoctorRequest request) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return EmployeeEntity(
+      id: EmployeeId('new-doctor-id'),
+      fullName: request.fullName,
+      displayName: request.displayName!,
+      avatar: request.avatarUrl ?? '',
+      role: 'DOCTOR',
+      position: 'Doctor',
+      rating: 0.0,
+      reviewCount: 0,
+      status: 'ACTIVE',
+      email: request.email,
+      phone: request.phone ?? '',
+      address: '',
+      city: '',
+      state: '',
+      country: '',
+    );
+  }
+
+  @override
+  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return EmployeeEntity(
+      id: EmployeeId('new-therapist-id'),
+      fullName: request.fullName,
+      displayName: request.displayName!,
+      avatar: request.avatarUrl ?? '',
+      role: 'THERAPIST',
+      position: 'Therapist',
+      rating: 0.0,
+      reviewCount: 0,
+      status: 'ACTIVE',
+      email: request.email,
+      phone: request.phone ?? '',
+      address: '',
+      city: '',
+      state: '',
+      country: '',
+    );
+  }
+
+  @override
+  Future<void> updateEmployee(UpdateEmployeeRequest request) async {
+    await Future.delayed(const Duration(seconds: 1));
+    debugPrint('Mock update employee: ${request.id}');
+  }
+
+  @override
+  Future<void> deleteEmployee(EmployeeId id) async {
+    await Future.delayed(const Duration(seconds: 1));
+    debugPrint('Mock delete employee: $id');
+  }
+
+  @override
+  Future<List<EmployeeEntity>> getEmployeesByRole({
+    required String role,
+    int? limit,
+  }) async {
+    await Future.delayed(const Duration(seconds: 1));
+    final count = limit ?? 10;
+    return List.generate(
+      count,
+      (index) => EmployeeEntity(
+        id: EmployeeId('mock-$role-$index'),
+        fullName: 'Mock $role $index',
+        displayName: 'Mock$role $index',
+        avatar: 'https://i.pravatar.cc/150?u=$role$index',
+        role: role,
+        position: role,
+        rating: 4.5,
+        reviewCount: 10 + index,
+        status: 'ACTIVE',
+        email: 'mock$role$index@example.com',
+        phone: '1234567890',
+        address: '123 Mock St',
+        city: 'Mock City',
+        state: 'Mock State',
+        country: 'Mock Country',
+      ),
+    );
+  }
+}
+
 @riverpod
 EmployeeRemoteDataSource employeeRemoteDataSource(Ref ref) {
+  final isMock = Store.get(StoreKey.mockFlag, false);
+  if (isMock) {
+    return EmployeeRemoteDataSourceMock();
+  }
   final apiService = ref.read(apiServiceProvider);
   return EmployeeRemoteDataSourceImpl(apiService: apiService);
 }

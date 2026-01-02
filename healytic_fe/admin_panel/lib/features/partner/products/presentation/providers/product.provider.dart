@@ -1,4 +1,3 @@
-import 'package:admin_panel/features/common/widgets/table/helper.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/employee/datasource/employee_implement.repository.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
@@ -30,21 +29,14 @@ class ProductNotifier extends _$ProductNotifier {
     return repo.getTotalRows();
   }
 
-  Future<List<DataRow>> getProducts({
-    required SetRowSelectionCallback setRowSelection,
+  Future<List<Product>> getProducts({
     required int startingAt,
     required int count,
     String? search,
     bool? sortAscending,
   }) async {
     final repo = ref.read(productRepositoryProvider);
-    return repo.getProducts(
-      setRowSelection,
-      startingAt,
-      count,
-      search,
-      sortAscending,
-    );
+    return repo.getProducts(startingAt, count, search, sortAscending);
   }
 
   Future<void> deleteProduct(ProductId id) async {

@@ -1,4 +1,3 @@
-import 'package:admin_panel/features/common/widgets/table/helper.dart';
 import 'package:admin_panel/features/partner/employee/datasource/employee_implement.repository.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
@@ -28,8 +27,7 @@ class EmployeeNotifier extends _$EmployeeNotifier {
     return repo.getTotalRows();
   }
 
-  Future<List<DataRow>> getEmployees({
-    required SetRowSelectionCallback setRowSelection,
+  Future<List<EmployeeEntity>> getEmployees({
     required int startingAt,
     required int count,
     String? search,
@@ -37,7 +35,6 @@ class EmployeeNotifier extends _$EmployeeNotifier {
   }) async {
     final repo = ref.read(employeeRepositoryProvider);
     final result = await repo.getEmployees(
-      setRowSelection,
       startingAt,
       count,
       search,

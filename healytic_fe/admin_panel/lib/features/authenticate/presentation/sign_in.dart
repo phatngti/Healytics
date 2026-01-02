@@ -2,7 +2,7 @@ import 'package:admin_panel/features/authenticate/presentation/widgets/logo.dart
 import 'package:admin_panel/features/authenticate/presentation/providers/sign_in.provider.dart';
 import 'package:admin_panel/features/common/widgets/button/button.dart';
 import 'package:admin_panel/features/common/widgets/button/selector_switch.dart';
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/common/widgets/toast.dart';
 import 'package:admin_panel/router/admin_routes.dart';
@@ -113,7 +113,8 @@ class SignInScreen extends HookConsumerWidget {
                           options: roles,
                         ),
                         AppDimens.verticalExtraLarge,
-                        AppTextField(
+                        FormFieldBuilders.buildTextField(
+                          context,
                           fieldKey: "email",
                           label: "Email",
                           controller: emailController,
@@ -127,7 +128,8 @@ class SignInScreen extends HookConsumerWidget {
                               ),
                         ),
                         AppDimens.verticalSmall,
-                        AppTextField(
+                        FormFieldBuilders.buildTextField(
+                          context,
                           fieldKey: "password",
                           label: "Password",
                           controller: passwordController,

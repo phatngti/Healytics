@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/common/widgets/quill.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +66,8 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Product Name
-                const AppTextField(
+                FormFieldBuilders.buildTextField(
+                  context,
                   fieldKey: 'product_name',
                   label: 'Product Name',
                   hintText: 'e.g. Rejuvenating Night Cream',

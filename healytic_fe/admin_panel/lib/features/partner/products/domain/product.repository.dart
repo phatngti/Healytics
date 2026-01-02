@@ -3,12 +3,10 @@ import 'package:admin_panel/features/partner/products/domain/category.entity.dar
 
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
-import 'package:flutter/material.dart';
 
 abstract class ProductRepository {
   /// Get paginated list of products for table display
-  Future<List<DataRow>> getProducts(
-    void Function(LocalKey, bool) setRowSelection,
+  Future<List<Product>> getProducts(
     int startingAt,
     int count,
     String? sortedBy,

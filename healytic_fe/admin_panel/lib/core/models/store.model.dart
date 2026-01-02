@@ -4,7 +4,7 @@ enum StoreKey<T> {
   accessToken<String>._(2),
   refreshToken<String>._(3),
   customHeaders<String>._(4),
-  role<String>._(5);
+  mockFlag<bool>._(5);
 
   const StoreKey._(this.id);
   final int id;

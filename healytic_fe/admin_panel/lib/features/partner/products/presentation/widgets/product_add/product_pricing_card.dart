@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -80,18 +80,20 @@ class ProductPricingCard extends StatelessWidget {
                 Divider(color: colorScheme.outlineVariant),
                 AppDimens.verticalLarge,
                 // SKU and Barcode Row
-                const Row(
+                Row(
                   children: [
                     Expanded(
-                      child: AppTextField(
+                      child: FormFieldBuilders.buildTextField(
+                        context,
                         fieldKey: 'sku',
                         label: 'SKU (Stock Keeping Unit)',
                         hintText: 'e.g. CR-001',
                       ),
                     ),
-                    SizedBox(width: 24),
+                    const SizedBox(width: 24),
                     Expanded(
-                      child: AppTextField(
+                      child: FormFieldBuilders.buildTextField(
+                        context,
                         fieldKey: 'barcode',
                         label: 'Barcode (ISBN, UPC, GTIN)',
                         hintText: 'Scan or enter barcode',
@@ -143,7 +145,8 @@ class ProductPricingCard extends StatelessWidget {
         const SizedBox(height: 6),
         SizedBox(
           width: MediaQuery.of(context).size.width * 0.25,
-          child: const AppTextField(
+          child: FormFieldBuilders.buildTextField(
+            context,
             fieldKey: 'stock_quantity',
             label: '',
             hintText: '0',

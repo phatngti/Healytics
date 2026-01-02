@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/input/selection_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:flutter/material.dart';
 
 class ProductVisibilityCard extends StatefulWidget {
@@ -71,8 +71,10 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
                 ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 6),
-              AppSelectionField(
+              FormFieldBuilders.buildCustomSelectionField(
+                context,
                 fieldKey: 'status',
+                label: 'Status',
                 initialValue: _status,
                 items: const [
                   DropdownMenuItem(value: 'draft', child: Text('Draft')),
@@ -82,9 +84,9 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
                 onChanged: (value) {
                   if (value != null) {
                     setState(() {
-                      _status = value;
+                      _status = value.toString();
                     });
-                    widget.onStatusChanged?.call(value);
+                    widget.onStatusChanged?.call(value.toString());
                   }
                 },
               ),

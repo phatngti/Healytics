@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/input/multi_select_chip_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -160,14 +160,17 @@ class _EmployeeSkillsServicesCardState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Skill Set Section using the common widget
-          AppMultiSelectChipField(
+          FormFieldBuilders.buildMultiSelectChipField(
+            context,
             fieldKey: 'skill_set',
             label: 'SKILL SET (MULTI-SELECT)',
             labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
             ),
-            availableOptions: widget.availableSkills,
+            availableOptions: {
+              for (var skill in widget.availableSkills) skill: skill,
+            },
             initialValue: widget.initialSkills,
             searchHint: 'Search skills...',
             helperText: 'Type to search existing skills or create new ones.',

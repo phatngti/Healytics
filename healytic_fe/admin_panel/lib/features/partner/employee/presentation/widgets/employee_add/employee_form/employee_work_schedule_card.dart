@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeWorkScheduleCard extends StatefulWidget {
@@ -341,7 +341,8 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
     required String value,
     required ValueChanged<String> onChanged,
   }) {
-    return AppTextField(
+    return FormFieldBuilders.buildTextField(
+      context,
       fieldKey: fieldKey,
       label: '', // Empty label as it is inline
       initialValue: value,
