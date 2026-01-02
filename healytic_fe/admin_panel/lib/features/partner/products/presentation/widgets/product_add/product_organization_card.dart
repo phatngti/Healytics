@@ -1,5 +1,4 @@
-import 'package:admin_panel/features/common/widgets/input/selection_field.dart';
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:flutter/material.dart';
@@ -133,10 +132,12 @@ class _ProductOrganizationCardState
                         child: CircularProgressIndicator(),
                       ),
                     )
-                  : AppSelectionField<String>(
+                  : FormFieldBuilders.buildCustomSelectionField<String>(
+                      context,
                       fieldKey: 'category',
                       hintText: 'Select category...',
                       initialValue: _category,
+                      label: 'Category',
                       items: _categories
                           .map(
                             (cat) => DropdownMenuItem(
@@ -145,12 +146,6 @@ class _ProductOrganizationCardState
                             ),
                           )
                           .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _category = value;
-                        });
-                        widget.onCategoryChanged?.call(value);
-                      },
                     ),
             ],
           ),
@@ -208,7 +203,8 @@ class _ProductOrganizationCardState
           ),
           const SizedBox(height: 16),
           // Vendor
-          const AppTextField(
+          FormFieldBuilders.buildTextField(
+            context,
             fieldKey: 'vendor',
             label: 'Vendor',
             hintText: 'e.g. SkinCeuticals',

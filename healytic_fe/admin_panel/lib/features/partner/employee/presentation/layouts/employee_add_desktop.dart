@@ -1,13 +1,9 @@
 import 'package:admin_panel/features/common/widgets/button/back_button.dart';
-import 'package:admin_panel/features/common/widgets/button/button.dart';
+
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
-import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/doctor_fields_card.dart';
-import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_contact_info_card.dart';
-import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_documents_certifications_card.dart';
-import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_professional_role_card.dart';
-import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_profile_image_card.dart';
-import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_work_schedule_card.dart';
-import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/therapist_fields_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_add_form_section.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form_actions.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form_profile_section.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -65,11 +61,14 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Left Column - Profile Image & Contact Info
-                    const SizedBox(width: 340, child: _LeftColumn()),
+                    const SizedBox(
+                      width: 340,
+                      child: EmployeeFormProfileSection(),
+                    ),
                     AppDimens.horizontalLarge,
                     // Right Column - Role, Skills, Schedule
                     Expanded(
-                      child: _RightColumn(
+                      child: EmployeeAddFormSection(
                         selectedRole: _selectedRole,
                         onRoleChanged: _handleRoleChanged,
                       ),
@@ -120,31 +119,15 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
                       ),
                     ],
                   ),
-                  Row(
-                    children: [
-                      AppButton(
-                        buttonType: ButtonType.outline,
-                        onPressed: widget.onCancel,
-                        child: const Text('Cancel'),
-                      ),
-                      AppDimens.horizontalSmall,
-                      AppButton(
-                        buttonType: ButtonType.elevated,
-                        onPressed: _handleSubmit,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.person_add_outlined,
-                              size: 18,
-                              color: colorScheme.onPrimary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text('Create ${_selectedRole.displayName}'),
-                          ],
-                        ),
-                      ),
-                    ],
+                  EmployeeFormActions(
+                    onCancel: widget.onCancel,
+                    onSubmit: _handleSubmit,
+                    submitLabel: 'Create ${_selectedRole.displayName}',
+                    submitIcon: Icon(
+                      Icons.person_add_outlined,
+                      size: 18,
+                      color: colorScheme.onPrimary,
+                    ),
                   ),
                 ],
               ),
@@ -152,53 +135,6 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _LeftColumn extends StatelessWidget {
-  const _LeftColumn();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        EmployeeProfileImageCard(),
-        AppDimens.verticalLarge,
-        EmployeeContactInfoCard(),
-      ],
-    );
-  }
-}
-
-class _RightColumn extends StatelessWidget {
-  final EmployeeRole selectedRole;
-  final ValueChanged<EmployeeRole> onRoleChanged;
-
-  const _RightColumn({required this.selectedRole, required this.onRoleChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        EmployeeProfessionalRoleCard(
-          key: ValueKey(selectedRole), // Rebuild when role changes
-          initialRole: selectedRole,
-          onRoleChanged: onRoleChanged,
-        ),
-        AppDimens.verticalMedium,
-        // Conditionally show role-specific fields
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          child: selectedRole == EmployeeRole.therapist
-              ? const TherapistFieldsCard(key: ValueKey('therapist'))
-              : const DoctorFieldsCard(key: ValueKey('doctor')),
-        ),
-        AppDimens.verticalMedium,
-        const EmployeeDocumentsCertificationsCard(),
-        AppDimens.verticalMedium,
-        const EmployeeWorkScheduleCard(),
-      ],
     );
   }
 }

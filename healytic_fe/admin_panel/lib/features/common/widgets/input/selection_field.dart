@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+part of 'form_field_builders.dart';
 
-class AppSelectionField<T> extends StatelessWidget {
-  const AppSelectionField({
+class _AppSelectionField<T> extends StatelessWidget {
+  const _AppSelectionField({
     super.key,
     required this.fieldKey,
     this.label,

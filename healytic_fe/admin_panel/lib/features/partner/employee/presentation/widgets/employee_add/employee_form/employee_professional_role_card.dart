@@ -1,8 +1,7 @@
-import 'package:admin_panel/features/common/widgets/input/date_pick_field.dart';
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
-import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/role_toggle_selector.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/role_toggle_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:uuid/uuid.dart';
@@ -37,6 +36,18 @@ class _EmployeeProfessionalRoleCardState
     );
     _jobTitleController = TextEditingController();
     _selectedRole = widget.initialRole;
+  }
+
+  @override
+  void didUpdateWidget(EmployeeProfessionalRoleCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialRole != oldWidget.initialRole) {
+      if (_selectedRole != widget.initialRole) {
+        setState(() {
+          _selectedRole = widget.initialRole;
+        });
+      }
+    }
   }
 
   @override
@@ -217,7 +228,8 @@ class _EmployeeProfessionalRoleCardState
               ),
               const SizedBox(width: 24),
               Expanded(
-                child: AppDatePickField(
+                child: FormFieldBuilders.buildDateField(
+                  context,
                   fieldKey: 'start_date',
                   label: 'Start Date',
                   hintText: 'Select Start Date',
@@ -238,7 +250,8 @@ class _EmployeeProfessionalRoleCardState
     TextEditingController? controller,
   }) {
     final fieldKey = label.toLowerCase().replaceAll(' ', '_');
-    return AppTextField(
+    return FormFieldBuilders.buildTextField(
+      context,
       fieldKey: fieldKey,
       label: label,
       hintText: placeholder,

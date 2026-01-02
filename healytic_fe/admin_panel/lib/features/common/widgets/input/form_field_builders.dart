@@ -1,9 +1,15 @@
-import 'package:admin_panel/features/common/widgets/input/auto_generate_text_field.dart';
-import 'package:admin_panel/features/common/widgets/input/date_pick_field.dart';
-import 'package:admin_panel/features/common/widgets/input/multi_select_chip_field.dart';
-import 'package:admin_panel/features/common/widgets/input/selection_field.dart';
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/button/button.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:intl/intl.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+
+part 'auto_generate_text_field.dart';
+part 'date_pick_field.dart';
+part 'multi_select_chip_field.dart';
+part 'selection_field.dart';
+part 'text_field.dart';
 
 /// Utility class containing reusable form field builders.
 /// These methods can be used across multiple widgets to build consistent form fields.
@@ -28,8 +34,15 @@ class FormFieldBuilders {
     String? fieldKey,
     bool isRequired = false,
     bool enabled = false,
+    TextStyle? labelStyle,
+    String? hintText,
+    double? width,
+    double? height,
+    bool uppercaseLabel = true,
+    String? initialValue,
+    String? Function(dynamic)? validator,
   }) {
-    return AppAutoGenerateTextField(
+    return _AppAutoGenerateTextField(
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
       onGenerate: onGenerate,
@@ -37,10 +50,18 @@ class FormFieldBuilders {
       buttonText: buttonText,
       isRequired: isRequired,
       enabled: enabled,
-      labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
-        fontWeight: FontWeight.bold,
-        letterSpacing: 0.5,
-      ),
+      labelStyle:
+          labelStyle ??
+          Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+      hintText: hintText,
+      width: width,
+      height: height,
+      uppercaseLabel: uppercaseLabel,
+      initialValue: initialValue,
+      validator: validator,
     );
   }
 
@@ -55,26 +76,53 @@ class FormFieldBuilders {
   static Widget buildTextField(
     BuildContext context, {
     required String label,
-    required String placeholder,
+    String? hintText,
     bool isRequired = false,
     IconData? prefixIcon,
     String? fieldKey,
+    Widget? suffixIcon,
+    Widget? suffix,
+    String? Function(dynamic)? validator,
+    bool obscureText = false,
+    TextEditingController? controller,
+    VoidCallback? onEditingComplete,
+    ValueChanged<dynamic>? onChanged,
+    bool enabled = true,
+    bool readOnly = false,
+    VoidCallback? onTap,
+    String? initialValue,
+    TextStyle? labelStyle,
+    OutlineInputBorder? border,
+    OutlineInputBorder? enabledBorder,
+    OutlineInputBorder? disabledBorder,
+    OutlineInputBorder? focusedBorder,
+    OutlineInputBorder? errorBorder,
+    OutlineInputBorder? hoverBorder,
+    TextInputType? keyboardType,
+    int? maxLines,
+    TextStyle? style,
+    EdgeInsetsGeometry? contentPadding,
+    bool uppercaseLabel = true,
+    double? width,
+    double? height,
   }) {
     // Handle empty label for fieldKey generation
     final generatedFieldKey =
         fieldKey ??
         (label.isNotEmpty
             ? label.toLowerCase().replaceAll(' ', '_')
-            : 'field_${placeholder.toLowerCase().replaceAll(' ', '_')}');
+            : 'field_${(hintText ?? '').toLowerCase().replaceAll(' ', '_')}');
 
-    return AppTextField(
+    return _AppTextField(
       fieldKey: generatedFieldKey,
       label: label,
-      labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
-        fontWeight: FontWeight.bold,
-        letterSpacing: 0.5,
-      ),
-      hintText: placeholder,
+      labelStyle:
+          labelStyle ??
+          Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+      hintText: hintText,
       isRequired: isRequired,
       prefixIcon: prefixIcon != null
           ? Icon(
@@ -83,6 +131,30 @@ class FormFieldBuilders {
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             )
           : null,
+      suffixIcon: suffixIcon,
+      suffix: suffix,
+      validator: validator,
+      obscureText: obscureText,
+      controller: controller,
+      onEditingComplete: onEditingComplete,
+      onChanged: onChanged,
+      enabled: enabled,
+      readOnly: readOnly,
+      onTap: onTap,
+      initialValue: initialValue,
+      border: border,
+      enabledBorder: enabledBorder,
+      disabledBorder: disabledBorder,
+      focusedBorder: focusedBorder,
+      errorBorder: errorBorder,
+      hoverBorder: hoverBorder,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      style: style,
+      contentPadding: contentPadding,
+      uppercaseLabel: uppercaseLabel,
+      width: width,
+      height: height,
     );
   }
 
@@ -98,7 +170,7 @@ class FormFieldBuilders {
     String? hintText,
     String? fieldKey,
   }) {
-    return AppDatePickField(
+    return _AppDatePickField(
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
       labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -125,14 +197,33 @@ class FormFieldBuilders {
     required List<String> items,
     String? fieldKey,
     ValueChanged<String?>? onChanged,
+    String? Function(String?)? validator,
+    bool enabled = true,
+    String? initialValue,
+    TextStyle? labelStyle,
+    OutlineInputBorder? border,
+    OutlineInputBorder? enabledBorder,
+    OutlineInputBorder? disabledBorder,
+    OutlineInputBorder? focusedBorder,
+    OutlineInputBorder? errorBorder,
+    String? hintText,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? contentPadding,
+    TextStyle? style,
+    Widget? icon,
+    bool isRequired = false,
+    bool uppercaseLabel = true,
   }) {
-    return AppSelectionField<String>(
+    return _AppSelectionField<String>(
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
-      labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
-        fontWeight: FontWeight.bold,
-        letterSpacing: 0.5,
-      ),
+      labelStyle:
+          labelStyle ??
+          Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
       items: items
           .map(
             (item) => DropdownMenuItem(
@@ -148,8 +239,84 @@ class FormFieldBuilders {
             ),
           )
           .toList(),
-      initialValue: items.first,
+      initialValue: initialValue,
       onChanged: onChanged ?? (value) {},
+      validator: validator,
+      enabled: enabled,
+      border: border,
+      enabledBorder: enabledBorder,
+      disabledBorder: disabledBorder,
+      focusedBorder: focusedBorder,
+      errorBorder: errorBorder,
+      hintText: hintText,
+      width: width,
+      height: height,
+      contentPadding: contentPadding,
+      style: style,
+      icon: icon,
+      isRequired: isRequired,
+      uppercaseLabel: uppercaseLabel,
+    );
+  }
+
+  /// Builds a dropdown selection field with custom items.
+  ///
+  /// [context] - The build context for accessing theme data.
+  /// [label] - The label text for the field.
+  /// [items] - The list of dropdown items to display.
+  /// [fieldKey] - Optional custom field key. If not provided, it will be generated from label.
+  /// [onChanged] - Optional callback when selection changes.
+  static Widget buildCustomSelectionField<T>(
+    BuildContext context, {
+    required String label,
+    required List<DropdownMenuItem<T>> items,
+    String? fieldKey,
+    ValueChanged<T?>? onChanged,
+    String? Function(T?)? validator,
+    bool enabled = true,
+    T? initialValue,
+    TextStyle? labelStyle,
+    OutlineInputBorder? border,
+    OutlineInputBorder? enabledBorder,
+    OutlineInputBorder? disabledBorder,
+    OutlineInputBorder? focusedBorder,
+    OutlineInputBorder? errorBorder,
+    String? hintText,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? contentPadding,
+    TextStyle? style,
+    Widget? icon,
+    bool isRequired = false,
+    bool uppercaseLabel = true,
+  }) {
+    return _AppSelectionField<T>(
+      fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
+      label: label,
+      labelStyle:
+          labelStyle ??
+          Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+      items: items,
+      initialValue: initialValue,
+      onChanged: onChanged ?? (value) {},
+      validator: validator,
+      enabled: enabled,
+      border: border,
+      enabledBorder: enabledBorder,
+      disabledBorder: disabledBorder,
+      focusedBorder: focusedBorder,
+      errorBorder: errorBorder,
+      hintText: hintText,
+      width: width,
+      height: height,
+      contentPadding: contentPadding,
+      style: style,
+      icon: icon,
+      isRequired: isRequired,
+      uppercaseLabel: uppercaseLabel,
     );
   }
 
@@ -167,7 +334,7 @@ class FormFieldBuilders {
   static Widget buildMultiSelectChipField(
     BuildContext context, {
     required String label,
-    required List<String> availableOptions,
+    required Map<String, String> availableOptions,
     String? fieldKey,
     List<String>? initialValue,
     String searchHint = 'Search...',
@@ -178,14 +345,20 @@ class FormFieldBuilders {
     Color? chipBackgroundColor,
     Color? chipBorderColor,
     Color? chipTextColor,
+    double? width,
+    double? height,
+    bool isRequired = false,
+    TextStyle? labelStyle,
   }) {
-    return AppMultiSelectChipField(
+    return _AppMultiSelectChipField(
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
-      labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
-        fontWeight: FontWeight.bold,
-        letterSpacing: 0.5,
-      ),
+      labelStyle:
+          labelStyle ??
+          Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
       availableOptions: availableOptions,
       initialValue: initialValue,
       searchHint: searchHint,
@@ -196,6 +369,9 @@ class FormFieldBuilders {
       chipBackgroundColor: chipBackgroundColor,
       chipBorderColor: chipBorderColor,
       chipTextColor: chipTextColor,
+      width: width,
+      height: height,
+      isRequired: isRequired,
     );
   }
 

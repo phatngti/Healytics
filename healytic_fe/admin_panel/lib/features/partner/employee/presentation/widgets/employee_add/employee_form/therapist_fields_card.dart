@@ -1,7 +1,7 @@
-import 'package:admin_panel/features/common/widgets/input/date_pick_field.dart';
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
-import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/massage_therapist_fields.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/spa_therapist_fields.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -15,8 +15,7 @@ class TherapistFieldsCard extends StatefulWidget {
 
 class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
   bool _isExpanded = true;
-  String _selectedTherapistType = 'MASSAGE';
-  String _selectedStrength = 'MEDIUM';
+  TherapistType _selectedTherapistType = TherapistType.massage;
 
   @override
   Widget build(BuildContext context) {
@@ -121,13 +120,13 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
             children: [
               Expanded(
                 child: _TherapistTypeOption(
-                  label: 'Spa Therapist',
+                  label: TherapistType.spa.displayName,
                   description: 'General wellness',
                   icon: Icons.spa_outlined,
-                  isSelected: _selectedTherapistType == 'SPA',
+                  isSelected: _selectedTherapistType == TherapistType.spa,
                   onTap: () {
                     setState(() {
-                      _selectedTherapistType = 'SPA';
+                      _selectedTherapistType = TherapistType.spa;
                     });
                   },
                 ),
@@ -135,13 +134,13 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
               const SizedBox(width: 16),
               Expanded(
                 child: _TherapistTypeOption(
-                  label: 'Massage Therapist',
+                  label: TherapistType.massage.displayName,
                   description: 'Deep tissue',
                   icon: Icons.self_improvement_outlined,
-                  isSelected: _selectedTherapistType == 'MASSAGE',
+                  isSelected: _selectedTherapistType == TherapistType.massage,
                   onTap: () {
                     setState(() {
-                      _selectedTherapistType = 'MASSAGE';
+                      _selectedTherapistType = TherapistType.massage;
                     });
                   },
                 ),
@@ -151,138 +150,22 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
           // Hidden field to store therapist type in form
           FormBuilderField<String>(
             name: 'therapist_type',
-            initialValue: _selectedTherapistType,
+            initialValue: _selectedTherapistType.apiValue,
             builder: (field) {
               // Update field when selection changes
-              if (field.value != _selectedTherapistType) {
+              if (field.value != _selectedTherapistType.apiValue) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  field.didChange(_selectedTherapistType);
+                  field.didChange(_selectedTherapistType.apiValue);
                 });
               }
               return const SizedBox.shrink();
             },
           ),
-          AppDimens.verticalMedium,
-          Row(
-            children: [
-              Expanded(
-                child: FormFieldBuilders.buildDropdownField(
-                  context,
-                  label: 'Therapist Level',
-                  items: ['Junior', 'Senior', 'Master'],
-                  fieldKey: 'therapist_level',
-                ),
-              ),
-              AppDimens.horizontalLarge,
-              Expanded(
-                child: AppTextField(
-                  fieldKey: 'commission_rate',
-                  label: 'Commission Rate',
-                  hintText: '0',
-                  keyboardType: TextInputType.number,
-                  suffixIcon: const Padding(
-                    padding: EdgeInsets.only(right: 12),
-                    child: Text(
-                      '%',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          AppDimens.verticalMedium,
-          // Massage Strength
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: colorScheme.outlineVariant),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Massage Strength',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: colorScheme.outlineVariant),
-                  ),
-                  child: Row(
-                    children: [
-                      _StrengthButton(
-                        label: 'Soft',
-                        isSelected: _selectedStrength == 'SOFT',
-                        onTap: () {
-                          setState(() {
-                            _selectedStrength = 'SOFT';
-                          });
-                        },
-                      ),
-                      _StrengthButton(
-                        label: 'Medium',
-                        isSelected: _selectedStrength == 'MEDIUM',
-                        onTap: () {
-                          setState(() {
-                            _selectedStrength = 'MEDIUM';
-                          });
-                        },
-                      ),
-                      _StrengthButton(
-                        label: 'Strong',
-                        isSelected: _selectedStrength == 'STRONG',
-                        onTap: () {
-                          setState(() {
-                            _selectedStrength = 'STRONG';
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                // Hidden field to store strength level in form
-                FormBuilderField<String>(
-                  name: 'strength_level',
-                  initialValue: _selectedStrength,
-                  builder: (field) {
-                    // Update field when selection changes
-                    if (field.value != _selectedStrength) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        field.didChange(_selectedStrength);
-                      });
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-                const SizedBox(height: 16),
-                AppDatePickField(
-                  fieldKey: 'health_check_date',
-                  label: 'Last Health Check',
-                  hintText: 'Select date',
-                ),
-              ],
-            ),
-          ),
-          AppDimens.verticalMedium,
-          AppTextField(
-            fieldKey: 'skills',
-            label: 'Skill Set',
-            hintText: 'e.g. Deep Tissue, Hot Stone, Swedish (comma separated)',
-            maxLines: 2,
-          ),
+
+          if (_selectedTherapistType == TherapistType.spa)
+            const SpaTherapistFields()
+          else
+            const MassageTherapistFields(),
         ],
       ),
     );
@@ -365,55 +248,6 @@ class _TherapistTypeOption extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StrengthButton extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _StrengthButton({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Expanded(
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(6),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? colorScheme.primaryContainer.withOpacity(0.5)
-                  : null,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(
-                color: isSelected ? colorScheme.primary : Colors.transparent,
-              ),
-            ),
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: isSelected
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
-              ),
-            ),
           ),
         ),
       ),

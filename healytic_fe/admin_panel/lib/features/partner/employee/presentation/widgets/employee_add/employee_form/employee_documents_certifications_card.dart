@@ -1,7 +1,9 @@
 import 'package:admin_panel/features/common/widgets/button/button.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EmployeeDocumentsCertificationsCard extends StatefulWidget {
   const EmployeeDocumentsCertificationsCard({super.key});
@@ -14,54 +16,44 @@ class EmployeeDocumentsCertificationsCard extends StatefulWidget {
 class _EmployeeDocumentsCertificationsCardState
     extends State<EmployeeDocumentsCertificationsCard> {
   bool _isExpanded = true;
-  XFile? _licenseFile;
-  XFile? _idCardFile;
-  String _licenseFileSize = '';
-  String _idCardFileSize = '';
-
   final ImagePicker _picker = ImagePicker();
 
-  Future<void> _pickDocument(String type) async {
+  // We rely on FormBuilder to hold the state of files (XFile) or URLs (String)
+  // keys: 'license_file', 'id_card_file'
+
+  Future<void> _pickDocument(String fieldName) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
       );
 
       if (pickedFile != null) {
-        final int sizeInBytes = await pickedFile.length();
-        final String sizeString = _getFileSizeString(sizeInBytes);
-
-        setState(() {
-          if (type == 'license') {
-            _licenseFile = pickedFile;
-            _licenseFileSize = sizeString;
-          } else if (type == 'id_card') {
-            _idCardFile = pickedFile;
-            _idCardFileSize = sizeString;
-          }
-        });
+        // Save XFile to form state
+        final formState = FormBuilder.of(context);
+        formState?.fields[fieldName]?.didChange(pickedFile);
       }
     } catch (e) {
       debugPrint('Error picking file: $e');
     }
   }
 
-  String _getFileSizeString(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  void _removeDocument(String fieldName) {
+    final formState = FormBuilder.of(context);
+    formState?.fields[fieldName]?.didChange(null);
   }
 
-  void _removeDocument(String type) {
-    setState(() {
-      if (type == 'license') {
-        _licenseFile = null;
-        _licenseFileSize = '';
-      } else if (type == 'id_card') {
-        _idCardFile = null;
-        _idCardFileSize = '';
+  Future<void> _viewDocument(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri != null && await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      debugPrint('Could not launch url: $url');
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Could not open file: $url')));
       }
-    });
+    }
   }
 
   @override
@@ -185,9 +177,7 @@ class _EmployeeDocumentsCertificationsCardState
           children: [
             _buildManagedDocumentItem(
               context: context,
-              documentKey: 'license',
-              file: _licenseFile,
-              fileSize: _licenseFileSize,
+              fieldName: 'license_file',
               uploadTitle: 'Professional License / Practice Permit',
               uploadSubtitle: 'PDF or JPG • Max 10MB',
               uploadIcon: Icons.badge,
@@ -196,9 +186,7 @@ class _EmployeeDocumentsCertificationsCardState
             AppDimens.verticalMedium,
             _buildManagedDocumentItem(
               context: context,
-              documentKey: 'id_card',
-              file: _idCardFile,
-              fileSize: _idCardFileSize,
+              fieldName: 'id_card_file',
               uploadTitle: 'Identity Card / Passport',
               uploadSubtitle: 'PDF, JPG, or PNG • Max 10MB',
               uploadIcon: Icons.perm_identity,
@@ -212,31 +200,55 @@ class _EmployeeDocumentsCertificationsCardState
 
   Widget _buildManagedDocumentItem({
     required BuildContext context,
-    required String documentKey,
-    required XFile? file,
-    required String fileSize,
+    required String fieldName,
     required String uploadTitle,
     required String uploadSubtitle,
     required IconData uploadIcon,
     required String uploadedTypeLabel,
   }) {
-    if (file == null) {
-      return _buildDocumentUploadItem(
-        context,
-        icon: uploadIcon,
-        title: uploadTitle,
-        subtitle: uploadSubtitle,
-        onUpload: () => _pickDocument(documentKey),
-      );
-    }
+    // Determine current value from FormBuilder
+    return FormBuilderField(
+      name: fieldName,
+      builder: (FormFieldState<dynamic> field) {
+        final value = field.value;
 
-    return _buildUploadedDocumentItem(
-      context,
-      fileName: file.name,
-      fileSize: fileSize,
-      type: uploadedTypeLabel,
-      onRemove: () => _removeDocument(documentKey),
-      onReplace: () => _pickDocument(documentKey),
+        // No value -> Show Upload
+        if (value == null || (value is String && value.isEmpty)) {
+          return _buildDocumentUploadItem(
+            context,
+            icon: uploadIcon,
+            title: uploadTitle,
+            subtitle: uploadSubtitle,
+            onUpload: () => _pickDocument(fieldName),
+          );
+        }
+
+        // Value exists (String URL or XFile) -> Show Viewed Item
+        String fileName = 'Document';
+        String fileSize = ''; // Can't easily know size from URL
+        bool isUrl = false;
+
+        if (value is XFile) {
+          fileName = value.name;
+        } else if (value is String) {
+          isUrl = true;
+          fileName = value.split('/').last;
+          if (fileName.contains('?')) {
+            fileName = fileName.split('?').first;
+          }
+        }
+
+        return _buildUploadedDocumentItem(
+          context,
+          fileName: fileName,
+          fileSize: fileSize,
+          type: uploadedTypeLabel,
+          isUrl: isUrl,
+          onView: isUrl ? () => _viewDocument(value as String) : null,
+          onRemove: () => _removeDocument(fieldName),
+          onReplace: () => _pickDocument(fieldName),
+        );
+      },
     );
   }
 
@@ -306,6 +318,8 @@ class _EmployeeDocumentsCertificationsCardState
     required String fileName,
     required String fileSize,
     required String type,
+    required bool isUrl,
+    VoidCallback? onView,
     required VoidCallback onRemove,
     required VoidCallback onReplace,
   }) {
@@ -365,14 +379,16 @@ class _EmployeeDocumentsCertificationsCardState
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      fileSize,
-                      style: TextStyle(
-                        color: colorScheme.onSurfaceVariant,
-                        fontSize: 12,
+                    if (fileSize.isNotEmpty) ...[
+                      const SizedBox(width: 8),
+                      Text(
+                        fileSize,
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ],
@@ -381,6 +397,21 @@ class _EmployeeDocumentsCertificationsCardState
           AppDimens.horizontalMedium,
           Row(
             children: [
+              if (isUrl && onView != null) ...[
+                AppButton(
+                  onPressed: onView,
+                  buttonType: ButtonType.text,
+                  child: Text(
+                    'View',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ),
+                AppDimens.horizontalSmall,
+              ],
               AppButton(
                 onPressed: onReplace,
                 buttonType: ButtonType.outline,

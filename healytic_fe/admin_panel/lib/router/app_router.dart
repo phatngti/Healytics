@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:admin_panel/router/admin_routes.dart' as admin;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 part 'app_router.g.dart';
 
@@ -43,11 +44,13 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
 @riverpod
 GoRouter router(Ref ref) {
   final notifier = ref.watch(routerListenableProvider.notifier);
-  String initialLocation = '/'; // Rõ ràng và an toàn hơn
+  String initialLocation = '/provider/dashboard'; // Rõ ràng và an toàn hơn
 
   String? redirect(BuildContext context, GoRouterState state) {
     final isLoggedIn = Store.get(StoreKey.accessToken, "").isNotEmpty;
-    final role = Store.get(StoreKey.role, "");
+    final role = isLoggedIn
+        ? JwtDecoder.decode(Store.get(StoreKey.accessToken, ""))['role']
+        : "";
     final path = state.uri.path;
 
     final isPublicRoute =
@@ -75,9 +78,16 @@ GoRouter router(Ref ref) {
   return GoRouter(
     initialLocation: initialLocation,
     debugLogDiagnostics: true,
-    routes: [...admin.$appRoutes, ...partner.$appRoutes],
+    routes: [
+      ShellRoute(
+        builder: (context, state, child) {
+          return SelectionArea(child: child);
+        },
+        routes: [...admin.$appRoutes, ...partner.$appRoutes],
+      ),
+    ],
     refreshListenable: notifier,
-    redirect: redirect,
+    // redirect: redirect,
   );
 }
 

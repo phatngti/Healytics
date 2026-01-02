@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+part of 'form_field_builders.dart';
 
 /// A reusable multi-select chip field with search functionality.
 /// Allows users to select from existing options or create new ones.
-class AppMultiSelectChipField extends StatefulWidget {
+class _AppMultiSelectChipField extends StatefulWidget {
   /// The form field key/name used by FormBuilder.
   final String fieldKey;
 
@@ -14,7 +13,7 @@ class AppMultiSelectChipField extends StatefulWidget {
   final TextStyle? labelStyle;
 
   /// List of available options for selection.
-  final List<String> availableOptions;
+  final Map<String, String> availableOptions;
 
   /// Initial selected values.
   final List<String>? initialValue;
@@ -46,12 +45,18 @@ class AppMultiSelectChipField extends StatefulWidget {
   /// Chip text color.
   final Color? chipTextColor;
 
-  const AppMultiSelectChipField({
+  /// Custom width for the field container.
+  final double? width;
+
+  /// Custom height for the field container.
+  final double? height;
+
+  const _AppMultiSelectChipField({
     super.key,
     required this.fieldKey,
     required this.label,
     this.labelStyle,
-    this.availableOptions = const [],
+    this.availableOptions = const {},
     this.initialValue,
     this.searchHint = 'Search...',
     this.helperText,
@@ -62,16 +67,18 @@ class AppMultiSelectChipField extends StatefulWidget {
     this.chipBackgroundColor,
     this.chipBorderColor,
     this.chipTextColor,
+    this.width,
+    this.height,
   });
 
   @override
-  State<AppMultiSelectChipField> createState() =>
+  State<_AppMultiSelectChipField> createState() =>
       _AppMultiSelectChipFieldState();
 }
 
-class _AppMultiSelectChipFieldState extends State<AppMultiSelectChipField> {
+class _AppMultiSelectChipFieldState extends State<_AppMultiSelectChipField> {
   final TextEditingController _searchController = TextEditingController();
-  List<String> _filteredOptions = [];
+  Map<String, String> _filteredOptions = {};
 
   @override
   void initState() {
@@ -93,9 +100,11 @@ class _AppMultiSelectChipFieldState extends State<AppMultiSelectChipField> {
       if (query.isEmpty) {
         _filteredOptions = widget.availableOptions;
       } else {
-        _filteredOptions = widget.availableOptions
-            .where((option) => option.toLowerCase().contains(query))
-            .toList();
+        _filteredOptions = Map.fromEntries(
+          widget.availableOptions.entries.where(
+            (entry) => entry.value.toLowerCase().contains(query),
+          ),
+        );
       }
     });
   }
@@ -125,6 +134,8 @@ class _AppMultiSelectChipFieldState extends State<AppMultiSelectChipField> {
             ),
             const SizedBox(height: 8),
             Container(
+              width: widget.width,
+              height: widget.height,
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
@@ -145,20 +156,17 @@ class _AppMultiSelectChipFieldState extends State<AppMultiSelectChipField> {
                     children: [
                       ...selectedItems.map((item) => _buildChip(item, field)),
                       SizedBox(
-                        width: 150,
                         child: TextField(
                           controller: _searchController,
                           decoration: InputDecoration(
                             hintText: widget.searchHint,
-                            hintStyle: TextStyle(
-                              color: colorScheme.onSurfaceVariant,
-                              fontSize: 14,
-                            ),
+                            hintStyle: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontSize: 14,
+                                ),
                             border: InputBorder.none,
                             filled: false,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                            ),
                             isDense: true,
                           ),
                           onSubmitted: (value) {
@@ -184,15 +192,18 @@ class _AppMultiSelectChipFieldState extends State<AppMultiSelectChipField> {
                         child: Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: _filteredOptions
+                          children: _filteredOptions.entries
                               .where(
-                                (option) => !selectedItems.contains(option),
+                                (entry) => !selectedItems.contains(entry.key),
                               )
                               .map(
-                                (option) => ActionChip(
-                                  label: Text(option),
+                                (entry) => ActionChip(
+                                  label: Text(entry.value),
                                   onPressed: () {
-                                    final newList = [...selectedItems, option];
+                                    final newList = [
+                                      ...selectedItems,
+                                      entry.key,
+                                    ];
                                     field.didChange(newList);
                                     widget.onChanged?.call(newList);
                                     _searchController.clear();
@@ -245,7 +256,7 @@ class _AppMultiSelectChipFieldState extends State<AppMultiSelectChipField> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            item,
+            widget.availableOptions[item] ?? item,
             style: TextStyle(
               color: chipText,
               fontWeight: FontWeight.bold,

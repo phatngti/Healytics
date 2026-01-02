@@ -1,6 +1,6 @@
 import 'package:admin_panel/features/authenticate/presentation/widgets/logo.dart';
 import 'package:admin_panel/features/common/widgets/button/button.dart';
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/router/admin_routes.dart';
 import 'package:admin_panel/utils/demensions.dart';
@@ -60,7 +60,8 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                   textAlign: TextAlign.center,
                 ),
                 AppDimens.verticalMedium,
-                AppTextField(
+                FormFieldBuilders.buildTextField(
+                  context,
                   fieldKey: "email",
                   label: "Email",
                   controller: emailController,

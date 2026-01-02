@@ -19,13 +19,15 @@ abstract class EmployeeEntity with _$EmployeeEntity {
     required double rating,
     required int reviewCount,
     required String status,
-    required String branch,
     required String email,
     required String phone,
     required String address,
     required String city,
     required String state,
     required String country,
+    String? licenseUrl,
+    String? idCardUrl,
+    @Default([]) List<String> documents,
   }) = _EmployeeEntity;
 
   factory EmployeeEntity.fromJson(Map<String, dynamic> json) =>

@@ -1,10 +1,7 @@
-import 'package:admin_panel/utils/demensions.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+part of 'form_field_builders.dart';
 
-class AppDatePickField extends StatelessWidget {
-  const AppDatePickField({
+class _AppDatePickField extends StatelessWidget {
+  const _AppDatePickField({
     super.key,
     required this.fieldKey,
     required this.label,

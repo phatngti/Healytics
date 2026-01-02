@@ -47,7 +47,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                 child: FormFieldBuilders.buildTextField(
                   context,
                   label: 'First Name',
-                  placeholder: 'e.g. Sarah',
+                  hintText: 'e.g. Sarah',
                   isRequired: true,
                 ),
               ),
@@ -56,7 +56,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                 child: FormFieldBuilders.buildTextField(
                   context,
                   label: 'Last Name',
-                  placeholder: 'e.g. Jenkins',
+                  hintText: 'e.g. Jenkins',
                   isRequired: true,
                 ),
               ),
@@ -67,7 +67,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
           FormFieldBuilders.buildTextField(
             context,
             label: 'Email Address',
-            placeholder: 'sarah.j@spa.com',
+            hintText: 'sarah.j@spa.com',
             isRequired: true,
             prefixIcon: Icons.mail_outline,
           ),
@@ -76,7 +76,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
           FormFieldBuilders.buildTextField(
             context,
             label: 'Phone Number',
-            placeholder: '+1 (555) 000-0000',
+            hintText: '+1 (555) 000-0000',
             prefixIcon: Icons.phone_outlined,
           ),
           const SizedBox(height: 20),
@@ -130,13 +130,13 @@ class EmployeeContactInfoCard extends StatelessWidget {
                 FormFieldBuilders.buildTextField(
                   context,
                   label: '',
-                  placeholder: 'Contact Name',
+                  hintText: 'Contact Name',
                 ),
                 const SizedBox(height: 12),
                 FormFieldBuilders.buildTextField(
                   context,
                   label: '',
-                  placeholder: 'Contact Phone',
+                  hintText: 'Contact Phone',
                   prefixIcon: Icons.phone_in_talk_outlined,
                 ),
               ],

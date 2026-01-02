@@ -2,7 +2,7 @@ import 'package:admin_panel/features/authenticate/domain/authenticate.entity.dar
 import 'package:admin_panel/features/authenticate/presentation/providers/sign_up.provider.dart';
 import 'package:admin_panel/features/authenticate/presentation/widgets/logo.dart';
 import 'package:admin_panel/features/common/widgets/button/button.dart';
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/common/widgets/toast.dart';
 import 'package:admin_panel/router/admin_routes.dart';
@@ -111,7 +111,8 @@ class SignUpFormScreen extends HookConsumerWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: AppTextField(
+                          child: FormFieldBuilders.buildTextField(
+                            context,
                             fieldKey: 'business_name',
                             label: 'Business Name',
                             hintText: 'Serenity Spa & Wellness',
@@ -119,7 +120,8 @@ class SignUpFormScreen extends HookConsumerWidget {
                         ),
                         AppDimens.horizontalSmall,
                         Expanded(
-                          child: AppTextField(
+                          child: FormFieldBuilders.buildTextField(
+                            context,
                             fieldKey: 'contract_person_name',
                             label: 'Contract Person Name',
                             hintText: 'Serenity Spa & Wellness',
@@ -131,7 +133,8 @@ class SignUpFormScreen extends HookConsumerWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: AppTextField(
+                          child: FormFieldBuilders.buildTextField(
+                            context,
                             fieldKey: 'bussiness_email',
                             label: 'Business Email',
                             hintText: 'contract@serenityspa.com',
@@ -139,7 +142,8 @@ class SignUpFormScreen extends HookConsumerWidget {
                         ),
                         AppDimens.horizontalSmall,
                         Expanded(
-                          child: AppTextField(
+                          child: FormFieldBuilders.buildTextField(
+                            context,
                             fieldKey: 'bussiness_phone',
                             label: 'Business Phone',
                             hintText: '(84) 0123456789',
@@ -151,7 +155,8 @@ class SignUpFormScreen extends HookConsumerWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: AppTextField(
+                          child: FormFieldBuilders.buildTextField(
+                            context,
                             fieldKey: 'password',
                             label: 'Password',
                             hintText: '********',
@@ -161,7 +166,8 @@ class SignUpFormScreen extends HookConsumerWidget {
                         ),
                         AppDimens.horizontalSmall,
                         Expanded(
-                          child: AppTextField(
+                          child: FormFieldBuilders.buildTextField(
+                            context,
                             fieldKey: 'confirm_password',
                             label: 'Confirm Password',
                             hintText: '********',
@@ -172,7 +178,8 @@ class SignUpFormScreen extends HookConsumerWidget {
                       ],
                     ),
                     AppDimens.verticalMedium,
-                    AppTextField(
+                    FormFieldBuilders.buildTextField(
+                      context,
                       fieldKey: 'address',
                       label: 'Address',
                       hintText: '123 Main St',
