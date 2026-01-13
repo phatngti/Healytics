@@ -1,9 +1,7 @@
-import 'package:admin_panel/utils/demensions.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+part of 'form_field_builders.dart';
 
-class AppTextField extends StatelessWidget {
-  const AppTextField({
+class _AppTextField extends StatelessWidget {
+  const _AppTextField({
     super.key,
     required this.fieldKey,
     required this.label,
@@ -34,6 +32,7 @@ class AppTextField extends StatelessWidget {
     this.contentPadding,
     this.isRequired = false,
     this.uppercaseLabel = true,
+    this.suffix,
   });
 
   final String fieldKey;
@@ -41,6 +40,7 @@ class AppTextField extends StatelessWidget {
 
   final Widget? suffixIcon;
   final Widget? prefixIcon; // Add prefixIcon field
+  final Widget? suffix;
   final String? Function(dynamic)? validator;
   final bool obscureText;
   final TextEditingController? controller;
@@ -69,6 +69,9 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
+    final isEnabled = enabled && formEnabled;
+
     return SizedBox(
       width: width,
       height: height,
@@ -78,6 +81,7 @@ class AppTextField extends StatelessWidget {
         name: fieldKey,
         initialValue: controller != null ? controller!.text : initialValue,
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        enabled: isEnabled,
         onChanged: onChanged,
         builder: (FormFieldState<dynamic> field) {
           return Column(
@@ -124,7 +128,7 @@ class AppTextField extends StatelessWidget {
                 readOnly: readOnly, // Pass readOnly
                 onTap: onTap, // Pass onTap
                 // --- FIX 1: Logic Enable/Disable ---
-                enabled: enabled, // Chặn tương tác người dùng
+                enabled: isEnabled, // Chặn tương tác người dùng
                 decoration: InputDecoration(
                   isDense: true,
                   contentPadding:
@@ -141,7 +145,7 @@ class AppTextField extends StatelessWidget {
                   ),
                   // --- FIX 2: Visual Feedback (Đổi màu nền khi disable) ---
                   filled: true, // Bắt buộc phải có để hiển thị fillColor
-                  fillColor: enabled
+                  fillColor: isEnabled
                       ? Theme.of(context).colorScheme.surface
                       : Theme.of(context).colorScheme.surfaceContainerHighest,
 
@@ -185,7 +189,8 @@ class AppTextField extends StatelessWidget {
                   hoverColor: Theme.of(context).colorScheme.surface,
 
                   suffixIcon: suffixIcon,
-                  prefixIcon: prefixIcon, // Use prefixIcon here
+                  prefixIcon: prefixIcon,
+                  suffix: suffix,
                   constraints: const BoxConstraints(
                     maxHeight: double.infinity,
                     maxWidth: double.infinity,
@@ -201,7 +206,7 @@ class AppTextField extends StatelessWidget {
                   }
                 },
                 onTapOutside: (_) {
-                  if (enabled) {
+                  if (isEnabled) {
                     field.validate();
                     FocusScope.of(context).unfocus();
                   }

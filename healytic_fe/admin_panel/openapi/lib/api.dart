@@ -40,7 +40,6 @@ part 'model/auth_tokens_dto.dart';
 part 'model/create_category_dto.dart';
 part 'model/create_doctor_dto.dart';
 part 'model/create_doctor_profile_dto.dart';
-part 'model/create_physical_details_dto.dart';
 part 'model/create_product_dto.dart';
 part 'model/create_product_media_dto.dart';
 part 'model/create_service_definition_dto.dart';

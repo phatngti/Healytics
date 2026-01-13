@@ -66,11 +66,6 @@ void main() {
       // TODO
     });
 
-    // String vendorName
-    test('to test the property `vendorName`', () async {
-      // TODO
-    });
-
     // List<String> employeeIds (default value: const [])
     test('to test the property `employeeIds`', () async {
       // TODO
@@ -79,12 +74,6 @@ void main() {
     // Product media (images/videos)
     // List<CreateProductMediaDto> media (default value: const [])
     test('to test the property `media`', () async {
-      // TODO
-    });
-
-    // Physical product details (required if type is physical)
-    // CreatePhysicalDetailsDto physicalDetails
-    test('to test the property `physicalDetails`', () async {
       // TODO
     });
 

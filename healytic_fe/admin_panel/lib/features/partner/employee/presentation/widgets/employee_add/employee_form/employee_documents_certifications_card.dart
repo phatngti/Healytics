@@ -1,0 +1,552 @@
+import 'package:admin_panel/features/common/widgets/button/button.dart';
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/utils/demensions.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class EmployeeDocumentsCertificationsCard extends StatefulWidget {
+  const EmployeeDocumentsCertificationsCard({super.key});
+
+  @override
+  State<EmployeeDocumentsCertificationsCard> createState() =>
+      _EmployeeDocumentsCertificationsCardState();
+}
+
+class _EmployeeDocumentsCertificationsCardState
+    extends State<EmployeeDocumentsCertificationsCard> {
+  bool _isExpanded = true;
+  final ImagePicker _picker = ImagePicker();
+
+  // We rely on FormBuilder to hold the state of files (XFile) or URLs (String)
+  // keys: 'license_file', 'id_card_file'
+
+  Future<void> _pickDocument(String fieldName) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+      );
+
+      if (pickedFile != null) {
+        // Save XFile to form state
+        final formState = FormBuilder.of(context);
+        formState?.fields[fieldName]?.didChange(pickedFile);
+      }
+    } catch (e) {
+      debugPrint('Error picking file: $e');
+    }
+  }
+
+  void _removeDocument(String fieldName) {
+    final formState = FormBuilder.of(context);
+    formState?.fields[fieldName]?.didChange(null);
+  }
+
+  Future<void> _viewDocument(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri != null && await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      debugPrint('Could not launch url: $url');
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Could not open file: $url')));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outlineVariant),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withAlpha(4),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          // Header
+          InkWell(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).extension<SemanticColors>()!.info!.withAlpha(25),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).extension<SemanticColors>()!.info!.withAlpha(50),
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.workspace_premium,
+                      size: 18,
+                      color: Theme.of(
+                        context,
+                      ).extension<SemanticColors>()!.info,
+                    ),
+                  ),
+                  AppDimens.horizontalMediumSmall,
+                  Text(
+                    'Documents & Certifications',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  AnimatedRotation(
+                    turns: _isExpanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      Icons.expand_more,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Content
+          AnimatedCrossFade(
+            firstChild: _buildContent(context),
+            secondChild: const SizedBox.shrink(),
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(milliseconds: 200),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Upload verified certificates, professional licenses, and degrees applicable to this therapist or doctor.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          AppDimens.verticalLarge,
+          _buildRequiredDocuments(context),
+          AppDimens.verticalLarge,
+          _buildAdditionalDocuments(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRequiredDocuments(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'REQUIRED DOCUMENTS',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        AppDimens.verticalMedium,
+        Column(
+          children: [
+            _buildManagedDocumentItem(
+              context: context,
+              fieldName: 'license_file',
+              uploadTitle: 'Professional License / Practice Permit',
+              uploadSubtitle: 'PDF or JPG • Max 10MB',
+              uploadIcon: Icons.badge,
+              uploadedTypeLabel: 'License / Permit',
+            ),
+            AppDimens.verticalMedium,
+            _buildManagedDocumentItem(
+              context: context,
+              fieldName: 'id_card_file',
+              uploadTitle: 'Identity Card / Passport',
+              uploadSubtitle: 'PDF, JPG, or PNG • Max 10MB',
+              uploadIcon: Icons.perm_identity,
+              uploadedTypeLabel: 'Identity Card',
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildManagedDocumentItem({
+    required BuildContext context,
+    required String fieldName,
+    required String uploadTitle,
+    required String uploadSubtitle,
+    required IconData uploadIcon,
+    required String uploadedTypeLabel,
+  }) {
+    // Determine current value from FormBuilder
+    return FormBuilderField(
+      name: fieldName,
+      builder: (FormFieldState<dynamic> field) {
+        final value = field.value;
+
+        // No value -> Show Upload
+        if (value == null || (value is String && value.isEmpty)) {
+          return _buildDocumentUploadItem(
+            context,
+            icon: uploadIcon,
+            title: uploadTitle,
+            subtitle: uploadSubtitle,
+            onUpload: () => _pickDocument(fieldName),
+          );
+        }
+
+        // Value exists (String URL or XFile) -> Show Viewed Item
+        String fileName = 'Document';
+        String fileSize = ''; // Can't easily know size from URL
+        bool isUrl = false;
+
+        if (value is XFile) {
+          fileName = value.name;
+        } else if (value is String) {
+          isUrl = true;
+          fileName = value.split('/').last;
+          if (fileName.contains('?')) {
+            fileName = fileName.split('?').first;
+          }
+        }
+
+        return _buildUploadedDocumentItem(
+          context,
+          fileName: fileName,
+          fileSize: fileSize,
+          type: uploadedTypeLabel,
+          isUrl: isUrl,
+          onView: isUrl ? () => _viewDocument(value as String) : null,
+          onRemove: () => _removeDocument(fieldName),
+          onReplace: () => _pickDocument(fieldName),
+        );
+      },
+    );
+  }
+
+  Widget _buildDocumentUploadItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onUpload,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: colorScheme.outlineVariant),
+            ),
+            child: Icon(icon, color: colorScheme.onSurfaceVariant, size: 20),
+          ),
+          AppDimens.horizontalMedium,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          AppDimens.horizontalMedium,
+          AppButton(
+            onPressed: onUpload,
+            buttonType: ButtonType.outline,
+            icon: const Icon(Icons.upload, size: 18),
+            child: const Text('Upload'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUploadedDocumentItem(
+    BuildContext context, {
+    required String fileName,
+    required String fileSize,
+    required String type,
+    required bool isUrl,
+    VoidCallback? onView,
+    required VoidCallback onRemove,
+    required VoidCallback onReplace,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.primary),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: colorScheme.outlineVariant),
+            ),
+            child: Icon(
+              _getFileIcon(fileName),
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+          ),
+          AppDimens.horizontalMedium,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  fileName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        type,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
+                    ),
+                    if (fileSize.isNotEmpty) ...[
+                      AppDimens.horizontalSmall,
+                      Text(
+                        fileSize,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          AppDimens.horizontalMedium,
+          Row(
+            children: [
+              if (isUrl && onView != null) ...[
+                AppButton(
+                  onPressed: onView,
+                  buttonType: ButtonType.text,
+                  child: Text(
+                    'View',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ),
+                AppDimens.horizontalSmall,
+              ],
+              AppButton(
+                onPressed: onReplace,
+                buttonType: ButtonType.outline,
+                customStyle: OutlinedButton.styleFrom(
+                  foregroundColor: colorScheme.onSurfaceVariant,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  side: BorderSide(color: colorScheme.outlineVariant),
+                ),
+                child: Text(
+                  'Replace',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              AppDimens.horizontalMedium,
+              InkWell(
+                onTap: onRemove,
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.delete,
+                    size: 20,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdditionalDocuments(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'ADDITIONAL DOCUMENTS',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        AppDimens.verticalMediumSmall,
+        InkWell(
+          onTap: () {},
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: colorScheme.outlineVariant,
+                style: BorderStyle
+                    .solid, // Dashed border not native, solid for now or custom painter if needed. HTML says dashed.
+              ),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.shadow.withAlpha(10),
+                        blurRadius: 2,
+                      ),
+                    ],
+                    border: Border.all(color: colorScheme.outlineVariant),
+                  ),
+                  child: Icon(
+                    Icons.cloud_upload,
+                    color: colorScheme.primary,
+                    size: 24,
+                  ),
+                ),
+                AppDimens.verticalMediumSmall,
+                Text(
+                  'Click to upload or drag and drop',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                AppDimens.verticalExtraSmall,
+                Text(
+                  'Upload any other relevant certificates, records, or files.\nSupported formats: PDF, JPG, PNG. Max file size: 10MB.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  IconData _getFileIcon(String fileName) {
+    if (!fileName.contains('.')) return Icons.insert_drive_file;
+    final extension = fileName.split('.').last.toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return Icons.picture_as_pdf;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return Icons.image;
+      case 'doc':
+      case 'docx':
+        return Icons.description;
+      default:
+        return Icons.insert_drive_file;
+    }
+  }
+}

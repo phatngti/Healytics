@@ -1,5 +1,6 @@
 import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
+import 'package:admin_panel/features/partner/products/datasource/data/product_mock_data.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 
@@ -7,6 +8,9 @@ import 'package:admin_panel/features/partner/products/domain/product.entity.dart
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:admin_openapi/api.dart';
+import 'package:admin_panel/core/entities/store.entity.dart';
+import 'package:admin_panel/core/models/store.model.dart';
+import 'package:flutter/foundation.dart';
 
 part 'remote_datasource.g.dart';
 
@@ -107,16 +111,6 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   Future<Product> createProduct(CreateProductRequest request) async {
     final typeEnum = _mapProductType(request.productType);
 
-    CreatePhysicalDetailsDto? physicalDetails;
-    if (typeEnum == CreateProductDtoTypeEnum.physical) {
-      physicalDetails = CreatePhysicalDetailsDto(
-        sku: request.sku,
-        barcode: request.barcode,
-        stockQuantity: request.stockQuantity,
-        costPerItem: request.costPerItem,
-      );
-    }
-
     CreateServiceDefinitionDto? serviceDefinition;
     if (typeEnum == CreateProductDtoTypeEnum.service) {
       serviceDefinition = CreateServiceDefinitionDto(
@@ -138,9 +132,8 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       salePrice: request.salePrice,
       status: _mapStatus(request.status),
       isVisibleOnline: request.onlineStore,
-      vendorName: request.vendor,
       employeeIds: request.staffIds,
-      physicalDetails: physicalDetails,
+
       serviceDefinition: serviceDefinition,
       media: request.images.asMap().entries.map((entry) {
         return CreateProductMediaDto(
@@ -211,7 +204,6 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
         slug: category?['slug']?.toString() ?? '',
       ),
       onlineStore: json['isVisibleOnline'] as bool? ?? false,
-      vendor: json['vendorName']?.toString(),
       images:
           (json['media'] as List<dynamic>?)
               ?.map((m) => m['url']?.toString() ?? '')
@@ -220,9 +212,6 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           [],
 
       // Physical details
-      sku: physical?['sku']?.toString(),
-      barcode: physical?['barcode']?.toString(),
-      stockQuantity: int.tryParse(physical?['stockQuantity']?.toString() ?? ''),
       costPerItem: double.tryParse(physical?['costPerItem']?.toString() ?? ''),
 
       // Service details
@@ -270,8 +259,122 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 }
 
+class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
+  @override
+  Future<List<Product>> getProducts(
+    int startingAt,
+    int count,
+    String? sortedBy,
+    bool? sortedAsc,
+  ) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return List.generate(
+      count,
+      (index) => Product(
+        id: ProductId('mock-id-${startingAt + index}'),
+        name: 'Mock Product ${startingAt + index}',
+        description: 'Description for mock product ${startingAt + index}',
+        basePrice: 100.0 + index,
+        salePrice: 90.0 + index,
+        productType: index % 2 == 0 ? 'service' : 'physical',
+        status: 'active',
+        category: CategoryEntity(
+          id: 'cat-${index % 5}',
+          name: 'Category ${index % 5}',
+          slug: 'category-${index % 5}',
+        ),
+        onlineStore: true,
+        images: ['https://picsum.photos/200/300?random=${startingAt + index}'],
+        costPerItem: index % 2 != 0 ? 50.0 : null,
+        duration: index % 2 == 0 ? 60 : null,
+        buffer: index % 2 == 0 ? 15 : null,
+        capacity: index % 2 == 0 ? 1 : null,
+        leadTime: index % 2 == 0 ? 24 : null,
+        staffAllocation: 'any',
+      ),
+    );
+  }
+
+  @override
+  Future<int> getTotalRows() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return 100;
+  }
+
+  @override
+  Future<Product> getProductById(ProductId id) async {
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Return matching mock product or a default one
+    final product = productMockData[id.value] ?? productMockDefault;
+
+    // Ensure ID matches requested ID if falling back to default
+    if (product.id != id) {
+      return product.copyWith(id: id);
+    }
+
+    return product;
+  }
+
+  @override
+  Future<Product> createProduct(CreateProductRequest request) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return Product(
+      id: ProductId('new-mock-id'),
+      name: request.name,
+      description: request.description,
+      basePrice: request.basePrice,
+      salePrice: request.salePrice,
+      productType: request.productType,
+      status: request.status,
+      category: const CategoryEntity(
+        id: 'cat-new',
+        name: 'New Category',
+        slug: 'new-category',
+      ),
+      onlineStore: request.onlineStore,
+      images: request.images,
+      costPerItem: request.costPerItem,
+      duration: request.duration,
+      buffer: request.buffer,
+      capacity: request.capacity,
+      leadTime: request.leadTime,
+      staffAllocation: request.staffAllocation,
+    );
+  }
+
+  @override
+  Future<void> updateProduct(UpdateProductRequest request) async {
+    await Future.delayed(const Duration(seconds: 1));
+    debugPrint('Mock update product: ${request.id}');
+  }
+
+  @override
+  Future<void> deleteProduct(ProductId id) async {
+    await Future.delayed(const Duration(seconds: 1));
+    debugPrint('Mock delete product: $id');
+  }
+
+  @override
+  Future<List<CategoryEntity>> getCategories() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return List.generate(
+      5,
+      (index) => CategoryEntity(
+        id: 'cat-$index',
+        name: 'Category $index',
+        slug: 'category-$index',
+      ),
+    );
+  }
+}
+
 @riverpod
 ProductRemoteDataSource productRemoteDataSource(Ref ref) {
+  final isMock = Store.get(StoreKey.mockFlag, false);
+  if (isMock) {
+    return ProductRemoteDataSourceMock();
+  }
   final apiService = ref.read(apiServiceProvider);
   return ProductRemoteDataSourceImpl(apiService: apiService);
 }

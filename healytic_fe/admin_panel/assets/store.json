@@ -3,5 +3,7 @@
     "customHeaders": {
         "deviceModel": "iPhone 13",
         "deviceType": "iOS"
-    }
+    },
+    "mockFlag": "true",
+    "mockRole": "provider"
 }

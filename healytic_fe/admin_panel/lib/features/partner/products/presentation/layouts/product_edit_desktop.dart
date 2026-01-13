@@ -1,7 +1,6 @@
 import 'package:admin_panel/features/common/widgets/button/back_button.dart';
 import 'package:admin_panel/features/common/widgets/button/button.dart';
-import 'package:admin_panel/features/common/widgets/input/selection_field.dart';
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/common/widgets/quill.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -124,7 +123,8 @@ class _ProductEditDesktopState extends ConsumerState<ProductEditDesktop> {
                                       ),
                                 ),
                                 AppDimens.verticalLarge,
-                                AppTextField(
+                                FormFieldBuilders.buildTextField(
+                                  context,
                                   fieldKey: "product_name",
                                   controller: widget.nameController,
                                   label: 'Product Name',
@@ -150,7 +150,8 @@ class _ProductEditDesktopState extends ConsumerState<ProductEditDesktop> {
                                       ),
                                 ),
                                 AppDimens.verticalLarge,
-                                AppTextField(
+                                FormFieldBuilders.buildTextField(
+                                  context,
                                   fieldKey: "product_price",
                                   controller: widget.priceController,
                                   label: 'Price',
@@ -261,9 +262,14 @@ class _ProductEditDesktopState extends ConsumerState<ProductEditDesktop> {
                                       ),
                                 ),
                                 AppDimens.verticalSmall,
-                                AppSelectionField(
-                                  initialValue: widget.statusController.text,
+                                FormFieldBuilders.buildCustomDropdownField(
+                                  context,
+                                  initialValue:
+                                      widget.statusController.text.isEmpty
+                                      ? null
+                                      : widget.statusController.text,
                                   fieldKey: "status",
+                                  label: 'Status',
                                   items: const [
                                     DropdownMenuItem(
                                       value: 'active',
@@ -312,9 +318,14 @@ class _ProductEditDesktopState extends ConsumerState<ProductEditDesktop> {
                                       ),
                                 ),
                                 AppDimens.verticalSmall,
-                                AppSelectionField(
-                                  initialValue: widget.categoryController.text,
+                                FormFieldBuilders.buildCustomDropdownField(
+                                  context,
+                                  initialValue:
+                                      widget.categoryController.text.isEmpty
+                                      ? null
+                                      : widget.categoryController.text,
                                   fieldKey: "category",
+                                  label: 'Category',
                                   items: const [
                                     DropdownMenuItem(
                                       value: 'spa',
