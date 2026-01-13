@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeContactInfoCard extends StatelessWidget {
@@ -7,16 +8,17 @@ class EmployeeContactInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: AppDimens.paddingAllLarge,
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: colorScheme.shadow.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -34,9 +36,9 @@ class EmployeeContactInfoCard extends StatelessWidget {
             ),
             child: Text(
               'Contact & Basic Info',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -51,7 +53,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   isRequired: true,
                 ),
               ),
-              const SizedBox(width: 16),
+              AppDimens.horizontalMedium,
               Expanded(
                 child: FormFieldBuilders.buildTextField(
                   context,
@@ -91,7 +93,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   hintText: 'MM/DD/YYYY',
                 ),
               ),
-              const SizedBox(width: 16),
+              AppDimens.horizontalMedium,
               Expanded(
                 child: FormFieldBuilders.buildDropdownField(
                   context,
@@ -107,7 +109,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          AppDimens.verticalLarge,
           // Emergency Contact Section
           Container(
             padding: const EdgeInsets.only(top: 20),
@@ -121,18 +123,18 @@ class EmployeeContactInfoCard extends StatelessWidget {
               children: [
                 Text(
                   'EMERGENCY CONTACT',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  style: textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
                   ),
                 ),
-                const SizedBox(height: 12),
+                AppDimens.verticalMediumSmall,
                 FormFieldBuilders.buildTextField(
                   context,
                   label: '',
                   hintText: 'Contact Name',
                 ),
-                const SizedBox(height: 12),
+                AppDimens.verticalMediumSmall,
                 FormFieldBuilders.buildTextField(
                   context,
                   label: '',

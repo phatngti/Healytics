@@ -23,13 +23,13 @@ class EmployeeFunctionButtons {
         child: SizedBox(
           height: screenHeight * 0.2,
           width: screenWidth * 0.1,
-          child: const Column(
+          child: Column(
             children: [
-              Text('Sort'),
+              Text('Sort', style: Theme.of(context).textTheme.bodyMedium),
               AppDimens.verticalSmall,
-              Text('Sort'),
+              Text('Sort', style: Theme.of(context).textTheme.bodyMedium),
               AppDimens.verticalSmall,
-              Text('Sort'),
+              Text('Sort', style: Theme.of(context).textTheme.bodyMedium),
             ],
           ),
         ),
@@ -49,16 +49,16 @@ class EmployeeFunctionButtons {
         ),
         child: SizedBox(
           height: screenHeight * 0.2,
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Filter'),
+              Text('Filter', style: Theme.of(context).textTheme.bodyMedium),
               AppDimens.verticalSmall,
-              Text('Filter'),
+              Text('Filter', style: Theme.of(context).textTheme.bodyMedium),
               AppDimens.verticalSmall,
-              Text('Filter'),
+              Text('Filter', style: Theme.of(context).textTheme.bodyMedium),
             ],
           ),
         ),

@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   OneToOne,
   Index,
 } from 'typeorm';
@@ -42,6 +43,27 @@ export class Employee {
   @Column({ name: 'avatar_url', type: 'text', nullable: true })
   avatarUrl: string;
 
+  @Column({ name: 'job_title', length: 100, nullable: true })
+  jobTitle: string;
+
+  @Column({ name: 'start_date', type: 'date', nullable: true })
+  startDate: Date;
+
+  @Column({ name: 'employment_type', length: 50, nullable: true })
+  employmentType: string;
+
+  @Column({ name: 'emergency_contact_name', length: 100, nullable: true })
+  emergencyContactName: string;
+
+  @Column({ name: 'emergency_contact_phone', length: 20, nullable: true })
+  emergencyContactPhone: string;
+
+  @Column({ name: 'id_card_url', type: 'text', nullable: true })
+  idCardUrl: string;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
   @Column({ type: 'date', nullable: true })
   dob: Date;
 
@@ -64,14 +86,18 @@ export class Employee {
   @Column({ name: 'review_count', type: 'int', default: 0 })
   reviewCount: number;
 
+  @Index()
   @Column({ name: 'branch_id', type: 'uuid', nullable: true })
   branchId: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz' })
+  deletedAt: Date | null;
 
   @OneToOne(() => DoctorProfile, (profile) => profile.employee, {
     cascade: true,

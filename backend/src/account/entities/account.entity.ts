@@ -4,23 +4,26 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   OneToOne,
+  Index,
 } from 'typeorm';
 import { Role } from '@/account/enum/role.enum';
 import { UserProfile } from './user-profile.entity';
 
-@Entity()
+@Entity('account')
 export class Account {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index()
   @Column({ unique: true })
   email: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'password_hash', nullable: true })
   passwordHash?: string;
 
-  @Column({ type: 'text', nullable: true, select: false })
+  @Column({ name: 'refresh_token_hash', type: 'text', nullable: true, select: false })
   refreshTokenHash: string | null;
 
   @Column({ type: 'enum', enum: Role, default: Role.USER })
@@ -37,12 +40,15 @@ export class Account {
   @Column({ type: 'jsonb', nullable: true })
   survey?: Record<string, any> | null;
 
-  @Column({ default: true })
+  @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz' })
+  deletedAt: Date | null;
 }

@@ -103,7 +103,6 @@ Class | Method | HTTP request | Description
  - [CreateCategoryDto](doc//CreateCategoryDto.md)
  - [CreateDoctorDto](doc//CreateDoctorDto.md)
  - [CreateDoctorProfileDto](doc//CreateDoctorProfileDto.md)
- - [CreatePhysicalDetailsDto](doc//CreatePhysicalDetailsDto.md)
  - [CreateProductDto](doc//CreateProductDto.md)
  - [CreateProductMediaDto](doc//CreateProductMediaDto.md)
  - [CreateServiceDefinitionDto](doc//CreateServiceDefinitionDto.md)

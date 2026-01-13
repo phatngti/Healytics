@@ -1,12 +1,9 @@
-import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class ProductPricingCard extends StatelessWidget {
-  final bool showStockQuantity;
-
-  const ProductPricingCard({super.key, this.showStockQuantity = false});
+  const ProductPricingCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,11 +12,11 @@ class ProductPricingCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMediumSmall,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
+            color: colorScheme.shadow.withAlpha(5),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -31,14 +28,14 @@ class ProductPricingCard extends StatelessWidget {
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: AppDimens.paddingAllLarge,
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(color: colorScheme.outlineVariant),
               ),
             ),
             child: Text(
-              'Pricing & Inventory',
+              'Service Pricing',
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -46,7 +43,7 @@ class ProductPricingCard extends StatelessWidget {
           ),
           // Content
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: AppDimens.paddingAllLarge,
             child: Column(
               children: [
                 // Price Fields Row
@@ -58,54 +55,15 @@ class ProductPricingCard extends StatelessWidget {
                         fieldKey: 'base_price',
                       ),
                     ),
-                    const SizedBox(width: 24),
+                    AppDimens.horizontalLarge,
                     Expanded(
                       child: _PriceField(
                         label: 'Sale Price',
                         fieldKey: 'sale_price',
                       ),
                     ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: _PriceField(
-                        label: 'Cost per item',
-                        fieldKey: 'cost_per_item',
-                        isOptional: true,
-                      ),
-                    ),
                   ],
                 ),
-                AppDimens.verticalLarge,
-                // Divider
-                Divider(color: colorScheme.outlineVariant),
-                AppDimens.verticalLarge,
-                // SKU and Barcode Row
-                Row(
-                  children: [
-                    Expanded(
-                      child: FormFieldBuilders.buildTextField(
-                        context,
-                        fieldKey: 'sku',
-                        label: 'SKU (Stock Keeping Unit)',
-                        hintText: 'e.g. CR-001',
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: FormFieldBuilders.buildTextField(
-                        context,
-                        fieldKey: 'barcode',
-                        label: 'Barcode (ISBN, UPC, GTIN)',
-                        hintText: 'Scan or enter barcode',
-                      ),
-                    ),
-                  ],
-                ),
-                // Stock Quantity (hidden by default for services)
-                if (showStockQuantity) ...[
-                  AppDimens.verticalLarge,
-                  _buildStockQuantityField(context),
-                ],
               ],
             ),
           ),
@@ -113,61 +71,13 @@ class ProductPricingCard extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildStockQuantityField(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Stock Quantity',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                'Track inventory history',
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        SizedBox(
-          width: MediaQuery.of(context).size.width * 0.25,
-          child: FormFieldBuilders.buildTextField(
-            context,
-            fieldKey: 'stock_quantity',
-            label: '',
-            hintText: '0',
-            keyboardType: TextInputType.number,
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 class _PriceField extends StatelessWidget {
   final String label;
   final String fieldKey;
-  final bool isOptional;
 
-  const _PriceField({
-    required this.label,
-    required this.fieldKey,
-    this.isOptional = false,
-  });
+  const _PriceField({required this.label, required this.fieldKey});
 
   @override
   Widget build(BuildContext context) {
@@ -186,14 +96,6 @@ class _PriceField extends StatelessWidget {
                   context,
                 ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
               ),
-              if (isOptional)
-                Text(
-                  ' (Optional)',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
             ],
           ),
         ),
@@ -207,21 +109,18 @@ class _PriceField extends StatelessWidget {
             filled: true,
             fillColor: colorScheme.surface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimens.radiusSmall,
               borderSide: BorderSide(color: colorScheme.outlineVariant),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimens.radiusSmall,
               borderSide: BorderSide(color: colorScheme.outlineVariant),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimens.radiusSmall,
               borderSide: BorderSide(color: colorScheme.primary),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 14,
-            ),
+            contentPadding: AppDimens.paddingAllMediumSmall,
           ),
         ),
       ],

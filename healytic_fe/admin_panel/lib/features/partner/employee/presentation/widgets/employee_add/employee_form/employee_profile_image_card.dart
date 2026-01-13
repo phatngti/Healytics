@@ -8,7 +8,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:universal_io/io.dart';
 
 class EmployeeProfileImageCard extends ConsumerStatefulWidget {
-  const EmployeeProfileImageCard({super.key});
+  final String? avatarUrl;
+
+  const EmployeeProfileImageCard({super.key, this.avatarUrl});
 
   @override
   ConsumerState<EmployeeProfileImageCard> createState() =>
@@ -85,9 +87,11 @@ class _EmployeeProfileImageCardState
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
 
     return FormBuilderField<String>(
       name: 'avatar_url',
+      enabled: formEnabled,
       builder: (field) {
         ImageProvider? imageProvider;
         if (_selectedImage != null) {
@@ -98,6 +102,9 @@ class _EmployeeProfileImageCardState
           }
         } else if (field.value != null && field.value!.isNotEmpty) {
           imageProvider = NetworkImage(field.value!);
+        } else if (widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty) {
+          // Fallback to initial avatar URL if not edited
+          imageProvider = NetworkImage(widget.avatarUrl!);
         }
 
         return Container(
@@ -108,7 +115,7 @@ class _EmployeeProfileImageCardState
             border: Border.all(color: colorScheme.outlineVariant),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(4),
+                color: colorScheme.shadow.withAlpha(4),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -123,14 +130,18 @@ class _EmployeeProfileImageCardState
                   context,
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
+              AppDimens.verticalMedium,
               Center(
                 child: Column(
                   children: [
                     MouseRegion(
-                      cursor: SystemMouseCursors.click,
+                      cursor: field.widget.enabled
+                          ? SystemMouseCursors.click
+                          : SystemMouseCursors.basic,
                       child: GestureDetector(
-                        onTap: _isUploading ? null : () => _pickImage(field),
+                        onTap: !field.widget.enabled || _isUploading
+                            ? null
+                            : () => _pickImage(field),
                         child: Stack(
                           children: [
                             Container(
@@ -153,7 +164,9 @@ class _EmployeeProfileImageCardState
                                     : null,
                               ),
                               child:
-                                  _selectedImage == null && field.value == null
+                                  _selectedImage == null &&
+                                      field.value == null &&
+                                      field.widget.enabled
                                   ? Icon(
                                       Icons.add_a_photo_outlined,
                                       size: 40,
@@ -164,8 +177,8 @@ class _EmployeeProfileImageCardState
                             if (_isUploading)
                               Positioned.fill(
                                 child: Container(
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black26,
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.shadow.withAlpha(66),
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Center(
@@ -177,7 +190,7 @@ class _EmployeeProfileImageCardState
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    AppDimens.verticalMediumSmall,
                     if (_selectedImage == null && field.value == null) ...[
                       Text(
                         'Allowed *.jpeg, *.jpg, *.png, *.gif\nMax size of 3.1 MB',
@@ -189,33 +202,35 @@ class _EmployeeProfileImageCardState
                       AppDimens.verticalMedium,
                     ],
 
-                    OutlinedButton.icon(
-                      onPressed: _isUploading ? null : () => _pickImage(field),
-                      icon: Icon(
-                        _selectedImage == null && field.value == null
-                            ? Icons.upload_outlined
-                            : Icons.edit_outlined,
-                        size: 16,
-                      ),
-                      label: Text(
-                        _isUploading
-                            ? 'Uploading...'
-                            : (_selectedImage == null && field.value == null
-                                  ? 'Upload Image'
-                                  : 'Change Image'),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w400,
+                    if (field.widget.enabled)
+                      OutlinedButton.icon(
+                        onPressed: _isUploading
+                            ? null
+                            : () => _pickImage(field),
+                        icon: Icon(
+                          _selectedImage == null && field.value == null
+                              ? Icons.upload_outlined
+                              : Icons.edit_outlined,
+                          size: 16,
+                        ),
+                        label: Text(
+                          _isUploading
+                              ? 'Uploading...'
+                              : (_selectedImage == null && field.value == null
+                                    ? 'Upload Image'
+                                    : 'Change Image'),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.w400),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: colorScheme.primary),
+                          backgroundColor: colorScheme.primaryContainer,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
                       ),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: colorScheme.primary),
-                        backgroundColor: colorScheme.primaryContainer,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),

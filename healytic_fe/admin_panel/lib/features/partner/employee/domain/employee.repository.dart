@@ -1,5 +1,4 @@
-import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 
@@ -21,8 +20,13 @@ abstract class EmployeeRepository {
   /// Create a new doctor employee
   Future<EmployeeEntity> createDoctor(CreateDoctorRequest request);
 
-  /// Create a new therapist employee
-  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request);
+  /// Create a new spa therapist employee
+  Future<EmployeeEntity> createSpaTherapist(CreateSpaTherapistRequest request);
+
+  /// Create a new massage therapist employee
+  Future<EmployeeEntity> createMassageTherapist(
+    CreateMassageTherapistRequest request,
+  );
 
   /// Update an existing employee
   Future<void> updateEmployee(UpdateEmployeeRequest request);
@@ -41,4 +45,10 @@ abstract class EmployeeRepository {
     required String role,
     int? limit,
   });
+
+  /// Get spa skills
+  Future<Map<String, String>> getSpaSkills();
+
+  /// Get device proficiency
+  Future<Map<String, String>> getDeviceProficiency();
 }

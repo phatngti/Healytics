@@ -2,7 +2,7 @@ part of 'form_field_builders.dart';
 
 /// A reusable multi-select chip field with search functionality.
 /// Allows users to select from existing options or create new ones.
-class _AppMultiSelectChipField extends StatefulWidget {
+class _AppMultiSelectChipField<T> extends StatefulWidget {
   /// The form field key/name used by FormBuilder.
   final String fieldKey;
 
@@ -13,10 +13,10 @@ class _AppMultiSelectChipField extends StatefulWidget {
   final TextStyle? labelStyle;
 
   /// List of available options for selection.
-  final Map<String, String> availableOptions;
+  final Map<T, String> availableOptions;
 
   /// Initial selected values.
-  final List<String>? initialValue;
+  final List<T>? initialValue;
 
   /// Placeholder text for the search input.
   final String searchHint;
@@ -31,10 +31,10 @@ class _AppMultiSelectChipField extends StatefulWidget {
   final bool allowCreate;
 
   /// Optional validator function.
-  final String? Function(List<String>?)? validator;
+  final String? Function(List<T>?)? validator;
 
   /// Callback when the selection changes.
-  final ValueChanged<List<String>>? onChanged;
+  final ValueChanged<List<T>>? onChanged;
 
   /// Chip background color.
   final Color? chipBackgroundColor;
@@ -50,6 +50,9 @@ class _AppMultiSelectChipField extends StatefulWidget {
 
   /// Custom height for the field container.
   final double? height;
+
+  /// Whether the field is enabled.
+  final bool enabled;
 
   const _AppMultiSelectChipField({
     super.key,
@@ -69,16 +72,18 @@ class _AppMultiSelectChipField extends StatefulWidget {
     this.chipTextColor,
     this.width,
     this.height,
+    this.enabled = true,
   });
 
   @override
-  State<_AppMultiSelectChipField> createState() =>
-      _AppMultiSelectChipFieldState();
+  State<_AppMultiSelectChipField<T>> createState() =>
+      _AppMultiSelectChipFieldState<T>();
 }
 
-class _AppMultiSelectChipFieldState extends State<_AppMultiSelectChipField> {
+class _AppMultiSelectChipFieldState<T>
+    extends State<_AppMultiSelectChipField<T>> {
   final TextEditingController _searchController = TextEditingController();
-  Map<String, String> _filteredOptions = {};
+  Map<T, String> _filteredOptions = {};
 
   @override
   void initState() {
@@ -112,22 +117,25 @@ class _AppMultiSelectChipFieldState extends State<_AppMultiSelectChipField> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
+    final isEnabled = widget.enabled && formEnabled;
 
-    return FormBuilderField<List<String>>(
+    return FormBuilderField<List<T>>(
       name: widget.fieldKey,
       initialValue: widget.initialValue ?? [],
       validator: widget.validator,
-      builder: (FormFieldState<List<String>> field) {
+      enabled: isEnabled,
+      builder: (FormFieldState<List<T>> field) {
         final selectedItems = field.value ?? [];
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.label,
+              widget.label.toUpperCase(),
               style:
                   widget.labelStyle ??
-                  Theme.of(context).textTheme.labelSmall?.copyWith(
+                  Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
                   ),
@@ -144,7 +152,9 @@ class _AppMultiSelectChipFieldState extends State<_AppMultiSelectChipField> {
                       ? Theme.of(context).colorScheme.error
                       : colorScheme.outlineVariant,
                 ),
-                color: colorScheme.surface,
+                color: isEnabled
+                    ? colorScheme.surface
+                    : colorScheme.surfaceContainerHighest.withOpacity(0.5),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,12 +164,14 @@ class _AppMultiSelectChipFieldState extends State<_AppMultiSelectChipField> {
                     runSpacing: 8,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      ...selectedItems.map((item) => _buildChip(item, field)),
+                      ...selectedItems.map(
+                        (item) => _buildChip(item, field, isEnabled),
+                      ),
                       SizedBox(
                         child: TextField(
-                          controller: _searchController,
+                          enabled: isEnabled,
                           decoration: InputDecoration(
-                            hintText: widget.searchHint,
+                            hintText: isEnabled ? widget.searchHint : '',
                             hintStyle: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
@@ -172,8 +184,9 @@ class _AppMultiSelectChipFieldState extends State<_AppMultiSelectChipField> {
                           onSubmitted: (value) {
                             if (widget.allowCreate &&
                                 value.isNotEmpty &&
-                                !selectedItems.contains(value)) {
-                              final newList = [...selectedItems, value];
+                                T == String &&
+                                !selectedItems.contains(value as T)) {
+                              final newList = [...selectedItems, value as T];
                               field.didChange(newList);
                               widget.onChanged?.call(newList);
                               _searchController.clear();
@@ -184,7 +197,8 @@ class _AppMultiSelectChipFieldState extends State<_AppMultiSelectChipField> {
                     ],
                   ),
                   if (_searchController.text.isNotEmpty &&
-                      _filteredOptions.isNotEmpty)
+                      _filteredOptions.isNotEmpty &&
+                      isEnabled)
                     Container(
                       margin: const EdgeInsets.only(top: 8),
                       constraints: const BoxConstraints(maxHeight: 120),
@@ -199,15 +213,17 @@ class _AppMultiSelectChipFieldState extends State<_AppMultiSelectChipField> {
                               .map(
                                 (entry) => ActionChip(
                                   label: Text(entry.value),
-                                  onPressed: () {
-                                    final newList = [
-                                      ...selectedItems,
-                                      entry.key,
-                                    ];
-                                    field.didChange(newList);
-                                    widget.onChanged?.call(newList);
-                                    _searchController.clear();
-                                  },
+                                  onPressed: isEnabled
+                                      ? () {
+                                          final newList = [
+                                            ...selectedItems,
+                                            entry.key,
+                                          ];
+                                          field.didChange(newList);
+                                          widget.onChanged?.call(newList);
+                                          _searchController.clear();
+                                        }
+                                      : null,
                                   backgroundColor:
                                       colorScheme.surfaceContainerHighest,
                                 ),
@@ -240,7 +256,7 @@ class _AppMultiSelectChipFieldState extends State<_AppMultiSelectChipField> {
     );
   }
 
-  Widget _buildChip(String item, FormFieldState<List<String>> field) {
+  Widget _buildChip(T item, FormFieldState<List<T>> field, bool isEnabled) {
     final chipBg = widget.chipBackgroundColor ?? Colors.green.shade50;
     final chipBorder = widget.chipBorderColor ?? Colors.green.shade100;
     final chipText = widget.chipTextColor ?? Colors.green.shade700;
@@ -248,31 +264,39 @@ class _AppMultiSelectChipFieldState extends State<_AppMultiSelectChipField> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: chipBg,
+        color: isEnabled
+            ? chipBg
+            : Theme.of(context).colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: chipBorder),
+        border: Border.all(
+          color: isEnabled ? chipBorder : Theme.of(context).colorScheme.outline,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            widget.availableOptions[item] ?? item,
+            widget.availableOptions[item] ?? item.toString(),
             style: TextStyle(
-              color: chipText,
+              color: isEnabled
+                  ? chipText
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.bold,
               fontSize: 12,
             ),
           ),
-          const SizedBox(width: 4),
-          InkWell(
-            onTap: () {
-              final currentItems = field.value ?? [];
-              final newList = currentItems.where((i) => i != item).toList();
-              field.didChange(newList);
-              widget.onChanged?.call(newList);
-            },
-            child: Icon(Icons.close, size: 14, color: chipText),
-          ),
+          if (isEnabled) ...[
+            const SizedBox(width: 4),
+            InkWell(
+              onTap: () {
+                final currentItems = field.value ?? [];
+                final newList = currentItems.where((i) => i != item).toList();
+                field.didChange(newList);
+                widget.onChanged?.call(newList);
+              },
+              child: Icon(Icons.close, size: 14, color: chipText),
+            ),
+          ],
         ],
       ),
     );

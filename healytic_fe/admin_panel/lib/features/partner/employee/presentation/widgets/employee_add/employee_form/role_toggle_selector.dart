@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 /// A segmented toggle button to switch between Doctor and Therapist roles
@@ -19,7 +20,7 @@ class RoleToggleSelector extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow,
@@ -37,7 +38,7 @@ class RoleToggleSelector extends StatelessWidget {
             icon: Icons.spa_outlined,
             onTap: () => onRoleChanged(EmployeeRole.therapist),
           ),
-          const SizedBox(width: 4),
+          AppDimens.horizontalExtraSmall,
           _RoleButton(
             role: EmployeeRole.doctor,
             isSelected: selectedRole == EmployeeRole.doctor,
@@ -68,20 +69,22 @@ class _RoleButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Material(
-      color: Colors.transparent,
+      color: colorScheme.surface.withAlpha(0),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(14),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? colorScheme.surface : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
+            color: isSelected
+                ? colorScheme.surface
+                : colorScheme.surface.withAlpha(0),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isSelected
                   ? colorScheme.outlineVariant
-                  : Colors.transparent,
+                  : colorScheme.surface.withAlpha(0),
             ),
             boxShadow: isSelected
                 ? [
@@ -103,7 +106,7 @@ class _RoleButton extends StatelessWidget {
                     ? colorScheme.primary
                     : colorScheme.onSurfaceVariant,
               ),
-              const SizedBox(width: 8),
+              AppDimens.horizontalSmall,
               Text(
                 role.displayName,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(

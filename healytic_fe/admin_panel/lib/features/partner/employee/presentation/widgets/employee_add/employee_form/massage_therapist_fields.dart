@@ -4,14 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class MassageTherapistFields extends StatefulWidget {
-  const MassageTherapistFields({super.key});
+  final String? initialStrengthLevel;
+
+  const MassageTherapistFields({super.key, this.initialStrengthLevel});
 
   @override
   State<MassageTherapistFields> createState() => _MassageTherapistFieldsState();
 }
 
 class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
-  String _selectedStrength = 'MEDIUM';
+  late String _selectedStrength;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedStrength = widget.initialStrengthLevel ?? 'MEDIUM';
+  }
 
   static const List<String> _therapistLevels = ['Junior', 'Senior', 'Master'];
 
@@ -29,6 +37,7 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,7 +73,7 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: colorScheme.outlineVariant),
           ),
           child: Column(
@@ -77,11 +86,13 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 12),
+              AppDimens.verticalMediumSmall,
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: colorScheme.surface,
+                  color: formEnabled
+                      ? colorScheme.surface
+                      : colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: colorScheme.outlineVariant),
                 ),
@@ -90,28 +101,37 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
                     _StrengthButton(
                       label: 'Soft',
                       isSelected: _selectedStrength == 'SOFT',
+                      isEnabled: formEnabled,
                       onTap: () {
-                        setState(() {
-                          _selectedStrength = 'SOFT';
-                        });
+                        if (formEnabled) {
+                          setState(() {
+                            _selectedStrength = 'SOFT';
+                          });
+                        }
                       },
                     ),
                     _StrengthButton(
                       label: 'Medium',
                       isSelected: _selectedStrength == 'MEDIUM',
+                      isEnabled: formEnabled,
                       onTap: () {
-                        setState(() {
-                          _selectedStrength = 'MEDIUM';
-                        });
+                        if (formEnabled) {
+                          setState(() {
+                            _selectedStrength = 'MEDIUM';
+                          });
+                        }
                       },
                     ),
                     _StrengthButton(
                       label: 'Strong',
                       isSelected: _selectedStrength == 'STRONG',
+                      isEnabled: formEnabled,
                       onTap: () {
-                        setState(() {
-                          _selectedStrength = 'STRONG';
-                        });
+                        if (formEnabled) {
+                          setState(() {
+                            _selectedStrength = 'STRONG';
+                          });
+                        }
                       },
                     ),
                   ],
@@ -159,11 +179,13 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
 class _StrengthButton extends StatelessWidget {
   final String label;
   final bool isSelected;
+  final bool isEnabled;
   final VoidCallback onTap;
 
   const _StrengthButton({
     required this.label,
     required this.isSelected,
+    required this.isEnabled,
     required this.onTap,
   });
 
@@ -173,9 +195,9 @@ class _StrengthButton extends StatelessWidget {
 
     return Expanded(
       child: Material(
-        color: Colors.transparent,
+        color: colorScheme.surface.withAlpha(0),
         child: InkWell(
-          onTap: onTap,
+          onTap: isEnabled ? onTap : null,
           borderRadius: BorderRadius.circular(6),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -185,7 +207,9 @@ class _StrengthButton extends StatelessWidget {
                   : null,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
-                color: isSelected ? colorScheme.primary : Colors.transparent,
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.surface.withAlpha(0),
               ),
             ),
             child: Text(
@@ -195,7 +219,9 @@ class _StrengthButton extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: isSelected
                     ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
+                    : (isEnabled
+                          ? colorScheme.onSurfaceVariant
+                          : colorScheme.onSurfaceVariant.withOpacity(0.5)),
               ),
             ),
           ),

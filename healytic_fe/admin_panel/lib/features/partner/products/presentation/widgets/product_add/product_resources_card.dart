@@ -1,3 +1,4 @@
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,11 +20,11 @@ class _ProductResourcesCardState extends ConsumerState<ProductResourcesCard> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMediumSmall,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
+            color: colorScheme.shadow.withAlpha(5),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -35,7 +36,7 @@ class _ProductResourcesCardState extends ConsumerState<ProductResourcesCard> {
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: AppDimens.paddingAllMediumLarge,
             decoration: BoxDecoration(
               color: colorScheme.surfaceContainerLow,
               border: Border(
@@ -49,7 +50,7 @@ class _ProductResourcesCardState extends ConsumerState<ProductResourcesCard> {
                   color: colorScheme.primary,
                   size: 20,
                 ),
-                const SizedBox(width: 8),
+                AppDimens.horizontalSmall,
                 Text(
                   'REQUIRED RESOURCES',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -62,7 +63,7 @@ class _ProductResourcesCardState extends ConsumerState<ProductResourcesCard> {
           ),
           // Content
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: AppDimens.paddingAllMediumLarge,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -102,11 +103,11 @@ class _ProductResourcesCardState extends ConsumerState<ProductResourcesCard> {
           _resources.add(_Resource(resourceId: '', quantity: 1));
         });
       },
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: AppDimens.radiusSmall,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: AppDimens.radiusSmall,
           border: Border.all(
             color: colorScheme.outlineVariant,
             style: BorderStyle.solid,
@@ -120,7 +121,7 @@ class _ProductResourcesCardState extends ConsumerState<ProductResourcesCard> {
               size: 18,
               color: colorScheme.onSurfaceVariant,
             ),
-            const SizedBox(width: 8),
+            AppDimens.horizontalSmall,
             Text(
               'Add Resource',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -163,7 +164,9 @@ class _ResourceRow extends StatelessWidget {
           flex: 3,
           child: DropdownButtonFormField<String>(
             isExpanded: true,
-            value: resource.resourceId.isEmpty ? null : resource.resourceId,
+            initialValue: resource.resourceId.isEmpty
+                ? null
+                : resource.resourceId,
             items: const [
               DropdownMenuItem(value: 'room_std', child: Text('Standard Room')),
               DropdownMenuItem(
@@ -184,26 +187,23 @@ class _ResourceRow extends StatelessWidget {
               filled: true,
               fillColor: colorScheme.surface,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppDimens.radiusSmall,
                 borderSide: BorderSide(color: colorScheme.outlineVariant),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppDimens.radiusSmall,
                 borderSide: BorderSide(color: colorScheme.outlineVariant),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppDimens.radiusSmall,
                 borderSide: BorderSide(color: colorScheme.primary),
               ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 10,
-              ),
+              contentPadding: AppDimens.paddingAllSmall,
             ),
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),
-        const SizedBox(width: 8),
+        AppDimens.horizontalSmall,
         Expanded(
           flex: 2,
           child: Stack(
@@ -222,21 +222,18 @@ class _ResourceRow extends StatelessWidget {
                   filled: true,
                   fillColor: colorScheme.surface,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimens.radiusSmall,
                     borderSide: BorderSide(color: colorScheme.outlineVariant),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimens.radiusSmall,
                     borderSide: BorderSide(color: colorScheme.outlineVariant),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimens.radiusSmall,
                     borderSide: BorderSide(color: colorScheme.primary),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 10,
-                  ),
+                  contentPadding: AppDimens.paddingAllSmall,
                 ),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
@@ -257,7 +254,7 @@ class _ResourceRow extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 8),
+        AppDimens.horizontalSmall,
         IconButton(
           onPressed: onRemove,
           icon: Icon(
@@ -265,7 +262,7 @@ class _ResourceRow extends StatelessWidget {
             size: 18,
             color: colorScheme.onSurfaceVariant,
           ),
-          style: IconButton.styleFrom(backgroundColor: Colors.transparent),
+          style: IconButton.styleFrom(backgroundColor: colorScheme.surface),
         ),
       ],
     );

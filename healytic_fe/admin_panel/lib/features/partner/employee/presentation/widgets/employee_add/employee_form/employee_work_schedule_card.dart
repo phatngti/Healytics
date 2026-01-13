@@ -1,8 +1,13 @@
-import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class EmployeeWorkScheduleCard extends StatefulWidget {
-  const EmployeeWorkScheduleCard({super.key});
+  final List<EmployeeSchedule>? initialSchedule;
+
+  const EmployeeWorkScheduleCard({super.key, this.initialSchedule});
 
   @override
   State<EmployeeWorkScheduleCard> createState() =>
@@ -12,19 +17,93 @@ class EmployeeWorkScheduleCard extends StatefulWidget {
 class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
   bool _isExpanded = true;
 
-  final List<Map<String, dynamic>> _schedule = [
-    {'day': 'Monday', 'active': true, 'start': '09:00', 'end': '17:00'},
-    {'day': 'Tuesday', 'active': true, 'start': '09:00', 'end': '17:00'},
-    {'day': 'Wednesday', 'active': true, 'start': '09:00', 'end': '17:00'},
-    {'day': 'Thursday', 'active': true, 'start': '09:00', 'end': '17:00'},
-    {'day': 'Friday', 'active': true, 'start': '09:00', 'end': '13:00'},
-    {'day': 'Saturday', 'active': false, 'start': '', 'end': ''},
-    {'day': 'Sunday', 'active': false, 'start': '', 'end': ''},
-  ];
+  late final List<Map<String, dynamic>> _schedule;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSchedule();
+  }
+
+  void _initSchedule() {
+    final defaultSchedule = [
+      {
+        'key': 'monday',
+        'display': 'Monday',
+        'active': true,
+        'start': '09:00',
+        'end': '17:00',
+      },
+      {
+        'key': 'tuesday',
+        'display': 'Tuesday',
+        'active': true,
+        'start': '09:00',
+        'end': '17:00',
+      },
+      {
+        'key': 'wednesday',
+        'display': 'Wednesday',
+        'active': true,
+        'start': '09:00',
+        'end': '17:00',
+      },
+      {
+        'key': 'thursday',
+        'display': 'Thursday',
+        'active': true,
+        'start': '09:00',
+        'end': '17:00',
+      },
+      {
+        'key': 'friday',
+        'display': 'Friday',
+        'active': true,
+        'start': '09:00',
+        'end': '13:00',
+      },
+      {
+        'key': 'saturday',
+        'display': 'Saturday',
+        'active': false,
+        'start': '',
+        'end': '',
+      },
+      {
+        'key': 'sunday',
+        'display': 'Sunday',
+        'active': false,
+        'start': '',
+        'end': '',
+      },
+    ];
+
+    if (widget.initialSchedule != null && widget.initialSchedule!.isNotEmpty) {
+      _schedule = defaultSchedule.map((day) {
+        final key = day['key'] as String;
+        try {
+          final scheduleItem = widget.initialSchedule!.firstWhere(
+            (item) => item.day.toLowerCase() == key,
+          );
+          return {
+            ...day,
+            'active': scheduleItem.isWorking,
+            'start': scheduleItem.start,
+            'end': scheduleItem.end,
+          };
+        } catch (_) {
+          return day;
+        }
+      }).toList();
+    } else {
+      _schedule = defaultSchedule;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
 
     return Container(
       decoration: BoxDecoration(
@@ -33,7 +112,7 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: colorScheme.shadow.withAlpha(4),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -57,17 +136,25 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
+                      color: Theme.of(
+                        context,
+                      ).extension<SemanticColors>()!.warning!.withAlpha(25),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.orange.shade100),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).extension<SemanticColors>()!.warning!.withAlpha(50),
+                      ),
                     ),
                     child: Icon(
                       Icons.schedule_outlined,
                       size: 18,
-                      color: Colors.orange.shade600,
+                      color: Theme.of(
+                        context,
+                      ).extension<SemanticColors>()!.warning,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  AppDimens.horizontalMediumSmall,
                   Text(
                     'Work Schedule',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -89,7 +176,7 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
           ),
           // Content
           AnimatedCrossFade(
-            firstChild: _buildContent(context),
+            firstChild: _buildContent(context, formEnabled),
             secondChild: const SizedBox.shrink(),
             crossFadeState: _isExpanded
                 ? CrossFadeState.showFirst
@@ -101,7 +188,7 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, bool formEnabled) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -115,23 +202,31 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.amber.shade50,
+              color: Theme.of(
+                context,
+              ).extension<SemanticColors>()!.warning!.withAlpha(25),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.amber.shade100),
+              border: Border.all(
+                color: Theme.of(
+                  context,
+                ).extension<SemanticColors>()!.warning!.withAlpha(50),
+              ),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: Colors.amber.shade700,
+                  color: Theme.of(context).extension<SemanticColors>()!.warning,
                   size: 20,
                 ),
-                const SizedBox(width: 8),
+                AppDimens.horizontalSmall,
                 Expanded(
                   child: RichText(
                     text: TextSpan(
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.amber.shade800,
+                        color: Theme.of(
+                          context,
+                        ).extension<SemanticColors>()!.warning,
                       ),
                       children: const [
                         TextSpan(text: 'Default Shift Pattern: '),
@@ -144,18 +239,21 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {
-                    // TODO: Apply preset
-                  },
+                  onPressed: formEnabled
+                      ? () {
+                          // TODO: Apply preset
+                        }
+                      : null,
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.amber.shade800,
+                    foregroundColor: Theme.of(
+                      context,
+                    ).extension<SemanticColors>()!.warning,
                     padding: EdgeInsets.zero,
                   ),
-                  child: const Text(
+                  child: Text(
                     'Apply Preset',
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       decoration: TextDecoration.underline,
-                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -163,7 +261,7 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          AppDimens.verticalLarge,
           // Schedule Table Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -212,10 +310,11 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
             final day = _schedule[index];
             return _buildScheduleRow(
               context,
-              day: day['day'],
+              day: day['display'],
               isActive: day['active'],
               startTime: day['start'],
               endTime: day['end'],
+              formEnabled: formEnabled,
               onActiveChanged: (value) {
                 setState(() {
                   _schedule[index]['active'] = value ?? false;
@@ -247,6 +346,7 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
     required ValueChanged<bool?> onActiveChanged,
     required ValueChanged<String> onStartTimeChanged,
     required ValueChanged<String> onEndTimeChanged,
+    required bool formEnabled,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -277,9 +377,13 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
               child: Center(
                 child: Switch(
                   value: isActive,
-                  onChanged: onActiveChanged,
-                  activeThumbColor: Colors.green.shade600,
-                  activeTrackColor: Colors.green.shade400,
+                  onChanged: formEnabled ? onActiveChanged : null,
+                  activeThumbColor: Theme.of(
+                    context,
+                  ).extension<SemanticColors>()!.success,
+                  activeTrackColor: Theme.of(
+                    context,
+                  ).extension<SemanticColors>()!.success!.withAlpha(150),
                 ),
               ),
             ),
@@ -289,33 +393,71 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
                 child: isActive
                     ? Row(
                         children: [
-                          SizedBox(
-                            width: 100,
-                            child: _buildTimeField(
-                              context,
-                              fieldKey:
-                                  'schedule_${day.toLowerCase().replaceAll(' ', '_')}_start',
-                              value: startTime,
-                              onChanged: onStartTimeChanged,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              'to',
-                              style: TextStyle(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 100,
-                            child: _buildTimeField(
-                              context,
-                              fieldKey:
-                                  'schedule_${day.toLowerCase().replaceAll(' ', '_')}_end',
-                              value: endTime,
-                              onChanged: onEndTimeChanged,
+                          Expanded(
+                            child: FormBuilderField<List<String>>(
+                              name:
+                                  'schedule_${day.toLowerCase().replaceAll(' ', '_')}',
+                              initialValue: [startTime, endTime],
+                              enabled: formEnabled,
+                              onChanged: (val) {
+                                if (val != null && val.length == 2) {
+                                  onStartTimeChanged(val[0]);
+                                  onEndTimeChanged(val[1]);
+                                }
+                              },
+                              builder: (FormFieldState<List<String>> field) {
+                                return Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 100,
+                                      child: _buildTimeField(
+                                        context,
+                                        value: field.value?[0] ?? '',
+                                        enabled: formEnabled,
+                                        onChanged: (val) {
+                                          final newValue = [
+                                            val,
+                                            field.value?[1] ?? '',
+                                          ];
+                                          field.didChange(newValue);
+                                          onStartTimeChanged(val);
+                                        },
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                      ),
+                                      child: Text(
+                                        'to',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
+                                            ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 100,
+                                      child: _buildTimeField(
+                                        context,
+                                        value: field.value?[1] ?? '',
+                                        enabled: formEnabled,
+                                        onChanged: (val) {
+                                          final newValue = [
+                                            field.value?[0] ?? '',
+                                            val,
+                                          ];
+                                          field.didChange(newValue);
+                                          onEndTimeChanged(val);
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -337,22 +479,48 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
 
   Widget _buildTimeField(
     BuildContext context, {
-    required String fieldKey,
     required String value,
     required ValueChanged<String> onChanged,
+    required bool enabled,
   }) {
-    return FormFieldBuilders.buildTextField(
-      context,
-      fieldKey: fieldKey,
-      label: '', // Empty label as it is inline
-      initialValue: value,
-      onChanged: (val) {
-        if (val != null) {
-          onChanged(val.toString());
-        }
-      },
-      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      labelStyle: const TextStyle(height: 0), // Try to minimize label height?
+    return TextField(
+      controller: TextEditingController(text: value)
+        ..selection = TextSelection.collapsed(offset: value.length),
+      onChanged: onChanged,
+      enabled: enabled,
+      decoration: InputDecoration(
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outline.withAlpha(100),
+          ),
+        ),
+        filled: true,
+        fillColor: enabled
+            ? Theme.of(context).colorScheme.surface
+            : Theme.of(context).colorScheme.surfaceContainerHighest,
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+        ),
+        hintText: '--:--',
+        hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+        ),
+      ),
+      style: Theme.of(context).textTheme.bodyMedium,
     );
   }
 }

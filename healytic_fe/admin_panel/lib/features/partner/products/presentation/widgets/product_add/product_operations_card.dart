@@ -80,11 +80,11 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
         Container(
           decoration: BoxDecoration(
             color: colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppDimens.radiusMediumSmall,
             border: Border.all(color: colorScheme.outlineVariant),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(5),
+                color: colorScheme.shadow.withAlpha(5),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -96,7 +96,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
             children: [
               // Header
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: AppDimens.paddingAllMediumLarge,
                 decoration: BoxDecoration(
                   color: colorScheme.surfaceContainerLow,
                   border: Border(
@@ -110,7 +110,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                       color: colorScheme.primary,
                       size: 20,
                     ),
-                    const SizedBox(width: 8),
+                    AppDimens.horizontalSmall,
                     Text(
                       'OPERATIONS & SCHEDULING',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -123,7 +123,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
               ),
               // Content
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: AppDimens.paddingAllMediumLarge,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -133,13 +133,13 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                       icon: Icons.group_outlined,
                       title: 'Staff & Assignment',
                     ),
-                    const SizedBox(height: 12),
+                    AppDimens.verticalMediumSmall,
                     _buildStaffAllocationOptions(context),
-                    const SizedBox(height: 16),
+                    AppDimens.verticalMedium,
                     // Only show staff selector if "Specific Staff" is selected
                     if (_staffAllocation == 'specific') ...[
                       _buildStaffRoleSelector(context),
-                      const SizedBox(height: 16),
+                      AppDimens.verticalMedium,
                       _buildStaffSelector(context),
                     ],
                     AppDimens.verticalMedium,
@@ -151,7 +151,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                       icon: Icons.schedule_outlined,
                       title: 'Scheduling Details',
                     ),
-                    const SizedBox(height: 12),
+                    AppDimens.verticalMediumSmall,
                     _buildSchedulingDetails(context),
                     AppDimens.verticalMedium,
                     Divider(color: colorScheme.outlineVariant),
@@ -162,7 +162,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                       icon: Icons.event_available_outlined,
                       title: 'Booking Rules',
                     ),
-                    const SizedBox(height: 12),
+                    AppDimens.verticalMediumSmall,
                     _buildBookingRules(context),
                   ],
                 ),
@@ -184,7 +184,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
     return Row(
       children: [
         Icon(icon, size: 16, color: colorScheme.onSurfaceVariant),
-        const SizedBox(width: 8),
+        AppDimens.horizontalSmall,
         Text(
           title.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -208,7 +208,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
             _updateFormBuilderStaff();
           },
         ),
-        const SizedBox(height: 8),
+        AppDimens.verticalSmall,
         _StaffAllocationOption(
           title: 'Specific Staff',
           subtitle: 'Limit booking to selected employees',
@@ -232,11 +232,11 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
             context,
           ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
         ),
-        const SizedBox(height: 8),
+        AppDimens.verticalSmall,
         Row(
           children: [
             _buildRoleChip(context, 'Doctor', 'DOCTOR'),
-            const SizedBox(width: 8),
+            AppDimens.horizontalSmall,
             _buildRoleChip(context, 'Therapist', 'THERAPIST'),
           ],
         ),
@@ -271,7 +271,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
       ),
       backgroundColor: colorScheme.surfaceContainerLow,
       side: BorderSide(
-        color: isSelected ? Colors.transparent : colorScheme.outlineVariant,
+        color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
       ),
     );
   }
@@ -280,7 +280,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
     if (_isLoadingStaff) {
       return const Center(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: AppDimens.paddingAllMedium,
           child: CircularProgressIndicator(),
         ),
       );
@@ -338,7 +338,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                 fieldKey: 'duration',
               ),
             ),
-            const SizedBox(width: 16),
+            AppDimens.horizontalMedium,
             Expanded(
               child: _IconTextField(
                 icon: Icons.more_time,
@@ -349,7 +349,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        AppDimens.verticalMedium,
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -359,7 +359,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
               hintText: '1',
               fieldKey: 'capacity',
             ),
-            const SizedBox(height: 4),
+            AppDimens.verticalExtraSmall,
             Text(
               'Maximum clients served simultaneously per slot.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -457,13 +457,13 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        AppDimens.verticalMedium,
         // Availability Info Card
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: AppDimens.paddingAllMediumSmall,
           decoration: BoxDecoration(
             color: colorScheme.primary.withAlpha(13),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppDimens.radiusSmall,
             border: Border.all(color: colorScheme.primary.withAlpha(26)),
           ),
           child: Column(
@@ -547,7 +547,7 @@ class _StaffAllocationOption extends StatelessWidget {
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             visualDensity: VisualDensity.compact,
           ),
-          const SizedBox(width: 4),
+          AppDimens.horizontalExtraSmall,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -596,7 +596,7 @@ class _EmployeeStaffChip extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4, right: 8, top: 4, bottom: 4),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppDimens.radiusPill,
         border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
@@ -633,10 +633,10 @@ class _EmployeeStaffChip extends StatelessWidget {
               context,
             ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
           ),
-          const SizedBox(width: 4),
+          AppDimens.horizontalExtraSmall,
           InkWell(
             onTap: onRemove,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: AppDimens.radiusPill,
             child: Icon(
               Icons.close,
               size: 14,
@@ -691,15 +691,15 @@ class _IconTextField extends StatelessWidget {
             filled: true,
             fillColor: colorScheme.surface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimens.radiusSmall,
               borderSide: BorderSide(color: colorScheme.outlineVariant),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimens.radiusSmall,
               borderSide: BorderSide(color: colorScheme.outlineVariant),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppDimens.radiusSmall,
               borderSide: BorderSide(color: colorScheme.primary),
             ),
             contentPadding: const EdgeInsets.symmetric(
@@ -755,15 +755,15 @@ class _ResourceRow extends StatelessWidget {
               filled: true,
               fillColor: colorScheme.surface,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppDimens.radiusSmall,
                 borderSide: BorderSide(color: colorScheme.outlineVariant),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppDimens.radiusSmall,
                 borderSide: BorderSide(color: colorScheme.outlineVariant),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppDimens.radiusSmall,
                 borderSide: BorderSide(color: colorScheme.primary),
               ),
               contentPadding: const EdgeInsets.symmetric(
@@ -774,7 +774,7 @@ class _ResourceRow extends StatelessWidget {
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),
-        const SizedBox(width: 8),
+        AppDimens.horizontalSmall,
         Expanded(
           flex: 2,
           child: Stack(
@@ -793,15 +793,15 @@ class _ResourceRow extends StatelessWidget {
                   filled: true,
                   fillColor: colorScheme.surface,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimens.radiusSmall,
                     borderSide: BorderSide(color: colorScheme.outlineVariant),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimens.radiusSmall,
                     borderSide: BorderSide(color: colorScheme.outlineVariant),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimens.radiusSmall,
                     borderSide: BorderSide(color: colorScheme.primary),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
@@ -828,7 +828,7 @@ class _ResourceRow extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 8),
+        AppDimens.horizontalSmall,
         IconButton(
           onPressed: onRemove,
           icon: Icon(
@@ -836,7 +836,7 @@ class _ResourceRow extends StatelessWidget {
             size: 18,
             color: colorScheme.onSurfaceVariant,
           ),
-          style: IconButton.styleFrom(backgroundColor: Colors.transparent),
+          style: IconButton.styleFrom(backgroundColor: colorScheme.surface),
         ),
       ],
     );
@@ -927,7 +927,7 @@ class _EmployeeSelectionDialogState extends State<_EmployeeSelectionDialog> {
                           ),
                         ),
                       ),
-                    const SizedBox(width: 12),
+                    AppDimens.horizontalMediumSmall,
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

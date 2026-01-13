@@ -31,36 +31,63 @@ class EmployeeTableSource {
         },
         cells: [
           DataCell(
-            Center(
-              child: Text(
-                employee.id.value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+            Text(
+              employee.id.value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
           DataCell(
-            Center(
-              child: ClipOval(
-                child: employee.avatar.isNotEmpty
-                    ? Image.network(
-                        employee.avatar,
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const CircleAvatar(child: Icon(Icons.person));
-                        },
-                      )
-                    : const CircleAvatar(child: Icon(Icons.person)),
-              ),
+            ClipOval(
+              child: employee.avatar.isNotEmpty
+                  ? Image.network(
+                      employee.avatar,
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const CircleAvatar(child: Icon(Icons.person));
+                      },
+                    )
+                  : const CircleAvatar(child: Icon(Icons.person)),
             ),
           ),
-          DataCell(Center(child: Text(employee.fullName))),
-          DataCell(Center(child: Text(employee.position))),
-          DataCell(Center(child: Text(employee.rating.toStringAsFixed(1)))),
-          DataCell(Center(child: Text(employee.reviewCount.toString()))),
-          DataCell(Center(child: Text(employee.status))),
+          DataCell(
+            Text(
+              employee.fullName,
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+          DataCell(
+            Text(
+              employee.position,
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+          DataCell(
+            Text(
+              employee.rating.toStringAsFixed(1),
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+          DataCell(
+            Text(
+              employee.reviewCount.toString(),
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+          DataCell(
+            Text(
+              employee.status,
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
         ],
       );
     }).toList();
@@ -71,18 +98,21 @@ class EmployeeTableSource {
       for (final row in rows) {
         row.cells.add(
           DataCell(
-            Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: actionButtons
-                    .map(
-                      (action) => IconButton(
-                        onPressed: () => action.onPressed(row.key),
-                        icon: Icon(action.icon),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: actionButtons
+                  .map(
+                    (action) => IconButton(
+                      onPressed: () => action.onPressed(row.key),
+                      icon: Icon(action.icon, size: 20),
+                      padding: const EdgeInsets.all(4),
+                      constraints: const BoxConstraints(),
+                      style: IconButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                    )
-                    .toList(),
-              ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         );

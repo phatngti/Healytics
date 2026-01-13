@@ -1,4 +1,6 @@
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -72,15 +74,16 @@ class _EmployeeSkillsServicesCardState
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: colorScheme.shadow.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -104,20 +107,22 @@ class _EmployeeSkillsServicesCardState
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: Colors.purple.shade50,
+                      color: colorScheme.tertiaryContainer,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.purple.shade100),
+                      border: Border.all(
+                        color: colorScheme.tertiary.withAlpha(75),
+                      ),
                     ),
                     child: Icon(
                       Icons.verified_outlined,
                       size: 18,
-                      color: Colors.purple.shade600,
+                      color: colorScheme.tertiary,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  AppDimens.horizontalMediumSmall,
                   Text(
                     'Skills & Services',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -150,9 +155,10 @@ class _EmployeeSkillsServicesCardState
 
   Widget _buildContent(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: AppDimens.paddingAllLarge,
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
@@ -164,7 +170,7 @@ class _EmployeeSkillsServicesCardState
             context,
             fieldKey: 'skill_set',
             label: 'SKILL SET (MULTI-SELECT)',
-            labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
+            labelStyle: textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
             ),
@@ -176,7 +182,7 @@ class _EmployeeSkillsServicesCardState
             helperText: 'Type to search existing skills or create new ones.',
             allowCreate: true,
           ),
-          const SizedBox(height: 24),
+          AppDimens.verticalLarge,
           // Performable Services Section with FormBuilder
           _buildPerformableServicesField(context),
         ],
@@ -186,6 +192,7 @@ class _EmployeeSkillsServicesCardState
 
   Widget _buildPerformableServicesField(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return FormBuilderField<List<String>>(
       name: 'performable_services',
@@ -198,19 +205,19 @@ class _EmployeeSkillsServicesCardState
           children: [
             Text(
               'PERFORMABLE SERVICES',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              style: textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
               ),
             ),
-            const SizedBox(height: 12),
+            AppDimens.verticalMediumSmall,
             if (field.hasError)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
                   field.errorText ?? '',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.error,
                   ),
                 ),
               ),
@@ -261,34 +268,36 @@ class _EmployeeSkillsServicesCardState
     required ValueChanged<bool?> onChanged,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Material(
-      color: Colors.transparent,
+      color: colorScheme.surface,
       child: InkWell(
         onTap: () => onChanged(!isSelected),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppDimens.radiusSmall,
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: AppDimens.paddingAllMediumSmall,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppDimens.radiusSmall,
             border: Border.all(
               color: isSelected
-                  ? Colors.green.shade300
+                  ? semanticColors.success ?? colorScheme.primary
                   : colorScheme.outlineVariant,
             ),
-            color: isSelected ? Colors.green.shade50.withAlpha(50) : null,
+            color: isSelected ? semanticColors.success?.withAlpha(25) : null,
           ),
           child: Row(
             children: [
               Checkbox(
                 value: isSelected,
                 onChanged: onChanged,
-                activeColor: Colors.green.shade600,
+                activeColor: semanticColors.success,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: AppDimens.radiusExtraSmall,
                 ),
               ),
-              const SizedBox(width: 8),
+              AppDimens.horizontalSmall,
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,14 +305,14 @@ class _EmployeeSkillsServicesCardState
                   children: [
                     Text(
                       service.name,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style: textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       '\$${service.price.toStringAsFixed(2)} • ${service.duration} min',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),

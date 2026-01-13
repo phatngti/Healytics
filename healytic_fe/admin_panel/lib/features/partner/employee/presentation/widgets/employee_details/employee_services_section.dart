@@ -1,7 +1,10 @@
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeServicesSection extends StatelessWidget {
-  const EmployeeServicesSection({super.key});
+  final bool isEditing;
+
+  const EmployeeServicesSection({super.key, this.isEditing = false});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +40,7 @@ class EmployeeServicesSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        AppDimens.verticalMedium,
         LayoutBuilder(
           builder: (context, constraints) {
             final crossAxisCount = constraints.maxWidth >= 600
@@ -75,7 +78,7 @@ class EmployeeServicesSection extends StatelessWidget {
                               color: colorScheme.onSurfaceVariant,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          AppDimens.horizontalMediumSmall,
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +110,7 @@ class EmployeeServicesSection extends StatelessWidget {
                       (constraints.maxWidth - 12 * (crossAxisCount - 1)) /
                       crossAxisCount,
                   child: Material(
-                    color: Colors.transparent,
+                    color: colorScheme.surface.withAlpha(0),
                     child: InkWell(
                       onTap: () {},
                       borderRadius: BorderRadius.circular(8),
@@ -131,7 +134,7 @@ class EmployeeServicesSection extends StatelessWidget {
                                     fontWeight: FontWeight.w500,
                                   ),
                             ),
-                            const SizedBox(width: 4),
+                            AppDimens.horizontalExtraSmall,
                             Icon(
                               Icons.arrow_forward,
                               size: 16,

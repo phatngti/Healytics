@@ -1,6 +1,5 @@
 import 'package:admin_panel/features/partner/employee/datasource/remote_datasource.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.repository.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
@@ -45,8 +44,15 @@ class EmployeeImplementRepository implements EmployeeRepository {
   }
 
   @override
-  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request) {
-    return remoteDataSource.createTherapist(request);
+  Future<EmployeeEntity> createSpaTherapist(CreateSpaTherapistRequest request) {
+    return remoteDataSource.createSpaTherapist(request);
+  }
+
+  @override
+  Future<EmployeeEntity> createMassageTherapist(
+    CreateMassageTherapistRequest request,
+  ) {
+    return remoteDataSource.createMassageTherapist(request);
   }
 
   @override
@@ -73,6 +79,16 @@ class EmployeeImplementRepository implements EmployeeRepository {
     int? limit,
   }) {
     return remoteDataSource.getEmployeesByRole(role: role, limit: limit);
+  }
+
+  @override
+  Future<Map<String, String>> getSpaSkills() {
+    return remoteDataSource.getSpaSkills();
+  }
+
+  @override
+  Future<Map<String, String>> getDeviceProficiency() {
+    return remoteDataSource.getDeviceProficiency();
   }
 }
 
