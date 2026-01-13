@@ -1,7 +1,7 @@
 import 'package:admin_panel/features/authenticate/presentation/providers/sign_up.provider.dart';
 import 'package:admin_panel/features/authenticate/presentation/widgets/logo.dart';
 import 'package:admin_panel/features/common/widgets/button/button.dart';
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/common/widgets/toast.dart';
 import 'package:admin_panel/router/admin_routes.dart';
@@ -97,7 +97,8 @@ class SignUpScreen extends HookConsumerWidget {
                     textAlign: TextAlign.center,
                   ),
                   AppDimens.verticalMedium,
-                  AppTextField(
+                  FormFieldBuilders.buildTextField(
+                    context,
                     fieldKey: "email",
                     label: "Email",
                     controller: emailController,

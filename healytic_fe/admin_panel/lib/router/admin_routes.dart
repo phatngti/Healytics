@@ -1,3 +1,5 @@
+import 'package:admin_panel/features/admin/category/presentation/category_add.dart';
+import 'package:admin_panel/features/admin/category/presentation/category_home.dart';
 import 'package:admin_panel/features/admin/dashboard/presentation/admin_dashboard_screen.dart';
 import 'package:admin_panel/features/authenticate/presentation/forgot_password/forgot_password.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_in.dart';
@@ -111,6 +113,14 @@ class SignUpFormRoute extends GoRouteData with $SignUpFormRoute {
       path: '/admin/partner-manager',
       name: PartnerManagerRoute.name,
     ),
+    TypedGoRoute<CategoryHomeRoute>(
+      path: '/admin/category',
+      name: CategoryHomeRoute.name,
+    ),
+    TypedGoRoute<CategoryAddRoute>(
+      path: '/admin/category/add',
+      name: CategoryAddRoute.name,
+    ),
   ],
 )
 class AdminShellRouteData extends ShellRouteData {
@@ -144,6 +154,32 @@ class PartnerManagerRoute extends GoRouteData with $PartnerManagerRoute {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const PartnerManagerScreen(),
+    );
+  }
+}
+
+class CategoryHomeRoute extends GoRouteData with $CategoryHomeRoute {
+  const CategoryHomeRoute();
+  static const name = "admin-category";
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const CategoryHomeScreen(),
+    );
+  }
+}
+
+class CategoryAddRoute extends GoRouteData with $CategoryAddRoute {
+  const CategoryAddRoute();
+  static const name = "admin-category-add";
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const CategoryAddScreen(),
     );
   }
 }

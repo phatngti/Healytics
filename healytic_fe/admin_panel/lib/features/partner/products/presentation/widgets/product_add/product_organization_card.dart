@@ -1,14 +1,13 @@
-import 'package:admin_panel/features/common/widgets/input/selection_field.dart';
-import 'package:admin_panel/features/common/widgets/input/text_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProductOrganizationCard extends ConsumerStatefulWidget {
   final String? initialCategory;
   final List<String> initialTags;
-  final String? initialVendor;
   final ValueChanged<String?>? onCategoryChanged;
   final ValueChanged<List<String>>? onTagsChanged;
 
@@ -16,7 +15,6 @@ class ProductOrganizationCard extends ConsumerStatefulWidget {
     super.key,
     this.initialCategory,
     this.initialTags = const [],
-    this.initialVendor,
     this.onCategoryChanged,
     this.onTagsChanged,
   });
@@ -92,17 +90,17 @@ class _ProductOrganizationCardState
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMediumSmall,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
+            color: colorScheme.shadow.withAlpha(5),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(20),
+      padding: AppDimens.paddingAllMediumLarge,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -114,7 +112,7 @@ class _ProductOrganizationCardState
               letterSpacing: 1,
             ),
           ),
-          const SizedBox(height: 16),
+          AppDimens.verticalMedium,
           // Category Dropdown
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,14 +127,16 @@ class _ProductOrganizationCardState
               _isLoadingCategories
                   ? const Center(
                       child: Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: AppDimens.paddingAllSmall,
                         child: CircularProgressIndicator(),
                       ),
                     )
-                  : AppSelectionField<String>(
+                  : FormFieldBuilders.buildCustomDropdownField<String>(
+                      context,
                       fieldKey: 'category',
                       hintText: 'Select category...',
                       initialValue: _category,
+                      label: 'Category',
                       items: _categories
                           .map(
                             (cat) => DropdownMenuItem(
@@ -145,16 +145,10 @@ class _ProductOrganizationCardState
                             ),
                           )
                           .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _category = value;
-                        });
-                        widget.onCategoryChanged?.call(value);
-                      },
                     ),
             ],
           ),
-          const SizedBox(height: 16),
+          AppDimens.verticalMedium,
           // Tags
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,15 +167,15 @@ class _ProductOrganizationCardState
                   filled: true,
                   fillColor: colorScheme.surface,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimens.radiusSmall,
                     borderSide: BorderSide(color: colorScheme.outlineVariant),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimens.radiusSmall,
                     borderSide: BorderSide(color: colorScheme.outlineVariant),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppDimens.radiusSmall,
                     borderSide: BorderSide(color: colorScheme.primary),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
@@ -192,7 +186,7 @@ class _ProductOrganizationCardState
                 onFieldSubmitted: _addTag,
               ),
               if (_tags.isNotEmpty) ...[
-                const SizedBox(height: 8),
+                AppDimens.verticalSmall,
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -205,13 +199,6 @@ class _ProductOrganizationCardState
                 ),
               ],
             ],
-          ),
-          const SizedBox(height: 16),
-          // Vendor
-          const AppTextField(
-            fieldKey: 'vendor',
-            label: 'Vendor',
-            hintText: 'e.g. SkinCeuticals',
           ),
         ],
       ),
@@ -230,10 +217,12 @@ class _TagChip extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding:
+          AppDimens.paddingHorizontalSmall +
+          AppDimens.paddingVerticalExtraSmall,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: AppDimens.radiusExtraSmall,
         border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
@@ -245,7 +234,7 @@ class _TagChip extends StatelessWidget {
               context,
             ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
           ),
-          const SizedBox(width: 4),
+          AppDimens.horizontalExtraSmall,
           InkWell(
             onTap: onRemove,
             child: Icon(

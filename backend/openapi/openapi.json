@@ -1321,7 +1321,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2025-12-23T12:23:07.714Z"
+              "submittedAt": "2026-01-13T14:44:58.654Z"
             }
           }
         },
@@ -1910,35 +1910,6 @@
           "url"
         ]
       },
-      "CreatePhysicalDetailsDto": {
-        "type": "object",
-        "properties": {
-          "sku": {
-            "type": "string",
-            "example": "SKU-001"
-          },
-          "barcode": {
-            "type": "string",
-            "example": "1234567890123"
-          },
-          "stockQuantity": {
-            "type": "number",
-            "example": 100
-          },
-          "costPerItem": {
-            "type": "number",
-            "example": 250000
-          },
-          "weightGram": {
-            "type": "number",
-            "example": 500
-          },
-          "dimensions": {
-            "type": "string",
-            "example": "10x20x5 cm"
-          }
-        }
-      },
       "CreateServiceDefinitionDto": {
         "type": "object",
         "properties": {
@@ -2024,10 +1995,6 @@
             "type": "boolean",
             "example": false
           },
-          "vendorName": {
-            "type": "string",
-            "example": "Vendor XYZ"
-          },
           "employeeIds": {
             "example": [
               "uuid-1",
@@ -2044,14 +2011,6 @@
             "items": {
               "$ref": "#/components/schemas/CreateProductMediaDto"
             }
-          },
-          "physicalDetails": {
-            "description": "Physical product details (required if type is physical)",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CreatePhysicalDetailsDto"
-              }
-            ]
           },
           "serviceDefinition": {
             "description": "Service definition (required if type is service)",
@@ -2124,10 +2083,6 @@
             "type": "boolean",
             "example": false
           },
-          "vendorName": {
-            "type": "string",
-            "example": "Vendor XYZ"
-          },
           "employeeIds": {
             "example": [
               "uuid-1",
@@ -2144,14 +2099,6 @@
             "items": {
               "$ref": "#/components/schemas/CreateProductMediaDto"
             }
-          },
-          "physicalDetails": {
-            "description": "Physical product details (required if type is physical)",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CreatePhysicalDetailsDto"
-              }
-            ]
           },
           "serviceDefinition": {
             "description": "Service definition (required if type is service)",

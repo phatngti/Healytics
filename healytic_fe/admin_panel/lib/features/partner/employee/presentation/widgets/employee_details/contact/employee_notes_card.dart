@@ -1,16 +1,28 @@
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeNotesCard extends StatelessWidget {
-  const EmployeeNotesCard({super.key});
+  final bool isEditing;
+
+  const EmployeeNotesCard({super.key, this.isEditing = false});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.yellow.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.yellow.shade100),
+        color: semanticColors.warning?.withAlpha(25),
+        borderRadius: AppDimens.radiusMedium,
+        border: Border.all(
+          color:
+              semanticColors.warning?.withAlpha(50) ??
+              colorScheme.outlineVariant,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -20,23 +32,23 @@ class EmployeeNotesCard extends StatelessWidget {
               Icon(
                 Icons.sticky_note_2_outlined,
                 size: 20,
-                color: Colors.yellow.shade800,
+                color: semanticColors.warning,
               ),
-              const SizedBox(width: 8),
+              AppDimens.horizontalSmall,
               Text(
                 'Manager Notes',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                style: textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.yellow.shade900,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          AppDimens.verticalSmall,
           Text(
             'Sarah is exceptionally skilled in deep tissue. Clients often request her for back pain relief. Prefers morning shifts.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.yellow.shade900,
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurface,
               height: 1.5,
             ),
           ),

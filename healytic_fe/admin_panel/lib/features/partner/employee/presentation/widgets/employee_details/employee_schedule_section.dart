@@ -1,11 +1,17 @@
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeScheduleSection extends StatelessWidget {
-  const EmployeeScheduleSection({super.key});
+  final bool isEditing;
+
+  const EmployeeScheduleSection({super.key, this.isEditing = false});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     final days = [
       {'day': 'MON', 'time': '9-5', 'active': true},
@@ -22,23 +28,23 @@ class EmployeeScheduleSection extends StatelessWidget {
       children: [
         Text(
           'WORK SCHEDULE SUMMARY',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          style: textTheme.labelSmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
             letterSpacing: 1,
           ),
         ),
-        const SizedBox(height: 16),
+        AppDimens.verticalMedium,
         Container(
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppDimens.radiusSmall,
             border: Border.all(color: colorScheme.outlineVariant),
           ),
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimens.paddingAllMedium,
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: colorScheme.outlineVariant),
@@ -52,22 +58,24 @@ class EmployeeScheduleSection extends StatelessWidget {
                       children: [
                         Text(
                           'Shift Type',
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(color: colorScheme.onSurfaceVariant),
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ),
-                        const SizedBox(height: 4),
+                        AppDimens.verticalExtraSmall,
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.wb_sunny,
                               size: 18,
-                              color: Colors.orange,
+                              color: semanticColors.warning,
                             ),
-                            const SizedBox(width: 8),
+                            AppDimens.horizontalSmall,
                             Text(
                               'Full Time - Morning',
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
+                              style: textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -78,14 +86,16 @@ class EmployeeScheduleSection extends StatelessWidget {
                       children: [
                         Text(
                           'Weekly Hours',
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(color: colorScheme.onSurfaceVariant),
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ),
-                        const SizedBox(height: 4),
+                        AppDimens.verticalExtraSmall,
                         Text(
                           '40h',
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                          style: textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -93,7 +103,7 @@ class EmployeeScheduleSection extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppDimens.paddingAllMedium,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: days.map((day) {
@@ -104,32 +114,30 @@ class EmployeeScheduleSection extends StatelessWidget {
                         children: [
                           Text(
                             day['day'] as String,
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          const SizedBox(height: 4),
+                          AppDimens.verticalExtraSmall,
                           Container(
                             width: 32,
                             height: 6,
                             decoration: BoxDecoration(
                               color: isActive
-                                  ? Colors.green
+                                  ? semanticColors.success
                                   : colorScheme.outlineVariant,
-                              borderRadius: BorderRadius.circular(3),
+                              borderRadius: AppDimens.radiusExtraSmall,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          AppDimens.verticalExtraSmall,
                           Text(
                             day['time'] as String,
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: isActive
-                                      ? null
-                                      : colorScheme.onSurfaceVariant,
-                                ),
+                            style: textTheme.labelSmall?.copyWith(
+                              color: isActive
+                                  ? null
+                                  : colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         ],
                       ),

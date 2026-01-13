@@ -18,8 +18,10 @@ class TableColumns {
     return columns
         .map(
           (column) => DataColumn(
+            columnWidth: const IntrinsicColumnWidth(flex: 1.0),
             label: Row(
               mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 if (column.prefixIcon != null) ...[
                   Icon(column.prefixIcon),
@@ -36,7 +38,7 @@ class TableColumns {
                 ),
               ],
             ),
-            headingRowAlignment: MainAxisAlignment.center,
+            headingRowAlignment: MainAxisAlignment.start,
           ),
         )
         .toList();

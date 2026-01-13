@@ -36,14 +36,6 @@ class ProductAddScreen extends HookConsumerWidget {
           final salePrice = double.tryParse(
             formData['sale_price']?.toString() ?? '',
           );
-          final costPerItem = double.tryParse(
-            formData['cost_per_item']?.toString() ?? '',
-          );
-          final sku = formData['sku'] as String?;
-          final barcode = formData['barcode'] as String?;
-          final stockQuantity = int.tryParse(
-            formData['stock_quantity']?.toString() ?? '',
-          );
 
           // Visibility
           final status = formData['visibility_status'] as String? ?? 'draft';
@@ -51,7 +43,6 @@ class ProductAddScreen extends HookConsumerWidget {
 
           // Organization
           final category = formData['category'] as String? ?? '';
-          final vendor = formData['vendor'] as String?;
 
           // Operations & Scheduling
           final duration = int.tryParse(formData['duration']?.toString() ?? '');
@@ -82,14 +73,9 @@ class ProductAddScreen extends HookConsumerWidget {
             productType: productType,
             basePrice: basePrice,
             salePrice: salePrice,
-            costPerItem: costPerItem,
-            sku: sku,
-            barcode: barcode,
-            stockQuantity: stockQuantity,
             status: status,
             onlineStore: onlineStore,
             category: category,
-            vendor: vendor,
             duration: duration,
             buffer: buffer,
             capacity: capacity,

@@ -4,7 +4,15 @@ import { Repository, IsNull } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
+import { CreateCategoryHandler } from './application/handlers/create-category.handler';
+import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
+import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';
 
+/**
+ * Service facade for managing product categories.
+ * Delegates mutation operations to dedicated handlers.
+ * Supports hierarchical categories with parent-child relationships.
+ */
 @Injectable()
 export class CategoriesService implements OnModuleInit {
   private readonly logger = new Logger(CategoriesService.name);
@@ -12,19 +20,27 @@ export class CategoriesService implements OnModuleInit {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    private readonly createCategoryHandler: CreateCategoryHandler,
+    private readonly updateCategoryHandler: UpdateCategoryHandler,
+    private readonly removeCategoryHandler: RemoveCategoryHandler,
   ) {}
 
-  async onModuleInit() {
+  /**
+   * Seeds default categories on module initialization.
+   */
+  async onModuleInit(): Promise<void> {
     await this.seedCategories();
   }
 
-  private async seedCategories() {
+  /**
+   * Seeds default categories if none exist.
+   */
+  private async seedCategories(): Promise<void> {
     const count = await this.categoryRepository.count();
     if (count > 0) {
       this.logger.log('Categories already seeded, skipping...');
       return;
     }
-
     const categories = [
       { slug: 'skincare', name: 'Skincare' },
       { slug: 'massage', name: 'Massage' },
@@ -34,7 +50,6 @@ export class CategoriesService implements OnModuleInit {
       { slug: 'body-treatment', name: 'Body Treatment' },
       { slug: 'wellness', name: 'Wellness' },
     ];
-
     this.logger.log('Seeding categories...');
     for (const cat of categories) {
       await this.categoryRepository.save(
@@ -48,12 +63,20 @@ export class CategoriesService implements OnModuleInit {
     this.logger.log('Categories seeded successfully.');
   }
 
+  /**
+   * Facade: Delegates to CreateCategoryHandler.
+   * @param createCategoryDto - The category data
+   * @returns The created category
+   */
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    const category = this.categoryRepository.create(createCategoryDto);
-    return this.categoryRepository.save(category);
+    return this.createCategoryHandler.execute(createCategoryDto);
   }
 
-  findAll(): Promise<Category[]> {
+  /**
+   * Retrieves all categories with their relations.
+   * @returns Array of all categories
+   */
+  async findAll(): Promise<Category[]> {
     return this.categoryRepository.find({
       relations: ['parent', 'children'],
       order: { name: 'ASC' },
@@ -61,9 +84,10 @@ export class CategoriesService implements OnModuleInit {
   }
 
   /**
-   * Get only root categories (no parent)
+   * Retrieves only root categories (those without a parent).
+   * @returns Array of root categories
    */
-  findRoots(): Promise<Category[]> {
+  async findRoots(): Promise<Category[]> {
     return this.categoryRepository.find({
       where: { parentId: IsNull() },
       relations: ['children'],
@@ -71,43 +95,57 @@ export class CategoriesService implements OnModuleInit {
     });
   }
 
+  /**
+   * Finds a category by ID.
+   * @param id - The category ID
+   * @returns The category
+   * @throws NotFoundException if not found
+   */
   async findOne(id: string): Promise<Category> {
     const category = await this.categoryRepository.findOne({
       where: { id },
       relations: ['parent', 'children'],
     });
-
     if (!category) {
+      this.logger.warn(`Category not found: ${id}`);
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
-
     return category;
   }
 
+  /**
+   * Finds a category by slug.
+   * @param slug - The category slug
+   * @returns The category
+   * @throws NotFoundException if not found
+   */
   async findBySlug(slug: string): Promise<Category> {
     const category = await this.categoryRepository.findOne({
       where: { slug },
       relations: ['parent', 'children'],
     });
-
     if (!category) {
+      this.logger.warn(`Category slug not found: ${slug}`);
       throw new NotFoundException(`Category with slug "${slug}" not found`);
     }
-
     return category;
   }
 
+  /**
+   * Facade: Delegates to UpdateCategoryHandler.
+   * @param id - The category ID
+   * @param updateCategoryDto - The update data
+   * @returns The updated category
+   */
   async update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<Category> {
-    const category = await this.findOne(id);
-    Object.assign(category, updateCategoryDto);
-    await this.categoryRepository.save(category);
-    return this.findOne(id);
+    return this.updateCategoryHandler.execute(id, updateCategoryDto);
   }
 
+  /**
+   * Facade: Delegates to RemoveCategoryHandler.
+   * @param id - The category ID
+   */
   async remove(id: string): Promise<void> {
-    const result = await this.categoryRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
-    }
+    return this.removeCategoryHandler.execute(id);
   }
 }

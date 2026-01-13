@@ -1,23 +1,27 @@
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 import '../employee_schedule_section.dart';
 import '../employee_services_section.dart';
 
 class EmployeeOperationalCard extends StatelessWidget {
-  const EmployeeOperationalCard({super.key});
+  final bool isEditing;
+
+  const EmployeeOperationalCard({super.key, this.isEditing = false});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: colorScheme.shadow.withOpacity(0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -38,21 +42,21 @@ class EmployeeOperationalCard extends StatelessWidget {
               children: [
                 Text(
                   'Operational',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(24),
+          Padding(
+            padding: AppDimens.paddingAllLarge,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                EmployeeServicesSection(),
-                SizedBox(height: 32),
-                EmployeeScheduleSection(),
+                EmployeeServicesSection(isEditing: isEditing),
+                AppDimens.verticalExtraLarge,
+                EmployeeScheduleSection(isEditing: isEditing),
               ],
             ),
           ),

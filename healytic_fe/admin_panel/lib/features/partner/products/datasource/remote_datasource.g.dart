@@ -55,4 +55,4 @@ final class ProductRemoteDataSourceProvider
 }
 
 String _$productRemoteDataSourceHash() =>
-    r'd42c1b3553ba5e55a06e24c8d5d785e2819abb95';
+    r'cb9ecc82cb59a88e5aa91b9caed586e4c1abefdc';

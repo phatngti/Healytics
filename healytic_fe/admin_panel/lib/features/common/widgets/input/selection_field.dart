@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+part of 'form_field_builders.dart';
 
-class AppSelectionField<T> extends StatelessWidget {
-  const AppSelectionField({
+class _AppSelectionField<T> extends StatelessWidget {
+  const _AppSelectionField({
     super.key,
     required this.fieldKey,
     this.label,
@@ -52,6 +51,9 @@ class AppSelectionField<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
+    final isEnabled = enabled && formEnabled;
+
     return SizedBox(
       width: width,
       height: height,
@@ -62,7 +64,7 @@ class AppSelectionField<T> extends StatelessWidget {
         initialValue: initialValue,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         onChanged: onChanged,
-        enabled: enabled,
+        enabled: isEnabled,
         builder: (FormFieldState<T> field) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,7 +101,7 @@ class AppSelectionField<T> extends StatelessWidget {
                     ? field.value
                     : null,
                 items: items,
-                onChanged: enabled
+                onChanged: isEnabled
                     ? (value) {
                         field.didChange(value);
                         if (onChanged != null) {
@@ -118,7 +120,7 @@ class AppSelectionField<T> extends StatelessWidget {
                     color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                   ),
                   filled: true,
-                  fillColor: enabled
+                  fillColor: isEnabled
                       ? colorScheme.surface
                       : colorScheme.surfaceContainerHighest,
                   errorText: field.errorText,

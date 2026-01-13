@@ -33,7 +33,7 @@ final class SignInProviderProvider
   SignInProvider create() => SignInProvider();
 }
 
-String _$signInProviderHash() => r'e63d1c9c11c055b6387ac425b36b99f941fa9621';
+String _$signInProviderHash() => r'41dd9477b52021daf593e2aadb0f72a07736acbb';
 
 abstract class _$SignInProvider extends $AsyncNotifier<SignInResponseEntity?> {
   FutureOr<SignInResponseEntity?> build();

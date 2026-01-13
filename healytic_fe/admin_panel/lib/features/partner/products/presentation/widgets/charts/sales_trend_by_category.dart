@@ -1,3 +1,4 @@
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -6,16 +7,18 @@ class SalesTrendsByCategory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(24),
-        margin: const EdgeInsets.all(16),
+        padding: AppDimens.paddingAllLarge,
+        margin: AppDimens.paddingAllMedium,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: colorScheme.surface,
+          borderRadius: AppDimens.radiusMediumSmall,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: colorScheme.shadow.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -31,18 +34,18 @@ class SalesTrendsByCategory extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Sales Trends by Category',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B), // Dark slate
+                      color: colorScheme.onSurface,
                     ),
                   ),
-                  _buildDropdownMock(),
+                  _buildDropdownMock(context),
                 ],
               ),
-              const SizedBox(height: 32),
+              AppDimens.verticalLargeExtra,
 
               // --- Chart Section ---
               Expanded(
@@ -58,8 +61,8 @@ class SalesTrendsByCategory extends StatelessWidget {
                       drawVerticalLine: false,
                       horizontalInterval: 2000,
                       getDrawingHorizontalLine: (value) {
-                        return const FlLine(
-                          color: Color(0xFFE2E8F0), // Light grey grid
+                        return FlLine(
+                          color: colorScheme.outlineVariant,
                           strokeWidth: 1,
                         );
                       },
@@ -84,8 +87,8 @@ class SalesTrendsByCategory extends StatelessWidget {
                             // but in the image it is shown.
                             return Text(
                               _formatNumber(value),
-                              style: const TextStyle(
-                                color: Color(0xFF64748B),
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -101,11 +104,11 @@ class SalesTrendsByCategory extends StatelessWidget {
                           reservedSize: 30,
                           getTitlesWidget: (value, meta) {
                             return Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
+                              padding: AppDimens.paddingTopSmall,
                               child: Text(
                                 _getCategoryName(value.toInt()),
-                                style: const TextStyle(
-                                  color: Color(0xFF334155),
+                                style: TextStyle(
+                                  color: colorScheme.onSurface,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -117,11 +120,11 @@ class SalesTrendsByCategory extends StatelessWidget {
                     ),
                     // The Bar Data
                     barGroups: [
-                      _makeGroupData(0, 12000), // Electronics
-                      _makeGroupData(1, 9500), // Peripherals
-                      _makeGroupData(2, 7800), // Accessories
-                      _makeGroupData(3, 6200), // Monitors
-                      _makeGroupData(4, 4200), // Audio
+                      _makeGroupData(0, 12000, colorScheme), // Electronics
+                      _makeGroupData(1, 9500, colorScheme), // Peripherals
+                      _makeGroupData(2, 7800, colorScheme), // Accessories
+                      _makeGroupData(3, 6200, colorScheme), // Monitors
+                      _makeGroupData(4, 4200, colorScheme), // Audio
                     ],
                   ),
                 ),
@@ -134,13 +137,13 @@ class SalesTrendsByCategory extends StatelessWidget {
   }
 
   // Helper to create the Bar Data
-  BarChartGroupData _makeGroupData(int x, double y) {
+  BarChartGroupData _makeGroupData(int x, double y, ColorScheme colorScheme) {
     return BarChartGroupData(
       x: x,
       barRods: [
         BarChartRodData(
           toY: y,
-          color: const Color(0xFF5FA5FA), // The specific blue from the image
+          color: colorScheme.primary,
           width: 40, // Thickness of the bar
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(4),
@@ -153,21 +156,29 @@ class SalesTrendsByCategory extends StatelessWidget {
   }
 
   // Helper to mock the dropdown button
-  Widget _buildDropdownMock() {
+  Widget _buildDropdownMock(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: AppDimens.paddingHorizontalSmall.add(
+        AppDimens.paddingVerticalExtraSmall,
+      ),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: colorScheme.outlineVariant),
+        borderRadius: AppDimens.radiusExtraSmall,
       ),
       child: Row(
-        children: const [
+        children: [
           Text(
             "Last 30 days",
-            style: TextStyle(fontSize: 14, color: Color(0xFF334155)),
+            style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
           ),
-          SizedBox(width: 8),
-          Icon(Icons.keyboard_arrow_down, size: 18, color: Color(0xFF64748B)),
+          AppDimens.horizontalSmall,
+          Icon(
+            Icons.keyboard_arrow_down,
+            size: 18,
+            color: colorScheme.onSurfaceVariant,
+          ),
         ],
       ),
     );

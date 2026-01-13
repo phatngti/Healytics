@@ -2,7 +2,9 @@ import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeBadgesStrength extends StatelessWidget {
-  const EmployeeBadgesStrength({super.key});
+  final bool isEditing;
+
+  const EmployeeBadgesStrength({super.key, this.isEditing = false});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,7 @@ class EmployeeBadgesStrength extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppDimens.radiusSmall,
               ),
               child: Text(
                 'SENIOR',
@@ -42,7 +44,7 @@ class EmployeeBadgesStrength extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppDimens.radiusSmall,
                 border: Border.all(color: colorScheme.outlineVariant),
               ),
               child: Text(
@@ -59,16 +61,16 @@ class EmployeeBadgesStrength extends StatelessWidget {
         Text(
           'TIME JOINED',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: const Color(0xFF618961),
+            color: colorScheme.primary,
             fontWeight: FontWeight.bold,
             letterSpacing: 1,
           ),
         ),
         AppDimens.verticalSmall,
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: AppDimens.paddingAllMediumSmall,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppDimens.radiusSmall,
             border: Border.all(color: colorScheme.outlineVariant),
           ),
           child: Row(

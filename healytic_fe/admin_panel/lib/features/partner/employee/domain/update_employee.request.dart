@@ -21,6 +21,9 @@ abstract class UpdateEmployeeRequest with _$UpdateEmployeeRequest {
     required String city,
     required String state,
     required String country,
+    String? licenseUrl,
+    String? idCardUrl,
+    @Default([]) List<String> documents,
     String? password,
   }) = _UpdateEmployeeRequest;
 

@@ -22,7 +22,6 @@ class SignInProvider extends _$SignInProvider {
           .login(request, role);
 
       // Save role to store
-      await Store.put(StoreKey.role, role);
       await Store.put(StoreKey.accessToken, response.accessToken);
 
       return response;

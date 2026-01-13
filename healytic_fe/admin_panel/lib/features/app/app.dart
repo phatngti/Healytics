@@ -16,6 +16,7 @@ class App extends HookConsumerWidget {
     return MaterialApp.router(
       title: 'GoHealh',
       routerConfig: router,
+
       debugShowCheckedModeBanner: false,
       theme: theme.lightTheme(),
       darkTheme: theme.darkTheme(),

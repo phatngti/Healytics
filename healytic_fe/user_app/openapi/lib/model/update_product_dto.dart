@@ -23,10 +23,8 @@ class UpdateProductDto {
     this.currency,
     this.status,
     this.isVisibleOnline,
-    this.vendorName,
     this.employeeIds = const [],
     this.media = const [],
-    this.physicalDetails,
     this.serviceDefinition,
   });
 
@@ -98,27 +96,10 @@ class UpdateProductDto {
   ///
   bool? isVisibleOnline;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? vendorName;
-
   List<String> employeeIds;
 
   /// Product media (images/videos)
   List<CreateProductMediaDto> media;
-
-  /// Physical product details (required if type is physical)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  CreatePhysicalDetailsDto? physicalDetails;
 
   /// Service definition (required if type is service)
   ///
@@ -141,10 +122,8 @@ class UpdateProductDto {
     other.currency == currency &&
     other.status == status &&
     other.isVisibleOnline == isVisibleOnline &&
-    other.vendorName == vendorName &&
     _deepEquality.equals(other.employeeIds, employeeIds) &&
     _deepEquality.equals(other.media, media) &&
-    other.physicalDetails == physicalDetails &&
     other.serviceDefinition == serviceDefinition;
 
   @override
@@ -160,14 +139,12 @@ class UpdateProductDto {
     (currency == null ? 0 : currency!.hashCode) +
     (status == null ? 0 : status!.hashCode) +
     (isVisibleOnline == null ? 0 : isVisibleOnline!.hashCode) +
-    (vendorName == null ? 0 : vendorName!.hashCode) +
     (employeeIds.hashCode) +
     (media.hashCode) +
-    (physicalDetails == null ? 0 : physicalDetails!.hashCode) +
     (serviceDefinition == null ? 0 : serviceDefinition!.hashCode);
 
   @override
-  String toString() => 'UpdateProductDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, vendorName=$vendorName, employeeIds=$employeeIds, media=$media, physicalDetails=$physicalDetails, serviceDefinition=$serviceDefinition]';
+  String toString() => 'UpdateProductDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, serviceDefinition=$serviceDefinition]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -221,18 +198,8 @@ class UpdateProductDto {
     } else {
       json[r'isVisibleOnline'] = null;
     }
-    if (this.vendorName != null) {
-      json[r'vendorName'] = this.vendorName;
-    } else {
-      json[r'vendorName'] = null;
-    }
       json[r'employeeIds'] = this.employeeIds;
       json[r'media'] = this.media;
-    if (this.physicalDetails != null) {
-      json[r'physicalDetails'] = this.physicalDetails;
-    } else {
-      json[r'physicalDetails'] = null;
-    }
     if (this.serviceDefinition != null) {
       json[r'serviceDefinition'] = this.serviceDefinition;
     } else {
@@ -270,12 +237,10 @@ class UpdateProductDto {
         currency: mapValueOfType<String>(json, r'currency'),
         status: UpdateProductDtoStatusEnum.fromJson(json[r'status']),
         isVisibleOnline: mapValueOfType<bool>(json, r'isVisibleOnline'),
-        vendorName: mapValueOfType<String>(json, r'vendorName'),
         employeeIds: json[r'employeeIds'] is Iterable
             ? (json[r'employeeIds'] as Iterable).cast<String>().toList(growable: false)
             : const [],
         media: CreateProductMediaDto.listFromJson(json[r'media']),
-        physicalDetails: CreatePhysicalDetailsDto.fromJson(json[r'physicalDetails']),
         serviceDefinition: CreateServiceDefinitionDto.fromJson(json[r'serviceDefinition']),
       );
     }
