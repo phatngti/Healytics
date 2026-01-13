@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/common/widgets/button/button.dart';
+import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -7,7 +8,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:file_picker/file_picker.dart';
 
 class EmployeeDetailsDocumentsCard extends StatefulWidget {
-  const EmployeeDetailsDocumentsCard({super.key});
+  final bool isEditing;
+
+  const EmployeeDetailsDocumentsCard({super.key, this.isEditing = false});
 
   @override
   State<EmployeeDetailsDocumentsCard> createState() =>
@@ -82,15 +85,18 @@ class _EmployeeDetailsDocumentsCardState
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
+    final formEnabled = widget.isEditing;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: colorScheme.shadow.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -113,20 +119,24 @@ class _EmployeeDetailsDocumentsCardState
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
+                      color: semanticColors.info?.withAlpha(25),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.blue.shade100),
+                      border: Border.all(
+                        color:
+                            semanticColors.info?.withAlpha(75) ??
+                            colorScheme.outlineVariant,
+                      ),
                     ),
                     child: Icon(
                       Icons.workspace_premium,
                       size: 18,
-                      color: Colors.indigo.shade600,
+                      color: colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  AppDimens.horizontalMediumSmall,
                   Text(
                     'Documents & Certifications',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -144,7 +154,7 @@ class _EmployeeDetailsDocumentsCardState
             ),
           ),
           AnimatedCrossFade(
-            firstChild: _buildContent(context),
+            firstChild: _buildContent(context, formEnabled),
             secondChild: const SizedBox.shrink(),
             crossFadeState: _isExpanded
                 ? CrossFadeState.showFirst
@@ -156,11 +166,12 @@ class _EmployeeDetailsDocumentsCardState
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, bool formEnabled) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: AppDimens.paddingAllLarge,
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
@@ -169,26 +180,28 @@ class _EmployeeDetailsDocumentsCardState
         children: [
           Text(
             'Upload verified certificates, professional licenses, and degrees applicable to this therapist or doctor.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 24),
-          _buildRequiredDocuments(context),
-          const SizedBox(height: 24),
-          _buildAdditionalDocuments(context),
+          AppDimens.verticalLarge,
+          _buildRequiredDocuments(context, formEnabled),
+          AppDimens.verticalLarge,
+          _buildAdditionalDocuments(context, formEnabled),
         ],
       ),
     );
   }
 
-  Widget _buildRequiredDocuments(BuildContext context) {
+  Widget _buildRequiredDocuments(BuildContext context, bool formEnabled) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'REQUIRED DOCUMENTS',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          style: textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
           ),
@@ -203,6 +216,7 @@ class _EmployeeDetailsDocumentsCardState
               uploadSubtitle: 'PDF or JPG • Max 10MB',
               uploadIcon: Icons.badge,
               uploadedTypeLabel: 'License / Permit',
+              formEnabled: formEnabled,
             ),
             AppDimens.verticalMedium,
             _buildManagedDocumentItem(
@@ -212,6 +226,7 @@ class _EmployeeDetailsDocumentsCardState
               uploadSubtitle: 'PDF, JPG, or PNG • Max 10MB',
               uploadIcon: Icons.perm_identity,
               uploadedTypeLabel: 'Identity Card',
+              formEnabled: formEnabled,
             ),
           ],
         ),
@@ -226,6 +241,7 @@ class _EmployeeDetailsDocumentsCardState
     required String uploadSubtitle,
     required IconData uploadIcon,
     required String uploadedTypeLabel,
+    required bool formEnabled,
   }) {
     return FormBuilderField(
       name: fieldName,
@@ -239,6 +255,7 @@ class _EmployeeDetailsDocumentsCardState
             title: uploadTitle,
             subtitle: uploadSubtitle,
             onUpload: () => _pickDocument(fieldName),
+            isEnabled: formEnabled,
           );
         }
 
@@ -262,15 +279,18 @@ class _EmployeeDetailsDocumentsCardState
           type: uploadedTypeLabel,
           isUrl: isUrl,
           onView: isUrl && url != null ? () => _viewDocument(url!) : null,
-          onRemove: () => _removeDocument(fieldName),
-          onReplace: () => _pickDocument(fieldName),
+          onRemove: formEnabled ? () => _removeDocument(fieldName) : null,
+          onReplace: formEnabled ? () => _pickDocument(fieldName) : null,
+          isEnabled: formEnabled,
         );
       },
     );
   }
 
-  Widget _buildAdditionalDocuments(BuildContext context) {
+  Widget _buildAdditionalDocuments(BuildContext context, bool formEnabled) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -279,24 +299,35 @@ class _EmployeeDetailsDocumentsCardState
           children: [
             Text(
               'ADDITIONAL DOCUMENTS',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              style: textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
               ),
             ),
             AppButton(
-              onPressed: () =>
-                  _pickDocument('additional_documents', isList: true),
+              onPressed: formEnabled
+                  ? () => _pickDocument('additional_documents', isList: true)
+                  : null,
               buttonType: ButtonType.text,
-              icon: Icon(Icons.add, size: 18, color: colorScheme.primary),
+              icon: Icon(
+                Icons.add,
+                size: 18,
+                color: formEnabled
+                    ? colorScheme.primary
+                    : colorScheme.onSurface,
+              ),
               child: Text(
                 'Add Document',
-                style: TextStyle(color: colorScheme.primary),
+                style: textTheme.labelMedium?.copyWith(
+                  color: formEnabled
+                      ? colorScheme.primary
+                      : colorScheme.onSurface,
+                ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        AppDimens.verticalMediumSmall,
         FormBuilderField(
           name: 'additional_documents',
           builder: (FormFieldState<List<dynamic>> field) {
@@ -304,11 +335,13 @@ class _EmployeeDetailsDocumentsCardState
 
             if (files.isEmpty) {
               return Container(
-                padding: const EdgeInsets.all(24),
+                padding: AppDimens.paddingAllLarge,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
+                  color: formEnabled
+                      ? colorScheme.surface
+                      : colorScheme.surfaceContainerHighest,
+                  borderRadius: AppDimens.radiusMedium,
                   border: Border.all(
                     color: colorScheme.outlineVariant,
                     style: BorderStyle.solid,
@@ -316,7 +349,9 @@ class _EmployeeDetailsDocumentsCardState
                 ),
                 child: Text(
                   'No additional documents uploaded',
-                  style: TextStyle(color: colorScheme.onSurfaceVariant),
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               );
             }
@@ -349,11 +384,16 @@ class _EmployeeDetailsDocumentsCardState
                   onView: isUrl && url != null
                       ? () => _viewDocument(url!)
                       : null,
-                  onRemove: () =>
-                      _removeDocument('additional_documents', index: index),
+                  onRemove: formEnabled
+                      ? () => _removeDocument(
+                          'additional_documents',
+                          index: index,
+                        )
+                      : null,
                   onReplace:
                       null, // Replace not typical for list items, better removed and re-added
                   showReplace: false,
+                  isEnabled: formEnabled,
                 );
               },
             );
@@ -369,13 +409,18 @@ class _EmployeeDetailsDocumentsCardState
     required String title,
     required String subtitle,
     required VoidCallback onUpload,
+    required bool isEnabled,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimens.paddingAllMedium,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        color: isEnabled
+            ? null
+            : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
@@ -384,40 +429,40 @@ class _EmployeeDetailsDocumentsCardState
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
+              color: isEnabled
+                  ? colorScheme.surface
+                  : colorScheme.surfaceContainerHighest,
+              borderRadius: AppDimens.radiusSmall,
               border: Border.all(color: colorScheme.outlineVariant),
             ),
             child: Icon(icon, color: colorScheme.onSurfaceVariant, size: 20),
           ),
-          const SizedBox(width: 16),
+          AppDimens.horizontalMedium,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(
+                  style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
-                    fontSize: 12,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 16),
+          AppDimens.horizontalMedium,
           AppButton(
-            onPressed: onUpload,
+            onPressed: isEnabled ? onUpload : null,
             buttonType: ButtonType.outline,
             icon: const Icon(Icons.upload, size: 18),
-            child: const Text('Upload'),
+            child: Text('Upload', style: textTheme.labelLarge),
           ),
         ],
       ),
@@ -431,15 +476,22 @@ class _EmployeeDetailsDocumentsCardState
     required String type,
     required bool isUrl,
     VoidCallback? onView,
-    required VoidCallback onRemove,
+    // Make onRemove and onReplace nullable
+    VoidCallback? onRemove,
     VoidCallback? onReplace,
     bool showReplace = true,
+    required bool isEnabled,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppDimens.paddingAllMedium,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        color: isEnabled
+            ? null
+            : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.primary),
       ),
       child: Row(
@@ -448,8 +500,10 @@ class _EmployeeDetailsDocumentsCardState
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
+              color: isEnabled
+                  ? colorScheme.surface
+                  : colorScheme.surfaceContainerHighest,
+              borderRadius: AppDimens.radiusSmall,
               border: Border.all(color: colorScheme.outlineVariant),
             ),
             child: Icon(
@@ -465,9 +519,8 @@ class _EmployeeDetailsDocumentsCardState
               children: [
                 Text(
                   fileName,
-                  style: const TextStyle(
+                  style: textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -480,24 +533,22 @@ class _EmployeeDetailsDocumentsCardState
                       ),
                       decoration: BoxDecoration(
                         color: colorScheme.primary,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: AppDimens.radiusExtraSmall,
                       ),
                       child: Text(
                         type,
-                        style: TextStyle(
-                          fontSize: 10,
+                        style: textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onPrimary,
                         ),
                       ),
                     ),
                     if (fileSize.isNotEmpty) ...[
-                      const SizedBox(width: 8),
+                      AppDimens.horizontalSmall,
                       Text(
                         fileSize,
-                        style: TextStyle(
+                        style: textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
-                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -515,8 +566,7 @@ class _EmployeeDetailsDocumentsCardState
                   buttonType: ButtonType.text,
                   child: Text(
                     'View',
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.primary,
                     ),
@@ -525,6 +575,8 @@ class _EmployeeDetailsDocumentsCardState
                 AppDimens.horizontalSmall,
               ],
               if (showReplace && onReplace != null) ...[
+                // onReplace being non-null implies enabled in my new logic?
+                // Actually I should just use the passed callback which I set to null if disabled
                 AppButton(
                   onPressed: onReplace,
                   buttonType: ButtonType.outline,
@@ -538,8 +590,7 @@ class _EmployeeDetailsDocumentsCardState
                   ),
                   child: Text(
                     'Replace',
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -547,22 +598,23 @@ class _EmployeeDetailsDocumentsCardState
                 ),
                 AppDimens.horizontalMedium,
               ],
-              InkWell(
-                onTap: onRemove,
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.transparent),
-                  ),
-                  child: Icon(
-                    Icons.delete,
-                    size: 20,
-                    color: colorScheme.onSurfaceVariant,
+              if (onRemove != null)
+                InkWell(
+                  onTap: onRemove,
+                  borderRadius: AppDimens.radiusSmall,
+                  child: Container(
+                    padding: AppDimens.paddingAllSmall,
+                    decoration: BoxDecoration(
+                      borderRadius: AppDimens.radiusSmall,
+                      border: Border.all(color: colorScheme.surface),
+                    ),
+                    child: Icon(
+                      Icons.delete,
+                      size: 20,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ],

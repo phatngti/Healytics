@@ -17,6 +17,7 @@ class _AppDatePickField extends StatelessWidget {
     this.style,
     this.hintStyle,
     this.labelStyle,
+    this.enabled = true,
   });
 
   final String fieldKey;
@@ -32,12 +33,14 @@ class _AppDatePickField extends StatelessWidget {
   final String? hintText;
   final TextStyle? style;
   final TextStyle? hintStyle;
-
   final TextStyle? labelStyle;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     // Define the label color matching HTML #618961
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
+    final isEnabled = enabled && formEnabled;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,6 +83,7 @@ class _AppDatePickField extends StatelessWidget {
           validator: validator,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           style: style,
+          enabled: isEnabled,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: hintStyle,
@@ -102,7 +106,9 @@ class _AppDatePickField extends StatelessWidget {
               ),
             ),
             suffixIcon: const Icon(Icons.calendar_today, size: 20),
-            fillColor: Theme.of(context).colorScheme.surface,
+            fillColor: isEnabled
+                ? Theme.of(context).colorScheme.surface
+                : Theme.of(context).colorScheme.surfaceContainerHighest,
             filled: true,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,

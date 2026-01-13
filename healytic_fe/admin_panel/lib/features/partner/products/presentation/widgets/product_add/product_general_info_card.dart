@@ -1,5 +1,5 @@
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
-import 'package:admin_panel/features/common/widgets/quill.dart';
+
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
@@ -18,11 +18,11 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMediumSmall,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
+            color: colorScheme.shadow.withAlpha(5),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -34,7 +34,7 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: AppDimens.paddingAllLarge,
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(color: colorScheme.outlineVariant),
@@ -49,7 +49,7 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
+                AppDimens.verticalExtraSmall,
                 Text(
                   'Basic details about your product or service.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -61,7 +61,7 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
           ),
           // Content
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: AppDimens.paddingAllLarge,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -75,20 +75,9 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
                 ),
                 AppDimens.verticalLarge,
                 // Description
-                Text(
-                  'Description',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 6),
-                FlutterQuillEditor(
-                  initialContent: const [],
-                  onChanged: (value) {
-                    // Value captured in FormBuilder
-                  },
-                  height: 250,
-                  width: double.infinity,
+                FormFieldBuilders.buildQuillEditor(
+                  context,
+                  label: 'Description',
                 ),
               ],
             ),

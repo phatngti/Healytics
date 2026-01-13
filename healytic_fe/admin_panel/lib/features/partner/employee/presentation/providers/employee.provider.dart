@@ -1,9 +1,7 @@
 import 'package:admin_panel/features/partner/employee/datasource/employee_implement.repository.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
-import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -64,13 +62,32 @@ class EmployeeNotifier extends _$EmployeeNotifier {
     return repo.createDoctor(request);
   }
 
-  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request) async {
+  Future<EmployeeEntity> createSpaTherapist(
+    CreateSpaTherapistRequest request,
+  ) async {
     final repo = ref.read(employeeRepositoryProvider);
-    return repo.createTherapist(request);
+    return repo.createSpaTherapist(request);
+  }
+
+  Future<EmployeeEntity> createMassageTherapist(
+    CreateMassageTherapistRequest request,
+  ) async {
+    final repo = ref.read(employeeRepositoryProvider);
+    return repo.createMassageTherapist(request);
   }
 
   Future<List<EmployeeEntity>> getEmployeesByRole(String role) async {
     final repo = ref.read(employeeRepositoryProvider);
     return repo.getEmployeesByRole(role: role);
+  }
+
+  Future<Map<String, String>> getSpaSkills() async {
+    final repo = ref.read(employeeRepositoryProvider);
+    return repo.getSpaSkills();
+  }
+
+  Future<Map<String, String>> getDeviceProficiency() async {
+    final repo = ref.read(employeeRepositoryProvider);
+    return repo.getDeviceProficiency();
   }
 }

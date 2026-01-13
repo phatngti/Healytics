@@ -4,13 +4,15 @@ import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeFormProfileSection extends StatelessWidget {
-  const EmployeeFormProfileSection({super.key});
+  final String? avatarUrl;
+
+  const EmployeeFormProfileSection({super.key, this.avatarUrl});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        EmployeeProfileImageCard(),
+        EmployeeProfileImageCard(avatarUrl: avatarUrl),
         AppDimens.verticalLarge,
         EmployeeContactInfoCard(),
       ],

@@ -1,14 +1,18 @@
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeRoleBranchSection extends StatelessWidget {
   final String role;
   final String status;
+  final bool isEditing;
 
   const EmployeeRoleBranchSection({
     super.key,
     required this.role,
     required this.status,
+    this.isEditing = false,
   });
 
   @override
@@ -26,7 +30,7 @@ class EmployeeRoleBranchSection extends StatelessWidget {
             _StatusBadge(status: status),
           ],
         ),
-        const SizedBox(height: 12),
+        AppDimens.verticalMediumSmall,
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -50,19 +54,20 @@ class _RoleBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final roleConfig = _getRoleConfig(role);
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
+    final roleConfig = _getRoleConfig(role, colorScheme, semanticColors);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(roleConfig.icon, size: 14, color: roleConfig.color),
-          const SizedBox(width: 4),
+          AppDimens.horizontalExtraSmall,
           Text(
             role.toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -76,23 +81,30 @@ class _RoleBadge extends StatelessWidget {
     );
   }
 
-  ({IconData icon, Color color}) _getRoleConfig(String role) {
+  ({IconData icon, Color color}) _getRoleConfig(
+    String role,
+    ColorScheme colorScheme,
+    SemanticColors semanticColors,
+  ) {
     try {
       final roleEnum = EmployeeRole.values.firstWhere(
         (e) => e.apiValue == role.toUpperCase(),
       );
       switch (roleEnum) {
         case EmployeeRole.doctor:
-          return (icon: Icons.medical_services, color: Colors.blue);
+          return (icon: Icons.medical_services, color: semanticColors.info!);
         case EmployeeRole.therapist:
-          return (icon: Icons.spa, color: const Color(0xFF13EC13));
+          return (icon: Icons.spa, color: semanticColors.success!);
         case EmployeeRole.receptionist:
-          return (icon: Icons.person, color: Colors.orange);
+          return (icon: Icons.person, color: semanticColors.warning!);
         case EmployeeRole.manager:
-          return (icon: Icons.admin_panel_settings, color: Colors.purple);
+          return (
+            icon: Icons.admin_panel_settings,
+            color: colorScheme.tertiary,
+          );
       }
     } catch (_) {
-      return (icon: Icons.work, color: Colors.grey);
+      return (icon: Icons.work, color: colorScheme.onSurfaceVariant);
     }
   }
 }
@@ -105,13 +117,14 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final statusConfig = _getStatusConfig(status);
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
+    final statusConfig = _getStatusConfig(status, semanticColors, colorScheme);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
@@ -140,31 +153,33 @@ class _StatusBadge extends StatelessWidget {
 
   ({String label, Color color, Color textColor}) _getStatusConfig(
     String status,
+    SemanticColors semanticColors,
+    ColorScheme colorScheme,
   ) {
     switch (status.toUpperCase()) {
       case 'ACTIVE':
         return (
           label: 'Active',
-          color: Colors.green,
-          textColor: Colors.green.shade700,
+          color: semanticColors.success!,
+          textColor: semanticColors.success!,
         );
       case 'INACTIVE':
         return (
           label: 'Inactive',
-          color: Colors.grey,
-          textColor: Colors.grey.shade700,
+          color: colorScheme.onSurfaceVariant,
+          textColor: colorScheme.onSurfaceVariant,
         );
       case 'ON_LEAVE':
         return (
           label: 'On Leave',
-          color: Colors.orange,
-          textColor: Colors.orange.shade700,
+          color: semanticColors.warning!,
+          textColor: semanticColors.warning!,
         );
       default:
         return (
           label: status,
-          color: Colors.grey,
-          textColor: Colors.grey.shade700,
+          color: colorScheme.onSurfaceVariant,
+          textColor: colorScheme.onSurfaceVariant,
         );
     }
   }

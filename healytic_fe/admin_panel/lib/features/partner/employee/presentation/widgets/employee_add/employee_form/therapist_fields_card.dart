@@ -1,13 +1,21 @@
 import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/massage_therapist_fields.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/spa_therapist_fields.dart';
+import 'package:admin_panel/utils/demensions.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 /// Form fields specific to therapists
 class TherapistFieldsCard extends StatefulWidget {
-  const TherapistFieldsCard({super.key});
+  final TherapistType? initialTherapistType;
+  final String? initialStrengthLevel;
+
+  const TherapistFieldsCard({
+    super.key,
+    this.initialTherapistType,
+    this.initialStrengthLevel,
+  });
 
   @override
   State<TherapistFieldsCard> createState() => _TherapistFieldsCardState();
@@ -15,20 +23,29 @@ class TherapistFieldsCard extends StatefulWidget {
 
 class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
   bool _isExpanded = true;
-  TherapistType _selectedTherapistType = TherapistType.massage;
+  late TherapistType _selectedTherapistType;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedTherapistType =
+        widget.initialTherapistType ?? TherapistType.massage;
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: colorScheme.shadow.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -52,20 +69,22 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: Colors.purple.shade50,
+                      color: colorScheme.tertiaryContainer,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.purple.shade100),
+                      border: Border.all(
+                        color: colorScheme.tertiary.withAlpha(75),
+                      ),
                     ),
                     child: Icon(
                       Icons.verified_outlined,
                       size: 18,
-                      color: Colors.purple.shade600,
+                      color: colorScheme.tertiary,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  AppDimens.horizontalMediumSmall,
                   Text(
                     'Skills & Services',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -84,7 +103,7 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
           ),
           // Content
           AnimatedCrossFade(
-            firstChild: _buildContent(context),
+            firstChild: _buildContent(context, formEnabled),
             secondChild: const SizedBox.shrink(),
             crossFadeState: _isExpanded
                 ? CrossFadeState.showFirst
@@ -96,11 +115,12 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, bool formEnabled) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: AppDimens.paddingAllLarge,
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
@@ -109,13 +129,10 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
         children: [
           // Therapist Type Selection
           Text(
-            'Therapist Type',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            'Therapist Type'.toUpperCase(),
+            style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          AppDimens.verticalSmall,
           Row(
             children: [
               Expanded(
@@ -124,24 +141,30 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
                   description: 'General wellness',
                   icon: Icons.spa_outlined,
                   isSelected: _selectedTherapistType == TherapistType.spa,
+                  isEnabled: formEnabled,
                   onTap: () {
-                    setState(() {
-                      _selectedTherapistType = TherapistType.spa;
-                    });
+                    if (formEnabled) {
+                      setState(() {
+                        _selectedTherapistType = TherapistType.spa;
+                      });
+                    }
                   },
                 ),
               ),
-              const SizedBox(width: 16),
+              AppDimens.horizontalMedium,
               Expanded(
                 child: _TherapistTypeOption(
                   label: TherapistType.massage.displayName,
                   description: 'Deep tissue',
                   icon: Icons.self_improvement_outlined,
                   isSelected: _selectedTherapistType == TherapistType.massage,
+                  isEnabled: formEnabled,
                   onTap: () {
-                    setState(() {
-                      _selectedTherapistType = TherapistType.massage;
-                    });
+                    if (formEnabled) {
+                      setState(() {
+                        _selectedTherapistType = TherapistType.massage;
+                      });
+                    }
                   },
                 ),
               ),
@@ -165,7 +188,9 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
           if (_selectedTherapistType == TherapistType.spa)
             const SpaTherapistFields()
           else
-            const MassageTherapistFields(),
+            MassageTherapistFields(
+              initialStrengthLevel: widget.initialStrengthLevel,
+            ),
         ],
       ),
     );
@@ -177,6 +202,7 @@ class _TherapistTypeOption extends StatelessWidget {
   final String description;
   final IconData icon;
   final bool isSelected;
+  final bool isEnabled;
   final VoidCallback onTap;
 
   const _TherapistTypeOption({
@@ -184,27 +210,34 @@ class _TherapistTypeOption extends StatelessWidget {
     required this.description,
     required this.icon,
     required this.isSelected,
+    required this.isEnabled,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Material(
-      color: Colors.transparent,
+      color: isEnabled
+          ? null
+          : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+      borderRadius: AppDimens.radiusMedium,
       child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        onTap: isEnabled ? onTap : null,
+        borderRadius: AppDimens.radiusMedium,
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: AppDimens.paddingAllMediumSmall,
           decoration: BoxDecoration(
             color: isSelected ? colorScheme.primaryContainer : null,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppDimens.radiusMedium,
             border: Border.all(
               color: isSelected
                   ? colorScheme.primary
-                  : colorScheme.outlineVariant,
+                  : (isEnabled
+                        ? colorScheme.outlineVariant
+                        : colorScheme.outlineVariant.withOpacity(0.5)),
             ),
           ),
           child: Row(
@@ -215,33 +248,37 @@ class _TherapistTypeOption extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? colorScheme.surface
-                      : Colors.grey.shade100,
+                      : (isEnabled
+                            ? colorScheme.outlineVariant
+                            : colorScheme.outlineVariant.withOpacity(0.5)),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
                   size: 18,
-                  color: isSelected ? colorScheme.primary : Colors.grey,
+                  color: isSelected ? colorScheme.primary : colorScheme.outline,
                 ),
               ),
-              const SizedBox(width: 12),
+              AppDimens.horizontalMediumSmall,
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       label,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style: textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: isSelected
-                            ? colorScheme.primary
-                            : colorScheme.onSurface,
+                        color: isEnabled
+                            ? null
+                            : colorScheme.onSurface.withOpacity(0.5),
                       ),
                     ),
                     Text(
                       description,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: isEnabled
+                            ? null
+                            : colorScheme.onSurfaceVariant.withOpacity(0.5),
                       ),
                     ),
                   ],

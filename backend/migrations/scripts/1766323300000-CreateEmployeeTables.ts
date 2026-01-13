@@ -4,15 +4,28 @@ export class CreateEmployeeTables1766323300000 implements MigrationInterface {
     name = 'CreateEmployeeTables1766323300000';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // 1. Tạo ENUM Types (PostgreSQL specific)
-        // Giúp đảm bảo data consistency ngay từ level database
-        await queryRunner.query(`CREATE TYPE "employee_role_enum" AS ENUM ('DOCTOR', 'THERAPIST', 'RECEPTIONIST', 'MANAGER')`);
-        await queryRunner.query(`CREATE TYPE "employee_status_enum" AS ENUM ('ACTIVE', 'INACTIVE', 'ON_LEAVE')`);
-        await queryRunner.query(`CREATE TYPE "therapist_level_enum" AS ENUM ('JUNIOR', 'SENIOR', 'MASTER')`);
-        await queryRunner.query(`CREATE TYPE "strength_level_enum" AS ENUM ('SOFT', 'MEDIUM', 'STRONG')`);
-        await queryRunner.query(`CREATE TYPE "gender_enum" AS ENUM ('MALE', 'FEMALE', 'OTHER')`);
+        // 1. Create ENUM Types (PostgreSQL specific) - Use IF NOT EXISTS for idempotency
+        await queryRunner.query(`DO $$ BEGIN
+            CREATE TYPE "employees_role_enum" AS ENUM ('DOCTOR', 'THERAPIST', 'RECEPTIONIST', 'MANAGER');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$;`);
+        
+        await queryRunner.query(`DO $$ BEGIN
+            CREATE TYPE "employees_status_enum" AS ENUM ('ACTIVE', 'INACTIVE', 'ON_LEAVE');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$;`);
+        
+        await queryRunner.query(`DO $$ BEGIN
+            CREATE TYPE "therapist_profiles_level_enum" AS ENUM ('JUNIOR', 'SENIOR', 'MASTER');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$;`);
+        
+        await queryRunner.query(`DO $$ BEGIN
+            CREATE TYPE "therapist_profiles_strength_level_enum" AS ENUM ('SOFT', 'MEDIUM', 'STRONG');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$;`);
+        
+        await queryRunner.query(`DO $$ BEGIN
+            CREATE TYPE "employees_gender_enum" AS ENUM ('MALE', 'FEMALE', 'OTHER');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$;`);
 
-        // 2. Tạo bảng Core: EMPLOYEES
+        // 2. Create Core Table: EMPLOYEES
         await queryRunner.createTable(new Table({
             name: "employees",
             columns: [
@@ -22,9 +35,9 @@ export class CreateEmployeeTables1766323300000 implements MigrationInterface {
                     isPrimary: true,
                     isGenerated: true,
                     generationStrategy: "uuid",
-                    default: "uuid_generate_v4()", // Yêu cầu extension "uuid-ossp"
+                    default: "uuid_generate_v4()",
                 },
-                { name: "auth_id", type: "varchar", length: "255", isUnique: true, isNullable: true }, // Link với Firebase/Auth0
+                { name: "auth_id", type: "varchar", length: "255", isUnique: true, isNullable: true },
                 { name: "employee_code", type: "varchar", length: "50", isUnique: true },
                 { name: "full_name", type: "varchar", length: "100" },
                 { name: "display_name", type: "varchar", length: "50", isNullable: true },
@@ -32,117 +45,119 @@ export class CreateEmployeeTables1766323300000 implements MigrationInterface {
                 { name: "phone", type: "varchar", length: "20", isNullable: true },
                 { name: "avatar_url", type: "text", isNullable: true },
                 { name: "dob", type: "date", isNullable: true },
-                { name: "gender", type: "gender_enum", isNullable: true },
+                { name: "gender", type: "employees_gender_enum", isNullable: true },
                 
-                // Các cột Enum quan trọng
-                { name: "role", type: "employee_role_enum" },
-                { name: "status", type: "employee_status_enum", default: "'ACTIVE'" },
+                // Enum columns
+                { name: "role", type: "employees_role_enum" },
+                { name: "status", type: "employees_status_enum", default: "'ACTIVE'" },
                 
-                // Cache fields cho performance
-                { name: "rating", type: "decimal", precision: 3, scale: 2, default: 0 }, // VD: 4.85
+                // Cache fields for performance
+                { name: "rating", type: "decimal", precision: 3, scale: 2, default: 0 },
                 { name: "review_count", type: "int", default: 0 },
                 
-                // Foreign Keys placeholders (Giả sử bảng branches đã tồn tại)
+                // Foreign Keys
                 { name: "branch_id", type: "uuid", isNullable: true },
                 
-                // Timestamps
-                { name: "created_at", type: "timestamp", default: "now()" },
-                { name: "updated_at", type: "timestamp", default: "now()" },
+                // Audit timestamps with timezone (Enterprise Standard)
+                { name: "created_at", type: "timestamptz", default: "now()" },
+                { name: "updated_at", type: "timestamptz", default: "now()" },
+                { name: "deleted_at", type: "timestamptz", isNullable: true },
             ]
         }), true);
 
-        // Tạo Index cho employees để search nhanh
-        await queryRunner.createIndex("employees", new TableIndex({ columnNames: ["email"] }));
-        await queryRunner.createIndex("employees", new TableIndex({ columnNames: ["phone"] }));
-        await queryRunner.createIndex("employees", new TableIndex({ columnNames: ["employee_code"] }));
+        // Create indexes for employees (search optimization + FK indexing)
+        await queryRunner.createIndex("employees", new TableIndex({
+            name: "IDX_EMPLOYEES_EMAIL",
+            columnNames: ["email"]
+        }));
+        await queryRunner.createIndex("employees", new TableIndex({
+            name: "IDX_EMPLOYEES_PHONE",
+            columnNames: ["phone"]
+        }));
+        await queryRunner.createIndex("employees", new TableIndex({
+            name: "IDX_EMPLOYEES_CODE",
+            columnNames: ["employee_code"]
+        }));
+        await queryRunner.createIndex("employees", new TableIndex({
+            name: "IDX_EMPLOYEES_BRANCH_ID",
+            columnNames: ["branch_id"]
+        }));
 
-
-        // 3. Tạo bảng Extension: DOCTOR_PROFILES
+        // 3. Create Extension Table: DOCTOR_PROFILES
         await queryRunner.createTable(new Table({
             name: "doctor_profiles",
             columns: [
-                { name: "employee_id", type: "uuid", isPrimary: true }, // PK cũng là FK
-                { name: "title", type: "varchar", length: "100", isNullable: true }, // VD: Thạc sĩ, BS CKI
-                { name: "medical_license", type: "varchar", length: "50", isUnique: true }, // Cực kỳ quan trọng
+                { name: "employee_id", type: "uuid", isPrimary: true },
+                { name: "title", type: "varchar", length: "100", isNullable: true },
+                { name: "medical_license", type: "varchar", length: "50", isUnique: true },
                 { name: "experience_years", type: "int", default: 0 },
                 { name: "consultation_fee", type: "decimal", precision: 15, scale: 2, default: 0 },
                 
-                // JSONB columns cho dữ liệu phức tạp
-                { name: "specializations", type: "jsonb", isNullable: true }, // ['Acne', 'Laser']
-                { name: "education", type: "jsonb", isNullable: true }, // [{school: '...', degree: '...'}]
-                { name: "certifications", type: "jsonb", isNullable: true }, // Các chứng chỉ phụ
+                // JSONB columns for complex data
+                { name: "specializations", type: "jsonb", isNullable: true },
+                { name: "education", type: "jsonb", isNullable: true },
+                { name: "certifications", type: "jsonb", isNullable: true },
             ]
         }), true);
 
-        // FK cho Doctor Profile -> Employees
+        // FK for Doctor Profile -> Employees
         await queryRunner.createForeignKey("doctor_profiles", new TableForeignKey({
-            columnNames: ["employee_id"],
-            referencedColumnNames: ["id"],
-            referencedTableName: "employees",
-            onDelete: "CASCADE" // Xóa Employee thì xóa luôn Profile bác sĩ
-        }));
-
-
-        // 4. Tạo bảng Extension: THERAPIST_PROFILES
-        await queryRunner.createTable(new Table({
-            name: "therapist_profiles",
-            columns: [
-                { name: "employee_id", type: "uuid", isPrimary: true },
-                { name: "level", type: "therapist_level_enum", default: "'JUNIOR'" },
-                { name: "type", type: "varchar", length: "50", isNullable: true }, // SPA vs MASSAGE
-                { name: "strength_level", type: "strength_level_enum", isNullable: true }, // Quan trọng cho massage
-                { name: "commission_rate", type: "decimal", precision: 5, scale: 2, default: 0 }, // % hoa hồng
-                { name: "health_check_date", type: "date", isNullable: true },
-                
-                // JSONB column
-                { name: "skills", type: "jsonb", isNullable: true }, // ['Thai Massage', 'Shiatsu']
-            ]
-        }), true);
-
-        // FK cho Therapist Profile -> Employees
-        await queryRunner.createForeignKey("therapist_profiles", new TableForeignKey({
+            name: "FK_DOCTOR_PROFILES_EMPLOYEE_ID",
             columnNames: ["employee_id"],
             referencedColumnNames: ["id"],
             referencedTableName: "employees",
             onDelete: "CASCADE"
         }));
 
+        // 4. Create Extension Table: THERAPIST_PROFILES
+        await queryRunner.createTable(new Table({
+            name: "therapist_profiles",
+            columns: [
+                { name: "employee_id", type: "uuid", isPrimary: true },
+                { name: "level", type: "therapist_profiles_level_enum", default: "'JUNIOR'" },
+                { name: "type", type: "varchar", length: "50", isNullable: true },
+                { name: "strength_level", type: "therapist_profiles_strength_level_enum", isNullable: true },
+                { name: "commission_rate", type: "decimal", precision: 5, scale: 2, default: 0 },
+                { name: "health_check_date", type: "date", isNullable: true },
+                
+                // JSONB column
+                { name: "skills", type: "jsonb", isNullable: true },
+            ]
+        }), true);
 
-        // NOTE: Bạn cần thêm FK tới bảng `branches` và `services` nếu các bảng đó đã tồn tại
-        // Ví dụ:
-        /*
-        await queryRunner.createForeignKey("employees", new TableForeignKey({
-            columnNames: ["branch_id"],
+        // FK for Therapist Profile -> Employees
+        await queryRunner.createForeignKey("therapist_profiles", new TableForeignKey({
+            name: "FK_THERAPIST_PROFILES_EMPLOYEE_ID",
+            columnNames: ["employee_id"],
             referencedColumnNames: ["id"],
-            referencedTableName: "branches",
-            onDelete: "SET NULL"
+            referencedTableName: "employees",
+            onDelete: "CASCADE"
         }));
-        */
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        // Xóa theo thứ tự ngược lại để tránh lỗi ràng buộc khóa ngoại (Foreign Key constraints)
+        // Drop in reverse order to avoid FK constraint errors
         
-        // 1. Xóa bảng employee_services
-        // employee_services moved to Product/Service migration
-        
-        // 2. Xóa bảng therapist_profiles
-        const tableTherapist = await queryRunner.getTable("therapist_profiles");
-        if (tableTherapist) await queryRunner.dropTable("therapist_profiles");
+        // 1. Drop therapist_profiles
+        await queryRunner.dropForeignKey("therapist_profiles", "FK_THERAPIST_PROFILES_EMPLOYEE_ID");
+        await queryRunner.dropTable("therapist_profiles", true);
 
-        // 3. Xóa bảng doctor_profiles
-        const tableDoctor = await queryRunner.getTable("doctor_profiles");
-        if (tableDoctor) await queryRunner.dropTable("doctor_profiles");
+        // 2. Drop doctor_profiles
+        await queryRunner.dropForeignKey("doctor_profiles", "FK_DOCTOR_PROFILES_EMPLOYEE_ID");
+        await queryRunner.dropTable("doctor_profiles", true);
 
-        // 4. Xóa bảng employees
-        // (Tự động xóa FKs liên quan nếu dropTable)
-        await queryRunner.dropTable("employees");
+        // 3. Drop employees indexes and table
+        await queryRunner.dropIndex("employees", "IDX_EMPLOYEES_BRANCH_ID");
+        await queryRunner.dropIndex("employees", "IDX_EMPLOYEES_CODE");
+        await queryRunner.dropIndex("employees", "IDX_EMPLOYEES_PHONE");
+        await queryRunner.dropIndex("employees", "IDX_EMPLOYEES_EMAIL");
+        await queryRunner.dropTable("employees", true);
 
-        // 5. Xóa Enums
-        await queryRunner.query(`DROP TYPE "gender_enum"`);
-        await queryRunner.query(`DROP TYPE "strength_level_enum"`);
-        await queryRunner.query(`DROP TYPE "therapist_level_enum"`);
-        await queryRunner.query(`DROP TYPE "employee_status_enum"`);
-        await queryRunner.query(`DROP TYPE "employee_role_enum"`);
+        // 4. Drop Enums
+        await queryRunner.query(`DROP TYPE IF EXISTS "employees_gender_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "therapist_profiles_strength_level_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "therapist_profiles_level_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "employees_status_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "employees_role_enum"`);
     }
 }

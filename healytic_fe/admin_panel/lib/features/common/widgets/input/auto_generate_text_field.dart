@@ -39,6 +39,8 @@ class _AppAutoGenerateTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
+    final isEnabled = enabled && formEnabled;
 
     return SizedBox(
       width: width,
@@ -49,6 +51,7 @@ class _AppAutoGenerateTextField extends StatelessWidget {
         name: fieldKey,
         initialValue: controller?.text ?? initialValue,
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        enabled: isEnabled,
         builder: (FormFieldState<String> field) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +85,7 @@ class _AppAutoGenerateTextField extends StatelessWidget {
                 ),
               TextFormField(
                 controller: controller,
-                enabled: enabled,
+                enabled: isEnabled,
                 initialValue: controller != null ? null : field.value,
                 decoration: InputDecoration(
                   hintText: hintText,
@@ -90,7 +93,7 @@ class _AppAutoGenerateTextField extends StatelessWidget {
                     color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                   ),
                   filled: true,
-                  fillColor: enabled
+                  fillColor: isEnabled
                       ? colorScheme.surface
                       : colorScheme.surfaceContainerHighest,
                   errorText: field.errorText,
@@ -104,7 +107,9 @@ class _AppAutoGenerateTextField extends StatelessWidget {
                   ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.outlineVariant),
+                    borderSide: BorderSide(
+                      color: colorScheme.outlineVariant.withAlpha(100),
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -117,18 +122,23 @@ class _AppAutoGenerateTextField extends StatelessWidget {
                   suffixIcon: Container(
                     margin: const EdgeInsets.fromLTRB(0, 4, 4, 4),
                     child: AppButton(
-                      onPressed: () {
-                        onGenerate();
-                        // Update the form field value after generation
-                        if (controller != null) {
-                          field.didChange(controller!.text);
-                        }
-                      },
+                      onPressed: isEnabled
+                          ? () {
+                              onGenerate();
+                              // Update the form field value after generation
+                              if (controller != null) {
+                                field.didChange(controller!.text);
+                              }
+                            }
+                          : null,
                       buttonType: ButtonType.text,
                       customStyle: TextButton.styleFrom(
-                        foregroundColor: colorScheme.onSurfaceVariant,
-                        backgroundColor: colorScheme.surfaceContainerHighest
-                            .withAlpha(50),
+                        foregroundColor: isEnabled
+                            ? colorScheme.onSurfaceVariant
+                            : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                        backgroundColor: isEnabled
+                            ? colorScheme.surfaceContainerHighest.withAlpha(50)
+                            : colorScheme.surfaceContainerHighest.withAlpha(20),
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6),

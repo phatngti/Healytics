@@ -18,6 +18,7 @@ class FlutterQuillEditor extends StatefulWidget {
     this.borderColor,
     this.borderWidth = 1.0,
     this.borderRadius = 8.0,
+    this.readOnly = false,
   });
 
   final List<Map<String, Object>>? initialContent;
@@ -27,6 +28,7 @@ class FlutterQuillEditor extends StatefulWidget {
   final Color? borderColor;
   final double borderWidth;
   final double borderRadius;
+  final bool readOnly;
 
   @override
   State<FlutterQuillEditor> createState() => _FlutterQuillEditorState();
@@ -44,6 +46,7 @@ class _FlutterQuillEditorState extends State<FlutterQuillEditor> {
           ]
         : widget.initialContent!;
     _controller.document = Document.fromJson(content);
+    _controller.readOnly = widget.readOnly;
 
     // Listen to document changes and notify parent
     _controller.document.changes.listen((event) {
@@ -52,6 +55,14 @@ class _FlutterQuillEditorState extends State<FlutterQuillEditor> {
         widget.onChanged!(delta);
       }
     });
+  }
+
+  @override
+  void didUpdateWidget(FlutterQuillEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.readOnly != oldWidget.readOnly) {
+      _controller.readOnly = widget.readOnly;
+    }
   }
 
   final QuillController _controller = () {
@@ -120,15 +131,16 @@ class _FlutterQuillEditorState extends State<FlutterQuillEditor> {
         borderRadius: BorderRadius.circular(widget.borderRadius),
         child: Column(
           children: [
-            QuillSimpleToolbar(
-              controller: _controller,
-              config: QuillSimpleToolbarConfig(
-                embedButtons: FlutterQuillEmbeds.toolbarButtons(),
-                showClipboardPaste: true,
-                showSmallButton: true,
-                multiRowsDisplay: false,
+            if (!widget.readOnly)
+              QuillSimpleToolbar(
+                controller: _controller,
+                config: QuillSimpleToolbarConfig(
+                  embedButtons: FlutterQuillEmbeds.toolbarButtons(),
+                  showClipboardPaste: true,
+                  showSmallButton: true,
+                  multiRowsDisplay: false,
+                ),
               ),
-            ),
             Expanded(
               child: QuillEditor(
                 focusNode: _editorFocusNode,

@@ -262,7 +262,7 @@ class _ProductEditDesktopState extends ConsumerState<ProductEditDesktop> {
                                       ),
                                 ),
                                 AppDimens.verticalSmall,
-                                FormFieldBuilders.buildCustomSelectionField(
+                                FormFieldBuilders.buildCustomDropdownField(
                                   context,
                                   initialValue:
                                       widget.statusController.text.isEmpty
@@ -318,7 +318,7 @@ class _ProductEditDesktopState extends ConsumerState<ProductEditDesktop> {
                                       ),
                                 ),
                                 AppDimens.verticalSmall,
-                                FormFieldBuilders.buildCustomSelectionField(
+                                FormFieldBuilders.buildCustomDropdownField(
                                   context,
                                   initialValue:
                                       widget.categoryController.text.isEmpty

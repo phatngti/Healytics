@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'dart:convert';
+import 'package:admin_panel/features/common/widgets/quill.dart';
 
 part 'auto_generate_text_field.dart';
 part 'date_pick_field.dart';
 part 'multi_select_chip_field.dart';
 part 'selection_field.dart';
 part 'text_field.dart';
+part 'multi_select_popover_field.dart';
+part 'quill_editor_field.dart';
 
 /// Utility class containing reusable form field builders.
 /// These methods can be used across multiple widgets to build consistent form fields.
@@ -169,10 +173,12 @@ class FormFieldBuilders {
     required String label,
     String? hintText,
     String? fieldKey,
+    bool enabled = true,
   }) {
     return _AppDatePickField(
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
+      enabled: enabled,
       labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
         fontWeight: FontWeight.bold,
         letterSpacing: 0.5,
@@ -266,7 +272,7 @@ class FormFieldBuilders {
   /// [items] - The list of dropdown items to display.
   /// [fieldKey] - Optional custom field key. If not provided, it will be generated from label.
   /// [onChanged] - Optional callback when selection changes.
-  static Widget buildCustomSelectionField<T>(
+  static Widget buildCustomDropdownField<T>(
     BuildContext context, {
     required String label,
     required List<DropdownMenuItem<T>> items,
@@ -349,8 +355,9 @@ class FormFieldBuilders {
     double? height,
     bool isRequired = false,
     TextStyle? labelStyle,
+    bool enabled = true,
   }) {
-    return _AppMultiSelectChipField(
+    return _AppMultiSelectChipField<String>(
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
       labelStyle:
@@ -372,6 +379,7 @@ class FormFieldBuilders {
       width: width,
       height: height,
       isRequired: isRequired,
+      enabled: enabled,
     );
   }
 
@@ -390,6 +398,7 @@ class FormFieldBuilders {
     VoidCallback? onTap,
     Widget? trailing,
     String emptyPlaceholder = 'Select...',
+    bool enabled = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -406,12 +415,14 @@ class FormFieldBuilders {
         ),
         const SizedBox(height: 6),
         InkWell(
-          onTap: onTap,
+          onTap: enabled ? onTap : null,
           borderRadius: BorderRadius.circular(8),
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: colorScheme.surface,
+              color: enabled
+                  ? colorScheme.surface
+                  : colorScheme.surfaceContainerHighest.withOpacity(0.3),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: colorScheme.outlineVariant),
               boxShadow: [
@@ -440,6 +451,66 @@ class FormFieldBuilders {
           ),
         ),
       ],
+    );
+  }
+
+  /// Builds a multi-select popover field.
+  ///
+  /// [context] - The build context.
+  /// [label] - The label text.
+  /// [items] - The items to select from (map of value to display string).
+  /// [fieldKey] - The form field key.
+  /// [initialValue] - Initial selected values.
+  /// [width] - Width of the field.
+  /// [height] - Height of the field.
+  static Widget buildMultiSelectPopoverField<T>(
+    BuildContext context, {
+    required String label,
+    required Map<T, String> items,
+    String? fieldKey,
+    List<T>? initialValue,
+    ValueChanged<List<T>>? onChanged,
+    String? Function(List<T>?)? validator,
+    String searchHint = 'Search...',
+    String? helperText,
+    bool isRequired = false,
+    double? width,
+    double? height,
+    bool enabled = true,
+  }) {
+    return MultiSelectPickerField<T>(
+      label: label,
+      items: items,
+      initialValue: initialValue,
+      onChanged: onChanged,
+      validator: validator,
+      searchHint: searchHint,
+      helperText: helperText,
+      isRequired: isRequired,
+      width: width,
+      height: height,
+      enabled: enabled,
+    );
+  }
+
+  static Widget buildQuillEditor(
+    BuildContext context, {
+    required String label,
+    String? fieldKey,
+    String? initialValue,
+    bool readOnly = false,
+    double height = 250,
+    TextStyle? labelStyle,
+    bool enabled = true,
+  }) {
+    return _AppQuillEditorField(
+      name: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
+      label: label.toUpperCase(),
+      initialValue: initialValue,
+      readOnly: readOnly,
+      height: height,
+      labelStyle: labelStyle,
+      enabled: enabled,
     );
   }
 }

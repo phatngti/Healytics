@@ -1,3 +1,4 @@
+import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
@@ -5,11 +6,15 @@ import '../employee_badges_strength.dart';
 import '../employee_skill_cloud.dart';
 
 class EmployeeSkillsCard extends StatelessWidget {
-  const EmployeeSkillsCard({super.key});
+  final bool isEditing;
+
+  const EmployeeSkillsCard({super.key, this.isEditing = false});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Container(
       decoration: BoxDecoration(
@@ -18,7 +23,7 @@ class EmployeeSkillsCard extends StatelessWidget {
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: colorScheme.shadow.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -32,7 +37,7 @@ class EmployeeSkillsCard extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  colorScheme.surfaceContainerHighest.withAlpha(4),
+                  colorScheme.surfaceContainerHighest.withAlpha(100),
                   colorScheme.surface,
                 ],
               ),
@@ -45,14 +50,11 @@ class EmployeeSkillsCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.psychology,
-                      color: Colors.green.shade700.withAlpha(4),
-                    ),
-                    const SizedBox(width: 8),
+                    Icon(Icons.psychology, color: semanticColors.success),
+                    AppDimens.horizontalSmall,
                     Text(
                       'Therapy Skills & Attributes',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -64,9 +66,13 @@ class EmployeeSkillsCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.green.shade100),
+                    color: semanticColors.success?.withAlpha(25),
+                    borderRadius: AppDimens.radiusLarge,
+                    border: Border.all(
+                      color:
+                          semanticColors.success?.withAlpha(75) ??
+                          colorScheme.outlineVariant,
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -74,13 +80,13 @@ class EmployeeSkillsCard extends StatelessWidget {
                       Icon(
                         Icons.verified_user,
                         size: 18,
-                        color: Colors.green.shade600.withAlpha(4),
+                        color: semanticColors.success,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         'Health Check Verified: Oct 24, 2023',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Colors.green.shade800,
+                        style: textTheme.labelSmall?.copyWith(
+                          color: semanticColors.success,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -91,11 +97,11 @@ class EmployeeSkillsCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: AppDimens.paddingAllLarge,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Expanded(child: EmployeeBadgesStrength()),
+                Expanded(child: EmployeeBadgesStrength(isEditing: isEditing)),
                 Container(
                   width: 1,
                   height: 150,
@@ -109,7 +115,7 @@ class EmployeeSkillsCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Expanded(child: EmployeeSkillCloud()),
+                Expanded(child: EmployeeSkillCloud(isEditing: isEditing)),
               ],
             ),
           ),

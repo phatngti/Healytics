@@ -1,8 +1,17 @@
 import 'package:admin_panel/features/common/widgets/button/button.dart';
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeStatsActionsSection extends StatelessWidget {
-  const EmployeeStatsActionsSection({super.key});
+  final bool isEditing;
+  final VoidCallback? onEdit;
+
+  const EmployeeStatsActionsSection({
+    super.key,
+    this.isEditing = false,
+    this.onEdit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,20 +43,24 @@ class EmployeeStatsActionsSection extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    AppDimens.horizontalExtraSmall,
                     Row(
                       children: List.generate(5, (index) {
                         if (index < 4) {
-                          return const Icon(
+                          return Icon(
                             Icons.star,
                             size: 18,
-                            color: Colors.amber,
+                            color: Theme.of(
+                              context,
+                            ).extension<SemanticColors>()!.warning,
                           );
                         } else {
-                          return const Icon(
+                          return Icon(
                             Icons.star_half,
                             size: 18,
-                            color: Colors.amber,
+                            color: Theme.of(
+                              context,
+                            ).extension<SemanticColors>()!.warning,
                           );
                         }
                       }),
@@ -84,23 +97,31 @@ class EmployeeStatsActionsSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        AppDimens.verticalMedium,
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             AppButton(
-              onPressed: () {},
+              onPressed: onEdit,
               buttonType: ButtonType.outline,
               child: const Text('Edit Profile'),
             ),
-            const SizedBox(width: 12),
+            AppDimens.horizontalMediumSmall,
             AppButton(
               onPressed: () {},
               buttonType: ButtonType.elevated,
               customStyle: OutlinedButton.styleFrom(
-                backgroundColor: Colors.red.shade50,
-                foregroundColor: Colors.red.shade700,
-                side: BorderSide(color: Colors.red.shade200),
+                backgroundColor: Theme.of(
+                  context,
+                ).extension<SemanticColors>()!.error!.withAlpha(25),
+                foregroundColor: Theme.of(
+                  context,
+                ).extension<SemanticColors>()!.error,
+                side: BorderSide(
+                  color: Theme.of(
+                    context,
+                  ).extension<SemanticColors>()!.error!.withAlpha(50),
+                ),
               ),
               child: const Text('Deactivate'),
             ),

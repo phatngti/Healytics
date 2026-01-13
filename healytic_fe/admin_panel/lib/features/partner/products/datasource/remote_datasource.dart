@@ -1,5 +1,6 @@
 import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
+import 'package:admin_panel/features/partner/products/datasource/data/product_mock_data.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 
@@ -110,16 +111,6 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   Future<Product> createProduct(CreateProductRequest request) async {
     final typeEnum = _mapProductType(request.productType);
 
-    CreatePhysicalDetailsDto? physicalDetails;
-    if (typeEnum == CreateProductDtoTypeEnum.physical) {
-      physicalDetails = CreatePhysicalDetailsDto(
-        sku: request.sku,
-        barcode: request.barcode,
-        stockQuantity: request.stockQuantity,
-        costPerItem: request.costPerItem,
-      );
-    }
-
     CreateServiceDefinitionDto? serviceDefinition;
     if (typeEnum == CreateProductDtoTypeEnum.service) {
       serviceDefinition = CreateServiceDefinitionDto(
@@ -141,9 +132,8 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       salePrice: request.salePrice,
       status: _mapStatus(request.status),
       isVisibleOnline: request.onlineStore,
-      vendorName: request.vendor,
       employeeIds: request.staffIds,
-      physicalDetails: physicalDetails,
+
       serviceDefinition: serviceDefinition,
       media: request.images.asMap().entries.map((entry) {
         return CreateProductMediaDto(
@@ -214,7 +204,6 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
         slug: category?['slug']?.toString() ?? '',
       ),
       onlineStore: json['isVisibleOnline'] as bool? ?? false,
-      vendor: json['vendorName']?.toString(),
       images:
           (json['media'] as List<dynamic>?)
               ?.map((m) => m['url']?.toString() ?? '')
@@ -223,9 +212,6 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           [],
 
       // Physical details
-      sku: physical?['sku']?.toString(),
-      barcode: physical?['barcode']?.toString(),
-      stockQuantity: int.tryParse(physical?['stockQuantity']?.toString() ?? ''),
       costPerItem: double.tryParse(physical?['costPerItem']?.toString() ?? ''),
 
       // Service details
@@ -298,11 +284,7 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
           slug: 'category-${index % 5}',
         ),
         onlineStore: true,
-        vendor: 'Mock Vendor',
         images: ['https://picsum.photos/200/300?random=${startingAt + index}'],
-        sku: index % 2 != 0 ? 'SKU-${startingAt + index}' : null,
-        barcode: index % 2 != 0 ? 'BAR-${startingAt + index}' : null,
-        stockQuantity: index % 2 != 0 ? 100 : null,
         costPerItem: index % 2 != 0 ? 50.0 : null,
         duration: index % 2 == 0 ? 60 : null,
         buffer: index % 2 == 0 ? 15 : null,
@@ -322,28 +304,16 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
   @override
   Future<Product> getProductById(ProductId id) async {
     await Future.delayed(const Duration(seconds: 1));
-    return Product(
-      id: id,
-      name: 'Mock Product ${id.value}',
-      description: 'Detail description for mock product ${id.value}',
-      basePrice: 199.99,
-      salePrice: 149.99,
-      productType: 'service',
-      status: 'active',
-      category: const CategoryEntity(
-        id: 'cat-1',
-        name: 'Mock Category',
-        slug: 'mock-category',
-      ),
-      onlineStore: true,
-      vendor: 'Mock Vendor',
-      images: ['https://picsum.photos/200/300'],
-      duration: 60,
-      buffer: 15,
-      capacity: 1,
-      leadTime: 24,
-      staffAllocation: 'any',
-    );
+
+    // Return matching mock product or a default one
+    final product = productMockData[id.value] ?? productMockDefault;
+
+    // Ensure ID matches requested ID if falling back to default
+    if (product.id != id) {
+      return product.copyWith(id: id);
+    }
+
+    return product;
   }
 
   @override
@@ -363,11 +333,7 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
         slug: 'new-category',
       ),
       onlineStore: request.onlineStore,
-      vendor: request.vendor,
       images: request.images,
-      sku: request.sku,
-      barcode: request.barcode,
-      stockQuantity: request.stockQuantity,
       costPerItem: request.costPerItem,
       duration: request.duration,
       buffer: request.buffer,

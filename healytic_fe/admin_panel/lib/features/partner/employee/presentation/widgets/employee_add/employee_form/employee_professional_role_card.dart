@@ -1,7 +1,9 @@
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
-
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/role_toggle_selector.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:uuid/uuid.dart';
@@ -9,11 +11,15 @@ import 'package:uuid/uuid.dart';
 class EmployeeProfessionalRoleCard extends StatefulWidget {
   final ValueChanged<EmployeeRole>? onRoleChanged;
   final EmployeeRole initialRole;
+  final bool readOnly;
+  final EmployeeEntity? employee;
 
   const EmployeeProfessionalRoleCard({
     super.key,
     this.onRoleChanged,
     this.initialRole = EmployeeRole.therapist,
+    this.readOnly = false,
+    this.employee,
   });
 
   @override
@@ -67,6 +73,8 @@ class _EmployeeProfessionalRoleCardState
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
+    final isReadOnly = widget.readOnly || !formEnabled;
 
     return Container(
       decoration: BoxDecoration(
@@ -75,7 +83,7 @@ class _EmployeeProfessionalRoleCardState
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: colorScheme.shadow.withAlpha(4),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -99,17 +107,25 @@ class _EmployeeProfessionalRoleCardState
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
+                      color: Theme.of(
+                        context,
+                      ).extension<SemanticColors>()!.info!.withAlpha(25),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.blue.shade100),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).extension<SemanticColors>()!.info!.withAlpha(50),
+                      ),
                     ),
                     child: Icon(
                       Icons.badge_outlined,
                       size: 18,
-                      color: Colors.blue.shade600,
+                      color: Theme.of(
+                        context,
+                      ).extension<SemanticColors>()!.info,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  AppDimens.horizontalMediumSmall,
                   Text(
                     'Professional Role',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -131,7 +147,7 @@ class _EmployeeProfessionalRoleCardState
           ),
           // Content
           AnimatedCrossFade(
-            firstChild: _buildContent(context),
+            firstChild: _buildContent(context, isReadOnly),
             secondChild: const SizedBox.shrink(),
             crossFadeState: _isExpanded
                 ? CrossFadeState.showFirst
@@ -143,9 +159,9 @@ class _EmployeeProfessionalRoleCardState
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, bool isReadOnly) {
     final colorScheme = Theme.of(context).colorScheme;
-
+    print('description: ${widget.employee?.description}');
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -163,9 +179,12 @@ class _EmployeeProfessionalRoleCardState
             ),
           ),
           const SizedBox(height: 8),
-          RoleToggleSelector(
-            selectedRole: _selectedRole,
-            onRoleChanged: _handleRoleChanged,
+          IgnorePointer(
+            ignoring: isReadOnly,
+            child: RoleToggleSelector(
+              selectedRole: _selectedRole,
+              onRoleChanged: _handleRoleChanged,
+            ),
           ),
           // Hidden field to store role in form
           FormBuilderField<String>(
@@ -198,13 +217,15 @@ class _EmployeeProfessionalRoleCardState
                   controller: _jobTitleController,
                 ),
               ),
-              const SizedBox(width: 24),
+              AppDimens.horizontalLarge,
               Expanded(
                 child: FormFieldBuilders.buildAutoGenerateTextField(
                   context,
                   label: 'Employee ID',
                   controller: _employeeIdController,
                   onGenerate: () {
+                    // Prevent generation in read only mode
+                    if (isReadOnly) return;
                     setState(() {
                       _employeeIdController.text = const Uuid()
                           .v4()
@@ -216,7 +237,7 @@ class _EmployeeProfessionalRoleCardState
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          AppDimens.verticalLarge,
           Row(
             children: [
               Expanded(
@@ -224,9 +245,10 @@ class _EmployeeProfessionalRoleCardState
                   context,
                   label: 'Employment Type',
                   items: ['Full-Time', 'Part-Time', 'Contractor', 'Seasonal'],
+                  initialValue: 'Full-Time',
                 ),
               ),
-              const SizedBox(width: 24),
+              AppDimens.horizontalLarge,
               Expanded(
                 child: FormFieldBuilders.buildDateField(
                   context,
@@ -236,6 +258,15 @@ class _EmployeeProfessionalRoleCardState
                 ),
               ),
             ],
+          ),
+          AppDimens.verticalLarge,
+          // Description (Quill Editor)
+          FormFieldBuilders.buildQuillEditor(
+            context,
+            label: 'Description'.toUpperCase(),
+            fieldKey: 'description',
+            readOnly: isReadOnly,
+            initialValue: widget.employee?.description,
           ),
         ],
       ),
