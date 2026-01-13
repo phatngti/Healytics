@@ -25,7 +25,7 @@ export class ServiceDefinition {
   @Column({ name: 'min_lead_time_hours', type: 'int', default: 0 })
   minLeadTimeHours: number;
 
-  @Column({ name: 'staff_assignment_type', length: 20, default: StaffAssignmentType.ANY })
+  @Column({ name: 'staff_assignment_type', type: 'varchar', length: 20, default: StaffAssignmentType.ANY })
   staffAssignmentType: StaffAssignmentType;
 
   // Relations

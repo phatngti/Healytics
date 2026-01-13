@@ -194,8 +194,6 @@ class ApiClient {
           return CreateDoctorDto.fromJson(value);
         case 'CreateDoctorProfileDto':
           return CreateDoctorProfileDto.fromJson(value);
-        case 'CreatePhysicalDetailsDto':
-          return CreatePhysicalDetailsDto.fromJson(value);
         case 'CreateProductDto':
           return CreateProductDto.fromJson(value);
         case 'CreateProductMediaDto':

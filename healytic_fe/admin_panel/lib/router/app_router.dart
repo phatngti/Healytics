@@ -1,11 +1,11 @@
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/utils/user_role_helper.dart';
 import 'package:admin_panel/router/partner_routes.dart' as partner;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:admin_panel/router/admin_routes.dart' as admin;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 
 part 'app_router.g.dart';
 
@@ -26,6 +26,11 @@ final List<Map<String, dynamic>> providerSlideMenuItems = [
     "label": 'Employee',
     "route": partner.EmployeeHomeRoute().location,
   },
+  {
+    "icon": Icons.tag,
+    "label": 'Service Tags',
+    "route": partner.ServiceTagsHomeRoute().location,
+  },
 ];
 
 final List<Map<String, dynamic>> adminSlideMenuItems = [
@@ -33,6 +38,11 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
     "icon": Icons.admin_panel_settings_outlined,
     "label": 'Dashboard',
     "route": admin.AdminDashboardRoute().location,
+  },
+  {
+    "icon": Icons.production_quantity_limits_outlined,
+    "label": 'Category',
+    "route": admin.CategoryHomeRoute().location,
   },
   {
     "icon": Icons.production_quantity_limits_outlined,
@@ -44,13 +54,14 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
 @riverpod
 GoRouter router(Ref ref) {
   final notifier = ref.watch(routerListenableProvider.notifier);
-  String initialLocation = '/provider/dashboard'; // Rõ ràng và an toàn hơn
+  String initialLocation =
+      Store.get(StoreKey.mockRole, 'provider') == 'provider'
+      ? '/provider/dashboard'
+      : '/admin/dashboard';
 
   String? redirect(BuildContext context, GoRouterState state) {
-    final isLoggedIn = Store.get(StoreKey.accessToken, "").isNotEmpty;
-    final role = isLoggedIn
-        ? JwtDecoder.decode(Store.get(StoreKey.accessToken, ""))['role']
-        : "";
+    final isLoggedIn = UserRoleHelper.isLoggedIn();
+    final role = UserRoleHelper.getRole();
     final path = state.uri.path;
 
     final isPublicRoute =

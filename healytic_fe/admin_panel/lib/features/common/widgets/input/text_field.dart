@@ -69,6 +69,9 @@ class _AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
+    final isEnabled = enabled && formEnabled;
+
     return SizedBox(
       width: width,
       height: height,
@@ -78,6 +81,7 @@ class _AppTextField extends StatelessWidget {
         name: fieldKey,
         initialValue: controller != null ? controller!.text : initialValue,
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        enabled: isEnabled,
         onChanged: onChanged,
         builder: (FormFieldState<dynamic> field) {
           return Column(
@@ -124,7 +128,7 @@ class _AppTextField extends StatelessWidget {
                 readOnly: readOnly, // Pass readOnly
                 onTap: onTap, // Pass onTap
                 // --- FIX 1: Logic Enable/Disable ---
-                enabled: enabled, // Chặn tương tác người dùng
+                enabled: isEnabled, // Chặn tương tác người dùng
                 decoration: InputDecoration(
                   isDense: true,
                   contentPadding:
@@ -141,7 +145,7 @@ class _AppTextField extends StatelessWidget {
                   ),
                   // --- FIX 2: Visual Feedback (Đổi màu nền khi disable) ---
                   filled: true, // Bắt buộc phải có để hiển thị fillColor
-                  fillColor: enabled
+                  fillColor: isEnabled
                       ? Theme.of(context).colorScheme.surface
                       : Theme.of(context).colorScheme.surfaceContainerHighest,
 
@@ -202,7 +206,7 @@ class _AppTextField extends StatelessWidget {
                   }
                 },
                 onTapOutside: (_) {
-                  if (enabled) {
+                  if (isEnabled) {
                     field.validate();
                     FocusScope.of(context).unfocus();
                   }

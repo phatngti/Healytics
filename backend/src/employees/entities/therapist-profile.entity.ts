@@ -41,6 +41,12 @@ export class TherapistProfile {
   @Column({ type: 'jsonb', nullable: true })
   skills: string[];
 
+  @Column({ name: 'device_proficiency', type: 'jsonb', nullable: true })
+  deviceProficiency: string[];
+
+  @Column({ name: 'license_url', type: 'text', nullable: true })
+  licenseUrl: string;
+
   @OneToOne(() => Employee, (employee) => employee.therapistProfile, {
     onDelete: 'CASCADE',
   })

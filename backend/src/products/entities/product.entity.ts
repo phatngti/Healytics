@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -15,7 +16,7 @@ import { Category } from '@/categories/entities/category.entity';
 import { ProductMedia } from './product-media.entity';
 import { ProductStatus } from '../enums/product-status.enum';
 import { ServiceDefinition } from './service-definition.entity';
-import { ProductPhysicalDetails } from './product-physical-details.entity';
+
 import { ServiceEmployeeEligibility } from './service-employee-eligibility.entity';
 
 @Entity('products')
@@ -61,11 +62,14 @@ export class Product {
   @Column({ type: 'varchar', name: 'vendor_name', length: 100, nullable: true })
   vendorName: string | null;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz' })
+  deletedAt: Date | null;
 
   // Relations
   @ManyToOne(() => Category, { onDelete: 'SET NULL' })
@@ -75,11 +79,7 @@ export class Product {
   @OneToMany(() => ProductMedia, (media) => media.product, { cascade: true })
   media: ProductMedia[];
 
-  @OneToOne(() => ProductPhysicalDetails, (details) => details.product, {
-    cascade: true,
-    eager: false,
-  })
-  physicalDetails: ProductPhysicalDetails | null;
+
 
   @OneToOne(() => ServiceDefinition, (definition) => definition.product, {
     cascade: true,

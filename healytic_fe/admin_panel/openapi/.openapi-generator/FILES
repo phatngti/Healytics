@@ -11,7 +11,6 @@ doc/CategoriesApi.md
 doc/CreateCategoryDto.md
 doc/CreateDoctorDto.md
 doc/CreateDoctorProfileDto.md
-doc/CreatePhysicalDetailsDto.md
 doc/CreateProductDto.md
 doc/CreateProductMediaDto.md
 doc/CreateServiceDefinitionDto.md
@@ -56,7 +55,6 @@ lib/model/auth_tokens_dto.dart
 lib/model/create_category_dto.dart
 lib/model/create_doctor_dto.dart
 lib/model/create_doctor_profile_dto.dart
-lib/model/create_physical_details_dto.dart
 lib/model/create_product_dto.dart
 lib/model/create_product_media_dto.dart
 lib/model/create_service_definition_dto.dart
@@ -86,7 +84,6 @@ test/categories_api_test.dart
 test/create_category_dto_test.dart
 test/create_doctor_dto_test.dart
 test/create_doctor_profile_dto_test.dart
-test/create_physical_details_dto_test.dart
 test/create_product_dto_test.dart
 test/create_product_media_dto_test.dart
 test/create_service_definition_dto_test.dart

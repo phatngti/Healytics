@@ -1,11 +1,15 @@
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
-
+import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 /// Form fields specific to doctors
 class DoctorFieldsCard extends StatefulWidget {
-  const DoctorFieldsCard({super.key});
+  final bool isEditing;
+  final DoctorEntity? doctor;
+
+  const DoctorFieldsCard({super.key, this.isEditing = true, this.doctor});
 
   @override
   State<DoctorFieldsCard> createState() => _DoctorFieldsCardState();
@@ -17,15 +21,17 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: colorScheme.shadow.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -34,35 +40,38 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          // Header
-          InkWell(
-            onTap: () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  _isExpanded = !_isExpanded;
+                });
+              },
               child: Row(
                 children: [
                   Container(
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
+                      color: semanticColors.info?.withAlpha(25),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.blue.shade100),
+                      border: Border.all(
+                        color:
+                            semanticColors.info?.withAlpha(75) ??
+                            colorScheme.outlineVariant,
+                      ),
                     ),
                     child: Icon(
                       Icons.school_outlined,
                       size: 18,
-                      color: Colors.blue.shade600,
+                      color: semanticColors.info,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  AppDimens.horizontalMediumSmall,
                   Text(
                     'Education & Qualifications',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -79,7 +88,6 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
               ),
             ),
           ),
-          // Content
           AnimatedCrossFade(
             firstChild: _buildContent(context),
             secondChild: const SizedBox.shrink(),
@@ -97,7 +105,7 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: AppDimens.paddingAllLarge,
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
@@ -112,6 +120,8 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
                   fieldKey: 'medical_title',
                   label: 'Medical Title',
                   hintText: 'e.g. BS CKI, Thạc sĩ',
+                  enabled: widget.isEditing,
+                  initialValue: widget.doctor?.jobTitle,
                 ),
               ),
               AppDimens.horizontalLarge,
@@ -123,6 +133,8 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
                   hintText: 'e.g. CCHN-00123',
                   isRequired: true,
                   prefixIcon: Icons.badge_outlined,
+                  enabled: widget.isEditing,
+                  initialValue: widget.doctor?.medicalLicense,
                 ),
               ),
             ],
@@ -137,6 +149,8 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
                   label: 'Years of Experience',
                   hintText: '0',
                   keyboardType: TextInputType.number,
+                  enabled: widget.isEditing,
+                  initialValue: widget.doctor?.experienceYears?.toString(),
                 ),
               ),
               AppDimens.horizontalLarge,
@@ -148,6 +162,8 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
                   hintText: '00%',
                   keyboardType: TextInputType.number,
                   suffixIcon: Icon(Icons.percent, size: 20),
+                  enabled: widget.isEditing,
+                  initialValue: widget.doctor?.consultationFee?.toString(),
                 ),
               ),
             ],
@@ -167,6 +183,8 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
             searchHint: 'Search or add specialization...',
             allowCreate: true,
             width: double.infinity,
+            enabled: widget.isEditing,
+            initialValue: widget.doctor?.specializations,
           ),
           AppDimens.verticalMedium,
           FormFieldBuilders.buildDropdownField(
@@ -180,6 +198,8 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
               'Associate Degree',
               'Other',
             ],
+            enabled: widget.isEditing,
+            initialValue: widget.doctor?.education.firstOrNull,
           ),
         ],
       ),

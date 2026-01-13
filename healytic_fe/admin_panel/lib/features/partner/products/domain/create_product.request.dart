@@ -18,9 +18,6 @@ abstract class CreateProductRequest with _$CreateProductRequest {
     required double basePrice,
     double? salePrice,
     double? costPerItem,
-    String? sku,
-    String? barcode,
-    int? stockQuantity,
 
     // Visibility
     @Default('draft') String status,
@@ -29,7 +26,6 @@ abstract class CreateProductRequest with _$CreateProductRequest {
     // Organization
     required String category,
     @Default([]) List<String> tags,
-    String? vendor,
 
     // Operations & Scheduling
     int? duration,

@@ -42,42 +42,6 @@ export class CreateProductMediaDto {
   sortOrder?: number;
 }
 
-export class CreatePhysicalDetailsDto {
-  @ApiPropertyOptional({ example: 'SKU-001' })
-  @IsString()
-  @IsOptional()
-  @MaxLength(50)
-  sku?: string;
-
-  @ApiPropertyOptional({ example: '1234567890123' })
-  @IsString()
-  @IsOptional()
-  @MaxLength(100)
-  barcode?: string;
-
-  @ApiPropertyOptional({ example: 100 })
-  @IsNumber()
-  @IsOptional()
-  @Min(0)
-  stockQuantity?: number;
-
-  @ApiPropertyOptional({ example: 250000 })
-  @IsNumber()
-  @IsOptional()
-  @Min(0)
-  costPerItem?: number;
-
-  @ApiPropertyOptional({ example: 500 })
-  @IsNumber()
-  @IsOptional()
-  weightGram?: number;
-
-  @ApiPropertyOptional({ example: '10x20x5 cm' })
-  @IsString()
-  @IsOptional()
-  @MaxLength(50)
-  dimensions?: string;
-}
 
 export class CreateServiceDefinitionDto {
   @ApiProperty({ example: 60, description: 'Duration in minutes' })
@@ -169,12 +133,6 @@ export class CreateProductDto {
   @IsOptional()
   isVisibleOnline?: boolean;
 
-  @ApiPropertyOptional({ example: 'Vendor XYZ' })
-  @IsString()
-  @IsOptional()
-  @MaxLength(100)
-  vendorName?: string;
-
   @ApiPropertyOptional({ example: ['uuid-1', 'uuid-2'] })
   @IsArray()
   @IsUUID(undefined, { each: true })
@@ -188,12 +146,6 @@ export class CreateProductDto {
   @ValidateNested({ each: true })
   @Type(() => CreateProductMediaDto)
   media?: CreateProductMediaDto[];
-
-  @ApiPropertyOptional({ type: CreatePhysicalDetailsDto, description: 'Physical product details (required if type is physical)' })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => CreatePhysicalDetailsDto)
-  physicalDetails?: CreatePhysicalDetailsDto;
 
   @ApiPropertyOptional({ type: CreateServiceDefinitionDto, description: 'Service definition (required if type is service)' })
   @IsOptional()

@@ -1,3 +1,5 @@
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 import 'employee_contact_item.dart';
@@ -5,25 +7,29 @@ import 'employee_contact_item.dart';
 class EmployeeContactCard extends StatelessWidget {
   final String email;
   final String phone;
+  final bool isEditing;
 
   const EmployeeContactCard({
     super.key,
     required this.email,
     required this.phone,
+    this.isEditing = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: colorScheme.shadow.withOpacity(0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -45,15 +51,15 @@ class EmployeeContactCard extends StatelessWidget {
               children: [
                 Text(
                   'Contact & Basic Info',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 IconButton(
                   icon: Icon(
                     Icons.edit,
                     size: 20,
-                    color: Colors.green.shade700,
+                    color: semanticColors.success,
                   ),
                   onPressed: () {},
                   visualDensity: VisualDensity.compact,
@@ -70,6 +76,7 @@ class EmployeeContactCard extends StatelessWidget {
                   label: 'Email Address',
                   value: email.isNotEmpty ? email : 'Not provided',
                   isLink: email.isNotEmpty,
+                  isEditing: isEditing,
                 ),
                 const SizedBox(height: 20),
                 EmployeeContactItem(
@@ -77,15 +84,17 @@ class EmployeeContactCard extends StatelessWidget {
                   label: 'Phone Number',
                   value: phone.isNotEmpty ? phone : 'Not provided',
                   isLink: phone.isNotEmpty,
+                  isEditing: isEditing,
                 ),
                 Divider(height: 32, color: colorScheme.outlineVariant),
                 EmployeeContactItem(
                   icon: Icons.emergency_outlined,
-                  iconColor: Colors.red,
-                  iconBgColor: Colors.red.shade50,
+                  iconColor: semanticColors.error,
+                  iconBgColor: semanticColors.error?.withAlpha(25),
                   label: 'Emergency Contact',
                   value: 'Not available',
                   subtitle: 'No emergency contact on file',
+                  isEditing: isEditing,
                 ),
               ],
             ),

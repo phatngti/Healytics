@@ -48,7 +48,7 @@ final class RouterProvider
   }
 }
 
-String _$routerHash() => r'09fe3148301aa6b25e9b4e45165ab4855333d834';
+String _$routerHash() => r'9b9876ff0a43529afbf57cfab5fd686aff86d8e6';
 
 @ProviderFor(RouterListenable)
 const routerListenableProvider = RouterListenableProvider._();

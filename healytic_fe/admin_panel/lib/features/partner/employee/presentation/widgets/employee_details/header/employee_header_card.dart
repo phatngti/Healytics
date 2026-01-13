@@ -8,8 +8,15 @@ import 'employee_stats_actions_section.dart';
 
 class EmployeeHeaderCard extends StatelessWidget {
   final EmployeeEntity employee;
+  final bool isEditing;
+  final VoidCallback? onEdit;
 
-  const EmployeeHeaderCard({super.key, required this.employee});
+  const EmployeeHeaderCard({
+    super.key,
+    required this.employee,
+    this.isEditing = false,
+    this.onEdit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,15 +37,17 @@ class EmployeeHeaderCard extends StatelessWidget {
             fullName: employee.fullName,
             displayName: employee.displayName,
             employeeId: employee.id,
+            isEditing: isEditing,
           ),
           AppDimens.horizontalLarge,
           Expanded(
             child: EmployeeRoleBranchSection(
               role: employee.role,
               status: employee.status,
+              isEditing: isEditing,
             ),
           ),
-          const EmployeeStatsActionsSection(),
+          EmployeeStatsActionsSection(isEditing: isEditing, onEdit: onEdit),
         ],
       ),
     );

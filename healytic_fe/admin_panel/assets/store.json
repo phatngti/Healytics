@@ -4,5 +4,6 @@
         "deviceModel": "iPhone 13",
         "deviceType": "iOS"
     },
-    "mockFlag": "true"
+    "mockFlag": "true",
+    "mockRole": "provider"
 }

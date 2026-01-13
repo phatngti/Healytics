@@ -31,7 +31,10 @@ class EmployeeAddFormSection extends StatelessWidget {
           duration: const Duration(milliseconds: 300),
           child: selectedRole == EmployeeRole.therapist
               ? const TherapistFieldsCard(key: ValueKey('therapist'))
-              : const DoctorFieldsCard(key: ValueKey('doctor')),
+              : const DoctorFieldsCard(
+                  key: ValueKey('doctor'),
+                  isEditing: true,
+                ),
         ),
         AppDimens.verticalMedium,
         const EmployeeDocumentsCertificationsCard(),

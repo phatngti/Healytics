@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/common/widgets/button/button.dart';
+import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -67,7 +68,7 @@ class _EmployeeDocumentsCertificationsCardState
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: colorScheme.shadow.withAlpha(4),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -91,17 +92,25 @@ class _EmployeeDocumentsCertificationsCardState
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
+                      color: Theme.of(
+                        context,
+                      ).extension<SemanticColors>()!.info!.withAlpha(25),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.blue.shade100),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).extension<SemanticColors>()!.info!.withAlpha(50),
+                      ),
                     ),
                     child: Icon(
                       Icons.workspace_premium,
                       size: 18,
-                      color: Colors.indigo.shade600,
+                      color: Theme.of(
+                        context,
+                      ).extension<SemanticColors>()!.info,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  AppDimens.horizontalMediumSmall,
                   Text(
                     'Documents & Certifications',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -152,9 +161,9 @@ class _EmployeeDocumentsCertificationsCardState
               color: colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 24),
+          AppDimens.verticalLarge,
           _buildRequiredDocuments(context),
-          const SizedBox(height: 24),
+          AppDimens.verticalLarge,
           _buildAdditionalDocuments(context),
         ],
       ),
@@ -264,7 +273,7 @@ class _EmployeeDocumentsCertificationsCardState
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
@@ -279,29 +288,27 @@ class _EmployeeDocumentsCertificationsCardState
             ),
             child: Icon(icon, color: colorScheme.onSurfaceVariant, size: 20),
           ),
-          const SizedBox(width: 16),
+          AppDimens.horizontalMedium,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
-                    fontSize: 12,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 16),
+          AppDimens.horizontalMedium,
           AppButton(
             onPressed: onUpload,
             buttonType: ButtonType.outline,
@@ -327,7 +334,7 @@ class _EmployeeDocumentsCertificationsCardState
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: colorScheme.primary),
       ),
       child: Row(
@@ -380,12 +387,11 @@ class _EmployeeDocumentsCertificationsCardState
                       ),
                     ),
                     if (fileSize.isNotEmpty) ...[
-                      const SizedBox(width: 8),
+                      AppDimens.horizontalSmall,
                       Text(
                         fileSize,
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
-                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -403,8 +409,7 @@ class _EmployeeDocumentsCertificationsCardState
                   buttonType: ButtonType.text,
                   child: Text(
                     'View',
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.primary,
                     ),
@@ -425,8 +430,7 @@ class _EmployeeDocumentsCertificationsCardState
                 ),
                 child: Text(
                   'Replace',
-                  style: TextStyle(
-                    fontSize: 12,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -440,7 +444,6 @@ class _EmployeeDocumentsCertificationsCardState
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.transparent),
                   ),
                   child: Icon(
                     Icons.delete,
@@ -468,16 +471,16 @@ class _EmployeeDocumentsCertificationsCardState
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 12),
+        AppDimens.verticalMediumSmall,
         InkWell(
           onTap: () {},
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
               color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: colorScheme.outlineVariant,
                 style: BorderStyle
@@ -494,7 +497,7 @@ class _EmployeeDocumentsCertificationsCardState
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withAlpha(10), // 0.04 * 255
+                        color: colorScheme.shadow.withAlpha(10),
                         blurRadius: 2,
                       ),
                     ],
@@ -506,18 +509,19 @@ class _EmployeeDocumentsCertificationsCardState
                     size: 24,
                   ),
                 ),
-                const SizedBox(height: 12),
+                AppDimens.verticalMediumSmall,
                 Text(
                   'Click to upload or drag and drop',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 4),
+                AppDimens.verticalExtraSmall,
                 Text(
                   'Upload any other relevant certificates, records, or files.\nSupported formats: PDF, JPG, PNG. Max file size: 10MB.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: colorScheme.outlineVariant,
-                    fontSize: 12,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

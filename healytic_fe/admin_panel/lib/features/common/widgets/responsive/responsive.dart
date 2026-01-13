@@ -13,22 +13,18 @@ class ResponsiveWrapper extends StatelessWidget {
     this.tablet,
     this.mobile,
     this.useLayout = false,
-    this.sidebar,
-    this.header,
   });
 
   final Widget? desktop;
   final Widget? tablet;
   final Widget? mobile;
   final bool? useLayout;
-  final Widget? sidebar;
-  final Widget? header;
 
   @override
   Widget build(BuildContext context) {
     return LayoutScope(
-      sidebar: sidebar ?? const Sidebar(),
-      header: header ?? const Header(),
+      sidebar: const Sidebar(),
+      header: const Header(),
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth >= 1200) {

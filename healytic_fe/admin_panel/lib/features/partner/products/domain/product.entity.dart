@@ -41,7 +41,6 @@ abstract class Product with _$Product {
     // Organization
     required CategoryEntity category,
     @Default([]) List<String> tags,
-    String? vendor,
 
     // Operations & Scheduling
     int? duration,

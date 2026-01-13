@@ -92,7 +92,7 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withAlpha(8),
+                    color: colorScheme.shadow.withAlpha(8),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

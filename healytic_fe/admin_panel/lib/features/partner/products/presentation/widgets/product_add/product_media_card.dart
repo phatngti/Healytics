@@ -1,5 +1,6 @@
 import 'package:admin_panel/core/providers/s3.provider.dart';
 import 'package:admin_panel/features/common/widgets/images/multi_picker.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,11 +31,11 @@ class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
         return Container(
           decoration: BoxDecoration(
             color: colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppDimens.radiusMediumSmall,
             border: Border.all(color: colorScheme.outlineVariant),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(5),
+                color: colorScheme.shadow.withAlpha(5),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -46,7 +47,7 @@ class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
             children: [
               // Header
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: AppDimens.paddingAllLarge,
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: colorScheme.outlineVariant),
@@ -63,7 +64,7 @@ class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 4),
+                        AppDimens.verticalExtraSmall,
                         Text(
                           'Upload images or videos.',
                           style: Theme.of(context).textTheme.bodySmall
@@ -88,7 +89,7 @@ class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
               ),
               // Content
               Padding(
-                padding: const EdgeInsets.all(24),
+                padding: AppDimens.paddingAllLarge,
                 child: ImageUploadWidget(
                   initialImages: currentImages.whereType<String>().toList(),
                   onImagesChanged: (images) {
@@ -142,13 +143,13 @@ class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
                     decoration: InputDecoration(
                       hintText: 'Enter image URL...',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppDimens.radiusSmall,
                       ),
                       enabled: !isLoading,
                     ),
                   ),
                   if (isLoading) ...[
-                    const SizedBox(height: 16),
+                    AppDimens.verticalMedium,
                     const CircularProgressIndicator(),
                   ],
                 ],

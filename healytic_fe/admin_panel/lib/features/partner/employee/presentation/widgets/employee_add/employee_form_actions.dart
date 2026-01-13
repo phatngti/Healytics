@@ -37,7 +37,7 @@ class EmployeeFormActions extends StatelessWidget {
             children: [
               if (submitIcon != null) ...[
                 submitIcon!,
-                const SizedBox(width: 8),
+                AppDimens.horizontalSmall,
               ],
               Text(submitLabel),
             ],
