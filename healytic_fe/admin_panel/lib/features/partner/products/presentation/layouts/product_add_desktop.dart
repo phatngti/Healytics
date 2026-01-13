@@ -33,10 +33,10 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
       children: [
         // Scrollable content
         SingleChildScrollView(
-          padding: const EdgeInsets.only(
-            left: 24,
-            right: 24,
-            bottom: 24,
+          padding: EdgeInsets.only(
+            left: AppDimens.paddingAllLarge.left,
+            right: AppDimens.paddingAllLarge.right,
+            bottom: AppDimens.paddingAllLarge.bottom,
             top: 100, // Height for the floating header
           ),
           child: Column(
@@ -52,9 +52,11 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                       children: [
                         const ProductGeneralInfoCard(),
                         AppDimens.verticalMedium,
-                        const ProductMediaCard(),
+                        const ProductOperationsCard(),
                         AppDimens.verticalMedium,
                         const ProductPricingCard(),
+                        AppDimens.verticalMedium,
+                        const ProductMediaCard(),
                         AppDimens.verticalMedium,
                         const ProductResourcesCard(),
                       ],
@@ -83,8 +85,6 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                             });
                           },
                         ),
-                        AppDimens.verticalMedium,
-                        const ProductOperationsCard(),
                       ],
                     ),
                   ),
@@ -99,7 +99,9 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
           left: 0,
           right: 0,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            padding: AppDimens.paddingHorizontalLarge.add(
+              AppDimens.paddingVerticalMedium,
+            ),
             decoration: BoxDecoration(
               color: colorScheme.surface,
               border: Border(
@@ -107,7 +109,7 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(8),
+                  color: colorScheme.shadow.withValues(alpha: 0.03),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -147,7 +149,7 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                             size: 18,
                             color: colorScheme.onPrimary,
                           ),
-                          const SizedBox(width: 8),
+                          AppDimens.horizontalSmall,
                           const Text('Save & Publish'),
                         ],
                       ),

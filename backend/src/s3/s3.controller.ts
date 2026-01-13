@@ -14,7 +14,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 
-import { S3Service } from './s3.service';
+import { S3Service, PresignedUploadResult } from './s3.service';
 
 @ApiTags('S3')
 @Controller('s3')
@@ -47,7 +47,7 @@ export class S3Controller {
   async preSign(
     @Body('fileName') fileName: string,
     @Body('contentType') contentType: string,
-  ) {
+  ): Promise<PresignedUploadResult> {
     return this.s3Service.getPresignedUploadUrl(fileName, contentType);
   }
 

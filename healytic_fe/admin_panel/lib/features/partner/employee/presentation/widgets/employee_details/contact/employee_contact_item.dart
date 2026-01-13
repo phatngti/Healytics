@@ -1,3 +1,4 @@
+import 'package:admin_panel/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeContactItem extends StatelessWidget {
@@ -8,6 +9,7 @@ class EmployeeContactItem extends StatelessWidget {
   final bool isLink;
   final Color? iconColor;
   final Color? iconBgColor;
+  final bool isEditing;
 
   const EmployeeContactItem({
     super.key,
@@ -18,11 +20,14 @@ class EmployeeContactItem extends StatelessWidget {
     this.isLink = false,
     this.iconColor,
     this.iconBgColor,
+    this.isEditing = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,7 +52,7 @@ class EmployeeContactItem extends StatelessWidget {
             children: [
               Text(
                 label.toUpperCase(),
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                style: textTheme.labelSmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -56,16 +61,16 @@ class EmployeeContactItem extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 value,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: isLink ? Colors.green.shade700 : null,
+                  color: isLink ? semanticColors.success : null,
                 ),
               ),
               if (subtitle != null) ...[
                 const SizedBox(height: 2),
                 Text(
                   subtitle!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),

@@ -23,7 +23,6 @@ _Product _$ProductFromJson(Map<String, dynamic> json) => _Product(
   tags:
       (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
-  vendor: json['vendor'] as String?,
   duration: (json['duration'] as num?)?.toInt(),
   buffer: (json['buffer'] as num?)?.toInt(),
   capacity: (json['capacity'] as num?)?.toInt(),
@@ -52,7 +51,6 @@ Map<String, dynamic> _$ProductToJson(_Product instance) => <String, dynamic>{
   'onlineStore': instance.onlineStore,
   'category': instance.category.toJson(),
   'tags': instance.tags,
-  'vendor': instance.vendor,
   'duration': instance.duration,
   'buffer': instance.buffer,
   'capacity': instance.capacity,

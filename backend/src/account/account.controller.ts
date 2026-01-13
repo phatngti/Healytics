@@ -24,13 +24,21 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 
+/**
+ * Controller for account management endpoints.
+ * API Version 1.
+ */
 @ApiTags('Account')
 @ApiBearerAuth()
-@Controller('account')
+@Controller({ path: 'account', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(...ALL_ROLES)
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
+
+  /**
+   * Gets the current user's survey data.
+   */
   @Get('survey')
   @ApiOperation({ summary: 'Get current user survey' })
   @ApiOkResponse({ description: 'User survey', type: SurveyResponseDto })
@@ -41,6 +49,9 @@ export class AccountController {
     return { survey };
   }
 
+  /**
+   * Creates a one-shot survey for the current user.
+   */
   @Post('survey')
   @ApiOperation({ summary: 'Create one-shot survey for current user' })
   @ApiBody({ type: SurveyDto })

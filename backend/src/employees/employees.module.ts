@@ -5,13 +5,23 @@ import { EmployeesController } from './employees.controller';
 import { Employee } from './entities/employee.entity';
 import { DoctorProfile } from './entities/doctor-profile.entity';
 import { TherapistProfile } from './entities/therapist-profile.entity';
+import { CreateDoctorHandler } from './application/handlers/create-doctor.handler';
+import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
+import { UpdateEmployeeHandler } from './application/handlers/update-employee.handler';
+import { RemoveEmployeeHandler } from './application/handlers/remove-employee.handler';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Employee, DoctorProfile, TherapistProfile]),
   ],
   controllers: [EmployeesController],
-  providers: [EmployeesService],
+  providers: [
+    EmployeesService,
+    CreateDoctorHandler,
+    CreateTherapistHandler,
+    UpdateEmployeeHandler,
+    RemoveEmployeeHandler,
+  ],
   exports: [EmployeesService],
 })
 export class EmployeesModule {}

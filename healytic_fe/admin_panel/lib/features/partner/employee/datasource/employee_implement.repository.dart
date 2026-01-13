@@ -1,10 +1,9 @@
 import 'package:admin_panel/features/partner/employee/datasource/remote_datasource.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_doctor.request.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_therapist.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.repository.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
-import 'package:flutter/material.dart';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'employee_implement.repository.g.dart';
@@ -15,66 +14,18 @@ class EmployeeImplementRepository implements EmployeeRepository {
   EmployeeImplementRepository({required this.remoteDataSource});
 
   @override
-  Future<List<DataRow>> getEmployees(
-    void Function(LocalKey, bool) setRowSelection,
+  Future<List<EmployeeEntity>> getEmployees(
     int startingAt,
     int count,
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    final employees = await remoteDataSource.getEmployees(
+    return remoteDataSource.getEmployees(
       startingAt,
       count,
       sortedBy,
       sortedAsc,
     );
-    return employees
-        .map(
-          (employee) => DataRow(
-            key: ValueKey<String>(employee.id.value),
-            onSelectChanged: (value) {
-              if (value != null) {
-                setRowSelection(ValueKey<String>(employee.id.value), value);
-              }
-            },
-            cells: [
-              DataCell(
-                Center(
-                  child: Text(
-                    employee.id.value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              DataCell(
-                Center(
-                  child: ClipOval(
-                    child: employee.avatar.isNotEmpty
-                        ? Image.network(
-                            employee.avatar,
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const CircleAvatar(
-                                child: Icon(Icons.person),
-                              );
-                            },
-                          )
-                        : const CircleAvatar(child: Icon(Icons.person)),
-                  ),
-                ),
-              ),
-              DataCell(Center(child: Text(employee.fullName))),
-              DataCell(Center(child: Text(employee.position))),
-              DataCell(Center(child: Text(employee.rating.toStringAsFixed(1)))),
-              DataCell(Center(child: Text(employee.reviewCount.toString()))),
-              DataCell(Center(child: Text(employee.status))),
-            ],
-          ),
-        )
-        .toList();
   }
 
   @override
@@ -93,8 +44,15 @@ class EmployeeImplementRepository implements EmployeeRepository {
   }
 
   @override
-  Future<EmployeeEntity> createTherapist(CreateTherapistRequest request) {
-    return remoteDataSource.createTherapist(request);
+  Future<EmployeeEntity> createSpaTherapist(CreateSpaTherapistRequest request) {
+    return remoteDataSource.createSpaTherapist(request);
+  }
+
+  @override
+  Future<EmployeeEntity> createMassageTherapist(
+    CreateMassageTherapistRequest request,
+  ) {
+    return remoteDataSource.createMassageTherapist(request);
   }
 
   @override
@@ -121,6 +79,16 @@ class EmployeeImplementRepository implements EmployeeRepository {
     int? limit,
   }) {
     return remoteDataSource.getEmployeesByRole(role: role, limit: limit);
+  }
+
+  @override
+  Future<Map<String, String>> getSpaSkills() {
+    return remoteDataSource.getSpaSkills();
+  }
+
+  @override
+  Future<Map<String, String>> getDeviceProficiency() {
+    return remoteDataSource.getDeviceProficiency();
   }
 }
 

@@ -44,6 +44,9 @@ class AppDimens {
   static const verticalLarge = SizedBox(height: 24.0);
 
   /// SizedBox with a height of 32.0
+  static const verticalLargeExtra = SizedBox(height: 32.0);
+
+  /// SizedBox with a height of 32.0
   static const verticalExtraLarge = SizedBox(height: 32.0);
 
   // --- Horizontal Spacing ---
@@ -61,6 +64,9 @@ class AppDimens {
 
   /// SizedBox with a width of 24.0
   static const horizontalLarge = SizedBox(width: 24.0);
+
+  /// SizedBox with a width of 32.0
+  static const horizontalLargeExtra = SizedBox(width: 32.0);
 
   /// SizedBox with a width of 32.0
   static const horizontalExtraLarge = SizedBox(width: 32.0);
@@ -94,8 +100,14 @@ class AppDimens {
   /// EdgeInsets.all(8.0)
   static const paddingAllSmall = EdgeInsets.all(8.0);
 
+  /// EdgeInsets.all(12.0)
+  static const paddingAllMediumSmall = EdgeInsets.all(12.0);
+
   /// EdgeInsets.all(16.0)
   static const paddingAllMedium = EdgeInsets.all(16.0);
+
+  /// EdgeInsets.all(20.0)
+  static const paddingAllMediumLarge = EdgeInsets.all(20.0);
 
   /// EdgeInsets.all(24.0)
   static const paddingAllLarge = EdgeInsets.all(24.0);
@@ -107,11 +119,20 @@ class AppDimens {
   /// EdgeInsets.symmetric(vertical: 8.0)
   static const paddingVerticalSmall = EdgeInsets.symmetric(vertical: 8.0);
 
+  /// EdgeInsets.symmetric(vertical: 12.0)
+  static const paddingVerticalMediumSmall = EdgeInsets.symmetric(
+    vertical: 12.0,
+  );
+
   /// EdgeInsets.symmetric(vertical: 16.0)
   static const paddingVerticalMedium = EdgeInsets.symmetric(vertical: 16.0);
 
   /// EdgeInsets.symmetric(vertical: 24.0)
   static const paddingVerticalLarge = EdgeInsets.symmetric(vertical: 24.0);
+
+  // Only Top
+  /// EdgeInsets.only(top: 8.0)
+  static const paddingTopSmall = EdgeInsets.only(top: 8.0);
 
   // Symmetric Horizontal
   /// EdgeInsets.symmetric(horizontal: 4.0)
@@ -125,6 +146,11 @@ class AppDimens {
   /// EdgeInsets.symmetric(horizontal: 16.0)
   static const paddingHorizontalMedium = EdgeInsets.symmetric(horizontal: 16.0);
 
+  /// EdgeInsets.symmetric(horizontal: 20.0)
+  static const paddingHorizontalMediumLarge = EdgeInsets.symmetric(
+    horizontal: 20.0,
+  );
+
   /// EdgeInsets.symmetric(horizontal: 24.0)
   static const paddingHorizontalLarge = EdgeInsets.symmetric(horizontal: 24.0);
 
@@ -135,11 +161,20 @@ class AppDimens {
   /// BorderRadius.circular(8.0)
   static const radiusSmall = BorderRadius.all(Radius.circular(8.0));
 
+  /// BorderRadius.circular(12.0)
+  static const radiusMediumSmall = BorderRadius.all(Radius.circular(12.0));
+
   /// BorderRadius.circular(16.0)
   static const radiusMedium = BorderRadius.all(Radius.circular(16.0));
 
+  /// BorderRadius.circular(20.0)
+  static const radiusMediumLarge = BorderRadius.all(Radius.circular(20.0));
+
   /// BorderRadius.circular(24.0)
   static const radiusLarge = BorderRadius.all(Radius.circular(24.0));
+
+  /// BorderRadius.circular(100.0) - Pill/Stadium shape
+  static const radiusPill = BorderRadius.all(Radius.circular(100.0));
 
   // --- Dimensions ---
   static const double sidebarWidth = 250.0;

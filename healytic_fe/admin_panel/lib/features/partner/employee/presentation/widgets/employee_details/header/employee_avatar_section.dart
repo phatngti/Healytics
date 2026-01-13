@@ -1,4 +1,6 @@
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +9,7 @@ class EmployeeAvatarSection extends StatelessWidget {
   final String fullName;
   final String displayName;
   final EmployeeId employeeId;
+  final bool isEditing;
 
   const EmployeeAvatarSection({
     super.key,
@@ -14,6 +17,7 @@ class EmployeeAvatarSection extends StatelessWidget {
     required this.fullName,
     required this.displayName,
     required this.employeeId,
+    this.isEditing = false,
   });
 
   @override
@@ -44,16 +48,20 @@ class EmployeeAvatarSection extends StatelessWidget {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF13EC13),
+                  color: Theme.of(context).extension<SemanticColors>()!.success,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
+                  border: Border.all(color: colorScheme.surface, width: 2),
                 ),
-                child: const Icon(Icons.check, size: 14, color: Colors.black),
+                child: Icon(
+                  Icons.check,
+                  size: 14,
+                  color: colorScheme.onSurface,
+                ),
               ),
             ),
           ],
         ),
-        const SizedBox(width: 20),
+        AppDimens.horizontalLarge,
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -70,7 +78,7 @@ class EmployeeAvatarSection extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 4),
+            AppDimens.verticalExtraSmall,
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(

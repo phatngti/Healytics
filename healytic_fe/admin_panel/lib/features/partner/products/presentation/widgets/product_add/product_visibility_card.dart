@@ -1,4 +1,5 @@
-import 'package:admin_panel/features/common/widgets/input/selection_field.dart';
+import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
+import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class ProductVisibilityCard extends StatefulWidget {
@@ -37,17 +38,17 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMediumSmall,
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
+            color: colorScheme.shadow.withAlpha(5),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(20),
+      padding: AppDimens.paddingAllMediumLarge,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -59,7 +60,7 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
               letterSpacing: 1,
             ),
           ),
-          const SizedBox(height: 16),
+          AppDimens.verticalMedium,
           // Status Dropdown
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,8 +72,10 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
                 ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 6),
-              AppSelectionField(
+              FormFieldBuilders.buildCustomDropdownField<String>(
+                context,
                 fieldKey: 'status',
+                label: 'Status',
                 initialValue: _status,
                 items: const [
                   DropdownMenuItem(value: 'draft', child: Text('Draft')),
@@ -82,15 +85,15 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
                 onChanged: (value) {
                   if (value != null) {
                     setState(() {
-                      _status = value;
+                      _status = value.toString();
                     });
-                    widget.onStatusChanged?.call(value);
+                    widget.onStatusChanged?.call(value.toString());
                   }
                 },
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          AppDimens.verticalMedium,
           // Online Store Toggle
           Container(
             padding: const EdgeInsets.only(top: 8),
