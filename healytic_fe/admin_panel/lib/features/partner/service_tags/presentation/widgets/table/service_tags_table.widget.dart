@@ -1,8 +1,8 @@
 import 'package:admin_panel/features/common/widgets/table/table.dart';
-import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_function_buttons.dart';
-import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_header_buttons.dart';
-import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_table_columns.dart';
-import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_table_source.dart';
+import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_function_buttons.widget.dart';
+import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_header_buttons.widget.dart';
+import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_table_columns.widget.dart';
+import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_table_source.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

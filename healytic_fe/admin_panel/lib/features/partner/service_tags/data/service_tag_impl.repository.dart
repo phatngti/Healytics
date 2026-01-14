@@ -1,16 +1,16 @@
-import 'package:admin_panel/features/partner/service_tags/datasource/service_tag_remote.datasource.dart';
+import 'package:admin_panel/features/partner/service_tags/data/service_tag_remote.datasource.dart';
 import 'package:admin_panel/features/partner/service_tags/domain/service_tag.entity.dart';
 import 'package:admin_panel/features/partner/service_tags/domain/service_tag.repository.dart';
 import 'package:admin_panel/features/partner/service_tags/domain/create_service_tag.request.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'service_tag_implement.repository.g.dart';
+part 'service_tag_impl.repository.g.dart';
 
 /// Repository implementation that delegates to the data source
-class ServiceTagImplementRepository implements ServiceTagRepository {
+class ServiceTagImplRepository implements ServiceTagRepository {
   final ServiceTagRemoteDataSource remoteDataSource;
 
-  ServiceTagImplementRepository({required this.remoteDataSource});
+  ServiceTagImplRepository({required this.remoteDataSource});
 
   @override
   Future<List<ServiceTagEntity>> getServiceTags({
@@ -76,5 +76,5 @@ class ServiceTagImplementRepository implements ServiceTagRepository {
 @riverpod
 ServiceTagRepository serviceTagRepository(Ref ref) {
   final remoteDataSource = ref.read(serviceTagRemoteDataSourceProvider);
-  return ServiceTagImplementRepository(remoteDataSource: remoteDataSource);
+  return ServiceTagImplRepository(remoteDataSource: remoteDataSource);
 }

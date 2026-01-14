@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/partner/products/datasource/remote_datasource.dart';
+import 'package:admin_panel/features/partner/products/data/product_remote.datasource.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
@@ -7,12 +7,12 @@ import 'package:admin_panel/features/partner/products/domain/update_product.requ
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'product_implement.repository.g.dart';
+part 'product_impl.repository.g.dart';
 
-class ProductImplementRepository implements ProductRepository {
+class ProductImplRepository implements ProductRepository {
   final ProductRemoteDataSource remoteDataSource;
 
-  ProductImplementRepository({required this.remoteDataSource});
+  ProductImplRepository({required this.remoteDataSource});
 
   @override
   Future<List<Product>> getProducts(
@@ -58,5 +58,5 @@ class ProductImplementRepository implements ProductRepository {
 @riverpod
 ProductRepository productRepository(Ref ref) {
   final remoteDataSource = ref.read(productRemoteDataSourceProvider);
-  return ProductImplementRepository(remoteDataSource: remoteDataSource);
+  return ProductImplRepository(remoteDataSource: remoteDataSource);
 }
