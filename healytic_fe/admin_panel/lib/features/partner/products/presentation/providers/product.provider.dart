@@ -1,7 +1,8 @@
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
-import 'package:admin_panel/features/partner/employee/datasource/employee_implement.repository.dart';
+import 'package:admin_panel/features/partner/employee/data/employee_impl.repository.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
-import 'package:admin_panel/features/partner/products/datasource/product_implement.repository.dart';
+import 'package:admin_panel/features/partner/products/data/product_impl.repository.dart';
+
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';

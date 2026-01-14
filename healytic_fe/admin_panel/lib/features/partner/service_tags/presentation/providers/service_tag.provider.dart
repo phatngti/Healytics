@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/partner/service_tags/datasource/service_tag_implement.repository.dart';
+import 'package:admin_panel/features/partner/service_tags/data/service_tag_impl.repository.dart';
 import 'package:admin_panel/features/partner/service_tags/domain/service_tag.entity.dart';
 import 'package:admin_panel/features/partner/service_tags/domain/create_service_tag.request.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';

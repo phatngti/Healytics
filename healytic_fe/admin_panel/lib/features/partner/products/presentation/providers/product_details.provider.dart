@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/partner/products/datasource/product_implement.repository.dart';
+import 'package:admin_panel/features/partner/products/data/product_impl.repository.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

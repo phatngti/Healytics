@@ -1,11 +1,11 @@
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_about.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_media_gallery.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_operations.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_organization.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_performance.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_pricing.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_status.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_about.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_media_gallery.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_operations.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_organization.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_performance.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_pricing.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_status.widget.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
