@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/service_tags_table.dart';
+import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/service_tags_table.widget.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
 import 'package:flutter/material.dart';
