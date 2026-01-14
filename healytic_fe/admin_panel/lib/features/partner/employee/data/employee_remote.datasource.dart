@@ -1,19 +1,34 @@
-import 'package:admin_panel/core/providers/api.provider.dart';
-import 'package:admin_panel/core/services/api.service.dart';
-import 'package:admin_panel/features/partner/employee/datasource/data/employee_mock_data.dart';
-import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
-import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
-import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
-import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
-import 'package:admin_openapi/api.dart';
+import 'dart:developer' as developer;
+
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
-import 'package:flutter/foundation.dart';
+import 'package:admin_panel/core/providers/api.provider.dart';
+import 'package:admin_panel/core/services/api.service.dart';
+import 'package:admin_panel/features/partner/employee/data/employee_mock_data.dart';
+import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
+import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
+import 'package:admin_openapi/api.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'remote_datasource.g.dart';
+part 'employee_remote.datasource.g.dart';
 
+// ============================================================================
+// 1. ABSTRACT INTERFACE
+// ============================================================================
+
+/// Abstract interface for employee remote data operations.
+///
+/// Defines the contract for fetching, creating, updating, and deleting
+/// employee data from remote sources.
 abstract class EmployeeRemoteDataSource {
+  /// Retrieves a paginated list of employees.
+  ///
+  /// - [startingAt]: The index to start fetching from.
+  /// - [count]: The number of employees to fetch.
+  /// - [sortedBy]: Optional field name to sort by.
+  /// - [sortedAsc]: Optional sort direction (true for ascending).
   Future<List<EmployeeEntity>> getEmployees(
     int startingAt,
     int count,
@@ -21,36 +36,56 @@ abstract class EmployeeRemoteDataSource {
     bool? sortedAsc,
   );
 
+  /// Returns the total count of employees.
   Future<int> getTotalRows();
 
+  /// Retrieves a single employee by their unique identifier.
   Future<EmployeeEntity> getEmployeeById(EmployeeId id);
 
+  /// Creates a new doctor employee.
   Future<EmployeeEntity> createDoctor(CreateDoctorRequest request);
 
+  /// Creates a new spa therapist employee.
   Future<EmployeeEntity> createSpaTherapist(CreateSpaTherapistRequest request);
 
+  /// Creates a new massage therapist employee.
   Future<EmployeeEntity> createMassageTherapist(
     CreateMassageTherapistRequest request,
   );
 
+  /// Updates an existing employee's information.
   Future<void> updateEmployee(UpdateEmployeeRequest request);
 
+  /// Deletes an employee by their unique identifier.
   Future<void> deleteEmployee(EmployeeId id);
 
+  /// Retrieves employees filtered by role.
+  ///
+  /// - [role]: The role to filter by (e.g., 'DOCTOR', 'THERAPIST').
+  /// - [limit]: Optional maximum number of results to return.
   Future<List<EmployeeEntity>> getEmployeesByRole({
     required String role,
     int? limit,
   });
 
+  /// Retrieves available spa skills options.
   Future<Map<String, String>> getSpaSkills();
 
+  /// Retrieves available device proficiency options.
   Future<Map<String, String>> getDeviceProficiency();
 }
 
-class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
-  final ApiService apiService;
+// ============================================================================
+// 2. IMPLEMENTATION (Real API)
+// ============================================================================
 
+/// Real implementation of [EmployeeRemoteDataSource] using API service.
+class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
+  /// Creates an instance with the required [ApiService].
   EmployeeRemoteDataSourceImpl({required this.apiService});
+
+  /// The API service for making network requests.
+  final ApiService apiService;
 
   EmployeesApi get _employeesApi => apiService.employeesApi;
 
@@ -66,14 +101,16 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       return [];
     }
 
-    // Convert API response to EmployeeEntity list
     final employees = response.map((item) {
       final json = item as Map<String, dynamic>;
       return _mapToEmployeeEntity(json);
     }).toList();
-    debugPrint('Employees: $employees');
 
-    // Apply pagination
+    developer.log(
+      'Fetched ${employees.length} employees',
+      name: 'EmployeeRemoteDataSource',
+    );
+
     final endIndex = (startingAt + count) > employees.length
         ? employees.length
         : startingAt + count;
@@ -87,8 +124,14 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   @override
   Future<int> getTotalRows() async {
     final response = await _employeesApi.employeesControllerFindAll();
-    debugPrint('Total rows: ${response?.length}');
-    return response?.length ?? 0;
+    final count = response?.length ?? 0;
+
+    developer.log(
+      'Total employee rows: $count',
+      name: 'EmployeeRemoteDataSource',
+    );
+
+    return count;
   }
 
   @override
@@ -97,7 +140,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       id.value.toString(),
     );
     if (response == null) {
-      throw Exception('Employee not found');
+      throw EmployeeNotFoundException(id);
     }
     return _mapToEmployeeEntity(response as Map<String, dynamic>);
   }
@@ -119,11 +162,21 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       request.id.value.toString(),
       dto,
     );
+
+    developer.log(
+      'Updated employee: ${request.id}',
+      name: 'EmployeeRemoteDataSource',
+    );
   }
 
   @override
   Future<void> deleteEmployee(EmployeeId id) async {
     await _employeesApi.employeesControllerRemove(id.value.toString());
+
+    developer.log(
+      'Deleted employee: $id',
+      name: 'EmployeeRemoteDataSource',
+    );
   }
 
   @override
@@ -154,8 +207,14 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
     final response = await _employeesApi.employeesControllerCreateDoctor(dto);
     if (response == null) {
-      throw Exception('Failed to create doctor');
+      throw EmployeeCreationException('Failed to create doctor');
     }
+
+    developer.log(
+      'Created doctor: ${request.firstName} ${request.lastName}',
+      name: 'EmployeeRemoteDataSource',
+    );
+
     return _mapToEmployeeEntity(response as Map<String, dynamic>);
   }
 
@@ -190,8 +249,14 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       dto,
     );
     if (response == null) {
-      throw Exception('Failed to create therapist');
+      throw EmployeeCreationException('Failed to create spa therapist');
     }
+
+    developer.log(
+      'Created spa therapist: ${request.firstName} ${request.lastName}',
+      name: 'EmployeeRemoteDataSource',
+    );
+
     return _mapToEmployeeEntity(response as Map<String, dynamic>);
   }
 
@@ -226,12 +291,51 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       dto,
     );
     if (response == null) {
-      throw Exception('Failed to create therapist');
+      throw EmployeeCreationException('Failed to create massage therapist');
     }
+
+    developer.log(
+      'Created massage therapist: ${request.firstName} ${request.lastName}',
+      name: 'EmployeeRemoteDataSource',
+    );
+
     return _mapToEmployeeEntity(response as Map<String, dynamic>);
   }
 
-  // Helper method to map API response to EmployeeEntity
+  @override
+  Future<List<EmployeeEntity>> getEmployeesByRole({
+    required String role,
+    int? limit,
+  }) async {
+    final allEmployees = await getEmployees(0, 1000, null, null);
+
+    final filtered = allEmployees.where((e) {
+      return e.role.toUpperCase() == role.toUpperCase();
+    }).toList();
+
+    if (limit != null && filtered.length > limit) {
+      return filtered.sublist(0, limit);
+    }
+
+    return filtered;
+  }
+
+  @override
+  Future<Map<String, String>> getDeviceProficiency() async {
+    // TODO(api): Implement API call when endpoint is available
+    return {};
+  }
+
+  @override
+  Future<Map<String, String>> getSpaSkills() async {
+    // TODO(api): Implement API call when endpoint is available
+    return {};
+  }
+
+  // ===========================================================================
+  // Private Helper Methods
+  // ===========================================================================
+
   EmployeeEntity _mapToEmployeeEntity(Map<String, dynamic> json) {
     final role = json['role']?.toString().toUpperCase() ?? '';
     final profile = json['profile'] as Map<String, dynamic>? ?? {};
@@ -263,7 +367,6 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         gender: common['gender'],
         employmentType: common['employmentType'],
         startDate: common['startDate'],
-        // Doctor specific
         jobTitle: profile['title']?.toString() ?? '',
         medicalLicense: profile['medicalLicense']?.toString() ?? '',
         experienceYears: int.tryParse(
@@ -303,8 +406,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
           gender: common['gender'],
           employmentType: common['employmentType'],
           startDate: common['startDate'],
-          // Spa Specific
-          jobTitle: 'Spa Therapist', // No title in profile for therapist?
+          jobTitle: 'Spa Therapist',
           therapistLevel: profile['level']?.toString(),
           commissionRate:
               double.tryParse(profile['commissionRate']?.toString() ?? '0.0') ??
@@ -338,7 +440,6 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
           gender: common['gender'],
           employmentType: common['employmentType'],
           startDate: common['startDate'],
-          // Massage Specific
           jobTitle: 'Massage Therapist',
           therapistLevel: profile['level']?.toString(),
           commissionRate:
@@ -351,7 +452,6 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       }
     }
 
-    // Fallback to basic
     return BasicEmployeeEntity(
       id: id,
       fullName: common['fullName'],
@@ -411,135 +511,79 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     return [];
   }
 
-  @override
-  Future<List<EmployeeEntity>> getEmployeesByRole({
-    required String role,
-    int? limit,
-  }) async {
-    // Since API doesn't support filtering by role yet, we fetch all and filter locally
-    final allEmployees = await getEmployees(0, 1000, null, null);
-
-    final filtered = allEmployees.where((e) {
-      return e.role.toUpperCase() == role.toUpperCase();
-    }).toList();
-
-    if (limit != null && filtered.length > limit) {
-      return filtered.sublist(0, limit);
-    }
-
-    return filtered;
-  }
-
-  // Helper method to map role to UpdateEmployeeDtoRoleEnum
   UpdateEmployeeDtoRoleEnum? _mapUpdateRole(String role) {
-    switch (role.toUpperCase()) {
-      case 'DOCTOR':
-        return UpdateEmployeeDtoRoleEnum.DOCTOR;
-      case 'THERAPIST':
-        return UpdateEmployeeDtoRoleEnum.THERAPIST;
-      case 'RECEPTIONIST':
-        return UpdateEmployeeDtoRoleEnum.RECEPTIONIST;
-      case 'MANAGER':
-        return UpdateEmployeeDtoRoleEnum.MANAGER;
-      default:
-        return null;
-    }
+    return switch (role.toUpperCase()) {
+      'DOCTOR' => UpdateEmployeeDtoRoleEnum.DOCTOR,
+      'THERAPIST' => UpdateEmployeeDtoRoleEnum.THERAPIST,
+      'RECEPTIONIST' => UpdateEmployeeDtoRoleEnum.RECEPTIONIST,
+      'MANAGER' => UpdateEmployeeDtoRoleEnum.MANAGER,
+      _ => null,
+    };
   }
 
-  // Helper method to map status to UpdateEmployeeDtoStatusEnum
   UpdateEmployeeDtoStatusEnum? _mapUpdateStatus(String status) {
-    switch (status.toUpperCase()) {
-      case 'ACTIVE':
-        return UpdateEmployeeDtoStatusEnum.ACTIVE;
-      case 'INACTIVE':
-        return UpdateEmployeeDtoStatusEnum.INACTIVE;
-      case 'ON_LEAVE':
-        return UpdateEmployeeDtoStatusEnum.ON_LEAVE;
-      default:
-        return null;
-    }
+    return switch (status.toUpperCase()) {
+      'ACTIVE' => UpdateEmployeeDtoStatusEnum.ACTIVE,
+      'INACTIVE' => UpdateEmployeeDtoStatusEnum.INACTIVE,
+      'ON_LEAVE' => UpdateEmployeeDtoStatusEnum.ON_LEAVE,
+      _ => null,
+    };
   }
 
-  // Helper method to map gender for Doctor DTO
   CreateDoctorDtoGenderEnum? _mapDoctorGender(String? gender) {
     if (gender == null) return null;
-    switch (gender.toUpperCase()) {
-      case 'MALE':
-        return CreateDoctorDtoGenderEnum.MALE;
-      case 'FEMALE':
-        return CreateDoctorDtoGenderEnum.FEMALE;
-      case 'OTHER':
-        return CreateDoctorDtoGenderEnum.OTHER;
-      default:
-        return null;
-    }
+    return switch (gender.toUpperCase()) {
+      'MALE' => CreateDoctorDtoGenderEnum.MALE,
+      'FEMALE' => CreateDoctorDtoGenderEnum.FEMALE,
+      'OTHER' => CreateDoctorDtoGenderEnum.OTHER,
+      _ => null,
+    };
   }
 
-  // Helper method to map gender for Therapist DTO
   CreateTherapistDtoGenderEnum? _mapTherapistGender(String? gender) {
     if (gender == null) return null;
-    switch (gender.toUpperCase()) {
-      case 'MALE':
-        return CreateTherapistDtoGenderEnum.MALE;
-      case 'FEMALE':
-        return CreateTherapistDtoGenderEnum.FEMALE;
-      case 'OTHER':
-        return CreateTherapistDtoGenderEnum.OTHER;
-      default:
-        return null;
-    }
+    return switch (gender.toUpperCase()) {
+      'MALE' => CreateTherapistDtoGenderEnum.MALE,
+      'FEMALE' => CreateTherapistDtoGenderEnum.FEMALE,
+      'OTHER' => CreateTherapistDtoGenderEnum.OTHER,
+      _ => null,
+    };
   }
 
-  // Helper method to map therapist level
   TherapistProfileDtoLevelEnum? _mapTherapistLevel(String? level) {
     if (level == null) return null;
-    switch (level.toUpperCase()) {
-      case 'JUNIOR':
-        return TherapistProfileDtoLevelEnum.JUNIOR;
-      case 'SENIOR':
-        return TherapistProfileDtoLevelEnum.SENIOR;
-      case 'MASTER':
-        return TherapistProfileDtoLevelEnum.MASTER;
-      default:
-        return null;
-    }
+    return switch (level.toUpperCase()) {
+      'JUNIOR' => TherapistProfileDtoLevelEnum.JUNIOR,
+      'SENIOR' => TherapistProfileDtoLevelEnum.SENIOR,
+      'MASTER' => TherapistProfileDtoLevelEnum.MASTER,
+      _ => null,
+    };
   }
 
-  // Helper method to map strength level
   TherapistProfileDtoStrengthLevelEnum? _mapStrengthLevel(
     String? strengthLevel,
   ) {
     if (strengthLevel == null) return null;
-    switch (strengthLevel.toUpperCase()) {
-      case 'SOFT':
-        return TherapistProfileDtoStrengthLevelEnum.SOFT;
-      case 'MEDIUM':
-        return TherapistProfileDtoStrengthLevelEnum.MEDIUM;
-      case 'STRONG':
-        return TherapistProfileDtoStrengthLevelEnum.STRONG;
-      default:
-        return null;
-    }
-  }
-
-  @override
-  Future<Map<String, String>> getDeviceProficiency() async {
-    // TODO: Implement API call
-    return {};
-  }
-
-  @override
-  Future<Map<String, String>> getSpaSkills() async {
-    // TODO: Implement API call
-    return {};
+    return switch (strengthLevel.toUpperCase()) {
+      'SOFT' => TherapistProfileDtoStrengthLevelEnum.SOFT,
+      'MEDIUM' => TherapistProfileDtoStrengthLevelEnum.MEDIUM,
+      'STRONG' => TherapistProfileDtoStrengthLevelEnum.STRONG,
+      _ => null,
+    };
   }
 }
 
+// ============================================================================
+// 3. MOCK IMPLEMENTATION
+// ============================================================================
+
+/// Mock implementation of [EmployeeRemoteDataSource] for UI testing.
+///
+/// Provides rich static data with simulated network delays.
 class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
   static const _workSchedule = employeeMockWorkSchedule;
 
   Map<String, dynamic> _getCommonFields(String idSuffix, String role) {
-    // Use hash of idSuffix to pick a stable random image
     final imageIndex = idSuffix.hashCode.abs() % employeeMockAvatarPaths.length;
     final avatarUrl = employeeMockAvatarPaths[imageIndex];
 
@@ -550,7 +594,7 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       'role': role.toUpperCase(),
       'position': role == 'Doctor'
           ? 'Specialist Doctor'
-          : '$role Therapist', // 'Spa Therapist' or 'Massage Therapist'
+          : '$role Therapist',
       'rating': 4.5,
       'reviewCount': 100,
       'status': 'ACTIVE',
@@ -697,10 +741,10 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
     return List.generate(count, (index) {
       final i = startingAt + index;
-      final type = i % 3; // 0: Doctor, 1: Spa, 2: Massage
+      final type = i % 3;
       final id = EmployeeId('mock-id-$i');
 
       if (type == 0) {
@@ -715,16 +759,15 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
 
   @override
   Future<int> getTotalRows() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     return 100;
   }
 
   @override
   Future<EmployeeEntity> getEmployeeById(EmployeeId id) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
     final idVal = id.value.toLowerCase();
 
-    // Heuristics to decide type based on ID content or random for generic IDs
     if (idVal.contains('doctor')) {
       return _createDoctor(id);
     } else if (idVal.contains('spa')) {
@@ -733,11 +776,9 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       return _createMassageTherapist(id);
     }
 
-    // Fallback based on hash code or parsing number
     final hashInfo = idVal.codeUnits.fold(0, (p, c) => p + c);
     final type = hashInfo % 3;
 
-    // Check if it ends with a number
     try {
       final parts = idVal.split('-');
       if (parts.isNotEmpty) {
@@ -749,7 +790,9 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
           if (type == 2) return _createMassageTherapist(id);
         }
       }
-    } catch (_) {}
+    } on FormatException {
+      // Ignore parsing errors, use fallback
+    }
 
     if (type == 0) return _createDoctor(id);
     if (type == 1) return _createSpaTherapist(id);
@@ -758,7 +801,13 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
 
   @override
   Future<EmployeeEntity> createDoctor(CreateDoctorRequest request) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    developer.log(
+      'Mock: Created doctor ${request.firstName} ${request.lastName}',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
+
     return DoctorEntity(
       id: EmployeeId('new-doctor-id-${DateTime.now().millisecondsSinceEpoch}'),
       fullName: '${request.firstName} ${request.lastName}',
@@ -785,7 +834,7 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       workSchedule: [],
       dateOfBirth: request.dateOfBirth,
       gender: request.gender,
-      employmentType: 'Full-Time', // Default for new
+      employmentType: 'Full-Time',
       startDate: DateTime.now().toIso8601String(),
     );
   }
@@ -794,7 +843,13 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
   Future<EmployeeEntity> createSpaTherapist(
     CreateSpaTherapistRequest request,
   ) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    developer.log(
+      'Mock: Created spa therapist ${request.firstName} ${request.lastName}',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
+
     return SpaTherapistEntity(
       id: EmployeeId(
         'new-spa-therapist-id-${DateTime.now().millisecondsSinceEpoch}',
@@ -822,7 +877,7 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       workSchedule: [],
       dateOfBirth: request.dateOfBirth,
       gender: request.gender,
-      employmentType: 'Part-Time', // Default for new
+      employmentType: 'Part-Time',
       startDate: DateTime.now().toIso8601String(),
     );
   }
@@ -831,7 +886,13 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
   Future<EmployeeEntity> createMassageTherapist(
     CreateMassageTherapistRequest request,
   ) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    developer.log(
+      'Mock: Created massage therapist ${request.firstName} ${request.lastName}',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
+
     return MassageTherapistEntity(
       id: EmployeeId(
         'new-massage-therapist-id-${DateTime.now().millisecondsSinceEpoch}',
@@ -859,21 +920,29 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       workSchedule: [],
       dateOfBirth: request.dateOfBirth,
       gender: request.gender,
-      employmentType: 'Contract', // Default for new
+      employmentType: 'Contract',
       startDate: DateTime.now().toIso8601String(),
     );
   }
 
   @override
   Future<void> updateEmployee(UpdateEmployeeRequest request) async {
-    await Future.delayed(const Duration(seconds: 1));
-    debugPrint('Mock update employee: ${request.id}');
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    developer.log(
+      'Mock: Updated employee ${request.id}',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
   }
 
   @override
   Future<void> deleteEmployee(EmployeeId id) async {
-    await Future.delayed(const Duration(seconds: 1));
-    debugPrint('Mock delete employee: $id');
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    developer.log(
+      'Mock: Deleted employee $id',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
   }
 
   @override
@@ -881,17 +950,15 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
     required String role,
     int? limit,
   }) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
     final count = limit ?? 10;
 
-    // Return specific types based on requested role
     if (role.toUpperCase() == 'DOCTOR') {
       return List.generate(
         count,
         (index) => _createDoctor(EmployeeId('mock-doc-$index')),
       );
     } else {
-      // Return mix of therapists if role is therapist, or just basic if generic
       return List.generate(count, (index) {
         if (index % 2 == 0) {
           return _createSpaTherapist(EmployeeId('mock-spa-$index'));
@@ -904,17 +971,25 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
 
   @override
   Future<Map<String, String>> getDeviceProficiency() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
     return employeeMockDeviceProficiency;
   }
 
   @override
   Future<Map<String, String>> getSpaSkills() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
     return employeeMockSpaSkills;
   }
 }
 
+// ============================================================================
+// 4. PROVIDER WITH MOCK SWITCHING
+// ============================================================================
+
+/// Provider for [EmployeeRemoteDataSource] with mock/real switching.
+///
+/// Uses [StoreKey.mockFlag] to determine whether to use mock or real
+/// implementation.
 @riverpod
 EmployeeRemoteDataSource employeeRemoteDataSource(Ref ref) {
   final isMock = Store.get(StoreKey.mockFlag, false);
@@ -923,4 +998,32 @@ EmployeeRemoteDataSource employeeRemoteDataSource(Ref ref) {
   }
   final apiService = ref.read(apiServiceProvider);
   return EmployeeRemoteDataSourceImpl(apiService: apiService);
+}
+
+// ============================================================================
+// 5. CUSTOM EXCEPTIONS
+// ============================================================================
+
+/// Exception thrown when an employee is not found.
+class EmployeeNotFoundException implements Exception {
+  /// Creates an exception for the given [id].
+  const EmployeeNotFoundException(this.id);
+
+  /// The employee ID that was not found.
+  final EmployeeId id;
+
+  @override
+  String toString() => 'EmployeeNotFoundException: Employee with id $id not found';
+}
+
+/// Exception thrown when employee creation fails.
+class EmployeeCreationException implements Exception {
+  /// Creates an exception with the given [message].
+  const EmployeeCreationException(this.message);
+
+  /// The error message.
+  final String message;
+
+  @override
+  String toString() => 'EmployeeCreationException: $message';
 }

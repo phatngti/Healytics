@@ -1,9 +1,9 @@
 import 'package:admin_panel/features/common/widgets/table/table.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_function_buttons.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_header_buttons.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_table_columns.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_table_source.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_function_buttons.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_header_buttons.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_table_columns.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_table_source.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

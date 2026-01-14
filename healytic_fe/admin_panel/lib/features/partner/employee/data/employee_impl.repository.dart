@@ -1,17 +1,22 @@
-import 'package:admin_panel/features/partner/employee/datasource/remote_datasource.dart';
+import 'package:admin_panel/features/partner/employee/data/employee_remote.datasource.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.repository.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
-
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'employee_implement.repository.g.dart';
+part 'employee_impl.repository.g.dart';
 
-class EmployeeImplementRepository implements EmployeeRepository {
+/// Implementation of [EmployeeRepository] that delegates to remote data source.
+///
+/// This class acts as the repository layer, coordinating data operations
+/// between the domain layer and the data source layer.
+class EmployeeRepositoryImpl implements EmployeeRepository {
+  /// Creates an instance with the required [remoteDataSource].
+  EmployeeRepositoryImpl({required this.remoteDataSource});
+
+  /// The remote data source for employee operations.
   final EmployeeRemoteDataSource remoteDataSource;
-
-  EmployeeImplementRepository({required this.remoteDataSource});
 
   @override
   Future<List<EmployeeEntity>> getEmployees(
@@ -44,7 +49,9 @@ class EmployeeImplementRepository implements EmployeeRepository {
   }
 
   @override
-  Future<EmployeeEntity> createSpaTherapist(CreateSpaTherapistRequest request) {
+  Future<EmployeeEntity> createSpaTherapist(
+    CreateSpaTherapistRequest request,
+  ) {
     return remoteDataSource.createSpaTherapist(request);
   }
 
@@ -92,8 +99,11 @@ class EmployeeImplementRepository implements EmployeeRepository {
   }
 }
 
+/// Provider for [EmployeeRepository].
+///
+/// Injects the remote data source and creates the repository implementation.
 @riverpod
 EmployeeRepository employeeRepository(Ref ref) {
   final remoteDataSource = ref.read(employeeRemoteDataSourceProvider);
-  return EmployeeImplementRepository(remoteDataSource: remoteDataSource);
+  return EmployeeRepositoryImpl(remoteDataSource: remoteDataSource);
 }

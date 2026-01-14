@@ -1,6 +1,6 @@
 import 'package:admin_panel/features/common/widgets/table/helper.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_table_actions.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_table_actions.widget.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

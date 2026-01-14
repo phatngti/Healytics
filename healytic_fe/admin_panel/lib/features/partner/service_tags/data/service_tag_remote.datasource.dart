@@ -2,7 +2,7 @@ import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
-import 'package:admin_panel/features/partner/service_tags/datasource/data/service_tag_mock_data.dart';
+import 'package:admin_panel/features/partner/service_tags/data/data/service_tag_mock_data.dart';
 import 'package:admin_panel/features/partner/service_tags/domain/service_tag.entity.dart';
 import 'package:admin_panel/features/partner/service_tags/domain/create_service_tag.request.dart';
 import 'package:flutter/foundation.dart';
