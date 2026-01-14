@@ -1,6 +1,6 @@
 import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
-import 'package:admin_panel/features/partner/products/datasource/data/product_mock_data.dart';
+import 'package:admin_panel/features/partner/products/data/data/product_mock_data.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 
@@ -12,7 +12,7 @@ import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:flutter/foundation.dart';
 
-part 'remote_datasource.g.dart';
+part 'product_remote.datasource.g.dart';
 
 abstract class ProductRemoteDataSource {
   Future<List<Product>> getProducts(

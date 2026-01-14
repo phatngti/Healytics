@@ -1,6 +1,6 @@
 import 'package:admin_panel/features/common/widgets/card/statistic_card.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/charts/sales_trend_by_category.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/table/table.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/charts/sales_trend_by_category.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/table/table.widget.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
 import 'package:flutter/material.dart';

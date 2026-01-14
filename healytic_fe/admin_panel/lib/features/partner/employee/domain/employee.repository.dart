@@ -2,8 +2,20 @@ import 'package:admin_panel/features/partner/employee/domain/create_employee.req
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 
+/// Repository interface for employee data operations.
+///
+/// This abstract class defines the contract for all employee-related
+/// data operations. Implementations should handle data fetching from
+/// remote APIs, local databases, or mock sources.
 abstract class EmployeeRepository {
-  /// Get paginated list of employees for table display
+  /// Retrieves a paginated list of employees for table display.
+  ///
+  /// - [startingAt]: The index to start fetching from (0-based).
+  /// - [count]: The number of employees to fetch.
+  /// - [sortedBy]: Optional field name to sort by.
+  /// - [sortedAsc]: Optional sort direction (true for ascending).
+  ///
+  /// Returns a list of [EmployeeEntity] objects.
   Future<List<EmployeeEntity>> getEmployees(
     int startingAt,
     int count,
@@ -11,44 +23,66 @@ abstract class EmployeeRepository {
     bool? sortedAsc,
   );
 
-  /// Get total count of employees
+  /// Returns the total count of employees in the system.
   Future<int> getTotalRows();
 
-  /// Get a single employee by ID
+  /// Retrieves a single employee by their unique identifier.
+  ///
+  /// Throws an exception if the employee is not found.
   Future<EmployeeEntity> getEmployeeById(EmployeeId id);
 
-  /// Create a new doctor employee
+  /// Creates a new doctor employee.
+  ///
+  /// Returns the created [EmployeeEntity] with the assigned ID.
   Future<EmployeeEntity> createDoctor(CreateDoctorRequest request);
 
-  /// Create a new spa therapist employee
+  /// Creates a new spa therapist employee.
+  ///
+  /// Returns the created [EmployeeEntity] with the assigned ID.
   Future<EmployeeEntity> createSpaTherapist(CreateSpaTherapistRequest request);
 
-  /// Create a new massage therapist employee
+  /// Creates a new massage therapist employee.
+  ///
+  /// Returns the created [EmployeeEntity] with the assigned ID.
   Future<EmployeeEntity> createMassageTherapist(
     CreateMassageTherapistRequest request,
   );
 
-  /// Update an existing employee
+  /// Updates an existing employee's information.
+  ///
+  /// Throws an exception if the employee is not found.
   Future<void> updateEmployee(UpdateEmployeeRequest request);
 
-  /// Delete an employee by ID
+  /// Deletes an employee by their unique identifier.
+  ///
+  /// Throws an exception if the employee is not found.
   Future<void> deleteEmployee(EmployeeId id);
 
-  /// Get list of employees as entities (for selection widgets)
+  /// Retrieves a list of employees as entities for selection widgets.
+  ///
+  /// - [startingAt]: The index to start fetching from.
+  /// - [count]: The number of employees to fetch.
   Future<List<EmployeeEntity>> getEmployeesList({
     required int startingAt,
     required int count,
   });
 
-  /// Get employees filtered by role (e.g., DOCTOR, THERAPIST)
+  /// Retrieves employees filtered by role.
+  ///
+  /// - [role]: The role to filter by (e.g., 'DOCTOR', 'THERAPIST').
+  /// - [limit]: Optional maximum number of results to return.
   Future<List<EmployeeEntity>> getEmployeesByRole({
     required String role,
     int? limit,
   });
 
-  /// Get spa skills
+  /// Retrieves available spa skills as key-value pairs.
+  ///
+  /// Keys are skill identifiers, values are display names.
   Future<Map<String, String>> getSpaSkills();
 
-  /// Get device proficiency
+  /// Retrieves available device proficiency options as key-value pairs.
+  ///
+  /// Keys are device identifiers, values are display names.
   Future<Map<String, String>> getDeviceProficiency();
 }
