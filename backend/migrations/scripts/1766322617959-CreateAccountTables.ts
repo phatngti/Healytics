@@ -1,68 +1,105 @@
-import { MigrationInterface, QueryRunner, TableIndex } from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex } from "typeorm";
 
 export class CreateAccountTables1766322617959 implements MigrationInterface {
     name = 'CreateAccountTables1766322617959'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(
-            `CREATE TABLE "account" (
-                "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-                "email" character varying NOT NULL,
-                "password_hash" character varying,
-                "refresh_token_hash" text,
-                "role" "public"."account_role_enum" NOT NULL DEFAULT 'user',
-                "survey" jsonb,
-                "is_active" boolean NOT NULL DEFAULT true,
-                "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-                "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-                "deleted_at" TIMESTAMPTZ,
-                CONSTRAINT "UQ_4c8f96ccf523e9a3faefd5bdd4c" UNIQUE ("email"),
-                CONSTRAINT "PK_54115ee388cdb6d86bb4bf5b2ea" PRIMARY KEY ("id")
-            )`
-        );
-        await queryRunner.query(
-            `CREATE TABLE "address" (
-                "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-                "street" character varying NOT NULL,
-                "ward" character varying NOT NULL,
-                "district" character varying NOT NULL,
-                "city_or_province" character varying NOT NULL,
-                "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-                "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-                "deleted_at" TIMESTAMPTZ,
-                CONSTRAINT "PK_d92de1f82754668b5f5f5dd4fd5" PRIMARY KEY ("id")
-            )`
-        );
-        await queryRunner.query(
-            `CREATE TABLE "user_profile" (
-                "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-                "first_name" character varying,
-                "last_name" character varying,
-                "phone" character varying,
-                "bio" text,
-                "date_of_birth" date,
-                "profile_completed" boolean NOT NULL DEFAULT false,
-                "is_used" boolean NOT NULL DEFAULT false,
-                "account_id" uuid,
-                "address_id" uuid,
-                "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-                "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-                "deleted_at" TIMESTAMPTZ,
-                CONSTRAINT "REL_b0da23332d347bef77f1f4d1e1" UNIQUE ("account_id"),
-                CONSTRAINT "REL_0850f469e017ce01896d785950" UNIQUE ("address_id"),
-                CONSTRAINT "PK_f44d0cd18cfd80b0fed7806c3b7" PRIMARY KEY ("id")
-            )`
-        );
-        
-        // Add FK constraints
-        await queryRunner.query(
-            `ALTER TABLE "user_profile" ADD CONSTRAINT "FK_b0da23332d347bef77f1f4d1e1c" FOREIGN KEY ("account_id") REFERENCES "account"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
-        );
-        await queryRunner.query(
-            `ALTER TABLE "user_profile" ADD CONSTRAINT "FK_0850f469e017ce01896d785950c" FOREIGN KEY ("address_id") REFERENCES "address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
-        );
+        // ------------------------------------------------------------------
+        // 1. CREATE ENUM TYPE: account_role_enum
+        // ------------------------------------------------------------------
+        await queryRunner.query(`DO $$ BEGIN
+            CREATE TYPE "public"."account_role_enum" AS ENUM ('user', 'employee', 'health_partner', 'admin');
+        EXCEPTION WHEN duplicate_object THEN NULL; END $$;`);
 
-        // Add indexes for FK columns (required for performance)
+        // ------------------------------------------------------------------
+        // 2. CREATE TABLE: account
+        // ------------------------------------------------------------------
+        await queryRunner.createTable(new Table({
+            name: "account",
+            columns: [
+                {
+                    name: "id",
+                    type: "uuid",
+                    isPrimary: true,
+                    isGenerated: true,
+                    generationStrategy: "uuid",
+                    default: "uuid_generate_v4()",
+                },
+                { name: "email", type: "varchar", length: "255", isUnique: true },
+                { name: "password_hash", type: "varchar", length: "255", isNullable: true },
+                { name: "refresh_token_hash", type: "text", isNullable: true },
+                { name: "role", type: "account_role_enum", default: "'user'" },
+                { name: "survey", type: "jsonb", isNullable: true },
+                { name: "is_active", type: "boolean", default: true },
+                // Audit columns with timezone (Enterprise Standard)
+                { name: "created_at", type: "timestamptz", default: "now()" },
+                { name: "updated_at", type: "timestamptz", default: "now()" },
+                { name: "deleted_at", type: "timestamptz", isNullable: true }, // Soft Delete
+            ]
+        }), true);
+
+        // Index for email search
+        await queryRunner.createIndex("account", new TableIndex({
+            name: "IDX_ACCOUNT_EMAIL",
+            columnNames: ["email"]
+        }));
+
+        // ------------------------------------------------------------------
+        // 3. CREATE TABLE: address
+        // ------------------------------------------------------------------
+        await queryRunner.createTable(new Table({
+            name: "address",
+            columns: [
+                {
+                    name: "id",
+                    type: "uuid",
+                    isPrimary: true,
+                    isGenerated: true,
+                    generationStrategy: "uuid",
+                    default: "uuid_generate_v4()",
+                },
+                { name: "street", type: "varchar", length: "255" },
+                { name: "ward", type: "varchar", length: "255" },
+                { name: "district", type: "varchar", length: "255" },
+                { name: "city_or_province", type: "varchar", length: "255" },
+                // Audit columns with timezone (Enterprise Standard)
+                { name: "created_at", type: "timestamptz", default: "now()" },
+                { name: "updated_at", type: "timestamptz", default: "now()" },
+                { name: "deleted_at", type: "timestamptz", isNullable: true }, // Soft Delete
+            ]
+        }), true);
+
+        // ------------------------------------------------------------------
+        // 4. CREATE TABLE: user_profile
+        // ------------------------------------------------------------------
+        await queryRunner.createTable(new Table({
+            name: "user_profile",
+            columns: [
+                {
+                    name: "id",
+                    type: "uuid",
+                    isPrimary: true,
+                    isGenerated: true,
+                    generationStrategy: "uuid",
+                    default: "uuid_generate_v4()",
+                },
+                { name: "first_name", type: "varchar", length: "100", isNullable: true },
+                { name: "last_name", type: "varchar", length: "100", isNullable: true },
+                { name: "phone", type: "varchar", length: "20", isNullable: true },
+                { name: "bio", type: "text", isNullable: true },
+                { name: "date_of_birth", type: "date", isNullable: true },
+                { name: "profile_completed", type: "boolean", default: false },
+                { name: "is_used", type: "boolean", default: false },
+                { name: "account_id", type: "uuid", isUnique: true, isNullable: true },
+                { name: "address_id", type: "uuid", isUnique: true, isNullable: true },
+                // Audit columns with timezone (Enterprise Standard)
+                { name: "created_at", type: "timestamptz", default: "now()" },
+                { name: "updated_at", type: "timestamptz", default: "now()" },
+                { name: "deleted_at", type: "timestamptz", isNullable: true }, // Soft Delete
+            ]
+        }), true);
+
+        // Indexes for FK columns (required for performance)
         await queryRunner.createIndex("user_profile", new TableIndex({
             name: "IDX_USER_PROFILE_ACCOUNT_ID",
             columnNames: ["account_id"]
@@ -71,21 +108,66 @@ export class CreateAccountTables1766322617959 implements MigrationInterface {
             name: "IDX_USER_PROFILE_ADDRESS_ID",
             columnNames: ["address_id"]
         }));
+
+        // FK: user_profile -> account
+        await queryRunner.createForeignKey("user_profile", new TableForeignKey({
+            name: "FK_USER_PROFILE_ACCOUNT_ID",
+            columnNames: ["account_id"],
+            referencedColumnNames: ["id"],
+            referencedTableName: "account",
+            onDelete: "CASCADE"
+        }));
+
+        // FK: user_profile -> address
+        await queryRunner.createForeignKey("user_profile", new TableForeignKey({
+            name: "FK_USER_PROFILE_ADDRESS_ID",
+            columnNames: ["address_id"],
+            referencedColumnNames: ["id"],
+            referencedTableName: "address",
+            onDelete: "SET NULL"
+        }));
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        // Drop indexes first
-        await queryRunner.dropIndex("user_profile", "IDX_USER_PROFILE_ADDRESS_ID");
-        await queryRunner.dropIndex("user_profile", "IDX_USER_PROFILE_ACCOUNT_ID");
-        
-        // Drop FK constraints
-        await queryRunner.query(`ALTER TABLE "user_profile" DROP CONSTRAINT "FK_0850f469e017ce01896d785950c"`);
-        await queryRunner.query(`ALTER TABLE "user_profile" DROP CONSTRAINT "FK_b0da23332d347bef77f1f4d1e1c"`);
-        
-        // Drop tables
-        await queryRunner.query(`DROP TABLE "user_profile"`);
-        await queryRunner.query(`DROP TABLE "address"`);
-        await queryRunner.query(`DROP TABLE "account"`);
-    }
+        // Drop in reverse order to avoid FK constraint errors
+        // Use existence checks for idempotency (safe for partial re-runs)
 
+        // 1. Drop user_profile
+        const userProfileTable = await queryRunner.getTable("user_profile");
+        if (userProfileTable) {
+            const fkAddress = userProfileTable.foreignKeys.find(fk => fk.name === "FK_USER_PROFILE_ADDRESS_ID");
+            if (fkAddress) {
+                await queryRunner.dropForeignKey("user_profile", fkAddress);
+            }
+            const fkAccount = userProfileTable.foreignKeys.find(fk => fk.name === "FK_USER_PROFILE_ACCOUNT_ID");
+            if (fkAccount) {
+                await queryRunner.dropForeignKey("user_profile", fkAccount);
+            }
+            const idxAddress = userProfileTable.indices.find(idx => idx.name === "IDX_USER_PROFILE_ADDRESS_ID");
+            if (idxAddress) {
+                await queryRunner.dropIndex("user_profile", idxAddress);
+            }
+            const idxAccount = userProfileTable.indices.find(idx => idx.name === "IDX_USER_PROFILE_ACCOUNT_ID");
+            if (idxAccount) {
+                await queryRunner.dropIndex("user_profile", idxAccount);
+            }
+        }
+        await queryRunner.dropTable("user_profile", true);
+
+        // 2. Drop address
+        await queryRunner.dropTable("address", true);
+
+        // 3. Drop account
+        const accountTable = await queryRunner.getTable("account");
+        if (accountTable) {
+            const idxEmail = accountTable.indices.find(idx => idx.name === "IDX_ACCOUNT_EMAIL");
+            if (idxEmail) {
+                await queryRunner.dropIndex("account", idxEmail);
+            }
+        }
+        await queryRunner.dropTable("account", true);
+
+        // 4. Drop enum
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."account_role_enum"`);
+    }
 }

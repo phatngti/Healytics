@@ -1,0 +1,50 @@
+import { Expose, Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+/**
+ * Response DTO for service tag data.
+ * Controls serialization output via @Expose decorators.
+ */
+export class ServiceTagResponseDto {
+  @Expose()
+  @ApiProperty({ example: 'uuid-tag-id' })
+  id: string;
+
+  @Expose()
+  @ApiProperty({ example: 'uuid-user-id' })
+  userId: string;
+
+  @Expose()
+  @ApiProperty({ example: 'Premium Service' })
+  name: string;
+
+  @Expose()
+  @ApiPropertyOptional({ example: 'Tags for premium tier services' })
+  description: string | null;
+
+  @Expose()
+  @ApiProperty({ example: 0xFF6366F1 })
+  colorValue: number;
+
+  @Expose()
+  @ApiProperty({ example: 5 })
+  usage: number;
+
+  @Expose()
+  @ApiProperty({ example: true })
+  isActive: boolean;
+
+  @Expose()
+  @ApiProperty({ example: 0 })
+  sortOrder: number;
+
+  @Expose()
+  @Type(() => Date)
+  @ApiProperty({ example: '2026-01-14T22:45:00.000Z' })
+  createdAt: Date;
+
+  @Expose()
+  @Type(() => Date)
+  @ApiProperty({ example: '2026-01-14T22:45:00.000Z' })
+  updatedAt: Date;
+}
