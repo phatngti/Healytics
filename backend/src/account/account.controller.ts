@@ -3,9 +3,10 @@ import {
   Get,
   Post,
   Body,
-  Req,
   ConflictException,
   UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { SurveyDto } from './dto/request/survey.dto';
@@ -14,6 +15,7 @@ import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { ALL_ROLES } from '@/auth/constants/role-groups';
+import { CurrentUser } from '@/auth/decorators/current-user.decorator';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -32,6 +34,7 @@ import {
 @ApiBearerAuth()
 @Controller({ path: 'account', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(ClassSerializerInterceptor)
 @Roles(...ALL_ROLES)
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
@@ -42,9 +45,8 @@ export class AccountController {
   @Get('survey')
   @ApiOperation({ summary: 'Get current user survey' })
   @ApiOkResponse({ description: 'User survey', type: SurveyResponseDto })
-  async getSurvey(@Req() req: any): Promise<SurveyResponseDto> {
-    const id = req.user?.id;
-    const survey = await this.accountService.getSurvey(id);
+  async getSurvey(@CurrentUser('id') userId: string): Promise<SurveyResponseDto> {
+    const survey = await this.accountService.getSurvey(userId);
     if (survey === null) return { survey: null } as SurveyResponseDto;
     return { survey };
   }
@@ -62,13 +64,12 @@ export class AccountController {
   })
   @ApiConflictResponse({ description: 'Survey already exists' })
   async postSurvey(
-    @Req() req: any,
+    @CurrentUser('id') userId: string,
     @Body() dto: SurveyDto,
   ): Promise<SurveyResponseDto> {
-    const id = req.user?.id;
-    const existing = await this.accountService.getSurvey(id);
+    const existing = await this.accountService.getSurvey(userId);
     if (existing !== null) throw new ConflictException('Survey already exists');
-    const created = await this.accountService.setSurvey(id, dto.survey);
+    const created = await this.accountService.setSurvey(userId, dto.survey);
     return { survey: created['survey'] };
   }
 }

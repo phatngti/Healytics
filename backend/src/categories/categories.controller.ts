@@ -8,6 +8,11 @@ import {
   Delete,
   Query,
   UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,6 +20,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiNotFoundResponse,
+  ApiNoContentResponse,
   ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
@@ -36,6 +42,7 @@ import { Public } from '@/auth/decorators/public.decorator';
 @ApiBearerAuth()
 @Controller({ path: 'categories', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(ClassSerializerInterceptor)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
@@ -65,10 +72,7 @@ export class CategoriesController {
   })
   @ApiQuery({ name: 'rootsOnly', required: false, type: Boolean, description: 'Return only root categories' })
   findAll(@Query('rootsOnly') rootsOnly?: string): Promise<Category[]> {
-    if (rootsOnly === 'true') {
-      return this.categoriesService.findRoots();
-    }
-    return this.categoriesService.findAll();
+    return this.categoriesService.findAll(rootsOnly === 'true');
   }
 
   /**
@@ -82,7 +86,7 @@ export class CategoriesController {
     type: Category,
   })
   @ApiNotFoundResponse({ description: 'Category not found.' })
-  findOne(@Param('id') id: string): Promise<Category> {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Category> {
     return this.categoriesService.findOne(id);
   }
 
@@ -113,7 +117,7 @@ export class CategoriesController {
   })
   @ApiNotFoundResponse({ description: 'Category not found.' })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
     return this.categoriesService.update(id, updateCategoryDto);
@@ -124,10 +128,11 @@ export class CategoriesController {
    */
   @Delete(':id')
   @Roles(...ADMIN_ROLES)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a category' })
-  @ApiOkResponse({ description: 'The category has been successfully deleted.' })
+  @ApiNoContentResponse({ description: 'The category has been successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Category not found.' })
-  remove(@Param('id') id: string): Promise<void> {
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.categoriesService.remove(id);
   }
 }
