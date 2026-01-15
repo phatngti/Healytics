@@ -14,6 +14,8 @@ import { UpdateServiceTagDto } from './dto/update-service-tag.dto';
 import { CreateServiceTagHandler } from './application/handlers/create-service-tag.handler';
 import { UpdateServiceTagHandler } from './application/handlers/update-service-tag.handler';
 import { RemoveServiceTagHandler } from './application/handlers/remove-service-tag.handler';
+import { AttachProductTagHandler } from './application/handlers/attach-product-tag.handler';
+import { DetachProductTagHandler } from './application/handlers/detach-product-tag.handler';
 
 /**
  * Service facade for service tag operations.
@@ -32,6 +34,8 @@ export class ServiceTagsService {
     private readonly createServiceTagHandler: CreateServiceTagHandler,
     private readonly updateServiceTagHandler: UpdateServiceTagHandler,
     private readonly removeServiceTagHandler: RemoveServiceTagHandler,
+    private readonly attachProductTagHandler: AttachProductTagHandler,
+    private readonly detachProductTagHandler: DetachProductTagHandler,
   ) {}
 
   /**
@@ -99,92 +103,25 @@ export class ServiceTagsService {
   }
 
   /**
-   * Attaches a tag to a product.
+   * Facade: Delegates to AttachProductTagHandler.
    */
   async attachToProduct(
     tagId: string,
     productId: string,
     userId: string,
   ): Promise<ProductTag> {
-    this.logger.log(`Attaching tag ${tagId} to product ${productId}`);
-
-    // Verify tag exists and belongs to user
-    const tag = await this.serviceTagRepository.findOne({
-      where: { id: tagId },
-    });
-
-    if (!tag) {
-      throw new NotFoundException(`Service tag with ID ${tagId} not found`);
-    }
-
-    if (tag.userId !== userId) {
-      throw new ForbiddenException('You do not have permission to use this tag');
-    }
-
-    // Check if already attached
-    const existing = await this.productTagRepository.findOne({
-      where: { productId, tagId },
-    });
-
-    if (existing) {
-      throw new ConflictException('Tag is already attached to this product');
-    }
-
-    // Create attachment
-    const productTag = this.productTagRepository.create({
-      productId,
-      tagId,
-    });
-
-    const savedProductTag = await this.productTagRepository.save(productTag);
-
-    // Increment usage counter
-    await this.serviceTagRepository.increment({ id: tagId }, 'usage', 1);
-
-    this.logger.log(`Tag ${tagId} attached to product ${productId}`);
-    return savedProductTag;
+    return this.attachProductTagHandler.execute(tagId, productId, userId);
   }
 
   /**
-   * Detaches a tag from a product.
+   * Facade: Delegates to DetachProductTagHandler.
    */
   async detachFromProduct(
     tagId: string,
     productId: string,
     userId: string,
   ): Promise<void> {
-    this.logger.log(`Detaching tag ${tagId} from product ${productId}`);
-
-    // Verify tag exists and belongs to user
-    const tag = await this.serviceTagRepository.findOne({
-      where: { id: tagId },
-    });
-
-    if (!tag) {
-      throw new NotFoundException(`Service tag with ID ${tagId} not found`);
-    }
-
-    if (tag.userId !== userId) {
-      throw new ForbiddenException('You do not have permission to modify this tag');
-    }
-
-    // Find and remove attachment
-    const productTag = await this.productTagRepository.findOne({
-      where: { productId, tagId },
-    });
-
-    if (!productTag) {
-      throw new NotFoundException('Tag is not attached to this product');
-    }
-
-    await this.productTagRepository.remove(productTag);
-
-    // Decrement usage counter
-    if (tag.usage > 0) {
-      await this.serviceTagRepository.decrement({ id: tagId }, 'usage', 1);
-    }
-
-    this.logger.log(`Tag ${tagId} detached from product ${productId}`);
+    return this.detachProductTagHandler.execute(tagId, productId, userId);
   }
 
   /**

@@ -6,8 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
   UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,7 +19,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiNotFoundResponse,
-  ApiQuery,
+  ApiNoContentResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
@@ -28,13 +32,21 @@ import { Roles } from '@/auth/decorators/roles.decorator';
 import { ADMIN_ROLES } from '@/auth/constants/role-groups';
 import { Public } from '@/auth/decorators/public.decorator';
 
+/**
+ * Controller for product management endpoints.
+ * API Version 1.
+ */
 @ApiTags('products')
 @ApiBearerAuth()
-@Controller('products')
+@Controller({ path: 'products', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(ClassSerializerInterceptor)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  /**
+   * Creates a new product.
+   */
   @Post()
   @Roles(...ADMIN_ROLES)
   @ApiOperation({ summary: 'Create a new product' })
@@ -42,10 +54,13 @@ export class ProductsController {
     description: 'The product has been successfully created.',
     type: Product,
   })
-  create(@Body() createProductDto: CreateProductDto) {
+  create(@Body() createProductDto: CreateProductDto): Promise<Product> {
     return this.productsService.create(createProductDto);
   }
 
+  /**
+   * Retrieves all products.
+   */
   @Get()
   @Public()
   @ApiOperation({ summary: 'Get all products' })
@@ -53,10 +68,13 @@ export class ProductsController {
     description: 'Return all products.',
     type: [Product],
   })
-  findAll() {
+  findAll(): Promise<Product[]> {
     return this.productsService.findAll();
   }
 
+  /**
+   * Retrieves a product by ID.
+   */
   @Get(':id')
   @Public()
   @ApiOperation({ summary: 'Get a product by id' })
@@ -65,10 +83,13 @@ export class ProductsController {
     type: Product,
   })
   @ApiNotFoundResponse({ description: 'Product not found.' })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Product> {
     return this.productsService.findOne(id);
   }
 
+  /**
+   * Retrieves a product by slug.
+   */
   @Get('slug/:slug')
   @Public()
   @ApiOperation({ summary: 'Get a product by slug' })
@@ -77,10 +98,13 @@ export class ProductsController {
     type: Product,
   })
   @ApiNotFoundResponse({ description: 'Product not found.' })
-  findBySlug(@Param('slug') slug: string) {
+  findBySlug(@Param('slug') slug: string): Promise<Product> {
     return this.productsService.findBySlug(slug);
   }
 
+  /**
+   * Updates a product.
+   */
   @Patch(':id')
   @Roles(...ADMIN_ROLES)
   @ApiOperation({ summary: 'Update a product' })
@@ -90,18 +114,22 @@ export class ProductsController {
   })
   @ApiNotFoundResponse({ description: 'Product not found.' })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductDto: UpdateProductDto,
-  ) {
+  ): Promise<Product> {
     return this.productsService.update(id, updateProductDto);
   }
 
+  /**
+   * Deletes a product (soft delete).
+   */
   @Delete(':id')
   @Roles(...ADMIN_ROLES)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a product' })
-  @ApiOkResponse({ description: 'The product has been successfully deleted.' })
+  @ApiNoContentResponse({ description: 'The product has been successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Product not found.' })
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.productsService.remove(id);
   }
 }
