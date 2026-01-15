@@ -17,7 +17,7 @@ n4f_config = BitsAndBytesConfig(
 # 24GB --> 8GB
 # def get_hf_llm(model_name = "microsoft/Phi-3-mini-4k-instruct", max_new_token = 300, **kwargs):
 
-def get_hf_llm(model_name = "meta-llama/Llama-3.2-3B-Instruct", max_new_token = 300, **kwargs):
+def get_hf_llm(model_name = "meta-llama/Llama-3.2-3B-Instruct", max_new_token = 3000, **kwargs):
      
     # hf_token = "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" // Model Llama_8B
     hf_token = "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" # Model Llama_3B

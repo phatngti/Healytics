@@ -14,7 +14,7 @@ def remove_non_utf8_characters(text: str) -> str:
 
 def load_pdf(pdf_file: str):
     """Đọc một file PDF và trả về nội dung đã được làm sạch."""
-    docs = PyPDFLoader(pdf_file, extract_images=True).load()
+    docs = PyPDFLoader(pdf_file, extract_images=False).load()
     for doc in docs:
         doc.page_content = remove_non_utf8_characters(doc.page_content)
     return docs
