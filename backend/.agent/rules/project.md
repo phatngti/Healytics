@@ -106,8 +106,9 @@ Generate code, corrections, and refactorings that comply with the basic principl
     - DTOs validated with class-validator for inputs.
     - Declare simple types for outputs.
   - A services module with business logic and persistence.
-    - Entities with MikroORM for data persistence.
+    - Entities with TypeORM for data persistence (PostgreSQL).
     - One service per entity.
+    - Use Handlers for complex transactional operations.
 - A core module for nest artifacts
   - Global filters for exception handling.
   - Global middlewares for request management.
