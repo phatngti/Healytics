@@ -74,9 +74,13 @@ export class CategoriesService implements OnModuleInit {
 
   /**
    * Retrieves all categories with their relations.
-   * @returns Array of all categories
+   * @param rootsOnly - If true, return only root categories
+   * @returns Array of all categories or root categories
    */
-  async findAll(): Promise<Category[]> {
+  async findAll(rootsOnly = false): Promise<Category[]> {
+    if (rootsOnly) {
+      return this.findRoots();
+    }
     return this.categoryRepository.find({
       relations: ['parent', 'children'],
       order: { name: 'ASC' },
