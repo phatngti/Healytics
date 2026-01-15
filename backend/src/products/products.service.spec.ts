@@ -1,66 +1,57 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProductsService } from './products.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Product } from './entities/product.entity';
 import { NotFoundException } from '@nestjs/common';
+import { ProductsService } from './products.service';
+import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductHandler } from './application/handlers/create-product.handler';
 import { UpdateProductHandler } from './application/handlers/update-product.handler';
 import { RemoveProductHandler } from './application/handlers/remove-product.handler';
+import {
+  MockRepository,
+  MockHandler,
+  createMockRepository,
+  createMockHandler,
+} from '../../test/mocks/mock-types';
 
 describe('ProductsService', () => {
   let service: ProductsService;
-  let createHandler: CreateProductHandler;
-  let updateHandler: UpdateProductHandler;
-  let removeHandler: RemoveProductHandler;
-  let productRepository;
-
-  const mockProductRepository = {
-    find: jest.fn(),
-    findOne: jest.fn(),
-  };
-
-  const mockCreateProductHandler = {
-    execute: jest.fn(),
-  };
-
-  const mockUpdateProductHandler = {
-    execute: jest.fn(),
-  };
-
-  const mockRemoveProductHandler = {
-    execute: jest.fn(),
-  };
+  let productRepository: MockRepository<Product>;
+  let createProductHandler: MockHandler;
+  let updateProductHandler: MockHandler;
+  let removeProductHandler: MockHandler;
 
   beforeEach(async () => {
+    // Arrange - Create fresh mocks for each test
+    productRepository = createMockRepository<Product>();
+    createProductHandler = createMockHandler();
+    updateProductHandler = createMockHandler();
+    removeProductHandler = createMockHandler();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
         {
           provide: getRepositoryToken(Product),
-          useValue: mockProductRepository,
+          useValue: productRepository,
         },
         {
           provide: CreateProductHandler,
-          useValue: mockCreateProductHandler,
+          useValue: createProductHandler,
         },
         {
           provide: UpdateProductHandler,
-          useValue: mockUpdateProductHandler,
+          useValue: updateProductHandler,
         },
         {
           provide: RemoveProductHandler,
-          useValue: mockRemoveProductHandler,
+          useValue: removeProductHandler,
         },
       ],
     }).compile();
 
     service = module.get<ProductsService>(ProductsService);
-    createHandler = module.get<CreateProductHandler>(CreateProductHandler);
-    updateHandler = module.get<UpdateProductHandler>(UpdateProductHandler);
-    removeHandler = module.get<RemoveProductHandler>(RemoveProductHandler);
-    productRepository = module.get(getRepositoryToken(Product));
   });
 
   afterEach(() => {
@@ -68,89 +59,143 @@ describe('ProductsService', () => {
   });
 
   describe('create', () => {
-    it('should delegate to CreateProductHandler', async () => {
-      const dto = { name: 'Test' } as CreateProductDto;
-      const expectedProduct = { id: '1', name: 'Test' };
-      
-      mockCreateProductHandler.execute.mockResolvedValue(expectedProduct);
+    it('should delegate to CreateProductHandler and return created product', async () => {
+      // Arrange
+      const dto: CreateProductDto = { name: 'Test Product' } as CreateProductDto;
+      const expectedProduct = { id: 'uuid-1', name: 'Test Product' };
+      createProductHandler.execute.mockResolvedValue(expectedProduct);
 
+      // Act
       const result = await service.create(dto);
 
+      // Assert
       expect(result).toEqual(expectedProduct);
-      expect(createHandler.execute).toHaveBeenCalledWith(dto);
+      expect(createProductHandler.execute).toHaveBeenCalledWith(dto);
+      expect(createProductHandler.execute).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('update', () => {
-    it('should delegate to UpdateProductHandler', async () => {
-      const dto = { name: 'Updated' } as UpdateProductDto;
-      const expectedProduct = { id: '1', name: 'Updated' };
-      
-      mockUpdateProductHandler.execute.mockResolvedValue(expectedProduct);
+    it('should delegate to UpdateProductHandler and return updated product', async () => {
+      // Arrange
+      const id = 'uuid-1';
+      const dto: UpdateProductDto = { name: 'Updated Product' } as UpdateProductDto;
+      const expectedProduct = { id, name: 'Updated Product' };
+      updateProductHandler.execute.mockResolvedValue(expectedProduct);
 
-      const result = await service.update('1', dto);
+      // Act
+      const result = await service.update(id, dto);
 
+      // Assert
       expect(result).toEqual(expectedProduct);
-      expect(updateHandler.execute).toHaveBeenCalledWith('1', dto);
+      expect(updateProductHandler.execute).toHaveBeenCalledWith(id, dto);
+      expect(updateProductHandler.execute).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('remove', () => {
     it('should delegate to RemoveProductHandler', async () => {
-      mockRemoveProductHandler.execute.mockResolvedValue(undefined);
+      // Arrange
+      const id = 'uuid-1';
+      removeProductHandler.execute.mockResolvedValue(undefined);
 
-      await service.remove('1');
+      // Act
+      await service.remove(id);
 
-      expect(removeHandler.execute).toHaveBeenCalledWith('1');
+      // Assert
+      expect(removeProductHandler.execute).toHaveBeenCalledWith(id);
+      expect(removeProductHandler.execute).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('findAll', () => {
-    it('should return an array of products', async () => {
-      const result = [{ id: '1', name: 'P1' }];
-      mockProductRepository.find.mockResolvedValue(result);
+    it('should return all products with relations ordered by createdAt DESC', async () => {
+      // Arrange
+      const expectedProducts = [
+        { id: 'uuid-1', name: 'Product 1' },
+        { id: 'uuid-2', name: 'Product 2' },
+      ];
+      productRepository.find.mockResolvedValue(expectedProducts);
 
-      expect(await service.findAll()).toEqual(result);
-      expect(mockProductRepository.find).toHaveBeenCalledWith(
+      // Act
+      const result = await service.findAll();
+
+      // Assert
+      expect(result).toEqual(expectedProducts);
+      expect(productRepository.find).toHaveBeenCalledWith(
         expect.objectContaining({
-            relations: expect.any(Array),
-            order: { createdAt: 'DESC' }
-        })
+          relations: expect.any(Array),
+          order: { createdAt: 'DESC' },
+        }),
       );
+    });
+
+    it('should return empty array when no products exist', async () => {
+      // Arrange
+      productRepository.find.mockResolvedValue([]);
+
+      // Act
+      const result = await service.findAll();
+
+      // Assert
+      expect(result).toEqual([]);
     });
   });
 
   describe('findOne', () => {
-    it('should return a product if found', async () => {
-      const product = { id: '1', name: 'P1' };
-      mockProductRepository.findOne.mockResolvedValue(product);
+    it('should return a product when found by ID', async () => {
+      // Arrange
+      const id = 'uuid-1';
+      const expectedProduct = { id, name: 'Test Product' };
+      productRepository.findOne.mockResolvedValue(expectedProduct);
 
-      expect(await service.findOne('1')).toEqual(product);
-      expect(mockProductRepository.findOne).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { id: '1' } })
+      // Act
+      const result = await service.findOne(id);
+
+      // Assert
+      expect(result).toEqual(expectedProduct);
+      expect(productRepository.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id } }),
       );
     });
 
-    it('should throw NotFoundException if not found', async () => {
-      mockProductRepository.findOne.mockResolvedValue(null);
-      await expect(service.findOne('999')).rejects.toThrow(NotFoundException);
+    it('should throw NotFoundException when product not found', async () => {
+      // Arrange
+      const id = 'non-existent-id';
+      productRepository.findOne.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.findOne(id)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne(id)).rejects.toThrow(`Product with ID ${id} not found`);
     });
   });
 
   describe('findBySlug', () => {
-    it('should return a product if found', async () => {
-      const product = { id: '1', slug: 'slug-1' };
-      mockProductRepository.findOne.mockResolvedValue(product);
+    it('should return a product when found by slug', async () => {
+      // Arrange
+      const slug = 'test-product';
+      const expectedProduct = { id: 'uuid-1', slug };
+      productRepository.findOne.mockResolvedValue(expectedProduct);
 
-      expect(await service.findBySlug('slug-1')).toEqual(product);
-      expect(mockProductRepository.findOne).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { slug: 'slug-1' } })
+      // Act
+      const result = await service.findBySlug(slug);
+
+      // Assert
+      expect(result).toEqual(expectedProduct);
+      expect(productRepository.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { slug } }),
       );
     });
 
-    it('should throw NotFoundException if not found', async () => {
-      mockProductRepository.findOne.mockResolvedValue(null);
-      await expect(service.findBySlug('missing-slug')).rejects.toThrow(NotFoundException);
+    it('should throw NotFoundException when product slug not found', async () => {
+      // Arrange
+      const slug = 'non-existent-slug';
+      productRepository.findOne.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.findBySlug(slug)).rejects.toThrow(NotFoundException);
+      await expect(service.findBySlug(slug)).rejects.toThrow(`Product with slug "${slug}" not found`);
     });
   });
 });
+

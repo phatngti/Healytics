@@ -492,7 +492,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "The employee has been successfully deleted."
           },
           "404": {
@@ -683,7 +683,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "The category has been successfully deleted."
           },
           "404": {
@@ -903,7 +903,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "The product has been successfully deleted."
           },
           "404": {
@@ -957,6 +957,349 @@
         "summary": "Get a product by slug",
         "tags": [
           "products"
+        ]
+      }
+    },
+    "/service-tags": {
+      "post": {
+        "operationId": "ServiceTagsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateServiceTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The service tag has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceTagResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new service tag",
+        "tags": [
+          "service-tags"
+        ]
+      },
+      "get": {
+        "operationId": "ServiceTagsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return all service tags for the current user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceTagResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all service tags for current user",
+        "tags": [
+          "service-tags"
+        ]
+      }
+    },
+    "/service-tags/active": {
+      "get": {
+        "operationId": "ServiceTagsController_findActive",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return active service tags for the current user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceTagResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get active service tags for current user",
+        "tags": [
+          "service-tags"
+        ]
+      }
+    },
+    "/service-tags/{id}": {
+      "get": {
+        "operationId": "ServiceTagsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return the service tag.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceTagResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service tag not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a service tag by ID",
+        "tags": [
+          "service-tags"
+        ]
+      },
+      "patch": {
+        "operationId": "ServiceTagsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateServiceTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The service tag has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceTagResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized to update this tag."
+          },
+          "404": {
+            "description": "Service tag not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a service tag",
+        "tags": [
+          "service-tags"
+        ]
+      },
+      "delete": {
+        "operationId": "ServiceTagsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The service tag has been successfully deleted."
+          },
+          "403": {
+            "description": "Not authorized to delete this tag."
+          },
+          "404": {
+            "description": "Service tag not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a service tag",
+        "tags": [
+          "service-tags"
+        ]
+      }
+    },
+    "/service-tags/{id}/products/{productId}": {
+      "post": {
+        "operationId": "ServiceTagsController_attachToProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Tag attached to product successfully."
+          },
+          "403": {
+            "description": "Not authorized to use this tag."
+          },
+          "404": {
+            "description": "Tag or product not found."
+          },
+          "409": {
+            "description": "Tag is already attached to this product."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Attach a tag to a product",
+        "tags": [
+          "service-tags"
+        ]
+      },
+      "delete": {
+        "operationId": "ServiceTagsController_detachFromProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Tag detached from product successfully."
+          },
+          "403": {
+            "description": "Not authorized to modify this tag."
+          },
+          "404": {
+            "description": "Tag or product-tag relationship not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Detach a tag from a product",
+        "tags": [
+          "service-tags"
+        ]
+      }
+    },
+    "/service-tags/products/{productId}": {
+      "get": {
+        "operationId": "ServiceTagsController_getTagsForProduct",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return all tags for the product.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceTagResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all tags attached to a product",
+        "tags": [
+          "service-tags"
         ]
       }
     },
@@ -1321,7 +1664,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-13T14:44:58.654Z"
+              "submittedAt": "2026-01-15T15:55:35.970Z"
             }
           }
         },
@@ -2107,6 +2450,125 @@
                 "$ref": "#/components/schemas/CreateServiceDefinitionDto"
               }
             ]
+          }
+        }
+      },
+      "CreateServiceTagDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Premium Service",
+            "description": "Tag name"
+          },
+          "description": {
+            "type": "string",
+            "example": "Tags for premium tier services"
+          },
+          "colorValue": {
+            "type": "number",
+            "example": 4284704497,
+            "description": "Color value as integer"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the tag is active"
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0,
+            "description": "Sort order for display"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ServiceTagResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uuid-tag-id"
+          },
+          "userId": {
+            "type": "string",
+            "example": "uuid-user-id"
+          },
+          "name": {
+            "type": "string",
+            "example": "Premium Service"
+          },
+          "description": {
+            "type": "object",
+            "example": "Tags for premium tier services"
+          },
+          "colorValue": {
+            "type": "number",
+            "example": 4284704497
+          },
+          "usage": {
+            "type": "number",
+            "example": 5
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-01-14T22:45:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-01-14T22:45:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "name",
+          "colorValue",
+          "usage",
+          "isActive",
+          "sortOrder",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateServiceTagDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Premium Service",
+            "description": "Tag name"
+          },
+          "description": {
+            "type": "string",
+            "example": "Tags for premium tier services"
+          },
+          "colorValue": {
+            "type": "number",
+            "example": 4284704497,
+            "description": "Color value as integer"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the tag is active"
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0,
+            "description": "Sort order for display"
           }
         }
       }
