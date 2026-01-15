@@ -7,7 +7,12 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
   Query,
+  ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,6 +20,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiNotFoundResponse,
+  ApiNoContentResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { EmployeesService } from './employees.service';
@@ -36,6 +42,7 @@ import { ADMIN_ROLES } from '@/auth/constants/role-groups';
 @ApiBearerAuth()
 @Controller({ path: 'employees', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(ClassSerializerInterceptor)
 @Roles(...ADMIN_ROLES)
 export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}
@@ -89,7 +96,7 @@ export class EmployeesController {
     type: Employee,
   })
   @ApiNotFoundResponse({ description: 'Employee not found.' })
-  findOne(@Param('id') id: string): Promise<Employee> {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Employee> {
     return this.employeesService.findOne(id);
   }
 
@@ -104,7 +111,7 @@ export class EmployeesController {
   })
   @ApiNotFoundResponse({ description: 'Employee not found.' })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
   ): Promise<Employee> {
     return this.employeesService.update(id, updateEmployeeDto);
@@ -114,10 +121,11 @@ export class EmployeesController {
    * Deletes an employee (soft delete).
    */
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete an employee' })
-  @ApiOkResponse({ description: 'The employee has been successfully deleted.' })
+  @ApiNoContentResponse({ description: 'The employee has been successfully deleted.' })
   @ApiNotFoundResponse({ description: 'Employee not found.' })
-  remove(@Param('id') id: string): Promise<void> {
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.employeesService.remove(id);
   }
 }
