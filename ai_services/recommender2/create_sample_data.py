@@ -498,4 +498,5 @@ sample_services = [
 with open(os.path.join(settings.RAW_DATA_DIR, "services.json"), "w", encoding='utf8') as file:
 	json.dump(sample_services, file, ensure_ascii=False, indent=4)
    
+print("Created sample services at", os.path.join(settings.RAW_DATA_DIR, "services.json"))
 
