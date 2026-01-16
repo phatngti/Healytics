@@ -10,3 +10,5 @@ RAW_DATA_DIR = os.path.join(DATA_DIR, "raw")
 # Config model
 EMBEDDING_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 
+# Service Json Path
+SERVICE_JSON_PATH = os.path.join(RAW_DATA_DIR, "services.json")

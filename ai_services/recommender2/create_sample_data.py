@@ -500,3 +500,5 @@ with open(os.path.join(settings.RAW_DATA_DIR, "services.json"), "w", encoding='u
    
 print("Created sample services at", os.path.join(settings.RAW_DATA_DIR, "services.json"))
 
+# for sample_service in sample_services:
+#     print(sample_service["id"])
