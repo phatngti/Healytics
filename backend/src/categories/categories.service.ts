@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, OnModuleInit, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -141,7 +146,10 @@ export class CategoriesService implements OnModuleInit {
    * @param updateCategoryDto - The update data
    * @returns The updated category
    */
-  async update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<Category> {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category> {
     return this.updateCategoryHandler.execute(id, updateCategoryDto);
   }
 

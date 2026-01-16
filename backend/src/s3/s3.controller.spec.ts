@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { S3Controller } from './s3.controller';
 import { S3Service } from './s3.service';
+import { PresignRequestDto } from './dto';
 import { MockType } from '../../test/mocks/mock-types';
 
 describe('S3Controller', () => {
@@ -36,8 +37,10 @@ describe('S3Controller', () => {
   describe('preSign', () => {
     it('should return presigned upload URL and key', async () => {
       // Arrange
-      const fileName = 'test-image.png';
-      const contentType = 'image/png';
+      const dto: PresignRequestDto = {
+        fileName: 'test-image.png',
+        contentType: 'image/png',
+      };
       const expectedResult = {
         uploadUrl: 'https://presigned-url.example.com',
         key: 'uploads/test-image.png',
@@ -45,11 +48,11 @@ describe('S3Controller', () => {
       s3Service.getPresignedUploadUrl!.mockResolvedValue(expectedResult);
 
       // Act
-      const result = await controller.preSign(fileName, contentType);
+      const result = await controller.preSign(dto);
 
       // Assert
       expect(result).toEqual(expectedResult);
-      expect(s3Service.getPresignedUploadUrl).toHaveBeenCalledWith(fileName, contentType);
+      expect(s3Service.getPresignedUploadUrl).toHaveBeenCalledWith(dto.fileName, dto.contentType);
     });
   });
 
