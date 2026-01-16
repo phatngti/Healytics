@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/request/register.dto';
+import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import {
   ApiBody,
@@ -15,16 +16,20 @@ import {
   ApiOkResponse,
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
 import { AccountService } from '@/account/account.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
-import { ApiTags } from '@nestjs/swagger';
 import { LoginDto } from './dto/request/login.dto';
 import { AdminLoginDto } from './dto/request/admin-login.dto';
 
+/**
+ * Controller for authentication endpoints.
+ * Handles user/admin login, registration, and token management.
+ */
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
@@ -37,6 +42,9 @@ export class AuthController {
   // User Authentication (Mobile App / End Users)
   // ============================================================================
 
+  /**
+   * Registers a new user and returns authentication tokens.
+   */
   @Public()
   @ApiBody({ type: RegisterDto })
   @ApiCreatedResponse({
@@ -48,6 +56,9 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
+  /**
+   * Logs in a user and returns authentication tokens.
+   */
   @Public()
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDto })
@@ -71,6 +82,9 @@ export class AuthController {
   // Admin/Partner Authentication (Dashboard / Admin Portal)
   // ============================================================================
 
+  /**
+   * Logs in an admin/partner and returns authentication tokens.
+   */
   @Public()
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: AdminLoginDto })
@@ -128,6 +142,9 @@ export class AuthController {
   // Common Authentication Endpoints
   // ============================================================================
 
+  /**
+   * Logs out the current user by invalidating their refresh token.
+   */
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('logout')
@@ -141,19 +158,21 @@ export class AuthController {
       if (uid) await this.accountService.removeRefreshToken(uid);
     } catch (_) {}
 
-    return { message: 'Logged out successfully' } as LogoutResponseDto;
+    return { message: 'Logged out successfully' };
   }
 
+  /**
+   * Refreshes authentication tokens using a valid refresh token.
+   */
   @Public()
   @HttpCode(200)
   @Post('refresh')
+  @ApiBody({ type: RefreshTokenRequestDto })
   @ApiOkResponse({
     description: 'Refresh returns new pair of tokens',
     type: AuthTokensDto,
   })
-  async refresh(
-    @Body('refresh_token') refresh_token: string,
-  ): Promise<AuthTokensDto> {
-    return this.authService.refresh(refresh_token);
+  async refresh(@Body() dto: RefreshTokenRequestDto): Promise<AuthTokensDto> {
+    return this.authService.refresh(dto.refresh_token);
   }
 }

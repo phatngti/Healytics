@@ -42,7 +42,9 @@ export class EmployeesService {
    * @param createTherapistDto - The therapist data
    * @returns The created employee with therapist profile
    */
-  async createTherapist(createTherapistDto: CreateTherapistDto): Promise<Employee> {
+  async createTherapist(
+    createTherapistDto: CreateTherapistDto,
+  ): Promise<Employee> {
     return this.createTherapistHandler.execute(createTherapistDto);
   }
 
@@ -87,7 +89,10 @@ export class EmployeesService {
    * @param updateEmployeeDto - The update data
    * @returns The updated employee
    */
-  async update(id: string, updateEmployeeDto: UpdateEmployeeDto): Promise<Employee> {
+  async update(
+    id: string,
+    updateEmployeeDto: UpdateEmployeeDto,
+  ): Promise<Employee> {
     return this.updateEmployeeHandler.execute(id, updateEmployeeDto);
   }
 

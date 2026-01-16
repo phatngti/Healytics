@@ -145,14 +145,15 @@ describe('ServiceTagsController', () => {
       const tagId = 'tag-uuid-1';
       const productId = 'product-uuid-1';
       const userId = 'user-uuid-1';
-      const expectedProductTag = { id: 'pt-1', tagId, productId };
-      serviceTagsService.attachToProduct!.mockResolvedValue(expectedProductTag);
+      const mockCreatedAt = new Date('2026-01-14T22:45:00.000Z');
+      const serviceProductTag = { id: 'pt-1', tagId, productId, createdAt: mockCreatedAt };
+      serviceTagsService.attachToProduct!.mockResolvedValue(serviceProductTag);
 
       // Act
       const result = await controller.attachToProduct(tagId, productId, userId);
 
       // Assert
-      expect(result).toEqual(expectedProductTag);
+      expect(result).toEqual({ tagId, productId, createdAt: mockCreatedAt });
       expect(serviceTagsService.attachToProduct).toHaveBeenCalledWith(tagId, productId, userId);
     });
   });

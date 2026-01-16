@@ -28,8 +28,7 @@ import { ServiceTagsService } from './service-tags.service';
 import { CreateServiceTagDto } from './dto/create-service-tag.dto';
 import { UpdateServiceTagDto } from './dto/update-service-tag.dto';
 import { ServiceTagResponseDto } from './dto/service-tag-response.dto';
-import { ServiceTag } from './entities/service-tag.entity';
-import { ProductTag } from './entities/product-tag.entity';
+import { AttachTagResponseDto } from './dto/attach-tag-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
@@ -62,7 +61,7 @@ export class ServiceTagsController {
   create(
     @Body() createServiceTagDto: CreateServiceTagDto,
     @CurrentUser('id') userId: string,
-  ): Promise<ServiceTag> {
+  ): Promise<ServiceTagResponseDto> {
     return this.serviceTagsService.create(createServiceTagDto, userId);
   }
 
@@ -75,7 +74,7 @@ export class ServiceTagsController {
     description: 'Return all service tags for the current user.',
     type: [ServiceTagResponseDto],
   })
-  findAll(@CurrentUser('id') userId: string): Promise<ServiceTag[]> {
+  findAll(@CurrentUser('id') userId: string): Promise<ServiceTagResponseDto[]> {
     return this.serviceTagsService.findAllByUser(userId);
   }
 
@@ -88,7 +87,7 @@ export class ServiceTagsController {
     description: 'Return active service tags for the current user.',
     type: [ServiceTagResponseDto],
   })
-  findActive(@CurrentUser('id') userId: string): Promise<ServiceTag[]> {
+  findActive(@CurrentUser('id') userId: string): Promise<ServiceTagResponseDto[]> {
     return this.serviceTagsService.findActiveByUser(userId);
   }
 
@@ -102,7 +101,7 @@ export class ServiceTagsController {
     type: ServiceTagResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Service tag not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ServiceTag> {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ServiceTagResponseDto> {
     return this.serviceTagsService.findOne(id);
   }
 
@@ -121,7 +120,7 @@ export class ServiceTagsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateServiceTagDto: UpdateServiceTagDto,
     @CurrentUser('id') userId: string,
-  ): Promise<ServiceTag> {
+  ): Promise<ServiceTagResponseDto> {
     return this.serviceTagsService.update(id, updateServiceTagDto, userId);
   }
 
@@ -131,7 +130,9 @@ export class ServiceTagsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a service tag' })
-  @ApiNoContentResponse({ description: 'The service tag has been successfully deleted.' })
+  @ApiNoContentResponse({
+    description: 'The service tag has been successfully deleted.',
+  })
   @ApiNotFoundResponse({ description: 'Service tag not found.' })
   @ApiForbiddenResponse({ description: 'Not authorized to delete this tag.' })
   remove(
@@ -146,16 +147,26 @@ export class ServiceTagsController {
    */
   @Post(':id/products/:productId')
   @ApiOperation({ summary: 'Attach a tag to a product' })
-  @ApiCreatedResponse({ description: 'Tag attached to product successfully.' })
+  @ApiCreatedResponse({
+    description: 'Tag attached to product successfully.',
+    type: AttachTagResponseDto,
+  })
   @ApiNotFoundResponse({ description: 'Tag or product not found.' })
   @ApiForbiddenResponse({ description: 'Not authorized to use this tag.' })
-  @ApiConflictResponse({ description: 'Tag is already attached to this product.' })
-  attachToProduct(
+  @ApiConflictResponse({
+    description: 'Tag is already attached to this product.',
+  })
+  async attachToProduct(
     @Param('id', ParseUUIDPipe) tagId: string,
     @Param('productId', ParseUUIDPipe) productId: string,
     @CurrentUser('id') userId: string,
-  ): Promise<ProductTag> {
-    return this.serviceTagsService.attachToProduct(tagId, productId, userId);
+  ): Promise<AttachTagResponseDto> {
+    const productTag = await this.serviceTagsService.attachToProduct(tagId, productId, userId);
+    return {
+      tagId: productTag.tagId,
+      productId: productTag.productId,
+      createdAt: productTag.createdAt,
+    };
   }
 
   /**
@@ -164,8 +175,12 @@ export class ServiceTagsController {
   @Delete(':id/products/:productId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Detach a tag from a product' })
-  @ApiNoContentResponse({ description: 'Tag detached from product successfully.' })
-  @ApiNotFoundResponse({ description: 'Tag or product-tag relationship not found.' })
+  @ApiNoContentResponse({
+    description: 'Tag detached from product successfully.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Tag or product-tag relationship not found.',
+  })
   @ApiForbiddenResponse({ description: 'Not authorized to modify this tag.' })
   detachFromProduct(
     @Param('id', ParseUUIDPipe) tagId: string,
@@ -186,7 +201,7 @@ export class ServiceTagsController {
   })
   getTagsForProduct(
     @Param('productId', ParseUUIDPipe) productId: string,
-  ): Promise<ServiceTag[]> {
+  ): Promise<ServiceTagResponseDto[]> {
     return this.serviceTagsService.getTagsForProduct(productId);
   }
 }
