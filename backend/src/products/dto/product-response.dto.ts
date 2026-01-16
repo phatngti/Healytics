@@ -22,57 +22,76 @@ class CategorySummaryDto {
 
 /**
  * Response DTO for product media.
+ * Matches ProductMedia entity structure.
  */
 class ProductMediaDto {
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ description: 'Unique media identifier' })
   id: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ description: 'Media URL' })
   url: string;
 
   @Expose()
-  @ApiPropertyOptional()
-  altText?: string;
+  @ApiPropertyOptional({ description: 'Media type (image, video, etc.)' })
+  mediaType?: string;
 
   @Expose()
-  @ApiProperty()
-  displayOrder: number;
+  @ApiPropertyOptional({ description: 'Whether this is the thumbnail' })
+  isThumbnail?: boolean;
+
+  @Expose()
+  @ApiProperty({ description: 'Sort order for display' })
+  sortOrder: number;
 }
 
 /**
  * Response DTO for service definition within product.
+ * Matches ServiceDefinition entity structure.
  */
 class ServiceDefinitionDto {
   @Expose()
-  @ApiProperty()
-  id: string;
+  @ApiProperty({ description: 'Product ID (primary key)' })
+  productId: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ description: 'Service duration in minutes' })
   durationMinutes: number;
 
   @Expose()
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: 'Buffer time between appointments' })
+  bufferMinutes?: number;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Maximum capacity per slot' })
   maxCapacity?: number;
 
   @Expose()
-  @ApiPropertyOptional()
-  preparationMinutes?: number;
+  @ApiPropertyOptional({ description: 'Minimum lead time for booking (hours)' })
+  minLeadTimeHours?: number;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Staff assignment type' })
+  staffAssignmentType?: string;
 }
 
 /**
  * Response DTO for employee eligibility within product.
+ * Matches ServiceEmployeeEligibility entity structure.
  */
 class ServiceEmployeeEligibilityDto {
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ description: 'Product ID' })
+  productId: string;
+
+  @Expose()
+  @ApiProperty({ description: 'Employee ID' })
   employeeId: string;
 
   @Expose()
-  @ApiPropertyOptional()
-  isPrimary?: boolean;
+  @ApiProperty({ description: 'Whether this is the primary employee' })
+  isPrimary: boolean;
 }
 
 /**

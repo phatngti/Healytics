@@ -21,13 +21,13 @@ import {
   ApiOkResponse,
   ApiNotFoundResponse,
   ApiNoContentResponse,
-  ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Category } from './entities/category.entity';
+import { CategoryResponseDto } from './dto/category-response.dto';
+import { FindCategoriesQueryDto } from './dto/find-categories-query.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
@@ -54,9 +54,9 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Create a new category' })
   @ApiCreatedResponse({
     description: 'The category has been successfully created.',
-    type: Category,
+    type: CategoryResponseDto,
   })
-  create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
+  create(@Body() createCategoryDto: CreateCategoryDto): Promise<CategoryResponseDto> {
     return this.categoriesService.create(createCategoryDto);
   }
 
@@ -68,11 +68,10 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Get all categories' })
   @ApiOkResponse({
     description: 'Return all categories.',
-    type: [Category],
+    type: [CategoryResponseDto],
   })
-  @ApiQuery({ name: 'rootsOnly', required: false, type: Boolean, description: 'Return only root categories' })
-  findAll(@Query('rootsOnly') rootsOnly?: string): Promise<Category[]> {
-    return this.categoriesService.findAll(rootsOnly === 'true');
+  findAll(@Query() query: FindCategoriesQueryDto): Promise<CategoryResponseDto[]> {
+    return this.categoriesService.findAll(query.rootsOnly ?? false);
   }
 
   /**
@@ -83,10 +82,10 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Get a category by id' })
   @ApiOkResponse({
     description: 'Return the category.',
-    type: Category,
+    type: CategoryResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Category not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Category> {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<CategoryResponseDto> {
     return this.categoriesService.findOne(id);
   }
 
@@ -98,10 +97,10 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Get a category by slug' })
   @ApiOkResponse({
     description: 'Return the category.',
-    type: Category,
+    type: CategoryResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Category not found.' })
-  findBySlug(@Param('slug') slug: string): Promise<Category> {
+  findBySlug(@Param('slug') slug: string): Promise<CategoryResponseDto> {
     return this.categoriesService.findBySlug(slug);
   }
 
@@ -113,13 +112,13 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Update a category' })
   @ApiOkResponse({
     description: 'The category has been successfully updated.',
-    type: Category,
+    type: CategoryResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Category not found.' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
-  ): Promise<Category> {
+  ): Promise<CategoryResponseDto> {
     return this.categoriesService.update(id, updateCategoryDto);
   }
 
@@ -130,7 +129,9 @@ export class CategoriesController {
   @Roles(...ADMIN_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a category' })
-  @ApiNoContentResponse({ description: 'The category has been successfully deleted.' })
+  @ApiNoContentResponse({
+    description: 'The category has been successfully deleted.',
+  })
   @ApiNotFoundResponse({ description: 'Category not found.' })
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.categoriesService.remove(id);

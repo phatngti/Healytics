@@ -5,84 +5,74 @@ import {
   Param,
   Delete,
   Body,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
-  ApiBody,
   ApiParam,
-  ApiResponse,
+  ApiCreatedResponse,
+  ApiOkResponse,
 } from '@nestjs/swagger';
 
-import { S3Service, PresignedUploadResult } from './s3.service';
+import { S3Service } from './s3.service';
+import {
+  PresignRequestDto,
+  PresignResponseDto,
+  FileUrlResponseDto,
+  DeleteFileResponseDto,
+} from './dto';
 
+/**
+ * Controller for S3-compatible storage operations.
+ * Handles file uploads, downloads, and deletions via presigned URLs.
+ */
 @ApiTags('S3')
 @Controller('s3')
+@UseInterceptors(ClassSerializerInterceptor)
 export class S3Controller {
   constructor(private readonly s3Service: S3Service) {}
 
+  /**
+   * Generates a presigned URL for uploading a file.
+   */
   @Post('presign')
-  @ApiOperation({ summary: 'Get presigned upload url' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        fileName: { type: 'string', example: 'example.png' },
-        contentType: { type: 'string', example: 'image/png' },
-      },
-      required: ['fileName', 'contentType'],
-    },
+  @ApiOperation({ summary: 'Get presigned upload URL' })
+  @ApiCreatedResponse({
+    description: 'The presigned URL has been successfully created.',
+    type: PresignResponseDto,
   })
-  @ApiResponse({
-    status: 201,
-    description: 'The presigned url has been successfully created.',
-    schema: {
-      type: 'object',
-      properties: {
-        uploadUrl: { type: 'string' },
-        key: { type: 'string' },
-      },
-    },
-  })
-  async preSign(
-    @Body('fileName') fileName: string,
-    @Body('contentType') contentType: string,
-  ): Promise<PresignedUploadResult> {
-    return this.s3Service.getPresignedUploadUrl(fileName, contentType);
+  async preSign(@Body() dto: PresignRequestDto): Promise<PresignResponseDto> {
+    return this.s3Service.getPresignedUploadUrl(dto.fileName, dto.contentType);
   }
 
+  /**
+   * Gets the public or signed URL for a file.
+   */
   @Get(':key')
-  @ApiOperation({ summary: 'Get file url' })
+  @ApiOperation({ summary: 'Get file URL' })
   @ApiParam({ name: 'key', type: 'string', description: 'File key' })
-  @ApiResponse({
-    status: 200,
-    description: 'Return the file url.',
-    schema: {
-      type: 'object',
-      properties: {
-        url: { type: 'string' },
-      },
-    },
+  @ApiOkResponse({
+    description: 'Return the file URL.',
+    type: FileUrlResponseDto,
   })
-  async getFileUrl(@Param('key') key: string) {
+  async getFileUrl(@Param('key') key: string): Promise<FileUrlResponseDto> {
     const url = await this.s3Service.getFileUrl(key);
     return { url };
   }
 
+  /**
+   * Deletes a file from the bucket.
+   */
   @Delete(':key')
   @ApiOperation({ summary: 'Delete file' })
   @ApiParam({ name: 'key', type: 'string', description: 'File key' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'The file has been successfully deleted.',
-    schema: {
-      type: 'object',
-      properties: {
-        message: { type: 'string', example: 'File deleted successfully' },
-      },
-    },
+    type: DeleteFileResponseDto,
   })
-  async deleteFile(@Param('key') key: string) {
+  async deleteFile(@Param('key') key: string): Promise<DeleteFileResponseDto> {
     await this.s3Service.deleteFile(key);
     return { message: 'File deleted successfully' };
   }

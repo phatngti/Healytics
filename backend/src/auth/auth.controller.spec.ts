@@ -3,6 +3,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AccountService } from '@/account/account.service';
 import { RegisterDto } from './dto/request/register.dto';
+import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
 import { MockType } from '../../test/mocks/mock-types';
 
 describe('AuthController', () => {
@@ -190,7 +191,7 @@ describe('AuthController', () => {
   describe('refresh', () => {
     it('should call authService.refresh with token and return new tokens', async () => {
       // Arrange
-      const refreshToken = 'old-refresh-token';
+      const dto: RefreshTokenRequestDto = { refresh_token: 'old-refresh-token' };
       const expectedTokens = {
         access_token: 'new-access-token',
         refresh_token: 'new-refresh-token',
@@ -198,11 +199,11 @@ describe('AuthController', () => {
       authService.refresh!.mockResolvedValue(expectedTokens);
 
       // Act
-      const result = await controller.refresh(refreshToken);
+      const result = await controller.refresh(dto);
 
       // Assert
       expect(result).toEqual(expectedTokens);
-      expect(authService.refresh).toHaveBeenCalledWith(refreshToken);
+      expect(authService.refresh).toHaveBeenCalledWith(dto.refresh_token);
     });
   });
 });
