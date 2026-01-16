@@ -28,7 +28,7 @@ import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
 import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { Employee } from './entities/employee.entity';
+import { EmployeeResponseDto } from './dto/employee-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
@@ -54,9 +54,9 @@ export class EmployeesController {
   @ApiOperation({ summary: 'Create a new doctor' })
   @ApiCreatedResponse({
     description: 'The doctor has been successfully created.',
-    type: Employee,
+    type: EmployeeResponseDto,
   })
-  createDoctor(@Body() createDoctorDto: CreateDoctorDto): Promise<Employee> {
+  createDoctor(@Body() createDoctorDto: CreateDoctorDto): Promise<EmployeeResponseDto> {
     return this.employeesService.createDoctor(createDoctorDto);
   }
 
@@ -67,9 +67,11 @@ export class EmployeesController {
   @ApiOperation({ summary: 'Create a new therapist' })
   @ApiCreatedResponse({
     description: 'The therapist has been successfully created.',
-    type: Employee,
+    type: EmployeeResponseDto,
   })
-  createTherapist(@Body() createTherapistDto: CreateTherapistDto): Promise<Employee> {
+  createTherapist(
+    @Body() createTherapistDto: CreateTherapistDto,
+  ): Promise<EmployeeResponseDto> {
     return this.employeesService.createTherapist(createTherapistDto);
   }
 
@@ -80,9 +82,9 @@ export class EmployeesController {
   @ApiOperation({ summary: 'Get all employees' })
   @ApiOkResponse({
     description: 'Return all employees.',
-    type: [Employee],
+    type: [EmployeeResponseDto],
   })
-  findAll(@Query() query: GetEmployeesQueryDto): Promise<Employee[]> {
+  findAll(@Query() query: GetEmployeesQueryDto): Promise<EmployeeResponseDto[]> {
     return this.employeesService.findAll(query);
   }
 
@@ -93,10 +95,10 @@ export class EmployeesController {
   @ApiOperation({ summary: 'Get an employee by id' })
   @ApiOkResponse({
     description: 'Return the employee.',
-    type: Employee,
+    type: EmployeeResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Employee not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Employee> {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<EmployeeResponseDto> {
     return this.employeesService.findOne(id);
   }
 
@@ -107,13 +109,13 @@ export class EmployeesController {
   @ApiOperation({ summary: 'Update an employee' })
   @ApiOkResponse({
     description: 'The employee has been successfully updated.',
-    type: Employee,
+    type: EmployeeResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Employee not found.' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
-  ): Promise<Employee> {
+  ): Promise<EmployeeResponseDto> {
     return this.employeesService.update(id, updateEmployeeDto);
   }
 
@@ -123,7 +125,9 @@ export class EmployeesController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete an employee' })
-  @ApiNoContentResponse({ description: 'The employee has been successfully deleted.' })
+  @ApiNoContentResponse({
+    description: 'The employee has been successfully deleted.',
+  })
   @ApiNotFoundResponse({ description: 'Employee not found.' })
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.employeesService.remove(id);

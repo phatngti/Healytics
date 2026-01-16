@@ -6,32 +6,82 @@ import { Gender } from '../enum/gender.enum';
 
 /**
  * Doctor profile response DTO.
+ * Matches DoctorProfile entity structure.
  */
 class DoctorProfileDto {
   @Expose()
-  @ApiPropertyOptional()
-  licenseNumber?: string;
+  @ApiPropertyOptional({ description: 'Employee ID (primary key)' })
+  employeeId?: string;
 
   @Expose()
-  @ApiPropertyOptional()
-  specialization?: string;
+  @ApiPropertyOptional({ description: 'Doctor title' })
+  title?: string;
 
   @Expose()
-  @ApiPropertyOptional()
-  yearsOfExperience?: number;
+  @ApiPropertyOptional({ description: 'Medical license number' })
+  medicalLicense?: string;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Years of experience' })
+  experienceYears?: number;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Consultation fee' })
+  consultationFee?: number;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'List of specializations' })
+  specializations?: string[];
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Education history' })
+  education?: any[];
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Certifications' })
+  certifications?: any[];
 }
 
 /**
  * Therapist profile response DTO.
+ * Matches TherapistProfile entity structure.
  */
 class TherapistProfileDto {
   @Expose()
-  @ApiPropertyOptional()
-  certifications?: string[];
+  @ApiPropertyOptional({ description: 'Employee ID (primary key)' })
+  employeeId?: string;
 
   @Expose()
-  @ApiPropertyOptional()
-  specialties?: string[];
+  @ApiPropertyOptional({ description: 'Therapist level (junior, senior, etc.)' })
+  level?: string;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Therapist type' })
+  type?: string;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Strength level' })
+  strengthLevel?: string;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Commission rate (percentage)' })
+  commissionRate?: number;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Health check date' })
+  healthCheckDate?: Date;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'List of skills' })
+  skills?: string[];
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Device proficiency list' })
+  deviceProficiency?: string[];
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'License URL' })
+  licenseUrl?: string;
 }
 
 /**
