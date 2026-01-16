@@ -25,7 +25,7 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { Product } from './entities/product.entity';
+import { ProductResponseDto } from './dto/product-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
@@ -52,9 +52,9 @@ export class ProductsController {
   @ApiOperation({ summary: 'Create a new product' })
   @ApiCreatedResponse({
     description: 'The product has been successfully created.',
-    type: Product,
+    type: ProductResponseDto,
   })
-  create(@Body() createProductDto: CreateProductDto): Promise<Product> {
+  create(@Body() createProductDto: CreateProductDto): Promise<ProductResponseDto> {
     return this.productsService.create(createProductDto);
   }
 
@@ -66,9 +66,9 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get all products' })
   @ApiOkResponse({
     description: 'Return all products.',
-    type: [Product],
+    type: [ProductResponseDto],
   })
-  findAll(): Promise<Product[]> {
+  findAll(): Promise<ProductResponseDto[]> {
     return this.productsService.findAll();
   }
 
@@ -80,10 +80,10 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get a product by id' })
   @ApiOkResponse({
     description: 'Return the product.',
-    type: Product,
+    type: ProductResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Product not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Product> {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ProductResponseDto> {
     return this.productsService.findOne(id);
   }
 
@@ -95,10 +95,10 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get a product by slug' })
   @ApiOkResponse({
     description: 'Return the product.',
-    type: Product,
+    type: ProductResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Product not found.' })
-  findBySlug(@Param('slug') slug: string): Promise<Product> {
+  findBySlug(@Param('slug') slug: string): Promise<ProductResponseDto> {
     return this.productsService.findBySlug(slug);
   }
 
@@ -110,13 +110,13 @@ export class ProductsController {
   @ApiOperation({ summary: 'Update a product' })
   @ApiOkResponse({
     description: 'The product has been successfully updated.',
-    type: Product,
+    type: ProductResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Product not found.' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
+  ): Promise<ProductResponseDto> {
     return this.productsService.update(id, updateProductDto);
   }
 
@@ -127,7 +127,9 @@ export class ProductsController {
   @Roles(...ADMIN_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a product' })
-  @ApiNoContentResponse({ description: 'The product has been successfully deleted.' })
+  @ApiNoContentResponse({
+    description: 'The product has been successfully deleted.',
+  })
   @ApiNotFoundResponse({ description: 'Product not found.' })
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.productsService.remove(id);

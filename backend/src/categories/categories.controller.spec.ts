@@ -3,6 +3,7 @@ import { CategoriesController } from './categories.controller';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { FindCategoriesQueryDto } from './dto/find-categories-query.dto';
 import { MockType } from '../../test/mocks/mock-types';
 
 describe('CategoriesController', () => {
@@ -58,11 +59,12 @@ describe('CategoriesController', () => {
   describe('findAll', () => {
     it('should call service.findAll with rootsOnly=false when not specified', async () => {
       // Arrange
+      const query: FindCategoriesQueryDto = {};
       const expectedCategories = [{ id: '1' }, { id: '2' }];
       categoriesService.findAll!.mockResolvedValue(expectedCategories);
 
       // Act
-      const result = await controller.findAll();
+      const result = await controller.findAll(query);
 
       // Assert
       expect(result).toEqual(expectedCategories);
@@ -71,11 +73,12 @@ describe('CategoriesController', () => {
 
     it('should call service.findAll with rootsOnly=true when specified', async () => {
       // Arrange
+      const query: FindCategoriesQueryDto = { rootsOnly: true };
       const expectedCategories = [{ id: '1', parentId: null }];
       categoriesService.findAll!.mockResolvedValue(expectedCategories);
 
       // Act
-      const result = await controller.findAll('true');
+      const result = await controller.findAll(query);
 
       // Assert
       expect(result).toEqual(expectedCategories);
