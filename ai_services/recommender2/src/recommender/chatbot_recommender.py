@@ -3,8 +3,8 @@ import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.append(ROOT_DIR)
 from config import settings
-from embedding_model import Embedding_Model
-from vector_store import Vector_Database
+from .embedding_model import Embedding_Model
+from .vector_store import Vector_Database
 
 class Chatbot_Recommender:
     def __init__(self, database_name):

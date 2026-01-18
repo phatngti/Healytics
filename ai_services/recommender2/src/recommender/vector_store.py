@@ -5,8 +5,8 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.append(ROOT_DIR)
 from config import settings
 import json
-from service_loader import Service_Loader
-from embedding_model import Embedding_Model
+from .service_loader import Service_Loader
+from .embedding_model import Embedding_Model
 
 vectordb_path = os.path.join(settings.PROCESSED_DATA_DIR, "vectordb")
 
