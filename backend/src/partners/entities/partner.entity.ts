@@ -13,7 +13,7 @@ import { Account } from '@/account/entities/account.entity';
 import { BusinessType } from '../enum/business-type.enum';
 import { Location } from '@/locations/entities/location.entity';
 
-@Entity('business_entity')
+@Entity('health_partner_profile')
 export class Partner {
     @PrimaryGeneratedColumn('uuid')
     id: string;
