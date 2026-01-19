@@ -81,7 +81,7 @@ export class DocumentsService {
             const partner = await this.partnersService.getPartnerByAccountId(
                 accountId,
             );
-            if (!partner || partner.id !== document.businessEntityId) {
+            if (!partner || partner.id !== document.partnerId) {
                 throw new BadRequestException('Access denied');
             }
         }
@@ -108,7 +108,7 @@ export class DocumentsService {
         // Check if document already exists
         let document = await this.documentRepo.findOne({
             where: {
-                businessEntityId: partner.id,
+                partnerId: partner.id,
                 documentType: dto.documentType,
             },
         });
@@ -143,7 +143,7 @@ export class DocumentsService {
         } else {
             // Create new document
             document = this.documentRepo.create({
-                businessEntityId: partner.id,
+                partnerId: partner.id,
                 documentType: dto.documentType,
                 documentKey: dto.documentUrl,
                 status: DocumentStatus.PENDING,
@@ -178,7 +178,7 @@ export class DocumentsService {
 
         // Get submitted documents
         const submitted = await this.documentRepo.find({
-            where: { businessEntityId: partner.id },
+            where: { partnerId: partner.id },
         });
 
         // Create map for quick lookup
@@ -255,7 +255,7 @@ export class DocumentsService {
 
         // Trigger auto-activation check if approved
         if (dto.status === DocumentStatus.APPROVED) {
-            await this.checkAndActivatePartner(document.businessEntityId);
+            await this.checkAndActivatePartner(document.partnerId);
         }
 
         this.logger.log(
@@ -269,9 +269,9 @@ export class DocumentsService {
      * SYSTEM: Auto-activation logic
      * Checks if all required documents are approved, then activates business
      */
-    private async checkAndActivatePartner(businessEntityId: string): Promise<void> {
+    private async checkAndActivatePartner(partnerId: string): Promise<void> {
         const partner = await this.partnerRepo.findOne({
-            where: { id: businessEntityId },
+            where: { id: partnerId },
         });
 
         if (!partner || partner.isVerified) {
@@ -289,7 +289,7 @@ export class DocumentsService {
         // Get approved documents
         const approvedDocs = await this.documentRepo.find({
             where: {
-                businessEntityId: partner.id,
+                partnerId: partner.id,
                 status: DocumentStatus.APPROVED,
             },
         });
@@ -317,9 +317,9 @@ export class DocumentsService {
     /**
      * ADMIN: Get all documents for a specific partner
      */
-    async getPartnerDocuments(businessEntityId: string): Promise<PartnerDocument[]> {
+    async getPartnerDocuments(partnerId: string): Promise<PartnerDocument[]> {
         return this.documentRepo.find({
-            where: { businessEntityId },
+            where: { partnerId },
             order: { uploadedAt: 'DESC' },
         });
     }

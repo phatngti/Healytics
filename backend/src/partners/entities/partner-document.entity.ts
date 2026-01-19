@@ -21,11 +21,11 @@ export class PartnerDocument {
     id: string;
 
     // Relationship to Partner
-    @Column({ name: 'business_entity_id' })
-    businessEntityId: string;
+    @Column({ name: 'partner_id' })
+    partnerId: string;
 
     @ManyToOne(() => Partner, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'business_entity_id' })
+    @JoinColumn({ name: 'partner_id' })
     partner: Partner;
 
     @Column({

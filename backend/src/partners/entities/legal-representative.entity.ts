@@ -48,11 +48,11 @@ export class LegalRepresentative {
     authLetterDocUrl: string | null;
 
     // Relationship to Partner
-    @Column({ name: 'business_entity_id' })
-    businessEntityId: string;
+    @Column({ name: 'partner_id' })
+    partnerId: string;
 
     @OneToOne(() => Partner, (entity) => entity.legalRepresentative)
-    @JoinColumn({ name: 'business_entity_id' })
+    @JoinColumn({ name: 'partner_id' })
     partner: Partner;
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
