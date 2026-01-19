@@ -21,7 +21,7 @@ export class BusinessTypeDto {
     description?: string;
 }
 
-export class GetBusinessTypesResponseDto {
+export class BusinessTypesResponseDto {
     @ApiProperty({
         type: [BusinessTypeDto],
         description: 'List of all available business types'

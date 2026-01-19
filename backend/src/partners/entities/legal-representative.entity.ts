@@ -47,6 +47,9 @@ export class LegalRepresentative {
     @Column({ name: 'auth_letter_doc_url', type: 'text', nullable: true })
     authLetterDocUrl: string | null;
 
+    @Column({ name: 'phone_number', type: 'varchar', length: 20, nullable: true })
+    phoneNumber: string | null;
+
     // Relationship to Partner
     @Column({ name: 'partner_id' })
     partnerId: string;

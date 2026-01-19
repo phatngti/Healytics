@@ -48,7 +48,7 @@ export class DocumentStatusDto {
     documentId: string | null;
 }
 
-export class GetDocumentStatusResponseDto {
+export class DocumentStatusResponseDto {
     @ApiProperty({
         type: [DocumentStatusDto],
         description: 'List of required documents with their status',

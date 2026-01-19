@@ -14,12 +14,12 @@ import { PartnersService } from './partners.service';
 import { SubmitDocumentDto } from './dto/request/submit-document.dto';
 import { ReviewDocumentDto } from './dto/request/review-document.dto';
 import {
-    GetDocumentStatusResponseDto,
+    DocumentStatusResponseDto,
     DocumentStatusDto,
-} from './dto/response/get-document-status-response.dto';
+} from './dto/response/document-status-response.dto';
 import { DocumentStatus } from './enum/document-status.enum';
-import { GetUploadUrlResponseDto } from './dto/response/get-upload-url-response.dto';
-import { GetDocumentUrlResponseDto } from './dto/response/get-document-url-response.dto';
+import { UploadUrlResponseDto } from './dto/response/upload-url-response.dto';
+import { DocumentUrlResponseDto } from './dto/response/document-url-response.dto';
 
 @Injectable()
 export class DocumentsService {
@@ -43,7 +43,7 @@ export class DocumentsService {
         accountId: string,
         fileName: string,
         contentType: string,
-    ): Promise<GetUploadUrlResponseDto> {
+    ): Promise<UploadUrlResponseDto> {
         const partner = await this.partnersService.getPartnerByAccountId(
             accountId,
         );
@@ -66,7 +66,7 @@ export class DocumentsService {
     /**
      * Get signed URL for viewing/downloading a document
      */
-    async getDocumentUrl(documentId: string, accountId?: string): Promise<GetDocumentUrlResponseDto> {
+    async getDocumentUrl(documentId: string, accountId?: string): Promise<DocumentUrlResponseDto> {
         const document = await this.documentRepo.findOne({
             where: { id: documentId },
             relations: ['partner'],
@@ -168,7 +168,7 @@ export class DocumentsService {
      */
     async getPartnerDocumentStatus(
         accountId: string,
-    ): Promise<GetDocumentStatusResponseDto> {
+    ): Promise<DocumentStatusResponseDto> {
         const partner = await this.partnersService.getPartnerByAccountId(
             accountId,
         );

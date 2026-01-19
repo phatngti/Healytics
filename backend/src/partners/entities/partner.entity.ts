@@ -59,6 +59,9 @@ export class Partner {
     @Column({ name: 'street_address', length: 300 })
     streetAddress: string;
 
+    @Column({ name: 'phone_number', type: 'varchar', length: 20, nullable: true })
+    phoneNumber: string | null;
+
     // Relationship to Account
     @Column({ name: 'account_id' })
     accountId: string;

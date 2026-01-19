@@ -24,7 +24,7 @@ export class PartnerItemDto {
     createdAt: Date;
 }
 
-export class GetPartnersResponseDto {
+export class PartnersResponseDto {
     @ApiProperty({ type: [PartnerItemDto] })
     data: PartnerItemDto[];
 

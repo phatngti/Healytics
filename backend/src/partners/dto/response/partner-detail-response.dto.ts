@@ -46,7 +46,7 @@ class LegalRepDetailDto {
     isAuthorizedUser: boolean;
 }
 
-export class GetPartnerDetailResponseDto {
+export class PartnerDetailResponseDto {
     @ApiProperty({ type: AccountInfoDto })
     account: AccountInfoDto;
 
