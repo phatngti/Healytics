@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Role } from '@/account/enum/role.enum';
 import { UserProfile } from './user-profile.entity';
+import { Partner } from '@/partners/entities/partner.entity';
 
 @Entity('account')
 export class Account {
@@ -35,6 +36,9 @@ export class Account {
     eager: true,
   })
   userProfile?: UserProfile;
+
+  @OneToOne(() => Partner, (partner) => partner.account)
+  partner?: Partner;
 
   // Store arbitrary user preferences directly on the account as JSONB
   @Column({ type: 'jsonb', nullable: true })

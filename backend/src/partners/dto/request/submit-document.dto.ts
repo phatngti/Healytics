@@ -1,0 +1,22 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsUrl } from 'class-validator';
+import { DocumentType } from '@/partners/enum/document-type.enum';
+
+export class SubmitDocumentDto {
+    @ApiProperty({
+        enum: DocumentType,
+        example: DocumentType.BUSINESS_LICENSE,
+        description: 'Type of document being submitted',
+    })
+    @IsEnum(DocumentType)
+    @IsNotEmpty()
+    documentType: DocumentType;
+
+    @ApiProperty({
+        example: 'https://r2.example.com/documents/1234-license.pdf',
+        description: 'R2 URL of the uploaded document',
+    })
+    @IsUrl()
+    @IsNotEmpty()
+    documentUrl: string;
+}

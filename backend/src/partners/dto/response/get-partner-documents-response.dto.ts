@@ -1,0 +1,52 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { DocumentType } from '../../enum/document-type.enum';
+import { DocumentStatus } from '../../enum/document-status.enum';
+
+export class PartnerDocumentDto {
+    @ApiProperty({
+        description: 'Document ID',
+        example: '123e4567-e89b-12d3-a456-426614174000',
+    })
+    id: string;
+
+    @ApiProperty({
+        description: 'Type of the document',
+        enum: DocumentType,
+        example: DocumentType.BUSINESS_LICENSE,
+    })
+    documentType: DocumentType;
+
+    @ApiProperty({
+        description: 'Current status of the document',
+        enum: DocumentStatus,
+        example: DocumentStatus.APPROVED,
+    })
+    status: DocumentStatus;
+
+    @ApiProperty({
+        description: 'Timestamp when document was uploaded',
+        example: '2024-01-19T06:45:00Z',
+    })
+    uploadedAt: Date;
+
+    @ApiProperty({
+        description: 'Admin feedback (especially when rejected)',
+        example: 'Document is unclear, please re-upload a clearer version',
+        nullable: true,
+    })
+    adminFeedback: string | null;
+
+    @ApiProperty({
+        description: 'Document key in R2/S3',
+        example: 'documents/abc-123/1234567890-business-license.pdf',
+    })
+    documentKey: string;
+}
+
+export class GetPartnerDocumentsResponseDto {
+    @ApiProperty({
+        description: 'List of all documents for the partner',
+        type: [PartnerDocumentDto],
+    })
+    documents: PartnerDocumentDto[];
+}
