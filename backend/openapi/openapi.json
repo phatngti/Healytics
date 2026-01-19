@@ -2659,7 +2659,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-19T03:11:09.517Z"
+              "submittedAt": "2026-01-19T04:12:16.230Z"
             }
           }
         },
@@ -3149,6 +3149,12 @@
             "nullable": true,
             "description": "URL of submitted document"
           },
+          "documentKey": {
+            "type": "object",
+            "example": "documents/abc-123/1234567890-license.pdf",
+            "nullable": true,
+            "description": "R2/S3 key of submitted document"
+          },
           "adminFeedback": {
             "type": "object",
             "example": "Ảnh bị mờ, vui lòng chụp lại",
@@ -3172,6 +3178,7 @@
           "isRequired",
           "status",
           "documentUrl",
+          "documentKey",
           "adminFeedback",
           "uploadedAt",
           "documentId"
@@ -3252,9 +3259,10 @@
         "type": "object",
         "properties": {
           "url": {
-            "type": "string",
+            "type": "object",
             "description": "Signed URL to view or download the document",
-            "example": "https://r2.example.com/signed-url..."
+            "example": "https://r2.example.com/signed-url...",
+            "nullable": true
           },
           "documentType": {
             "type": "string",
@@ -3391,10 +3399,17 @@
             "description": "Timestamp when document was uploaded",
             "example": "2024-01-19T06:45:00Z"
           },
+          "documentUrl": {
+            "type": "object",
+            "description": "Document URL (HTTP link for registration documents, R2 URL for uploaded documents)",
+            "example": "https://example.com/documents/identity-card.jpg",
+            "nullable": true
+          },
           "documentKey": {
-            "type": "string",
-            "description": "R2/S3 key for the uploaded document",
-            "example": "documents/abc-123/1234567890-business-license.pdf"
+            "type": "object",
+            "description": "R2/S3 key for uploaded documents (null for registration documents)",
+            "example": "documents/abc-123/1234567890-business-license.pdf",
+            "nullable": true
           }
         },
         "required": [
@@ -3402,7 +3417,7 @@
           "documentType",
           "status",
           "uploadedAt",
-          "documentKey"
+          "documentUrl"
         ]
       },
       "ReviewDocumentDto": {
@@ -3564,10 +3579,17 @@
             "example": "Document is unclear, please re-upload a clearer version",
             "nullable": true
           },
+          "documentUrl": {
+            "type": "object",
+            "description": "Document URL (HTTP link for registration documents, R2 URL for uploaded documents)",
+            "example": "https://example.com/documents/identity-card.jpg",
+            "nullable": true
+          },
           "documentKey": {
-            "type": "string",
-            "description": "Document key in R2/S3",
-            "example": "documents/abc-123/1234567890-business-license.pdf"
+            "type": "object",
+            "description": "Document key in R2/S3 (null for registration documents)",
+            "example": "documents/abc-123/1234567890-business-license.pdf",
+            "nullable": true
           }
         },
         "required": [
@@ -3576,7 +3598,7 @@
           "status",
           "uploadedAt",
           "adminFeedback",
-          "documentKey"
+          "documentUrl"
         ]
       },
       "GetPartnerDocumentsResponseDto": {

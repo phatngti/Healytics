@@ -27,6 +27,14 @@ export class DocumentStatusDto {
     documentUrl: string | null;
 
     @ApiProperty({
+        example: 'documents/abc-123/1234567890-license.pdf',
+        nullable: true,
+        description: 'R2/S3 key of submitted document',
+    })
+    documentKey: string | null;
+
+
+    @ApiProperty({
         example: 'Ảnh bị mờ, vui lòng chụp lại',
         nullable: true,
         description: 'Admin feedback (only for rejected documents)',

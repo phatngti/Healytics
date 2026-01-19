@@ -13,7 +13,9 @@ import { DocumentStatus } from '../enum/document-status.enum';
 
 /**
  * Tracks documents uploaded by partners for verification.
- * Each document is stored in R2 and tracked by its key.
+ * Supports two types of documents:
+ * 1. Registration documents (identity cards) - documentUrl only (HTTP link)
+ * 2. Uploaded documents - documentUrl + documentKey (R2/S3 key)
  */
 @Entity('partner_document')
 export class PartnerDocument {
@@ -34,8 +36,13 @@ export class PartnerDocument {
     })
     documentType: DocumentType;
 
-    @Column({ name: 'document_key' })
-    documentKey: string; // S3/R2 object key
+    // Document URL - always present for registration documents, can be null during initial upload steps
+    @Column({ name: 'document_url', type: 'text', nullable: true })
+    documentUrl: string | null;
+
+    // R2/S3 object key - only for uploaded documents, null for registration documents
+    @Column({ name: 'document_key', type: 'text', nullable: true })
+    documentKey: string | null;
 
     @Column({
         type: 'enum',

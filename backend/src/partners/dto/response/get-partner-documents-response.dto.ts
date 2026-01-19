@@ -37,10 +37,19 @@ export class PartnerDocumentDto {
     adminFeedback: string | null;
 
     @ApiProperty({
-        description: 'Document key in R2/S3',
-        example: 'documents/abc-123/1234567890-business-license.pdf',
+        description: 'Document URL (HTTP link for registration documents, R2 URL for uploaded documents)',
+        example: 'https://example.com/documents/identity-card.jpg',
+        nullable: true,
     })
-    documentKey: string;
+    documentUrl: string | null;
+
+    @ApiProperty({
+        description: 'Document key in R2/S3 (null for registration documents)',
+        example: 'documents/abc-123/1234567890-business-license.pdf',
+        nullable: true,
+        required: false,
+    })
+    documentKey: string | null;
 }
 
 export class GetPartnerDocumentsResponseDto {

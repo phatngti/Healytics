@@ -154,21 +154,24 @@ export class PartnersService {
             // This ensures they are tracked in the verification system from the start
             const regDocs = [
                 {
-                    businessEntityId: savedPartner.id,
+                    partnerId: savedPartner.id,
                     documentType: DocumentType.TAX_CODE,
-                    documentKey: dto.partner.taxCode, // Using the tax code string as "key" for verification
+                    documentUrl: dto.partner.taxCode, // Using the tax code string as URL/value for verification
+                    documentKey: null,
                     status: DocumentStatus.PENDING,
                 },
                 {
-                    businessEntityId: savedPartner.id,
+                    partnerId: savedPartner.id,
                     documentType: DocumentType.IDENTITY_FRONT,
-                    documentKey: dto.legalRepresentative.images.frontImgUrl,
+                    documentUrl: dto.legalRepresentative.images.frontImgUrl,
+                    documentKey: null,
                     status: DocumentStatus.PENDING,
                 },
                 {
-                    businessEntityId: savedPartner.id,
+                    partnerId: savedPartner.id,
                     documentType: DocumentType.IDENTITY_BACK,
-                    documentKey: dto.legalRepresentative.images.backImgUrl,
+                    documentUrl: dto.legalRepresentative.images.backImgUrl,
+                    documentKey: null,
                     status: DocumentStatus.PENDING,
                 },
             ];
@@ -176,9 +179,10 @@ export class PartnersService {
             // Add authorization letter if provided
             if (dto.legalRepresentative.authorization.authLetterDocUrl) {
                 regDocs.push({
-                    businessEntityId: savedPartner.id,
+                    partnerId: savedPartner.id,
                     documentType: DocumentType.AUTHORIZATION_LETTER,
-                    documentKey: dto.legalRepresentative.authorization.authLetterDocUrl,
+                    documentUrl: dto.legalRepresentative.authorization.authLetterDocUrl,
+                    documentKey: null,
                     status: DocumentStatus.PENDING,
                 });
             }
