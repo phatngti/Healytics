@@ -29,7 +29,7 @@ class LegalRepresentativeDto {
     idNumber: string;
 }
 
-export class GetMyProfileResponseDto {
+export class MyProfileResponseDto {
     @ApiProperty({ example: 'uuid' })
     id: string;
 

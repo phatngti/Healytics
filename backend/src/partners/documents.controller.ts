@@ -29,12 +29,12 @@ import { SubmitDocumentDto } from './dto/request/submit-document.dto';
 import { ReviewDocumentDto } from './dto/request/review-document.dto';
 import { GetUploadUrlRequestDto } from './dto/request/get-upload-url-request.dto';
 import { DocumentType } from './enum/document-type.enum';
-import { GetDocumentStatusResponseDto } from './dto/response/get-document-status-response.dto';
-import { GetUploadUrlResponseDto } from './dto/response/get-upload-url-response.dto';
-import { GetDocumentUrlResponseDto } from './dto/response/get-document-url-response.dto';
+import { DocumentStatusResponseDto } from './dto/response/document-status-response.dto';
+import { UploadUrlResponseDto } from './dto/response/upload-url-response.dto';
+import { DocumentUrlResponseDto } from './dto/response/document-url-response.dto';
 import { SubmitDocumentResponseDto } from './dto/response/submit-document-response.dto';
 import { ReviewDocumentResponseDto } from './dto/response/review-document-response.dto';
-import { GetPartnerDocumentsResponseDto } from './dto/response/get-partner-documents-response.dto';
+import { PartnerDocumentsResponseDto } from './dto/response/partner-documents-response.dto';
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { Role } from '@/account/enum/role.enum';
 import { RolesGuard } from '@/auth/guards/roles.guard';
@@ -66,9 +66,9 @@ export class DocumentsController {
     @ApiResponse({
         status: 200,
         description: 'Document status retrieved successfully',
-        type: GetDocumentStatusResponseDto,
+        type: DocumentStatusResponseDto,
     })
-    async getMyDocuments(@Req() req): Promise<GetDocumentStatusResponseDto> {
+    async getMyDocuments(@Req() req): Promise<DocumentStatusResponseDto> {
         return this.documentsService.getPartnerDocumentStatus(req.user.id);
     }
 
@@ -87,12 +87,12 @@ export class DocumentsController {
     @ApiResponse({
         status: 200,
         description: 'Presigned URL generated',
-        type: GetUploadUrlResponseDto,
+        type: UploadUrlResponseDto,
     })
     async getUploadUrl(
         @Req() req,
         @Body() dto: GetUploadUrlRequestDto,
-    ): Promise<GetUploadUrlResponseDto> {
+    ): Promise<UploadUrlResponseDto> {
         return this.documentsService.getUploadUrl(
             req.user.id,
             dto.fileName,
@@ -115,7 +115,7 @@ export class DocumentsController {
     @ApiResponse({
         status: 200,
         description: 'Signed URL generated',
-        type: GetDocumentUrlResponseDto,
+        type: DocumentUrlResponseDto,
     })
     @ApiResponse({
         status: 404,
@@ -124,7 +124,7 @@ export class DocumentsController {
     async getDocumentUrl(
         @Req() req,
         @Param('id') id: string,
-    ): Promise<GetDocumentUrlResponseDto> {
+    ): Promise<DocumentUrlResponseDto> {
         return this.documentsService.getDocumentUrl(id, req.user.id);
     }
 
@@ -317,11 +317,11 @@ export class DocumentsController {
     @ApiResponse({
         status: 200,
         description: 'Document status retrieved successfully',
-        type: GetDocumentStatusResponseDto,
+        type: DocumentStatusResponseDto,
     })
     async getPartnerDocumentStatusAdmin(
         @Param('accountId') accountId: string,
-    ): Promise<GetDocumentStatusResponseDto> {
+    ): Promise<DocumentStatusResponseDto> {
         // Reuses the exact same logic partner uses
         return this.documentsService.getPartnerDocumentStatus(accountId);
     }
@@ -341,11 +341,11 @@ export class DocumentsController {
     @ApiResponse({
         status: 200,
         description: 'Documents retrieved successfully',
-        type: GetPartnerDocumentsResponseDto,
+        type: PartnerDocumentsResponseDto,
     })
     async getPartnerDocuments(
         @Param('accountId') accountId: string,
-    ): Promise<GetPartnerDocumentsResponseDto> {
+    ): Promise<PartnerDocumentsResponseDto> {
         const documents = await this.documentsService.getPartnerDocuments(accountId);
         return { documents };
     }
@@ -365,13 +365,13 @@ export class DocumentsController {
     @ApiResponse({
         status: 200,
         description: 'Signed URL generated',
-        type: GetDocumentUrlResponseDto,
+        type: DocumentUrlResponseDto,
     })
     @ApiResponse({
         status: 404,
         description: 'Document not found',
     })
-    async getDocumentUrlAdmin(@Param('id') id: string): Promise<GetDocumentUrlResponseDto> {
+    async getDocumentUrlAdmin(@Param('id') id: string): Promise<DocumentUrlResponseDto> {
         return this.documentsService.getDocumentUrl(id);
     }
 }

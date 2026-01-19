@@ -12,10 +12,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PartnersService } from './partners.service';
-import { GetBusinessTypesResponseDto } from './dto/response/get-business-types-response.dto';
-import { GetMyProfileResponseDto } from './dto/response/get-my-profile-response.dto';
-import { GetPartnersResponseDto } from './dto/response/get-partners-response.dto';
-import { GetPartnerDetailResponseDto } from './dto/response/get-partner-detail-response.dto';
+import { BusinessTypesResponseDto } from './dto/response/business-types-response.dto';
+import { MyProfileResponseDto } from './dto/response/my-profile-response.dto';
+import { PartnersResponseDto } from './dto/response/partners-response.dto';
+import { PartnerDetailResponseDto } from './dto/response/partner-detail-response.dto';
 import { UpdatePartnerDto } from './dto/request/update-partner.dto';
 import { GetPartnersQueryDto } from './dto/request/get-partners-query.dto';
 import { Public } from '@/auth/decorators/public.decorator';
@@ -39,9 +39,9 @@ export class PartnersController {
     @ApiResponse({
         status: 200,
         description: 'List of business types retrieved successfully',
-        type: GetBusinessTypesResponseDto,
+        type: BusinessTypesResponseDto,
     })
-    getBusinessTypes(): GetBusinessTypesResponseDto {
+    getBusinessTypes(): BusinessTypesResponseDto {
         return this.partnersService.getBusinessTypes();
     }
 
@@ -62,9 +62,9 @@ export class PartnersController {
     @ApiResponse({
         status: 200,
         description: 'Profile retrieved successfully',
-        type: GetMyProfileResponseDto,
+        type: MyProfileResponseDto,
     })
-    async getMyProfile(@Req() req): Promise<GetMyProfileResponseDto> {
+    async getMyProfile(@Req() req): Promise<MyProfileResponseDto> {
         return this.partnersService.getMyProfile(req.user.id);
     }
 
@@ -81,12 +81,12 @@ export class PartnersController {
     @ApiResponse({
         status: 200,
         description: 'Profile updated successfully',
-        type: GetMyProfileResponseDto,
+        type: MyProfileResponseDto,
     })
     async updateMyProfile(
         @Req() req,
         @Body() dto: UpdatePartnerDto,
-    ): Promise<GetMyProfileResponseDto> {
+    ): Promise<MyProfileResponseDto> {
         return this.partnersService.updateMyProfile(req.user.id, dto);
     }
 
@@ -107,11 +107,11 @@ export class PartnersController {
     @ApiResponse({
         status: 200,
         description: 'Partners list retrieved successfully',
-        type: GetPartnersResponseDto,
+        type: PartnersResponseDto,
     })
     async getPartners(
         @Query() query: GetPartnersQueryDto,
-    ): Promise<GetPartnersResponseDto> {
+    ): Promise<PartnersResponseDto> {
         return this.partnersService.getPartners(query);
     }
 
@@ -128,7 +128,7 @@ export class PartnersController {
     @ApiResponse({
         status: 200,
         description: 'Partner details retrieved successfully',
-        type: GetPartnerDetailResponseDto,
+        type: PartnerDetailResponseDto,
     })
     @ApiResponse({
         status: 404,
@@ -136,7 +136,7 @@ export class PartnersController {
     })
     async getPartnerDetail(
         @Param('id') id: string,
-    ): Promise<GetPartnerDetailResponseDto> {
+    ): Promise<PartnerDetailResponseDto> {
         return this.partnersService.getPartnerDetail(id);
     }
 

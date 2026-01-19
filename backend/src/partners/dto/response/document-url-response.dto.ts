@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { DocumentType } from '../../enum/document-type.enum';
 import { DocumentStatus } from '../../enum/document-status.enum';
 
-export class GetDocumentUrlResponseDto {
+export class DocumentUrlResponseDto {
     @ApiProperty({
         description: 'Signed URL to view or download the document',
         example: 'https://r2.example.com/signed-url...',

@@ -336,7 +336,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetBusinessTypesResponseDto"
+                  "$ref": "#/components/schemas/BusinessTypesResponseDto"
                 }
               }
             }
@@ -359,7 +359,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetMyProfileResponseDto"
+                  "$ref": "#/components/schemas/MyProfileResponseDto"
                 }
               }
             }
@@ -395,7 +395,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetMyProfileResponseDto"
+                  "$ref": "#/components/schemas/MyProfileResponseDto"
                 }
               }
             }
@@ -466,7 +466,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetPartnersResponseDto"
+                  "$ref": "#/components/schemas/PartnersResponseDto"
                 }
               }
             }
@@ -503,7 +503,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetPartnerDetailResponseDto"
+                  "$ref": "#/components/schemas/PartnerDetailResponseDto"
                 }
               }
             }
@@ -534,7 +534,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetDocumentStatusResponseDto"
+                  "$ref": "#/components/schemas/DocumentStatusResponseDto"
                 }
               }
             }
@@ -611,7 +611,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetUploadUrlResponseDto"
+                  "$ref": "#/components/schemas/UploadUrlResponseDto"
                 }
               }
             }
@@ -649,7 +649,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetDocumentUrlResponseDto"
+                  "$ref": "#/components/schemas/DocumentUrlResponseDto"
                 }
               }
             }
@@ -802,7 +802,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetDocumentStatusResponseDto"
+                  "$ref": "#/components/schemas/DocumentStatusResponseDto"
                 }
               }
             }
@@ -840,7 +840,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetPartnerDocumentsResponseDto"
+                  "$ref": "#/components/schemas/PartnerDocumentsResponseDto"
                 }
               }
             }
@@ -878,7 +878,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetDocumentUrlResponseDto"
+                  "$ref": "#/components/schemas/DocumentUrlResponseDto"
                 }
               }
             }
@@ -2659,7 +2659,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-19T04:12:16.230Z"
+              "submittedAt": "2026-01-19T05:19:31.216Z"
             }
           }
         },
@@ -2691,7 +2691,7 @@
           "label"
         ]
       },
-      "GetBusinessTypesResponseDto": {
+      "BusinessTypesResponseDto": {
         "type": "object",
         "properties": {
           "data": {
@@ -2760,7 +2760,7 @@
           "idNumber"
         ]
       },
-      "GetMyProfileResponseDto": {
+      "MyProfileResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -2830,9 +2830,74 @@
           "createdAt"
         ]
       },
+      "UpdateLegalRepresentativeDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "Nguyen Van A",
+            "description": "Full name of legal representative"
+          },
+          "position": {
+            "type": "string",
+            "example": "CEO",
+            "description": "Position/title of legal representative"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+84987654321",
+            "description": "Phone number of legal representative"
+          },
+          "idType": {
+            "type": "string",
+            "example": "CITIZEN_ID",
+            "enum": [
+              "CITIZEN_ID",
+              "PASSPORT",
+              "MILITARY_ID"
+            ],
+            "description": "Type of identification document"
+          },
+          "idNumber": {
+            "type": "string",
+            "example": "001234567890",
+            "description": "ID number"
+          },
+          "idIssueDate": {
+            "type": "string",
+            "example": "2020-01-15",
+            "description": "ID issue date (YYYY-MM-DD)"
+          },
+          "idFrontImgUrl": {
+            "type": "string",
+            "example": "https://example.com/id-front.jpg",
+            "description": "URL of ID card front image"
+          },
+          "idBackImgUrl": {
+            "type": "string",
+            "example": "https://example.com/id-back.jpg",
+            "description": "URL of ID card back image"
+          },
+          "isAuthorizedUser": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether this person is an authorized user"
+          },
+          "authLetterDocUrl": {
+            "type": "string",
+            "example": "https://example.com/auth-letter.pdf",
+            "description": "Authorization letter document URL"
+          }
+        }
+      },
       "UpdatePartnerDto": {
         "type": "object",
         "properties": {
+          "legalName": {
+            "type": "string",
+            "example": "ABC Health Services Ltd.",
+            "description": "Legal name of the business"
+          },
           "brandName": {
             "type": "string",
             "example": "Hanoi Spa & Wellness",
@@ -2843,10 +2908,33 @@
             "example": "+84987654321",
             "description": "Contact phone number"
           },
+          "provinceId": {
+            "type": "string",
+            "example": "uuid-of-province",
+            "description": "Province ID (administrative division)"
+          },
+          "districtId": {
+            "type": "string",
+            "example": "uuid-of-district",
+            "description": "District ID (administrative division)"
+          },
+          "wardId": {
+            "type": "string",
+            "example": "uuid-of-ward",
+            "description": "Ward ID (administrative division)"
+          },
           "streetAddress": {
             "type": "string",
             "example": "123 Le Loi Street",
-            "description": "Street address (can only update if not verified)"
+            "description": "Street address"
+          },
+          "legalRepresentative": {
+            "description": "Legal representative information to update",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdateLegalRepresentativeDto"
+              }
+            ]
           }
         }
       },
@@ -2906,7 +2994,7 @@
           "createdAt"
         ]
       },
-      "GetPartnersResponseDto": {
+      "PartnersResponseDto": {
         "type": "object",
         "properties": {
           "data": {
@@ -3022,7 +3110,7 @@
           "isAuthorizedUser"
         ]
       },
-      "GetPartnerDetailResponseDto": {
+      "PartnerDetailResponseDto": {
         "type": "object",
         "properties": {
           "account": {
@@ -3184,7 +3272,7 @@
           "documentId"
         ]
       },
-      "GetDocumentStatusResponseDto": {
+      "DocumentStatusResponseDto": {
         "type": "object",
         "properties": {
           "documents": {
@@ -3236,7 +3324,7 @@
           "contentType"
         ]
       },
-      "GetUploadUrlResponseDto": {
+      "UploadUrlResponseDto": {
         "type": "object",
         "properties": {
           "uploadUrl": {
@@ -3255,7 +3343,7 @@
           "documentKey"
         ]
       },
-      "GetDocumentUrlResponseDto": {
+      "DocumentUrlResponseDto": {
         "type": "object",
         "properties": {
           "url": {
@@ -3601,7 +3689,7 @@
           "documentUrl"
         ]
       },
-      "GetPartnerDocumentsResponseDto": {
+      "PartnerDocumentsResponseDto": {
         "type": "object",
         "properties": {
           "documents": {
