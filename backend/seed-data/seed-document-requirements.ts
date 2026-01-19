@@ -17,9 +17,9 @@ const dataSource = new DataSource({
 });
 
 async function runSeed() {
-    console.log('📦 Connecting to database...');
+    console.log('Connecting to database...');
     await dataSource.initialize();
-    console.log('✅ Connected!');
+    console.log('Connected!');
 
     try {
         await seedDocumentRequirements(dataSource);

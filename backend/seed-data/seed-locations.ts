@@ -20,20 +20,20 @@ async function runSeed() {
     });
 
     try {
-        console.log('🔌 Connecting to database...');
+        console.log('Connecting to database...');
         console.log(`   Host: ${process.env.POSTGRES_HOST}:${process.env.POSTGRES_PORT}`);
         console.log(`   Database: ${process.env.POSTGRES_DB}`);
 
         await dataSource.initialize();
-        console.log('✅ Database connected');
-        console.log('🔄 Synchronizing schema (will drop old tables)...\n');
+        console.log('Database connected');
+        console.log('Synchronizing schema (will drop old tables)...\n');
 
         // Run tree-based seed
         await seedLocations(dataSource);
 
-        console.log('\n✨ Seeding completed successfully!');
+        console.log('\nSeeding completed successfully!');
     } catch (error) {
-        console.error('\n❌ Error during seeding:');
+        console.error('\nError during seeding:');
         if (error instanceof Error) {
             console.error('Message:', error.message);
             console.error('Stack:', error.stack);
@@ -44,7 +44,7 @@ async function runSeed() {
     } finally {
         if (dataSource.isInitialized) {
             await dataSource.destroy();
-            console.log('🔌 Database connection closed');
+            console.log('Database connection closed');
         }
     }
 }
