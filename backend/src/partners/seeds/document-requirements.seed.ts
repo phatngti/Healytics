@@ -63,13 +63,13 @@ export async function seedDocumentRequirements(dataSource: DataSource) {
             description: 'Giấy ANTT (Nghị định 96)',
             displayOrder: 3,
         },
-        {
-            businessType: BusinessType.MASSAGE_THERAPY,
-            documentType: DocumentType.CCHN_MASSAGE,
-            isRequired: true,
-            description: 'Chứng chỉ nghề ký thuật viên (Sơ cấp/Trung cấp)',
-            displayOrder: 4,
-        },
+        // {
+        //     businessType: BusinessType.MASSAGE_THERAPY,
+        //     documentType: DocumentType.CCHN_MASSAGE,
+        //     isRequired: true,
+        //     description: 'Chứng chỉ nghề ký thuật viên (Sơ cấp/Trung cấp)',
+        //     displayOrder: 4,
+        // },
 
         // === 2. MASSAGE REHABILITATION ===
         {
@@ -104,13 +104,13 @@ export async function seedDocumentRequirements(dataSource: DataSource) {
             description: 'GCN đủ điều kiện kinh doanh thể thao',
             displayOrder: 3,
         },
-        {
-            businessType: BusinessType.FITNESS,
-            documentType: DocumentType.CCHN,
-            isRequired: false,
-            description: 'Bằng/Chứng chỉ HLV chuyên nghiệp (Liên đoàn Thể thao cấp)',
-            displayOrder: 4,
-        },
+        // {
+        //     businessType: BusinessType.FITNESS,
+        //     documentType: DocumentType.CCHN,
+        //     isRequired: false,
+        //     description: 'Bằng/Chứng chỉ HLV chuyên nghiệp (Liên đoàn Thể thao cấp)',
+        //     displayOrder: 4,
+        // },
 
         // === 5. PHARMACY ===
         {
@@ -136,13 +136,13 @@ export async function seedDocumentRequirements(dataSource: DataSource) {
             description: 'Giấy phép hoạt động khám bệnh, chữa bệnh (RHM)',
             displayOrder: 3,
         },
-        {
-            businessType: BusinessType.DENTAL,
-            documentType: DocumentType.CCHN_DENTAL,
-            isRequired: true,
-            description: 'CCHN Bác sĩ Răng Hàm Mặt',
-            displayOrder: 4,
-        },
+        // {
+        //     businessType: BusinessType.DENTAL,
+        //     documentType: DocumentType.CCHN_DENTAL,
+        //     isRequired: true,
+        //     description: 'CCHN Bác sĩ Răng Hàm Mặt',
+        //     displayOrder: 4,
+        // },
 
         // === 7. TRADITIONAL MEDICINE ===
         {
@@ -152,13 +152,13 @@ export async function seedDocumentRequirements(dataSource: DataSource) {
             description: 'Giấy phép hoạt động khám bệnh, chữa bệnh (YHCT)',
             displayOrder: 3,
         },
-        {
-            businessType: BusinessType.TRADITIONAL_MEDICINE,
-            documentType: DocumentType.CCHN,
-            isRequired: true,
-            description: 'CCHN Lương y hoặc Bác sĩ YHCT',
-            displayOrder: 4,
-        },
+        // {
+        //     businessType: BusinessType.TRADITIONAL_MEDICINE,
+        //     documentType: DocumentType.CCHN,
+        //     isRequired: true,
+        //     description: 'CCHN Lương y hoặc Bác sĩ YHCT',
+        //     displayOrder: 4,
+        // },
 
         // === 8. PSYCHOLOGY ===
         {
@@ -177,13 +177,13 @@ export async function seedDocumentRequirements(dataSource: DataSource) {
             description: 'Giấy phép hoạt động KCB (Da liễu/PTTM)',
             displayOrder: 3,
         },
-        {
-            businessType: BusinessType.DERMATOLOGY,
-            documentType: DocumentType.CCHN,
-            isRequired: true,
-            description: 'CCHN Bác sĩ + Chứng chỉ thú thuật (CME) (nếu có)',
-            displayOrder: 4,
-        },
+        // {
+        //     businessType: BusinessType.DERMATOLOGY,
+        //     documentType: DocumentType.CCHN,
+        //     isRequired: true,
+        //     description: 'CCHN Bác sĩ + Chứng chỉ thú thuật (CME) (nếu có)',
+        //     displayOrder: 4,
+        // },
         {
             businessType: BusinessType.DERMATOLOGY,
             documentType: DocumentType.PORTFOLIO,
@@ -209,13 +209,13 @@ export async function seedDocumentRequirements(dataSource: DataSource) {
             description: 'Giấy phép hoạt động KCB Tâm thần học',
             displayOrder: 3,
         },
-        {
-            businessType: BusinessType.PSYCHIATRY,
-            documentType: DocumentType.CCHN,
-            isRequired: true,
-            description: 'CCHN Bác sĩ chuyên khoa Tâm thần',
-            displayOrder: 4,
-        },
+        // {
+        //     businessType: BusinessType.PSYCHIATRY,
+        //     documentType: DocumentType.CCHN,
+        //     isRequired: true,
+        //     description: 'CCHN Bác sĩ chuyên khoa Tâm thần',
+        //     displayOrder: 4,
+        // },
     ];
 
     await repo.save(requirements);

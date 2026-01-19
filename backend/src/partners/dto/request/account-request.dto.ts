@@ -6,9 +6,7 @@ import {
     MinLength,
     MaxLength,
     Matches,
-    ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 class AccountRequestDto {
     @ApiProperty({ example: 'spahanoi123', description: 'Username' })
