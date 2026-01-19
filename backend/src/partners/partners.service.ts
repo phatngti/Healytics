@@ -146,7 +146,7 @@ export class PartnersService {
                     dto.legalRepresentative.authorization.isAuthorizedUser,
                 authLetterDocUrl:
                     dto.legalRepresentative.authorization.authLetterDocUrl,
-                businessEntityId: savedPartner.id,
+                partnerId: savedPartner.id,
             });
             await queryRunner.manager.save(legalRep);
 
@@ -243,9 +243,9 @@ export class PartnersService {
             brandName: partner.brandName,
             businessType: partner.businessType,
             address: {
-                province: partner.province.name,
-                district: partner.district.name,
-                ward: partner.ward.name,
+                province: partner.province?.name ?? '',
+                district: partner.district?.name ?? '',
+                ward: partner.ward?.name ?? '',
                 streetAddress: partner.streetAddress,
             },
             legalRepresentative: {
@@ -283,23 +283,25 @@ export class PartnersService {
                 const districtId = dto.districtId || partner.districtId;
                 const wardId = dto.wardId || partner.wardId;
 
-                // Validate address hierarchy
-                try {
-                    await this.locationsService.validateAddress(
-                        provinceId,
-                        districtId,
-                        wardId,
-                    );
-                } catch (error) {
-                    throw new BadRequestException(
-                        `Invalid address: ${error.message}`,
-                    );
-                }
+                // Validate address hierarchy (only if all fields are present)
+                if (provinceId && districtId && wardId) {
+                    try {
+                        await this.locationsService.validateAddress(
+                            provinceId as string,
+                            districtId as string,
+                            wardId as string,
+                        );
+                    } catch (error) {
+                        throw new BadRequestException(
+                            `Invalid address: ${error.message}`,
+                        );
+                    }
 
-                // Apply address updates
-                partner.provinceId = provinceId;
-                partner.districtId = districtId;
-                partner.wardId = wardId;
+                    // Apply address updates
+                    partner.provinceId = provinceId as string;
+                    partner.districtId = districtId as string;
+                    partner.wardId = wardId as string;
+                }
             }
 
             // Update partner fields
@@ -335,17 +337,23 @@ export class PartnersService {
                     if (dto.legalRepresentative.idIssueDate) {
                         legalRep.idIssueDate = new Date(dto.legalRepresentative.idIssueDate);
                     }
-                    if (dto.legalRepresentative.idFrontImgUrl) {
-                        legalRep.idFrontImgUrl = dto.legalRepresentative.idFrontImgUrl;
+                    // Handle nested images object
+                    if (dto.legalRepresentative.images) {
+                        if (dto.legalRepresentative.images.frontImgUrl) {
+                            legalRep.idFrontImgUrl = dto.legalRepresentative.images.frontImgUrl;
+                        }
+                        if (dto.legalRepresentative.images.backImgUrl) {
+                            legalRep.idBackImgUrl = dto.legalRepresentative.images.backImgUrl;
+                        }
                     }
-                    if (dto.legalRepresentative.idBackImgUrl) {
-                        legalRep.idBackImgUrl = dto.legalRepresentative.idBackImgUrl;
-                    }
-                    if (dto.legalRepresentative.isAuthorizedUser !== undefined) {
-                        legalRep.isAuthorizedUser = dto.legalRepresentative.isAuthorizedUser;
-                    }
-                    if (dto.legalRepresentative.authLetterDocUrl) {
-                        legalRep.authLetterDocUrl = dto.legalRepresentative.authLetterDocUrl;
+                    // Handle nested authorization object
+                    if (dto.legalRepresentative.authorization) {
+                        if (dto.legalRepresentative.authorization.isAuthorizedUser !== undefined) {
+                            legalRep.isAuthorizedUser = dto.legalRepresentative.authorization.isAuthorizedUser;
+                        }
+                        if (dto.legalRepresentative.authorization.authLetterDocUrl) {
+                            legalRep.authLetterDocUrl = dto.legalRepresentative.authorization.authLetterDocUrl;
+                        }
                     }
 
                     await queryRunner.manager.save(legalRep);
@@ -375,6 +383,7 @@ export class PartnersService {
             .select([
                 'partner.id',
                 'partner.taxCode',
+                'partner.legalName',
                 'partner.brandName',
                 'partner.businessType',
                 'partner.isVerified',
@@ -407,6 +416,7 @@ export class PartnersService {
             data: data.map((b) => ({
                 id: b.id,
                 taxCode: b.taxCode,
+                legalName: b.legalName,
                 brandName: b.brandName,
                 email: b.account.email,
                 businessType: b.businessType,
@@ -450,9 +460,9 @@ export class PartnersService {
             brandName: partner.brandName,
             businessType: partner.businessType,
             address: {
-                province: partner.province.name,
-                district: partner.district.name,
-                ward: partner.ward.name,
+                province: partner.province?.name ?? '',
+                district: partner.district?.name ?? '',
+                ward: partner.ward?.name ?? '',
                 streetAddress: partner.streetAddress,
             },
             legalRepresentative: {

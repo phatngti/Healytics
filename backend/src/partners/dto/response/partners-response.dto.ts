@@ -11,6 +11,9 @@ export class PartnerItemDto {
     @ApiProperty({ example: 'Hanoi Spa' })
     brandName: string;
 
+    @ApiProperty({ example: 'Hanoi Spa Co., Ltd' })
+    legalName: string;
+
     @ApiProperty({ example: 'partner@example.com' })
     email: string;
 

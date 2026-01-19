@@ -305,7 +305,10 @@ export class DocumentsController {
     /**
      * Get partner document status with MISSING indicators (Admin only)
      */
-    @Get(':accountId/document-status')
+    /**
+     * Get partner document status with MISSING indicators (Admin only)
+     */
+    @Get(':partnerId/document-status')
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @HttpCode(HttpStatus.OK)
@@ -313,23 +316,25 @@ export class DocumentsController {
         summary: 'Get partner document status (Admin)',
         description: 'Shows all required documents with status including MISSING for documents not yet uploaded',
     })
-    @ApiParam({ name: 'accountId', description: 'Account ID' })
+    @ApiParam({ name: 'partnerId', description: 'Partner ID (Business Entity ID)' })
     @ApiResponse({
         status: 200,
         description: 'Document status retrieved successfully',
         type: DocumentStatusResponseDto,
     })
     async getPartnerDocumentStatusAdmin(
-        @Param('accountId') accountId: string,
+        @Param('partnerId') partnerId: string,
     ): Promise<DocumentStatusResponseDto> {
-        // Reuses the exact same logic partner uses
-        return this.documentsService.getPartnerDocumentStatus(accountId);
+        return this.documentsService.getPartnerDocumentStatusByPartnerId(partnerId);
     }
 
     /**
      * Get all documents for a specific partner (Admin only)
      */
-    @Get(':accountId/documents')
+    /**
+     * Get all documents for a specific partner (Admin only)
+     */
+    @Get(':partnerId/documents')
     @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @HttpCode(HttpStatus.OK)
@@ -337,16 +342,16 @@ export class DocumentsController {
         summary: 'Get partner documents (Admin)',
         description: 'View all submitted documents for a partner',
     })
-    @ApiParam({ name: 'accountId', description: 'Account ID' })
+    @ApiParam({ name: 'partnerId', description: 'Partner ID (Business Entity ID)' })
     @ApiResponse({
         status: 200,
         description: 'Documents retrieved successfully',
         type: PartnerDocumentsResponseDto,
     })
     async getPartnerDocuments(
-        @Param('accountId') accountId: string,
+        @Param('partnerId') partnerId: string,
     ): Promise<PartnerDocumentsResponseDto> {
-        const documents = await this.documentsService.getPartnerDocuments(accountId);
+        const documents = await this.documentsService.getPartnerDocuments(partnerId);
         return { documents };
     }
 

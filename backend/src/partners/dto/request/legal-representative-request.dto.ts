@@ -74,6 +74,18 @@ export class LegalRepresentativeRequestDto {
     position?: string;
 
     @ApiProperty({
+        example: '0901234567',
+        description: 'Phone number of legal representative',
+        required: false,
+    })
+    @IsString()
+    @IsOptional()
+    @Matches(/^(0|\+84)[3-9][0-9]{8}$/, {
+        message: 'Phone number must be a valid Vietnamese phone number',
+    })
+    phoneNumber?: string;
+
+    @ApiProperty({
         enum: IdType,
         example: IdType.CITIZEN_ID,
         description: 'Type of identification document',

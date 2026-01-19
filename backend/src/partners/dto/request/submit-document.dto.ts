@@ -19,4 +19,11 @@ export class SubmitDocumentDto {
     @IsUrl()
     @IsNotEmpty()
     documentUrl: string;
+
+    @ApiProperty({
+        description: 'Storage key for the document (if uploaded to R2)',
+        required: false,
+        example: 'documents/123/file.pdf'
+    })
+    documentKey?: string;
 }
