@@ -14,10 +14,10 @@ import { RegisterPartnerDto } from './dto/request/register-partner.dto';
 import { UpdatePartnerDto } from './dto/request/update-partner.dto';
 import { GetPartnersQueryDto } from './dto/request/get-partners-query.dto';
 import { RegisterPartnerResponseDto } from './dto/response/register-partner-response.dto';
-import { GetMyProfileResponseDto } from './dto/response/get-my-profile-response.dto';
-import { GetPartnersResponseDto } from './dto/response/get-partners-response.dto';
-import { GetPartnerDetailResponseDto } from './dto/response/get-partner-detail-response.dto';
-import { GetBusinessTypesResponseDto } from './dto/response/get-business-types-response.dto';
+import { MyProfileResponseDto } from './dto/response/my-profile-response.dto';
+import { PartnersResponseDto } from './dto/response/partners-response.dto';
+import { PartnerDetailResponseDto } from './dto/response/partner-detail-response.dto';
+import { BusinessTypesResponseDto } from './dto/response/business-types-response.dto';
 import { Role } from '@/account/enum/role.enum';
 import { BusinessType } from './enum/business-type.enum';
 import { DocumentType } from './enum/document-type.enum';
@@ -43,7 +43,7 @@ export class PartnersService {
     /**
      * Get all available business types with Vietnamese labels
      */
-    getBusinessTypes(): GetBusinessTypesResponseDto {
+    getBusinessTypes(): BusinessTypesResponseDto {
         return {
             data: [
                 { value: BusinessType.MASSAGE_THERAPY, label: 'Massage Thư giãn' },
@@ -230,7 +230,7 @@ export class PartnersService {
     /**
      * Get partner's own profile
      */
-    async getMyProfile(accountId: string): Promise<GetMyProfileResponseDto> {
+    async getMyProfile(accountId: string): Promise<MyProfileResponseDto> {
         const partner = await this.getPartnerByAccountId(accountId);
         if (!partner) {
             throw new NotFoundException('Partner not found');
@@ -261,32 +261,111 @@ export class PartnersService {
     }
 
     /**
-     * Update partner's profile
+     * Update partner's profile - comprehensive update with transaction support
      */
-    async updateMyProfile(accountId: string, dto: UpdatePartnerDto): Promise<GetMyProfileResponseDto> {
+    async updateMyProfile(accountId: string, dto: UpdatePartnerDto): Promise<MyProfileResponseDto> {
         const partner = await this.getPartnerByAccountId(accountId);
         if (!partner) {
             throw new NotFoundException('Partner not found');
         }
 
-        // Only allow updating street address if not verified
-        if (dto.streetAddress && partner.isVerified) {
-            throw new BadRequestException(
-                'Cannot update address after verification',
-            );
+        // Start transaction for atomic updates
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            // Validate and update address if any address field is provided
+            const addressFieldsProvided = dto.provinceId || dto.districtId || dto.wardId;
+            if (addressFieldsProvided) {
+                // Use provided values or fall back to existing values
+                const provinceId = dto.provinceId || partner.provinceId;
+                const districtId = dto.districtId || partner.districtId;
+                const wardId = dto.wardId || partner.wardId;
+
+                // Validate address hierarchy
+                try {
+                    await this.locationsService.validateAddress(
+                        provinceId,
+                        districtId,
+                        wardId,
+                    );
+                } catch (error) {
+                    throw new BadRequestException(
+                        `Invalid address: ${error.message}`,
+                    );
+                }
+
+                // Apply address updates
+                partner.provinceId = provinceId;
+                partner.districtId = districtId;
+                partner.wardId = wardId;
+            }
+
+            // Update partner fields
+            if (dto.legalName) partner.legalName = dto.legalName;
+            if (dto.brandName) partner.brandName = dto.brandName;
+            if (dto.phoneNumber) partner.phoneNumber = dto.phoneNumber;
+            if (dto.streetAddress) partner.streetAddress = dto.streetAddress;
+
+            await queryRunner.manager.save(partner);
+
+            // Update legal representative if provided
+            if (dto.legalRepresentative) {
+                const legalRep = await queryRunner.manager.findOne(LegalRepresentative, {
+                    where: { partnerId: partner.id },
+                });
+
+                if (legalRep) {
+                    if (dto.legalRepresentative.fullName) {
+                        legalRep.fullName = dto.legalRepresentative.fullName;
+                    }
+                    if (dto.legalRepresentative.position) {
+                        legalRep.position = dto.legalRepresentative.position;
+                    }
+                    if (dto.legalRepresentative.phoneNumber) {
+                        legalRep.phoneNumber = dto.legalRepresentative.phoneNumber;
+                    }
+                    if (dto.legalRepresentative.idType) {
+                        legalRep.idType = dto.legalRepresentative.idType;
+                    }
+                    if (dto.legalRepresentative.idNumber) {
+                        legalRep.idNumber = dto.legalRepresentative.idNumber;
+                    }
+                    if (dto.legalRepresentative.idIssueDate) {
+                        legalRep.idIssueDate = new Date(dto.legalRepresentative.idIssueDate);
+                    }
+                    if (dto.legalRepresentative.idFrontImgUrl) {
+                        legalRep.idFrontImgUrl = dto.legalRepresentative.idFrontImgUrl;
+                    }
+                    if (dto.legalRepresentative.idBackImgUrl) {
+                        legalRep.idBackImgUrl = dto.legalRepresentative.idBackImgUrl;
+                    }
+                    if (dto.legalRepresentative.isAuthorizedUser !== undefined) {
+                        legalRep.isAuthorizedUser = dto.legalRepresentative.isAuthorizedUser;
+                    }
+                    if (dto.legalRepresentative.authLetterDocUrl) {
+                        legalRep.authLetterDocUrl = dto.legalRepresentative.authLetterDocUrl;
+                    }
+
+                    await queryRunner.manager.save(legalRep);
+                }
+            }
+
+            await queryRunner.commitTransaction();
+            return this.getMyProfile(accountId);
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        } finally {
+            await queryRunner.release();
         }
-
-        if (dto.brandName) partner.brandName = dto.brandName;
-        if (dto.streetAddress) partner.streetAddress = dto.streetAddress;
-
-        await this.partnerRepository.save(partner);
-        return this.getMyProfile(accountId);
     }
 
     /**
      * Get list of partners (Admin)
      */
-    async getPartners(query: GetPartnersQueryDto): Promise<GetPartnersResponseDto> {
+    async getPartners(query: GetPartnersQueryDto): Promise<PartnersResponseDto> {
         const { page = 1, limit = 10, isVerified, search } = query;
         const skip = (page - 1) * limit;
 
@@ -343,7 +422,7 @@ export class PartnersService {
     /**
      * Get partner detail (Admin)
      */
-    async getPartnerDetail(partnerId: string): Promise<GetPartnerDetailResponseDto> {
+    async getPartnerDetail(partnerId: string): Promise<PartnerDetailResponseDto> {
         const partner = await this.partnerRepository.findOne({
             where: { id: partnerId },
             relations: [

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GetUploadUrlResponseDto {
+export class UploadUrlResponseDto {
     @ApiProperty({
         description: 'Presigned URL for uploading the file directly to R2/S3',
         example: 'https://r2.example.com/presigned-url...',

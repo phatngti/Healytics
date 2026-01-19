@@ -52,7 +52,7 @@ export class PartnerDocumentDto {
     documentKey: string | null;
 }
 
-export class GetPartnerDocumentsResponseDto {
+export class PartnerDocumentsResponseDto {
     @ApiProperty({
         description: 'List of all documents for the partner',
         type: [PartnerDocumentDto],
