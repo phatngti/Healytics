@@ -52,8 +52,10 @@ export class DocumentsService {
         }
 
         // Generate presigned URL via S3Service
+        // S3Service adds timestamp prefix, so we pass the path without timestamp
+        // Result key will be: {timestamp}-documents/{partnerId}/{fileName}
         const result = await this.s3Service.getPresignedUploadUrl(
-            `documents/${partner.id}/${Date.now()}-${fileName}`,
+            `documents/${partner.id}/${fileName}`,
             contentType,
         );
 
@@ -151,7 +153,7 @@ export class DocumentsService {
                 partnerId: partner.id,
                 documentType: dto.documentType,
                 documentUrl: dto.documentUrl,
-                documentKey: null, // Will be set in controller if file uploaded
+                documentKey: dto.documentKey || null, // Use key from DTO if provided
                 status: DocumentStatus.PENDING,
             });
             this.logger.log(
@@ -159,7 +161,29 @@ export class DocumentsService {
             );
         }
 
+        // Always update key if provided in DTO
+        if (dto.documentKey) {
+            document.documentKey = dto.documentKey;
+        }
+
         return this.documentRepo.save(document);
+    }
+
+    /**
+     * ADMIN: Get document status by Partner ID
+     */
+    async getPartnerDocumentStatusByPartnerId(
+        partnerId: string,
+    ): Promise<DocumentStatusResponseDto> {
+        const partner = await this.partnerRepo.findOne({
+            where: { id: partnerId },
+        });
+
+        if (!partner) {
+            throw new NotFoundException('Partner not found');
+        }
+
+        return this._generateDocumentStatusResponse(partner);
     }
 
     /**
@@ -176,6 +200,13 @@ export class DocumentsService {
             throw new NotFoundException('Partner not found');
         }
 
+        return this._generateDocumentStatusResponse(partner);
+    }
+
+    /**
+     * Helper to generate status response from partner entity
+     */
+    private async _generateDocumentStatusResponse(partner: Partner): Promise<DocumentStatusResponseDto> {
         // Get required documents for this business type
         const requirements = await this.requirementRepo.find({
             where: { businessType: partner.businessType },

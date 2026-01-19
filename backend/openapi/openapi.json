@@ -108,6 +108,43 @@
         ]
       }
     },
+    "/auth/partner/login": {
+      "post": {
+        "operationId": "AuthController_loginPartner",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartnerLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Partner login returns access and refresh tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "403": {
+            "description": "Account is not authorized for partner login"
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/auth/admin/login": {
       "post": {
         "operationId": "AuthController_loginAdmin",
@@ -780,17 +817,17 @@
         ]
       }
     },
-    "/partners/{accountId}/document-status": {
+    "/partners/{partnerId}/document-status": {
       "get": {
         "operationId": "DocumentsController_getPartnerDocumentStatusAdmin",
         "summary": "Get partner document status (Admin)",
         "description": "Shows all required documents with status including MISSING for documents not yet uploaded",
         "parameters": [
           {
-            "name": "accountId",
+            "name": "partnerId",
             "required": true,
             "in": "path",
-            "description": "Account ID",
+            "description": "Partner ID (Business Entity ID)",
             "schema": {
               "type": "string"
             }
@@ -818,17 +855,17 @@
         ]
       }
     },
-    "/partners/{accountId}/documents": {
+    "/partners/{partnerId}/documents": {
       "get": {
         "operationId": "DocumentsController_getPartnerDocuments",
         "summary": "Get partner documents (Admin)",
         "description": "View all submitted documents for a partner",
         "parameters": [
           {
-            "name": "accountId",
+            "name": "partnerId",
             "required": true,
             "in": "path",
-            "description": "Account ID",
+            "description": "Partner ID (Business Entity ID)",
             "schema": {
               "type": "string"
             }
@@ -2409,6 +2446,11 @@
             "example": "Giám đốc",
             "description": "Position in the company"
           },
+          "phoneNumber": {
+            "type": "string",
+            "example": "0901234567",
+            "description": "Phone number of legal representative"
+          },
           "idType": {
             "type": "string",
             "enum": [
@@ -2532,6 +2574,27 @@
           "access_expires_in",
           "refresh_token",
           "refresh_expires_in"
+        ]
+      },
+      "PartnerLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "partner@clinic.com",
+            "description": "The email of the partner",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "example": "StrongP@ssw0rd!",
+            "description": "The password of the partner",
+            "format": "password"
+          }
+        },
+        "required": [
+          "email",
+          "password"
         ]
       },
       "AdminLoginDto": {
@@ -2659,7 +2722,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-19T05:19:31.216Z"
+              "submittedAt": "2026-01-19T07:13:27.459Z"
             }
           }
         },
@@ -2835,58 +2898,44 @@
         "properties": {
           "fullName": {
             "type": "string",
-            "example": "Nguyen Van A",
+            "example": "NGUYỄN VĂN A",
             "description": "Full name of legal representative"
           },
           "position": {
             "type": "string",
-            "example": "CEO",
-            "description": "Position/title of legal representative"
+            "example": "Giám đốc",
+            "description": "Position in the company"
           },
           "phoneNumber": {
             "type": "string",
-            "example": "+84987654321",
+            "example": "0901234567",
             "description": "Phone number of legal representative"
           },
           "idType": {
             "type": "string",
-            "example": "CITIZEN_ID",
             "enum": [
               "CITIZEN_ID",
               "PASSPORT",
               "MILITARY_ID"
             ],
+            "example": "CITIZEN_ID",
             "description": "Type of identification document"
           },
           "idNumber": {
             "type": "string",
             "example": "001234567890",
-            "description": "ID number"
+            "description": "ID number (9 or 12 digits for Vietnam)"
           },
           "idIssueDate": {
             "type": "string",
-            "example": "2020-01-15",
-            "description": "ID issue date (YYYY-MM-DD)"
+            "example": "2023-01-15",
+            "description": "Date of ID issuance (ISO 8601 format)"
           },
-          "idFrontImgUrl": {
-            "type": "string",
-            "example": "https://example.com/id-front.jpg",
-            "description": "URL of ID card front image"
+          "images": {
+            "$ref": "#/components/schemas/IdImagesRequestDto"
           },
-          "idBackImgUrl": {
-            "type": "string",
-            "example": "https://example.com/id-back.jpg",
-            "description": "URL of ID card back image"
-          },
-          "isAuthorizedUser": {
-            "type": "boolean",
-            "example": false,
-            "description": "Whether this person is an authorized user"
-          },
-          "authLetterDocUrl": {
-            "type": "string",
-            "example": "https://example.com/auth-letter.pdf",
-            "description": "Authorization letter document URL"
+          "authorization": {
+            "$ref": "#/components/schemas/AuthorizationRequestDto"
           }
         }
       },
@@ -2953,6 +3002,10 @@
             "type": "string",
             "example": "Hanoi Spa"
           },
+          "legalName": {
+            "type": "string",
+            "example": "Hanoi Spa Co., Ltd"
+          },
           "email": {
             "type": "string",
             "example": "partner@example.com"
@@ -2988,6 +3041,7 @@
           "id",
           "taxCode",
           "brandName",
+          "legalName",
           "email",
           "businessType",
           "isVerified",
@@ -3429,6 +3483,11 @@
             "type": "string",
             "example": "https://r2.example.com/documents/1234-license.pdf",
             "description": "R2 URL of the uploaded document"
+          },
+          "documentKey": {
+            "type": "string",
+            "description": "Storage key for the document (if uploaded to R2)",
+            "example": "documents/123/file.pdf"
           }
         },
         "required": [

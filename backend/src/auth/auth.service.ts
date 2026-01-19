@@ -49,7 +49,7 @@ export class AuthService {
   constructor(
     private readonly accountService: AccountService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   /**
    * Creates access and refresh tokens for a user.
@@ -211,6 +211,30 @@ export class AuthService {
   }
 
   /**
+   * Logs in a partner user (HEALTH_PARTNER role only).
+   * @param user - The validated user
+   * @returns Authentication tokens
+   */
+  async loginPartner(user: ValidatedUser): Promise<AuthTokensDto> {
+    const userId = user.id;
+    const userEmail = user.email;
+    const userRole = user.role;
+
+    if (!userId) {
+      throw new UnauthorizedException();
+    }
+
+    if (user.roleNotAllowed || userRole !== Role.HEALTH_PARTNER) {
+      throw new ForbiddenException(
+        'This account is not authorized for partner login.',
+      );
+    }
+
+    this.logger.log(`Partner login: ${userId}`);
+    return this.createTokensForUser(userId, userEmail, userRole, user.userProfile);
+  }
+
+  /**
    * Legacy login (for backward compatibility, validates any role).
    * @deprecated Use loginUser or loginAdmin instead
    * @param user - The validated user
@@ -251,7 +275,7 @@ export class AuthService {
     }
     const match = await bcrypt.compare(refreshToken, user.refreshTokenHash || '');
     if (!match) {
-      await this.accountService.removeRefreshToken(userId).catch(() => {});
+      await this.accountService.removeRefreshToken(userId).catch(() => { });
       throw new UnauthorizedException('Refresh token does not match');
     }
     this.logger.log(`Token refreshed for user: ${userId}`);

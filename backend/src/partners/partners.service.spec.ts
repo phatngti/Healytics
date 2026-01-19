@@ -13,6 +13,9 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { BusinessType } from './enum/business-type.enum';
+import { DocumentType } from './enum/document-type.enum';
+import { DocumentStatus } from './enum/document-status.enum';
+import { PartnerDocument } from './entities/partner-document.entity';
 import { Role } from '@/account/enum/role.enum';
 
 describe('PartnersService', () => {
@@ -98,6 +101,7 @@ describe('PartnersService', () => {
         legalRepresentative: {
             fullName: 'John Doe',
             position: 'Director',
+            phoneNumber: '0901234567',
             idType: 'CCCD',
             idNumber: '012345678901',
         },
@@ -122,6 +126,7 @@ describe('PartnersService', () => {
         legalRepresentative: {
             fullName: 'John Doe',
             position: 'Director',
+            phoneNumber: '0901234567',
             idType: 'CCCD',
             idNumber: '012345678901',
             idIssueDate: '2020-01-15',
@@ -218,6 +223,11 @@ describe('PartnersService', () => {
 
         it('should successfully register a new partner', async () => {
             // Arrange
+            const createCalls: any[] = [];
+            mockQueryRunner.manager.create.mockImplementation((entity, data) => {
+                createCalls.push({ entity, data });
+                return data;
+            });
             mockQueryRunner.manager.save.mockImplementation((entity, data) => {
                 if (Array.isArray(data)) return data; // For PartnerDocument array
                 if (data) return { id: 'new-uuid', ...data };
@@ -227,12 +237,92 @@ describe('PartnersService', () => {
             // Act
             const result = await service.registerPartner(mockRegisterDto as any);
 
-            // Assert
+            // Assert - Basic response validation
             expect(result.status).toBe('success');
             expect(result.access_token).toBe('test-access-token');
             expect(result.refresh_token).toBe('test-refresh-token');
             expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
             expect(mockQueryRunner.release).toHaveBeenCalled();
+
+            // Assert - Verify PartnerDocument records were created with correct data
+            // The service creates documents for TAX_CODE, IDENTITY_FRONT, IDENTITY_BACK
+            const documentCreates = createCalls.filter(
+                (call) => call.entity === PartnerDocument,
+            );
+            expect(documentCreates.length).toBeGreaterThanOrEqual(3);
+
+            // Verify TAX_CODE document
+            expect(
+                documentCreates.some(
+                    (call) =>
+                        call.data.documentType === DocumentType.TAX_CODE &&
+                        call.data.documentUrl === mockRegisterDto.partner.taxCode &&
+                        call.data.status === DocumentStatus.PENDING,
+                ),
+            ).toBe(true);
+
+            // Verify IDENTITY_FRONT document with URL from DTO
+            expect(
+                documentCreates.some(
+                    (call) =>
+                        call.data.documentType === DocumentType.IDENTITY_FRONT &&
+                        call.data.documentUrl ===
+                        mockRegisterDto.legalRepresentative.images.frontImgUrl &&
+                        call.data.status === DocumentStatus.PENDING,
+                ),
+            ).toBe(true);
+
+            // Verify IDENTITY_BACK document with URL from DTO
+            expect(
+                documentCreates.some(
+                    (call) =>
+                        call.data.documentType === DocumentType.IDENTITY_BACK &&
+                        call.data.documentUrl ===
+                        mockRegisterDto.legalRepresentative.images.backImgUrl &&
+                        call.data.status === DocumentStatus.PENDING,
+                ),
+            ).toBe(true);
+        });
+
+        it('should create AUTHORIZATION_LETTER document when provided', async () => {
+            // Arrange
+            const dtoWithAuthLetter = {
+                ...mockRegisterDto,
+                legalRepresentative: {
+                    ...mockRegisterDto.legalRepresentative,
+                    authorization: {
+                        isAuthorizedUser: true,
+                        authLetterDocUrl: 'https://example.com/auth-letter.pdf',
+                    },
+                },
+            };
+
+            const createCalls: any[] = [];
+            mockQueryRunner.manager.create.mockImplementation((entity, data) => {
+                createCalls.push({ entity, data });
+                return data;
+            });
+            mockQueryRunner.manager.save.mockImplementation((entity, data) => {
+                if (Array.isArray(data)) return data;
+                if (data) return { id: 'new-uuid', ...data };
+                return { id: 'new-uuid', ...entity };
+            });
+
+            // Act
+            await service.registerPartner(dtoWithAuthLetter as any);
+
+            // Assert - Verify AUTHORIZATION_LETTER document was created
+            const documentCreates = createCalls.filter(
+                (call) => call.entity === PartnerDocument,
+            );
+            expect(
+                documentCreates.some(
+                    (call) =>
+                        call.data.documentType === DocumentType.AUTHORIZATION_LETTER &&
+                        call.data.documentUrl ===
+                        dtoWithAuthLetter.legalRepresentative.authorization.authLetterDocUrl,
+                ),
+            ).toBe(true);
         });
 
         it('should throw ConflictException for duplicate email', async () => {

@@ -35,26 +35,26 @@ export class Partner {
     businessType: BusinessType;
 
     // Address information using administrative divisions (Tree Entity)
-    @Column({ name: 'province_id', type: 'uuid' })
-    provinceId: string;
+    @Column({ name: 'province_id', type: 'uuid', nullable: true })
+    provinceId: string | null;
 
-    @ManyToOne(() => Location)
+    @ManyToOne(() => Location, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'province_id' })
-    province: Location;
+    province: Location | null;
 
-    @Column({ name: 'district_id', type: 'uuid' })
-    districtId: string;
+    @Column({ name: 'district_id', type: 'uuid', nullable: true })
+    districtId: string | null;
 
-    @ManyToOne(() => Location)
+    @ManyToOne(() => Location, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'district_id' })
-    district: Location;
+    district: Location | null;
 
-    @Column({ name: 'ward_id', type: 'uuid' })
-    wardId: string;
+    @Column({ name: 'ward_id', type: 'uuid', nullable: true })
+    wardId: string | null;
 
-    @ManyToOne(() => Location)
+    @ManyToOne(() => Location, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'ward_id' })
-    ward: Location;
+    ward: Location | null;
 
     @Column({ name: 'street_address', length: 300 })
     streetAddress: string;
