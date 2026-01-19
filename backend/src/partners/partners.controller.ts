@@ -22,6 +22,7 @@ import { Public } from '@/auth/decorators/public.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { Role } from '@/account/enum/role.enum';
+import { RolesGuard } from '@/auth/guards/roles.guard';
 
 @ApiTags('partners')
 @Controller('partners')
@@ -50,6 +51,7 @@ export class PartnersController {
 
     @Get('me')
     @UseGuards(JwtAuthGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.HEALTH_PARTNER)
     @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)
@@ -68,6 +70,7 @@ export class PartnersController {
 
     @Put('me')
     @UseGuards(JwtAuthGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.HEALTH_PARTNER)
     @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)
@@ -93,6 +96,7 @@ export class PartnersController {
 
     @Get()
     @UseGuards(JwtAuthGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)
@@ -113,6 +117,7 @@ export class PartnersController {
 
     @Get(':id')
     @UseGuards(JwtAuthGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)

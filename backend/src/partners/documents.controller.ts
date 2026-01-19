@@ -28,6 +28,7 @@ import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { SubmitDocumentDto } from './dto/request/submit-document.dto';
 import { ReviewDocumentDto } from './dto/request/review-document.dto';
 import { GetUploadUrlRequestDto } from './dto/request/get-upload-url-request.dto';
+import { DocumentType } from './enum/document-type.enum';
 import { GetDocumentStatusResponseDto } from './dto/response/get-document-status-response.dto';
 import { GetUploadUrlResponseDto } from './dto/response/get-upload-url-response.dto';
 import { GetDocumentUrlResponseDto } from './dto/response/get-document-url-response.dto';
@@ -169,10 +170,10 @@ export class DocumentsController {
     @ApiOperation({
         summary: 'Upload document file directly (Swagger UI)',
         description:
-            'Upload a document file directly. The file will be uploaded to S3 and a document record created.',
+            'Upload a document file directly. The file will be uploaded to R2 and a document record created. Document type must match the requirements for your business type.',
     })
     @ApiBody({
-        description: 'Document file upload',
+        description: 'Document file upload with type specification',
         schema: {
             type: 'object',
             required: ['file', 'documentType'],
@@ -180,12 +181,11 @@ export class DocumentsController {
                 file: {
                     type: 'string',
                     format: 'binary',
-                    description: 'Document file (image or PDF)',
+                    description: 'Document file (JPEG, PNG, or PDF)',
                 },
                 documentType: {
                     type: 'string',
-                    enum: ['BUSINESS_LICENSE', 'TAX_CODE', 'IDENTITY_CARD_FRONT', 'IDENTITY_CARD_BACK', 'AUTHORIZATION_LETTER'],
-                    description: 'Type of document',
+                    description: 'Type of document being uploaded. Must match one of the required document types for your business.',
                     example: 'BUSINESS_LICENSE',
                 },
             },
@@ -198,7 +198,7 @@ export class DocumentsController {
     })
     @ApiResponse({
         status: 400,
-        description: 'Invalid file or document type',
+        description: 'Invalid file, file type, or document type',
     })
     async uploadDocument(
         @Req() req,
@@ -213,6 +213,13 @@ export class DocumentsController {
             throw new BadRequestException('documentType is required');
         }
 
+        // Validate document type against enum
+        if (!Object.values(DocumentType).includes(documentType as DocumentType)) {
+            throw new BadRequestException(
+                `Invalid document type. Must be one of: ${Object.values(DocumentType).join(', ')}`,
+            );
+        }
+
         // Validate file type
         const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
         if (!allowedMimeTypes.includes(file.mimetype)) {
@@ -221,8 +228,8 @@ export class DocumentsController {
             );
         }
 
-        // Validate file size (e.g., 5MB limit)
-        const maxSize = 5 * 1024 * 1024; // 5MB
+        // Validate file size (5MB limit)
+        const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
             throw new BadRequestException(
                 'File size exceeds 5MB limit',
@@ -236,9 +243,10 @@ export class DocumentsController {
         }
 
         // Generate unique file key
-        const fileKey = `documents/${partner.id}/${Date.now()}-${file.originalname}`;
+        const fileExtension = file.originalname.split('.').pop();
+        const fileKey = `documents/${partner.id}/${documentType}/${Date.now()}.${fileExtension}`;
 
-        // Upload file directly to S3 using the new uploadFile method
+        // Upload file to R2/S3
         await this.documentsService['s3Service'].uploadFile(
             fileKey,
             file.buffer,
@@ -247,7 +255,7 @@ export class DocumentsController {
 
         // Submit document record with the uploaded file key
         return this.documentsService.submitDocument(req.user.id, {
-            documentType: documentType as any,
+            documentType: documentType as DocumentType,
             documentUrl: fileKey,
         });
     }

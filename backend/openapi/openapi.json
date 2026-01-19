@@ -672,11 +672,11 @@
       "post": {
         "operationId": "DocumentsController_uploadDocument",
         "summary": "Upload document file directly (Swagger UI)",
-        "description": "Upload a document file directly. The file will be uploaded to S3 and a document record created.",
+        "description": "Upload a document file directly. The file will be uploaded to R2 and a document record created. Document type must match the requirements for your business type.",
         "parameters": [],
         "requestBody": {
           "required": true,
-          "description": "Document file upload",
+          "description": "Document file upload with type specification",
           "content": {
             "multipart/form-data": {
               "schema": {
@@ -689,18 +689,11 @@
                   "file": {
                     "type": "string",
                     "format": "binary",
-                    "description": "Document file (image or PDF)"
+                    "description": "Document file (JPEG, PNG, or PDF)"
                   },
                   "documentType": {
                     "type": "string",
-                    "enum": [
-                      "BUSINESS_LICENSE",
-                      "TAX_CODE",
-                      "IDENTITY_CARD_FRONT",
-                      "IDENTITY_CARD_BACK",
-                      "AUTHORIZATION_LETTER"
-                    ],
-                    "description": "Type of document",
+                    "description": "Type of document being uploaded. Must match one of the required document types for your business.",
                     "example": "BUSINESS_LICENSE"
                   }
                 }
@@ -720,7 +713,7 @@
             }
           },
           "400": {
-            "description": "Invalid file or document type"
+            "description": "Invalid file, file type, or document type"
           }
         },
         "tags": [
@@ -2666,7 +2659,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-19T00:47:19.687Z"
+              "submittedAt": "2026-01-19T03:11:09.517Z"
             }
           }
         },
