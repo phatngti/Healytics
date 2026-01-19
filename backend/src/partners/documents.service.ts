@@ -86,7 +86,12 @@ export class DocumentsService {
             }
         }
 
-        const url = await this.s3Service.getFileUrl(document.documentKey);
+        // For documents with documentKey (uploaded files), get signed URL from R2/S3
+        // For documents with only documentUrl (registration links), return the URL directly
+        const url = document.documentKey
+            ? await this.s3Service.getFileUrl(document.documentKey)
+            : document.documentUrl;
+
         return {
             url,
             documentType: document.documentType,
@@ -115,9 +120,9 @@ export class DocumentsService {
 
         if (document) {
             // CLEANUP: If the document key is different, delete the old file from R2/S3
-            if (document.documentKey && document.documentKey !== dto.documentUrl) {
+            // Only delete if it's an R2 file (has documentKey), not a registration URL
+            if (document.documentKey && document.documentUrl !== dto.documentUrl) {
                 try {
-                    // Fire and forget - don't block user if deletion fails
                     await this.s3Service.deleteFile(document.documentKey);
                     this.logger.log(
                         `Deleted old document file: ${document.documentKey}`,
@@ -127,14 +132,14 @@ export class DocumentsService {
                         `Failed to delete old document ${document.documentKey}`,
                         error,
                     );
-                    // Continue anyway - the new document upload should succeed regardless
                 }
             }
 
             // Update existing document
-            document.documentKey = dto.documentUrl;
+            document.documentUrl = dto.documentUrl;
+            document.documentKey = null; // Reset - will be set in controller if file uploaded
             document.status = DocumentStatus.PENDING;
-            document.adminFeedback = null; // Clear old feedback
+            document.adminFeedback = null;
             document.verificationNotes = null;
             document.verifiedBy = null;
             this.logger.log(
@@ -145,7 +150,8 @@ export class DocumentsService {
             document = this.documentRepo.create({
                 partnerId: partner.id,
                 documentType: dto.documentType,
-                documentKey: dto.documentUrl,
+                documentUrl: dto.documentUrl,
+                documentKey: null, // Will be set in controller if file uploaded
                 status: DocumentStatus.PENDING,
             });
             this.logger.log(
@@ -198,7 +204,8 @@ export class DocumentsService {
                 description: req.description,
                 isRequired: req.isRequired,
                 status: status,
-                documentUrl: doc?.documentKey || null,
+                documentUrl: doc?.documentUrl || null,
+                documentKey: doc?.documentKey || null,
                 adminFeedback: doc?.adminFeedback || null,
                 uploadedAt: doc?.uploadedAt || null,
                 documentId: doc?.id || null,

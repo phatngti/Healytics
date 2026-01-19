@@ -30,8 +30,17 @@ export class SubmitDocumentResponseDto {
     uploadedAt: Date;
 
     @ApiProperty({
-        description: 'R2/S3 key for the uploaded document',
-        example: 'documents/abc-123/1234567890-business-license.pdf',
+        description: 'Document URL (HTTP link for registration documents, R2 URL for uploaded documents)',
+        example: 'https://example.com/documents/identity-card.jpg',
+        nullable: true,
     })
-    documentKey: string;
+    documentUrl: string | null;
+
+    @ApiProperty({
+        description: 'R2/S3 key for uploaded documents (null for registration documents)',
+        example: 'documents/abc-123/1234567890-business-license.pdf',
+        nullable: true,
+        required: false,
+    })
+    documentKey: string | null;
 }
