@@ -1,100 +1,20 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { PartialType } from '@nestjs/swagger';
 import {
     IsOptional,
     IsString,
     MaxLength,
-    IsPhoneNumber,
     IsUUID,
     ValidateNested,
-    IsEnum
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { IdType } from '../../enum/id-type.enum';
+import { LegalRepresentativeRequestDto } from './legal-representative-request.dto';
 
-export class UpdateLegalRepresentativeDto {
-    @ApiPropertyOptional({
-        example: 'Nguyen Van A',
-        description: 'Full name of legal representative',
-    })
-    @IsOptional()
-    @IsString()
-    @MaxLength(150)
-    fullName?: string;
-
-    @ApiPropertyOptional({
-        example: 'CEO',
-        description: 'Position/title of legal representative',
-    })
-    @IsOptional()
-    @IsString()
-    @MaxLength(100)
-    position?: string;
-
-    @ApiPropertyOptional({
-        example: '+84987654321',
-        description: 'Phone number of legal representative',
-    })
-    @IsOptional()
-    @IsString()
-    phoneNumber?: string;
-
-    @ApiPropertyOptional({
-        example: IdType.CITIZEN_ID,
-        enum: IdType,
-        description: 'Type of identification document',
-    })
-    @IsOptional()
-    @IsEnum(IdType)
-    idType?: IdType;
-
-    @ApiPropertyOptional({
-        example: '001234567890',
-        description: 'ID number',
-    })
-    @IsOptional()
-    @IsString()
-    @MaxLength(20)
-    idNumber?: string;
-
-    @ApiPropertyOptional({
-        example: '2020-01-15',
-        description: 'ID issue date (YYYY-MM-DD)',
-    })
-    @IsOptional()
-    @IsString()
-    idIssueDate?: string;
-
-    @ApiPropertyOptional({
-        example: 'https://example.com/id-front.jpg',
-        description: 'URL of ID card front image',
-    })
-    @IsOptional()
-    @IsString()
-    idFrontImgUrl?: string;
-
-    @ApiPropertyOptional({
-        example: 'https://example.com/id-back.jpg',
-        description: 'URL of ID card back image',
-    })
-    @IsOptional()
-    @IsString()
-    idBackImgUrl?: string;
-
-    @ApiPropertyOptional({
-        example: false,
-        description: 'Whether this person is an authorized user',
-    })
-    @IsOptional()
-    isAuthorizedUser?: boolean;
-
-    @ApiPropertyOptional({
-        example: 'https://example.com/auth-letter.pdf',
-        description: 'Authorization letter document URL',
-    })
-    @IsOptional()
-    @IsString()
-    authLetterDocUrl?: string;
-}
+/**
+ * Update DTO for legal representative - all fields optional
+ * Derived from LegalRepresentativeRequestDto using PartialType
+ */
+export class UpdateLegalRepresentativeDto extends PartialType(LegalRepresentativeRequestDto) { }
 
 export class UpdatePartnerDto {
     @ApiPropertyOptional({

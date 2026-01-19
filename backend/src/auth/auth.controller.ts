@@ -29,6 +29,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { LoginDto } from './dto/request/login.dto';
 import { AdminLoginDto } from './dto/request/admin-login.dto';
+import { PartnerLoginDto } from './dto/request/partner-login.dto';
 import { PartnersService } from '@/partners/partners.service';
 import { RegisterPartnerDto } from '@/partners/dto/request/register-partner.dto';
 import { RegisterPartnerResponseDto } from '@/partners/dto/response/register-partner-response.dto';
@@ -118,7 +119,29 @@ export class AuthController {
   }
 
   /**
-   * Logs in an admin/partner and returns authentication tokens.
+   * Logs in a partner and returns authentication tokens.
+   */
+  @Public()
+  @UseGuards(LocalAuthGuard)
+  @ApiBody({ type: PartnerLoginDto })
+  @ApiOkResponse({
+    description: 'Partner login returns access and refresh tokens',
+    type: AuthTokensDto,
+  })
+  @ApiForbiddenResponse({
+    description: 'Account is not authorized for partner login',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid credentials',
+  })
+  @HttpCode(200)
+  @Post('partner/login')
+  async loginPartner(@Req() req): Promise<AuthTokensDto> {
+    return this.authService.loginPartner(req.user);
+  }
+
+  /**
+   * Logs in an admin and returns authentication tokens.
    */
   @Public()
   @UseGuards(LocalAuthGuard)
