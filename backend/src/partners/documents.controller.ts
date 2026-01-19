@@ -253,11 +253,17 @@ export class DocumentsController {
             file.mimetype,
         );
 
-        // Submit document record with the uploaded file key
-        return this.documentsService.submitDocument(req.user.id, {
+        // Submit document record with the uploaded file
+        const document = await this.documentsService.submitDocument(req.user.id, {
             documentType: documentType as DocumentType,
-            documentUrl: fileKey,
+            documentUrl: fileKey, // Store the key as URL initially
         });
+
+        // Update the document to set the documentKey (since it's an uploaded file)
+        document.documentKey = fileKey;
+        await this.documentsService['documentRepo'].save(document);
+
+        return document;
     }
 
 
