@@ -59,7 +59,7 @@ export class AuthService {
    * @param profile - Optional user profile
    * @returns The generated tokens
    */
-  private async createTokensForUser(
+  async createTokensForUser(
     userId: string,
     email?: string,
     role?: Role,

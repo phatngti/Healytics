@@ -67,6 +67,28 @@ export class S3Service {
   }
 
   /**
+   * Uploads a file directly to the bucket.
+   * @param key - The file key/path in the bucket
+   * @param buffer - The file buffer to upload
+   * @param contentType - The MIME type of the file
+   */
+  async uploadFile(
+    key: string,
+    buffer: Buffer,
+    contentType: string,
+  ): Promise<void> {
+    await this.s3Client.send(
+      new PutObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+        Body: buffer,
+        ContentType: contentType,
+      }),
+    );
+    this.logger.log(`File uploaded: ${key}`);
+  }
+
+  /**
    * Gets the public or signed URL for a file.
    * @param key - The file key in the bucket
    * @returns The file URL
