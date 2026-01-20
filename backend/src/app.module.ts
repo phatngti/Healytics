@@ -48,6 +48,7 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
     S3Module,
     LocationsModule,
     PartnersModule,
+    AdminModule,
   ],
   providers: [
     {

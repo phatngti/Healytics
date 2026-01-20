@@ -1888,6 +1888,351 @@
           }
         ]
       }
+    },
+    "/admin/partners": {
+      "get": {
+        "operationId": "AdminPartnersController_getPartners",
+        "summary": "List all partners",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "verificationStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by verification status (PENDING, APPROVED, REJECTED)",
+            "schema": {
+              "example": "PENDING",
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by tax code, brand name, legal name, or email",
+            "schema": {
+              "example": "spa",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/{id}": {
+      "get": {
+        "operationId": "AdminPartnersController_getPartnerDetail",
+        "summary": "Get partner details including documents",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Partner ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerDetailResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/{id}/review": {
+      "put": {
+        "operationId": "AdminPartnersController_reviewPartner",
+        "summary": "Review partner profile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Partner ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewPartnerProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewPartnerResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/{partnerId}/documents": {
+      "get": {
+        "operationId": "AdminPartnersController_getPartnerDocumentStatus",
+        "summary": "Get document status for a partner",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "required": true,
+            "in": "path",
+            "description": "Partner ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentStatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/{partnerId}/documents/{documentId}/url": {
+      "get": {
+        "operationId": "AdminPartnersController_getDocumentUrl",
+        "summary": "Get signed URL to view a document",
+        "parameters": [
+          {
+            "name": "documentId",
+            "required": true,
+            "in": "path",
+            "description": "Document ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": true,
+            "in": "path",
+            "description": "Partner ID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentUrlResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/{partnerId}/documents/{documentId}/review": {
+      "put": {
+        "operationId": "AdminPartnersController_reviewDocument",
+        "summary": "Review a partner document",
+        "parameters": [
+          {
+            "name": "documentId",
+            "required": true,
+            "in": "path",
+            "description": "Document ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": true,
+            "in": "path",
+            "description": "Partner ID",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewDocumentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewDocumentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/audit-logs": {
+      "get": {
+        "operationId": "AuditController_getAuditLogs",
+        "summary": "Get audit logs",
+        "parameters": [
+          {
+            "name": "targetId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by Target ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actorId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by Actor ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "description": "Filter by Action type",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of audit logs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditLog"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Audit Logs"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -2440,7 +2785,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-20T00:31:06.205Z"
+              "submittedAt": "2026-01-20T00:52:47.747Z"
             }
           }
         },
@@ -4589,6 +4934,293 @@
           "productId",
           "createdAt"
         ]
+      },
+      "AdminPartnerDocumentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "documentType": {
+            "type": "string"
+          },
+          "documentUrl": {
+            "type": "object",
+            "nullable": true
+          },
+          "documentKey": {
+            "type": "object",
+            "nullable": true
+          },
+          "isReviewed": {
+            "type": "boolean",
+            "description": "Whether the document has been reviewed by admin"
+          },
+          "isValid": {
+            "type": "boolean",
+            "description": "Whether the document is valid"
+          },
+          "verificationNotes": {
+            "type": "object",
+            "nullable": true
+          },
+          "adminFeedback": {
+            "type": "object",
+            "nullable": true
+          },
+          "uploadedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "documentType",
+          "documentUrl",
+          "documentKey",
+          "isReviewed",
+          "isValid",
+          "verificationNotes",
+          "adminFeedback",
+          "uploadedAt"
+        ]
+      },
+      "AdminPartnerDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "taxCode": {
+            "type": "string"
+          },
+          "legalName": {
+            "type": "string"
+          },
+          "brandName": {
+            "type": "string"
+          },
+          "businessType": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "object",
+            "nullable": true
+          },
+          "address": {
+            "type": "string"
+          },
+          "verificationStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "verificationCompletedAt": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPartnerDocumentDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "taxCode",
+          "legalName",
+          "brandName",
+          "businessType",
+          "phone",
+          "address",
+          "verificationStatus",
+          "verificationCompletedAt",
+          "createdAt",
+          "documents"
+        ]
+      },
+      "ReviewItemDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "DOCUMENT",
+              "FIELD"
+            ],
+            "description": "Type of item being reviewed"
+          },
+          "documentId": {
+            "type": "string",
+            "description": "UUID of the document (if type is DOCUMENT)"
+          },
+          "fieldName": {
+            "type": "string",
+            "description": "Name of the field (if type is FIELD)"
+          },
+          "isValid": {
+            "type": "boolean",
+            "description": "Mark the item as valid or invalid",
+            "example": true
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for rejection or feedback"
+          }
+        },
+        "required": [
+          "type",
+          "isValid"
+        ]
+      },
+      "ReviewPartnerProfileDto": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "REJECTED"
+            ],
+            "description": "Overall decision on the partner profile"
+          },
+          "generalComment": {
+            "type": "string",
+            "description": "General comment for the review"
+          },
+          "items": {
+            "description": "List of specific items (fields or documents) with their validation status",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReviewItemDto"
+            }
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "ReviewPartnerResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Review submitted successfully",
+            "description": "Success message"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ReviewDocumentDto": {
+        "type": "object",
+        "properties": {
+          "isValid": {
+            "type": "boolean",
+            "description": "Set to true if the document is valid, false if invalid",
+            "example": true
+          },
+          "adminFeedback": {
+            "type": "string",
+            "example": "Image is too blurry, please re-upload",
+            "description": "Feedback for partner (required if isValid is false)"
+          },
+          "verificationNotes": {
+            "type": "string",
+            "example": "Verified against national database",
+            "description": "Internal admin notes"
+          }
+        },
+        "required": [
+          "isValid"
+        ]
+      },
+      "ReviewDocumentResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Document ID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "documentType": {
+            "type": "string",
+            "description": "Type of the document",
+            "enum": [
+              "BUSINESS_LICENSE",
+              "IDENTITY_FRONT",
+              "IDENTITY_BACK",
+              "AUTHORIZATION_LETTER",
+              "ANTT",
+              "KCB_LICENSE",
+              "GCN_FITNESS",
+              "GPP",
+              "RHM_LICENSE",
+              "MEDICAL_WASTE_CONTRACT",
+              "YHCT_LICENSE",
+              "PSYCHOLOGY_LICENSE",
+              "DERMATOLOGY_LICENSE",
+              "TECHNICAL_PORTFOLIO",
+              "NUTRITION_LICENSE",
+              "PSYCHIATRY_LICENSE"
+            ],
+            "example": "BUSINESS_LICENSE"
+          },
+          "isReviewed": {
+            "type": "boolean",
+            "description": "Whether the document has been reviewed",
+            "example": true
+          },
+          "isValid": {
+            "type": "boolean",
+            "description": "Whether the document is valid after review",
+            "example": true
+          },
+          "adminFeedback": {
+            "type": "object",
+            "description": "Admin feedback (especially when invalid)",
+            "example": "Document is unclear, please re-upload a clearer version",
+            "nullable": true
+          },
+          "verificationNotes": {
+            "type": "object",
+            "description": "Internal verification notes",
+            "example": "Verified against tax database",
+            "nullable": true
+          },
+          "verifiedBy": {
+            "type": "object",
+            "description": "Admin account ID who verified",
+            "example": "123e4567-e89b-12d3-a456-426614174001",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "documentType",
+          "isReviewed",
+          "isValid",
+          "adminFeedback",
+          "verificationNotes",
+          "verifiedBy"
+        ]
+      },
+      "AuditLog": {
+        "type": "object",
+        "properties": {}
       }
     }
   }

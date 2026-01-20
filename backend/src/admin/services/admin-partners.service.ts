@@ -6,6 +6,8 @@ import { PartnerDocument } from '@/partners/entities/partner-document.entity';
 import { AdminPartnerDetailResponseDto } from '../dto/admin-partner-detail-response.dto';
 import { ReviewPartnerProfileDto, ReviewDecision, ReviewItemType } from '../dto/review-partner-profile.dto';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
+import { PartnersService } from '@/partners/partners.service';
+import { GetPartnersQueryDto } from '@/partners/dto/request/get-partners-query.dto';
 
 @Injectable()
 export class AdminPartnersService {
@@ -15,6 +17,7 @@ export class AdminPartnersService {
         @InjectRepository(PartnerDocument)
         private readonly documentRepo: Repository<PartnerDocument>,
         private readonly dataSource: DataSource,
+        private readonly partnersService: PartnersService,
     ) { }
 
     async getPartnerDetail(id: string): Promise<AdminPartnerDetailResponseDto> {
@@ -102,22 +105,7 @@ export class AdminPartnersService {
         });
     }
 
-    async getPartners(query: any): Promise<any> {
-        const qb = this.partnerRepo.createQueryBuilder('partner')
-            .leftJoinAndSelect('partner.account', 'account')
-            .orderBy('partner.createdAt', 'DESC');
-
-        const [items, total] = await qb.getManyAndCount();
-
-        return {
-            items,
-            meta: {
-                totalItems: total,
-                itemCount: items.length,
-                itemsPerPage: items.length, // simple implementation
-                totalPages: 1,
-                currentPage: 1,
-            }
-        };
+    async getPartners(query: GetPartnersQueryDto): Promise<any> {
+        return this.partnersService.getPartners(query);
     }
 }
