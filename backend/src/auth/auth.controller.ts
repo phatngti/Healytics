@@ -5,6 +5,8 @@ import {
   UseGuards,
   Req,
   HttpCode,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/request/register.dto';
@@ -17,6 +19,8 @@ import {
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
   ApiTags,
+  ApiOperation,
+  ApiResponse,
 } from '@nestjs/swagger';
 import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
@@ -25,10 +29,14 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { LoginDto } from './dto/request/login.dto';
 import { AdminLoginDto } from './dto/request/admin-login.dto';
+import { PartnerLoginDto } from './dto/request/partner-login.dto';
+import { PartnersService } from '@/partners/partners.service';
+import { RegisterPartnerDto } from '@/partners/dto/request/register-partner.dto';
+import { RegisterPartnerResponseDto } from '@/partners/dto/response/register-partner-response.dto';
 
 /**
  * Controller for authentication endpoints.
- * Handles user/admin login, registration, and token management.
+ * Handles user/admin/partner login, registration, and token management.
  */
 @ApiTags('Authentication')
 @Controller('auth')
@@ -36,7 +44,9 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private accountService: AccountService,
-  ) {}
+    @Inject(forwardRef(() => PartnersService))
+    private partnersService: PartnersService,
+  ) { }
 
   // ============================================================================
   // User Authentication (Mobile App / End Users)
@@ -83,7 +93,55 @@ export class AuthController {
   // ============================================================================
 
   /**
-   * Logs in an admin/partner and returns authentication tokens.
+   * Registers a new business partner and returns authentication tokens.
+   */
+  @Public()
+  @HttpCode(201)
+  @ApiOperation({
+    summary: 'Register a new business partner',
+    description: 'Creates business entity, legal representative, and returns auth tokens immediately',
+  })
+  @ApiCreatedResponse({
+    description: 'Partner registration successful - returns tokens and business data',
+    type: RegisterPartnerResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid input data or address hierarchy',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Email or tax code already exists',
+  })
+  @Post('partner/register')
+  async registerPartner(@Body() dto: RegisterPartnerDto): Promise<RegisterPartnerResponseDto> {
+    return this.partnersService.registerPartner(dto);
+  }
+
+  /**
+   * Logs in a partner and returns authentication tokens.
+   */
+  @Public()
+  @UseGuards(LocalAuthGuard)
+  @ApiBody({ type: PartnerLoginDto })
+  @ApiOkResponse({
+    description: 'Partner login returns access and refresh tokens',
+    type: AuthTokensDto,
+  })
+  @ApiForbiddenResponse({
+    description: 'Account is not authorized for partner login',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid credentials',
+  })
+  @HttpCode(200)
+  @Post('partner/login')
+  async loginPartner(@Req() req): Promise<AuthTokensDto> {
+    return this.authService.loginPartner(req.user);
+  }
+
+  /**
+   * Logs in an admin and returns authentication tokens.
    */
   @Public()
   @UseGuards(LocalAuthGuard)
@@ -156,7 +214,7 @@ export class AuthController {
     try {
       const uid = req.user?.id;
       if (uid) await this.accountService.removeRefreshToken(uid);
-    } catch (_) {}
+    } catch (_) { }
 
     return { message: 'Logged out successfully' };
   }
