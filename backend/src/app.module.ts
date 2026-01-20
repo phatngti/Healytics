@@ -8,6 +8,9 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { ServiceTagsModule } from './service-tags/service-tags.module';
 import { S3Module } from './s3/s3.module';
+import { LocationsModule } from './locations/locations.module';
+import { PartnersModule } from './partners/partners.module';
+import { AdminModule } from './admin/admin.module';
 import databaseConfig from './config/database.config';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
@@ -32,7 +35,7 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
           password: db.password,
           database: db.database,
           entities: db.entities,
-          synchronize: db.synchronize,
+          synchronize: db.synchronize || process.env.NODE_ENV === 'development',
         } as const;
       },
     }),
@@ -43,6 +46,9 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
     ProductsModule,
     ServiceTagsModule,
     S3Module,
+    LocationsModule,
+    PartnersModule,
+    AdminModule,
   ],
   providers: [
     {
@@ -57,4 +63,3 @@ export class AppModule implements NestModule {
     consumer.apply(LoggingMiddleware).forRoutes('*');
   }
 }
-
