@@ -94,50 +94,6 @@ export class PartnersController {
     // Admin Management Endpoints
     // ============================================================================
 
-    @Get()
-    @UseGuards(JwtAuthGuard)
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
-    @ApiBearerAuth()
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({
-        summary: 'List all partners',
-        description: 'Admin gets list of all partners with pagination and filters',
-    })
-    @ApiResponse({
-        status: 200,
-        description: 'Partners list retrieved successfully',
-        type: PartnersResponseDto,
-    })
-    async getPartners(
-        @Query() query: GetPartnersQueryDto,
-    ): Promise<PartnersResponseDto> {
-        return this.partnersService.getPartners(query);
-    }
 
-    @Get(':id')
-    @UseGuards(JwtAuthGuard)
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
-    @ApiBearerAuth()
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({
-        summary: 'Get partner details',
-        description: 'Admin views detailed information of a specific partner',
-    })
-    @ApiResponse({
-        status: 200,
-        description: 'Partner details retrieved successfully',
-        type: PartnerDetailResponseDto,
-    })
-    @ApiResponse({
-        status: 404,
-        description: 'Partner not found',
-    })
-    async getPartnerDetail(
-        @Param('id') id: string,
-    ): Promise<PartnerDetailResponseDto> {
-        return this.partnersService.getPartnerDetail(id);
-    }
 
 }

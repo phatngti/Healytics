@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DocumentType } from '../../enum/document-type.enum';
-import { DocumentStatus } from '../../enum/document-status.enum';
 
 export class ReviewDocumentResponseDto {
     @ApiProperty({
@@ -17,14 +16,19 @@ export class ReviewDocumentResponseDto {
     documentType: DocumentType;
 
     @ApiProperty({
-        description: 'Updated status after review',
-        enum: DocumentStatus,
-        example: DocumentStatus.APPROVED,
+        description: 'Whether the document has been reviewed',
+        example: true,
     })
-    status: DocumentStatus;
+    isReviewed: boolean;
 
     @ApiProperty({
-        description: 'Admin feedback (especially when rejected)',
+        description: 'Whether the document is valid after review',
+        example: true,
+    })
+    isValid: boolean;
+
+    @ApiProperty({
+        description: 'Admin feedback (especially when invalid)',
         example: 'Document is unclear, please re-upload a clearer version',
         nullable: true,
     })

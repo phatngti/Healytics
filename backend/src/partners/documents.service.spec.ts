@@ -8,8 +8,8 @@ import { S3Service } from '@/s3/s3.service';
 import { PartnersService } from './partners.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { DocumentType } from './enum/document-type.enum';
-import { DocumentStatus } from './enum/document-status.enum';
 import { BusinessType } from './enum/business-type.enum';
+import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
 
 describe('DocumentsService', () => {
     let service: DocumentsService;
@@ -45,12 +45,12 @@ describe('DocumentsService', () => {
         getPartnerByAccountId: jest.fn(),
     };
 
-    // Mock data
+    // Mock data - using new verification model
     const mockPartner = {
         id: 'partner-uuid',
         accountId: 'account-uuid',
         businessType: BusinessType.MASSAGE_THERAPY,
-        isVerified: false,
+        verificationStatus: PartnerVerificationStatus.PENDING,
         verificationCompletedAt: null,
     };
 
@@ -60,7 +60,8 @@ describe('DocumentsService', () => {
         documentType: DocumentType.BUSINESS_LICENSE,
         documentUrl: 'https://example.com/doc.pdf',
         documentKey: 'documents/partner-uuid/123-doc.pdf',
-        status: DocumentStatus.PENDING,
+        isReviewed: false,
+        isValid: true, // Optimistic validation
         adminFeedback: null,
         verificationNotes: null,
         verifiedBy: null,
@@ -175,6 +176,8 @@ describe('DocumentsService', () => {
             // Assert
             expect(result.url).toBe('https://s3.example.com/signed-url');
             expect(result.documentType).toBe(DocumentType.BUSINESS_LICENSE);
+            expect(result.isReviewed).toBe(false);
+            expect(result.isValid).toBe(true);
             expect(mockS3Service.getFileUrl).toHaveBeenCalledWith(
                 mockDocument.documentKey,
             );
@@ -242,14 +245,15 @@ describe('DocumentsService', () => {
             documentUrl: 'https://example.com/new-doc.pdf',
         };
 
-        it('should create new document when not exists', async () => {
+        it('should create new document when not exists (with optimistic validation)', async () => {
             // Arrange
             mockPartnersService.getPartnerByAccountId.mockResolvedValue(mockPartner);
             mockDocumentRepo.findOne.mockResolvedValue(null);
             mockDocumentRepo.create.mockReturnValue({
                 ...submitDto,
                 partnerId: mockPartner.id,
-                status: DocumentStatus.PENDING,
+                isReviewed: false,
+                isValid: true, // Optimistic validation
             });
             mockDocumentRepo.save.mockImplementation((doc) => ({ id: 'new-doc', ...doc }));
 
@@ -258,14 +262,22 @@ describe('DocumentsService', () => {
 
             // Assert
             expect(result.id).toBe('new-doc');
+            expect(result.isValid).toBe(true); // Optimistic
+            expect(result.isReviewed).toBe(false);
             expect(mockDocumentRepo.create).toHaveBeenCalled();
             expect(mockDocumentRepo.save).toHaveBeenCalled();
         });
 
-        it('should update existing document (UPSERT)', async () => {
+        it('should update existing document and reset review status (UPSERT)', async () => {
             // Arrange
+            const existingDoc = {
+                ...mockDocument,
+                isReviewed: true,
+                isValid: false,
+                adminFeedback: 'Previous feedback',
+            };
             mockPartnersService.getPartnerByAccountId.mockResolvedValue(mockPartner);
-            mockDocumentRepo.findOne.mockResolvedValue({ ...mockDocument });
+            mockDocumentRepo.findOne.mockResolvedValue({ ...existingDoc });
             mockDocumentRepo.save.mockImplementation((doc) => doc);
 
             // Act
@@ -273,7 +285,9 @@ describe('DocumentsService', () => {
 
             // Assert
             expect(result.documentUrl).toBe(submitDto.documentUrl);
-            expect(result.status).toBe(DocumentStatus.PENDING);
+            expect(result.isReviewed).toBe(false); // Reset
+            expect(result.isValid).toBe(true); // Reset to optimistic
+            expect(result.adminFeedback).toBeNull(); // Cleared
             expect(mockDocumentRepo.create).not.toHaveBeenCalled();
         });
 
@@ -313,7 +327,8 @@ describe('DocumentsService', () => {
                 {
                     ...mockDocument,
                     documentType: DocumentType.BUSINESS_LICENSE,
-                    status: DocumentStatus.APPROVED,
+                    isReviewed: true,
+                    isValid: true,
                 },
             ]);
 
@@ -322,10 +337,30 @@ describe('DocumentsService', () => {
 
             // Assert
             expect(result.documents).toHaveLength(2);
-            expect(result.documents[0].status).toBe(DocumentStatus.APPROVED);
+            expect(result.documents[0].status).toBe('VALID');
             expect(result.documents[1].status).toBe('MISSING');
             expect(result.totalRequired).toBe(2);
-            expect(result.totalApproved).toBe(1);
+            expect(result.totalValid).toBe(1);
+        });
+
+        it('should return PENDING status for unreviewed documents', async () => {
+            // Arrange
+            mockPartnersService.getPartnerByAccountId.mockResolvedValue(mockPartner);
+            mockRequirementRepo.find.mockResolvedValue(mockRequirements);
+            mockDocumentRepo.find.mockResolvedValue([
+                {
+                    ...mockDocument,
+                    documentType: DocumentType.BUSINESS_LICENSE,
+                    isReviewed: false,
+                    isValid: true,
+                },
+            ]);
+
+            // Act
+            const result = await service.getPartnerDocumentStatus('account-uuid');
+
+            // Assert
+            expect(result.documents[0].status).toBe('PENDING');
         });
 
         it('should throw NotFoundException when partner not found', async () => {
@@ -341,12 +376,12 @@ describe('DocumentsService', () => {
 
     describe('reviewDocument', () => {
         const approveDto = {
-            status: DocumentStatus.APPROVED,
+            isValid: true,
             verificationNotes: 'Looks good',
         };
 
         const rejectDto = {
-            status: DocumentStatus.REJECTED,
+            isValid: false,
             adminFeedback: 'Document is blurry, please re-upload',
         };
 
@@ -358,7 +393,7 @@ describe('DocumentsService', () => {
             mockDocumentRepo.find.mockResolvedValue([]);
         });
 
-        it('should approve document', async () => {
+        it('should mark document as valid and reviewed', async () => {
             // Arrange & Act
             const result = await service.reviewDocument(
                 'doc-uuid',
@@ -367,12 +402,13 @@ describe('DocumentsService', () => {
             );
 
             // Assert
-            expect(result.status).toBe(DocumentStatus.APPROVED);
+            expect(result.isReviewed).toBe(true);
+            expect(result.isValid).toBe(true);
             expect(result.verifiedBy).toBe('admin-uuid');
             expect(mockDocumentRepo.save).toHaveBeenCalled();
         });
 
-        it('should reject document with feedback', async () => {
+        it('should mark document as invalid with feedback', async () => {
             // Arrange & Act
             const result = await service.reviewDocument(
                 'doc-uuid',
@@ -381,14 +417,15 @@ describe('DocumentsService', () => {
             );
 
             // Assert
-            expect(result.status).toBe(DocumentStatus.REJECTED);
+            expect(result.isReviewed).toBe(true);
+            expect(result.isValid).toBe(false);
             expect(result.adminFeedback).toBe(rejectDto.adminFeedback);
         });
 
-        it('should throw BadRequestException when rejecting without feedback', async () => {
+        it('should throw BadRequestException when marking invalid without feedback', async () => {
             // Arrange
             const rejectWithoutFeedback = {
-                status: DocumentStatus.REJECTED,
+                isValid: false,
                 adminFeedback: '',
             };
 
@@ -398,7 +435,7 @@ describe('DocumentsService', () => {
             ).rejects.toThrow(BadRequestException);
             await expect(
                 service.reviewDocument('doc-uuid', rejectWithoutFeedback, 'admin-uuid'),
-            ).rejects.toThrow('Admin feedback is required when rejecting a document');
+            ).rejects.toThrow('Admin feedback is required when marking a document as invalid');
         });
 
         it('should throw NotFoundException when document not found', async () => {
@@ -411,11 +448,11 @@ describe('DocumentsService', () => {
             ).rejects.toThrow(NotFoundException);
         });
 
-        it('should auto-activate partner when all required documents approved', async () => {
+        it('should auto-activate partner when all required documents are valid', async () => {
             // Arrange
             mockDocumentRepo.find.mockResolvedValue([
-                { documentType: DocumentType.BUSINESS_LICENSE, status: DocumentStatus.APPROVED },
-                { documentType: DocumentType.ANTT, status: DocumentStatus.APPROVED },
+                { documentType: DocumentType.BUSINESS_LICENSE, isReviewed: true, isValid: true },
+                { documentType: DocumentType.ANTT, isReviewed: true, isValid: true },
             ]);
 
             // Act
@@ -424,7 +461,7 @@ describe('DocumentsService', () => {
             // Assert
             expect(mockPartnerRepo.save).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    isVerified: true,
+                    verificationStatus: PartnerVerificationStatus.APPROVED,
                     verificationCompletedAt: expect.any(Date),
                 }),
             );

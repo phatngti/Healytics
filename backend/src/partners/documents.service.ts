@@ -17,9 +17,9 @@ import {
     DocumentStatusResponseDto,
     DocumentStatusDto,
 } from './dto/response/document-status-response.dto';
-import { DocumentStatus } from './enum/document-status.enum';
 import { UploadUrlResponseDto } from './dto/response/upload-url-response.dto';
 import { DocumentUrlResponseDto } from './dto/response/document-url-response.dto';
+import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
 
 @Injectable()
 export class DocumentsService {
@@ -92,12 +92,13 @@ export class DocumentsService {
         // For documents with only documentUrl (registration links), return the URL directly
         const url = document.documentKey
             ? await this.s3Service.getFileUrl(document.documentKey)
-            : document.documentUrl;
+            : document.documentUrl ?? null;
 
         return {
             url,
             documentType: document.documentType,
-            status: document.status,
+            isReviewed: document.isReviewed,
+            isValid: document.isValid,
         };
     }
 
@@ -137,10 +138,11 @@ export class DocumentsService {
                 }
             }
 
-            // Update existing document
-            document.documentUrl = dto.documentUrl;
-            document.documentKey = null; // Reset - will be set in controller if file uploaded
-            document.status = DocumentStatus.PENDING;
+            // Update existing document - reset review status
+            document.documentUrl = dto.documentUrl ?? null;
+            document.documentKey = dto.documentKey ?? null; // Reset - will be set in controller if file uploaded
+            document.isReviewed = false;
+            document.isValid = true; // Optimistic validation
             document.adminFeedback = null;
             document.verificationNotes = null;
             document.verifiedBy = null;
@@ -154,7 +156,8 @@ export class DocumentsService {
                 documentType: dto.documentType,
                 documentUrl: dto.documentUrl,
                 documentKey: dto.documentKey || null, // Use key from DTO if provided
-                status: DocumentStatus.PENDING,
+                isReviewed: false,
+                isValid: true, // Optimistic validation
             });
             this.logger.log(
                 `New document ${dto.documentType} submitted for partner ${partner.id}`,
@@ -227,14 +230,23 @@ export class DocumentsService {
         const documents: DocumentStatusDto[] = requirements.map((req) => {
             const doc = submittedMap.get(req.documentType);
 
-            // Calculate status dynamically: 'MISSING' if not uploaded, otherwise actual status
-            const status: DocumentStatus | 'MISSING' = doc?.status || 'MISSING';
+            // Calculate status dynamically based on new fields
+            let status: 'MISSING' | 'PENDING' | 'VALID' | 'INVALID';
+            if (!doc) {
+                status = 'MISSING';
+            } else if (!doc.isReviewed) {
+                status = 'PENDING';
+            } else {
+                status = doc.isValid ? 'VALID' : 'INVALID';
+            }
 
             return {
                 documentType: req.documentType,
                 description: req.description,
                 isRequired: req.isRequired,
                 status: status,
+                isReviewed: doc?.isReviewed ?? false,
+                isValid: doc?.isValid ?? false,
                 documentUrl: doc?.documentUrl || null,
                 documentKey: doc?.documentKey || null,
                 adminFeedback: doc?.adminFeedback || null,
@@ -244,15 +256,15 @@ export class DocumentsService {
         });
 
         const totalRequired = requirements.filter((r) => r.isRequired).length;
-        const totalApproved = submitted.filter(
-            (d) => d.status === DocumentStatus.APPROVED,
+        const totalValid = submitted.filter(
+            (d) => d.isReviewed && d.isValid,
         ).length;
 
         return {
             documents,
             totalRequired,
-            totalApproved,
-            isVerified: partner.isVerified,
+            totalValid,
+            verificationStatus: partner.verificationStatus,
         };
     }
 
@@ -273,31 +285,29 @@ export class DocumentsService {
             throw new NotFoundException('Document not found');
         }
 
-        // Validation: Feedback required when rejecting
-        if (
-            dto.status === DocumentStatus.REJECTED &&
-            !dto.adminFeedback?.trim()
-        ) {
+        // Validation: Feedback required when marking as invalid
+        if (!dto.isValid && !dto.adminFeedback?.trim()) {
             throw new BadRequestException(
-                'Admin feedback is required when rejecting a document',
+                'Admin feedback is required when marking a document as invalid',
             );
         }
 
-        // Update document
-        document.status = dto.status;
+        // Update document with new model
+        document.isReviewed = true;
+        document.isValid = dto.isValid;
         document.adminFeedback = dto.adminFeedback || null;
         document.verificationNotes = dto.verificationNotes || null;
         document.verifiedBy = adminId;
 
         await this.documentRepo.save(document);
 
-        // Trigger auto-activation check if approved
-        if (dto.status === DocumentStatus.APPROVED) {
+        // Trigger auto-activation check if valid
+        if (dto.isValid) {
             await this.checkAndActivatePartner(document.partnerId);
         }
 
         this.logger.log(
-            `Document ${documentId} reviewed by ${adminId}: ${dto.status}`,
+            `Document ${documentId} reviewed by ${adminId}: isValid=${dto.isValid}`,
         );
 
         return document;
@@ -305,14 +315,14 @@ export class DocumentsService {
 
     /**
      * SYSTEM: Auto-activation logic
-     * Checks if all required documents are approved, then activates business
+     * Checks if all required documents are valid, then activates business
      */
     private async checkAndActivatePartner(partnerId: string): Promise<void> {
         const partner = await this.partnerRepo.findOne({
             where: { id: partnerId },
         });
 
-        if (!partner || partner.isVerified) {
+        if (!partner || partner.verificationStatus === PartnerVerificationStatus.APPROVED) {
             return; // Already verified or not found
         }
 
@@ -324,24 +334,25 @@ export class DocumentsService {
             },
         });
 
-        // Get approved documents
-        const approvedDocs = await this.documentRepo.find({
+        // Get valid documents (reviewed + valid)
+        const validDocs = await this.documentRepo.find({
             where: {
                 partnerId: partner.id,
-                status: DocumentStatus.APPROVED,
+                isReviewed: true,
+                isValid: true,
             },
         });
 
         const requiredTypes = new Set(requirements.map((r) => r.documentType));
-        const approvedTypes = new Set(approvedDocs.map((d) => d.documentType));
+        const validTypes = new Set(validDocs.map((d) => d.documentType));
 
-        // Check if all required documents are approved
-        const allApproved = [...requiredTypes].every((type) =>
-            approvedTypes.has(type),
+        // Check if all required documents are valid
+        const allValid = [...requiredTypes].every((type) =>
+            validTypes.has(type),
         );
 
-        if (allApproved) {
-            partner.isVerified = true;
+        if (allValid) {
+            partner.verificationStatus = PartnerVerificationStatus.APPROVED;
             partner.verificationCompletedAt = new Date();
             await this.partnerRepo.save(partner);
 
