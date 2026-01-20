@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DocumentType } from '../../enum/document-type.enum';
-import { DocumentStatus } from '../../enum/document-status.enum';
 
 export class DocumentUrlResponseDto {
     @ApiProperty({
@@ -18,9 +17,14 @@ export class DocumentUrlResponseDto {
     documentType: DocumentType;
 
     @ApiProperty({
-        description: 'Current status of the document',
-        enum: DocumentStatus,
-        example: DocumentStatus.APPROVED,
+        description: 'Whether the document has been reviewed by admin',
+        example: true,
     })
-    status: DocumentStatus;
+    isReviewed: boolean;
+
+    @ApiProperty({
+        description: 'Whether the document is valid (only meaningful when isReviewed=true)',
+        example: true,
+    })
+    isValid: boolean;
 }

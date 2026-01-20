@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DocumentType } from '@/partners/enum/document-type.enum';
-import { DocumentStatus } from '@/partners/enum/document-status.enum';
+import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 
 export class DocumentStatusDto {
     @ApiProperty({ enum: DocumentType })
@@ -13,11 +13,17 @@ export class DocumentStatusDto {
     isRequired: boolean;
 
     @ApiProperty({
-        description: 'Status of the document. Returns "MISSING" if not uploaded yet.',
-        enum: [...Object.values(DocumentStatus), 'MISSING'],
-        example: 'MISSING',
+        description: 'Computed status: MISSING if not uploaded, PENDING if not reviewed, VALID/INVALID based on isValid',
+        enum: ['MISSING', 'PENDING', 'VALID', 'INVALID'],
+        example: 'PENDING',
     })
-    status: DocumentStatus | 'MISSING';
+    status: 'MISSING' | 'PENDING' | 'VALID' | 'INVALID';
+
+    @ApiProperty({ example: false, description: 'Whether the document has been reviewed by admin' })
+    isReviewed: boolean;
+
+    @ApiProperty({ example: true, description: 'Whether the document is valid (only meaningful when isReviewed=true)' })
+    isValid: boolean;
 
     @ApiProperty({
         example: 'https://r2.example.com/documents/license.pdf',
@@ -33,11 +39,10 @@ export class DocumentStatusDto {
     })
     documentKey: string | null;
 
-
     @ApiProperty({
         example: 'Ảnh bị mờ, vui lòng chụp lại',
         nullable: true,
-        description: 'Admin feedback (only for rejected documents)',
+        description: 'Admin feedback (only for invalid documents)',
     })
     adminFeedback: string | null;
 
@@ -63,13 +68,14 @@ export class DocumentStatusResponseDto {
 
     @ApiProperty({
         example: 3,
-        description: 'Number of approved documents',
+        description: 'Number of valid documents',
     })
-    totalApproved: number;
+    totalValid: number;
 
     @ApiProperty({
-        example: false,
-        description: 'Whether business is fully verified',
+        enum: PartnerVerificationStatus,
+        example: PartnerVerificationStatus.PENDING,
+        description: 'Overall verification status',
     })
-    isVerified: boolean;
+    verificationStatus: PartnerVerificationStatus;
 }

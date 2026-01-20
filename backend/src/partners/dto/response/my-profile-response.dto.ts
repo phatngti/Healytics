@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BusinessType } from '@/partners/enum/business-type.enum';
+import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
+import { DocumentType } from '@/partners/enum/document-type.enum';
 
 class AddressDto {
     @ApiProperty({ example: 'Hà Nội' })
@@ -29,6 +31,26 @@ class LegalRepresentativeDto {
     idNumber: string;
 }
 
+class PartnerDocumentDto {
+    @ApiProperty({ example: 'uuid-123' })
+    id: string;
+
+    @ApiProperty({ enum: DocumentType })
+    documentType: DocumentType;
+
+    @ApiProperty({ example: 'https://...', nullable: true })
+    documentUrl: string | null;
+
+    @ApiProperty({ example: false })
+    isReviewed: boolean;
+
+    @ApiProperty({ example: true })
+    isValid: boolean;
+
+    @ApiProperty({ example: 'Image blurry', nullable: true })
+    adminFeedback: string | null;
+}
+
 export class MyProfileResponseDto {
     @ApiProperty({ example: 'uuid' })
     id: string;
@@ -51,8 +73,18 @@ export class MyProfileResponseDto {
     @ApiProperty({ type: LegalRepresentativeDto })
     legalRepresentative: LegalRepresentativeDto;
 
-    @ApiProperty({ example: false })
-    isVerified: boolean;
+    @ApiProperty({ enum: PartnerVerificationStatus, example: PartnerVerificationStatus.PENDING })
+    verificationStatus: PartnerVerificationStatus;
+
+    @ApiProperty({
+        example: { taxCode: 'Invalid format' },
+        nullable: true,
+        description: 'Field-level rejection details'
+    })
+    rejectionDetails: Record<string, string> | null;
+
+    @ApiProperty({ type: [PartnerDocumentDto], description: 'List of documents with their status' })
+    documents: PartnerDocumentDto[];
 
     @ApiProperty({ example: null, nullable: true })
     verificationCompletedAt: Date | null;

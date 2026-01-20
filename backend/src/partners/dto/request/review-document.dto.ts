@@ -1,19 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString, IsOptional } from 'class-validator';
-import { DocumentStatus } from '@/partners/enum/document-status.enum';
+import { IsString, IsOptional, IsBoolean } from 'class-validator';
 
 export class ReviewDocumentDto {
     @ApiProperty({
-        enum: DocumentStatus,
-        example: DocumentStatus.APPROVED,
-        description: 'Review decision',
+        description: 'Set to true if the document is valid, false if invalid',
+        example: true
     })
-    @IsEnum(DocumentStatus)
-    status: DocumentStatus;
+    @IsBoolean()
+    isValid: boolean;
 
     @ApiProperty({
-        example: 'Ảnh bị mờ, vui lòng chụp lại rõ hơn',
-        description: 'Feedback for partner (required when rejecting)',
+        example: 'Image is too blurry, please re-upload',
+        description: 'Feedback for partner (required if isValid is false)',
         required: false,
     })
     @IsString()
@@ -21,7 +19,7 @@ export class ReviewDocumentDto {
     adminFeedback?: string;
 
     @ApiProperty({
-        example: 'Verified license number matches database',
+        example: 'Verified against national database',
         description: 'Internal admin notes',
         required: false,
     })

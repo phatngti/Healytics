@@ -448,117 +448,6 @@
         ]
       }
     },
-    "/partners": {
-      "get": {
-        "operationId": "PartnersController_getPartners",
-        "summary": "List all partners",
-        "description": "Admin gets list of all partners with pagination and filters",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "description": "Page number",
-            "schema": {
-              "default": 1,
-              "example": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "Items per page",
-            "schema": {
-              "default": 10,
-              "example": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "isVerified",
-            "required": false,
-            "in": "query",
-            "description": "Filter by verification status",
-            "schema": {
-              "example": true,
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "description": "Search by tax code, brand name, legal name, or email",
-            "schema": {
-              "example": "spa",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Partners list retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PartnersResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "partners"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/partners/{id}": {
-      "get": {
-        "operationId": "PartnersController_getPartnerDetail",
-        "summary": "Get partner details",
-        "description": "Admin views detailed information of a specific partner",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Partner details retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PartnerDetailResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Partner not found"
-          }
-        },
-        "tags": [
-          "partners"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
     "/partners/me/documents": {
       "get": {
         "operationId": "DocumentsController_getMyDocuments",
@@ -751,177 +640,6 @@
           },
           "400": {
             "description": "Invalid file, file type, or document type"
-          }
-        },
-        "tags": [
-          "Partner Documents"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/partners/documents/{id}/review": {
-      "put": {
-        "operationId": "DocumentsController_reviewDocument",
-        "summary": "Review partner document (Admin)",
-        "description": "Approve or reject document. Feedback required when rejecting. Auto-activates partner when all documents approved.",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Document ID",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReviewDocumentDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Document reviewed successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReviewDocumentResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Feedback required when rejecting"
-          },
-          "404": {
-            "description": "Document not found"
-          }
-        },
-        "tags": [
-          "Partner Documents"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/partners/{partnerId}/document-status": {
-      "get": {
-        "operationId": "DocumentsController_getPartnerDocumentStatusAdmin",
-        "summary": "Get partner document status (Admin)",
-        "description": "Shows all required documents with status including MISSING for documents not yet uploaded",
-        "parameters": [
-          {
-            "name": "partnerId",
-            "required": true,
-            "in": "path",
-            "description": "Partner ID (Business Entity ID)",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Document status retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentStatusResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Partner Documents"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/partners/{partnerId}/documents": {
-      "get": {
-        "operationId": "DocumentsController_getPartnerDocuments",
-        "summary": "Get partner documents (Admin)",
-        "description": "View all submitted documents for a partner",
-        "parameters": [
-          {
-            "name": "partnerId",
-            "required": true,
-            "in": "path",
-            "description": "Partner ID (Business Entity ID)",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Documents retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PartnerDocumentsResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Partner Documents"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/partners/documents/{id}/url": {
-      "get": {
-        "operationId": "DocumentsController_getDocumentUrlAdmin",
-        "summary": "Get document URL (Admin)",
-        "description": "Returns signed URL to view/download any document",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Document ID",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Signed URL generated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentUrlResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Document not found"
           }
         },
         "tags": [
@@ -2722,7 +2440,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-19T07:13:27.459Z"
+              "submittedAt": "2026-01-20T00:31:06.205Z"
             }
           }
         },
@@ -2823,6 +2541,62 @@
           "idNumber"
         ]
       },
+      "PartnerDocumentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uuid-123"
+          },
+          "documentType": {
+            "type": "string",
+            "enum": [
+              "BUSINESS_LICENSE",
+              "IDENTITY_FRONT",
+              "IDENTITY_BACK",
+              "AUTHORIZATION_LETTER",
+              "ANTT",
+              "KCB_LICENSE",
+              "GCN_FITNESS",
+              "GPP",
+              "RHM_LICENSE",
+              "MEDICAL_WASTE_CONTRACT",
+              "YHCT_LICENSE",
+              "PSYCHOLOGY_LICENSE",
+              "DERMATOLOGY_LICENSE",
+              "TECHNICAL_PORTFOLIO",
+              "NUTRITION_LICENSE",
+              "PSYCHIATRY_LICENSE"
+            ]
+          },
+          "documentUrl": {
+            "type": "object",
+            "example": "https://...",
+            "nullable": true
+          },
+          "isReviewed": {
+            "type": "boolean",
+            "example": false
+          },
+          "isValid": {
+            "type": "boolean",
+            "example": true
+          },
+          "adminFeedback": {
+            "type": "object",
+            "example": "Image blurry",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "documentType",
+          "documentUrl",
+          "isReviewed",
+          "isValid",
+          "adminFeedback"
+        ]
+      },
       "MyProfileResponseDto": {
         "type": "object",
         "properties": {
@@ -2865,9 +2639,29 @@
           "legalRepresentative": {
             "$ref": "#/components/schemas/LegalRepresentativeDto"
           },
-          "isVerified": {
-            "type": "boolean",
-            "example": false
+          "verificationStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ],
+            "example": "PENDING"
+          },
+          "rejectionDetails": {
+            "type": "object",
+            "example": {
+              "taxCode": "Invalid format"
+            },
+            "nullable": true,
+            "description": "Field-level rejection details"
+          },
+          "documents": {
+            "description": "List of documents with their status",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerDocumentDto"
+            }
           },
           "verificationCompletedAt": {
             "type": "object",
@@ -2888,7 +2682,9 @@
           "businessType",
           "address",
           "legalRepresentative",
-          "isVerified",
+          "verificationStatus",
+          "rejectionDetails",
+          "documents",
           "verificationCompletedAt",
           "createdAt"
         ]
@@ -2987,282 +2783,28 @@
           }
         }
       },
-      "PartnerItemDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "uuid"
-          },
-          "taxCode": {
-            "type": "string",
-            "example": "0123456789"
-          },
-          "brandName": {
-            "type": "string",
-            "example": "Hanoi Spa"
-          },
-          "legalName": {
-            "type": "string",
-            "example": "Hanoi Spa Co., Ltd"
-          },
-          "email": {
-            "type": "string",
-            "example": "partner@example.com"
-          },
-          "businessType": {
-            "type": "string",
-            "enum": [
-              "MASSAGE_THERAPY",
-              "MASSAGE_REHABILITATION",
-              "SPA_BEAUTY",
-              "FITNESS",
-              "PHARMACY",
-              "DENTAL",
-              "TRADITIONAL_MEDICINE",
-              "PSYCHOLOGY",
-              "DERMATOLOGY",
-              "NUTRITION",
-              "PSYCHIATRY"
-            ],
-            "example": "SPA_BEAUTY"
-          },
-          "isVerified": {
-            "type": "boolean",
-            "example": false
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2024-01-15T10:30:00Z"
-          }
-        },
-        "required": [
-          "id",
-          "taxCode",
-          "brandName",
-          "legalName",
-          "email",
-          "businessType",
-          "isVerified",
-          "createdAt"
-        ]
-      },
-      "PartnersResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PartnerItemDto"
-            }
-          },
-          "total": {
-            "type": "number",
-            "example": 50
-          },
-          "page": {
-            "type": "number",
-            "example": 1
-          },
-          "limit": {
-            "type": "number",
-            "example": 10
-          }
-        },
-        "required": [
-          "data",
-          "total",
-          "page",
-          "limit"
-        ]
-      },
-      "AccountInfoDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "uuid"
-          },
-          "email": {
-            "type": "string",
-            "example": "partner@example.com"
-          },
-          "isActive": {
-            "type": "boolean",
-            "example": true
-          }
-        },
-        "required": [
-          "id",
-          "email",
-          "isActive"
-        ]
-      },
-      "AddressDetailDto": {
-        "type": "object",
-        "properties": {
-          "province": {
-            "type": "string",
-            "example": "Hà Nội"
-          },
-          "district": {
-            "type": "string",
-            "example": "Hoàn Kiếm"
-          },
-          "ward": {
-            "type": "string",
-            "example": "Hàng Bạc"
-          },
-          "streetAddress": {
-            "type": "string",
-            "example": "123 Le Loi Street"
-          }
-        },
-        "required": [
-          "province",
-          "district",
-          "ward",
-          "streetAddress"
-        ]
-      },
-      "LegalRepDetailDto": {
-        "type": "object",
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "example": "NGUYEN VAN A"
-          },
-          "position": {
-            "type": "string",
-            "example": "Giám đốc"
-          },
-          "idType": {
-            "type": "string",
-            "example": "CITIZEN_ID"
-          },
-          "idNumber": {
-            "type": "string",
-            "example": "001234567890"
-          },
-          "idIssueDate": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2020-01-01"
-          },
-          "isAuthorizedUser": {
-            "type": "boolean",
-            "example": true
-          }
-        },
-        "required": [
-          "fullName",
-          "position",
-          "idType",
-          "idNumber",
-          "idIssueDate",
-          "isAuthorizedUser"
-        ]
-      },
-      "PartnerDetailResponseDto": {
-        "type": "object",
-        "properties": {
-          "account": {
-            "$ref": "#/components/schemas/AccountInfoDto"
-          },
-          "id": {
-            "type": "string",
-            "example": "uuid"
-          },
-          "taxCode": {
-            "type": "string",
-            "example": "0123456789"
-          },
-          "legalName": {
-            "type": "string",
-            "example": "CÔNG TY TNHH SPA HÀ NỘI"
-          },
-          "brandName": {
-            "type": "string",
-            "example": "Hanoi Spa"
-          },
-          "businessType": {
-            "type": "string",
-            "enum": [
-              "MASSAGE_THERAPY",
-              "MASSAGE_REHABILITATION",
-              "SPA_BEAUTY",
-              "FITNESS",
-              "PHARMACY",
-              "DENTAL",
-              "TRADITIONAL_MEDICINE",
-              "PSYCHOLOGY",
-              "DERMATOLOGY",
-              "NUTRITION",
-              "PSYCHIATRY"
-            ],
-            "example": "SPA_BEAUTY"
-          },
-          "address": {
-            "$ref": "#/components/schemas/AddressDetailDto"
-          },
-          "legalRepresentative": {
-            "$ref": "#/components/schemas/LegalRepDetailDto"
-          },
-          "isVerified": {
-            "type": "boolean",
-            "example": false
-          },
-          "verificationCompletedAt": {
-            "type": "object",
-            "example": null,
-            "nullable": true
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2024-01-15T10:30:00Z"
-          }
-        },
-        "required": [
-          "account",
-          "id",
-          "taxCode",
-          "legalName",
-          "brandName",
-          "businessType",
-          "address",
-          "legalRepresentative",
-          "isVerified",
-          "verificationCompletedAt",
-          "createdAt"
-        ]
-      },
       "DocumentStatusDto": {
         "type": "object",
         "properties": {
           "documentType": {
             "type": "string",
             "enum": [
-              "TAX_CODE",
               "BUSINESS_LICENSE",
               "IDENTITY_FRONT",
               "IDENTITY_BACK",
               "AUTHORIZATION_LETTER",
               "ANTT",
-              "CCHN",
-              "GPP",
+              "KCB_LICENSE",
               "GCN_FITNESS",
+              "GPP",
               "RHM_LICENSE",
+              "MEDICAL_WASTE_CONTRACT",
               "YHCT_LICENSE",
-              "PSYCHIATRY_LICENSE",
+              "PSYCHOLOGY_LICENSE",
               "DERMATOLOGY_LICENSE",
-              "CCHN_MASSAGE",
-              "CCHN_PHARMACY",
-              "CCHN_DENTAL",
-              "CCHN_NUTRITION",
-              "CCHN_PSYCHOLOGY",
-              "PORTFOLIO"
+              "TECHNICAL_PORTFOLIO",
+              "NUTRITION_LICENSE",
+              "PSYCHIATRY_LICENSE"
             ]
           },
           "description": {
@@ -3275,15 +2817,24 @@
           },
           "status": {
             "type": "string",
-            "description": "Status of the document. Returns \"MISSING\" if not uploaded yet.",
+            "description": "Computed status: MISSING if not uploaded, PENDING if not reviewed, VALID/INVALID based on isValid",
             "enum": [
+              "MISSING",
               "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "CHANGES_REQUESTED",
-              "MISSING"
+              "VALID",
+              "INVALID"
             ],
-            "example": "MISSING"
+            "example": "PENDING"
+          },
+          "isReviewed": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether the document has been reviewed by admin"
+          },
+          "isValid": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the document is valid (only meaningful when isReviewed=true)"
           },
           "documentUrl": {
             "type": "object",
@@ -3301,7 +2852,7 @@
             "type": "object",
             "example": "Ảnh bị mờ, vui lòng chụp lại",
             "nullable": true,
-            "description": "Admin feedback (only for rejected documents)"
+            "description": "Admin feedback (only for invalid documents)"
           },
           "uploadedAt": {
             "type": "object",
@@ -3319,6 +2870,8 @@
           "description",
           "isRequired",
           "status",
+          "isReviewed",
+          "isValid",
           "documentUrl",
           "documentKey",
           "adminFeedback",
@@ -3341,22 +2894,27 @@
             "example": 5,
             "description": "Total number of required documents"
           },
-          "totalApproved": {
+          "totalValid": {
             "type": "number",
             "example": 3,
-            "description": "Number of approved documents"
+            "description": "Number of valid documents"
           },
-          "isVerified": {
-            "type": "boolean",
-            "example": false,
-            "description": "Whether business is fully verified"
+          "verificationStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ],
+            "example": "PENDING",
+            "description": "Overall verification status"
           }
         },
         "required": [
           "documents",
           "totalRequired",
-          "totalApproved",
-          "isVerified"
+          "totalValid",
+          "verificationStatus"
         ]
       },
       "GetUploadUrlRequestDto": {
@@ -3410,44 +2968,41 @@
             "type": "string",
             "description": "Type of the document",
             "enum": [
-              "TAX_CODE",
               "BUSINESS_LICENSE",
               "IDENTITY_FRONT",
               "IDENTITY_BACK",
               "AUTHORIZATION_LETTER",
               "ANTT",
-              "CCHN",
-              "GPP",
+              "KCB_LICENSE",
               "GCN_FITNESS",
+              "GPP",
               "RHM_LICENSE",
+              "MEDICAL_WASTE_CONTRACT",
               "YHCT_LICENSE",
-              "PSYCHIATRY_LICENSE",
+              "PSYCHOLOGY_LICENSE",
               "DERMATOLOGY_LICENSE",
-              "CCHN_MASSAGE",
-              "CCHN_PHARMACY",
-              "CCHN_DENTAL",
-              "CCHN_NUTRITION",
-              "CCHN_PSYCHOLOGY",
-              "PORTFOLIO"
+              "TECHNICAL_PORTFOLIO",
+              "NUTRITION_LICENSE",
+              "PSYCHIATRY_LICENSE"
             ],
             "example": "BUSINESS_LICENSE"
           },
-          "status": {
-            "type": "string",
-            "description": "Current status of the document",
-            "enum": [
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "CHANGES_REQUESTED"
-            ],
-            "example": "APPROVED"
+          "isReviewed": {
+            "type": "boolean",
+            "description": "Whether the document has been reviewed by admin",
+            "example": true
+          },
+          "isValid": {
+            "type": "boolean",
+            "description": "Whether the document is valid (only meaningful when isReviewed=true)",
+            "example": true
           }
         },
         "required": [
           "url",
           "documentType",
-          "status"
+          "isReviewed",
+          "isValid"
         ]
       },
       "SubmitDocumentDto": {
@@ -3456,25 +3011,22 @@
           "documentType": {
             "type": "string",
             "enum": [
-              "TAX_CODE",
               "BUSINESS_LICENSE",
               "IDENTITY_FRONT",
               "IDENTITY_BACK",
               "AUTHORIZATION_LETTER",
               "ANTT",
-              "CCHN",
-              "GPP",
+              "KCB_LICENSE",
               "GCN_FITNESS",
+              "GPP",
               "RHM_LICENSE",
+              "MEDICAL_WASTE_CONTRACT",
               "YHCT_LICENSE",
-              "PSYCHIATRY_LICENSE",
+              "PSYCHOLOGY_LICENSE",
               "DERMATOLOGY_LICENSE",
-              "CCHN_MASSAGE",
-              "CCHN_PHARMACY",
-              "CCHN_DENTAL",
-              "CCHN_NUTRITION",
-              "CCHN_PSYCHOLOGY",
-              "PORTFOLIO"
+              "TECHNICAL_PORTFOLIO",
+              "NUTRITION_LICENSE",
+              "PSYCHIATRY_LICENSE"
             ],
             "example": "BUSINESS_LICENSE",
             "description": "Type of document being submitted"
@@ -3507,38 +3059,34 @@
             "type": "string",
             "description": "Type of the document",
             "enum": [
-              "TAX_CODE",
               "BUSINESS_LICENSE",
               "IDENTITY_FRONT",
               "IDENTITY_BACK",
               "AUTHORIZATION_LETTER",
               "ANTT",
-              "CCHN",
-              "GPP",
+              "KCB_LICENSE",
               "GCN_FITNESS",
+              "GPP",
               "RHM_LICENSE",
+              "MEDICAL_WASTE_CONTRACT",
               "YHCT_LICENSE",
-              "PSYCHIATRY_LICENSE",
+              "PSYCHOLOGY_LICENSE",
               "DERMATOLOGY_LICENSE",
-              "CCHN_MASSAGE",
-              "CCHN_PHARMACY",
-              "CCHN_DENTAL",
-              "CCHN_NUTRITION",
-              "CCHN_PSYCHOLOGY",
-              "PORTFOLIO"
+              "TECHNICAL_PORTFOLIO",
+              "NUTRITION_LICENSE",
+              "PSYCHIATRY_LICENSE"
             ],
             "example": "BUSINESS_LICENSE"
           },
-          "status": {
-            "type": "string",
-            "description": "Status of the document (always PENDING after submission)",
-            "enum": [
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "CHANGES_REQUESTED"
-            ],
-            "example": "PENDING"
+          "isReviewed": {
+            "type": "boolean",
+            "description": "Whether the document has been reviewed by admin",
+            "example": false
+          },
+          "isValid": {
+            "type": "boolean",
+            "description": "Whether the document is valid (optimistic: true until marked invalid)",
+            "example": true
           },
           "uploadedAt": {
             "format": "date-time",
@@ -3562,205 +3110,10 @@
         "required": [
           "id",
           "documentType",
-          "status",
+          "isReviewed",
+          "isValid",
           "uploadedAt",
           "documentUrl"
-        ]
-      },
-      "ReviewDocumentDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "CHANGES_REQUESTED"
-            ],
-            "example": "APPROVED",
-            "description": "Review decision"
-          },
-          "adminFeedback": {
-            "type": "string",
-            "example": "Ảnh bị mờ, vui lòng chụp lại rõ hơn",
-            "description": "Feedback for partner (required when rejecting)"
-          },
-          "verificationNotes": {
-            "type": "string",
-            "example": "Verified license number matches database",
-            "description": "Internal admin notes"
-          }
-        },
-        "required": [
-          "status"
-        ]
-      },
-      "ReviewDocumentResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Document ID",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "documentType": {
-            "type": "string",
-            "description": "Type of the document",
-            "enum": [
-              "TAX_CODE",
-              "BUSINESS_LICENSE",
-              "IDENTITY_FRONT",
-              "IDENTITY_BACK",
-              "AUTHORIZATION_LETTER",
-              "ANTT",
-              "CCHN",
-              "GPP",
-              "GCN_FITNESS",
-              "RHM_LICENSE",
-              "YHCT_LICENSE",
-              "PSYCHIATRY_LICENSE",
-              "DERMATOLOGY_LICENSE",
-              "CCHN_MASSAGE",
-              "CCHN_PHARMACY",
-              "CCHN_DENTAL",
-              "CCHN_NUTRITION",
-              "CCHN_PSYCHOLOGY",
-              "PORTFOLIO"
-            ],
-            "example": "BUSINESS_LICENSE"
-          },
-          "status": {
-            "type": "string",
-            "description": "Updated status after review",
-            "enum": [
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "CHANGES_REQUESTED"
-            ],
-            "example": "APPROVED"
-          },
-          "adminFeedback": {
-            "type": "object",
-            "description": "Admin feedback (especially when rejected)",
-            "example": "Document is unclear, please re-upload a clearer version",
-            "nullable": true
-          },
-          "verificationNotes": {
-            "type": "object",
-            "description": "Internal verification notes",
-            "example": "Verified against tax database",
-            "nullable": true
-          },
-          "verifiedBy": {
-            "type": "object",
-            "description": "Admin account ID who verified",
-            "example": "123e4567-e89b-12d3-a456-426614174001",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "documentType",
-          "status",
-          "adminFeedback",
-          "verificationNotes",
-          "verifiedBy"
-        ]
-      },
-      "PartnerDocumentDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Document ID",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "documentType": {
-            "type": "string",
-            "description": "Type of the document",
-            "enum": [
-              "TAX_CODE",
-              "BUSINESS_LICENSE",
-              "IDENTITY_FRONT",
-              "IDENTITY_BACK",
-              "AUTHORIZATION_LETTER",
-              "ANTT",
-              "CCHN",
-              "GPP",
-              "GCN_FITNESS",
-              "RHM_LICENSE",
-              "YHCT_LICENSE",
-              "PSYCHIATRY_LICENSE",
-              "DERMATOLOGY_LICENSE",
-              "CCHN_MASSAGE",
-              "CCHN_PHARMACY",
-              "CCHN_DENTAL",
-              "CCHN_NUTRITION",
-              "CCHN_PSYCHOLOGY",
-              "PORTFOLIO"
-            ],
-            "example": "BUSINESS_LICENSE"
-          },
-          "status": {
-            "type": "string",
-            "description": "Current status of the document",
-            "enum": [
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "CHANGES_REQUESTED"
-            ],
-            "example": "APPROVED"
-          },
-          "uploadedAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Timestamp when document was uploaded",
-            "example": "2024-01-19T06:45:00Z"
-          },
-          "adminFeedback": {
-            "type": "object",
-            "description": "Admin feedback (especially when rejected)",
-            "example": "Document is unclear, please re-upload a clearer version",
-            "nullable": true
-          },
-          "documentUrl": {
-            "type": "object",
-            "description": "Document URL (HTTP link for registration documents, R2 URL for uploaded documents)",
-            "example": "https://example.com/documents/identity-card.jpg",
-            "nullable": true
-          },
-          "documentKey": {
-            "type": "object",
-            "description": "Document key in R2/S3 (null for registration documents)",
-            "example": "documents/abc-123/1234567890-business-license.pdf",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "documentType",
-          "status",
-          "uploadedAt",
-          "adminFeedback",
-          "documentUrl"
-        ]
-      },
-      "PartnerDocumentsResponseDto": {
-        "type": "object",
-        "properties": {
-          "documents": {
-            "description": "List of all documents for the partner",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PartnerDocumentDto"
-            }
-          }
-        },
-        "required": [
-          "documents"
         ]
       },
       "LocationDto": {
