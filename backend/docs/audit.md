@@ -116,7 +116,7 @@ Authorization: Bearer <accessToken>
     "userAgent": "Mozilla/5.0...",
     "metadata": {
       "previousStatus": "PENDING",
-      "newStatus": "VERIFIED"
+      "newStatus": "APPROVED"
     },
     "createdAt": "2024-01-15T10:30:00Z"
   }

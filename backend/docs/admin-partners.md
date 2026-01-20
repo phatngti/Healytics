@@ -29,11 +29,9 @@ The **Admin Partners Module** provides administrative capabilities for managing 
 ```mermaid
 stateDiagram-v2
     [*] --> PENDING: Partner registers
-    PENDING --> VERIFIED: Admin approves
+    PENDING --> APPROVED: Admin approves
     PENDING --> REJECTED: Admin rejects (with reasons)
     REJECTED --> PENDING: Partner updates & re-submits
-    VERIFIED --> SUSPENDED: Admin suspends
-    SUSPENDED --> VERIFIED: Admin reinstates
 ```
 
 ---
@@ -53,7 +51,7 @@ erDiagram
         string brand_name
         string tax_code "Unique"
         enum business_type
-        enum verification_status "PENDING | VERIFIED | REJECTED | SUSPENDED"
+        enum verification_status "PENDING | APPROVED | REJECTED"
         jsonb rejection_details "Field-level feedback"
         timestamptz verification_completed_at
         timestamptz created_at
@@ -73,9 +71,8 @@ erDiagram
 | Status | Description |
 |:-------|:------------|
 | `PENDING` | Awaiting admin review |
-| `VERIFIED` | Approved and active |
-| `REJECTED` | Rejected with feedback |
-| `SUSPENDED` | Temporarily disabled |
+| `APPROVED` | Partner approved to operate |
+| `REJECTED` | Partner rejected with feedback |
 
 ---
 
