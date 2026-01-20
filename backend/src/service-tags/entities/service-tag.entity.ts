@@ -33,7 +33,15 @@ export class ServiceTag {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  @Column({ name: 'color_value', type: 'int', default: 0xFF6366F1 })
+  @Column({
+    name: 'color_value',
+    type: 'bigint',
+    default: 0xFF6366F1,
+    transformer: {
+      to: (value) => value,
+      from: (value) => parseInt(value, 10),
+    },
+  })
   colorValue: number;
 
   @Column({ type: 'int', default: 0 })
