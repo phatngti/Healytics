@@ -8,10 +8,13 @@ import {
     OneToOne,
     JoinColumn,
     ManyToOne,
+    OneToMany,
 } from 'typeorm';
 import { Account } from '@/account/entities/account.entity';
 import { BusinessType } from '../enum/business-type.enum';
 import { Location } from '@/locations/entities/location.entity';
+import { PartnerVerificationStatus } from '../enum/partner-verification-status.enum';
+import { PartnerDocument } from './partner-document.entity';
 
 @Entity('health_partner_profile')
 export class Partner {
@@ -76,11 +79,27 @@ export class Partner {
     })
     legalRepresentative: any;
 
-    @Column({ name: 'is_verified', default: false })
-    isVerified: boolean;
+    // --- [BỔ SUNG QUAN HỆ NÀY ĐỂ FIX LỖI] ---
+    @OneToMany(() => PartnerDocument, (document) => document.partner)
+    documents: PartnerDocument[];
+    // --- Verification Logic ---
 
-    @Column({ name: 'verification_completed_at', nullable: true })
-    verificationCompletedAt: Date;
+    @Column({
+        name: 'verification_status',
+        type: 'enum',
+        enum: PartnerVerificationStatus,
+        default: PartnerVerificationStatus.PENDING,
+    })
+    verificationStatus: PartnerVerificationStatus;
+
+    // ----------------------------------
+
+    // Field-level rejection details: { "legalName": "Name does not match license", "taxCode": "Invalid format" }
+    @Column({ type: 'jsonb', nullable: true })
+    rejectionDetails: Record<string, string> | null;
+
+    @Column({ name: 'verification_completed_at', type: 'timestamptz', nullable: true })
+    verificationCompletedAt: Date | null;
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
     createdAt: Date;

@@ -14,8 +14,8 @@ import {
 } from '@nestjs/common';
 import { BusinessType } from './enum/business-type.enum';
 import { DocumentType } from './enum/document-type.enum';
-import { DocumentStatus } from './enum/document-status.enum';
 import { PartnerDocument } from './entities/partner-document.entity';
+import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
 import { Role } from '@/account/enum/role.enum';
 
 describe('PartnersService', () => {
@@ -92,7 +92,7 @@ describe('PartnersService', () => {
         wardId: 'ward-1',
         streetAddress: '123 Test Street',
         accountId: 'account-uuid',
-        isVerified: false,
+        verificationStatus: PartnerVerificationStatus.PENDING,
         verificationCompletedAt: null,
         createdAt: new Date(),
         province: { name: 'Hà Nội' },
@@ -244,44 +244,38 @@ describe('PartnersService', () => {
             expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
             expect(mockQueryRunner.release).toHaveBeenCalled();
 
-            // Assert - Verify PartnerDocument records were created with correct data
-            // The service creates documents for TAX_CODE, IDENTITY_FRONT, IDENTITY_BACK
+            // Assert - Verify PartnerDocument records were created (without TAX_CODE)
+            // The service creates documents for IDENTITY_FRONT, IDENTITY_BACK only
             const documentCreates = createCalls.filter(
                 (call) => call.entity === PartnerDocument,
             );
-            expect(documentCreates.length).toBeGreaterThanOrEqual(3);
+            expect(documentCreates.length).toBeGreaterThanOrEqual(2);
 
-            // Verify TAX_CODE document
-            expect(
-                documentCreates.some(
-                    (call) =>
-                        call.data.documentType === DocumentType.TAX_CODE &&
-                        call.data.documentUrl === mockRegisterDto.partner.taxCode &&
-                        call.data.status === DocumentStatus.PENDING,
-                ),
-            ).toBe(true);
-
-            // Verify IDENTITY_FRONT document with URL from DTO
+            // Verify IDENTITY_FRONT document with new isReviewed/isValid flags
             expect(
                 documentCreates.some(
                     (call) =>
                         call.data.documentType === DocumentType.IDENTITY_FRONT &&
                         call.data.documentUrl ===
                         mockRegisterDto.legalRepresentative.images.frontImgUrl &&
-                        call.data.status === DocumentStatus.PENDING,
+                        call.data.isReviewed === false &&
+                        call.data.isValid === true, // Optimistic validation
                 ),
             ).toBe(true);
 
-            // Verify IDENTITY_BACK document with URL from DTO
+            // Verify IDENTITY_BACK document with new isReviewed/isValid flags
             expect(
                 documentCreates.some(
                     (call) =>
                         call.data.documentType === DocumentType.IDENTITY_BACK &&
                         call.data.documentUrl ===
                         mockRegisterDto.legalRepresentative.images.backImgUrl &&
-                        call.data.status === DocumentStatus.PENDING,
+                        call.data.isReviewed === false &&
+                        call.data.isValid === true, // Optimistic validation
                 ),
             ).toBe(true);
+
+            // Note: TAX_CODE is now a data field on Partner, not a document type
         });
 
         it('should create AUTHORIZATION_LETTER document when provided', async () => {
@@ -311,7 +305,7 @@ describe('PartnersService', () => {
             // Act
             await service.registerPartner(dtoWithAuthLetter as any);
 
-            // Assert - Verify AUTHORIZATION_LETTER document was created
+            // Assert - Verify AUTHORIZATION_LETTER document was created with new flags
             const documentCreates = createCalls.filter(
                 (call) => call.entity === PartnerDocument,
             );
@@ -320,7 +314,9 @@ describe('PartnersService', () => {
                     (call) =>
                         call.data.documentType === DocumentType.AUTHORIZATION_LETTER &&
                         call.data.documentUrl ===
-                        dtoWithAuthLetter.legalRepresentative.authorization.authLetterDocUrl,
+                        dtoWithAuthLetter.legalRepresentative.authorization.authLetterDocUrl &&
+                        call.data.isReviewed === false &&
+                        call.data.isValid === true, // Optimistic validation
                 ),
             ).toBe(true);
         });
@@ -389,7 +385,7 @@ describe('PartnersService', () => {
             expect(result).toEqual(mockPartner);
             expect(mockPartnerRepository.findOne).toHaveBeenCalledWith({
                 where: { accountId: 'account-uuid' },
-                relations: ['province', 'district', 'ward', 'legalRepresentative'],
+                relations: ['province', 'district', 'ward', 'legalRepresentative', 'documents'],
             });
         });
 
@@ -406,7 +402,7 @@ describe('PartnersService', () => {
     });
 
     describe('getMyProfile', () => {
-        it('should return formatted profile', async () => {
+        it('should return formatted profile with verificationStatus', async () => {
             // Arrange
             mockPartnerRepository.findOne.mockResolvedValue(mockPartner);
 
@@ -419,6 +415,7 @@ describe('PartnersService', () => {
             expect(result.address.province).toBe('Hà Nội');
             expect(result.address.district).toBe('Quận 1');
             expect(result.legalRepresentative.fullName).toBe('John Doe');
+            expect(result.verificationStatus).toBe(PartnerVerificationStatus.PENDING);
         });
 
         it('should throw NotFoundException when partner not found', async () => {
@@ -526,9 +523,11 @@ describe('PartnersService', () => {
 
         it('should return paginated partners list', async () => {
             // Arrange
-            const partnersData = [
-                { ...mockPartner, account: mockAccount },
-            ];
+            const partnerWithNewFields = {
+                ...mockPartner,
+                verificationStatus: PartnerVerificationStatus.PENDING,
+            };
+            const partnersData = [partnerWithNewFields];
             mockQueryBuilder.getManyAndCount.mockResolvedValue([partnersData, 1]);
 
             // Act
@@ -539,19 +538,24 @@ describe('PartnersService', () => {
             expect(result.total).toBe(1);
             expect(result.page).toBe(1);
             expect(result.limit).toBe(10);
+            expect(result.data[0].verificationStatus).toBe(PartnerVerificationStatus.PENDING);
         });
 
-        it('should filter by isVerified status', async () => {
+        it('should filter by verificationStatus', async () => {
             // Arrange
             mockQueryBuilder.getManyAndCount.mockResolvedValue([[], 0]);
 
             // Act
-            await service.getPartners({ page: 1, limit: 10, isVerified: true });
+            await service.getPartners({
+                page: 1,
+                limit: 10,
+                verificationStatus: PartnerVerificationStatus.APPROVED,
+            });
 
             // Assert
             expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-                'partner.isVerified = :isVerified',
-                { isVerified: true },
+                'partner.verificationStatus = :verificationStatus',
+                { verificationStatus: PartnerVerificationStatus.APPROVED },
             );
         });
 
@@ -571,7 +575,7 @@ describe('PartnersService', () => {
     });
 
     describe('getPartnerDetail', () => {
-        it('should return partner detail', async () => {
+        it('should return partner detail with verificationStatus', async () => {
             // Arrange
             mockPartnerRepository.findOne.mockResolvedValue(mockPartner);
 
@@ -582,6 +586,7 @@ describe('PartnersService', () => {
             expect(result.id).toBe(mockPartner.id);
             expect(result.account.email).toBe(mockAccount.email);
             expect(result.address.province).toBe('Hà Nội');
+            expect(result.verificationStatus).toBe(PartnerVerificationStatus.PENDING);
         });
 
         it('should throw NotFoundException when partner not found', async () => {

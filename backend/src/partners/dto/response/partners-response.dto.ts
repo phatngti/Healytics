@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BusinessType } from '@/partners/enum/business-type.enum';
+import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 
 export class PartnerItemDto {
     @ApiProperty({ example: 'uuid' })
@@ -20,8 +21,8 @@ export class PartnerItemDto {
     @ApiProperty({ enum: BusinessType, example: BusinessType.SPA_BEAUTY })
     businessType: BusinessType;
 
-    @ApiProperty({ example: false })
-    isVerified: boolean;
+    @ApiProperty({ enum: PartnerVerificationStatus, example: PartnerVerificationStatus.PENDING })
+    verificationStatus: PartnerVerificationStatus;
 
     @ApiProperty({ example: '2024-01-15T10:30:00Z' })
     createdAt: Date;

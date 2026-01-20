@@ -22,7 +22,7 @@ import { Role } from '@/account/enum/role.enum';
 import { BusinessType } from './enum/business-type.enum';
 import { DocumentType } from './enum/document-type.enum';
 import { PartnerDocument } from './entities/partner-document.entity';
-import { DocumentStatus } from './enum/document-status.enum';
+import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
 import { LocationsService } from '@/locations/locations.service';
 import { AuthService } from '@/auth/auth.service';
 
@@ -152,27 +152,23 @@ export class PartnersService {
 
             // Automatically create PartnerDocument records for registration documents
             // This ensures they are tracked in the verification system from the start
+            // Note: TAX_CODE is now strictly a data field on Partner, not tracked as a document
             const regDocs = [
-                {
-                    partnerId: savedPartner.id,
-                    documentType: DocumentType.TAX_CODE,
-                    documentUrl: dto.partner.taxCode, // Using the tax code string as URL/value for verification
-                    documentKey: null,
-                    status: DocumentStatus.PENDING,
-                },
                 {
                     partnerId: savedPartner.id,
                     documentType: DocumentType.IDENTITY_FRONT,
                     documentUrl: dto.legalRepresentative.images.frontImgUrl,
                     documentKey: null,
-                    status: DocumentStatus.PENDING,
+                    isReviewed: false,
+                    isValid: true, // Optimistic validation
                 },
                 {
                     partnerId: savedPartner.id,
                     documentType: DocumentType.IDENTITY_BACK,
                     documentUrl: dto.legalRepresentative.images.backImgUrl,
                     documentKey: null,
-                    status: DocumentStatus.PENDING,
+                    isReviewed: false,
+                    isValid: true, // Optimistic validation
                 },
             ];
 
@@ -183,7 +179,8 @@ export class PartnersService {
                     documentType: DocumentType.AUTHORIZATION_LETTER,
                     documentUrl: dto.legalRepresentative.authorization.authLetterDocUrl,
                     documentKey: null,
-                    status: DocumentStatus.PENDING,
+                    isReviewed: false,
+                    isValid: true, // Optimistic validation
                 });
             }
 
@@ -223,12 +220,12 @@ export class PartnersService {
     ): Promise<Partner | null> {
         return this.partnerRepository.findOne({
             where: { accountId },
-            relations: ['province', 'district', 'ward', 'legalRepresentative'],
+            relations: ['province', 'district', 'ward', 'legalRepresentative', 'documents'],
         });
     }
 
     /**
-     * Get partner's own profile
+     * Get partner's own profile with rejection details and document statuses
      */
     async getMyProfile(accountId: string): Promise<MyProfileResponseDto> {
         const partner = await this.getPartnerByAccountId(accountId);
@@ -254,14 +251,27 @@ export class PartnersService {
                 idType: partner.legalRepresentative.idType,
                 idNumber: partner.legalRepresentative.idNumber,
             },
-            isVerified: partner.isVerified,
+            verificationStatus: partner.verificationStatus,
+            rejectionDetails: partner.rejectionDetails || null,
+            documents: (partner as any).documents?.map((doc: any) => ({
+                id: doc.id,
+                documentType: doc.documentType,
+                documentUrl: doc.documentUrl,
+                isReviewed: doc.isReviewed,
+                isValid: doc.isValid,
+                adminFeedback: doc.adminFeedback,
+            })) || [],
             verificationCompletedAt: partner.verificationCompletedAt,
             createdAt: partner.createdAt,
         };
     }
 
     /**
-     * Update partner's profile - comprehensive update with transaction support
+     * Update partner's profile - with document sync and verification reset
+     * 
+     * IMPORTANT FIXES:
+     * 1. Syncs CCCD/Authorization images to PartnerDocument table
+     * 2. Resets verificationStatus to PENDING when important fields change
      */
     async updateMyProfile(accountId: string, dto: UpdatePartnerDto): Promise<MyProfileResponseDto> {
         const partner = await this.getPartnerByAccountId(accountId);
@@ -269,21 +279,20 @@ export class PartnersService {
             throw new NotFoundException('Partner not found');
         }
 
-        // Start transaction for atomic updates
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
-            // Validate and update address if any address field is provided
+            let shouldResetVerification = false; // Flag to check if we need to reset to PENDING
+
+            // 1. Validate and update address if any address field is provided
             const addressFieldsProvided = dto.provinceId || dto.districtId || dto.wardId;
             if (addressFieldsProvided) {
-                // Use provided values or fall back to existing values
                 const provinceId = dto.provinceId || partner.provinceId;
                 const districtId = dto.districtId || partner.districtId;
                 const wardId = dto.wardId || partner.wardId;
 
-                // Validate address hierarchy (only if all fields are present)
                 if (provinceId && districtId && wardId) {
                     try {
                         await this.locationsService.validateAddress(
@@ -297,30 +306,62 @@ export class PartnersService {
                         );
                     }
 
-                    // Apply address updates
-                    partner.provinceId = provinceId as string;
-                    partner.districtId = districtId as string;
-                    partner.wardId = wardId as string;
+                    // Check if address actually changed
+                    if (partner.provinceId !== provinceId ||
+                        partner.districtId !== districtId ||
+                        partner.wardId !== wardId) {
+                        partner.provinceId = provinceId as string;
+                        partner.districtId = districtId as string;
+                        partner.wardId = wardId as string;
+                        shouldResetVerification = true; // Address change -> needs re-verification
+                    }
                 }
             }
 
-            // Update partner fields
-            if (dto.legalName) partner.legalName = dto.legalName;
+            // 2. Update partner fields with change detection for important fields
+            if (dto.legalName && dto.legalName !== partner.legalName) {
+                partner.legalName = dto.legalName;
+                shouldResetVerification = true; // Legal name change -> needs re-verification
+            }
             if (dto.brandName) partner.brandName = dto.brandName;
             if (dto.phoneNumber) partner.phoneNumber = dto.phoneNumber;
-            if (dto.streetAddress) partner.streetAddress = dto.streetAddress;
+            if (dto.streetAddress && dto.streetAddress !== partner.streetAddress) {
+                partner.streetAddress = dto.streetAddress;
+                shouldResetVerification = true; // Address change -> needs re-verification
+            }
+
+            // Auto-clear rejection details when partner updates a rejected field
+            if (partner.rejectionDetails) {
+                const fieldsToCheck = ['legalName', 'brandName', 'phoneNumber', 'streetAddress', 'provinceId', 'districtId', 'wardId'];
+                for (const field of fieldsToCheck) {
+                    if (dto[field as keyof UpdatePartnerDto] !== undefined && partner.rejectionDetails[field]) {
+                        delete partner.rejectionDetails[field];
+                    }
+                }
+                if (Object.keys(partner.rejectionDetails).length === 0) {
+                    partner.rejectionDetails = null;
+                }
+            }
+
+            // 3. Reset verification status if important fields changed
+            if (shouldResetVerification && partner.verificationStatus !== PartnerVerificationStatus.PENDING) {
+                partner.verificationStatus = PartnerVerificationStatus.PENDING;
+                partner.verificationCompletedAt = null;
+            }
 
             await queryRunner.manager.save(partner);
 
-            // Update legal representative if provided
+            // 4. Update legal representative and SYNC to PartnerDocument
             if (dto.legalRepresentative) {
                 const legalRep = await queryRunner.manager.findOne(LegalRepresentative, {
                     where: { partnerId: partner.id },
                 });
 
                 if (legalRep) {
-                    if (dto.legalRepresentative.fullName) {
+                    // Update basic fields
+                    if (dto.legalRepresentative.fullName && dto.legalRepresentative.fullName !== legalRep.fullName) {
                         legalRep.fullName = dto.legalRepresentative.fullName;
+                        shouldResetVerification = true;
                     }
                     if (dto.legalRepresentative.position) {
                         legalRep.position = dto.legalRepresentative.position;
@@ -331,33 +372,88 @@ export class PartnersService {
                     if (dto.legalRepresentative.idType) {
                         legalRep.idType = dto.legalRepresentative.idType;
                     }
-                    if (dto.legalRepresentative.idNumber) {
+                    if (dto.legalRepresentative.idNumber && dto.legalRepresentative.idNumber !== legalRep.idNumber) {
                         legalRep.idNumber = dto.legalRepresentative.idNumber;
+                        shouldResetVerification = true; // ID number change -> needs re-verification
                     }
                     if (dto.legalRepresentative.idIssueDate) {
                         legalRep.idIssueDate = new Date(dto.legalRepresentative.idIssueDate);
                     }
-                    // Handle nested images object
+
+                    // [CRITICAL FIX] Handle images and SYNC to PartnerDocument
                     if (dto.legalRepresentative.images) {
-                        if (dto.legalRepresentative.images.frontImgUrl) {
+                        // A. ID Front Image
+                        if (dto.legalRepresentative.images.frontImgUrl &&
+                            dto.legalRepresentative.images.frontImgUrl !== legalRep.idFrontImgUrl) {
                             legalRep.idFrontImgUrl = dto.legalRepresentative.images.frontImgUrl;
+
+                            // Sync to PartnerDocument
+                            const frontDoc = await queryRunner.manager.findOne(PartnerDocument, {
+                                where: { partnerId: partner.id, documentType: DocumentType.IDENTITY_FRONT }
+                            });
+                            if (frontDoc) {
+                                frontDoc.documentUrl = dto.legalRepresentative.images.frontImgUrl;
+                                frontDoc.isReviewed = false; // Reset review status
+                                frontDoc.isValid = true;     // Reset to optimistic
+                                frontDoc.adminFeedback = null;
+                                await queryRunner.manager.save(frontDoc);
+                            }
+                            shouldResetVerification = true;
                         }
-                        if (dto.legalRepresentative.images.backImgUrl) {
+
+                        // B. ID Back Image
+                        if (dto.legalRepresentative.images.backImgUrl &&
+                            dto.legalRepresentative.images.backImgUrl !== legalRep.idBackImgUrl) {
                             legalRep.idBackImgUrl = dto.legalRepresentative.images.backImgUrl;
+
+                            // Sync to PartnerDocument
+                            const backDoc = await queryRunner.manager.findOne(PartnerDocument, {
+                                where: { partnerId: partner.id, documentType: DocumentType.IDENTITY_BACK }
+                            });
+                            if (backDoc) {
+                                backDoc.documentUrl = dto.legalRepresentative.images.backImgUrl;
+                                backDoc.isReviewed = false;
+                                backDoc.isValid = true;
+                                backDoc.adminFeedback = null;
+                                await queryRunner.manager.save(backDoc);
+                            }
+                            shouldResetVerification = true;
                         }
                     }
-                    // Handle nested authorization object
+
+                    // Handle authorization
                     if (dto.legalRepresentative.authorization) {
                         if (dto.legalRepresentative.authorization.isAuthorizedUser !== undefined) {
                             legalRep.isAuthorizedUser = dto.legalRepresentative.authorization.isAuthorizedUser;
                         }
-                        if (dto.legalRepresentative.authorization.authLetterDocUrl) {
+                        if (dto.legalRepresentative.authorization.authLetterDocUrl &&
+                            dto.legalRepresentative.authorization.authLetterDocUrl !== legalRep.authLetterDocUrl) {
                             legalRep.authLetterDocUrl = dto.legalRepresentative.authorization.authLetterDocUrl;
+
+                            // Sync to PartnerDocument
+                            const authDoc = await queryRunner.manager.findOne(PartnerDocument, {
+                                where: { partnerId: partner.id, documentType: DocumentType.AUTHORIZATION_LETTER }
+                            });
+                            if (authDoc) {
+                                authDoc.documentUrl = dto.legalRepresentative.authorization.authLetterDocUrl;
+                                authDoc.isReviewed = false;
+                                authDoc.isValid = true;
+                                authDoc.adminFeedback = null;
+                                await queryRunner.manager.save(authDoc);
+                            }
+                            shouldResetVerification = true;
                         }
                     }
 
                     await queryRunner.manager.save(legalRep);
                 }
+            }
+
+            // 5. Final check: Reset verification if any important change occurred in step 4
+            if (shouldResetVerification && partner.verificationStatus !== PartnerVerificationStatus.PENDING) {
+                partner.verificationStatus = PartnerVerificationStatus.PENDING;
+                partner.verificationCompletedAt = null;
+                await queryRunner.manager.save(partner);
             }
 
             await queryRunner.commitTransaction();
@@ -374,7 +470,7 @@ export class PartnersService {
      * Get list of partners (Admin)
      */
     async getPartners(query: GetPartnersQueryDto): Promise<PartnersResponseDto> {
-        const { page = 1, limit = 10, isVerified, search } = query;
+        const { page = 1, limit = 10, verificationStatus, search } = query;
         const skip = (page - 1) * limit;
 
         const queryBuilder = this.partnerRepository
@@ -386,15 +482,15 @@ export class PartnersService {
                 'partner.legalName',
                 'partner.brandName',
                 'partner.businessType',
-                'partner.isVerified',
+                'partner.verificationStatus',
                 'partner.createdAt',
                 'account.email',
             ]);
 
         // Filter by verification status
-        if (typeof isVerified === 'boolean') {
-            queryBuilder.andWhere('partner.isVerified = :isVerified', {
-                isVerified,
+        if (query.verificationStatus) {
+            queryBuilder.andWhere('partner.verificationStatus = :verificationStatus', {
+                verificationStatus: query.verificationStatus,
             });
         }
 
@@ -420,7 +516,7 @@ export class PartnersService {
                 brandName: b.brandName,
                 email: b.account.email,
                 businessType: b.businessType,
-                isVerified: b.isVerified,
+                verificationStatus: b.verificationStatus,
                 createdAt: b.createdAt,
             })),
             total,
@@ -474,7 +570,7 @@ export class PartnersService {
                 isAuthorizedUser:
                     partner.legalRepresentative.isAuthorizedUser,
             },
-            isVerified: partner.isVerified,
+            verificationStatus: partner.verificationStatus,
             verificationCompletedAt: partner.verificationCompletedAt,
             createdAt: partner.createdAt,
         };

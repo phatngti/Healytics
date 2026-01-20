@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DocumentType } from '../../enum/document-type.enum';
-import { DocumentStatus } from '../../enum/document-status.enum';
 
 export class PartnerDocumentDto {
     @ApiProperty({
@@ -17,11 +16,16 @@ export class PartnerDocumentDto {
     documentType: DocumentType;
 
     @ApiProperty({
-        description: 'Current status of the document',
-        enum: DocumentStatus,
-        example: DocumentStatus.APPROVED,
+        description: 'Whether the document has been reviewed by admin',
+        example: false,
     })
-    status: DocumentStatus;
+    isReviewed: boolean;
+
+    @ApiProperty({
+        description: 'Whether the document is valid',
+        example: true,
+    })
+    isValid: boolean;
 
     @ApiProperty({
         description: 'Timestamp when document was uploaded',
@@ -30,7 +34,7 @@ export class PartnerDocumentDto {
     uploadedAt: Date;
 
     @ApiProperty({
-        description: 'Admin feedback (especially when rejected)',
+        description: 'Admin feedback (especially when invalid)',
         example: 'Document is unclear, please re-upload a clearer version',
         nullable: true,
     })

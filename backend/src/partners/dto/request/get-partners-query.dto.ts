@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsBoolean, IsString, IsInt, Min } from 'class-validator';
+import { IsOptional, IsEnum, IsString, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 
 export class GetPartnersQueryDto {
     @ApiPropertyOptional({
@@ -26,13 +27,13 @@ export class GetPartnersQueryDto {
     limit?: number = 10;
 
     @ApiPropertyOptional({
-        example: true,
-        description: 'Filter by verification status',
+        enum: PartnerVerificationStatus,
+        example: PartnerVerificationStatus.PENDING,
+        description: 'Filter by verification status (PENDING, APPROVED, REJECTED)',
     })
     @IsOptional()
-    @Type(() => Boolean)
-    @IsBoolean()
-    isVerified?: boolean;
+    @IsEnum(PartnerVerificationStatus)
+    verificationStatus?: PartnerVerificationStatus;
 
     @ApiPropertyOptional({
         example: 'spa',

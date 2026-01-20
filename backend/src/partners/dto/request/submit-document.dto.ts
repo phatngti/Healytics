@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsUrl } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
 import { DocumentType } from '@/partners/enum/document-type.enum';
 
 export class SubmitDocumentDto {
@@ -17,13 +17,14 @@ export class SubmitDocumentDto {
         description: 'R2 URL of the uploaded document',
     })
     @IsUrl()
-    @IsNotEmpty()
-    documentUrl: string;
+    documentUrl?: string;
 
     @ApiProperty({
         description: 'Storage key for the document (if uploaded to R2)',
         required: false,
         example: 'documents/123/file.pdf'
     })
+    @IsOptional()
+    @IsString()
     documentKey?: string;
 }

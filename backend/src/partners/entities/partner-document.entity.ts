@@ -9,20 +9,16 @@ import {
 } from 'typeorm';
 import { DocumentType } from '../enum/document-type.enum';
 import { Partner } from './partner.entity';
-import { DocumentStatus } from '../enum/document-status.enum';
 
 /**
  * Tracks documents uploaded by partners for verification.
- * Supports two types of documents:
- * 1. Registration documents (identity cards) - documentUrl only (HTTP link)
- * 2. Uploaded documents - documentUrl + documentKey (R2/S3 key)
+ * Uses two separate flags to track review and validity status.
  */
 @Entity('partner_document')
 export class PartnerDocument {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    // Relationship to Partner
     @Column({ name: 'partner_id' })
     partnerId: string;
 
@@ -36,33 +32,38 @@ export class PartnerDocument {
     })
     documentType: DocumentType;
 
-    // Document URL - always present for registration documents, can be null during initial upload steps
+    // URL is always present for registration documents
     @Column({ name: 'document_url', type: 'text', nullable: true })
     documentUrl: string | null;
 
-    // R2/S3 object key - only for uploaded documents, null for registration documents
+    // R2/S3 key for uploaded documents
     @Column({ name: 'document_key', type: 'text', nullable: true })
     documentKey: string | null;
 
-    @Column({
-        type: 'enum',
-        enum: DocumentStatus,
-        default: DocumentStatus.PENDING,
-    })
-    status: DocumentStatus;
+    // --- Separate Review and Validity Status ---
+
+    /** Indicates if this document has been reviewed by an admin */
+    @Column({ name: 'is_reviewed', default: false })
+    isReviewed: boolean;
+
+    /** Indicates if this document is valid (optimistic: true by default until admin marks invalid) */
+    @Column({ name: 'is_valid', default: true })
+    isValid: boolean;
+
+    // -------------------------------------------
 
     @Column({ type: 'text', nullable: true, name: 'verification_notes' })
     verificationNotes: string | null;
 
     @Column({ type: 'text', nullable: true, name: 'admin_feedback' })
-    adminFeedback: string | null; // Feedback when rejected for partner to fix
+    adminFeedback: string | null;
 
     @Column({
         type: 'uuid',
         name: 'verified_by',
         nullable: true,
     })
-    verifiedBy: string | null; // Admin account ID who verified
+    verifiedBy: string | null;
 
     @CreateDateColumn({ name: 'uploaded_at' })
     uploadedAt: Date;

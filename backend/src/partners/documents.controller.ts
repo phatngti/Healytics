@@ -253,130 +253,20 @@ export class DocumentsController {
             file.mimetype,
         );
 
+        // Get signed URL for the uploaded file
+        const signedUrl = await this.documentsService['s3Service'].getFileUrl(fileKey);
+
         // Submit document record with the uploaded file
         const document = await this.documentsService.submitDocument(req.user.id, {
             documentType: documentType as DocumentType,
-            documentUrl: fileKey, // Store the key as URL initially
+            documentUrl: signedUrl,
+            documentKey: fileKey,
         });
-
-        // Update the document to set the documentKey (since it's an uploaded file)
-        document.documentKey = fileKey;
-        await this.documentsService['documentRepo'].save(document);
 
         return document;
     }
 
 
-    /**
-     * Review a partner document (Admin only)
-     */
-    @Put('documents/:id/review')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({
-        summary: 'Review partner document (Admin)',
-        description:
-            'Approve or reject document. Feedback required when rejecting. Auto-activates partner when all documents approved.',
-    })
-    @ApiParam({ name: 'id', description: 'Document ID' })
-    @ApiBody({ type: ReviewDocumentDto })
-    @ApiResponse({
-        status: 200,
-        description: 'Document reviewed successfully',
-        type: ReviewDocumentResponseDto,
-    })
-    @ApiResponse({
-        status: 400,
-        description: 'Feedback required when rejecting',
-    })
-    @ApiResponse({
-        status: 404,
-        description: 'Document not found',
-    })
-    async reviewDocument(
-        @Param('id') id: string,
-        @Body() dto: ReviewDocumentDto,
-        @Req() req,
-    ): Promise<ReviewDocumentResponseDto> {
-        return this.documentsService.reviewDocument(id, dto, req.user.id);
-    }
 
-    /**
-     * Get partner document status with MISSING indicators (Admin only)
-     */
-    /**
-     * Get partner document status with MISSING indicators (Admin only)
-     */
-    @Get(':partnerId/document-status')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({
-        summary: 'Get partner document status (Admin)',
-        description: 'Shows all required documents with status including MISSING for documents not yet uploaded',
-    })
-    @ApiParam({ name: 'partnerId', description: 'Partner ID (Business Entity ID)' })
-    @ApiResponse({
-        status: 200,
-        description: 'Document status retrieved successfully',
-        type: DocumentStatusResponseDto,
-    })
-    async getPartnerDocumentStatusAdmin(
-        @Param('partnerId') partnerId: string,
-    ): Promise<DocumentStatusResponseDto> {
-        return this.documentsService.getPartnerDocumentStatusByPartnerId(partnerId);
-    }
 
-    /**
-     * Get all documents for a specific partner (Admin only)
-     */
-    /**
-     * Get all documents for a specific partner (Admin only)
-     */
-    @Get(':partnerId/documents')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({
-        summary: 'Get partner documents (Admin)',
-        description: 'View all submitted documents for a partner',
-    })
-    @ApiParam({ name: 'partnerId', description: 'Partner ID (Business Entity ID)' })
-    @ApiResponse({
-        status: 200,
-        description: 'Documents retrieved successfully',
-        type: PartnerDocumentsResponseDto,
-    })
-    async getPartnerDocuments(
-        @Param('partnerId') partnerId: string,
-    ): Promise<PartnerDocumentsResponseDto> {
-        const documents = await this.documentsService.getPartnerDocuments(partnerId);
-        return { documents };
-    }
-
-    /**
-     * Get signed URL to view a document (Admin only)
-     */
-    @Get('documents/:id/url')
-    @UseGuards(RolesGuard)
-    @Roles(Role.ADMIN)
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({
-        summary: 'Get document URL (Admin)',
-        description: 'Returns signed URL to view/download any document',
-    })
-    @ApiParam({ name: 'id', description: 'Document ID' })
-    @ApiResponse({
-        status: 200,
-        description: 'Signed URL generated',
-        type: DocumentUrlResponseDto,
-    })
-    @ApiResponse({
-        status: 404,
-        description: 'Document not found',
-    })
-    async getDocumentUrlAdmin(@Param('id') id: string): Promise<DocumentUrlResponseDto> {
-        return this.documentsService.getDocumentUrl(id);
-    }
 }

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DocumentType } from '../../enum/document-type.enum';
-import { DocumentStatus } from '../../enum/document-status.enum';
 
 export class SubmitDocumentResponseDto {
     @ApiProperty({
@@ -17,11 +16,16 @@ export class SubmitDocumentResponseDto {
     documentType: DocumentType;
 
     @ApiProperty({
-        description: 'Status of the document (always PENDING after submission)',
-        enum: DocumentStatus,
-        example: DocumentStatus.PENDING,
+        description: 'Whether the document has been reviewed by admin',
+        example: false,
     })
-    status: DocumentStatus;
+    isReviewed: boolean;
+
+    @ApiProperty({
+        description: 'Whether the document is valid (optimistic: true until marked invalid)',
+        example: true,
+    })
+    isValid: boolean;
 
     @ApiProperty({
         description: 'Timestamp when document was uploaded',

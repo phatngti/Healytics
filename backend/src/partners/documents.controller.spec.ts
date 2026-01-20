@@ -3,7 +3,6 @@ import { DocumentsController } from './documents.controller';
 import { DocumentsService } from './documents.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { DocumentType } from './enum/document-type.enum';
-import { DocumentStatus } from './enum/document-status.enum';
 
 describe('DocumentsController', () => {
     let controller: DocumentsController;
@@ -34,7 +33,8 @@ describe('DocumentsController', () => {
     const mockDocumentUrlResponse = {
         url: 'https://s3.example.com/signed-url',
         documentType: DocumentType.BUSINESS_LICENSE,
-        status: DocumentStatus.PENDING,
+        isReviewed: false,
+        isValid: true,
     };
 
     const mockDocument = {
@@ -43,7 +43,8 @@ describe('DocumentsController', () => {
         documentType: DocumentType.BUSINESS_LICENSE,
         documentUrl: 'https://example.com/doc.pdf',
         documentKey: 'documents/partner-uuid/123-doc.pdf',
-        status: DocumentStatus.PENDING,
+        isReviewed: false,
+        isValid: true,
         uploadedAt: new Date(),
     };
 
@@ -53,7 +54,9 @@ describe('DocumentsController', () => {
                 documentType: DocumentType.BUSINESS_LICENSE,
                 description: 'Giấy phép kinh doanh',
                 isRequired: true,
-                status: DocumentStatus.APPROVED,
+                status: 'VALID', // computed status
+                isReviewed: true,
+                isValid: true,
                 documentUrl: 'https://example.com/doc.pdf',
                 documentKey: null,
                 adminFeedback: null,
@@ -62,8 +65,8 @@ describe('DocumentsController', () => {
             },
         ],
         totalRequired: 3,
-        totalApproved: 1,
-        isVerified: false,
+        totalValid: 1,
+        verificationStatus: 'PENDING',
     };
 
     beforeEach(async () => {
@@ -193,128 +196,12 @@ describe('DocumentsController', () => {
             // Assert
             expect(result.id).toBe(mockDocument.id);
             expect(result.documentType).toBe(mockDocument.documentType);
-            expect(result.status).toBe(mockDocument.status);
+            expect(result.isReviewed).toBe(mockDocument.isReviewed);
+            expect(result.isValid).toBe(mockDocument.isValid);
             expect(mockDocumentsService.submitDocument).toHaveBeenCalledWith(
                 mockReq.user.id,
                 submitDto,
             );
-        });
-    });
-
-    describe('reviewDocument', () => {
-        const adminReq = {
-            user: {
-                id: 'admin-uuid',
-                email: 'admin@test.com',
-            },
-        };
-
-        it('should approve document', async () => {
-            // Arrange
-            const documentId = 'doc-uuid';
-            const reviewDto = {
-                status: DocumentStatus.APPROVED,
-                verificationNotes: 'Looks good',
-            };
-            const approvedDoc = { ...mockDocument, status: DocumentStatus.APPROVED };
-            mockDocumentsService.reviewDocument.mockResolvedValue(approvedDoc);
-
-            // Act
-            const result = await controller.reviewDocument(documentId, reviewDto, adminReq);
-
-            // Assert
-            expect(result.status).toBe(DocumentStatus.APPROVED);
-            expect(mockDocumentsService.reviewDocument).toHaveBeenCalledWith(
-                documentId,
-                reviewDto,
-                adminReq.user.id,
-            );
-        });
-
-        it('should reject document with feedback', async () => {
-            // Arrange
-            const documentId = 'doc-uuid';
-            const reviewDto = {
-                status: DocumentStatus.REJECTED,
-                adminFeedback: 'Document is blurry',
-            };
-            const rejectedDoc = {
-                ...mockDocument,
-                status: DocumentStatus.REJECTED,
-                adminFeedback: reviewDto.adminFeedback,
-            };
-            mockDocumentsService.reviewDocument.mockResolvedValue(rejectedDoc);
-
-            // Act
-            const result = await controller.reviewDocument(documentId, reviewDto, adminReq);
-
-            // Assert
-            expect(result.status).toBe(DocumentStatus.REJECTED);
-            expect(result.adminFeedback).toBe(reviewDto.adminFeedback);
-        });
-
-        it('should propagate BadRequestException for missing feedback', async () => {
-            // Arrange
-            const documentId = 'doc-uuid';
-            const reviewDto = {
-                status: DocumentStatus.REJECTED,
-                adminFeedback: '',
-            };
-            mockDocumentsService.reviewDocument.mockRejectedValue(
-                new BadRequestException('Admin feedback is required when rejecting'),
-            );
-
-            // Act & Assert
-            await expect(
-                controller.reviewDocument(documentId, reviewDto, adminReq),
-            ).rejects.toThrow(BadRequestException);
-        });
-    });
-
-    describe('getPartnerDocumentStatusAdmin', () => {
-        it('should return document status for specified account (admin)', async () => {
-            // Arrange
-            const accountId = 'partner-account-uuid';
-            mockDocumentsService.getPartnerDocumentStatus.mockResolvedValue(mockDocumentStatus);
-
-            // Act
-            const result = await controller.getPartnerDocumentStatusAdmin(accountId);
-
-            // Assert
-            expect(result).toEqual(mockDocumentStatus);
-            expect(mockDocumentsService.getPartnerDocumentStatus).toHaveBeenCalledWith(accountId);
-        });
-    });
-
-    describe('getPartnerDocuments', () => {
-        it('should return all documents for a partner (admin)', async () => {
-            // Arrange
-            const accountId = 'partner-account-uuid';
-            const mockDocuments = [mockDocument, { ...mockDocument, id: 'doc-2' }];
-            mockDocumentsService.getPartnerDocuments.mockResolvedValue(mockDocuments);
-
-            // Act
-            const result = await controller.getPartnerDocuments(accountId);
-
-            // Assert
-            expect(result.documents).toEqual(mockDocuments);
-            expect(mockDocumentsService.getPartnerDocuments).toHaveBeenCalledWith(accountId);
-        });
-    });
-
-    describe('getDocumentUrlAdmin', () => {
-        it('should return document URL without ownership check (admin)', async () => {
-            // Arrange
-            const documentId = 'doc-uuid';
-            mockDocumentsService.getDocumentUrl.mockResolvedValue(mockDocumentUrlResponse);
-
-            // Act
-            const result = await controller.getDocumentUrlAdmin(documentId);
-
-            // Assert
-            expect(result).toEqual(mockDocumentUrlResponse);
-            // Admin call should NOT pass accountId (no ownership check)
-            expect(mockDocumentsService.getDocumentUrl).toHaveBeenCalledWith(documentId);
         });
     });
 });

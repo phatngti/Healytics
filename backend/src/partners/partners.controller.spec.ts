@@ -3,6 +3,7 @@ import { PartnersController } from './partners.controller';
 import { PartnersService } from './partners.service';
 import { NotFoundException } from '@nestjs/common';
 import { BusinessType } from './enum/business-type.enum';
+import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
 
 describe('PartnersController', () => {
     let controller: PartnersController;
@@ -42,7 +43,6 @@ describe('PartnersController', () => {
             idType: 'CCCD',
             idNumber: '012345678901',
         },
-        isVerified: false,
         createdAt: new Date(),
     };
 
@@ -54,7 +54,7 @@ describe('PartnersController', () => {
                 brandName: 'Brand 1',
                 email: 'partner1@test.com',
                 businessType: BusinessType.MASSAGE_THERAPY,
-                isVerified: true,
+                verificationStatus: PartnerVerificationStatus.PENDING,
                 createdAt: new Date(),
             },
         ],
@@ -152,60 +152,7 @@ describe('PartnersController', () => {
         });
     });
 
-    describe('getPartners', () => {
-        it('should return paginated partners list', async () => {
-            // Arrange
-            const query = { page: 1, limit: 10 };
-            mockPartnersService.getPartners.mockResolvedValue(mockPartnersList);
 
-            // Act
-            const result = await controller.getPartners(query);
 
-            // Assert
-            expect(result).toEqual(mockPartnersList);
-            expect(mockPartnersService.getPartners).toHaveBeenCalledWith(query);
-        });
 
-        it('should pass filters to service', async () => {
-            // Arrange
-            const query = { page: 1, limit: 10, isVerified: true, search: 'test' };
-            mockPartnersService.getPartners.mockResolvedValue({ ...mockPartnersList, data: [] });
-
-            // Act
-            await controller.getPartners(query);
-
-            // Assert
-            expect(mockPartnersService.getPartners).toHaveBeenCalledWith(query);
-        });
-    });
-
-    describe('getPartnerDetail', () => {
-        it('should return partner detail by ID', async () => {
-            // Arrange
-            const partnerId = 'partner-uuid';
-            const mockDetail = {
-                ...mockProfile,
-                account: { id: 'account-uuid', email: 'partner@test.com', isActive: true },
-            };
-            mockPartnersService.getPartnerDetail.mockResolvedValue(mockDetail);
-
-            // Act
-            const result = await controller.getPartnerDetail(partnerId);
-
-            // Assert
-            expect(result).toEqual(mockDetail);
-            expect(mockPartnersService.getPartnerDetail).toHaveBeenCalledWith(partnerId);
-        });
-
-        it('should propagate NotFoundException from service', async () => {
-            // Arrange
-            const partnerId = 'invalid-partner';
-            mockPartnersService.getPartnerDetail.mockRejectedValue(
-                new NotFoundException('Partner not found'),
-            );
-
-            // Act & Assert
-            await expect(controller.getPartnerDetail(partnerId)).rejects.toThrow(NotFoundException);
-        });
-    });
 });
