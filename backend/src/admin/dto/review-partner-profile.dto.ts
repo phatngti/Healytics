@@ -4,6 +4,7 @@ import { Type } from 'class-transformer';
 
 export enum ReviewDecision {
     APPROVED = 'APPROVED',
+    CHANGES_REQUIRED = 'CHANGES_REQUIRED',
     REJECTED = 'REJECTED',
 }
 
