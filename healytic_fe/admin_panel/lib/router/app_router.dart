@@ -1,6 +1,7 @@
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/utils/user_role_helper.dart';
+import 'package:admin_panel/router/admin_routes.dart';
 import 'package:admin_panel/router/partner_routes.dart' as partner;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -63,6 +64,7 @@ GoRouter router(Ref ref) {
     final isLoggedIn = UserRoleHelper.isLoggedIn();
     final role = UserRoleHelper.getRole();
     final path = state.uri.path;
+    final isProviderVerified = UserRoleHelper.isProviderVerified();
 
     final isPublicRoute =
         path == '/' ||
@@ -70,17 +72,36 @@ GoRouter router(Ref ref) {
         path == '/sign-up' ||
         path.startsWith('/sign-up/');
 
+    final isVerificationRoute = path == '/provider/verification-status';
+
     if (isLoggedIn) {
       if (isPublicRoute) {
         if (role == 'admin') {
           return '/admin/dashboard';
         } else {
+          // Provider: check verification status
+          if (isProviderVerified) {
+            return '/provider/dashboard';
+          } else {
+            return '/provider/verification-status';
+          }
+        }
+      }
+
+      // Provider-specific verification redirect logic
+      if (role == 'provider') {
+        if (!isProviderVerified && !isVerificationRoute) {
+          // Unverified provider trying to access other routes
+          return '/provider/verification-status';
+        } else if (isProviderVerified && isVerificationRoute) {
+          // Verified provider trying to access verification page
           return '/provider/dashboard';
         }
       }
     } else {
       if (!isPublicRoute) {
-        return '/';
+        return SignUpFormRoute().location;
+        //  return '/';
       }
     }
     return null;
@@ -98,7 +119,7 @@ GoRouter router(Ref ref) {
       ),
     ],
     refreshListenable: notifier,
-    // redirect: redirect,
+    redirect: redirect,
   );
 }
 

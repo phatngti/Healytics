@@ -1,0 +1,23 @@
+import 'package:admin_panel/features/common/widgets/table/helper.dart';
+import 'package:data_table_2/data_table_2.dart';
+
+/// Column definitions for the partner verification table
+class PartnerTableColumns {
+  /// Column sizes optimized based on content length:
+  /// - Provider Details: L (wide - contains avatar, name, and ID)
+  /// - Service Type: M (medium - service chips)
+  /// - Submitted: M (medium - date and relative time)
+  /// - Priority: S (small - priority indicator)
+  /// - Status: S (small - status chip)
+  /// - Actions: S (small - action icons)
+  static const List<TableColumnData> _columnDefinitions = [
+    TableColumnData(label: 'Provider Details', size: ColumnSize.L),
+    TableColumnData(label: 'Service Type', size: ColumnSize.M),
+    TableColumnData(label: 'Submitted', size: ColumnSize.M),
+    TableColumnData(label: 'Priority', size: ColumnSize.S),
+    TableColumnData(label: 'Status', size: ColumnSize.S),
+    TableColumnData(label: 'Actions', size: ColumnSize.S),
+  ];
+
+  static TableColumns get columns => TableColumns(columns: _columnDefinitions);
+}
