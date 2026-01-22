@@ -3,10 +3,11 @@ import 'package:admin_panel/features/admin/category/presentation/category_home.d
 import 'package:admin_panel/features/admin/dashboard/presentation/admin_dashboard_screen.dart';
 import 'package:admin_panel/features/authenticate/presentation/forgot_password/forgot_password.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_in.dart';
-import 'package:admin_panel/features/authenticate/presentation/sign_up/email_code_verification.dart';
-import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up.dart';
-import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up_form.dart';
+import 'package:admin_panel/features/authenticate/presentation/sign_up/email_code_verification.screen.dart';
+import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up.screen.dart';
+import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up_form.screen.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/partner_manager_screen.dart';
+import 'package:admin_panel/features/admin/partner_manager/presentation/review_application.screen.dart';
 import 'package:admin_panel/router/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -113,6 +114,10 @@ class SignUpFormRoute extends GoRouteData with $SignUpFormRoute {
       path: '/admin/partner-manager',
       name: PartnerManagerRoute.name,
     ),
+    TypedGoRoute<ReviewApplicationRoute>(
+      path: '/admin/partner-manager/review/:partnerId',
+      name: ReviewApplicationRoute.name,
+    ),
     TypedGoRoute<CategoryHomeRoute>(
       path: '/admin/category',
       name: CategoryHomeRoute.name,
@@ -154,6 +159,23 @@ class PartnerManagerRoute extends GoRouteData with $PartnerManagerRoute {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const PartnerManagerScreen(),
+    );
+  }
+}
+
+class ReviewApplicationRoute extends GoRouteData with $ReviewApplicationRoute {
+  const ReviewApplicationRoute({required this.partnerId});
+
+  /// The partner verification ID to review
+  final String partnerId;
+
+  static const name = "review-application";
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ReviewApplicationScreen(partnerId: partnerId),
     );
   }
 }

@@ -6,7 +6,6 @@ import 'package:logging/logging.dart';
 import 'package:timezone/data/latest_all.dart';
 import 'package:admin_panel/features/app/app.dart';
 import 'package:admin_panel/hooks/bootstrap.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

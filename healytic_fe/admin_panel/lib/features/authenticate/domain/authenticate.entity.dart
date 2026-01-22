@@ -29,12 +29,29 @@ abstract class SignInResponseEntity with _$SignInResponseEntity {
 @Freezed(toJson: true)
 abstract class SignUpRequestEntity with _$SignUpRequestEntity {
   const factory SignUpRequestEntity({
-    required String password,
-    required String bussinessName,
-    required String contractPersonName,
-    required String bussinessEmail,
-    required String bussinessPhone,
-    required String address,
+    // Business Entity (Step 1)
+    @Default('') String companyName,
+    @Default('') String taxRegistrationCode,
+    @Default('') String businessEmail,
+    @Default('') String businessPhone,
+    @Default([]) List<String> serviceCategories,
+
+    // Location (Step 2)
+    @Default('') String country,
+    @Default('') String city,
+    @Default('') String district,
+    @Default('') String detailedAddress,
+
+    // Legal Representative (Step 3)
+    @Default('') String representativeName,
+    @Default('') String governmentIdNumber,
+    String? frontIdUrl,
+    String? backIdUrl,
+    @Default(false) bool requiresAuthorizationLetter,
+    String? authorizationLetterUrl,
+
+    // Account Security
+    @Default('') String password,
   }) = _SignUpRequestEntity;
 
   factory SignUpRequestEntity.fromJson(Map<String, dynamic> json) =>

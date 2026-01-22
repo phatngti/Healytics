@@ -11,14 +11,7 @@ _SignUpState _$SignUpStateFromJson(Map<String, dynamic> json) => _SignUpState(
       $enumDecodeNullable(_$SignupStepEnumMap, json['step']) ??
       SignupStep.email,
   request: json['request'] == null
-      ? const SignUpRequestEntity(
-          password: '',
-          bussinessName: '',
-          contractPersonName: '',
-          bussinessEmail: '',
-          bussinessPhone: '',
-          address: '',
-        )
+      ? const SignUpRequestEntity()
       : SignUpRequestEntity.fromJson(json['request'] as Map<String, dynamic>),
   emailToken: json['emailToken'] as String? ?? '',
   otpToken: json['otpToken'] as String? ?? '',

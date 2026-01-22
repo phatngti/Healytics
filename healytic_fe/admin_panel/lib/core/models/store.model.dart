@@ -5,7 +5,8 @@ enum StoreKey<T> {
   refreshToken<String>._(3),
   customHeaders<String>._(4),
   mockFlag<bool>._(5),
-  mockRole<String>._(6);
+  mockRole<String>._(6),
+  partnerVerified<bool>._(7);
 
   const StoreKey._(this.id);
   final int id;

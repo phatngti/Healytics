@@ -11,19 +11,7 @@ enum SignupStep { email, otp, form }
 abstract class SignUpState with _$SignUpState {
   const factory SignUpState({
     @Default(SignupStep.email) SignupStep step,
-
-    @Default(
-      SignUpRequestEntity(
-        password: '',
-        bussinessName: '',
-        contractPersonName: '',
-        bussinessEmail: '',
-        bussinessPhone: '',
-        address: '',
-      ),
-    )
-    SignUpRequestEntity request,
-
+    @Default(SignUpRequestEntity()) SignUpRequestEntity request,
     @Default('') String emailToken,
     @Default('') String otpToken,
   }) = _SignUpState;

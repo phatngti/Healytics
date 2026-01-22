@@ -221,7 +221,7 @@ return $default(_that.step,_that.request,_that.emailToken,_that.otpToken);case _
 @JsonSerializable()
 
 class _SignUpState implements SignUpState {
-  const _SignUpState({this.step = SignupStep.email, this.request = const SignUpRequestEntity(password: '', bussinessName: '', contractPersonName: '', bussinessEmail: '', bussinessPhone: '', address: ''), this.emailToken = '', this.otpToken = ''});
+  const _SignUpState({this.step = SignupStep.email, this.request = const SignUpRequestEntity(), this.emailToken = '', this.otpToken = ''});
   factory _SignUpState.fromJson(Map<String, dynamic> json) => _$SignUpStateFromJson(json);
 
 @override@JsonKey() final  SignupStep step;
