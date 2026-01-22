@@ -23,6 +23,7 @@ This scope provides guidelines for building consistent, responsive UIs in Flutte
 - **Color Usage:** Always source from `Theme.of(context).colorScheme` (e.g., `primary`, `secondary`). For semantics, use extensions (e.g., `Theme.of(context).extension<CustomColors>()!.success`).
 - **Best Practices:** 
   - Avoid hardcoded colors; use theme properties.
+  - Use `Color.withValues(alpha: 0.5)` instead of the deprecated `withOpacity(0.5)` for color opacity manipulation (Flutter 3.27+).
   - Ensure WCAG compliance: 4.5:1 contrast for normal text, 3:1 for large.
   - Follow 60-30-10 rule: 60% primary/neutral, 30% secondary, 10% accent.
   - Use complementary colors cautiously for accents.
