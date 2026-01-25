@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class  $npmConfigName1768804479234 implements MigrationInterface {
-    name = ' $npmConfigName1768804479234'
+export class MakePartnerLocationFieldsNullable1768804479234 implements MigrationInterface {
+    name = 'MakePartnerLocationFieldsNullable1768804479234'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE "health_partner_profile" DROP CONSTRAINT "FK_aa49b97e7d565a79ed2a81ca9a0"`);
