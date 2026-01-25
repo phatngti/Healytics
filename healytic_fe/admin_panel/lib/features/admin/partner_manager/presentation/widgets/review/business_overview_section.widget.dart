@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_detail.entity.dart';
+import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/reviewable_field.widget.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -57,47 +58,65 @@ class BusinessOverviewSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: _buildLabelValue(
-                        context,
-                        label: 'Brand Name',
-                        value: brandName,
-                        isLarge: true,
+                      child: ReviewableField(
+                        fieldId: 'business.brandName',
+                        child: _buildLabelValue(
+                          context,
+                          label: 'Brand Name',
+                          value: brandName,
+                          isLarge: true,
+                        ),
                       ),
                     ),
                     AppDimens.horizontalLarge,
-                    Expanded(child: _buildTaxCode(context, semantics)),
+                    Expanded(
+                      child: ReviewableField(
+                        fieldId: 'business.taxCode',
+                        child: _buildTaxCode(context, semantics),
+                      ),
+                    ),
                   ],
                 ),
                 AppDimens.verticalLarge,
 
                 // Service Tags
-                _buildLabel(context, 'Service Tags'),
-                AppDimens.verticalSmall,
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: serviceTags.map((tag) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
+                ReviewableField(
+                  fieldId: 'business.serviceTags',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLabel(context, 'Service Tags'),
+                      AppDimens.verticalSmall,
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: serviceTags.map((tag) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceContainerHighest,
+                              borderRadius: AppDimens.radiusSmall,
+                              border: Border.all(
+                                color: colorScheme.outline.withValues(
+                                  alpha: 0.1,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              tag,
+                              style: textTheme.labelSmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest,
-                        borderRadius: AppDimens.radiusSmall,
-                        border: Border.all(
-                          color: colorScheme.outline.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      child: Text(
-                        tag,
-                        style: textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                    ],
+                  ),
                 ),
                 AppDimens.verticalLarge,
 
@@ -116,7 +135,12 @@ class BusinessOverviewSection extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(child: _buildAddress(context)),
+                        Expanded(
+                          child: ReviewableField(
+                            fieldId: 'business.address',
+                            child: _buildAddress(context),
+                          ),
+                        ),
                         AppDimens.horizontalLarge,
                         Expanded(child: _buildMapPlaceholder(context)),
                       ],

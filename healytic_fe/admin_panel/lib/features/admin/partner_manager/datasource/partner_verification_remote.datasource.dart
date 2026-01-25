@@ -3,8 +3,10 @@ import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification.entity.dart';
+import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_detail.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_stats.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/datasource/data/partner_verification_mock_data.dart';
+import 'package:admin_panel/features/admin/partner_manager/datasource/data/partner_verification_detail_mock_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -27,6 +29,11 @@ abstract class PartnerVerificationRemoteDataSource {
   Future<int> getTotalRows({PartnerVerificationStatus? statusFilter});
 
   Future<PartnerVerificationEntity> getPartnerById(PartnerVerificationId id);
+
+  /// Get detailed partner verification information for review page
+  Future<PartnerVerificationDetailEntity> getPartnerDetailById(
+    PartnerVerificationId id,
+  );
 
   Future<void> approvePartner(PartnerVerificationId id);
 
@@ -74,6 +81,14 @@ class PartnerVerificationRemoteDataSourceImpl
 
   @override
   Future<PartnerVerificationEntity> getPartnerById(
+    PartnerVerificationId id,
+  ) async {
+    // TODO: Implement real API call
+    throw UnimplementedError('Partner Verification API not implemented yet');
+  }
+
+  @override
+  Future<PartnerVerificationDetailEntity> getPartnerDetailById(
     PartnerVerificationId id,
   ) async {
     // TODO: Implement real API call
@@ -177,6 +192,18 @@ class PartnerVerificationRemoteDataSourceMock
       (p) => p.id == id,
       orElse: () => throw Exception('Partner not found: $id'),
     );
+  }
+
+  @override
+  Future<PartnerVerificationDetailEntity> getPartnerDetailById(
+    PartnerVerificationId id,
+  ) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    final detail = partnerVerificationDetailMockData[id.value];
+    if (detail == null) {
+      throw Exception('Partner detail not found: $id');
+    }
+    return detail;
   }
 
   @override
