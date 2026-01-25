@@ -2785,7 +2785,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-22T02:57:13.912Z"
+              "submittedAt": "2026-01-20T02:22:27.654Z"
             }
           }
         },
@@ -5092,7 +5092,6 @@
             "type": "string",
             "enum": [
               "APPROVED",
-              "CHANGES_REQUIRED",
               "REJECTED"
             ],
             "description": "Overall decision on the partner profile"
