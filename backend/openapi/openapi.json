@@ -5092,6 +5092,7 @@
             "type": "string",
             "enum": [
               "APPROVED",
+              "CHANGES_REQUIRED",
               "REJECTED"
             ],
             "description": "Overall decision on the partner profile"
