@@ -1,12 +1,11 @@
-import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/account_security_section.widget.dart';
-import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/business_entity_section.widget.dart';
-import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/legal_representative_section.widget.dart';
-import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/location_section.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/account_security_form.widget.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/business_entity_form.widget.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/legal_representative_form.widget.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/location_form.widget.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 /// Collapsed section card for completed or locked verification sections.
 ///
@@ -32,7 +31,6 @@ class VerificationSectionCard extends StatefulWidget {
 
 class _VerificationSectionCardState extends State<VerificationSectionCard> {
   bool _isExpanded = false;
-  final _formKey = GlobalKey<FormBuilderState>();
 
   @override
   Widget build(BuildContext context) {
@@ -145,33 +143,28 @@ class _VerificationSectionCardState extends State<VerificationSectionCard> {
         color: colorScheme.surface,
         border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
-      child: FormBuilder(key: _formKey, child: _getSectionWidget()),
+      child: _getSectionWidget(),
     );
   }
 
   Widget _getSectionWidget() {
     switch (widget.section.type) {
       case VerificationSectionType.businessEntity:
-        final info = widget.verificationStatus.businessEntity;
-        return BusinessEntitySection(
-          initialCompanyName: info?.companyName,
-          initialTaxCode: info?.taxRegistrationCode,
-          initialEmail: info?.businessEmail,
-          initialPhone: info?.businessPhone,
-          initialServiceCategories: info?.serviceCategories,
+        return BusinessEntityForm(
+          info: widget.verificationStatus.businessEntity,
         );
       case VerificationSectionType.locationDetails:
-        final info = widget.verificationStatus.locationDetails;
-        return LocationSection(
-          initialCountry: info?.country,
-          initialCity: info?.city,
-          initialDistrict: info?.districtArea,
-          initialAddress: info?.detailedAddress,
-        );
+        return LocationForm(info: widget.verificationStatus.locationDetails);
       case VerificationSectionType.legalRepresentative:
-        return const LegalRepresentativeSection();
+        return LegalRepresentativeForm(
+          section: widget.section,
+          legalRepresentative: widget.verificationStatus.legalRepresentative,
+          onUploadDocument: (_) {
+            // TODO: Handle document upload
+          },
+        );
       case VerificationSectionType.accountSecurity:
-        return const AccountSecuritySection();
+        return const AccountSecurityForm();
     }
   }
 }

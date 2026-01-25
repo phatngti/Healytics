@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/reviewable_field.widget.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -48,10 +49,26 @@ class AccountContactSection extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _buildInfoItem(context, 'Username', username)),
-                Expanded(child: _buildEmailItem(context)),
                 Expanded(
-                  child: _buildInfoItem(context, 'Phone Number', phoneNumber),
+                  child: ReviewableField(
+                    fieldId: 'account.username',
+                    compactMode: true,
+                    child: _buildInfoItem(context, 'Username', username),
+                  ),
+                ),
+                Expanded(
+                  child: ReviewableField(
+                    fieldId: 'account.email',
+                    compactMode: true,
+                    child: _buildEmailItem(context),
+                  ),
+                ),
+                Expanded(
+                  child: ReviewableField(
+                    fieldId: 'account.phoneNumber',
+                    compactMode: true,
+                    child: _buildInfoItem(context, 'Phone Number', phoneNumber),
+                  ),
                 ),
               ],
             ),
