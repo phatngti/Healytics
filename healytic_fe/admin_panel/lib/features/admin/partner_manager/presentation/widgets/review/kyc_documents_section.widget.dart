@@ -1,27 +1,33 @@
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_detail.entity.dart';
+import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/reviewable_field.widget.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 /// KYC Documents section showing uploaded verification documents
-class KycDocumentsSection extends StatelessWidget {
-  const KycDocumentsSection({required this.documents, super.key});
+class KycDocumentsSection extends ConsumerWidget {
+  const KycDocumentsSection({this.documents, super.key});
 
-  final List<KycDocument> documents;
+  final List<KycDocument>? documents;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final docs = documents ?? [];
+    print("docs: $docs");
 
-    final idCards = documents.where(
-      (d) =>
-          d.type == KycDocumentType.idCardFront ||
-          d.type == KycDocumentType.idCardBack,
-    );
-    final otherDocs = documents.where(
-      (d) => d.type == KycDocumentType.authorizationLetter,
-    );
+    final idCards = docs
+        .where(
+          (d) =>
+              d.type == KycDocumentType.idCardFront ||
+              d.type == KycDocumentType.idCardBack,
+        )
+        .toList();
+    final otherDocs = docs
+        .where((d) => d.type == KycDocumentType.authorizationLetter)
+        .toList();
 
     return Container(
       decoration: BoxDecoration(
@@ -40,7 +46,7 @@ class KycDocumentsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Section Header
-          _buildSectionHeader(context, colorScheme, textTheme),
+          _buildSectionHeader(context, colorScheme, textTheme, docs),
           const Divider(height: 1),
 
           // Content
@@ -53,11 +59,17 @@ class KycDocumentsSection extends StatelessWidget {
                 if (idCards.isNotEmpty) ...[
                   _buildLabel(context, 'Identity Card (Front/Back)'),
                   AppDimens.verticalMediumSmall,
-                  Row(
-                    children: idCards.map((doc) {
-                      return Expanded(child: _buildIdCardPreview(context, doc));
-                    }).toList(),
-                  ),
+                  ...idCards.map((doc) {
+                    final fieldId = 'kyc.${doc.type.name}';
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: ReviewableField(
+                        fieldId: fieldId,
+                        compactMode: true,
+                        child: _buildIdCardPreview(context, doc),
+                      ),
+                    );
+                  }),
                 ],
 
                 // Authorization Letter
@@ -65,7 +77,13 @@ class KycDocumentsSection extends StatelessWidget {
                   AppDimens.verticalLarge,
                   _buildLabel(context, 'Authorization Letter'),
                   AppDimens.verticalMediumSmall,
-                  ...otherDocs.map((doc) => _buildDocumentItem(context, doc)),
+                  ...otherDocs.map((doc) {
+                    final fieldId = 'kyc.${doc.type.name}';
+                    return ReviewableField(
+                      fieldId: fieldId,
+                      child: _buildDocumentItem(context, doc),
+                    );
+                  }),
                 ],
               ],
             ),
@@ -79,6 +97,7 @@ class KycDocumentsSection extends StatelessWidget {
     BuildContext context,
     ColorScheme colorScheme,
     TextTheme textTheme,
+    List<KycDocument> docs,
   ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -103,7 +122,7 @@ class KycDocumentsSection extends StatelessWidget {
               borderRadius: AppDimens.radiusPill,
             ),
             child: Text(
-              '${documents.length} Files',
+              '${docs.length} Files',
               style: textTheme.labelSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -135,9 +154,113 @@ class KycDocumentsSection extends StatelessWidget {
       padding: const EdgeInsets.only(right: 12),
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          child: _IdCardPreviewTile(colorScheme: colorScheme, icon: icon),
+        child: GestureDetector(
+          onTap: () {
+            if (doc.fileUrl != null) {
+              _showImagePreview(context, doc.fileUrl!);
+            }
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            child: _IdCardPreviewTile(
+              colorScheme: colorScheme,
+              icon: icon,
+              docId: doc.id,
+              imageUrl: doc.fileUrl,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showImagePreview(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Backdrop with blur
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(color: Colors.black.withValues(alpha: 0.8)),
+              ),
+            ),
+
+            // Image
+            InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.9,
+                  maxHeight: MediaQuery.of(context).size.height * 0.9,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: AppDimens.radiusMedium,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      padding: AppDimens.paddingAllLarge,
+                      color: Colors.white,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.broken_image_outlined,
+                            size: 48,
+                            color: Colors.red,
+                          ),
+                          AppDimens.verticalMediumSmall,
+                          Text(
+                            'Failed to load image',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+
+            // Close button
+            Positioned(
+              top: 24,
+              right: 24,
+              child: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.black.withValues(alpha: 0.5),
+                  padding: const EdgeInsets.all(8),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -206,10 +329,17 @@ class KycDocumentsSection extends StatelessWidget {
 
 /// Stateful hover tile for ID card preview
 class _IdCardPreviewTile extends StatefulWidget {
-  const _IdCardPreviewTile({required this.colorScheme, required this.icon});
+  const _IdCardPreviewTile({
+    required this.colorScheme,
+    required this.icon,
+    required this.docId,
+    this.imageUrl,
+  });
 
   final ColorScheme colorScheme;
   final IconData icon;
+  final String docId;
+  final String? imageUrl;
 
   @override
   State<_IdCardPreviewTile> createState() => _IdCardPreviewTileState();
@@ -226,7 +356,8 @@ class _IdCardPreviewTileState extends State<_IdCardPreviewTile> {
       cursor: SystemMouseCursors.click,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        height: 64,
+        height: 120,
+        width: 180,
         decoration: BoxDecoration(
           color: widget.colorScheme.surfaceContainerHighest,
           borderRadius: AppDimens.radiusSmall,
@@ -234,35 +365,84 @@ class _IdCardPreviewTileState extends State<_IdCardPreviewTile> {
             color: _isHovered
                 ? widget.colorScheme.primary
                 : widget.colorScheme.outline.withValues(alpha: 0.2),
+            width: _isHovered ? 2 : 1,
           ),
         ),
+        clipBehavior: Clip.antiAlias,
         child: Stack(
+          fit: StackFit.expand,
           children: [
-            Center(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
+            // Image or fallback icon
+            if (widget.imageUrl != null)
+              Image.network(
+                widget.imageUrl!,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(
+                    child: Icon(
+                      widget.icon,
+                      color: widget.colorScheme.onSurfaceVariant,
+                      size: 32,
+                    ),
+                  );
+                },
+              )
+            else
+              Center(
                 child: Icon(
                   widget.icon,
-                  key: ValueKey(_isHovered),
-                  color: _isHovered
-                      ? widget.colorScheme.primary
-                      : widget.colorScheme.onSurfaceVariant,
-                  size: 24,
+                  color: widget.colorScheme.onSurfaceVariant,
+                  size: 32,
                 ),
               ),
-            ),
+
+            // Hover overlay with zoom icon
             if (_isHovered)
-              Positioned.fill(
+              AnimatedOpacity(
+                opacity: _isHovered ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 200),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.4),
-                    borderRadius: AppDimens.radiusSmall,
+                    color: Colors.black.withValues(alpha: 0.5),
                   ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.visibility,
-                      color: Colors.white,
-                      size: 24,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        borderRadius: AppDimens.radiusPill,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.zoom_in,
+                            color: widget.colorScheme.primary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'View',
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(
+                                  color: widget.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

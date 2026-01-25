@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_detail.entity.dart';
+import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/reviewable_field.widget.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
@@ -42,25 +43,37 @@ class LegalRepresentativeSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: _buildInfoItem(
-                        context,
-                        'Full Name',
-                        representative?.fullName,
+                      child: ReviewableField(
+                        fieldId: 'legal.fullName',
+                        compactMode: true,
+                        child: _buildInfoItem(
+                          context,
+                          'Full Name',
+                          representative?.fullName,
+                        ),
                       ),
                     ),
                     Expanded(
-                      child: _buildInfoItem(
-                        context,
-                        'Position',
-                        representative?.position,
+                      child: ReviewableField(
+                        fieldId: 'legal.position',
+                        compactMode: true,
+                        child: _buildInfoItem(
+                          context,
+                          'Position',
+                          representative?.position,
+                        ),
                       ),
                     ),
                     Expanded(
-                      child: _buildInfoItem(
-                        context,
-                        'Citizen ID',
-                        representative?.citizenId,
-                        isMono: true,
+                      child: ReviewableField(
+                        fieldId: 'legal.citizenId',
+                        compactMode: true,
+                        child: _buildInfoItem(
+                          context,
+                          'Citizen ID',
+                          representative?.citizenId,
+                          isMono: true,
+                        ),
                       ),
                     ),
                   ],

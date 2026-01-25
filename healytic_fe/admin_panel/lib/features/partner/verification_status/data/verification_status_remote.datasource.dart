@@ -66,22 +66,41 @@ class VerificationStatusRemoteDataSourceMock
         ),
       ],
       businessEntity: const BusinessEntityInfo(
-        companyName: 'Serenity Spa & Wellness LLC',
-        taxRegistrationCode: 'XX-1234567-Y',
-        businessEmail: 'partners@serenityspa.com',
-        businessPhone: '+1 (555) 000-0000',
-        serviceCategories: [
-          'Massage Therapy',
-          'Sauna',
-          'Facials',
-          'Aromatherapy',
-        ],
+        companyName: VerificationStringField(
+          value: 'Serenity Spa & Wellness LLC',
+          requiresUpdate: true,
+          adminFeedback: 'Name mismatch with tax document.',
+        ),
+        taxRegistrationCode: VerificationStringField(
+          value: 'XX-1234567-Y',
+          requiresUpdate: true,
+          adminFeedback: 'Tax registration code mismatch with tax document.',
+        ),
+        businessEmail: VerificationStringField(
+          value: 'partners@serenityspa.com',
+          requiresUpdate: true,
+          adminFeedback: 'Email mismatch with tax document.',
+        ),
+        businessPhone: VerificationStringField(
+          value: '+1 (555) 000-0000',
+          requiresUpdate: true,
+          adminFeedback: 'Phone number mismatch with tax document.',
+        ),
+        serviceCategories: VerificationStringListField(
+          value: ['Massage Therapy', 'Sauna', 'Facials', 'Aromatherapy'],
+          requiresUpdate: true,
+          adminFeedback: 'Service categories mismatch with tax document.',
+        ),
       ),
       locationDetails: const LocationDetailsInfo(
-        country: 'United States',
-        city: 'New York',
-        districtArea: 'Manhattan',
-        detailedAddress: '123 Harmony Lane, Suite 400',
+        country: VerificationOptionalStringField(value: 'United States'),
+        city: VerificationOptionalStringField(value: 'New York'),
+        districtArea: VerificationOptionalStringField(value: 'Manhattan'),
+        detailedAddress: VerificationStringField(
+          value: '123 Harmony Lane, Suite 400',
+          requiresUpdate: true,
+          adminFeedback: 'Please provide unit number if applicable.',
+        ),
       ),
       legalRepresentative: const LegalRepresentativeEntity(
         fullName: 'Jane Doe',

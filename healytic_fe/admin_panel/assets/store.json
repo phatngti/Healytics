@@ -5,6 +5,6 @@
         "deviceType": "iOS"
     },
     "mockFlag": "true",
-    "mockRole": "provider",
+    "mockRole": "admin",
     "partnerVerified": "false"
 }

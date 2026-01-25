@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/admin/partner_manager/datasource/partner_verification_remote.datasource.dart';
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_detail.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/account_contact_section.widget.dart';
@@ -8,6 +9,7 @@ import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/review_header.widget.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Desktop layout for the review application page
@@ -18,8 +20,25 @@ class ReviewApplicationDesktop extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO: Replace with actual data from provider/repository
-    final partnerDetail = _getMockPartnerDetail();
+    final dataSource = ref.watch(partnerVerificationRemoteDataSourceProvider);
+    final partnerDetailFuture = useMemoized(
+      () => dataSource.getPartnerDetailById(PartnerVerificationId(partnerId)),
+      [partnerId],
+    );
+    final partnerDetailSnapshot = useFuture(partnerDetailFuture);
+
+    if (partnerDetailSnapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (partnerDetailSnapshot.hasError) {
+      return Center(child: Text('Error: ${partnerDetailSnapshot.error}'));
+    }
+
+    final partnerDetail = partnerDetailSnapshot.data;
+    if (partnerDetail == null) {
+      return const Center(child: Text('Partner not found'));
+    }
 
     return Column(
       children: [
@@ -100,64 +119,14 @@ class ReviewApplicationDesktop extends HookConsumerWidget {
           onApprove: (note) {
             // TODO: Implement approve action
           },
+          onRequestRevision: (note, fieldFeedback) {
+            // TODO: Implement request revision action
+          },
           onReject: (note) {
             // TODO: Implement reject action
           },
         ),
       ],
-    );
-  }
-
-  /// Mock data for development - replace with repository call
-  PartnerVerificationDetailEntity _getMockPartnerDetail() {
-    return PartnerVerificationDetailEntity(
-      id: PartnerVerificationId(partnerId),
-      brandName: 'Hanoi Spa & Wellness',
-      taxRegistrationCode: '0101234567-HN',
-      isTaxCodeValid: true,
-      serviceTags: ['Spa Treatment', 'Massage Therapy', 'Sauna', 'Facial Care'],
-      address: const AddressInfo(
-        streetAddress: '18 Au Trieu Street',
-        ward: 'Hang Trong Ward',
-        district: 'Hoan Kiem District',
-        city: 'Hanoi',
-        country: 'Vietnam',
-      ),
-      username: 'hanoispa_admin',
-      email: 'contact@hanoispa.vn',
-      isEmailVerified: true,
-      phoneNumber: '+84 90 123 4567',
-      legalRepresentative: const LegalRepresentative(
-        fullName: 'Nguyen Van An',
-        position: 'General Director',
-        citizenId: '001088000XXX',
-        verificationNote:
-            'The legal representative name matches the name on the '
-            'tax registration documents provided.',
-      ),
-      kycDocuments: [
-        KycDocument(
-          id: 'doc1',
-          type: KycDocumentType.idCardFront,
-          fileName: 'ID_Card_Front.jpg',
-          uploadedAt: DateTime(2023, 10, 24),
-        ),
-        KycDocument(
-          id: 'doc2',
-          type: KycDocumentType.idCardBack,
-          fileName: 'ID_Card_Back.jpg',
-          uploadedAt: DateTime(2023, 10, 24),
-        ),
-        KycDocument(
-          id: 'doc3',
-          type: KycDocumentType.authorizationLetter,
-          fileName: 'Auth_Letter_Signed.pdf',
-          fileSize: '2.4 MB',
-          uploadedAt: DateTime(2023, 10, 24),
-        ),
-      ],
-      status: PartnerVerificationStatus.pending,
-      submittedAt: DateTime(2023, 10, 24),
     );
   }
 }

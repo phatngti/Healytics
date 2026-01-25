@@ -98,6 +98,46 @@ abstract class VerificationDocument with _$VerificationDocument {
       _$VerificationDocumentFromJson(json);
 }
 
+/// Wrapper for a required string verification field.
+@freezed
+abstract class VerificationStringField with _$VerificationStringField {
+  const factory VerificationStringField({
+    required String value,
+    @Default(false) bool requiresUpdate,
+    String? adminFeedback,
+  }) = _VerificationStringField;
+
+  factory VerificationStringField.fromJson(Map<String, dynamic> json) =>
+      _$VerificationStringFieldFromJson(json);
+}
+
+/// Wrapper for an optional string verification field.
+@freezed
+abstract class VerificationOptionalStringField
+    with _$VerificationOptionalStringField {
+  const factory VerificationOptionalStringField({
+    String? value,
+    @Default(false) bool requiresUpdate,
+    String? adminFeedback,
+  }) = _VerificationOptionalStringField;
+
+  factory VerificationOptionalStringField.fromJson(Map<String, dynamic> json) =>
+      _$VerificationOptionalStringFieldFromJson(json);
+}
+
+/// Wrapper for a list of strings verification field.
+@freezed
+abstract class VerificationStringListField with _$VerificationStringListField {
+  const factory VerificationStringListField({
+    required List<String> value,
+    @Default(false) bool requiresUpdate,
+    String? adminFeedback,
+  }) = _VerificationStringListField;
+
+  factory VerificationStringListField.fromJson(Map<String, dynamic> json) =>
+      _$VerificationStringListFieldFromJson(json);
+}
+
 /// Represents the legal representative details and documents.
 @freezed
 abstract class LegalRepresentativeEntity with _$LegalRepresentativeEntity {
@@ -130,19 +170,20 @@ abstract class BusinessEntityInfo with _$BusinessEntityInfo {
   /// Creates a new [BusinessEntityInfo].
   const factory BusinessEntityInfo({
     /// Company name.
-    required String companyName,
+    required VerificationStringField companyName,
 
     /// Tax registration code.
-    required String taxRegistrationCode,
+    required VerificationStringField taxRegistrationCode,
 
     /// Business email address.
-    required String businessEmail,
+    required VerificationStringField businessEmail,
 
     /// Business phone number.
-    required String businessPhone,
+    required VerificationStringField businessPhone,
 
     /// List of service categories.
-    @Default([]) List<String> serviceCategories,
+    @Default(VerificationStringListField(value: []))
+    VerificationStringListField serviceCategories,
   }) = _BusinessEntityInfo;
 
   /// Creates a [BusinessEntityInfo] from JSON data.
@@ -156,16 +197,16 @@ abstract class LocationDetailsInfo with _$LocationDetailsInfo {
   /// Creates a new [LocationDetailsInfo].
   const factory LocationDetailsInfo({
     /// Country name or code.
-    String? country,
+    VerificationOptionalStringField? country,
 
     /// City name.
-    String? city,
+    VerificationOptionalStringField? city,
 
     /// District or area.
-    String? districtArea,
+    VerificationOptionalStringField? districtArea,
 
     /// Detailed street address.
-    required String detailedAddress,
+    required VerificationStringField detailedAddress,
   }) = _LocationDetailsInfo;
 
   /// Creates a [LocationDetailsInfo] from JSON data.
