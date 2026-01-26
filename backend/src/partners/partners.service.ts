@@ -134,6 +134,7 @@ export class PartnersService {
                 streetAddress: dto.partner.streetAddress,
                 phoneNumber: dto.partner.phoneNumber || null,
                 accountId: savedAccount.id,
+                verificationStatus: PartnerVerificationStatus.REQUIRED_SUBMIT,
             });
             const savedPartner =
                 await queryRunner.manager.save(partner);
@@ -530,13 +531,9 @@ export class PartnersService {
                     partner.verificationCompletedAt = null;
                 } else {
                     if (partner.verificationStatus === PartnerVerificationStatus.APPROVED && hasCriticalChange) {
-                        partner.verificationStatus = PartnerVerificationStatus.REQUIRED_RESUBMIT;
+                        partner.verificationStatus = PartnerVerificationStatus.REQUIRED_SUBMIT;
                     }
                 }
-
-                // [FIX] Clean up relations to avoid cascade save issues
-                if ((partner as any).documents) delete (partner as any).documents;
-                if (partner.legalRepresentative) delete partner.legalRepresentative;
 
                 await queryRunner.manager.save(partner);
             }

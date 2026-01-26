@@ -148,7 +148,7 @@ describe('AdminPartnersService', () => {
             await service.reviewPartner(partnerId, dto, adminId);
 
             expect(mockQueryRunner.manager.save).toHaveBeenCalledWith(expect.objectContaining({
-                verificationStatus: PartnerVerificationStatus.REQUIRED_RESUBMIT,
+                verificationStatus: PartnerVerificationStatus.REQUIRED_SUBMIT,
                 rejectionDetails: expect.objectContaining({
                     document_DOC_TYPE_A: 'Blurry'
                 })
@@ -174,7 +174,7 @@ describe('AdminPartnersService', () => {
 
             // Should NOT be APPROVED, must be REQUIRED_RESUBMIT
             expect(mockQueryRunner.manager.save).toHaveBeenCalledWith(expect.objectContaining({
-                verificationStatus: PartnerVerificationStatus.REQUIRED_RESUBMIT,
+                verificationStatus: PartnerVerificationStatus.REQUIRED_SUBMIT,
                 rejectionDetails: expect.objectContaining({
                     legalName: 'Wrong name'
                 })
