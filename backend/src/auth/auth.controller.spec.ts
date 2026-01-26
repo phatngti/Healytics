@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AccountService } from '@/account/account.service';
+import { PartnersService } from '@/partners/partners.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
 import { MockType } from '../../test/mocks/mock-types';
@@ -15,7 +16,7 @@ describe('AuthController', () => {
     // Arrange - Create typed mocks
     const mockAuthService: MockType<AuthService> = {
       register: jest.fn(),
-      login: jest.fn(),
+
       loginUser: jest.fn(),
       loginAdmin: jest.fn(),
       refresh: jest.fn(),
@@ -23,6 +24,10 @@ describe('AuthController', () => {
 
     const mockAccountService: MockType<AccountService> = {
       removeRefreshToken: jest.fn(),
+    };
+
+    const mockPartnersService: MockType<PartnersService> = {
+      registerPartner: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -35,6 +40,10 @@ describe('AuthController', () => {
         {
           provide: AccountService,
           useValue: mockAccountService,
+        },
+        {
+          provide: PartnersService,
+          useValue: mockPartnersService,
         },
       ],
     }).compile();
@@ -108,46 +117,7 @@ describe('AuthController', () => {
     });
   });
 
-  describe('register (legacy)', () => {
-    it('should call authService.register and return tokens', async () => {
-      // Arrange
-      const dto: RegisterDto = {
-        email: 'test@example.com',
-        password: 'password123',
-      } as RegisterDto;
-      const expectedTokens = {
-        access_token: 'access-token',
-        refresh_token: 'refresh-token',
-      };
-      authService.register!.mockResolvedValue(expectedTokens);
 
-      // Act
-      const result = await controller.register(dto);
-
-      // Assert
-      expect(result).toEqual(expectedTokens);
-      expect(authService.register).toHaveBeenCalledWith(dto);
-    });
-  });
-
-  describe('login (legacy)', () => {
-    it('should call authService.login with validated user', async () => {
-      // Arrange
-      const mockReq = { user: { id: 'uuid-1', email: 'test@example.com' } };
-      const expectedTokens = {
-        access_token: 'access-token',
-        refresh_token: 'refresh-token',
-      };
-      authService.login!.mockResolvedValue(expectedTokens);
-
-      // Act
-      const result = await controller.login(mockReq);
-
-      // Assert
-      expect(result).toEqual(expectedTokens);
-      expect(authService.login).toHaveBeenCalledWith(mockReq.user);
-    });
-  });
 
   describe('logout', () => {
     it('should remove refresh token and return success message', async () => {

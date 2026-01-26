@@ -66,14 +66,17 @@ erDiagram
 ```
 
 ### Document Types
-| Type | Description | Required For |
-|:-----|:------------|:-------------|
-| `BUSINESS_LICENSE` | Business registration certificate | All |
-| `TAX_REGISTRATION` | Tax registration document | All |
-| `IDENTITY_CARD_FRONT` | ID card front side | All |
-| `IDENTITY_CARD_BACK` | ID card back side | All |
-| `AUTHORIZATION_LETTER` | Authorization for non-owner | If not owner |
-| `MEDICAL_LICENSE` | Medical practice license | CLINIC, HOSPITAL |
+| Type | Description | Required For | Storage |
+|:-----|:------------|:-------------|:--------|
+| `BUSINESS_LICENSE` | Business registration certificate | All | PartnerDocument |
+| `TAX_REGISTRATION` | Tax registration document | All | PartnerDocument |
+| `IDENTITY_CARD_FRONT` | ID card front side | All | LegalRepresentative |
+| `IDENTITY_CARD_BACK` | ID card back side | All | LegalRepresentative |
+| `AUTHORIZATION_LETTER` | Authorization for non-owner | If not owner | LegalRepresentative |
+| `MEDICAL_LICENSE` | Medical practice license | CLINIC, HOSPITAL | PartnerDocument |
+
+> [!NOTE]
+> Identity documents (`IDENTITY_CARD_*`, `AUTHORIZATION_LETTER`) are collected during registration and stored directly in the `LegalRepresentative` entity. They do not appear in the standard `PartnerDocument` list but are visible in the Partner Profile.
 
 ---
 

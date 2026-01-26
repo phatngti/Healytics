@@ -234,21 +234,7 @@ export class AuthService {
     return this.createTokensForUser(userId, userEmail, userRole, user.userProfile);
   }
 
-  /**
-   * Legacy login (for backward compatibility, validates any role).
-   * @deprecated Use loginUser or loginAdmin instead
-   * @param user - The validated user
-   * @returns Authentication tokens
-   */
-  async login(user: ValidatedUser): Promise<AuthTokensDto> {
-    const userId = user.id;
-    const userEmail = user.email;
-    const userRole = user.role;
-    if (!userId) {
-      throw new UnauthorizedException();
-    }
-    return this.createTokensForUser(userId, userEmail, userRole, user.userProfile);
-  }
+
 
   /**
    * Refreshes authentication tokens.
