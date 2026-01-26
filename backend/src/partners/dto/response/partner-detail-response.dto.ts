@@ -63,6 +63,9 @@ class LegalRepDetailDto {
 
     @ApiProperty({ example: 'https://example.com/auth-letter.pdf', nullable: true })
     authLetterDocUrl: string | null;
+
+    @ApiProperty({ example: '0901234567', nullable: true })
+    phoneNumber: string | null;
 }
 
 export class PartnerDetailResponseDto {

@@ -1654,7 +1654,7 @@
             "name": "verificationStatus",
             "required": false,
             "in": "query",
-            "description": "Filter by verification status (PENDING, APPROVED, REJECTED)",
+            "description": "Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED)",
             "schema": {
               "example": "PENDING",
               "enum": [
@@ -2385,7 +2385,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-26T14:23:07.543Z"
+              "submittedAt": "2026-01-26T16:53:10.068Z"
             }
           }
         },
@@ -2495,13 +2495,48 @@
           "idNumber": {
             "type": "string",
             "example": "001234567890"
+          },
+          "idIssueDate": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2023-01-15"
+          },
+          "idFrontImgUrl": {
+            "type": "object",
+            "example": "https://...",
+            "nullable": true
+          },
+          "idBackImgUrl": {
+            "type": "object",
+            "example": "https://...",
+            "nullable": true
+          },
+          "isAuthorizedUser": {
+            "type": "boolean",
+            "example": true
+          },
+          "authLetterDocUrl": {
+            "type": "object",
+            "example": "https://...",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "object",
+            "example": "0901234567",
+            "nullable": true
           }
         },
         "required": [
           "fullName",
           "position",
           "idType",
-          "idNumber"
+          "idNumber",
+          "idIssueDate",
+          "idFrontImgUrl",
+          "idBackImgUrl",
+          "isAuthorizedUser",
+          "authLetterDocUrl",
+          "phoneNumber"
         ]
       },
       "PartnerDocumentDto": {
@@ -4346,38 +4381,38 @@
             "type": "string",
             "example": "001234567890"
           },
-          "id": {
-            "type": "string",
-            "example": "uuid-123"
-          },
           "idIssueDate": {
             "format": "date-time",
             "type": "string",
-            "example": "2020-01-15"
+            "example": "2023-01-15"
           },
           "idFrontImgUrl": {
             "type": "object",
-            "example": "https://example.com/front.jpg",
+            "example": "https://...",
             "nullable": true
           },
           "idBackImgUrl": {
             "type": "object",
-            "example": "https://example.com/back.jpg",
+            "example": "https://...",
             "nullable": true
           },
           "isAuthorizedUser": {
             "type": "boolean",
-            "example": false
+            "example": true
           },
           "authLetterDocUrl": {
             "type": "object",
-            "example": null,
+            "example": "https://...",
             "nullable": true
           },
           "phoneNumber": {
             "type": "object",
             "example": "0901234567",
             "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "example": "uuid-123"
           }
         },
         "required": [
@@ -4385,13 +4420,13 @@
           "position",
           "idType",
           "idNumber",
-          "id",
           "idIssueDate",
           "idFrontImgUrl",
           "idBackImgUrl",
           "isAuthorizedUser",
           "authLetterDocUrl",
-          "phoneNumber"
+          "phoneNumber",
+          "id"
         ]
       },
       "AdminPartnerDetailResponseDto": {

@@ -29,7 +29,7 @@ export class GetPartnersQueryDto {
     @ApiPropertyOptional({
         enum: PartnerVerificationStatus,
         example: PartnerVerificationStatus.PENDING,
-        description: 'Filter by verification status (PENDING, APPROVED, REJECTED)',
+        description: 'Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED)',
     })
     @IsOptional()
     @IsEnum(PartnerVerificationStatus)
