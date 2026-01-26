@@ -32,16 +32,6 @@ class AccountRequestDto {
     @IsEmail()
     email: string;
 
-    @ApiProperty({
-        example: '0912345678',
-        description: 'Phone number (10 digits)',
-    })
-    @IsString()
-    @IsNotEmpty()
-    @Matches(/^0\d{9}$/, {
-        message: 'Phone number must be 10 digits starting with 0',
-    })
-    phoneNumber: string;
 }
 
 export { AccountRequestDto };

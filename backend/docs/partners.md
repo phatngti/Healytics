@@ -210,6 +210,6 @@ Authorization: Bearer <accessToken>
 | `verification_status` | INDEX | Status filtering. |
 
 ### Security Considerations
-*   **Immutable Fields**: `legalName`, `taxCode`, `businessType` cannot be changed via update.
+*   **Critical Fields**: Updating `legalName`, `taxCode`, `businessType`, or `address` will automatically revoke `APPROVED` status and trigger a new verification process (Status -> `REQUIRED_RESUBMIT`).
 *   **Ownership Check**: Partners can only access their own profile.
-*   **Rejection Auto-Clear**: Encourages partners to fix issues and re-submit.
+*   **Rejection Auto-Clear**: Updating a field that was previously rejected will automatically clear the rejection error for that field. If all rejections are cleared, the partner status resets to `PENDING` for re-review.

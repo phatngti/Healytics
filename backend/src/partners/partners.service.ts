@@ -23,6 +23,8 @@ import { BusinessType } from './enum/business-type.enum';
 import { DocumentType } from './enum/document-type.enum';
 import { PartnerDocument } from './entities/partner-document.entity';
 import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
+import { PartnerDocumentStatus } from './enum/partner-document-status.enum';
+import { DocumentRequirement } from './entities/document-requirement.entity';
 import { LocationsService } from '@/locations/locations.service';
 import { AuthService } from '@/auth/auth.service';
 
@@ -35,6 +37,8 @@ export class PartnersService {
         private readonly partnerRepository: Repository<Partner>,
         @InjectRepository(LegalRepresentative)
         private readonly legalRepRepository: Repository<LegalRepresentative>,
+        @InjectRepository(DocumentRequirement)
+        private readonly docRequirementRepository: Repository<DocumentRequirement>,
         private readonly dataSource: DataSource,
         private readonly locationsService: LocationsService,
         private readonly authService: AuthService,
@@ -151,42 +155,9 @@ export class PartnersService {
             });
             await queryRunner.manager.save(legalRep);
 
-            // Automatically create PartnerDocument records for registration documents
-            // This ensures they are tracked in the verification system from the start
-            // Note: TAX_CODE is now strictly a data field on Partner, not tracked as a document
-            const regDocs = [
-                {
-                    partnerId: savedPartner.id,
-                    documentType: DocumentType.IDENTITY_FRONT,
-                    documentUrl: dto.legalRepresentative.images.frontImgUrl,
-                    documentKey: null,
-                    isReviewed: false,
-                    isValid: true, // Optimistic validation
-                },
-                {
-                    partnerId: savedPartner.id,
-                    documentType: DocumentType.IDENTITY_BACK,
-                    documentUrl: dto.legalRepresentative.images.backImgUrl,
-                    documentKey: null,
-                    isReviewed: false,
-                    isValid: true, // Optimistic validation
-                },
-            ];
-
-            // Add authorization letter if provided
-            if (dto.legalRepresentative.authorization.authLetterDocUrl) {
-                regDocs.push({
-                    partnerId: savedPartner.id,
-                    documentType: DocumentType.AUTHORIZATION_LETTER,
-                    documentUrl: dto.legalRepresentative.authorization.authLetterDocUrl,
-                    documentKey: null,
-                    isReviewed: false,
-                    isValid: true, // Optimistic validation
-                });
-            }
-
-            const partnerDocs = regDocs.map(d => queryRunner.manager.create(PartnerDocument, d));
-            await queryRunner.manager.save(PartnerDocument, partnerDocs);
+            // Note: Identity documents (IDENTITY_FRONT, IDENTITY_BACK, AUTHORIZATION_LETTER)
+            // are stored directly in LegalRepresentative entity and not tracked as PartnerDocuments.
+            // Only business-specific documents (uploaded later) are tracked in PartnerDocument table.
 
             // Commit transaction
             await queryRunner.commitTransaction();
@@ -234,6 +205,94 @@ export class PartnersService {
             throw new NotFoundException('Partner not found');
         }
 
+        // Fetch document requirements for this business type
+        const requirements = await this.docRequirementRepository.find({
+            where: { businessType: partner.businessType },
+        });
+
+        // Map uploaded documents by type for easy lookup
+        const uploadedDocsMap = new Map<DocumentType, PartnerDocument>();
+        if (partner.documents) {
+            partner.documents.forEach((doc) => {
+                uploadedDocsMap.set(doc.documentType, doc);
+            });
+        }
+
+        // Merge requirements with uploaded documents
+        const documentDtos: any[] = requirements.map((req) => {
+            const uploadedDoc = uploadedDocsMap.get(req.documentType);
+            let status = PartnerDocumentStatus.MISSING;
+            let documentUrl: string | null = null;
+            let documentKey: string | null = null;
+            let id: string | null = null;
+            let isReviewed = false;
+            let isValid = false;
+            let adminFeedback: string | null = null;
+            let verificationNotes: string | null = null;
+            let uploadedAt: Date | null = null;
+
+            if (uploadedDoc) {
+                id = uploadedDoc.id;
+                documentUrl = uploadedDoc.documentUrl;
+                documentKey = uploadedDoc.documentKey;
+                isReviewed = uploadedDoc.isReviewed;
+                isValid = uploadedDoc.isValid;
+                adminFeedback = uploadedDoc.adminFeedback;
+                verificationNotes = uploadedDoc.verificationNotes;
+                uploadedAt = uploadedDoc.uploadedAt;
+
+                if (uploadedDoc.isReviewed) {
+                    status = uploadedDoc.isValid
+                        ? PartnerDocumentStatus.APPROVED
+                        : PartnerDocumentStatus.REJECTED;
+                } else {
+                    status = PartnerDocumentStatus.PENDING;
+                }
+            }
+
+            return {
+                id,
+                documentType: req.documentType,
+                documentUrl,
+                documentKey,
+                status,
+                isRequired: req.isRequired,
+                description: req.description,
+                isReviewed,
+                isValid,
+                adminFeedback,
+                verificationNotes,
+                uploadedAt,
+            };
+        });
+
+        // Also include any uploaded documents that might not be in the current requirements (edge case)
+        if (partner.documents) {
+            partner.documents.forEach((doc) => {
+                const reqExists = requirements.find(r => r.documentType === doc.documentType);
+                if (!reqExists) {
+                    let status = PartnerDocumentStatus.PENDING;
+                    if (doc.isReviewed) {
+                        status = doc.isValid ? PartnerDocumentStatus.APPROVED : PartnerDocumentStatus.REJECTED;
+                    }
+                    documentDtos.push({
+                        id: doc.id,
+                        documentType: doc.documentType,
+                        documentUrl: doc.documentUrl,
+                        documentKey: doc.documentKey,
+                        status,
+                        isRequired: false, // Not in current requirements
+                        description: null,
+                        isReviewed: doc.isReviewed,
+                        isValid: doc.isValid,
+                        adminFeedback: doc.adminFeedback,
+                        verificationNotes: doc.verificationNotes,
+                        uploadedAt: doc.uploadedAt,
+                    });
+                }
+            });
+        }
+
         return {
             id: partner.id,
             taxCode: partner.taxCode,
@@ -242,8 +301,11 @@ export class PartnersService {
             businessType: partner.businessType,
             phoneNumber: partner.phoneNumber || null,
             address: {
+                provinceId: partner.provinceId,
                 province: partner.province?.name ?? '',
+                districtId: partner.districtId,
                 district: partner.district?.name ?? '',
+                wardId: partner.wardId,
                 ward: partner.ward?.name ?? '',
                 streetAddress: partner.streetAddress,
             },
@@ -255,211 +317,232 @@ export class PartnersService {
             },
             verificationStatus: partner.verificationStatus,
             rejectionDetails: partner.rejectionDetails || null,
-            documents: (partner as any).documents?.map((doc: any) => ({
-                id: doc.id,
-                documentType: doc.documentType,
-                documentUrl: doc.documentUrl,
-                isReviewed: doc.isReviewed,
-                isValid: doc.isValid,
-                adminFeedback: doc.adminFeedback,
-            })) || [],
+            documents: documentDtos,
             verificationCompletedAt: partner.verificationCompletedAt,
             createdAt: partner.createdAt,
         };
     }
 
     /**
-     * Update partner's profile - with document sync and verification reset
+     * Update partner's profile - with "Smart Update" logic
      * 
-     * IMPORTANT FIXES:
-     * 1. Syncs CCCD/Authorization images to PartnerDocument table
-     * 2. Resets verificationStatus to PENDING when important fields change
+     * Logic:
+     * 1. Check current vs new value
+     * 2. If changed -> Update value & Clear specific rejection detail
+     * 3. If all rejection details cleared -> Reset status to PENDING
      */
     async updateMyProfile(accountId: string, dto: UpdatePartnerDto): Promise<MyProfileResponseDto> {
+        // 1. Lấy thông tin Partner
         const partner = await this.getPartnerByAccountId(accountId);
-        if (!partner) {
-            throw new NotFoundException('Partner not found');
-        }
+        if (!partner) throw new NotFoundException('Partner not found');
 
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
         try {
-            let shouldResetVerification = false; // Flag to check if we need to reset to PENDING
+            // Clone map lỗi hiện tại để xử lý (tránh mutate trực tiếp object cũ)
+            const currentRejection = partner.rejectionDetails ? { ...partner.rejectionDetails } : {};
+            let isModified = false;
 
-            // 1. Validate and update address if any address field is provided
-            const addressFieldsProvided = dto.provinceId || dto.districtId || dto.wardId;
-            if (addressFieldsProvided) {
-                const provinceId = dto.provinceId || partner.provinceId;
-                const districtId = dto.districtId || partner.districtId;
-                const wardId = dto.wardId || partner.wardId;
+            // Cờ đánh dấu xem có sửa thông tin nhạy cảm không (để revoke APPROVED)
+            let hasCriticalChange = false;
 
-                if (provinceId && districtId && wardId) {
-                    try {
-                        await this.locationsService.validateAddress(
-                            provinceId as string,
-                            districtId as string,
-                            wardId as string,
-                        );
-                    } catch (error) {
-                        throw new BadRequestException(
-                            `Invalid address: ${error.message}`,
-                        );
-                    }
+            // --- A. XỬ LÝ CHECK TRÙNG LẶP (TaxCode) ---
+            if (dto.taxCode && dto.taxCode !== partner.taxCode) {
+                const existing = await queryRunner.manager.findOne(Partner, { where: { taxCode: dto.taxCode } });
+                if (existing) throw new BadRequestException('Tax code already exists');
+            }
 
-                    // Check if address actually changed
-                    if (partner.provinceId !== provinceId ||
-                        partner.districtId !== districtId ||
-                        partner.wardId !== wardId) {
-                        partner.provinceId = provinceId as string;
-                        partner.districtId = districtId as string;
-                        partner.wardId = wardId as string;
-                        shouldResetVerification = true; // Address change -> needs re-verification
+            // --- B. CẬP NHẬT FIELD CƠ BẢN (Text) ---
+            // Danh sách các field ánh xạ trực tiếp
+            const directFields: (keyof UpdatePartnerDto & keyof Partner)[] = [
+                'legalName', 'brandName', 'phoneNumber', 'streetAddress', 'taxCode', 'businessType'
+            ];
+            // Danh sách field nhạy cảm (Sửa phát là mất APPROVED ngay)
+            const criticalFields = ['legalName', 'streetAddress', 'taxCode', 'businessType'];
+
+            directFields.forEach(key => {
+                const newValue = dto[key];
+                const oldValue = partner[key]; // Lưu ý: Cần ép kiểu nếu TS báo lỗi
+
+                if (newValue !== undefined && newValue !== oldValue) {
+                    (partner as any)[key] = newValue;
+                    isModified = true;
+
+                    if (criticalFields.includes(key)) hasCriticalChange = true;
+
+                    // [CLEANUP] Sửa rồi thì xóa lỗi cũ đi
+                    if (currentRejection[key]) delete currentRejection[key];
+                }
+            });
+
+            // --- C. CẬP NHẬT ĐỊA CHỈ (Address Logic) ---
+            if (dto.provinceId || dto.districtId || dto.wardId) {
+                const newProvince = dto.provinceId || partner.provinceId;
+                const newDistrict = dto.districtId || partner.districtId;
+                const newWard = dto.wardId || partner.wardId;
+
+                // Chỉ validate khi có đủ 3 cấp
+                if (newProvince && newDistrict && newWard) {
+                    const isAddressChanged =
+                        newProvince !== partner.provinceId ||
+                        newDistrict !== partner.districtId ||
+                        newWard !== partner.wardId;
+
+                    if (isAddressChanged) {
+                        // Gọi service validate địa chỉ có tồn tại không
+                        await this.locationsService.validateAddress(newProvince, newDistrict, newWard);
+
+                        partner.provinceId = newProvince;
+                        partner.districtId = newDistrict;
+                        partner.wardId = newWard;
+
+                        isModified = true;
+                        hasCriticalChange = true; // Đổi địa chỉ luôn là critical
+
+                        // [CLEANUP] Xóa lỗi liên quan đến địa chỉ
+                        ['provinceId', 'districtId', 'wardId', 'address'].forEach(k => {
+                            if (currentRejection[k]) delete currentRejection[k];
+                        });
                     }
                 }
             }
 
-            // 2. Update partner fields with change detection for important fields
-            if (dto.legalName && dto.legalName !== partner.legalName) {
-                partner.legalName = dto.legalName;
-                shouldResetVerification = true; // Legal name change -> needs re-verification
-            }
-            if (dto.brandName) partner.brandName = dto.brandName;
-            if (dto.phoneNumber) partner.phoneNumber = dto.phoneNumber;
-            if (dto.streetAddress && dto.streetAddress !== partner.streetAddress) {
-                partner.streetAddress = dto.streetAddress;
-                shouldResetVerification = true; // Address change -> needs re-verification
-            }
-
-            // Auto-clear rejection details when partner updates a rejected field
-            if (partner.rejectionDetails) {
-                const fieldsToCheck = ['legalName', 'brandName', 'phoneNumber', 'streetAddress', 'provinceId', 'districtId', 'wardId'];
-                for (const field of fieldsToCheck) {
-                    if (dto[field as keyof UpdatePartnerDto] !== undefined && partner.rejectionDetails[field]) {
-                        delete partner.rejectionDetails[field];
-                    }
-                }
-                if (Object.keys(partner.rejectionDetails).length === 0) {
-                    partner.rejectionDetails = null;
-                }
-            }
-
-            // 3. Reset verification status if important fields changed
-            if (shouldResetVerification && partner.verificationStatus !== PartnerVerificationStatus.PENDING) {
-                partner.verificationStatus = PartnerVerificationStatus.PENDING;
-                partner.verificationCompletedAt = null;
-            }
-
-            await queryRunner.manager.save(partner);
-
-            // 4. Update legal representative and SYNC to PartnerDocument
+            // --- D. CẬP NHẬT NGƯỜI ĐẠI DIỆN (Legal Rep) ---
             if (dto.legalRepresentative) {
                 const legalRep = await queryRunner.manager.findOne(LegalRepresentative, {
                     where: { partnerId: partner.id },
                 });
-
                 if (legalRep) {
-                    // Update basic fields
-                    if (dto.legalRepresentative.fullName && dto.legalRepresentative.fullName !== legalRep.fullName) {
-                        legalRep.fullName = dto.legalRepresentative.fullName;
-                        shouldResetVerification = true;
-                    }
-                    if (dto.legalRepresentative.position) {
-                        legalRep.position = dto.legalRepresentative.position;
-                    }
-                    if (dto.legalRepresentative.phoneNumber) {
-                        legalRep.phoneNumber = dto.legalRepresentative.phoneNumber;
-                    }
-                    if (dto.legalRepresentative.idType) {
-                        legalRep.idType = dto.legalRepresentative.idType;
-                    }
-                    if (dto.legalRepresentative.idNumber && dto.legalRepresentative.idNumber !== legalRep.idNumber) {
-                        legalRep.idNumber = dto.legalRepresentative.idNumber;
-                        shouldResetVerification = true; // ID number change -> needs re-verification
-                    }
-                    if (dto.legalRepresentative.idIssueDate) {
-                        legalRep.idIssueDate = new Date(dto.legalRepresentative.idIssueDate);
-                    }
+                    let repModified = false;
+                    const repDto = dto.legalRepresentative;
 
-                    // [CRITICAL FIX] Handle images and SYNC to PartnerDocument
-                    if (dto.legalRepresentative.images) {
-                        // A. ID Front Image
-                        if (dto.legalRepresentative.images.frontImgUrl &&
-                            dto.legalRepresentative.images.frontImgUrl !== legalRep.idFrontImgUrl) {
-                            legalRep.idFrontImgUrl = dto.legalRepresentative.images.frontImgUrl;
-
-                            // Sync to PartnerDocument
-                            const frontDoc = await queryRunner.manager.findOne(PartnerDocument, {
-                                where: { partnerId: partner.id, documentType: DocumentType.IDENTITY_FRONT }
-                            });
-                            if (frontDoc) {
-                                frontDoc.documentUrl = dto.legalRepresentative.images.frontImgUrl;
-                                frontDoc.isReviewed = false; // Reset review status
-                                frontDoc.isValid = true;     // Reset to optimistic
-                                frontDoc.adminFeedback = null;
-                                await queryRunner.manager.save(frontDoc);
-                            }
-                            shouldResetVerification = true;
+                    // Hàm helper update field con
+                    const updateRep = (field: keyof LegalRepresentative, val: any, rejKey: string, isCritical: boolean) => {
+                        if (val !== undefined && val !== legalRep[field]) {
+                            (legalRep as any)[field] = val;
+                            repModified = true;
+                            if (isCritical) hasCriticalChange = true;
+                            if (currentRejection[rejKey]) delete currentRejection[rejKey];
                         }
+                    };
 
-                        // B. ID Back Image
-                        if (dto.legalRepresentative.images.backImgUrl &&
-                            dto.legalRepresentative.images.backImgUrl !== legalRep.idBackImgUrl) {
-                            legalRep.idBackImgUrl = dto.legalRepresentative.images.backImgUrl;
+                    updateRep('fullName', repDto.fullName, 'legalRep.fullName', true);
+                    updateRep('idNumber', repDto.idNumber, 'legalRep.idNumber', true);
+                    updateRep('idType', repDto.idType, 'legalRep.idType', true);
+                    updateRep('phoneNumber', repDto.phoneNumber, 'legalRep.phoneNumber', false);
+                    updateRep('position', repDto.position, 'legalRep.position', false);
 
-                            // Sync to PartnerDocument
-                            const backDoc = await queryRunner.manager.findOne(PartnerDocument, {
-                                where: { partnerId: partner.id, documentType: DocumentType.IDENTITY_BACK }
-                            });
-                            if (backDoc) {
-                                backDoc.documentUrl = dto.legalRepresentative.images.backImgUrl;
-                                backDoc.isReviewed = false;
-                                backDoc.isValid = true;
-                                backDoc.adminFeedback = null;
-                                await queryRunner.manager.save(backDoc);
-                            }
-                            shouldResetVerification = true;
+                    if (repDto.idIssueDate) {
+                        const newDate = new Date(repDto.idIssueDate);
+                        const currentIssueDate = new Date(legalRep.idIssueDate);
+                        if (newDate.getTime() !== currentIssueDate.getTime()) {
+                            legalRep.idIssueDate = newDate;
+                            repModified = true;
+                            hasCriticalChange = true;
+                            if (currentRejection['legalRep.idIssueDate']) delete currentRejection['legalRep.idIssueDate'];
                         }
                     }
 
-                    // Handle authorization
-                    if (dto.legalRepresentative.authorization) {
-                        if (dto.legalRepresentative.authorization.isAuthorizedUser !== undefined) {
-                            legalRep.isAuthorizedUser = dto.legalRepresentative.authorization.isAuthorizedUser;
-                        }
-                        if (dto.legalRepresentative.authorization.authLetterDocUrl &&
-                            dto.legalRepresentative.authorization.authLetterDocUrl !== legalRep.authLetterDocUrl) {
-                            legalRep.authLetterDocUrl = dto.legalRepresentative.authorization.authLetterDocUrl;
-
-                            // Sync to PartnerDocument
-                            const authDoc = await queryRunner.manager.findOne(PartnerDocument, {
-                                where: { partnerId: partner.id, documentType: DocumentType.AUTHORIZATION_LETTER }
-                            });
-                            if (authDoc) {
-                                authDoc.documentUrl = dto.legalRepresentative.authorization.authLetterDocUrl;
-                                authDoc.isReviewed = false;
-                                authDoc.isValid = true;
-                                authDoc.adminFeedback = null;
-                                await queryRunner.manager.save(authDoc);
-                            }
-                            shouldResetVerification = true;
-                        }
+                    if (repDto.images) {
+                        updateRep('idFrontImgUrl', repDto.images.frontImgUrl, 'legalRep.idFrontImgUrl', true);
+                        updateRep('idBackImgUrl', repDto.images.backImgUrl, 'legalRep.idBackImgUrl', true);
+                    }
+                    if (repDto.authorization) {
+                        updateRep('isAuthorizedUser', repDto.authorization.isAuthorizedUser, 'legalRep.isAuthorizedUser', true);
+                        updateRep('authLetterDocUrl', repDto.authorization.authLetterDocUrl, 'legalRep.authLetterDocUrl', true);
                     }
 
-                    await queryRunner.manager.save(legalRep);
+                    if (repModified) {
+                        await queryRunner.manager.save(legalRep);
+                        isModified = true;
+                    }
                 }
             }
 
-            // 5. Final check: Reset verification if any important change occurred in step 4
-            if (shouldResetVerification && partner.verificationStatus !== PartnerVerificationStatus.PENDING) {
-                partner.verificationStatus = PartnerVerificationStatus.PENDING;
-                partner.verificationCompletedAt = null;
-                await queryRunner.manager.save(partner);
+            // --- E. CẬP NHẬT DOCUMENT (File) ---
+            if (dto.documents && dto.documents.length > 0) {
+                for (const docDto of dto.documents) {
+                    let existingDoc = await queryRunner.manager.findOne(PartnerDocument, {
+                        where: { partnerId: partner.id, documentType: docDto.documentType },
+                    });
+
+                    // Luôn coi là mới nếu chưa có hoặc URL khác
+                    const isNewUpload = !existingDoc || existingDoc.documentUrl !== docDto.documentUrl;
+
+                    if (isNewUpload) {
+                        if (existingDoc) {
+                            // Update cái cũ
+                            existingDoc.documentUrl = docDto.documentUrl;
+                            existingDoc.isReviewed = false; // [QUAN TRỌNG] Reset flag để Admin biết đường check
+                            existingDoc.isValid = true;     // Tạm coi là Valid cho đến khi Admin soi
+                            existingDoc.adminFeedback = null;
+                            existingDoc.uploadedAt = new Date();
+                        } else {
+                            // Tạo cái mới
+                            existingDoc = queryRunner.manager.create(PartnerDocument, {
+                                partnerId: partner.id,
+                                documentType: docDto.documentType,
+                                documentUrl: docDto.documentUrl,
+                                isReviewed: false,
+                                isValid: true,
+                                uploadedAt: new Date(),
+                            });
+                        }
+                        await queryRunner.manager.save(existingDoc);
+                        isModified = true;
+                        hasCriticalChange = true; // Upload lại giấy tờ là việc lớn
+
+                        // [CLEANUP] Xóa lỗi cũ của loại document này
+                        const docKey = `document_${docDto.documentType}`;
+                        if (currentRejection[docKey]) delete currentRejection[docKey];
+                    }
+                }
             }
 
+            // --- F. TÍNH TOÁN TRẠNG THÁI (Recalculate Status) ---
+            if (isModified) {
+                // 1. Cập nhật map lỗi vào DB
+                const hasFieldErrors = Object.keys(currentRejection).length > 0;
+                partner.rejectionDetails = hasFieldErrors ? currentRejection : null;
+
+                // 2. Check lại toàn bộ Document (để xem có cái nào đang INVALID ko)
+                const allDocs = await queryRunner.manager.find(PartnerDocument, { where: { partnerId: partner.id } });
+
+                const hasRejectedDocs = allDocs.some(d => d.isReviewed && !d.isValid);
+
+                const requirements = await this.docRequirementRepository.find({
+                    where: { businessType: partner.businessType, isRequired: true },
+                });
+                const docMap = new Map(allDocs.map(d => [d.documentType, d]));
+                const isMissingDocs = requirements.some(req => {
+                    const doc = docMap.get(req.documentType);
+                    return !doc || !doc.documentUrl;
+                });
+
+                // 3. Logic chuyển đổi trạng thái
+                const isClean = !hasFieldErrors && !hasRejectedDocs;
+                const isComplete = !isMissingDocs;
+
+                if (isClean && isComplete) {
+                    partner.verificationStatus = PartnerVerificationStatus.PENDING;
+                    partner.verificationCompletedAt = null;
+                } else {
+                    if (partner.verificationStatus === PartnerVerificationStatus.APPROVED && hasCriticalChange) {
+                        partner.verificationStatus = PartnerVerificationStatus.REQUIRED_RESUBMIT;
+                    }
+                }
+
+                // [FIX] Clean up relations to avoid cascade save issues
+                if ((partner as any).documents) delete (partner as any).documents;
+                if (partner.legalRepresentative) delete partner.legalRepresentative;
+
+                await queryRunner.manager.save(partner);
+            }
             await queryRunner.commitTransaction();
-            return this.getMyProfile(accountId);
+            return this.getMyProfile(accountId); // Trả về data mới nhất
+
         } catch (error) {
             await queryRunner.rollbackTransaction();
             throw error;
@@ -558,8 +641,11 @@ export class PartnersService {
             brandName: partner.brandName,
             businessType: partner.businessType,
             address: {
+                provinceId: partner.provinceId,
                 province: partner.province?.name ?? '',
+                districtId: partner.districtId,
                 district: partner.district?.name ?? '',
+                wardId: partner.wardId,
                 ward: partner.ward?.name ?? '',
                 streetAddress: partner.streetAddress,
             },
@@ -569,8 +655,10 @@ export class PartnersService {
                 idType: partner.legalRepresentative.idType,
                 idNumber: partner.legalRepresentative.idNumber,
                 idIssueDate: partner.legalRepresentative.idIssueDate,
-                isAuthorizedUser:
-                    partner.legalRepresentative.isAuthorizedUser,
+                idFrontImgUrl: partner.legalRepresentative.idFrontImgUrl,
+                idBackImgUrl: partner.legalRepresentative.idBackImgUrl,
+                isAuthorizedUser: partner.legalRepresentative.isAuthorizedUser,
+                authLetterDocUrl: partner.legalRepresentative.authLetterDocUrl,
             },
             verificationStatus: partner.verificationStatus,
             verificationCompletedAt: partner.verificationCompletedAt,

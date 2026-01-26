@@ -162,39 +162,7 @@ export class AuthController {
     return this.authService.loginAdmin(req.user);
   }
 
-  // ============================================================================
-  // Legacy Endpoints (for backward compatibility)
-  // ============================================================================
 
-  /**
-   * @deprecated Use /auth/user/register instead
-   */
-  @Public()
-  @ApiBody({ type: RegisterDto })
-  @ApiCreatedResponse({
-    description: 'Registration returns access and refresh tokens',
-    type: AuthTokensDto,
-  })
-  @Post('register')
-  async register(@Body() dto: RegisterDto): Promise<AuthTokensDto> {
-    return this.authService.register(dto);
-  }
-
-  /**
-   * @deprecated Use /auth/user/login or /auth/admin/login instead
-   */
-  @Public()
-  @UseGuards(LocalAuthGuard)
-  @ApiBody({ type: LoginDto })
-  @ApiOkResponse({
-    description: 'Login returns access and refresh tokens',
-    type: AuthTokensDto,
-  })
-  @HttpCode(200)
-  @Post('login')
-  async login(@Req() req): Promise<AuthTokensDto> {
-    return this.authService.login(req.user);
-  }
 
   // ============================================================================
   // Common Authentication Endpoints

@@ -10,13 +10,47 @@ import {
 import { Type } from 'class-transformer';
 import { LegalRepresentativeRequestDto } from './legal-representative-request.dto';
 
+import { DocumentType } from '@/partners/enum/document-type.enum';
+import { BusinessType } from '@/partners/enum/business-type.enum';
+import { IsEnum } from 'class-validator';
+
 /**
  * Update DTO for legal representative - all fields optional
  * Derived from LegalRepresentativeRequestDto using PartialType
  */
 export class UpdateLegalRepresentativeDto extends PartialType(LegalRepresentativeRequestDto) { }
 
+export class DocumentUpdateDto {
+    @ApiPropertyOptional({ enum: DocumentType })
+    @IsOptional()
+    @IsString()
+    documentType: DocumentType;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsString()
+    documentUrl: string;
+}
+
 export class UpdatePartnerDto {
+    @ApiPropertyOptional({
+        example: '0123456789',
+        description: 'Tax code (updatable if rejected)',
+    })
+    @IsOptional()
+    @IsString()
+    @MaxLength(20)
+    taxCode?: string;
+
+    @ApiPropertyOptional({
+        example: 'Abc Industry',
+        description: 'Business Type',
+        enum: BusinessType,
+    })
+    @IsOptional()
+    @IsEnum(BusinessType)
+    businessType?: BusinessType;
+
     @ApiPropertyOptional({
         example: 'ABC Health Services Ltd.',
         description: 'Legal name of the business',
@@ -84,4 +118,13 @@ export class UpdatePartnerDto {
     @ValidateNested()
     @Type(() => UpdateLegalRepresentativeDto)
     legalRepresentative?: UpdateLegalRepresentativeDto;
+
+    @ApiPropertyOptional({
+        type: [DocumentUpdateDto],
+        description: 'List of documents to update or upload',
+    })
+    @IsOptional()
+    @ValidateNested({ each: true })
+    @Type(() => DocumentUpdateDto)
+    documents?: DocumentUpdateDto[];
 }

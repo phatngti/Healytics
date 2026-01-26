@@ -34,27 +34,6 @@ export async function seedDocumentRequirements(dataSource: DataSource) {
                 description: 'Giấy ĐKKD (ERC) và Mã số thuế',
                 displayOrder: 1,
             },
-            {
-                businessType,
-                documentType: DocumentType.IDENTITY_FRONT,
-                isRequired: true,
-                description: 'CCCD/Hộ chiếu người Đại diện pháp luật (Mặt trước)',
-                displayOrder: 2,
-            },
-            {
-                businessType,
-                documentType: DocumentType.IDENTITY_BACK,
-                isRequired: true,
-                description: 'CCCD/Hộ chiếu người Đại diện pháp luật (Mặt sau)',
-                displayOrder: 3,
-            },
-            {
-                businessType,
-                documentType: DocumentType.AUTHORIZATION_LETTER,
-                isRequired: false, // Only required if admin ≠ legal representative
-                description: 'Giấy ủy quyền (Bắt buộc nếu Admin không phải người Đại diện pháp luật)',
-                displayOrder: 100,
-            },
         ]),
 
         // ========================================

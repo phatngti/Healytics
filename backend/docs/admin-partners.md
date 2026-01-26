@@ -193,23 +193,27 @@ Authorization: Bearer <accessToken>
 **Request - Approve:**
 ```json
 {
-  "decision": "APPROVE"
+  "decision": "APPROVED",
+  "generalComment": "Looks good"
 }
 ```
 
-**Request - Reject with Details:**
+**Request - Changes Required / Reject:**
 ```json
 {
-  "decision": "REJECT",
-  "reviewItems": [
+  "decision": "CHANGES_REQUIRED",
+  "generalComment": "Please fix the brand name and re-upload the license.",
+  "items": [
     {
       "type": "FIELD",
       "fieldName": "brandName",
+      "isValid": false,
       "reason": "Brand name contains inappropriate content"
     },
     {
       "type": "DOCUMENT",
       "documentId": "uuid",
+      "isValid": false,
       "reason": "Image is blurry, please re-upload"
     }
   ]
@@ -225,6 +229,7 @@ Authorization: Bearer <accessToken>
 
 > [!NOTE]
 > This endpoint is automatically audited with action `PARTNER_REVIEW`.
+> If `items` contains invalid entries, the partner status will be set to `REQUIRED_RESUBMIT`.
 
 ---
 
