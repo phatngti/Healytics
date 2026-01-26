@@ -1,11 +1,12 @@
 import {
     IsEnum,
     IsNotEmpty,
+    IsOptional,
     IsString,
     IsUUID,
     MaxLength,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { BusinessType } from '../../enum/business-type.enum';
 
 /**
@@ -80,4 +81,14 @@ export class PartnerRequestDto {
     @IsNotEmpty()
     @MaxLength(300)
     streetAddress: string;
+
+    @ApiPropertyOptional({
+        description: 'Contact phone number for the business',
+        example: '0901234567',
+        maxLength: 20,
+    })
+    @IsOptional()
+    @IsString()
+    @MaxLength(20)
+    phoneNumber?: string;
 }
