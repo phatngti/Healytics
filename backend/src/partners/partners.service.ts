@@ -314,6 +314,12 @@ export class PartnersService {
                 position: partner.legalRepresentative.position,
                 idType: partner.legalRepresentative.idType,
                 idNumber: partner.legalRepresentative.idNumber,
+                idIssueDate: partner.legalRepresentative.idIssueDate,
+                idFrontImgUrl: partner.legalRepresentative.idFrontImgUrl,
+                idBackImgUrl: partner.legalRepresentative.idBackImgUrl,
+                isAuthorizedUser: partner.legalRepresentative.isAuthorizedUser,
+                authLetterDocUrl: partner.legalRepresentative.authLetterDocUrl,
+                phoneNumber: partner.legalRepresentative.phoneNumber,
             },
             verificationStatus: partner.verificationStatus,
             rejectionDetails: partner.rejectionDetails || null,
@@ -534,9 +540,7 @@ export class PartnersService {
                     }
                 }
 
-                // [FIX] Clean up relations to avoid cascade save issues
-                if ((partner as any).documents) delete (partner as any).documents;
-                if (partner.legalRepresentative) delete partner.legalRepresentative;
+
 
                 await queryRunner.manager.save(partner);
             }
@@ -659,6 +663,7 @@ export class PartnersService {
                 idBackImgUrl: partner.legalRepresentative.idBackImgUrl,
                 isAuthorizedUser: partner.legalRepresentative.isAuthorizedUser,
                 authLetterDocUrl: partner.legalRepresentative.authLetterDocUrl,
+                phoneNumber: partner.legalRepresentative.phoneNumber,
             },
             verificationStatus: partner.verificationStatus,
             verificationCompletedAt: partner.verificationCompletedAt,
