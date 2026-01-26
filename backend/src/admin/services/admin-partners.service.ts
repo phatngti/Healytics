@@ -247,8 +247,8 @@ export class AdminPartnersService {
                 partner.rejectionDetails = null;
             } else if (hasErrors) {
                 // If there are errors, we MUST Require Resubmit regardless of decision
-                verdict = PartnerVerificationStatus.REQUIRED_SUBMIT;
-                partner.verificationStatus = PartnerVerificationStatus.REQUIRED_SUBMIT;
+                verdict = PartnerVerificationStatus.REQUIRED_RESUBMIT;
+                partner.verificationStatus = PartnerVerificationStatus.REQUIRED_RESUBMIT;
                 partner.rejectionDetails = finalRejections;
             } else {
                 // Clean slate -> Check for APPROVED criteria
@@ -282,8 +282,8 @@ export class AdminPartnersService {
                     if (!dto.generalComment) {
                         throw new BadRequestException('Must specify rejection items or comment when requesting changes.');
                     }
-                    verdict = PartnerVerificationStatus.REQUIRED_SUBMIT;
-                    partner.verificationStatus = PartnerVerificationStatus.REQUIRED_SUBMIT;
+                    verdict = PartnerVerificationStatus.REQUIRED_RESUBMIT;
+                    partner.verificationStatus = PartnerVerificationStatus.REQUIRED_RESUBMIT;
                     partner.rejectionDetails = null;
                 }
             }

@@ -39,7 +39,29 @@ export class LegalRepresentativeDto {
     @ApiProperty({ example: '001234567890' })
     idNumber: string;
 
-
+    // Added to match Admin requirement if needed, or we will adhere strictly to MyProfile structure first.
+    // MyProfile's LegalRepDto only had these 4 fields in the previous view.
+    // Checking previous view: yes only 4 fields.
+    // Wait, Admin view had MORE fields (images, auth letter, etc).
+    // The user said "same format". If I reduce Admin information, is that okay?
+    // "result of get partner detail ... same to get profile"
+    // If Partner Profile hides images, Admin might still need them.
+    // But `MyProfileResponseDto` uses `Partner` entity relations.
+    // Let's check `PartnersService.getMyProfile` mapping for LegalRep.
+    // It maps: fullName, position, idType, idNumber.
+    // It DOES NOT map images or auth letter.
+    // If I make them the same, Admin loses access to ID images? That sounds bad for an Admin Detail view that is used for REVIEW.
+    // Maybe the user means the "structure" (address object vs string, doc status) rather than removing fields.
+    // I will export them but I might need to EXTEND them for Admin if fields are missing.
+    // Actually, looking at `PartnerDetailResponseDto` in `partners/dto/response/partner-detail-response.dto.ts` (Viewed in step 7, lines 607+), there is a `PartnerDetailResponseDto`.
+    // The user specifically said "get profile of partner service" which is `getMyProfile`.
+    // I should check if `getMyProfile` really excludes images.
+    // Step 7, line 297:
+    // legalRepresentative: { fullName, position, idType, idNumber } -> YES, excludes images.
+    // If I make Admin use this, Admin cannot review images.
+    // Use `PartnerDetailResponseDto` as reference? No, user said "get profile".
+    // I will assume user wants the *structure* (nested address, calculated doc status) but surely assumes Admin sees all info.
+    // I will export these DTOs. I will verify if I should add images to `LegalRepresentativeDto`.
 }
 
 import { PartnerDocumentStatus } from '@/partners/enum/partner-document-status.enum';
