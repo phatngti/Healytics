@@ -7,11 +7,11 @@ import sys
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
-CURRENT_DIR = os.path.dirname(__file__)
-PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, "../../../"))
-RECOMMENDER_SRC = os.path.join(PROJECT_ROOT, "recommender2", "src")
-sys.path.append(RECOMMENDER_SRC)
-from recommender.chatbot_recommender import Chatbot_Recommender
+# CURRENT_DIR = os.path.dirname(__file__)
+# PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, "../../../"))
+# RECOMMENDER_SRC = os.path.join(PROJECT_ROOT, "recommender2", "src")
+# sys.path.append(RECOMMENDER_SRC)
+# from recommender.chatbot_recommender import Chatbot_Recommender
 from langchain_core.runnables import RunnableLambda
 
 
