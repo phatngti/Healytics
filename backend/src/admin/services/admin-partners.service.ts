@@ -23,7 +23,7 @@ export class AdminPartnersService {
     async getPartnerDetail(id: string): Promise<AdminPartnerDetailResponseDto> {
         const partner = await this.partnerRepo.findOne({
             where: { id },
-            relations: ['account', 'province', 'district', 'ward'],
+            relations: ['account', 'province', 'district', 'ward', 'legalRepresentative'],
         });
 
         if (!partner) {
@@ -86,10 +86,22 @@ export class AdminPartnersService {
                                 }
                             );
                         }
-                        // Handle FIELDS
+                        // Handle Partner FIELDS
                         else if (item.type === ReviewItemType.FIELD && item.fieldName) {
                             if (!item.isValid && item.reason) {
                                 fieldRejections[item.fieldName] = item.reason;
+                            }
+                        }
+                        // Handle Legal Representative FIELDS
+                        else if (item.type === ReviewItemType.LEGAL_REP_FIELD && item.fieldName) {
+                            if (!item.isValid && item.reason) {
+                                fieldRejections[`legalRep.${item.fieldName}`] = item.reason;
+                            }
+                        }
+                        // Handle Account FIELDS
+                        else if (item.type === ReviewItemType.ACCOUNT_FIELD && item.fieldName) {
+                            if (!item.isValid && item.reason) {
+                                fieldRejections[`account.${item.fieldName}`] = item.reason;
                             }
                         }
                     }

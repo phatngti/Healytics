@@ -128,6 +128,7 @@ export class PartnersService {
                 districtId: dto.partner.districtId,
                 wardId: dto.partner.wardId,
                 streetAddress: dto.partner.streetAddress,
+                phoneNumber: dto.partner.phoneNumber || null,
                 accountId: savedAccount.id,
             });
             const savedPartner =
@@ -239,6 +240,7 @@ export class PartnersService {
             legalName: partner.legalName,
             brandName: partner.brandName,
             businessType: partner.businessType,
+            phoneNumber: partner.phoneNumber || null,
             address: {
                 province: partner.province?.name ?? '',
                 district: partner.district?.name ?? '',

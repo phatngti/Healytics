@@ -67,6 +67,9 @@ export class MyProfileResponseDto {
     @ApiProperty({ enum: BusinessType, example: BusinessType.SPA_BEAUTY })
     businessType: BusinessType;
 
+    @ApiProperty({ example: '0901234567', nullable: true })
+    phoneNumber: string | null;
+
     @ApiProperty({ type: AddressDto })
     address: AddressDto;
 
