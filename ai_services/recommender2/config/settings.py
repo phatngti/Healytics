@@ -12,7 +12,10 @@ SERVICE_JSON_PATH = os.path.join(RAW_DATA_DIR, "services.json")
 EMBEDDING_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2" # 768 dimensions
 
 # Cấu hình recommender
-TOP_K_CHATBOT_RESULTS = 1
+TOP_K_CHATBOT_RESULTS = 3
 TOP_K_HOME_RESULTS = 2
 SIMILARITY_THRESHOLD = 0.2 
+
+# Cấu hình database
+DATABASE_NAME = "healytics_collection"
 
