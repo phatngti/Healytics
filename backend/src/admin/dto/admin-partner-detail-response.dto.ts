@@ -1,56 +1,53 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Partner } from '@/partners/entities/partner.entity';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
-import { PartnerDocument } from '@/partners/entities/partner-document.entity';
+import { PartnerDocument, PartnerDocument as PDocument } from '@/partners/entities/partner-document.entity';
 import { LegalRepresentative } from '@/partners/entities/legal-representative.entity';
 import { IdType } from '@/partners/enum/id-type.enum';
-import { Account } from '@/account/entities/account.entity';
-import { Role } from '@/account/enum/role.enum';
+import {
+    AddressDto,
+    LegalRepresentativeDto as BaseLegalRepresentativeDto,
+    PartnerDocumentDto
+} from '@/partners/dto/response/my-profile-response.dto';
+import { PartnerDocumentStatus } from '@/partners/enum/partner-document-status.enum';
 
-export class AdminPartnerDocumentDto {
-    @ApiProperty()
+export class AdminLegalRepresentativeDto extends BaseLegalRepresentativeDto {
+    @ApiProperty({ example: 'uuid-123' })
     id: string;
 
-    @ApiProperty()
-    documentType: string;
+    @ApiProperty({ example: '2020-01-15' })
+    idIssueDate: Date;
 
-    @ApiProperty({ nullable: true })
-    documentUrl: string | null;
+    @ApiProperty({ example: 'https://example.com/front.jpg', nullable: true })
+    idFrontImgUrl: string | null;
 
-    @ApiProperty({ nullable: true })
-    documentKey: string | null;
+    @ApiProperty({ example: 'https://example.com/back.jpg', nullable: true })
+    idBackImgUrl: string | null;
 
-    @ApiProperty({ description: 'Whether the document has been reviewed by admin' })
-    isReviewed: boolean;
+    @ApiProperty({ example: false })
+    isAuthorizedUser: boolean;
 
-    @ApiProperty({ description: 'Whether the document is valid' })
-    isValid: boolean;
+    @ApiProperty({ example: null, nullable: true })
+    authLetterDocUrl: string | null;
 
-    @ApiProperty({ nullable: true })
-    verificationNotes: string | null;
+    @ApiProperty({ example: '0901234567', nullable: true })
+    phoneNumber: string | null;
 
-    @ApiProperty({ nullable: true })
-    adminFeedback: string | null;
-
-    @ApiProperty()
-    uploadedAt: Date;
-}
-
-export class AdminAccountDto {
-    @ApiProperty()
-    id: string;
-
-    @ApiProperty()
-    email: string;
-
-    @ApiProperty({ enum: Role })
-    role: Role;
-
-    @ApiProperty()
-    isActive: boolean;
-
-    @ApiProperty()
-    createdAt: Date;
+    static fromEntity(rep: LegalRepresentative): AdminLegalRepresentativeDto {
+        const dto = new AdminLegalRepresentativeDto();
+        dto.id = rep.id;
+        dto.fullName = rep.fullName;
+        dto.position = rep.position;
+        dto.idType = rep.idType as unknown as string; // Casting if enum mismatch in DTO
+        dto.idNumber = rep.idNumber;
+        dto.idIssueDate = rep.idIssueDate;
+        dto.idFrontImgUrl = rep.idFrontImgUrl;
+        dto.idBackImgUrl = rep.idBackImgUrl;
+        dto.isAuthorizedUser = rep.isAuthorizedUser;
+        dto.authLetterDocUrl = rep.authLetterDocUrl;
+        dto.phoneNumber = rep.phoneNumber;
+        return dto;
+    }
 }
 
 export class AdminPartnerDetailResponseDto {
@@ -73,10 +70,10 @@ export class AdminPartnerDetailResponseDto {
     businessType: string;
 
     @ApiProperty({ nullable: true })
-    phone: string | null;
+    phoneNumber: string | null;
 
-    @ApiProperty()
-    address: string;
+    @ApiProperty({ type: AddressDto })
+    address: AddressDto;
 
     @ApiProperty({ enum: PartnerVerificationStatus })
     verificationStatus: PartnerVerificationStatus;
@@ -87,83 +84,47 @@ export class AdminPartnerDetailResponseDto {
     @ApiProperty()
     createdAt: Date;
 
-    @ApiProperty({ type: AdminAccountDto, nullable: true })
-    account: AdminAccountDto | null;
+    @ApiProperty({ type: AdminLegalRepresentativeDto, nullable: true })
+    legalRepresentative: AdminLegalRepresentativeDto | null;
 
-    @ApiProperty({ nullable: true })
-    legalRepresentative: any;
+    @ApiProperty({ type: [PartnerDocumentDto] })
+    documents: PartnerDocumentDto[];
 
-    @ApiProperty({ type: [AdminPartnerDocumentDto] })
-    documents: AdminPartnerDocumentDto[];
-    @ApiProperty({ type: Object, nullable: true, description: 'Field-level rejection details (includes partner, legalRep.*, account.* prefixed keys)' })
+    @ApiProperty({ type: Object, nullable: true, description: 'Field-level rejection details' })
     rejectionDetails: Record<string, string> | null;
 
-    constructor(partner: Partner, documents: PartnerDocument[]) {
-        this.id = partner.id;
-        this.email = partner.account?.email;
-        this.taxCode = partner.taxCode;
-        this.legalName = partner.legalName;
-        this.brandName = partner.brandName;
-        this.businessType = partner.businessType;
-        this.phone = partner.phoneNumber;
-        // Construct address string if location relations exist
-        const parts = [partner.streetAddress];
-        if (partner.ward) parts.push(partner.ward.name);
-        if (partner.district) parts.push(partner.district.name);
-        if (partner.province) parts.push(partner.province.name);
-        this.address = parts.filter(Boolean).join(', ');
+    static fromEntity(partner: Partner, documents: PartnerDocumentDto[]): AdminPartnerDetailResponseDto {
+        const dto = new AdminPartnerDetailResponseDto();
+        dto.id = partner.id;
+        dto.email = partner.account?.email;
+        dto.taxCode = partner.taxCode;
+        dto.legalName = partner.legalName;
+        dto.brandName = partner.brandName;
+        dto.businessType = partner.businessType;
+        dto.phoneNumber = partner.phoneNumber;
 
-        this.verificationStatus = partner.verificationStatus;
-        this.verificationCompletedAt = partner.verificationCompletedAt;
-        this.createdAt = partner.createdAt;
+        dto.address = {
+            provinceId: partner.provinceId,
+            province: partner.province?.name ?? '',
+            districtId: partner.districtId,
+            district: partner.district?.name ?? '',
+            wardId: partner.wardId,
+            ward: partner.ward?.name ?? '',
+            streetAddress: partner.streetAddress,
+        };
 
+        dto.verificationStatus = partner.verificationStatus;
+        dto.verificationCompletedAt = partner.verificationCompletedAt;
+        dto.createdAt = partner.createdAt;
 
-        // Map account if exists
-        if (partner.account) {
-            const acc = partner.account as Account;
-            this.account = {
-                id: acc.id,
-                email: acc.email,
-                role: acc.role,
-                isActive: acc.isActive,
-                createdAt: acc.createdAt,
-            };
-        } else {
-            this.account = null;
-        }
+        dto.legalRepresentative = partner.legalRepresentative
+            ? AdminLegalRepresentativeDto.fromEntity(partner.legalRepresentative)
+            : null;
 
-        // Map legal representative if exists
-        if (partner.legalRepresentative) {
-            const rep = partner.legalRepresentative as LegalRepresentative;
-            this.legalRepresentative = {
-                id: rep.id,
-                fullName: rep.fullName,
-                position: rep.position,
-                idType: rep.idType,
-                idNumber: rep.idNumber,
-                idIssueDate: rep.idIssueDate,
-                idFrontImgUrl: rep.idFrontImgUrl,
-                idBackImgUrl: rep.idBackImgUrl,
-                isAuthorizedUser: rep.isAuthorizedUser,
-                authLetterDocUrl: rep.authLetterDocUrl,
-                phoneNumber: rep.phoneNumber,
-            };
-        } else {
-            this.legalRepresentative = null;
-        }
+        dto.documents = documents;
+        dto.rejectionDetails = partner.rejectionDetails;
 
-        this.documents = documents.map(doc => ({
-            id: doc.id,
-            documentType: doc.documentType,
-            documentUrl: doc.documentUrl,
-            documentKey: doc.documentKey,
-            isReviewed: doc.isReviewed,
-            isValid: doc.isValid,
-            verificationNotes: doc.verificationNotes,
-            adminFeedback: doc.adminFeedback,
-            uploadedAt: doc.uploadedAt,
-        }));
-        this.rejectionDetails = partner.rejectionDetails;
+        return dto;
     }
 }
 

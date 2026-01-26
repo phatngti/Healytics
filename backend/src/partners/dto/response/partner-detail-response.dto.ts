@@ -14,11 +14,20 @@ class AccountInfoDto {
 }
 
 class AddressDetailDto {
+    @ApiProperty({ example: 'uuid', nullable: true })
+    provinceId: string | null;
+
     @ApiProperty({ example: 'Hà Nội' })
     province: string;
 
+    @ApiProperty({ example: 'uuid', nullable: true })
+    districtId: string | null;
+
     @ApiProperty({ example: 'Hoàn Kiếm' })
     district: string;
+
+    @ApiProperty({ example: 'uuid', nullable: true })
+    wardId: string | null;
 
     @ApiProperty({ example: 'Hàng Bạc' })
     ward: string;
@@ -43,8 +52,17 @@ class LegalRepDetailDto {
     @ApiProperty({ example: '2020-01-01' })
     idIssueDate: Date;
 
+    @ApiProperty({ example: 'https://example.com/front.jpg', nullable: true })
+    idFrontImgUrl: string | null;
+
+    @ApiProperty({ example: 'https://example.com/back.jpg', nullable: true })
+    idBackImgUrl: string | null;
+
     @ApiProperty({ example: true })
     isAuthorizedUser: boolean;
+
+    @ApiProperty({ example: 'https://example.com/auth-letter.pdf', nullable: true })
+    authLetterDocUrl: string | null;
 }
 
 export class PartnerDetailResponseDto {

@@ -11,6 +11,7 @@ import { S3Module } from './s3/s3.module';
 import { LocationsModule } from './locations/locations.module';
 import { PartnersModule } from './partners/partners.module';
 import { AdminModule } from './admin/admin.module';
+import { SeedModule } from './common/seed/seed.module';
 import databaseConfig from './config/database.config';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
@@ -49,6 +50,7 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
     LocationsModule,
     PartnersModule,
     AdminModule,
+    SeedModule,
   ],
   providers: [
     {
