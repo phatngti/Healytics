@@ -47,6 +47,14 @@ def get_hf_llm(model_name = "meta-llama/Llama-3.2-3B-Instruct", max_new_token = 
         pipeline=model_pipeline,
         model_kwargs=kwargs
     )
+    print("CUDA available:", torch.cuda.is_available())
+    
+    if torch.cuda.is_available():
+        print("GPU name:", torch.cuda.get_device_name(0))
+    else:
+        print("GPU name: None")
+
+    print("Model is on device:", model.device)
 
     return llm
 
