@@ -15,24 +15,6 @@ export class AdminLegalRepresentativeDto extends BaseLegalRepresentativeDto {
     @ApiProperty({ example: 'uuid-123' })
     id: string;
 
-    @ApiProperty({ example: '2020-01-15' })
-    idIssueDate: Date;
-
-    @ApiProperty({ example: 'https://example.com/front.jpg', nullable: true })
-    idFrontImgUrl: string | null;
-
-    @ApiProperty({ example: 'https://example.com/back.jpg', nullable: true })
-    idBackImgUrl: string | null;
-
-    @ApiProperty({ example: false })
-    isAuthorizedUser: boolean;
-
-    @ApiProperty({ example: null, nullable: true })
-    authLetterDocUrl: string | null;
-
-    @ApiProperty({ example: '0901234567', nullable: true })
-    phoneNumber: string | null;
-
     static fromEntity(rep: LegalRepresentative): AdminLegalRepresentativeDto {
         const dto = new AdminLegalRepresentativeDto();
         dto.id = rep.id;
