@@ -5,5 +5,6 @@
 export enum PartnerVerificationStatus {
     PENDING = 'PENDING',    // Awaiting admin decision
     APPROVED = 'APPROVED',  // Partner approved to operate
-    REJECTED = 'REJECTED',  // Partner rejected
+    REJECTED = 'REJECTED',  // Partner rejected (Terminal)
+    REQUIRED_RESUBMIT = 'REQUIRED_RESUBMIT', // Admin requested changes (Soft Reject)
 }

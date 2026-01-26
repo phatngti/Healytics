@@ -8,9 +8,12 @@ import { Account } from '@/account/entities/account.entity';
 import { AuditModule } from '@/audit/audit.module';
 import { PartnersModule } from '@/partners/partners.module';
 
+import { DocumentRequirement } from '@/partners/entities/document-requirement.entity';
+import { PartnerReviewLog } from '@/partners/entities/partner-review-log.entity';
+
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Partner, PartnerDocument, Account]),
+        TypeOrmModule.forFeature([Partner, PartnerDocument, Account, PartnerReviewLog, DocumentRequirement]),
         AuditModule,
         PartnersModule,
     ],

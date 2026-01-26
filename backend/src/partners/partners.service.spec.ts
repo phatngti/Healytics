@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { BusinessType } from './enum/business-type.enum';
 import { DocumentType } from './enum/document-type.enum';
+import { DocumentRequirement } from './entities/document-requirement.entity';
 import { PartnerDocument } from './entities/partner-document.entity';
 import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
 import { Role } from '@/account/enum/role.enum';
@@ -23,6 +24,7 @@ describe('PartnersService', () => {
     let accountRepository: Record<string, jest.Mock>;
     let partnerRepository: Record<string, jest.Mock>;
     let legalRepRepository: Record<string, jest.Mock>;
+    let docRequirementRepository: Record<string, jest.Mock>;
     let locationsService: Record<string, jest.Mock>;
     let authService: Record<string, jest.Mock>;
     let dataSource: Record<string, jest.Mock>;
@@ -47,6 +49,10 @@ describe('PartnersService', () => {
         save: jest.fn(),
     };
 
+    const mockDocRequirementRepository = {
+        find: jest.fn(),
+    };
+
     const mockLocationsService = {
         validateAddress: jest.fn(),
     };
@@ -66,6 +72,7 @@ describe('PartnersService', () => {
             create: jest.fn(),
             save: jest.fn(),
             findOne: jest.fn(),
+            find: jest.fn(),
         },
     };
 
@@ -160,6 +167,10 @@ describe('PartnersService', () => {
                     useValue: mockLegalRepRepository,
                 },
                 {
+                    provide: getRepositoryToken(DocumentRequirement),
+                    useValue: mockDocRequirementRepository,
+                },
+                {
                     provide: DataSource,
                     useValue: mockDataSource,
                 },
@@ -178,6 +189,7 @@ describe('PartnersService', () => {
         accountRepository = module.get(getRepositoryToken(Account));
         partnerRepository = module.get(getRepositoryToken(Partner));
         legalRepRepository = module.get(getRepositoryToken(LegalRepresentative));
+        docRequirementRepository = module.get(getRepositoryToken(DocumentRequirement));
         locationsService = module.get(LocationsService);
         authService = module.get(AuthService);
         dataSource = module.get(DataSource);
@@ -223,13 +235,9 @@ describe('PartnersService', () => {
 
         it('should successfully register a new partner', async () => {
             // Arrange
-            const createCalls: any[] = [];
-            mockQueryRunner.manager.create.mockImplementation((entity, data) => {
-                createCalls.push({ entity, data });
-                return data;
-            });
+            mockQueryRunner.manager.create.mockImplementation((entity, data) => data);
             mockQueryRunner.manager.save.mockImplementation((entity, data) => {
-                if (Array.isArray(data)) return data; // For PartnerDocument array
+                if (Array.isArray(data)) return data;
                 if (data) return { id: 'new-uuid', ...data };
                 return { id: 'new-uuid', ...entity };
             });
@@ -244,41 +252,11 @@ describe('PartnersService', () => {
             expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
             expect(mockQueryRunner.release).toHaveBeenCalled();
 
-            // Assert - Verify PartnerDocument records were created (without TAX_CODE)
-            // The service creates documents for IDENTITY_FRONT, IDENTITY_BACK only
-            const documentCreates = createCalls.filter(
-                (call) => call.entity === PartnerDocument,
-            );
-            expect(documentCreates.length).toBeGreaterThanOrEqual(2);
-
-            // Verify IDENTITY_FRONT document with new isReviewed/isValid flags
-            expect(
-                documentCreates.some(
-                    (call) =>
-                        call.data.documentType === DocumentType.IDENTITY_FRONT &&
-                        call.data.documentUrl ===
-                        mockRegisterDto.legalRepresentative.images.frontImgUrl &&
-                        call.data.isReviewed === false &&
-                        call.data.isValid === true, // Optimistic validation
-                ),
-            ).toBe(true);
-
-            // Verify IDENTITY_BACK document with new isReviewed/isValid flags
-            expect(
-                documentCreates.some(
-                    (call) =>
-                        call.data.documentType === DocumentType.IDENTITY_BACK &&
-                        call.data.documentUrl ===
-                        mockRegisterDto.legalRepresentative.images.backImgUrl &&
-                        call.data.isReviewed === false &&
-                        call.data.isValid === true, // Optimistic validation
-                ),
-            ).toBe(true);
-
-            // Note: TAX_CODE is now a data field on Partner, not a document type
+            // Note: Identity documents (IDENTITY_FRONT, IDENTITY_BACK, AUTHORIZATION_LETTER)
+            // are now stored only in LegalRepresentative entity, not as PartnerDocument records
         });
 
-        it('should create AUTHORIZATION_LETTER document when provided', async () => {
+        it('should store authorization letter URL in LegalRepresentative when provided', async () => {
             // Arrange
             const dtoWithAuthLetter = {
                 ...mockRegisterDto,
@@ -305,20 +283,15 @@ describe('PartnersService', () => {
             // Act
             await service.registerPartner(dtoWithAuthLetter as any);
 
-            // Assert - Verify AUTHORIZATION_LETTER document was created with new flags
-            const documentCreates = createCalls.filter(
-                (call) => call.entity === PartnerDocument,
+            // Assert - Verify LegalRepresentative was created with auth letter URL
+            const legalRepCreate = createCalls.find(
+                (call) => call.entity === LegalRepresentative,
             );
-            expect(
-                documentCreates.some(
-                    (call) =>
-                        call.data.documentType === DocumentType.AUTHORIZATION_LETTER &&
-                        call.data.documentUrl ===
-                        dtoWithAuthLetter.legalRepresentative.authorization.authLetterDocUrl &&
-                        call.data.isReviewed === false &&
-                        call.data.isValid === true, // Optimistic validation
-                ),
-            ).toBe(true);
+            expect(legalRepCreate).toBeDefined();
+            expect(legalRepCreate.data.authLetterDocUrl).toBe(
+                'https://example.com/auth-letter.pdf',
+            );
+            expect(legalRepCreate.data.isAuthorizedUser).toBe(true);
         });
 
         it('should throw ConflictException for duplicate email', async () => {
@@ -405,6 +378,9 @@ describe('PartnersService', () => {
         it('should return formatted profile with verificationStatus', async () => {
             // Arrange
             mockPartnerRepository.findOne.mockResolvedValue(mockPartner);
+            mockDocRequirementRepository.find.mockResolvedValue([
+                { documentType: DocumentType.BUSINESS_LICENSE, isRequired: true, description: 'Required' },
+            ]);
 
             // Act
             const result = await service.getMyProfile('account-uuid');
@@ -416,6 +392,8 @@ describe('PartnersService', () => {
             expect(result.address.district).toBe('Quận 1');
             expect(result.legalRepresentative.fullName).toBe('John Doe');
             expect(result.verificationStatus).toBe(PartnerVerificationStatus.PENDING);
+            expect(result.documents).toBeDefined();
+            expect(result.documents[0].status).toBe('MISSING');
         });
 
         it('should throw NotFoundException when partner not found', async () => {
@@ -440,14 +418,17 @@ describe('PartnersService', () => {
 
         it('should update partner profile successfully', async () => {
             // Arrange
-            mockPartnerRepository.findOne.mockResolvedValue({ ...mockPartner });
+            mockPartnerRepository.findOne.mockImplementation(() => Promise.resolve({ ...mockPartner }));
             mockQueryRunner.manager.save.mockResolvedValue({
                 ...mockPartner,
                 ...updateDto,
             });
-            mockQueryRunner.manager.findOne.mockResolvedValue(
-                mockPartner.legalRepresentative,
-            );
+            mockQueryRunner.manager.findOne.mockImplementation((entity) => {
+                if (entity && entity.name === 'LegalRepresentative') return Promise.resolve(mockPartner.legalRepresentative);
+                if (entity && entity.name === 'Partner') return Promise.resolve(null);
+                return Promise.resolve(null);
+            });
+            mockQueryRunner.manager.find.mockResolvedValue([]);
 
             // Act
             const result = await service.updateMyProfile(
@@ -478,9 +459,10 @@ describe('PartnersService', () => {
                 districtId: 'new-district',
                 wardId: 'new-ward',
             };
-            mockPartnerRepository.findOne.mockResolvedValue({ ...mockPartner });
+            mockPartnerRepository.findOne.mockImplementation(() => Promise.resolve({ ...mockPartner }));
             mockLocationsService.validateAddress.mockResolvedValue(true);
             mockQueryRunner.manager.save.mockResolvedValue(mockPartner);
+            mockQueryRunner.manager.find.mockResolvedValue([]);
 
             // Act
             await service.updateMyProfile('account-uuid', updateWithAddress as any);
