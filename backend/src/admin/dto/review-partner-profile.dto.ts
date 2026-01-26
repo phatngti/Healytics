@@ -12,7 +12,6 @@ export enum ReviewItemType {
     DOCUMENT = 'DOCUMENT',
     FIELD = 'FIELD',
     LEGAL_REP_FIELD = 'LEGAL_REP_FIELD',
-    ACCOUNT_FIELD = 'ACCOUNT_FIELD',
 }
 
 export class ReviewItemDto {
