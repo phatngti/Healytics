@@ -2,6 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Partner } from '@/partners/entities/partner.entity';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { PartnerDocument } from '@/partners/entities/partner-document.entity';
+import { LegalRepresentative } from '@/partners/entities/legal-representative.entity';
+import { IdType } from '@/partners/enum/id-type.enum';
+import { Account } from '@/account/entities/account.entity';
+import { Role } from '@/account/enum/role.enum';
 
 export class AdminPartnerDocumentDto {
     @ApiProperty()
@@ -30,6 +34,23 @@ export class AdminPartnerDocumentDto {
 
     @ApiProperty()
     uploadedAt: Date;
+}
+
+export class AdminAccountDto {
+    @ApiProperty()
+    id: string;
+
+    @ApiProperty()
+    email: string;
+
+    @ApiProperty({ enum: Role })
+    role: Role;
+
+    @ApiProperty()
+    isActive: boolean;
+
+    @ApiProperty()
+    createdAt: Date;
 }
 
 export class AdminPartnerDetailResponseDto {
@@ -66,8 +87,16 @@ export class AdminPartnerDetailResponseDto {
     @ApiProperty()
     createdAt: Date;
 
+    @ApiProperty({ type: AdminAccountDto, nullable: true })
+    account: AdminAccountDto | null;
+
+    @ApiProperty({ nullable: true })
+    legalRepresentative: any;
+
     @ApiProperty({ type: [AdminPartnerDocumentDto] })
     documents: AdminPartnerDocumentDto[];
+    @ApiProperty({ type: Object, nullable: true, description: 'Field-level rejection details (includes partner, legalRep.*, account.* prefixed keys)' })
+    rejectionDetails: Record<string, string> | null;
 
     constructor(partner: Partner, documents: PartnerDocument[]) {
         this.id = partner.id;
@@ -88,6 +117,41 @@ export class AdminPartnerDetailResponseDto {
         this.verificationCompletedAt = partner.verificationCompletedAt;
         this.createdAt = partner.createdAt;
 
+
+        // Map account if exists
+        if (partner.account) {
+            const acc = partner.account as Account;
+            this.account = {
+                id: acc.id,
+                email: acc.email,
+                role: acc.role,
+                isActive: acc.isActive,
+                createdAt: acc.createdAt,
+            };
+        } else {
+            this.account = null;
+        }
+
+        // Map legal representative if exists
+        if (partner.legalRepresentative) {
+            const rep = partner.legalRepresentative as LegalRepresentative;
+            this.legalRepresentative = {
+                id: rep.id,
+                fullName: rep.fullName,
+                position: rep.position,
+                idType: rep.idType,
+                idNumber: rep.idNumber,
+                idIssueDate: rep.idIssueDate,
+                idFrontImgUrl: rep.idFrontImgUrl,
+                idBackImgUrl: rep.idBackImgUrl,
+                isAuthorizedUser: rep.isAuthorizedUser,
+                authLetterDocUrl: rep.authLetterDocUrl,
+                phoneNumber: rep.phoneNumber,
+            };
+        } else {
+            this.legalRepresentative = null;
+        }
+
         this.documents = documents.map(doc => ({
             id: doc.id,
             documentType: doc.documentType,
@@ -99,5 +163,7 @@ export class AdminPartnerDetailResponseDto {
             adminFeedback: doc.adminFeedback,
             uploadedAt: doc.uploadedAt,
         }));
+        this.rejectionDetails = partner.rejectionDetails;
     }
 }
+
