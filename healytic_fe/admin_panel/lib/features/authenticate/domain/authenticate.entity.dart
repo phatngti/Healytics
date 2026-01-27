@@ -26,6 +26,175 @@ abstract class SignInResponseEntity with _$SignInResponseEntity {
       _$SignInResponseEntityFromJson(json);
 }
 
+// ===========================================================================
+// OTP Flow Entities (Mock only - no backend endpoints)
+// ===========================================================================
+
+/// Response from sending OTP to email (mock implementation).
+@Freezed(toJson: true)
+abstract class SendOtpResponseEntity with _$SendOtpResponseEntity {
+  const factory SendOtpResponseEntity({
+    required String emailToken,
+    required String message,
+  }) = _SendOtpResponseEntity;
+
+  factory SendOtpResponseEntity.fromJson(Map<String, dynamic> json) =>
+      _$SendOtpResponseEntityFromJson(json);
+}
+
+/// Response from verifying OTP (mock implementation).
+@Freezed(toJson: true)
+abstract class VerifyOtpResponseEntity with _$VerifyOtpResponseEntity {
+  const factory VerifyOtpResponseEntity({
+    required String otpToken,
+    required String message,
+  }) = _VerifyOtpResponseEntity;
+
+  factory VerifyOtpResponseEntity.fromJson(Map<String, dynamic> json) =>
+      _$VerifyOtpResponseEntityFromJson(json);
+}
+
+// ===========================================================================
+// Partner Registration Entities (Maps to OpenAPI DTOs)
+// ===========================================================================
+
+/// Account credentials for registration.
+@Freezed(toJson: true)
+abstract class AccountRequestEntity with _$AccountRequestEntity {
+  const factory AccountRequestEntity({
+    required String username,
+    required String email,
+    required String password,
+  }) = _AccountRequestEntity;
+
+  factory AccountRequestEntity.fromJson(Map<String, dynamic> json) =>
+      _$AccountRequestEntityFromJson(json);
+
+  @override
+  String toString() {
+    return 'AccountRequestEntity(username: $username, email: $email, password: $password)';
+  }
+}
+
+/// Partner (Business Entity) information.
+@Freezed(toJson: true)
+abstract class PartnerRequestEntity with _$PartnerRequestEntity {
+  const factory PartnerRequestEntity({
+    required String taxCode,
+    required String legalName,
+    required String brandName,
+    required String businessType,
+    required String provinceId,
+    required String districtId,
+    required String wardId,
+    required String streetAddress,
+    String? phoneNumber,
+  }) = _PartnerRequestEntity;
+
+  factory PartnerRequestEntity.fromJson(Map<String, dynamic> json) =>
+      _$PartnerRequestEntityFromJson(json);
+}
+
+/// ID images for legal representative.
+@Freezed(toJson: true)
+abstract class IdImagesEntity with _$IdImagesEntity {
+  const factory IdImagesEntity({
+    required String frontImgUrl,
+    required String backImgUrl,
+  }) = _IdImagesEntity;
+
+  factory IdImagesEntity.fromJson(Map<String, dynamic> json) =>
+      _$IdImagesEntityFromJson(json);
+}
+
+/// Authorization information for legal representative.
+@Freezed(toJson: true)
+abstract class AuthorizationEntity with _$AuthorizationEntity {
+  const factory AuthorizationEntity({
+    required bool isAuthorizedUser,
+    String? authLetterDocUrl,
+  }) = _AuthorizationEntity;
+
+  factory AuthorizationEntity.fromJson(Map<String, dynamic> json) =>
+      _$AuthorizationEntityFromJson(json);
+}
+
+/// Partner document verification information.
+@Freezed(toJson: true)
+abstract class PartnerDocumentVerificationEntity
+    with _$PartnerDocumentVerificationEntity {
+  const factory PartnerDocumentVerificationEntity({
+    String? businessLicenseUrl,
+    String? authorizationLetterUrl,
+    String? taxCertificateUrl,
+    @Default([]) List<String> otherDocumentUrls,
+  }) = _PartnerDocumentVerificationEntity;
+
+  factory PartnerDocumentVerificationEntity.fromJson(
+    Map<String, dynamic> json,
+  ) => _$PartnerDocumentVerificationEntityFromJson(json);
+}
+
+/// Legal representative information.
+@Freezed(toJson: true)
+abstract class LegalRepresentativeEntity with _$LegalRepresentativeEntity {
+  const factory LegalRepresentativeEntity({
+    required String fullName,
+    String? position,
+    String? phoneNumber,
+    required String idType,
+    required String idNumber,
+    required String idIssueDate,
+    required IdImagesEntity images,
+    required PartnerDocumentVerificationEntity documents,
+  }) = _LegalRepresentativeEntity;
+
+  factory LegalRepresentativeEntity.fromJson(Map<String, dynamic> json) =>
+      _$LegalRepresentativeEntityFromJson(json);
+}
+
+/// Complete partner registration request.
+@Freezed(toJson: true)
+abstract class RegisterPartnerRequestEntity
+    with _$RegisterPartnerRequestEntity {
+  const factory RegisterPartnerRequestEntity({
+    required AccountRequestEntity account,
+    required PartnerRequestEntity partner,
+    required LegalRepresentativeEntity legalRepresentative,
+  }) = _RegisterPartnerRequestEntity;
+
+  factory RegisterPartnerRequestEntity.fromJson(Map<String, dynamic> json) =>
+      _$RegisterPartnerRequestEntityFromJson(json);
+
+  @override
+  String toString() {
+    return 'RegisterPartnerRequestEntity(account: $account, partner: $partner, legalRepresentative: $legalRepresentative)';
+  }
+}
+
+/// Response from partner registration.
+@Freezed(toJson: true)
+abstract class RegisterPartnerResponseEntity
+    with _$RegisterPartnerResponseEntity {
+  const factory RegisterPartnerResponseEntity({
+    required String accountId,
+    required String businessEntityId,
+    required String status,
+    required String message,
+    required String accessToken,
+    required String accessExpiresIn,
+    required String refreshToken,
+    required String refreshExpiresIn,
+  }) = _RegisterPartnerResponseEntity;
+
+  factory RegisterPartnerResponseEntity.fromJson(Map<String, dynamic> json) =>
+      _$RegisterPartnerResponseEntityFromJson(json);
+}
+
+// ===========================================================================
+// Legacy SignUpRequestEntity (kept for backward compatibility)
+// ===========================================================================
+
 @Freezed(toJson: true)
 abstract class SignUpRequestEntity with _$SignUpRequestEntity {
   const factory SignUpRequestEntity({

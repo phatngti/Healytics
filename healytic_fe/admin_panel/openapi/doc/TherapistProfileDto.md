@@ -8,12 +8,15 @@ import 'package:admin_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**level** | **String** | Therapist level | [optional] 
-**type** | **String** | Type of therapist (SPA, MASSAGE) | [optional] 
-**strengthLevel** | **String** | Therapist strength level for massage | [optional] 
-**commissionRate** | **num** | Commission rate percentage | [optional] 
-**healthCheckDate** | **String** | Last health check date | [optional] 
-**skills** | **List<String>** | Therapist skills | [optional] [default to const []]
+**employeeId** | **String** | Employee ID (primary key) | [optional] 
+**level** | **String** | Therapist level (junior, senior, etc.) | [optional] 
+**type** | **String** | Therapist type | [optional] 
+**strengthLevel** | **String** | Strength level | [optional] 
+**commissionRate** | **num** | Commission rate (percentage) | [optional] 
+**healthCheckDate** | [**DateTime**](DateTime.md) | Health check date | [optional] 
+**skills** | **List<String>** | List of skills | [optional] [default to const []]
+**deviceProficiency** | **List<String>** | Device proficiency list | [optional] [default to const []]
+**licenseUrl** | **String** | License URL | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

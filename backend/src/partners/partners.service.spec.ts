@@ -142,9 +142,11 @@ describe('PartnersService', () => {
                 frontImgUrl: 'https://example.com/front.jpg',
                 backImgUrl: 'https://example.com/back.jpg',
             },
-            authorization: {
-                isAuthorizedUser: false,
-                authLetterDocUrl: null,
+            documents: {
+                businessLicenseUrl: null,
+                authorizationLetterUrl: null,
+                taxCertificateUrl: null,
+                otherDocumentUrls: [],
             },
         },
     };
@@ -257,15 +259,17 @@ describe('PartnersService', () => {
             // are now stored only in LegalRepresentative entity, not as PartnerDocument records
         });
 
-        it('should store authorization letter URL in LegalRepresentative when provided', async () => {
+        it('should store document URLs in LegalRepresentative when provided', async () => {
             // Arrange
-            const dtoWithAuthLetter = {
+            const dtoWithDocuments = {
                 ...mockRegisterDto,
                 legalRepresentative: {
                     ...mockRegisterDto.legalRepresentative,
-                    authorization: {
-                        isAuthorizedUser: true,
-                        authLetterDocUrl: 'https://example.com/auth-letter.pdf',
+                    documents: {
+                        businessLicenseUrl: 'https://example.com/business-license.pdf',
+                        authorizationLetterUrl: 'https://example.com/auth-letter.pdf',
+                        taxCertificateUrl: null,
+                        otherDocumentUrls: [],
                     },
                 },
             };
@@ -282,17 +286,19 @@ describe('PartnersService', () => {
             });
 
             // Act
-            await service.registerPartner(dtoWithAuthLetter as any);
+            await service.registerPartner(dtoWithDocuments as any);
 
-            // Assert - Verify LegalRepresentative was created with auth letter URL
+            // Assert - Verify LegalRepresentative was created with document URLs
             const legalRepCreate = createCalls.find(
                 (call) => call.entity === LegalRepresentative,
             );
             expect(legalRepCreate).toBeDefined();
-            expect(legalRepCreate.data.authLetterDocUrl).toBe(
+            expect(legalRepCreate.data.businessLicenseUrl).toBe(
+                'https://example.com/business-license.pdf',
+            );
+            expect(legalRepCreate.data.authorizationLetterUrl).toBe(
                 'https://example.com/auth-letter.pdf',
             );
-            expect(legalRepCreate.data.isAuthorizedUser).toBe(true);
         });
 
         it('should throw ConflictException for duplicate email', async () => {

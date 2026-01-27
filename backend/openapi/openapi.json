@@ -2079,23 +2079,35 @@
           "backImgUrl"
         ]
       },
-      "AuthorizationRequestDto": {
+      "PartnerDocumentVerificationDto": {
         "type": "object",
         "properties": {
-          "isAuthorizedUser": {
-            "type": "boolean",
-            "example": true,
-            "description": "Whether the legal representative is the authorized user"
+          "businessLicenseUrl": {
+            "type": "string",
+            "example": "https://storage.example.com/business_license.pdf",
+            "description": "URL to business license document"
           },
-          "authLetterDocUrl": {
-            "type": "object",
-            "example": "https://storage.example.com/auth_letter.pdf",
-            "description": "URL to authorization letter document (required if isAuthorizedUser is false)"
+          "authorizationLetterUrl": {
+            "type": "string",
+            "example": "https://storage.example.com/authorization_letter.pdf",
+            "description": "URL to authorization letter document"
+          },
+          "taxCertificateUrl": {
+            "type": "string",
+            "example": "https://storage.example.com/tax_certificate.pdf",
+            "description": "URL to tax certificate document"
+          },
+          "otherDocumentUrls": {
+            "example": [
+              "https://storage.example.com/other_doc1.pdf"
+            ],
+            "description": "Array of URLs to other supporting documents",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
-        },
-        "required": [
-          "isAuthorizedUser"
-        ]
+        }
       },
       "LegalRepresentativeRequestDto": {
         "type": "object",
@@ -2138,8 +2150,8 @@
           "images": {
             "$ref": "#/components/schemas/IdImagesRequestDto"
           },
-          "authorization": {
-            "$ref": "#/components/schemas/AuthorizationRequestDto"
+          "documents": {
+            "$ref": "#/components/schemas/PartnerDocumentVerificationDto"
           }
         },
         "required": [
@@ -2148,7 +2160,7 @@
           "idNumber",
           "idIssueDate",
           "images",
-          "authorization"
+          "documents"
         ]
       },
       "RegisterPartnerDto": {
@@ -2778,8 +2790,8 @@
           "images": {
             "$ref": "#/components/schemas/IdImagesRequestDto"
           },
-          "authorization": {
-            "$ref": "#/components/schemas/AuthorizationRequestDto"
+          "documents": {
+            "$ref": "#/components/schemas/PartnerDocumentVerificationDto"
           }
         }
       },

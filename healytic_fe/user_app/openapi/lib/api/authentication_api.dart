@@ -16,53 +16,6 @@ class AuthenticationApi {
 
   final ApiClient apiClient;
 
-  /// Performs an HTTP 'POST /auth/login' operation and returns the [Response].
-  /// Parameters:
-  ///
-  /// * [LoginDto] loginDto (required):
-  Future<Response> authControllerLoginWithHttpInfo(LoginDto loginDto,) async {
-    // ignore: prefer_const_declarations
-    final path = r'/auth/login';
-
-    // ignore: prefer_final_locals
-    Object? postBody = loginDto;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-    const contentTypes = <String>['application/json'];
-
-
-    return apiClient.invokeAPI(
-      path,
-      'POST',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
-    );
-  }
-
-  /// Parameters:
-  ///
-  /// * [LoginDto] loginDto (required):
-  Future<AuthTokensDto?> authControllerLogin(LoginDto loginDto,) async {
-    final response = await authControllerLoginWithHttpInfo(loginDto,);
-    if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
-    }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
-    
-    }
-    return null;
-  }
-
   /// Performs an HTTP 'POST /auth/admin/login' operation and returns the [Response].
   /// Parameters:
   ///
@@ -97,6 +50,53 @@ class AuthenticationApi {
   /// * [AdminLoginDto] adminLoginDto (required):
   Future<AuthTokensDto?> authControllerLoginAdmin(AdminLoginDto adminLoginDto,) async {
     final response = await authControllerLoginAdminWithHttpInfo(adminLoginDto,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
+    
+    }
+    return null;
+  }
+
+  /// Performs an HTTP 'POST /auth/partner/login' operation and returns the [Response].
+  /// Parameters:
+  ///
+  /// * [PartnerLoginDto] partnerLoginDto (required):
+  Future<Response> authControllerLoginPartnerWithHttpInfo(PartnerLoginDto partnerLoginDto,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/auth/partner/login';
+
+    // ignore: prefer_final_locals
+    Object? postBody = partnerLoginDto;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Parameters:
+  ///
+  /// * [PartnerLoginDto] partnerLoginDto (required):
+  Future<AuthTokensDto?> authControllerLoginPartner(PartnerLoginDto partnerLoginDto,) async {
+    final response = await authControllerLoginPartnerWithHttpInfo(partnerLoginDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -199,56 +199,15 @@ class AuthenticationApi {
   }
 
   /// Performs an HTTP 'POST /auth/refresh' operation and returns the [Response].
-  Future<Response> authControllerRefreshWithHttpInfo() async {
+  /// Parameters:
+  ///
+  /// * [RefreshTokenRequestDto] refreshTokenRequestDto (required):
+  Future<Response> authControllerRefreshWithHttpInfo(RefreshTokenRequestDto refreshTokenRequestDto,) async {
     // ignore: prefer_const_declarations
     final path = r'/auth/refresh';
 
     // ignore: prefer_final_locals
-    Object? postBody;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-    const contentTypes = <String>[];
-
-
-    return apiClient.invokeAPI(
-      path,
-      'POST',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
-    );
-  }
-
-  Future<AuthTokensDto?> authControllerRefresh() async {
-    final response = await authControllerRefreshWithHttpInfo();
-    if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
-    }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
-    
-    }
-    return null;
-  }
-
-  /// Performs an HTTP 'POST /auth/register' operation and returns the [Response].
-  /// Parameters:
-  ///
-  /// * [RegisterDto] registerDto (required):
-  Future<Response> authControllerRegisterWithHttpInfo(RegisterDto registerDto,) async {
-    // ignore: prefer_const_declarations
-    final path = r'/auth/register';
-
-    // ignore: prefer_final_locals
-    Object? postBody = registerDto;
+    Object? postBody = refreshTokenRequestDto;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
@@ -270,9 +229,9 @@ class AuthenticationApi {
 
   /// Parameters:
   ///
-  /// * [RegisterDto] registerDto (required):
-  Future<AuthTokensDto?> authControllerRegister(RegisterDto registerDto,) async {
-    final response = await authControllerRegisterWithHttpInfo(registerDto,);
+  /// * [RefreshTokenRequestDto] refreshTokenRequestDto (required):
+  Future<AuthTokensDto?> authControllerRefresh(RefreshTokenRequestDto refreshTokenRequestDto,) async {
+    final response = await authControllerRefreshWithHttpInfo(refreshTokenRequestDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -281,6 +240,62 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
+    
+    }
+    return null;
+  }
+
+  /// Register a new business partner
+  ///
+  /// Creates business entity, legal representative, and returns auth tokens immediately
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [RegisterPartnerDto] registerPartnerDto (required):
+  Future<Response> authControllerRegisterPartnerWithHttpInfo(RegisterPartnerDto registerPartnerDto,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/auth/partner/register';
+
+    // ignore: prefer_final_locals
+    Object? postBody = registerPartnerDto;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Register a new business partner
+  ///
+  /// Creates business entity, legal representative, and returns auth tokens immediately
+  ///
+  /// Parameters:
+  ///
+  /// * [RegisterPartnerDto] registerPartnerDto (required):
+  Future<RegisterPartnerResponseDto?> authControllerRegisterPartner(RegisterPartnerDto registerPartnerDto,) async {
+    final response = await authControllerRegisterPartnerWithHttpInfo(registerPartnerDto,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'RegisterPartnerResponseDto',) as RegisterPartnerResponseDto;
     
     }
     return null;

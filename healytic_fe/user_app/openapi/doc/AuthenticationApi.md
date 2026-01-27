@@ -9,55 +9,14 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**authControllerLogin**](AuthenticationApi.md#authcontrollerlogin) | **POST** /auth/login | 
 [**authControllerLoginAdmin**](AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | 
+[**authControllerLoginPartner**](AuthenticationApi.md#authcontrollerloginpartner) | **POST** /auth/partner/login | 
 [**authControllerLoginUser**](AuthenticationApi.md#authcontrollerloginuser) | **POST** /auth/user/login | 
 [**authControllerLogout**](AuthenticationApi.md#authcontrollerlogout) | **POST** /auth/logout | 
 [**authControllerRefresh**](AuthenticationApi.md#authcontrollerrefresh) | **POST** /auth/refresh | 
-[**authControllerRegister**](AuthenticationApi.md#authcontrollerregister) | **POST** /auth/register | 
+[**authControllerRegisterPartner**](AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
 [**authControllerRegisterUser**](AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | 
 
-
-# **authControllerLogin**
-> AuthTokensDto authControllerLogin(loginDto)
-
-
-
-### Example
-```dart
-import 'package:user_openapi/api.dart';
-
-final api_instance = AuthenticationApi();
-final loginDto = LoginDto(); // LoginDto | 
-
-try {
-    final result = api_instance.authControllerLogin(loginDto);
-    print(result);
-} catch (e) {
-    print('Exception when calling AuthenticationApi->authControllerLogin: $e\n');
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **loginDto** | [**LoginDto**](LoginDto.md)|  | 
-
-### Return type
-
-[**AuthTokensDto**](AuthTokensDto.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authControllerLoginAdmin**
 > AuthTokensDto authControllerLoginAdmin(adminLoginDto)
@@ -84,6 +43,47 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **adminLoginDto** | [**AdminLoginDto**](AdminLoginDto.md)|  | 
+
+### Return type
+
+[**AuthTokensDto**](AuthTokensDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerLoginPartner**
+> AuthTokensDto authControllerLoginPartner(partnerLoginDto)
+
+
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+final partnerLoginDto = PartnerLoginDto(); // PartnerLoginDto | 
+
+try {
+    final result = api_instance.authControllerLoginPartner(partnerLoginDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerLoginPartner: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **partnerLoginDto** | [**PartnerLoginDto**](PartnerLoginDto.md)|  | 
 
 ### Return type
 
@@ -179,7 +179,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authControllerRefresh**
-> AuthTokensDto authControllerRefresh()
+> AuthTokensDto authControllerRefresh(refreshTokenRequestDto)
 
 
 
@@ -188,9 +188,10 @@ No authorization required
 import 'package:user_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
+final refreshTokenRequestDto = RefreshTokenRequestDto(); // RefreshTokenRequestDto | 
 
 try {
-    final result = api_instance.authControllerRefresh();
+    final result = api_instance.authControllerRefresh(refreshTokenRequestDto);
     print(result);
 } catch (e) {
     print('Exception when calling AuthenticationApi->authControllerRefresh: $e\n');
@@ -198,7 +199,10 @@ try {
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **refreshTokenRequestDto** | [**RefreshTokenRequestDto**](RefreshTokenRequestDto.md)|  | 
 
 ### Return type
 
@@ -210,28 +214,30 @@ No authorization required
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **authControllerRegister**
-> AuthTokensDto authControllerRegister(registerDto)
+# **authControllerRegisterPartner**
+> RegisterPartnerResponseDto authControllerRegisterPartner(registerPartnerDto)
 
+Register a new business partner
 
+Creates business entity, legal representative, and returns auth tokens immediately
 
 ### Example
 ```dart
 import 'package:user_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final registerDto = RegisterDto(); // RegisterDto | 
+final registerPartnerDto = RegisterPartnerDto(); // RegisterPartnerDto | 
 
 try {
-    final result = api_instance.authControllerRegister(registerDto);
+    final result = api_instance.authControllerRegisterPartner(registerPartnerDto);
     print(result);
 } catch (e) {
-    print('Exception when calling AuthenticationApi->authControllerRegister: $e\n');
+    print('Exception when calling AuthenticationApi->authControllerRegisterPartner: $e\n');
 }
 ```
 
@@ -239,11 +245,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **registerDto** | [**RegisterDto**](RegisterDto.md)|  | 
+ **registerPartnerDto** | [**RegisterPartnerDto**](RegisterPartnerDto.md)|  | 
 
 ### Return type
 
-[**AuthTokensDto**](AuthTokensDto.md)
+[**RegisterPartnerResponseDto**](RegisterPartnerResponseDto.md)
 
 ### Authorization
 

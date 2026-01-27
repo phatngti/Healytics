@@ -147,10 +147,14 @@ export class PartnersService {
                 idIssueDate: new Date(dto.legalRepresentative.idIssueDate),
                 idFrontImgUrl: dto.legalRepresentative.images.frontImgUrl,
                 idBackImgUrl: dto.legalRepresentative.images.backImgUrl,
-                isAuthorizedUser:
-                    dto.legalRepresentative.authorization.isAuthorizedUser,
-                authLetterDocUrl:
-                    dto.legalRepresentative.authorization.authLetterDocUrl,
+                businessLicenseUrl:
+                    dto.legalRepresentative.documents?.businessLicenseUrl || null,
+                authorizationLetterUrl:
+                    dto.legalRepresentative.documents?.authorizationLetterUrl || null,
+                taxCertificateUrl:
+                    dto.legalRepresentative.documents?.taxCertificateUrl || null,
+                otherDocumentUrls:
+                    dto.legalRepresentative.documents?.otherDocumentUrls || null,
                 partnerId: savedPartner.id,
             });
             await queryRunner.manager.save(legalRep);
@@ -455,9 +459,11 @@ export class PartnersService {
                         updateRep('idFrontImgUrl', repDto.images.frontImgUrl, 'legalRep.idFrontImgUrl', true);
                         updateRep('idBackImgUrl', repDto.images.backImgUrl, 'legalRep.idBackImgUrl', true);
                     }
-                    if (repDto.authorization) {
-                        updateRep('isAuthorizedUser', repDto.authorization.isAuthorizedUser, 'legalRep.isAuthorizedUser', true);
-                        updateRep('authLetterDocUrl', repDto.authorization.authLetterDocUrl, 'legalRep.authLetterDocUrl', true);
+                    if (repDto.documents) {
+                        updateRep('businessLicenseUrl', repDto.documents.businessLicenseUrl, 'legalRep.businessLicenseUrl', true);
+                        updateRep('authorizationLetterUrl', repDto.documents.authorizationLetterUrl, 'legalRep.authorizationLetterUrl', true);
+                        updateRep('taxCertificateUrl', repDto.documents.taxCertificateUrl, 'legalRep.taxCertificateUrl', true);
+                        updateRep('otherDocumentUrls', repDto.documents.otherDocumentUrls, 'legalRep.otherDocumentUrls', true);
                     }
 
                     if (repModified) {
@@ -669,7 +675,6 @@ export class PartnersService {
                 idIssueDate: partner.legalRepresentative.idIssueDate,
                 idFrontImgUrl: partner.legalRepresentative.idFrontImgUrl,
                 idBackImgUrl: partner.legalRepresentative.idBackImgUrl,
-                isAuthorizedUser: partner.legalRepresentative.isAuthorizedUser,
                 authLetterDocUrl: partner.legalRepresentative.authLetterDocUrl,
                 phoneNumber: partner.legalRepresentative.phoneNumber,
             },

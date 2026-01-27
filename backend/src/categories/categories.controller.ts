@@ -30,9 +30,9 @@ import { CategoryResponseDto } from './dto/category-response.dto';
 import { FindCategoriesQueryDto } from './dto/find-categories-query.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
-import { Roles } from '@/auth/decorators/roles.decorator';
+import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { ADMIN_ROLES } from '@/auth/constants/role-groups';
-import { Public } from '@/auth/decorators/public.decorator';
+import { Public } from '@/common/decorators/auth/public.decorator';
 
 /**
  * Controller for category management endpoints.

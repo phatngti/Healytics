@@ -10,12 +10,12 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**s3ControllerDeleteFile**](S3Api.md#s3controllerdeletefile) | **DELETE** /s3/{key} | Delete file
-[**s3ControllerGetFileUrl**](S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file url
-[**s3ControllerPreSign**](S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload url
+[**s3ControllerGetFileUrl**](S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file URL
+[**s3ControllerPreSign**](S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload URL
 
 
 # **s3ControllerDeleteFile**
-> S3ControllerDeleteFile200Response s3ControllerDeleteFile(key)
+> DeleteFileResponseDto s3ControllerDeleteFile(key)
 
 Delete file
 
@@ -42,7 +42,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**S3ControllerDeleteFile200Response**](S3ControllerDeleteFile200Response.md)
+[**DeleteFileResponseDto**](DeleteFileResponseDto.md)
 
 ### Authorization
 
@@ -56,9 +56,9 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **s3ControllerGetFileUrl**
-> S3ControllerGetFileUrl200Response s3ControllerGetFileUrl(key)
+> FileUrlResponseDto s3ControllerGetFileUrl(key)
 
-Get file url
+Get file URL
 
 ### Example
 ```dart
@@ -83,7 +83,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**S3ControllerGetFileUrl200Response**](S3ControllerGetFileUrl200Response.md)
+[**FileUrlResponseDto**](FileUrlResponseDto.md)
 
 ### Authorization
 
@@ -97,19 +97,19 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **s3ControllerPreSign**
-> S3ControllerPreSign201Response s3ControllerPreSign(s3ControllerPreSignRequest)
+> PresignResponseDto s3ControllerPreSign(presignRequestDto)
 
-Get presigned upload url
+Get presigned upload URL
 
 ### Example
 ```dart
 import 'package:admin_openapi/api.dart';
 
 final api_instance = S3Api();
-final s3ControllerPreSignRequest = S3ControllerPreSignRequest(); // S3ControllerPreSignRequest | 
+final presignRequestDto = PresignRequestDto(); // PresignRequestDto | 
 
 try {
-    final result = api_instance.s3ControllerPreSign(s3ControllerPreSignRequest);
+    final result = api_instance.s3ControllerPreSign(presignRequestDto);
     print(result);
 } catch (e) {
     print('Exception when calling S3Api->s3ControllerPreSign: $e\n');
@@ -120,11 +120,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **s3ControllerPreSignRequest** | [**S3ControllerPreSignRequest**](S3ControllerPreSignRequest.md)|  | 
+ **presignRequestDto** | [**PresignRequestDto**](PresignRequestDto.md)|  | 
 
 ### Return type
 
-[**S3ControllerPreSign201Response**](S3ControllerPreSign201Response.md)
+[**PresignResponseDto**](PresignResponseDto.md)
 
 ### Authorization
 

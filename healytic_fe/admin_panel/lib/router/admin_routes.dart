@@ -4,7 +4,7 @@ import 'package:admin_panel/features/admin/dashboard/presentation/admin_dashboar
 import 'package:admin_panel/features/authenticate/presentation/forgot_password/forgot_password.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_in.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_up/email_code_verification.screen.dart';
-import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up.screen.dart';
+
 import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up_form.screen.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/partner_manager_screen.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/review_application.screen.dart';
@@ -57,10 +57,6 @@ class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
       path: 'email-code-verification',
       name: EmailCodeVerificationRoute.name,
     ),
-    TypedGoRoute<SignUpFormRoute>(
-      path: 'sign-up-form',
-      name: SignUpFormRoute.name,
-    ),
   ],
 )
 class SignUpRoute extends GoRouteData with $SignUpRoute {
@@ -71,7 +67,7 @@ class SignUpRoute extends GoRouteData with $SignUpRoute {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const SignUpScreen(),
+      child: const SignUpFormScreen(),
     );
   }
 }
@@ -86,19 +82,6 @@ class EmailCodeVerificationRoute extends GoRouteData
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const EmailCodeVerificationScreen(),
-    );
-  }
-}
-
-class SignUpFormRoute extends GoRouteData with $SignUpFormRoute {
-  const SignUpFormRoute();
-  static const name = "sign-up-form";
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return buildSlideTransitionPage(
-      pageKey: state.pageKey,
-      child: const SignUpFormScreen(),
     );
   }
 }
