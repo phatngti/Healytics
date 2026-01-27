@@ -19,21 +19,21 @@ void main() {
   group('tests for S3Api', () {
     // Delete file
     //
-    //Future<S3ControllerDeleteFile200Response> s3ControllerDeleteFile(String key) async
+    //Future<DeleteFileResponseDto> s3ControllerDeleteFile(String key) async
     test('test s3ControllerDeleteFile', () async {
       // TODO
     });
 
-    // Get file url
+    // Get file URL
     //
-    //Future<S3ControllerGetFileUrl200Response> s3ControllerGetFileUrl(String key) async
+    //Future<FileUrlResponseDto> s3ControllerGetFileUrl(String key) async
     test('test s3ControllerGetFileUrl', () async {
       // TODO
     });
 
-    // Get presigned upload url
+    // Get presigned upload URL
     //
-    //Future<S3ControllerPreSign201Response> s3ControllerPreSign(S3ControllerPreSignRequest s3ControllerPreSignRequest) async
+    //Future<PresignResponseDto> s3ControllerPreSign(PresignRequestDto presignRequestDto) async
     test('test s3ControllerPreSign', () async {
       // TODO
     });

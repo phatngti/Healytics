@@ -58,8 +58,8 @@ class LegalRepDetailDto {
     @ApiProperty({ example: 'https://example.com/back.jpg', nullable: true })
     idBackImgUrl: string | null;
 
-    @ApiProperty({ example: true })
-    isAuthorizedUser: boolean;
+    @ApiProperty({ example: 'https://example.com/business-license.pdf', nullable: true })
+    businessLicenseUrl: string | null;
 
     @ApiProperty({ example: 'https://example.com/auth-letter.pdf', nullable: true })
     authLetterDocUrl: string | null;

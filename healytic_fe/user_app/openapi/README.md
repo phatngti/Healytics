@@ -66,12 +66,16 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *AccountApi* | [**accountControllerGetSurvey**](doc//AccountApi.md#accountcontrollergetsurvey) | **GET** /account/survey | Get current user survey
 *AccountApi* | [**accountControllerPostSurvey**](doc//AccountApi.md#accountcontrollerpostsurvey) | **POST** /account/survey | Create one-shot survey for current user
-*AuthenticationApi* | [**authControllerLogin**](doc//AuthenticationApi.md#authcontrollerlogin) | **POST** /auth/login | 
+*AdminPartnersApi* | [**adminPartnersControllerGetPartnerDetail**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartnerdetail) | **GET** /admin/partners/{id} | Get partner details including documents
+*AdminPartnersApi* | [**adminPartnersControllerGetPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartners) | **GET** /admin/partners | List all partners
+*AdminPartnersApi* | [**adminPartnersControllerReviewPartner**](doc//AdminPartnersApi.md#adminpartnerscontrollerreviewpartner) | **PUT** /admin/partners/{id}/review | Review partner profile
+*AuditLogsApi* | [**auditControllerGetAuditLogs**](doc//AuditLogsApi.md#auditcontrollergetauditlogs) | **GET** /audit-logs | Get audit logs
 *AuthenticationApi* | [**authControllerLoginAdmin**](doc//AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | 
+*AuthenticationApi* | [**authControllerLoginPartner**](doc//AuthenticationApi.md#authcontrollerloginpartner) | **POST** /auth/partner/login | 
 *AuthenticationApi* | [**authControllerLoginUser**](doc//AuthenticationApi.md#authcontrollerloginuser) | **POST** /auth/user/login | 
 *AuthenticationApi* | [**authControllerLogout**](doc//AuthenticationApi.md#authcontrollerlogout) | **POST** /auth/logout | 
 *AuthenticationApi* | [**authControllerRefresh**](doc//AuthenticationApi.md#authcontrollerrefresh) | **POST** /auth/refresh | 
-*AuthenticationApi* | [**authControllerRegister**](doc//AuthenticationApi.md#authcontrollerregister) | **POST** /auth/register | 
+*AuthenticationApi* | [**authControllerRegisterPartner**](doc//AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
 *AuthenticationApi* | [**authControllerRegisterUser**](doc//AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | 
 *CategoriesApi* | [**categoriesControllerCreate**](doc//CategoriesApi.md#categoriescontrollercreate) | **POST** /categories | Create a new category
 *CategoriesApi* | [**categoriesControllerFindAll**](doc//CategoriesApi.md#categoriescontrollerfindall) | **GET** /categories | Get all categories
@@ -85,6 +89,13 @@ Class | Method | HTTP request | Description
 *EmployeesApi* | [**employeesControllerFindOne**](doc//EmployeesApi.md#employeescontrollerfindone) | **GET** /employees/{id} | Get an employee by id
 *EmployeesApi* | [**employeesControllerRemove**](doc//EmployeesApi.md#employeescontrollerremove) | **DELETE** /employees/{id} | Delete an employee
 *EmployeesApi* | [**employeesControllerUpdate**](doc//EmployeesApi.md#employeescontrollerupdate) | **PATCH** /employees/{id} | Update an employee
+*LocationsApi* | [**locationsControllerGetDistricts**](doc//LocationsApi.md#locationscontrollergetdistricts) | **GET** /locations/provinces/{provinceId}/districts | Get all districts in a province
+*LocationsApi* | [**locationsControllerGetProvinces**](doc//LocationsApi.md#locationscontrollergetprovinces) | **GET** /locations/provinces | Get all provinces in Vietnam
+*LocationsApi* | [**locationsControllerGetWards**](doc//LocationsApi.md#locationscontrollergetwards) | **GET** /locations/districts/{districtId}/wards | Get all wards in a district
+*LocationsApi* | [**locationsControllerSeedData**](doc//LocationsApi.md#locationscontrollerseeddata) | **POST** /locations/seed | Seed Vietnam administrative divisions data
+*PartnersApi* | [**partnersControllerGetBusinessTypes**](doc//PartnersApi.md#partnerscontrollergetbusinesstypes) | **GET** /partners/business-types | Get all business types
+*PartnersApi* | [**partnersControllerGetMyProfile**](doc//PartnersApi.md#partnerscontrollergetmyprofile) | **GET** /partners/me | Get own business profile
+*PartnersApi* | [**partnersControllerUpdateMyProfile**](doc//PartnersApi.md#partnerscontrollerupdatemyprofile) | **PUT** /partners/me | Update own business profile
 *ProductsApi* | [**productsControllerCreate**](doc//ProductsApi.md#productscontrollercreate) | **POST** /products | Create a new product
 *ProductsApi* | [**productsControllerFindAll**](doc//ProductsApi.md#productscontrollerfindall) | **GET** /products | Get all products
 *ProductsApi* | [**productsControllerFindBySlug**](doc//ProductsApi.md#productscontrollerfindbyslug) | **GET** /products/slug/{slug} | Get a product by slug
@@ -92,37 +103,84 @@ Class | Method | HTTP request | Description
 *ProductsApi* | [**productsControllerRemove**](doc//ProductsApi.md#productscontrollerremove) | **DELETE** /products/{id} | Delete a product
 *ProductsApi* | [**productsControllerUpdate**](doc//ProductsApi.md#productscontrollerupdate) | **PATCH** /products/{id} | Update a product
 *S3Api* | [**s3ControllerDeleteFile**](doc//S3Api.md#s3controllerdeletefile) | **DELETE** /s3/{key} | Delete file
-*S3Api* | [**s3ControllerGetFileUrl**](doc//S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file url
-*S3Api* | [**s3ControllerPreSign**](doc//S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload url
+*S3Api* | [**s3ControllerGetFileUrl**](doc//S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file URL
+*S3Api* | [**s3ControllerPreSign**](doc//S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload URL
+*ServiceTagsApi* | [**serviceTagsControllerAttachToProduct**](doc//ServiceTagsApi.md#servicetagscontrollerattachtoproduct) | **POST** /service-tags/{id}/products/{productId} | Attach a tag to a product
+*ServiceTagsApi* | [**serviceTagsControllerCreate**](doc//ServiceTagsApi.md#servicetagscontrollercreate) | **POST** /service-tags | Create a new service tag
+*ServiceTagsApi* | [**serviceTagsControllerDetachFromProduct**](doc//ServiceTagsApi.md#servicetagscontrollerdetachfromproduct) | **DELETE** /service-tags/{id}/products/{productId} | Detach a tag from a product
+*ServiceTagsApi* | [**serviceTagsControllerFindActive**](doc//ServiceTagsApi.md#servicetagscontrollerfindactive) | **GET** /service-tags/active | Get active service tags for current user
+*ServiceTagsApi* | [**serviceTagsControllerFindAll**](doc//ServiceTagsApi.md#servicetagscontrollerfindall) | **GET** /service-tags | Get all service tags for current user
+*ServiceTagsApi* | [**serviceTagsControllerFindOne**](doc//ServiceTagsApi.md#servicetagscontrollerfindone) | **GET** /service-tags/{id} | Get a service tag by ID
+*ServiceTagsApi* | [**serviceTagsControllerGetTagsForProduct**](doc//ServiceTagsApi.md#servicetagscontrollergettagsforproduct) | **GET** /service-tags/products/{productId} | Get all tags attached to a product
+*ServiceTagsApi* | [**serviceTagsControllerRemove**](doc//ServiceTagsApi.md#servicetagscontrollerremove) | **DELETE** /service-tags/{id} | Delete a service tag
+*ServiceTagsApi* | [**serviceTagsControllerUpdate**](doc//ServiceTagsApi.md#servicetagscontrollerupdate) | **PATCH** /service-tags/{id} | Update a service tag
 
 
 ## Documentation For Models
 
+ - [AccountRequestDto](doc//AccountRequestDto.md)
+ - [AddressDto](doc//AddressDto.md)
+ - [AdminLegalRepresentativeDto](doc//AdminLegalRepresentativeDto.md)
  - [AdminLoginDto](doc//AdminLoginDto.md)
+ - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
+ - [AttachTagResponseDto](doc//AttachTagResponseDto.md)
  - [AuthTokensDto](doc//AuthTokensDto.md)
+ - [BusinessTypeDto](doc//BusinessTypeDto.md)
+ - [BusinessTypesResponseDto](doc//BusinessTypesResponseDto.md)
+ - [CategoryResponseDto](doc//CategoryResponseDto.md)
+ - [CategorySummaryDto](doc//CategorySummaryDto.md)
  - [CreateCategoryDto](doc//CreateCategoryDto.md)
  - [CreateDoctorDto](doc//CreateDoctorDto.md)
  - [CreateDoctorProfileDto](doc//CreateDoctorProfileDto.md)
  - [CreateProductDto](doc//CreateProductDto.md)
  - [CreateProductMediaDto](doc//CreateProductMediaDto.md)
  - [CreateServiceDefinitionDto](doc//CreateServiceDefinitionDto.md)
+ - [CreateServiceTagDto](doc//CreateServiceTagDto.md)
  - [CreateTherapistDto](doc//CreateTherapistDto.md)
  - [CreateTherapistProfileDto](doc//CreateTherapistProfileDto.md)
+ - [DeleteFileResponseDto](doc//DeleteFileResponseDto.md)
  - [DoctorProfileDto](doc//DoctorProfileDto.md)
+ - [DocumentUpdateDto](doc//DocumentUpdateDto.md)
+ - [EmployeeResponseDto](doc//EmployeeResponseDto.md)
+ - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
+ - [GetDistrictsResponseDto](doc//GetDistrictsResponseDto.md)
+ - [GetProvincesResponseDto](doc//GetProvincesResponseDto.md)
+ - [GetWardsResponseDto](doc//GetWardsResponseDto.md)
+ - [IdImagesRequestDto](doc//IdImagesRequestDto.md)
+ - [LegalRepresentativeDto](doc//LegalRepresentativeDto.md)
+ - [LegalRepresentativeRequestDto](doc//LegalRepresentativeRequestDto.md)
+ - [LocationDto](doc//LocationDto.md)
  - [LoginDto](doc//LoginDto.md)
  - [LogoutResponseDto](doc//LogoutResponseDto.md)
+ - [MyProfileResponseDto](doc//MyProfileResponseDto.md)
+ - [PartnerDocumentDto](doc//PartnerDocumentDto.md)
+ - [PartnerDocumentVerificationDto](doc//PartnerDocumentVerificationDto.md)
+ - [PartnerLoginDto](doc//PartnerLoginDto.md)
+ - [PartnerRequestDto](doc//PartnerRequestDto.md)
+ - [PresignRequestDto](doc//PresignRequestDto.md)
+ - [PresignResponseDto](doc//PresignResponseDto.md)
+ - [ProductMediaDto](doc//ProductMediaDto.md)
+ - [ProductResponseDto](doc//ProductResponseDto.md)
+ - [RefreshTokenRequestDto](doc//RefreshTokenRequestDto.md)
  - [RegisterDto](doc//RegisterDto.md)
+ - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
+ - [RegisterPartnerResponseDto](doc//RegisterPartnerResponseDto.md)
  - [RegisterProfileDto](doc//RegisterProfileDto.md)
- - [S3ControllerDeleteFile200Response](doc//S3ControllerDeleteFile200Response.md)
- - [S3ControllerGetFileUrl200Response](doc//S3ControllerGetFileUrl200Response.md)
- - [S3ControllerPreSign201Response](doc//S3ControllerPreSign201Response.md)
- - [S3ControllerPreSignRequest](doc//S3ControllerPreSignRequest.md)
+ - [ReviewItemDto](doc//ReviewItemDto.md)
+ - [ReviewPartnerProfileDto](doc//ReviewPartnerProfileDto.md)
+ - [ReviewPartnerResponseDto](doc//ReviewPartnerResponseDto.md)
+ - [ServiceDefinitionDto](doc//ServiceDefinitionDto.md)
+ - [ServiceEmployeeEligibilityDto](doc//ServiceEmployeeEligibilityDto.md)
+ - [ServiceTagResponseDto](doc//ServiceTagResponseDto.md)
  - [SurveyDto](doc//SurveyDto.md)
  - [SurveyResponseDto](doc//SurveyResponseDto.md)
  - [TherapistProfileDto](doc//TherapistProfileDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)
  - [UpdateEmployeeDto](doc//UpdateEmployeeDto.md)
+ - [UpdateLegalRepresentativeDto](doc//UpdateLegalRepresentativeDto.md)
+ - [UpdatePartnerDto](doc//UpdatePartnerDto.md)
  - [UpdateProductDto](doc//UpdateProductDto.md)
+ - [UpdateServiceTagDto](doc//UpdateServiceTagDto.md)
 
 
 ## Documentation For Authorization

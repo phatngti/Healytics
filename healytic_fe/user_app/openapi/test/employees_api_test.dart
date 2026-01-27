@@ -19,28 +19,28 @@ void main() {
   group('tests for EmployeesApi', () {
     // Create a new doctor
     //
-    //Future<Object> employeesControllerCreateDoctor(CreateDoctorDto createDoctorDto) async
+    //Future<EmployeeResponseDto> employeesControllerCreateDoctor(CreateDoctorDto createDoctorDto) async
     test('test employeesControllerCreateDoctor', () async {
       // TODO
     });
 
     // Create a new therapist
     //
-    //Future<Object> employeesControllerCreateTherapist(CreateTherapistDto createTherapistDto) async
+    //Future<EmployeeResponseDto> employeesControllerCreateTherapist(CreateTherapistDto createTherapistDto) async
     test('test employeesControllerCreateTherapist', () async {
       // TODO
     });
 
     // Get all employees
     //
-    //Future<List<Object>> employeesControllerFindAll({ String role }) async
+    //Future<List<EmployeeResponseDto>> employeesControllerFindAll({ String role }) async
     test('test employeesControllerFindAll', () async {
       // TODO
     });
 
     // Get an employee by id
     //
-    //Future<Object> employeesControllerFindOne(String id) async
+    //Future<EmployeeResponseDto> employeesControllerFindOne(String id) async
     test('test employeesControllerFindOne', () async {
       // TODO
     });
@@ -54,7 +54,7 @@ void main() {
 
     // Update an employee
     //
-    //Future<Object> employeesControllerUpdate(String id, UpdateEmployeeDto updateEmployeeDto) async
+    //Future<EmployeeResponseDto> employeesControllerUpdate(String id, UpdateEmployeeDto updateEmployeeDto) async
     test('test employeesControllerUpdate', () async {
       // TODO
     });

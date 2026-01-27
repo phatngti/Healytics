@@ -26,7 +26,7 @@ import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
 import { AccountService } from '@/account/account.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { Public } from './decorators/public.decorator';
+import { Public } from '../common/decorators/auth/public.decorator';
 import { LoginDto } from './dto/request/login.dto';
 import { AdminLoginDto } from './dto/request/admin-login.dto';
 import { PartnerLoginDto } from './dto/request/partner-login.dto';

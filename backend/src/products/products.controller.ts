@@ -28,9 +28,9 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductResponseDto } from './dto/product-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
-import { Roles } from '@/auth/decorators/roles.decorator';
+import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { ADMIN_ROLES } from '@/auth/constants/role-groups';
-import { Public } from '@/auth/decorators/public.decorator';
+import { Public } from '@/common/decorators/auth/public.decorator';
 
 /**
  * Controller for product management endpoints.

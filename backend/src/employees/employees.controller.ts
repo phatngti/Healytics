@@ -31,7 +31,7 @@ import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { EmployeeResponseDto } from './dto/employee-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
-import { Roles } from '@/auth/decorators/roles.decorator';
+import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { ADMIN_ROLES } from '@/auth/constants/role-groups';
 
 /**

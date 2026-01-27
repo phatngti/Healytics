@@ -11,7 +11,7 @@ import { LocationsService } from './locations.service';
 import { GetProvincesResponseDto } from './dto/response/get-provinces-response.dto';
 import { GetDistrictsResponseDto } from './dto/response/get-districts-response.dto';
 import { GetWardsResponseDto } from './dto/response/get-wards-response.dto';
-import { Public } from '@/auth/decorators/public.decorator';
+import { Public } from '@/common/decorators/auth/public.decorator';
 import { DataSource } from 'typeorm';
 import { seedLocations } from './seeds/location.seed';
 

@@ -13,6 +13,7 @@ _SignUpState _$SignUpStateFromJson(Map<String, dynamic> json) => _SignUpState(
   request: json['request'] == null
       ? const SignUpRequestEntity()
       : SignUpRequestEntity.fromJson(json['request'] as Map<String, dynamic>),
+  email: json['email'] as String? ?? '',
   emailToken: json['emailToken'] as String? ?? '',
   otpToken: json['otpToken'] as String? ?? '',
 );
@@ -21,6 +22,7 @@ Map<String, dynamic> _$SignUpStateToJson(_SignUpState instance) =>
     <String, dynamic>{
       'step': _$SignupStepEnumMap[instance.step]!,
       'request': instance.request.toJson(),
+      'email': instance.email,
       'emailToken': instance.emailToken,
       'otpToken': instance.otpToken,
     };
@@ -37,12 +39,21 @@ const _$SignupStepEnumMap = {
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Provider for signup flow state management.
+///
+/// Handles the multi-step signup process: email -> OTP -> form submission.
 
 @ProviderFor(SignUpProvider)
 const signUpProviderProvider = SignUpProviderProvider._();
 
+/// Provider for signup flow state management.
+///
+/// Handles the multi-step signup process: email -> OTP -> form submission.
 final class SignUpProviderProvider
     extends $AsyncNotifierProvider<SignUpProvider, SignUpState> {
+  /// Provider for signup flow state management.
+  ///
+  /// Handles the multi-step signup process: email -> OTP -> form submission.
   const SignUpProviderProvider._()
     : super(
         from: null,
@@ -62,7 +73,11 @@ final class SignUpProviderProvider
   SignUpProvider create() => SignUpProvider();
 }
 
-String _$signUpProviderHash() => r'e53f4b11526af3319338a18c4f6448b8a2325323';
+String _$signUpProviderHash() => r'511d85b3130745b10afdd9b82a849e4198ca23c5';
+
+/// Provider for signup flow state management.
+///
+/// Handles the multi-step signup process: email -> OTP -> form submission.
 
 abstract class _$SignUpProvider extends $AsyncNotifier<SignUpState> {
   FutureOr<SignUpState> build();

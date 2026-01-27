@@ -69,6 +69,82 @@
         ]
       }
     },
+    "/auth/partner/register": {
+      "post": {
+        "operationId": "AuthController_registerPartner",
+        "summary": "Register a new business partner",
+        "description": "Creates business entity, legal representative, and returns auth tokens immediately",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterPartnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Partner registration successful - returns tokens and business data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterPartnerResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or address hierarchy"
+          },
+          "409": {
+            "description": "Email or tax code already exists"
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/partner/login": {
+      "post": {
+        "operationId": "AuthController_loginPartner",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartnerLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Partner login returns access and refresh tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "403": {
+            "description": "Account is not authorized for partner login"
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/auth/admin/login": {
       "post": {
         "operationId": "AuthController_loginAdmin",
@@ -106,68 +182,6 @@
         ]
       }
     },
-    "/auth/register": {
-      "post": {
-        "operationId": "AuthController_register",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Registration returns access and refresh tokens",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthTokensDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Authentication"
-        ]
-      }
-    },
-    "/auth/login": {
-      "post": {
-        "operationId": "AuthController_login",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Login returns access and refresh tokens",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthTokensDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Authentication"
-        ]
-      }
-    },
     "/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
@@ -193,6 +207,16 @@
       "post": {
         "operationId": "AuthController_refresh",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequestDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Refresh returns new pair of tokens",
@@ -213,6 +237,7 @@
     "/account/survey": {
       "get": {
         "operationId": "AccountController_getSurvey",
+        "summary": "Get current user survey",
         "parameters": [],
         "responses": {
           "200": {
@@ -226,18 +251,18 @@
             }
           }
         },
+        "tags": [
+          "Account"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Get current user survey",
-        "tags": [
-          "Account"
         ]
       },
       "post": {
         "operationId": "AccountController_postSurvey",
+        "summary": "Create one-shot survey for current user",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -264,20 +289,308 @@
             "description": "Survey already exists"
           }
         },
+        "tags": [
+          "Account"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Create one-shot survey for current user",
+        ]
+      }
+    },
+    "/partners/business-types": {
+      "get": {
+        "operationId": "PartnersController_getBusinessTypes",
+        "summary": "Get all business types",
+        "description": "Returns list of all business types with Vietnamese labels for dropdown selection",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of business types retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessTypesResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": [
-          "Account"
+          "partners"
+        ]
+      }
+    },
+    "/partners/me": {
+      "get": {
+        "operationId": "PartnersController_getMyProfile",
+        "summary": "Get own business profile",
+        "description": "Partner gets their own business entity information",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyProfileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "PartnersController_updateMyProfile",
+        "summary": "Update own business profile",
+        "description": "Partner updates their business information (limited fields)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePartnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyProfileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/locations/provinces": {
+      "get": {
+        "operationId": "LocationsController_getProvinces",
+        "summary": "Get all provinces in Vietnam",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of all provinces",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetProvincesResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "locations"
+        ]
+      }
+    },
+    "/locations/provinces/{provinceId}/districts": {
+      "get": {
+        "operationId": "LocationsController_getDistricts",
+        "summary": "Get all districts in a province",
+        "parameters": [
+          {
+            "name": "provinceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of districts in the province",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDistrictsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Province not found"
+          }
+        },
+        "tags": [
+          "locations"
+        ]
+      }
+    },
+    "/locations/districts/{districtId}/wards": {
+      "get": {
+        "operationId": "LocationsController_getWards",
+        "summary": "Get all wards in a district",
+        "parameters": [
+          {
+            "name": "districtId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of wards in the district",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetWardsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "District not found"
+          }
+        },
+        "tags": [
+          "locations"
+        ]
+      }
+    },
+    "/locations/seed": {
+      "post": {
+        "operationId": "LocationsController_seedData",
+        "summary": "Seed Vietnam administrative divisions data",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Seeding completed successfully"
+          }
+        },
+        "tags": [
+          "locations"
+        ]
+      }
+    },
+    "/s3/presign": {
+      "post": {
+        "operationId": "S3Controller_preSign",
+        "summary": "Get presigned upload URL",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresignRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The presigned URL has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresignResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "S3"
+        ]
+      }
+    },
+    "/s3/{key}": {
+      "get": {
+        "operationId": "S3Controller_getFileUrl",
+        "summary": "Get file URL",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "description": "File key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return the file URL.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileUrlResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "S3"
+        ]
+      },
+      "delete": {
+        "operationId": "S3Controller_deleteFile",
+        "summary": "Delete file",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "description": "File key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file has been successfully deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteFileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "S3"
         ]
       }
     },
     "/employees/doctors": {
       "post": {
         "operationId": "EmployeesController_createDoctor",
+        "summary": "Create a new doctor",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -295,26 +608,26 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Employee"
+                  "$ref": "#/components/schemas/EmployeeResponseDto"
                 }
               }
             }
           }
         },
+        "tags": [
+          "employees"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Create a new doctor",
-        "tags": [
-          "employees"
         ]
       }
     },
     "/employees/therapists": {
       "post": {
         "operationId": "EmployeesController_createTherapist",
+        "summary": "Create a new therapist",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -332,39 +645,39 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Employee"
+                  "$ref": "#/components/schemas/EmployeeResponseDto"
                 }
               }
             }
           }
         },
+        "tags": [
+          "employees"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Create a new therapist",
-        "tags": [
-          "employees"
         ]
       }
     },
     "/employees": {
       "get": {
         "operationId": "EmployeesController_findAll",
+        "summary": "Get all employees",
         "parameters": [
           {
             "name": "role",
             "required": false,
             "in": "query",
             "schema": {
-              "type": "string",
               "enum": [
                 "DOCTOR",
                 "THERAPIST",
                 "RECEPTIONIST",
                 "MANAGER"
-              ]
+              ],
+              "type": "string"
             }
           }
         ],
@@ -376,27 +689,27 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Employee"
+                    "$ref": "#/components/schemas/EmployeeResponseDto"
                   }
                 }
               }
             }
           }
         },
+        "tags": [
+          "employees"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Get all employees",
-        "tags": [
-          "employees"
         ]
       }
     },
     "/employees/{id}": {
       "get": {
         "operationId": "EmployeesController_findOne",
+        "summary": "Get an employee by id",
         "parameters": [
           {
             "name": "id",
@@ -413,7 +726,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Employee"
+                  "$ref": "#/components/schemas/EmployeeResponseDto"
                 }
               }
             }
@@ -422,18 +735,18 @@
             "description": "Employee not found."
           }
         },
+        "tags": [
+          "employees"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Get an employee by id",
-        "tags": [
-          "employees"
         ]
       },
       "patch": {
         "operationId": "EmployeesController_update",
+        "summary": "Update an employee",
         "parameters": [
           {
             "name": "id",
@@ -460,7 +773,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Employee"
+                  "$ref": "#/components/schemas/EmployeeResponseDto"
                 }
               }
             }
@@ -469,18 +782,18 @@
             "description": "Employee not found."
           }
         },
+        "tags": [
+          "employees"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Update an employee",
-        "tags": [
-          "employees"
         ]
       },
       "delete": {
         "operationId": "EmployeesController_remove",
+        "summary": "Delete an employee",
         "parameters": [
           {
             "name": "id",
@@ -492,27 +805,27 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "The employee has been successfully deleted."
           },
           "404": {
             "description": "Employee not found."
           }
         },
+        "tags": [
+          "employees"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Delete an employee",
-        "tags": [
-          "employees"
         ]
       }
     },
     "/categories": {
       "post": {
         "operationId": "CategoriesController_create",
+        "summary": "Create a new category",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -530,31 +843,32 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Category"
+                  "$ref": "#/components/schemas/CategoryResponseDto"
                 }
               }
             }
           }
         },
+        "tags": [
+          "categories"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Create a new category",
-        "tags": [
-          "categories"
         ]
       },
       "get": {
         "operationId": "CategoriesController_findAll",
+        "summary": "Get all categories",
         "parameters": [
           {
             "name": "rootsOnly",
             "required": false,
             "in": "query",
-            "description": "Return only root categories",
+            "description": "Return only root categories (without parent)",
             "schema": {
+              "example": true,
               "type": "boolean"
             }
           }
@@ -567,27 +881,27 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Category"
+                    "$ref": "#/components/schemas/CategoryResponseDto"
                   }
                 }
               }
             }
           }
         },
+        "tags": [
+          "categories"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Get all categories",
-        "tags": [
-          "categories"
         ]
       }
     },
     "/categories/{id}": {
       "get": {
         "operationId": "CategoriesController_findOne",
+        "summary": "Get a category by id",
         "parameters": [
           {
             "name": "id",
@@ -604,7 +918,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Category"
+                  "$ref": "#/components/schemas/CategoryResponseDto"
                 }
               }
             }
@@ -613,18 +927,18 @@
             "description": "Category not found."
           }
         },
+        "tags": [
+          "categories"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Get a category by id",
-        "tags": [
-          "categories"
         ]
       },
       "patch": {
         "operationId": "CategoriesController_update",
+        "summary": "Update a category",
         "parameters": [
           {
             "name": "id",
@@ -651,7 +965,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Category"
+                  "$ref": "#/components/schemas/CategoryResponseDto"
                 }
               }
             }
@@ -660,18 +974,18 @@
             "description": "Category not found."
           }
         },
+        "tags": [
+          "categories"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Update a category",
-        "tags": [
-          "categories"
         ]
       },
       "delete": {
         "operationId": "CategoriesController_remove",
+        "summary": "Delete a category",
         "parameters": [
           {
             "name": "id",
@@ -683,27 +997,27 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "The category has been successfully deleted."
           },
           "404": {
             "description": "Category not found."
           }
         },
+        "tags": [
+          "categories"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Delete a category",
-        "tags": [
-          "categories"
         ]
       }
     },
     "/categories/slug/{slug}": {
       "get": {
         "operationId": "CategoriesController_findBySlug",
+        "summary": "Get a category by slug",
         "parameters": [
           {
             "name": "slug",
@@ -720,7 +1034,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Category"
+                  "$ref": "#/components/schemas/CategoryResponseDto"
                 }
               }
             }
@@ -729,20 +1043,20 @@
             "description": "Category not found."
           }
         },
+        "tags": [
+          "categories"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Get a category by slug",
-        "tags": [
-          "categories"
         ]
       }
     },
     "/products": {
       "post": {
         "operationId": "ProductsController_create",
+        "summary": "Create a new product",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -760,24 +1074,24 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Product"
+                  "$ref": "#/components/schemas/ProductResponseDto"
                 }
               }
             }
           }
         },
+        "tags": [
+          "products"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Create a new product",
-        "tags": [
-          "products"
         ]
       },
       "get": {
         "operationId": "ProductsController_findAll",
+        "summary": "Get all products",
         "parameters": [],
         "responses": {
           "200": {
@@ -787,27 +1101,27 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Product"
+                    "$ref": "#/components/schemas/ProductResponseDto"
                   }
                 }
               }
             }
           }
         },
+        "tags": [
+          "products"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Get all products",
-        "tags": [
-          "products"
         ]
       }
     },
     "/products/{id}": {
       "get": {
         "operationId": "ProductsController_findOne",
+        "summary": "Get a product by id",
         "parameters": [
           {
             "name": "id",
@@ -824,7 +1138,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Product"
+                  "$ref": "#/components/schemas/ProductResponseDto"
                 }
               }
             }
@@ -833,18 +1147,18 @@
             "description": "Product not found."
           }
         },
+        "tags": [
+          "products"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Get a product by id",
-        "tags": [
-          "products"
         ]
       },
       "patch": {
         "operationId": "ProductsController_update",
+        "summary": "Update a product",
         "parameters": [
           {
             "name": "id",
@@ -871,7 +1185,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Product"
+                  "$ref": "#/components/schemas/ProductResponseDto"
                 }
               }
             }
@@ -880,18 +1194,18 @@
             "description": "Product not found."
           }
         },
+        "tags": [
+          "products"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Update a product",
-        "tags": [
-          "products"
         ]
       },
       "delete": {
         "operationId": "ProductsController_remove",
+        "summary": "Delete a product",
         "parameters": [
           {
             "name": "id",
@@ -903,27 +1217,27 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "The product has been successfully deleted."
           },
           "404": {
             "description": "Product not found."
           }
         },
+        "tags": [
+          "products"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Delete a product",
-        "tags": [
-          "products"
         ]
       }
     },
     "/products/slug/{slug}": {
       "get": {
         "operationId": "ProductsController_findBySlug",
+        "summary": "Get a product by slug",
         "parameters": [
           {
             "name": "slug",
@@ -940,7 +1254,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Product"
+                  "$ref": "#/components/schemas/ProductResponseDto"
                 }
               }
             }
@@ -949,80 +1263,120 @@
             "description": "Product not found."
           }
         },
+        "tags": [
+          "products"
+        ],
         "security": [
           {
             "bearer": []
           }
-        ],
-        "summary": "Get a product by slug",
-        "tags": [
-          "products"
         ]
       }
     },
-    "/s3/presign": {
+    "/service-tags": {
       "post": {
-        "operationId": "S3Controller_preSign",
+        "operationId": "ServiceTagsController_create",
+        "summary": "Create a new service tag",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "fileName": {
-                    "type": "string",
-                    "example": "example.png"
-                  },
-                  "contentType": {
-                    "type": "string",
-                    "example": "image/png"
-                  }
-                },
-                "required": [
-                  "fileName",
-                  "contentType"
-                ]
+                "$ref": "#/components/schemas/CreateServiceTagDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "The presigned url has been successfully created.",
+            "description": "The service tag has been successfully created.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "uploadUrl": {
-                      "type": "string"
-                    },
-                    "key": {
-                      "type": "string"
-                    }
+                  "$ref": "#/components/schemas/ServiceTagResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "service-tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "ServiceTagsController_findAll",
+        "summary": "Get all service tags for current user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return all service tags for the current user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceTagResponseDto"
                   }
                 }
               }
             }
           }
         },
-        "summary": "Get presigned upload url",
         "tags": [
-          "S3"
+          "service-tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
-    "/s3/{key}": {
+    "/service-tags/active": {
       "get": {
-        "operationId": "S3Controller_getFileUrl",
+        "operationId": "ServiceTagsController_findActive",
+        "summary": "Get active service tags for current user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return active service tags for the current user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceTagResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "service-tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/service-tags/{id}": {
+      "get": {
+        "operationId": "ServiceTagsController_findOne",
+        "summary": "Get a service tag by ID",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "required": true,
             "in": "path",
-            "description": "File key",
             "schema": {
               "type": "string"
             }
@@ -1030,34 +1384,215 @@
         ],
         "responses": {
           "200": {
-            "description": "Return the file url.",
+            "description": "Return the service tag.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "url": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ServiceTagResponseDto"
                 }
+              }
+            }
+          },
+          "404": {
+            "description": "Service tag not found."
+          }
+        },
+        "tags": [
+          "service-tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "ServiceTagsController_update",
+        "summary": "Update a service tag",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateServiceTagDto"
               }
             }
           }
         },
-        "summary": "Get file url",
+        "responses": {
+          "200": {
+            "description": "The service tag has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceTagResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized to update this tag."
+          },
+          "404": {
+            "description": "Service tag not found."
+          }
+        },
         "tags": [
-          "S3"
+          "service-tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "delete": {
-        "operationId": "S3Controller_deleteFile",
+        "operationId": "ServiceTagsController_remove",
+        "summary": "Delete a service tag",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "required": true,
             "in": "path",
-            "description": "File key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The service tag has been successfully deleted."
+          },
+          "403": {
+            "description": "Not authorized to delete this tag."
+          },
+          "404": {
+            "description": "Service tag not found."
+          }
+        },
+        "tags": [
+          "service-tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/service-tags/{id}/products/{productId}": {
+      "post": {
+        "operationId": "ServiceTagsController_attachToProduct",
+        "summary": "Attach a tag to a product",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Tag attached to product successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachTagResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized to use this tag."
+          },
+          "404": {
+            "description": "Tag or product not found."
+          },
+          "409": {
+            "description": "Tag is already attached to this product."
+          }
+        },
+        "tags": [
+          "service-tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ServiceTagsController_detachFromProduct",
+        "summary": "Detach a tag from a product",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Tag detached from product successfully."
+          },
+          "403": {
+            "description": "Not authorized to modify this tag."
+          },
+          "404": {
+            "description": "Tag or product-tag relationship not found."
+          }
+        },
+        "tags": [
+          "service-tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/service-tags/products/{productId}": {
+      "get": {
+        "operationId": "ServiceTagsController_getTagsForProduct",
+        "summary": "Get all tags attached to a product",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
             "schema": {
               "type": "string"
             }
@@ -1065,25 +1600,237 @@
         ],
         "responses": {
           "200": {
-            "description": "The file has been successfully deleted.",
+            "description": "Return all tags for the product.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "File deleted successfully"
-                    }
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceTagResponseDto"
                   }
                 }
               }
             }
           }
         },
-        "summary": "Delete file",
         "tags": [
-          "S3"
+          "service-tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners": {
+      "get": {
+        "operationId": "AdminPartnersController_getPartners",
+        "summary": "List all partners",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "verificationStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by verification status (PENDING, APPROVED, REJECTED)",
+            "schema": {
+              "example": "PENDING",
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED",
+                "REQUIRED_RESUBMIT"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by tax code, brand name, legal name, or email",
+            "schema": {
+              "example": "spa",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/{id}": {
+      "get": {
+        "operationId": "AdminPartnersController_getPartnerDetail",
+        "summary": "Get partner details including documents",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Partner ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerDetailResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/{id}/review": {
+      "put": {
+        "operationId": "AdminPartnersController_reviewPartner",
+        "summary": "Review partner profile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Partner ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewPartnerProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewPartnerResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/audit-logs": {
+      "get": {
+        "operationId": "AuditController_getAuditLogs",
+        "summary": "Get audit logs",
+        "parameters": [
+          {
+            "name": "targetId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by Target ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actorId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by Actor ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "description": "Filter by Action type",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of audit logs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditLog"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Audit Logs"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     }
@@ -1209,6 +1956,322 @@
           "password"
         ]
       },
+      "AccountRequestDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "spahanoi123",
+            "description": "Username"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123",
+            "description": "Password (min 8 characters)"
+          },
+          "email": {
+            "type": "string",
+            "example": "contact@spahanoi.com",
+            "description": "Email address"
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "email"
+        ]
+      },
+      "PartnerRequestDto": {
+        "type": "object",
+        "properties": {
+          "taxCode": {
+            "type": "string",
+            "description": "Tax code of the business (unique identifier)",
+            "example": "0123456789",
+            "maxLength": 20
+          },
+          "legalName": {
+            "type": "string",
+            "description": "Legal name of the business",
+            "example": "ABC Healthcare Company Limited",
+            "maxLength": 200
+          },
+          "brandName": {
+            "type": "string",
+            "description": "Brand name of the business",
+            "example": "ABC Clinic",
+            "maxLength": 150
+          },
+          "businessType": {
+            "type": "string",
+            "description": "Type of business",
+            "enum": [
+              "MASSAGE_THERAPY",
+              "MASSAGE_REHABILITATION",
+              "SPA_BEAUTY",
+              "FITNESS",
+              "PHARMACY",
+              "DENTAL",
+              "TRADITIONAL_MEDICINE",
+              "PSYCHOLOGY",
+              "DERMATOLOGY",
+              "NUTRITION",
+              "PSYCHIATRY"
+            ],
+            "example": "SPA_BEAUTY"
+          },
+          "provinceId": {
+            "type": "string",
+            "description": "UUID of the province (from Location tree)",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "districtId": {
+            "type": "string",
+            "description": "UUID of the district (from Location tree)",
+            "example": "123e4567-e89b-12d3-a456-426614174001"
+          },
+          "wardId": {
+            "type": "string",
+            "description": "UUID of the ward (from Location tree)",
+            "example": "123e4567-e89b-12d3-a456-426614174002"
+          },
+          "streetAddress": {
+            "type": "string",
+            "description": "Street address of the business",
+            "example": "123 Main Street",
+            "maxLength": 300
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Contact phone number for the business",
+            "example": "0901234567",
+            "maxLength": 20
+          }
+        },
+        "required": [
+          "taxCode",
+          "legalName",
+          "brandName",
+          "businessType",
+          "provinceId",
+          "districtId",
+          "wardId",
+          "streetAddress"
+        ]
+      },
+      "IdImagesRequestDto": {
+        "type": "object",
+        "properties": {
+          "frontImgUrl": {
+            "type": "string",
+            "example": "https://storage.example.com/id_front.jpg",
+            "description": "URL to front image of ID document"
+          },
+          "backImgUrl": {
+            "type": "string",
+            "example": "https://storage.example.com/id_back.jpg",
+            "description": "URL to back image of ID document"
+          }
+        },
+        "required": [
+          "frontImgUrl",
+          "backImgUrl"
+        ]
+      },
+      "PartnerDocumentVerificationDto": {
+        "type": "object",
+        "properties": {
+          "businessLicenseUrl": {
+            "type": "string",
+            "example": "https://storage.example.com/business_license.pdf",
+            "description": "URL to business license document"
+          },
+          "authorizationLetterUrl": {
+            "type": "string",
+            "example": "https://storage.example.com/authorization_letter.pdf",
+            "description": "URL to authorization letter document"
+          },
+          "taxCertificateUrl": {
+            "type": "string",
+            "example": "https://storage.example.com/tax_certificate.pdf",
+            "description": "URL to tax certificate document"
+          },
+          "otherDocumentUrls": {
+            "example": [
+              "https://storage.example.com/other_doc1.pdf"
+            ],
+            "description": "Array of URLs to other supporting documents",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "LegalRepresentativeRequestDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "NGUYỄN VĂN A",
+            "description": "Full name of legal representative"
+          },
+          "position": {
+            "type": "string",
+            "example": "Giám đốc",
+            "description": "Position in the company"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "0901234567",
+            "description": "Phone number of legal representative"
+          },
+          "idType": {
+            "type": "string",
+            "enum": [
+              "CITIZEN_ID",
+              "PASSPORT",
+              "MILITARY_ID"
+            ],
+            "example": "CITIZEN_ID",
+            "description": "Type of identification document"
+          },
+          "idNumber": {
+            "type": "string",
+            "example": "001234567890",
+            "description": "ID number (9 or 12 digits for Vietnam)"
+          },
+          "idIssueDate": {
+            "type": "string",
+            "example": "2023-01-15",
+            "description": "Date of ID issuance (ISO 8601 format)"
+          },
+          "images": {
+            "$ref": "#/components/schemas/IdImagesRequestDto"
+          },
+          "documents": {
+            "$ref": "#/components/schemas/PartnerDocumentVerificationDto"
+          }
+        },
+        "required": [
+          "fullName",
+          "idType",
+          "idNumber",
+          "idIssueDate",
+          "images",
+          "documents"
+        ]
+      },
+      "RegisterPartnerDto": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "description": "Account credentials for login",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AccountRequestDto"
+              }
+            ]
+          },
+          "partner": {
+            "description": "Partner (Business Entity) information",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerRequestDto"
+              }
+            ]
+          },
+          "legalRepresentative": {
+            "description": "Legal representative information",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LegalRepresentativeRequestDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "account",
+          "partner",
+          "legalRepresentative"
+        ]
+      },
+      "RegisterPartnerResponseDto": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "ID of the created partner account"
+          },
+          "businessEntityId": {
+            "type": "string",
+            "example": "987e6543-e21b-98d7-b654-321987654321",
+            "description": "ID of the created business entity"
+          },
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Registration status"
+          },
+          "message": {
+            "type": "string",
+            "example": "Partner registration successful",
+            "description": "Message"
+          },
+          "access_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "description": "JWT access token for immediate authentication"
+          },
+          "access_expires_in": {
+            "type": "string",
+            "example": "3600s",
+            "description": "Access token expiration time"
+          },
+          "refresh_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "description": "JWT refresh token for obtaining new access tokens"
+          },
+          "refresh_expires_in": {
+            "type": "string",
+            "example": "7d",
+            "description": "Refresh token expiration time"
+          }
+        },
+        "required": [
+          "accountId",
+          "businessEntityId",
+          "status",
+          "message",
+          "access_token",
+          "access_expires_in",
+          "refresh_token",
+          "refresh_expires_in"
+        ]
+      },
+      "PartnerLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "partner@clinic.com",
+            "description": "The email of the partner",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "example": "StrongP@ssw0rd!",
+            "description": "The password of the partner",
+            "format": "password"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
       "AdminLoginDto": {
         "type": "object",
         "properties": {
@@ -1240,6 +2303,19 @@
         },
         "required": [
           "message"
+        ]
+      },
+      "RefreshTokenRequestDto": {
+        "type": "object",
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "description": "Refresh token obtained from login or previous refresh",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...refresh"
+          }
+        },
+        "required": [
+          "refresh_token"
         ]
       },
       "SurveyResponseDto": {
@@ -1321,12 +2397,633 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-04T18:27:10.036Z"
+              "submittedAt": "2026-01-27T17:19:40.199Z"
             }
           }
         },
         "required": [
           "survey"
+        ]
+      },
+      "BusinessTypeDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "example": "SPA",
+            "description": "Business type enum value"
+          },
+          "label": {
+            "type": "string",
+            "example": "Spa & Làm đẹp",
+            "description": "Vietnamese label for display"
+          },
+          "description": {
+            "type": "string",
+            "example": "Spa and beauty services",
+            "description": "English description"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ]
+      },
+      "BusinessTypesResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "List of all available business types",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BusinessTypeDto"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AddressDto": {
+        "type": "object",
+        "properties": {
+          "provinceId": {
+            "type": "object",
+            "example": "uuid",
+            "nullable": true
+          },
+          "province": {
+            "type": "string",
+            "example": "Hà Nội"
+          },
+          "districtId": {
+            "type": "object",
+            "example": "uuid",
+            "nullable": true
+          },
+          "district": {
+            "type": "string",
+            "example": "Hoàn Kiếm"
+          },
+          "wardId": {
+            "type": "object",
+            "example": "uuid",
+            "nullable": true
+          },
+          "ward": {
+            "type": "string",
+            "example": "Hàng Bạc"
+          },
+          "streetAddress": {
+            "type": "string",
+            "example": "123 Le Loi Street"
+          }
+        },
+        "required": [
+          "provinceId",
+          "province",
+          "districtId",
+          "district",
+          "wardId",
+          "ward",
+          "streetAddress"
+        ]
+      },
+      "LegalRepresentativeDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "NGUYEN VAN A"
+          },
+          "position": {
+            "type": "string",
+            "example": "Giám đốc"
+          },
+          "idType": {
+            "type": "string",
+            "example": "CITIZEN_ID"
+          },
+          "idNumber": {
+            "type": "string",
+            "example": "001234567890"
+          }
+        },
+        "required": [
+          "fullName",
+          "position",
+          "idType",
+          "idNumber"
+        ]
+      },
+      "PartnerDocumentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "object",
+            "example": "uuid-123",
+            "nullable": true
+          },
+          "documentType": {
+            "type": "string",
+            "enum": [
+              "BUSINESS_LICENSE",
+              "IDENTITY_FRONT",
+              "IDENTITY_BACK",
+              "AUTHORIZATION_LETTER",
+              "ANTT",
+              "KCB_LICENSE",
+              "GCN_FITNESS",
+              "GPP",
+              "RHM_LICENSE",
+              "MEDICAL_WASTE_CONTRACT",
+              "YHCT_LICENSE",
+              "PSYCHOLOGY_LICENSE",
+              "DERMATOLOGY_LICENSE",
+              "TECHNICAL_PORTFOLIO",
+              "NUTRITION_LICENSE",
+              "PSYCHIATRY_LICENSE"
+            ]
+          },
+          "documentUrl": {
+            "type": "object",
+            "example": "https://...",
+            "nullable": true
+          },
+          "documentKey": {
+            "type": "object",
+            "example": "documents/...",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "MISSING",
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ],
+            "example": "PENDING"
+          },
+          "isRequired": {
+            "type": "boolean",
+            "example": true
+          },
+          "description": {
+            "type": "object",
+            "example": "Business License",
+            "nullable": true
+          },
+          "isReviewed": {
+            "type": "boolean",
+            "example": false
+          },
+          "isValid": {
+            "type": "boolean",
+            "example": true
+          },
+          "adminFeedback": {
+            "type": "object",
+            "example": "Image blurry",
+            "nullable": true
+          },
+          "verificationNotes": {
+            "type": "object",
+            "example": "Verified details",
+            "nullable": true
+          },
+          "uploadedAt": {
+            "type": "object",
+            "example": "2024-01-20T10:00:00Z",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "documentType",
+          "documentUrl",
+          "documentKey",
+          "status",
+          "isRequired",
+          "description",
+          "isReviewed",
+          "isValid",
+          "adminFeedback",
+          "verificationNotes",
+          "uploadedAt"
+        ]
+      },
+      "MyProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uuid"
+          },
+          "taxCode": {
+            "type": "string",
+            "example": "0123456789"
+          },
+          "legalName": {
+            "type": "string",
+            "example": "CÔNG TY TNHH SPA HÀ NỘI"
+          },
+          "brandName": {
+            "type": "string",
+            "example": "Hanoi Spa"
+          },
+          "businessType": {
+            "type": "string",
+            "enum": [
+              "MASSAGE_THERAPY",
+              "MASSAGE_REHABILITATION",
+              "SPA_BEAUTY",
+              "FITNESS",
+              "PHARMACY",
+              "DENTAL",
+              "TRADITIONAL_MEDICINE",
+              "PSYCHOLOGY",
+              "DERMATOLOGY",
+              "NUTRITION",
+              "PSYCHIATRY"
+            ],
+            "example": "SPA_BEAUTY"
+          },
+          "phoneNumber": {
+            "type": "object",
+            "example": "0901234567",
+            "nullable": true
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressDto"
+          },
+          "legalRepresentative": {
+            "$ref": "#/components/schemas/LegalRepresentativeDto"
+          },
+          "verificationStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "REQUIRED_RESUBMIT"
+            ],
+            "example": "PENDING"
+          },
+          "rejectionDetails": {
+            "type": "object",
+            "example": {
+              "taxCode": "Invalid format"
+            },
+            "nullable": true,
+            "description": "Field-level rejection details"
+          },
+          "documents": {
+            "description": "List of documents with their status",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerDocumentDto"
+            }
+          },
+          "verificationCompletedAt": {
+            "type": "object",
+            "example": null,
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "taxCode",
+          "legalName",
+          "brandName",
+          "businessType",
+          "phoneNumber",
+          "address",
+          "legalRepresentative",
+          "verificationStatus",
+          "rejectionDetails",
+          "documents",
+          "verificationCompletedAt",
+          "createdAt"
+        ]
+      },
+      "UpdateLegalRepresentativeDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "NGUYỄN VĂN A",
+            "description": "Full name of legal representative"
+          },
+          "position": {
+            "type": "string",
+            "example": "Giám đốc",
+            "description": "Position in the company"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "0901234567",
+            "description": "Phone number of legal representative"
+          },
+          "idType": {
+            "type": "string",
+            "enum": [
+              "CITIZEN_ID",
+              "PASSPORT",
+              "MILITARY_ID"
+            ],
+            "example": "CITIZEN_ID",
+            "description": "Type of identification document"
+          },
+          "idNumber": {
+            "type": "string",
+            "example": "001234567890",
+            "description": "ID number (9 or 12 digits for Vietnam)"
+          },
+          "idIssueDate": {
+            "type": "string",
+            "example": "2023-01-15",
+            "description": "Date of ID issuance (ISO 8601 format)"
+          },
+          "images": {
+            "$ref": "#/components/schemas/IdImagesRequestDto"
+          },
+          "documents": {
+            "$ref": "#/components/schemas/PartnerDocumentVerificationDto"
+          }
+        }
+      },
+      "DocumentUpdateDto": {
+        "type": "object",
+        "properties": {
+          "documentType": {
+            "type": "string",
+            "enum": [
+              "BUSINESS_LICENSE",
+              "IDENTITY_FRONT",
+              "IDENTITY_BACK",
+              "AUTHORIZATION_LETTER",
+              "ANTT",
+              "KCB_LICENSE",
+              "GCN_FITNESS",
+              "GPP",
+              "RHM_LICENSE",
+              "MEDICAL_WASTE_CONTRACT",
+              "YHCT_LICENSE",
+              "PSYCHOLOGY_LICENSE",
+              "DERMATOLOGY_LICENSE",
+              "TECHNICAL_PORTFOLIO",
+              "NUTRITION_LICENSE",
+              "PSYCHIATRY_LICENSE"
+            ]
+          },
+          "documentUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdatePartnerDto": {
+        "type": "object",
+        "properties": {
+          "taxCode": {
+            "type": "string",
+            "example": "0123456789",
+            "description": "Tax code (updatable if rejected)"
+          },
+          "businessType": {
+            "type": "string",
+            "example": "Abc Industry",
+            "description": "Business Type",
+            "enum": [
+              "MASSAGE_THERAPY",
+              "MASSAGE_REHABILITATION",
+              "SPA_BEAUTY",
+              "FITNESS",
+              "PHARMACY",
+              "DENTAL",
+              "TRADITIONAL_MEDICINE",
+              "PSYCHOLOGY",
+              "DERMATOLOGY",
+              "NUTRITION",
+              "PSYCHIATRY"
+            ]
+          },
+          "legalName": {
+            "type": "string",
+            "example": "ABC Health Services Ltd.",
+            "description": "Legal name of the business"
+          },
+          "brandName": {
+            "type": "string",
+            "example": "Hanoi Spa & Wellness",
+            "description": "Brand name of the business"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+84987654321",
+            "description": "Contact phone number"
+          },
+          "provinceId": {
+            "type": "string",
+            "example": "uuid-of-province",
+            "description": "Province ID (administrative division)"
+          },
+          "districtId": {
+            "type": "string",
+            "example": "uuid-of-district",
+            "description": "District ID (administrative division)"
+          },
+          "wardId": {
+            "type": "string",
+            "example": "uuid-of-ward",
+            "description": "Ward ID (administrative division)"
+          },
+          "streetAddress": {
+            "type": "string",
+            "example": "123 Le Loi Street",
+            "description": "Street address"
+          },
+          "legalRepresentative": {
+            "description": "Legal representative information to update",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdateLegalRepresentativeDto"
+              }
+            ]
+          },
+          "documents": {
+            "description": "List of documents to update or upload",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentUpdateDto"
+            }
+          }
+        }
+      },
+      "LocationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uuid-string"
+          },
+          "code": {
+            "type": "string",
+            "example": "01"
+          },
+          "name": {
+            "type": "string",
+            "example": "Hà Nội"
+          },
+          "nameEn": {
+            "type": "string",
+            "example": "Ha Noi"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Thành phố Hà Nội"
+          },
+          "fullNameEn": {
+            "type": "string",
+            "example": "Hanoi City"
+          },
+          "level": {
+            "type": "string",
+            "example": "PROVINCE"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "fullName",
+          "level"
+        ]
+      },
+      "GetProvincesResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "example": 63
+          }
+        },
+        "required": [
+          "data",
+          "total"
+        ]
+      },
+      "GetDistrictsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "example": 12
+          }
+        },
+        "required": [
+          "data",
+          "total"
+        ]
+      },
+      "GetWardsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "example": 14
+          }
+        },
+        "required": [
+          "data",
+          "total"
+        ]
+      },
+      "PresignRequestDto": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "description": "Original file name",
+            "example": "profile-picture.png"
+          },
+          "contentType": {
+            "type": "string",
+            "description": "MIME type of the file",
+            "example": "image/png"
+          }
+        },
+        "required": [
+          "fileName",
+          "contentType"
+        ]
+      },
+      "PresignResponseDto": {
+        "type": "object",
+        "properties": {
+          "uploadUrl": {
+            "type": "string",
+            "description": "Presigned URL for uploading the file",
+            "example": "https://bucket.r2.cloudflarestorage.com/..."
+          },
+          "key": {
+            "type": "string",
+            "description": "Storage key for the uploaded file",
+            "example": "1705401234567-profile-picture.png"
+          }
+        },
+        "required": [
+          "uploadUrl",
+          "key"
+        ]
+      },
+      "FileUrlResponseDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Public or signed URL for the file",
+            "example": "https://cdn.example.com/1705401234567-profile-picture.png"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "DeleteFileResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Confirmation message",
+            "example": "File deleted successfully"
+          }
+        },
+        "required": [
+          "message"
         ]
       },
       "DoctorProfileDto": {
@@ -1465,60 +3162,180 @@
           "profile"
         ]
       },
-      "Employee": {
-        "type": "object",
-        "properties": {}
-      },
       "TherapistProfileDto": {
         "type": "object",
         "properties": {
+          "employeeId": {
+            "type": "string",
+            "description": "Employee ID (primary key)"
+          },
           "level": {
             "type": "string",
-            "enum": [
-              "JUNIOR",
-              "SENIOR",
-              "MASTER"
-            ],
-            "example": "JUNIOR",
-            "description": "Therapist level"
+            "description": "Therapist level (junior, senior, etc.)"
           },
           "type": {
             "type": "string",
-            "example": "SPA",
-            "description": "Type of therapist (SPA, MASSAGE)"
+            "description": "Therapist type"
           },
           "strengthLevel": {
             "type": "string",
-            "enum": [
-              "SOFT",
-              "MEDIUM",
-              "STRONG"
-            ],
-            "example": "MEDIUM",
-            "description": "Therapist strength level for massage"
+            "description": "Strength level"
           },
           "commissionRate": {
             "type": "number",
-            "example": 10.5,
-            "description": "Commission rate percentage"
+            "description": "Commission rate (percentage)"
           },
           "healthCheckDate": {
+            "format": "date-time",
             "type": "string",
-            "example": "2023-01-01",
-            "description": "Last health check date"
+            "description": "Health check date"
           },
           "skills": {
-            "example": [
-              "Thai Massage",
-              "Shiatsu"
-            ],
-            "description": "Therapist skills",
+            "description": "List of skills",
             "type": "array",
             "items": {
               "type": "string"
             }
+          },
+          "deviceProficiency": {
+            "description": "Device proficiency list",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "licenseUrl": {
+            "type": "string",
+            "description": "License URL"
           }
         }
+      },
+      "EmployeeResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique employee identifier"
+          },
+          "employeeCode": {
+            "type": "string",
+            "description": "Employee code"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Full name"
+          },
+          "displayName": {
+            "type": "object",
+            "description": "Display name"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address"
+          },
+          "phone": {
+            "type": "object",
+            "description": "Phone number"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "description": "Avatar URL"
+          },
+          "jobTitle": {
+            "type": "object",
+            "description": "Job title"
+          },
+          "startDate": {
+            "type": "object",
+            "description": "Start date"
+          },
+          "employmentType": {
+            "type": "object",
+            "description": "Employment type"
+          },
+          "description": {
+            "type": "object",
+            "description": "Description/bio"
+          },
+          "dob": {
+            "type": "object",
+            "description": "Date of birth"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ],
+            "description": "Gender"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "DOCTOR",
+              "THERAPIST",
+              "RECEPTIONIST",
+              "MANAGER"
+            ],
+            "description": "Employee role"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "ON_LEAVE"
+            ],
+            "description": "Employee status"
+          },
+          "rating": {
+            "type": "number",
+            "description": "Rating (0-5)"
+          },
+          "reviewCount": {
+            "type": "number",
+            "description": "Number of reviews"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update timestamp"
+          },
+          "doctorProfile": {
+            "description": "Doctor profile",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DoctorProfileDto"
+              }
+            ]
+          },
+          "therapistProfile": {
+            "description": "Therapist profile",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TherapistProfileDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "employeeCode",
+          "fullName",
+          "email",
+          "role",
+          "status",
+          "rating",
+          "reviewCount",
+          "createdAt",
+          "updatedAt"
+        ]
       },
       "CreateTherapistDto": {
         "type": "object",
@@ -1843,9 +3660,86 @@
           "slug"
         ]
       },
-      "Category": {
+      "CategorySummaryDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ]
+      },
+      "CategoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique category identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Category name"
+          },
+          "slug": {
+            "type": "string",
+            "description": "URL-friendly slug"
+          },
+          "description": {
+            "type": "object",
+            "description": "Category description"
+          },
+          "imageUrl": {
+            "type": "object",
+            "description": "Category image URL"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether category is active"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update timestamp"
+          },
+          "parent": {
+            "description": "Parent category",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CategorySummaryDto"
+              }
+            ]
+          },
+          "children": {
+            "description": "Child categories",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummaryDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
       },
       "UpdateCategoryDto": {
         "type": "object",
@@ -2027,9 +3921,200 @@
           "type"
         ]
       },
-      "Product": {
+      "ProductMediaDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique media identifier"
+          },
+          "url": {
+            "type": "string",
+            "description": "Media URL"
+          },
+          "mediaType": {
+            "type": "string",
+            "description": "Media type (image, video, etc.)"
+          },
+          "isThumbnail": {
+            "type": "boolean",
+            "description": "Whether this is the thumbnail"
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "Sort order for display"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "sortOrder"
+        ]
+      },
+      "ServiceDefinitionDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "Product ID (primary key)"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "description": "Service duration in minutes"
+          },
+          "bufferMinutes": {
+            "type": "number",
+            "description": "Buffer time between appointments"
+          },
+          "maxCapacity": {
+            "type": "number",
+            "description": "Maximum capacity per slot"
+          },
+          "minLeadTimeHours": {
+            "type": "number",
+            "description": "Minimum lead time for booking (hours)"
+          },
+          "staffAssignmentType": {
+            "type": "string",
+            "description": "Staff assignment type"
+          }
+        },
+        "required": [
+          "productId",
+          "durationMinutes"
+        ]
+      },
+      "ServiceEmployeeEligibilityDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "Product ID"
+          },
+          "employeeId": {
+            "type": "string",
+            "description": "Employee ID"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary employee"
+          }
+        },
+        "required": [
+          "productId",
+          "employeeId",
+          "isPrimary"
+        ]
+      },
+      "ProductResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique product identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Product name"
+          },
+          "slug": {
+            "type": "string",
+            "description": "URL-friendly slug"
+          },
+          "description": {
+            "type": "object",
+            "description": "Product description"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "physical",
+              "service"
+            ],
+            "description": "Product type"
+          },
+          "basePrice": {
+            "type": "number",
+            "description": "Base price in specified currency"
+          },
+          "salePrice": {
+            "type": "object",
+            "description": "Sale price if on discount"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code (ISO 4217)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "active",
+              "archived"
+            ],
+            "description": "Product status"
+          },
+          "isVisibleOnline": {
+            "type": "boolean",
+            "description": "Whether product is visible online"
+          },
+          "vendorName": {
+            "type": "object",
+            "description": "Vendor name"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update timestamp"
+          },
+          "category": {
+            "description": "Product category",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CategorySummaryDto"
+              }
+            ]
+          },
+          "media": {
+            "description": "Product media assets",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductMediaDto"
+            }
+          },
+          "serviceDefinition": {
+            "description": "Service definition for service products",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServiceDefinitionDto"
+              }
+            ]
+          },
+          "serviceEmployeeEligibilities": {
+            "description": "Eligible employees for service",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceEmployeeEligibilityDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "type",
+          "basePrice",
+          "currency",
+          "status",
+          "isVisibleOnline",
+          "createdAt",
+          "updatedAt"
+        ]
       },
       "UpdateProductDto": {
         "type": "object",
@@ -2109,6 +4194,374 @@
             ]
           }
         }
+      },
+      "CreateServiceTagDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Premium Service",
+            "description": "Tag name"
+          },
+          "description": {
+            "type": "string",
+            "example": "Tags for premium tier services"
+          },
+          "colorValue": {
+            "type": "number",
+            "example": 4284704497,
+            "description": "Color value as integer"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the tag is active"
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0,
+            "description": "Sort order for display"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ServiceTagResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uuid-tag-id"
+          },
+          "userId": {
+            "type": "string",
+            "example": "uuid-user-id"
+          },
+          "name": {
+            "type": "string",
+            "example": "Premium Service"
+          },
+          "description": {
+            "type": "object",
+            "example": "Tags for premium tier services"
+          },
+          "colorValue": {
+            "type": "number",
+            "example": 4284704497
+          },
+          "usage": {
+            "type": "number",
+            "example": 5
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-01-14T22:45:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-01-14T22:45:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "name",
+          "colorValue",
+          "usage",
+          "isActive",
+          "sortOrder",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateServiceTagDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Premium Service",
+            "description": "Tag name"
+          },
+          "description": {
+            "type": "string",
+            "example": "Tags for premium tier services"
+          },
+          "colorValue": {
+            "type": "number",
+            "example": 4284704497,
+            "description": "Color value as integer"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the tag is active"
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0,
+            "description": "Sort order for display"
+          }
+        }
+      },
+      "AttachTagResponseDto": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "string",
+            "description": "Service tag ID",
+            "example": "uuid-tag-id"
+          },
+          "productId": {
+            "type": "string",
+            "description": "Product ID",
+            "example": "uuid-product-id"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp of the relationship"
+          }
+        },
+        "required": [
+          "tagId",
+          "productId",
+          "createdAt"
+        ]
+      },
+      "AdminLegalRepresentativeDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "NGUYEN VAN A"
+          },
+          "position": {
+            "type": "string",
+            "example": "Giám đốc"
+          },
+          "idType": {
+            "type": "string",
+            "example": "CITIZEN_ID"
+          },
+          "idNumber": {
+            "type": "string",
+            "example": "001234567890"
+          },
+          "id": {
+            "type": "string",
+            "example": "uuid-123"
+          },
+          "idIssueDate": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2020-01-15"
+          },
+          "idFrontImgUrl": {
+            "type": "object",
+            "example": "https://example.com/front.jpg",
+            "nullable": true
+          },
+          "idBackImgUrl": {
+            "type": "object",
+            "example": "https://example.com/back.jpg",
+            "nullable": true
+          },
+          "authorizationLetterUrl": {
+            "type": "object",
+            "example": null,
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "object",
+            "example": "0901234567",
+            "nullable": true
+          }
+        },
+        "required": [
+          "fullName",
+          "position",
+          "idType",
+          "idNumber",
+          "id",
+          "idIssueDate",
+          "idFrontImgUrl",
+          "idBackImgUrl",
+          "authorizationLetterUrl",
+          "phoneNumber"
+        ]
+      },
+      "AdminPartnerDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "taxCode": {
+            "type": "string"
+          },
+          "legalName": {
+            "type": "string"
+          },
+          "brandName": {
+            "type": "string"
+          },
+          "businessType": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "object",
+            "nullable": true
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressDto"
+          },
+          "verificationStatus": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "REQUIRED_RESUBMIT"
+            ]
+          },
+          "verificationCompletedAt": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "legalRepresentative": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdminLegalRepresentativeDto"
+              }
+            ]
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerDocumentDto"
+            }
+          },
+          "rejectionDetails": {
+            "type": "object",
+            "nullable": true,
+            "description": "Field-level rejection details"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "taxCode",
+          "legalName",
+          "brandName",
+          "businessType",
+          "phoneNumber",
+          "address",
+          "verificationStatus",
+          "verificationCompletedAt",
+          "createdAt",
+          "legalRepresentative",
+          "documents",
+          "rejectionDetails"
+        ]
+      },
+      "ReviewItemDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "DOCUMENT",
+              "FIELD",
+              "LEGAL_REP_FIELD"
+            ],
+            "description": "Type of item being reviewed"
+          },
+          "documentId": {
+            "type": "string",
+            "description": "UUID of the document (if type is DOCUMENT)"
+          },
+          "fieldName": {
+            "type": "string",
+            "description": "Name of the field (if type is FIELD)"
+          },
+          "isValid": {
+            "type": "boolean",
+            "description": "Mark the item as valid or invalid",
+            "example": true
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for rejection or feedback"
+          }
+        },
+        "required": [
+          "type",
+          "isValid"
+        ]
+      },
+      "ReviewPartnerProfileDto": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "CHANGES_REQUIRED",
+              "REJECTED"
+            ],
+            "description": "Overall decision on the partner profile"
+          },
+          "generalComment": {
+            "type": "string",
+            "description": "General comment for the review"
+          },
+          "items": {
+            "description": "List of specific items (fields or documents) with their validation status",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReviewItemDto"
+            }
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "ReviewPartnerResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Review submitted successfully",
+            "description": "Success message"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "AuditLog": {
+        "type": "object",
+        "properties": {}
       }
     }
   }

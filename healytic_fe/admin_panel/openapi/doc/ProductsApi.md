@@ -18,7 +18,7 @@ Method | HTTP request | Description
 
 
 # **productsControllerCreate**
-> Object productsControllerCreate(createProductDto)
+> ProductResponseDto productsControllerCreate(createProductDto)
 
 Create a new product
 
@@ -51,7 +51,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**ProductResponseDto**](ProductResponseDto.md)
 
 ### Authorization
 
@@ -65,7 +65,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsControllerFindAll**
-> List<Object> productsControllerFindAll()
+> List<ProductResponseDto> productsControllerFindAll()
 
 Get all products
 
@@ -94,7 +94,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**List<Object>**](Object.md)
+[**List<ProductResponseDto>**](ProductResponseDto.md)
 
 ### Authorization
 
@@ -108,7 +108,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsControllerFindBySlug**
-> Object productsControllerFindBySlug(slug)
+> ProductResponseDto productsControllerFindBySlug(slug)
 
 Get a product by slug
 
@@ -141,7 +141,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**ProductResponseDto**](ProductResponseDto.md)
 
 ### Authorization
 
@@ -155,7 +155,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsControllerFindOne**
-> Object productsControllerFindOne(id)
+> ProductResponseDto productsControllerFindOne(id)
 
 Get a product by id
 
@@ -188,7 +188,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**ProductResponseDto**](ProductResponseDto.md)
 
 ### Authorization
 
@@ -248,7 +248,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsControllerUpdate**
-> Object productsControllerUpdate(id, updateProductDto)
+> ProductResponseDto productsControllerUpdate(id, updateProductDto)
 
 Update a product
 
@@ -283,7 +283,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**ProductResponseDto**](ProductResponseDto.md)
 
 ### Authorization
 
