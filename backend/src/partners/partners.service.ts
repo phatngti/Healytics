@@ -532,17 +532,25 @@ export class PartnersService {
                 const isComplete = !isMissingDocs;
 
                 if (isClean && isComplete) {
-                    partner.verificationStatus = PartnerVerificationStatus.PENDING;
-                    partner.verificationCompletedAt = null;
+                    // Only transition to PENDING if currently ONBOARDING or REQUIRED_RESUBMIT
+                    if (partner.verificationStatus === PartnerVerificationStatus.ONBOARDING ||
+                        partner.verificationStatus === PartnerVerificationStatus.REQUIRED_RESUBMIT) {
+                        partner.verificationStatus = PartnerVerificationStatus.PENDING;
+                        partner.verificationCompletedAt = null;
+                    }
                 } else {
                     if (partner.verificationStatus === PartnerVerificationStatus.APPROVED && hasCriticalChange) {
                         partner.verificationStatus = PartnerVerificationStatus.REQUIRED_RESUBMIT;
                     }
                 }
 
+                // 1. Use Destructuring to separate relations from data.
+                // We extract 'documents' and 'legalRepresentative' into their own variables (which we ignore),
+                // and collect everything else into 'updateData'.
+                const { documents, legalRepresentative, ...updateData } = partner;
 
-
-                await queryRunner.manager.save(partner);
+                // 2. Pass only the 'updateData' to TypeORM
+                await queryRunner.manager.update(Partner, partner.id, updateData);
             }
             await queryRunner.commitTransaction();
             return this.getMyProfile(accountId); // Trả về data mới nhất
