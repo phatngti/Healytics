@@ -73,6 +73,7 @@ describe('PartnersService', () => {
             save: jest.fn(),
             findOne: jest.fn(),
             find: jest.fn(),
+            update: jest.fn(),
         },
     };
 
@@ -475,10 +476,74 @@ describe('PartnersService', () => {
             );
         });
 
+
+        it('should transition from ONBOARDING to PENDING when all documents are uploaded', async () => {
+            // Arrange
+            const partnerOnboarding = {
+                ...mockPartner,
+                verificationStatus: PartnerVerificationStatus.ONBOARDING,
+                documents: [],
+            };
+
+            // Requirements: ID Card Front (implied by legalRep mock) + Business License (mocked below)
+            mockDocRequirementRepository.find.mockResolvedValue([
+                { documentType: DocumentType.BUSINESS_LICENSE, isRequired: true }
+            ]);
+
+            mockPartnerRepository.findOne.mockImplementation(() => Promise.resolve({ ...partnerOnboarding }));
+
+            // Mock document upload
+            const docDto = {
+                documentType: DocumentType.BUSINESS_LICENSE,
+                documentUrl: 'https://example.com/license.jpg',
+            };
+            const updateWithDoc = {
+                documents: [docDto],
+            };
+
+            // Mock find existing doc (none)
+            mockQueryRunner.manager.findOne.mockImplementation((entity) => {
+                if (entity.name === 'PartnerDocument') return Promise.resolve(null); // New doc
+                if (entity.name === 'LegalRepresentative') return Promise.resolve(mockPartner.legalRepresentative);
+                return Promise.resolve(null);
+            });
+            mockQueryRunner.manager.find.mockImplementation((entity) => {
+                // Return all current documents including the one just uploaded (simulated)
+                // Note: The service fetches all docs again to check status
+                if (entity.name === 'PartnerDocument') {
+                    return Promise.resolve([{
+                        partnerId: mockPartner.id,
+                        documentType: DocumentType.BUSINESS_LICENSE,
+                        documentUrl: 'https://example.com/license.jpg',
+                        isReviewed: false,
+                        isValid: true,
+                    }]);
+                }
+                if (entity.name === 'DocumentRequirement') return Promise.resolve([{ documentType: DocumentType.BUSINESS_LICENSE, isRequired: true }]);
+                return Promise.resolve([]);
+            });
+
+            // Mock update to verify status change
+            let updateDataUsed: any;
+            mockQueryRunner.manager.update.mockImplementation((entity, id, data) => {
+                if (entity === Partner) {
+                    updateDataUsed = data;
+                }
+                return Promise.resolve({ generatedMaps: [], raw: [], affected: 1 });
+            });
+
+            // Act
+            await service.updateMyProfile('account-uuid', updateWithDoc as any);
+
+            // Assert
+            expect(updateDataUsed).toBeDefined();
+            expect(updateDataUsed.verificationStatus).toBe(PartnerVerificationStatus.PENDING);
+        });
+
         it('should rollback transaction on error', async () => {
             // Arrange
             mockPartnerRepository.findOne.mockResolvedValue({ ...mockPartner });
-            mockQueryRunner.manager.save.mockRejectedValue(new Error('Update error'));
+            mockQueryRunner.manager.update.mockRejectedValue(new Error('Update error'));
 
             // Act & Assert
             await expect(
