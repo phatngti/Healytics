@@ -1,6 +1,7 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
 import { EmployeesModule } from './employees/employees.module';
@@ -15,6 +16,7 @@ import { SeedModule } from './common/seed/seed.module';
 import databaseConfig from './config/database.config';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
+import { PublicThrottlerGuard } from './common/guards';
 
 @Module({
   imports: [
@@ -23,6 +25,11 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
       envFilePath: '.env',
       load: [databaseConfig],
     }),
+    // Rate limiting: 100 requests per 60 seconds for public routes
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100,
+    }]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -56,6 +63,10 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
     {
       provide: 'APP_GUARD',
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: 'APP_GUARD',
+      useClass: PublicThrottlerGuard,
     },
   ],
 })

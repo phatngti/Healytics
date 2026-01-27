@@ -25,8 +25,6 @@ export class AdminLegalRepresentativeDto extends BaseLegalRepresentativeDto {
         dto.idIssueDate = rep.idIssueDate;
         dto.idFrontImgUrl = rep.idFrontImgUrl;
         dto.idBackImgUrl = rep.idBackImgUrl;
-        dto.isAuthorizedUser = rep.isAuthorizedUser;
-        dto.authLetterDocUrl = rep.authLetterDocUrl;
         dto.phoneNumber = rep.phoneNumber;
         return dto;
     }

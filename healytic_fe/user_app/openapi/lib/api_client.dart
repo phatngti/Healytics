@@ -184,10 +184,28 @@ class ApiClient {
           return value is DateTime ? value : DateTime.tryParse(value);
         case 'Object':
           return value;
+        case 'AccountRequestDto':
+          return AccountRequestDto.fromJson(value);
+        case 'AddressDto':
+          return AddressDto.fromJson(value);
+        case 'AdminLegalRepresentativeDto':
+          return AdminLegalRepresentativeDto.fromJson(value);
         case 'AdminLoginDto':
           return AdminLoginDto.fromJson(value);
+        case 'AdminPartnerDetailResponseDto':
+          return AdminPartnerDetailResponseDto.fromJson(value);
+        case 'AttachTagResponseDto':
+          return AttachTagResponseDto.fromJson(value);
         case 'AuthTokensDto':
           return AuthTokensDto.fromJson(value);
+        case 'BusinessTypeDto':
+          return BusinessTypeDto.fromJson(value);
+        case 'BusinessTypesResponseDto':
+          return BusinessTypesResponseDto.fromJson(value);
+        case 'CategoryResponseDto':
+          return CategoryResponseDto.fromJson(value);
+        case 'CategorySummaryDto':
+          return CategorySummaryDto.fromJson(value);
         case 'CreateCategoryDto':
           return CreateCategoryDto.fromJson(value);
         case 'CreateDoctorDto':
@@ -200,28 +218,80 @@ class ApiClient {
           return CreateProductMediaDto.fromJson(value);
         case 'CreateServiceDefinitionDto':
           return CreateServiceDefinitionDto.fromJson(value);
+        case 'CreateServiceTagDto':
+          return CreateServiceTagDto.fromJson(value);
         case 'CreateTherapistDto':
           return CreateTherapistDto.fromJson(value);
         case 'CreateTherapistProfileDto':
           return CreateTherapistProfileDto.fromJson(value);
+        case 'DeleteFileResponseDto':
+          return DeleteFileResponseDto.fromJson(value);
         case 'DoctorProfileDto':
           return DoctorProfileDto.fromJson(value);
+        case 'DocumentUpdateDto':
+          return DocumentUpdateDto.fromJson(value);
+        case 'EmployeeResponseDto':
+          return EmployeeResponseDto.fromJson(value);
+        case 'FileUrlResponseDto':
+          return FileUrlResponseDto.fromJson(value);
+        case 'GetDistrictsResponseDto':
+          return GetDistrictsResponseDto.fromJson(value);
+        case 'GetProvincesResponseDto':
+          return GetProvincesResponseDto.fromJson(value);
+        case 'GetWardsResponseDto':
+          return GetWardsResponseDto.fromJson(value);
+        case 'IdImagesRequestDto':
+          return IdImagesRequestDto.fromJson(value);
+        case 'LegalRepresentativeDto':
+          return LegalRepresentativeDto.fromJson(value);
+        case 'LegalRepresentativeRequestDto':
+          return LegalRepresentativeRequestDto.fromJson(value);
+        case 'LocationDto':
+          return LocationDto.fromJson(value);
         case 'LoginDto':
           return LoginDto.fromJson(value);
         case 'LogoutResponseDto':
           return LogoutResponseDto.fromJson(value);
+        case 'MyProfileResponseDto':
+          return MyProfileResponseDto.fromJson(value);
+        case 'PartnerDocumentDto':
+          return PartnerDocumentDto.fromJson(value);
+        case 'PartnerDocumentVerificationDto':
+          return PartnerDocumentVerificationDto.fromJson(value);
+        case 'PartnerLoginDto':
+          return PartnerLoginDto.fromJson(value);
+        case 'PartnerRequestDto':
+          return PartnerRequestDto.fromJson(value);
+        case 'PresignRequestDto':
+          return PresignRequestDto.fromJson(value);
+        case 'PresignResponseDto':
+          return PresignResponseDto.fromJson(value);
+        case 'ProductMediaDto':
+          return ProductMediaDto.fromJson(value);
+        case 'ProductResponseDto':
+          return ProductResponseDto.fromJson(value);
+        case 'RefreshTokenRequestDto':
+          return RefreshTokenRequestDto.fromJson(value);
         case 'RegisterDto':
           return RegisterDto.fromJson(value);
+        case 'RegisterPartnerDto':
+          return RegisterPartnerDto.fromJson(value);
+        case 'RegisterPartnerResponseDto':
+          return RegisterPartnerResponseDto.fromJson(value);
         case 'RegisterProfileDto':
           return RegisterProfileDto.fromJson(value);
-        case 'S3ControllerDeleteFile200Response':
-          return S3ControllerDeleteFile200Response.fromJson(value);
-        case 'S3ControllerGetFileUrl200Response':
-          return S3ControllerGetFileUrl200Response.fromJson(value);
-        case 'S3ControllerPreSign201Response':
-          return S3ControllerPreSign201Response.fromJson(value);
-        case 'S3ControllerPreSignRequest':
-          return S3ControllerPreSignRequest.fromJson(value);
+        case 'ReviewItemDto':
+          return ReviewItemDto.fromJson(value);
+        case 'ReviewPartnerProfileDto':
+          return ReviewPartnerProfileDto.fromJson(value);
+        case 'ReviewPartnerResponseDto':
+          return ReviewPartnerResponseDto.fromJson(value);
+        case 'ServiceDefinitionDto':
+          return ServiceDefinitionDto.fromJson(value);
+        case 'ServiceEmployeeEligibilityDto':
+          return ServiceEmployeeEligibilityDto.fromJson(value);
+        case 'ServiceTagResponseDto':
+          return ServiceTagResponseDto.fromJson(value);
         case 'SurveyDto':
           return SurveyDto.fromJson(value);
         case 'SurveyResponseDto':
@@ -232,8 +302,14 @@ class ApiClient {
           return UpdateCategoryDto.fromJson(value);
         case 'UpdateEmployeeDto':
           return UpdateEmployeeDto.fromJson(value);
+        case 'UpdateLegalRepresentativeDto':
+          return UpdateLegalRepresentativeDto.fromJson(value);
+        case 'UpdatePartnerDto':
+          return UpdatePartnerDto.fromJson(value);
         case 'UpdateProductDto':
           return UpdateProductDto.fromJson(value);
+        case 'UpdateServiceTagDto':
+          return UpdateServiceTagDto.fromJson(value);
         default:
           dynamic match;
           if (value is List && (match = _regList.firstMatch(targetType)?.group(1)) != null) {

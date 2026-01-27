@@ -1,7 +1,6 @@
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/utils/user_role_helper.dart';
-import 'package:admin_panel/router/admin_routes.dart';
 import 'package:admin_panel/router/partner_routes.dart' as partner;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -100,8 +99,7 @@ GoRouter router(Ref ref) {
       }
     } else {
       if (!isPublicRoute) {
-        return SignUpFormRoute().location;
-        //  return '/';
+        return '/';
       }
     }
     return null;

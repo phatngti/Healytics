@@ -33,7 +33,7 @@ class EmailCodeVerificationScreen extends HookConsumerWidget {
               ToastType.success,
               'Verify OTP successfully',
             );
-            context.go(SignUpFormRoute().location);
+            context.go(SignUpRoute().location);
           }
         },
         error: (error, stackTrace) {

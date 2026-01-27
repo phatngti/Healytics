@@ -41,11 +41,17 @@ export class LegalRepresentative {
     @Column({ name: 'id_back_img_url', type: 'text' })
     idBackImgUrl: string;
 
-    @Column({ name: 'is_authorized_user', default: false })
-    isAuthorizedUser: boolean;
+    @Column({ name: 'business_license_url', type: 'text', nullable: true })
+    businessLicenseUrl: string | null;
 
-    @Column({ name: 'auth_letter_doc_url', type: 'text', nullable: true })
-    authLetterDocUrl: string | null;
+    @Column({ name: 'authorization_letter_url', type: 'text', nullable: true })
+    authorizationLetterUrl: string | null;
+
+    @Column({ name: 'tax_certificate_url', type: 'text', nullable: true })
+    taxCertificateUrl: string | null;
+
+    @Column({ name: 'other_document_urls', type: 'simple-array', nullable: true })
+    otherDocumentUrls: string[] | null;
 
     @Column({ name: 'phone_number', type: 'varchar', length: 20, nullable: true })
     phoneNumber: string | null;

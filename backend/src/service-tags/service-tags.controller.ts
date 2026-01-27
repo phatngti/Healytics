@@ -31,9 +31,9 @@ import { ServiceTagResponseDto } from './dto/service-tag-response.dto';
 import { AttachTagResponseDto } from './dto/attach-tag-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
-import { Roles } from '@/auth/decorators/roles.decorator';
+import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { Role } from '@/account/enum/role.enum';
-import { CurrentUser } from '@/auth/decorators/current-user.decorator';
+import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 
 /**
  * Controller for service tag management endpoints.
