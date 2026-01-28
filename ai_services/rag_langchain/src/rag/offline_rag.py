@@ -98,10 +98,10 @@ class Offline_RAG:
         self.llm = llm
         # self.prompt = hub.pull("rlm/rag-prompt") # Template Prompt có sẵn
         self.str_parser = Str_OutputParser()
-        self.recommender = Chatbot_Recommender("healytics_collection")
+        # self.recommender = Chatbot_Recommender("healytics_collection")
     
-    def recommend_services(self, question: str):
-        return self.recommender.recommend(question)
+    # def recommend_services(self, question: str):
+    #     return self.recommender.recommend(question)
 
     def get_chain(self, retriever):
         # Tạo biến need_recommender để xác định có cần recommender hay không dựa vào mô hình intent classification !
