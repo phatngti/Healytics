@@ -11,7 +11,7 @@
 # newgrp docker
 # docker build -t healytics_chatbot_rag . (Build docker image)
 # docker run --gpus all -it healytics_chatbot_rag bash
-# docker run --name healytics_chatbot --gpus all -it -v /home/giahung21112004/Projects/Healytics/ai_services/rag_langchain:/app -v torch_cache:/root/.cache/torch -v hf_cache:/root/.cache/huggingface -w /app healytics_chatbot_rag bash (lệnh thay thế để mount code khỏi build)
+# docker run --name healytics_chatbot_2 --gpus all -it -p 5000:5000 -v /home/giahung21112004/Projects/Healytics/ai_services/rag_langchain:/app -v torch_cache:/root/.cache/torch -v hf_cache:/root/.cache/huggingface -w /app healytics_chatbot_rag bash (lệnh thay thế để mount code khỏi build)
 # docker start -ai healytics_chatbot
 
 
