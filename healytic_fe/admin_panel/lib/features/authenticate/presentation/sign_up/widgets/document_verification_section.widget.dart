@@ -1,81 +1,329 @@
 import 'dart:developer' as developer;
 
 import 'package:admin_panel/core/providers/s3.provider.dart';
+import 'package:admin_panel/constants/document_types.dart';
+import 'package:admin_panel/constants/file_type.dart';
 import 'package:admin_panel/utils/demensions.dart';
+import 'package:admin_panel/utils/url_utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+/// Presentation config combining business document type with UI properties.
+class _DocumentFieldConfig {
+  const _DocumentFieldConfig({
+    required this.documentType,
+    required this.icon,
+    required this.isRequired,
+  });
+
+  final DocumentType documentType;
+  final IconData icon;
+  final bool isRequired;
+
+  String get documentKey => documentType.documentKey;
+  String get label => documentType.label;
+}
+
+class DocumentUploadType {
+  final String type;
+  final String key;
+  final String documentKey;
+
+  DocumentUploadType({
+    required this.type,
+    required this.key,
+    required this.documentKey,
+  });
+
+  /// Extracts the S3 key from the full URL.
+  /// Example: 'http://bucket.s3.amazonaws.com/path/to/file.pdf' -> 'path/to/file.pdf'
+  String get url {
+    return formatR2Url(key) ?? key;
+  }
+
+  /// Returns the display type based on file extension.
+  String get fileType => FileTypeDisplay.fromExtension(type).name;
+}
 
 /// Document Verification form section (Section 4) of Partner Registration.
 ///
-/// Contains upload fields for:
-/// - Business License (Giấy phép kinh doanh)
-/// - Authorization Letter (Giấy ủy quyền)
-/// - Tax Registration Certificate (Mã số thuế)
-/// - Other Supporting Documents (Tài liệu bổ sung)
+/// Renders different document upload fields based on the business [scope].
+/// Each scope has specific required and optional documents.
+///
+/// Each document field is registered with FormBuilder using the document's key.
+/// The form values are stored as String URLs (S3 keys).
 class DocumentVerificationSection extends StatelessWidget {
-  const DocumentVerificationSection({super.key});
+  /// Creates a document verification section.
+  ///
+  /// The [scope] parameter determines which documents are displayed.
+  const DocumentVerificationSection({super.key, required this.scope});
+
+  /// The business scope/type that determines which documents to show.
+  final String scope;
+
+  /// Returns the list of document field configs for the given scope.
+  List<_DocumentFieldConfig> _getDocumentsForScope(String scope) {
+    switch (scope.toUpperCase()) {
+      case 'DENTAL':
+        return [
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.businessLicense,
+            icon: Icons.description_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.rhmLicense,
+            icon: Icons.sentiment_satisfied_alt_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.medicalWasteContract,
+            icon: Icons.delete_outline,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.authorizationLetter,
+            icon: Icons.assignment_ind_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.kcbLicense,
+            icon: Icons.medical_services_outlined,
+            isRequired: false,
+          ),
+        ];
+      case 'DERMATOLOGY':
+        return [
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.businessLicense,
+            icon: Icons.description_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.dermatologyLicense,
+            icon: Icons.face_retouching_natural_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.technicalPortfolio,
+            icon: Icons.folder_special_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.authorizationLetter,
+            icon: Icons.assignment_ind_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.kcbLicense,
+            icon: Icons.medical_services_outlined,
+            isRequired: false,
+          ),
+        ];
+      case 'TRADITIONAL_MEDICINE':
+        return [
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.businessLicense,
+            icon: Icons.description_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.yhctLicense,
+            icon: Icons.spa_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.authorizationLetter,
+            icon: Icons.assignment_ind_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.kcbLicense,
+            icon: Icons.medical_services_outlined,
+            isRequired: false,
+          ),
+        ];
+      case 'PSYCHOLOGY':
+        return [
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.businessLicense,
+            icon: Icons.description_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.psychologyLicense,
+            icon: Icons.psychology_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.authorizationLetter,
+            icon: Icons.assignment_ind_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.kcbLicense,
+            icon: Icons.medical_services_outlined,
+            isRequired: false,
+          ),
+        ];
+      case 'PSYCHIATRY':
+        return [
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.businessLicense,
+            icon: Icons.description_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.psychiatryLicense,
+            icon: Icons.psychology_alt_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.authorizationLetter,
+            icon: Icons.assignment_ind_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.kcbLicense,
+            icon: Icons.medical_services_outlined,
+            isRequired: false,
+          ),
+        ];
+      case 'NUTRITION':
+        return [
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.businessLicense,
+            icon: Icons.description_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.nutritionLicense,
+            icon: Icons.restaurant_menu_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.antt,
+            icon: Icons.verified_user_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.authorizationLetter,
+            icon: Icons.assignment_ind_outlined,
+            isRequired: false,
+          ),
+        ];
+      case 'PHARMACY':
+        return [
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.businessLicense,
+            icon: Icons.description_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.gpp,
+            icon: Icons.local_pharmacy_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.authorizationLetter,
+            icon: Icons.assignment_ind_outlined,
+            isRequired: false,
+          ),
+        ];
+      case 'FITNESS':
+        return [
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.businessLicense,
+            icon: Icons.description_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.gcnFitness,
+            icon: Icons.fitness_center_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.authorizationLetter,
+            icon: Icons.assignment_ind_outlined,
+            isRequired: false,
+          ),
+        ];
+      case 'SPA_BEAUTY':
+      case 'MASSAGE_THERAPY':
+      case 'MASSAGE_REHABILITATION':
+      default:
+        return [
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.businessLicense,
+            icon: Icons.description_outlined,
+            isRequired: true,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.authorizationLetter,
+            icon: Icons.assignment_ind_outlined,
+            isRequired: false,
+          ),
+          _DocumentFieldConfig(
+            documentType: DocumentTypes.kcbLicense,
+            icon: Icons.medical_services_outlined,
+            isRequired: false,
+          ),
+        ];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final documents = _getDocumentsForScope(scope);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Business License (Required)
-        _buildDocumentUploadField(
-          context,
-          name: 'business_license',
-          label: 'Business License (Giấy phép kinh doanh)',
-          icon: Icons.description_outlined,
-          isRequired: true,
-        ),
-        AppDimens.verticalLarge,
-
-        // Authorization Letter (Optional)
-        _buildDocumentUploadField(
-          context,
-          name: 'authorization_letter',
-          label: 'Authorization Letter (Giấy ủy quyền)',
-          icon: Icons.assignment_ind_outlined,
-          isRequired: false,
-        ),
-        AppDimens.verticalLarge,
-
-        // Tax Registration Certificate (Required)
-        _buildDocumentUploadField(
-          context,
-          name: 'tax_certificate',
-          label: 'Tax Registration Certificate (Mã số thuế)',
-          icon: Icons.account_balance_outlined,
-          isRequired: true,
-        ),
+        // Render document fields based on scope
+        for (int i = 0; i < documents.length; i++) ...[
+          _DocumentUploadField(
+            documentKey: documents[i].documentKey,
+            label: documents[i].label,
+            icon: documents[i].icon,
+            isRequired: documents[i].isRequired,
+          ),
+          if (i < documents.length - 1) AppDimens.verticalLarge,
+        ],
         AppDimens.verticalLarge,
 
         // Other Supporting Documents (Optional, Multiple files supported)
-        _buildMultiDocumentUploadField(
-          context,
-          name: 'other_documents',
-          label: 'Other Supporting Documents (Tài liệu bổ sung)',
+        _MultiDocumentUploadField(
+          name: DocumentTypes.otherDocuments.documentKey,
+          label: DocumentTypes.otherDocuments.label,
           icon: Icons.folder_open_outlined,
           isRequired: false,
         ),
       ],
     );
   }
+}
 
-  /// Builds a document upload field with label using FormBuilderField.
-  ///
-  /// Shows a required indicator (*) or "(Optional)" text based on [isRequired].
-  Widget _buildDocumentUploadField(
-    BuildContext context, {
-    required String name,
-    required String label,
-    required IconData icon,
-    required bool isRequired,
-  }) {
+/// Single document upload field with FormBuilder integration.
+///
+/// The form value is stored as a String (S3 URL/key).
+class _DocumentUploadField extends StatelessWidget {
+  const _DocumentUploadField({
+    required this.documentKey,
+    required this.label,
+    required this.icon,
+    required this.isRequired,
+  });
+
+  final String documentKey;
+  final String label;
+  final IconData icon;
+  final bool isRequired;
+
+  @override
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -110,32 +358,45 @@ class DocumentVerificationSection extends StatelessWidget {
           ],
         ),
         AppDimens.verticalSmall,
-        FormBuilderField<String?>(
-          name: name,
-          builder: (FormFieldState<String?> field) {
+        FormBuilderField<DocumentUploadType?>(
+          name: 'documents.$documentKey',
+          validator: isRequired
+              ? (value) =>
+                    (value == null || value.url.isEmpty) ? 'Required' : null
+              : null,
+          builder: (FormFieldState<DocumentUploadType?> field) {
             return _DocumentUploadArea(
+              documentKey: documentKey,
               icon: icon,
               initialValue: field.value,
-              onFileSelected: (value) {
-                field.didChange(value);
-              },
+              errorText: field.errorText,
+              onFileSelected: (file) => field.didChange(file),
             );
           },
         ),
       ],
     );
   }
+}
 
-  /// Builds a multi-document upload field with label (supports multiple files).
-  ///
-  /// Shows a required indicator (*) or "(Optional)" text based on [isRequired].
-  Widget _buildMultiDocumentUploadField(
-    BuildContext context, {
-    required String name,
-    required String label,
-    required IconData icon,
-    required bool isRequired,
-  }) {
+/// Multi-document upload field with FormBuilder integration.
+///
+/// The form value is stored as a `List<String>` (S3 URLs/keys).
+class _MultiDocumentUploadField extends StatelessWidget {
+  const _MultiDocumentUploadField({
+    required this.name,
+    required this.label,
+    required this.icon,
+    required this.isRequired,
+  });
+
+  final String name;
+  final String label;
+  final IconData icon;
+  final bool isRequired;
+
+  @override
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -170,16 +431,14 @@ class DocumentVerificationSection extends StatelessWidget {
           ],
         ),
         AppDimens.verticalSmall,
-        FormBuilderField<List<String>>(
-          name: name,
+        FormBuilderField<List<DocumentUploadType>>(
+          name: 'documents.$name',
           initialValue: const [],
-          builder: (FormFieldState<List<String>> field) {
+          builder: (FormFieldState<List<DocumentUploadType>> field) {
             return _MultiDocumentUploadArea(
               icon: icon,
               initialFiles: field.value ?? [],
-              onFilesSelected: (value) {
-                field.didChange(value);
-              },
+              onFilesSelected: (value) => field.didChange(value),
             );
           },
         ),
@@ -189,16 +448,23 @@ class DocumentVerificationSection extends StatelessWidget {
 }
 
 /// Document upload area with drag & drop styling.
+///
+/// When a file is uploaded, this widget calls [onFileSelected] with the S3 key.
 class _DocumentUploadArea extends ConsumerStatefulWidget {
-  final IconData icon;
-  final ValueChanged<String?>? onFileSelected;
-  final String? initialValue;
-
   const _DocumentUploadArea({
+    required this.documentKey,
     required this.icon,
     this.onFileSelected,
     this.initialValue,
+    this.errorText,
   });
+
+  final String documentKey;
+
+  final IconData icon;
+  final ValueChanged<DocumentUploadType?>? onFileSelected;
+  final DocumentUploadType? initialValue;
+  final String? errorText;
 
   @override
   ConsumerState<_DocumentUploadArea> createState() =>
@@ -214,10 +480,19 @@ class _DocumentUploadAreaState extends ConsumerState<_DocumentUploadArea> {
   void initState() {
     super.initState();
     if (widget.initialValue != null) {
-      // In a real scenario, we might only have the URL/key, not the original filename
-      // So we might need to display the key or some placeholder, or fetch metadata
-      // For now, let's assume the value is what we want to display or we extract filename from it
-      _uploadedFileName = widget.initialValue!.split('/').last;
+      _uploadedFileName = widget.initialValue!.url.split('/').last;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _DocumentUploadArea oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue) {
+      if (widget.initialValue != null) {
+        _uploadedFileName = widget.initialValue!.url.split('/').last;
+      } else {
+        _uploadedFileName = null;
+      }
     }
   }
 
@@ -231,100 +506,119 @@ class _DocumentUploadAreaState extends ConsumerState<_DocumentUploadArea> {
       return _buildUploadedFileView(colorScheme, textTheme);
     }
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
-      child: GestureDetector(
-        onTap: _isUploading ? null : _pickFile,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          height: 128,
-          decoration: BoxDecoration(
-            color: _isHovering
-                ? colorScheme.primary.withValues(alpha: 0.05)
-                : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-            borderRadius: AppDimens.radiusSmall,
-            border: Border.all(
-              color: _isHovering
-                  ? colorScheme.primary
-                  : colorScheme.outline.withValues(alpha: 0.3),
-              width: 2,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => setState(() => _isHovering = true),
+          onExit: (_) => setState(() => _isHovering = false),
+          child: GestureDetector(
+            onTap: _isUploading ? null : _pickFile,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 128,
+              decoration: BoxDecoration(
+                color: _isHovering
+                    ? colorScheme.primary.withValues(alpha: 0.05)
+                    : colorScheme.surfaceContainerHighest.withValues(
+                        alpha: 0.3,
+                      ),
+                borderRadius: AppDimens.radiusSmall,
+                border: Border.all(
+                  color: widget.errorText != null
+                      ? colorScheme.error
+                      : _isHovering
+                      ? colorScheme.primary
+                      : colorScheme.outline.withValues(alpha: 0.3),
+                  width: 2,
+                ),
+              ),
+              child: Center(
+                child: _isUploading
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 28,
+                            height: 28,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          AppDimens.verticalSmall,
+                          Text(
+                            'Uploading...',
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            widget.icon,
+                            size: 28,
+                            color: _isHovering
+                                ? colorScheme.primary
+                                : colorScheme.onSurfaceVariant,
+                          ),
+                          AppDimens.verticalSmall,
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Click to upload',
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: ' or drag and drop',
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          AppDimens.verticalExtraSmall,
+                          Text(
+                            'PDF, JPG, PNG | Max 10MB',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.7,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
             ),
           ),
-          child: Center(
-            child: _isUploading
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                      AppDimens.verticalSmall,
-                      Text(
-                        'Uploading...',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        widget.icon,
-                        size: 28,
-                        color: _isHovering
-                            ? colorScheme.primary
-                            : colorScheme.onSurfaceVariant,
-                      ),
-                      AppDimens.verticalSmall,
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Click to upload',
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            TextSpan(
-                              text: ' or drag and drop',
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      AppDimens.verticalExtraSmall,
-                      Text(
-                        'PDF, JPG, PNG | Max 10MB',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant.withValues(
-                            alpha: 0.7,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
         ),
-      ),
+        if (widget.errorText != null) ...[
+          AppDimens.verticalExtraSmall,
+          Text(
+            widget.errorText!,
+            style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+          ),
+        ],
+      ],
     );
   }
 
   /// Builds the view showing uploaded file info with icon and remove button.
   Widget _buildUploadedFileView(ColorScheme colorScheme, TextTheme textTheme) {
-    final fileIcon = _getFileIcon(_uploadedFileName!);
-    final iconColor = _getFileIconColor(_uploadedFileName!, colorScheme);
+    final fileIcon = FileTypeUtils.getFileIcon(_uploadedFileName!);
+    final iconColor = FileTypeUtils.getFileIconColor(
+      _uploadedFileName!,
+      colorScheme,
+    );
 
     return Container(
       height: 128,
@@ -395,36 +689,6 @@ class _DocumentUploadAreaState extends ConsumerState<_DocumentUploadArea> {
     );
   }
 
-  /// Returns appropriate icon based on file extension.
-  IconData _getFileIcon(String fileName) {
-    final extension = fileName.split('.').last.toLowerCase();
-    switch (extension) {
-      case 'pdf':
-        return Icons.picture_as_pdf_rounded;
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-        return Icons.image_rounded;
-      default:
-        return Icons.insert_drive_file_rounded;
-    }
-  }
-
-  /// Returns appropriate icon color based on file type.
-  Color _getFileIconColor(String fileName, ColorScheme colorScheme) {
-    final extension = fileName.split('.').last.toLowerCase();
-    switch (extension) {
-      case 'pdf':
-        return Colors.red.shade600;
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-        return Colors.blue.shade600;
-      default:
-        return colorScheme.primary;
-    }
-  }
-
   /// Removes the uploaded file and notifies parent.
   void _removeFile() {
     setState(() => _uploadedFileName = null);
@@ -466,19 +730,40 @@ class _DocumentUploadAreaState extends ConsumerState<_DocumentUploadArea> {
         pickedFile.path!,
         name: pickedFile.name,
         bytes: pickedFile.bytes,
-        mimeType: _getMimeType(pickedFile.name),
+        mimeType: FileTypeUtils.getMimeType(pickedFile.name),
       );
 
       // Upload to S3
       final s3Service = ref.read(s3ServiceProvider);
       final key = await s3Service.uploadFile(xFile);
 
+      if (key == null) {
+        if (mounted) {
+          setState(() => _isUploading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Upload failed: No key returned'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
       if (mounted) {
         setState(() {
           _isUploading = false;
           _uploadedFileName = pickedFile.name;
         });
-        widget.onFileSelected?.call(key);
+
+        // Create DocumentUploadType with file info
+        final extension = pickedFile.name.split('.').last.toLowerCase();
+        final documentUpload = DocumentUploadType(
+          type: extension,
+          key: key,
+          documentKey: widget.documentKey,
+        );
+        widget.onFileSelected?.call(documentUpload);
       }
     } catch (e) {
       developer.log('Error picking/uploading file: $e', name: 'DocumentUpload');
@@ -493,34 +778,19 @@ class _DocumentUploadAreaState extends ConsumerState<_DocumentUploadArea> {
       }
     }
   }
-
-  String _getMimeType(String fileName) {
-    final extension = fileName.split('.').last.toLowerCase();
-    switch (extension) {
-      case 'pdf':
-        return 'application/pdf';
-      case 'jpg':
-      case 'jpeg':
-        return 'image/jpeg';
-      case 'png':
-        return 'image/png';
-      default:
-        return 'application/octet-stream';
-    }
-  }
 }
 
 /// Multi-document upload area that supports uploading multiple files.
 class _MultiDocumentUploadArea extends ConsumerStatefulWidget {
-  final IconData icon;
-  final ValueChanged<List<String>>? onFilesSelected;
-  final List<String> initialFiles;
-
   const _MultiDocumentUploadArea({
     required this.icon,
     this.onFilesSelected,
     this.initialFiles = const [],
   });
+
+  final IconData icon;
+  final ValueChanged<List<DocumentUploadType>>? onFilesSelected;
+  final List<DocumentUploadType> initialFiles;
 
   @override
   ConsumerState<_MultiDocumentUploadArea> createState() =>
@@ -538,12 +808,27 @@ class _MultiDocumentUploadAreaState
   @override
   void initState() {
     super.initState();
-    _uploadedFiles = widget.initialFiles.map((url) {
+    _uploadedFiles = widget.initialFiles.map((file) {
       return _UploadedFileInfo(
-        s3Key: url,
-        fileName: url.split('/').last, // Approximate filename from URL
+        s3Key: file.url,
+        fileName: file.url.split('/').last,
+        documentUploadType: file,
       );
     }).toList();
+  }
+
+  @override
+  void didUpdateWidget(covariant _MultiDocumentUploadArea oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialFiles != oldWidget.initialFiles) {
+      _uploadedFiles = widget.initialFiles.map((file) {
+        return _UploadedFileInfo(
+          s3Key: file.url,
+          fileName: file.url.split('/').last,
+          documentUploadType: file,
+        );
+      }).toList();
+    }
   }
 
   @override
@@ -583,8 +868,11 @@ class _MultiDocumentUploadAreaState
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
-    final fileIcon = _getFileIcon(fileInfo.fileName);
-    final iconColor = _getFileIconColor(fileInfo.fileName, colorScheme);
+    final fileIcon = FileTypeUtils.getFileIcon(fileInfo.fileName);
+    final iconColor = FileTypeUtils.getFileIconColor(
+      fileInfo.fileName,
+      colorScheme,
+    );
 
     return Container(
       height: 64,
@@ -759,48 +1047,16 @@ class _MultiDocumentUploadAreaState
     );
   }
 
-  /// Returns appropriate icon based on file extension.
-  IconData _getFileIcon(String fileName) {
-    final extension = fileName.split('.').last.toLowerCase();
-    switch (extension) {
-      case 'pdf':
-        return Icons.picture_as_pdf_rounded;
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-        return Icons.image_rounded;
-      default:
-        return Icons.insert_drive_file_rounded;
-    }
-  }
-
-  /// Returns appropriate icon color based on file type.
-  Color _getFileIconColor(String fileName, ColorScheme colorScheme) {
-    final extension = fileName.split('.').last.toLowerCase();
-    switch (extension) {
-      case 'pdf':
-        return Colors.red.shade600;
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-        return Colors.blue.shade600;
-      default:
-        return colorScheme.primary;
-    }
-  }
-
   /// Removes a file at the given index and notifies parent.
   void _removeFile(int index) {
     setState(() => _uploadedFiles.removeAt(index));
     _notifyParent();
   }
 
-  /// Notifies the parent widget with the current list of S3 keys.
+  /// Notifies the parent widget with the current list of documents.
   void _notifyParent() {
-    print("_uploadedFiles: ${_uploadedFiles.toString()}");
-    final keys = _uploadedFiles.map((f) => f.s3Key).toList();
-    print("keys: $keys");
-    widget.onFilesSelected?.call(keys);
+    final files = _uploadedFiles.map((f) => f.documentUploadType).toList();
+    widget.onFilesSelected?.call(files);
   }
 
   Future<void> _pickFiles() async {
@@ -851,7 +1107,7 @@ class _MultiDocumentUploadAreaState
           final xFile = XFile.fromData(
             pickedFile.bytes!,
             name: pickedFile.name,
-            mimeType: _getMimeType(pickedFile.name),
+            mimeType: FileTypeUtils.getMimeType(pickedFile.name),
           );
 
           // Upload to S3
@@ -862,9 +1118,19 @@ class _MultiDocumentUploadAreaState
           }
 
           if (mounted) {
+            final extension = pickedFile.name.split('.').last.toLowerCase();
+            final documentUpload = DocumentUploadType(
+              type: extension,
+              key: formatR2Url(key) ?? key,
+              documentKey: 'other_documents',
+            );
             setState(() {
               _uploadedFiles.add(
-                _UploadedFileInfo(s3Key: key, fileName: pickedFile.name),
+                _UploadedFileInfo(
+                  s3Key: key,
+                  fileName: pickedFile.name,
+                  documentUploadType: documentUpload,
+                ),
               );
             });
           }
@@ -888,10 +1154,8 @@ class _MultiDocumentUploadAreaState
         setState(() => _isUploading = false);
         _notifyParent();
       }
-    } catch (e, s) {
+    } catch (e) {
       developer.log('Error picking files: $e', name: 'MultiDocumentUpload');
-      print(e);
-      print(s);
       if (mounted) {
         setState(() => _isUploading = false);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -903,29 +1167,19 @@ class _MultiDocumentUploadAreaState
       }
     }
   }
-
-  String _getMimeType(String fileName) {
-    final extension = fileName.split('.').last.toLowerCase();
-    switch (extension) {
-      case 'pdf':
-        return 'application/pdf';
-      case 'jpg':
-      case 'jpeg':
-        return 'image/jpeg';
-      case 'png':
-        return 'image/png';
-      default:
-        return 'application/octet-stream';
-    }
-  }
 }
 
 /// Helper class to store uploaded file information.
 class _UploadedFileInfo {
   final String s3Key;
   final String fileName;
+  final DocumentUploadType documentUploadType;
 
-  const _UploadedFileInfo({required this.s3Key, required this.fileName});
+  const _UploadedFileInfo({
+    required this.s3Key,
+    required this.fileName,
+    required this.documentUploadType,
+  });
 
   @override
   String toString() {

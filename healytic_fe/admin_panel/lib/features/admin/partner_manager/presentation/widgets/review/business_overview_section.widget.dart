@@ -10,15 +10,15 @@ class BusinessOverviewSection extends StatelessWidget {
     required this.brandName,
     this.taxRegistrationCode,
     this.isTaxCodeValid = false,
-    this.serviceTags = const [],
+    required this.serviceTags,
     this.address,
     super.key,
   });
 
-  final String brandName;
-  final String? taxRegistrationCode;
+  final VerifiedFieldEntity<String> brandName;
+  final VerifiedFieldEntity<String?>? taxRegistrationCode;
   final bool isTaxCodeValid;
-  final List<String> serviceTags;
+  final VerifiedFieldEntity<List<String>> serviceTags;
   final AddressInfo? address;
 
   @override
@@ -59,19 +59,20 @@ class BusinessOverviewSection extends StatelessWidget {
                   children: [
                     Expanded(
                       child: ReviewableField(
-                        fieldId: 'business.brandName',
+                        title: 'Brand Name',
+                        fieldId: brandName.fieldKey,
                         child: _buildLabelValue(
                           context,
-                          label: 'Brand Name',
-                          value: brandName,
+                          value: brandName.value,
                           isLarge: true,
                         ),
                       ),
                     ),
-                    AppDimens.horizontalLarge,
+                    Spacer(flex: 1),
                     Expanded(
                       child: ReviewableField(
-                        fieldId: 'business.taxCode',
+                        title: 'Tax Code',
+                        fieldId: taxRegistrationCode!.fieldKey,
                         child: _buildTaxCode(context, semantics),
                       ),
                     ),
@@ -81,16 +82,15 @@ class BusinessOverviewSection extends StatelessWidget {
 
                 // Service Tags
                 ReviewableField(
-                  fieldId: 'business.serviceTags',
+                  title: 'Service Tags',
+                  fieldId: serviceTags.fieldKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLabel(context, 'Service Tags'),
-                      AppDimens.verticalSmall,
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: serviceTags.map((tag) {
+                        children: serviceTags.value.map((tag) {
                           return Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,
@@ -118,12 +118,12 @@ class BusinessOverviewSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                AppDimens.verticalLarge,
 
-                // Address Section
+                // Address Section (with dashed separator)
                 if (address != null) ...[
+                  AppDimens.verticalMedium,
                   Container(
-                    padding: AppDimens.paddingTopSmall,
+                    padding: const EdgeInsets.only(top: 16),
                     decoration: BoxDecoration(
                       border: Border(
                         top: BorderSide(
@@ -132,17 +132,78 @@ class BusinessOverviewSection extends StatelessWidget {
                         ),
                       ),
                     ),
-                    child: Row(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: ReviewableField(
-                            fieldId: 'business.address',
-                            child: _buildAddress(context),
-                          ),
+                        _buildLabel(context, 'Registered Address'),
+                        AppDimens.verticalMediumSmall,
+                        // Row 1: Province, District, Ward
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: ReviewableField(
+                                title: 'Province/City',
+                                fieldId: address!.city!.fieldKey,
+                                compactMode: true,
+                                child: _buildAddressField(
+                                  context,
+                                  address!.city!.value.name,
+                                ),
+                              ),
+                            ),
+                            AppDimens.horizontalMedium,
+                            Expanded(
+                              child: ReviewableField(
+                                title: 'District',
+                                fieldId: address!.district!.fieldKey,
+                                compactMode: true,
+                                child: _buildAddressField(
+                                  context,
+                                  address!.district!.value.name,
+                                ),
+                              ),
+                            ),
+                            AppDimens.horizontalMedium,
+                            Expanded(
+                              child: ReviewableField(
+                                title: 'Ward',
+                                fieldId: address!.ward!.fieldKey,
+                                compactMode: true,
+                                child: _buildAddressField(
+                                  context,
+                                  address!.ward!.value.name,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        AppDimens.horizontalLarge,
-                        Expanded(child: _buildMapPlaceholder(context)),
+                        AppDimens.verticalMedium,
+                        // Row 2: Street Address + Map Preview
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Street Address
+                            Expanded(
+                              flex: 3,
+                              child: ReviewableField(
+                                title: 'Street Address',
+                                fieldId: address!.streetAddress!.fieldKey,
+                                compactMode: true,
+                                child: _buildAddressField(
+                                  context,
+                                  address!.streetAddress?.value,
+                                ),
+                              ),
+                            ),
+                            AppDimens.horizontalMedium,
+                            // Map Placeholder
+                            Expanded(
+                              flex: 2,
+                              child: _buildMapPlaceholder(context),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -182,12 +243,10 @@ class BusinessOverviewSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel(context, 'Tax Registration Code'),
-        AppDimens.verticalExtraSmall,
         Row(
           children: [
             Text(
-              taxRegistrationCode ?? 'N/A',
+              taxRegistrationCode?.value ?? 'N/A',
               style: textTheme.bodyMedium?.copyWith(
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.w500,
@@ -203,34 +262,27 @@ class BusinessOverviewSection extends StatelessWidget {
     );
   }
 
-  Widget _buildAddress(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+  /// Builds a single address field with label and value
+  Widget _buildAddressField(BuildContext context, String? value) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildLabel(context, 'Registered Address'),
-        AppDimens.verticalExtraSmall,
-        Text(
-          address?.streetAddress ?? '',
-          style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-        ),
-        if (address?.ward != null || address?.district != null)
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: AppDimens.radiusSmall,
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Text(
-            '${address?.ward ?? ''}, ${address?.district ?? ''}',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
+            value ?? 'N/A',
+            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
           ),
-        if (address?.city != null || address?.country != null)
-          Text(
-            '${address?.city ?? ''}, ${address?.country ?? ''}',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -284,7 +336,6 @@ class BusinessOverviewSection extends StatelessWidget {
 
   Widget _buildLabelValue(
     BuildContext context, {
-    required String label,
     required String value,
     bool isLarge = false,
   }) {
@@ -293,8 +344,6 @@ class BusinessOverviewSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel(context, label),
-        AppDimens.verticalExtraSmall,
         Text(
           value,
           style: isLarge

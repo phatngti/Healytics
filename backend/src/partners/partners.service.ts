@@ -10,23 +10,30 @@ import * as bcrypt from 'bcrypt';
 import { Account } from '@/account/entities/account.entity';
 import { Partner } from './entities/partner.entity';
 import { LegalRepresentative } from './entities/legal-representative.entity';
+import { PartnerReviewLog } from '../admin/entities/partner-review-log.entity';
 import { RegisterPartnerDto } from './dto/request/register-partner.dto';
 import { UpdatePartnerDto } from './dto/request/update-partner.dto';
 import { GetPartnersQueryDto } from './dto/request/get-partners-query.dto';
 import { RegisterPartnerResponseDto } from './dto/response/register-partner-response.dto';
-import { MyProfileResponseDto } from './dto/response/my-profile-response.dto';
+import { MyProfileResponseDto, DocumentStatusDto } from './dto/response/my-profile-response.dto';
 import { PartnersResponseDto } from './dto/response/partners-response.dto';
 import { PartnerDetailResponseDto } from './dto/response/partner-detail-response.dto';
 import { BusinessTypesResponseDto } from './dto/response/business-types-response.dto';
 import { Role } from '@/account/enum/role.enum';
 import { BusinessType } from './enum/business-type.enum';
-import { DocumentType } from './enum/document-type.enum';
-import { PartnerDocument } from './entities/partner-document.entity';
+import { PartnerDocument, PartnerDocumentStatuses, DocumentTypes, DocumentFileTypes } from './entities/partner-document.entity';
 import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
-import { PartnerDocumentStatus } from './enum/partner-document-status.enum';
 import { DocumentRequirement } from './entities/document-requirement.entity';
 import { LocationsService } from '@/locations/locations.service';
 import { AuthService } from '@/auth/auth.service';
+
+// Helper types for field feedback from review log
+interface FieldFeedback {
+    isVerified: boolean;
+    feedback?: string;
+}
+
+type FieldFeedbackMap = Record<string, FieldFeedback>;
 
 @Injectable()
 export class PartnersService {
@@ -39,6 +46,8 @@ export class PartnersService {
         private readonly legalRepRepository: Repository<LegalRepresentative>,
         @InjectRepository(DocumentRequirement)
         private readonly docRequirementRepository: Repository<DocumentRequirement>,
+        @InjectRepository(PartnerReviewLog)
+        private readonly reviewLogRepository: Repository<PartnerReviewLog>,
         private readonly dataSource: DataSource,
         private readonly locationsService: LocationsService,
         private readonly authService: AuthService,
@@ -138,30 +147,38 @@ export class PartnersService {
             const savedPartner =
                 await queryRunner.manager.save(partner);
 
-            // Create Legal Representative
+            // Create Legal Representative (without document URLs - moved to PartnerDocument)
             const legalRep = queryRunner.manager.create(LegalRepresentative, {
                 fullName: dto.legalRepresentative.fullName,
                 position: dto.legalRepresentative.position,
                 idType: dto.legalRepresentative.idType,
                 idNumber: dto.legalRepresentative.idNumber,
                 idIssueDate: new Date(dto.legalRepresentative.idIssueDate),
-                idFrontImgUrl: dto.legalRepresentative.images.frontImgUrl,
-                idBackImgUrl: dto.legalRepresentative.images.backImgUrl,
-                businessLicenseUrl:
-                    dto.legalRepresentative.documents?.businessLicenseUrl || null,
-                authorizationLetterUrl:
-                    dto.legalRepresentative.documents?.authorizationLetterUrl || null,
-                taxCertificateUrl:
-                    dto.legalRepresentative.documents?.taxCertificateUrl || null,
-                otherDocumentUrls:
-                    dto.legalRepresentative.documents?.otherDocumentUrls || null,
                 partnerId: savedPartner.id,
             });
             await queryRunner.manager.save(legalRep);
 
-            // Note: Identity documents (IDENTITY_FRONT, IDENTITY_BACK, AUTHORIZATION_LETTER)
-            // are stored directly in LegalRepresentative entity and not tracked as PartnerDocuments.
-            // Only business-specific documents (uploaded later) are tracked in PartnerDocument table.
+            // Create PartnerDocuments for identity images
+            const documentsToCreate: Partial<PartnerDocument>[] = [];
+
+            dto.legalRepresentative.documents.forEach(doc => {
+                documentsToCreate.push(...doc.urls.map(url => ({
+                    partnerId: savedPartner.id,
+                    fileUrl: url,
+                    type: doc.type,
+                    fileType: doc.fileType,
+                    documentKey: doc.documentKey,
+                    status: PartnerDocumentStatuses.PENDING,
+                })));
+            });
+
+            // Save all documents in batch
+            if (documentsToCreate.length > 0) {
+                const documents = documentsToCreate.map(doc => 
+                    queryRunner.manager.create(PartnerDocument, doc)
+                );
+                await queryRunner.manager.save(documents);
+            }
 
             // Commit transaction
             await queryRunner.commitTransaction();
@@ -201,7 +218,7 @@ export class PartnersService {
     }
 
     /**
-     * Get partner's own profile with rejection details and document statuses
+     * Get partner's own profile with verification fields including requiresUpdate, adminFeedback, and isVerified
      */
     async getMyProfile(accountId: string): Promise<MyProfileResponseDto> {
         const partner = await this.getPartnerByAccountId(accountId);
@@ -209,109 +226,140 @@ export class PartnersService {
             throw new NotFoundException('Partner not found');
         }
 
-        // Fetch document requirements for this business type
-        const requirements = await this.docRequirementRepository.find({
-            where: { businessType: partner.businessType },
+        const rejectionDetails = partner.rejectionDetails || {};
+        const legalRep = partner.legalRepresentative;
+
+        // Fetch the latest review log for feedback and isVerified data
+        const latestReviewLog = await this.reviewLogRepository.findOne({
+            where: { partnerId: partner.id },
+            order: { createdAt: 'DESC' },
         });
 
-        // Map uploaded documents by type for easy lookup
-        const uploadedDocsMap = new Map<DocumentType, PartnerDocument>();
-        if (partner.documents) {
-            partner.documents.forEach((doc) => {
-                uploadedDocsMap.set(doc.documentType, doc);
-            });
-        }
+        // Build feedback maps from review log
+        const fieldFeedbackMap = this.buildFieldFeedbackMap(latestReviewLog);
+        const documentFeedbackMap = this.buildDocumentFeedbackMap(latestReviewLog);
 
-        // Merge requirements with uploaded documents
-        const documentDtos: any[] = requirements.map((req) => {
-            const uploadedDoc = uploadedDocsMap.get(req.documentType);
-            let status = PartnerDocumentStatus.MISSING;
-            let documentUrl: string | null = null;
-            let documentKey: string | null = null;
-            let id: string | null = null;
-            let isReviewed = false;
-            let isValid = false;
-            let adminFeedback: string | null = null;
-            let verificationNotes: string | null = null;
-            let uploadedAt: Date | null = null;
+        // Helper function to create VerificationStringField with feedback from review log
+        const createStringField = (
+            value: string,
+            displayValue: string,
+            fieldKey: string,
+        ) => {
+            const fieldFeedback = fieldFeedbackMap[fieldKey];
+            return {
+                value,
+                displayValue,
+                requiresUpdate: !!rejectionDetails[fieldKey] || (fieldFeedback?.isVerified === false),
+                adminFeedback: fieldFeedback?.feedback || rejectionDetails[fieldKey] || null,
+                isVerified: fieldFeedback?.isVerified ?? null,
+            };
+        };
 
-            if (uploadedDoc) {
-                id = uploadedDoc.id;
-                documentUrl = uploadedDoc.documentUrl;
-                documentKey = uploadedDoc.documentKey;
-                isReviewed = uploadedDoc.isReviewed;
-                isValid = uploadedDoc.isValid;
-                adminFeedback = uploadedDoc.adminFeedback;
-                verificationNotes = uploadedDoc.verificationNotes;
-                uploadedAt = uploadedDoc.uploadedAt;
+        // Helper function to create VerificationOptionalStringField with feedback from review log
+        const createOptionalStringField = (
+            value: string | null,
+            displayValue: string | null,
+            fieldKey: string,
+        ) => {
+            const fieldFeedback = fieldFeedbackMap[fieldKey];
+            return {
+                value,
+                displayValue,
+                requiresUpdate: !!rejectionDetails[fieldKey] || (fieldFeedback?.isVerified === false),
+                adminFeedback: fieldFeedback?.feedback || rejectionDetails[fieldKey] || null,
+                isVerified: fieldFeedback?.isVerified ?? null,
+            };
+        };
 
-                if (uploadedDoc.isReviewed) {
-                    status = uploadedDoc.isValid
-                        ? PartnerDocumentStatus.APPROVED
-                        : PartnerDocumentStatus.REJECTED;
-                } else {
-                    status = PartnerDocumentStatus.PENDING;
-                }
-            }
-
+        // Helper function to create VerificationDocument from PartnerDocument with feedback from review log
+        const createDocumentFromPartnerDoc = (
+            doc: PartnerDocument | undefined,
+            id: string,
+            label: string,
+            fieldKey: string,
+        ) => {
+            const fileUrl = doc?.fileUrl || null;
+            const hasUrl = !!fileUrl;
+            
+            // Check document feedback from review log using document ID
+            const docFeedback = doc ? documentFeedbackMap[doc.id] : undefined;
+            const isRejected = !!rejectionDetails[fieldKey] || (docFeedback?.isVerified === false);
+            
             return {
                 id,
-                documentType: req.documentType,
-                documentUrl,
-                documentKey,
-                status,
-                isRequired: req.isRequired,
-                description: req.description,
-                isReviewed,
-                isValid,
-                adminFeedback,
-                verificationNotes,
-                uploadedAt,
+                label,
+                fileUrl,
+                fileName: fileUrl ? fileUrl.split('/').pop() : null,
+                status: isRejected ? DocumentStatusDto.REVISION_REQUIRED : (hasUrl ? DocumentStatusDto.APPROVED : DocumentStatusDto.MISSING),
+                requiresUpdate: isRejected || !hasUrl,
+                adminFeedback: docFeedback?.feedback || rejectionDetails[fieldKey] || null,
+                isVerified: docFeedback?.isVerified ?? null,
             };
-        });
+        };
 
-        // Also include any uploaded documents that might not be in the current requirements (edge case)
-        if (partner.documents) {
-            partner.documents.forEach((doc) => {
-                const reqExists = requirements.find(r => r.documentType === doc.documentType);
-                if (!reqExists) {
-                    let status = PartnerDocumentStatus.PENDING;
-                    if (doc.isReviewed) {
-                        status = doc.isValid ? PartnerDocumentStatus.APPROVED : PartnerDocumentStatus.REJECTED;
-                    }
-                    documentDtos.push({
-                        id: doc.id,
-                        documentType: doc.documentType,
-                        documentUrl: doc.documentUrl,
-                        documentKey: doc.documentKey,
-                        status,
-                        isRequired: false, // Not in current requirements
-                        description: null,
-                        isReviewed: doc.isReviewed,
-                        isValid: doc.isValid,
-                        adminFeedback: doc.adminFeedback,
-                        verificationNotes: doc.verificationNotes,
-                        uploadedAt: doc.uploadedAt,
-                    });
-                }
-            });
-        }
+        // Fetch partner documents
+        const documents = partner.documents || [];
+
+        // Get business type display value
+        const businessTypeLabels: Record<BusinessType, string> = {
+            [BusinessType.MASSAGE_THERAPY]: 'Massage Thư giãn',
+            [BusinessType.MASSAGE_REHABILITATION]: 'Massage Trị liệu',
+            [BusinessType.SPA_BEAUTY]: 'Spa & Làm đẹp',
+            [BusinessType.FITNESS]: 'Thể hình (Gym/Yoga)',
+            [BusinessType.PHARMACY]: 'Dược phẩm',
+            [BusinessType.DENTAL]: 'Nha khoa',
+            [BusinessType.TRADITIONAL_MEDICINE]: 'Đông y',
+            [BusinessType.PSYCHOLOGY]: 'Tâm lý & Trị liệu',
+            [BusinessType.DERMATOLOGY]: 'Da liễu & Thẩm mỹ',
+            [BusinessType.NUTRITION]: 'Dinh dưỡng',
+            [BusinessType.PSYCHIATRY]: 'Tâm thần học',
+        };
+
+        // Get ID type display value
+        const idTypeLabels: Record<string, string> = {
+            CITIZEN_ID: 'Căn cước công dân',
+            ID_CARD: 'Chứng minh nhân dân',
+            PASSPORT: 'Hộ chiếu',
+        };
 
         return {
             id: partner.id,
-            taxCode: partner.taxCode,
-            legalName: partner.legalName,
-            brandName: partner.brandName,
-            businessType: partner.businessType,
-            phoneNumber: partner.phoneNumber || null,
-            address: {
-                provinceId: partner.provinceId,
-                province: partner.province?.name ?? '',
-                districtId: partner.districtId,
-                district: partner.district?.name ?? '',
-                wardId: partner.wardId,
-                ward: partner.ward?.name ?? '',
-                streetAddress: partner.streetAddress,
+            partnerInfo: {
+                taxCode: createStringField(partner.taxCode, partner.taxCode, 'taxCode'),
+                legalName: createStringField(partner.legalName, partner.legalName, 'legalName'),
+                brandName: createStringField(partner.brandName, partner.brandName, 'brandName'),
+                businessType: createStringField(
+                    partner.businessType,
+                    businessTypeLabels[partner.businessType] || partner.businessType,
+                    'businessType',
+                ),
+                phoneNumber: createOptionalStringField(
+                    partner.phoneNumber,
+                    partner.phoneNumber,
+                    'phoneNumber',
+                ),
+            },
+            locationDetails: {
+                provinceId: createStringField(
+                    partner.provinceId || '',
+                    partner.province?.name ?? '',
+                    'provinceId',
+                ),
+                districtId: createStringField(
+                    partner.districtId || '',
+                    partner.district?.name ?? '',
+                    'districtId',
+                ),
+                wardId: createStringField(
+                    partner.wardId || '',
+                    partner.ward?.name ?? '',
+                    'wardId',
+                ),
+                streetAddress: createStringField(
+                    partner.streetAddress,
+                    partner.streetAddress,
+                    'streetAddress',
+                ),
             },
             legalRepresentative: {
                 fullName: partner.legalRepresentative.fullName,
@@ -326,8 +374,6 @@ export class PartnersService {
                 phoneNumber: partner.legalRepresentative.phoneNumber,
             },
             verificationStatus: partner.verificationStatus,
-            rejectionDetails: partner.rejectionDetails || null,
-            documents: documentDtos,
             verificationCompletedAt: partner.verificationCompletedAt,
             createdAt: partner.createdAt,
         };
@@ -455,16 +501,9 @@ export class PartnersService {
                         }
                     }
 
-                    if (repDto.images) {
-                        updateRep('idFrontImgUrl', repDto.images.frontImgUrl, 'legalRep.idFrontImgUrl', true);
-                        updateRep('idBackImgUrl', repDto.images.backImgUrl, 'legalRep.idBackImgUrl', true);
-                    }
-                    if (repDto.documents) {
-                        updateRep('businessLicenseUrl', repDto.documents.businessLicenseUrl, 'legalRep.businessLicenseUrl', true);
-                        updateRep('authorizationLetterUrl', repDto.documents.authorizationLetterUrl, 'legalRep.authorizationLetterUrl', true);
-                        updateRep('taxCertificateUrl', repDto.documents.taxCertificateUrl, 'legalRep.taxCertificateUrl', true);
-                        updateRep('otherDocumentUrls', repDto.documents.otherDocumentUrls, 'legalRep.otherDocumentUrls', true);
-                    }
+                    // Note: Document URL updates (idFrontImgUrl, idBackImgUrl, businessLicenseUrl, etc.) 
+                    // are now handled through the PartnerDocument table, not LegalRepresentative fields
+                    // See: updateDocumentImage method for updating document images
 
                     if (repModified) {
                         await queryRunner.manager.save(legalRep);
@@ -474,44 +513,9 @@ export class PartnersService {
             }
 
             // --- E. CẬP NHẬT DOCUMENT (File) ---
-            if (dto.documents && dto.documents.length > 0) {
-                for (const docDto of dto.documents) {
-                    let existingDoc = await queryRunner.manager.findOne(PartnerDocument, {
-                        where: { partnerId: partner.id, documentType: docDto.documentType },
-                    });
-
-                    // Luôn coi là mới nếu chưa có hoặc URL khác
-                    const isNewUpload = !existingDoc || existingDoc.documentUrl !== docDto.documentUrl;
-
-                    if (isNewUpload) {
-                        if (existingDoc) {
-                            // Update cái cũ
-                            existingDoc.documentUrl = docDto.documentUrl;
-                            existingDoc.isReviewed = false; // [QUAN TRỌNG] Reset flag để Admin biết đường check
-                            existingDoc.isValid = true;     // Tạm coi là Valid cho đến khi Admin soi
-                            existingDoc.adminFeedback = null;
-                            existingDoc.uploadedAt = new Date();
-                        } else {
-                            // Tạo cái mới
-                            existingDoc = queryRunner.manager.create(PartnerDocument, {
-                                partnerId: partner.id,
-                                documentType: docDto.documentType,
-                                documentUrl: docDto.documentUrl,
-                                isReviewed: false,
-                                isValid: true,
-                                uploadedAt: new Date(),
-                            });
-                        }
-                        await queryRunner.manager.save(existingDoc);
-                        isModified = true;
-                        hasCriticalChange = true; // Upload lại giấy tờ là việc lớn
-
-                        // [CLEANUP] Xóa lỗi cũ của loại document này
-                        const docKey = `document_${docDto.documentType}`;
-                        if (currentRejection[docKey]) delete currentRejection[docKey];
-                    }
-                }
-            }
+            // Note: With simplified schema, documents are just stored with type/fileUrl/status
+            // Document updates through this endpoint are currently not supported
+            // as the new schema focuses on KYC document uploads
 
             // --- F. TÍNH TOÁN TRẠNG THÁI (Recalculate Status) ---
             if (isModified) {
@@ -519,23 +523,13 @@ export class PartnersService {
                 const hasFieldErrors = Object.keys(currentRejection).length > 0;
                 partner.rejectionDetails = hasFieldErrors ? currentRejection : null;
 
-                // 2. Check lại toàn bộ Document (để xem có cái nào đang INVALID ko)
+                // 2. Check lại toàn bộ Document (để xem có cái nào đang rejected ko)
                 const allDocs = await queryRunner.manager.find(PartnerDocument, { where: { partnerId: partner.id } });
 
-                const hasRejectedDocs = allDocs.some(d => d.isReviewed && !d.isValid);
-
-                const requirements = await this.docRequirementRepository.find({
-                    where: { businessType: partner.businessType, isRequired: true },
-                });
-                const docMap = new Map(allDocs.map(d => [d.documentType, d]));
-                const isMissingDocs = requirements.some(req => {
-                    const doc = docMap.get(req.documentType);
-                    return !doc || !doc.documentUrl;
-                });
+                const hasRejectedDocs = allDocs.some(d => d.status === PartnerDocumentStatuses.REJECTED);
 
                 // 3. Logic chuyển đổi trạng thái
                 const isClean = !hasFieldErrors && !hasRejectedDocs;
-                const isComplete = !isMissingDocs;
 
                 if (isClean && isComplete) {
                     // Only transition to PENDING if currently ONBOARDING or REQUIRED_RESUBMIT
@@ -640,12 +634,19 @@ export class PartnersService {
                 'district',
                 'ward',
                 'legalRepresentative',
+                'documents',
             ],
         });
 
         if (!partner) {
             throw new NotFoundException('Partner not found');
         }
+
+        // Helper to get document URL by type
+        const getDocUrl = (type: string): string | null => {
+            const doc = partner.documents?.find(d => d.type === type);
+            return doc?.fileUrl || null;
+        };
 
         return {
             account: {
@@ -682,5 +683,49 @@ export class PartnersService {
             verificationCompletedAt: partner.verificationCompletedAt,
             createdAt: partner.createdAt,
         };
+    }
+
+    // ============================================================================
+    // Helper Methods for Review Log Feedback
+    // ============================================================================
+
+    /**
+     * Build field feedback map from the latest review log
+     */
+    private buildFieldFeedbackMap(reviewLog: PartnerReviewLog | null): FieldFeedbackMap {
+        const feedbackMap: FieldFeedbackMap = {};
+
+        if (!reviewLog?.fieldReviews) {
+            return feedbackMap;
+        }
+
+        for (const [fieldName, review] of Object.entries(reviewLog.fieldReviews)) {
+            feedbackMap[fieldName] = {
+                isVerified: review.isValid,
+                feedback: review.reason,
+            };
+        }
+
+        return feedbackMap;
+    }
+
+    /**
+     * Build document feedback map from the latest review log
+     */
+    private buildDocumentFeedbackMap(reviewLog: PartnerReviewLog | null): FieldFeedbackMap {
+        const feedbackMap: FieldFeedbackMap = {};
+
+        if (!reviewLog?.documentReviews) {
+            return feedbackMap;
+        }
+
+        for (const [docId, review] of Object.entries(reviewLog.documentReviews)) {
+            feedbackMap[docId] = {
+                isVerified: review.isValid,
+                feedback: review.feedback,
+            };
+        }
+
+        return feedbackMap;
     }
 }

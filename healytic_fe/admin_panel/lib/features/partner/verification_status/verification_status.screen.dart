@@ -1,3 +1,5 @@
+import 'package:admin_panel/features/authenticate/domain/location.entity.dart';
+import 'package:admin_panel/features/authenticate/presentation/providers/location.provider.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/verification_status.provider.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/revision_alert_banner.widget.dart';
@@ -147,6 +149,20 @@ class VerificationStatusScreen extends ConsumerWidget {
     WidgetRef ref,
     ProviderVerificationStatusEntity status,
   ) {
+    // Watch location providers for dropdown data
+    final provincesAsync = ref.watch(provincesProvider);
+    final provinces = provincesAsync.value ?? <LocationEntity>[];
+
+    // Get current province ID to fetch districts
+    final currentProvinceId = status.locationDetails?.provinceId.value;
+    final districtsAsync = ref.watch(districtsProvider(currentProvinceId));
+    final districts = districtsAsync.value ?? <LocationEntity>[];
+
+    // Get current district ID to fetch wards
+    final currentDistrictId = status.locationDetails?.districtId.value;
+    final wardsAsync = ref.watch(wardsProvider(currentDistrictId));
+    final wards = wardsAsync.value ?? <LocationEntity>[];
+
     return Column(
       children: status.sections
           .map(
@@ -155,6 +171,9 @@ class VerificationStatusScreen extends ConsumerWidget {
               child: VerificationSectionCard(
                 section: section,
                 verificationStatus: status,
+                provinces: provinces,
+                districts: districts,
+                wards: wards,
               ),
             ),
           )

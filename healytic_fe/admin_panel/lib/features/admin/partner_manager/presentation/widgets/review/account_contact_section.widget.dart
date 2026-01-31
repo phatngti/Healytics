@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_detail.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/reviewable_field.widget.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
@@ -13,10 +14,10 @@ class AccountContactSection extends StatelessWidget {
     super.key,
   });
 
-  final String? username;
-  final String? email;
+  final VerifiedFieldEntity<String?>? username;
+  final VerifiedFieldEntity<String?>? email;
   final bool isEmailVerified;
-  final String? phoneNumber;
+  final VerifiedFieldEntity<String?>? phoneNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -51,23 +52,26 @@ class AccountContactSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: ReviewableField(
-                    fieldId: 'account.username',
+                    title: 'Username',
+                    fieldId: username!.fieldKey,
                     compactMode: true,
-                    child: _buildInfoItem(context, 'Username', username),
+                    child: _buildInfoItem(context, username?.value),
                   ),
                 ),
                 Expanded(
                   child: ReviewableField(
-                    fieldId: 'account.email',
+                    title: 'Email',
+                    fieldId: email!.fieldKey,
                     compactMode: true,
                     child: _buildEmailItem(context),
                   ),
                 ),
                 Expanded(
                   child: ReviewableField(
-                    fieldId: 'account.phoneNumber',
+                    title: 'Phone Number',
+                    fieldId: phoneNumber!.fieldKey,
                     compactMode: true,
-                    child: _buildInfoItem(context, 'Phone Number', phoneNumber),
+                    child: _buildInfoItem(context, phoneNumber?.value),
                   ),
                 ),
               ],
@@ -98,22 +102,12 @@ class AccountContactSection extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoItem(BuildContext context, String label, String? value) {
-    final colorScheme = Theme.of(context).colorScheme;
+  Widget _buildInfoItem(BuildContext context, String? value) {
     final textTheme = Theme.of(context).textTheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label.toUpperCase(),
-          style: textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
-        ),
-        AppDimens.verticalExtraSmall,
         Text(
           value ?? 'N/A',
           style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
@@ -123,27 +117,17 @@ class AccountContactSection extends StatelessWidget {
   }
 
   Widget _buildEmailItem(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final semantics = Theme.of(context).extension<SemanticColors>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'EMAIL ADDRESS',
-          style: textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
-        ),
-        AppDimens.verticalExtraSmall,
         Row(
           children: [
             Flexible(
               child: Text(
-                email ?? 'N/A',
+                email?.value ?? 'N/A',
                 style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),

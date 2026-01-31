@@ -15,7 +15,7 @@ import { BusinessType } from '../enum/business-type.enum';
 import { Location } from '@/locations/entities/location.entity';
 import { PartnerVerificationStatus } from '../enum/partner-verification-status.enum';
 import { PartnerDocument } from './partner-document.entity';
-import { PartnerReviewLog } from './partner-review-log.entity';
+import { PartnerReviewLog } from '../../admin/entities/partner-review-log.entity';
 
 @Entity('health_partner_profile')
 export class Partner {

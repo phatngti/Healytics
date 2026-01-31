@@ -52,7 +52,7 @@ export class CreateDocumentRequirementTable1769427320000 implements MigrationInt
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         // Drop in reverse order: Index -> Table -> Enums
-        await queryRunner.dropIndex("document_requirement", "IDX_DOC_REQ_BUSINESS_TYPE");
+        await queryRunner.query("DROP INDEX IF EXISTS document_requirement_idx_business_type");
         await queryRunner.dropTable("document_requirement", true); // true = IF EXISTS
         await queryRunner.query(`DROP TYPE IF EXISTS "public"."document_requirement_documenttype_enum"`);
         await queryRunner.query(`DROP TYPE IF EXISTS "public"."document_requirement_businesstype_enum"`);

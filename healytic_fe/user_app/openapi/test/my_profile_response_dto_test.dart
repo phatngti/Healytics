@@ -21,55 +21,23 @@ void main() {
       // TODO
     });
 
-    // String taxCode
-    test('to test the property `taxCode`', () async {
+    // PartnerInfoDto partnerInfo
+    test('to test the property `partnerInfo`', () async {
       // TODO
     });
 
-    // String legalName
-    test('to test the property `legalName`', () async {
+    // LocationDetailsInfoDto locationDetails
+    test('to test the property `locationDetails`', () async {
       // TODO
     });
 
-    // String brandName
-    test('to test the property `brandName`', () async {
-      // TODO
-    });
-
-    // String businessType
-    test('to test the property `businessType`', () async {
-      // TODO
-    });
-
-    // Object phoneNumber
-    test('to test the property `phoneNumber`', () async {
-      // TODO
-    });
-
-    // AddressDto address
-    test('to test the property `address`', () async {
-      // TODO
-    });
-
-    // LegalRepresentativeDto legalRepresentative
+    // LegalRepresentativeInfoDto legalRepresentative
     test('to test the property `legalRepresentative`', () async {
       // TODO
     });
 
     // String verificationStatus
     test('to test the property `verificationStatus`', () async {
-      // TODO
-    });
-
-    // Field-level rejection details
-    // Object rejectionDetails
-    test('to test the property `rejectionDetails`', () async {
-      // TODO
-    });
-
-    // List of documents with their status
-    // List<PartnerDocumentDto> documents (default value: const [])
-    test('to test the property `documents`', () async {
       // TODO
     });
 

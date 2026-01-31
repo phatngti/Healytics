@@ -87,13 +87,13 @@ GoRouter router(Ref ref) {
         }
       }
 
-      // Provider-specific verification redirect logic
-      if (role == 'provider') {
+      // health_partner-specific verification redirect logic
+      if (role == 'health_partner') {
         if (!isProviderVerified && !isVerificationRoute) {
-          // Unverified provider trying to access other routes
+          // Unverified health_partner trying to access other routes
           return '/provider/verification-status';
         } else if (isProviderVerified && isVerificationRoute) {
-          // Verified provider trying to access verification page
+          // Verified health_partner trying to access verification page
           return '/provider/dashboard';
         }
       }

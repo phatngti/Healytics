@@ -21,69 +21,38 @@ void main() {
       // TODO
     });
 
-    // String email
-    test('to test the property `email`', () async {
+    // BusinessInfoDto businessInfo
+    test('to test the property `businessInfo`', () async {
       // TODO
     });
 
-    // String taxCode
-    test('to test the property `taxCode`', () async {
-      // TODO
-    });
-
-    // String legalName
-    test('to test the property `legalName`', () async {
-      // TODO
-    });
-
-    // String brandName
-    test('to test the property `brandName`', () async {
-      // TODO
-    });
-
-    // String businessType
-    test('to test the property `businessType`', () async {
-      // TODO
-    });
-
-    // Object phoneNumber
-    test('to test the property `phoneNumber`', () async {
-      // TODO
-    });
-
-    // AddressDto address
-    test('to test the property `address`', () async {
-      // TODO
-    });
-
-    // String verificationStatus
-    test('to test the property `verificationStatus`', () async {
-      // TODO
-    });
-
-    // Object verificationCompletedAt
-    test('to test the property `verificationCompletedAt`', () async {
-      // TODO
-    });
-
-    // DateTime createdAt
-    test('to test the property `createdAt`', () async {
-      // TODO
-    });
-
-    // AdminLegalRepresentativeDto legalRepresentative
+    // LegalRepresentativeDto legalRepresentative
     test('to test the property `legalRepresentative`', () async {
       // TODO
     });
 
-    // List<PartnerDocumentDto> documents (default value: const [])
-    test('to test the property `documents`', () async {
+    // List<VerifiedField> kycDocuments (default value: const [])
+    test('to test the property `kycDocuments`', () async {
       // TODO
     });
 
-    // Field-level rejection details
-    // Object rejectionDetails
-    test('to test the property `rejectionDetails`', () async {
+    // String status
+    test('to test the property `status`', () async {
+      // TODO
+    });
+
+    // String priority
+    test('to test the property `priority`', () async {
+      // TODO
+    });
+
+    // DateTime submittedAt
+    test('to test the property `submittedAt`', () async {
+      // TODO
+    });
+
+    // String reviewNote
+    test('to test the property `reviewNote`', () async {
       // TODO
     });
 

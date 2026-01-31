@@ -16,23 +16,33 @@ void main() {
   // final instance = LegalRepresentativeDto();
 
   group('test LegalRepresentativeDto', () {
-    // String fullName
+    // VerifiedField fullName
     test('to test the property `fullName`', () async {
       // TODO
     });
 
-    // String position
+    // VerifiedField position
     test('to test the property `position`', () async {
       // TODO
     });
 
-    // String idType
+    // VerifiedField phoneNumber
+    test('to test the property `phoneNumber`', () async {
+      // TODO
+    });
+
+    // VerifiedField idType
     test('to test the property `idType`', () async {
       // TODO
     });
 
-    // String idNumber
+    // VerifiedField idNumber
     test('to test the property `idNumber`', () async {
+      // TODO
+    });
+
+    // VerifiedField idIssueDate
+    test('to test the property `idIssueDate`', () async {
       // TODO
     });
 

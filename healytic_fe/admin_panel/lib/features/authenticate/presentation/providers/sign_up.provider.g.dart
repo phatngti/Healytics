@@ -16,6 +16,7 @@ _SignUpState _$SignUpStateFromJson(Map<String, dynamic> json) => _SignUpState(
   email: json['email'] as String? ?? '',
   emailToken: json['emailToken'] as String? ?? '',
   otpToken: json['otpToken'] as String? ?? '',
+  registrationSuccess: json['registrationSuccess'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$SignUpStateToJson(_SignUpState instance) =>
@@ -25,6 +26,7 @@ Map<String, dynamic> _$SignUpStateToJson(_SignUpState instance) =>
       'email': instance.email,
       'emailToken': instance.emailToken,
       'otpToken': instance.otpToken,
+      'registrationSuccess': instance.registrationSuccess,
     };
 
 const _$SignupStepEnumMap = {
@@ -73,7 +75,7 @@ final class SignUpProviderProvider
   SignUpProvider create() => SignUpProvider();
 }
 
-String _$signUpProviderHash() => r'511d85b3130745b10afdd9b82a849e4198ca23c5';
+String _$signUpProviderHash() => r'3e97ddf9bb16f138e86ea5bbee9f3447349829a0';
 
 /// Provider for signup flow state management.
 ///

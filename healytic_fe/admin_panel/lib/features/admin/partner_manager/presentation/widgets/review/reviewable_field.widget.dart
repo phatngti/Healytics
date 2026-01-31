@@ -14,12 +14,20 @@ class ReviewableField extends ConsumerStatefulWidget {
   const ReviewableField({
     required this.fieldId,
     required this.child,
+    required this.title,
+    this.titleStyle,
     this.compactMode = false,
     super.key,
   });
 
   /// Unique identifier for the field (e.g., 'business.brandName')
   final String fieldId;
+
+  /// Optional title displayed above the field content
+  final String title;
+
+  /// Custom style for the title text
+  final TextStyle? titleStyle;
 
   /// The field content to wrap
   final Widget child;
@@ -74,24 +82,50 @@ class _ReviewableFieldState extends ConsumerState<ReviewableField> {
     final feedbackMap = ref.watch(reviewFeedbackProvider);
     final feedback = feedbackMap[widget.fieldId];
     final status = feedback?.status ?? FieldFeedbackStatus.pending;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Row(
+    // Build feedback controls widget
+    Widget feedbackControls = OverlayPortal(
+      controller: _overlayController,
+      overlayChildBuilder: (context) => _buildFeedbackPopover(context),
+      child: _FieldFeedbackControls(
+        key: _linkKey,
+        status: status,
+        compactMode: widget.compactMode,
+        onAccept: _handleAccept,
+        onEditToggle: _handleEditToggle,
+      ),
+    );
+
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Expanded(child: widget.child),
-        AppDimens.horizontalSmall,
-        OverlayPortal(
-          controller: _overlayController,
-          overlayChildBuilder: (context) => _buildFeedbackPopover(context),
-          child: _FieldFeedbackControls(
-            key: _linkKey,
-            status: status,
-            compactMode: widget.compactMode,
-            onAccept: _handleAccept,
-            onEditToggle: _handleEditToggle,
-          ),
+        Row(
+          children: [
+            Flexible(
+              child: Tooltip(
+                message: widget.title,
+                child: Text(
+                  widget.title,
+                  style:
+                      widget.titleStyle ??
+                      textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            AppDimens.horizontalSmall,
+            feedbackControls,
+          ],
         ),
-        AppDimens.horizontalSmall,
+        AppDimens.verticalExtraSmall,
+        widget.child,
       ],
     );
   }
@@ -108,113 +142,145 @@ class _ReviewableFieldState extends ConsumerState<ReviewableField> {
 
     final position = renderBox.localToGlobal(Offset.zero);
     final size = renderBox.size;
+    final screenSize = MediaQuery.of(context).size;
 
-    return Positioned(
-      top: position.dy + size.height + 8,
-      right: MediaQuery.of(context).size.width - position.dx - size.width,
-      child: Material(
-        elevation: 8,
-        borderRadius: AppDimens.radiusSmall,
-        shadowColor: colorScheme.shadow.withValues(alpha: 0.2),
-        child: Container(
-          width: 288,
-          padding: AppDimens.paddingAllMediumSmall,
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            borderRadius: AppDimens.radiusSmall,
-            border: Border.all(
-              color: colorScheme.outline.withValues(alpha: 0.2),
-            ),
+    // Estimated popover height (header + textarea + button + padding)
+    const popoverHeight = 180.0;
+    const popoverWidth = 288.0;
+    const gap = 8.0;
+
+    // Check if there's enough space below the button
+    final spaceBelow = screenSize.height - (position.dy + size.height + gap);
+    final spaceAbove = position.dy - gap;
+    final showAbove = spaceBelow < popoverHeight && spaceAbove > popoverHeight;
+
+    // Calculate horizontal position (prefer right-aligned, but ensure it fits)
+    final rightOffset = screenSize.width - position.dx - size.width;
+    final adjustedRight = rightOffset.clamp(
+      8.0,
+      screenSize.width - popoverWidth - 8,
+    );
+
+    return Stack(
+      children: [
+        // Tap barrier to dismiss popup
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => _overlayController.hide(),
+            child: const SizedBox.expand(),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        ),
+        // Popover
+        Positioned(
+          top: showAbove ? null : position.dy + size.height + gap,
+          bottom: showAbove ? screenSize.height - position.dy + gap : null,
+          right: adjustedRight,
+          child: Material(
+            elevation: 8,
+            borderRadius: AppDimens.radiusSmall,
+            shadowColor: colorScheme.shadow.withValues(alpha: 0.2),
+            child: Container(
+              width: 288,
+              padding: AppDimens.paddingAllMediumSmall,
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: AppDimens.radiusSmall,
+                border: Border.all(
+                  color: colorScheme.outline.withValues(alpha: 0.2),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'REVISION NOTE',
-                    style: textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurfaceVariant,
-                      letterSpacing: 0.5,
-                    ),
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'REVISION NOTE',
+                        style: textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurfaceVariant,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => _overlayController.hide(),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Icon(
+                          Icons.close,
+                          size: 16,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
-                  InkWell(
-                    onTap: () => _overlayController.hide(),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Icon(
-                      Icons.close,
-                      size: 16,
-                      color: colorScheme.onSurfaceVariant,
+                  AppDimens.verticalSmall,
+
+                  // Textarea
+                  TextField(
+                    controller: _feedbackController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: 'Describe the issue...',
+                      hintStyle: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      filled: true,
+                      fillColor: colorScheme.surfaceContainerHighest,
+                      border: OutlineInputBorder(
+                        borderRadius: AppDimens.radiusSmall,
+                        borderSide: BorderSide(
+                          color: colorScheme.outline.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: AppDimens.radiusSmall,
+                        borderSide: BorderSide(
+                          color: colorScheme.outline.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: AppDimens.radiusSmall,
+                        borderSide: BorderSide(color: warningColor, width: 1),
+                      ),
+                      contentPadding: AppDimens.paddingAllSmall,
+                      isDense: true,
+                    ),
+                    style: textTheme.bodySmall,
+                  ),
+                  AppDimens.verticalSmall,
+
+                  // Save button
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _handleSaveFeedback,
+                      style: TextButton.styleFrom(
+                        backgroundColor: warningColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: AppDimens.radiusExtraSmall,
+                        ),
+                        textStyle: textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      child: const Text('Save Feedback'),
                     ),
                   ),
                 ],
               ),
-              AppDimens.verticalSmall,
-
-              // Textarea
-              TextField(
-                controller: _feedbackController,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: 'Describe the issue...',
-                  hintStyle: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  filled: true,
-                  fillColor: colorScheme.surfaceContainerHighest,
-                  border: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSmall,
-                    borderSide: BorderSide(
-                      color: colorScheme.outline.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSmall,
-                    borderSide: BorderSide(
-                      color: colorScheme.outline.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSmall,
-                    borderSide: BorderSide(color: warningColor, width: 1),
-                  ),
-                  contentPadding: AppDimens.paddingAllSmall,
-                  isDense: true,
-                ),
-                style: textTheme.bodySmall,
-              ),
-              AppDimens.verticalSmall,
-
-              // Save button
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: _handleSaveFeedback,
-                  style: TextButton.styleFrom(
-                    backgroundColor: warningColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppDimens.radiusExtraSmall,
-                    ),
-                    textStyle: textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  child: const Text('Save Feedback'),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

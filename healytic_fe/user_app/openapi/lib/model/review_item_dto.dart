@@ -13,15 +13,14 @@ part of openapi.api;
 class ReviewItemDto {
   /// Returns a new [ReviewItemDto] instance.
   ReviewItemDto({
-    required this.type,
-    this.documentId,
-    this.fieldName,
-    required this.isValid,
-    this.reason,
+    required this.fieldKey,
+    this.documentKey,
+    required this.isVerified,
+    this.feedback,
   });
 
-  /// Type of item being reviewed
-  ReviewItemDtoTypeEnum type;
+  /// Key of the field or document being reviewed
+  String fieldKey;
 
   /// UUID of the document (if type is DOCUMENT)
   ///
@@ -30,19 +29,10 @@ class ReviewItemDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? documentId;
-
-  /// Name of the field (if type is FIELD)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? fieldName;
+  String? documentKey;
 
   /// Mark the item as valid or invalid
-  bool isValid;
+  bool isVerified;
 
   /// Reason for rejection or feedback
   ///
@@ -51,46 +41,39 @@ class ReviewItemDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? reason;
+  String? feedback;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is ReviewItemDto &&
-    other.type == type &&
-    other.documentId == documentId &&
-    other.fieldName == fieldName &&
-    other.isValid == isValid &&
-    other.reason == reason;
+    other.fieldKey == fieldKey &&
+    other.documentKey == documentKey &&
+    other.isVerified == isVerified &&
+    other.feedback == feedback;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (type.hashCode) +
-    (documentId == null ? 0 : documentId!.hashCode) +
-    (fieldName == null ? 0 : fieldName!.hashCode) +
-    (isValid.hashCode) +
-    (reason == null ? 0 : reason!.hashCode);
+    (fieldKey.hashCode) +
+    (documentKey == null ? 0 : documentKey!.hashCode) +
+    (isVerified.hashCode) +
+    (feedback == null ? 0 : feedback!.hashCode);
 
   @override
-  String toString() => 'ReviewItemDto[type=$type, documentId=$documentId, fieldName=$fieldName, isValid=$isValid, reason=$reason]';
+  String toString() => 'ReviewItemDto[fieldKey=$fieldKey, documentKey=$documentKey, isVerified=$isVerified, feedback=$feedback]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'type'] = this.type;
-    if (this.documentId != null) {
-      json[r'documentId'] = this.documentId;
+      json[r'fieldKey'] = this.fieldKey;
+    if (this.documentKey != null) {
+      json[r'documentKey'] = this.documentKey;
     } else {
-      json[r'documentId'] = null;
+      json[r'documentKey'] = null;
     }
-    if (this.fieldName != null) {
-      json[r'fieldName'] = this.fieldName;
+      json[r'isVerified'] = this.isVerified;
+    if (this.feedback != null) {
+      json[r'feedback'] = this.feedback;
     } else {
-      json[r'fieldName'] = null;
-    }
-      json[r'isValid'] = this.isValid;
-    if (this.reason != null) {
-      json[r'reason'] = this.reason;
-    } else {
-      json[r'reason'] = null;
+      json[r'feedback'] = null;
     }
     return json;
   }
@@ -114,11 +97,10 @@ class ReviewItemDto {
       }());
 
       return ReviewItemDto(
-        type: ReviewItemDtoTypeEnum.fromJson(json[r'type'])!,
-        documentId: mapValueOfType<String>(json, r'documentId'),
-        fieldName: mapValueOfType<String>(json, r'fieldName'),
-        isValid: mapValueOfType<bool>(json, r'isValid')!,
-        reason: mapValueOfType<String>(json, r'reason'),
+        fieldKey: mapValueOfType<String>(json, r'fieldKey')!,
+        documentKey: mapValueOfType<String>(json, r'documentKey'),
+        isVerified: mapValueOfType<bool>(json, r'isVerified')!,
+        feedback: mapValueOfType<String>(json, r'feedback'),
       );
     }
     return null;
@@ -166,85 +148,8 @@ class ReviewItemDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'type',
-    'isValid',
+    'fieldKey',
+    'isVerified',
   };
 }
-
-/// Type of item being reviewed
-class ReviewItemDtoTypeEnum {
-  /// Instantiate a new enum with the provided [value].
-  const ReviewItemDtoTypeEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const DOCUMENT = ReviewItemDtoTypeEnum._(r'DOCUMENT');
-  static const FIELD = ReviewItemDtoTypeEnum._(r'FIELD');
-  static const LEGAL_REP_FIELD = ReviewItemDtoTypeEnum._(r'LEGAL_REP_FIELD');
-
-  /// List of all possible values in this [enum][ReviewItemDtoTypeEnum].
-  static const values = <ReviewItemDtoTypeEnum>[
-    DOCUMENT,
-    FIELD,
-    LEGAL_REP_FIELD,
-  ];
-
-  static ReviewItemDtoTypeEnum? fromJson(dynamic value) => ReviewItemDtoTypeEnumTypeTransformer().decode(value);
-
-  static List<ReviewItemDtoTypeEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <ReviewItemDtoTypeEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = ReviewItemDtoTypeEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [ReviewItemDtoTypeEnum] to String,
-/// and [decode] dynamic data back to [ReviewItemDtoTypeEnum].
-class ReviewItemDtoTypeEnumTypeTransformer {
-  factory ReviewItemDtoTypeEnumTypeTransformer() => _instance ??= const ReviewItemDtoTypeEnumTypeTransformer._();
-
-  const ReviewItemDtoTypeEnumTypeTransformer._();
-
-  String encode(ReviewItemDtoTypeEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a ReviewItemDtoTypeEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  ReviewItemDtoTypeEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'DOCUMENT': return ReviewItemDtoTypeEnum.DOCUMENT;
-        case r'FIELD': return ReviewItemDtoTypeEnum.FIELD;
-        case r'LEGAL_REP_FIELD': return ReviewItemDtoTypeEnum.LEGAL_REP_FIELD;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [ReviewItemDtoTypeEnumTypeTransformer] instance.
-  static ReviewItemDtoTypeEnumTypeTransformer? _instance;
-}
-
 

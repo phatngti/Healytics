@@ -6,6 +6,7 @@ import 'package:admin_panel/features/authenticate/presentation/sign_in.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_up/email_code_verification.screen.dart';
 
 import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up_form.screen.dart';
+import 'package:admin_panel/features/authenticate/presentation/sign_up/sucess_registration.screen.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/partner_manager_screen.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/review_application.screen.dart';
 import 'package:admin_panel/router/utils.dart';
@@ -57,6 +58,10 @@ class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
       path: 'email-code-verification',
       name: EmailCodeVerificationRoute.name,
     ),
+    TypedGoRoute<SuccessRegistrationRoute>(
+      path: 'success',
+      name: SuccessRegistrationRoute.name,
+    ),
   ],
 )
 class SignUpRoute extends GoRouteData with $SignUpRoute {
@@ -82,6 +87,21 @@ class EmailCodeVerificationRoute extends GoRouteData
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const EmailCodeVerificationScreen(),
+    );
+  }
+}
+
+/// Route displayed after successful partner registration.
+class SuccessRegistrationRoute extends GoRouteData
+    with $SuccessRegistrationRoute {
+  const SuccessRegistrationRoute();
+  static const name = 'success-registration';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const SucessRegistrationScreen(),
     );
   }
 }

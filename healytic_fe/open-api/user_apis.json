@@ -1679,7 +1679,41 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnersResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/total": {
+      "get": {
+        "operationId": "AdminPartnersController_getTotalPartners",
+        "summary": "Get total number of partners",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TotalPartnersResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -2059,54 +2093,41 @@
           "streetAddress"
         ]
       },
-      "IdImagesRequestDto": {
-        "type": "object",
-        "properties": {
-          "frontImgUrl": {
-            "type": "string",
-            "example": "https://storage.example.com/id_front.jpg",
-            "description": "URL to front image of ID document"
-          },
-          "backImgUrl": {
-            "type": "string",
-            "example": "https://storage.example.com/id_back.jpg",
-            "description": "URL to back image of ID document"
-          }
-        },
-        "required": [
-          "frontImgUrl",
-          "backImgUrl"
-        ]
-      },
       "PartnerDocumentVerificationDto": {
         "type": "object",
         "properties": {
-          "businessLicenseUrl": {
+          "fileType": {
             "type": "string",
-            "example": "https://storage.example.com/business_license.pdf",
-            "description": "URL to business license document"
+            "example": "image",
+            "description": "File type of document"
           },
-          "authorizationLetterUrl": {
+          "type": {
             "type": "string",
-            "example": "https://storage.example.com/authorization_letter.pdf",
-            "description": "URL to authorization letter document"
+            "example": "BUSINESS_LICENSE",
+            "description": "Type of document"
           },
-          "taxCertificateUrl": {
+          "documentKey": {
             "type": "string",
-            "example": "https://storage.example.com/tax_certificate.pdf",
-            "description": "URL to tax certificate document"
+            "example": "business_license.pdf",
+            "description": "Document key (R2/S3 path)"
           },
-          "otherDocumentUrls": {
+          "urls": {
             "example": [
-              "https://storage.example.com/other_doc1.pdf"
+              "https://storage.example.com/business_license.pdf"
             ],
-            "description": "Array of URLs to other supporting documents",
+            "description": "Array of URLs to document files",
             "type": "array",
             "items": {
               "type": "string"
             }
           }
-        }
+        },
+        "required": [
+          "fileType",
+          "type",
+          "documentKey",
+          "urls"
+        ]
       },
       "LegalRepresentativeRequestDto": {
         "type": "object",
@@ -2146,11 +2167,11 @@
             "example": "2023-01-15",
             "description": "Date of ID issuance (ISO 8601 format)"
           },
-          "images": {
-            "$ref": "#/components/schemas/IdImagesRequestDto"
-          },
           "documents": {
-            "$ref": "#/components/schemas/PartnerDocumentVerificationDto"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerDocumentVerificationDto"
+            }
           }
         },
         "required": [
@@ -2158,7 +2179,6 @@
           "idType",
           "idNumber",
           "idIssueDate",
-          "images",
           "documents"
         ]
       },
@@ -2397,7 +2417,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-27T17:19:40.199Z"
+              "submittedAt": "2026-01-31T19:43:03.835Z"
             }
           }
         },
@@ -2444,173 +2464,252 @@
           "data"
         ]
       },
-      "AddressDto": {
+      "VerificationStringFieldDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "example": "XX-1234567-Y",
+            "description": "The raw value"
+          },
+          "displayValue": {
+            "type": "string",
+            "example": "XX-1234567-Y",
+            "description": "Human-readable display value"
+          },
+          "requiresUpdate": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether this field requires update"
+          },
+          "adminFeedback": {
+            "type": "object",
+            "example": "Tax code mismatch with tax document.",
+            "nullable": true
+          },
+          "isVerified": {
+            "type": "object",
+            "example": true,
+            "nullable": true,
+            "description": "Whether this field was verified by admin (from partner_review_log)"
+          }
+        },
+        "required": [
+          "value",
+          "displayValue",
+          "requiresUpdate"
+        ]
+      },
+      "VerificationOptionalStringFieldDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object",
+            "example": "+1 (555) 000-0000",
+            "nullable": true
+          },
+          "displayValue": {
+            "type": "object",
+            "example": "+1 (555) 000-0000",
+            "nullable": true
+          },
+          "requiresUpdate": {
+            "type": "boolean",
+            "example": false
+          },
+          "adminFeedback": {
+            "type": "object",
+            "example": "Phone number mismatch with tax document.",
+            "nullable": true
+          },
+          "isVerified": {
+            "type": "object",
+            "example": true,
+            "nullable": true,
+            "description": "Whether this field was verified by admin (from partner_review_log)"
+          }
+        },
+        "required": [
+          "requiresUpdate"
+        ]
+      },
+      "PartnerInfoDto": {
+        "type": "object",
+        "properties": {
+          "taxCode": {
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
+          },
+          "legalName": {
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
+          },
+          "brandName": {
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
+          },
+          "businessType": {
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
+          },
+          "phoneNumber": {
+            "$ref": "#/components/schemas/VerificationOptionalStringFieldDto"
+          }
+        },
+        "required": [
+          "taxCode",
+          "legalName",
+          "brandName",
+          "businessType",
+          "phoneNumber"
+        ]
+      },
+      "LocationDetailsInfoDto": {
         "type": "object",
         "properties": {
           "provinceId": {
-            "type": "object",
-            "example": "uuid",
-            "nullable": true
-          },
-          "province": {
-            "type": "string",
-            "example": "Hà Nội"
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
           },
           "districtId": {
-            "type": "object",
-            "example": "uuid",
-            "nullable": true
-          },
-          "district": {
-            "type": "string",
-            "example": "Hoàn Kiếm"
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
           },
           "wardId": {
-            "type": "object",
-            "example": "uuid",
-            "nullable": true
-          },
-          "ward": {
-            "type": "string",
-            "example": "Hàng Bạc"
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
           },
           "streetAddress": {
-            "type": "string",
-            "example": "123 Le Loi Street"
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
           }
         },
         "required": [
           "provinceId",
-          "province",
           "districtId",
-          "district",
           "wardId",
-          "ward",
           "streetAddress"
         ]
       },
-      "LegalRepresentativeDto": {
-        "type": "object",
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "example": "NGUYEN VAN A"
-          },
-          "position": {
-            "type": "string",
-            "example": "Giám đốc"
-          },
-          "idType": {
-            "type": "string",
-            "example": "CITIZEN_ID"
-          },
-          "idNumber": {
-            "type": "string",
-            "example": "001234567890"
-          }
-        },
-        "required": [
-          "fullName",
-          "position",
-          "idType",
-          "idNumber"
-        ]
-      },
-      "PartnerDocumentDto": {
+      "VerificationDocumentDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "object",
-            "example": "uuid-123",
-            "nullable": true
-          },
-          "documentType": {
             "type": "string",
-            "enum": [
-              "BUSINESS_LICENSE",
-              "IDENTITY_FRONT",
-              "IDENTITY_BACK",
-              "AUTHORIZATION_LETTER",
-              "ANTT",
-              "KCB_LICENSE",
-              "GCN_FITNESS",
-              "GPP",
-              "RHM_LICENSE",
-              "MEDICAL_WASTE_CONTRACT",
-              "YHCT_LICENSE",
-              "PSYCHOLOGY_LICENSE",
-              "DERMATOLOGY_LICENSE",
-              "TECHNICAL_PORTFOLIO",
-              "NUTRITION_LICENSE",
-              "PSYCHIATRY_LICENSE"
-            ]
+            "example": "id_front",
+            "description": "Document identifier"
           },
-          "documentUrl": {
+          "label": {
+            "type": "string",
+            "example": "Front Side ID",
+            "description": "Display label for the document"
+          },
+          "fileUrl": {
             "type": "object",
-            "example": "https://...",
+            "example": "https://example.com/id_front_v1.jpg",
             "nullable": true
           },
-          "documentKey": {
+          "fileName": {
             "type": "object",
-            "example": "documents/...",
+            "example": "id_front_v1.jpg",
             "nullable": true
           },
           "status": {
             "type": "string",
             "enum": [
-              "MISSING",
-              "PENDING",
-              "APPROVED",
-              "REJECTED"
+              "pending",
+              "approved",
+              "rejected",
+              "revision_required",
+              "missing"
             ],
-            "example": "PENDING"
+            "example": "pending"
           },
-          "isRequired": {
-            "type": "boolean",
-            "example": true
-          },
-          "description": {
-            "type": "object",
-            "example": "Business License",
-            "nullable": true
-          },
-          "isReviewed": {
+          "requiresUpdate": {
             "type": "boolean",
             "example": false
           },
-          "isValid": {
-            "type": "boolean",
-            "example": true
-          },
           "adminFeedback": {
             "type": "object",
-            "example": "Image blurry",
+            "example": "Front ID photo is too dark and blurry.",
             "nullable": true
           },
-          "verificationNotes": {
+          "isVerified": {
             "type": "object",
-            "example": "Verified details",
-            "nullable": true
-          },
-          "uploadedAt": {
-            "type": "object",
-            "example": "2024-01-20T10:00:00Z",
-            "nullable": true
+            "example": true,
+            "nullable": true,
+            "description": "Whether this document was verified by admin (from partner_review_log)"
           }
         },
         "required": [
           "id",
-          "documentType",
-          "documentUrl",
-          "documentKey",
+          "label",
           "status",
-          "isRequired",
-          "description",
-          "isReviewed",
-          "isValid",
-          "adminFeedback",
-          "verificationNotes",
-          "uploadedAt"
+          "requiresUpdate"
+        ]
+      },
+      "DocumentVerificationInfoDto": {
+        "type": "object",
+        "properties": {
+          "businessLicense": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VerificationDocumentDto"
+              }
+            ]
+          },
+          "authorizationLetter": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VerificationDocumentDto"
+              }
+            ]
+          },
+          "taxCertificate": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VerificationDocumentDto"
+              }
+            ]
+          }
+        }
+      },
+      "LegalRepresentativeInfoDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
+          },
+          "position": {
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
+          },
+          "phoneNumber": {
+            "$ref": "#/components/schemas/VerificationOptionalStringFieldDto"
+          },
+          "idType": {
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
+          },
+          "idNumber": {
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
+          },
+          "idIssueDate": {
+            "$ref": "#/components/schemas/VerificationStringFieldDto"
+          },
+          "idFrontImage": {
+            "$ref": "#/components/schemas/VerificationDocumentDto"
+          },
+          "idBackImage": {
+            "$ref": "#/components/schemas/VerificationDocumentDto"
+          },
+          "documents": {
+            "$ref": "#/components/schemas/DocumentVerificationInfoDto"
+          }
+        },
+        "required": [
+          "fullName",
+          "position",
+          "phoneNumber",
+          "idType",
+          "idNumber",
+          "idIssueDate",
+          "idFrontImage",
+          "idBackImage",
+          "documents"
         ]
       },
       "MyProfileResponseDto": {
@@ -2620,45 +2719,14 @@
             "type": "string",
             "example": "uuid"
           },
-          "taxCode": {
-            "type": "string",
-            "example": "0123456789"
+          "partnerInfo": {
+            "$ref": "#/components/schemas/PartnerInfoDto"
           },
-          "legalName": {
-            "type": "string",
-            "example": "CÔNG TY TNHH SPA HÀ NỘI"
-          },
-          "brandName": {
-            "type": "string",
-            "example": "Hanoi Spa"
-          },
-          "businessType": {
-            "type": "string",
-            "enum": [
-              "MASSAGE_THERAPY",
-              "MASSAGE_REHABILITATION",
-              "SPA_BEAUTY",
-              "FITNESS",
-              "PHARMACY",
-              "DENTAL",
-              "TRADITIONAL_MEDICINE",
-              "PSYCHOLOGY",
-              "DERMATOLOGY",
-              "NUTRITION",
-              "PSYCHIATRY"
-            ],
-            "example": "SPA_BEAUTY"
-          },
-          "phoneNumber": {
-            "type": "object",
-            "example": "0901234567",
-            "nullable": true
-          },
-          "address": {
-            "$ref": "#/components/schemas/AddressDto"
+          "locationDetails": {
+            "$ref": "#/components/schemas/LocationDetailsInfoDto"
           },
           "legalRepresentative": {
-            "$ref": "#/components/schemas/LegalRepresentativeDto"
+            "$ref": "#/components/schemas/LegalRepresentativeInfoDto"
           },
           "verificationStatus": {
             "type": "string",
@@ -2669,21 +2737,6 @@
               "REQUIRED_RESUBMIT"
             ],
             "example": "PENDING"
-          },
-          "rejectionDetails": {
-            "type": "object",
-            "example": {
-              "taxCode": "Invalid format"
-            },
-            "nullable": true,
-            "description": "Field-level rejection details"
-          },
-          "documents": {
-            "description": "List of documents with their status",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PartnerDocumentDto"
-            }
           },
           "verificationCompletedAt": {
             "type": "object",
@@ -2698,17 +2751,10 @@
         },
         "required": [
           "id",
-          "taxCode",
-          "legalName",
-          "brandName",
-          "businessType",
-          "phoneNumber",
-          "address",
+          "partnerInfo",
+          "locationDetails",
           "legalRepresentative",
           "verificationStatus",
-          "rejectionDetails",
-          "documents",
-          "verificationCompletedAt",
           "createdAt"
         ]
       },
@@ -2750,11 +2796,11 @@
             "example": "2023-01-15",
             "description": "Date of ID issuance (ISO 8601 format)"
           },
-          "images": {
-            "$ref": "#/components/schemas/IdImagesRequestDto"
-          },
           "documents": {
-            "$ref": "#/components/schemas/PartnerDocumentVerificationDto"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerDocumentVerificationDto"
+            }
           }
         }
       },
@@ -4339,95 +4385,45 @@
           "createdAt"
         ]
       },
-      "AdminLegalRepresentativeDto": {
-        "type": "object",
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "example": "NGUYEN VAN A"
-          },
-          "position": {
-            "type": "string",
-            "example": "Giám đốc"
-          },
-          "idType": {
-            "type": "string",
-            "example": "CITIZEN_ID"
-          },
-          "idNumber": {
-            "type": "string",
-            "example": "001234567890"
-          },
-          "id": {
-            "type": "string",
-            "example": "uuid-123"
-          },
-          "idIssueDate": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2020-01-15"
-          },
-          "idFrontImgUrl": {
-            "type": "object",
-            "example": "https://example.com/front.jpg",
-            "nullable": true
-          },
-          "idBackImgUrl": {
-            "type": "object",
-            "example": "https://example.com/back.jpg",
-            "nullable": true
-          },
-          "authorizationLetterUrl": {
-            "type": "object",
-            "example": null,
-            "nullable": true
-          },
-          "phoneNumber": {
-            "type": "object",
-            "example": "0901234567",
-            "nullable": true
-          }
-        },
-        "required": [
-          "fullName",
-          "position",
-          "idType",
-          "idNumber",
-          "id",
-          "idIssueDate",
-          "idFrontImgUrl",
-          "idBackImgUrl",
-          "authorizationLetterUrl",
-          "phoneNumber"
-        ]
-      },
-      "AdminPartnerDetailResponseDto": {
+      "PartnerItemDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
+            "type": "string",
+            "example": "uuid"
           },
           "taxCode": {
-            "type": "string"
-          },
-          "legalName": {
-            "type": "string"
+            "type": "string",
+            "example": "0123456789"
           },
           "brandName": {
-            "type": "string"
+            "type": "string",
+            "example": "Hanoi Spa"
+          },
+          "legalName": {
+            "type": "string",
+            "example": "Hanoi Spa Co., Ltd"
+          },
+          "email": {
+            "type": "string",
+            "example": "partner@example.com"
           },
           "businessType": {
-            "type": "string"
-          },
-          "phoneNumber": {
-            "type": "object",
-            "nullable": true
-          },
-          "address": {
-            "$ref": "#/components/schemas/AddressDto"
+            "type": "string",
+            "enum": [
+              "MASSAGE_THERAPY",
+              "MASSAGE_REHABILITATION",
+              "SPA_BEAUTY",
+              "FITNESS",
+              "PHARMACY",
+              "DENTAL",
+              "TRADITIONAL_MEDICINE",
+              "PSYCHOLOGY",
+              "DERMATOLOGY",
+              "NUTRITION",
+              "PSYCHIATRY"
+            ],
+            "example": "SPA_BEAUTY"
           },
           "verificationStatus": {
             "type": "string",
@@ -4436,86 +4432,263 @@
               "APPROVED",
               "REJECTED",
               "REQUIRED_RESUBMIT"
-            ]
-          },
-          "verificationCompletedAt": {
-            "type": "object",
-            "nullable": true
+            ],
+            "example": "PENDING"
           },
           "createdAt": {
             "format": "date-time",
-            "type": "string"
-          },
-          "legalRepresentative": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AdminLegalRepresentativeDto"
-              }
-            ]
-          },
-          "documents": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PartnerDocumentDto"
-            }
-          },
-          "rejectionDetails": {
-            "type": "object",
-            "nullable": true,
-            "description": "Field-level rejection details"
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z"
           }
         },
         "required": [
           "id",
-          "email",
           "taxCode",
-          "legalName",
           "brandName",
+          "legalName",
+          "email",
           "businessType",
-          "phoneNumber",
-          "address",
           "verificationStatus",
-          "verificationCompletedAt",
-          "createdAt",
-          "legalRepresentative",
-          "documents",
-          "rejectionDetails"
+          "createdAt"
+        ]
+      },
+      "PartnersResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerItemDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "example": 50
+          },
+          "page": {
+            "type": "number",
+            "example": 1
+          },
+          "limit": {
+            "type": "number",
+            "example": 10
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "limit"
+        ]
+      },
+      "TotalPartnersResponseDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number",
+            "example": 150,
+            "description": "Total number of partners"
+          }
+        },
+        "required": [
+          "total"
+        ]
+      },
+      "VerifiedField": {
+        "type": "object",
+        "properties": {
+          "fieldKey": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "example": false
+          },
+          "feedback": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fieldKey",
+          "value",
+          "isVerified"
+        ]
+      },
+      "AddressInfoDto": {
+        "type": "object",
+        "properties": {
+          "streetAddress": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "ward": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "district": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "city": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "country": {
+            "type": "string",
+            "example": "Vietnam"
+          },
+          "latitude": {
+            "type": "number",
+            "example": 21.0285,
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "example": 105.8542,
+            "nullable": true
+          }
+        },
+        "required": [
+          "streetAddress"
+        ]
+      },
+      "BusinessInfoDto": {
+        "type": "object",
+        "properties": {
+          "brandName": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "taxRegistrationCode": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "serviceTags": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressInfoDto"
+          },
+          "username": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "email": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "phoneNumber": {
+            "$ref": "#/components/schemas/VerifiedField"
+          }
+        },
+        "required": [
+          "brandName",
+          "serviceTags"
+        ]
+      },
+      "LegalRepresentativeDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "position": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "phoneNumber": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "idType": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "idNumber": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "idIssueDate": {
+            "$ref": "#/components/schemas/VerifiedField"
+          }
+        },
+        "required": [
+          "fullName"
+        ]
+      },
+      "AdminPartnerDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uuid-123"
+          },
+          "businessInfo": {
+            "$ref": "#/components/schemas/BusinessInfoDto"
+          },
+          "legalRepresentative": {
+            "$ref": "#/components/schemas/LegalRepresentativeDto"
+          },
+          "kycDocuments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerifiedField"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "REQUIRED_RESUBMIT"
+            ],
+            "example": "PENDING"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "normal",
+              "high",
+              "urgent"
+            ],
+            "example": "normal"
+          },
+          "submittedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-20T10:00:00Z"
+          },
+          "reviewNote": {
+            "type": "string",
+            "example": "Additional review notes from admin"
+          }
+        },
+        "required": [
+          "id",
+          "businessInfo",
+          "kycDocuments",
+          "status",
+          "priority",
+          "submittedAt"
         ]
       },
       "ReviewItemDto": {
         "type": "object",
         "properties": {
-          "type": {
+          "fieldKey": {
             "type": "string",
-            "enum": [
-              "DOCUMENT",
-              "FIELD",
-              "LEGAL_REP_FIELD"
-            ],
-            "description": "Type of item being reviewed"
+            "description": "Key of the field or document being reviewed"
           },
-          "documentId": {
+          "documentKey": {
             "type": "string",
             "description": "UUID of the document (if type is DOCUMENT)"
           },
-          "fieldName": {
-            "type": "string",
-            "description": "Name of the field (if type is FIELD)"
-          },
-          "isValid": {
+          "isVerified": {
             "type": "boolean",
             "description": "Mark the item as valid or invalid",
             "example": true
           },
-          "reason": {
+          "feedback": {
             "type": "string",
             "description": "Reason for rejection or feedback"
           }
         },
         "required": [
-          "type",
-          "isValid"
+          "fieldKey",
+          "isVerified"
         ]
       },
       "ReviewPartnerProfileDto": {

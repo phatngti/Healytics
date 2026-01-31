@@ -31,8 +31,6 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
   void initState() {
     super.initState();
     _images = List.from(widget.initialImages);
-
-    print("images ${widget.initialImages}");
   }
 
   @override

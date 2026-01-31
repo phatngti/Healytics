@@ -103,6 +103,7 @@ abstract class VerificationDocument with _$VerificationDocument {
 abstract class VerificationStringField with _$VerificationStringField {
   const factory VerificationStringField({
     required String value,
+    required String displayValue,
     @Default(false) bool requiresUpdate,
     String? adminFeedback,
   }) = _VerificationStringField;
@@ -117,6 +118,7 @@ abstract class VerificationOptionalStringField
     with _$VerificationOptionalStringField {
   const factory VerificationOptionalStringField({
     String? value,
+    required String displayValue,
     @Default(false) bool requiresUpdate,
     String? adminFeedback,
   }) = _VerificationOptionalStringField;
@@ -130,6 +132,7 @@ abstract class VerificationOptionalStringField
 abstract class VerificationStringListField with _$VerificationStringListField {
   const factory VerificationStringListField({
     required List<String> value,
+    required String displayValue,
     @Default(false) bool requiresUpdate,
     String? adminFeedback,
   }) = _VerificationStringListField;
@@ -138,80 +141,118 @@ abstract class VerificationStringListField with _$VerificationStringListField {
       _$VerificationStringListFieldFromJson(json);
 }
 
-/// Represents the legal representative details and documents.
+/// Represents partner (business entity) information for verification.
+/// Aligned with PartnerRequestEntity from sign-up form.
 @freezed
-abstract class LegalRepresentativeEntity with _$LegalRepresentativeEntity {
-  /// Creates a new [LegalRepresentativeEntity].
-  const factory LegalRepresentativeEntity({
-    /// Full legal name of the representative.
-    required String fullName,
-
-    /// Government ID number.
-    required String govIdNumber,
-
-    /// Front side of government ID.
-    required VerificationDocument idFront,
-
-    /// Back side of government ID.
-    required VerificationDocument idBack,
-
-    /// Authorization letter document.
-    VerificationDocument? authorizationLetter,
-  }) = _LegalRepresentativeEntity;
-
-  /// Creates a [LegalRepresentativeEntity] from JSON data.
-  factory LegalRepresentativeEntity.fromJson(Map<String, dynamic> json) =>
-      _$LegalRepresentativeEntityFromJson(json);
-}
-
-/// Represents business entity information for verification.
-@freezed
-abstract class BusinessEntityInfo with _$BusinessEntityInfo {
-  /// Creates a new [BusinessEntityInfo].
-  const factory BusinessEntityInfo({
-    /// Company name.
-    required VerificationStringField companyName,
-
+abstract class PartnerInfo with _$PartnerInfo {
+  /// Creates a new [PartnerInfo].
+  const factory PartnerInfo({
     /// Tax registration code.
-    required VerificationStringField taxRegistrationCode,
+    required VerificationStringField taxCode,
 
-    /// Business email address.
-    required VerificationStringField businessEmail,
+    /// Legal company name.
+    required VerificationStringField legalName,
+
+    /// Brand/trade name.
+    required VerificationStringField brandName,
+
+    /// Business type (e.g., 'Individual Business', 'Corporation').
+    required VerificationStringField businessType,
 
     /// Business phone number.
-    required VerificationStringField businessPhone,
+    VerificationOptionalStringField? phoneNumber,
+  }) = _PartnerInfo;
 
-    /// List of service categories.
-    @Default(VerificationStringListField(value: []))
-    VerificationStringListField serviceCategories,
-  }) = _BusinessEntityInfo;
-
-  /// Creates a [BusinessEntityInfo] from JSON data.
-  factory BusinessEntityInfo.fromJson(Map<String, dynamic> json) =>
-      _$BusinessEntityInfoFromJson(json);
+  /// Creates a [PartnerInfo] from JSON data.
+  factory PartnerInfo.fromJson(Map<String, dynamic> json) =>
+      _$PartnerInfoFromJson(json);
 }
 
 /// Represents location details information for verification.
+/// Aligned with PartnerRequestEntity address fields from sign-up form.
 @freezed
 abstract class LocationDetailsInfo with _$LocationDetailsInfo {
   /// Creates a new [LocationDetailsInfo].
   const factory LocationDetailsInfo({
-    /// Country name or code.
-    VerificationOptionalStringField? country,
+    /// Province ID.
+    required VerificationStringField provinceId,
 
-    /// City name.
-    VerificationOptionalStringField? city,
+    /// District ID.
+    required VerificationStringField districtId,
 
-    /// District or area.
-    VerificationOptionalStringField? districtArea,
+    /// Ward ID.
+    required VerificationStringField wardId,
 
     /// Detailed street address.
-    required VerificationStringField detailedAddress,
+    required VerificationStringField streetAddress,
   }) = _LocationDetailsInfo;
 
   /// Creates a [LocationDetailsInfo] from JSON data.
   factory LocationDetailsInfo.fromJson(Map<String, dynamic> json) =>
       _$LocationDetailsInfoFromJson(json);
+}
+
+/// Represents document verification information.
+/// Aligned with PartnerDocumentVerificationEntity from sign-up form.
+@freezed
+abstract class DocumentVerificationInfo with _$DocumentVerificationInfo {
+  /// Creates a new [DocumentVerificationInfo].
+  const factory DocumentVerificationInfo({
+    /// Business license document.
+    VerificationDocument? businessLicense,
+
+    /// Authorization letter document.
+    VerificationDocument? authorizationLetter,
+
+    /// Tax certificate document.
+    VerificationDocument? taxCertificate,
+
+    /// Other supporting documents.
+    @Default([]) List<VerificationDocument> otherDocuments,
+  }) = _DocumentVerificationInfo;
+
+  /// Creates a [DocumentVerificationInfo] from JSON data.
+  factory DocumentVerificationInfo.fromJson(Map<String, dynamic> json) =>
+      _$DocumentVerificationInfoFromJson(json);
+}
+
+/// Represents the legal representative details and documents.
+/// Aligned with LegalRepresentativeEntity from sign-up form.
+@freezed
+abstract class LegalRepresentativeInfo with _$LegalRepresentativeInfo {
+  /// Creates a new [LegalRepresentativeInfo].
+  const factory LegalRepresentativeInfo({
+    /// Full legal name of the representative.
+    required VerificationStringField fullName,
+
+    /// Position/title of the representative.
+    VerificationStringField? position,
+
+    /// Phone number of the representative.
+    VerificationStringField? phoneNumber,
+
+    /// Type of government ID (e.g., 'ID Card', 'Passport').
+    required VerificationStringField idType,
+
+    /// Government ID number.
+    required VerificationStringField idNumber,
+
+    /// ID issue date (ISO format string).
+    required VerificationStringField idIssueDate,
+
+    /// Front side of government ID.
+    required VerificationDocument idFrontImage,
+
+    /// Back side of government ID.
+    required VerificationDocument idBackImage,
+
+    /// Document verification info (business license, authorization, etc.).
+    DocumentVerificationInfo? documents,
+  }) = _LegalRepresentativeInfo;
+
+  /// Creates a [LegalRepresentativeInfo] from JSON data.
+  factory LegalRepresentativeInfo.fromJson(Map<String, dynamic> json) =>
+      _$LegalRepresentativeInfoFromJson(json);
 }
 
 /// Represents a single verification section in the application.
@@ -255,14 +296,14 @@ abstract class ProviderVerificationStatusEntity
     /// List of verification sections.
     required List<VerificationSectionEntity> sections,
 
-    /// Business entity details, if available.
-    BusinessEntityInfo? businessEntity,
+    /// Partner (business entity) details, if available.
+    PartnerInfo? partnerInfo,
 
     /// Location details, if available.
     LocationDetailsInfo? locationDetails,
 
     /// Legal representative details, if available.
-    LegalRepresentativeEntity? legalRepresentative,
+    LegalRepresentativeInfo? legalRepresentative,
 
     /// Admin feedback title/summary.
     String? adminFeedback,

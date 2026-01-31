@@ -1,6 +1,7 @@
 import 'package:admin_panel/features/admin/partner_manager/datasource/partner_verification_remote.datasource.dart';
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification.repository.dart';
+import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_detail.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_stats.entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -33,8 +34,9 @@ class PartnerVerificationRepositoryImpl
       dataSource.getTotalRows(statusFilter: statusFilter);
 
   @override
-  Future<PartnerVerificationEntity> getPartnerById(PartnerVerificationId id) =>
-      dataSource.getPartnerById(id);
+  Future<PartnerVerificationDetailEntity> getPartnerDetailById(
+    PartnerVerificationId id,
+  ) => dataSource.getPartnerDetailById(id);
 
   @override
   Future<void> approvePartner(PartnerVerificationId id) =>
@@ -43,6 +45,19 @@ class PartnerVerificationRepositoryImpl
   @override
   Future<void> rejectPartner(PartnerVerificationId id, {String? reason}) =>
       dataSource.rejectPartner(id, reason: reason);
+
+  @override
+  Future<void> reviewPartner(
+    PartnerVerificationId id, {
+    required String decision,
+    String? generalComment,
+    Map<String, String?>? fieldFeedback,
+  }) => dataSource.reviewPartner(
+    id,
+    decision: decision,
+    generalComment: generalComment,
+    fieldFeedback: fieldFeedback,
+  );
 
   @override
   Future<PartnerVerificationStats> getStats() => dataSource.getStats();
