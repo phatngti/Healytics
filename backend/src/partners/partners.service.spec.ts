@@ -142,9 +142,11 @@ describe('PartnersService', () => {
                 frontImgUrl: 'https://example.com/front.jpg',
                 backImgUrl: 'https://example.com/back.jpg',
             },
-            authorization: {
-                isAuthorizedUser: false,
-                authLetterDocUrl: null,
+            documents: {
+                businessLicenseUrl: null,
+                authorizationLetterUrl: null,
+                taxCertificateUrl: null,
+                otherDocumentUrls: [],
             },
         },
     };
@@ -257,15 +259,17 @@ describe('PartnersService', () => {
             // are now stored only in LegalRepresentative entity, not as PartnerDocument records
         });
 
-        it('should store authorization letter URL in LegalRepresentative when provided', async () => {
+        it('should store document URLs in LegalRepresentative when provided', async () => {
             // Arrange
-            const dtoWithAuthLetter = {
+            const dtoWithDocuments = {
                 ...mockRegisterDto,
                 legalRepresentative: {
                     ...mockRegisterDto.legalRepresentative,
-                    authorization: {
-                        isAuthorizedUser: true,
-                        authLetterDocUrl: 'https://example.com/auth-letter.pdf',
+                    documents: {
+                        businessLicenseUrl: 'https://example.com/business-license.pdf',
+                        authorizationLetterUrl: 'https://example.com/auth-letter.pdf',
+                        taxCertificateUrl: null,
+                        otherDocumentUrls: [],
                     },
                 },
             };
@@ -282,17 +286,19 @@ describe('PartnersService', () => {
             });
 
             // Act
-            await service.registerPartner(dtoWithAuthLetter as any);
+            await service.registerPartner(dtoWithDocuments as any);
 
-            // Assert - Verify LegalRepresentative was created with auth letter URL
+            // Assert - Verify LegalRepresentative was created with document URLs
             const legalRepCreate = createCalls.find(
                 (call) => call.entity === LegalRepresentative,
             );
             expect(legalRepCreate).toBeDefined();
-            expect(legalRepCreate.data.authLetterDocUrl).toBe(
+            expect(legalRepCreate.data.businessLicenseUrl).toBe(
+                'https://example.com/business-license.pdf',
+            );
+            expect(legalRepCreate.data.authorizationLetterUrl).toBe(
                 'https://example.com/auth-letter.pdf',
             );
-            expect(legalRepCreate.data.isAuthorizedUser).toBe(true);
         });
 
         it('should throw ConflictException for duplicate email', async () => {
@@ -376,25 +382,32 @@ describe('PartnersService', () => {
     });
 
     describe('getMyProfile', () => {
-        it('should return formatted profile with verificationStatus', async () => {
+        it('should return formatted profile with verification fields', async () => {
             // Arrange
-            mockPartnerRepository.findOne.mockResolvedValue(mockPartner);
-            mockDocRequirementRepository.find.mockResolvedValue([
-                { documentType: DocumentType.BUSINESS_LICENSE, isRequired: true, description: 'Required' },
-            ]);
+            const mockPartnerWithLegalRep = {
+                ...mockPartner,
+                legalRepresentative: {
+                    ...mockPartner.legalRepresentative,
+                    idIssueDate: new Date('2020-01-15'),
+                    idFrontImgUrl: 'https://example.com/front.jpg',
+                    idBackImgUrl: 'https://example.com/back.jpg',
+                    businessLicenseUrl: null,
+                    authorizationLetterUrl: null,
+                    taxCertificateUrl: null,
+                },
+            };
+            mockPartnerRepository.findOne.mockResolvedValue(mockPartnerWithLegalRep);
 
             // Act
             const result = await service.getMyProfile('account-uuid');
 
             // Assert
             expect(result.id).toBe(mockPartner.id);
-            expect(result.taxCode).toBe(mockPartner.taxCode);
-            expect(result.address.province).toBe('Hà Nội');
-            expect(result.address.district).toBe('Quận 1');
-            expect(result.legalRepresentative.fullName).toBe('John Doe');
+            expect(result.partnerInfo.taxCode.value).toBe(mockPartner.taxCode);
+            expect(result.locationDetails.provinceId.displayValue).toBe('Hà Nội');
+            expect(result.locationDetails.districtId.displayValue).toBe('Quận 1');
+            expect(result.legalRepresentative.fullName.value).toBe('John Doe');
             expect(result.verificationStatus).toBe(PartnerVerificationStatus.PENDING);
-            expect(result.documents).toBeDefined();
-            expect(result.documents[0].status).toBe('MISSING');
         });
 
         it('should throw NotFoundException when partner not found', async () => {

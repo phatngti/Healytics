@@ -18,7 +18,7 @@ Method | HTTP request | Description
 
 
 # **categoriesControllerCreate**
-> Object categoriesControllerCreate(createCategoryDto)
+> CategoryResponseDto categoriesControllerCreate(createCategoryDto)
 
 Create a new category
 
@@ -51,7 +51,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**CategoryResponseDto**](CategoryResponseDto.md)
 
 ### Authorization
 
@@ -65,7 +65,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **categoriesControllerFindAll**
-> List<Object> categoriesControllerFindAll(rootsOnly)
+> List<CategoryResponseDto> categoriesControllerFindAll(rootsOnly)
 
 Get all categories
 
@@ -80,7 +80,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = CategoriesApi();
-final rootsOnly = true; // bool | Return only root categories
+final rootsOnly = true; // bool | Return only root categories (without parent)
 
 try {
     final result = api_instance.categoriesControllerFindAll(rootsOnly);
@@ -94,11 +94,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **rootsOnly** | **bool**| Return only root categories | [optional] 
+ **rootsOnly** | **bool**| Return only root categories (without parent) | [optional] 
 
 ### Return type
 
-[**List<Object>**](Object.md)
+[**List<CategoryResponseDto>**](CategoryResponseDto.md)
 
 ### Authorization
 
@@ -112,7 +112,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **categoriesControllerFindBySlug**
-> Object categoriesControllerFindBySlug(slug)
+> CategoryResponseDto categoriesControllerFindBySlug(slug)
 
 Get a category by slug
 
@@ -145,7 +145,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**CategoryResponseDto**](CategoryResponseDto.md)
 
 ### Authorization
 
@@ -159,7 +159,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **categoriesControllerFindOne**
-> Object categoriesControllerFindOne(id)
+> CategoryResponseDto categoriesControllerFindOne(id)
 
 Get a category by id
 
@@ -192,7 +192,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**CategoryResponseDto**](CategoryResponseDto.md)
 
 ### Authorization
 
@@ -252,7 +252,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **categoriesControllerUpdate**
-> Object categoriesControllerUpdate(id, updateCategoryDto)
+> CategoryResponseDto categoriesControllerUpdate(id, updateCategoryDto)
 
 Update a category
 
@@ -287,7 +287,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**CategoryResponseDto**](CategoryResponseDto.md)
 
 ### Authorization
 

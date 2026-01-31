@@ -18,10 +18,12 @@ import { AuditInterceptor } from '@/audit/interceptors/audit.interceptor';
 import { AdminPartnerDetailResponseDto } from '../dto/admin-partner-detail-response.dto';
 import { ReviewPartnerProfileDto } from '../dto/review-partner-profile.dto';
 import { ReviewPartnerResponseDto } from '../dto/review-partner-response.dto';
+import { PartnersResponseDto } from '@/partners/dto/response/partners-response.dto';
+import { TotalPartnersResponseDto } from '../dto/total-partners-response.dto';
 
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
-import { Roles } from '@/auth/decorators/roles.decorator';
+import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { Role } from '@/account/enum/role.enum';
 import { Audit } from '@/audit/decorators/audit.decorator';
 
@@ -38,8 +40,16 @@ export class AdminPartnersController {
 
     @Get()
     @ApiOperation({ summary: 'List all partners' })
-    async getPartners(@Query() query: GetPartnersQueryDto) {
+    @ApiResponse({ status: 200, type: PartnersResponseDto })
+    async getPartners(@Query() query: GetPartnersQueryDto): Promise<PartnersResponseDto> {
         return this.adminPartnersService.getPartners(query);
+    }
+
+    @Get('total')
+    @ApiOperation({ summary: 'Get total number of partners' })
+    @ApiResponse({ status: 200, type: TotalPartnersResponseDto })
+    async getTotalPartners(): Promise<TotalPartnersResponseDto> {
+        return this.adminPartnersService.getTotalPartners();
     }
 
     @Get(':id')

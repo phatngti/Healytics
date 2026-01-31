@@ -16,39 +16,57 @@ void main() {
   // final instance = TherapistProfileDto();
 
   group('test TherapistProfileDto', () {
-    // Therapist level
+    // Employee ID (primary key)
+    // String employeeId
+    test('to test the property `employeeId`', () async {
+      // TODO
+    });
+
+    // Therapist level (junior, senior, etc.)
     // String level
     test('to test the property `level`', () async {
       // TODO
     });
 
-    // Type of therapist (SPA, MASSAGE)
+    // Therapist type
     // String type
     test('to test the property `type`', () async {
       // TODO
     });
 
-    // Therapist strength level for massage
+    // Strength level
     // String strengthLevel
     test('to test the property `strengthLevel`', () async {
       // TODO
     });
 
-    // Commission rate percentage
+    // Commission rate (percentage)
     // num commissionRate
     test('to test the property `commissionRate`', () async {
       // TODO
     });
 
-    // Last health check date
-    // String healthCheckDate
+    // Health check date
+    // DateTime healthCheckDate
     test('to test the property `healthCheckDate`', () async {
       // TODO
     });
 
-    // Therapist skills
+    // List of skills
     // List<String> skills (default value: const [])
     test('to test the property `skills`', () async {
+      // TODO
+    });
+
+    // Device proficiency list
+    // List<String> deviceProficiency (default value: const [])
+    test('to test the property `deviceProficiency`', () async {
+      // TODO
+    });
+
+    // License URL
+    // String licenseUrl
+    test('to test the property `licenseUrl`', () async {
       // TODO
     });
 

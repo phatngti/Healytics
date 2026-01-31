@@ -13,18 +13,36 @@ part of openapi.api;
 class TherapistProfileDto {
   /// Returns a new [TherapistProfileDto] instance.
   TherapistProfileDto({
+    this.employeeId,
     this.level,
     this.type,
     this.strengthLevel,
     this.commissionRate,
     this.healthCheckDate,
     this.skills = const [],
+    this.deviceProficiency = const [],
+    this.licenseUrl,
   });
 
-  /// Therapist level
-  TherapistProfileDtoLevelEnum? level;
+  /// Employee ID (primary key)
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? employeeId;
 
-  /// Type of therapist (SPA, MASSAGE)
+  /// Therapist level (junior, senior, etc.)
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? level;
+
+  /// Therapist type
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -33,10 +51,16 @@ class TherapistProfileDto {
   ///
   String? type;
 
-  /// Therapist strength level for massage
-  TherapistProfileDtoStrengthLevelEnum? strengthLevel;
+  /// Strength level
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? strengthLevel;
 
-  /// Commission rate percentage
+  /// Commission rate (percentage)
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -45,42 +69,65 @@ class TherapistProfileDto {
   ///
   num? commissionRate;
 
-  /// Last health check date
+  /// Health check date
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? healthCheckDate;
+  DateTime? healthCheckDate;
 
-  /// Therapist skills
+  /// List of skills
   List<String> skills;
+
+  /// Device proficiency list
+  List<String> deviceProficiency;
+
+  /// License URL
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? licenseUrl;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is TherapistProfileDto &&
+    other.employeeId == employeeId &&
     other.level == level &&
     other.type == type &&
     other.strengthLevel == strengthLevel &&
     other.commissionRate == commissionRate &&
     other.healthCheckDate == healthCheckDate &&
-    _deepEquality.equals(other.skills, skills);
+    _deepEquality.equals(other.skills, skills) &&
+    _deepEquality.equals(other.deviceProficiency, deviceProficiency) &&
+    other.licenseUrl == licenseUrl;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
+    (employeeId == null ? 0 : employeeId!.hashCode) +
     (level == null ? 0 : level!.hashCode) +
     (type == null ? 0 : type!.hashCode) +
     (strengthLevel == null ? 0 : strengthLevel!.hashCode) +
     (commissionRate == null ? 0 : commissionRate!.hashCode) +
     (healthCheckDate == null ? 0 : healthCheckDate!.hashCode) +
-    (skills.hashCode);
+    (skills.hashCode) +
+    (deviceProficiency.hashCode) +
+    (licenseUrl == null ? 0 : licenseUrl!.hashCode);
 
   @override
-  String toString() => 'TherapistProfileDto[level=$level, type=$type, strengthLevel=$strengthLevel, commissionRate=$commissionRate, healthCheckDate=$healthCheckDate, skills=$skills]';
+  String toString() => 'TherapistProfileDto[employeeId=$employeeId, level=$level, type=$type, strengthLevel=$strengthLevel, commissionRate=$commissionRate, healthCheckDate=$healthCheckDate, skills=$skills, deviceProficiency=$deviceProficiency, licenseUrl=$licenseUrl]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+    if (this.employeeId != null) {
+      json[r'employeeId'] = this.employeeId;
+    } else {
+      json[r'employeeId'] = null;
+    }
     if (this.level != null) {
       json[r'level'] = this.level;
     } else {
@@ -102,11 +149,17 @@ class TherapistProfileDto {
       json[r'commissionRate'] = null;
     }
     if (this.healthCheckDate != null) {
-      json[r'healthCheckDate'] = this.healthCheckDate;
+      json[r'healthCheckDate'] = this.healthCheckDate!.toUtc().toIso8601String();
     } else {
       json[r'healthCheckDate'] = null;
     }
       json[r'skills'] = this.skills;
+      json[r'deviceProficiency'] = this.deviceProficiency;
+    if (this.licenseUrl != null) {
+      json[r'licenseUrl'] = this.licenseUrl;
+    } else {
+      json[r'licenseUrl'] = null;
+    }
     return json;
   }
 
@@ -129,14 +182,19 @@ class TherapistProfileDto {
       }());
 
       return TherapistProfileDto(
-        level: TherapistProfileDtoLevelEnum.fromJson(json[r'level']),
+        employeeId: mapValueOfType<String>(json, r'employeeId'),
+        level: mapValueOfType<String>(json, r'level'),
         type: mapValueOfType<String>(json, r'type'),
-        strengthLevel: TherapistProfileDtoStrengthLevelEnum.fromJson(json[r'strengthLevel']),
+        strengthLevel: mapValueOfType<String>(json, r'strengthLevel'),
         commissionRate: num.parse('${json[r'commissionRate']}'),
-        healthCheckDate: mapValueOfType<String>(json, r'healthCheckDate'),
+        healthCheckDate: mapDateTime(json, r'healthCheckDate', r''),
         skills: json[r'skills'] is Iterable
             ? (json[r'skills'] as Iterable).cast<String>().toList(growable: false)
             : const [],
+        deviceProficiency: json[r'deviceProficiency'] is Iterable
+            ? (json[r'deviceProficiency'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        licenseUrl: mapValueOfType<String>(json, r'licenseUrl'),
       );
     }
     return null;
@@ -186,158 +244,4 @@ class TherapistProfileDto {
   static const requiredKeys = <String>{
   };
 }
-
-/// Therapist level
-class TherapistProfileDtoLevelEnum {
-  /// Instantiate a new enum with the provided [value].
-  const TherapistProfileDtoLevelEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const JUNIOR = TherapistProfileDtoLevelEnum._(r'JUNIOR');
-  static const SENIOR = TherapistProfileDtoLevelEnum._(r'SENIOR');
-  static const MASTER = TherapistProfileDtoLevelEnum._(r'MASTER');
-
-  /// List of all possible values in this [enum][TherapistProfileDtoLevelEnum].
-  static const values = <TherapistProfileDtoLevelEnum>[
-    JUNIOR,
-    SENIOR,
-    MASTER,
-  ];
-
-  static TherapistProfileDtoLevelEnum? fromJson(dynamic value) => TherapistProfileDtoLevelEnumTypeTransformer().decode(value);
-
-  static List<TherapistProfileDtoLevelEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <TherapistProfileDtoLevelEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = TherapistProfileDtoLevelEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [TherapistProfileDtoLevelEnum] to String,
-/// and [decode] dynamic data back to [TherapistProfileDtoLevelEnum].
-class TherapistProfileDtoLevelEnumTypeTransformer {
-  factory TherapistProfileDtoLevelEnumTypeTransformer() => _instance ??= const TherapistProfileDtoLevelEnumTypeTransformer._();
-
-  const TherapistProfileDtoLevelEnumTypeTransformer._();
-
-  String encode(TherapistProfileDtoLevelEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a TherapistProfileDtoLevelEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  TherapistProfileDtoLevelEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'JUNIOR': return TherapistProfileDtoLevelEnum.JUNIOR;
-        case r'SENIOR': return TherapistProfileDtoLevelEnum.SENIOR;
-        case r'MASTER': return TherapistProfileDtoLevelEnum.MASTER;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [TherapistProfileDtoLevelEnumTypeTransformer] instance.
-  static TherapistProfileDtoLevelEnumTypeTransformer? _instance;
-}
-
-
-/// Therapist strength level for massage
-class TherapistProfileDtoStrengthLevelEnum {
-  /// Instantiate a new enum with the provided [value].
-  const TherapistProfileDtoStrengthLevelEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const SOFT = TherapistProfileDtoStrengthLevelEnum._(r'SOFT');
-  static const MEDIUM = TherapistProfileDtoStrengthLevelEnum._(r'MEDIUM');
-  static const STRONG = TherapistProfileDtoStrengthLevelEnum._(r'STRONG');
-
-  /// List of all possible values in this [enum][TherapistProfileDtoStrengthLevelEnum].
-  static const values = <TherapistProfileDtoStrengthLevelEnum>[
-    SOFT,
-    MEDIUM,
-    STRONG,
-  ];
-
-  static TherapistProfileDtoStrengthLevelEnum? fromJson(dynamic value) => TherapistProfileDtoStrengthLevelEnumTypeTransformer().decode(value);
-
-  static List<TherapistProfileDtoStrengthLevelEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <TherapistProfileDtoStrengthLevelEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = TherapistProfileDtoStrengthLevelEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [TherapistProfileDtoStrengthLevelEnum] to String,
-/// and [decode] dynamic data back to [TherapistProfileDtoStrengthLevelEnum].
-class TherapistProfileDtoStrengthLevelEnumTypeTransformer {
-  factory TherapistProfileDtoStrengthLevelEnumTypeTransformer() => _instance ??= const TherapistProfileDtoStrengthLevelEnumTypeTransformer._();
-
-  const TherapistProfileDtoStrengthLevelEnumTypeTransformer._();
-
-  String encode(TherapistProfileDtoStrengthLevelEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a TherapistProfileDtoStrengthLevelEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  TherapistProfileDtoStrengthLevelEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'SOFT': return TherapistProfileDtoStrengthLevelEnum.SOFT;
-        case r'MEDIUM': return TherapistProfileDtoStrengthLevelEnum.MEDIUM;
-        case r'STRONG': return TherapistProfileDtoStrengthLevelEnum.STRONG;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [TherapistProfileDtoStrengthLevelEnumTypeTransformer] instance.
-  static TherapistProfileDtoStrengthLevelEnumTypeTransformer? _instance;
-}
-
 

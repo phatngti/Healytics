@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:admin_openapi/api.dart';
 import 'package:admin_panel/core/services/api.service.dart';
 import 'package:http/http.dart' as http;
@@ -26,22 +28,20 @@ class S3Service {
       final fileName = file.name;
 
       // 3. Get presigned URL
-      final request = S3ControllerPreSignRequest(
+      final request = PresignRequestDto(
         fileName: fileName,
         contentType: mimeType,
       );
 
       final response = await _s3Api.s3ControllerPreSign(request);
-      print('S3 Upload Response: $response');
+      developer.log('S3 Upload Response: $response', name: 'S3Service');
 
-      if (response == null ||
-          response.uploadUrl == null ||
-          response.key == null) {
+      if (response == null) {
         throw Exception('Failed to get presigned URL from server.');
       }
 
-      final uploadUrl = response.uploadUrl!;
-      final key = response.key!;
+      final uploadUrl = response.uploadUrl;
+      final key = response.key;
 
       // 4. Upload to S3/R2
       final putResponse = await http.put(
@@ -58,8 +58,7 @@ class S3Service {
 
       return key;
     } catch (e) {
-      // You might want to log this error using a logger
-      print('S3 Upload Error: $e');
+      developer.log('S3 Upload Error: $e', name: 'S3Service', error: e);
       rethrow;
     }
   }
@@ -70,7 +69,7 @@ class S3Service {
       final response = await _s3Api.s3ControllerGetFileUrl(key);
       return response?.url;
     } catch (e) {
-      print('S3 GetUrl Error: $e');
+      developer.log('S3 GetUrl Error: $e', name: 'S3Service', error: e);
       return null;
     }
   }

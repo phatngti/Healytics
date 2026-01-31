@@ -8,36 +8,26 @@ export enum ReviewDecision {
     REJECTED = 'REJECTED',
 }
 
-export enum ReviewItemType {
-    DOCUMENT = 'DOCUMENT',
-    FIELD = 'FIELD',
-    LEGAL_REP_FIELD = 'LEGAL_REP_FIELD',
-}
+
 
 export class ReviewItemDto {
-    @ApiProperty({ enum: ReviewItemType, description: 'Type of item being reviewed' })
-    @IsEnum(ReviewItemType)
-    @IsNotEmpty()
-    type: ReviewItemType;
+    @ApiProperty({ description: 'Key of the field or document being reviewed' })
+    @IsString()
+    fieldKey: string;
 
     @ApiProperty({ description: 'UUID of the document (if type is DOCUMENT)', required: false })
     @IsOptional()
     @IsUUID()
-    documentId?: string;
-
-    @ApiProperty({ description: 'Name of the field (if type is FIELD)', required: false })
-    @IsOptional()
-    @IsString()
-    fieldName?: string;
+    documentKey?: string;
 
     @ApiProperty({ description: 'Mark the item as valid or invalid', example: true })
     @IsBoolean()
-    isValid: boolean;
+    isVerified: boolean;
 
     @ApiProperty({ description: 'Reason for rejection or feedback', required: false })
     @IsOptional()
     @IsString()
-    reason?: string;
+    feedback?: string;
 }
 
 export class ReviewPartnerProfileDto {

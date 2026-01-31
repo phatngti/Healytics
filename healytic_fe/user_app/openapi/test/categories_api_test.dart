@@ -19,28 +19,28 @@ void main() {
   group('tests for CategoriesApi', () {
     // Create a new category
     //
-    //Future<Object> categoriesControllerCreate(CreateCategoryDto createCategoryDto) async
+    //Future<CategoryResponseDto> categoriesControllerCreate(CreateCategoryDto createCategoryDto) async
     test('test categoriesControllerCreate', () async {
       // TODO
     });
 
     // Get all categories
     //
-    //Future<List<Object>> categoriesControllerFindAll({ bool rootsOnly }) async
+    //Future<List<CategoryResponseDto>> categoriesControllerFindAll({ bool rootsOnly }) async
     test('test categoriesControllerFindAll', () async {
       // TODO
     });
 
     // Get a category by slug
     //
-    //Future<Object> categoriesControllerFindBySlug(String slug) async
+    //Future<CategoryResponseDto> categoriesControllerFindBySlug(String slug) async
     test('test categoriesControllerFindBySlug', () async {
       // TODO
     });
 
     // Get a category by id
     //
-    //Future<Object> categoriesControllerFindOne(String id) async
+    //Future<CategoryResponseDto> categoriesControllerFindOne(String id) async
     test('test categoriesControllerFindOne', () async {
       // TODO
     });
@@ -54,7 +54,7 @@ void main() {
 
     // Update a category
     //
-    //Future<Object> categoriesControllerUpdate(String id, UpdateCategoryDto updateCategoryDto) async
+    //Future<CategoryResponseDto> categoriesControllerUpdate(String id, UpdateCategoryDto updateCategoryDto) async
     test('test categoriesControllerUpdate', () async {
       // TODO
     });

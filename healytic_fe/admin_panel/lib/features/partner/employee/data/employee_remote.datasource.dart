@@ -173,10 +173,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   Future<void> deleteEmployee(EmployeeId id) async {
     await _employeesApi.employeesControllerRemove(id.value.toString());
 
-    developer.log(
-      'Deleted employee: $id',
-      name: 'EmployeeRemoteDataSource',
-    );
+    developer.log('Deleted employee: $id', name: 'EmployeeRemoteDataSource');
   }
 
   @override
@@ -223,11 +220,11 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     CreateSpaTherapistRequest request,
   ) async {
     final profile = TherapistProfileDto(
-      level: _mapTherapistLevel(request.therapistLevel),
+      level: request.therapistLevel,
       type: TherapistType.spa.apiValue,
       strengthLevel: null,
       commissionRate: request.commissionRate,
-      healthCheckDate: request.healthCheckDate,
+      healthCheckDate: _parseDateTime(request.healthCheckDate),
       skills: request.skills,
     );
 
@@ -265,11 +262,11 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     CreateMassageTherapistRequest request,
   ) async {
     final profile = TherapistProfileDto(
-      level: _mapTherapistLevel(request.therapistLevel),
+      level: request.therapistLevel,
       type: TherapistType.massage.apiValue,
-      strengthLevel: _mapStrengthLevel(request.strengthLevel),
+      strengthLevel: request.strengthLevel,
       commissionRate: request.commissionRate,
-      healthCheckDate: request.healthCheckDate,
+      healthCheckDate: _parseDateTime(request.healthCheckDate),
       skills: request.skills,
     );
 
@@ -550,26 +547,10 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     };
   }
 
-  TherapistProfileDtoLevelEnum? _mapTherapistLevel(String? level) {
-    if (level == null) return null;
-    return switch (level.toUpperCase()) {
-      'JUNIOR' => TherapistProfileDtoLevelEnum.JUNIOR,
-      'SENIOR' => TherapistProfileDtoLevelEnum.SENIOR,
-      'MASTER' => TherapistProfileDtoLevelEnum.MASTER,
-      _ => null,
-    };
-  }
-
-  TherapistProfileDtoStrengthLevelEnum? _mapStrengthLevel(
-    String? strengthLevel,
-  ) {
-    if (strengthLevel == null) return null;
-    return switch (strengthLevel.toUpperCase()) {
-      'SOFT' => TherapistProfileDtoStrengthLevelEnum.SOFT,
-      'MEDIUM' => TherapistProfileDtoStrengthLevelEnum.MEDIUM,
-      'STRONG' => TherapistProfileDtoStrengthLevelEnum.STRONG,
-      _ => null,
-    };
+  /// Parses a string to DateTime, returns null if parsing fails.
+  DateTime? _parseDateTime(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return null;
+    return DateTime.tryParse(dateString);
   }
 }
 
@@ -592,9 +573,7 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       'displayName': 'Mock $role $idSuffix',
       'avatar': avatarUrl,
       'role': role.toUpperCase(),
-      'position': role == 'Doctor'
-          ? 'Specialist Doctor'
-          : '$role Therapist',
+      'position': role == 'Doctor' ? 'Specialist Doctor' : '$role Therapist',
       'rating': 4.5,
       'reviewCount': 100,
       'status': 'ACTIVE',
@@ -1013,7 +992,8 @@ class EmployeeNotFoundException implements Exception {
   final EmployeeId id;
 
   @override
-  String toString() => 'EmployeeNotFoundException: Employee with id $id not found';
+  String toString() =>
+      'EmployeeNotFoundException: Employee with id $id not found';
 }
 
 /// Exception thrown when employee creation fails.

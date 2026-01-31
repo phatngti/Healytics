@@ -18,9 +18,9 @@ import { PartnersResponseDto } from './dto/response/partners-response.dto';
 import { PartnerDetailResponseDto } from './dto/response/partner-detail-response.dto';
 import { UpdatePartnerDto } from './dto/request/update-partner.dto';
 import { GetPartnersQueryDto } from './dto/request/get-partners-query.dto';
-import { Public } from '@/auth/decorators/public.decorator';
+import { Public } from '@/common/decorators/auth/public.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
-import { Roles } from '@/auth/decorators/roles.decorator';
+import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { Role } from '@/account/enum/role.enum';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 

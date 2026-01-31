@@ -63,6 +63,7 @@ GoRouter router(Ref ref) {
     final isLoggedIn = UserRoleHelper.isLoggedIn();
     final role = UserRoleHelper.getRole();
     final path = state.uri.path;
+    final isProviderVerified = UserRoleHelper.isProviderVerified();
 
     final isPublicRoute =
         path == '/' ||
@@ -70,11 +71,29 @@ GoRouter router(Ref ref) {
         path == '/sign-up' ||
         path.startsWith('/sign-up/');
 
+    final isVerificationRoute = path == '/provider/verification-status';
+
     if (isLoggedIn) {
       if (isPublicRoute) {
         if (role == 'admin') {
           return '/admin/dashboard';
         } else {
+          // Provider: check verification status
+          if (isProviderVerified) {
+            return '/provider/dashboard';
+          } else {
+            return '/provider/verification-status';
+          }
+        }
+      }
+
+      // health_partner-specific verification redirect logic
+      if (role == 'health_partner') {
+        if (!isProviderVerified && !isVerificationRoute) {
+          // Unverified health_partner trying to access other routes
+          return '/provider/verification-status';
+        } else if (isProviderVerified && isVerificationRoute) {
+          // Verified health_partner trying to access verification page
           return '/provider/dashboard';
         }
       }
@@ -98,7 +117,7 @@ GoRouter router(Ref ref) {
       ),
     ],
     refreshListenable: notifier,
-    // redirect: redirect,
+    redirect: redirect,
   );
 }
 

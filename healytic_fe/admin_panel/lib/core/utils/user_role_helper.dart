@@ -55,4 +55,12 @@ class UserRoleHelper {
     final accessToken = Store.tryGet(StoreKey.accessToken) ?? '';
     return accessToken.isNotEmpty;
   }
+
+  /// Returns true if the provider is verified.
+  ///
+  /// In mock mode, uses `partnerVerified` from store.json.
+  /// In production mode, uses the stored verification status.
+  static bool isProviderVerified() {
+    return Store.tryGet(StoreKey.partnerVerified) ?? false;
+  }
 }

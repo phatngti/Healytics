@@ -2,15 +2,53 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Partner } from '@/partners/entities/partner.entity';
-import { PartnerDocument } from '@/partners/entities/partner-document.entity';
-import { PartnerReviewLog } from '@/partners/entities/partner-review-log.entity';
+import { PartnerDocument, PartnerDocumentStatuses } from '@/partners/entities/partner-document.entity';
+import { PartnerReviewLog } from '@/admin/entities/partner-review-log.entity';
 import { DocumentRequirement } from '@/partners/entities/document-requirement.entity';
 import { AdminPartnerDetailResponseDto } from '../dto/admin-partner-detail-response.dto';
-import { ReviewPartnerProfileDto, ReviewDecision, ReviewItemType } from '../dto/review-partner-profile.dto';
+import { ReviewPartnerProfileDto, ReviewDecision } from '../dto/review-partner-profile.dto';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { PartnersService } from '@/partners/partners.service';
 import { GetPartnersQueryDto } from '@/partners/dto/request/get-partners-query.dto';
-import { PartnerDocumentStatus } from '@/partners/enum/partner-document-status.enum';
+
+// ============================================================================
+// Field Keys for Review (centralized for easy maintenance)
+// ============================================================================
+export const PartnerFieldKeys = {
+    // Business Info Fields
+    brandName: 'brandName',
+    taxCode: 'taxCode',
+    legalName: 'legalName',
+    businessType: 'businessType',
+    serviceTags: 'serviceTags',
+    phoneNumber: 'phoneNumber',
+    email: 'email',
+    username: 'username',
+    
+    // Address Fields (matching /partners/me API keys)
+    streetAddress: 'streetAddress',
+    // Legacy keys for backward compatibility
+    ward: 'ward',
+    district: 'district',
+    city: 'city',
+    
+    // Legal Representative Fields (prefixed with 'legalRep.')
+    fullName: 'fullName',
+    position: 'position',
+    idType: 'idType',
+    idNumber: 'idNumber',
+    idIssueDate: 'idIssueDate',
+} as const;
+
+export type PartnerFieldKey = typeof PartnerFieldKeys[keyof typeof PartnerFieldKeys];
+
+// Helper type for field review data
+export interface FieldFeedback {
+    isVerified: boolean;
+    feedback?: string;
+}
+
+export type FieldFeedbackMap = Record<string, FieldFeedback>;
 
 @Injectable()
 export class AdminPartnersService {
@@ -37,98 +75,68 @@ export class AdminPartnersService {
             throw new NotFoundException('Partner not found');
         }
 
+        // Fetch documents with simplified schema
         const documents = await this.documentRepo.find({
             where: { partnerId: id },
-            order: { uploadedAt: 'DESC' },
+            order: { createdAt: 'DESC' },
         });
 
-        // Fetch document requirements for this business type
-        const requirements = await this.docRequirementRepo.find({
-            where: { businessType: partner.businessType },
+        // Assign documents to partner for DTO mapping
+        partner.documents = documents;
+
+        // Fetch the latest review log for feedback data
+        const latestReviewLog = await this.reviewLogRepo.findOne({
+            where: { partnerId: id },
+            order: { createdAt: 'DESC' },
         });
 
-        // Map uploaded documents by type for easy lookup
-        const uploadedDocsMap = new Map<string, PartnerDocument>();
-        documents.forEach((doc) => {
-            uploadedDocsMap.set(doc.documentType, doc);
-        });
+        // Build field feedback map from review log
+        const fieldFeedbackMap = this.buildFieldFeedbackMap(latestReviewLog);
 
-        // Merge requirements with uploaded documents
-        const mergedDocuments: any[] = requirements.map((req) => {
-            const uploadedDoc = uploadedDocsMap.get(req.documentType);
+        // Build document feedback map from review log
+        const documentFeedbackMap = this.buildDocumentFeedbackMap(latestReviewLog);
 
-            let status = PartnerDocumentStatus.MISSING;
-            let documentUrl: string | null = null;
-            let documentKey: string | null = null;
-            let id: string | null = null;
-            let isReviewed = false;
-            let isValid = false;
-            let adminFeedback: string | null = null;
-            let verificationNotes: string | null = null;
-            let uploadedAt: Date | null = null;
+        return AdminPartnerDetailResponseDto.fromPartner(partner, fieldFeedbackMap, documentFeedbackMap);
+    }
 
-            if (uploadedDoc) {
-                id = uploadedDoc.id;
-                documentUrl = uploadedDoc.documentUrl;
-                documentKey = uploadedDoc.documentKey;
-                isReviewed = uploadedDoc.isReviewed;
-                isValid = uploadedDoc.isValid;
-                adminFeedback = uploadedDoc.adminFeedback;
-                verificationNotes = uploadedDoc.verificationNotes;
-                uploadedAt = uploadedDoc.uploadedAt;
+    /**
+     * Build field feedback map from the latest review log
+     */
+    private buildFieldFeedbackMap(reviewLog: PartnerReviewLog | null): FieldFeedbackMap {
+        const feedbackMap: FieldFeedbackMap = {};
 
-                if (uploadedDoc.isReviewed) {
-                    status = uploadedDoc.isValid
-                        ? PartnerDocumentStatus.APPROVED
-                        : PartnerDocumentStatus.REJECTED;
-                } else {
-                    status = PartnerDocumentStatus.PENDING;
-                }
-            }
+        if (!reviewLog?.fieldReviews) {
+            return feedbackMap;
+        }
 
-            return {
-                id,
-                documentType: req.documentType,
-                documentUrl,
-                documentKey,
-                status,
-                isRequired: req.isRequired,
-                description: req.description,
-                isReviewed,
-                isValid,
-                adminFeedback,
-                verificationNotes,
-                uploadedAt,
+        for (const [fieldName, review] of Object.entries(reviewLog.fieldReviews)) {
+            feedbackMap[fieldName] = {
+                isVerified: review.isValid,
+                feedback: review.reason,
             };
-        });
+        }
 
-        // Also include any uploaded documents that might not be in the current requirements
-        documents.forEach((doc) => {
-            const reqExists = requirements.find(r => r.documentType === doc.documentType);
-            if (!reqExists) {
-                let status = PartnerDocumentStatus.PENDING;
-                if (doc.isReviewed) {
-                    status = doc.isValid ? PartnerDocumentStatus.APPROVED : PartnerDocumentStatus.REJECTED;
-                }
+        return feedbackMap;
+    }
 
-                mergedDocuments.push({
-                    id: doc.id,
-                    documentType: doc.documentType,
-                    documentUrl: doc.documentUrl,
-                    documentKey: doc.documentKey,
-                    status,
-                    isRequired: false, // Not in current requirements
-                    description: null,
-                    isReviewed: doc.isReviewed,
-                    isValid: doc.isValid,
-                    adminFeedback: doc.adminFeedback,
-                    verificationNotes: doc.verificationNotes,
-                    uploadedAt: doc.uploadedAt,
-                });
-            }
-        });
+    /**
+     * Build document feedback map from the latest review log
+     */
+    private buildDocumentFeedbackMap(reviewLog: PartnerReviewLog | null): FieldFeedbackMap {
+        const feedbackMap: FieldFeedbackMap = {};
 
-        return AdminPartnerDetailResponseDto.fromEntity(partner, mergedDocuments);
+        if (!reviewLog?.documentReviews) {
+            return feedbackMap;
+        }
+
+        for (const [docId, review] of Object.entries(reviewLog.documentReviews)) {
+            feedbackMap[docId] = {
+                isVerified: review.isValid,
+                feedback: review.feedback,
+            };
+        }
+
+        return feedbackMap;
     }
 
     async reviewPartner(id: string, dto: ReviewPartnerProfileDto, adminId: string): Promise<void> {
@@ -157,16 +165,25 @@ export class AdminPartnersService {
             });
             const docMap = new Map(existingDocs.map(d => [d.id, d]));
 
-            // Track valid document types (for completeness check)
-            const validDocumentTypes = new Set<string>();
+            // Track accepted document types (for completeness check)
+            const acceptedDocuments = new Set<string>();
 
             // Helper to record field review
-            const recordFieldReview = (fieldName: string, isValid: boolean, reason?: string, value?: any) => {
-                fieldReviews[fieldName] = {
+            const recordFieldReview = (fieldKey: string, isVerified: boolean, feedback?: string, value?: any) => {
+                fieldReviews[fieldKey] = {
                     value: value ?? null,
-                    isValid,
-                    reason: isValid ? null : reason
+                    isValid: isVerified,
+                    reason: isVerified ? null : feedback
                 };
+            };
+
+            // Helper to get field value from partner or legal representative
+            const getFieldValue = (fieldKey: string): any => {
+                if (fieldKey.startsWith('legalRep.')) {
+                    const actualFieldName = fieldKey.substring('legalRep.'.length);
+                    return partner.legalRepresentative ? (partner.legalRepresentative as any)[actualFieldName] : null;
+                }
+                return (partner as any)[fieldKey];
             };
 
             // 2. Process Items (Validation & Status Update) - Update documents and record for logging
@@ -174,64 +191,56 @@ export class AdminPartnersService {
 
             if (dto.items && dto.items.length > 0) {
                 for (const item of dto.items) {
-                    // --- DOCUMENT ---
-                    if (item.type === ReviewItemType.DOCUMENT && item.documentId) {
-                        const doc = docMap.get(item.documentId);
+                    // --- DOCUMENT (identified by presence of documentKey) ---
+                    if (item.documentKey) {
+                        const doc = docMap.get(item.documentKey);
                         if (doc) {
-                            // Update Document Status
-                            await manager.update(PartnerDocument, { id: item.documentId }, {
-                                isReviewed: true,
-                                isValid: item.isValid,
-                                adminFeedback: item.isValid ? null : item.reason,
-                                verifiedBy: adminId,
-                                verificationNotes: dto.generalComment
+                            // Update Document Status using new simplified schema
+                            const newStatus = item.isVerified 
+                                ? PartnerDocumentStatuses.ACCEPTED 
+                                : PartnerDocumentStatuses.REJECTED;
+                            
+                            await manager.update(PartnerDocument, { id: item.documentKey }, {
+                                status: newStatus,
                             });
 
                             // Log Snapshot
-                            documentReviews[item.documentId] = {
-                                documentType: doc.documentType,
-                                url: doc.documentUrl,
-                                isValid: item.isValid,
-                                feedback: item.reason
+                            documentReviews[item.documentKey] = {
+                                documentType: doc.type,
+                                url: doc.fileUrl,
+                                isValid: item.isVerified,
+                                feedback: item.feedback
                             };
 
-                            if (!item.isValid) {
+                            if (!item.isVerified) {
                                 // Add to rejection list
-                                finalRejections[`document_${doc.documentType}`] = item.reason || 'Document rejected';
+                                finalRejections[`document_${doc.id}`] = item.feedback || 'Document rejected';
                             } else {
-                                // Add to valid set
-                                validDocumentTypes.add(doc.documentType);
+                                // Add to accepted set
+                                acceptedDocuments.add(doc.id);
                             }
                         }
                     }
-                    // --- PARTNER FIELDS ---
-                    else if (item.type === ReviewItemType.FIELD && item.fieldName) {
-                        const value = (partner as any)[item.fieldName];
-                        recordFieldReview(item.fieldName, item.isValid, item.reason, value);
-                        if (!item.isValid) {
-                            finalRejections[item.fieldName] = item.reason || 'Field rejected';
-                        }
-                    }
-                    // --- LEGAL REP FIELDS ---
-                    else if (item.type === ReviewItemType.LEGAL_REP_FIELD && item.fieldName && partner.legalRepresentative) {
-                        const value = (partner.legalRepresentative as any)[item.fieldName];
-                        recordFieldReview(`legalRep.${item.fieldName}`, item.isValid, item.reason, value);
-                        if (!item.isValid) {
-                            finalRejections[`legalRep.${item.fieldName}`] = item.reason || 'Field rejected';
+                    // --- FIELD (partner or legalRep, determined by fieldKey prefix) ---
+                    else {
+                        const value = getFieldValue(item.fieldKey);
+                        recordFieldReview(item.fieldKey, item.isVerified, item.feedback, value);
+                        if (!item.isVerified) {
+                            finalRejections[item.fieldKey] = item.feedback || 'Field rejected';
                         }
                     }
                 }
             }
 
-            // 3. CHECK LEGACY DOCUMENTS (Catch missed bad docs)
+            // 3. CHECK EXISTING DOCUMENTS (Catch missed rejected docs)
             existingDocs.forEach(doc => {
-                const isProcessed = dto.items?.some(i => i.type === ReviewItemType.DOCUMENT && i.documentId === doc.id);
+                const isProcessed = dto.items?.some(i => i.documentKey === doc.id);
                 if (!isProcessed) {
-                    if (doc.isValid) {
-                        validDocumentTypes.add(doc.documentType);
-                    } else if (doc.isReviewed && !doc.isValid) {
+                    if (doc.status === PartnerDocumentStatuses.ACCEPTED) {
+                        acceptedDocuments.add(doc.id);
+                    } else if (doc.status === PartnerDocumentStatuses.REJECTED) {
                         // Previous rejection still stands -> Add to rejections
-                        finalRejections[`document_${doc.documentType}`] = doc.adminFeedback || 'Previous rejection';
+                        finalRejections[`document_${doc.id}`] = 'Previous rejection';
                     }
                 }
             });
@@ -258,12 +267,9 @@ export class AdminPartnersService {
                         where: { businessType: partner.businessType, isRequired: true }
                     });
 
-                    const missingDocs = requirements
-                        .filter(req => !validDocumentTypes.has(req.documentType))
-                        .map(req => req.documentType);
-
-                    if (missingDocs.length > 0) {
-                        throw new BadRequestException(`Cannot approve: Missing required documents: ${missingDocs.join(', ')}`);
+                    // With simplified schema, we just check if we have any documents
+                    if (existingDocs.length === 0 && requirements.length > 0) {
+                        throw new BadRequestException(`Cannot approve: Missing required documents`);
                     }
 
                     verdict = PartnerVerificationStatus.APPROVED;
@@ -271,10 +277,10 @@ export class AdminPartnersService {
                     partner.verificationCompletedAt = new Date();
                     partner.rejectionDetails = null;
 
-                    // Auto-approve remaining unreviewed documents
+                    // Auto-accept remaining pending documents
                     await manager.update(PartnerDocument,
-                        { partnerId: id, isReviewed: false },
-                        { isReviewed: true, isValid: true, verifiedBy: adminId }
+                        { partnerId: id, status: PartnerDocumentStatuses.PENDING },
+                        { status: PartnerDocumentStatuses.ACCEPTED }
                     );
                 } else {
                     // CHANGES_REQUIRED but no specific errors found?
@@ -305,5 +311,10 @@ export class AdminPartnersService {
 
     async getPartners(query: GetPartnersQueryDto): Promise<any> {
         return this.partnersService.getPartners(query);
+    }
+
+    async getTotalPartners(): Promise<{ total: number }> {
+        const total = await this.partnerRepo.count();
+        return { total };
     }
 }
