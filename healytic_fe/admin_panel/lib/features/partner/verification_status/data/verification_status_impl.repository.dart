@@ -1,3 +1,6 @@
+import 'package:admin_panel/core/entities/store.entity.dart';
+import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/features/partner/verification_status/data/verification_status_remote.datasource.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.repository.dart';
@@ -5,15 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'verification_status_impl.repository.g.dart';
 
-/// Flag to switch between mock and real data source.
-///
-/// Set to `false` to use mock data during development.
-const bool _useRealApi = false;
-
-/// Implementation of [VerificationStatusRepository].
-///
-/// Delegates operations to the appropriate data source based on
-/// the [_useRealApi] flag.
 class VerificationStatusRepositoryImpl implements VerificationStatusRepository {
   /// Creates a new [VerificationStatusRepositoryImpl].
   VerificationStatusRepositoryImpl({
@@ -47,10 +41,12 @@ class VerificationStatusRepositoryImpl implements VerificationStatusRepository {
 /// Provides the verification status data source.
 @riverpod
 VerificationStatusRemoteDataSource verificationStatusDataSource(Ref ref) {
-  if (_useRealApi) {
-    return VerificationStatusRemoteDataSourceImpl();
+  final isMock = Store.get(StoreKey.mockFlag, false);
+  if (isMock) {
+    return VerificationStatusRemoteDataSourceMock();
   }
-  return VerificationStatusRemoteDataSourceMock();
+  final apiService = ref.watch(apiServiceProvider);
+  return VerificationStatusRemoteDataSourceImpl(apiService: apiService);
 }
 
 /// Provides the verification status repository.

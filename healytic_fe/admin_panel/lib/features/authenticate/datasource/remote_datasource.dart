@@ -70,7 +70,7 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
       response = await _authApi.authControllerLoginUser(
         LoginDto(email: request.email, password: request.password),
       );
-    } else if (role == 'partner') {
+    } else if (role == 'health_partner') {
       response = await _authApi.authControllerLoginPartner(
         PartnerLoginDto(email: request.email, password: request.password),
       );
@@ -89,14 +89,28 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
     final token = response.accessToken;
     final decodedToken = JwtDecoder.decode(token);
     final tokenRole = decodedToken['role'];
+    final verificationStatus = decodedToken['verificationStatus'];
+    String? verificationCompletedAt; // Declare as nullable String
+
     if (role != tokenRole) {
       throw ApiException(HttpStatus.unauthorized, 'Role not match');
+    }
+
+    // Extract verificationCompletedAt for health_partner role
+    if (tokenRole == 'health_partner') {
+      final rawVerificationCompletedAt =
+          decodedToken['verificationCompletedAt'];
+      if (rawVerificationCompletedAt != null) {
+        verificationCompletedAt = rawVerificationCompletedAt.toString();
+      }
     }
 
     return SignInResponseEntity(
       accessToken: response.accessToken,
       refreshToken: response.refreshToken,
       role: tokenRole,
+      verificationStatus: verificationStatus,
+      verificationCompletedAt: verificationCompletedAt,
     );
   }
 
@@ -150,20 +164,17 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
         idType: _mapIdType(request.legalRepresentative.idType),
         idNumber: request.legalRepresentative.idNumber,
         idIssueDate: request.legalRepresentative.idIssueDate,
-        images: IdImagesRequestDto(
-          frontImgUrl: request.legalRepresentative.images.frontImgUrl,
-          backImgUrl: request.legalRepresentative.images.backImgUrl,
-        ),
-        documents: PartnerDocumentVerificationDto(
-          businessLicenseUrl:
-              request.legalRepresentative.documents.businessLicenseUrl,
-          authorizationLetterUrl:
-              request.legalRepresentative.documents.authorizationLetterUrl,
-          taxCertificateUrl:
-              request.legalRepresentative.documents.taxCertificateUrl,
-          otherDocumentUrls:
-              request.legalRepresentative.documents.otherDocumentUrls,
-        ),
+        // Map list of documents to list of DTOs
+        documents: request.legalRepresentative.documents
+            .map(
+              (doc) => PartnerDocumentVerificationDto(
+                fileType: doc.fileType,
+                type: doc.type,
+                documentKey: doc.documentKey,
+                urls: doc.urls,
+              ),
+            )
+            .toList(),
       ),
     );
 

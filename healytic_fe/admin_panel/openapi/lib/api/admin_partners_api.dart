@@ -141,11 +141,63 @@ class AdminPartnersApi {
   ///
   /// * [String] search:
   ///   Search by tax code, brand name, legal name, or email
-  Future<void> adminPartnersControllerGetPartners({ num? page, num? limit, String? verificationStatus, String? search, }) async {
+  Future<PartnersResponseDto?> adminPartnersControllerGetPartners({ num? page, num? limit, String? verificationStatus, String? search, }) async {
     final response = await adminPartnersControllerGetPartnersWithHttpInfo( page: page, limit: limit, verificationStatus: verificationStatus, search: search, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnersResponseDto',) as PartnersResponseDto;
+    
+    }
+    return null;
+  }
+
+  /// Get total number of partners
+  ///
+  /// Note: This method returns the HTTP [Response].
+  Future<Response> adminPartnersControllerGetTotalPartnersWithHttpInfo() async {
+    // ignore: prefer_const_declarations
+    final path = r'/admin/partners/total';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get total number of partners
+  Future<TotalPartnersResponseDto?> adminPartnersControllerGetTotalPartners() async {
+    final response = await adminPartnersControllerGetTotalPartnersWithHttpInfo();
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'TotalPartnersResponseDto',) as TotalPartnersResponseDto;
+    
+    }
+    return null;
   }
 
   /// Review partner profile

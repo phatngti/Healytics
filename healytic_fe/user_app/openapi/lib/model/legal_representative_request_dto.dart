@@ -19,8 +19,7 @@ class LegalRepresentativeRequestDto {
     required this.idType,
     required this.idNumber,
     required this.idIssueDate,
-    required this.images,
-    required this.documents,
+    this.documents = const [],
   });
 
   /// Full name of legal representative
@@ -53,9 +52,7 @@ class LegalRepresentativeRequestDto {
   /// Date of ID issuance (ISO 8601 format)
   String idIssueDate;
 
-  IdImagesRequestDto images;
-
-  PartnerDocumentVerificationDto documents;
+  List<PartnerDocumentVerificationDto> documents;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is LegalRepresentativeRequestDto &&
@@ -65,8 +62,7 @@ class LegalRepresentativeRequestDto {
     other.idType == idType &&
     other.idNumber == idNumber &&
     other.idIssueDate == idIssueDate &&
-    other.images == images &&
-    other.documents == documents;
+    _deepEquality.equals(other.documents, documents);
 
   @override
   int get hashCode =>
@@ -77,11 +73,10 @@ class LegalRepresentativeRequestDto {
     (idType.hashCode) +
     (idNumber.hashCode) +
     (idIssueDate.hashCode) +
-    (images.hashCode) +
     (documents.hashCode);
 
   @override
-  String toString() => 'LegalRepresentativeRequestDto[fullName=$fullName, position=$position, phoneNumber=$phoneNumber, idType=$idType, idNumber=$idNumber, idIssueDate=$idIssueDate, images=$images, documents=$documents]';
+  String toString() => 'LegalRepresentativeRequestDto[fullName=$fullName, position=$position, phoneNumber=$phoneNumber, idType=$idType, idNumber=$idNumber, idIssueDate=$idIssueDate, documents=$documents]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -99,7 +94,6 @@ class LegalRepresentativeRequestDto {
       json[r'idType'] = this.idType;
       json[r'idNumber'] = this.idNumber;
       json[r'idIssueDate'] = this.idIssueDate;
-      json[r'images'] = this.images;
       json[r'documents'] = this.documents;
     return json;
   }
@@ -129,8 +123,7 @@ class LegalRepresentativeRequestDto {
         idType: LegalRepresentativeRequestDtoIdTypeEnum.fromJson(json[r'idType'])!,
         idNumber: mapValueOfType<String>(json, r'idNumber')!,
         idIssueDate: mapValueOfType<String>(json, r'idIssueDate')!,
-        images: IdImagesRequestDto.fromJson(json[r'images'])!,
-        documents: PartnerDocumentVerificationDto.fromJson(json[r'documents'])!,
+        documents: PartnerDocumentVerificationDto.listFromJson(json[r'documents']),
       );
     }
     return null;
@@ -182,7 +175,6 @@ class LegalRepresentativeRequestDto {
     'idType',
     'idNumber',
     'idIssueDate',
-    'images',
     'documents',
   };
 }

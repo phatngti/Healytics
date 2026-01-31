@@ -53,12 +53,10 @@ class PartnerTableSource {
         cells: [
           // Provider Details
           DataCell(_buildProviderDetails(context, partner)),
-          // Service Types
+          // Business Type
           DataCell(_buildServiceTypes(context, partner.serviceTypes)),
           // Submitted Date
           DataCell(_buildSubmittedDate(context, partner)),
-          // Priority
-          DataCell(_buildPriority(context, partner.priority)),
           // Status
           DataCell(_buildStatusBadge(context, partner.status)),
           // Actions
@@ -222,35 +220,6 @@ class PartnerTableSource {
           ),
         ),
       ],
-    );
-  }
-
-  static Widget _buildPriority(BuildContext context, PartnerPriority priority) {
-    final textTheme = Theme.of(context).textTheme;
-
-    if (priority == PartnerPriority.high) {
-      final dangerColor = _getDangerColor(context);
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.flag, size: 18, color: dangerColor),
-          AppDimens.horizontalExtraSmall,
-          Text(
-            'HIGH',
-            style: textTheme.labelSmall?.copyWith(
-              color: dangerColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      );
-    }
-
-    return Text(
-      'Normal',
-      style: textTheme.bodySmall?.copyWith(
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
     );
   }
 

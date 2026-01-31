@@ -1,103 +1,66 @@
+import 'package:admin_panel/features/authenticate/domain/location.entity.dart';
+import 'package:admin_panel/features/authenticate/presentation/providers/location.provider.dart';
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Business Location subsection of Partner Registration.
 ///
 /// Contains:
-/// - Province/City dropdown
+/// - Province/City dropdown (fetched from API)
 /// - District dropdown (cascading based on province)
 /// - Ward/Commune dropdown (cascading based on district)
 /// - Street Address text field
-class BusinessLocationSection extends StatefulWidget {
-  /// Initial province value.
-  final String? initialProvince;
+class BusinessLocationSection extends ConsumerStatefulWidget {
+  /// Initial province ID.
+  final String? initialProvinceId;
 
-  /// Initial district value.
-  final String? initialDistrict;
+  /// Initial district ID.
+  final String? initialDistrictId;
 
-  /// Initial ward value.
-  final String? initialWard;
+  /// Initial ward ID.
+  final String? initialWardId;
 
   /// Initial street address.
   final String? initialStreetAddress;
 
   const BusinessLocationSection({
     super.key,
-    this.initialProvince,
-    this.initialDistrict,
-    this.initialWard,
+    this.initialProvinceId,
+    this.initialDistrictId,
+    this.initialWardId,
     this.initialStreetAddress,
   });
 
   @override
-  State<BusinessLocationSection> createState() =>
+  ConsumerState<BusinessLocationSection> createState() =>
       _BusinessLocationSectionState();
 }
 
-class _BusinessLocationSectionState extends State<BusinessLocationSection> {
-  String? _selectedProvince;
-  String? _selectedDistrict;
-
-  // Mock data for Vietnam provinces/cities and their districts
-  final Map<String, List<String>> _provinceDistricts = const {
-    'Hanoi': [
-      'Hoan Kiem',
-      'Ba Dinh',
-      'Dong Da',
-      'Cau Giay',
-      'Hai Ba Trung',
-      'Thanh Xuan',
-    ],
-    'Ho Chi Minh City': [
-      'District 1',
-      'District 3',
-      'District 7',
-      'Binh Thanh',
-      'Phu Nhuan',
-      'Go Vap',
-    ],
-    'Da Nang': [
-      'Hai Chau',
-      'Thanh Khe',
-      'Son Tra',
-      'Ngu Hanh Son',
-      'Lien Chieu',
-    ],
-    'Can Tho': ['Ninh Kieu', 'Binh Thuy', 'Cai Rang', 'O Mon'],
-  };
-
-  // Mock data for wards/communes
-  final Map<String, List<String>> _districtWards = const {
-    'Hoan Kiem': ['Hang Bac', 'Hang Bong', 'Hang Dao', 'Hang Gai'],
-    'Ba Dinh': ['Phuc Xa', 'Truc Bach', 'Vinh Phuc', 'Cong Vi'],
-    'District 1': ['Ben Nghe', 'Ben Thanh', 'Da Kao', 'Nguyen Thai Binh'],
-    'District 3': ['Ward 1', 'Ward 2', 'Ward 3', 'Ward 4'],
-    'District 7': ['Tan Phu', 'Tan Quy', 'Phu My', 'Tan Hung'],
-    'Hai Chau': ['Hai Chau 1', 'Hai Chau 2', 'Thach Thang', 'Thanh Binh'],
-  };
+class _BusinessLocationSectionState
+    extends ConsumerState<BusinessLocationSection> {
+  String? _selectedProvinceId;
+  String? _selectedDistrictId;
+  String? _selectedWardId;
 
   @override
   void initState() {
     super.initState();
-    _selectedProvince = widget.initialProvince;
-    _selectedDistrict = widget.initialDistrict;
-  }
-
-  List<String> get _availableDistricts {
-    if (_selectedProvince == null) return [];
-    return _provinceDistricts[_selectedProvince] ?? [];
-  }
-
-  List<String> get _availableWards {
-    if (_selectedDistrict == null) return [];
-    return _districtWards[_selectedDistrict] ?? [];
+    _selectedProvinceId = widget.initialProvinceId;
+    _selectedDistrictId = widget.initialDistrictId;
+    _selectedWardId = widget.initialWardId;
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    // Watch location providers
+    final provincesAsync = ref.watch(provincesProvider);
+    final districtsAsync = ref.watch(districtsProvider(_selectedProvinceId));
+    final wardsAsync = ref.watch(wardsProvider(_selectedDistrictId));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,51 +94,24 @@ class _BusinessLocationSectionState extends State<BusinessLocationSection> {
 
             if (isWide) {
               return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: _buildDropdownWithLabel(
+                    child: _buildProvinceDropdown(
                       context,
-                      label: 'Province/City',
-                      fieldKey: 'province',
-                      items: _provinceDistricts.keys.toList(),
-                      initialValue: _selectedProvince,
-                      hintText: 'Select Province',
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedProvince = value;
-                          _selectedDistrict = null;
-                        });
-                      },
+                      provincesAsync: provincesAsync,
                     ),
                   ),
                   AppDimens.horizontalMedium,
                   Expanded(
-                    child: _buildDropdownWithLabel(
+                    child: _buildDistrictDropdown(
                       context,
-                      label: 'District',
-                      fieldKey: 'district',
-                      items: _availableDistricts,
-                      initialValue: _selectedDistrict,
-                      hintText: 'Select District',
-                      enabled: _selectedProvince != null,
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedDistrict = value;
-                        });
-                      },
+                      districtsAsync: districtsAsync,
                     ),
                   ),
                   AppDimens.horizontalMedium,
                   Expanded(
-                    child: _buildDropdownWithLabel(
-                      context,
-                      label: 'Ward/Commune',
-                      fieldKey: 'ward',
-                      items: _availableWards,
-                      initialValue: widget.initialWard,
-                      hintText: 'Select Ward',
-                      enabled: _selectedDistrict != null,
-                    ),
+                    child: _buildWardDropdown(context, wardsAsync: wardsAsync),
                   ),
                 ],
               );
@@ -183,45 +119,11 @@ class _BusinessLocationSectionState extends State<BusinessLocationSection> {
 
             return Column(
               children: [
-                _buildDropdownWithLabel(
-                  context,
-                  label: 'Province/City',
-                  fieldKey: 'province',
-                  items: _provinceDistricts.keys.toList(),
-                  initialValue: _selectedProvince,
-                  hintText: 'Select Province',
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedProvince = value;
-                      _selectedDistrict = null;
-                    });
-                  },
-                ),
+                _buildProvinceDropdown(context, provincesAsync: provincesAsync),
                 AppDimens.verticalMedium,
-                _buildDropdownWithLabel(
-                  context,
-                  label: 'District',
-                  fieldKey: 'district',
-                  items: _availableDistricts,
-                  initialValue: _selectedDistrict,
-                  hintText: 'Select District',
-                  enabled: _selectedProvince != null,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedDistrict = value;
-                    });
-                  },
-                ),
+                _buildDistrictDropdown(context, districtsAsync: districtsAsync),
                 AppDimens.verticalMedium,
-                _buildDropdownWithLabel(
-                  context,
-                  label: 'Ward/Commune',
-                  fieldKey: 'ward',
-                  items: _availableWards,
-                  initialValue: widget.initialWard,
-                  hintText: 'Select Ward',
-                  enabled: _selectedDistrict != null,
-                ),
+                _buildWardDropdown(context, wardsAsync: wardsAsync),
               ],
             );
           },
@@ -240,13 +142,78 @@ class _BusinessLocationSectionState extends State<BusinessLocationSection> {
     );
   }
 
-  /// Builds a dropdown with smaller label styling for location fields.
-  Widget _buildDropdownWithLabel(
+  /// Builds the province dropdown with loading/error handling.
+  Widget _buildProvinceDropdown(
+    BuildContext context, {
+    required AsyncValue<List<LocationEntity>> provincesAsync,
+  }) {
+    return _buildLocationDropdown(
+      context,
+      label: 'Province/City',
+      fieldKey: 'province',
+      asyncValue: provincesAsync,
+      selectedId: _selectedProvinceId,
+      hintText: 'Select Province',
+      onChanged: (id) {
+        setState(() {
+          _selectedProvinceId = id;
+          _selectedDistrictId = null;
+          _selectedWardId = null;
+        });
+      },
+    );
+  }
+
+  /// Builds the district dropdown with loading/error handling.
+  Widget _buildDistrictDropdown(
+    BuildContext context, {
+    required AsyncValue<List<LocationEntity>> districtsAsync,
+  }) {
+    return _buildLocationDropdown(
+      context,
+      label: 'District',
+      fieldKey: 'district',
+      asyncValue: districtsAsync,
+      selectedId: _selectedDistrictId,
+      hintText: 'Select District',
+      enabled: _selectedProvinceId != null,
+      onChanged: (id) {
+        setState(() {
+          _selectedDistrictId = id;
+          _selectedWardId = null;
+        });
+      },
+    );
+  }
+
+  /// Builds the ward dropdown with loading/error handling.
+  Widget _buildWardDropdown(
+    BuildContext context, {
+    required AsyncValue<List<LocationEntity>> wardsAsync,
+  }) {
+    return _buildLocationDropdown(
+      context,
+      label: 'Ward/Commune',
+      fieldKey: 'ward',
+      asyncValue: wardsAsync,
+      selectedId: _selectedWardId,
+      hintText: 'Select Ward',
+      enabled: _selectedDistrictId != null,
+      onChanged: (id) {
+        setState(() {
+          _selectedWardId = id;
+        });
+      },
+    );
+  }
+
+  /// Generic builder for location dropdowns with async state handling.
+  Widget _buildLocationDropdown(
     BuildContext context, {
     required String label,
     required String fieldKey,
-    required List<String> items,
-    String? initialValue,
+    required AsyncValue<List<LocationEntity>> asyncValue,
+    required String? selectedId,
     String? hintText,
     bool enabled = true,
     ValueChanged<String?>? onChanged,
@@ -265,18 +232,120 @@ class _BusinessLocationSectionState extends State<BusinessLocationSection> {
           ),
         ),
         const SizedBox(height: 6),
-        FormFieldBuilders.buildDropdownField(
-          context,
-          fieldKey: fieldKey,
-          label: '',
-          items: items,
-          initialValue: initialValue,
-          hintText: hintText,
-          enabled: enabled,
-          onChanged: onChanged,
-          uppercaseLabel: false,
+        asyncValue.when(
+          data: (locations) {
+            return FormFieldBuilders.buildCustomDropdownField<String>(
+              context,
+              fieldKey: fieldKey,
+              label: '',
+              items: locations
+                  .map(
+                    (loc) => DropdownMenuItem<String>(
+                      value: loc.id,
+                      child: Text(
+                        loc.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                      ),
+                    ),
+                  )
+                  .toList(),
+              initialValue: selectedId,
+              hintText: hintText,
+              enabled: enabled && locations.isNotEmpty,
+              onChanged: (id) {
+                onChanged?.call(id);
+              },
+              uppercaseLabel: false,
+              isRequired: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a $label';
+                }
+                return null;
+              },
+            );
+          },
+          loading: () => _buildLoadingDropdown(context, hintText: hintText),
+          error: (error, stack) =>
+              _buildErrorDropdown(context, error: error, hintText: hintText),
         ),
       ],
+    );
+  }
+
+  /// Builds a loading state for dropdowns.
+  Widget _buildLoadingDropdown(BuildContext context, {String? hintText}) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Loading...',
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds an error state for dropdowns.
+  Widget _buildErrorDropdown(
+    BuildContext context, {
+    required Object error,
+    String? hintText,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: colorScheme.errorContainer.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colorScheme.error.withValues(alpha: 0.5)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            Icon(Icons.error_outline, size: 16, color: colorScheme.error),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Failed to load',
+                style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

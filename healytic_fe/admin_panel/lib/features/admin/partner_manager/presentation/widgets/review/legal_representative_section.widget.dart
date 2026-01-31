@@ -13,7 +13,6 @@ class LegalRepresentativeSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
@@ -39,51 +38,78 @@ class LegalRepresentativeSection extends StatelessWidget {
             padding: AppDimens.paddingAllLarge,
             child: Column(
               children: [
+                // Row 1: Full Name & Position
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: ReviewableField(
-                        fieldId: 'legal.fullName',
+                        title: 'Full Name',
+                        fieldId: representative!.fullName.fieldKey,
                         compactMode: true,
                         child: _buildInfoItem(
                           context,
-                          'Full Name',
-                          representative?.fullName,
+                          representative!.fullName.value,
+                        ),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: ReviewableField(
+                        title: 'Position',
+                        fieldId: representative!.position!.fieldKey,
+                        compactMode: true,
+                        child: _buildInfoItem(
+                          context,
+                          representative?.position?.value,
                         ),
                       ),
                     ),
                     Expanded(
                       child: ReviewableField(
-                        fieldId: 'legal.position',
+                        title: 'ID Type',
+                        fieldId: representative!.idType!.fieldKey,
                         compactMode: true,
                         child: _buildInfoItem(
                           context,
-                          'Position',
-                          representative?.position,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: ReviewableField(
-                        fieldId: 'legal.citizenId',
-                        compactMode: true,
-                        child: _buildInfoItem(
-                          context,
-                          'Citizen ID',
-                          representative?.citizenId,
-                          isMono: true,
+                          representative!.idType!.value,
                         ),
                       ),
                     ),
                   ],
                 ),
-
-                // Verification Note
-                if (representative?.verificationNote != null) ...[
-                  AppDimens.verticalMedium,
-                  _buildVerificationNote(context),
-                ],
+                AppDimens.verticalMedium,
+                // Row 2: ID Type, ID Number, ID Issue Date
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: ReviewableField(
+                        title: 'ID Number',
+                        fieldId: representative!.idNumber!.fieldKey,
+                        compactMode: true,
+                        child: _buildInfoItem(
+                          context,
+                          representative!.idNumber!.value,
+                          isMono: true,
+                        ),
+                      ),
+                    ),
+                    Spacer(flex: 1),
+                    Expanded(
+                      child: ReviewableField(
+                        title: 'ID Issue Date',
+                        fieldId: representative!.idIssueDate!.fieldKey,
+                        compactMode: true,
+                        child: _buildInfoItem(
+                          context,
+                          representative!.idIssueDate!.value,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -114,25 +140,14 @@ class LegalRepresentativeSection extends StatelessWidget {
 
   Widget _buildInfoItem(
     BuildContext context,
-    String label,
     String? value, {
     bool isMono = false,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label.toUpperCase(),
-          style: textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
-        ),
-        AppDimens.verticalExtraSmall,
         Text(
           value ?? 'N/A',
           style: textTheme.bodyMedium?.copyWith(
@@ -141,47 +156,6 @@ class LegalRepresentativeSection extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildVerificationNote(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Container(
-      padding: AppDimens.paddingAllMediumSmall,
-      decoration: BoxDecoration(
-        color: colorScheme.primary.withValues(alpha: 0.05),
-        borderRadius: AppDimens.radiusSmall,
-        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.1)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.info_outline, size: 18, color: colorScheme.primary),
-          AppDimens.horizontalMediumSmall,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Verification Note',
-                  style: textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                AppDimens.verticalExtraSmall,
-                Text(
-                  representative?.verificationNote ?? '',
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:admin_panel/constants/document_types.dart';
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_detail.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/reviewable_field.widget.dart';
 import 'package:admin_panel/utils/demensions.dart';
@@ -11,22 +12,21 @@ class KycDocumentsSection extends ConsumerWidget {
 
   final List<KycDocument>? documents;
 
+  /// Document keys for ID card images
+  static const _idCardDocumentKeys = {'identity_front', 'identity_back'};
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final docs = documents ?? [];
-    print("docs: $docs");
 
-    final idCards = docs
-        .where(
-          (d) =>
-              d.type == KycDocumentType.idCardFront ||
-              d.type == KycDocumentType.idCardBack,
-        )
+    // Separate ID card documents from other documents
+    final idCardDocuments = docs
+        .where((d) => _idCardDocumentKeys.contains(d.documentKey))
         .toList();
-    final otherDocs = docs
-        .where((d) => d.type == KycDocumentType.authorizationLetter)
+    final otherDocuments = docs
+        .where((d) => !_idCardDocumentKeys.contains(d.documentKey))
         .toList();
 
     return Container(
@@ -55,41 +55,77 @@ class KycDocumentsSection extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ID Cards
-                if (idCards.isNotEmpty) ...[
-                  _buildLabel(context, 'Identity Card (Front/Back)'),
+                // ══════════════════════════════════════════════════════════════
+                // Section 1: Identity Card (Front/Back)
+                // ══════════════════════════════════════════════════════════════
+                if (idCardDocuments.isNotEmpty) ...[
                   AppDimens.verticalMediumSmall,
-                  ...idCards.map((doc) {
-                    final fieldId = 'kyc.${doc.type.name}';
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: ReviewableField(
-                        fieldId: fieldId,
-                        compactMode: true,
-                        child: _buildIdCardPreview(context, doc),
-                      ),
-                    );
-                  }),
+                  _buildIdCardGrid(context, idCardDocuments),
                 ],
 
-                // Authorization Letter
-                if (otherDocs.isNotEmpty) ...[
-                  AppDimens.verticalLarge,
-                  _buildLabel(context, 'Authorization Letter'),
-                  AppDimens.verticalMediumSmall,
-                  ...otherDocs.map((doc) {
-                    final fieldId = 'kyc.${doc.type.name}';
-                    return ReviewableField(
-                      fieldId: fieldId,
-                      child: _buildDocumentItem(context, doc),
-                    );
-                  }),
+                // ══════════════════════════════════════════════════════════════
+                // Section 2: Documents (All other documents)
+                // ══════════════════════════════════════════════════════════════
+                if (otherDocuments.isNotEmpty) ...[
+                  if (idCardDocuments.isNotEmpty) AppDimens.verticalLarge,
+                  ...otherDocuments.map(
+                    (doc) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ReviewableField(
+                            title:
+                                DocumentTypes.findByKey(
+                                  doc.documentKey,
+                                )?.label ??
+                                doc.documentKey,
+                            fieldId: 'kyc.${doc.documentKey}',
+                            child: _buildDocumentItem(context, doc),
+                          ),
+                          AppDimens.verticalSmall,
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  /// Builds a 2-column grid specifically for ID card (Front/Back) images
+  Widget _buildIdCardGrid(BuildContext context, List<KycDocument> idCardDocs) {
+    // Sort to ensure Front comes before Back
+    final sortedDocs = List<KycDocument>.from(idCardDocs)
+      ..sort((a, b) {
+        if (a.documentKey == 'identity_front') return -1;
+        if (b.documentKey == 'identity_front') return 1;
+        return 0;
+      });
+
+    return Row(
+      children: sortedDocs.map((doc) {
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              right: doc.documentKey == 'identity_front' ? 6 : 0,
+              left: doc.documentKey == 'identity_back' ? 6 : 0,
+            ),
+            child: ReviewableField(
+              title:
+                  DocumentTypes.findByKey(doc.documentKey)?.label ??
+                  doc.documentKey,
+              fieldId: doc.documentKey,
+              compactMode: true,
+              child: _buildImagePreview(context, doc),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -133,42 +169,24 @@ class KycDocumentsSection extends ConsumerWidget {
     );
   }
 
-  Widget _buildLabel(BuildContext context, String label) {
-    return Text(
-      label,
-      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-        fontWeight: FontWeight.w600,
-      ),
-    );
-  }
-
-  Widget _buildIdCardPreview(BuildContext context, KycDocument doc) {
+  Widget _buildImagePreview(BuildContext context, KycDocument doc) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final icon = doc.type == KycDocumentType.idCardFront
-        ? Icons.badge_outlined
-        : Icons.credit_card;
+    // Derive icon based on document label/type
+    IconData icon = Icons.image_outlined;
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 12),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () {
-            if (doc.fileUrl != null) {
-              _showImagePreview(context, doc.fileUrl!);
-            }
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            child: _IdCardPreviewTile(
-              colorScheme: colorScheme,
-              icon: icon,
-              docId: doc.id,
-              imageUrl: doc.fileUrl,
-            ),
-          ),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          if (doc.fileUrl != null) {
+            _showImagePreview(context, doc.fileUrl!);
+          }
+        },
+        child: _ImagePreviewTile(
+          colorScheme: colorScheme,
+          icon: icon,
+          imageUrl: doc.fileUrl,
         ),
       ),
     );
@@ -266,9 +284,27 @@ class KycDocumentsSection extends ConsumerWidget {
     );
   }
 
+  /// Returns icon and color based on file extension
+  ({IconData icon, Color color}) _getFileTypeInfo(String fileName) {
+    final extension = fileName.split('.').lastOrNull?.toLowerCase() ?? '';
+
+    return switch (extension) {
+      'pdf' => (icon: Icons.picture_as_pdf, color: Colors.red),
+      'doc' || 'docx' => (icon: Icons.article_outlined, color: Colors.blue),
+      'xls' ||
+      'xlsx' => (icon: Icons.table_chart_outlined, color: Colors.green),
+      'txt' => (icon: Icons.text_snippet_outlined, color: Colors.grey),
+      'zip' ||
+      'rar' ||
+      '7z' => (icon: Icons.folder_zip_outlined, color: Colors.amber),
+      _ => (icon: Icons.insert_drive_file_outlined, color: Colors.blueGrey),
+    };
+  }
+
   Widget _buildDocumentItem(BuildContext context, KycDocument doc) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final fileTypeInfo = _getFileTypeInfo(doc.fileName);
 
     final formattedDate = doc.uploadedAt != null
         ? DateFormat('MMM dd').format(doc.uploadedAt!)
@@ -277,49 +313,70 @@ class KycDocumentsSection extends ConsumerWidget {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: Container(
-        padding: AppDimens.paddingAllMediumSmall,
+        padding: AppDimens.paddingAllMedium,
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: AppDimens.radiusSmall,
-          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+          color: colorScheme.surfaceContainerLow,
+          borderRadius: AppDimens.radiusMediumSmall,
+          border: Border.all(color: colorScheme.outlineVariant),
         ),
         child: Row(
           children: [
+            // Document icon (dynamic based on file type)
             Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
-                borderRadius: AppDimens.radiusExtraSmall,
+                color: fileTypeInfo.color.withValues(alpha: 0.1),
+                borderRadius: AppDimens.radiusSmall,
               ),
-              child: const Icon(
-                Icons.picture_as_pdf,
-                color: Colors.red,
-                size: 20,
+              child: Icon(
+                fileTypeInfo.icon,
+                color: fileTypeInfo.color,
+                size: 22,
               ),
             ),
-            AppDimens.horizontalMediumSmall,
+            AppDimens.horizontalMedium,
+            // Document info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Document label
                   Text(
-                    doc.fileName,
-                    style: textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500,
+                    DocumentTypes.findByKey(doc.documentKey)!.label,
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  AppDimens.verticalExtraSmall,
+                  // File info (name, size, date)
                   Text(
-                    '${doc.fileSize ?? ''} • Uploaded $formattedDate',
+                    [
+                      if (formattedDate.isNotEmpty) 'Uploaded $formattedDate',
+                      if (doc.fileSize != null) doc.fileSize,
+                    ].join(' • '),
                     style: textTheme.labelSmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            Icon(Icons.download, size: 20, color: colorScheme.onSurfaceVariant),
+            // Download icon
+            IconButton(
+              icon: Icon(
+                Icons.download,
+                size: 20,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              onPressed: () {
+                // TODO: Implement download
+              },
+              tooltip: 'Download',
+            ),
           ],
         ),
       ),
@@ -327,25 +384,23 @@ class KycDocumentsSection extends ConsumerWidget {
   }
 }
 
-/// Stateful hover tile for ID card preview
-class _IdCardPreviewTile extends StatefulWidget {
-  const _IdCardPreviewTile({
+/// Stateful hover tile for image document preview
+class _ImagePreviewTile extends StatefulWidget {
+  const _ImagePreviewTile({
     required this.colorScheme,
     required this.icon,
-    required this.docId,
     this.imageUrl,
   });
 
   final ColorScheme colorScheme;
   final IconData icon;
-  final String docId;
   final String? imageUrl;
 
   @override
-  State<_IdCardPreviewTile> createState() => _IdCardPreviewTileState();
+  State<_ImagePreviewTile> createState() => _ImagePreviewTileState();
 }
 
-class _IdCardPreviewTileState extends State<_IdCardPreviewTile> {
+class _ImagePreviewTileState extends State<_ImagePreviewTile> {
   bool _isHovered = false;
 
   @override
@@ -354,101 +409,113 @@ class _IdCardPreviewTileState extends State<_IdCardPreviewTile> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       cursor: SystemMouseCursors.click,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 120,
-        width: 180,
-        decoration: BoxDecoration(
-          color: widget.colorScheme.surfaceContainerHighest,
-          borderRadius: AppDimens.radiusSmall,
-          border: Border.all(
-            color: _isHovered
-                ? widget.colorScheme.primary
-                : widget.colorScheme.outline.withValues(alpha: 0.2),
-            width: _isHovered ? 2 : 1,
-          ),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Image or fallback icon
-            if (widget.imageUrl != null)
-              Image.network(
-                widget.imageUrl!,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                          : null,
-                    ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return Center(
-                    child: Icon(
-                      widget.icon,
-                      color: widget.colorScheme.onSurfaceVariant,
-                      size: 32,
-                    ),
-                  );
-                },
-              )
-            else
-              Center(
-                child: Icon(
-                  widget.icon,
-                  color: widget.colorScheme.onSurfaceVariant,
-                  size: 32,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image preview
+          AspectRatio(
+            aspectRatio: 3 / 2, // Standard document aspect ratio
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              decoration: BoxDecoration(
+                color: widget.colorScheme.surfaceContainerHighest,
+                borderRadius: AppDimens.radiusSmall,
+                border: Border.all(
+                  color: _isHovered
+                      ? widget.colorScheme.primary
+                      : widget.colorScheme.outline.withValues(alpha: 0.2),
+                  width: _isHovered ? 2 : 1,
                 ),
               ),
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Image or fallback icon
+                  if (widget.imageUrl != null)
+                    Image.network(
+                      widget.imageUrl!,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Icon(
+                            widget.icon,
+                            color: widget.colorScheme.onSurfaceVariant,
+                            size: 32,
+                          ),
+                        );
+                      },
+                    )
+                  else
+                    Center(
+                      child: Icon(
+                        widget.icon,
+                        color: widget.colorScheme.onSurfaceVariant,
+                        size: 32,
+                      ),
+                    ),
 
-            // Hover overlay with zoom icon
-            if (_isHovered)
-              AnimatedOpacity(
-                opacity: _isHovered ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 200),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.5),
-                  ),
-                  child: Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        borderRadius: AppDimens.radiusPill,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.zoom_in,
-                            color: widget.colorScheme.primary,
-                            size: 20,
+                  // Always-visible zoom button in bottom-right corner
+                  Positioned(
+                    right: 8,
+                    bottom: 8,
+                    child: AnimatedScale(
+                      scale: _isHovered ? 1.1 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: widget.colorScheme.surface.withValues(
+                            alpha: 0.9,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'View',
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: widget.colorScheme.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                        ],
+                          borderRadius: AppDimens.radiusSmall,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.zoom_in,
+                          color: widget.colorScheme.primary,
+                          size: 18,
+                        ),
                       ),
                     ),
                   ),
-                ),
+
+                  // Hover overlay effect
+                  if (_isHovered)
+                    AnimatedOpacity(
+                      opacity: 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: widget.colorScheme.primary.withValues(
+                            alpha: 0.1,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

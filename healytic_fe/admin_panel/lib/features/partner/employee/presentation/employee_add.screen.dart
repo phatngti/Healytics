@@ -20,7 +20,6 @@ class EmployeeAddScreen extends ConsumerStatefulWidget {
 
 class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   Future<void> _handleSubmit(Map<String, dynamic> values) async {
-    print("values $values");
     try {
       final role =
           values['employee_role']?.toString().toUpperCase() ??

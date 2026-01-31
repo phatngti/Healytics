@@ -52,12 +52,7 @@ void main() {
       // TODO
     });
 
-    // IdImagesRequestDto images
-    test('to test the property `images`', () async {
-      // TODO
-    });
-
-    // PartnerDocumentVerificationDto documents
+    // List<PartnerDocumentVerificationDto> documents (default value: const [])
     test('to test the property `documents`', () async {
       // TODO
     });

@@ -382,25 +382,32 @@ describe('PartnersService', () => {
     });
 
     describe('getMyProfile', () => {
-        it('should return formatted profile with verificationStatus', async () => {
+        it('should return formatted profile with verification fields', async () => {
             // Arrange
-            mockPartnerRepository.findOne.mockResolvedValue(mockPartner);
-            mockDocRequirementRepository.find.mockResolvedValue([
-                { documentType: DocumentType.BUSINESS_LICENSE, isRequired: true, description: 'Required' },
-            ]);
+            const mockPartnerWithLegalRep = {
+                ...mockPartner,
+                legalRepresentative: {
+                    ...mockPartner.legalRepresentative,
+                    idIssueDate: new Date('2020-01-15'),
+                    idFrontImgUrl: 'https://example.com/front.jpg',
+                    idBackImgUrl: 'https://example.com/back.jpg',
+                    businessLicenseUrl: null,
+                    authorizationLetterUrl: null,
+                    taxCertificateUrl: null,
+                },
+            };
+            mockPartnerRepository.findOne.mockResolvedValue(mockPartnerWithLegalRep);
 
             // Act
             const result = await service.getMyProfile('account-uuid');
 
             // Assert
             expect(result.id).toBe(mockPartner.id);
-            expect(result.taxCode).toBe(mockPartner.taxCode);
-            expect(result.address.province).toBe('Hà Nội');
-            expect(result.address.district).toBe('Quận 1');
-            expect(result.legalRepresentative.fullName).toBe('John Doe');
+            expect(result.partnerInfo.taxCode.value).toBe(mockPartner.taxCode);
+            expect(result.locationDetails.provinceId.displayValue).toBe('Hà Nội');
+            expect(result.locationDetails.districtId.displayValue).toBe('Quận 1');
+            expect(result.legalRepresentative.fullName.value).toBe('John Doe');
             expect(result.verificationStatus).toBe(PartnerVerificationStatus.PENDING);
-            expect(result.documents).toBeDefined();
-            expect(result.documents[0].status).toBe('MISSING');
         });
 
         it('should throw NotFoundException when partner not found', async () => {

@@ -186,10 +186,8 @@ class ApiClient {
           return value;
         case 'AccountRequestDto':
           return AccountRequestDto.fromJson(value);
-        case 'AddressDto':
-          return AddressDto.fromJson(value);
-        case 'AdminLegalRepresentativeDto':
-          return AdminLegalRepresentativeDto.fromJson(value);
+        case 'AddressInfoDto':
+          return AddressInfoDto.fromJson(value);
         case 'AdminLoginDto':
           return AdminLoginDto.fromJson(value);
         case 'AdminPartnerDetailResponseDto':
@@ -198,6 +196,8 @@ class ApiClient {
           return AttachTagResponseDto.fromJson(value);
         case 'AuthTokensDto':
           return AuthTokensDto.fromJson(value);
+        case 'BusinessInfoDto':
+          return BusinessInfoDto.fromJson(value);
         case 'BusinessTypeDto':
           return BusinessTypeDto.fromJson(value);
         case 'BusinessTypesResponseDto':
@@ -230,6 +230,8 @@ class ApiClient {
           return DoctorProfileDto.fromJson(value);
         case 'DocumentUpdateDto':
           return DocumentUpdateDto.fromJson(value);
+        case 'DocumentVerificationInfoDto':
+          return DocumentVerificationInfoDto.fromJson(value);
         case 'EmployeeResponseDto':
           return EmployeeResponseDto.fromJson(value);
         case 'FileUrlResponseDto':
@@ -240,12 +242,14 @@ class ApiClient {
           return GetProvincesResponseDto.fromJson(value);
         case 'GetWardsResponseDto':
           return GetWardsResponseDto.fromJson(value);
-        case 'IdImagesRequestDto':
-          return IdImagesRequestDto.fromJson(value);
         case 'LegalRepresentativeDto':
           return LegalRepresentativeDto.fromJson(value);
+        case 'LegalRepresentativeInfoDto':
+          return LegalRepresentativeInfoDto.fromJson(value);
         case 'LegalRepresentativeRequestDto':
           return LegalRepresentativeRequestDto.fromJson(value);
+        case 'LocationDetailsInfoDto':
+          return LocationDetailsInfoDto.fromJson(value);
         case 'LocationDto':
           return LocationDto.fromJson(value);
         case 'LoginDto':
@@ -254,14 +258,18 @@ class ApiClient {
           return LogoutResponseDto.fromJson(value);
         case 'MyProfileResponseDto':
           return MyProfileResponseDto.fromJson(value);
-        case 'PartnerDocumentDto':
-          return PartnerDocumentDto.fromJson(value);
         case 'PartnerDocumentVerificationDto':
           return PartnerDocumentVerificationDto.fromJson(value);
+        case 'PartnerInfoDto':
+          return PartnerInfoDto.fromJson(value);
+        case 'PartnerItemDto':
+          return PartnerItemDto.fromJson(value);
         case 'PartnerLoginDto':
           return PartnerLoginDto.fromJson(value);
         case 'PartnerRequestDto':
           return PartnerRequestDto.fromJson(value);
+        case 'PartnersResponseDto':
+          return PartnersResponseDto.fromJson(value);
         case 'PresignRequestDto':
           return PresignRequestDto.fromJson(value);
         case 'PresignResponseDto':
@@ -298,6 +306,8 @@ class ApiClient {
           return SurveyResponseDto.fromJson(value);
         case 'TherapistProfileDto':
           return TherapistProfileDto.fromJson(value);
+        case 'TotalPartnersResponseDto':
+          return TotalPartnersResponseDto.fromJson(value);
         case 'UpdateCategoryDto':
           return UpdateCategoryDto.fromJson(value);
         case 'UpdateEmployeeDto':
@@ -310,6 +320,14 @@ class ApiClient {
           return UpdateProductDto.fromJson(value);
         case 'UpdateServiceTagDto':
           return UpdateServiceTagDto.fromJson(value);
+        case 'VerificationDocumentDto':
+          return VerificationDocumentDto.fromJson(value);
+        case 'VerificationOptionalStringFieldDto':
+          return VerificationOptionalStringFieldDto.fromJson(value);
+        case 'VerificationStringFieldDto':
+          return VerificationStringFieldDto.fromJson(value);
+        case 'VerifiedField':
+          return VerifiedField.fromJson(value);
         default:
           dynamic match;
           if (value is List && (match = _regList.firstMatch(targetType)?.group(1)) != null) {

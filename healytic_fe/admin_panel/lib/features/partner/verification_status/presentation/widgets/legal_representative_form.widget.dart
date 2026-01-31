@@ -1,13 +1,17 @@
 import 'dart:ui' as ui;
+
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/common/verification_form_fields.widget.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 /// Form section for the Legal Representative verification step.
 ///
-/// Displays disabled inputs for name/ID and interactive upload cards
-/// for ID verification documents.
+/// Displays:
+/// - Personal info fields (disabled/read-only)
+/// - Identity verification upload cards with animated glow for required uploads
+/// - Verified document cards with green checkmarks
 class LegalRepresentativeForm extends StatelessWidget {
   /// Creates a new [LegalRepresentativeForm].
   const LegalRepresentativeForm({
@@ -21,125 +25,152 @@ class LegalRepresentativeForm extends StatelessWidget {
   final VerificationSectionEntity section;
 
   /// The legal representative data.
-  final LegalRepresentativeEntity? legalRepresentative;
+  final LegalRepresentativeInfo? legalRepresentative;
 
   /// Callback when a document upload is requested.
   final void Function(VerificationDocument doc) onUploadDocument;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    if (legalRepresentative == null) {
+      return const Center(
+        child: Text('No legal representative information available'),
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section header with step number
-        Row(
-          children: [
-            // Step badge
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  '${section.stepNumber ?? 3}',
-                  style: textTheme.labelLarge?.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              section.label,
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
-        AppDimens.verticalMedium,
-        // Form card
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            border: Border.all(
-              color: colorScheme.primary.withValues(alpha: 0.3),
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withValues(alpha: 0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Disabled inputs row
-              if (legalRepresentative != null) ...[
-                _buildDisabledInputs(context),
-                AppDimens.verticalLarge,
-              ],
-              // Identity verification section
-              _buildIdentityVerification(context),
-              // Authorization letter section
-              if (legalRepresentative?.authorizationLetter != null) ...[
-                const Divider(height: 48),
-                _buildAuthorizationLetter(context),
-              ],
-            ],
-          ),
-        ),
+        // Personal info fields (with reduced opacity as they're read-only)
+        _buildPersonalInfoGrid(context),
+        AppDimens.verticalLarge,
+        // Identity verification section
+        _buildIdentityVerification(context),
       ],
     );
   }
 
-  Widget _buildDisabledInputs(BuildContext context) {
-    return Opacity(
-      opacity: 0.5,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isWide = constraints.maxWidth > 500;
-          final children = [
-            _DisabledTextField(
-              label: 'Full Name',
-              value: legalRepresentative?.fullName ?? '',
-            ),
-            if (isWide) const SizedBox(width: 24),
-            if (!isWide) AppDimens.verticalMedium,
-            _DisabledTextField(
-              label: 'Gov. ID Number',
-              value: legalRepresentative?.govIdNumber ?? '',
-            ),
-          ];
+  Widget _buildPersonalInfoGrid(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth > 600;
 
-          if (isWide) {
-            return Row(
-              children: [
-                Expanded(child: children[0]),
-                children[1],
-                Expanded(child: children[2]),
-              ],
-            );
-          }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: children,
+        // Helper to create a VerificationStringField for optional fields
+        VerificationStringField positionField() {
+          final position = legalRepresentative!.position;
+          return VerificationStringField(
+            value: position?.value ?? '',
+            displayValue: position?.displayValue ?? 'N/A',
+            requiresUpdate: position?.requiresUpdate ?? false,
+            adminFeedback: position?.adminFeedback,
           );
-        },
-      ),
+        }
+
+        VerificationStringField phoneField() {
+          final phone = legalRepresentative!.phoneNumber;
+          return VerificationStringField(
+            value: phone?.value ?? '',
+            displayValue: phone?.displayValue ?? 'N/A',
+            requiresUpdate: phone?.requiresUpdate ?? false,
+            adminFeedback: phone?.adminFeedback,
+          );
+        }
+
+        if (isWide) {
+          return Column(
+            children: [
+              // Row 1: Full Name & Position
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: VerificationTextField(
+                      label: 'Full Name',
+                      field: legalRepresentative!.fullName,
+                    ),
+                  ),
+                  AppDimens.horizontalLarge,
+                  Expanded(
+                    child: VerificationTextField(
+                      label: 'Position',
+                      field: positionField(),
+                    ),
+                  ),
+                ],
+              ),
+              AppDimens.verticalMedium,
+              // Row 2: Phone Number & ID Type
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: VerificationTextField(
+                      label: 'Phone Number',
+                      field: phoneField(),
+                    ),
+                  ),
+                  AppDimens.horizontalLarge,
+                  Expanded(
+                    child: VerificationTextField(
+                      label: 'ID Type',
+                      field: legalRepresentative!.idType,
+                    ),
+                  ),
+                ],
+              ),
+              AppDimens.verticalMedium,
+              // Row 3: ID Number & Date of Issue
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: VerificationTextField(
+                      label: 'ID Number',
+                      field: legalRepresentative!.idNumber,
+                    ),
+                  ),
+                  AppDimens.horizontalLarge,
+                  Expanded(
+                    child: VerificationTextField(
+                      label: 'Date of Issue',
+                      field: legalRepresentative!.idIssueDate,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        }
+
+        // Mobile: Single column
+        return Column(
+          children: [
+            VerificationTextField(
+              label: 'Full Name',
+              field: legalRepresentative!.fullName,
+            ),
+            AppDimens.verticalMedium,
+            VerificationTextField(label: 'Position', field: positionField()),
+            AppDimens.verticalMedium,
+            VerificationTextField(label: 'Phone Number', field: phoneField()),
+            AppDimens.verticalMedium,
+            VerificationTextField(
+              label: 'ID Type',
+              field: legalRepresentative!.idType,
+            ),
+            AppDimens.verticalMedium,
+            VerificationTextField(
+              label: 'ID Number',
+              field: legalRepresentative!.idNumber,
+            ),
+            AppDimens.verticalMedium,
+            VerificationTextField(
+              label: 'Date of Issue',
+              field: legalRepresentative!.idIssueDate,
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -147,13 +178,16 @@ class LegalRepresentativeForm extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final idFront = legalRepresentative?.idFront;
-    final idBack = legalRepresentative?.idBack;
+    final idFront = legalRepresentative?.idFrontImage;
+    final idBack = legalRepresentative?.idBackImage;
+    final frontRequiresUpdate = idFront?.requiresUpdate ?? false;
+    final backRequiresUpdate = idBack?.requiresUpdate ?? false;
+    final anyRequiresUpdate = frontRequiresUpdate || backRequiresUpdate;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header with update badge
+        // Section header with action badge
         Row(
           children: [
             Text(
@@ -163,133 +197,67 @@ class LegalRepresentativeForm extends StatelessWidget {
                 color: colorScheme.onSurface,
               ),
             ),
-            if (idFront?.requiresUpdate == true) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: colorScheme.errorContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'UPDATE NEEDED',
-                  style: textTheme.labelSmall?.copyWith(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onErrorContainer,
-                  ),
-                ),
-              ),
-            ],
+            const SizedBox(width: 8),
+            if (anyRequiresUpdate)
+              VerificationActionRequiredBadge(color: colorScheme.error),
           ],
         ),
-        AppDimens.verticalExtraLarge,
+        AppDimens.verticalMedium,
         // Document upload cards
         LayoutBuilder(
           builder: (context, constraints) {
             final isWide = constraints.maxWidth > 500;
-            final children = [
-              if (idFront != null)
-                _IdentityUploadCard(
-                  document: idFront,
-                  onUpload: () => onUploadDocument(idFront),
-                ),
-              if (isWide) const SizedBox(width: 16),
-              if (!isWide) AppDimens.verticalMedium,
-              if (idBack != null) _CompletedDocumentCard(document: idBack),
-            ];
 
             if (isWide) {
               return Row(
                 children: [
-                  if (idFront != null) Expanded(child: children[0]),
-                  children[1],
-                  if (idBack != null) Expanded(child: children[2]),
+                  // ID Front: show upload card if requiresUpdate, else completed card
+                  if (idFront != null)
+                    Expanded(
+                      child: frontRequiresUpdate
+                          ? _IdentityUploadCard(
+                              document: idFront,
+                              onUpload: () => onUploadDocument(idFront),
+                            )
+                          : _CompletedDocumentCard(document: idFront),
+                    ),
+                  const SizedBox(width: 16),
+                  // ID Back: show upload card if requiresUpdate, else completed card
+                  if (idBack != null)
+                    Expanded(
+                      child: backRequiresUpdate
+                          ? _IdentityUploadCard(
+                              document: idBack,
+                              onUpload: () => onUploadDocument(idBack),
+                            )
+                          : _CompletedDocumentCard(document: idBack),
+                    ),
                 ],
               );
             }
-            return Column(children: children);
-          },
-        ),
-      ],
-    );
-  }
 
-  Widget _buildAuthorizationLetter(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final semanticColors = Theme.of(context).extension<SemanticColors>();
-
-    return Opacity(
-      opacity: 0.5,
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            return Column(
               children: [
-                Text(
-                  'Authorization Letter',
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'No changes required for this document.',
-                  style: textTheme.bodySmall?.copyWith(
-                    fontStyle: FontStyle.italic,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
+                // ID Front: show upload card if requiresUpdate, else completed card
+                if (idFront != null)
+                  frontRequiresUpdate
+                      ? _IdentityUploadCard(
+                          document: idFront,
+                          onUpload: () => onUploadDocument(idFront),
+                        )
+                      : _CompletedDocumentCard(document: idFront),
+                AppDimens.verticalMedium,
+                // ID Back: show upload card if requiresUpdate, else completed card
+                if (idBack != null)
+                  backRequiresUpdate
+                      ? _IdentityUploadCard(
+                          document: idBack,
+                          onUpload: () => onUploadDocument(idBack),
+                        )
+                      : _CompletedDocumentCard(document: idBack),
               ],
-            ),
-          ),
-          Icon(Icons.verified, color: semanticColors?.success ?? Colors.green),
-        ],
-      ),
-    );
-  }
-}
-
-/// Disabled text field showing readonly data.
-class _DisabledTextField extends StatelessWidget {
-  const _DisabledTextField({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: textTheme.labelMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            border: Border.all(color: colorScheme.outlineVariant),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            value,
-            style: textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
+            );
+          },
         ),
       ],
     );
@@ -307,78 +275,162 @@ class _IdentityUploadCard extends StatefulWidget {
   State<_IdentityUploadCard> createState() => _IdentityUploadCardState();
 }
 
-class _IdentityUploadCardState extends State<_IdentityUploadCard> {
-  bool _isHovering = false;
+class _IdentityUploadCardState extends State<_IdentityUploadCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _glowController;
+  late final Animation<double> _glowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _glowController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    _glowAnimation = Tween<double>(begin: 0.2, end: 0.5).animate(
+      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
+    );
+
+    // Only animate glow if update is required
+    if (widget.document.requiresUpdate) {
+      _glowController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _glowController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors = Theme.of(context).extension<SemanticColors>();
-    final successColor = semanticColors?.success ?? Colors.green;
+    final requiresUpdate = widget.document.requiresUpdate;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            height: 176,
-            decoration: BoxDecoration(
-              color: _isHovering
-                  ? successColor.withValues(alpha: 0.1)
-                  : successColor.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: InkWell(
-              onTap: widget.onUpload,
-              borderRadius: BorderRadius.circular(12),
-              child: CustomPaint(
-                painter: _DashedBorderPainter(
-                  color: successColor,
-                  strokeWidth: 2,
-                  dashWidth: 6,
-                  dashSpace: 4,
-                  borderRadius: 12,
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: successColor.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        AnimatedBuilder(
+          animation: _glowAnimation,
+          builder: (context, child) {
+            final hasImage = widget.document.fileUrl != null;
+
+            return Container(
+              height: 192,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                color: requiresUpdate
+                    ? colorScheme.error.withValues(alpha: 0.05)
+                    : colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: requiresUpdate
+                    ? [
+                        BoxShadow(
+                          color: colorScheme.error.withValues(
+                            alpha: _glowAnimation.value,
+                          ),
+                          blurRadius: 15,
+                          spreadRadius: -2,
                         ),
-                        child: Icon(
-                          Icons.add_photo_alternate_rounded,
-                          size: 32,
-                          color: successColor,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Upload ${widget.document.label}',
-                        style: textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: successColor,
+                      ]
+                    : null,
+              ),
+              child: InkWell(
+                onTap: widget.onUpload,
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Background image preview (blurred)
+                    if (hasImage)
+                      ImageFiltered(
+                        imageFilter: ui.ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                        child: Image.network(
+                          widget.document.fileUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const SizedBox.shrink(),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Tap to browse files',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: successColor.withValues(alpha: 0.7),
+                    // Dark overlay for image
+                    if (hasImage)
+                      Container(color: Colors.black.withValues(alpha: 0.4)),
+                    // Dashed border and upload content
+                    CustomPaint(
+                      painter: _DashedBorderPainter(
+                        color: requiresUpdate
+                            ? colorScheme.error
+                            : colorScheme.outline,
+                        strokeWidth: 2,
+                        dashWidth: 6,
+                        dashSpace: 4,
+                        borderRadius: 12,
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Upload icon container
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: hasImage
+                                    ? Colors.white.withValues(alpha: 0.9)
+                                    : requiresUpdate
+                                    ? colorScheme.error.withValues(alpha: 0.1)
+                                    : colorScheme.primaryContainer,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add_a_photo_rounded,
+                                size: 24,
+                                color: requiresUpdate
+                                    ? colorScheme.error
+                                    : hasImage
+                                    ? colorScheme.primary
+                                    : colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            // Label
+                            Text(
+                              widget.document.label,
+                              style: textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: hasImage
+                                    ? Colors.white
+                                    : requiresUpdate
+                                    ? colorScheme.error
+                                    : colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            // Helper text
+                            Text(
+                              'Click to upload new file',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: hasImage
+                                    ? Colors.white.withValues(alpha: 0.8)
+                                    : requiresUpdate
+                                    ? colorScheme.error.withValues(alpha: 0.7)
+                                    : colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ),
-          // Upload New badge - positioned on top edge
+            );
+          },
+        ),
+        // Upload New badge
+        if (requiresUpdate)
           Positioned(
             top: -12,
             left: 0,
@@ -386,39 +438,45 @@ class _IdentityUploadCardState extends State<_IdentityUploadCard> {
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
+                  horizontal: 12,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: successColor,
-                  borderRadius: BorderRadius.circular(20),
+                  color: colorScheme.error,
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: successColor.withValues(alpha: 0.4),
+                      color: colorScheme.error.withValues(alpha: 0.4),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: Text(
-                  'UPLOAD NEW',
-                  style: textTheme.labelSmall?.copyWith(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1,
-                    color: Colors.white,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.upload_rounded, color: Colors.white, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      'UPLOAD NEW',
+                      style: textTheme.labelSmall?.copyWith(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.8,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }
 
-/// Card showing a completed/approved document.
+/// Card showing a completed/verified document.
 class _CompletedDocumentCard extends StatelessWidget {
   const _CompletedDocumentCard({required this.document});
 
@@ -431,70 +489,196 @@ class _CompletedDocumentCard extends StatelessWidget {
     final semanticColors = Theme.of(context).extension<SemanticColors>();
     final successColor = semanticColors?.success ?? Colors.green;
 
-    return Container(
-      height: 176,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: successColor, width: 2),
-              ),
-              child: Icon(Icons.check, size: 24, color: successColor),
+    final hasImage = document.fileUrl != null;
+
+    return Stack(
+      children: [
+        Container(
+          height: 192,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
+            border: Border.all(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 12),
-            Text(
-              document.label,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: colorScheme.surface,
-                border: Border.all(color: colorScheme.outlineVariant),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.image_outlined,
-                    size: 16,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: Text(
-                      document.fileName ?? 'document.jpg',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: hasImage
+              ? Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Document image
+                    Image.network(
+                      document.fileUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Center(
+                        child: Icon(
+                          Icons.broken_image_rounded,
+                          size: 40,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
-                      overflow: TextOverflow.ellipsis,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                            strokeWidth: 2,
+                          ),
+                        );
+                      },
+                    ),
+                    // Gradient overlay for label visibility
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withValues(alpha: 0.7),
+                            ],
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                document.label,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: successColor.withValues(alpha: 0.9),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.check_circle,
+                                    size: 12,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Verified',
+                                    style: textTheme.labelSmall?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Center(
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Document icon
+                        Icon(
+                          Icons.assignment_ind_rounded,
+                          size: 40,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 12),
+                        // Label
+                        Text(
+                          document.label,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // Verified badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            border: Border.all(
+                              color: colorScheme.outlineVariant,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                size: 14,
+                                color: successColor,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Verified',
+                                style: textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ],
+                ),
         ),
-      ),
+        // Green checkmark overlay
+        Positioned(
+          top: 12,
+          right: 12,
+          child: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: successColor,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: successColor.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                ),
+              ],
+            ),
+            child: const Icon(Icons.check, size: 16, color: Colors.white),
+          ),
+        ),
+      ],
     );
   }
 }
 
+/// Custom painter for dashed borders.
 class _DashedBorderPainter extends CustomPainter {
   final Color color;
   final double strokeWidth;

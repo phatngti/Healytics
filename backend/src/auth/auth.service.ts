@@ -13,12 +13,19 @@ import { JwtService } from '@nestjs/jwt';
 import { Role } from '@/account/enum/role.enum';
 import { UserProfile } from '@/account/entities/user-profile.entity';
 import { Account } from '@/account/entities/account.entity';
+import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 
 /** Roles allowed for admin/partner login */
 const ADMIN_ROLES: Role[] = [Role.ADMIN, Role.HEALTH_PARTNER, Role.EMPLOYEE];
 
 /** Roles allowed for user login */
 const USER_ROLES: Role[] = [Role.USER];
+
+/** Partner verification info for JWT payload */
+export interface PartnerVerificationInfo {
+  verificationStatus: PartnerVerificationStatus;
+  verificationCompletedAt: Date | null;
+}
 
 /** JWT payload structure */
 interface AuthJwtPayload {
@@ -28,6 +35,8 @@ interface AuthJwtPayload {
   firstName?: string;
   lastName?: string;
   profileCompleted?: boolean;
+  verificationStatus?: PartnerVerificationStatus;
+  verificationCompletedAt?: string | null;
 }
 
 /** Validated user from authentication */
@@ -57,6 +66,7 @@ export class AuthService {
    * @param email - The user's email
    * @param role - The user's role
    * @param profile - Optional user profile
+   * @param partnerVerification - Optional partner verification info
    * @returns The generated tokens
    */
   async createTokensForUser(
@@ -64,12 +74,17 @@ export class AuthService {
     email?: string,
     role?: Role,
     profile?: UserProfile,
+    partnerVerification?: PartnerVerificationInfo,
   ): Promise<AuthTokensDto> {
     const payload: AuthJwtPayload = { sub: userId, email, role };
     if (profile) {
       payload.firstName = profile.firstName;
       payload.lastName = profile.lastName;
       payload.profileCompleted = profile.profileCompleted;
+    }
+    if (partnerVerification) {
+      payload.verificationStatus = partnerVerification.verificationStatus;
+      payload.verificationCompletedAt = partnerVerification.verificationCompletedAt?.toISOString() ?? null;
     }
     const accessExpires = process.env.JWT_EXPIRES_IN || '3600s';
     const refreshExpires = process.env.JWT_REFRESH_EXPIRES_IN || '7d';

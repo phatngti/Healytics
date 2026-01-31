@@ -13,78 +13,48 @@ part of openapi.api;
 class PartnerDocumentVerificationDto {
   /// Returns a new [PartnerDocumentVerificationDto] instance.
   PartnerDocumentVerificationDto({
-    this.businessLicenseUrl,
-    this.authorizationLetterUrl,
-    this.taxCertificateUrl,
-    this.otherDocumentUrls = const [],
+    required this.fileType,
+    required this.type,
+    required this.documentKey,
+    this.urls = const [],
   });
 
-  /// URL to business license document
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? businessLicenseUrl;
+  /// File type of document
+  String fileType;
 
-  /// URL to authorization letter document
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? authorizationLetterUrl;
+  /// Type of document
+  String type;
 
-  /// URL to tax certificate document
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? taxCertificateUrl;
+  /// Document key (R2/S3 path)
+  String documentKey;
 
-  /// Array of URLs to other supporting documents
-  List<String> otherDocumentUrls;
+  /// Array of URLs to document files
+  List<String> urls;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is PartnerDocumentVerificationDto &&
-    other.businessLicenseUrl == businessLicenseUrl &&
-    other.authorizationLetterUrl == authorizationLetterUrl &&
-    other.taxCertificateUrl == taxCertificateUrl &&
-    _deepEquality.equals(other.otherDocumentUrls, otherDocumentUrls);
+    other.fileType == fileType &&
+    other.type == type &&
+    other.documentKey == documentKey &&
+    _deepEquality.equals(other.urls, urls);
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (businessLicenseUrl == null ? 0 : businessLicenseUrl!.hashCode) +
-    (authorizationLetterUrl == null ? 0 : authorizationLetterUrl!.hashCode) +
-    (taxCertificateUrl == null ? 0 : taxCertificateUrl!.hashCode) +
-    (otherDocumentUrls.hashCode);
+    (fileType.hashCode) +
+    (type.hashCode) +
+    (documentKey.hashCode) +
+    (urls.hashCode);
 
   @override
-  String toString() => 'PartnerDocumentVerificationDto[businessLicenseUrl=$businessLicenseUrl, authorizationLetterUrl=$authorizationLetterUrl, taxCertificateUrl=$taxCertificateUrl, otherDocumentUrls=$otherDocumentUrls]';
+  String toString() => 'PartnerDocumentVerificationDto[fileType=$fileType, type=$type, documentKey=$documentKey, urls=$urls]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.businessLicenseUrl != null) {
-      json[r'businessLicenseUrl'] = this.businessLicenseUrl;
-    } else {
-      json[r'businessLicenseUrl'] = null;
-    }
-    if (this.authorizationLetterUrl != null) {
-      json[r'authorizationLetterUrl'] = this.authorizationLetterUrl;
-    } else {
-      json[r'authorizationLetterUrl'] = null;
-    }
-    if (this.taxCertificateUrl != null) {
-      json[r'taxCertificateUrl'] = this.taxCertificateUrl;
-    } else {
-      json[r'taxCertificateUrl'] = null;
-    }
-      json[r'otherDocumentUrls'] = this.otherDocumentUrls;
+      json[r'fileType'] = this.fileType;
+      json[r'type'] = this.type;
+      json[r'documentKey'] = this.documentKey;
+      json[r'urls'] = this.urls;
     return json;
   }
 
@@ -107,11 +77,11 @@ class PartnerDocumentVerificationDto {
       }());
 
       return PartnerDocumentVerificationDto(
-        businessLicenseUrl: mapValueOfType<String>(json, r'businessLicenseUrl'),
-        authorizationLetterUrl: mapValueOfType<String>(json, r'authorizationLetterUrl'),
-        taxCertificateUrl: mapValueOfType<String>(json, r'taxCertificateUrl'),
-        otherDocumentUrls: json[r'otherDocumentUrls'] is Iterable
-            ? (json[r'otherDocumentUrls'] as Iterable).cast<String>().toList(growable: false)
+        fileType: mapValueOfType<String>(json, r'fileType')!,
+        type: mapValueOfType<String>(json, r'type')!,
+        documentKey: mapValueOfType<String>(json, r'documentKey')!,
+        urls: json[r'urls'] is Iterable
+            ? (json[r'urls'] as Iterable).cast<String>().toList(growable: false)
             : const [],
       );
     }
@@ -160,6 +130,10 @@ class PartnerDocumentVerificationDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'fileType',
+    'type',
+    'documentKey',
+    'urls',
   };
 }
 

@@ -100,16 +100,14 @@ export class CreateServiceTagsSchema1767800000000 implements MigrationInterface 
         // Drop tables in reverse order to avoid FK constraint errors
 
         // 2. product_tags
-        await queryRunner.dropForeignKey("product_tags", "FK_PRODUCT_TAGS_TAG_ID");
-        await queryRunner.dropForeignKey("product_tags", "FK_PRODUCT_TAGS_PRODUCT_ID");
-        await queryRunner.dropIndex("product_tags", "IDX_PRODUCT_TAGS_TAG_ID");
-        await queryRunner.dropIndex("product_tags", "IDX_PRODUCT_TAGS_PRODUCT_ID");
-        await queryRunner.dropTable("product_tags");
+        await queryRunner.query("DROP INDEX IF EXISTS product_tags_idx_tag_id");
+        await queryRunner.query("DROP INDEX IF EXISTS product_tags_idx_product_id");
+        await queryRunner.query("DROP TABLE IF EXISTS product_tags");
 
         // 1. service_tags
-        await queryRunner.dropIndex("service_tags", "IDX_SERVICE_TAGS_USER_ACTIVE");
-        await queryRunner.dropForeignKey("service_tags", "FK_SERVICE_TAGS_USER_ID");
-        await queryRunner.dropIndex("service_tags", "IDX_SERVICE_TAGS_USER_ID");
-        await queryRunner.dropTable("service_tags");
+        await queryRunner.query("DROP INDEX IF EXISTS service_tags_idx_user_active");
+        await queryRunner.query("DROP INDEX IF EXISTS service_tags_idx_user_id");
+        await queryRunner.query("DROP INDEX IF EXISTS service_tags_idx_user_id");
+        await queryRunner.query("DROP TABLE IF EXISTS service_tags");
     }
 }

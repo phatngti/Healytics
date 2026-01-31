@@ -11,6 +11,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**adminPartnersControllerGetPartnerDetail**](AdminPartnersApi.md#adminpartnerscontrollergetpartnerdetail) | **GET** /admin/partners/{id} | Get partner details including documents
 [**adminPartnersControllerGetPartners**](AdminPartnersApi.md#adminpartnerscontrollergetpartners) | **GET** /admin/partners | List all partners
+[**adminPartnersControllerGetTotalPartners**](AdminPartnersApi.md#adminpartnerscontrollergettotalpartners) | **GET** /admin/partners/total | Get total number of partners
 [**adminPartnersControllerReviewPartner**](AdminPartnersApi.md#adminpartnerscontrollerreviewpartner) | **PUT** /admin/partners/{id}/review | Review partner profile
 
 
@@ -62,7 +63,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **adminPartnersControllerGetPartners**
-> adminPartnersControllerGetPartners(page, limit, verificationStatus, search)
+> PartnersResponseDto adminPartnersControllerGetPartners(page, limit, verificationStatus, search)
 
 List all partners
 
@@ -83,7 +84,8 @@ final verificationStatus = PENDING; // String | Filter by verification status (P
 final search = spa; // String | Search by tax code, brand name, legal name, or email
 
 try {
-    api_instance.adminPartnersControllerGetPartners(page, limit, verificationStatus, search);
+    final result = api_instance.adminPartnersControllerGetPartners(page, limit, verificationStatus, search);
+    print(result);
 } catch (e) {
     print('Exception when calling AdminPartnersApi->adminPartnersControllerGetPartners: $e\n');
 }
@@ -100,7 +102,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-void (empty response body)
+[**PartnersResponseDto**](PartnersResponseDto.md)
 
 ### Authorization
 
@@ -109,7 +111,50 @@ void (empty response body)
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **adminPartnersControllerGetTotalPartners**
+> TotalPartnersResponseDto adminPartnersControllerGetTotalPartners()
+
+Get total number of partners
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = AdminPartnersApi();
+
+try {
+    final result = api_instance.adminPartnersControllerGetTotalPartners();
+    print(result);
+} catch (e) {
+    print('Exception when calling AdminPartnersApi->adminPartnersControllerGetTotalPartners: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**TotalPartnersResponseDto**](TotalPartnersResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
