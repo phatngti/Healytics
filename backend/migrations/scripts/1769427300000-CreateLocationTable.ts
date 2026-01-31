@@ -51,9 +51,9 @@ export class CreateLocationTable1769427300000 implements MigrationInterface {
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         // Drop in reverse order: FK -> Index -> Table -> Enum
-        await queryRunner.dropForeignKey("location", "FK_LOCATION_PARENT_ID");
-        await queryRunner.dropIndex("location", "IDX_LOCATION_CODE");
-        await queryRunner.dropTable("location", true); // true = IF EXISTS
+        await queryRunner.query("DROP INDEX IF EXISTS location_idx_parent_id");
+        await queryRunner.query("DROP INDEX IF EXISTS location_idx_code");
+        await queryRunner.query("DROP TABLE IF EXISTS location"); // true = IF EXISTS
         await queryRunner.query(`DROP TYPE IF EXISTS "public"."location_level_enum"`);
     }
 }

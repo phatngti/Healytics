@@ -21,7 +21,7 @@ class SignInScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final roles = [
       SelectorSwitchOption(label: 'Admin', value: 'admin'),
-      SelectorSwitchOption(label: 'Provider', value: 'provider'),
+      SelectorSwitchOption(label: 'Partner', value: 'health_partner'),
     ];
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final emailController = useTextEditingController();

@@ -13,59 +13,40 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { IdType } from '@/partners/enum/id-type.enum';
+import { DocumentFileType, DocumentFileTypes, DocumentTypes, DocumentTypeValue } from '@/partners/entities/partner-document.entity';
 
-export class IdImagesRequestDto {
-    @ApiProperty({
-        example: 'https://storage.example.com/id_front.jpg',
-        description: 'URL to front image of ID document',
-    })
-    @IsUrl()
-    @IsNotEmpty()
-    frontImgUrl: string;
-
-    @ApiProperty({
-        example: 'https://storage.example.com/id_back.jpg',
-        description: 'URL to back image of ID document',
-    })
-    @IsUrl()
-    @IsNotEmpty()
-    backImgUrl: string;
-}
 
 export class PartnerDocumentVerificationDto {
-    @ApiPropertyOptional({
-        example: 'https://storage.example.com/business_license.pdf',
-        description: 'URL to business license document',
+    @ApiProperty({
+        example: 'image',
+        description: 'File type of document',
     })
-    @IsOptional()
-    @IsUrl()
-    businessLicenseUrl?: string;
+    @IsEnum(DocumentFileTypes)
+    fileType: DocumentFileType;
 
-    @ApiPropertyOptional({
-        example: 'https://storage.example.com/authorization_letter.pdf',
-        description: 'URL to authorization letter document',
+    @ApiProperty({
+        example: 'BUSINESS_LICENSE',
+        description: 'Type of document',
     })
-    @IsOptional()
-    @IsUrl()
-    authorizationLetterUrl?: string;
+    @IsEnum(DocumentTypes)
+    type: DocumentTypeValue;
 
-    @ApiPropertyOptional({
-        example: 'https://storage.example.com/tax_certificate.pdf',
-        description: 'URL to tax certificate document',
+    @ApiProperty({
+        example: 'business_license.pdf',
+        description: 'Document key (R2/S3 path)',
     })
-    @IsOptional()
-    @IsUrl()
-    taxCertificateUrl?: string;
+    @IsString()
+    @IsNotEmpty()
+    documentKey: string;
 
-    @ApiPropertyOptional({
-        example: ['https://storage.example.com/other_doc1.pdf'],
-        description: 'Array of URLs to other supporting documents',
+    @ApiProperty({
+        example: ['https://storage.example.com/business_license.pdf'],
+        description: 'Array of URLs to document files',
         type: [String],
     })
-    @IsOptional()
     @IsArray()
     @IsUrl({}, { each: true })
-    otherDocumentUrls?: string[];
+    urls: string[];
 }
 
 export class LegalRepresentativeRequestDto {
@@ -125,13 +106,9 @@ export class LegalRepresentativeRequestDto {
     @IsDateString()
     idIssueDate: string;
 
-    @ApiProperty({ type: IdImagesRequestDto })
-    @ValidateNested()
-    @Type(() => IdImagesRequestDto)
-    images: IdImagesRequestDto;
 
-    @ApiProperty({ type: PartnerDocumentVerificationDto })
-    @ValidateNested()
+    @ApiProperty({ type: [PartnerDocumentVerificationDto] })
+    @ValidateNested({ each: true })
     @Type(() => PartnerDocumentVerificationDto)
-    documents: PartnerDocumentVerificationDto;
+    documents: PartnerDocumentVerificationDto[];
 }

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:admin_openapi/api.dart';
 import 'package:admin_panel/features/authenticate/domain/authenticate.entity.dart';
 import 'package:admin_panel/features/authenticate/presentation/providers/sign_up.provider.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/account_information_section.widget.dart';
@@ -26,38 +29,59 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 /// - Business & Partner Information (Section 2)
 /// - Legal Representative (Section 3)
 /// - Document Verification (Section 4)
+
 class SignUpFormScreen extends HookConsumerWidget {
   const SignUpFormScreen({super.key});
+
+  /// Extracts user-friendly error message from API exceptions.
+  String _extractErrorMessage(Object error) {
+    if (error is ApiException && error.message != null) {
+      try {
+        final json = jsonDecode(error.message!);
+        // Handle nested message structure from backend
+        if (json is Map<String, dynamic>) {
+          final message = json['message'];
+          if (message is Map<String, dynamic>) {
+            return message['message'] as String? ?? error.message!;
+          } else if (message is String) {
+            return message;
+          }
+        }
+      } catch (_) {
+        // If parsing fails, return the raw message
+        return error.message!;
+      }
+    }
+    return error.toString();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final scrollController = useScrollController();
 
-    // File URL states
-    // File URL states
-    final frontIdUrl = useState<String?>(null);
-    final backIdUrl = useState<String?>(null);
     final colorScheme = Theme.of(context).colorScheme;
-
     final state = ref.watch(signUpProviderProvider);
 
     // Listen for state changes
     ref.listen(signUpProviderProvider, (previous, next) {
+      // Only handle transitions from loading state (actual API responses)
+      final wasLoading = previous?.isLoading ?? false;
+      if (!wasLoading) return;
+
       next.whenOrNull(
         data: (data) {
-          if (data.step == SignupStep.form &&
-              previous?.value?.step == SignupStep.form) {
-            ToastContext.showToast(
-              context,
-              ToastType.success,
-              'Registration successful! Please sign in.',
-            );
-            context.go(const SignInRoute().location);
+          // Only redirect on successful registration
+          if (data.registrationSuccess) {
+            ref.read(signUpProviderProvider.notifier).reset();
+            context.go(const SuccessRegistrationRoute().location);
           }
         },
         error: (error, stackTrace) {
-          ToastContext.showToast(context, ToastType.error, error.toString());
+          final message = _extractErrorMessage(error);
+          ToastContext.showToast(context, ToastType.error, message);
+          // Reset loading state after error to re-enable the submit button
+          ref.read(signUpProviderProvider.notifier).reset();
         },
       );
     });
@@ -85,12 +109,40 @@ class SignUpFormScreen extends HookConsumerWidget {
           phoneNumber: values['representative_phone'],
         );
 
-        // Get file URLs from state
-        final frontIdUrlValue = frontIdUrl.value;
-        final backIdUrlValue = backIdUrl.value;
-
-        // Get document URLs from form values
-
+        // Build documents list from form values matching "documents.*" pattern
+        // Exclude id_front and id_back as they are handled separately via images
+        final documents = <PartnerDocumentVerificationEntity>[];
+        for (final entry in values.entries) {
+          if (entry.key.startsWith('documents.') && entry.value != null) {
+            final value = entry.value;
+            if (value is DocumentUploadType) {
+              // Single document field
+              documents.add(
+                PartnerDocumentVerificationEntity(
+                  fileType: value.fileType,
+                  type: value.documentKey.toUpperCase(),
+                  documentKey: value.documentKey,
+                  urls: [value.url],
+                ),
+              );
+            } else if (value is List<DocumentUploadType> && value.isNotEmpty) {
+              // Multi-document field (e.g., other_documents)
+              final docKey = entry.key.replaceFirst('documents.', '');
+              documents.addAll(
+                value
+                    .map(
+                      (d) => PartnerDocumentVerificationEntity(
+                        fileType: d.fileType,
+                        type: docKey.toUpperCase(),
+                        documentKey: docKey,
+                        urls: [d.url],
+                      ),
+                    )
+                    .toList(),
+              );
+            }
+          }
+        }
         final legalRepresentativeRequest = LegalRepresentativeEntity(
           fullName: values['representative_name'] ?? '',
           position: values['representative_position'],
@@ -100,17 +152,7 @@ class SignUpFormScreen extends HookConsumerWidget {
           idIssueDate:
               values['id_issue_date']?.toString().split(' ').first ??
               DateTime.now().toIso8601String().split('T').first,
-          images: IdImagesEntity(
-            frontImgUrl: frontIdUrlValue ?? '',
-            backImgUrl: backIdUrlValue ?? '',
-          ),
-          documents: PartnerDocumentVerificationEntity(
-            businessLicenseUrl: values['business_license'] as String?,
-            authorizationLetterUrl: values['authorization_letter'] as String?,
-            taxCertificateUrl: values['tax_certificate'] as String?,
-            otherDocumentUrls:
-                (values['other_documents'] as List<String>?) ?? [],
-          ),
+          documents: documents,
         );
 
         final request = RegisterPartnerRequestEntity(
@@ -175,10 +217,7 @@ class SignUpFormScreen extends HookConsumerWidget {
                         FormSectionCard(
                           sectionNumber: '3',
                           title: 'Legal Representative',
-                          child: LegalRepresentativeSectionV2(
-                            onFrontIdSelected: (url) => frontIdUrl.value = url,
-                            onBackIdSelected: (url) => backIdUrl.value = url,
-                          ),
+                          child: LegalRepresentativeSectionV2(),
                         ),
                         AppDimens.verticalLarge,
 
@@ -186,7 +225,9 @@ class SignUpFormScreen extends HookConsumerWidget {
                         FormSectionCard(
                           sectionNumber: '4',
                           title: 'Document Verification',
-                          child: const DocumentVerificationSection(),
+                          child: const DocumentVerificationSection(
+                            scope: 'SPA_BEAUTY',
+                          ),
                         ),
                         AppDimens.verticalLarge,
 

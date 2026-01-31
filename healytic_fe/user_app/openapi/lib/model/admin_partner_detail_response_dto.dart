@@ -14,119 +14,86 @@ class AdminPartnerDetailResponseDto {
   /// Returns a new [AdminPartnerDetailResponseDto] instance.
   AdminPartnerDetailResponseDto({
     required this.id,
-    required this.email,
-    required this.taxCode,
-    required this.legalName,
-    required this.brandName,
-    required this.businessType,
-    required this.phoneNumber,
-    required this.address,
-    required this.verificationStatus,
-    required this.verificationCompletedAt,
-    required this.createdAt,
-    required this.legalRepresentative,
-    this.documents = const [],
-    required this.rejectionDetails,
+    required this.businessInfo,
+    this.legalRepresentative,
+    this.kycDocuments = const [],
+    required this.status,
+    required this.priority,
+    required this.submittedAt,
+    this.reviewNote,
   });
 
   String id;
 
-  String email;
+  BusinessInfoDto businessInfo;
 
-  String taxCode;
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  LegalRepresentativeDto? legalRepresentative;
 
-  String legalName;
+  List<VerifiedField> kycDocuments;
 
-  String brandName;
+  AdminPartnerDetailResponseDtoStatusEnum status;
 
-  String businessType;
+  AdminPartnerDetailResponseDtoPriorityEnum priority;
 
-  Object? phoneNumber;
+  DateTime submittedAt;
 
-  AddressDto address;
-
-  AdminPartnerDetailResponseDtoVerificationStatusEnum verificationStatus;
-
-  Object? verificationCompletedAt;
-
-  DateTime createdAt;
-
-  AdminLegalRepresentativeDto? legalRepresentative;
-
-  List<PartnerDocumentDto> documents;
-
-  /// Field-level rejection details
-  Object? rejectionDetails;
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? reviewNote;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is AdminPartnerDetailResponseDto &&
     other.id == id &&
-    other.email == email &&
-    other.taxCode == taxCode &&
-    other.legalName == legalName &&
-    other.brandName == brandName &&
-    other.businessType == businessType &&
-    other.phoneNumber == phoneNumber &&
-    other.address == address &&
-    other.verificationStatus == verificationStatus &&
-    other.verificationCompletedAt == verificationCompletedAt &&
-    other.createdAt == createdAt &&
+    other.businessInfo == businessInfo &&
     other.legalRepresentative == legalRepresentative &&
-    _deepEquality.equals(other.documents, documents) &&
-    other.rejectionDetails == rejectionDetails;
+    _deepEquality.equals(other.kycDocuments, kycDocuments) &&
+    other.status == status &&
+    other.priority == priority &&
+    other.submittedAt == submittedAt &&
+    other.reviewNote == reviewNote;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
-    (email.hashCode) +
-    (taxCode.hashCode) +
-    (legalName.hashCode) +
-    (brandName.hashCode) +
-    (businessType.hashCode) +
-    (phoneNumber == null ? 0 : phoneNumber!.hashCode) +
-    (address.hashCode) +
-    (verificationStatus.hashCode) +
-    (verificationCompletedAt == null ? 0 : verificationCompletedAt!.hashCode) +
-    (createdAt.hashCode) +
+    (businessInfo.hashCode) +
     (legalRepresentative == null ? 0 : legalRepresentative!.hashCode) +
-    (documents.hashCode) +
-    (rejectionDetails == null ? 0 : rejectionDetails!.hashCode);
+    (kycDocuments.hashCode) +
+    (status.hashCode) +
+    (priority.hashCode) +
+    (submittedAt.hashCode) +
+    (reviewNote == null ? 0 : reviewNote!.hashCode);
 
   @override
-  String toString() => 'AdminPartnerDetailResponseDto[id=$id, email=$email, taxCode=$taxCode, legalName=$legalName, brandName=$brandName, businessType=$businessType, phoneNumber=$phoneNumber, address=$address, verificationStatus=$verificationStatus, verificationCompletedAt=$verificationCompletedAt, createdAt=$createdAt, legalRepresentative=$legalRepresentative, documents=$documents, rejectionDetails=$rejectionDetails]';
+  String toString() => 'AdminPartnerDetailResponseDto[id=$id, businessInfo=$businessInfo, legalRepresentative=$legalRepresentative, kycDocuments=$kycDocuments, status=$status, priority=$priority, submittedAt=$submittedAt, reviewNote=$reviewNote]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
-      json[r'email'] = this.email;
-      json[r'taxCode'] = this.taxCode;
-      json[r'legalName'] = this.legalName;
-      json[r'brandName'] = this.brandName;
-      json[r'businessType'] = this.businessType;
-    if (this.phoneNumber != null) {
-      json[r'phoneNumber'] = this.phoneNumber;
-    } else {
-      json[r'phoneNumber'] = null;
-    }
-      json[r'address'] = this.address;
-      json[r'verificationStatus'] = this.verificationStatus;
-    if (this.verificationCompletedAt != null) {
-      json[r'verificationCompletedAt'] = this.verificationCompletedAt;
-    } else {
-      json[r'verificationCompletedAt'] = null;
-    }
-      json[r'createdAt'] = this.createdAt.toUtc().toIso8601String();
+      json[r'businessInfo'] = this.businessInfo;
     if (this.legalRepresentative != null) {
       json[r'legalRepresentative'] = this.legalRepresentative;
     } else {
       json[r'legalRepresentative'] = null;
     }
-      json[r'documents'] = this.documents;
-    if (this.rejectionDetails != null) {
-      json[r'rejectionDetails'] = this.rejectionDetails;
+      json[r'kycDocuments'] = this.kycDocuments;
+      json[r'status'] = this.status;
+      json[r'priority'] = this.priority;
+      json[r'submittedAt'] = this.submittedAt.toUtc().toIso8601String();
+    if (this.reviewNote != null) {
+      json[r'reviewNote'] = this.reviewNote;
     } else {
-      json[r'rejectionDetails'] = null;
+      json[r'reviewNote'] = null;
     }
     return json;
   }
@@ -151,19 +118,13 @@ class AdminPartnerDetailResponseDto {
 
       return AdminPartnerDetailResponseDto(
         id: mapValueOfType<String>(json, r'id')!,
-        email: mapValueOfType<String>(json, r'email')!,
-        taxCode: mapValueOfType<String>(json, r'taxCode')!,
-        legalName: mapValueOfType<String>(json, r'legalName')!,
-        brandName: mapValueOfType<String>(json, r'brandName')!,
-        businessType: mapValueOfType<String>(json, r'businessType')!,
-        phoneNumber: mapValueOfType<Object>(json, r'phoneNumber'),
-        address: AddressDto.fromJson(json[r'address'])!,
-        verificationStatus: AdminPartnerDetailResponseDtoVerificationStatusEnum.fromJson(json[r'verificationStatus'])!,
-        verificationCompletedAt: mapValueOfType<Object>(json, r'verificationCompletedAt'),
-        createdAt: mapDateTime(json, r'createdAt', r'')!,
-        legalRepresentative: AdminLegalRepresentativeDto.fromJson(json[r'legalRepresentative']),
-        documents: PartnerDocumentDto.listFromJson(json[r'documents']),
-        rejectionDetails: mapValueOfType<Object>(json, r'rejectionDetails'),
+        businessInfo: BusinessInfoDto.fromJson(json[r'businessInfo'])!,
+        legalRepresentative: LegalRepresentativeDto.fromJson(json[r'legalRepresentative']),
+        kycDocuments: VerifiedField.listFromJson(json[r'kycDocuments']),
+        status: AdminPartnerDetailResponseDtoStatusEnum.fromJson(json[r'status'])!,
+        priority: AdminPartnerDetailResponseDtoPriorityEnum.fromJson(json[r'priority'])!,
+        submittedAt: mapDateTime(json, r'submittedAt', r'')!,
+        reviewNote: mapValueOfType<String>(json, r'reviewNote'),
       );
     }
     return null;
@@ -212,26 +173,18 @@ class AdminPartnerDetailResponseDto {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'id',
-    'email',
-    'taxCode',
-    'legalName',
-    'brandName',
-    'businessType',
-    'phoneNumber',
-    'address',
-    'verificationStatus',
-    'verificationCompletedAt',
-    'createdAt',
-    'legalRepresentative',
-    'documents',
-    'rejectionDetails',
+    'businessInfo',
+    'kycDocuments',
+    'status',
+    'priority',
+    'submittedAt',
   };
 }
 
 
-class AdminPartnerDetailResponseDtoVerificationStatusEnum {
+class AdminPartnerDetailResponseDtoStatusEnum {
   /// Instantiate a new enum with the provided [value].
-  const AdminPartnerDetailResponseDtoVerificationStatusEnum._(this.value);
+  const AdminPartnerDetailResponseDtoStatusEnum._(this.value);
 
   /// The underlying value of this enum member.
   final String value;
@@ -241,26 +194,26 @@ class AdminPartnerDetailResponseDtoVerificationStatusEnum {
 
   String toJson() => value;
 
-  static const PENDING = AdminPartnerDetailResponseDtoVerificationStatusEnum._(r'PENDING');
-  static const APPROVED = AdminPartnerDetailResponseDtoVerificationStatusEnum._(r'APPROVED');
-  static const REJECTED = AdminPartnerDetailResponseDtoVerificationStatusEnum._(r'REJECTED');
-  static const REQUIRED_RESUBMIT = AdminPartnerDetailResponseDtoVerificationStatusEnum._(r'REQUIRED_RESUBMIT');
+  static const PENDING = AdminPartnerDetailResponseDtoStatusEnum._(r'PENDING');
+  static const APPROVED = AdminPartnerDetailResponseDtoStatusEnum._(r'APPROVED');
+  static const REJECTED = AdminPartnerDetailResponseDtoStatusEnum._(r'REJECTED');
+  static const REQUIRED_RESUBMIT = AdminPartnerDetailResponseDtoStatusEnum._(r'REQUIRED_RESUBMIT');
 
-  /// List of all possible values in this [enum][AdminPartnerDetailResponseDtoVerificationStatusEnum].
-  static const values = <AdminPartnerDetailResponseDtoVerificationStatusEnum>[
+  /// List of all possible values in this [enum][AdminPartnerDetailResponseDtoStatusEnum].
+  static const values = <AdminPartnerDetailResponseDtoStatusEnum>[
     PENDING,
     APPROVED,
     REJECTED,
     REQUIRED_RESUBMIT,
   ];
 
-  static AdminPartnerDetailResponseDtoVerificationStatusEnum? fromJson(dynamic value) => AdminPartnerDetailResponseDtoVerificationStatusEnumTypeTransformer().decode(value);
+  static AdminPartnerDetailResponseDtoStatusEnum? fromJson(dynamic value) => AdminPartnerDetailResponseDtoStatusEnumTypeTransformer().decode(value);
 
-  static List<AdminPartnerDetailResponseDtoVerificationStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <AdminPartnerDetailResponseDtoVerificationStatusEnum>[];
+  static List<AdminPartnerDetailResponseDtoStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
+    final result = <AdminPartnerDetailResponseDtoStatusEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = AdminPartnerDetailResponseDtoVerificationStatusEnum.fromJson(row);
+        final value = AdminPartnerDetailResponseDtoStatusEnum.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -270,16 +223,16 @@ class AdminPartnerDetailResponseDtoVerificationStatusEnum {
   }
 }
 
-/// Transformation class that can [encode] an instance of [AdminPartnerDetailResponseDtoVerificationStatusEnum] to String,
-/// and [decode] dynamic data back to [AdminPartnerDetailResponseDtoVerificationStatusEnum].
-class AdminPartnerDetailResponseDtoVerificationStatusEnumTypeTransformer {
-  factory AdminPartnerDetailResponseDtoVerificationStatusEnumTypeTransformer() => _instance ??= const AdminPartnerDetailResponseDtoVerificationStatusEnumTypeTransformer._();
+/// Transformation class that can [encode] an instance of [AdminPartnerDetailResponseDtoStatusEnum] to String,
+/// and [decode] dynamic data back to [AdminPartnerDetailResponseDtoStatusEnum].
+class AdminPartnerDetailResponseDtoStatusEnumTypeTransformer {
+  factory AdminPartnerDetailResponseDtoStatusEnumTypeTransformer() => _instance ??= const AdminPartnerDetailResponseDtoStatusEnumTypeTransformer._();
 
-  const AdminPartnerDetailResponseDtoVerificationStatusEnumTypeTransformer._();
+  const AdminPartnerDetailResponseDtoStatusEnumTypeTransformer._();
 
-  String encode(AdminPartnerDetailResponseDtoVerificationStatusEnum data) => data.value;
+  String encode(AdminPartnerDetailResponseDtoStatusEnum data) => data.value;
 
-  /// Decodes a [dynamic value][data] to a AdminPartnerDetailResponseDtoVerificationStatusEnum.
+  /// Decodes a [dynamic value][data] to a AdminPartnerDetailResponseDtoStatusEnum.
   ///
   /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
   /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
@@ -287,13 +240,13 @@ class AdminPartnerDetailResponseDtoVerificationStatusEnumTypeTransformer {
   ///
   /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
   /// and users are still using an old app with the old code.
-  AdminPartnerDetailResponseDtoVerificationStatusEnum? decode(dynamic data, {bool allowNull = true}) {
+  AdminPartnerDetailResponseDtoStatusEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'PENDING': return AdminPartnerDetailResponseDtoVerificationStatusEnum.PENDING;
-        case r'APPROVED': return AdminPartnerDetailResponseDtoVerificationStatusEnum.APPROVED;
-        case r'REJECTED': return AdminPartnerDetailResponseDtoVerificationStatusEnum.REJECTED;
-        case r'REQUIRED_RESUBMIT': return AdminPartnerDetailResponseDtoVerificationStatusEnum.REQUIRED_RESUBMIT;
+        case r'PENDING': return AdminPartnerDetailResponseDtoStatusEnum.PENDING;
+        case r'APPROVED': return AdminPartnerDetailResponseDtoStatusEnum.APPROVED;
+        case r'REJECTED': return AdminPartnerDetailResponseDtoStatusEnum.REJECTED;
+        case r'REQUIRED_RESUBMIT': return AdminPartnerDetailResponseDtoStatusEnum.REQUIRED_RESUBMIT;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -303,8 +256,88 @@ class AdminPartnerDetailResponseDtoVerificationStatusEnumTypeTransformer {
     return null;
   }
 
-  /// Singleton [AdminPartnerDetailResponseDtoVerificationStatusEnumTypeTransformer] instance.
-  static AdminPartnerDetailResponseDtoVerificationStatusEnumTypeTransformer? _instance;
+  /// Singleton [AdminPartnerDetailResponseDtoStatusEnumTypeTransformer] instance.
+  static AdminPartnerDetailResponseDtoStatusEnumTypeTransformer? _instance;
+}
+
+
+
+class AdminPartnerDetailResponseDtoPriorityEnum {
+  /// Instantiate a new enum with the provided [value].
+  const AdminPartnerDetailResponseDtoPriorityEnum._(this.value);
+
+  /// The underlying value of this enum member.
+  final String value;
+
+  @override
+  String toString() => value;
+
+  String toJson() => value;
+
+  static const low = AdminPartnerDetailResponseDtoPriorityEnum._(r'low');
+  static const normal = AdminPartnerDetailResponseDtoPriorityEnum._(r'normal');
+  static const high = AdminPartnerDetailResponseDtoPriorityEnum._(r'high');
+  static const urgent = AdminPartnerDetailResponseDtoPriorityEnum._(r'urgent');
+
+  /// List of all possible values in this [enum][AdminPartnerDetailResponseDtoPriorityEnum].
+  static const values = <AdminPartnerDetailResponseDtoPriorityEnum>[
+    low,
+    normal,
+    high,
+    urgent,
+  ];
+
+  static AdminPartnerDetailResponseDtoPriorityEnum? fromJson(dynamic value) => AdminPartnerDetailResponseDtoPriorityEnumTypeTransformer().decode(value);
+
+  static List<AdminPartnerDetailResponseDtoPriorityEnum> listFromJson(dynamic json, {bool growable = false,}) {
+    final result = <AdminPartnerDetailResponseDtoPriorityEnum>[];
+    if (json is List && json.isNotEmpty) {
+      for (final row in json) {
+        final value = AdminPartnerDetailResponseDtoPriorityEnum.fromJson(row);
+        if (value != null) {
+          result.add(value);
+        }
+      }
+    }
+    return result.toList(growable: growable);
+  }
+}
+
+/// Transformation class that can [encode] an instance of [AdminPartnerDetailResponseDtoPriorityEnum] to String,
+/// and [decode] dynamic data back to [AdminPartnerDetailResponseDtoPriorityEnum].
+class AdminPartnerDetailResponseDtoPriorityEnumTypeTransformer {
+  factory AdminPartnerDetailResponseDtoPriorityEnumTypeTransformer() => _instance ??= const AdminPartnerDetailResponseDtoPriorityEnumTypeTransformer._();
+
+  const AdminPartnerDetailResponseDtoPriorityEnumTypeTransformer._();
+
+  String encode(AdminPartnerDetailResponseDtoPriorityEnum data) => data.value;
+
+  /// Decodes a [dynamic value][data] to a AdminPartnerDetailResponseDtoPriorityEnum.
+  ///
+  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
+  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
+  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
+  ///
+  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
+  /// and users are still using an old app with the old code.
+  AdminPartnerDetailResponseDtoPriorityEnum? decode(dynamic data, {bool allowNull = true}) {
+    if (data != null) {
+      switch (data) {
+        case r'low': return AdminPartnerDetailResponseDtoPriorityEnum.low;
+        case r'normal': return AdminPartnerDetailResponseDtoPriorityEnum.normal;
+        case r'high': return AdminPartnerDetailResponseDtoPriorityEnum.high;
+        case r'urgent': return AdminPartnerDetailResponseDtoPriorityEnum.urgent;
+        default:
+          if (!allowNull) {
+            throw ArgumentError('Unknown enum value to decode: $data');
+          }
+      }
+    }
+    return null;
+  }
+
+  /// Singleton [AdminPartnerDetailResponseDtoPriorityEnumTypeTransformer] instance.
+  static AdminPartnerDetailResponseDtoPriorityEnumTypeTransformer? _instance;
 }
 
 

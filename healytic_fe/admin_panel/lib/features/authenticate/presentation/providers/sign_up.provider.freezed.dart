@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SignUpState {
 
- SignupStep get step; SignUpRequestEntity get request; String get email; String get emailToken; String get otpToken;
+ SignupStep get step; SignUpRequestEntity get request; String get email; String get emailToken; String get otpToken; bool get registrationSuccess;
 /// Create a copy of SignUpState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $SignUpStateCopyWith<SignUpState> get copyWith => _$SignUpStateCopyWithImpl<Sign
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignUpState&&(identical(other.step, step) || other.step == step)&&(identical(other.request, request) || other.request == request)&&(identical(other.email, email) || other.email == email)&&(identical(other.emailToken, emailToken) || other.emailToken == emailToken)&&(identical(other.otpToken, otpToken) || other.otpToken == otpToken));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignUpState&&(identical(other.step, step) || other.step == step)&&(identical(other.request, request) || other.request == request)&&(identical(other.email, email) || other.email == email)&&(identical(other.emailToken, emailToken) || other.emailToken == emailToken)&&(identical(other.otpToken, otpToken) || other.otpToken == otpToken)&&(identical(other.registrationSuccess, registrationSuccess) || other.registrationSuccess == registrationSuccess));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,step,request,email,emailToken,otpToken);
+int get hashCode => Object.hash(runtimeType,step,request,email,emailToken,otpToken,registrationSuccess);
 
 @override
 String toString() {
-  return 'SignUpState(step: $step, request: $request, email: $email, emailToken: $emailToken, otpToken: $otpToken)';
+  return 'SignUpState(step: $step, request: $request, email: $email, emailToken: $emailToken, otpToken: $otpToken, registrationSuccess: $registrationSuccess)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $SignUpStateCopyWith<$Res>  {
   factory $SignUpStateCopyWith(SignUpState value, $Res Function(SignUpState) _then) = _$SignUpStateCopyWithImpl;
 @useResult
 $Res call({
- SignupStep step, SignUpRequestEntity request, String email, String emailToken, String otpToken
+ SignupStep step, SignUpRequestEntity request, String email, String emailToken, String otpToken, bool registrationSuccess
 });
 
 
@@ -65,14 +65,15 @@ class _$SignUpStateCopyWithImpl<$Res>
 
 /// Create a copy of SignUpState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? step = null,Object? request = null,Object? email = null,Object? emailToken = null,Object? otpToken = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? step = null,Object? request = null,Object? email = null,Object? emailToken = null,Object? otpToken = null,Object? registrationSuccess = null,}) {
   return _then(_self.copyWith(
 step: null == step ? _self.step : step // ignore: cast_nullable_to_non_nullable
 as SignupStep,request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
 as SignUpRequestEntity,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,emailToken: null == emailToken ? _self.emailToken : emailToken // ignore: cast_nullable_to_non_nullable
 as String,otpToken: null == otpToken ? _self.otpToken : otpToken // ignore: cast_nullable_to_non_nullable
-as String,
+as String,registrationSuccess: null == registrationSuccess ? _self.registrationSuccess : registrationSuccess // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 /// Create a copy of SignUpState
@@ -166,10 +167,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SignupStep step,  SignUpRequestEntity request,  String email,  String emailToken,  String otpToken)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SignupStep step,  SignUpRequestEntity request,  String email,  String emailToken,  String otpToken,  bool registrationSuccess)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SignUpState() when $default != null:
-return $default(_that.step,_that.request,_that.email,_that.emailToken,_that.otpToken);case _:
+return $default(_that.step,_that.request,_that.email,_that.emailToken,_that.otpToken,_that.registrationSuccess);case _:
   return orElse();
 
 }
@@ -187,10 +188,10 @@ return $default(_that.step,_that.request,_that.email,_that.emailToken,_that.otpT
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SignupStep step,  SignUpRequestEntity request,  String email,  String emailToken,  String otpToken)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SignupStep step,  SignUpRequestEntity request,  String email,  String emailToken,  String otpToken,  bool registrationSuccess)  $default,) {final _that = this;
 switch (_that) {
 case _SignUpState():
-return $default(_that.step,_that.request,_that.email,_that.emailToken,_that.otpToken);case _:
+return $default(_that.step,_that.request,_that.email,_that.emailToken,_that.otpToken,_that.registrationSuccess);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +208,10 @@ return $default(_that.step,_that.request,_that.email,_that.emailToken,_that.otpT
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SignupStep step,  SignUpRequestEntity request,  String email,  String emailToken,  String otpToken)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SignupStep step,  SignUpRequestEntity request,  String email,  String emailToken,  String otpToken,  bool registrationSuccess)?  $default,) {final _that = this;
 switch (_that) {
 case _SignUpState() when $default != null:
-return $default(_that.step,_that.request,_that.email,_that.emailToken,_that.otpToken);case _:
+return $default(_that.step,_that.request,_that.email,_that.emailToken,_that.otpToken,_that.registrationSuccess);case _:
   return null;
 
 }
@@ -222,7 +223,7 @@ return $default(_that.step,_that.request,_that.email,_that.emailToken,_that.otpT
 @JsonSerializable()
 
 class _SignUpState implements SignUpState {
-  const _SignUpState({this.step = SignupStep.email, this.request = const SignUpRequestEntity(), this.email = '', this.emailToken = '', this.otpToken = ''});
+  const _SignUpState({this.step = SignupStep.email, this.request = const SignUpRequestEntity(), this.email = '', this.emailToken = '', this.otpToken = '', this.registrationSuccess = false});
   factory _SignUpState.fromJson(Map<String, dynamic> json) => _$SignUpStateFromJson(json);
 
 @override@JsonKey() final  SignupStep step;
@@ -230,6 +231,7 @@ class _SignUpState implements SignUpState {
 @override@JsonKey() final  String email;
 @override@JsonKey() final  String emailToken;
 @override@JsonKey() final  String otpToken;
+@override@JsonKey() final  bool registrationSuccess;
 
 /// Create a copy of SignUpState
 /// with the given fields replaced by the non-null parameter values.
@@ -244,16 +246,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignUpState&&(identical(other.step, step) || other.step == step)&&(identical(other.request, request) || other.request == request)&&(identical(other.email, email) || other.email == email)&&(identical(other.emailToken, emailToken) || other.emailToken == emailToken)&&(identical(other.otpToken, otpToken) || other.otpToken == otpToken));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignUpState&&(identical(other.step, step) || other.step == step)&&(identical(other.request, request) || other.request == request)&&(identical(other.email, email) || other.email == email)&&(identical(other.emailToken, emailToken) || other.emailToken == emailToken)&&(identical(other.otpToken, otpToken) || other.otpToken == otpToken)&&(identical(other.registrationSuccess, registrationSuccess) || other.registrationSuccess == registrationSuccess));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,step,request,email,emailToken,otpToken);
+int get hashCode => Object.hash(runtimeType,step,request,email,emailToken,otpToken,registrationSuccess);
 
 @override
 String toString() {
-  return 'SignUpState(step: $step, request: $request, email: $email, emailToken: $emailToken, otpToken: $otpToken)';
+  return 'SignUpState(step: $step, request: $request, email: $email, emailToken: $emailToken, otpToken: $otpToken, registrationSuccess: $registrationSuccess)';
 }
 
 
@@ -264,7 +266,7 @@ abstract mixin class _$SignUpStateCopyWith<$Res> implements $SignUpStateCopyWith
   factory _$SignUpStateCopyWith(_SignUpState value, $Res Function(_SignUpState) _then) = __$SignUpStateCopyWithImpl;
 @override @useResult
 $Res call({
- SignupStep step, SignUpRequestEntity request, String email, String emailToken, String otpToken
+ SignupStep step, SignUpRequestEntity request, String email, String emailToken, String otpToken, bool registrationSuccess
 });
 
 
@@ -281,14 +283,15 @@ class __$SignUpStateCopyWithImpl<$Res>
 
 /// Create a copy of SignUpState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? step = null,Object? request = null,Object? email = null,Object? emailToken = null,Object? otpToken = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? step = null,Object? request = null,Object? email = null,Object? emailToken = null,Object? otpToken = null,Object? registrationSuccess = null,}) {
   return _then(_SignUpState(
 step: null == step ? _self.step : step // ignore: cast_nullable_to_non_nullable
 as SignupStep,request: null == request ? _self.request : request // ignore: cast_nullable_to_non_nullable
 as SignUpRequestEntity,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,emailToken: null == emailToken ? _self.emailToken : emailToken // ignore: cast_nullable_to_non_nullable
 as String,otpToken: null == otpToken ? _self.otpToken : otpToken // ignore: cast_nullable_to_non_nullable
-as String,
+as String,registrationSuccess: null == registrationSuccess ? _self.registrationSuccess : registrationSuccess // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

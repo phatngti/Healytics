@@ -11,6 +11,12 @@ import {
 import { Partner } from './partner.entity';
 import { IdType } from '../enum/id-type.enum';
 
+/**
+ * Legal Representative entity.
+ * Document-related fields (id_front_img_url, id_back_img_url, is_authorized_user,
+ * auth_letter_doc_url) have been migrated to the partner_document table.
+ * @see migrations/scripts/1769427340000-RefactorLegalRepDocumentColumns.ts
+ */
 @Entity('legal_representative')
 export class LegalRepresentative {
     @PrimaryGeneratedColumn('uuid')
@@ -34,24 +40,6 @@ export class LegalRepresentative {
 
     @Column({ name: 'id_issue_date', type: 'date' })
     idIssueDate: Date;
-
-    @Column({ name: 'id_front_img_url', type: 'text' })
-    idFrontImgUrl: string;
-
-    @Column({ name: 'id_back_img_url', type: 'text' })
-    idBackImgUrl: string;
-
-    @Column({ name: 'business_license_url', type: 'text', nullable: true })
-    businessLicenseUrl: string | null;
-
-    @Column({ name: 'authorization_letter_url', type: 'text', nullable: true })
-    authorizationLetterUrl: string | null;
-
-    @Column({ name: 'tax_certificate_url', type: 'text', nullable: true })
-    taxCertificateUrl: string | null;
-
-    @Column({ name: 'other_document_urls', type: 'simple-array', nullable: true })
-    otherDocumentUrls: string[] | null;
 
     @Column({ name: 'phone_number', type: 'varchar', length: 20, nullable: true })
     phoneNumber: string | null;

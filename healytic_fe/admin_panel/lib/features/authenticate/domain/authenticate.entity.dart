@@ -20,6 +20,8 @@ abstract class SignInResponseEntity with _$SignInResponseEntity {
     required String accessToken,
     required String refreshToken,
     required String role,
+    String? verificationStatus,
+    String? verificationCompletedAt,
   }) = _SignInResponseEntity;
 
   factory SignInResponseEntity.fromJson(Map<String, dynamic> json) =>
@@ -95,18 +97,6 @@ abstract class PartnerRequestEntity with _$PartnerRequestEntity {
       _$PartnerRequestEntityFromJson(json);
 }
 
-/// ID images for legal representative.
-@Freezed(toJson: true)
-abstract class IdImagesEntity with _$IdImagesEntity {
-  const factory IdImagesEntity({
-    required String frontImgUrl,
-    required String backImgUrl,
-  }) = _IdImagesEntity;
-
-  factory IdImagesEntity.fromJson(Map<String, dynamic> json) =>
-      _$IdImagesEntityFromJson(json);
-}
-
 /// Authorization information for legal representative.
 @Freezed(toJson: true)
 abstract class AuthorizationEntity with _$AuthorizationEntity {
@@ -120,19 +110,33 @@ abstract class AuthorizationEntity with _$AuthorizationEntity {
 }
 
 /// Partner document verification information.
+///
+/// Each document has a type, fileType, documentKey, and list of URLs.
 @Freezed(toJson: true)
 abstract class PartnerDocumentVerificationEntity
     with _$PartnerDocumentVerificationEntity {
   const factory PartnerDocumentVerificationEntity({
-    String? businessLicenseUrl,
-    String? authorizationLetterUrl,
-    String? taxCertificateUrl,
-    @Default([]) List<String> otherDocumentUrls,
+    /// File type of document (e.g., 'pdf', 'image').
+    required String fileType,
+
+    /// Type of document (e.g., 'BUSINESS_LICENSE', 'AUTHORIZATION_LETTER').
+    required String type,
+
+    /// Document key/identifier (e.g., 'business_license').
+    required String documentKey,
+
+    /// Array of URLs to document files.
+    @Default([]) List<String> urls,
   }) = _PartnerDocumentVerificationEntity;
 
   factory PartnerDocumentVerificationEntity.fromJson(
     Map<String, dynamic> json,
   ) => _$PartnerDocumentVerificationEntityFromJson(json);
+
+  @override
+  String toString() {
+    return 'PartnerDocumentVerificationEntity(fileType: $fileType, type: $type, documentKey: $documentKey, urls: $urls)';
+  }
 }
 
 /// Legal representative information.
@@ -145,8 +149,9 @@ abstract class LegalRepresentativeEntity with _$LegalRepresentativeEntity {
     required String idType,
     required String idNumber,
     required String idIssueDate,
-    required IdImagesEntity images,
-    required PartnerDocumentVerificationEntity documents,
+
+    /// List of verification documents.
+    @Default([]) List<PartnerDocumentVerificationEntity> documents,
   }) = _LegalRepresentativeEntity;
 
   factory LegalRepresentativeEntity.fromJson(Map<String, dynamic> json) =>

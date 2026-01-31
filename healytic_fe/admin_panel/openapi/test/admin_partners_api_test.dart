@@ -26,8 +26,15 @@ void main() {
 
     // List all partners
     //
-    //Future adminPartnersControllerGetPartners({ num page, num limit, String verificationStatus, String search }) async
+    //Future<PartnersResponseDto> adminPartnersControllerGetPartners({ num page, num limit, String verificationStatus, String search }) async
     test('test adminPartnersControllerGetPartners', () async {
+      // TODO
+    });
+
+    // Get total number of partners
+    //
+    //Future<TotalPartnersResponseDto> adminPartnersControllerGetTotalPartners() async
+    test('test adminPartnersControllerGetTotalPartners', () async {
       // TODO
     });
 

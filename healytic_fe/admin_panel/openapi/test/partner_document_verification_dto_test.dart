@@ -16,27 +16,27 @@ void main() {
   // final instance = PartnerDocumentVerificationDto();
 
   group('test PartnerDocumentVerificationDto', () {
-    // URL to business license document
-    // String businessLicenseUrl
-    test('to test the property `businessLicenseUrl`', () async {
+    // File type of document
+    // String fileType
+    test('to test the property `fileType`', () async {
       // TODO
     });
 
-    // URL to authorization letter document
-    // String authorizationLetterUrl
-    test('to test the property `authorizationLetterUrl`', () async {
+    // Type of document
+    // String type
+    test('to test the property `type`', () async {
       // TODO
     });
 
-    // URL to tax certificate document
-    // String taxCertificateUrl
-    test('to test the property `taxCertificateUrl`', () async {
+    // Document key (R2/S3 path)
+    // String documentKey
+    test('to test the property `documentKey`', () async {
       // TODO
     });
 
-    // Array of URLs to other supporting documents
-    // List<String> otherDocumentUrls (default value: const [])
-    test('to test the property `otherDocumentUrls`', () async {
+    // Array of URLs to document files
+    // List<String> urls (default value: const [])
+    test('to test the property `urls`', () async {
       // TODO
     });
 

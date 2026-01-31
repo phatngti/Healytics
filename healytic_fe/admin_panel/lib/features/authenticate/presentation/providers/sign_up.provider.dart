@@ -20,6 +20,7 @@ abstract class SignUpState with _$SignUpState {
     @Default('') String email,
     @Default('') String emailToken,
     @Default('') String otpToken,
+    @Default(false) bool registrationSuccess,
   }) = _SignUpState;
 
   factory SignUpState.fromJson(Map<String, dynamic> json) =>
@@ -40,9 +41,9 @@ class SignUpProvider extends _$SignUpProvider {
     return const SignUpState();
   }
 
-  /// Resets the signup state to initial values.
+  /// Resets only the async state (loading/error) while preserving all data.
   void reset() {
-    state = const AsyncValue.data(SignUpState());
+    state = AsyncValue.data(state.value ?? const SignUpState());
   }
 
   /// Sends OTP to the specified email address.
@@ -91,23 +92,20 @@ class SignUpProvider extends _$SignUpProvider {
 
   /// Registers a new partner using the complete registration request.
   ///
-  /// Returns the registration response containing tokens.
-  Future<RegisterPartnerResponseEntity> registerPartner(
-    RegisterPartnerRequestEntity request,
-  ) async {
+  /// Updates state to data on success or error on failure.
+  Future<void> registerPartner(RegisterPartnerRequestEntity request) async {
     state = const AsyncValue.loading();
 
-    final datasource = ref.read(authenticateRemoteDatasourceProvider);
-    final response = await datasource.registerPartner(request);
+    state = await AsyncValue.guard(() async {
+      final datasource = ref.read(authenticateRemoteDatasourceProvider);
+      final response = await datasource.registerPartner(request);
 
-    developer.log(
-      'Partner registered: ${response.businessEntityId}',
-      name: 'SignUpProvider',
-    );
+      developer.log(
+        'Partner registered: ${response.businessEntityId}',
+        name: 'SignUpProvider',
+      );
 
-    // Reset to loading false after successful registration
-    state = AsyncValue.data(state.value!);
-
-    return response;
+      return state.value!.copyWith(registrationSuccess: true);
+    });
   }
 }

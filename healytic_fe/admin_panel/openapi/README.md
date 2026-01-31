@@ -68,6 +68,7 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**accountControllerPostSurvey**](doc//AccountApi.md#accountcontrollerpostsurvey) | **POST** /account/survey | Create one-shot survey for current user
 *AdminPartnersApi* | [**adminPartnersControllerGetPartnerDetail**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartnerdetail) | **GET** /admin/partners/{id} | Get partner details including documents
 *AdminPartnersApi* | [**adminPartnersControllerGetPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartners) | **GET** /admin/partners | List all partners
+*AdminPartnersApi* | [**adminPartnersControllerGetTotalPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergettotalpartners) | **GET** /admin/partners/total | Get total number of partners
 *AdminPartnersApi* | [**adminPartnersControllerReviewPartner**](doc//AdminPartnersApi.md#adminpartnerscontrollerreviewpartner) | **PUT** /admin/partners/{id}/review | Review partner profile
 *AuditLogsApi* | [**auditControllerGetAuditLogs**](doc//AuditLogsApi.md#auditcontrollergetauditlogs) | **GET** /audit-logs | Get audit logs
 *AuthenticationApi* | [**authControllerLoginAdmin**](doc//AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | 
@@ -119,12 +120,12 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [AccountRequestDto](doc//AccountRequestDto.md)
- - [AddressDto](doc//AddressDto.md)
- - [AdminLegalRepresentativeDto](doc//AdminLegalRepresentativeDto.md)
+ - [AddressInfoDto](doc//AddressInfoDto.md)
  - [AdminLoginDto](doc//AdminLoginDto.md)
  - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
  - [AttachTagResponseDto](doc//AttachTagResponseDto.md)
  - [AuthTokensDto](doc//AuthTokensDto.md)
+ - [BusinessInfoDto](doc//BusinessInfoDto.md)
  - [BusinessTypeDto](doc//BusinessTypeDto.md)
  - [BusinessTypesResponseDto](doc//BusinessTypesResponseDto.md)
  - [CategoryResponseDto](doc//CategoryResponseDto.md)
@@ -141,22 +142,26 @@ Class | Method | HTTP request | Description
  - [DeleteFileResponseDto](doc//DeleteFileResponseDto.md)
  - [DoctorProfileDto](doc//DoctorProfileDto.md)
  - [DocumentUpdateDto](doc//DocumentUpdateDto.md)
+ - [DocumentVerificationInfoDto](doc//DocumentVerificationInfoDto.md)
  - [EmployeeResponseDto](doc//EmployeeResponseDto.md)
  - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
  - [GetDistrictsResponseDto](doc//GetDistrictsResponseDto.md)
  - [GetProvincesResponseDto](doc//GetProvincesResponseDto.md)
  - [GetWardsResponseDto](doc//GetWardsResponseDto.md)
- - [IdImagesRequestDto](doc//IdImagesRequestDto.md)
  - [LegalRepresentativeDto](doc//LegalRepresentativeDto.md)
+ - [LegalRepresentativeInfoDto](doc//LegalRepresentativeInfoDto.md)
  - [LegalRepresentativeRequestDto](doc//LegalRepresentativeRequestDto.md)
+ - [LocationDetailsInfoDto](doc//LocationDetailsInfoDto.md)
  - [LocationDto](doc//LocationDto.md)
  - [LoginDto](doc//LoginDto.md)
  - [LogoutResponseDto](doc//LogoutResponseDto.md)
  - [MyProfileResponseDto](doc//MyProfileResponseDto.md)
- - [PartnerDocumentDto](doc//PartnerDocumentDto.md)
  - [PartnerDocumentVerificationDto](doc//PartnerDocumentVerificationDto.md)
+ - [PartnerInfoDto](doc//PartnerInfoDto.md)
+ - [PartnerItemDto](doc//PartnerItemDto.md)
  - [PartnerLoginDto](doc//PartnerLoginDto.md)
  - [PartnerRequestDto](doc//PartnerRequestDto.md)
+ - [PartnersResponseDto](doc//PartnersResponseDto.md)
  - [PresignRequestDto](doc//PresignRequestDto.md)
  - [PresignResponseDto](doc//PresignResponseDto.md)
  - [ProductMediaDto](doc//ProductMediaDto.md)
@@ -175,12 +180,17 @@ Class | Method | HTTP request | Description
  - [SurveyDto](doc//SurveyDto.md)
  - [SurveyResponseDto](doc//SurveyResponseDto.md)
  - [TherapistProfileDto](doc//TherapistProfileDto.md)
+ - [TotalPartnersResponseDto](doc//TotalPartnersResponseDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)
  - [UpdateEmployeeDto](doc//UpdateEmployeeDto.md)
  - [UpdateLegalRepresentativeDto](doc//UpdateLegalRepresentativeDto.md)
  - [UpdatePartnerDto](doc//UpdatePartnerDto.md)
  - [UpdateProductDto](doc//UpdateProductDto.md)
  - [UpdateServiceTagDto](doc//UpdateServiceTagDto.md)
+ - [VerificationDocumentDto](doc//VerificationDocumentDto.md)
+ - [VerificationOptionalStringFieldDto](doc//VerificationOptionalStringFieldDto.md)
+ - [VerificationStringFieldDto](doc//VerificationStringFieldDto.md)
+ - [VerifiedField](doc//VerifiedField.md)
 
 
 ## Documentation For Authorization

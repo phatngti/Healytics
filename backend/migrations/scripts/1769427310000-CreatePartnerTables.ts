@@ -270,35 +270,36 @@ export class CreatePartnerTables1769427310000 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
         // =====================
         // Drop in reverse order: FKs -> Indexes -> Tables -> Enums
+        // Using safe drop with IF EXISTS to prevent errors
         // =====================
 
-        // 1. Drop foreign keys
-        await queryRunner.dropForeignKey("legal_representative", "FK_LEGAL_REP_PARTNER_ID");
-        await queryRunner.dropForeignKey("partner_review_log", "FK_REVIEW_LOG_REVIEWER_ID");
-        await queryRunner.dropForeignKey("partner_review_log", "FK_REVIEW_LOG_PARTNER_ID");
-        await queryRunner.dropForeignKey("partner_document", "FK_PARTNER_DOC_PARTNER_ID");
-        await queryRunner.dropForeignKey("health_partner_profile", "FK_PARTNER_ACCOUNT_ID");
-        await queryRunner.dropForeignKey("health_partner_profile", "FK_PARTNER_WARD_ID");
-        await queryRunner.dropForeignKey("health_partner_profile", "FK_PARTNER_DISTRICT_ID");
-        await queryRunner.dropForeignKey("health_partner_profile", "FK_PARTNER_PROVINCE_ID");
+        // 1. Safe drop foreign keys
+        await queryRunner.query(`ALTER TABLE IF EXISTS "legal_representative" DROP CONSTRAINT IF EXISTS "FK_LEGAL_REP_PARTNER_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "partner_review_log" DROP CONSTRAINT IF EXISTS "FK_REVIEW_LOG_REVIEWER_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "partner_review_log" DROP CONSTRAINT IF EXISTS "FK_REVIEW_LOG_PARTNER_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "partner_document" DROP CONSTRAINT IF EXISTS "FK_PARTNER_DOC_PARTNER_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "health_partner_profile" DROP CONSTRAINT IF EXISTS "FK_PARTNER_ACCOUNT_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "health_partner_profile" DROP CONSTRAINT IF EXISTS "FK_PARTNER_WARD_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "health_partner_profile" DROP CONSTRAINT IF EXISTS "FK_PARTNER_DISTRICT_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "health_partner_profile" DROP CONSTRAINT IF EXISTS "FK_PARTNER_PROVINCE_ID"`);
 
-        // 2. Drop indexes
-        await queryRunner.dropIndex("legal_representative", "IDX_LEGAL_REP_PARTNER_ID");
-        await queryRunner.dropIndex("partner_review_log", "IDX_REVIEW_LOG_REVIEWER_ID");
-        await queryRunner.dropIndex("partner_review_log", "IDX_REVIEW_LOG_PARTNER_ID");
-        await queryRunner.dropIndex("partner_document", "IDX_PARTNER_DOC_PARTNER_ID");
-        await queryRunner.dropIndex("health_partner_profile", "IDX_PARTNER_ACCOUNT_ID");
-        await queryRunner.dropIndex("health_partner_profile", "IDX_PARTNER_WARD_ID");
-        await queryRunner.dropIndex("health_partner_profile", "IDX_PARTNER_DISTRICT_ID");
-        await queryRunner.dropIndex("health_partner_profile", "IDX_PARTNER_PROVINCE_ID");
+        // 2. Safe drop indexes
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_LEGAL_REP_PARTNER_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_REVIEW_LOG_REVIEWER_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_REVIEW_LOG_PARTNER_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_PARTNER_DOC_PARTNER_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_PARTNER_ACCOUNT_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_PARTNER_WARD_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_PARTNER_DISTRICT_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_PARTNER_PROVINCE_ID"`);
 
-        // 3. Drop tables
-        await queryRunner.dropTable("legal_representative", true);
-        await queryRunner.dropTable("partner_review_log", true);
-        await queryRunner.dropTable("partner_document", true);
-        await queryRunner.dropTable("health_partner_profile", true);
+        // 3. Safe drop tables
+        await queryRunner.query(`DROP TABLE IF EXISTS "legal_representative" CASCADE`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "partner_review_log" CASCADE`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "partner_document" CASCADE`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "health_partner_profile" CASCADE`);
 
-        // 4. Drop enums
+        // 4. Safe drop enums
         await queryRunner.query(`DROP TYPE IF EXISTS "public"."legal_representative_id_type_enum"`);
         await queryRunner.query(`DROP TYPE IF EXISTS "public"."partner_review_log_verdict_enum"`);
         await queryRunner.query(`DROP TYPE IF EXISTS "public"."partner_document_documenttype_enum"`);

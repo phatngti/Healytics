@@ -14,8 +14,7 @@ Name | Type | Description | Notes
 **idType** | **String** | Type of identification document | 
 **idNumber** | **String** | ID number (9 or 12 digits for Vietnam) | 
 **idIssueDate** | **String** | Date of ID issuance (ISO 8601 format) | 
-**images** | [**IdImagesRequestDto**](IdImagesRequestDto.md) |  | 
-**documents** | [**PartnerDocumentVerificationDto**](PartnerDocumentVerificationDto.md) |  | 
+**documents** | [**List<PartnerDocumentVerificationDto>**](PartnerDocumentVerificationDto.md) |  | [default to const []]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

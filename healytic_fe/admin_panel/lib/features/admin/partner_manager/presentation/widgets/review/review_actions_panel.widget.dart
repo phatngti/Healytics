@@ -43,10 +43,12 @@ class _ReviewActionsPanelState extends ConsumerState<ReviewActionsPanel> {
     final warningColor = semantics?.warning ?? Colors.orange;
     final dangerColor = semantics?.error ?? Colors.red;
 
-    // Watch the feedback provider for flagged count
-    final feedbackNotifier = ref.watch(reviewFeedbackProvider.notifier);
-    final flaggedCount = feedbackNotifier.flaggedFieldCount;
-    final hasRevisionRequests = feedbackNotifier.hasRevisionRequests;
+    // Watch the feedback provider state to trigger rebuilds on state changes
+    final feedbackState = ref.watch(reviewFeedbackProvider);
+    final flaggedCount = feedbackState.values
+        .where((f) => f.status == FieldFeedbackStatus.revisionRequested)
+        .length;
+    final hasRevisionRequests = flaggedCount > 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -56,8 +58,13 @@ class _ReviewActionsPanelState extends ConsumerState<ReviewActionsPanel> {
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.15),
-            blurRadius: 12,
+            blurRadius: 16,
             offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -187,44 +194,27 @@ class _ReviewActionsPanelState extends ConsumerState<ReviewActionsPanel> {
 
     return Column(
       children: [
-        // Approve Button
-        SizedBox(
-          width: double.infinity,
-          height: 44,
-          child: ElevatedButton.icon(
-            onPressed: () => widget.onApprove(_noteController.text),
-            icon: const Icon(Icons.check_circle, size: 20),
-            label: const Text('Approve Provider'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: successColor,
-              foregroundColor: Colors.white,
-              textStyle: textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+        // Approve Button with glow shadow
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: AppDimens.radiusSmall,
+            boxShadow: [
+              BoxShadow(
+                color: successColor.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: AppDimens.radiusSmall,
-              ),
-              elevation: 4,
-              shadowColor: successColor.withValues(alpha: 0.4),
-            ),
+            ],
           ),
-        ),
-        AppDimens.verticalMediumSmall,
-
-        // Request Revision Button (only shown when fields are flagged)
-        if (hasRevisionRequests) ...[
-          SizedBox(
+          child: SizedBox(
             width: double.infinity,
             height: 44,
             child: ElevatedButton.icon(
-              onPressed: () => widget.onRequestRevision(
-                _noteController.text,
-                feedbackNotifier.revisionFeedbackList,
-              ),
-              icon: const Icon(Icons.edit_note, size: 20),
-              label: const Text('Request Revision'),
+              onPressed: () => widget.onApprove(_noteController.text),
+              icon: const Icon(Icons.check_circle, size: 20),
+              label: const Text('Approve Provider'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: warningColor,
+                backgroundColor: successColor,
                 foregroundColor: Colors.white,
                 textStyle: textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -232,8 +222,47 @@ class _ReviewActionsPanelState extends ConsumerState<ReviewActionsPanel> {
                 shape: RoundedRectangleBorder(
                   borderRadius: AppDimens.radiusSmall,
                 ),
-                elevation: 4,
-                shadowColor: warningColor.withValues(alpha: 0.4),
+                elevation: 0,
+              ),
+            ),
+          ),
+        ),
+        AppDimens.verticalMediumSmall,
+
+        // Request Revision Button with glow shadow (only shown when fields are flagged)
+        if (hasRevisionRequests) ...[
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: AppDimens.radiusSmall,
+              boxShadow: [
+                BoxShadow(
+                  color: warningColor.withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: ElevatedButton.icon(
+                onPressed: () => widget.onRequestRevision(
+                  _noteController.text,
+                  feedbackNotifier.revisionFeedbackList,
+                ),
+                icon: const Icon(Icons.edit_note, size: 20),
+                label: const Text('Request Revision'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: warningColor,
+                  foregroundColor: Colors.white,
+                  textStyle: textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: AppDimens.radiusSmall,
+                  ),
+                  elevation: 0,
+                ),
               ),
             ),
           ),

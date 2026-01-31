@@ -281,7 +281,7 @@ as String,
 /// @nodoc
 mixin _$SignInResponseEntity {
 
- String get accessToken; String get refreshToken; String get role;
+ String get accessToken; String get refreshToken; String get role; String? get verificationStatus; String? get verificationCompletedAt;
 /// Create a copy of SignInResponseEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -294,16 +294,16 @@ $SignInResponseEntityCopyWith<SignInResponseEntity> get copyWith => _$SignInResp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignInResponseEntity&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.role, role) || other.role == role));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignInResponseEntity&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.role, role) || other.role == role)&&(identical(other.verificationStatus, verificationStatus) || other.verificationStatus == verificationStatus)&&(identical(other.verificationCompletedAt, verificationCompletedAt) || other.verificationCompletedAt == verificationCompletedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,role);
+int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,role,verificationStatus,verificationCompletedAt);
 
 @override
 String toString() {
-  return 'SignInResponseEntity(accessToken: $accessToken, refreshToken: $refreshToken, role: $role)';
+  return 'SignInResponseEntity(accessToken: $accessToken, refreshToken: $refreshToken, role: $role, verificationStatus: $verificationStatus, verificationCompletedAt: $verificationCompletedAt)';
 }
 
 
@@ -314,7 +314,7 @@ abstract mixin class $SignInResponseEntityCopyWith<$Res>  {
   factory $SignInResponseEntityCopyWith(SignInResponseEntity value, $Res Function(SignInResponseEntity) _then) = _$SignInResponseEntityCopyWithImpl;
 @useResult
 $Res call({
- String accessToken, String refreshToken, String role
+ String accessToken, String refreshToken, String role, String? verificationStatus, String? verificationCompletedAt
 });
 
 
@@ -331,12 +331,14 @@ class _$SignInResponseEntityCopyWithImpl<$Res>
 
 /// Create a copy of SignInResponseEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = null,Object? refreshToken = null,Object? role = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = null,Object? refreshToken = null,Object? role = null,Object? verificationStatus = freezed,Object? verificationCompletedAt = freezed,}) {
   return _then(_self.copyWith(
 accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
 as String,refreshToken: null == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
-as String,
+as String,verificationStatus: freezed == verificationStatus ? _self.verificationStatus : verificationStatus // ignore: cast_nullable_to_non_nullable
+as String?,verificationCompletedAt: freezed == verificationCompletedAt ? _self.verificationCompletedAt : verificationCompletedAt // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -421,10 +423,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String accessToken,  String refreshToken,  String role)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String accessToken,  String refreshToken,  String role,  String? verificationStatus,  String? verificationCompletedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SignInResponseEntity() when $default != null:
-return $default(_that.accessToken,_that.refreshToken,_that.role);case _:
+return $default(_that.accessToken,_that.refreshToken,_that.role,_that.verificationStatus,_that.verificationCompletedAt);case _:
   return orElse();
 
 }
@@ -442,10 +444,10 @@ return $default(_that.accessToken,_that.refreshToken,_that.role);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String accessToken,  String refreshToken,  String role)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String accessToken,  String refreshToken,  String role,  String? verificationStatus,  String? verificationCompletedAt)  $default,) {final _that = this;
 switch (_that) {
 case _SignInResponseEntity():
-return $default(_that.accessToken,_that.refreshToken,_that.role);case _:
+return $default(_that.accessToken,_that.refreshToken,_that.role,_that.verificationStatus,_that.verificationCompletedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -462,10 +464,10 @@ return $default(_that.accessToken,_that.refreshToken,_that.role);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String accessToken,  String refreshToken,  String role)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String accessToken,  String refreshToken,  String role,  String? verificationStatus,  String? verificationCompletedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _SignInResponseEntity() when $default != null:
-return $default(_that.accessToken,_that.refreshToken,_that.role);case _:
+return $default(_that.accessToken,_that.refreshToken,_that.role,_that.verificationStatus,_that.verificationCompletedAt);case _:
   return null;
 
 }
@@ -477,12 +479,14 @@ return $default(_that.accessToken,_that.refreshToken,_that.role);case _:
 @JsonSerializable()
 
 class _SignInResponseEntity implements SignInResponseEntity {
-  const _SignInResponseEntity({required this.accessToken, required this.refreshToken, required this.role});
+  const _SignInResponseEntity({required this.accessToken, required this.refreshToken, required this.role, this.verificationStatus, this.verificationCompletedAt});
   factory _SignInResponseEntity.fromJson(Map<String, dynamic> json) => _$SignInResponseEntityFromJson(json);
 
 @override final  String accessToken;
 @override final  String refreshToken;
 @override final  String role;
+@override final  String? verificationStatus;
+@override final  String? verificationCompletedAt;
 
 /// Create a copy of SignInResponseEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -497,16 +501,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignInResponseEntity&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.role, role) || other.role == role));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignInResponseEntity&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.role, role) || other.role == role)&&(identical(other.verificationStatus, verificationStatus) || other.verificationStatus == verificationStatus)&&(identical(other.verificationCompletedAt, verificationCompletedAt) || other.verificationCompletedAt == verificationCompletedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,role);
+int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,role,verificationStatus,verificationCompletedAt);
 
 @override
 String toString() {
-  return 'SignInResponseEntity(accessToken: $accessToken, refreshToken: $refreshToken, role: $role)';
+  return 'SignInResponseEntity(accessToken: $accessToken, refreshToken: $refreshToken, role: $role, verificationStatus: $verificationStatus, verificationCompletedAt: $verificationCompletedAt)';
 }
 
 
@@ -517,7 +521,7 @@ abstract mixin class _$SignInResponseEntityCopyWith<$Res> implements $SignInResp
   factory _$SignInResponseEntityCopyWith(_SignInResponseEntity value, $Res Function(_SignInResponseEntity) _then) = __$SignInResponseEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String accessToken, String refreshToken, String role
+ String accessToken, String refreshToken, String role, String? verificationStatus, String? verificationCompletedAt
 });
 
 
@@ -534,12 +538,14 @@ class __$SignInResponseEntityCopyWithImpl<$Res>
 
 /// Create a copy of SignInResponseEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = null,Object? refreshToken = null,Object? role = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = null,Object? refreshToken = null,Object? role = null,Object? verificationStatus = freezed,Object? verificationCompletedAt = freezed,}) {
   return _then(_SignInResponseEntity(
 accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
 as String,refreshToken: null == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
-as String,
+as String,verificationStatus: freezed == verificationStatus ? _self.verificationStatus : verificationStatus // ignore: cast_nullable_to_non_nullable
+as String?,verificationCompletedAt: freezed == verificationCompletedAt ? _self.verificationCompletedAt : verificationCompletedAt // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -1628,272 +1634,6 @@ as String?,
 
 
 /// @nodoc
-mixin _$IdImagesEntity {
-
- String get frontImgUrl; String get backImgUrl;
-/// Create a copy of IdImagesEntity
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$IdImagesEntityCopyWith<IdImagesEntity> get copyWith => _$IdImagesEntityCopyWithImpl<IdImagesEntity>(this as IdImagesEntity, _$identity);
-
-  /// Serializes this IdImagesEntity to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is IdImagesEntity&&(identical(other.frontImgUrl, frontImgUrl) || other.frontImgUrl == frontImgUrl)&&(identical(other.backImgUrl, backImgUrl) || other.backImgUrl == backImgUrl));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,frontImgUrl,backImgUrl);
-
-@override
-String toString() {
-  return 'IdImagesEntity(frontImgUrl: $frontImgUrl, backImgUrl: $backImgUrl)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $IdImagesEntityCopyWith<$Res>  {
-  factory $IdImagesEntityCopyWith(IdImagesEntity value, $Res Function(IdImagesEntity) _then) = _$IdImagesEntityCopyWithImpl;
-@useResult
-$Res call({
- String frontImgUrl, String backImgUrl
-});
-
-
-
-
-}
-/// @nodoc
-class _$IdImagesEntityCopyWithImpl<$Res>
-    implements $IdImagesEntityCopyWith<$Res> {
-  _$IdImagesEntityCopyWithImpl(this._self, this._then);
-
-  final IdImagesEntity _self;
-  final $Res Function(IdImagesEntity) _then;
-
-/// Create a copy of IdImagesEntity
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? frontImgUrl = null,Object? backImgUrl = null,}) {
-  return _then(_self.copyWith(
-frontImgUrl: null == frontImgUrl ? _self.frontImgUrl : frontImgUrl // ignore: cast_nullable_to_non_nullable
-as String,backImgUrl: null == backImgUrl ? _self.backImgUrl : backImgUrl // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-}
-
-
-/// Adds pattern-matching-related methods to [IdImagesEntity].
-extension IdImagesEntityPatterns on IdImagesEntity {
-/// A variant of `map` that fallback to returning `orElse`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _IdImagesEntity value)?  $default,{required TResult orElse(),}){
-final _that = this;
-switch (_that) {
-case _IdImagesEntity() when $default != null:
-return $default(_that);case _:
-  return orElse();
-
-}
-}
-/// A `switch`-like method, using callbacks.
-///
-/// Callbacks receives the raw object, upcasted.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case final Subclass2 value:
-///     return ...;
-/// }
-/// ```
-
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _IdImagesEntity value)  $default,){
-final _that = this;
-switch (_that) {
-case _IdImagesEntity():
-return $default(_that);case _:
-  throw StateError('Unexpected subclass');
-
-}
-}
-/// A variant of `map` that fallback to returning `null`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
-
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _IdImagesEntity value)?  $default,){
-final _that = this;
-switch (_that) {
-case _IdImagesEntity() when $default != null:
-return $default(_that);case _:
-  return null;
-
-}
-}
-/// A variant of `when` that fallback to an `orElse` callback.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String frontImgUrl,  String backImgUrl)?  $default,{required TResult orElse(),}) {final _that = this;
-switch (_that) {
-case _IdImagesEntity() when $default != null:
-return $default(_that.frontImgUrl,_that.backImgUrl);case _:
-  return orElse();
-
-}
-}
-/// A `switch`-like method, using callbacks.
-///
-/// As opposed to `map`, this offers destructuring.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case Subclass2(:final field2):
-///     return ...;
-/// }
-/// ```
-
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String frontImgUrl,  String backImgUrl)  $default,) {final _that = this;
-switch (_that) {
-case _IdImagesEntity():
-return $default(_that.frontImgUrl,_that.backImgUrl);case _:
-  throw StateError('Unexpected subclass');
-
-}
-}
-/// A variant of `when` that fallback to returning `null`
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
-
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String frontImgUrl,  String backImgUrl)?  $default,) {final _that = this;
-switch (_that) {
-case _IdImagesEntity() when $default != null:
-return $default(_that.frontImgUrl,_that.backImgUrl);case _:
-  return null;
-
-}
-}
-
-}
-
-/// @nodoc
-@JsonSerializable()
-
-class _IdImagesEntity implements IdImagesEntity {
-  const _IdImagesEntity({required this.frontImgUrl, required this.backImgUrl});
-  factory _IdImagesEntity.fromJson(Map<String, dynamic> json) => _$IdImagesEntityFromJson(json);
-
-@override final  String frontImgUrl;
-@override final  String backImgUrl;
-
-/// Create a copy of IdImagesEntity
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$IdImagesEntityCopyWith<_IdImagesEntity> get copyWith => __$IdImagesEntityCopyWithImpl<_IdImagesEntity>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$IdImagesEntityToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _IdImagesEntity&&(identical(other.frontImgUrl, frontImgUrl) || other.frontImgUrl == frontImgUrl)&&(identical(other.backImgUrl, backImgUrl) || other.backImgUrl == backImgUrl));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,frontImgUrl,backImgUrl);
-
-@override
-String toString() {
-  return 'IdImagesEntity(frontImgUrl: $frontImgUrl, backImgUrl: $backImgUrl)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$IdImagesEntityCopyWith<$Res> implements $IdImagesEntityCopyWith<$Res> {
-  factory _$IdImagesEntityCopyWith(_IdImagesEntity value, $Res Function(_IdImagesEntity) _then) = __$IdImagesEntityCopyWithImpl;
-@override @useResult
-$Res call({
- String frontImgUrl, String backImgUrl
-});
-
-
-
-
-}
-/// @nodoc
-class __$IdImagesEntityCopyWithImpl<$Res>
-    implements _$IdImagesEntityCopyWith<$Res> {
-  __$IdImagesEntityCopyWithImpl(this._self, this._then);
-
-  final _IdImagesEntity _self;
-  final $Res Function(_IdImagesEntity) _then;
-
-/// Create a copy of IdImagesEntity
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? frontImgUrl = null,Object? backImgUrl = null,}) {
-  return _then(_IdImagesEntity(
-frontImgUrl: null == frontImgUrl ? _self.frontImgUrl : frontImgUrl // ignore: cast_nullable_to_non_nullable
-as String,backImgUrl: null == backImgUrl ? _self.backImgUrl : backImgUrl // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-
-}
-
-
-/// @nodoc
 mixin _$AuthorizationEntity {
 
  bool get isAuthorizedUser; String? get authLetterDocUrl;
@@ -2162,7 +1902,11 @@ as String?,
 /// @nodoc
 mixin _$PartnerDocumentVerificationEntity {
 
- String? get businessLicenseUrl; String? get authorizationLetterUrl; String? get taxCertificateUrl; List<String> get otherDocumentUrls;
+/// File type of document (e.g., 'pdf', 'image').
+ String get fileType;/// Type of document (e.g., 'BUSINESS_LICENSE', 'AUTHORIZATION_LETTER').
+ String get type;/// Document key/identifier (e.g., 'business_license').
+ String get documentKey;/// Array of URLs to document files.
+ List<String> get urls;
 /// Create a copy of PartnerDocumentVerificationEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2175,17 +1919,13 @@ $PartnerDocumentVerificationEntityCopyWith<PartnerDocumentVerificationEntity> ge
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDocumentVerificationEntity&&(identical(other.businessLicenseUrl, businessLicenseUrl) || other.businessLicenseUrl == businessLicenseUrl)&&(identical(other.authorizationLetterUrl, authorizationLetterUrl) || other.authorizationLetterUrl == authorizationLetterUrl)&&(identical(other.taxCertificateUrl, taxCertificateUrl) || other.taxCertificateUrl == taxCertificateUrl)&&const DeepCollectionEquality().equals(other.otherDocumentUrls, otherDocumentUrls));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerDocumentVerificationEntity&&(identical(other.fileType, fileType) || other.fileType == fileType)&&(identical(other.type, type) || other.type == type)&&(identical(other.documentKey, documentKey) || other.documentKey == documentKey)&&const DeepCollectionEquality().equals(other.urls, urls));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,businessLicenseUrl,authorizationLetterUrl,taxCertificateUrl,const DeepCollectionEquality().hash(otherDocumentUrls));
+int get hashCode => Object.hash(runtimeType,fileType,type,documentKey,const DeepCollectionEquality().hash(urls));
 
-@override
-String toString() {
-  return 'PartnerDocumentVerificationEntity(businessLicenseUrl: $businessLicenseUrl, authorizationLetterUrl: $authorizationLetterUrl, taxCertificateUrl: $taxCertificateUrl, otherDocumentUrls: $otherDocumentUrls)';
-}
 
 
 }
@@ -2195,7 +1935,7 @@ abstract mixin class $PartnerDocumentVerificationEntityCopyWith<$Res>  {
   factory $PartnerDocumentVerificationEntityCopyWith(PartnerDocumentVerificationEntity value, $Res Function(PartnerDocumentVerificationEntity) _then) = _$PartnerDocumentVerificationEntityCopyWithImpl;
 @useResult
 $Res call({
- String? businessLicenseUrl, String? authorizationLetterUrl, String? taxCertificateUrl, List<String> otherDocumentUrls
+ String fileType, String type, String documentKey, List<String> urls
 });
 
 
@@ -2212,12 +1952,12 @@ class _$PartnerDocumentVerificationEntityCopyWithImpl<$Res>
 
 /// Create a copy of PartnerDocumentVerificationEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? businessLicenseUrl = freezed,Object? authorizationLetterUrl = freezed,Object? taxCertificateUrl = freezed,Object? otherDocumentUrls = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? fileType = null,Object? type = null,Object? documentKey = null,Object? urls = null,}) {
   return _then(_self.copyWith(
-businessLicenseUrl: freezed == businessLicenseUrl ? _self.businessLicenseUrl : businessLicenseUrl // ignore: cast_nullable_to_non_nullable
-as String?,authorizationLetterUrl: freezed == authorizationLetterUrl ? _self.authorizationLetterUrl : authorizationLetterUrl // ignore: cast_nullable_to_non_nullable
-as String?,taxCertificateUrl: freezed == taxCertificateUrl ? _self.taxCertificateUrl : taxCertificateUrl // ignore: cast_nullable_to_non_nullable
-as String?,otherDocumentUrls: null == otherDocumentUrls ? _self.otherDocumentUrls : otherDocumentUrls // ignore: cast_nullable_to_non_nullable
+fileType: null == fileType ? _self.fileType : fileType // ignore: cast_nullable_to_non_nullable
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as String,documentKey: null == documentKey ? _self.documentKey : documentKey // ignore: cast_nullable_to_non_nullable
+as String,urls: null == urls ? _self.urls : urls // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }
@@ -2303,10 +2043,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? businessLicenseUrl,  String? authorizationLetterUrl,  String? taxCertificateUrl,  List<String> otherDocumentUrls)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String fileType,  String type,  String documentKey,  List<String> urls)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PartnerDocumentVerificationEntity() when $default != null:
-return $default(_that.businessLicenseUrl,_that.authorizationLetterUrl,_that.taxCertificateUrl,_that.otherDocumentUrls);case _:
+return $default(_that.fileType,_that.type,_that.documentKey,_that.urls);case _:
   return orElse();
 
 }
@@ -2324,10 +2064,10 @@ return $default(_that.businessLicenseUrl,_that.authorizationLetterUrl,_that.taxC
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? businessLicenseUrl,  String? authorizationLetterUrl,  String? taxCertificateUrl,  List<String> otherDocumentUrls)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String fileType,  String type,  String documentKey,  List<String> urls)  $default,) {final _that = this;
 switch (_that) {
 case _PartnerDocumentVerificationEntity():
-return $default(_that.businessLicenseUrl,_that.authorizationLetterUrl,_that.taxCertificateUrl,_that.otherDocumentUrls);case _:
+return $default(_that.fileType,_that.type,_that.documentKey,_that.urls);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2344,10 +2084,10 @@ return $default(_that.businessLicenseUrl,_that.authorizationLetterUrl,_that.taxC
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? businessLicenseUrl,  String? authorizationLetterUrl,  String? taxCertificateUrl,  List<String> otherDocumentUrls)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String fileType,  String type,  String documentKey,  List<String> urls)?  $default,) {final _that = this;
 switch (_that) {
 case _PartnerDocumentVerificationEntity() when $default != null:
-return $default(_that.businessLicenseUrl,_that.authorizationLetterUrl,_that.taxCertificateUrl,_that.otherDocumentUrls);case _:
+return $default(_that.fileType,_that.type,_that.documentKey,_that.urls);case _:
   return null;
 
 }
@@ -2359,17 +2099,22 @@ return $default(_that.businessLicenseUrl,_that.authorizationLetterUrl,_that.taxC
 @JsonSerializable()
 
 class _PartnerDocumentVerificationEntity implements PartnerDocumentVerificationEntity {
-  const _PartnerDocumentVerificationEntity({this.businessLicenseUrl, this.authorizationLetterUrl, this.taxCertificateUrl, final  List<String> otherDocumentUrls = const []}): _otherDocumentUrls = otherDocumentUrls;
+  const _PartnerDocumentVerificationEntity({required this.fileType, required this.type, required this.documentKey, final  List<String> urls = const []}): _urls = urls;
   factory _PartnerDocumentVerificationEntity.fromJson(Map<String, dynamic> json) => _$PartnerDocumentVerificationEntityFromJson(json);
 
-@override final  String? businessLicenseUrl;
-@override final  String? authorizationLetterUrl;
-@override final  String? taxCertificateUrl;
- final  List<String> _otherDocumentUrls;
-@override@JsonKey() List<String> get otherDocumentUrls {
-  if (_otherDocumentUrls is EqualUnmodifiableListView) return _otherDocumentUrls;
+/// File type of document (e.g., 'pdf', 'image').
+@override final  String fileType;
+/// Type of document (e.g., 'BUSINESS_LICENSE', 'AUTHORIZATION_LETTER').
+@override final  String type;
+/// Document key/identifier (e.g., 'business_license').
+@override final  String documentKey;
+/// Array of URLs to document files.
+ final  List<String> _urls;
+/// Array of URLs to document files.
+@override@JsonKey() List<String> get urls {
+  if (_urls is EqualUnmodifiableListView) return _urls;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_otherDocumentUrls);
+  return EqualUnmodifiableListView(_urls);
 }
 
 
@@ -2386,17 +2131,13 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerDocumentVerificationEntity&&(identical(other.businessLicenseUrl, businessLicenseUrl) || other.businessLicenseUrl == businessLicenseUrl)&&(identical(other.authorizationLetterUrl, authorizationLetterUrl) || other.authorizationLetterUrl == authorizationLetterUrl)&&(identical(other.taxCertificateUrl, taxCertificateUrl) || other.taxCertificateUrl == taxCertificateUrl)&&const DeepCollectionEquality().equals(other._otherDocumentUrls, _otherDocumentUrls));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerDocumentVerificationEntity&&(identical(other.fileType, fileType) || other.fileType == fileType)&&(identical(other.type, type) || other.type == type)&&(identical(other.documentKey, documentKey) || other.documentKey == documentKey)&&const DeepCollectionEquality().equals(other._urls, _urls));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,businessLicenseUrl,authorizationLetterUrl,taxCertificateUrl,const DeepCollectionEquality().hash(_otherDocumentUrls));
+int get hashCode => Object.hash(runtimeType,fileType,type,documentKey,const DeepCollectionEquality().hash(_urls));
 
-@override
-String toString() {
-  return 'PartnerDocumentVerificationEntity(businessLicenseUrl: $businessLicenseUrl, authorizationLetterUrl: $authorizationLetterUrl, taxCertificateUrl: $taxCertificateUrl, otherDocumentUrls: $otherDocumentUrls)';
-}
 
 
 }
@@ -2406,7 +2147,7 @@ abstract mixin class _$PartnerDocumentVerificationEntityCopyWith<$Res> implement
   factory _$PartnerDocumentVerificationEntityCopyWith(_PartnerDocumentVerificationEntity value, $Res Function(_PartnerDocumentVerificationEntity) _then) = __$PartnerDocumentVerificationEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String? businessLicenseUrl, String? authorizationLetterUrl, String? taxCertificateUrl, List<String> otherDocumentUrls
+ String fileType, String type, String documentKey, List<String> urls
 });
 
 
@@ -2423,12 +2164,12 @@ class __$PartnerDocumentVerificationEntityCopyWithImpl<$Res>
 
 /// Create a copy of PartnerDocumentVerificationEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? businessLicenseUrl = freezed,Object? authorizationLetterUrl = freezed,Object? taxCertificateUrl = freezed,Object? otherDocumentUrls = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? fileType = null,Object? type = null,Object? documentKey = null,Object? urls = null,}) {
   return _then(_PartnerDocumentVerificationEntity(
-businessLicenseUrl: freezed == businessLicenseUrl ? _self.businessLicenseUrl : businessLicenseUrl // ignore: cast_nullable_to_non_nullable
-as String?,authorizationLetterUrl: freezed == authorizationLetterUrl ? _self.authorizationLetterUrl : authorizationLetterUrl // ignore: cast_nullable_to_non_nullable
-as String?,taxCertificateUrl: freezed == taxCertificateUrl ? _self.taxCertificateUrl : taxCertificateUrl // ignore: cast_nullable_to_non_nullable
-as String?,otherDocumentUrls: null == otherDocumentUrls ? _self._otherDocumentUrls : otherDocumentUrls // ignore: cast_nullable_to_non_nullable
+fileType: null == fileType ? _self.fileType : fileType // ignore: cast_nullable_to_non_nullable
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as String,documentKey: null == documentKey ? _self.documentKey : documentKey // ignore: cast_nullable_to_non_nullable
+as String,urls: null == urls ? _self._urls : urls // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }
@@ -2440,7 +2181,8 @@ as List<String>,
 /// @nodoc
 mixin _$LegalRepresentativeEntity {
 
- String get fullName; String? get position; String? get phoneNumber; String get idType; String get idNumber; String get idIssueDate; IdImagesEntity get images; PartnerDocumentVerificationEntity get documents;
+ String get fullName; String? get position; String? get phoneNumber; String get idType; String get idNumber; String get idIssueDate;/// List of verification documents.
+ List<PartnerDocumentVerificationEntity> get documents;
 /// Create a copy of LegalRepresentativeEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2453,16 +2195,16 @@ $LegalRepresentativeEntityCopyWith<LegalRepresentativeEntity> get copyWith => _$
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LegalRepresentativeEntity&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.position, position) || other.position == position)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.idType, idType) || other.idType == idType)&&(identical(other.idNumber, idNumber) || other.idNumber == idNumber)&&(identical(other.idIssueDate, idIssueDate) || other.idIssueDate == idIssueDate)&&(identical(other.images, images) || other.images == images)&&(identical(other.documents, documents) || other.documents == documents));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LegalRepresentativeEntity&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.position, position) || other.position == position)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.idType, idType) || other.idType == idType)&&(identical(other.idNumber, idNumber) || other.idNumber == idNumber)&&(identical(other.idIssueDate, idIssueDate) || other.idIssueDate == idIssueDate)&&const DeepCollectionEquality().equals(other.documents, documents));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,fullName,position,phoneNumber,idType,idNumber,idIssueDate,images,documents);
+int get hashCode => Object.hash(runtimeType,fullName,position,phoneNumber,idType,idNumber,idIssueDate,const DeepCollectionEquality().hash(documents));
 
 @override
 String toString() {
-  return 'LegalRepresentativeEntity(fullName: $fullName, position: $position, phoneNumber: $phoneNumber, idType: $idType, idNumber: $idNumber, idIssueDate: $idIssueDate, images: $images, documents: $documents)';
+  return 'LegalRepresentativeEntity(fullName: $fullName, position: $position, phoneNumber: $phoneNumber, idType: $idType, idNumber: $idNumber, idIssueDate: $idIssueDate, documents: $documents)';
 }
 
 
@@ -2473,11 +2215,11 @@ abstract mixin class $LegalRepresentativeEntityCopyWith<$Res>  {
   factory $LegalRepresentativeEntityCopyWith(LegalRepresentativeEntity value, $Res Function(LegalRepresentativeEntity) _then) = _$LegalRepresentativeEntityCopyWithImpl;
 @useResult
 $Res call({
- String fullName, String? position, String? phoneNumber, String idType, String idNumber, String idIssueDate, IdImagesEntity images, PartnerDocumentVerificationEntity documents
+ String fullName, String? position, String? phoneNumber, String idType, String idNumber, String idIssueDate, List<PartnerDocumentVerificationEntity> documents
 });
 
 
-$IdImagesEntityCopyWith<$Res> get images;$PartnerDocumentVerificationEntityCopyWith<$Res> get documents;
+
 
 }
 /// @nodoc
@@ -2490,7 +2232,7 @@ class _$LegalRepresentativeEntityCopyWithImpl<$Res>
 
 /// Create a copy of LegalRepresentativeEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? fullName = null,Object? position = freezed,Object? phoneNumber = freezed,Object? idType = null,Object? idNumber = null,Object? idIssueDate = null,Object? images = null,Object? documents = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? fullName = null,Object? position = freezed,Object? phoneNumber = freezed,Object? idType = null,Object? idNumber = null,Object? idIssueDate = null,Object? documents = null,}) {
   return _then(_self.copyWith(
 fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,position: freezed == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
@@ -2498,30 +2240,11 @@ as String?,phoneNumber: freezed == phoneNumber ? _self.phoneNumber : phoneNumber
 as String?,idType: null == idType ? _self.idType : idType // ignore: cast_nullable_to_non_nullable
 as String,idNumber: null == idNumber ? _self.idNumber : idNumber // ignore: cast_nullable_to_non_nullable
 as String,idIssueDate: null == idIssueDate ? _self.idIssueDate : idIssueDate // ignore: cast_nullable_to_non_nullable
-as String,images: null == images ? _self.images : images // ignore: cast_nullable_to_non_nullable
-as IdImagesEntity,documents: null == documents ? _self.documents : documents // ignore: cast_nullable_to_non_nullable
-as PartnerDocumentVerificationEntity,
+as String,documents: null == documents ? _self.documents : documents // ignore: cast_nullable_to_non_nullable
+as List<PartnerDocumentVerificationEntity>,
   ));
 }
-/// Create a copy of LegalRepresentativeEntity
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$IdImagesEntityCopyWith<$Res> get images {
-  
-  return $IdImagesEntityCopyWith<$Res>(_self.images, (value) {
-    return _then(_self.copyWith(images: value));
-  });
-}/// Create a copy of LegalRepresentativeEntity
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$PartnerDocumentVerificationEntityCopyWith<$Res> get documents {
-  
-  return $PartnerDocumentVerificationEntityCopyWith<$Res>(_self.documents, (value) {
-    return _then(_self.copyWith(documents: value));
-  });
-}
+
 }
 
 
@@ -2603,10 +2326,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String fullName,  String? position,  String? phoneNumber,  String idType,  String idNumber,  String idIssueDate,  IdImagesEntity images,  PartnerDocumentVerificationEntity documents)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String fullName,  String? position,  String? phoneNumber,  String idType,  String idNumber,  String idIssueDate,  List<PartnerDocumentVerificationEntity> documents)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LegalRepresentativeEntity() when $default != null:
-return $default(_that.fullName,_that.position,_that.phoneNumber,_that.idType,_that.idNumber,_that.idIssueDate,_that.images,_that.documents);case _:
+return $default(_that.fullName,_that.position,_that.phoneNumber,_that.idType,_that.idNumber,_that.idIssueDate,_that.documents);case _:
   return orElse();
 
 }
@@ -2624,10 +2347,10 @@ return $default(_that.fullName,_that.position,_that.phoneNumber,_that.idType,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String fullName,  String? position,  String? phoneNumber,  String idType,  String idNumber,  String idIssueDate,  IdImagesEntity images,  PartnerDocumentVerificationEntity documents)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String fullName,  String? position,  String? phoneNumber,  String idType,  String idNumber,  String idIssueDate,  List<PartnerDocumentVerificationEntity> documents)  $default,) {final _that = this;
 switch (_that) {
 case _LegalRepresentativeEntity():
-return $default(_that.fullName,_that.position,_that.phoneNumber,_that.idType,_that.idNumber,_that.idIssueDate,_that.images,_that.documents);case _:
+return $default(_that.fullName,_that.position,_that.phoneNumber,_that.idType,_that.idNumber,_that.idIssueDate,_that.documents);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2644,10 +2367,10 @@ return $default(_that.fullName,_that.position,_that.phoneNumber,_that.idType,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String fullName,  String? position,  String? phoneNumber,  String idType,  String idNumber,  String idIssueDate,  IdImagesEntity images,  PartnerDocumentVerificationEntity documents)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String fullName,  String? position,  String? phoneNumber,  String idType,  String idNumber,  String idIssueDate,  List<PartnerDocumentVerificationEntity> documents)?  $default,) {final _that = this;
 switch (_that) {
 case _LegalRepresentativeEntity() when $default != null:
-return $default(_that.fullName,_that.position,_that.phoneNumber,_that.idType,_that.idNumber,_that.idIssueDate,_that.images,_that.documents);case _:
+return $default(_that.fullName,_that.position,_that.phoneNumber,_that.idType,_that.idNumber,_that.idIssueDate,_that.documents);case _:
   return null;
 
 }
@@ -2659,7 +2382,7 @@ return $default(_that.fullName,_that.position,_that.phoneNumber,_that.idType,_th
 @JsonSerializable()
 
 class _LegalRepresentativeEntity implements LegalRepresentativeEntity {
-  const _LegalRepresentativeEntity({required this.fullName, this.position, this.phoneNumber, required this.idType, required this.idNumber, required this.idIssueDate, required this.images, required this.documents});
+  const _LegalRepresentativeEntity({required this.fullName, this.position, this.phoneNumber, required this.idType, required this.idNumber, required this.idIssueDate, final  List<PartnerDocumentVerificationEntity> documents = const []}): _documents = documents;
   factory _LegalRepresentativeEntity.fromJson(Map<String, dynamic> json) => _$LegalRepresentativeEntityFromJson(json);
 
 @override final  String fullName;
@@ -2668,8 +2391,15 @@ class _LegalRepresentativeEntity implements LegalRepresentativeEntity {
 @override final  String idType;
 @override final  String idNumber;
 @override final  String idIssueDate;
-@override final  IdImagesEntity images;
-@override final  PartnerDocumentVerificationEntity documents;
+/// List of verification documents.
+ final  List<PartnerDocumentVerificationEntity> _documents;
+/// List of verification documents.
+@override@JsonKey() List<PartnerDocumentVerificationEntity> get documents {
+  if (_documents is EqualUnmodifiableListView) return _documents;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_documents);
+}
+
 
 /// Create a copy of LegalRepresentativeEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -2684,16 +2414,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LegalRepresentativeEntity&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.position, position) || other.position == position)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.idType, idType) || other.idType == idType)&&(identical(other.idNumber, idNumber) || other.idNumber == idNumber)&&(identical(other.idIssueDate, idIssueDate) || other.idIssueDate == idIssueDate)&&(identical(other.images, images) || other.images == images)&&(identical(other.documents, documents) || other.documents == documents));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LegalRepresentativeEntity&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.position, position) || other.position == position)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.idType, idType) || other.idType == idType)&&(identical(other.idNumber, idNumber) || other.idNumber == idNumber)&&(identical(other.idIssueDate, idIssueDate) || other.idIssueDate == idIssueDate)&&const DeepCollectionEquality().equals(other._documents, _documents));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,fullName,position,phoneNumber,idType,idNumber,idIssueDate,images,documents);
+int get hashCode => Object.hash(runtimeType,fullName,position,phoneNumber,idType,idNumber,idIssueDate,const DeepCollectionEquality().hash(_documents));
 
 @override
 String toString() {
-  return 'LegalRepresentativeEntity(fullName: $fullName, position: $position, phoneNumber: $phoneNumber, idType: $idType, idNumber: $idNumber, idIssueDate: $idIssueDate, images: $images, documents: $documents)';
+  return 'LegalRepresentativeEntity(fullName: $fullName, position: $position, phoneNumber: $phoneNumber, idType: $idType, idNumber: $idNumber, idIssueDate: $idIssueDate, documents: $documents)';
 }
 
 
@@ -2704,11 +2434,11 @@ abstract mixin class _$LegalRepresentativeEntityCopyWith<$Res> implements $Legal
   factory _$LegalRepresentativeEntityCopyWith(_LegalRepresentativeEntity value, $Res Function(_LegalRepresentativeEntity) _then) = __$LegalRepresentativeEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String fullName, String? position, String? phoneNumber, String idType, String idNumber, String idIssueDate, IdImagesEntity images, PartnerDocumentVerificationEntity documents
+ String fullName, String? position, String? phoneNumber, String idType, String idNumber, String idIssueDate, List<PartnerDocumentVerificationEntity> documents
 });
 
 
-@override $IdImagesEntityCopyWith<$Res> get images;@override $PartnerDocumentVerificationEntityCopyWith<$Res> get documents;
+
 
 }
 /// @nodoc
@@ -2721,7 +2451,7 @@ class __$LegalRepresentativeEntityCopyWithImpl<$Res>
 
 /// Create a copy of LegalRepresentativeEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? fullName = null,Object? position = freezed,Object? phoneNumber = freezed,Object? idType = null,Object? idNumber = null,Object? idIssueDate = null,Object? images = null,Object? documents = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? fullName = null,Object? position = freezed,Object? phoneNumber = freezed,Object? idType = null,Object? idNumber = null,Object? idIssueDate = null,Object? documents = null,}) {
   return _then(_LegalRepresentativeEntity(
 fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,position: freezed == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
@@ -2729,31 +2459,12 @@ as String?,phoneNumber: freezed == phoneNumber ? _self.phoneNumber : phoneNumber
 as String?,idType: null == idType ? _self.idType : idType // ignore: cast_nullable_to_non_nullable
 as String,idNumber: null == idNumber ? _self.idNumber : idNumber // ignore: cast_nullable_to_non_nullable
 as String,idIssueDate: null == idIssueDate ? _self.idIssueDate : idIssueDate // ignore: cast_nullable_to_non_nullable
-as String,images: null == images ? _self.images : images // ignore: cast_nullable_to_non_nullable
-as IdImagesEntity,documents: null == documents ? _self.documents : documents // ignore: cast_nullable_to_non_nullable
-as PartnerDocumentVerificationEntity,
+as String,documents: null == documents ? _self._documents : documents // ignore: cast_nullable_to_non_nullable
+as List<PartnerDocumentVerificationEntity>,
   ));
 }
 
-/// Create a copy of LegalRepresentativeEntity
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$IdImagesEntityCopyWith<$Res> get images {
-  
-  return $IdImagesEntityCopyWith<$Res>(_self.images, (value) {
-    return _then(_self.copyWith(images: value));
-  });
-}/// Create a copy of LegalRepresentativeEntity
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$PartnerDocumentVerificationEntityCopyWith<$Res> get documents {
-  
-  return $PartnerDocumentVerificationEntityCopyWith<$Res>(_self.documents, (value) {
-    return _then(_self.copyWith(documents: value));
-  });
-}
+
 }
 
 

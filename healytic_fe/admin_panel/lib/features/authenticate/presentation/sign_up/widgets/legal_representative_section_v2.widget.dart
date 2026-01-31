@@ -2,10 +2,14 @@ import 'dart:developer' as developer;
 import 'dart:typed_data';
 
 import 'package:admin_panel/core/providers/s3.provider.dart';
+import 'package:admin_panel/constants/document_types.dart';
+import 'package:admin_panel/constants/file_type.dart';
+import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/document_verification_section.widget.dart';
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -18,19 +22,10 @@ import 'package:image_picker/image_picker.dart';
 /// - ID Type dropdown
 /// - ID Number text field
 /// - Date of Issue date picker
-/// - Identity Verification file uploads (front/back)
+/// - Identity Verification file uploads (front/back) using FormBuilderField
+///   with document keys 'id_front' and 'id_back' to integrate with form submission.
 class LegalRepresentativeSectionV2 extends StatelessWidget {
-  /// Callback when front ID image is selected.
-  final ValueChanged<String?>? onFrontIdSelected;
-
-  /// Callback when back ID image is selected.
-  final ValueChanged<String?>? onBackIdSelected;
-
-  const LegalRepresentativeSectionV2({
-    super.key,
-    this.onFrontIdSelected,
-    this.onBackIdSelected,
-  });
+  const LegalRepresentativeSectionV2({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -107,9 +102,26 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
                       context,
                       fieldKey: 'representative_phone',
                       label: 'Phone Number',
-                      hintText: '+1 (555) 000-0000',
+                      hintText: '0912345678',
                       isRequired: true,
                       keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.toString().isEmpty) {
+                          return 'Phone number is required';
+                        }
+                        // Vietnamese phone number pattern
+                        final phoneRegex = RegExp(
+                          r'^(\+84|84|0)(3|5|7|8|9)[0-9]{8}$',
+                        );
+                        final phone = value.toString().replaceAll(
+                          RegExp(r'[\s\-()]'),
+                          '',
+                        );
+                        if (!phoneRegex.hasMatch(phone)) {
+                          return 'Please enter a valid Vietnamese phone number';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   AppDimens.horizontalMedium,
@@ -137,9 +149,26 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
                   context,
                   fieldKey: 'representative_phone',
                   label: 'Phone Number',
-                  hintText: '+1 (555) 000-0000',
+                  hintText: '0912345678',
                   isRequired: true,
                   keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.toString().isEmpty) {
+                      return 'Phone number is required';
+                    }
+                    // Vietnamese phone number pattern
+                    final phoneRegex = RegExp(
+                      r'^(\+84|84|0)(3|5|7|8|9)[0-9]{8}$',
+                    );
+                    final phone = value.toString().replaceAll(
+                      RegExp(r'[\s\-()]'),
+                      '',
+                    );
+                    if (!phoneRegex.hasMatch(phone)) {
+                      return 'Please enter a valid Vietnamese phone number';
+                    }
+                    return null;
+                  },
                 ),
                 AppDimens.verticalMedium,
                 FormFieldBuilders.buildDropdownField(
@@ -169,8 +198,25 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
                       context,
                       fieldKey: 'id_number',
                       label: 'ID Number',
-                      hintText: 'Enter ID number',
+                      hintText: 'Enter ID number (9 or 12 digits)',
                       isRequired: true,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.toString().isEmpty) {
+                          return 'ID number is required';
+                        }
+                        final idNumber = value.toString().replaceAll(
+                          RegExp(r'\s'),
+                          '',
+                        );
+                        if (idNumber.length != 9 && idNumber.length != 12) {
+                          return 'ID number must be 9 or 12 digits';
+                        }
+                        if (!RegExp(r'^[0-9]+$').hasMatch(idNumber)) {
+                          return 'ID number must contain only digits';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   AppDimens.horizontalMedium,
@@ -192,8 +238,25 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
                   context,
                   fieldKey: 'id_number',
                   label: 'ID Number',
-                  hintText: 'Enter ID number',
+                  hintText: 'Enter ID number (9 or 12 digits)',
                   isRequired: true,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.toString().isEmpty) {
+                      return 'ID number is required';
+                    }
+                    final idNumber = value.toString().replaceAll(
+                      RegExp(r'\s'),
+                      '',
+                    );
+                    if (idNumber.length != 9 && idNumber.length != 12) {
+                      return 'ID number must be 9 or 12 digits';
+                    }
+                    if (!RegExp(r'^[0-9]+$').hasMatch(idNumber)) {
+                      return 'ID number must contain only digits';
+                    }
+                    return null;
+                  },
                 ),
                 AppDimens.verticalMedium,
                 FormFieldBuilders.buildDateField(
@@ -219,27 +282,30 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
         ),
         AppDimens.verticalMedium,
 
-        // ID Upload fields
+        // ID Upload fields using FormBuilderField with documents.* pattern
         LayoutBuilder(
           builder: (context, constraints) {
             final isWide = constraints.maxWidth > 600;
 
             if (isWide) {
               return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: _IdUploadCard(
-                      label: 'Front Side',
+                    child: _IdUploadField(
+                      documentKey: DocumentTypes.idCardFront.documentKey,
+                      label: DocumentTypes.idCardFront.label,
                       icon: Icons.credit_card_outlined,
-                      onFileSelected: onFrontIdSelected,
+                      isRequired: true,
                     ),
                   ),
                   AppDimens.horizontalMedium,
                   Expanded(
-                    child: _IdUploadCard(
-                      label: 'Back Side',
+                    child: _IdUploadField(
+                      documentKey: DocumentTypes.idCardBack.documentKey,
+                      label: DocumentTypes.idCardBack.label,
                       icon: Icons.badge_outlined,
-                      onFileSelected: onBackIdSelected,
+                      isRequired: true,
                     ),
                   ),
                 ],
@@ -248,16 +314,18 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
 
             return Column(
               children: [
-                _IdUploadCard(
-                  label: 'Front Side',
+                _IdUploadField(
+                  documentKey: DocumentTypes.idCardFront.documentKey,
+                  label: DocumentTypes.idCardFront.label,
                   icon: Icons.credit_card_outlined,
-                  onFileSelected: onFrontIdSelected,
+                  isRequired: true,
                 ),
                 AppDimens.verticalMedium,
-                _IdUploadCard(
-                  label: 'Back Side',
+                _IdUploadField(
+                  documentKey: DocumentTypes.idCardBack.documentKey,
+                  label: DocumentTypes.idCardBack.label,
                   icon: Icons.badge_outlined,
-                  onFileSelected: onBackIdSelected,
+                  isRequired: true,
                 ),
               ],
             );
@@ -268,26 +336,113 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
   }
 }
 
-/// ID upload card widget matching the HTML design.
-class _IdUploadCard extends ConsumerStatefulWidget {
+// ============================================================================
+// ID Upload Field with FormBuilder Integration
+// ============================================================================
+
+/// Single ID image upload field with FormBuilder integration.
+///
+/// The form value is stored as a [DocumentUploadType] to integrate with
+/// the form's document collection pattern using the documents.* key prefix.
+class _IdUploadField extends StatelessWidget {
+  const _IdUploadField({
+    required this.documentKey,
+    required this.label,
+    required this.icon,
+    required this.isRequired,
+  });
+
+  final String documentKey;
   final String label;
   final IconData icon;
-  final ValueChanged<String?>? onFileSelected;
+  final bool isRequired;
 
-  const _IdUploadCard({
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              label,
+              style: textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            if (isRequired)
+              Text(
+                ' *',
+                style: textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.error,
+                ),
+              ),
+          ],
+        ),
+        AppDimens.verticalSmall,
+        FormBuilderField<DocumentUploadType?>(
+          name: 'documents.$documentKey',
+          validator: isRequired
+              ? (value) =>
+                    (value == null || value.url.isEmpty) ? 'Required' : null
+              : null,
+          builder: (FormFieldState<DocumentUploadType?> field) {
+            return _IdUploadArea(
+              documentKey: documentKey,
+              label: label,
+              icon: icon,
+              initialValue: field.value,
+              errorText: field.errorText,
+              onFileSelected: (file) => field.didChange(file),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+/// ID image upload area with image preview support.
+///
+/// When a file is uploaded, this widget calls [onFileSelected] with a
+/// [DocumentUploadType] containing the S3 key and file metadata.
+class _IdUploadArea extends ConsumerStatefulWidget {
+  const _IdUploadArea({
+    required this.documentKey,
     required this.label,
     required this.icon,
     this.onFileSelected,
+    this.initialValue,
+    this.errorText,
   });
 
+  final String documentKey;
+  final String label;
+  final IconData icon;
+  final ValueChanged<DocumentUploadType?>? onFileSelected;
+  final DocumentUploadType? initialValue;
+  final String? errorText;
+
   @override
-  ConsumerState<_IdUploadCard> createState() => _IdUploadCardState();
+  ConsumerState<_IdUploadArea> createState() => _IdUploadAreaState();
 }
 
-class _IdUploadCardState extends ConsumerState<_IdUploadCard> {
+class _IdUploadAreaState extends ConsumerState<_IdUploadArea> {
   bool _isHovering = false;
   bool _isUploading = false;
   Uint8List? _uploadedImageBytes;
+
+  @override
+  void initState() {
+    super.initState();
+    // Note: We can't load image bytes from URL in initState for existing values
+    // The preview will only show for newly uploaded images
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -299,34 +454,55 @@ class _IdUploadCardState extends ConsumerState<_IdUploadCard> {
       return _buildPreviewState(colorScheme);
     }
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
-      child: GestureDetector(
-        onTap: _isUploading ? null : _pickFile,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          height: 180,
-          decoration: BoxDecoration(
-            color: _isHovering
-                ? colorScheme.primary.withValues(alpha: 0.05)
-                : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-            borderRadius: AppDimens.radiusMediumSmall,
-            border: Border.all(
-              color: _isHovering
-                  ? colorScheme.primary
-                  : colorScheme.outline.withValues(alpha: 0.3),
-              width: 2,
+    // Show uploaded file indicator if we have initial value but no bytes
+    if (widget.initialValue != null) {
+      return _buildUploadedIndicator(colorScheme, textTheme);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => setState(() => _isHovering = true),
+          onExit: (_) => setState(() => _isHovering = false),
+          child: GestureDetector(
+            onTap: _isUploading ? null : _pickFile,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 180,
+              decoration: BoxDecoration(
+                color: _isHovering
+                    ? colorScheme.primary.withValues(alpha: 0.05)
+                    : colorScheme.surfaceContainerHighest.withValues(
+                        alpha: 0.3,
+                      ),
+                borderRadius: AppDimens.radiusMediumSmall,
+                border: Border.all(
+                  color: widget.errorText != null
+                      ? colorScheme.error
+                      : _isHovering
+                      ? colorScheme.primary
+                      : colorScheme.outline.withValues(alpha: 0.3),
+                  width: 2,
+                ),
+              ),
+              child: Center(
+                child: _isUploading
+                    ? _buildUploadingState(colorScheme, textTheme)
+                    : _buildDefaultState(colorScheme, textTheme),
+              ),
             ),
           ),
-          child: Center(
-            child: _isUploading
-                ? _buildUploadingState(colorScheme, textTheme)
-                : _buildDefaultState(colorScheme, textTheme),
-          ),
         ),
-      ),
+        if (widget.errorText != null) ...[
+          AppDimens.verticalExtraSmall,
+          Text(
+            widget.errorText!,
+            style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+          ),
+        ],
+      ],
     );
   }
 
@@ -403,6 +579,69 @@ class _IdUploadCardState extends ConsumerState<_IdUploadCard> {
     );
   }
 
+  /// Builds an indicator for when we have an initial value but no image bytes.
+  Widget _buildUploadedIndicator(ColorScheme colorScheme, TextTheme textTheme) {
+    return Container(
+      height: 180,
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+        borderRadius: AppDimens.radiusMediumSmall,
+        border: Border.all(
+          color: colorScheme.primary.withValues(alpha: 0.5),
+          width: 2,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  size: 40,
+                  color: colorScheme.primary,
+                ),
+                AppDimens.verticalSmall,
+                Text(
+                  widget.label,
+                  style: textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                AppDimens.verticalExtraSmall,
+                Text(
+                  'Image uploaded',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Remove button at top right
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Material(
+              color: colorScheme.error.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: _removeImage,
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Icon(Icons.close, size: 18, color: colorScheme.error),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPreviewState(ColorScheme colorScheme) {
     return Stack(
       children: [
@@ -437,7 +676,11 @@ class _IdUploadCardState extends ConsumerState<_IdUploadCard> {
           bottom: 12,
           child: Row(
             children: [
-              Icon(Icons.check_circle, size: 16, color: Colors.greenAccent),
+              const Icon(
+                Icons.check_circle,
+                size: 16,
+                color: Colors.greenAccent,
+              ),
               AppDimens.horizontalExtraSmall,
               Text(
                 widget.label,
@@ -512,19 +755,40 @@ class _IdUploadCardState extends ConsumerState<_IdUploadCard> {
         pickedFile.path!,
         name: pickedFile.name,
         bytes: pickedFile.bytes,
-        mimeType: _getMimeType(pickedFile.name),
+        mimeType: FileTypeUtils.getMimeType(pickedFile.name),
       );
 
       // Upload to S3
       final s3Service = ref.read(s3ServiceProvider);
       final key = await s3Service.uploadFile(xFile);
 
+      if (key == null) {
+        if (mounted) {
+          setState(() => _isUploading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Upload failed: No key returned'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
       if (mounted) {
         setState(() {
           _isUploading = false;
           _uploadedImageBytes = pickedFile.bytes;
         });
-        widget.onFileSelected?.call(key);
+
+        // Create DocumentUploadType with file info
+        final extension = pickedFile.name.split('.').last.toLowerCase();
+        final documentUpload = DocumentUploadType(
+          type: extension,
+          key: key,
+          documentKey: widget.documentKey,
+        );
+        widget.onFileSelected?.call(documentUpload);
       }
     } catch (e) {
       developer.log('Error picking/uploading ID image: $e', name: 'IdUpload');
@@ -537,19 +801,6 @@ class _IdUploadCardState extends ConsumerState<_IdUploadCard> {
           ),
         );
       }
-    }
-  }
-
-  String _getMimeType(String fileName) {
-    final extension = fileName.split('.').last.toLowerCase();
-    switch (extension) {
-      case 'jpg':
-      case 'jpeg':
-        return 'image/jpeg';
-      case 'png':
-        return 'image/png';
-      default:
-        return 'application/octet-stream';
     }
   }
 }

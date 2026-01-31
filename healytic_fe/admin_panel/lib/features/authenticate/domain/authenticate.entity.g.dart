@@ -22,6 +22,8 @@ _SignInResponseEntity _$SignInResponseEntityFromJson(
   accessToken: json['accessToken'] as String,
   refreshToken: json['refreshToken'] as String,
   role: json['role'] as String,
+  verificationStatus: json['verificationStatus'] as String?,
+  verificationCompletedAt: json['verificationCompletedAt'] as String?,
 );
 
 Map<String, dynamic> _$SignInResponseEntityToJson(
@@ -30,6 +32,8 @@ Map<String, dynamic> _$SignInResponseEntityToJson(
   'accessToken': instance.accessToken,
   'refreshToken': instance.refreshToken,
   'role': instance.role,
+  'verificationStatus': instance.verificationStatus,
+  'verificationCompletedAt': instance.verificationCompletedAt,
 };
 
 _SendOtpResponseEntity _$SendOtpResponseEntityFromJson(
@@ -104,18 +108,6 @@ Map<String, dynamic> _$PartnerRequestEntityToJson(
   'phoneNumber': instance.phoneNumber,
 };
 
-_IdImagesEntity _$IdImagesEntityFromJson(Map<String, dynamic> json) =>
-    _IdImagesEntity(
-      frontImgUrl: json['frontImgUrl'] as String,
-      backImgUrl: json['backImgUrl'] as String,
-    );
-
-Map<String, dynamic> _$IdImagesEntityToJson(_IdImagesEntity instance) =>
-    <String, dynamic>{
-      'frontImgUrl': instance.frontImgUrl,
-      'backImgUrl': instance.backImgUrl,
-    };
-
 _AuthorizationEntity _$AuthorizationEntityFromJson(Map<String, dynamic> json) =>
     _AuthorizationEntity(
       isAuthorizedUser: json['isAuthorizedUser'] as bool,
@@ -132,23 +124,21 @@ Map<String, dynamic> _$AuthorizationEntityToJson(
 _PartnerDocumentVerificationEntity _$PartnerDocumentVerificationEntityFromJson(
   Map<String, dynamic> json,
 ) => _PartnerDocumentVerificationEntity(
-  businessLicenseUrl: json['businessLicenseUrl'] as String?,
-  authorizationLetterUrl: json['authorizationLetterUrl'] as String?,
-  taxCertificateUrl: json['taxCertificateUrl'] as String?,
-  otherDocumentUrls:
-      (json['otherDocumentUrls'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList() ??
+  fileType: json['fileType'] as String,
+  type: json['type'] as String,
+  documentKey: json['documentKey'] as String,
+  urls:
+      (json['urls'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
 );
 
 Map<String, dynamic> _$PartnerDocumentVerificationEntityToJson(
   _PartnerDocumentVerificationEntity instance,
 ) => <String, dynamic>{
-  'businessLicenseUrl': instance.businessLicenseUrl,
-  'authorizationLetterUrl': instance.authorizationLetterUrl,
-  'taxCertificateUrl': instance.taxCertificateUrl,
-  'otherDocumentUrls': instance.otherDocumentUrls,
+  'fileType': instance.fileType,
+  'type': instance.type,
+  'documentKey': instance.documentKey,
+  'urls': instance.urls,
 };
 
 _LegalRepresentativeEntity _$LegalRepresentativeEntityFromJson(
@@ -160,10 +150,15 @@ _LegalRepresentativeEntity _$LegalRepresentativeEntityFromJson(
   idType: json['idType'] as String,
   idNumber: json['idNumber'] as String,
   idIssueDate: json['idIssueDate'] as String,
-  images: IdImagesEntity.fromJson(json['images'] as Map<String, dynamic>),
-  documents: PartnerDocumentVerificationEntity.fromJson(
-    json['documents'] as Map<String, dynamic>,
-  ),
+  documents:
+      (json['documents'] as List<dynamic>?)
+          ?.map(
+            (e) => PartnerDocumentVerificationEntity.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$LegalRepresentativeEntityToJson(
@@ -175,8 +170,7 @@ Map<String, dynamic> _$LegalRepresentativeEntityToJson(
   'idType': instance.idType,
   'idNumber': instance.idNumber,
   'idIssueDate': instance.idIssueDate,
-  'images': instance.images.toJson(),
-  'documents': instance.documents.toJson(),
+  'documents': instance.documents.map((e) => e.toJson()).toList(),
 };
 
 _RegisterPartnerRequestEntity _$RegisterPartnerRequestEntityFromJson(

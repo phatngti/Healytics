@@ -9,19 +9,13 @@ import 'package:user_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | 
-**email** | **String** |  | 
-**taxCode** | **String** |  | 
-**legalName** | **String** |  | 
-**brandName** | **String** |  | 
-**businessType** | **String** |  | 
-**phoneNumber** | [**Object**](.md) |  | 
-**address** | [**AddressDto**](AddressDto.md) |  | 
-**verificationStatus** | **String** |  | 
-**verificationCompletedAt** | [**Object**](.md) |  | 
-**createdAt** | [**DateTime**](DateTime.md) |  | 
-**legalRepresentative** | [**AdminLegalRepresentativeDto**](AdminLegalRepresentativeDto.md) |  | 
-**documents** | [**List<PartnerDocumentDto>**](PartnerDocumentDto.md) |  | [default to const []]
-**rejectionDetails** | [**Object**](.md) | Field-level rejection details | 
+**businessInfo** | [**BusinessInfoDto**](BusinessInfoDto.md) |  | 
+**legalRepresentative** | [**LegalRepresentativeDto**](LegalRepresentativeDto.md) |  | [optional] 
+**kycDocuments** | [**List<VerifiedField>**](VerifiedField.md) |  | [default to const []]
+**status** | **String** |  | 
+**priority** | **String** |  | 
+**submittedAt** | [**DateTime**](DateTime.md) |  | 
+**reviewNote** | **String** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

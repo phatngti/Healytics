@@ -5,14 +5,65 @@ import {
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
+    DeleteDateColumn,
     JoinColumn,
+    Index,
 } from 'typeorm';
-import { DocumentType } from '../enum/document-type.enum';
 import { Partner } from './partner.entity';
 
 /**
+ * Partner document statuses (stored as text in DB)
+ */
+export const PartnerDocumentStatuses = {
+    PENDING: 'pending',
+    ACCEPTED: 'accepted',
+    REJECTED: 'rejected',
+} as const;
+
+export type PartnerDocumentStatus = typeof PartnerDocumentStatuses[keyof typeof PartnerDocumentStatuses];
+
+/**
+ * Document file types (stored as text in DB)
+ */
+export const DocumentFileTypes = {
+    IMAGE: 'image',
+    PDF: 'pdf',
+    TXT: 'txt',
+    DOC: 'doc',
+    OTHER: 'other',
+} as const;
+
+export type DocumentFileType = typeof DocumentFileTypes[keyof typeof DocumentFileTypes];
+
+/**
+ * Document types/categories (stored as text in DB)
+ * e.g., IDENTITY_FRONT, BUSINESS_LICENSE, etc.
+ */
+export const DocumentTypes = {
+    IDENTITY_FRONT: 'IDENTITY_FRONT',
+    IDENTITY_BACK: 'IDENTITY_BACK',
+    BUSINESS_LICENSE: 'BUSINESS_LICENSE',
+    AUTHORIZATION_LETTER: 'AUTHORIZATION_LETTER',
+    ANTT: 'ANTT',
+    KCB_LICENSE: 'KCB_LICENSE',
+    GCN_FITNESS: 'GCN_FITNESS',
+    GPP: 'GPP',
+    RHM_LICENSE: 'RHM_LICENSE',
+    MEDICAL_WASTE_CONTRACT: 'MEDICAL_WASTE_CONTRACT',
+    YHCT_LICENSE: 'YHCT_LICENSE',
+    PSYCHOLOGY_LICENSE: 'PSYCHOLOGY_LICENSE',
+    DERMATOLOGY_LICENSE: 'DERMATOLOGY_LICENSE',
+    TECHNICAL_PORTFOLIO: 'TECHNICAL_PORTFOLIO',
+    NUTRITION_LICENSE: 'NUTRITION_LICENSE',
+    PSYCHIATRY_LICENSE: 'PSYCHIATRY_LICENSE',
+    OTHER_DOCUMENTS: 'OTHER_DOCUMENTS',
+} as const;
+
+export type DocumentTypeValue = typeof DocumentTypes[keyof typeof DocumentTypes];
+
+/**
  * Tracks documents uploaded by partners for verification.
- * Uses two separate flags to track review and validity status.
+ * Uses TEXT columns for type and status for flexibility.
  */
 @Entity('partner_document')
 export class PartnerDocument {
@@ -20,54 +71,39 @@ export class PartnerDocument {
     id: string;
 
     @Column({ name: 'partner_id' })
+    @Index('IDX_partner_document_partner_id')
     partnerId: string;
 
     @ManyToOne(() => Partner, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'partner_id' })
     partner: Partner;
 
-    @Column({
-        type: 'enum',
-        enum: DocumentType,
-    })
-    documentType: DocumentType;
+    /** Storage key (R2/S3 path) */
+    @Column({ name: 'document_key', type: 'text' })
+    documentKey: string;
 
-    // URL is always present for registration documents
-    @Column({ name: 'document_url', type: 'text', nullable: true })
-    documentUrl: string | null;
+    /** Public URL to access the document */
+    @Column({ name: 'file_url', type: 'text', nullable: true })
+    fileUrl: string | null;
 
-    // R2/S3 key for uploaded documents
-    @Column({ name: 'document_key', type: 'text', nullable: true })
-    documentKey: string | null;
+    /** Document category: IDENTITY_FRONT, BUSINESS_LICENSE, etc. */
+    @Column({ name: 'type', type: 'text' })
+    type: DocumentTypeValue;
 
-    // --- Separate Review and Validity Status ---
+    /** File type: image, pdf, txt, etc. */
+    @Column({ name: 'file_type', type: 'text', default: DocumentFileTypes.IMAGE })
+    fileType: DocumentFileType;
 
-    /** Indicates if this document has been reviewed by an admin */
-    @Column({ name: 'is_reviewed', default: false })
-    isReviewed: boolean;
+    /** Document status: pending, accepted, rejected */
+    @Column({ type: 'text', default: PartnerDocumentStatuses.PENDING })
+    status: PartnerDocumentStatus;
 
-    /** Indicates if this document is valid (optimistic: true by default until admin marks invalid) */
-    @Column({ name: 'is_valid', default: true })
-    isValid: boolean;
+    @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+    createdAt: Date;
 
-    // -------------------------------------------
-
-    @Column({ type: 'text', nullable: true, name: 'verification_notes' })
-    verificationNotes: string | null;
-
-    @Column({ type: 'text', nullable: true, name: 'admin_feedback' })
-    adminFeedback: string | null;
-
-    @Column({
-        type: 'uuid',
-        name: 'verified_by',
-        nullable: true,
-    })
-    verifiedBy: string | null;
-
-    @CreateDateColumn({ name: 'uploaded_at' })
-    uploadedAt: Date;
-
-    @UpdateDateColumn({ name: 'updated_at' })
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
     updatedAt: Date;
+
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz' })
+    deletedAt: Date | null;
 }

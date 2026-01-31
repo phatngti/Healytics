@@ -19,8 +19,7 @@ class UpdateLegalRepresentativeDto {
     this.idType,
     this.idNumber,
     this.idIssueDate,
-    this.images,
-    this.documents,
+    this.documents = const [],
   });
 
   /// Full name of legal representative
@@ -71,21 +70,7 @@ class UpdateLegalRepresentativeDto {
   ///
   String? idIssueDate;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  IdImagesRequestDto? images;
-
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  PartnerDocumentVerificationDto? documents;
+  List<PartnerDocumentVerificationDto> documents;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is UpdateLegalRepresentativeDto &&
@@ -95,8 +80,7 @@ class UpdateLegalRepresentativeDto {
     other.idType == idType &&
     other.idNumber == idNumber &&
     other.idIssueDate == idIssueDate &&
-    other.images == images &&
-    other.documents == documents;
+    _deepEquality.equals(other.documents, documents);
 
   @override
   int get hashCode =>
@@ -107,11 +91,10 @@ class UpdateLegalRepresentativeDto {
     (idType == null ? 0 : idType!.hashCode) +
     (idNumber == null ? 0 : idNumber!.hashCode) +
     (idIssueDate == null ? 0 : idIssueDate!.hashCode) +
-    (images == null ? 0 : images!.hashCode) +
-    (documents == null ? 0 : documents!.hashCode);
+    (documents.hashCode);
 
   @override
-  String toString() => 'UpdateLegalRepresentativeDto[fullName=$fullName, position=$position, phoneNumber=$phoneNumber, idType=$idType, idNumber=$idNumber, idIssueDate=$idIssueDate, images=$images, documents=$documents]';
+  String toString() => 'UpdateLegalRepresentativeDto[fullName=$fullName, position=$position, phoneNumber=$phoneNumber, idType=$idType, idNumber=$idNumber, idIssueDate=$idIssueDate, documents=$documents]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -145,16 +128,7 @@ class UpdateLegalRepresentativeDto {
     } else {
       json[r'idIssueDate'] = null;
     }
-    if (this.images != null) {
-      json[r'images'] = this.images;
-    } else {
-      json[r'images'] = null;
-    }
-    if (this.documents != null) {
       json[r'documents'] = this.documents;
-    } else {
-      json[r'documents'] = null;
-    }
     return json;
   }
 
@@ -183,8 +157,7 @@ class UpdateLegalRepresentativeDto {
         idType: UpdateLegalRepresentativeDtoIdTypeEnum.fromJson(json[r'idType']),
         idNumber: mapValueOfType<String>(json, r'idNumber'),
         idIssueDate: mapValueOfType<String>(json, r'idIssueDate'),
-        images: IdImagesRequestDto.fromJson(json[r'images']),
-        documents: PartnerDocumentVerificationDto.fromJson(json[r'documents']),
+        documents: PartnerDocumentVerificationDto.listFromJson(json[r'documents']),
       );
     }
     return null;

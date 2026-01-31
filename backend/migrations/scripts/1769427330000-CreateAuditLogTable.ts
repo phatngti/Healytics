@@ -38,10 +38,10 @@ export class CreateAuditLogTable1769427330000 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        // Drop in reverse order: Indexes -> Table
-        await queryRunner.dropIndex("audit_log", "IDX_AUDIT_LOG_CREATED_AT");
-        await queryRunner.dropIndex("audit_log", "IDX_AUDIT_LOG_TARGET");
-        await queryRunner.dropIndex("audit_log", "IDX_AUDIT_LOG_ACTOR_ID");
-        await queryRunner.dropTable("audit_log", true); // true = IF EXISTS
+        // Drop in reverse order: Indexes -> Table (all with IF EXISTS for safe rollback)
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_AUDIT_LOG_CREATED_AT"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_AUDIT_LOG_TARGET"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_AUDIT_LOG_ACTOR_ID"`);
+        await queryRunner.dropTable("audit_log", true);
     }
 }
