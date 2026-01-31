@@ -171,6 +171,7 @@ class MyProfileResponseDtoVerificationStatusEnum {
 
   String toJson() => value;
 
+  static const ONBOARDING = MyProfileResponseDtoVerificationStatusEnum._(r'ONBOARDING');
   static const PENDING = MyProfileResponseDtoVerificationStatusEnum._(r'PENDING');
   static const APPROVED = MyProfileResponseDtoVerificationStatusEnum._(r'APPROVED');
   static const REJECTED = MyProfileResponseDtoVerificationStatusEnum._(r'REJECTED');
@@ -178,6 +179,7 @@ class MyProfileResponseDtoVerificationStatusEnum {
 
   /// List of all possible values in this [enum][MyProfileResponseDtoVerificationStatusEnum].
   static const values = <MyProfileResponseDtoVerificationStatusEnum>[
+    ONBOARDING,
     PENDING,
     APPROVED,
     REJECTED,
@@ -220,6 +222,7 @@ class MyProfileResponseDtoVerificationStatusEnumTypeTransformer {
   MyProfileResponseDtoVerificationStatusEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
+        case r'ONBOARDING': return MyProfileResponseDtoVerificationStatusEnum.ONBOARDING;
         case r'PENDING': return MyProfileResponseDtoVerificationStatusEnum.PENDING;
         case r'APPROVED': return MyProfileResponseDtoVerificationStatusEnum.APPROVED;
         case r'REJECTED': return MyProfileResponseDtoVerificationStatusEnum.REJECTED;

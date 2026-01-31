@@ -33,42 +33,28 @@ export class VerificationOptionalStringFieldDto {
     @ApiPropertyOptional({ example: '+1 (555) 000-0000', nullable: true })
     value: string | null;
 
-    @ApiProperty({ example: 'Giám đốc' })
-    position: string;
+    @ApiPropertyOptional({ example: '+1 (555) 000-0000', nullable: true })
+    displayValue: string | null;
 
-    @ApiProperty({ example: 'CITIZEN_ID' })
-    idType: string;
+    @ApiProperty({ example: false, description: 'Whether this field requires update' })
+    requiresUpdate: boolean;
 
-    @ApiProperty({ example: '001234567890' })
-    idNumber: string;
+    @ApiPropertyOptional({ example: 'Phone number mismatch with tax document.', nullable: true })
+    adminFeedback?: string | null;
 
-    @ApiProperty({ example: '2023-01-15' })
-    idIssueDate: Date;
-
-    @ApiProperty({ example: 'https://...', nullable: true })
-    idFrontImgUrl: string | null;
-
-    @ApiProperty({ example: 'https://...', nullable: true })
-    idBackImgUrl: string | null;
-
-    @ApiProperty({ example: true })
-    isAuthorizedUser: boolean;
-
-    @ApiProperty({ example: 'https://...', nullable: true })
-    authLetterDocUrl: string | null;
-
-    @ApiProperty({ example: '0901234567', nullable: true })
-    phoneNumber: string | null;
+    @ApiPropertyOptional({ example: true, nullable: true, description: 'Whether this field was verified by admin (from partner_review_log)' })
+    isVerified?: boolean | null;
 }
 
 import { PartnerDocumentStatus } from '@/partners/enum/partner-document-status.enum';
+import { DocumentTypeValue } from '@/partners/entities/partner-document.entity';
 
 export class PartnerDocumentDto {
     @ApiProperty({ example: 'uuid-123', nullable: true })
     id: string | null;
 
-    @ApiProperty({ enum: DocumentType })
-    documentType: DocumentType;
+    @ApiProperty({ example: 'BUSINESS_LICENSE' })
+    documentType: DocumentTypeValue;
 
     @ApiProperty({ example: 'https://...', nullable: true })
     documentUrl: string | null;

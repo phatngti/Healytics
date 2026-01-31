@@ -80,7 +80,7 @@ import 'package:user_openapi/api.dart';
 final api_instance = AdminPartnersApi();
 final page = 1; // num | Page number
 final limit = 10; // num | Items per page
-final verificationStatus = PENDING; // String | Filter by verification status (PENDING, APPROVED, REJECTED)
+final verificationStatus = PENDING; // String | Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED)
 final search = spa; // String | Search by tax code, brand name, legal name, or email
 
 try {
@@ -97,7 +97,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **page** | **num**| Page number | [optional] [default to 1]
  **limit** | **num**| Items per page | [optional] [default to 10]
- **verificationStatus** | **String**| Filter by verification status (PENDING, APPROVED, REJECTED) | [optional] 
+ **verificationStatus** | **String**| Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED) | [optional] 
  **search** | **String**| Search by tax code, brand name, legal name, or email | [optional] 
 
 ### Return type
