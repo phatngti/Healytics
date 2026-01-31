@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **value** | [**Object**](.md) |  | [optional] 
 **displayValue** | [**Object**](.md) |  | [optional] 
-**requiresUpdate** | **bool** |  | 
+**requiresUpdate** | **bool** | Whether this field requires update | 
 **adminFeedback** | [**Object**](.md) |  | [optional] 
 **isVerified** | [**Object**](.md) | Whether this field was verified by admin (from partner_review_log) | [optional] 
 

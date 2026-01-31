@@ -24,6 +24,7 @@ class VerificationOptionalStringFieldDto {
 
   Object? displayValue;
 
+  /// Whether this field requires update
   bool requiresUpdate;
 
   Object? adminFeedback;

@@ -53,17 +53,29 @@ export class KycDocumentDto {
     @ApiProperty({ example: 'uuid-123' })
     id: string;
 
-    static fromEntity(rep: LegalRepresentative): AdminLegalRepresentativeDto {
-        const dto = new AdminLegalRepresentativeDto();
-        dto.id = rep.id;
-        dto.fullName = rep.fullName;
-        dto.position = rep.position;
-        dto.idType = rep.idType as unknown as string; // Casting if enum mismatch in DTO
-        dto.idNumber = rep.idNumber;
-        dto.idIssueDate = rep.idIssueDate;
-        dto.idFrontImgUrl = rep.idFrontImgUrl;
-        dto.idBackImgUrl = rep.idBackImgUrl;
-        dto.phoneNumber = rep.phoneNumber;
+    @ApiProperty({ example: 'documents/business-license.pdf' })
+    documentKey: string;
+
+    @ApiPropertyOptional({ example: 'https://example.com/doc.pdf', nullable: true })
+    fileUrl?: string | null;
+
+    @ApiProperty({ example: 'BUSINESS_LICENSE' })
+    type: string;
+
+    @ApiProperty({ example: 'pdf' })
+    fileType: string;
+
+    @ApiProperty({ example: 'pending' })
+    status: string;
+
+    static fromEntity(doc: PartnerDocument): KycDocumentDto {
+        const dto = new KycDocumentDto();
+        dto.id = doc.id;
+        dto.documentKey = doc.documentKey;
+        dto.fileUrl = doc.fileUrl;
+        dto.type = doc.type;
+        dto.fileType = doc.fileType;
+        dto.status = doc.status;
         return dto;
     }
 }
