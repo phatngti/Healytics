@@ -362,16 +362,67 @@ export class PartnersService {
                 ),
             },
             legalRepresentative: {
-                fullName: partner.legalRepresentative.fullName,
-                position: partner.legalRepresentative.position,
-                idType: partner.legalRepresentative.idType,
-                idNumber: partner.legalRepresentative.idNumber,
-                idIssueDate: partner.legalRepresentative.idIssueDate,
-                idFrontImgUrl: partner.legalRepresentative.idFrontImgUrl,
-                idBackImgUrl: partner.legalRepresentative.idBackImgUrl,
-                isAuthorizedUser: partner.legalRepresentative.isAuthorizedUser,
-                authLetterDocUrl: partner.legalRepresentative.authLetterDocUrl,
-                phoneNumber: partner.legalRepresentative.phoneNumber,
+                fullName: createStringField(
+                    legalRep.fullName,
+                    legalRep.fullName,
+                    'legalRep.fullName',
+                ),
+                position: createStringField(
+                    legalRep.position,
+                    legalRep.position,
+                    'legalRep.position',
+                ),
+                phoneNumber: createOptionalStringField(
+                    legalRep.phoneNumber,
+                    legalRep.phoneNumber,
+                    'legalRep.phoneNumber',
+                ),
+                idType: createStringField(
+                    legalRep.idType,
+                    idTypeLabels[legalRep.idType] || legalRep.idType,
+                    'legalRep.idType',
+                ),
+                idNumber: createStringField(
+                    legalRep.idNumber,
+                    legalRep.idNumber,
+                    'legalRep.idNumber',
+                ),
+                idIssueDate: createStringField(
+                    legalRep.idIssueDate instanceof Date
+                        ? legalRep.idIssueDate.toISOString().split('T')[0]
+                        : String(legalRep.idIssueDate),
+                    legalRep.idIssueDate instanceof Date
+                        ? legalRep.idIssueDate.toLocaleDateString('vi-VN')
+                        : String(legalRep.idIssueDate),
+                    'legalRep.idIssueDate',
+                ),
+                idFrontImage: createDocumentFromPartnerDoc(
+                    documents.find(d => d.type === DocumentTypes.IDENTITY_FRONT),
+                    'id_front',
+                    'Mặt trước CCCD/CMND',
+                    'legalRep.idFrontImage',
+                ),
+                idBackImage: createDocumentFromPartnerDoc(
+                    documents.find(d => d.type === DocumentTypes.IDENTITY_BACK),
+                    'id_back',
+                    'Mặt sau CCCD/CMND',
+                    'legalRep.idBackImage',
+                ),
+                documents: {
+                    businessLicense: createDocumentFromPartnerDoc(
+                        documents.find(d => d.type === DocumentTypes.BUSINESS_LICENSE),
+                        'business_license',
+                        'Giấy phép kinh doanh',
+                        'legalRep.businessLicense',
+                    ) ?? null,
+                    authorizationLetter: createDocumentFromPartnerDoc(
+                        documents.find(d => d.type === DocumentTypes.AUTHORIZATION_LETTER),
+                        'authorization_letter',
+                        'Giấy ủy quyền',
+                        'legalRep.authorizationLetter',
+                    ) ?? null,
+                    taxCertificate: null,
+                },
             },
             verificationStatus: partner.verificationStatus,
             verificationCompletedAt: partner.verificationCompletedAt,
@@ -530,6 +581,8 @@ export class PartnersService {
 
                 // 3. Logic chuyển đổi trạng thái
                 const isClean = !hasFieldErrors && !hasRejectedDocs;
+                // Check if partner has completed all required fields for verification
+                const isComplete = !!partner.taxCode && !!partner.legalName && !!partner.brandName;
 
                 if (isClean && isComplete) {
                     // Only transition to PENDING if currently ONBOARDING or REQUIRED_RESUBMIT
@@ -674,9 +727,10 @@ export class PartnersService {
                 idType: partner.legalRepresentative.idType,
                 idNumber: partner.legalRepresentative.idNumber,
                 idIssueDate: partner.legalRepresentative.idIssueDate,
-                idFrontImgUrl: partner.legalRepresentative.idFrontImgUrl,
-                idBackImgUrl: partner.legalRepresentative.idBackImgUrl,
-                authLetterDocUrl: partner.legalRepresentative.authLetterDocUrl,
+                idFrontImgUrl: getDocUrl(DocumentTypes.IDENTITY_FRONT),
+                idBackImgUrl: getDocUrl(DocumentTypes.IDENTITY_BACK),
+                businessLicenseUrl: getDocUrl(DocumentTypes.BUSINESS_LICENSE),
+                authLetterDocUrl: getDocUrl(DocumentTypes.AUTHORIZATION_LETTER),
                 phoneNumber: partner.legalRepresentative.phoneNumber,
             },
             verificationStatus: partner.verificationStatus,

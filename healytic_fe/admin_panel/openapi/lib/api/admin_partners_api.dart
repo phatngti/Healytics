@@ -84,7 +84,7 @@ class AdminPartnersApi {
   ///   Items per page
   ///
   /// * [String] verificationStatus:
-  ///   Filter by verification status (PENDING, APPROVED, REJECTED)
+  ///   Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED)
   ///
   /// * [String] search:
   ///   Search by tax code, brand name, legal name, or email
@@ -137,7 +137,7 @@ class AdminPartnersApi {
   ///   Items per page
   ///
   /// * [String] verificationStatus:
-  ///   Filter by verification status (PENDING, APPROVED, REJECTED)
+  ///   Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED)
   ///
   /// * [String] search:
   ///   Search by tax code, brand name, legal name, or email

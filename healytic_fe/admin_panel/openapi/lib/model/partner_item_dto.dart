@@ -277,6 +277,7 @@ class PartnerItemDtoVerificationStatusEnum {
 
   String toJson() => value;
 
+  static const ONBOARDING = PartnerItemDtoVerificationStatusEnum._(r'ONBOARDING');
   static const PENDING = PartnerItemDtoVerificationStatusEnum._(r'PENDING');
   static const APPROVED = PartnerItemDtoVerificationStatusEnum._(r'APPROVED');
   static const REJECTED = PartnerItemDtoVerificationStatusEnum._(r'REJECTED');
@@ -284,6 +285,7 @@ class PartnerItemDtoVerificationStatusEnum {
 
   /// List of all possible values in this [enum][PartnerItemDtoVerificationStatusEnum].
   static const values = <PartnerItemDtoVerificationStatusEnum>[
+    ONBOARDING,
     PENDING,
     APPROVED,
     REJECTED,
@@ -326,6 +328,7 @@ class PartnerItemDtoVerificationStatusEnumTypeTransformer {
   PartnerItemDtoVerificationStatusEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
+        case r'ONBOARDING': return PartnerItemDtoVerificationStatusEnum.ONBOARDING;
         case r'PENDING': return PartnerItemDtoVerificationStatusEnum.PENDING;
         case r'APPROVED': return PartnerItemDtoVerificationStatusEnum.APPROVED;
         case r'REJECTED': return PartnerItemDtoVerificationStatusEnum.REJECTED;

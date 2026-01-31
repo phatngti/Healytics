@@ -2418,7 +2418,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-27T03:01:28.164Z"
+              "submittedAt": "2026-01-31T20:14:45.119Z"
             }
           }
         },
@@ -2516,7 +2516,8 @@
           },
           "requiresUpdate": {
             "type": "boolean",
-            "example": false
+            "example": false,
+            "description": "Whether this field requires update"
           },
           "adminFeedback": {
             "type": "object",
@@ -2584,69 +2585,7 @@
           "streetAddress"
         ]
       },
-      "LegalRepresentativeDto": {
-        "type": "object",
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "example": "NGUYEN VAN A"
-          },
-          "position": {
-            "type": "string",
-            "example": "Giám đốc"
-          },
-          "idType": {
-            "type": "string",
-            "example": "CITIZEN_ID"
-          },
-          "idNumber": {
-            "type": "string",
-            "example": "001234567890"
-          },
-          "idIssueDate": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2023-01-15"
-          },
-          "idFrontImgUrl": {
-            "type": "object",
-            "example": "https://...",
-            "nullable": true
-          },
-          "idBackImgUrl": {
-            "type": "object",
-            "example": "https://...",
-            "nullable": true
-          },
-          "isAuthorizedUser": {
-            "type": "boolean",
-            "example": true
-          },
-          "authLetterDocUrl": {
-            "type": "object",
-            "example": "https://...",
-            "nullable": true
-          },
-          "phoneNumber": {
-            "type": "object",
-            "example": "0901234567",
-            "nullable": true
-          }
-        },
-        "required": [
-          "fullName",
-          "position",
-          "idType",
-          "idNumber",
-          "idIssueDate",
-          "idFrontImgUrl",
-          "idBackImgUrl",
-          "isAuthorizedUser",
-          "authLetterDocUrl",
-          "phoneNumber"
-        ]
-      },
-      "PartnerDocumentDto": {
+      "VerificationDocumentDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4449,74 +4388,7 @@
           "createdAt"
         ]
       },
-      "AdminLegalRepresentativeDto": {
-        "type": "object",
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "example": "NGUYEN VAN A"
-          },
-          "position": {
-            "type": "string",
-            "example": "Giám đốc"
-          },
-          "idType": {
-            "type": "string",
-            "example": "CITIZEN_ID"
-          },
-          "idNumber": {
-            "type": "string",
-            "example": "001234567890"
-          },
-          "idIssueDate": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2023-01-15"
-          },
-          "idFrontImgUrl": {
-            "type": "object",
-            "example": "https://...",
-            "nullable": true
-          },
-          "idBackImgUrl": {
-            "type": "object",
-            "example": "https://...",
-            "nullable": true
-          },
-          "isAuthorizedUser": {
-            "type": "boolean",
-            "example": true
-          },
-          "authLetterDocUrl": {
-            "type": "object",
-            "example": "https://...",
-            "nullable": true
-          },
-          "phoneNumber": {
-            "type": "object",
-            "example": "0901234567",
-            "nullable": true
-          },
-          "id": {
-            "type": "string",
-            "example": "uuid-123"
-          }
-        },
-        "required": [
-          "fullName",
-          "position",
-          "idType",
-          "idNumber",
-          "idIssueDate",
-          "idFrontImgUrl",
-          "idBackImgUrl",
-          "isAuthorizedUser",
-          "authLetterDocUrl",
-          "phoneNumber",
-          "id"
-        ]
-      },
-      "AdminPartnerDetailResponseDto": {
+      "PartnerItemDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4761,6 +4633,7 @@
           "status": {
             "type": "string",
             "enum": [
+              "ONBOARDING",
               "PENDING",
               "APPROVED",
               "REJECTED",
