@@ -3,10 +3,12 @@ import 'package:admin_panel/features/admin/category/presentation/category_home.d
 import 'package:admin_panel/features/admin/dashboard/presentation/admin_dashboard_screen.dart';
 import 'package:admin_panel/features/authenticate/presentation/forgot_password/forgot_password.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_in.dart';
-import 'package:admin_panel/features/authenticate/presentation/sign_up/email_code_verification.dart';
-import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up.dart';
-import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up_form.dart';
+import 'package:admin_panel/features/authenticate/presentation/sign_up/email_code_verification.screen.dart';
+
+import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up_form.screen.dart';
+import 'package:admin_panel/features/authenticate/presentation/sign_up/sucess_registration.screen.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/partner_manager_screen.dart';
+import 'package:admin_panel/features/admin/partner_manager/presentation/review_application.screen.dart';
 import 'package:admin_panel/router/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -56,9 +58,9 @@ class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
       path: 'email-code-verification',
       name: EmailCodeVerificationRoute.name,
     ),
-    TypedGoRoute<SignUpFormRoute>(
-      path: 'sign-up-form',
-      name: SignUpFormRoute.name,
+    TypedGoRoute<SuccessRegistrationRoute>(
+      path: 'success',
+      name: SuccessRegistrationRoute.name,
     ),
   ],
 )
@@ -70,7 +72,7 @@ class SignUpRoute extends GoRouteData with $SignUpRoute {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const SignUpScreen(),
+      child: const SignUpFormScreen(),
     );
   }
 }
@@ -89,15 +91,17 @@ class EmailCodeVerificationRoute extends GoRouteData
   }
 }
 
-class SignUpFormRoute extends GoRouteData with $SignUpFormRoute {
-  const SignUpFormRoute();
-  static const name = "sign-up-form";
+/// Route displayed after successful partner registration.
+class SuccessRegistrationRoute extends GoRouteData
+    with $SuccessRegistrationRoute {
+  const SuccessRegistrationRoute();
+  static const name = 'success-registration';
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const SignUpFormScreen(),
+      child: const SucessRegistrationScreen(),
     );
   }
 }
@@ -112,6 +116,10 @@ class SignUpFormRoute extends GoRouteData with $SignUpFormRoute {
     TypedGoRoute<PartnerManagerRoute>(
       path: '/admin/partner-manager',
       name: PartnerManagerRoute.name,
+    ),
+    TypedGoRoute<ReviewApplicationRoute>(
+      path: '/admin/partner-manager/review/:partnerId',
+      name: ReviewApplicationRoute.name,
     ),
     TypedGoRoute<CategoryHomeRoute>(
       path: '/admin/category',
@@ -154,6 +162,23 @@ class PartnerManagerRoute extends GoRouteData with $PartnerManagerRoute {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const PartnerManagerScreen(),
+    );
+  }
+}
+
+class ReviewApplicationRoute extends GoRouteData with $ReviewApplicationRoute {
+  const ReviewApplicationRoute({required this.partnerId});
+
+  /// The partner verification ID to review
+  final String partnerId;
+
+  static const name = "review-application";
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ReviewApplicationScreen(partnerId: partnerId),
     );
   }
 }

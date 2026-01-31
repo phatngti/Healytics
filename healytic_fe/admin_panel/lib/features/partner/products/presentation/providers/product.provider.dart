@@ -6,7 +6,7 @@ import 'package:admin_panel/features/partner/products/data/product_impl.reposito
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
-import 'package:flutter/material.dart';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

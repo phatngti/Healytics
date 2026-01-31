@@ -17,13 +17,13 @@ void main() {
   // final instance = AuthenticationApi();
 
   group('tests for AuthenticationApi', () {
-    //Future<AuthTokensDto> authControllerLogin(LoginDto loginDto) async
-    test('test authControllerLogin', () async {
+    //Future<AuthTokensDto> authControllerLoginAdmin(AdminLoginDto adminLoginDto) async
+    test('test authControllerLoginAdmin', () async {
       // TODO
     });
 
-    //Future<AuthTokensDto> authControllerLoginAdmin(AdminLoginDto adminLoginDto) async
-    test('test authControllerLoginAdmin', () async {
+    //Future<AuthTokensDto> authControllerLoginPartner(PartnerLoginDto partnerLoginDto) async
+    test('test authControllerLoginPartner', () async {
       // TODO
     });
 
@@ -37,13 +37,17 @@ void main() {
       // TODO
     });
 
-    //Future<AuthTokensDto> authControllerRefresh() async
+    //Future<AuthTokensDto> authControllerRefresh(RefreshTokenRequestDto refreshTokenRequestDto) async
     test('test authControllerRefresh', () async {
       // TODO
     });
 
-    //Future<AuthTokensDto> authControllerRegister(RegisterDto registerDto) async
-    test('test authControllerRegister', () async {
+    // Register a new business partner
+    //
+    // Creates business entity, legal representative, and returns auth tokens immediately
+    //
+    //Future<RegisterPartnerResponseDto> authControllerRegisterPartner(RegisterPartnerDto registerPartnerDto) async
+    test('test authControllerRegisterPartner', () async {
       // TODO
     });
 

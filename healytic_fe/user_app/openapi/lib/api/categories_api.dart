@@ -53,7 +53,7 @@ class CategoriesApi {
   /// Parameters:
   ///
   /// * [CreateCategoryDto] createCategoryDto (required):
-  Future<Object?> categoriesControllerCreate(CreateCategoryDto createCategoryDto,) async {
+  Future<CategoryResponseDto?> categoriesControllerCreate(CreateCategoryDto createCategoryDto,) async {
     final response = await categoriesControllerCreateWithHttpInfo(createCategoryDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -62,7 +62,7 @@ class CategoriesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CategoryResponseDto',) as CategoryResponseDto;
     
     }
     return null;
@@ -75,7 +75,7 @@ class CategoriesApi {
   /// Parameters:
   ///
   /// * [bool] rootsOnly:
-  ///   Return only root categories
+  ///   Return only root categories (without parent)
   Future<Response> categoriesControllerFindAllWithHttpInfo({ bool? rootsOnly, }) async {
     // ignore: prefer_const_declarations
     final path = r'/categories';
@@ -110,8 +110,8 @@ class CategoriesApi {
   /// Parameters:
   ///
   /// * [bool] rootsOnly:
-  ///   Return only root categories
-  Future<List<Object>?> categoriesControllerFindAll({ bool? rootsOnly, }) async {
+  ///   Return only root categories (without parent)
+  Future<List<CategoryResponseDto>?> categoriesControllerFindAll({ bool? rootsOnly, }) async {
     final response = await categoriesControllerFindAllWithHttpInfo( rootsOnly: rootsOnly, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -121,8 +121,8 @@ class CategoriesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       final responseBody = await _decodeBodyBytes(response);
-      return (await apiClient.deserializeAsync(responseBody, 'List<Object>') as List)
-        .cast<Object>()
+      return (await apiClient.deserializeAsync(responseBody, 'List<CategoryResponseDto>') as List)
+        .cast<CategoryResponseDto>()
         .toList(growable: false);
 
     }
@@ -167,7 +167,7 @@ class CategoriesApi {
   /// Parameters:
   ///
   /// * [String] slug (required):
-  Future<Object?> categoriesControllerFindBySlug(String slug,) async {
+  Future<CategoryResponseDto?> categoriesControllerFindBySlug(String slug,) async {
     final response = await categoriesControllerFindBySlugWithHttpInfo(slug,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -176,7 +176,7 @@ class CategoriesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CategoryResponseDto',) as CategoryResponseDto;
     
     }
     return null;
@@ -220,7 +220,7 @@ class CategoriesApi {
   /// Parameters:
   ///
   /// * [String] id (required):
-  Future<Object?> categoriesControllerFindOne(String id,) async {
+  Future<CategoryResponseDto?> categoriesControllerFindOne(String id,) async {
     final response = await categoriesControllerFindOneWithHttpInfo(id,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -229,7 +229,7 @@ class CategoriesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CategoryResponseDto',) as CategoryResponseDto;
     
     }
     return null;
@@ -322,7 +322,7 @@ class CategoriesApi {
   /// * [String] id (required):
   ///
   /// * [UpdateCategoryDto] updateCategoryDto (required):
-  Future<Object?> categoriesControllerUpdate(String id, UpdateCategoryDto updateCategoryDto,) async {
+  Future<CategoryResponseDto?> categoriesControllerUpdate(String id, UpdateCategoryDto updateCategoryDto,) async {
     final response = await categoriesControllerUpdateWithHttpInfo(id, updateCategoryDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -331,7 +331,7 @@ class CategoriesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CategoryResponseDto',) as CategoryResponseDto;
     
     }
     return null;

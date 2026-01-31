@@ -9,7 +9,7 @@ import { AuditModule } from '@/audit/audit.module';
 import { PartnersModule } from '@/partners/partners.module';
 
 import { DocumentRequirement } from '@/partners/entities/document-requirement.entity';
-import { PartnerReviewLog } from '@/partners/entities/partner-review-log.entity';
+import { PartnerReviewLog } from '@/admin/entities/partner-review-log.entity';
 
 @Module({
     imports: [

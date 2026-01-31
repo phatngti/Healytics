@@ -18,7 +18,7 @@ Method | HTTP request | Description
 
 
 # **employeesControllerCreateDoctor**
-> Object employeesControllerCreateDoctor(createDoctorDto)
+> EmployeeResponseDto employeesControllerCreateDoctor(createDoctorDto)
 
 Create a new doctor
 
@@ -51,7 +51,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**EmployeeResponseDto**](EmployeeResponseDto.md)
 
 ### Authorization
 
@@ -65,7 +65,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **employeesControllerCreateTherapist**
-> Object employeesControllerCreateTherapist(createTherapistDto)
+> EmployeeResponseDto employeesControllerCreateTherapist(createTherapistDto)
 
 Create a new therapist
 
@@ -98,7 +98,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**EmployeeResponseDto**](EmployeeResponseDto.md)
 
 ### Authorization
 
@@ -112,7 +112,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **employeesControllerFindAll**
-> List<Object> employeesControllerFindAll(role)
+> List<EmployeeResponseDto> employeesControllerFindAll(role)
 
 Get all employees
 
@@ -145,7 +145,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**List<Object>**](Object.md)
+[**List<EmployeeResponseDto>**](EmployeeResponseDto.md)
 
 ### Authorization
 
@@ -159,7 +159,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **employeesControllerFindOne**
-> Object employeesControllerFindOne(id)
+> EmployeeResponseDto employeesControllerFindOne(id)
 
 Get an employee by id
 
@@ -192,7 +192,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**EmployeeResponseDto**](EmployeeResponseDto.md)
 
 ### Authorization
 
@@ -252,7 +252,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **employeesControllerUpdate**
-> Object employeesControllerUpdate(id, updateEmployeeDto)
+> EmployeeResponseDto employeesControllerUpdate(id, updateEmployeeDto)
 
 Update an employee
 
@@ -287,7 +287,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Object**](Object.md)
+[**EmployeeResponseDto**](EmployeeResponseDto.md)
 
 ### Authorization
 

@@ -53,7 +53,7 @@ class EmployeesApi {
   /// Parameters:
   ///
   /// * [CreateDoctorDto] createDoctorDto (required):
-  Future<Object?> employeesControllerCreateDoctor(CreateDoctorDto createDoctorDto,) async {
+  Future<EmployeeResponseDto?> employeesControllerCreateDoctor(CreateDoctorDto createDoctorDto,) async {
     final response = await employeesControllerCreateDoctorWithHttpInfo(createDoctorDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -62,7 +62,7 @@ class EmployeesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
     
     }
     return null;
@@ -105,7 +105,7 @@ class EmployeesApi {
   /// Parameters:
   ///
   /// * [CreateTherapistDto] createTherapistDto (required):
-  Future<Object?> employeesControllerCreateTherapist(CreateTherapistDto createTherapistDto,) async {
+  Future<EmployeeResponseDto?> employeesControllerCreateTherapist(CreateTherapistDto createTherapistDto,) async {
     final response = await employeesControllerCreateTherapistWithHttpInfo(createTherapistDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -114,7 +114,7 @@ class EmployeesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
     
     }
     return null;
@@ -161,7 +161,7 @@ class EmployeesApi {
   /// Parameters:
   ///
   /// * [String] role:
-  Future<List<Object>?> employeesControllerFindAll({ String? role, }) async {
+  Future<List<EmployeeResponseDto>?> employeesControllerFindAll({ String? role, }) async {
     final response = await employeesControllerFindAllWithHttpInfo( role: role, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -171,8 +171,8 @@ class EmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       final responseBody = await _decodeBodyBytes(response);
-      return (await apiClient.deserializeAsync(responseBody, 'List<Object>') as List)
-        .cast<Object>()
+      return (await apiClient.deserializeAsync(responseBody, 'List<EmployeeResponseDto>') as List)
+        .cast<EmployeeResponseDto>()
         .toList(growable: false);
 
     }
@@ -217,7 +217,7 @@ class EmployeesApi {
   /// Parameters:
   ///
   /// * [String] id (required):
-  Future<Object?> employeesControllerFindOne(String id,) async {
+  Future<EmployeeResponseDto?> employeesControllerFindOne(String id,) async {
     final response = await employeesControllerFindOneWithHttpInfo(id,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -226,7 +226,7 @@ class EmployeesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
     
     }
     return null;
@@ -319,7 +319,7 @@ class EmployeesApi {
   /// * [String] id (required):
   ///
   /// * [UpdateEmployeeDto] updateEmployeeDto (required):
-  Future<Object?> employeesControllerUpdate(String id, UpdateEmployeeDto updateEmployeeDto,) async {
+  Future<EmployeeResponseDto?> employeesControllerUpdate(String id, UpdateEmployeeDto updateEmployeeDto,) async {
     final response = await employeesControllerUpdateWithHttpInfo(id, updateEmployeeDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -328,7 +328,7 @@ class EmployeesApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
     
     }
     return null;

@@ -53,7 +53,7 @@ class ProductsApi {
   /// Parameters:
   ///
   /// * [CreateProductDto] createProductDto (required):
-  Future<Object?> productsControllerCreate(CreateProductDto createProductDto,) async {
+  Future<ProductResponseDto?> productsControllerCreate(CreateProductDto createProductDto,) async {
     final response = await productsControllerCreateWithHttpInfo(createProductDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -62,7 +62,7 @@ class ProductsApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ProductResponseDto',) as ProductResponseDto;
     
     }
     return null;
@@ -97,7 +97,7 @@ class ProductsApi {
   }
 
   /// Get all products
-  Future<List<Object>?> productsControllerFindAll() async {
+  Future<List<ProductResponseDto>?> productsControllerFindAll() async {
     final response = await productsControllerFindAllWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -107,8 +107,8 @@ class ProductsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       final responseBody = await _decodeBodyBytes(response);
-      return (await apiClient.deserializeAsync(responseBody, 'List<Object>') as List)
-        .cast<Object>()
+      return (await apiClient.deserializeAsync(responseBody, 'List<ProductResponseDto>') as List)
+        .cast<ProductResponseDto>()
         .toList(growable: false);
 
     }
@@ -153,7 +153,7 @@ class ProductsApi {
   /// Parameters:
   ///
   /// * [String] slug (required):
-  Future<Object?> productsControllerFindBySlug(String slug,) async {
+  Future<ProductResponseDto?> productsControllerFindBySlug(String slug,) async {
     final response = await productsControllerFindBySlugWithHttpInfo(slug,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -162,7 +162,7 @@ class ProductsApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ProductResponseDto',) as ProductResponseDto;
     
     }
     return null;
@@ -206,7 +206,7 @@ class ProductsApi {
   /// Parameters:
   ///
   /// * [String] id (required):
-  Future<Object?> productsControllerFindOne(String id,) async {
+  Future<ProductResponseDto?> productsControllerFindOne(String id,) async {
     final response = await productsControllerFindOneWithHttpInfo(id,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -215,7 +215,7 @@ class ProductsApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ProductResponseDto',) as ProductResponseDto;
     
     }
     return null;
@@ -308,7 +308,7 @@ class ProductsApi {
   /// * [String] id (required):
   ///
   /// * [UpdateProductDto] updateProductDto (required):
-  Future<Object?> productsControllerUpdate(String id, UpdateProductDto updateProductDto,) async {
+  Future<ProductResponseDto?> productsControllerUpdate(String id, UpdateProductDto updateProductDto,) async {
     final response = await productsControllerUpdateWithHttpInfo(id, updateProductDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -317,7 +317,7 @@ class ProductsApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ProductResponseDto',) as ProductResponseDto;
     
     }
     return null;
