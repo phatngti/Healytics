@@ -1,61 +1,309 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableIndex, TableForeignKey, TableUnique } from "typeorm";
 
 export class CreatePartnerTables1769427310000 implements MigrationInterface {
     name = 'CreatePartnerTables1769427310000'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // Create enums
-        await queryRunner.query(`CREATE TYPE "public"."health_partner_profile_business_type_enum" AS ENUM('MASSAGE_THERAPY', 'MASSAGE_REHABILITATION', 'SPA_BEAUTY', 'FITNESS', 'PHARMACY', 'DENTAL', 'TRADITIONAL_MEDICINE', 'PSYCHOLOGY', 'DERMATOLOGY', 'NUTRITION', 'PSYCHIATRY')`);
-        await queryRunner.query(`CREATE TYPE "public"."health_partner_profile_verification_status_enum" AS ENUM('PENDING', 'APPROVED', 'REJECTED')`);
-        await queryRunner.query(`CREATE TYPE "public"."partner_document_documenttype_enum" AS ENUM('BUSINESS_LICENSE', 'IDENTITY_FRONT', 'IDENTITY_BACK', 'AUTHORIZATION_LETTER', 'ANTT', 'KCB_LICENSE', 'GCN_FITNESS', 'GPP', 'RHM_LICENSE', 'MEDICAL_WASTE_CONTRACT', 'YHCT_LICENSE', 'PSYCHOLOGY_LICENSE', 'DERMATOLOGY_LICENSE', 'TECHNICAL_PORTFOLIO', 'NUTRITION_LICENSE', 'PSYCHIATRY_LICENSE')`);
-        await queryRunner.query(`CREATE TYPE "public"."partner_review_log_verdict_enum" AS ENUM('PENDING', 'APPROVED', 'REJECTED')`);
-        await queryRunner.query(`CREATE TYPE "public"."legal_representative_id_type_enum" AS ENUM('CITIZEN_ID', 'PASSPORT', 'MILITARY_ID')`);
+        // =====================
+        // 1. Create all enum types (PostgreSQL-specific, using raw SQL)
+        // =====================
+        await queryRunner.query(`
+            DO $$ BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'health_partner_profile_business_type_enum') THEN 
+                    CREATE TYPE "public"."health_partner_profile_business_type_enum" AS ENUM(
+                        'MASSAGE_THERAPY', 'MASSAGE_REHABILITATION', 'SPA_BEAUTY', 'FITNESS', 
+                        'PHARMACY', 'DENTAL', 'TRADITIONAL_MEDICINE', 'PSYCHOLOGY', 
+                        'DERMATOLOGY', 'NUTRITION', 'PSYCHIATRY'
+                    ); 
+                END IF; 
+            END $$
+        `);
 
-        // Create health_partner_profile table
-        await queryRunner.query(`CREATE TABLE "health_partner_profile" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "tax_code" character varying(20) NOT NULL, "legal_name" character varying(200) NOT NULL, "brand_name" character varying(150) NOT NULL, "business_type" "public"."health_partner_profile_business_type_enum" NOT NULL, "province_id" uuid, "district_id" uuid, "ward_id" uuid, "street_address" character varying(300) NOT NULL, "phone_number" character varying(20), "account_id" uuid NOT NULL, "verification_status" "public"."health_partner_profile_verification_status_enum" NOT NULL DEFAULT 'PENDING', "rejectionDetails" jsonb, "verification_completed_at" TIMESTAMP WITH TIME ZONE, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "UQ_PARTNER_TAX_CODE" UNIQUE ("tax_code"), CONSTRAINT "UQ_PARTNER_ACCOUNT_ID" UNIQUE ("account_id"), CONSTRAINT "PK_PARTNER" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`
+            DO $$ BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'health_partner_profile_verification_status_enum') THEN 
+                    CREATE TYPE "public"."health_partner_profile_verification_status_enum" AS ENUM('PENDING', 'APPROVED', 'REJECTED'); 
+                END IF; 
+            END $$
+        `);
 
-        // Create partner_document table
-        await queryRunner.query(`CREATE TABLE "partner_document" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "partner_id" uuid NOT NULL, "documentType" "public"."partner_document_documenttype_enum" NOT NULL, "document_url" text, "document_key" text, "is_reviewed" boolean NOT NULL DEFAULT false, "is_valid" boolean NOT NULL DEFAULT true, "verification_notes" text, "admin_feedback" text, "verified_by" uuid, "uploaded_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_PARTNER_DOCUMENT" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`
+            DO $$ BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'partner_document_documenttype_enum') THEN 
+                    CREATE TYPE "public"."partner_document_documenttype_enum" AS ENUM(
+                        'BUSINESS_LICENSE', 'IDENTITY_FRONT', 'IDENTITY_BACK', 'AUTHORIZATION_LETTER', 
+                        'ANTT', 'KCB_LICENSE', 'GCN_FITNESS', 'GPP', 'RHM_LICENSE', 
+                        'MEDICAL_WASTE_CONTRACT', 'YHCT_LICENSE', 'PSYCHOLOGY_LICENSE', 
+                        'DERMATOLOGY_LICENSE', 'TECHNICAL_PORTFOLIO', 'NUTRITION_LICENSE', 'PSYCHIATRY_LICENSE'
+                    ); 
+                END IF; 
+            END $$
+        `);
 
-        // Create partner_review_log table
-        await queryRunner.query(`CREATE TABLE "partner_review_log" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "partner_id" uuid NOT NULL, "verdict" "public"."partner_review_log_verdict_enum" NOT NULL, "fieldReviews" jsonb, "documentReviews" jsonb, "reviewer_id" uuid, "generalComment" text, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_PARTNER_REVIEW_LOG" PRIMARY KEY ("id")); COMMENT ON COLUMN "partner_review_log"."verdict" IS 'Kết quả của đợt review này (VD: REJECTED hoặc APPROVED)'`);
+        await queryRunner.query(`
+            DO $$ BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'partner_review_log_verdict_enum') THEN 
+                    CREATE TYPE "public"."partner_review_log_verdict_enum" AS ENUM('PENDING', 'APPROVED', 'REJECTED'); 
+                END IF; 
+            END $$
+        `);
 
-        // Create legal_representative table
-        await queryRunner.query(`CREATE TABLE "legal_representative" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "full_name" character varying(150) NOT NULL, "position" character varying(100) NOT NULL, "id_type" "public"."legal_representative_id_type_enum" NOT NULL, "id_number" character varying(20) NOT NULL, "id_issue_date" date NOT NULL, "id_front_img_url" text NOT NULL, "id_back_img_url" text NOT NULL, "is_authorized_user" boolean NOT NULL DEFAULT false, "auth_letter_doc_url" text, "phone_number" character varying(20), "partner_id" uuid NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "UQ_LEGAL_REP_PARTNER_ID" UNIQUE ("partner_id"), CONSTRAINT "PK_LEGAL_REPRESENTATIVE" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`
+            DO $$ BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'legal_representative_id_type_enum') THEN 
+                    CREATE TYPE "public"."legal_representative_id_type_enum" AS ENUM('CITIZEN_ID', 'PASSPORT', 'MILITARY_ID'); 
+                END IF; 
+            END $$
+        `);
 
-        // Add foreign key constraints
-        await queryRunner.query(`ALTER TABLE "health_partner_profile" ADD CONSTRAINT "FK_PARTNER_PROVINCE_ID" FOREIGN KEY ("province_id") REFERENCES "location"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "health_partner_profile" ADD CONSTRAINT "FK_PARTNER_DISTRICT_ID" FOREIGN KEY ("district_id") REFERENCES "location"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "health_partner_profile" ADD CONSTRAINT "FK_PARTNER_WARD_ID" FOREIGN KEY ("ward_id") REFERENCES "location"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "health_partner_profile" ADD CONSTRAINT "FK_PARTNER_ACCOUNT_ID" FOREIGN KEY ("account_id") REFERENCES "account"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "partner_document" ADD CONSTRAINT "FK_PARTNER_DOC_PARTNER_ID" FOREIGN KEY ("partner_id") REFERENCES "health_partner_profile"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "partner_review_log" ADD CONSTRAINT "FK_REVIEW_LOG_PARTNER_ID" FOREIGN KEY ("partner_id") REFERENCES "health_partner_profile"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "partner_review_log" ADD CONSTRAINT "FK_REVIEW_LOG_REVIEWER_ID" FOREIGN KEY ("reviewer_id") REFERENCES "account"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "legal_representative" ADD CONSTRAINT "FK_LEGAL_REP_PARTNER_ID" FOREIGN KEY ("partner_id") REFERENCES "health_partner_profile"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        // =====================
+        // 2. Create health_partner_profile table
+        // =====================
+        await queryRunner.createTable(new Table({
+            name: "health_partner_profile",
+            columns: [
+                { name: "id", type: "uuid", isPrimary: true, default: "uuid_generate_v4()" },
+                { name: "tax_code", type: "varchar", length: "20", isNullable: false },
+                { name: "legal_name", type: "varchar", length: "200", isNullable: false },
+                { name: "brand_name", type: "varchar", length: "150", isNullable: false },
+                { name: "business_type", type: "public.health_partner_profile_business_type_enum", isNullable: false },
+                { name: "province_id", type: "uuid", isNullable: true },
+                { name: "district_id", type: "uuid", isNullable: true },
+                { name: "ward_id", type: "uuid", isNullable: true },
+                { name: "street_address", type: "varchar", length: "300", isNullable: false },
+                { name: "phone_number", type: "varchar", length: "20", isNullable: true },
+                { name: "account_id", type: "uuid", isNullable: false },
+                { name: "verification_status", type: "public.health_partner_profile_verification_status_enum", isNullable: false, default: "'PENDING'" },
+                { name: "rejectionDetails", type: "jsonb", isNullable: true },
+                { name: "verification_completed_at", type: "timestamptz", isNullable: true },
+                { name: "created_at", type: "timestamptz", default: "now()", isNullable: false },
+                { name: "updated_at", type: "timestamptz", default: "now()", isNullable: false },
+                { name: "deleted_at", type: "timestamptz", isNullable: true }
+            ],
+            uniques: [
+                { name: "UQ_PARTNER_TAX_CODE", columnNames: ["tax_code"] },
+                { name: "UQ_PARTNER_ACCOUNT_ID", columnNames: ["account_id"] }
+            ]
+        }), true);
+
+        // Add indexes for FK columns (REQUIRED for performance)
+        await queryRunner.createIndex("health_partner_profile", new TableIndex({
+            name: "IDX_PARTNER_PROVINCE_ID",
+            columnNames: ["province_id"]
+        }));
+        await queryRunner.createIndex("health_partner_profile", new TableIndex({
+            name: "IDX_PARTNER_DISTRICT_ID",
+            columnNames: ["district_id"]
+        }));
+        await queryRunner.createIndex("health_partner_profile", new TableIndex({
+            name: "IDX_PARTNER_WARD_ID",
+            columnNames: ["ward_id"]
+        }));
+        await queryRunner.createIndex("health_partner_profile", new TableIndex({
+            name: "IDX_PARTNER_ACCOUNT_ID",
+            columnNames: ["account_id"]
+        }));
+
+        // =====================
+        // 3. Create partner_document table
+        // =====================
+        await queryRunner.createTable(new Table({
+            name: "partner_document",
+            columns: [
+                { name: "id", type: "uuid", isPrimary: true, default: "uuid_generate_v4()" },
+                { name: "partner_id", type: "uuid", isNullable: false },
+                { name: "documentType", type: "public.partner_document_documenttype_enum", isNullable: false },
+                { name: "document_url", type: "text", isNullable: true },
+                { name: "document_key", type: "text", isNullable: true },
+                { name: "is_reviewed", type: "boolean", default: false, isNullable: false },
+                { name: "is_valid", type: "boolean", default: true, isNullable: false },
+                { name: "verification_notes", type: "text", isNullable: true },
+                { name: "admin_feedback", type: "text", isNullable: true },
+                { name: "verified_by", type: "uuid", isNullable: true },
+                { name: "uploaded_at", type: "timestamp", default: "now()", isNullable: false },
+                { name: "updated_at", type: "timestamp", default: "now()", isNullable: false }
+            ]
+        }), true);
+
+        // Add index for FK column
+        await queryRunner.createIndex("partner_document", new TableIndex({
+            name: "IDX_PARTNER_DOC_PARTNER_ID",
+            columnNames: ["partner_id"]
+        }));
+
+        // =====================
+        // 4. Create partner_review_log table
+        // =====================
+        await queryRunner.createTable(new Table({
+            name: "partner_review_log",
+            columns: [
+                { name: "id", type: "uuid", isPrimary: true, default: "uuid_generate_v4()" },
+                { name: "partner_id", type: "uuid", isNullable: false },
+                { name: "verdict", type: "public.partner_review_log_verdict_enum", isNullable: false, comment: "Kết quả của đợt review này (VD: REJECTED hoặc APPROVED)" },
+                { name: "fieldReviews", type: "jsonb", isNullable: true },
+                { name: "documentReviews", type: "jsonb", isNullable: true },
+                { name: "reviewer_id", type: "uuid", isNullable: true },
+                { name: "generalComment", type: "text", isNullable: true },
+                { name: "created_at", type: "timestamp", default: "now()", isNullable: false }
+            ]
+        }), true);
+
+        // Add indexes for FK columns
+        await queryRunner.createIndex("partner_review_log", new TableIndex({
+            name: "IDX_REVIEW_LOG_PARTNER_ID",
+            columnNames: ["partner_id"]
+        }));
+        await queryRunner.createIndex("partner_review_log", new TableIndex({
+            name: "IDX_REVIEW_LOG_REVIEWER_ID",
+            columnNames: ["reviewer_id"]
+        }));
+
+        // =====================
+        // 5. Create legal_representative table
+        // =====================
+        await queryRunner.createTable(new Table({
+            name: "legal_representative",
+            columns: [
+                { name: "id", type: "uuid", isPrimary: true, default: "uuid_generate_v4()" },
+                { name: "full_name", type: "varchar", length: "150", isNullable: false },
+                { name: "position", type: "varchar", length: "100", isNullable: false },
+                { name: "id_type", type: "public.legal_representative_id_type_enum", isNullable: false },
+                { name: "id_number", type: "varchar", length: "20", isNullable: false },
+                { name: "id_issue_date", type: "date", isNullable: false },
+                { name: "id_front_img_url", type: "text", isNullable: false },
+                { name: "id_back_img_url", type: "text", isNullable: false },
+                { name: "is_authorized_user", type: "boolean", default: false, isNullable: false },
+                { name: "auth_letter_doc_url", type: "text", isNullable: true },
+                { name: "phone_number", type: "varchar", length: "20", isNullable: true },
+                { name: "partner_id", type: "uuid", isNullable: false },
+                { name: "created_at", type: "timestamptz", default: "now()", isNullable: false },
+                { name: "updated_at", type: "timestamptz", default: "now()", isNullable: false },
+                { name: "deleted_at", type: "timestamptz", isNullable: true }
+            ],
+            uniques: [
+                { name: "UQ_LEGAL_REP_PARTNER_ID", columnNames: ["partner_id"] }
+            ]
+        }), true);
+
+        // Add index for FK column
+        await queryRunner.createIndex("legal_representative", new TableIndex({
+            name: "IDX_LEGAL_REP_PARTNER_ID",
+            columnNames: ["partner_id"]
+        }));
+
+        // =====================
+        // 6. Create all foreign key constraints
+        // =====================
+        // health_partner_profile FKs
+        await queryRunner.createForeignKey("health_partner_profile", new TableForeignKey({
+            name: "FK_PARTNER_PROVINCE_ID",
+            columnNames: ["province_id"],
+            referencedTableName: "location",
+            referencedColumnNames: ["id"],
+            onDelete: "SET NULL",
+            onUpdate: "NO ACTION"
+        }));
+        await queryRunner.createForeignKey("health_partner_profile", new TableForeignKey({
+            name: "FK_PARTNER_DISTRICT_ID",
+            columnNames: ["district_id"],
+            referencedTableName: "location",
+            referencedColumnNames: ["id"],
+            onDelete: "SET NULL",
+            onUpdate: "NO ACTION"
+        }));
+        await queryRunner.createForeignKey("health_partner_profile", new TableForeignKey({
+            name: "FK_PARTNER_WARD_ID",
+            columnNames: ["ward_id"],
+            referencedTableName: "location",
+            referencedColumnNames: ["id"],
+            onDelete: "SET NULL",
+            onUpdate: "NO ACTION"
+        }));
+        await queryRunner.createForeignKey("health_partner_profile", new TableForeignKey({
+            name: "FK_PARTNER_ACCOUNT_ID",
+            columnNames: ["account_id"],
+            referencedTableName: "account",
+            referencedColumnNames: ["id"],
+            onDelete: "NO ACTION",
+            onUpdate: "NO ACTION"
+        }));
+
+        // partner_document FKs
+        await queryRunner.createForeignKey("partner_document", new TableForeignKey({
+            name: "FK_PARTNER_DOC_PARTNER_ID",
+            columnNames: ["partner_id"],
+            referencedTableName: "health_partner_profile",
+            referencedColumnNames: ["id"],
+            onDelete: "CASCADE",
+            onUpdate: "NO ACTION"
+        }));
+
+        // partner_review_log FKs
+        await queryRunner.createForeignKey("partner_review_log", new TableForeignKey({
+            name: "FK_REVIEW_LOG_PARTNER_ID",
+            columnNames: ["partner_id"],
+            referencedTableName: "health_partner_profile",
+            referencedColumnNames: ["id"],
+            onDelete: "CASCADE",
+            onUpdate: "NO ACTION"
+        }));
+        await queryRunner.createForeignKey("partner_review_log", new TableForeignKey({
+            name: "FK_REVIEW_LOG_REVIEWER_ID",
+            columnNames: ["reviewer_id"],
+            referencedTableName: "account",
+            referencedColumnNames: ["id"],
+            onDelete: "NO ACTION",
+            onUpdate: "NO ACTION"
+        }));
+
+        // legal_representative FKs
+        await queryRunner.createForeignKey("legal_representative", new TableForeignKey({
+            name: "FK_LEGAL_REP_PARTNER_ID",
+            columnNames: ["partner_id"],
+            referencedTableName: "health_partner_profile",
+            referencedColumnNames: ["id"],
+            onDelete: "NO ACTION",
+            onUpdate: "NO ACTION"
+        }));
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        // Drop foreign key constraints
-        await queryRunner.query(`ALTER TABLE "legal_representative" DROP CONSTRAINT "FK_LEGAL_REP_PARTNER_ID"`);
-        await queryRunner.query(`ALTER TABLE "partner_review_log" DROP CONSTRAINT "FK_REVIEW_LOG_REVIEWER_ID"`);
-        await queryRunner.query(`ALTER TABLE "partner_review_log" DROP CONSTRAINT "FK_REVIEW_LOG_PARTNER_ID"`);
-        await queryRunner.query(`ALTER TABLE "partner_document" DROP CONSTRAINT "FK_PARTNER_DOC_PARTNER_ID"`);
-        await queryRunner.query(`ALTER TABLE "health_partner_profile" DROP CONSTRAINT "FK_PARTNER_ACCOUNT_ID"`);
-        await queryRunner.query(`ALTER TABLE "health_partner_profile" DROP CONSTRAINT "FK_PARTNER_WARD_ID"`);
-        await queryRunner.query(`ALTER TABLE "health_partner_profile" DROP CONSTRAINT "FK_PARTNER_DISTRICT_ID"`);
-        await queryRunner.query(`ALTER TABLE "health_partner_profile" DROP CONSTRAINT "FK_PARTNER_PROVINCE_ID"`);
+        // =====================
+        // Drop in reverse order: FKs -> Indexes -> Tables -> Enums
+        // Using safe drop with IF EXISTS to prevent errors
+        // =====================
 
-        // Drop tables
-        await queryRunner.query(`DROP TABLE "legal_representative"`);
-        await queryRunner.query(`DROP TABLE "partner_review_log"`);
-        await queryRunner.query(`DROP TABLE "partner_document"`);
-        await queryRunner.query(`DROP TABLE "health_partner_profile"`);
+        // 1. Safe drop foreign keys
+        await queryRunner.query(`ALTER TABLE IF EXISTS "legal_representative" DROP CONSTRAINT IF EXISTS "FK_LEGAL_REP_PARTNER_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "partner_review_log" DROP CONSTRAINT IF EXISTS "FK_REVIEW_LOG_REVIEWER_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "partner_review_log" DROP CONSTRAINT IF EXISTS "FK_REVIEW_LOG_PARTNER_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "partner_document" DROP CONSTRAINT IF EXISTS "FK_PARTNER_DOC_PARTNER_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "health_partner_profile" DROP CONSTRAINT IF EXISTS "FK_PARTNER_ACCOUNT_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "health_partner_profile" DROP CONSTRAINT IF EXISTS "FK_PARTNER_WARD_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "health_partner_profile" DROP CONSTRAINT IF EXISTS "FK_PARTNER_DISTRICT_ID"`);
+        await queryRunner.query(`ALTER TABLE IF EXISTS "health_partner_profile" DROP CONSTRAINT IF EXISTS "FK_PARTNER_PROVINCE_ID"`);
 
-        // Drop enums
-        await queryRunner.query(`DROP TYPE "public"."legal_representative_id_type_enum"`);
-        await queryRunner.query(`DROP TYPE "public"."partner_review_log_verdict_enum"`);
-        await queryRunner.query(`DROP TYPE "public"."partner_document_documenttype_enum"`);
-        await queryRunner.query(`DROP TYPE "public"."health_partner_profile_verification_status_enum"`);
-        await queryRunner.query(`DROP TYPE "public"."health_partner_profile_business_type_enum"`);
+        // 2. Safe drop indexes
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_LEGAL_REP_PARTNER_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_REVIEW_LOG_REVIEWER_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_REVIEW_LOG_PARTNER_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_PARTNER_DOC_PARTNER_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_PARTNER_ACCOUNT_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_PARTNER_WARD_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_PARTNER_DISTRICT_ID"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "IDX_PARTNER_PROVINCE_ID"`);
+
+        // 3. Safe drop tables
+        await queryRunner.query(`DROP TABLE IF EXISTS "legal_representative" CASCADE`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "partner_review_log" CASCADE`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "partner_document" CASCADE`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "health_partner_profile" CASCADE`);
+
+        // 4. Safe drop enums
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."legal_representative_id_type_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."partner_review_log_verdict_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."partner_document_documenttype_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."health_partner_profile_verification_status_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."health_partner_profile_business_type_enum"`);
     }
 }

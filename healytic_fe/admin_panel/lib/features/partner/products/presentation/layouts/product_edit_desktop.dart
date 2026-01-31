@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin_panel/core/providers/storage.provider.dart';
 import 'package:admin_panel/features/common/widgets/images/multi_picker.dart';
-import 'package:universal_io/io.dart';
 
 class ProductEditDesktop extends ConsumerStatefulWidget {
   const ProductEditDesktop({

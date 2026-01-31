@@ -21,8 +21,14 @@ class SignInProvider extends _$SignInProvider {
           .read(authenticateRepositoryProvider)
           .login(request, role);
 
-      // Save role to store
+      // Save access token to store
       await Store.put(StoreKey.accessToken, response.accessToken);
+
+      // For health_partner role, determine verification status
+      if (role == 'health_partner') {
+        final isVerified = response.verificationCompletedAt != null;
+        await Store.put(StoreKey.partnerVerified, isVerified);
+      }
 
       return response;
     });

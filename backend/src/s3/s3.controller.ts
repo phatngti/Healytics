@@ -23,6 +23,8 @@ import {
   FileUrlResponseDto,
   DeleteFileResponseDto,
 } from './dto';
+import { Public } from '@/common/decorators/auth/public.decorator';
+import { Throttle } from '@/common/decorators/auth/throttle.decorator';
 
 /**
  * Controller for S3-compatible storage operations.
@@ -37,6 +39,8 @@ export class S3Controller {
   /**
    * Generates a presigned URL for uploading a file.
    */
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('presign')
   @ApiOperation({ summary: 'Get presigned upload URL' })
   @ApiCreatedResponse({
@@ -50,6 +54,8 @@ export class S3Controller {
   /**
    * Gets the public or signed URL for a file.
    */
+  @Public()
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @Get(':key')
   @ApiOperation({ summary: 'Get file URL' })
   @ApiParam({ name: 'key', type: 'string', description: 'File key' })

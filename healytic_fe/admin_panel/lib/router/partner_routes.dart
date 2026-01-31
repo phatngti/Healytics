@@ -8,6 +8,7 @@ import 'package:admin_panel/features/partner/products/presentation/product_detai
 import 'package:admin_panel/features/partner/products/presentation/product_edit.screen.dart';
 import 'package:admin_panel/features/partner/products/presentation/product_home.screen.dart';
 import 'package:admin_panel/features/partner/service_tags/presentation/service_tags_home.screen.dart';
+import 'package:admin_panel/features/partner/verification_status/verification_status.screen.dart';
 import 'package:admin_panel/router/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -55,6 +56,10 @@ part 'partner_routes.g.dart';
     TypedGoRoute<ServiceTagsHomeRoute>(
       path: '/provider/service_tags',
       name: ServiceTagsHomeRoute.name,
+    ),
+    TypedGoRoute<VerificationStatusRoute>(
+      path: '/provider/verification-status',
+      name: VerificationStatusRoute.name,
     ),
   ],
 )
@@ -197,6 +202,20 @@ class ServiceTagsHomeRoute extends GoRouteData with $ServiceTagsHomeRoute {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const ServiceTagsHomeScreen(),
+    );
+  }
+}
+
+class VerificationStatusRoute extends GoRouteData
+    with $VerificationStatusRoute {
+  const VerificationStatusRoute();
+  static const name = "provider-verification-status";
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const VerificationStatusScreen(),
     );
   }
 }

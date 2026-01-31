@@ -3,11 +3,11 @@ import { AdminPartnersService } from './admin-partners.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Partner } from '@/partners/entities/partner.entity';
 import { PartnerDocument } from '@/partners/entities/partner-document.entity';
-import { PartnerReviewLog } from '@/partners/entities/partner-review-log.entity';
+import { PartnerReviewLog } from '@/admin/entities/partner-review-log.entity';
 import { DocumentRequirement } from '@/partners/entities/document-requirement.entity';
 import { DataSource, Repository } from 'typeorm';
 import { PartnersService } from '@/partners/partners.service';
-import { ReviewDecision, ReviewPartnerProfileDto, ReviewItemType } from '../dto/review-partner-profile.dto';
+import { ReviewDecision, ReviewPartnerProfileDto } from '../dto/review-partner-profile.dto';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { BadRequestException } from '@nestjs/common';
 import { BusinessType } from '@/partners/enum/business-type.enum';
@@ -127,7 +127,7 @@ describe('AdminPartnersService', () => {
                 decision: ReviewDecision.CHANGES_REQUIRED,
                 generalComment: 'Fix docs',
                 items: [
-                    { type: ReviewItemType.DOCUMENT, documentId: 'd1', isValid: false, reason: 'Blurry' }
+                    { fieldKey: 'business_license', documentKey: 'd1', isVerified: false, feedback: 'Blurry' }
                 ]
             };
 
@@ -162,7 +162,7 @@ describe('AdminPartnersService', () => {
                 decision: ReviewDecision.APPROVED, // User clicked Approve by mistake?
                 generalComment: 'Oops',
                 items: [
-                    { type: ReviewItemType.FIELD, fieldName: 'legalName', isValid: false, reason: 'Wrong name' }
+                    { fieldKey: 'legalName', isVerified: false, feedback: 'Wrong name' }
                 ]
             };
 

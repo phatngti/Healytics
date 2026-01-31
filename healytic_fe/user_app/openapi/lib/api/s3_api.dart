@@ -56,7 +56,7 @@ class S3Api {
   ///
   /// * [String] key (required):
   ///   File key
-  Future<S3ControllerDeleteFile200Response?> s3ControllerDeleteFile(String key,) async {
+  Future<DeleteFileResponseDto?> s3ControllerDeleteFile(String key,) async {
     final response = await s3ControllerDeleteFileWithHttpInfo(key,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -65,13 +65,13 @@ class S3Api {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'S3ControllerDeleteFile200Response',) as S3ControllerDeleteFile200Response;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'DeleteFileResponseDto',) as DeleteFileResponseDto;
     
     }
     return null;
   }
 
-  /// Get file url
+  /// Get file URL
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -105,13 +105,13 @@ class S3Api {
     );
   }
 
-  /// Get file url
+  /// Get file URL
   ///
   /// Parameters:
   ///
   /// * [String] key (required):
   ///   File key
-  Future<S3ControllerGetFileUrl200Response?> s3ControllerGetFileUrl(String key,) async {
+  Future<FileUrlResponseDto?> s3ControllerGetFileUrl(String key,) async {
     final response = await s3ControllerGetFileUrlWithHttpInfo(key,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -120,25 +120,25 @@ class S3Api {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'S3ControllerGetFileUrl200Response',) as S3ControllerGetFileUrl200Response;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'FileUrlResponseDto',) as FileUrlResponseDto;
     
     }
     return null;
   }
 
-  /// Get presigned upload url
+  /// Get presigned upload URL
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
-  /// * [S3ControllerPreSignRequest] s3ControllerPreSignRequest (required):
-  Future<Response> s3ControllerPreSignWithHttpInfo(S3ControllerPreSignRequest s3ControllerPreSignRequest,) async {
+  /// * [PresignRequestDto] presignRequestDto (required):
+  Future<Response> s3ControllerPreSignWithHttpInfo(PresignRequestDto presignRequestDto,) async {
     // ignore: prefer_const_declarations
     final path = r'/s3/presign';
 
     // ignore: prefer_final_locals
-    Object? postBody = s3ControllerPreSignRequest;
+    Object? postBody = presignRequestDto;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
@@ -158,13 +158,13 @@ class S3Api {
     );
   }
 
-  /// Get presigned upload url
+  /// Get presigned upload URL
   ///
   /// Parameters:
   ///
-  /// * [S3ControllerPreSignRequest] s3ControllerPreSignRequest (required):
-  Future<S3ControllerPreSign201Response?> s3ControllerPreSign(S3ControllerPreSignRequest s3ControllerPreSignRequest,) async {
-    final response = await s3ControllerPreSignWithHttpInfo(s3ControllerPreSignRequest,);
+  /// * [PresignRequestDto] presignRequestDto (required):
+  Future<PresignResponseDto?> s3ControllerPreSign(PresignRequestDto presignRequestDto,) async {
+    final response = await s3ControllerPreSignWithHttpInfo(presignRequestDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -172,7 +172,7 @@ class S3Api {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'S3ControllerPreSign201Response',) as S3ControllerPreSign201Response;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PresignResponseDto',) as PresignResponseDto;
     
     }
     return null;

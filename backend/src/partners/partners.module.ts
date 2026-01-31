@@ -8,7 +8,7 @@ import { Account } from '@/account/entities/account.entity';
 import { LocationsModule } from '@/locations/locations.module';
 import { DocumentRequirement } from './entities/document-requirement.entity';
 import { PartnerDocument } from './entities/partner-document.entity';
-import { PartnerReviewLog } from './entities/partner-review-log.entity';
+import { PartnerReviewLog } from '../admin/entities/partner-review-log.entity';
 import { S3Module } from '@/s3/s3.module';
 import { AuthModule } from '@/auth/auth.module';
 import { AccountModule } from '@/account/account.module';

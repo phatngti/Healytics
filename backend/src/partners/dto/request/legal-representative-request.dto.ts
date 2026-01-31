@@ -1,56 +1,52 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
     IsEnum,
     IsString,
     IsNotEmpty,
-    IsBoolean,
     IsUrl,
     IsDateString,
     MaxLength,
     ValidateNested,
-    ValidateIf,
     IsOptional,
     Matches,
+    IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { IdType } from '@/partners/enum/id-type.enum';
+import { DocumentFileType, DocumentFileTypes, DocumentTypes, DocumentTypeValue } from '@/partners/entities/partner-document.entity';
 
-export class IdImagesRequestDto {
+
+export class PartnerDocumentVerificationDto {
     @ApiProperty({
-        example: 'https://storage.example.com/id_front.jpg',
-        description: 'URL to front image of ID document',
+        example: 'image',
+        description: 'File type of document',
     })
-    @IsUrl()
+    @IsEnum(DocumentFileTypes)
+    fileType: DocumentFileType;
+
+    @ApiProperty({
+        example: 'BUSINESS_LICENSE',
+        description: 'Type of document',
+    })
+    @IsEnum(DocumentTypes)
+    type: DocumentTypeValue;
+
+    @ApiProperty({
+        example: 'business_license.pdf',
+        description: 'Document key (R2/S3 path)',
+    })
+    @IsString()
     @IsNotEmpty()
-    frontImgUrl: string;
+    documentKey: string;
 
     @ApiProperty({
-        example: 'https://storage.example.com/id_back.jpg',
-        description: 'URL to back image of ID document',
+        example: ['https://storage.example.com/business_license.pdf'],
+        description: 'Array of URLs to document files',
+        type: [String],
     })
-    @IsUrl()
-    @IsNotEmpty()
-    backImgUrl: string;
-}
-
-
-export class AuthorizationRequestDto {
-    @ApiProperty({
-        example: true,
-        description: 'Whether the legal representative is the authorized user',
-    })
-    @IsBoolean()
-    isAuthorizedUser: boolean;
-
-    @ApiProperty({
-        example: 'https://storage.example.com/auth_letter.pdf',
-        description: 'URL to authorization letter document (required if isAuthorizedUser is false)',
-        required: false,
-    })
-    @ValidateIf((o) => !o.isAuthorizedUser)
-    @IsUrl()
-    @IsNotEmpty()
-    authLetterDocUrl: string | null;
+    @IsArray()
+    @IsUrl({}, { each: true })
+    urls: string[];
 }
 
 export class LegalRepresentativeRequestDto {
@@ -63,20 +59,18 @@ export class LegalRepresentativeRequestDto {
     @MaxLength(100)
     fullName: string;
 
-    @ApiProperty({
+    @ApiPropertyOptional({
         example: 'Giám đốc',
         description: 'Position in the company',
-        required: false,
     })
     @IsString()
     @IsOptional()
     @MaxLength(50)
     position?: string;
 
-    @ApiProperty({
+    @ApiPropertyOptional({
         example: '0901234567',
         description: 'Phone number of legal representative',
-        required: false,
     })
     @IsString()
     @IsOptional()
@@ -112,13 +106,9 @@ export class LegalRepresentativeRequestDto {
     @IsDateString()
     idIssueDate: string;
 
-    @ApiProperty({ type: IdImagesRequestDto })
-    @ValidateNested()
-    @Type(() => IdImagesRequestDto)
-    images: IdImagesRequestDto;
 
-    @ApiProperty({ type: AuthorizationRequestDto })
-    @ValidateNested()
-    @Type(() => AuthorizationRequestDto)
-    authorization: AuthorizationRequestDto;
+    @ApiProperty({ type: [PartnerDocumentVerificationDto] })
+    @ValidateNested({ each: true })
+    @Type(() => PartnerDocumentVerificationDto)
+    documents: PartnerDocumentVerificationDto[];
 }

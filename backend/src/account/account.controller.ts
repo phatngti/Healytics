@@ -13,9 +13,9 @@ import { SurveyDto } from './dto/request/survey.dto';
 import { SurveyResponseDto } from './dto/response/survey-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
-import { Roles } from '@/auth/decorators/roles.decorator';
+import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { ALL_ROLES } from '@/auth/constants/role-groups';
-import { CurrentUser } from '@/auth/decorators/current-user.decorator';
+import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import {
   ApiTags,
   ApiBearerAuth,

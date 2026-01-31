@@ -19,28 +19,28 @@ void main() {
   group('tests for ProductsApi', () {
     // Create a new product
     //
-    //Future<Object> productsControllerCreate(CreateProductDto createProductDto) async
+    //Future<ProductResponseDto> productsControllerCreate(CreateProductDto createProductDto) async
     test('test productsControllerCreate', () async {
       // TODO
     });
 
     // Get all products
     //
-    //Future<List<Object>> productsControllerFindAll() async
+    //Future<List<ProductResponseDto>> productsControllerFindAll() async
     test('test productsControllerFindAll', () async {
       // TODO
     });
 
     // Get a product by slug
     //
-    //Future<Object> productsControllerFindBySlug(String slug) async
+    //Future<ProductResponseDto> productsControllerFindBySlug(String slug) async
     test('test productsControllerFindBySlug', () async {
       // TODO
     });
 
     // Get a product by id
     //
-    //Future<Object> productsControllerFindOne(String id) async
+    //Future<ProductResponseDto> productsControllerFindOne(String id) async
     test('test productsControllerFindOne', () async {
       // TODO
     });
@@ -54,7 +54,7 @@ void main() {
 
     // Update a product
     //
-    //Future<Object> productsControllerUpdate(String id, UpdateProductDto updateProductDto) async
+    //Future<ProductResponseDto> productsControllerUpdate(String id, UpdateProductDto updateProductDto) async
     test('test productsControllerUpdate', () async {
       // TODO
     });

@@ -169,6 +169,7 @@ class _AppMultiSelectChipFieldState<T>
                       ),
                       SizedBox(
                         child: TextField(
+                          controller: _searchController,
                           enabled: isEnabled,
                           decoration: InputDecoration(
                             hintText: isEnabled ? widget.searchHint : '',

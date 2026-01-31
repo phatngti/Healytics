@@ -3,10 +3,17 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 
 class TableColumnData {
-  const TableColumnData({required this.label, this.prefixIcon});
+  const TableColumnData({
+    required this.label,
+    this.prefixIcon,
+    this.size = ColumnSize.M,
+  });
 
   final String label;
   final IconData? prefixIcon;
+
+  /// Column size: S (small), M (medium), L (large)
+  final ColumnSize size;
 }
 
 class TableColumns {
@@ -17,8 +24,8 @@ class TableColumns {
   List<DataColumn> dataColumns(BuildContext context) {
     return columns
         .map(
-          (column) => DataColumn(
-            columnWidth: const IntrinsicColumnWidth(flex: 1.0),
+          (column) => DataColumn2(
+            size: column.size,
             label: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.start,
