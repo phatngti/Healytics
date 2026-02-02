@@ -1,5 +1,6 @@
 import 'package:admin_panel/features/authenticate/domain/location.entity.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/verification_status.provider.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/business_entity_form.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/document_verification_section.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/legal_representative_form.widget.dart';
@@ -7,6 +8,7 @@ import 'package:admin_panel/features/partner/verification_status/presentation/wi
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Collapsible section card for verification sections.
 ///
@@ -15,7 +17,7 @@ import 'package:flutter/material.dart';
 /// - Section title
 /// - Action Required badge for sections needing revision
 /// - Expandable content with form widgets
-class VerificationSectionCard extends StatefulWidget {
+class VerificationSectionCard extends ConsumerStatefulWidget {
   /// Creates a new [VerificationSectionCard].
   const VerificationSectionCard({
     required this.section,
@@ -42,11 +44,12 @@ class VerificationSectionCard extends StatefulWidget {
   final List<LocationEntity> wards;
 
   @override
-  State<VerificationSectionCard> createState() =>
+  ConsumerState<VerificationSectionCard> createState() =>
       _VerificationSectionCardState();
 }
 
-class _VerificationSectionCardState extends State<VerificationSectionCard> {
+class _VerificationSectionCardState
+    extends ConsumerState<VerificationSectionCard> {
   bool _isExpanded = false;
 
   @override
@@ -205,13 +208,10 @@ class _VerificationSectionCardState extends State<VerificationSectionCard> {
   Widget _getSectionWidget() {
     switch (widget.section.type) {
       case VerificationSectionType.businessEntity:
-        return BusinessEntityForm(
-          info: widget.verificationStatus.partnerInfo,
-          locationInfo: widget.verificationStatus.locationDetails,
-        );
+        return BusinessEntityForm(info: widget.verificationStatus.businessInfo);
       case VerificationSectionType.locationDetails:
         return LocationForm(
-          info: widget.verificationStatus.locationDetails,
+          info: widget.verificationStatus.businessInfo.address,
           provinces: widget.provinces,
           districts: widget.districts,
           wards: widget.wards,
@@ -220,15 +220,16 @@ class _VerificationSectionCardState extends State<VerificationSectionCard> {
         return LegalRepresentativeForm(
           section: widget.section,
           legalRepresentative: widget.verificationStatus.legalRepresentative,
-          onUploadDocument: (_) {
-            // TODO: Handle document upload
+          kycDocuments: widget.verificationStatus.kycDocuments,
+          onUploadComplete: (result) {
+            ref.read(pendingUploadsProvider.notifier).addUpload(result);
           },
         );
       case VerificationSectionType.accountSecurity:
         return DocumentVerificationSection(
-          documents: widget.verificationStatus.legalRepresentative?.documents,
-          onUploadDocument: (_) {
-            // TODO: Handle document upload
+          documents: widget.verificationStatus.kycDocuments,
+          onUploadComplete: (result) {
+            ref.read(pendingUploadsProvider.notifier).addUpload(result);
           },
         );
     }

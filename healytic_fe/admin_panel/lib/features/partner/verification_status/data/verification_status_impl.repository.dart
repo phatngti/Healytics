@@ -4,6 +4,7 @@ import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/features/partner/verification_status/data/verification_status_remote.datasource.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.repository.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/document_verification_section.widget.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'verification_status_impl.repository.g.dart';
@@ -22,19 +23,10 @@ class VerificationStatusRepositoryImpl implements VerificationStatusRepository {
   }
 
   @override
-  Future<bool> resubmitApplication() {
-    return _dataSource.resubmitApplication();
-  }
-
-  @override
-  Future<VerificationDocument> uploadDocument({
-    required String documentId,
-    required String filePath,
+  Future<bool> resubmitApplication({
+    List<DocumentUploadResult> uploads = const [],
   }) {
-    return _dataSource.uploadDocument(
-      documentId: documentId,
-      filePath: filePath,
-    );
+    return _dataSource.resubmitApplication(uploads: uploads);
   }
 }
 

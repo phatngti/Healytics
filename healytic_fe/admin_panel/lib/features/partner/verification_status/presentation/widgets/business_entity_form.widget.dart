@@ -5,22 +5,18 @@ import 'package:flutter/material.dart';
 
 /// Form section for Business Entity (Partner) verification.
 ///
-/// Displays business info fields and registered address in a grid layout
-/// with verification status indicators for fields requiring updates.
+/// Displays business info fields in a grid layout with verification
+/// status indicators for fields requiring updates.
 class BusinessEntityForm extends StatelessWidget {
   /// Creates a new [BusinessEntityForm].
   const BusinessEntityForm({
     required this.info,
-    this.locationInfo,
     this.onFieldChanged,
     super.key,
   });
 
-  /// The partner info verification data.
-  final PartnerInfo? info;
-
-  /// The location details verification data.
-  final LocationDetailsInfo? locationInfo;
+  /// The business info verification data.
+  final BusinessInfo? info;
 
   /// Callback when a field value changes.
   final void Function(String fieldKey, String value)? onFieldChanged;
@@ -34,7 +30,6 @@ class BusinessEntityForm extends StatelessWidget {
     }
 
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +37,7 @@ class BusinessEntityForm extends StatelessWidget {
         // Business Info Grid (2 columns on desktop)
         _buildBusinessInfoGrid(context),
         // Registered Address Section
-        if (locationInfo != null) ...[
+        if (info!.address != null) ...[
           AppDimens.verticalLarge,
           _buildDivider(colorScheme),
           AppDimens.verticalLarge,
@@ -59,54 +54,66 @@ class BusinessEntityForm extends StatelessWidget {
         if (isWide) {
           return Column(
             children: [
-              // Row 1: Brand Name & Legal Name
+              // Row 1: Brand Name & Tax Code
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: VerificationTextField(
                       label: 'Brand Name',
+                      fieldId: 'brand_name',
                       field: info!.brandName,
                       onChanged: onFieldChanged != null
-                          ? (value) => onFieldChanged!('brandName', value)
+                          ? (value) => onFieldChanged!('brand_name', value)
                           : null,
                     ),
                   ),
                   AppDimens.horizontalLarge,
                   Expanded(
-                    child: VerificationTextField(
-                      label: 'Legal Name',
-                      field: info!.legalName,
-                      onChanged: onFieldChanged != null
-                          ? (value) => onFieldChanged!('legalName', value)
-                          : null,
-                    ),
+                    child: info!.taxRegistrationCode != null
+                        ? VerificationTextField(
+                            label: 'Tax Code',
+                            fieldId: 'tax_registration_code',
+                            field: info!.taxRegistrationCode!,
+                            onChanged: onFieldChanged != null
+                                ? (value) => onFieldChanged!(
+                                    'tax_registration_code',
+                                    value,
+                                  )
+                                : null,
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ],
               ),
               AppDimens.verticalMedium,
-              // Row 2: Tax Code & Business Type
+              // Row 2: Service Tags & Phone Number
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: VerificationTextField(
-                      label: 'Tax Code',
-                      field: info!.taxCode,
+                      label: 'Service Tags',
+                      fieldId: 'service_tags',
+                      field: info!.serviceTags,
                       onChanged: onFieldChanged != null
-                          ? (value) => onFieldChanged!('taxCode', value)
+                          ? (value) => onFieldChanged!('service_tags', value)
                           : null,
                     ),
                   ),
                   AppDimens.horizontalLarge,
                   Expanded(
-                    child: VerificationTextField(
-                      label: 'Business Type',
-                      field: info!.businessType,
-                      onChanged: onFieldChanged != null
-                          ? (value) => onFieldChanged!('businessType', value)
-                          : null,
-                    ),
+                    child: info!.phoneNumber != null
+                        ? VerificationTextField(
+                            label: 'Phone Number',
+                            fieldId: 'phone_number',
+                            field: info!.phoneNumber!,
+                            onChanged: onFieldChanged != null
+                                ? (value) =>
+                                      onFieldChanged!('phone_number', value)
+                                : null,
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ],
               ),
@@ -119,35 +126,48 @@ class BusinessEntityForm extends StatelessWidget {
           children: [
             VerificationTextField(
               label: 'Brand Name',
+              fieldId: info!.brandName.fieldKey,
               field: info!.brandName,
               onChanged: onFieldChanged != null
-                  ? (value) => onFieldChanged!('brandName', value)
+                  ? (value) => onFieldChanged!(info!.brandName.fieldKey, value)
                   : null,
             ),
+            if (info!.taxRegistrationCode != null) ...[
+              AppDimens.verticalMedium,
+              VerificationTextField(
+                label: 'Tax Code',
+                fieldId: info!.taxRegistrationCode!.fieldKey,
+                field: info!.taxRegistrationCode!,
+                onChanged: onFieldChanged != null
+                    ? (value) => onFieldChanged!(
+                        info!.taxRegistrationCode!.fieldKey,
+                        value,
+                      )
+                    : null,
+              ),
+            ],
             AppDimens.verticalMedium,
             VerificationTextField(
-              label: 'Legal Name',
-              field: info!.legalName,
+              label: 'Service Tags',
+              fieldId: info!.serviceTags.fieldKey,
+              field: info!.serviceTags,
               onChanged: onFieldChanged != null
-                  ? (value) => onFieldChanged!('legalName', value)
+                  ? (value) =>
+                        onFieldChanged!(info!.serviceTags.fieldKey, value)
                   : null,
             ),
-            AppDimens.verticalMedium,
-            VerificationTextField(
-              label: 'Tax Code',
-              field: info!.taxCode,
-              onChanged: onFieldChanged != null
-                  ? (value) => onFieldChanged!('taxCode', value)
-                  : null,
-            ),
-            AppDimens.verticalMedium,
-            VerificationTextField(
-              label: 'Business Type',
-              field: info!.businessType,
-              onChanged: onFieldChanged != null
-                  ? (value) => onFieldChanged!('businessType', value)
-                  : null,
-            ),
+            if (info!.phoneNumber != null) ...[
+              AppDimens.verticalMedium,
+              VerificationTextField(
+                label: 'Phone Number',
+                fieldId: info!.phoneNumber!.fieldKey,
+                field: info!.phoneNumber!,
+                onChanged: onFieldChanged != null
+                    ? (value) =>
+                          onFieldChanged!(info!.phoneNumber!.fieldKey, value)
+                    : null,
+              ),
+            ],
           ],
         );
       },

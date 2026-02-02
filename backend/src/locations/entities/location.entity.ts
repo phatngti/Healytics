@@ -6,6 +6,7 @@ import {
     TreeChildren,
     TreeParent,
     Index,
+    JoinColumn,
 } from 'typeorm';
 import { LocationLevel } from './location-level.enum';
 
@@ -44,5 +45,6 @@ export class Location {
     children: Location[]; // Child locations (e.g., Province -> Districts)
 
     @TreeParent()
+    @JoinColumn({ name: 'parent_id' })
     parent: Location | null; // Parent location (e.g., District -> Province)
 }

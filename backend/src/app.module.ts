@@ -1,4 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -16,6 +17,7 @@ import { SeedModule } from './common/seed/seed.module';
 import databaseConfig from './config/database.config';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { PublicThrottlerGuard } from './common/guards';
 
 @Module({
@@ -67,6 +69,10 @@ import { PublicThrottlerGuard } from './common/guards';
     {
       provide: 'APP_GUARD',
       useClass: PublicThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
     },
   ],
 })

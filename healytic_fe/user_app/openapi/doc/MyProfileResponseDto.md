@@ -9,9 +9,9 @@ import 'package:user_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | 
-**partnerInfo** | [**PartnerInfoDto**](PartnerInfoDto.md) |  | 
-**locationDetails** | [**LocationDetailsInfoDto**](LocationDetailsInfoDto.md) |  | 
-**legalRepresentative** | [**LegalRepresentativeInfoDto**](LegalRepresentativeInfoDto.md) |  | 
+**businessInfo** | [**BusinessInfoDto**](BusinessInfoDto.md) |  | 
+**legalRepresentative** | [**LegalRepresentativeDto**](LegalRepresentativeDto.md) |  | [optional] 
+**kycDocuments** | [**List<VerifiedField>**](VerifiedField.md) |  | [default to const []]
 **verificationStatus** | **String** |  | 
 **verificationCompletedAt** | [**Object**](.md) |  | [optional] 
 **createdAt** | [**DateTime**](DateTime.md) |  | 
