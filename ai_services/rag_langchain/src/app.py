@@ -8,6 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from langserve import add_routes
 from src.base.llm_model import get_hf_llm
 from src.rag.main import build_rag_chain, InputQA, OutputQA
+from langchain_core.messages import AIMessage
+
 
 # Khởi tạo mô hình ngôn ngữ
 llm = get_hf_llm(temperature=0.2)  # temperature cao => câu trả lời sáng tạo hơn
@@ -24,9 +26,8 @@ genai_chain = build_rag_chain(
 
 # ---------- App - FastAPI ---------- 
 app = FastAPI(
-    title="LangChain Server",
+    title="Healytics Chatbot",
     version="1.0",
-    description="A simple API server using LangChain's Runnable interfaces",
 )
 
 # Cho phép truy cập API từ mọi nguồn (CORS)
@@ -48,19 +49,31 @@ async def check():
 
 
 # Route chính để hỏi mô hình RAG
-@app.post("/generative_ai", response_model=OutputQA)
+@app.post("/generative_ai")
 async def generative_ai(inputs: InputQA):
-    # Gửi câu hỏi (inputs.question) vào mô hình
-    answer = genai_chain.invoke(inputs.question)
-    return {"answer": answer}
-
-
+    result = genai_chain.invoke(inputs.question)
+    
+    # Nếu result là string rất dài chứa prompt, hãy parse nó
+    if isinstance(result, str):
+        # Tìm phần answer sau tag <|assistant|>
+        if "<|assistant|>" in result:
+            answer = result.split("<|assistant|>")[-1].strip()
+        else:
+            answer = result
+    elif isinstance(result, dict):
+        answer = result.get("answer", "")
+    elif isinstance(result, AIMessage):
+        answer = result.content
+    else:
+        answer = str(result)
+    
+    return {"answer": answer.strip()}
 
 # ---------- LangServe Playground ----------
 # Cho phép test RAG trực tiếp qua giao diện web LangServe
-add_routes(
-    app,
-    genai_chain,
-    path="/generative_ai",      # Đường dẫn hiển thị trên web
-    playground_type="default",  # Giao diện test mặc định
-)
+# add_routes(
+#     app,
+#     genai_chain,
+#     path="/generative_ai",      # Đường dẫn hiển thị trên web
+#     playground_type="default",  # Giao diện test mặc định
+# )
