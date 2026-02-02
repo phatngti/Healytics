@@ -23,6 +23,7 @@ import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { Role } from '@/account/enum/role.enum';
 import { RolesGuard } from '@/auth/guards/roles.guard';
+import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 @ApiTags('partners')
 @Controller('partners')
@@ -50,6 +51,7 @@ export class PartnersController {
     // ============================================================================
 
     @Get('me')
+    @LogResponse()
     @UseGuards(JwtAuthGuard)
     @UseGuards(RolesGuard)
     @Roles(Role.HEALTH_PARTNER)

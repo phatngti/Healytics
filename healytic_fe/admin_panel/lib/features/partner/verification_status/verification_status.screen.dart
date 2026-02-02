@@ -20,6 +20,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class VerificationStatusScreen extends ConsumerWidget {
   const VerificationStatusScreen({super.key});
 
+  /// Gets admin feedback from entity fields that have feedback.
+  String? _getAdminFeedback(ProviderVerificationStatusEntity status) {
+    // Collect all feedback from fields
+    final feedbacks = <String>[];
+
+    return feedbacks.isNotEmpty ? feedbacks.first : null;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statusAsync = ref.watch(verificationStatusProvider);
@@ -27,84 +35,89 @@ class VerificationStatusScreen extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return statusAsync.when(
-      data: (status) => Scaffold(
-        backgroundColor: colorScheme.surface,
-        appBar: VerificationHeader(
-          applicationId: status.applicationId,
-          onHelpPressed: () {
-            // TODO: Navigate to help center
-          },
-        ),
-        body: Stack(
-          children: [
-            // Main content
-            SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 100),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 800),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Alert banner
-                        if (status.status ==
-                                VerificationRevisionStatus.revisionRequested &&
-                            status.adminFeedback != null)
-                          RevisionAlertBanner(
-                            title: status.adminFeedback!,
-                            message: status.adminFeedbackDetail ?? '',
-                            adminFeedback:
-                                'Front ID photo is too dark and blurry.',
+      data: (status) {
+        final adminFeedback = _getAdminFeedback(status);
+        final showRevisionBanner =
+            status.verificationStatus ==
+                VerificationRevisionStatus.requiredResubmit &&
+            adminFeedback != null;
+
+        return Scaffold(
+          backgroundColor: colorScheme.surface,
+          appBar: VerificationHeader(
+            applicationId: status.id,
+            onHelpPressed: () {
+              // TODO: Navigate to help center
+            },
+          ),
+          body: Stack(
+            children: [
+              // Main content
+              SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 100),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Alert banner
+                          if (showRevisionBanner)
+                            RevisionAlertBanner(
+                              title: 'Action Required',
+                              message: 'Please update the fields marked below.',
+                              adminFeedback: adminFeedback,
+                            ),
+                          AppDimens.verticalLargeExtra,
+                          // Page title
+                          Text(
+                            'Application Revision',
+                            style: textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: colorScheme.onSurface,
+                            ),
                           ),
-                        AppDimens.verticalLargeExtra,
-                        // Page title
-                        Text(
-                          'Application Revision',
-                          style: textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: colorScheme.onSurface,
+                          AppDimens.verticalSmall,
+                          Text(
+                            'Please update the specific sections highlighted below '
+                            'to proceed with your registration.',
+                            style: textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                        ),
-                        AppDimens.verticalSmall,
-                        Text(
-                          'Please update the specific sections highlighted below '
-                          'to proceed with your registration.',
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        AppDimens.verticalLarge,
-                        // Section cards
-                        _buildSectionList(context, ref, status),
-                      ],
+                          AppDimens.verticalLarge,
+                          // Section cards
+                          _buildSectionList(context, ref, status),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            // Fixed bottom bar
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: VerificationBottomBar(
-                status: status.status,
-                isLoading: statusAsync.isLoading,
-                onCancel: () {
-                  // TODO: Navigate back or show confirmation
-                },
-                onResubmit: () {
-                  ref
-                      .read(verificationStatusProvider.notifier)
-                      .resubmitApplication();
-                },
+              // Fixed bottom bar
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: VerificationBottomBar(
+                  status: status.verificationStatus,
+                  isLoading: statusAsync.isLoading,
+                  onCancel: () {
+                    // TODO: Navigate back or show confirmation
+                  },
+                  onResubmit: () {
+                    ref
+                        .read(verificationStatusProvider.notifier)
+                        .resubmitApplication();
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      },
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, stack) => Scaffold(
@@ -154,12 +167,21 @@ class VerificationStatusScreen extends ConsumerWidget {
     final provinces = provincesAsync.value ?? <LocationEntity>[];
 
     // Get current province ID to fetch districts
-    final currentProvinceId = status.locationDetails?.provinceId.value;
+    String? currentProvinceId;
+    final address = status.businessInfo.address;
+    final cityValue = address?.city?.value;
+    if (cityValue is Map) {
+      currentProvinceId = cityValue['id']?.toString();
+    }
     final districtsAsync = ref.watch(districtsProvider(currentProvinceId));
     final districts = districtsAsync.value ?? <LocationEntity>[];
 
     // Get current district ID to fetch wards
-    final currentDistrictId = status.locationDetails?.districtId.value;
+    String? currentDistrictId;
+    final districtValue = address?.district?.value;
+    if (districtValue is Map) {
+      currentDistrictId = districtValue['id']?.toString();
+    }
     final wardsAsync = ref.watch(wardsProvider(currentDistrictId));
     final wards = wardsAsync.value ?? <LocationEntity>[];
 

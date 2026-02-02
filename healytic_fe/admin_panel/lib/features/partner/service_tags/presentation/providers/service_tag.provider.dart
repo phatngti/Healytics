@@ -26,7 +26,6 @@ class ServiceTagNotifier extends _$ServiceTagNotifier {
   FutureOr<ServiceTagState> build() async {
     final repo = ref.read(serviceTagRepositoryProvider);
     final totalCount = await repo.getTotalRows();
-    print("totalCount: $totalCount");
     return ServiceTagState(
       totalCount: totalCount,
       currentPage: 0,

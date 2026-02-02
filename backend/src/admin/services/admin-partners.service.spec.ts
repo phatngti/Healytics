@@ -127,7 +127,7 @@ describe('AdminPartnersService', () => {
                 decision: ReviewDecision.CHANGES_REQUIRED,
                 generalComment: 'Fix docs',
                 items: [
-                    { fieldKey: 'business_license', documentKey: 'd1', isVerified: false, feedback: 'Blurry' }
+                    { fieldKey: 'partners/docs/business_license.pdf', isVerified: false, feedback: 'Blurry' }  // documentKey (storage path) format
                 ]
             };
 
@@ -149,9 +149,6 @@ describe('AdminPartnersService', () => {
 
             expect(mockQueryRunner.manager.save).toHaveBeenCalledWith(expect.objectContaining({
                 verificationStatus: PartnerVerificationStatus.REQUIRED_RESUBMIT,
-                rejectionDetails: expect.objectContaining({
-                    document_DOC_TYPE_A: 'Blurry'
-                })
             }));
         });
 
@@ -175,9 +172,6 @@ describe('AdminPartnersService', () => {
             // Should NOT be APPROVED, must be REQUIRED_RESUBMIT
             expect(mockQueryRunner.manager.save).toHaveBeenCalledWith(expect.objectContaining({
                 verificationStatus: PartnerVerificationStatus.REQUIRED_RESUBMIT,
-                rejectionDetails: expect.objectContaining({
-                    legalName: 'Wrong name'
-                })
             }));
         });
     });

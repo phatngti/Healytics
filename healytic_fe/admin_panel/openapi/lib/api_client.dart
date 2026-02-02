@@ -230,8 +230,6 @@ class ApiClient {
           return DoctorProfileDto.fromJson(value);
         case 'DocumentUpdateDto':
           return DocumentUpdateDto.fromJson(value);
-        case 'DocumentVerificationInfoDto':
-          return DocumentVerificationInfoDto.fromJson(value);
         case 'EmployeeResponseDto':
           return EmployeeResponseDto.fromJson(value);
         case 'FileUrlResponseDto':
@@ -244,12 +242,8 @@ class ApiClient {
           return GetWardsResponseDto.fromJson(value);
         case 'LegalRepresentativeDto':
           return LegalRepresentativeDto.fromJson(value);
-        case 'LegalRepresentativeInfoDto':
-          return LegalRepresentativeInfoDto.fromJson(value);
         case 'LegalRepresentativeRequestDto':
           return LegalRepresentativeRequestDto.fromJson(value);
-        case 'LocationDetailsInfoDto':
-          return LocationDetailsInfoDto.fromJson(value);
         case 'LocationDto':
           return LocationDto.fromJson(value);
         case 'LoginDto':
@@ -260,8 +254,6 @@ class ApiClient {
           return MyProfileResponseDto.fromJson(value);
         case 'PartnerDocumentVerificationDto':
           return PartnerDocumentVerificationDto.fromJson(value);
-        case 'PartnerInfoDto':
-          return PartnerInfoDto.fromJson(value);
         case 'PartnerItemDto':
           return PartnerItemDto.fromJson(value);
         case 'PartnerLoginDto':
@@ -320,12 +312,6 @@ class ApiClient {
           return UpdateProductDto.fromJson(value);
         case 'UpdateServiceTagDto':
           return UpdateServiceTagDto.fromJson(value);
-        case 'VerificationDocumentDto':
-          return VerificationDocumentDto.fromJson(value);
-        case 'VerificationOptionalStringFieldDto':
-          return VerificationOptionalStringFieldDto.fromJson(value);
-        case 'VerificationStringFieldDto':
-          return VerificationStringFieldDto.fromJson(value);
         case 'VerifiedField':
           return VerifiedField.fromJson(value);
         default:

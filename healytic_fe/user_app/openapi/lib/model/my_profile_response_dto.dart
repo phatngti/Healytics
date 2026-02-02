@@ -14,9 +14,9 @@ class MyProfileResponseDto {
   /// Returns a new [MyProfileResponseDto] instance.
   MyProfileResponseDto({
     required this.id,
-    required this.partnerInfo,
-    required this.locationDetails,
-    required this.legalRepresentative,
+    required this.businessInfo,
+    this.legalRepresentative,
+    this.kycDocuments = const [],
     required this.verificationStatus,
     this.verificationCompletedAt,
     required this.createdAt,
@@ -24,11 +24,17 @@ class MyProfileResponseDto {
 
   String id;
 
-  PartnerInfoDto partnerInfo;
+  BusinessInfoDto businessInfo;
 
-  LocationDetailsInfoDto locationDetails;
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  LegalRepresentativeDto? legalRepresentative;
 
-  LegalRepresentativeInfoDto legalRepresentative;
+  List<VerifiedField> kycDocuments;
 
   MyProfileResponseDtoVerificationStatusEnum verificationStatus;
 
@@ -39,9 +45,9 @@ class MyProfileResponseDto {
   @override
   bool operator ==(Object other) => identical(this, other) || other is MyProfileResponseDto &&
     other.id == id &&
-    other.partnerInfo == partnerInfo &&
-    other.locationDetails == locationDetails &&
+    other.businessInfo == businessInfo &&
     other.legalRepresentative == legalRepresentative &&
+    _deepEquality.equals(other.kycDocuments, kycDocuments) &&
     other.verificationStatus == verificationStatus &&
     other.verificationCompletedAt == verificationCompletedAt &&
     other.createdAt == createdAt;
@@ -50,22 +56,26 @@ class MyProfileResponseDto {
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
-    (partnerInfo.hashCode) +
-    (locationDetails.hashCode) +
-    (legalRepresentative.hashCode) +
+    (businessInfo.hashCode) +
+    (legalRepresentative == null ? 0 : legalRepresentative!.hashCode) +
+    (kycDocuments.hashCode) +
     (verificationStatus.hashCode) +
     (verificationCompletedAt == null ? 0 : verificationCompletedAt!.hashCode) +
     (createdAt.hashCode);
 
   @override
-  String toString() => 'MyProfileResponseDto[id=$id, partnerInfo=$partnerInfo, locationDetails=$locationDetails, legalRepresentative=$legalRepresentative, verificationStatus=$verificationStatus, verificationCompletedAt=$verificationCompletedAt, createdAt=$createdAt]';
+  String toString() => 'MyProfileResponseDto[id=$id, businessInfo=$businessInfo, legalRepresentative=$legalRepresentative, kycDocuments=$kycDocuments, verificationStatus=$verificationStatus, verificationCompletedAt=$verificationCompletedAt, createdAt=$createdAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
-      json[r'partnerInfo'] = this.partnerInfo;
-      json[r'locationDetails'] = this.locationDetails;
+      json[r'businessInfo'] = this.businessInfo;
+    if (this.legalRepresentative != null) {
       json[r'legalRepresentative'] = this.legalRepresentative;
+    } else {
+      json[r'legalRepresentative'] = null;
+    }
+      json[r'kycDocuments'] = this.kycDocuments;
       json[r'verificationStatus'] = this.verificationStatus;
     if (this.verificationCompletedAt != null) {
       json[r'verificationCompletedAt'] = this.verificationCompletedAt;
@@ -96,9 +106,9 @@ class MyProfileResponseDto {
 
       return MyProfileResponseDto(
         id: mapValueOfType<String>(json, r'id')!,
-        partnerInfo: PartnerInfoDto.fromJson(json[r'partnerInfo'])!,
-        locationDetails: LocationDetailsInfoDto.fromJson(json[r'locationDetails'])!,
-        legalRepresentative: LegalRepresentativeInfoDto.fromJson(json[r'legalRepresentative'])!,
+        businessInfo: BusinessInfoDto.fromJson(json[r'businessInfo'])!,
+        legalRepresentative: LegalRepresentativeDto.fromJson(json[r'legalRepresentative']),
+        kycDocuments: VerifiedField.listFromJson(json[r'kycDocuments']),
         verificationStatus: MyProfileResponseDtoVerificationStatusEnum.fromJson(json[r'verificationStatus'])!,
         verificationCompletedAt: mapValueOfType<Object>(json, r'verificationCompletedAt'),
         createdAt: mapDateTime(json, r'createdAt', r'')!,
@@ -150,9 +160,8 @@ class MyProfileResponseDto {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'id',
-    'partnerInfo',
-    'locationDetails',
-    'legalRepresentative',
+    'businessInfo',
+    'kycDocuments',
     'verificationStatus',
     'createdAt',
   };

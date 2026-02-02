@@ -4,21 +4,22 @@ part 'verification_status.entity.freezed.dart';
 part 'verification_status.entity.g.dart';
 
 /// Status of the overall verification revision process.
+/// Aligned with `MyProfileResponseDtoVerificationStatusEnum` from API.
 enum VerificationRevisionStatus {
-  /// Application is pending initial review.
+  /// Partner is in initial onboarding phase, registration form not submitted.
+  onboarding,
+
+  /// Application is pending review by admin.
   pending,
-
-  /// Application is under review by admin.
-  underReview,
-
-  /// Admin has requested revisions.
-  revisionRequested,
 
   /// Application has been approved.
   approved,
 
   /// Application has been rejected.
   rejected,
+
+  /// Admin has requested revisions (resubmit required).
+  requiredResubmit,
 }
 
 /// Status of an individual verification section.
@@ -51,203 +52,119 @@ enum VerificationSectionType {
   accountSecurity,
 }
 
-/// Status of an uploaded document.
-enum DocumentStatus {
-  /// Document has not been uploaded.
-  notUploaded,
+/// Generic verified field entity aligned with API's `VerifiedField`.
+/// Contains a value of any type with verification status and optional feedback.
+@freezed
+abstract class VerifiedField with _$VerifiedField {
+  /// Creates a new [VerifiedField].
+  const factory VerifiedField({
+    /// Field key used for identification (e.g., 'brand_name', 'tax_code').
+    required String fieldKey,
 
-  /// Document is pending review.
-  pendingReview,
+    /// The actual value of the field (can be any type: String, List, etc.).
+    required Object value,
 
-  /// Document has been approved.
-  approved,
+    /// Whether this field has been verified by admin.
+    required bool isVerified,
 
-  /// Document requires re-upload.
-  revisionRequired,
+    /// Admin feedback for this specific field, if any.
+    String? feedback,
+  }) = _VerifiedField;
+
+  /// Creates a [VerifiedField] from JSON data.
+  factory VerifiedField.fromJson(Map<String, dynamic> json) =>
+      _$VerifiedFieldFromJson(json);
 }
 
-/// Represents a verification document (ID card, authorization letter, etc.).
+/// Represents address/location information for verification.
+/// Aligned with `AddressInfoDto` from API.
 @freezed
-abstract class VerificationDocument with _$VerificationDocument {
-  /// Creates a new [VerificationDocument].
-  const factory VerificationDocument({
-    /// Unique identifier for the document.
-    required String id,
+abstract class AddressInfo with _$AddressInfo {
+  /// Creates a new [AddressInfo].
+  const factory AddressInfo({
+    /// Street address.
+    required VerifiedField streetAddress,
 
-    /// Display label for the document type.
-    required String label,
+    /// Ward name.
+    VerifiedField? ward,
 
-    /// URL to the uploaded file, if any.
-    String? fileUrl,
+    /// District name.
+    VerifiedField? district,
 
-    /// Original filename of the uploaded file.
-    String? fileName,
+    /// City/Province name.
+    VerifiedField? city,
 
-    /// Current status of the document.
-    @Default(DocumentStatus.notUploaded) DocumentStatus status,
+    /// Country.
+    String? country,
 
-    /// Whether this document requires an update.
-    @Default(false) bool requiresUpdate,
+    /// Latitude coordinate.
+    double? latitude,
 
-    /// Admin feedback for this specific document.
-    String? adminFeedback,
-  }) = _VerificationDocument;
+    /// Longitude coordinate.
+    double? longitude,
+  }) = _AddressInfo;
 
-  /// Creates a [VerificationDocument] from JSON data.
-  factory VerificationDocument.fromJson(Map<String, dynamic> json) =>
-      _$VerificationDocumentFromJson(json);
-}
-
-/// Wrapper for a required string verification field.
-@freezed
-abstract class VerificationStringField with _$VerificationStringField {
-  const factory VerificationStringField({
-    required String value,
-    required String displayValue,
-    @Default(false) bool requiresUpdate,
-    String? adminFeedback,
-  }) = _VerificationStringField;
-
-  factory VerificationStringField.fromJson(Map<String, dynamic> json) =>
-      _$VerificationStringFieldFromJson(json);
-}
-
-/// Wrapper for an optional string verification field.
-@freezed
-abstract class VerificationOptionalStringField
-    with _$VerificationOptionalStringField {
-  const factory VerificationOptionalStringField({
-    String? value,
-    required String displayValue,
-    @Default(false) bool requiresUpdate,
-    String? adminFeedback,
-  }) = _VerificationOptionalStringField;
-
-  factory VerificationOptionalStringField.fromJson(Map<String, dynamic> json) =>
-      _$VerificationOptionalStringFieldFromJson(json);
-}
-
-/// Wrapper for a list of strings verification field.
-@freezed
-abstract class VerificationStringListField with _$VerificationStringListField {
-  const factory VerificationStringListField({
-    required List<String> value,
-    required String displayValue,
-    @Default(false) bool requiresUpdate,
-    String? adminFeedback,
-  }) = _VerificationStringListField;
-
-  factory VerificationStringListField.fromJson(Map<String, dynamic> json) =>
-      _$VerificationStringListFieldFromJson(json);
+  /// Creates an [AddressInfo] from JSON data.
+  factory AddressInfo.fromJson(Map<String, dynamic> json) =>
+      _$AddressInfoFromJson(json);
 }
 
 /// Represents partner (business entity) information for verification.
-/// Aligned with PartnerRequestEntity from sign-up form.
+/// Aligned with `BusinessInfoDto` from API.
 @freezed
-abstract class PartnerInfo with _$PartnerInfo {
-  /// Creates a new [PartnerInfo].
-  const factory PartnerInfo({
-    /// Tax registration code.
-    required VerificationStringField taxCode,
-
-    /// Legal company name.
-    required VerificationStringField legalName,
-
+abstract class BusinessInfo with _$BusinessInfo {
+  /// Creates a new [BusinessInfo].
+  const factory BusinessInfo({
     /// Brand/trade name.
-    required VerificationStringField brandName,
+    required VerifiedField brandName,
 
-    /// Business type (e.g., 'Individual Business', 'Corporation').
-    required VerificationStringField businessType,
+    /// Tax registration code.
+    VerifiedField? taxRegistrationCode,
+
+    /// Service tags/categories.
+    required VerifiedField serviceTags,
+
+    /// Business address information.
+    AddressInfo? address,
+
+    /// Username for the partner account.
+    VerifiedField? username,
+
+    /// Email address.
+    VerifiedField? email,
 
     /// Business phone number.
-    VerificationOptionalStringField? phoneNumber,
-  }) = _PartnerInfo;
+    VerifiedField? phoneNumber,
+  }) = _BusinessInfo;
 
-  /// Creates a [PartnerInfo] from JSON data.
-  factory PartnerInfo.fromJson(Map<String, dynamic> json) =>
-      _$PartnerInfoFromJson(json);
+  /// Creates a [BusinessInfo] from JSON data.
+  factory BusinessInfo.fromJson(Map<String, dynamic> json) =>
+      _$BusinessInfoFromJson(json);
 }
 
-/// Represents location details information for verification.
-/// Aligned with PartnerRequestEntity address fields from sign-up form.
-@freezed
-abstract class LocationDetailsInfo with _$LocationDetailsInfo {
-  /// Creates a new [LocationDetailsInfo].
-  const factory LocationDetailsInfo({
-    /// Province ID.
-    required VerificationStringField provinceId,
-
-    /// District ID.
-    required VerificationStringField districtId,
-
-    /// Ward ID.
-    required VerificationStringField wardId,
-
-    /// Detailed street address.
-    required VerificationStringField streetAddress,
-  }) = _LocationDetailsInfo;
-
-  /// Creates a [LocationDetailsInfo] from JSON data.
-  factory LocationDetailsInfo.fromJson(Map<String, dynamic> json) =>
-      _$LocationDetailsInfoFromJson(json);
-}
-
-/// Represents document verification information.
-/// Aligned with PartnerDocumentVerificationEntity from sign-up form.
-@freezed
-abstract class DocumentVerificationInfo with _$DocumentVerificationInfo {
-  /// Creates a new [DocumentVerificationInfo].
-  const factory DocumentVerificationInfo({
-    /// Business license document.
-    VerificationDocument? businessLicense,
-
-    /// Authorization letter document.
-    VerificationDocument? authorizationLetter,
-
-    /// Tax certificate document.
-    VerificationDocument? taxCertificate,
-
-    /// Other supporting documents.
-    @Default([]) List<VerificationDocument> otherDocuments,
-  }) = _DocumentVerificationInfo;
-
-  /// Creates a [DocumentVerificationInfo] from JSON data.
-  factory DocumentVerificationInfo.fromJson(Map<String, dynamic> json) =>
-      _$DocumentVerificationInfoFromJson(json);
-}
-
-/// Represents the legal representative details and documents.
-/// Aligned with LegalRepresentativeEntity from sign-up form.
+/// Represents the legal representative details.
+/// Aligned with `LegalRepresentativeDto` from API.
 @freezed
 abstract class LegalRepresentativeInfo with _$LegalRepresentativeInfo {
   /// Creates a new [LegalRepresentativeInfo].
   const factory LegalRepresentativeInfo({
     /// Full legal name of the representative.
-    required VerificationStringField fullName,
+    required VerifiedField fullName,
 
     /// Position/title of the representative.
-    VerificationStringField? position,
+    VerifiedField? position,
 
     /// Phone number of the representative.
-    VerificationStringField? phoneNumber,
+    VerifiedField? phoneNumber,
 
     /// Type of government ID (e.g., 'ID Card', 'Passport').
-    required VerificationStringField idType,
+    VerifiedField? idType,
 
     /// Government ID number.
-    required VerificationStringField idNumber,
+    VerifiedField? idNumber,
 
-    /// ID issue date (ISO format string).
-    required VerificationStringField idIssueDate,
-
-    /// Front side of government ID.
-    required VerificationDocument idFrontImage,
-
-    /// Back side of government ID.
-    required VerificationDocument idBackImage,
-
-    /// Document verification info (business license, authorization, etc.).
-    DocumentVerificationInfo? documents,
+    /// ID issue date.
+    VerifiedField? idIssueDate,
   }) = _LegalRepresentativeInfo;
 
   /// Creates a [LegalRepresentativeInfo] from JSON data.
@@ -282,37 +199,35 @@ abstract class VerificationSectionEntity with _$VerificationSectionEntity {
 }
 
 /// Main entity representing the provider's verification status.
+/// Aligned with `MyProfileResponseDto` from API.
 @freezed
 abstract class ProviderVerificationStatusEntity
     with _$ProviderVerificationStatusEntity {
   /// Creates a new [ProviderVerificationStatusEntity].
   const factory ProviderVerificationStatusEntity({
-    /// Application ID (e.g., "#SP-8821").
-    required String applicationId,
+    /// Partner ID (UUID).
+    required String id,
 
-    /// Overall status of the verification process.
-    required VerificationRevisionStatus status,
-
-    /// List of verification sections.
-    required List<VerificationSectionEntity> sections,
-
-    /// Partner (business entity) details, if available.
-    PartnerInfo? partnerInfo,
-
-    /// Location details, if available.
-    LocationDetailsInfo? locationDetails,
+    /// Business entity details.
+    required BusinessInfo businessInfo,
 
     /// Legal representative details, if available.
     LegalRepresentativeInfo? legalRepresentative,
 
-    /// Admin feedback title/summary.
-    String? adminFeedback,
+    /// KYC documents as verified fields.
+    @Default([]) List<VerifiedField> kycDocuments,
 
-    /// Detailed admin feedback message.
-    String? adminFeedbackDetail,
+    /// Overall status of the verification process.
+    required VerificationRevisionStatus verificationStatus,
 
-    /// Timestamp of last update.
-    DateTime? lastUpdated,
+    /// When verification was completed (if applicable).
+    DateTime? verificationCompletedAt,
+
+    /// When the partner was created.
+    required DateTime createdAt,
+
+    /// List of verification sections for UI navigation.
+    @Default([]) List<VerificationSectionEntity> sections,
   }) = _ProviderVerificationStatusEntity;
 
   /// Creates a [ProviderVerificationStatusEntity] from JSON data.

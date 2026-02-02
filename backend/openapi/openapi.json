@@ -2418,7 +2418,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-01-31T20:14:45.119Z"
+              "submittedAt": "2026-02-02T04:29:36.192Z"
             }
           }
         },
@@ -2465,253 +2465,117 @@
           "data"
         ]
       },
-      "VerificationStringFieldDto": {
+      "VerifiedField": {
         "type": "object",
         "properties": {
+          "fieldKey": {
+            "type": "string"
+          },
           "value": {
-            "type": "string",
-            "example": "XX-1234567-Y",
-            "description": "The raw value"
-          },
-          "displayValue": {
-            "type": "string",
-            "example": "XX-1234567-Y",
-            "description": "Human-readable display value"
-          },
-          "requiresUpdate": {
-            "type": "boolean",
-            "example": false,
-            "description": "Whether this field requires update"
-          },
-          "adminFeedback": {
-            "type": "object",
-            "example": "Tax code mismatch with tax document.",
-            "nullable": true
+            "type": "object"
           },
           "isVerified": {
-            "type": "object",
-            "example": true,
-            "nullable": true,
-            "description": "Whether this field was verified by admin (from partner_review_log)"
-          }
-        },
-        "required": [
-          "value",
-          "displayValue",
-          "requiresUpdate"
-        ]
-      },
-      "VerificationOptionalStringFieldDto": {
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "object",
-            "example": "+1 (555) 000-0000",
-            "nullable": true
-          },
-          "displayValue": {
-            "type": "object",
-            "example": "+1 (555) 000-0000",
-            "nullable": true
-          },
-          "requiresUpdate": {
-            "type": "boolean",
-            "example": false,
-            "description": "Whether this field requires update"
-          },
-          "adminFeedback": {
-            "type": "object",
-            "example": "Phone number mismatch with tax document.",
-            "nullable": true
-          },
-          "isVerified": {
-            "type": "object",
-            "example": true,
-            "nullable": true,
-            "description": "Whether this field was verified by admin (from partner_review_log)"
-          }
-        },
-        "required": [
-          "requiresUpdate"
-        ]
-      },
-      "PartnerInfoDto": {
-        "type": "object",
-        "properties": {
-          "taxCode": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
-          },
-          "legalName": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
-          },
-          "brandName": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
-          },
-          "businessType": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
-          },
-          "phoneNumber": {
-            "$ref": "#/components/schemas/VerificationOptionalStringFieldDto"
-          }
-        },
-        "required": [
-          "taxCode",
-          "legalName",
-          "brandName",
-          "businessType",
-          "phoneNumber"
-        ]
-      },
-      "LocationDetailsInfoDto": {
-        "type": "object",
-        "properties": {
-          "provinceId": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
-          },
-          "districtId": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
-          },
-          "wardId": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
-          },
-          "streetAddress": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
-          }
-        },
-        "required": [
-          "provinceId",
-          "districtId",
-          "wardId",
-          "streetAddress"
-        ]
-      },
-      "VerificationDocumentDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "id_front",
-            "description": "Document identifier"
-          },
-          "label": {
-            "type": "string",
-            "example": "Front Side ID",
-            "description": "Display label for the document"
-          },
-          "fileUrl": {
-            "type": "object",
-            "example": "https://example.com/id_front_v1.jpg",
-            "nullable": true
-          },
-          "fileName": {
-            "type": "object",
-            "example": "id_front_v1.jpg",
-            "nullable": true
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "approved",
-              "rejected",
-              "revision_required",
-              "missing"
-            ],
-            "example": "pending"
-          },
-          "requiresUpdate": {
             "type": "boolean",
             "example": false
           },
-          "adminFeedback": {
-            "type": "object",
-            "example": "Front ID photo is too dark and blurry.",
-            "nullable": true
-          },
-          "isVerified": {
-            "type": "object",
-            "example": true,
-            "nullable": true,
-            "description": "Whether this document was verified by admin (from partner_review_log)"
+          "feedback": {
+            "type": "string"
           }
         },
         "required": [
-          "id",
-          "label",
-          "status",
-          "requiresUpdate"
+          "fieldKey",
+          "value",
+          "isVerified"
         ]
       },
-      "DocumentVerificationInfoDto": {
+      "AddressInfoDto": {
         "type": "object",
         "properties": {
-          "businessLicense": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/VerificationDocumentDto"
-              }
-            ]
+          "streetAddress": {
+            "$ref": "#/components/schemas/VerifiedField"
           },
-          "authorizationLetter": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/VerificationDocumentDto"
-              }
-            ]
+          "ward": {
+            "$ref": "#/components/schemas/VerifiedField"
           },
-          "taxCertificate": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/VerificationDocumentDto"
-              }
-            ]
+          "district": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "city": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "country": {
+            "type": "string",
+            "example": "Vietnam"
+          },
+          "latitude": {
+            "type": "number",
+            "example": 21.0285,
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "example": 105.8542,
+            "nullable": true
           }
-        }
+        },
+        "required": [
+          "streetAddress"
+        ]
       },
-      "LegalRepresentativeInfoDto": {
+      "BusinessInfoDto": {
+        "type": "object",
+        "properties": {
+          "brandName": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "taxRegistrationCode": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "serviceTags": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressInfoDto"
+          },
+          "username": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "email": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "phoneNumber": {
+            "$ref": "#/components/schemas/VerifiedField"
+          }
+        },
+        "required": [
+          "brandName",
+          "serviceTags"
+        ]
+      },
+      "LegalRepresentativeDto": {
         "type": "object",
         "properties": {
           "fullName": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
+            "$ref": "#/components/schemas/VerifiedField"
           },
           "position": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
+            "$ref": "#/components/schemas/VerifiedField"
           },
           "phoneNumber": {
-            "$ref": "#/components/schemas/VerificationOptionalStringFieldDto"
+            "$ref": "#/components/schemas/VerifiedField"
           },
           "idType": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
+            "$ref": "#/components/schemas/VerifiedField"
           },
           "idNumber": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
+            "$ref": "#/components/schemas/VerifiedField"
           },
           "idIssueDate": {
-            "$ref": "#/components/schemas/VerificationStringFieldDto"
-          },
-          "idFrontImage": {
-            "$ref": "#/components/schemas/VerificationDocumentDto"
-          },
-          "idBackImage": {
-            "$ref": "#/components/schemas/VerificationDocumentDto"
-          },
-          "documents": {
-            "$ref": "#/components/schemas/DocumentVerificationInfoDto"
+            "$ref": "#/components/schemas/VerifiedField"
           }
         },
         "required": [
-          "fullName",
-          "position",
-          "phoneNumber",
-          "idType",
-          "idNumber",
-          "idIssueDate",
-          "idFrontImage",
-          "idBackImage",
-          "documents"
+          "fullName"
         ]
       },
       "MyProfileResponseDto": {
@@ -2721,14 +2585,17 @@
             "type": "string",
             "example": "uuid"
           },
-          "partnerInfo": {
-            "$ref": "#/components/schemas/PartnerInfoDto"
-          },
-          "locationDetails": {
-            "$ref": "#/components/schemas/LocationDetailsInfoDto"
+          "businessInfo": {
+            "$ref": "#/components/schemas/BusinessInfoDto"
           },
           "legalRepresentative": {
-            "$ref": "#/components/schemas/LegalRepresentativeInfoDto"
+            "$ref": "#/components/schemas/LegalRepresentativeDto"
+          },
+          "kycDocuments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerifiedField"
+            }
           },
           "verificationStatus": {
             "type": "string",
@@ -2754,9 +2621,8 @@
         },
         "required": [
           "id",
-          "partnerInfo",
-          "locationDetails",
-          "legalRepresentative",
+          "businessInfo",
+          "kycDocuments",
           "verificationStatus",
           "createdAt"
         ]
@@ -4498,119 +4364,6 @@
           "total"
         ]
       },
-      "VerifiedField": {
-        "type": "object",
-        "properties": {
-          "fieldKey": {
-            "type": "string"
-          },
-          "value": {
-            "type": "object"
-          },
-          "isVerified": {
-            "type": "boolean",
-            "example": false
-          },
-          "feedback": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "fieldKey",
-          "value",
-          "isVerified"
-        ]
-      },
-      "AddressInfoDto": {
-        "type": "object",
-        "properties": {
-          "streetAddress": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "ward": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "district": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "city": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "country": {
-            "type": "string",
-            "example": "Vietnam"
-          },
-          "latitude": {
-            "type": "number",
-            "example": 21.0285,
-            "nullable": true
-          },
-          "longitude": {
-            "type": "number",
-            "example": 105.8542,
-            "nullable": true
-          }
-        },
-        "required": [
-          "streetAddress"
-        ]
-      },
-      "BusinessInfoDto": {
-        "type": "object",
-        "properties": {
-          "brandName": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "taxRegistrationCode": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "serviceTags": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "address": {
-            "$ref": "#/components/schemas/AddressInfoDto"
-          },
-          "username": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "email": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "phoneNumber": {
-            "$ref": "#/components/schemas/VerifiedField"
-          }
-        },
-        "required": [
-          "brandName",
-          "serviceTags"
-        ]
-      },
-      "LegalRepresentativeDto": {
-        "type": "object",
-        "properties": {
-          "fullName": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "position": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "phoneNumber": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "idType": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "idNumber": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "idIssueDate": {
-            "$ref": "#/components/schemas/VerifiedField"
-          }
-        },
-        "required": [
-          "fullName"
-        ]
-      },
       "AdminPartnerDetailResponseDto": {
         "type": "object",
         "properties": {
@@ -4675,26 +4428,13 @@
         "properties": {
           "fieldKey": {
             "type": "string",
-            "description": "Key of the field or document being reviewed"
-          },
-          "documentKey": {
-            "type": "string",
-            "description": "UUID of the document (if type is DOCUMENT)"
-          },
-          "isVerified": {
-            "type": "boolean",
-            "description": "Mark the item as valid or invalid",
-            "example": true
+            "description": "Key of the field being reviewed"
           },
           "feedback": {
             "type": "string",
             "description": "Reason for rejection or feedback"
           }
-        },
-        "required": [
-          "fieldKey",
-          "isVerified"
-        ]
+        }
       },
       "ReviewPartnerProfileDto": {
         "type": "object",

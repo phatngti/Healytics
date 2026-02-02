@@ -1,6 +1,6 @@
 import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
-import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/common/verifiable_field.widget.dart';
 import 'package:flutter/material.dart';
 
 /// Common verification form field widgets for the verification status feature.
@@ -10,16 +10,17 @@ import 'package:flutter/material.dart';
 
 /// Text field with verification status indicator.
 ///
-/// Displays a label with a required indicator (*) and status badge.
-/// When [field.requiresUpdate] is true, shows an editable text field or
+/// Uses [VerifiableField] wrapper to display label, status badge, and feedback.
+/// When [field.isVerified] is false, shows an editable text field or
 /// dropdown (if [isDropdown] is true) with error border.
 /// Otherwise, shows a read-only container with the value.
 class VerificationTextField extends StatelessWidget {
   const VerificationTextField({
     required this.label,
     required this.field,
-    this.hintText,
+    this.fieldId,
     this.onChanged,
+    this.isEdited = false,
     this.isDropdown = false,
     this.dropdownItems,
     super.key,
@@ -28,14 +29,17 @@ class VerificationTextField extends StatelessWidget {
   /// The label text displayed above the field.
   final String label;
 
-  /// The verification field containing value, update status, and feedback.
-  final VerificationStringField field;
+  /// Optional unique identifier for the field (defaults to label-derived key).
+  final String? fieldId;
 
-  /// Hint text shown when the field is editable.
-  final String? hintText;
+  /// The verification field containing value, update status, and feedback.
+  final VerifiedField field;
 
   /// Callback when the field value changes.
   final ValueChanged<String>? onChanged;
+
+  /// Whether the user has edited this field's value.
+  final bool isEdited;
 
   /// Whether to show a dropdown instead of a text field when editable.
   final bool isDropdown;
@@ -43,146 +47,129 @@ class VerificationTextField extends StatelessWidget {
   /// List of items to show in the dropdown (required when [isDropdown] is true).
   final List<String>? dropdownItems;
 
+  String get _fieldKey => fieldId ?? label.toLowerCase().replaceAll(' ', '_');
+
+  /// Gets the display value from the field value.
+  String get _displayValue {
+    final value = field.value;
+    if (value is String) return value;
+    if (value is Map) return value['name']?.toString() ?? value.toString();
+    if (value is List) return value.join(', ');
+    return value.toString();
+  }
+
+  /// Whether the field requires an update (not verified).
+  bool get _requiresUpdate => !field.isVerified;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors = Theme.of(context).extension<SemanticColors>();
-    final successColor = semanticColors?.success ?? Colors.green;
 
-    final isEditable = field.requiresUpdate;
+    return VerifiableField(
+      fieldId: _fieldKey,
+      title: label,
+      requiresUpdate: _requiresUpdate,
+      isEdited: isEdited,
+      adminFeedback: field.feedback,
+      child: _buildFieldContent(
+        context,
+        colorScheme: colorScheme,
+        textTheme: textTheme,
+        isEditable: _requiresUpdate,
+      ),
+    );
+  }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Label with status indicator
-        Row(
-          children: [
-            Text(
-              label,
-              style: textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              '*',
-              style: textTheme.labelMedium?.copyWith(color: colorScheme.error),
-            ),
-            const Spacer(),
-            if (field.requiresUpdate)
-              VerificationStatusBadge(
-                label: 'UPDATE NEEDED',
-                color: colorScheme.error,
-              )
-            else
-              Icon(Icons.check_circle, size: 16, color: successColor),
-          ],
-        ),
-        const SizedBox(height: 8),
+  Widget _buildFieldContent(
+    BuildContext context, {
+    required ColorScheme colorScheme,
+    required TextTheme textTheme,
+    required bool isEditable,
+  }) {
+    // Determine border color based on edit state
+    final borderColor = isEdited ? colorScheme.primary : colorScheme.error;
 
-        // Text field or Dropdown
-        if (isEditable)
-          if (isDropdown && dropdownItems != null)
-            FormFieldBuilders.buildDropdownField(
-              context,
-              label: '',
-              fieldKey: label.toLowerCase().replaceAll(' ', '_'),
-              items: dropdownItems!,
-              initialValue: dropdownItems!.contains(field.displayValue)
-                  ? field.displayValue
-                  : null,
-              onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
-              hintText: hintText ?? field.adminFeedback,
-              enabled: isEditable,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: colorScheme.error),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: colorScheme.error),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: colorScheme.primary, width: 2),
-              ),
-            )
-          else
-            FormFieldBuilders.buildTextField(
-              context,
-              label: '',
-              fieldKey: label.toLowerCase().replaceAll(' ', '_'),
-              initialValue: field.displayValue,
-              onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
-              hintText: hintText ?? field.adminFeedback,
-              enabled: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: colorScheme.error),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: colorScheme.error),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: colorScheme.primary, width: 2),
-              ),
-            )
-        else
-          Opacity(
-            opacity: 0.6,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                border: Border.all(color: colorScheme.outlineVariant),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      field.displayValue,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                  if (isDropdown)
-                    Icon(
-                      Icons.expand_more,
-                      color: colorScheme.onSurfaceVariant,
-                      size: 20,
-                    ),
-                ],
-              ),
-            ),
+    if (isEditable) {
+      if (isDropdown && dropdownItems != null) {
+        return FormFieldBuilders.buildDropdownField(
+          context,
+          label: '',
+          fieldKey: _fieldKey,
+          items: dropdownItems!,
+          initialValue: dropdownItems!.contains(_displayValue)
+              ? _displayValue
+              : null,
+          onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
+          hintText: field.feedback,
+          enabled: isEditable,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: borderColor),
           ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: borderColor),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: colorScheme.primary, width: 2),
+          ),
+        );
+      }
+      return FormFieldBuilders.buildTextField(
+        context,
+        label: '',
+        fieldKey: _fieldKey,
+        initialValue: _displayValue,
+        onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
+        hintText: field.feedback,
+        enabled: true,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
+        ),
+      );
+    }
 
-        // Admin feedback
-        if (field.adminFeedback != null && field.adminFeedback!.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Icon(Icons.info_outline, size: 14, color: colorScheme.error),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  field.adminFeedback!,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.error,
-                    fontStyle: FontStyle.italic,
-                  ),
+    // Read-only display
+    return Opacity(
+      opacity: 0.6,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest,
+          border: Border.all(color: colorScheme.outlineVariant),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                _displayValue,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
-            ],
-          ),
-        ],
-      ],
+            ),
+            if (isDropdown)
+              Icon(
+                Icons.expand_more,
+                color: colorScheme.onSurfaceVariant,
+                size: 20,
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -268,233 +255,230 @@ class VerificationReadOnlyTextField extends StatelessWidget {
               ),
             ),
           ),
+        // Feedback message display
+        if (adminFeedback != null && adminFeedback!.isNotEmpty)
+          _FeedbackMessage(feedback: adminFeedback!),
       ],
     );
   }
 }
 
-/// Editable or read-only field based on [VerificationStringField.requiresUpdate].
+/// Editable or read-only field based on [VerifiedField.isVerified].
 ///
-/// Displays action required badge when update is needed and success
-/// checkmark when verified.
+/// Uses [VerifiableField] wrapper for consistent status display.
 class VerificationEditableField extends StatelessWidget {
   const VerificationEditableField({
     required this.label,
     required this.field,
+    this.fieldId,
     this.onChanged,
+    this.isEdited = false,
     super.key,
   });
 
   /// The label text displayed above the field.
   final String label;
 
+  /// Optional unique identifier for the field.
+  final String? fieldId;
+
   /// The verification field containing value and update status.
-  final VerificationStringField field;
+  final VerifiedField field;
 
   /// Callback when the field value changes.
   final ValueChanged<String>? onChanged;
+
+  /// Whether the user has edited this field's value.
+  final bool isEdited;
+
+  String get _fieldKey => fieldId ?? label.toLowerCase().replaceAll(' ', '_');
+
+  String get _displayValue {
+    final value = field.value;
+    if (value is String) return value;
+    return value.toString();
+  }
+
+  bool get _requiresUpdate => !field.isVerified;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final requiresAction = field.requiresUpdate;
-    final semanticColors = Theme.of(context).extension<SemanticColors>();
-    final successColor = semanticColors?.success ?? Colors.green;
+    final requiresAction = _requiresUpdate;
+    final borderColor = isEdited ? colorScheme.primary : colorScheme.error;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Label with action badge
-        Row(
-          children: [
-            Text(
-              label,
-              style: textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const Spacer(),
-            if (requiresAction)
-              VerificationActionRequiredBadge(color: colorScheme.error)
-            else
-              Icon(Icons.check_circle, size: 16, color: successColor),
-          ],
-        ),
-        const SizedBox(height: 6),
-        // Field container - editable when requires action
-        if (requiresAction)
-          FormFieldBuilders.buildTextField(
-            context,
-            label: '',
-            fieldKey: label.toLowerCase().replaceAll(' ', '_'),
-            initialValue: field.value,
-            onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
-            hintText: field.adminFeedback,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.w500,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.error, width: 1.5),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.error, width: 1.5),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.error, width: 2),
-            ),
-          )
-        else
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              border: Border.all(color: colorScheme.outlineVariant),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              field.value,
+    return VerifiableField(
+      fieldId: _fieldKey,
+      title: label,
+      requiresUpdate: _requiresUpdate,
+      isEdited: isEdited,
+      adminFeedback: field.feedback,
+      child: requiresAction
+          ? FormFieldBuilders.buildTextField(
+              context,
+              label: '',
+              fieldKey: _fieldKey,
+              initialValue: _displayValue,
+              onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
+              hintText: field.feedback,
               style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: borderColor, width: 1.5),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: borderColor, width: 1.5),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: colorScheme.primary, width: 2),
+              ),
+            )
+          : Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                border: Border.all(color: colorScheme.outlineVariant),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                _displayValue,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
-          ),
-      ],
     );
   }
 }
 
 /// Dropdown-styled field that can be editable based on verification status.
 ///
-/// Shows a dropdown chevron icon and supports editing when update is required.
+/// Uses [VerifiableField] wrapper for consistent status display.
 class VerificationDropdownField extends StatelessWidget {
   const VerificationDropdownField({
     required this.label,
     required this.field,
+    this.fieldId,
     this.onChanged,
+    this.isEdited = false,
     super.key,
   });
 
   /// The label text displayed above the field.
   final String label;
 
+  /// Optional unique identifier for the field.
+  final String? fieldId;
+
   /// The verification field containing value and update status.
-  final VerificationStringField field;
+  final VerifiedField field;
 
   /// Callback when the field value changes.
   final ValueChanged<String>? onChanged;
+
+  /// Whether the user has edited this field's value.
+  final bool isEdited;
+
+  String get _fieldKey => fieldId ?? label.toLowerCase().replaceAll(' ', '_');
+
+  String get _displayValue {
+    final value = field.value;
+    if (value is String) return value;
+    return value.toString();
+  }
+
+  bool get _requiresUpdate => !field.isVerified;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final requiresAction = field.requiresUpdate;
-    final semanticColors = Theme.of(context).extension<SemanticColors>();
-    final successColor = semanticColors?.success ?? Colors.green;
+    final requiresAction = _requiresUpdate;
+    final borderColor = isEdited ? colorScheme.primary : colorScheme.error;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Label with action badge
-        Row(
-          children: [
-            Text(
-              label,
-              style: textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurfaceVariant,
+    return VerifiableField(
+      fieldId: _fieldKey,
+      title: label,
+      requiresUpdate: _requiresUpdate,
+      isEdited: isEdited,
+      adminFeedback: field.feedback,
+      child: requiresAction
+          ? FormFieldBuilders.buildTextField(
+              context,
+              label: '',
+              fieldKey: _fieldKey,
+              initialValue: _displayValue,
+              onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
+              hintText: field.feedback,
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
               ),
-            ),
-            const Spacer(),
-            if (requiresAction)
-              VerificationActionRequiredBadge(color: colorScheme.error)
-            else
-              Icon(Icons.check_circle, size: 16, color: successColor),
-          ],
-        ),
-        const SizedBox(height: 8),
-        // Field container - editable when requires action
-        if (requiresAction)
-          FormFieldBuilders.buildTextField(
-            context,
-            label: '',
-            fieldKey: label.toLowerCase().replaceAll(' ', '_'),
-            initialValue: field.value,
-            onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
-            hintText: field.adminFeedback,
-            style: textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurface,
-              fontWeight: FontWeight.w500,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
-            suffixIcon: Icon(
-              Icons.expand_more,
-              color: colorScheme.error,
-              size: 20,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.error, width: 1.5),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.error, width: 1.5),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.error, width: 2),
-            ),
-          )
-        else
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              border: Border.all(color: colorScheme.outlineVariant),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    field.value,
-                    style: textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+              suffixIcon: Icon(Icons.expand_more, color: borderColor, size: 20),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: borderColor, width: 1.5),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: borderColor, width: 1.5),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: colorScheme.primary, width: 2),
+              ),
+            )
+          : Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                border: Border.all(color: colorScheme.outlineVariant),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _displayValue,
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ),
-                Icon(
-                  Icons.expand_more,
-                  color: colorScheme.onSurfaceVariant,
-                  size: 20,
-                ),
-              ],
+                  Icon(
+                    Icons.expand_more,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 20,
+                  ),
+                ],
+              ),
             ),
-          ),
-      ],
     );
   }
 }
 
-/// Read-only field displaying a label and value.
+/// Read-only field displaying a label and value with optional feedback.
 class VerificationReadOnlyField extends StatelessWidget {
   const VerificationReadOnlyField({
     required this.label,
     required this.value,
+    this.adminFeedback,
     super.key,
   });
 
@@ -503,6 +487,9 @@ class VerificationReadOnlyField extends StatelessWidget {
 
   /// The value to display.
   final String value;
+
+  /// Optional admin feedback message to display.
+  final String? adminFeedback;
 
   @override
   Widget build(BuildContext context) {
@@ -535,7 +522,57 @@ class VerificationReadOnlyField extends StatelessWidget {
             ),
           ),
         ),
+        // Feedback message display
+        if (adminFeedback != null && adminFeedback!.isNotEmpty)
+          _FeedbackMessage(feedback: adminFeedback!),
       ],
+    );
+  }
+}
+
+/// Reusable feedback message widget for displaying admin feedback.
+class _FeedbackMessage extends StatelessWidget {
+  const _FeedbackMessage({required this.feedback});
+
+  final String feedback;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: colorScheme.error.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(8),
+          border: Border(left: BorderSide(color: colorScheme.error, width: 3)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.format_quote,
+              size: 16,
+              color: colorScheme.error.withValues(alpha: 0.7),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                feedback,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontStyle: FontStyle.italic,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

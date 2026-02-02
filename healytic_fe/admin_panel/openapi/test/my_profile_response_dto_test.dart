@@ -21,18 +21,18 @@ void main() {
       // TODO
     });
 
-    // PartnerInfoDto partnerInfo
-    test('to test the property `partnerInfo`', () async {
+    // BusinessInfoDto businessInfo
+    test('to test the property `businessInfo`', () async {
       // TODO
     });
 
-    // LocationDetailsInfoDto locationDetails
-    test('to test the property `locationDetails`', () async {
-      // TODO
-    });
-
-    // LegalRepresentativeInfoDto legalRepresentative
+    // LegalRepresentativeDto legalRepresentative
     test('to test the property `legalRepresentative`', () async {
+      // TODO
+    });
+
+    // List<VerifiedField> kycDocuments (default value: const [])
+    test('to test the property `kycDocuments`', () async {
       // TODO
     });
 

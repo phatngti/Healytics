@@ -158,13 +158,7 @@ class PartnerVerificationRemoteDataSourceImpl
     final items = <ReviewItemDto>[];
     if (fieldFeedback != null) {
       for (final entry in fieldFeedback.entries) {
-        items.add(
-          ReviewItemDto(
-            fieldKey: entry.key,
-            isVerified: false, // Fields with feedback need revision
-            feedback: entry.value,
-          ),
-        );
+        items.add(ReviewItemDto(fieldKey: entry.key, feedback: entry.value));
       }
     }
 

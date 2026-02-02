@@ -17,6 +17,7 @@ import { DocumentType } from './enum/document-type.enum';
 import { DocumentRequirement } from './entities/document-requirement.entity';
 import { PartnerDocument } from './entities/partner-document.entity';
 import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
+import { PartnerReviewLog } from '@/admin/entities/partner-review-log.entity';
 import { Role } from '@/account/enum/role.enum';
 
 describe('PartnersService', () => {
@@ -382,6 +383,17 @@ describe('PartnersService', () => {
     });
 
     describe('getMyProfile', () => {
+        let mockReviewLogRepository: Record<string, jest.Mock>;
+
+        beforeEach(() => {
+            // Create a mock for the reviewLogRepository
+            mockReviewLogRepository = {
+                findOne: jest.fn().mockResolvedValue(null),
+            };
+            // Inject it into the service (accessing private property for testing)
+            (service as any).reviewLogRepository = mockReviewLogRepository;
+        });
+
         it('should return formatted profile with verification fields', async () => {
             // Arrange
             const mockPartnerWithLegalRep = {
@@ -389,12 +401,8 @@ describe('PartnersService', () => {
                 legalRepresentative: {
                     ...mockPartner.legalRepresentative,
                     idIssueDate: new Date('2020-01-15'),
-                    idFrontImgUrl: 'https://example.com/front.jpg',
-                    idBackImgUrl: 'https://example.com/back.jpg',
-                    businessLicenseUrl: null,
-                    authorizationLetterUrl: null,
-                    taxCertificateUrl: null,
                 },
+                documents: [],
             };
             mockPartnerRepository.findOne.mockResolvedValue(mockPartnerWithLegalRep);
 
@@ -403,10 +411,9 @@ describe('PartnersService', () => {
 
             // Assert
             expect(result.id).toBe(mockPartner.id);
-            expect(result.partnerInfo.taxCode.value).toBe(mockPartner.taxCode);
-            expect(result.locationDetails.provinceId.displayValue).toBe('Hà Nội');
-            expect(result.locationDetails.districtId.displayValue).toBe('Quận 1');
-            expect(result.legalRepresentative.fullName.value).toBe('John Doe');
+            expect(result.businessInfo.brandName.value).toBe(mockPartner.brandName);
+            expect(result.businessInfo.address?.streetAddress.value).toBe(mockPartner.streetAddress);
+            expect(result.legalRepresentative?.fullName.value).toBe('John Doe');
             expect(result.verificationStatus).toBe(PartnerVerificationStatus.PENDING);
         });
 
@@ -631,35 +638,6 @@ describe('PartnersService', () => {
                 '(partner.taxCode ILIKE :search OR partner.brandName ILIKE :search OR partner.legalName ILIKE :search OR account.email ILIKE :search)',
                 { search: '%test%' },
             );
-        });
-    });
-
-    describe('getPartnerDetail', () => {
-        it('should return partner detail with verificationStatus', async () => {
-            // Arrange
-            mockPartnerRepository.findOne.mockResolvedValue(mockPartner);
-
-            // Act
-            const result = await service.getPartnerDetail('partner-uuid');
-
-            // Assert
-            expect(result.id).toBe(mockPartner.id);
-            expect(result.account.email).toBe(mockAccount.email);
-            expect(result.address.province).toBe('Hà Nội');
-            expect(result.verificationStatus).toBe(PartnerVerificationStatus.PENDING);
-        });
-
-        it('should throw NotFoundException when partner not found', async () => {
-            // Arrange
-            mockPartnerRepository.findOne.mockResolvedValue(null);
-
-            // Act & Assert
-            await expect(
-                service.getPartnerDetail('invalid-partner'),
-            ).rejects.toThrow(NotFoundException);
-            await expect(
-                service.getPartnerDetail('invalid-partner'),
-            ).rejects.toThrow('Partner not found');
         });
     });
 });

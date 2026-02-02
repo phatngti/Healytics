@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/document_verification_section.widget.dart';
 
 /// Repository interface for verification status operations.
 ///
@@ -13,17 +14,9 @@ abstract class VerificationStatusRepository {
 
   /// Resubmits the application after making requested revisions.
   ///
+  /// [uploads] contains the list of re-uploaded documents to submit.
   /// Returns `true` if the resubmission was successful.
-  Future<bool> resubmitApplication();
-
-  /// Uploads a verification document.
-  ///
-  /// - [documentId]: The ID of the document being uploaded.
-  /// - [filePath]: Local path to the file being uploaded.
-  ///
-  /// Returns the updated [VerificationDocument] with the new file URL.
-  Future<VerificationDocument> uploadDocument({
-    required String documentId,
-    required String filePath,
+  Future<bool> resubmitApplication({
+    List<DocumentUploadResult> uploads = const [],
   });
 }

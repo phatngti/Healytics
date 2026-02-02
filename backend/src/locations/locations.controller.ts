@@ -5,6 +5,7 @@ import {
     Param,
     HttpCode,
     HttpStatus,
+    ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { LocationsService } from './locations.service';
@@ -45,7 +46,7 @@ export class LocationsController {
     })
     @ApiResponse({ status: 404, description: 'Province not found' })
     async getDistricts(
-        @Param('provinceId') provinceId: string,
+        @Param('provinceId', ParseUUIDPipe) provinceId: string,
     ): Promise<GetDistrictsResponseDto> {
         return this.locationsService.getDistrictsByProvinceId(provinceId);
     }
@@ -60,7 +61,7 @@ export class LocationsController {
     })
     @ApiResponse({ status: 404, description: 'District not found' })
     async getWards(
-        @Param('districtId') districtId: string,
+        @Param('districtId', ParseUUIDPipe) districtId: string,
     ): Promise<GetWardsResponseDto> {
         return this.locationsService.getWardsByDistrictId(districtId);
     }
