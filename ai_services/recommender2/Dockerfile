@@ -32,7 +32,7 @@ RUN pip install --no-cache-dir \
 COPY . /app
 
 # 6. 
-# EXPOSE 8000
+EXPOSE 8000
 
 # 7. Command 
 CMD ["python", "main.py"]

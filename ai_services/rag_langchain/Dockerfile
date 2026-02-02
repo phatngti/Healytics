@@ -9,10 +9,14 @@
 # sudo docker run hello-world
 # sudo usermod -aG docker $USER
 # newgrp docker
-# docker build -t healytics_chatbot_rag . (Build docker image)
+# docker build -t giahung21112004/healytics_chatbot_rag:latest . (Build docker image)
 # docker run --gpus all -it healytics_chatbot_rag bash
 # docker run --name healytics_chatbot_2 --gpus all -it -p 5000:5000 -v /home/giahung21112004/Projects/Healytics/ai_services/rag_langchain:/app -v torch_cache:/root/.cache/torch -v hf_cache:/root/.cache/huggingface -w /app healytics_chatbot_rag bash (lệnh thay thế để mount code khỏi build)
 # docker start -ai healytics_chatbot
+# docker login
+# docker tag healytics_chatbot_rag:latest giahung21112004/healytics_chatbot_rag:latest
+# docker images
+# docker push giahung21112004/healytics_chatbot_rag:latest
 
 
 FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
