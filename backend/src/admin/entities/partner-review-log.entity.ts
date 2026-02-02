@@ -10,7 +10,7 @@ import { Partner } from '../../partners/entities/partner.entity';
 import { Account } from '@/account/entities/account.entity';
 import { PartnerVerificationStatus } from '../../partners/enum/partner-verification-status.enum';
 
-@Entity('partner_review_log')
+@Entity('health_partner_review_log')
 export class PartnerReviewLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -31,17 +31,17 @@ export class PartnerReviewLog {
     verdict: PartnerVerificationStatus;
 
     // 3. Review Fields
-    @Column({ type: 'jsonb', nullable: true })
+    @Column({ name: 'field_reviews', type: 'jsonb', nullable: true })
     fieldReviews: {
         [fieldName: string]: {
             value: any;       //  (Snapshot)
             isValid: boolean;
-            reason?: string;  // rejection reason
+            feedback?: string;  // rejection reason
         }
     } | null;
 
     // 4. Review Documents
-    @Column({ type: 'jsonb', nullable: true })
+    @Column({ name: 'document_reviews', type: 'jsonb', nullable: true })
     documentReviews: {
         [docId: string]: {
             documentType: string;
@@ -59,7 +59,7 @@ export class PartnerReviewLog {
     @JoinColumn({ name: 'reviewer_id' })
     reviewer: Account;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ name: 'general_comment', type: 'text', nullable: true })
     generalComment: string | null;
 
     @CreateDateColumn({ name: 'created_at' })

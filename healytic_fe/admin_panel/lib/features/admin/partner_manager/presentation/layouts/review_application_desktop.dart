@@ -15,6 +15,7 @@ import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// Desktop layout for the review application page
 class ReviewApplicationDesktop extends ConsumerStatefulWidget {
@@ -93,7 +94,7 @@ class _ReviewApplicationDesktopState
         );
 
         // Navigate back to partner list
-        Navigator.of(context).pop();
+        context.pop();
       }
     } catch (error, stackTrace) {
       developer.log(

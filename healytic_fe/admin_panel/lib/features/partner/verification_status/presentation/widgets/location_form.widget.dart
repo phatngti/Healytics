@@ -19,8 +19,8 @@ class LocationForm extends StatelessWidget {
     super.key,
   });
 
-  /// The location details verification data.
-  final LocationDetailsInfo? info;
+  /// The address info verification data.
+  final AddressInfo? info;
 
   /// Callback when a field value changes.
   final void Function(String fieldKey, String value)? onFieldChanged;
@@ -57,75 +57,86 @@ class LocationForm extends StatelessWidget {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: VerificationTextField(
-                      label: 'Province',
-                      field: info!.provinceId,
-                      hintText: 'Select Province',
-                      isDropdown: true,
-                      dropdownItems: _toDropdownItems(provinces),
-                      onChanged: (value) =>
-                          onFieldChanged?.call('province_id', value),
+                  if (info!.city != null)
+                    Expanded(
+                      child: VerificationTextField(
+                        label: 'Province',
+                        fieldId: info!.city!.fieldKey,
+                        field: info!.city!,
+                        isDropdown: true,
+                        dropdownItems: _toDropdownItems(provinces),
+                        onChanged: (value) =>
+                            onFieldChanged?.call(info!.city!.fieldKey, value),
+                      ),
                     ),
-                  ),
                   AppDimens.horizontalMedium,
-                  Expanded(
-                    child: VerificationTextField(
-                      label: 'District',
-                      field: info!.districtId,
-                      hintText: 'Select District',
-                      isDropdown: true,
-                      dropdownItems: _toDropdownItems(districts),
-                      onChanged: (value) =>
-                          onFieldChanged?.call('district_id', value),
+                  if (info!.district != null)
+                    Expanded(
+                      child: VerificationTextField(
+                        label: 'District',
+                        fieldId: info!.district!.fieldKey,
+                        field: info!.district!,
+                        isDropdown: true,
+                        dropdownItems: _toDropdownItems(districts),
+                        onChanged: (value) => onFieldChanged?.call(
+                          info!.district!.fieldKey,
+                          value,
+                        ),
+                      ),
                     ),
-                  ),
                   AppDimens.horizontalMedium,
-                  Expanded(
-                    child: VerificationTextField(
-                      label: 'Ward',
-                      field: info!.wardId,
-                      hintText: 'Select Ward',
-                      isDropdown: true,
-                      dropdownItems: _toDropdownItems(wards),
-                      onChanged: (value) =>
-                          onFieldChanged?.call('ward_id', value),
+                  if (info!.ward != null)
+                    Expanded(
+                      child: VerificationTextField(
+                        label: 'Ward',
+                        fieldId: info!.ward!.fieldKey,
+                        field: info!.ward!,
+                        isDropdown: true,
+                        dropdownItems: _toDropdownItems(wards),
+                        onChanged: (value) =>
+                            onFieldChanged?.call(info!.ward!.fieldKey, value),
+                      ),
                     ),
-                  ),
                 ],
               );
             }
 
             return Column(
               children: [
-                VerificationTextField(
-                  label: 'Province',
-                  field: info!.provinceId,
-                  hintText: 'Select Province',
-                  isDropdown: true,
-                  dropdownItems: _toDropdownItems(provinces),
-                  onChanged: (value) =>
-                      onFieldChanged?.call('province_id', value),
-                ),
-                AppDimens.verticalMedium,
-                VerificationTextField(
-                  label: 'District',
-                  field: info!.districtId,
-                  hintText: 'Select District',
-                  isDropdown: true,
-                  dropdownItems: _toDropdownItems(districts),
-                  onChanged: (value) =>
-                      onFieldChanged?.call('district_id', value),
-                ),
-                AppDimens.verticalMedium,
-                VerificationTextField(
-                  label: 'Ward',
-                  field: info!.wardId,
-                  hintText: 'Select Ward',
-                  isDropdown: true,
-                  dropdownItems: _toDropdownItems(wards),
-                  onChanged: (value) => onFieldChanged?.call('ward_id', value),
-                ),
+                if (info!.city != null) ...[
+                  VerificationTextField(
+                    label: 'Province',
+                    fieldId: info!.city!.fieldKey,
+                    field: info!.city!,
+                    isDropdown: true,
+                    dropdownItems: _toDropdownItems(provinces),
+                    onChanged: (value) =>
+                        onFieldChanged?.call(info!.city!.fieldKey, value),
+                  ),
+                  AppDimens.verticalMedium,
+                ],
+                if (info!.district != null) ...[
+                  VerificationTextField(
+                    label: 'District',
+                    fieldId: info!.district!.fieldKey,
+                    field: info!.district!,
+                    isDropdown: true,
+                    dropdownItems: _toDropdownItems(districts),
+                    onChanged: (value) =>
+                        onFieldChanged?.call('district', value),
+                  ),
+                  AppDimens.verticalMedium,
+                ],
+                if (info!.ward != null)
+                  VerificationTextField(
+                    label: 'Ward',
+                    fieldId: info!.ward!.fieldKey,
+                    field: info!.ward!,
+                    isDropdown: true,
+                    dropdownItems: _toDropdownItems(wards),
+                    onChanged: (value) =>
+                        onFieldChanged?.call(info!.ward!.fieldKey, value),
+                  ),
               ],
             );
           },
@@ -135,9 +146,10 @@ class LocationForm extends StatelessWidget {
         // Row 2: Street Address
         VerificationTextField(
           label: 'Street Address',
-          field: info!.streetAddress,
-          hintText: '123 Harmony Lane, Suite 400',
-          onChanged: (value) => onFieldChanged?.call('street_address', value),
+          fieldId: info!.streetAddress!.fieldKey,
+          field: info!.streetAddress!,
+          onChanged: (value) =>
+              onFieldChanged?.call(info!.streetAddress!.fieldKey, value),
         ),
       ],
     );

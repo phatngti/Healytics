@@ -3,7 +3,8 @@ import { Partner } from '@/partners/entities/partner.entity';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { LegalRepresentative } from '@/partners/entities/legal-representative.entity';
 import { PartnerDocument } from '@/partners/entities/partner-document.entity';
-import { FieldFeedbackMap, PartnerFieldKeys } from '../services/admin-partners.service';
+import { FieldFeedbackMap } from '../services/admin-partners.service';
+import { PartnerFieldKeys } from '@/common/constants/partner-form-keys';
 
 // ============================================================================
 // Priority Enum (matching Flutter's PartnerPriority)
@@ -68,6 +69,9 @@ export class KycDocumentDto {
     @ApiProperty({ example: 'pending' })
     status: string;
 
+    @ApiPropertyOptional({ example: 'Additional review notes from admin' })
+    uploadedAt?: string;
+
     static fromEntity(doc: PartnerDocument): KycDocumentDto {
         const dto = new KycDocumentDto();
         dto.id = doc.id;
@@ -76,6 +80,7 @@ export class KycDocumentDto {
         dto.type = doc.type;
         dto.fileType = doc.fileType;
         dto.status = doc.status;
+        dto.uploadedAt = doc.createdAt.toISOString();
         return dto;
     }
 }
@@ -268,10 +273,9 @@ export class BusinessInfoDto {
 
         dto.address = AddressInfoDto.fromPartner(partner, feedbackMap);
 
-        const username = partner.account?.email?.split('@')[0];
-        if (username) {
+        if (partner.account?.username) {
             const usernameFb = getFeedback(PartnerFieldKeys.username);
-            dto.username = VerifiedField.of(PartnerFieldKeys.username, username, usernameFb.isVerified, usernameFb.reason);
+            dto.username = VerifiedField.of(PartnerFieldKeys.username, partner.account.username, usernameFb.isVerified, usernameFb.reason);
         }
 
         if (partner.account?.email) {

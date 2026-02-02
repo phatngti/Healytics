@@ -129,13 +129,13 @@ class SignUpFormScreen extends HookConsumerWidget {
               // Multi-document field (e.g., other_documents)
               final docKey = entry.key.replaceFirst('documents.', '');
               documents.addAll(
-                value
+                value.indexed
                     .map(
-                      (d) => PartnerDocumentVerificationEntity(
-                        fileType: d.fileType,
+                      (indexed) => PartnerDocumentVerificationEntity(
+                        fileType: indexed.$2.fileType,
                         type: docKey.toUpperCase(),
-                        documentKey: docKey,
-                        urls: [d.url],
+                        documentKey: '${docKey}_${indexed.$1 + 1}',
+                        urls: [indexed.$2.url],
                       ),
                     )
                     .toList(),

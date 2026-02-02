@@ -17,7 +17,7 @@ import { IdType } from '../enum/id-type.enum';
  * auth_letter_doc_url) have been migrated to the partner_document table.
  * @see migrations/scripts/1769427340000-RefactorLegalRepDocumentColumns.ts
  */
-@Entity('legal_representative')
+@Entity('health_partner_legal_representative')
 export class LegalRepresentative {
     @PrimaryGeneratedColumn('uuid')
     id: string;

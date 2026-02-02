@@ -1,6 +1,7 @@
-import 'package:admin_openapi/api.dart';
+import 'package:admin_openapi/api.dart' as api;
 import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/document_verification_section.widget.dart';
 
 /// Abstract interface for verification status data source.
 abstract class VerificationStatusRemoteDataSource {
@@ -8,173 +9,158 @@ abstract class VerificationStatusRemoteDataSource {
   Future<ProviderVerificationStatusEntity> getVerificationStatus();
 
   /// Resubmits the application to the remote API.
-  Future<bool> resubmitApplication();
-
-  /// Uploads a document to the remote storage.
-  Future<VerificationDocument> uploadDocument({
-    required String documentId,
-    required String filePath,
+  ///
+  /// [uploads] contains the list of re-uploaded documents to submit.
+  Future<bool> resubmitApplication({
+    List<DocumentUploadResult> uploads = const [],
   });
 }
 
 /// Mock implementation of [VerificationStatusRemoteDataSource].
 ///
-/// Returns sample data matching the HTML design for development
-/// and testing purposes.
+/// Returns sample data matching the design for development and testing.
 class VerificationStatusRemoteDataSourceMock
     implements VerificationStatusRemoteDataSource {
   @override
   Future<ProviderVerificationStatusEntity> getVerificationStatus() async {
-    // Simulate network delay
     await Future<void>.delayed(const Duration(milliseconds: 500));
 
-    // Define partner info with requiresUpdate flags
-    const partnerInfo = PartnerInfo(
-      taxCode: VerificationStringField(
-        value: 'XX-1234567-Y',
-        displayValue: 'XX-1234567-Y',
-        requiresUpdate: true,
-        adminFeedback: 'Tax code mismatch with tax document.',
-      ),
-      legalName: VerificationStringField(
-        value: 'Serenity Spa & Wellness LLC',
-        displayValue: 'Serenity Spa & Wellness LLC',
-        requiresUpdate: true,
-        adminFeedback: 'Name mismatch with tax document.',
-      ),
-      brandName: VerificationStringField(
+    const businessInfo = BusinessInfo(
+      brandName: VerifiedField(
+        fieldKey: 'brand_name',
         value: 'Serenity Spa',
-        displayValue: 'Serenity Spa',
-        requiresUpdate: false,
+        isVerified: true,
       ),
-      businessType: VerificationStringField(
-        value: 'Individual Business',
-        displayValue: 'Individual Business',
-        requiresUpdate: false,
+      taxRegistrationCode: VerifiedField(
+        fieldKey: 'tax_registration_code',
+        value: 'XX-1234567-Y',
+        isVerified: false,
+        feedback: 'Tax code mismatch with tax document.',
       ),
-      phoneNumber: VerificationOptionalStringField(
+      serviceTags: VerifiedField(
+        fieldKey: 'service_tags',
+        value: ['Spa', 'Wellness', 'Massage'],
+        isVerified: true,
+      ),
+      address: AddressInfo(
+        streetAddress: VerifiedField(
+          fieldKey: 'street_address',
+          value: '123 Harmony Lane, Suite 400',
+          isVerified: false,
+          feedback: 'Please provide unit number if applicable.',
+        ),
+        ward: VerifiedField(
+          fieldKey: 'ward',
+          value: {
+            'id': '35a05597-60d5-4e7c-aa16-8d4952386d3c',
+            'name': 'Phường Thanh Trì',
+          },
+          isVerified: false,
+          feedback: 'Ward mismatch with tax document.',
+        ),
+        district: VerifiedField(
+          fieldKey: 'district',
+          value: {
+            'id': 'd7f692d1-e766-4c29-b855-894467308850',
+            'name': 'Quận Ba Đình',
+          },
+          isVerified: false,
+          feedback: 'District mismatch with tax document.',
+        ),
+        city: VerifiedField(
+          fieldKey: 'city',
+          value: {
+            'id': '05a7608b-0978-42d1-b6b0-9f21198e6dfa',
+            'name': 'Thành phố Hà Nội',
+          },
+          isVerified: false,
+          feedback: 'Province mismatch with tax document.',
+        ),
+        country: 'Vietnam',
+      ),
+      phoneNumber: VerifiedField(
+        fieldKey: 'phone_number',
         value: '+1 (555) 000-0000',
-        displayValue: '+1 (555) 000-0000',
-        requiresUpdate: true,
-        adminFeedback: 'Phone number mismatch with tax document.',
+        isVerified: false,
+        feedback: 'Phone number mismatch with tax document.',
       ),
     );
 
-    // Define location details with requiresUpdate flags
-    const locationDetails = LocationDetailsInfo(
-      provinceId: VerificationStringField(
-        value: '05a7608b-0978-42d1-b6b0-9f21198e6dfa',
-        displayValue: 'Thành phố Hà Nội',
-        requiresUpdate: true,
-        adminFeedback: 'Province ID mismatch with tax document.',
-      ),
-      districtId: VerificationStringField(
-        value: 'd7f692d1-e766-4c29-b855-894467308850',
-        displayValue: 'Quận Ba Đình',
-        requiresUpdate: true,
-        adminFeedback: 'District ID mismatch with tax document.',
-      ),
-      wardId: VerificationStringField(
-        value: '35a05597-60d5-4e7c-aa16-8d4952386d3c',
-        displayValue: 'Huyện Thanh Trì',
-        requiresUpdate: true,
-        adminFeedback: 'Ward ID mismatch with tax document.',
-      ),
-      streetAddress: VerificationStringField(
-        value: '123 Harmony Lane, Suite 400',
-        displayValue: '123 Harmony Lane, Suite 400',
-        requiresUpdate: true,
-        adminFeedback: 'Please provide unit number if applicable.',
-      ),
-    );
-
-    // Define legal representative with requiresUpdate flags
     const legalRepresentative = LegalRepresentativeInfo(
-      fullName: VerificationStringField(
+      fullName: VerifiedField(
+        fieldKey: 'full_name',
         value: 'Jane Doe',
-        displayValue: 'Jane Doe',
-        requiresUpdate: true,
-        adminFeedback: 'Name mismatch with tax document.',
+        isVerified: false,
+        feedback: 'Name mismatch with ID document.',
       ),
-      position: VerificationStringField(
+      position: VerifiedField(
+        fieldKey: 'position',
         value: 'CEO',
-        displayValue: 'CEO',
-        requiresUpdate: true,
-        adminFeedback: 'Position mismatch with tax document.',
+        isVerified: false,
+        feedback: 'Position mismatch with tax document.',
       ),
-      phoneNumber: VerificationStringField(
+      phoneNumber: VerifiedField(
+        fieldKey: 'legal_rep_phone_number',
         value: '+1 (555) 000-0000',
-        displayValue: '+1 (555) 000-0000',
-        requiresUpdate: true,
-        adminFeedback: 'Phone number mismatch with tax document.',
+        isVerified: false,
+        feedback: 'Phone number mismatch with tax document.',
       ),
-      idType: VerificationStringField(
+      idType: VerifiedField(
+        fieldKey: 'id_type',
         value: 'ID Card',
-        displayValue: 'ID Card',
-        requiresUpdate: true,
-        adminFeedback: 'ID type mismatch with tax document.',
+        isVerified: false,
+        feedback: 'ID type mismatch with document.',
       ),
-      idNumber: VerificationStringField(
+      idNumber: VerifiedField(
+        fieldKey: 'id_number',
         value: 'A12345678',
-        displayValue: 'A12345678',
-        requiresUpdate: true,
-        adminFeedback: 'ID number mismatch with tax document.',
+        isVerified: false,
+        feedback: 'ID number mismatch with document.',
       ),
-      idIssueDate: VerificationStringField(
+      idIssueDate: VerifiedField(
+        fieldKey: 'id_issue_date',
         value: '2020-01-15',
-        displayValue: '2020-01-15',
-        requiresUpdate: true,
-        adminFeedback: 'ID issue date mismatch with tax document.',
-      ),
-      idFrontImage: VerificationDocument(
-        id: 'id_front',
-        label: 'Front Side ID',
-        status: DocumentStatus.revisionRequired,
-        requiresUpdate: true,
-        adminFeedback: 'Front ID photo is too dark and blurry.',
-      ),
-      idBackImage: VerificationDocument(
-        id: 'id_back',
-        label: 'Back Side ID',
-        fileUrl: 'https://example.com/id_back_v1.jpg',
-        fileName: 'id_back_v1.jpg',
-        status: DocumentStatus.approved,
-        requiresUpdate: false,
-      ),
-      documents: DocumentVerificationInfo(
-        businessLicense: VerificationDocument(
-          id: 'business_license',
-          label: 'Business License',
-          fileUrl: 'https://example.com/business_license.pdf',
-          fileName: 'business_license.pdf',
-          status: DocumentStatus.approved,
-          requiresUpdate: false,
-        ),
-        authorizationLetter: VerificationDocument(
-          id: 'auth_letter',
-          label: 'Authorization Letter',
-          fileUrl: 'https://example.com/auth_letter.pdf',
-          fileName: 'authorization_letter.pdf',
-          status: DocumentStatus.approved,
-          requiresUpdate: false,
-        ),
-        taxCertificate: VerificationDocument(
-          id: 'tax_certificate',
-          label: 'Tax Certificate',
-          fileUrl: 'https://example.com/tax_certificate.pdf',
-          fileName: 'tax_certificate.pdf',
-          status: DocumentStatus.approved,
-          requiresUpdate: false,
-        ),
+        isVerified: false,
+        feedback: 'ID issue date mismatch with document.',
       ),
     );
 
-    // Determine section statuses based on requiresUpdate values
-    final businessEntityStatus = _hasBusinessEntityUpdates(partnerInfo)
+    const kycDocuments = <VerifiedField>[
+      VerifiedField(
+        fieldKey: 'id_front_image',
+        value: '',
+        isVerified: false,
+        feedback: 'Front ID photo is too dark and blurry.',
+      ),
+      VerifiedField(
+        fieldKey: 'id_back_image',
+        value: 'https://example.com/id_back_v1.jpg',
+        isVerified: true,
+      ),
+      VerifiedField(
+        fieldKey: 'business_license',
+        value: 'https://example.com/business_license.pdf',
+        isVerified: true,
+      ),
+      VerifiedField(
+        fieldKey: 'authorization_letter',
+        value: 'https://example.com/auth_letter.pdf',
+        isVerified: true,
+      ),
+      VerifiedField(
+        fieldKey: 'tax_certificate',
+        value: 'https://example.com/tax_certificate.pdf',
+        isVerified: true,
+      ),
+    ];
+
+    final businessEntityStatus = _hasBusinessInfoUpdates(businessInfo)
         ? SectionStatus.revisionRequired
         : SectionStatus.completed;
 
-    final locationDetailsStatus = _hasLocationDetailsUpdates(locationDetails)
+    final locationDetailsStatus =
+        businessInfo.address != null &&
+            _hasAddressUpdates(businessInfo.address!)
         ? SectionStatus.revisionRequired
         : SectionStatus.completed;
 
@@ -184,114 +170,78 @@ class VerificationStatusRemoteDataSourceMock
         : SectionStatus.completed;
 
     return ProviderVerificationStatusEntity(
-      applicationId: '#SP-8821',
-      status: VerificationRevisionStatus.revisionRequested,
-      adminFeedback: 'Action Required: Revision Requested',
-      adminFeedbackDetail:
-          'Our verification team has reviewed your application. '
-          'The front side of your Government ID is blurred and illegible. '
-          'Please re-upload a clear, high-resolution photo of your ID card.',
-      lastUpdated: DateTime.now(),
+      id: 'mock-partner-id-12345678',
+      businessInfo: businessInfo,
+      legalRepresentative: legalRepresentative,
+      kycDocuments: kycDocuments,
+      verificationStatus: VerificationRevisionStatus.requiredResubmit,
+      createdAt: DateTime.now(),
       sections: [
         VerificationSectionEntity(
           type: VerificationSectionType.businessEntity,
           label: 'Business Entity',
           status: businessEntityStatus,
-          isLocked: false,
           stepNumber: 1,
         ),
         VerificationSectionEntity(
           type: VerificationSectionType.locationDetails,
           label: 'Location Details',
           status: locationDetailsStatus,
-          isLocked: false,
           stepNumber: 2,
         ),
         VerificationSectionEntity(
           type: VerificationSectionType.legalRepresentative,
           label: 'Legal Representative',
           status: legalRepresentativeStatus,
-          isLocked: false,
           stepNumber: 3,
         ),
         const VerificationSectionEntity(
           type: VerificationSectionType.accountSecurity,
           label: 'Documents',
           status: SectionStatus.completed,
-          isLocked: false,
           stepNumber: 4,
         ),
       ],
-      partnerInfo: partnerInfo,
-      locationDetails: locationDetails,
-      legalRepresentative: legalRepresentative,
     );
   }
 
-  /// Checks if any business entity fields require update.
-  bool _hasBusinessEntityUpdates(PartnerInfo partnerInfo) {
-    return partnerInfo.taxCode.requiresUpdate ||
-        partnerInfo.legalName.requiresUpdate ||
-        partnerInfo.brandName.requiresUpdate ||
-        partnerInfo.businessType.requiresUpdate ||
-        (partnerInfo.phoneNumber?.requiresUpdate ?? false);
+  bool _hasBusinessInfoUpdates(BusinessInfo info) {
+    return !info.brandName.isVerified ||
+        !(info.taxRegistrationCode?.isVerified ?? true) ||
+        !info.serviceTags.isVerified ||
+        !(info.phoneNumber?.isVerified ?? true);
   }
 
-  /// Checks if any location details fields require update.
-  bool _hasLocationDetailsUpdates(LocationDetailsInfo locationDetails) {
-    return locationDetails.provinceId.requiresUpdate ||
-        locationDetails.districtId.requiresUpdate ||
-        locationDetails.wardId.requiresUpdate ||
-        locationDetails.streetAddress.requiresUpdate;
+  bool _hasAddressUpdates(AddressInfo address) {
+    return !address.streetAddress.isVerified ||
+        !(address.ward?.isVerified ?? true) ||
+        !(address.district?.isVerified ?? true) ||
+        !(address.city?.isVerified ?? true);
   }
 
-  /// Checks if any legal representative fields require update.
   bool _hasLegalRepresentativeUpdates(LegalRepresentativeInfo legalRep) {
-    return legalRep.fullName.requiresUpdate ||
-        (legalRep.position?.requiresUpdate ?? false) ||
-        (legalRep.phoneNumber?.requiresUpdate ?? false) ||
-        legalRep.idType.requiresUpdate ||
-        legalRep.idNumber.requiresUpdate ||
-        legalRep.idIssueDate.requiresUpdate ||
-        legalRep.idFrontImage.requiresUpdate ||
-        legalRep.idBackImage.requiresUpdate;
+    return !legalRep.fullName.isVerified ||
+        !(legalRep.position?.isVerified ?? true) ||
+        !(legalRep.phoneNumber?.isVerified ?? true) ||
+        !(legalRep.idType?.isVerified ?? true) ||
+        !(legalRep.idNumber?.isVerified ?? true) ||
+        !(legalRep.idIssueDate?.isVerified ?? true);
   }
 
   @override
-  Future<bool> resubmitApplication() async {
-    // Simulate network delay
+  Future<bool> resubmitApplication({
+    List<DocumentUploadResult> uploads = const [],
+  }) async {
     await Future<void>.delayed(const Duration(seconds: 1));
     return true;
-  }
-
-  @override
-  Future<VerificationDocument> uploadDocument({
-    required String documentId,
-    required String filePath,
-  }) async {
-    // Simulate upload delay
-    await Future<void>.delayed(const Duration(seconds: 2));
-
-    return VerificationDocument(
-      id: documentId,
-      label: documentId == 'id_front' ? 'Front Side ID' : 'Document',
-      fileUrl: 'https://example.com/uploaded/$documentId.jpg',
-      fileName: filePath.split('/').last,
-      status: DocumentStatus.pendingReview,
-      requiresUpdate: false,
-    );
   }
 }
 
 /// Real implementation of [VerificationStatusRemoteDataSource].
-///
-/// Fetches partner profile from the API and maps to domain entities.
 class VerificationStatusRemoteDataSourceImpl
     implements VerificationStatusRemoteDataSource {
-  /// Creates a new [VerificationStatusRemoteDataSourceImpl].
   VerificationStatusRemoteDataSourceImpl({required this.apiService});
 
-  /// The API service instance.
   final ApiService apiService;
 
   @override
@@ -305,317 +255,232 @@ class VerificationStatusRemoteDataSourceImpl
   }
 
   @override
-  Future<bool> resubmitApplication() async {
-    // TODO: Implement actual resubmit API call when available
+  Future<bool> resubmitApplication({
+    List<DocumentUploadResult> uploads = const [],
+  }) async {
+    // TODO: Implement actual API call with uploads
+    // Convert uploads to the required API format
     throw UnimplementedError('Resubmit API not yet implemented');
   }
 
-  @override
-  Future<VerificationDocument> uploadDocument({
-    required String documentId,
-    required String filePath,
-  }) async {
-    // TODO: Implement actual upload API call when available
-    throw UnimplementedError('Upload document API not yet implemented');
-  }
-
-  /// Maps [MyProfileResponseDto] to [ProviderVerificationStatusEntity].
-  ProviderVerificationStatusEntity _mapToEntity(MyProfileResponseDto dto) {
-    final partnerInfo = _mapPartnerInfo(dto.partnerInfo);
-    final locationDetails = _mapLocationDetails(dto.locationDetails);
+  ProviderVerificationStatusEntity _mapToEntity(api.MyProfileResponseDto dto) {
+    final businessInfo = _mapBusinessInfo(dto.businessInfo);
     final legalRepresentative = _mapLegalRepresentative(
       dto.legalRepresentative,
     );
+    final kycDocuments = _mapKycDocuments(dto.kycDocuments);
 
     return ProviderVerificationStatusEntity(
-      applicationId: '#${dto.id.substring(0, 8).toUpperCase()}',
-      status: _mapVerificationStatus(dto.verificationStatus),
+      id: dto.id,
+      businessInfo: businessInfo,
+      legalRepresentative: legalRepresentative,
+      kycDocuments: kycDocuments,
+      verificationStatus: _mapVerificationStatus(dto.verificationStatus),
+      createdAt: dto.createdAt,
       sections: _buildSections(
-        partnerInfo: partnerInfo,
-        locationDetails: locationDetails,
+        businessInfo: businessInfo,
         legalRepresentative: legalRepresentative,
+        kycDocuments: kycDocuments,
         verificationStatus: dto.verificationStatus,
       ),
-      partnerInfo: partnerInfo,
-      locationDetails: locationDetails,
-      legalRepresentative: legalRepresentative,
-      adminFeedback: _extractAdminFeedback(dto.verificationStatus),
-      adminFeedbackDetail: _extractAdminFeedbackDetail(
-        dto.legalRepresentative.documents,
-      ),
-      lastUpdated: dto.createdAt,
     );
   }
 
-  /// Maps API verification status enum to domain enum.
   VerificationRevisionStatus _mapVerificationStatus(
-    MyProfileResponseDtoVerificationStatusEnum status,
+    api.MyProfileResponseDtoVerificationStatusEnum status,
   ) {
     switch (status) {
-      case MyProfileResponseDtoVerificationStatusEnum.PENDING:
+      case api.MyProfileResponseDtoVerificationStatusEnum.ONBOARDING:
+        return VerificationRevisionStatus.onboarding;
+      case api.MyProfileResponseDtoVerificationStatusEnum.PENDING:
         return VerificationRevisionStatus.pending;
-      case MyProfileResponseDtoVerificationStatusEnum.APPROVED:
+      case api.MyProfileResponseDtoVerificationStatusEnum.APPROVED:
         return VerificationRevisionStatus.approved;
-      case MyProfileResponseDtoVerificationStatusEnum.REJECTED:
+      case api.MyProfileResponseDtoVerificationStatusEnum.REJECTED:
         return VerificationRevisionStatus.rejected;
-      case MyProfileResponseDtoVerificationStatusEnum.REQUIRED_RESUBMIT:
-        return VerificationRevisionStatus.revisionRequested;
+      case api.MyProfileResponseDtoVerificationStatusEnum.REQUIRED_RESUBMIT:
+        return VerificationRevisionStatus.requiredResubmit;
     }
-    return VerificationRevisionStatus.pending;
+    return VerificationRevisionStatus.onboarding;
   }
 
-  /// Builds verification sections based on the profile data.
+  BusinessInfo _mapBusinessInfo(api.BusinessInfoDto dto) {
+    return BusinessInfo(
+      brandName: _mapVerifiedFieldDto(dto.brandName, 'brand_name'),
+      taxRegistrationCode: dto.taxRegistrationCode != null
+          ? _mapVerifiedFieldDto(
+              dto.taxRegistrationCode!,
+              'tax_registration_code',
+            )
+          : null,
+      serviceTags: _mapVerifiedFieldDto(dto.serviceTags, 'service_tags'),
+      address: _mapAddressInfo(dto.address),
+      username: dto.username != null
+          ? _mapVerifiedFieldDto(dto.username!, 'username')
+          : null,
+      email: dto.email != null
+          ? _mapVerifiedFieldDto(dto.email!, 'email')
+          : null,
+      phoneNumber: dto.phoneNumber != null
+          ? _mapVerifiedFieldDto(dto.phoneNumber!, 'phone_number')
+          : null,
+    );
+  }
+
+  AddressInfo? _mapAddressInfo(api.AddressInfoDto? dto) {
+    if (dto == null) return null;
+    return AddressInfo(
+      streetAddress: _mapVerifiedFieldDto(dto.streetAddress, 'street_address'),
+      ward: dto.ward != null ? _mapVerifiedFieldDto(dto.ward!, 'ward') : null,
+      district: dto.district != null
+          ? _mapVerifiedFieldDto(dto.district!, 'district')
+          : null,
+      city: dto.city != null ? _mapVerifiedFieldDto(dto.city!, 'city') : null,
+      country: dto.country,
+      latitude: dto.latitude?.toDouble(),
+      longitude: dto.longitude?.toDouble(),
+    );
+  }
+
+  LegalRepresentativeInfo? _mapLegalRepresentative(
+    api.LegalRepresentativeDto? dto,
+  ) {
+    if (dto == null) return null;
+    return LegalRepresentativeInfo(
+      fullName: _mapVerifiedFieldDto(dto.fullName, 'full_name'),
+      position: dto.position != null
+          ? _mapVerifiedFieldDto(dto.position!, 'position')
+          : null,
+      phoneNumber: dto.phoneNumber != null
+          ? _mapVerifiedFieldDto(dto.phoneNumber!, 'legal_rep_phone_number')
+          : null,
+      idType: dto.idType != null
+          ? _mapVerifiedFieldDto(dto.idType!, 'id_type')
+          : null,
+      idNumber: dto.idNumber != null
+          ? _mapVerifiedFieldDto(dto.idNumber!, 'id_number')
+          : null,
+      idIssueDate: dto.idIssueDate != null
+          ? _mapVerifiedFieldDto(dto.idIssueDate!, 'id_issue_date')
+          : null,
+    );
+  }
+
+  VerifiedField _mapVerifiedFieldDto(
+    api.VerifiedField field,
+    String defaultFieldKey,
+  ) {
+    // Use defaultFieldKey if fieldKey is empty (shouldn't happen per API contract)
+    final resolvedKey = field.fieldKey.isEmpty
+        ? defaultFieldKey
+        : field.fieldKey;
+    return VerifiedField(
+      fieldKey: resolvedKey,
+      value: field.value,
+      isVerified: field.isVerified,
+      feedback: field.feedback,
+    );
+  }
+
+  List<VerifiedField> _mapKycDocuments(List<api.VerifiedField> kycDocuments) {
+    return kycDocuments
+        .map((doc) => _mapVerifiedFieldDto(doc, doc.fieldKey))
+        .toList();
+  }
+
   List<VerificationSectionEntity> _buildSections({
-    required PartnerInfo partnerInfo,
-    required LocationDetailsInfo locationDetails,
-    required LegalRepresentativeInfo legalRepresentative,
-    required MyProfileResponseDtoVerificationStatusEnum verificationStatus,
+    required BusinessInfo businessInfo,
+    required LegalRepresentativeInfo? legalRepresentative,
+    required List<VerifiedField> kycDocuments,
+    required api.MyProfileResponseDtoVerificationStatusEnum verificationStatus,
   }) {
     return [
       VerificationSectionEntity(
         type: VerificationSectionType.businessEntity,
         label: 'Business Entity',
         status: _determineSectionStatus(
-          hasUpdates: _hasPartnerInfoUpdates(partnerInfo),
+          hasUpdates: _hasBusinessInfoUpdates(businessInfo),
           verificationStatus: verificationStatus,
         ),
-        isLocked: false,
         stepNumber: 1,
       ),
       VerificationSectionEntity(
         type: VerificationSectionType.locationDetails,
         label: 'Location Details',
         status: _determineSectionStatus(
-          hasUpdates: _hasLocationDetailsUpdates(locationDetails),
+          hasUpdates: businessInfo.address != null
+              ? _hasAddressUpdates(businessInfo.address!)
+              : false,
           verificationStatus: verificationStatus,
         ),
-        isLocked: false,
         stepNumber: 2,
       ),
       VerificationSectionEntity(
         type: VerificationSectionType.legalRepresentative,
         label: 'Legal Representative',
         status: _determineSectionStatus(
-          hasUpdates: _hasLegalRepresentativeUpdates(legalRepresentative),
+          hasUpdates: legalRepresentative != null
+              ? _hasLegalRepresentativeUpdates(legalRepresentative)
+              : false,
           verificationStatus: verificationStatus,
         ),
-        isLocked: false,
         stepNumber: 3,
       ),
-      const VerificationSectionEntity(
+      VerificationSectionEntity(
         type: VerificationSectionType.accountSecurity,
         label: 'Documents',
-        status: SectionStatus.completed,
-        isLocked: false,
+        status: _determineSectionStatus(
+          hasUpdates: _hasKycDocumentUpdates(kycDocuments),
+          verificationStatus: verificationStatus,
+        ),
         stepNumber: 4,
       ),
     ];
   }
 
-  /// Determines section status based on updates and verification status.
   SectionStatus _determineSectionStatus({
     required bool hasUpdates,
-    required MyProfileResponseDtoVerificationStatusEnum verificationStatus,
+    required api.MyProfileResponseDtoVerificationStatusEnum verificationStatus,
   }) {
-    if (hasUpdates) {
-      return SectionStatus.revisionRequired;
-    }
+    if (hasUpdates) return SectionStatus.revisionRequired;
 
     switch (verificationStatus) {
-      case MyProfileResponseDtoVerificationStatusEnum.APPROVED:
+      case api.MyProfileResponseDtoVerificationStatusEnum.APPROVED:
         return SectionStatus.completed;
-      case MyProfileResponseDtoVerificationStatusEnum.PENDING:
+      case api.MyProfileResponseDtoVerificationStatusEnum.ONBOARDING:
+      case api.MyProfileResponseDtoVerificationStatusEnum.PENDING:
         return SectionStatus.inProgress;
-      case MyProfileResponseDtoVerificationStatusEnum.REJECTED:
-      case MyProfileResponseDtoVerificationStatusEnum.REQUIRED_RESUBMIT:
+      case api.MyProfileResponseDtoVerificationStatusEnum.REJECTED:
+      case api.MyProfileResponseDtoVerificationStatusEnum.REQUIRED_RESUBMIT:
         return SectionStatus.revisionRequired;
     }
     return SectionStatus.completed;
   }
 
-  /// Checks if any partner info fields require update.
-  bool _hasPartnerInfoUpdates(PartnerInfo info) {
-    return info.taxCode.requiresUpdate ||
-        info.legalName.requiresUpdate ||
-        info.brandName.requiresUpdate ||
-        info.businessType.requiresUpdate ||
-        (info.phoneNumber?.requiresUpdate ?? false);
+  bool _hasBusinessInfoUpdates(BusinessInfo info) {
+    return !info.brandName.isVerified ||
+        !(info.taxRegistrationCode?.isVerified ?? true) ||
+        !info.serviceTags.isVerified ||
+        !(info.phoneNumber?.isVerified ?? true);
   }
 
-  /// Checks if any location details fields require update.
-  bool _hasLocationDetailsUpdates(LocationDetailsInfo info) {
-    return info.provinceId.requiresUpdate ||
-        info.districtId.requiresUpdate ||
-        info.wardId.requiresUpdate ||
-        info.streetAddress.requiresUpdate;
+  bool _hasAddressUpdates(AddressInfo address) {
+    return !address.streetAddress.isVerified ||
+        !(address.ward?.isVerified ?? true) ||
+        !(address.district?.isVerified ?? true) ||
+        !(address.city?.isVerified ?? true);
   }
 
-  /// Checks if any legal representative fields require update.
   bool _hasLegalRepresentativeUpdates(LegalRepresentativeInfo info) {
-    return info.fullName.requiresUpdate ||
-        (info.position?.requiresUpdate ?? false) ||
-        (info.phoneNumber?.requiresUpdate ?? false) ||
-        info.idType.requiresUpdate ||
-        info.idNumber.requiresUpdate ||
-        info.idIssueDate.requiresUpdate ||
-        info.idFrontImage.requiresUpdate ||
-        info.idBackImage.requiresUpdate;
+    return !info.fullName.isVerified ||
+        !(info.position?.isVerified ?? true) ||
+        !(info.phoneNumber?.isVerified ?? true) ||
+        !(info.idType?.isVerified ?? true) ||
+        !(info.idNumber?.isVerified ?? true) ||
+        !(info.idIssueDate?.isVerified ?? true);
   }
 
-  /// Maps partner (business entity) information from DTO.
-  PartnerInfo _mapPartnerInfo(PartnerInfoDto dto) {
-    return PartnerInfo(
-      taxCode: _mapStringField(dto.taxCode),
-      legalName: _mapStringField(dto.legalName),
-      brandName: _mapStringField(dto.brandName),
-      businessType: _mapStringField(dto.businessType),
-      phoneNumber: _mapOptionalStringField(dto.phoneNumber),
-    );
-  }
-
-  /// Maps location details information from DTO.
-  LocationDetailsInfo _mapLocationDetails(LocationDetailsInfoDto dto) {
-    return LocationDetailsInfo(
-      provinceId: _mapStringField(dto.provinceId),
-      districtId: _mapStringField(dto.districtId),
-      wardId: _mapStringField(dto.wardId),
-      streetAddress: _mapStringField(dto.streetAddress),
-    );
-  }
-
-  /// Maps legal representative info from DTO.
-  LegalRepresentativeInfo _mapLegalRepresentative(
-    LegalRepresentativeInfoDto dto,
-  ) {
-    return LegalRepresentativeInfo(
-      fullName: _mapStringField(dto.fullName),
-      position: _mapStringField(dto.position),
-      phoneNumber: _mapOptionalToStringField(dto.phoneNumber),
-      idType: _mapStringField(dto.idType),
-      idNumber: _mapStringField(dto.idNumber),
-      idIssueDate: _mapStringField(dto.idIssueDate),
-      idFrontImage: _mapDocumentDto(dto.idFrontImage),
-      idBackImage: _mapDocumentDto(dto.idBackImage),
-      documents: _mapDocumentVerification(dto.documents),
-    );
-  }
-
-  /// Maps a verification string field DTO to domain entity.
-  VerificationStringField _mapStringField(VerificationStringFieldDto dto) {
-    return VerificationStringField(
-      value: dto.value,
-      displayValue: dto.displayValue,
-      requiresUpdate: dto.requiresUpdate,
-      adminFeedback: dto.adminFeedback?.toString(),
-    );
-  }
-
-  /// Maps an optional verification string field DTO to domain entity.
-  VerificationOptionalStringField? _mapOptionalStringField(
-    VerificationOptionalStringFieldDto dto,
-  ) {
-    return VerificationOptionalStringField(
-      value: dto.value?.toString(),
-      displayValue: dto.displayValue?.toString() ?? '',
-      requiresUpdate: dto.requiresUpdate,
-      adminFeedback: dto.adminFeedback?.toString(),
-    );
-  }
-
-  /// Maps an optional verification string field DTO to VerificationStringField.
-  /// Used when the domain entity expects VerificationStringField? but the DTO
-  /// provides VerificationOptionalStringFieldDto.
-  VerificationStringField? _mapOptionalToStringField(
-    VerificationOptionalStringFieldDto dto,
-  ) {
-    final value = dto.value?.toString();
-    if (value == null || value.isEmpty) {
-      return null;
-    }
-    return VerificationStringField(
-      value: value,
-      displayValue: dto.displayValue?.toString() ?? '',
-      requiresUpdate: dto.requiresUpdate,
-      adminFeedback: dto.adminFeedback?.toString(),
-    );
-  }
-
-  /// Maps a verification document DTO to domain entity.
-  VerificationDocument _mapDocumentDto(VerificationDocumentDto dto) {
-    return VerificationDocument(
-      id: dto.id,
-      label: dto.label,
-      fileUrl: dto.fileUrl?.toString(),
-      fileName: dto.fileName?.toString(),
-      status: _mapDocumentDtoStatus(dto.status),
-      requiresUpdate: dto.requiresUpdate,
-      adminFeedback: dto.adminFeedback?.toString(),
-    );
-  }
-
-  /// Maps document verification info from DTO.
-  DocumentVerificationInfo _mapDocumentVerification(
-    DocumentVerificationInfoDto dto,
-  ) {
-    return DocumentVerificationInfo(
-      businessLicense: dto.businessLicense != null
-          ? _mapDocumentDto(dto.businessLicense!)
-          : null,
-      authorizationLetter: dto.authorizationLetter != null
-          ? _mapDocumentDto(dto.authorizationLetter!)
-          : null,
-      taxCertificate: dto.taxCertificate != null
-          ? _mapDocumentDto(dto.taxCertificate!)
-          : null,
-    );
-  }
-
-  /// Maps document status from DTO enum.
-  DocumentStatus _mapDocumentDtoStatus(
-    VerificationDocumentDtoStatusEnum status,
-  ) {
-    switch (status) {
-      case VerificationDocumentDtoStatusEnum.missing:
-        return DocumentStatus.notUploaded;
-      case VerificationDocumentDtoStatusEnum.pending:
-        return DocumentStatus.pendingReview;
-      case VerificationDocumentDtoStatusEnum.approved:
-        return DocumentStatus.approved;
-      case VerificationDocumentDtoStatusEnum.rejected:
-      case VerificationDocumentDtoStatusEnum.revisionRequired:
-        return DocumentStatus.revisionRequired;
-    }
-    return DocumentStatus.notUploaded;
-  }
-
-  /// Extracts admin feedback title from verification status.
-  String? _extractAdminFeedback(
-    MyProfileResponseDtoVerificationStatusEnum status,
-  ) {
-    switch (status) {
-      case MyProfileResponseDtoVerificationStatusEnum.REQUIRED_RESUBMIT:
-        return 'Action Required: Revision Requested';
-      case MyProfileResponseDtoVerificationStatusEnum.REJECTED:
-        return 'Application Rejected';
-      default:
-        return null;
-    }
-  }
-
-  /// Extracts detailed admin feedback from documents.
-  String? _extractAdminFeedbackDetail(DocumentVerificationInfoDto documents) {
-    final feedbacks = <String>[];
-
-    if (documents.businessLicense?.adminFeedback != null) {
-      feedbacks.add(documents.businessLicense!.adminFeedback.toString());
-    }
-    if (documents.authorizationLetter?.adminFeedback != null) {
-      feedbacks.add(documents.authorizationLetter!.adminFeedback.toString());
-    }
-    if (documents.taxCertificate?.adminFeedback != null) {
-      feedbacks.add(documents.taxCertificate!.adminFeedback.toString());
-    }
-
-    return feedbacks.isNotEmpty ? feedbacks.join(' ') : null;
+  bool _hasKycDocumentUpdates(List<VerifiedField> documents) {
+    return documents.any((doc) => !doc.isVerified);
   }
 }

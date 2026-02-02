@@ -10,37 +10,7 @@ import { ReviewPartnerProfileDto, ReviewDecision } from '../dto/review-partner-p
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { PartnersService } from '@/partners/partners.service';
 import { GetPartnersQueryDto } from '@/partners/dto/request/get-partners-query.dto';
-
-// ============================================================================
-// Field Keys for Review (centralized for easy maintenance)
-// ============================================================================
-export const PartnerFieldKeys = {
-    // Business Info Fields
-    brandName: 'brandName',
-    taxCode: 'taxCode',
-    legalName: 'legalName',
-    businessType: 'businessType',
-    serviceTags: 'serviceTags',
-    phoneNumber: 'phoneNumber',
-    email: 'email',
-    username: 'username',
-    
-    // Address Fields (matching /partners/me API keys)
-    streetAddress: 'streetAddress',
-    // Legacy keys for backward compatibility
-    ward: 'ward',
-    district: 'district',
-    city: 'city',
-    
-    // Legal Representative Fields (prefixed with 'legalRep.')
-    fullName: 'fullName',
-    position: 'position',
-    idType: 'idType',
-    idNumber: 'idNumber',
-    idIssueDate: 'idIssueDate',
-} as const;
-
-export type PartnerFieldKey = typeof PartnerFieldKeys[keyof typeof PartnerFieldKeys];
+import { PartnerFieldKeys, PartnerFieldKey } from '@/common/constants/partner-form-keys';
 
 // Helper type for field review data
 export interface FieldFeedback {
@@ -68,21 +38,12 @@ export class AdminPartnersService {
     async getPartnerDetail(id: string): Promise<AdminPartnerDetailResponseDto> {
         const partner = await this.partnerRepo.findOne({
             where: { id },
-            relations: ['account', 'province', 'district', 'ward', 'legalRepresentative'],
+            relations: ['account', 'province', 'district', 'ward', 'legalRepresentative', 'documents'],
         });
 
         if (!partner) {
             throw new NotFoundException('Partner not found');
         }
-
-        // Fetch documents with simplified schema
-        const documents = await this.documentRepo.find({
-            where: { partnerId: id },
-            order: { createdAt: 'DESC' },
-        });
-
-        // Assign documents to partner for DTO mapping
-        partner.documents = documents;
 
         // Fetch the latest review log for feedback data
         const latestReviewLog = await this.reviewLogRepo.findOne({
@@ -112,7 +73,7 @@ export class AdminPartnersService {
         for (const [fieldName, review] of Object.entries(reviewLog.fieldReviews)) {
             feedbackMap[fieldName] = {
                 isVerified: review.isValid,
-                feedback: review.reason,
+                feedback: review.feedback,
             };
         }
 
@@ -139,10 +100,114 @@ export class AdminPartnersService {
         return feedbackMap;
     }
 
+    // ============================================================================
+    // Private Helper Methods for Review Processing
+    // ============================================================================
+
+    /**
+     * Check if a value is a known partner field key (not a document key)
+     * Document keys are values NOT in PartnerFieldKeys
+     */
+    private isPartnerFieldKey(value: string): boolean {
+        const fieldKeyValues = Object.values(PartnerFieldKeys) as string[];
+        return fieldKeyValues.includes(value);
+    }
+
+    /**
+     * Sanitize entity records - removes timestamp fields (created_at, updated_at, deleted_at)
+     */
+    private sanitizeRecordValue(value: any): any {
+        if (value === null || value === undefined) return null;
+        if (typeof value !== 'object' || value instanceof Date) return value;
+        if (Array.isArray(value)) return value.map(item => this.sanitizeRecordValue(item));
+        
+        // Remove timestamp fields from object
+        const { createdAt, created_at, deletedAt, deleted_at, updatedAt, updated_at, ...rest } = value;
+        return rest;
+    }
+
+    /**
+     * Get field value from partner entity using field key
+     */
+    private getFieldValue(partner: Partner, fieldKey: string): any {
+        // Field resolver map for cleaner value resolution
+        const fieldResolvers: Record<string, () => any> = {
+            [PartnerFieldKeys.ward]: () => partner.ward,
+            [PartnerFieldKeys.district]: () => partner.district,
+            [PartnerFieldKeys.city]: () => partner.province,
+            [PartnerFieldKeys.brandName]: () => partner.brandName,
+            [PartnerFieldKeys.taxCode]: () => partner.taxCode,
+            [PartnerFieldKeys.legalName]: () => partner.legalName,
+            [PartnerFieldKeys.businessType]: () => partner.businessType,
+            [PartnerFieldKeys.streetAddress]: () => partner.streetAddress,
+            [PartnerFieldKeys.phoneNumber]: () => partner.phoneNumber,
+            [PartnerFieldKeys.email]: () => partner.account?.email ?? null,
+            [PartnerFieldKeys.username]: () => partner.account?.username ?? null,
+            [PartnerFieldKeys.serviceTags]: () => (partner as any).serviceTags ?? null,
+            [PartnerFieldKeys.idType]: () => partner.legalRepresentative?.idType ?? null,
+            [PartnerFieldKeys.idNumber]: () => partner.legalRepresentative?.idNumber ?? null,
+            [PartnerFieldKeys.idIssueDate]: () => partner.legalRepresentative?.idIssueDate ?? null,
+            [PartnerFieldKeys.fullName]: () => partner.legalRepresentative?.fullName ?? null,
+            [PartnerFieldKeys.position]: () => partner.legalRepresentative?.position ?? null,
+        };
+
+        const resolver = fieldResolvers[fieldKey];
+        return resolver ? resolver() : (partner as any)[fieldKey] ?? null;
+    }
+
+    /**
+     * Process a document review item - updates document status and records review data
+     * Note: fieldKey contains the documentKey (storage path) from PartnerDocument entity
+     */
+    private async processDocumentReviewItem(
+        manager: any,
+        item: { fieldKey: string; feedback: string },
+        docMap: Map<string, PartnerDocument>,
+        documentReviews: Record<string, any>,
+        finalRejections: Record<string, string>,
+    ): Promise<void> {
+        const documentKey = item.fieldKey;
+        const doc = docMap.get(documentKey);
+        if (!doc) return;
+
+
+        await manager.update(PartnerDocument, { id: doc.id }, { status: PartnerDocumentStatuses.REJECTED });
+
+        // Record document review snapshot (keyed by documentKey for consistency)
+        documentReviews[documentKey] = {
+            documentType: doc.type,
+            url: doc.fileUrl,
+            feedback: item.feedback,
+        };
+
+        finalRejections[`document_${doc.documentKey}`] = item.feedback;
+    }
+
+    /**
+     * Process a field review item - records field value and review status
+     */
+    private processFieldReviewItem(
+        partner: Partner,
+        item: { fieldKey: string; feedback: string },
+        fieldReviews: Record<string, any>,
+        finalRejections: Record<string, string>,
+    ): void {
+        const fieldKey = item.fieldKey;
+        const value = this.getFieldValue(partner, fieldKey);
+
+        fieldReviews[fieldKey] = {
+            value: this.sanitizeRecordValue(value),
+            feedback: item.feedback,
+        };
+
+        finalRejections[fieldKey] = item.feedback || 'Field rejected';
+    }
+
+
     async reviewPartner(id: string, dto: ReviewPartnerProfileDto, adminId: string): Promise<void> {
         const partner = await this.partnerRepo.findOne({
             where: { id },
-            relations: ['legalRepresentative']
+            relations: ['legalRepresentative', 'province', 'district', 'ward', 'account', 'documents']
         });
 
         if (!partner) {
@@ -155,97 +220,36 @@ export class AdminPartnersService {
         }
 
         await this.dataSource.transaction(async (manager) => {
-            // 1. Prepare Log Data Snapshots
-            const fieldReviews: Record<string, any> = {};
-            const documentReviews: Record<string, any> = {};
-
-            // Fetch all current documents for snapshotting
+            // 1. Fetch all current documents for snapshotting
             const existingDocs = await manager.find(PartnerDocument, {
                 where: { partnerId: id }
             });
-            const docMap = new Map(existingDocs.map(d => [d.id, d]));
+            // Map documents by documentKey (storage path) for lookup
+            const docMap = new Map(existingDocs.map(d => [d.documentKey, d]));
 
-            // Track accepted document types (for completeness check)
-            const acceptedDocuments = new Set<string>();
-
-            // Helper to record field review
-            const recordFieldReview = (fieldKey: string, isVerified: boolean, feedback?: string, value?: any) => {
-                fieldReviews[fieldKey] = {
-                    value: value ?? null,
-                    isValid: isVerified,
-                    reason: isVerified ? null : feedback
-                };
-            };
-
-            // Helper to get field value from partner or legal representative
-            const getFieldValue = (fieldKey: string): any => {
-                if (fieldKey.startsWith('legalRep.')) {
-                    const actualFieldName = fieldKey.substring('legalRep.'.length);
-                    return partner.legalRepresentative ? (partner.legalRepresentative as any)[actualFieldName] : null;
-                }
-                return (partner as any)[fieldKey];
-            };
-
-            // 2. Process Items (Validation & Status Update) - Update documents and record for logging
+            // 2. Initialize review tracking data
+            const fieldReviews: Record<string, any> = {};
+            const documentReviews: Record<string, any> = {};
             const finalRejections: Record<string, string> = {};
 
-            if (dto.items && dto.items.length > 0) {
-                for (const item of dto.items) {
-                    // --- DOCUMENT (identified by presence of documentKey) ---
-                    if (item.documentKey) {
-                        const doc = docMap.get(item.documentKey);
-                        if (doc) {
-                            // Update Document Status using new simplified schema
-                            const newStatus = item.isVerified 
-                                ? PartnerDocumentStatuses.ACCEPTED 
-                                : PartnerDocumentStatuses.REJECTED;
-                            
-                            await manager.update(PartnerDocument, { id: item.documentKey }, {
-                                status: newStatus,
-                            });
-
-                            // Log Snapshot
-                            documentReviews[item.documentKey] = {
-                                documentType: doc.type,
-                                url: doc.fileUrl,
-                                isValid: item.isVerified,
-                                feedback: item.feedback
-                            };
-
-                            if (!item.isVerified) {
-                                // Add to rejection list
-                                finalRejections[`document_${doc.id}`] = item.feedback || 'Document rejected';
-                            } else {
-                                // Add to accepted set
-                                acceptedDocuments.add(doc.id);
-                            }
-                        }
-                    }
-                    // --- FIELD (partner or legalRep, determined by fieldKey prefix) ---
-                    else {
-                        const value = getFieldValue(item.fieldKey);
-                        recordFieldReview(item.fieldKey, item.isVerified, item.feedback, value);
-                        if (!item.isVerified) {
-                            finalRejections[item.fieldKey] = item.feedback || 'Field rejected';
-                        }
-                    }
+            // 3. Process review items
+            // fieldKey values in PartnerFieldKeys are field reviews
+            // fieldKey values NOT in PartnerFieldKeys are document reviews (documentKey storage paths)
+            for (const item of dto.items ?? []) {
+                if (item.fieldKey && this.isPartnerFieldKey(item.fieldKey)) {
+                    // Known field key - process as field review
+                    this.processFieldReviewItem(
+                        partner, item, fieldReviews, finalRejections
+                    );
+                } else if (item.fieldKey) {
+                    // Not a known field key - process as document review (documentKey)
+                    await this.processDocumentReviewItem(
+                        manager, item, docMap, documentReviews, finalRejections
+                    );
                 }
             }
 
-            // 3. CHECK EXISTING DOCUMENTS (Catch missed rejected docs)
-            existingDocs.forEach(doc => {
-                const isProcessed = dto.items?.some(i => i.documentKey === doc.id);
-                if (!isProcessed) {
-                    if (doc.status === PartnerDocumentStatuses.ACCEPTED) {
-                        acceptedDocuments.add(doc.id);
-                    } else if (doc.status === PartnerDocumentStatuses.REJECTED) {
-                        // Previous rejection still stands -> Add to rejections
-                        finalRejections[`document_${doc.id}`] = 'Previous rejection';
-                    }
-                }
-            });
-
-            // 4. DETERMINE VERDICT
+            // 5. Determine verdict based on rejections
             const hasErrors = Object.keys(finalRejections).length > 0;
             let verdict: PartnerVerificationStatus;
 
@@ -253,12 +257,10 @@ export class AdminPartnersService {
                 // Explicit REJECT (Terminal) overrides everything
                 verdict = PartnerVerificationStatus.REJECTED;
                 partner.verificationStatus = PartnerVerificationStatus.REJECTED;
-                partner.rejectionDetails = null;
             } else if (hasErrors) {
                 // If there are errors, we MUST Require Resubmit regardless of decision
                 verdict = PartnerVerificationStatus.REQUIRED_RESUBMIT;
                 partner.verificationStatus = PartnerVerificationStatus.REQUIRED_RESUBMIT;
-                partner.rejectionDetails = finalRejections;
             } else {
                 // Clean slate -> Check for APPROVED criteria
                 if (dto.decision === ReviewDecision.APPROVED) {
@@ -275,13 +277,6 @@ export class AdminPartnersService {
                     verdict = PartnerVerificationStatus.APPROVED;
                     partner.verificationStatus = PartnerVerificationStatus.APPROVED;
                     partner.verificationCompletedAt = new Date();
-                    partner.rejectionDetails = null;
-
-                    // Auto-accept remaining pending documents
-                    await manager.update(PartnerDocument,
-                        { partnerId: id, status: PartnerDocumentStatuses.PENDING },
-                        { status: PartnerDocumentStatuses.ACCEPTED }
-                    );
                 } else {
                     // CHANGES_REQUIRED but no specific errors found?
                     // Still set to REQUIRED_RESUBMIT but maybe empty rejections?
@@ -290,13 +285,12 @@ export class AdminPartnersService {
                     }
                     verdict = PartnerVerificationStatus.REQUIRED_RESUBMIT;
                     partner.verificationStatus = PartnerVerificationStatus.REQUIRED_RESUBMIT;
-                    partner.rejectionDetails = null;
                 }
             }
 
             await manager.save(partner);
 
-            // 5. Create Review Log
+            // 6. Create Review Log
             const reviewLog = manager.create(PartnerReviewLog, {
                 partnerId: id,
                 reviewerId: adminId,
