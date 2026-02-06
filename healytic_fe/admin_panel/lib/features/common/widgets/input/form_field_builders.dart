@@ -388,46 +388,76 @@ class FormFieldBuilders {
   /// [context] - The build context for accessing theme data.
   /// [label] - The label text displayed above the field.
   /// [chips] - A list of widgets (typically chips) to display inside the container.
+  /// [fieldKey] - Optional custom field key for FormBuilder registration.
   /// [onTap] - Optional callback when the field is tapped.
   /// [trailing] - Optional trailing widget (defaults to expand_more icon).
   /// [emptyPlaceholder] - Placeholder text when no chips are selected.
+  /// [labelStyle] - Optional custom label style.
+  /// [isRequired] - Whether the field is required (shows asterisk).
+  /// [uppercaseLabel] - Whether to uppercase the label.
   static Widget buildChipSelectorField(
     BuildContext context, {
     required String label,
     required List<Widget> chips,
+    String? fieldKey,
     VoidCallback? onTap,
     Widget? trailing,
     String emptyPlaceholder = 'Select...',
     bool enabled = true,
+    TextStyle? labelStyle,
+    bool isRequired = false,
+    bool uppercaseLabel = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label.toUpperCase(),
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.5,
+        if (label.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: uppercaseLabel ? label.toUpperCase() : label,
+                    style:
+                        labelStyle ??
+                        Theme.of(context).textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                  ),
+                  if (isRequired)
+                    const TextSpan(
+                      text: ' *',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
         InkWell(
           onTap: enabled ? onTap : null,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: AppDimens.radiusSmall,
           child: Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.symmetric(
+              vertical: AppDimens.paddingVerticalSmall.top * 1.5,
+              horizontal: AppDimens.paddingHorizontalSmall.left,
+            ),
             decoration: BoxDecoration(
               color: enabled
                   ? colorScheme.surface
-                  : colorScheme.surfaceContainerHighest.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.outlineVariant),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withAlpha(3), blurRadius: 4),
-              ],
+                  : colorScheme.surfaceContainerHighest,
+              borderRadius: AppDimens.radiusSmall,
+              border: Border.all(
+                color: enabled
+                    ? colorScheme.outline
+                    : colorScheme.outline.withAlpha(100),
+              ),
             ),
             child: Row(
               children: [
@@ -436,7 +466,11 @@ class FormFieldBuilders {
                       ? Text(
                           emptyPlaceholder,
                           style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: colorScheme.onSurfaceVariant),
+                              ?.copyWith(
+                                color: colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
                         )
                       : Wrap(spacing: 8, runSpacing: 8, children: chips),
                 ),

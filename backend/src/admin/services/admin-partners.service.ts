@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, In } from 'typeorm';
 import { Partner } from '@/partners/entities/partner.entity';
 import { PartnerDocument, PartnerDocumentStatuses } from '@/partners/entities/partner-document.entity';
 import { PartnerReviewLog } from '@/admin/entities/partner-review-log.entity';
@@ -143,7 +143,6 @@ export class AdminPartnersService {
             [PartnerFieldKeys.phoneNumber]: () => partner.phoneNumber,
             [PartnerFieldKeys.email]: () => partner.account?.email ?? null,
             [PartnerFieldKeys.username]: () => partner.account?.username ?? null,
-            [PartnerFieldKeys.serviceTags]: () => (partner as any).serviceTags ?? null,
             [PartnerFieldKeys.idType]: () => partner.legalRepresentative?.idType ?? null,
             [PartnerFieldKeys.idNumber]: () => partner.legalRepresentative?.idNumber ?? null,
             [PartnerFieldKeys.idIssueDate]: () => partner.legalRepresentative?.idIssueDate ?? null,
@@ -266,7 +265,7 @@ export class AdminPartnersService {
                 if (dto.decision === ReviewDecision.APPROVED) {
                     // Check if missing required documents
                     const requirements = await this.docRequirementRepo.find({
-                        where: { businessType: partner.businessType, isRequired: true }
+                        where: { businessType: In(partner.businessType), isRequired: true }
                     });
 
                     // With simplified schema, we just check if we have any documents

@@ -210,12 +210,11 @@ class _ReviewApplicationDesktopState
           brandName: partner.brandName,
           taxRegistrationCode: partner.taxRegistrationCode,
           isTaxCodeValid: partner.isTaxCodeValid,
-          serviceTags: partner.serviceTags,
+          businessTypes: partner.businessType,
           address: partner.address,
         ),
         AppDimens.verticalMedium,
         AccountContactSection(
-          username: partner.username,
           email: partner.email,
           isEmailVerified: partner.isEmailVerified,
           phoneNumber: partner.phoneNumber,

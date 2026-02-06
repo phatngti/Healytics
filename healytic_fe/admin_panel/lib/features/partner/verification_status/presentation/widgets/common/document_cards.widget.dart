@@ -9,6 +9,7 @@ import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/url_utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -23,6 +24,11 @@ class DocumentUploadResult {
   final String documentKey;
   final String url;
   final String fileName;
+
+  @override
+  String toString() {
+    return 'DocumentUploadResult(documentKey: $documentKey, url: $url, fileName: $fileName)';
+  }
 }
 
 /// Gets a human-readable label for a document field key.
@@ -53,28 +59,39 @@ String? getFileUrl(VerifiedField document) {
   return null;
 }
 
-/// Unified upload card for documents requiring action.
+/// FormBuilder field for document uploads with animated glow effect.
 ///
 /// Features:
+/// - Registers automatically with parent FormBuilder
 /// - Animated glow effect for attention
 /// - File picking and S3 upload logic
 /// - Shows "EDITED" badge after successful upload
 /// - Shows uploaded file preview immediately after upload
-class DocumentUploadCard extends ConsumerStatefulWidget {
-  const DocumentUploadCard({
+class DocumentUploadCard extends FormBuilderField<DocumentUploadResult> {
+  DocumentUploadCard({
     required this.document,
-    this.onUploadComplete,
     this.uploadedPreviewUrl,
     this.showEditedBadge = false,
     this.height = 192,
+    this.onUploadComplete,
     super.key,
-  });
+  }) : super(
+         name: document.fieldKey,
+         builder: (FormFieldState<DocumentUploadResult> field) {
+           final state = field as _DocumentUploadCardState;
+           return _DocumentUploadCardContent(
+             state: state,
+             document: document,
+             uploadedPreviewUrl: uploadedPreviewUrl,
+             showEditedBadge: showEditedBadge,
+             height: height,
+             onUploadComplete: onUploadComplete,
+           );
+         },
+       );
 
   /// The document field data.
   final VerifiedField document;
-
-  /// Callback when upload completes successfully with the uploaded file info.
-  final void Function(DocumentUploadResult result)? onUploadComplete;
 
   /// Optional URL to show as preview (e.g., after upload success).
   final String? uploadedPreviewUrl;
@@ -85,11 +102,43 @@ class DocumentUploadCard extends ConsumerStatefulWidget {
   /// Card height.
   final double height;
 
+  /// Callback when upload completes successfully.
+  final ValueChanged<DocumentUploadResult>? onUploadComplete;
+
   @override
-  ConsumerState<DocumentUploadCard> createState() => _DocumentUploadCardState();
+  FormBuilderFieldState<DocumentUploadCard, DocumentUploadResult>
+  createState() => _DocumentUploadCardState();
 }
 
-class _DocumentUploadCardState extends ConsumerState<DocumentUploadCard>
+class _DocumentUploadCardState
+    extends FormBuilderFieldState<DocumentUploadCard, DocumentUploadResult> {}
+
+/// Internal content widget for DocumentUploadCard that handles animations
+/// and upload logic.
+class _DocumentUploadCardContent extends ConsumerStatefulWidget {
+  const _DocumentUploadCardContent({
+    required this.state,
+    required this.document,
+    this.uploadedPreviewUrl,
+    this.showEditedBadge = false,
+    this.height = 192,
+    this.onUploadComplete,
+  });
+
+  final _DocumentUploadCardState state;
+  final VerifiedField document;
+  final String? uploadedPreviewUrl;
+  final bool showEditedBadge;
+  final double height;
+  final ValueChanged<DocumentUploadResult>? onUploadComplete;
+
+  @override
+  ConsumerState<_DocumentUploadCardContent> createState() =>
+      _DocumentUploadCardContentState();
+}
+
+class _DocumentUploadCardContentState
+    extends ConsumerState<_DocumentUploadCardContent>
     with SingleTickerProviderStateMixin {
   late final AnimationController _glowController;
   late final Animation<double> _glowAnimation;
@@ -169,12 +218,16 @@ class _DocumentUploadCardState extends ConsumerState<DocumentUploadCard>
       if (mounted) {
         setState(() => _isUploading = false);
 
-        // Notify parent with upload result
         final uploadResult = DocumentUploadResult(
           documentKey: widget.document.fieldKey,
           url: formatR2Url(key) ?? key,
           fileName: pickedFile.name,
         );
+
+        // Update FormBuilder field state via the parent state
+        widget.state.didChange(uploadResult);
+
+        // Also notify via callback if provided
         widget.onUploadComplete?.call(uploadResult);
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -206,10 +259,16 @@ class _DocumentUploadCardState extends ConsumerState<DocumentUploadCard>
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final label = getDocumentLabel(widget.document.fieldKey);
-    // Use uploaded preview URL if available, otherwise use document's URL
-    final fileUrl = widget.uploadedPreviewUrl ?? getFileUrl(widget.document);
+    // Use form state value URL, uploaded preview URL, or document's URL
+    final formValue = widget.state.value;
+    final fileUrl =
+        formValue?.url ??
+        widget.uploadedPreviewUrl ??
+        getFileUrl(widget.document);
     final showEdited =
-        widget.showEditedBadge || widget.uploadedPreviewUrl != null;
+        widget.showEditedBadge ||
+        widget.uploadedPreviewUrl != null ||
+        formValue != null;
 
     return AnimatedBuilder(
       animation: _glowAnimation,
@@ -240,7 +299,7 @@ class _DocumentUploadCardState extends ConsumerState<DocumentUploadCard>
               borderRadius: BorderRadius.circular(12),
               child: Stack(
                 children: [
-                  // Current file preview (blurred)
+                  // Current file preview (blurred) - only for images
                   if (fileUrl != null)
                     Positioned.fill(
                       child: ImageFiltered(
@@ -415,8 +474,6 @@ class CompletedDocumentCard extends StatelessWidget {
     final semanticColors = Theme.of(context).extension<SemanticColors>();
     final successColor = semanticColors?.success ?? Colors.green;
     final label = getDocumentLabel(document.fieldKey);
-    final fileUrl = previewUrlOverride ?? getFileUrl(document);
-    final hasImage = fileUrl != null;
     final showEdited = showEditedBadge || previewUrlOverride != null;
 
     return Stack(
@@ -436,14 +493,11 @@ class CompletedDocumentCard extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: hasImage
-              ? DocumentImagePreview(
-                  imageUrl: fileUrl,
-                  label: label,
-                  successColor: showEdited ? colorScheme.primary : successColor,
-                  showEditedBadge: showEdited,
-                )
-              : DocumentPlaceholder(label: label, successColor: successColor),
+          child: DocumentPlaceholder(
+            label: label,
+            successColor: successColor,
+            icon: Icons.description_rounded,
+          ),
         ),
         // Badge overlay (checkmark or EDITED)
         Positioned(
@@ -747,11 +801,13 @@ class DocumentPlaceholder extends StatelessWidget {
   const DocumentPlaceholder({
     required this.label,
     required this.successColor,
+    this.icon,
     super.key,
   });
 
   final String label;
   final Color successColor;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -766,7 +822,7 @@ class DocumentPlaceholder extends StatelessWidget {
           children: [
             // Document icon
             Icon(
-              Icons.assignment_ind_rounded,
+              icon ?? Icons.assignment_ind_rounded,
               size: 40,
               color: colorScheme.onSurfaceVariant,
             ),

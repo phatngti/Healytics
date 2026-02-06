@@ -150,7 +150,7 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
         taxCode: request.partner.taxCode,
         legalName: request.partner.legalName,
         brandName: request.partner.brandName,
-        businessType: _mapBusinessType(request.partner.businessType),
+        businessType: _mapBusinessTypes(request.partner.businessType),
         provinceId: request.partner.provinceId,
         districtId: request.partner.districtId,
         wardId: request.partner.wardId,
@@ -179,7 +179,6 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
     );
 
     final response = await _authApi.authControllerRegisterPartner(dto);
-
     if (response == null) {
       throw ApiException(
         HttpStatus.internalServerError,
@@ -208,23 +207,27 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
   // Private Helper Methods
   // ===========================================================================
 
-  PartnerRequestDtoBusinessTypeEnum _mapBusinessType(String businessType) {
-    return switch (businessType.toUpperCase()) {
-      'MASSAGE_THERAPY' => PartnerRequestDtoBusinessTypeEnum.MASSAGE_THERAPY,
-      'MASSAGE_REHABILITATION' =>
-        PartnerRequestDtoBusinessTypeEnum.MASSAGE_REHABILITATION,
-      'SPA_BEAUTY' => PartnerRequestDtoBusinessTypeEnum.SPA_BEAUTY,
-      'FITNESS' => PartnerRequestDtoBusinessTypeEnum.FITNESS,
-      'PHARMACY' => PartnerRequestDtoBusinessTypeEnum.PHARMACY,
-      'DENTAL' => PartnerRequestDtoBusinessTypeEnum.DENTAL,
-      'TRADITIONAL_MEDICINE' =>
-        PartnerRequestDtoBusinessTypeEnum.TRADITIONAL_MEDICINE,
-      'PSYCHOLOGY' => PartnerRequestDtoBusinessTypeEnum.PSYCHOLOGY,
-      'DERMATOLOGY' => PartnerRequestDtoBusinessTypeEnum.DERMATOLOGY,
-      'NUTRITION' => PartnerRequestDtoBusinessTypeEnum.NUTRITION,
-      'PSYCHIATRY' => PartnerRequestDtoBusinessTypeEnum.PSYCHIATRY,
-      _ => PartnerRequestDtoBusinessTypeEnum.SPA_BEAUTY,
-    };
+  List<PartnerRequestDtoBusinessTypeEnum> _mapBusinessTypes(
+    List<String> businessTypes,
+  ) {
+    return businessTypes.map((type) {
+      return switch (type.toUpperCase()) {
+        'MASSAGE_THERAPY' => PartnerRequestDtoBusinessTypeEnum.MASSAGE_THERAPY,
+        'MASSAGE_REHABILITATION' =>
+          PartnerRequestDtoBusinessTypeEnum.MASSAGE_REHABILITATION,
+        'SPA_BEAUTY' => PartnerRequestDtoBusinessTypeEnum.SPA_BEAUTY,
+        'FITNESS' => PartnerRequestDtoBusinessTypeEnum.FITNESS,
+        'PHARMACY' => PartnerRequestDtoBusinessTypeEnum.PHARMACY,
+        'DENTAL' => PartnerRequestDtoBusinessTypeEnum.DENTAL,
+        'TRADITIONAL_MEDICINE' =>
+          PartnerRequestDtoBusinessTypeEnum.TRADITIONAL_MEDICINE,
+        'PSYCHOLOGY' => PartnerRequestDtoBusinessTypeEnum.PSYCHOLOGY,
+        'DERMATOLOGY' => PartnerRequestDtoBusinessTypeEnum.DERMATOLOGY,
+        'NUTRITION' => PartnerRequestDtoBusinessTypeEnum.NUTRITION,
+        'PSYCHIATRY' => PartnerRequestDtoBusinessTypeEnum.PSYCHIATRY,
+        _ => PartnerRequestDtoBusinessTypeEnum.SPA_BEAUTY,
+      };
+    }).toList();
   }
 
   LegalRepresentativeRequestDtoIdTypeEnum _mapIdType(String idType) {

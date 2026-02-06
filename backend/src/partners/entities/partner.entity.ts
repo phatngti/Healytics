@@ -34,10 +34,23 @@ export class Partner {
 
     @Column({
         name: 'business_type',
-        type: 'enum',
-        enum: BusinessType,
+        type: 'varchar',
+        length: 500,
+        transformer: {
+            // When saving: convert array to comma-separated string
+            to: (value: BusinessType[] | BusinessType | null): string | null => {
+                if (!value) return null;
+                if (Array.isArray(value)) return value.join(',');
+                return value; // backward compatibility for single value
+            },
+            // When loading: split comma-separated string to array
+            from: (value: string | null): BusinessType[] => {
+                if (!value) return [];
+                return value.split(',').filter(v => v.trim()) as BusinessType[];
+            },
+        },
     })
-    businessType: BusinessType;
+    businessType: BusinessType[];
 
     // Address information using administrative divisions (Tree Entity)
     @Column({ name: 'province_id', type: 'uuid', nullable: true })

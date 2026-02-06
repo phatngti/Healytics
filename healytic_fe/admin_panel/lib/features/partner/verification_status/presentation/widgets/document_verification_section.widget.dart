@@ -164,12 +164,13 @@ class _DocumentVerificationSectionState
                 children: [
                   AspectRatio(
                     aspectRatio: isWide ? 2.0 : 2.5,
+                    // DocumentUploadCard is now a FormBuilderField
                     child: DocumentUploadCard(
                       document: document,
-                      onUploadComplete: _handleUploadComplete,
                       uploadedPreviewUrl: uploadedUrl,
                       showEditedBadge: hasBeenEdited,
                       height: double.infinity,
+                      onUploadComplete: _handleUploadComplete,
                     ),
                   ),
                   if (document.feedback != null &&
@@ -222,19 +223,11 @@ class _DocumentVerificationSectionState
   }
 
   IconData _getDocumentIcon(String fieldKey) {
-    switch (fieldKey) {
-      case 'business_license':
-        return Icons.description_outlined;
-      case 'authorization_letter':
-        return Icons.assignment_ind_outlined;
-      case 'tax_certificate':
-        return Icons.receipt_long_outlined;
-      case 'id_front_image':
-      case 'id_back_image':
-        return Icons.badge_outlined;
-      default:
-        return Icons.insert_drive_file_outlined;
+    final docType = DocumentTypes.findByKey(fieldKey);
+    if (docType != null) {
+      return Icons.badge_outlined;
     }
+    return Icons.insert_drive_file_outlined;
   }
 }
 

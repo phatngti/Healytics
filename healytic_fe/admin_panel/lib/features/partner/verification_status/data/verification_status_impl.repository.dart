@@ -25,8 +25,9 @@ class VerificationStatusRepositoryImpl implements VerificationStatusRepository {
   @override
   Future<bool> resubmitApplication({
     List<DocumentUploadResult> uploads = const [],
+    Map<String, dynamic> edits = const {},
   }) {
-    return _dataSource.resubmitApplication(uploads: uploads);
+    return _dataSource.resubmitApplication(uploads: uploads, edits: edits);
   }
 }
 
