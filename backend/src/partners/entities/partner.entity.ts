@@ -16,6 +16,7 @@ import { Location } from '@/locations/entities/location.entity';
 import { PartnerVerificationStatus } from '../enum/partner-verification-status.enum';
 import { PartnerDocument } from './partner-document.entity';
 import { PartnerReviewLog } from '../../admin/entities/partner-review-log.entity';
+import { LegalRepresentative } from './legal-representative.entity';
 
 @Entity('health_partner_profile')
 export class Partner {
@@ -33,10 +34,23 @@ export class Partner {
 
     @Column({
         name: 'business_type',
-        type: 'enum',
-        enum: BusinessType,
+        type: 'varchar',
+        length: 500,
+        transformer: {
+            // When saving: convert array to comma-separated string
+            to: (value: BusinessType[] | BusinessType | null): string | null => {
+                if (!value) return null;
+                if (Array.isArray(value)) return value.join(',');
+                return value; // backward compatibility for single value
+            },
+            // When loading: split comma-separated string to array
+            from: (value: string | null): BusinessType[] => {
+                if (!value) return [];
+                return value.split(',').filter(v => v.trim()) as BusinessType[];
+            },
+        },
     })
-    businessType: BusinessType;
+    businessType: BusinessType[];
 
     // Address information using administrative divisions (Tree Entity)
     @Column({ name: 'province_id', type: 'uuid', nullable: true })
@@ -75,12 +89,11 @@ export class Partner {
     account: Account;
 
     // Relationship to Legal Representative (using string to avoid circular dependency)
-    @OneToOne('LegalRepresentative', 'partner', {
+    @OneToOne(() => LegalRepresentative, (legalRepresentative) => legalRepresentative.partner, {
         cascade: true,
     })
-    legalRepresentative: any;
+    legalRepresentative: LegalRepresentative;
 
-    // --- [BỔ SUNG QUAN HỆ NÀY ĐỂ FIX LỖI] ---
     @OneToMany(() => PartnerDocument, (document) => document.partner)
     documents: PartnerDocument[];
 
@@ -97,10 +110,6 @@ export class Partner {
     verificationStatus: PartnerVerificationStatus;
 
     // ----------------------------------
-
-    // Field-level rejection details: { "legalName": "Name does not match license", "taxCode": "Invalid format" }
-    @Column({ type: 'jsonb', nullable: true })
-    rejectionDetails: Record<string, string> | null;
 
     @Column({ name: 'verification_completed_at', type: 'timestamptz', nullable: true })
     verificationCompletedAt: Date | null;

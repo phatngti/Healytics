@@ -94,7 +94,7 @@ Class | Method | HTTP request | Description
 *LocationsApi* | [**locationsControllerGetProvinces**](doc//LocationsApi.md#locationscontrollergetprovinces) | **GET** /locations/provinces | Get all provinces in Vietnam
 *LocationsApi* | [**locationsControllerGetWards**](doc//LocationsApi.md#locationscontrollergetwards) | **GET** /locations/districts/{districtId}/wards | Get all wards in a district
 *LocationsApi* | [**locationsControllerSeedData**](doc//LocationsApi.md#locationscontrollerseeddata) | **POST** /locations/seed | Seed Vietnam administrative divisions data
-*PartnersApi* | [**partnersControllerGetBusinessTypes**](doc//PartnersApi.md#partnerscontrollergetbusinesstypes) | **GET** /partners/business-types | Get all business types
+*PartnersApi* | [**partnersControllerGetBusinessServices**](doc//PartnersApi.md#partnerscontrollergetbusinessservices) | **GET** /partners/business-services | Get all business services
 *PartnersApi* | [**partnersControllerGetMyProfile**](doc//PartnersApi.md#partnerscontrollergetmyprofile) | **GET** /partners/me | Get own business profile
 *PartnersApi* | [**partnersControllerUpdateMyProfile**](doc//PartnersApi.md#partnerscontrollerupdatemyprofile) | **PUT** /partners/me | Update own business profile
 *ProductsApi* | [**productsControllerCreate**](doc//ProductsApi.md#productscontrollercreate) | **POST** /products | Create a new product
@@ -120,14 +120,16 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [AccountRequestDto](doc//AccountRequestDto.md)
+ - [AddressDto](doc//AddressDto.md)
  - [AddressInfoDto](doc//AddressInfoDto.md)
  - [AdminLoginDto](doc//AdminLoginDto.md)
  - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
  - [AttachTagResponseDto](doc//AttachTagResponseDto.md)
  - [AuthTokensDto](doc//AuthTokensDto.md)
+ - [BusinessInfo](doc//BusinessInfo.md)
  - [BusinessInfoDto](doc//BusinessInfoDto.md)
- - [BusinessTypeDto](doc//BusinessTypeDto.md)
- - [BusinessTypesResponseDto](doc//BusinessTypesResponseDto.md)
+ - [BusinessServiceDto](doc//BusinessServiceDto.md)
+ - [BusinessServicesResponseDto](doc//BusinessServicesResponseDto.md)
  - [CategoryResponseDto](doc//CategoryResponseDto.md)
  - [CategorySummaryDto](doc//CategorySummaryDto.md)
  - [CreateCategoryDto](doc//CreateCategoryDto.md)
@@ -141,23 +143,19 @@ Class | Method | HTTP request | Description
  - [CreateTherapistProfileDto](doc//CreateTherapistProfileDto.md)
  - [DeleteFileResponseDto](doc//DeleteFileResponseDto.md)
  - [DoctorProfileDto](doc//DoctorProfileDto.md)
- - [DocumentUpdateDto](doc//DocumentUpdateDto.md)
- - [DocumentVerificationInfoDto](doc//DocumentVerificationInfoDto.md)
  - [EmployeeResponseDto](doc//EmployeeResponseDto.md)
  - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
  - [GetDistrictsResponseDto](doc//GetDistrictsResponseDto.md)
  - [GetProvincesResponseDto](doc//GetProvincesResponseDto.md)
  - [GetWardsResponseDto](doc//GetWardsResponseDto.md)
+ - [KycDocumentDto](doc//KycDocumentDto.md)
  - [LegalRepresentativeDto](doc//LegalRepresentativeDto.md)
- - [LegalRepresentativeInfoDto](doc//LegalRepresentativeInfoDto.md)
  - [LegalRepresentativeRequestDto](doc//LegalRepresentativeRequestDto.md)
- - [LocationDetailsInfoDto](doc//LocationDetailsInfoDto.md)
  - [LocationDto](doc//LocationDto.md)
  - [LoginDto](doc//LoginDto.md)
  - [LogoutResponseDto](doc//LogoutResponseDto.md)
  - [MyProfileResponseDto](doc//MyProfileResponseDto.md)
  - [PartnerDocumentVerificationDto](doc//PartnerDocumentVerificationDto.md)
- - [PartnerInfoDto](doc//PartnerInfoDto.md)
  - [PartnerItemDto](doc//PartnerItemDto.md)
  - [PartnerLoginDto](doc//PartnerLoginDto.md)
  - [PartnerRequestDto](doc//PartnerRequestDto.md)
@@ -183,13 +181,9 @@ Class | Method | HTTP request | Description
  - [TotalPartnersResponseDto](doc//TotalPartnersResponseDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)
  - [UpdateEmployeeDto](doc//UpdateEmployeeDto.md)
- - [UpdateLegalRepresentativeDto](doc//UpdateLegalRepresentativeDto.md)
  - [UpdatePartnerDto](doc//UpdatePartnerDto.md)
  - [UpdateProductDto](doc//UpdateProductDto.md)
  - [UpdateServiceTagDto](doc//UpdateServiceTagDto.md)
- - [VerificationDocumentDto](doc//VerificationDocumentDto.md)
- - [VerificationOptionalStringFieldDto](doc//VerificationOptionalStringFieldDto.md)
- - [VerificationStringFieldDto](doc//VerificationStringFieldDto.md)
  - [VerifiedField](doc//VerifiedField.md)
 
 

@@ -3,6 +3,8 @@ import {
     ConflictException,
     BadRequestException,
     NotFoundException,
+    Inject,
+    forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
@@ -15,63 +17,51 @@ import { RegisterPartnerDto } from './dto/request/register-partner.dto';
 import { UpdatePartnerDto } from './dto/request/update-partner.dto';
 import { GetPartnersQueryDto } from './dto/request/get-partners-query.dto';
 import { RegisterPartnerResponseDto } from './dto/response/register-partner-response.dto';
-import { MyProfileResponseDto, DocumentStatusDto } from './dto/response/my-profile-response.dto';
+import { MyProfileResponseDto, FieldFeedbackMap } from './dto/response/my-profile-response.dto';
 import { PartnersResponseDto } from './dto/response/partners-response.dto';
-import { PartnerDetailResponseDto } from './dto/response/partner-detail-response.dto';
-import { BusinessTypesResponseDto } from './dto/response/business-types-response.dto';
 import { Role } from '@/account/enum/role.enum';
-import { BusinessType } from './enum/business-type.enum';
-import { PartnerDocument, PartnerDocumentStatuses, DocumentTypes, DocumentFileTypes } from './entities/partner-document.entity';
+import { PartnerDocument, PartnerDocumentStatuses, DocumentTypes, DocumentFileTypes, DocumentFileType } from './entities/partner-document.entity';
 import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
-import { DocumentRequirement } from './entities/document-requirement.entity';
 import { LocationsService } from '@/locations/locations.service';
 import { AuthService } from '@/auth/auth.service';
-
-// Helper types for field feedback from review log
-interface FieldFeedback {
-    isVerified: boolean;
-    feedback?: string;
-}
-
-type FieldFeedbackMap = Record<string, FieldFeedback>;
+import { BusinessServicesResponseDto } from './dto/response/business-types-response.dto';
+import { BusinessType, bussinessServices } from './enum/business-type.enum';
 
 @Injectable()
 export class PartnersService {
+
     constructor(
         @InjectRepository(Account)
         private readonly accountRepository: Repository<Account>,
         @InjectRepository(Partner)
         private readonly partnerRepository: Repository<Partner>,
-        @InjectRepository(LegalRepresentative)
-        private readonly legalRepRepository: Repository<LegalRepresentative>,
-        @InjectRepository(DocumentRequirement)
-        private readonly docRequirementRepository: Repository<DocumentRequirement>,
         @InjectRepository(PartnerReviewLog)
         private readonly reviewLogRepository: Repository<PartnerReviewLog>,
         private readonly dataSource: DataSource,
         private readonly locationsService: LocationsService,
+        @Inject(forwardRef(() => AuthService))
         private readonly authService: AuthService,
     ) { }
 
-    /**
+    /**bussinessServices
      * Get all available business types with Vietnamese labels
      */
-    getBusinessTypes(): BusinessTypesResponseDto {
+    getBusinessServices(): BusinessServicesResponseDto {
         return {
-            data: [
-                { value: BusinessType.MASSAGE_THERAPY, label: 'Massage Thư giãn' },
-                { value: BusinessType.MASSAGE_REHABILITATION, label: 'Massage Trị liệu' },
-                { value: BusinessType.SPA_BEAUTY, label: 'Spa & Làm đẹp' },
-                { value: BusinessType.FITNESS, label: 'Thể hình (Gym/Yoga)' },
-                { value: BusinessType.PHARMACY, label: 'Dược phẩm' },
-                { value: BusinessType.DENTAL, label: 'Nha khoa' },
-                { value: BusinessType.TRADITIONAL_MEDICINE, label: 'Đông y' },
-                { value: BusinessType.PSYCHOLOGY, label: 'Tâm lý & Trị liệu' },
-                { value: BusinessType.DERMATOLOGY, label: 'Da liễu & Thẩm mỹ' },
-                { value: BusinessType.NUTRITION, label: 'Dinh dưỡng' },
-                { value: BusinessType.PSYCHIATRY, label: 'Tâm thần học' },
-            ],
-        };
+            data: Array.from(bussinessServices.values())
+        }
+    }
+
+    async getPartnerProfile(userId: string): Promise<Partner> {
+        
+        const partner = await this.partnerRepository.findOne({
+            where: { accountId: userId },
+        });
+
+        if (!partner) {
+            throw new NotFoundException('Partner profile not found');
+        }
+        return partner;
     }
 
     async registerPartner(
@@ -136,7 +126,7 @@ export class PartnersService {
                 taxCode: dto.partner.taxCode,
                 legalName: dto.partner.legalName,
                 brandName: dto.partner.brandName,
-                businessType: dto.partner.businessType,
+                businessType: dto.partner.businessType as BusinessType[],
                 provinceId: dto.partner.provinceId,
                 districtId: dto.partner.districtId,
                 wardId: dto.partner.wardId,
@@ -168,7 +158,7 @@ export class PartnersService {
                     type: doc.type,
                     fileType: doc.fileType,
                     documentKey: doc.documentKey,
-                    status: PartnerDocumentStatuses.PENDING,
+                    status: PartnerDocumentStatuses.ACCEPTED,
                 })));
             });
 
@@ -221,13 +211,13 @@ export class PartnersService {
      * Get partner's own profile with verification fields including requiresUpdate, adminFeedback, and isVerified
      */
     async getMyProfile(accountId: string): Promise<MyProfileResponseDto> {
-        const partner = await this.getPartnerByAccountId(accountId);
+        const partner = await this.partnerRepository.findOne({
+            where: { accountId },
+            relations: ['province', 'district', 'ward', 'legalRepresentative', 'documents', 'account'],
+        });
         if (!partner) {
             throw new NotFoundException('Partner not found');
         }
-
-        const rejectionDetails = partner.rejectionDetails || {};
-        const legalRep = partner.legalRepresentative;
 
         // Fetch the latest review log for feedback and isVerified data
         const latestReviewLog = await this.reviewLogRepository.findOne({
@@ -239,207 +229,26 @@ export class PartnersService {
         const fieldFeedbackMap = this.buildFieldFeedbackMap(latestReviewLog);
         const documentFeedbackMap = this.buildDocumentFeedbackMap(latestReviewLog);
 
-        // Helper function to create VerificationStringField with feedback from review log
-        const createStringField = (
-            value: string,
-            displayValue: string,
-            fieldKey: string,
-        ) => {
-            const fieldFeedback = fieldFeedbackMap[fieldKey];
-            return {
-                value,
-                displayValue,
-                requiresUpdate: !!rejectionDetails[fieldKey] || (fieldFeedback?.isVerified === false),
-                adminFeedback: fieldFeedback?.feedback || rejectionDetails[fieldKey] || null,
-                isVerified: fieldFeedback?.isVerified ?? null,
-            };
-        };
-
-        // Helper function to create VerificationOptionalStringField with feedback from review log
-        const createOptionalStringField = (
-            value: string | null,
-            displayValue: string | null,
-            fieldKey: string,
-        ) => {
-            const fieldFeedback = fieldFeedbackMap[fieldKey];
-            return {
-                value,
-                displayValue,
-                requiresUpdate: !!rejectionDetails[fieldKey] || (fieldFeedback?.isVerified === false),
-                adminFeedback: fieldFeedback?.feedback || rejectionDetails[fieldKey] || null,
-                isVerified: fieldFeedback?.isVerified ?? null,
-            };
-        };
-
-        // Helper function to create VerificationDocument from PartnerDocument with feedback from review log
-        const createDocumentFromPartnerDoc = (
-            doc: PartnerDocument | undefined,
-            id: string,
-            label: string,
-            fieldKey: string,
-        ) => {
-            const fileUrl = doc?.fileUrl || null;
-            const hasUrl = !!fileUrl;
-            
-            // Check document feedback from review log using document ID
-            const docFeedback = doc ? documentFeedbackMap[doc.id] : undefined;
-            const isRejected = !!rejectionDetails[fieldKey] || (docFeedback?.isVerified === false);
-            
-            return {
-                id,
-                label,
-                fileUrl,
-                fileName: fileUrl ? fileUrl.split('/').pop() : null,
-                status: isRejected ? DocumentStatusDto.REVISION_REQUIRED : (hasUrl ? DocumentStatusDto.APPROVED : DocumentStatusDto.MISSING),
-                requiresUpdate: isRejected || !hasUrl,
-                adminFeedback: docFeedback?.feedback || rejectionDetails[fieldKey] || null,
-                isVerified: docFeedback?.isVerified ?? null,
-            };
-        };
-
-        // Fetch partner documents
-        const documents = partner.documents || [];
-
-        // Get business type display value
-        const businessTypeLabels: Record<BusinessType, string> = {
-            [BusinessType.MASSAGE_THERAPY]: 'Massage Thư giãn',
-            [BusinessType.MASSAGE_REHABILITATION]: 'Massage Trị liệu',
-            [BusinessType.SPA_BEAUTY]: 'Spa & Làm đẹp',
-            [BusinessType.FITNESS]: 'Thể hình (Gym/Yoga)',
-            [BusinessType.PHARMACY]: 'Dược phẩm',
-            [BusinessType.DENTAL]: 'Nha khoa',
-            [BusinessType.TRADITIONAL_MEDICINE]: 'Đông y',
-            [BusinessType.PSYCHOLOGY]: 'Tâm lý & Trị liệu',
-            [BusinessType.DERMATOLOGY]: 'Da liễu & Thẩm mỹ',
-            [BusinessType.NUTRITION]: 'Dinh dưỡng',
-            [BusinessType.PSYCHIATRY]: 'Tâm thần học',
-        };
-
-        // Get ID type display value
-        const idTypeLabels: Record<string, string> = {
-            CITIZEN_ID: 'Căn cước công dân',
-            ID_CARD: 'Chứng minh nhân dân',
-            PASSPORT: 'Hộ chiếu',
-        };
-
-        return {
-            id: partner.id,
-            partnerInfo: {
-                taxCode: createStringField(partner.taxCode, partner.taxCode, 'taxCode'),
-                legalName: createStringField(partner.legalName, partner.legalName, 'legalName'),
-                brandName: createStringField(partner.brandName, partner.brandName, 'brandName'),
-                businessType: createStringField(
-                    partner.businessType,
-                    businessTypeLabels[partner.businessType] || partner.businessType,
-                    'businessType',
-                ),
-                phoneNumber: createOptionalStringField(
-                    partner.phoneNumber,
-                    partner.phoneNumber,
-                    'phoneNumber',
-                ),
-            },
-            locationDetails: {
-                provinceId: createStringField(
-                    partner.provinceId || '',
-                    partner.province?.name ?? '',
-                    'provinceId',
-                ),
-                districtId: createStringField(
-                    partner.districtId || '',
-                    partner.district?.name ?? '',
-                    'districtId',
-                ),
-                wardId: createStringField(
-                    partner.wardId || '',
-                    partner.ward?.name ?? '',
-                    'wardId',
-                ),
-                streetAddress: createStringField(
-                    partner.streetAddress,
-                    partner.streetAddress,
-                    'streetAddress',
-                ),
-            },
-            legalRepresentative: {
-                fullName: createStringField(
-                    legalRep.fullName,
-                    legalRep.fullName,
-                    'legalRep.fullName',
-                ),
-                position: createStringField(
-                    legalRep.position,
-                    legalRep.position,
-                    'legalRep.position',
-                ),
-                phoneNumber: createOptionalStringField(
-                    legalRep.phoneNumber,
-                    legalRep.phoneNumber,
-                    'legalRep.phoneNumber',
-                ),
-                idType: createStringField(
-                    legalRep.idType,
-                    idTypeLabels[legalRep.idType] || legalRep.idType,
-                    'legalRep.idType',
-                ),
-                idNumber: createStringField(
-                    legalRep.idNumber,
-                    legalRep.idNumber,
-                    'legalRep.idNumber',
-                ),
-                idIssueDate: createStringField(
-                    legalRep.idIssueDate instanceof Date
-                        ? legalRep.idIssueDate.toISOString().split('T')[0]
-                        : String(legalRep.idIssueDate),
-                    legalRep.idIssueDate instanceof Date
-                        ? legalRep.idIssueDate.toLocaleDateString('vi-VN')
-                        : String(legalRep.idIssueDate),
-                    'legalRep.idIssueDate',
-                ),
-                idFrontImage: createDocumentFromPartnerDoc(
-                    documents.find(d => d.type === DocumentTypes.IDENTITY_FRONT),
-                    'id_front',
-                    'Mặt trước CCCD/CMND',
-                    'legalRep.idFrontImage',
-                ),
-                idBackImage: createDocumentFromPartnerDoc(
-                    documents.find(d => d.type === DocumentTypes.IDENTITY_BACK),
-                    'id_back',
-                    'Mặt sau CCCD/CMND',
-                    'legalRep.idBackImage',
-                ),
-                documents: {
-                    businessLicense: createDocumentFromPartnerDoc(
-                        documents.find(d => d.type === DocumentTypes.BUSINESS_LICENSE),
-                        'business_license',
-                        'Giấy phép kinh doanh',
-                        'legalRep.businessLicense',
-                    ) ?? null,
-                    authorizationLetter: createDocumentFromPartnerDoc(
-                        documents.find(d => d.type === DocumentTypes.AUTHORIZATION_LETTER),
-                        'authorization_letter',
-                        'Giấy ủy quyền',
-                        'legalRep.authorizationLetter',
-                    ) ?? null,
-                    taxCertificate: null,
-                },
-            },
-            verificationStatus: partner.verificationStatus,
-            verificationCompletedAt: partner.verificationCompletedAt,
-            createdAt: partner.createdAt,
-        };
+        return MyProfileResponseDto.fromPartner(partner, fieldFeedbackMap, documentFeedbackMap);
     }
 
     /**
      * Update partner's profile - with "Smart Update" logic
      * 
      * Logic:
-     * 1. Check current vs new value
+     * 1. Check current vs new value using UpdatedField wrapper
      * 2. If changed -> Update value & Clear specific rejection detail
      * 3. If all rejection details cleared -> Reset status to PENDING
+     * 
+     * DTO Structure:
+     * - bussinessInfo: { brandName, taxRegistrationCode, serviceTags, address, username, email, phoneNumber }
+     * - legalRepresentative: { fullName, position, phoneNumber, idType, idNumber, idIssueDate }
+     * - kycDocuments: [{ fileUrl, fileType }]
+     * 
+     * Each field is wrapped in UpdatedField<T> with { fieldKey, value } structure
      */
     async updateMyProfile(accountId: string, dto: UpdatePartnerDto): Promise<MyProfileResponseDto> {
-        // 1. Lấy thông tin Partner
+        // 1. Get Partner information
         const partner = await this.getPartnerByAccountId(accountId);
         if (!partner) throw new NotFoundException('Partner not found');
 
@@ -448,75 +257,89 @@ export class PartnersService {
         await queryRunner.startTransaction();
 
         try {
-            // Clone map lỗi hiện tại để xử lý (tránh mutate trực tiếp object cũ)
-            const currentRejection = partner.rejectionDetails ? { ...partner.rejectionDetails } : {};
             let isModified = false;
 
-            // Cờ đánh dấu xem có sửa thông tin nhạy cảm không (để revoke APPROVED)
+            // Flag to track if sensitive information is modified (to revoke APPROVED)
             let hasCriticalChange = false;
 
-            // --- A. XỬ LÝ CHECK TRÙNG LẶP (TaxCode) ---
-            if (dto.taxCode && dto.taxCode !== partner.taxCode) {
-                const existing = await queryRunner.manager.findOne(Partner, { where: { taxCode: dto.taxCode } });
-                if (existing) throw new BadRequestException('Tax code already exists');
-            }
+            // Helper function to extract value from UpdatedField wrapper
+            const getValue = <T>(field: { fieldKey: string; value: T } | undefined): T | undefined => {
+                return field?.value;
+            };
 
-            // --- B. CẬP NHẬT FIELD CƠ BẢN (Text) ---
-            // Danh sách các field ánh xạ trực tiếp
-            const directFields: (keyof UpdatePartnerDto & keyof Partner)[] = [
-                'legalName', 'brandName', 'phoneNumber', 'streetAddress', 'taxCode', 'businessType'
-            ];
-            // Danh sách field nhạy cảm (Sửa phát là mất APPROVED ngay)
-            const criticalFields = ['legalName', 'streetAddress', 'taxCode', 'businessType'];
+            // --- A. PROCESS BUSINESS INFO ---
+            if (dto.bussinessInfo) {
+                const bizInfo = dto.bussinessInfo;
 
-            directFields.forEach(key => {
-                const newValue = dto[key];
-                const oldValue = partner[key]; // Lưu ý: Cần ép kiểu nếu TS báo lỗi
-
-                if (newValue !== undefined && newValue !== oldValue) {
-                    (partner as any)[key] = newValue;
+                // A.1 Check for duplicate TaxCode
+                const newTaxCode = getValue(bizInfo.taxRegistrationCode);
+                if (newTaxCode && newTaxCode !== partner.taxCode) {
+                    const existing = await queryRunner.manager.findOne(Partner, { where: { taxCode: newTaxCode } });
+                    if (existing) throw new BadRequestException('Tax code already exists');
+                    partner.taxCode = newTaxCode;
                     isModified = true;
-
-                    if (criticalFields.includes(key)) hasCriticalChange = true;
-
-                    // [CLEANUP] Sửa rồi thì xóa lỗi cũ đi
-                    if (currentRejection[key]) delete currentRejection[key];
+                    hasCriticalChange = true;
                 }
-            });
 
-            // --- C. CẬP NHẬT ĐỊA CHỈ (Address Logic) ---
-            if (dto.provinceId || dto.districtId || dto.wardId) {
-                const newProvince = dto.provinceId || partner.provinceId;
-                const newDistrict = dto.districtId || partner.districtId;
-                const newWard = dto.wardId || partner.wardId;
+                // A.2 Update brand name
+                const newBrandName = getValue(bizInfo.brandName);
+                if (newBrandName !== undefined && newBrandName !== partner.brandName) {
+                    partner.brandName = newBrandName;
+                    isModified = true;
+                }
 
-                // Chỉ validate khi có đủ 3 cấp
-                if (newProvince && newDistrict && newWard) {
-                    const isAddressChanged =
-                        newProvince !== partner.provinceId ||
-                        newDistrict !== partner.districtId ||
-                        newWard !== partner.wardId;
+                // A.3 Update phone number
+                const newPhoneNumber = getValue(bizInfo.phoneNumber);
+                if (newPhoneNumber !== undefined && newPhoneNumber !== partner.phoneNumber) {
+                    partner.phoneNumber = newPhoneNumber;
+                    isModified = true;
+                }
 
-                    if (isAddressChanged) {
-                        // Gọi service validate địa chỉ có tồn tại không
-                        await this.locationsService.validateAddress(newProvince, newDistrict, newWard);
+                // A.4 Update address
+                if (bizInfo.address) {
+                    const addressDto = bizInfo.address;
+                    
+                    // Extract address values
+                    const newStreetAddress = getValue(addressDto.streetAddress);
+                    const newCity = getValue(addressDto.city);
+                    const newDistrict = getValue(addressDto.district);
+                    const newWard = getValue(addressDto.ward);
 
-                        partner.provinceId = newProvince;
-                        partner.districtId = newDistrict;
-                        partner.wardId = newWard;
-
+                    // Update street address
+                    if (newStreetAddress !== undefined && newStreetAddress !== partner.streetAddress) {
+                        partner.streetAddress = newStreetAddress;
                         isModified = true;
-                        hasCriticalChange = true; // Đổi địa chỉ luôn là critical
+                        hasCriticalChange = true;
+                    }
 
-                        // [CLEANUP] Xóa lỗi liên quan đến địa chỉ
-                        ['provinceId', 'districtId', 'wardId', 'address'].forEach(k => {
-                            if (currentRejection[k]) delete currentRejection[k];
-                        });
+                    // Update province/district/ward (city = province in this context)
+                    const newProvinceId = newCity?.id || partner.provinceId;
+                    const newDistrictId = newDistrict?.id || partner.districtId;
+                    const newWardId = newWard?.id || partner.wardId;
+
+                    // Only validate when we have all 3 levels
+                    if (newProvinceId && newDistrictId && newWardId) {
+                        const isAddressChanged =
+                            newProvinceId !== partner.provinceId ||
+                            newDistrictId !== partner.districtId ||
+                            newWardId !== partner.wardId;
+
+                        if (isAddressChanged) {
+                            // Validate address exists
+                            await this.locationsService.validateAddress(newProvinceId, newDistrictId, newWardId);
+
+                            partner.provinceId = newProvinceId;
+                            partner.districtId = newDistrictId;
+                            partner.wardId = newWardId;
+
+                            isModified = true;
+                            hasCriticalChange = true;
+                        }
                     }
                 }
             }
 
-            // --- D. CẬP NHẬT NGƯỜI ĐẠI DIỆN (Legal Rep) ---
+            // --- B. UPDATE LEGAL REPRESENTATIVE ---
             if (dto.legalRepresentative) {
                 const legalRep = await queryRunner.manager.findOne(LegalRepresentative, {
                     where: { partnerId: partner.id },
@@ -525,36 +348,37 @@ export class PartnersService {
                     let repModified = false;
                     const repDto = dto.legalRepresentative;
 
-                    // Hàm helper update field con
-                    const updateRep = (field: keyof LegalRepresentative, val: any, rejKey: string, isCritical: boolean) => {
-                        if (val !== undefined && val !== legalRep[field]) {
-                            (legalRep as any)[field] = val;
+                    // Helper function to update legal representative field
+                    const updateRepField = <T>(
+                        field: keyof LegalRepresentative,
+                        updatedField: { fieldKey: string; value: T } | undefined,
+                        isCritical: boolean
+                    ) => {
+                        const newValue = getValue(updatedField);
+                        if (newValue !== undefined && newValue !== legalRep[field]) {
+                            (legalRep as any)[field] = newValue;
                             repModified = true;
                             if (isCritical) hasCriticalChange = true;
-                            if (currentRejection[rejKey]) delete currentRejection[rejKey];
                         }
                     };
 
-                    updateRep('fullName', repDto.fullName, 'legalRep.fullName', true);
-                    updateRep('idNumber', repDto.idNumber, 'legalRep.idNumber', true);
-                    updateRep('idType', repDto.idType, 'legalRep.idType', true);
-                    updateRep('phoneNumber', repDto.phoneNumber, 'legalRep.phoneNumber', false);
-                    updateRep('position', repDto.position, 'legalRep.position', false);
+                    updateRepField('fullName', repDto.fullName, true);
+                    updateRepField('idNumber', repDto.idNumber, true);
+                    updateRepField('idType', repDto.idType, true);
+                    updateRepField('phoneNumber', repDto.phoneNumber, false);
+                    updateRepField('position', repDto.position, false);
 
-                    if (repDto.idIssueDate) {
-                        const newDate = new Date(repDto.idIssueDate);
+                    // Handle idIssueDate separately (needs Date parsing)
+                    const newIdIssueDate = getValue(repDto.idIssueDate);
+                    if (newIdIssueDate) {
+                        const newDate = new Date(newIdIssueDate);
                         const currentIssueDate = new Date(legalRep.idIssueDate);
                         if (newDate.getTime() !== currentIssueDate.getTime()) {
                             legalRep.idIssueDate = newDate;
                             repModified = true;
                             hasCriticalChange = true;
-                            if (currentRejection['legalRep.idIssueDate']) delete currentRejection['legalRep.idIssueDate'];
                         }
                     }
-
-                    // Note: Document URL updates (idFrontImgUrl, idBackImgUrl, businessLicenseUrl, etc.) 
-                    // are now handled through the PartnerDocument table, not LegalRepresentative fields
-                    // See: updateDocumentImage method for updating document images
 
                     if (repModified) {
                         await queryRunner.manager.save(legalRep);
@@ -563,24 +387,42 @@ export class PartnersService {
                 }
             }
 
-            // --- E. CẬP NHẬT DOCUMENT (File) ---
-            // Note: With simplified schema, documents are just stored with type/fileUrl/status
-            // Document updates through this endpoint are currently not supported
-            // as the new schema focuses on KYC document uploads
+            // --- C. UPDATE KYC DOCUMENTS ---
+            if (dto.kycDocuments && dto.kycDocuments.length > 0) {
+                for (const docUpdate of dto.kycDocuments) {
+                    const docValue = docUpdate.value;
+                    if (docValue?.fileUrl) {
+                        // Create or update document based on fileType
+                        const existingDoc = await queryRunner.manager.findOne(PartnerDocument, {
+                            where: { partnerId: partner.id, fileUrl: docValue.fileUrl },
+                        });
 
-            // --- F. TÍNH TOÁN TRẠNG THÁI (Recalculate Status) ---
+                        if (!existingDoc) {
+                            // Create new document
+                            const newDoc = queryRunner.manager.create(PartnerDocument, {
+                                partnerId: partner.id,
+                                fileUrl: docValue.fileUrl,
+                                fileType: (docValue.fileType as DocumentFileType) || DocumentFileTypes.IMAGE,
+                                documentKey: docUpdate.fieldKey || 'OTHER_DOCUMENTS',
+                                type: DocumentTypes.OTHER_DOCUMENTS,
+                                status: PartnerDocumentStatuses.ACCEPTED,
+                            });
+                            await queryRunner.manager.save(newDoc);
+                            isModified = true;
+                        }
+                    }
+                }
+            }
+
+            // --- D. RECALCULATE STATUS ---
             if (isModified) {
-                // 1. Cập nhật map lỗi vào DB
-                const hasFieldErrors = Object.keys(currentRejection).length > 0;
-                partner.rejectionDetails = hasFieldErrors ? currentRejection : null;
-
-                // 2. Check lại toàn bộ Document (để xem có cái nào đang rejected ko)
+                // Check all documents for rejected status
                 const allDocs = await queryRunner.manager.find(PartnerDocument, { where: { partnerId: partner.id } });
 
                 const hasRejectedDocs = allDocs.some(d => d.status === PartnerDocumentStatuses.REJECTED);
 
-                // 3. Logic chuyển đổi trạng thái
-                const isClean = !hasFieldErrors && !hasRejectedDocs;
+                // Status transition logic
+                const isClean = !hasRejectedDocs;
                 // Check if partner has completed all required fields for verification
                 const isComplete = !!partner.taxCode && !!partner.legalName && !!partner.brandName;
 
@@ -597,16 +439,14 @@ export class PartnersService {
                     }
                 }
 
-                // 1. Use Destructuring to separate relations from data.
-                // We extract 'documents' and 'legalRepresentative' into their own variables (which we ignore),
-                // and collect everything else into 'updateData'.
+                // Use destructuring to separate relations from data
                 const { documents, legalRepresentative, ...updateData } = partner;
 
-                // 2. Pass only the 'updateData' to TypeORM
+                // Pass only the updateData to TypeORM
                 await queryRunner.manager.update(Partner, partner.id, updateData);
             }
             await queryRunner.commitTransaction();
-            return this.getMyProfile(accountId); // Trả về data mới nhất
+            return this.getMyProfile(accountId); // Return latest data
 
         } catch (error) {
             await queryRunner.rollbackTransaction();
@@ -675,69 +515,6 @@ export class PartnersService {
         };
     }
 
-    /**
-     * Get partner detail (Admin)
-     */
-    async getPartnerDetail(partnerId: string): Promise<PartnerDetailResponseDto> {
-        const partner = await this.partnerRepository.findOne({
-            where: { id: partnerId },
-            relations: [
-                'account',
-                'province',
-                'district',
-                'ward',
-                'legalRepresentative',
-                'documents',
-            ],
-        });
-
-        if (!partner) {
-            throw new NotFoundException('Partner not found');
-        }
-
-        // Helper to get document URL by type
-        const getDocUrl = (type: string): string | null => {
-            const doc = partner.documents?.find(d => d.type === type);
-            return doc?.fileUrl || null;
-        };
-
-        return {
-            account: {
-                id: partner.account.id,
-                email: partner.account.email,
-                isActive: partner.account.isActive,
-            },
-            id: partner.id,
-            taxCode: partner.taxCode,
-            legalName: partner.legalName,
-            brandName: partner.brandName,
-            businessType: partner.businessType,
-            address: {
-                provinceId: partner.provinceId,
-                province: partner.province?.name ?? '',
-                districtId: partner.districtId,
-                district: partner.district?.name ?? '',
-                wardId: partner.wardId,
-                ward: partner.ward?.name ?? '',
-                streetAddress: partner.streetAddress,
-            },
-            legalRepresentative: {
-                fullName: partner.legalRepresentative.fullName,
-                position: partner.legalRepresentative.position,
-                idType: partner.legalRepresentative.idType,
-                idNumber: partner.legalRepresentative.idNumber,
-                idIssueDate: partner.legalRepresentative.idIssueDate,
-                idFrontImgUrl: getDocUrl(DocumentTypes.IDENTITY_FRONT),
-                idBackImgUrl: getDocUrl(DocumentTypes.IDENTITY_BACK),
-                businessLicenseUrl: getDocUrl(DocumentTypes.BUSINESS_LICENSE),
-                authLetterDocUrl: getDocUrl(DocumentTypes.AUTHORIZATION_LETTER),
-                phoneNumber: partner.legalRepresentative.phoneNumber,
-            },
-            verificationStatus: partner.verificationStatus,
-            verificationCompletedAt: partner.verificationCompletedAt,
-            createdAt: partner.createdAt,
-        };
-    }
 
     // ============================================================================
     // Helper Methods for Review Log Feedback
@@ -755,8 +532,7 @@ export class PartnersService {
 
         for (const [fieldName, review] of Object.entries(reviewLog.fieldReviews)) {
             feedbackMap[fieldName] = {
-                isVerified: review.isValid,
-                feedback: review.reason,
+                feedback: review.feedback,
             };
         }
 
@@ -775,7 +551,6 @@ export class PartnersService {
 
         for (const [docId, review] of Object.entries(reviewLog.documentReviews)) {
             feedbackMap[docId] = {
-                isVerified: review.isValid,
                 feedback: review.feedback,
             };
         }

@@ -134,7 +134,6 @@ class ServiceTagRemoteDataSourceMock implements ServiceTagRemoteDataSource {
     print('ServiceTagRemoteDataSourceMock.getServiceTags called');
 
     final endIndex = (startingAt + count).clamp(0, mockServiceTags.length);
-    print("endIndex: $endIndex");
     return mockServiceTags.sublist(
       startingAt.clamp(0, mockServiceTags.length),
       endIndex,

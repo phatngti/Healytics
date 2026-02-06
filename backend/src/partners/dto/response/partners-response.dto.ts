@@ -18,8 +18,8 @@ export class PartnerItemDto {
     @ApiProperty({ example: 'partner@example.com' })
     email: string;
 
-    @ApiProperty({ enum: BusinessType, example: BusinessType.SPA_BEAUTY })
-    businessType: BusinessType;
+    @ApiProperty({ enum: BusinessType, isArray: true, example: [BusinessType.SPA_BEAUTY] })
+    businessType: BusinessType[];
 
     @ApiProperty({ enum: PartnerVerificationStatus, example: PartnerVerificationStatus.PENDING })
     verificationStatus: PartnerVerificationStatus;

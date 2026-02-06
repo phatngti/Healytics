@@ -71,11 +71,6 @@ abstract class AccountRequestEntity with _$AccountRequestEntity {
 
   factory AccountRequestEntity.fromJson(Map<String, dynamic> json) =>
       _$AccountRequestEntityFromJson(json);
-
-  @override
-  String toString() {
-    return 'AccountRequestEntity(username: $username, email: $email, password: $password)';
-  }
 }
 
 /// Partner (Business Entity) information.
@@ -85,7 +80,7 @@ abstract class PartnerRequestEntity with _$PartnerRequestEntity {
     required String taxCode,
     required String legalName,
     required String brandName,
-    required String businessType,
+    required List<String> businessType,
     required String provinceId,
     required String districtId,
     required String wardId,
@@ -132,11 +127,6 @@ abstract class PartnerDocumentVerificationEntity
   factory PartnerDocumentVerificationEntity.fromJson(
     Map<String, dynamic> json,
   ) => _$PartnerDocumentVerificationEntityFromJson(json);
-
-  @override
-  String toString() {
-    return 'PartnerDocumentVerificationEntity(fileType: $fileType, type: $type, documentKey: $documentKey, urls: $urls)';
-  }
 }
 
 /// Legal representative information.
@@ -170,11 +160,6 @@ abstract class RegisterPartnerRequestEntity
 
   factory RegisterPartnerRequestEntity.fromJson(Map<String, dynamic> json) =>
       _$RegisterPartnerRequestEntityFromJson(json);
-
-  @override
-  String toString() {
-    return 'RegisterPartnerRequestEntity(account: $account, partner: $partner, legalRepresentative: $legalRepresentative)';
-  }
 }
 
 /// Response from partner registration.

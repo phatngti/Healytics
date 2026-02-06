@@ -26,18 +26,13 @@ void main() {
       // TODO
     });
 
-    // VerifiedField serviceTags
-    test('to test the property `serviceTags`', () async {
+    // VerifiedField businessType
+    test('to test the property `businessType`', () async {
       // TODO
     });
 
     // AddressInfoDto address
     test('to test the property `address`', () async {
-      // TODO
-    });
-
-    // VerifiedField username
-    test('to test the property `username`', () async {
       // TODO
     });
 
