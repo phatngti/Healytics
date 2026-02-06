@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 **brandName** | **String** |  | 
 **legalName** | **String** |  | 
 **email** | **String** |  | 
-**businessType** | **String** |  | 
+**businessType** | **List<String>** |  | [default to const []]
 **verificationStatus** | **String** |  | 
 **createdAt** | [**DateTime**](DateTime.md) |  | 
 

@@ -13,26 +13,18 @@ part of openapi.api;
 class ReviewItemDto {
   /// Returns a new [ReviewItemDto] instance.
   ReviewItemDto({
-    required this.fieldKey,
-    this.documentKey,
-    required this.isVerified,
+    this.fieldKey,
     this.feedback,
   });
 
-  /// Key of the field or document being reviewed
-  String fieldKey;
-
-  /// UUID of the document (if type is DOCUMENT)
+  /// Key of the field being reviewed
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? documentKey;
-
-  /// Mark the item as valid or invalid
-  bool isVerified;
+  String? fieldKey;
 
   /// Reason for rejection or feedback
   ///
@@ -46,30 +38,24 @@ class ReviewItemDto {
   @override
   bool operator ==(Object other) => identical(this, other) || other is ReviewItemDto &&
     other.fieldKey == fieldKey &&
-    other.documentKey == documentKey &&
-    other.isVerified == isVerified &&
     other.feedback == feedback;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (fieldKey.hashCode) +
-    (documentKey == null ? 0 : documentKey!.hashCode) +
-    (isVerified.hashCode) +
+    (fieldKey == null ? 0 : fieldKey!.hashCode) +
     (feedback == null ? 0 : feedback!.hashCode);
 
   @override
-  String toString() => 'ReviewItemDto[fieldKey=$fieldKey, documentKey=$documentKey, isVerified=$isVerified, feedback=$feedback]';
+  String toString() => 'ReviewItemDto[fieldKey=$fieldKey, feedback=$feedback]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+    if (this.fieldKey != null) {
       json[r'fieldKey'] = this.fieldKey;
-    if (this.documentKey != null) {
-      json[r'documentKey'] = this.documentKey;
     } else {
-      json[r'documentKey'] = null;
+      json[r'fieldKey'] = null;
     }
-      json[r'isVerified'] = this.isVerified;
     if (this.feedback != null) {
       json[r'feedback'] = this.feedback;
     } else {
@@ -97,9 +83,7 @@ class ReviewItemDto {
       }());
 
       return ReviewItemDto(
-        fieldKey: mapValueOfType<String>(json, r'fieldKey')!,
-        documentKey: mapValueOfType<String>(json, r'documentKey'),
-        isVerified: mapValueOfType<bool>(json, r'isVerified')!,
+        fieldKey: mapValueOfType<String>(json, r'fieldKey'),
         feedback: mapValueOfType<String>(json, r'feedback'),
       );
     }
@@ -148,8 +132,6 @@ class ReviewItemDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'fieldKey',
-    'isVerified',
   };
 }
 

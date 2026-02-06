@@ -14,6 +14,7 @@ import { Role } from '@/account/enum/role.enum';
 import { UserProfile } from '@/account/entities/user-profile.entity';
 import { Account } from '@/account/entities/account.entity';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
+import { PartnersService } from '@/partners/partners.service';
 
 /** Roles allowed for admin/partner login */
 const ADMIN_ROLES: Role[] = [Role.ADMIN, Role.HEALTH_PARTNER, Role.EMPLOYEE];
@@ -58,6 +59,7 @@ export class AuthService {
   constructor(
     private readonly accountService: AccountService,
     private readonly jwtService: JwtService,
+    private readonly partnerService: PartnersService,
   ) { }
 
   /**
@@ -82,6 +84,8 @@ export class AuthService {
       payload.lastName = profile.lastName;
       payload.profileCompleted = profile.profileCompleted;
     }
+
+    console.log('partnerVerification', partnerVerification);
     if (partnerVerification) {
       payload.verificationStatus = partnerVerification.verificationStatus;
       payload.verificationCompletedAt = partnerVerification.verificationCompletedAt?.toISOString() ?? null;
@@ -245,8 +249,18 @@ export class AuthService {
       );
     }
 
+    const partnerProfile = await this.partnerService.getPartnerProfile(userId);
+    if (!partnerProfile) {
+      throw new ForbiddenException(
+        'This account is not authorized for partner login.',
+      );
+    }
+
     this.logger.log(`Partner login: ${userId}`);
-    return this.createTokensForUser(userId, userEmail, userRole, user.userProfile);
+    return this.createTokensForUser(userId, userEmail, userRole, user.userProfile, {
+      verificationCompletedAt: partnerProfile.verificationCompletedAt,
+      verificationStatus: partnerProfile.verificationStatus,
+    });
   }
 
 

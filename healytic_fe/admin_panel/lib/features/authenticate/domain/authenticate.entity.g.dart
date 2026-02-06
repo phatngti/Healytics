@@ -86,7 +86,9 @@ _PartnerRequestEntity _$PartnerRequestEntityFromJson(
   taxCode: json['taxCode'] as String,
   legalName: json['legalName'] as String,
   brandName: json['brandName'] as String,
-  businessType: json['businessType'] as String,
+  businessType: (json['businessType'] as List<dynamic>)
+      .map((e) => e as String)
+      .toList(),
   provinceId: json['provinceId'] as String,
   districtId: json['districtId'] as String,
   wardId: json['wardId'] as String,

@@ -5,44 +5,40 @@ import {
     Get,
     Put,
     Body,
-    Query,
-    Param,
     Req,
     UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PartnersService } from './partners.service';
-import { BusinessTypesResponseDto } from './dto/response/business-types-response.dto';
 import { MyProfileResponseDto } from './dto/response/my-profile-response.dto';
-import { PartnersResponseDto } from './dto/response/partners-response.dto';
-import { PartnerDetailResponseDto } from './dto/response/partner-detail-response.dto';
 import { UpdatePartnerDto } from './dto/request/update-partner.dto';
-import { GetPartnersQueryDto } from './dto/request/get-partners-query.dto';
 import { Public } from '@/common/decorators/auth/public.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { Role } from '@/account/enum/role.enum';
 import { RolesGuard } from '@/auth/guards/roles.guard';
+import { LogResponse } from '@/common/interceptors/response.interceptor';
+import { BusinessServicesResponseDto } from './dto/response/business-types-response.dto';
 
 @ApiTags('partners')
 @Controller('partners')
 export class PartnersController {
     constructor(private readonly partnersService: PartnersService) { }
 
-    @Get('business-types')
+    @Get('business-services')
     @Public()
     @HttpCode(HttpStatus.OK)
     @ApiOperation({
-        summary: 'Get all business types',
-        description: 'Returns list of all business types with Vietnamese labels for dropdown selection',
+        summary: 'Get all business services',
+        description: 'Returns list of all business services with Vietnamese labels for dropdown selection',
     })
     @ApiResponse({
         status: 200,
-        description: 'List of business types retrieved successfully',
-        type: BusinessTypesResponseDto,
+        description: 'List of business services retrieved successfully',
+        type: BusinessServicesResponseDto,
     })
-    getBusinessTypes(): BusinessTypesResponseDto {
-        return this.partnersService.getBusinessTypes();
+    getBusinessServices(): BusinessServicesResponseDto {
+        return this.partnersService.getBusinessServices();
     }
 
     // ============================================================================
@@ -50,6 +46,7 @@ export class PartnersController {
     // ============================================================================
 
     @Get('me')
+    @LogResponse()
     @UseGuards(JwtAuthGuard)
     @UseGuards(RolesGuard)
     @Roles(Role.HEALTH_PARTNER)
@@ -69,6 +66,7 @@ export class PartnersController {
     }
 
     @Put('me')
+    @LogResponse()
     @UseGuards(JwtAuthGuard)
     @UseGuards(RolesGuard)
     @Roles(Role.HEALTH_PARTNER)

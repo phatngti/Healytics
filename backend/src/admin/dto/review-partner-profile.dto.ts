@@ -11,23 +11,13 @@ export enum ReviewDecision {
 
 
 export class ReviewItemDto {
-    @ApiProperty({ description: 'Key of the field or document being reviewed' })
+    @ApiProperty({ description: 'Key of the field being reviewed', required: false })
     @IsString()
     fieldKey: string;
 
-    @ApiProperty({ description: 'UUID of the document (if type is DOCUMENT)', required: false })
-    @IsOptional()
-    @IsUUID()
-    documentKey?: string;
-
-    @ApiProperty({ description: 'Mark the item as valid or invalid', example: true })
-    @IsBoolean()
-    isVerified: boolean;
-
     @ApiProperty({ description: 'Reason for rejection or feedback', required: false })
-    @IsOptional()
     @IsString()
-    feedback?: string;
+    feedback: string;
 }
 
 export class ReviewPartnerProfileDto {

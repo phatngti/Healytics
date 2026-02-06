@@ -10,7 +10,7 @@ class BusinessOverviewSection extends StatelessWidget {
     required this.brandName,
     this.taxRegistrationCode,
     this.isTaxCodeValid = false,
-    required this.serviceTags,
+    required this.businessTypes,
     this.address,
     super.key,
   });
@@ -18,7 +18,7 @@ class BusinessOverviewSection extends StatelessWidget {
   final VerifiedFieldEntity<String> brandName;
   final VerifiedFieldEntity<String?>? taxRegistrationCode;
   final bool isTaxCodeValid;
-  final VerifiedFieldEntity<List<String>> serviceTags;
+  final VerifiedFieldEntity<List<String>> businessTypes;
   final AddressInfo? address;
 
   @override
@@ -80,17 +80,17 @@ class BusinessOverviewSection extends StatelessWidget {
                 ),
                 AppDimens.verticalLarge,
 
-                // Service Tags
+                // Business Types
                 ReviewableField(
-                  title: 'Service Tags',
-                  fieldId: serviceTags.fieldKey,
+                  title: 'Business Types',
+                  fieldId: businessTypes.fieldKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: serviceTags.value.map((tag) {
+                        children: businessTypes.value.map((tag) {
                           return Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,
