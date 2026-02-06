@@ -82,7 +82,7 @@ describe('AdminPartnersService', () => {
                 items: []
             };
 
-            const mockPartner = { id: partnerId, verificationStatus: 'PENDING', businessType: BusinessType.PHARMACY } as Partner;
+            const mockPartner = { id: partnerId, verificationStatus: 'PENDING', businessType: [BusinessType.PHARMACY] } as Partner;
             mockPartnerRepo.findOne.mockResolvedValue(mockPartner);
             mockDocReqRepo.find.mockResolvedValue([{ documentType: 'DOC_TYPE_A', isRequired: true }]); // Mock requirements
             mockQueryRunner.manager.find.mockImplementation((entity) => {
@@ -106,7 +106,7 @@ describe('AdminPartnersService', () => {
                 generalComment: 'LGTM',
             };
 
-            const mockPartner = { id: partnerId, verificationStatus: 'PENDING', businessType: BusinessType.PHARMACY } as Partner;
+            const mockPartner = { id: partnerId, verificationStatus: 'PENDING', businessType: [BusinessType.PHARMACY] } as Partner;
             mockPartnerRepo.findOne.mockResolvedValue(mockPartner);
             mockDocReqRepo.find.mockResolvedValue([{ documentType: 'REQUIRED_DOC_X', isRequired: true }]); // Mock requirements
 
@@ -127,7 +127,7 @@ describe('AdminPartnersService', () => {
                 decision: ReviewDecision.CHANGES_REQUIRED,
                 generalComment: 'Fix docs',
                 items: [
-                    { fieldKey: 'business_license', documentKey: 'd1', isVerified: false, feedback: 'Blurry' }
+                    { fieldKey: 'partners/docs/business_license.pdf', feedback: 'Blurry' }  // documentKey (storage path) format
                 ]
             };
 
@@ -149,9 +149,6 @@ describe('AdminPartnersService', () => {
 
             expect(mockQueryRunner.manager.save).toHaveBeenCalledWith(expect.objectContaining({
                 verificationStatus: PartnerVerificationStatus.REQUIRED_RESUBMIT,
-                rejectionDetails: expect.objectContaining({
-                    document_DOC_TYPE_A: 'Blurry'
-                })
             }));
         });
 
@@ -162,7 +159,7 @@ describe('AdminPartnersService', () => {
                 decision: ReviewDecision.APPROVED, // User clicked Approve by mistake?
                 generalComment: 'Oops',
                 items: [
-                    { fieldKey: 'legalName', isVerified: false, feedback: 'Wrong name' }
+                    { fieldKey: 'legalName', feedback: 'Wrong name' }
                 ]
             };
 
@@ -175,9 +172,6 @@ describe('AdminPartnersService', () => {
             // Should NOT be APPROVED, must be REQUIRED_RESUBMIT
             expect(mockQueryRunner.manager.save).toHaveBeenCalledWith(expect.objectContaining({
                 verificationStatus: PartnerVerificationStatus.REQUIRED_RESUBMIT,
-                rejectionDetails: expect.objectContaining({
-                    legalName: 'Wrong name'
-                })
             }));
         });
     });

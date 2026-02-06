@@ -158,13 +158,7 @@ class PartnerVerificationRemoteDataSourceImpl
     final items = <ReviewItemDto>[];
     if (fieldFeedback != null) {
       for (final entry in fieldFeedback.entries) {
-        items.add(
-          ReviewItemDto(
-            fieldKey: entry.key,
-            isVerified: false, // Fields with feedback need revision
-            feedback: entry.value,
-          ),
-        );
+        items.add(ReviewItemDto(fieldKey: entry.key, feedback: entry.value));
       }
     }
 
@@ -213,11 +207,7 @@ class PartnerVerificationRemoteDataSourceImpl
             )
           : null,
       isTaxCodeValid: false, // TODO: Add isTaxCodeValid to DTO if available
-      serviceTags: _mapVerifiedFieldList(businessInfo.serviceTags),
       address: _mapAddress(businessInfo.address),
-      username: businessInfo.username != null
-          ? _mapVerifiedFieldNullable<String?>(businessInfo.username!)
-          : null,
       email: businessInfo.email != null
           ? _mapVerifiedFieldNullable<String?>(businessInfo.email!)
           : null,
@@ -225,6 +215,7 @@ class PartnerVerificationRemoteDataSourceImpl
       phoneNumber: businessInfo.phoneNumber != null
           ? _mapVerifiedFieldNullable<String?>(businessInfo.phoneNumber!)
           : null,
+      businessType: _mapVerifiedFieldList(businessInfo.businessType),
       legalRepresentative: _mapLegalRepresentative(dto.legalRepresentative),
       kycDocuments: _mapKycDocuments(dto.kycDocuments),
       status: _mapVerificationStatus(dto.status),
@@ -327,7 +318,7 @@ class PartnerVerificationRemoteDataSourceImpl
       id: PartnerVerificationId(dto.id),
       name: dto.brandName,
       initials: _getInitials(dto.brandName),
-      serviceTypes: [dto.businessType.value],
+      // serviceTypes: [dto.businessType.value],
       submittedAt: dto.createdAt,
       priority: PartnerPriority.normal,
       status: _mapItemVerificationStatus(dto.verificationStatus),

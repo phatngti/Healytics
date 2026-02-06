@@ -3,11 +3,12 @@ import 'package:admin_panel/features/admin/partner_manager/domain/partner_verifi
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/reviewable_field.widget.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 /// KYC Documents section showing uploaded verification documents
-class KycDocumentsSection extends ConsumerWidget {
+class KycDocumentsSection extends HookConsumerWidget {
   const KycDocumentsSection({this.documents, super.key});
 
   final List<KycDocument>? documents;
@@ -25,8 +26,16 @@ class KycDocumentsSection extends ConsumerWidget {
     final idCardDocuments = docs
         .where((d) => _idCardDocumentKeys.contains(d.documentKey))
         .toList();
+    final identityDocuments = docs
+        .where(
+          (d) =>
+              !([..._idCardDocumentKeys].contains(d.documentKey) ||
+                  d.documentKey.startsWith('other_documents')),
+        )
+        .toList();
+
     final otherDocuments = docs
-        .where((d) => !_idCardDocumentKeys.contains(d.documentKey))
+        .where((d) => d.documentKey.startsWith('other_documents'))
         .toList();
 
     return Container(
@@ -66,28 +75,52 @@ class KycDocumentsSection extends ConsumerWidget {
                 // ══════════════════════════════════════════════════════════════
                 // Section 2: Documents (All other documents)
                 // ══════════════════════════════════════════════════════════════
-                if (otherDocuments.isNotEmpty) ...[
+                if (identityDocuments.isNotEmpty) ...[
                   if (idCardDocuments.isNotEmpty) AppDimens.verticalLarge,
-                  ...otherDocuments.map(
-                    (doc) => Padding(
+                  ...identityDocuments.map((doc) {
+                    return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ReviewableField(
-                            title:
-                                DocumentTypes.findByKey(
-                                  doc.documentKey,
-                                )?.label ??
-                                doc.documentKey,
-                            fieldId: 'kyc.${doc.documentKey}',
+                            title: _getDocumentLabel(doc.documentKey),
+                            fieldId: doc.documentKey,
                             child: _buildDocumentItem(context, doc),
                           ),
                           AppDimens.verticalSmall,
                         ],
                       ),
-                    ),
-                  ),
+                    );
+                  }),
+                ],
+
+                // ══════════════════════════════════════════════════════════════
+                // Section 3: Other Documents
+                // ══════════════════════════════════════════════════════════════
+                if (otherDocuments.isNotEmpty) ...[
+                  if (idCardDocuments.isNotEmpty ||
+                      identityDocuments.isNotEmpty) ...[
+                    AppDimens.verticalLarge,
+                    const Divider(height: 1),
+                    AppDimens.verticalLarge,
+                  ],
+                  ...otherDocuments.map((doc) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ReviewableField(
+                            title: _getDocumentLabel(doc.documentKey),
+                            fieldId: doc.documentKey,
+                            child: _buildDocumentItem(context, doc),
+                          ),
+                          AppDimens.verticalSmall,
+                        ],
+                      ),
+                    );
+                  }),
                 ],
               ],
             ),
@@ -307,7 +340,7 @@ class KycDocumentsSection extends ConsumerWidget {
     final fileTypeInfo = _getFileTypeInfo(doc.fileName);
 
     final formattedDate = doc.uploadedAt != null
-        ? DateFormat('MMM dd').format(doc.uploadedAt!)
+        ? DateFormat('EEE, d/M/y').format(doc.uploadedAt!)
         : '';
 
     return MouseRegion(
@@ -343,7 +376,7 @@ class KycDocumentsSection extends ConsumerWidget {
                 children: [
                   // Document label
                   Text(
-                    DocumentTypes.findByKey(doc.documentKey)!.label,
+                    _getDocumentLabel(doc.documentKey),
                     style: textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -381,6 +414,13 @@ class KycDocumentsSection extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _getDocumentLabel(String key) {
+    if (key.startsWith('other_documents')) {
+      return DocumentTypes.otherDocuments.label;
+    }
+    return DocumentTypes.findByKey(key)?.label ?? '';
   }
 }
 

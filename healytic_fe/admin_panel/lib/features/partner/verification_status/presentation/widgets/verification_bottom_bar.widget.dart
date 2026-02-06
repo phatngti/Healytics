@@ -32,11 +32,11 @@ class VerificationBottomBar extends StatelessWidget {
 
   String get _statusText {
     switch (status) {
+      case VerificationRevisionStatus.onboarding:
+        return 'Onboarding';
       case VerificationRevisionStatus.pending:
         return 'Pending Review';
-      case VerificationRevisionStatus.underReview:
-        return 'Under Review';
-      case VerificationRevisionStatus.revisionRequested:
+      case VerificationRevisionStatus.requiredResubmit:
         return 'Awaiting Revision';
       case VerificationRevisionStatus.approved:
         return 'Approved';
@@ -49,10 +49,10 @@ class VerificationBottomBar extends StatelessWidget {
     final semanticColors = Theme.of(context).extension<SemanticColors>();
 
     switch (status) {
+      case VerificationRevisionStatus.onboarding:
       case VerificationRevisionStatus.pending:
-      case VerificationRevisionStatus.underReview:
         return semanticColors?.info ?? Colors.blue;
-      case VerificationRevisionStatus.revisionRequested:
+      case VerificationRevisionStatus.requiredResubmit:
         return semanticColors?.warning ?? Colors.orange;
       case VerificationRevisionStatus.approved:
         return semanticColors?.success ?? Colors.green;

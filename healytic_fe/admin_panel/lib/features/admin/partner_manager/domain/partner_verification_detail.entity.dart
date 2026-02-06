@@ -185,14 +185,15 @@ abstract class PartnerVerificationDetailEntity
     required VerifiedFieldEntity<String> brandName,
     VerifiedFieldEntity<String?>? taxRegistrationCode,
     @Default(false) bool isTaxCodeValid,
-    required VerifiedFieldEntity<List<String>> serviceTags,
     AddressInfo? address,
 
     // Account & Contact with verification status
-    VerifiedFieldEntity<String?>? username,
     VerifiedFieldEntity<String?>? email,
     @Default(false) bool isEmailVerified,
     VerifiedFieldEntity<String?>? phoneNumber,
+
+    // Business Type with verification status
+    required VerifiedFieldEntity<List<String>> businessType,
 
     // Legal Representative
     LegalRepresentative? legalRepresentative,
@@ -215,12 +216,11 @@ abstract class PartnerVerificationDetailEntity
       'brandName': brandName.toJson(),
       'taxRegistrationCode': taxRegistrationCode?.toJson(),
       'isTaxCodeValid': isTaxCodeValid,
-      'serviceTags': serviceTags.toJson(),
       'address': address?.toJson(),
-      'username': username?.toJson(),
       'email': email?.toJson(),
       'isEmailVerified': isEmailVerified,
       'phoneNumber': phoneNumber?.toJson(),
+      'businessType': businessType.toJson(),
       'legalRepresentative': legalRepresentative?.toJson(),
       'kycDocuments': kycDocuments.map((e) => e.toJson()).toList(),
       'status': status.name,

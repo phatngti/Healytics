@@ -53,7 +53,7 @@ class AccountContactSection extends StatelessWidget {
                 Expanded(
                   child: ReviewableField(
                     title: 'Username',
-                    fieldId: username!.fieldKey,
+                    fieldId: username?.fieldKey ?? 'username',
                     compactMode: true,
                     child: _buildInfoItem(context, username?.value),
                   ),
@@ -61,7 +61,7 @@ class AccountContactSection extends StatelessWidget {
                 Expanded(
                   child: ReviewableField(
                     title: 'Email',
-                    fieldId: email!.fieldKey,
+                    fieldId: email?.fieldKey ?? 'email',
                     compactMode: true,
                     child: _buildEmailItem(context),
                   ),
@@ -69,7 +69,7 @@ class AccountContactSection extends StatelessWidget {
                 Expanded(
                   child: ReviewableField(
                     title: 'Phone Number',
-                    fieldId: phoneNumber!.fieldKey,
+                    fieldId: phoneNumber?.fieldKey ?? 'phoneNumber',
                     compactMode: true,
                     child: _buildInfoItem(context, phoneNumber?.value),
                   ),

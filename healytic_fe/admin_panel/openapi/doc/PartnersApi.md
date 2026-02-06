@@ -9,17 +9,17 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**partnersControllerGetBusinessTypes**](PartnersApi.md#partnerscontrollergetbusinesstypes) | **GET** /partners/business-types | Get all business types
+[**partnersControllerGetBusinessServices**](PartnersApi.md#partnerscontrollergetbusinessservices) | **GET** /partners/business-services | Get all business services
 [**partnersControllerGetMyProfile**](PartnersApi.md#partnerscontrollergetmyprofile) | **GET** /partners/me | Get own business profile
 [**partnersControllerUpdateMyProfile**](PartnersApi.md#partnerscontrollerupdatemyprofile) | **PUT** /partners/me | Update own business profile
 
 
-# **partnersControllerGetBusinessTypes**
-> BusinessTypesResponseDto partnersControllerGetBusinessTypes()
+# **partnersControllerGetBusinessServices**
+> BusinessServicesResponseDto partnersControllerGetBusinessServices()
 
-Get all business types
+Get all business services
 
-Returns list of all business types with Vietnamese labels for dropdown selection
+Returns list of all business services with Vietnamese labels for dropdown selection
 
 ### Example
 ```dart
@@ -28,10 +28,10 @@ import 'package:admin_openapi/api.dart';
 final api_instance = PartnersApi();
 
 try {
-    final result = api_instance.partnersControllerGetBusinessTypes();
+    final result = api_instance.partnersControllerGetBusinessServices();
     print(result);
 } catch (e) {
-    print('Exception when calling PartnersApi->partnersControllerGetBusinessTypes: $e\n');
+    print('Exception when calling PartnersApi->partnersControllerGetBusinessServices: $e\n');
 }
 ```
 
@@ -40,7 +40,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**BusinessTypesResponseDto**](BusinessTypesResponseDto.md)
+[**BusinessServicesResponseDto**](BusinessServicesResponseDto.md)
 
 ### Authorization
 

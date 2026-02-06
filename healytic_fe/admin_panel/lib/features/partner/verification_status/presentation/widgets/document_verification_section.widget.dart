@@ -1,280 +1,241 @@
+import 'package:admin_panel/constants/document_types.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/common/document_cards.widget.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/common/verification_form_fields.widget.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
-/// Document Verification section widget.
+// Re-export DocumentUploadResult for external use
+export 'package:admin_panel/features/partner/verification_status/presentation/widgets/common/document_cards.widget.dart'
+    show DocumentUploadResult;
+
+/// Section for displaying document verification status and upload actions.
 ///
-/// Displays a grid of document cards showing verification status:
-/// - Action required cards with upload button
-/// - Verified document rows with green checkmarks
-class DocumentVerificationSection extends StatelessWidget {
+/// Shows required documents with their verification status:
+/// - Documents needing upload are highlighted with animated upload cards
+/// - Verified documents show a compact success indicator
+class DocumentVerificationSection extends StatefulWidget {
   /// Creates a new [DocumentVerificationSection].
   const DocumentVerificationSection({
     required this.documents,
-    required this.onUploadDocument,
+    this.onUploadComplete,
     super.key,
   });
 
-  /// The document verification info.
-  final DocumentVerificationInfo? documents;
+  /// The KYC documents as VerifiedField list.
+  final List<VerifiedField>? documents;
 
-  /// Callback when document upload is requested.
-  final void Function(VerificationDocument doc)? onUploadDocument;
+  /// Callback when a document upload completes successfully.
+  final void Function(DocumentUploadResult result)? onUploadComplete;
 
   @override
-  Widget build(BuildContext context) {
-    if (documents == null) {
-      return const Center(child: Text('No documents available'));
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWide = constraints.maxWidth > 500;
-
-        if (isWide) {
-          return _buildGridLayout(context);
-        }
-        return _buildColumnLayout(context);
-      },
-    );
-  }
-
-  Widget _buildGridLayout(BuildContext context) {
-    return Column(
-      children: [
-        // First row: Business License + Authorization Letter
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Business License
-            if (documents!.businessLicense != null)
-              Expanded(
-                child: documents!.businessLicense!.requiresUpdate
-                    ? _DocumentActionCard(
-                        document: documents!.businessLicense!,
-                        onUpload: () =>
-                            onUploadDocument?.call(documents!.businessLicense!),
-                      )
-                    : _VerifiedDocumentRow(
-                        document: documents!.businessLicense!,
-                        icon: Icons.description_outlined,
-                      ),
-              ),
-            const SizedBox(width: 16),
-            // Authorization Letter
-            if (documents!.authorizationLetter != null)
-              Expanded(
-                child: documents!.authorizationLetter!.requiresUpdate
-                    ? _DocumentActionCard(
-                        document: documents!.authorizationLetter!,
-                        onUpload: () => onUploadDocument?.call(
-                          documents!.authorizationLetter!,
-                        ),
-                      )
-                    : _VerifiedDocumentRow(
-                        document: documents!.authorizationLetter!,
-                        icon: Icons.badge_outlined,
-                      ),
-              ),
-          ],
-        ),
-        AppDimens.verticalMedium,
-        // Second row: Tax Registration + Other Documents
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (documents!.taxCertificate != null)
-              Expanded(
-                child: documents!.taxCertificate!.requiresUpdate
-                    ? _DocumentActionCard(
-                        document: documents!.taxCertificate!,
-                        onUpload: () =>
-                            onUploadDocument?.call(documents!.taxCertificate!),
-                      )
-                    : _VerifiedDocumentRow(
-                        document: documents!.taxCertificate!,
-                        icon: Icons.account_balance_outlined,
-                      ),
-              ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _OtherDocumentsRow(documents: documents!.otherDocuments),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildColumnLayout(BuildContext context) {
-    return Column(
-      children: [
-        // Business License
-        if (documents!.businessLicense != null)
-          documents!.businessLicense!.requiresUpdate
-              ? _DocumentActionCard(
-                  document: documents!.businessLicense!,
-                  onUpload: () =>
-                      onUploadDocument?.call(documents!.businessLicense!),
-                )
-              : _VerifiedDocumentRow(
-                  document: documents!.businessLicense!,
-                  icon: Icons.description_outlined,
-                ),
-        AppDimens.verticalMedium,
-        // Authorization Letter
-        if (documents!.authorizationLetter != null)
-          documents!.authorizationLetter!.requiresUpdate
-              ? _DocumentActionCard(
-                  document: documents!.authorizationLetter!,
-                  onUpload: () =>
-                      onUploadDocument?.call(documents!.authorizationLetter!),
-                )
-              : _VerifiedDocumentRow(
-                  document: documents!.authorizationLetter!,
-                  icon: Icons.badge_outlined,
-                ),
-        AppDimens.verticalMediumSmall,
-        // Tax Certificate
-        if (documents!.taxCertificate != null)
-          documents!.taxCertificate!.requiresUpdate
-              ? _DocumentActionCard(
-                  document: documents!.taxCertificate!,
-                  onUpload: () =>
-                      onUploadDocument?.call(documents!.taxCertificate!),
-                )
-              : _VerifiedDocumentRow(
-                  document: documents!.taxCertificate!,
-                  icon: Icons.account_balance_outlined,
-                ),
-        AppDimens.verticalMediumSmall,
-        _OtherDocumentsRow(documents: documents!.otherDocuments),
-      ],
-    );
-  }
+  State<DocumentVerificationSection> createState() =>
+      _DocumentVerificationSectionState();
 }
 
-/// Action required document card with upload button.
-class _DocumentActionCard extends StatelessWidget {
-  const _DocumentActionCard({required this.document, required this.onUpload});
+class _DocumentVerificationSectionState
+    extends State<DocumentVerificationSection> {
+  /// Identity document keys that are shown in Legal Representative section.
+  static final _identityDocKeys = {
+    DocumentTypes.idCardFront.documentKey,
+    DocumentTypes.idCardBack.documentKey,
+  };
 
-  final VerificationDocument document;
-  final VoidCallback onUpload;
+  /// Tracks uploaded file URLs by document key for EDITED status and preview.
+  final Map<String, String> _uploadedUrls = {};
+
+  void _handleUploadComplete(DocumentUploadResult result) {
+    setState(() {
+      _uploadedUrls[result.documentKey] = result.url;
+    });
+    widget.onUploadComplete?.call(result);
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final requiresAction = document.requiresUpdate;
 
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: requiresAction
-            ? colorScheme.error.withValues(alpha: 0.05)
-            : colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: requiresAction
-              ? colorScheme.error
-              : colorScheme.outlineVariant,
-          width: requiresAction ? 2 : 1,
-          style: BorderStyle.solid,
-        ),
-      ),
-      child: Column(
-        children: [
-          // Alert icon
-          if (requiresAction)
-            Align(
-              alignment: Alignment.topRight,
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: colorScheme.error.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.priority_high,
-                  size: 16,
+    if (widget.documents == null || widget.documents!.isEmpty) {
+      return const Center(child: Text('No documents to verify'));
+    }
+
+    // Filter out identity documents (shown in Legal Representative section)
+    final filteredDocuments = widget.documents!
+        .where((doc) => !_identityDocKeys.contains(doc.fieldKey))
+        .toList();
+
+    if (filteredDocuments.isEmpty) {
+      return const Center(child: Text('No documents to verify'));
+    }
+
+    // Separate documents into needs action vs verified
+    final documentsNeedingAction = filteredDocuments
+        .where((doc) => !doc.isVerified)
+        .toList();
+    final verifiedDocuments = filteredDocuments
+        .where((doc) => doc.isVerified)
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Documents Needing Action Section
+        if (documentsNeedingAction.isNotEmpty) ...[
+          Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: colorScheme.error,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Documents Requiring Action',
+                style: textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
                   color: colorScheme.error,
                 ),
               ),
-            ),
-          // Document icon
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: requiresAction
-                  ? colorScheme.error.withValues(alpha: 0.1)
-                  : colorScheme.primaryContainer,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.description_outlined,
-              size: 24,
-              color: requiresAction
-                  ? colorScheme.error
-                  : colorScheme.onPrimaryContainer,
-            ),
+              const SizedBox(width: 8),
+              VerificationActionRequiredBadge(color: colorScheme.error),
+            ],
           ),
-          AppDimens.verticalMediumSmall,
-          // Label
-          Text(
-            document.label,
-            style: textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: requiresAction ? colorScheme.error : colorScheme.onSurface,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          AppDimens.verticalSmall,
-          // Feedback message
-          if (document.adminFeedback != null &&
-              document.adminFeedback!.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                document.adminFeedback!,
-                style: textTheme.bodySmall?.copyWith(
-                  color: requiresAction
-                      ? colorScheme.error
-                      : colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
           AppDimens.verticalMedium,
-          // Upload button
-          FilledButton.icon(
-            onPressed: onUpload,
-            style: FilledButton.styleFrom(
-              backgroundColor: requiresAction
-                  ? colorScheme.error
-                  : colorScheme.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            icon: const Icon(Icons.upload_rounded, size: 18),
-            label: const Text('Upload Scan'),
-          ),
+          _buildActionDocumentsGrid(context, documentsNeedingAction),
         ],
+
+        // Verified Documents Section
+        if (verifiedDocuments.isNotEmpty) ...[
+          if (documentsNeedingAction.isNotEmpty) ...[
+            AppDimens.verticalLarge,
+            Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+            AppDimens.verticalLarge,
+          ],
+          Row(
+            children: [
+              Icon(
+                Icons.check_circle_outline,
+                color:
+                    Theme.of(context).extension<SemanticColors>()?.success ??
+                    Colors.green,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Verified Documents',
+                style: textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+          AppDimens.verticalMedium,
+          _buildVerifiedDocumentsList(context, verifiedDocuments),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildActionDocumentsGrid(
+    BuildContext context,
+    List<VerifiedField> documents,
+  ) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth > 600;
+        final cardWidth = isWide
+            ? (constraints.maxWidth - 16) / 2
+            : constraints.maxWidth;
+
+        return Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: documents.map((document) {
+            final uploadedUrl = _uploadedUrls[document.fieldKey];
+            final hasBeenEdited = uploadedUrl != null;
+
+            return SizedBox(
+              width: cardWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AspectRatio(
+                    aspectRatio: isWide ? 2.0 : 2.5,
+                    // DocumentUploadCard is now a FormBuilderField
+                    child: DocumentUploadCard(
+                      document: document,
+                      uploadedPreviewUrl: uploadedUrl,
+                      showEditedBadge: hasBeenEdited,
+                      height: double.infinity,
+                      onUploadComplete: _handleUploadComplete,
+                    ),
+                  ),
+                  if (document.feedback != null &&
+                      document.feedback!.isNotEmpty)
+                    FeedbackMessage(feedback: document.feedback!),
+                ],
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildVerifiedDocumentsList(
+    BuildContext context,
+    List<VerifiedField> documents,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
+      ),
+      child: Column(
+        children: documents.asMap().entries.map((entry) {
+          final index = entry.key;
+          final document = entry.value;
+          return Column(
+            children: [
+              _VerifiedDocumentRow(
+                document: document,
+                icon: _getDocumentIcon(document.fieldKey),
+              ),
+              if (index < documents.length - 1)
+                Divider(
+                  height: 1,
+                  indent: 56,
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                ),
+            ],
+          );
+        }).toList(),
       ),
     );
   }
+
+  IconData _getDocumentIcon(String fieldKey) {
+    final docType = DocumentTypes.findByKey(fieldKey);
+    if (docType != null) {
+      return Icons.badge_outlined;
+    }
+    return Icons.insert_drive_file_outlined;
+  }
 }
 
-/// Row showing a verified document with icon and checkmark.
-/// Supports action-required state when document needs update.
+/// Row showing a verified document with its info.
 class _VerifiedDocumentRow extends StatelessWidget {
   const _VerifiedDocumentRow({required this.document, required this.icon});
 
-  final VerificationDocument document;
+  final VerifiedField document;
   final IconData icon;
 
   @override
@@ -283,189 +244,62 @@ class _VerifiedDocumentRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final semanticColors = Theme.of(context).extension<SemanticColors>();
     final successColor = semanticColors?.success ?? Colors.green;
-    final isVerified = document.status == DocumentStatus.approved;
-    final requiresUpdate = document.requiresUpdate;
-    final hasAdminFeedback =
-        document.adminFeedback != null && document.adminFeedback!.isNotEmpty;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: requiresUpdate
-            ? colorScheme.error.withValues(alpha: 0.05)
-            : colorScheme.surfaceContainerLow,
-        border: Border.all(
-          color: requiresUpdate
-              ? colorScheme.error
-              : colorScheme.outlineVariant,
-          width: requiresUpdate ? 2 : 1,
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              // Icon container
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: requiresUpdate
-                      ? colorScheme.error.withValues(alpha: 0.1)
-                      : colorScheme.surface,
-                  border: Border.all(
-                    color: requiresUpdate
-                        ? colorScheme.error.withValues(alpha: 0.3)
-                        : colorScheme.outlineVariant,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  color: requiresUpdate
-                      ? colorScheme.error
-                      : colorScheme.onSurfaceVariant,
-                  size: 20,
-                ),
-              ),
-              AppDimens.horizontalMediumSmall,
-              // Label and date
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      document.label,
-                      style: textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: requiresUpdate
-                            ? colorScheme.error
-                            : colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Updated ${document.fileName ?? 'recently'}',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: requiresUpdate
-                            ? colorScheme.error.withValues(alpha: 0.7)
-                            : colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Status icon
-              if (isVerified)
-                Icon(Icons.check_circle, color: successColor, size: 24)
-              else
-                Icon(Icons.pending, color: colorScheme.outline, size: 24),
-            ],
-          ),
-          // Admin feedback section
-          if (hasAdminFeedback) ...[
-            AppDimens.verticalSmall,
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: colorScheme.error.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.info_outline, size: 16, color: colorScheme.error),
-                  AppDimens.horizontalSmall,
-                  Expanded(
-                    child: Text(
-                      document.adminFeedback!,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.error,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-/// Row showing "Other Documents" with count.
-class _OtherDocumentsRow extends StatelessWidget {
-  const _OtherDocumentsRow({required this.documents});
-
-  final List<VerificationDocument> documents;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final semanticColors = Theme.of(context).extension<SemanticColors>();
-    final successColor = semanticColors?.success ?? Colors.green;
-    final allVerified = documents.every(
-      (d) => d.status == DocumentStatus.approved,
-    );
+    final label = getDocumentLabel(document.fieldKey);
 
     return Opacity(
-      opacity: allVerified ? 0.75 : 1.0,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLow,
-          border: Border.all(color: colorScheme.outlineVariant),
-          borderRadius: BorderRadius.circular(12),
-        ),
+      opacity: 0.7,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            // Icon container
+            // Document icon
             Container(
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: colorScheme.surface,
-                border: Border.all(color: colorScheme.outlineVariant),
+                color: colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                Icons.folder_open_outlined,
-                color: colorScheme.onSurfaceVariant,
-                size: 20,
-              ),
+              child: Icon(icon, color: colorScheme.onSurfaceVariant, size: 20),
             ),
-            AppDimens.horizontalMediumSmall,
-            // Label and count
+            const SizedBox(width: 16),
+            // Document info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Other Documents',
-                    style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                    label,
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
                       color: colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 2),
                   Text(
-                    '${documents.length} files attached',
+                    'Verified',
                     style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                      color: successColor,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                  if (document.feedback != null &&
+                      document.feedback!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      document.feedback!,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
               ),
             ),
-            // Status icon
-            if (allVerified)
-              Icon(Icons.check_circle, color: successColor, size: 24)
-            else
-              Icon(Icons.pending, color: colorScheme.outline, size: 24),
+            // Check icon
+            Icon(Icons.check_circle, size: 20, color: successColor),
           ],
         ),
       ),

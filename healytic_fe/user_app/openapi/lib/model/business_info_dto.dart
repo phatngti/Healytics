@@ -15,9 +15,8 @@ class BusinessInfoDto {
   BusinessInfoDto({
     required this.brandName,
     this.taxRegistrationCode,
-    required this.serviceTags,
+    required this.businessType,
     this.address,
-    this.username,
     this.email,
     this.phoneNumber,
   });
@@ -32,7 +31,7 @@ class BusinessInfoDto {
   ///
   VerifiedField? taxRegistrationCode;
 
-  VerifiedField serviceTags;
+  VerifiedField businessType;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -41,14 +40,6 @@ class BusinessInfoDto {
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
   AddressInfoDto? address;
-
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  VerifiedField? username;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -70,9 +61,8 @@ class BusinessInfoDto {
   bool operator ==(Object other) => identical(this, other) || other is BusinessInfoDto &&
     other.brandName == brandName &&
     other.taxRegistrationCode == taxRegistrationCode &&
-    other.serviceTags == serviceTags &&
+    other.businessType == businessType &&
     other.address == address &&
-    other.username == username &&
     other.email == email &&
     other.phoneNumber == phoneNumber;
 
@@ -81,14 +71,13 @@ class BusinessInfoDto {
     // ignore: unnecessary_parenthesis
     (brandName.hashCode) +
     (taxRegistrationCode == null ? 0 : taxRegistrationCode!.hashCode) +
-    (serviceTags.hashCode) +
+    (businessType.hashCode) +
     (address == null ? 0 : address!.hashCode) +
-    (username == null ? 0 : username!.hashCode) +
     (email == null ? 0 : email!.hashCode) +
     (phoneNumber == null ? 0 : phoneNumber!.hashCode);
 
   @override
-  String toString() => 'BusinessInfoDto[brandName=$brandName, taxRegistrationCode=$taxRegistrationCode, serviceTags=$serviceTags, address=$address, username=$username, email=$email, phoneNumber=$phoneNumber]';
+  String toString() => 'BusinessInfoDto[brandName=$brandName, taxRegistrationCode=$taxRegistrationCode, businessType=$businessType, address=$address, email=$email, phoneNumber=$phoneNumber]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -98,16 +87,11 @@ class BusinessInfoDto {
     } else {
       json[r'taxRegistrationCode'] = null;
     }
-      json[r'serviceTags'] = this.serviceTags;
+      json[r'businessType'] = this.businessType;
     if (this.address != null) {
       json[r'address'] = this.address;
     } else {
       json[r'address'] = null;
-    }
-    if (this.username != null) {
-      json[r'username'] = this.username;
-    } else {
-      json[r'username'] = null;
     }
     if (this.email != null) {
       json[r'email'] = this.email;
@@ -143,9 +127,8 @@ class BusinessInfoDto {
       return BusinessInfoDto(
         brandName: VerifiedField.fromJson(json[r'brandName'])!,
         taxRegistrationCode: VerifiedField.fromJson(json[r'taxRegistrationCode']),
-        serviceTags: VerifiedField.fromJson(json[r'serviceTags'])!,
+        businessType: VerifiedField.fromJson(json[r'businessType'])!,
         address: AddressInfoDto.fromJson(json[r'address']),
-        username: VerifiedField.fromJson(json[r'username']),
         email: VerifiedField.fromJson(json[r'email']),
         phoneNumber: VerifiedField.fromJson(json[r'phoneNumber']),
       );
@@ -196,7 +179,7 @@ class BusinessInfoDto {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'brandName',
-    'serviceTags',
+    'businessType',
   };
 }
 

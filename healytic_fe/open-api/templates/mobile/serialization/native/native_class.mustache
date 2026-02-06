@@ -86,7 +86,17 @@ class {{{classname}}} {
     {{/isDate}}
     {{^isDateTime}}
       {{^isDate}}
-      json[r'{{{baseName}}}'] = this.{{{name}}}{{#isArray}}{{#uniqueItems}}{{#isNullable}}!{{/isNullable}}.toList(growable: false){{/uniqueItems}}{{/isArray}};
+        {{#isArray}}
+          {{#isEnum}}
+      json[r'{{{baseName}}}'] = this.{{{name}}}{{#isNullable}}!{{/isNullable}}.map((e) => e.toJson()).toList();
+          {{/isEnum}}
+          {{^isEnum}}
+      json[r'{{{baseName}}}'] = this.{{{name}}}{{#uniqueItems}}{{#isNullable}}!{{/isNullable}}.toList(growable: false){{/uniqueItems}};
+          {{/isEnum}}
+        {{/isArray}}
+        {{^isArray}}
+      json[r'{{{baseName}}}'] = this.{{{name}}};
+        {{/isArray}}
       {{/isDate}}
     {{/isDateTime}}
     {{#isNullable}}
@@ -197,7 +207,7 @@ class {{{classname}}} {
         {{^complexType}}
           {{#isArray}}
             {{#isEnum}}
-        {{{name}}}: {{{items.datatypeWithEnum}}}.listFromJson(json[r'{{{baseName}}}']){{#uniqueItems}}.toSet(){{/uniqueItems}},
+        {{{name}}}: {{{enumName}}}.listFromJson(json[r'{{{baseName}}}']){{#uniqueItems}}.toSet(){{/uniqueItems}},
             {{/isEnum}}
             {{^isEnum}}
         {{{name}}}: json[r'{{{baseName}}}'] is Iterable
@@ -286,16 +296,8 @@ class {{{classname}}} {
 {{#vars}}
     {{^isModel}}
     {{#isEnum}}
-        {{^isContainer}}
 
 {{>serialization/native/native_enum_inline}}
-        {{/isContainer}}
-        {{#isContainer}}
-            {{#mostInnerItems}}
-
-{{>serialization/native/native_enum_inline}}
-            {{/mostInnerItems}}
-        {{/isContainer}}
     {{/isEnum}}
     {{/isModel}}
 {{/vars}}

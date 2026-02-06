@@ -18,7 +18,7 @@ class PartnerItemDto {
     required this.brandName,
     required this.legalName,
     required this.email,
-    required this.businessType,
+    this.businessType = const [],
     required this.verificationStatus,
     required this.createdAt,
   });
@@ -33,7 +33,7 @@ class PartnerItemDto {
 
   String email;
 
-  PartnerItemDtoBusinessTypeEnum businessType;
+  List<BusinessTypeEnum> businessType;
 
   PartnerItemDtoVerificationStatusEnum verificationStatus;
 
@@ -46,7 +46,7 @@ class PartnerItemDto {
     other.brandName == brandName &&
     other.legalName == legalName &&
     other.email == email &&
-    other.businessType == businessType &&
+    _deepEquality.equals(other.businessType, businessType) &&
     other.verificationStatus == verificationStatus &&
     other.createdAt == createdAt;
 
@@ -72,7 +72,7 @@ class PartnerItemDto {
       json[r'brandName'] = this.brandName;
       json[r'legalName'] = this.legalName;
       json[r'email'] = this.email;
-      json[r'businessType'] = this.businessType;
+      json[r'businessType'] = this.businessType.map((e) => e.toJson()).toList();
       json[r'verificationStatus'] = this.verificationStatus;
       json[r'createdAt'] = this.createdAt.toUtc().toIso8601String();
     return json;
@@ -102,7 +102,7 @@ class PartnerItemDto {
         brandName: mapValueOfType<String>(json, r'brandName')!,
         legalName: mapValueOfType<String>(json, r'legalName')!,
         email: mapValueOfType<String>(json, r'email')!,
-        businessType: PartnerItemDtoBusinessTypeEnum.fromJson(json[r'businessType'])!,
+        businessType: PartnerItemDtoBusinessTypeEnum.listFromJson(json[r'businessType']),
         verificationStatus: PartnerItemDtoVerificationStatusEnum.fromJson(json[r'verificationStatus'])!,
         createdAt: mapDateTime(json, r'createdAt', r'')!,
       );
@@ -169,12 +169,12 @@ class PartnerItemDtoBusinessTypeEnum {
   const PartnerItemDtoBusinessTypeEnum._(this.value);
 
   /// The underlying value of this enum member.
-  final String value;
+  final List<String> value;
 
   @override
-  String toString() => value;
+  String toString() => value.toString();
 
-  String toJson() => value;
+  List<String> toJson() => value;
 
   static const MASSAGE_THERAPY = PartnerItemDtoBusinessTypeEnum._(r'MASSAGE_THERAPY');
   static const MASSAGE_REHABILITATION = PartnerItemDtoBusinessTypeEnum._(r'MASSAGE_REHABILITATION');
@@ -219,14 +219,14 @@ class PartnerItemDtoBusinessTypeEnum {
   }
 }
 
-/// Transformation class that can [encode] an instance of [PartnerItemDtoBusinessTypeEnum] to String,
+/// Transformation class that can [encode] an instance of [PartnerItemDtoBusinessTypeEnum] to List<String>,
 /// and [decode] dynamic data back to [PartnerItemDtoBusinessTypeEnum].
 class PartnerItemDtoBusinessTypeEnumTypeTransformer {
   factory PartnerItemDtoBusinessTypeEnumTypeTransformer() => _instance ??= const PartnerItemDtoBusinessTypeEnumTypeTransformer._();
 
   const PartnerItemDtoBusinessTypeEnumTypeTransformer._();
 
-  String encode(PartnerItemDtoBusinessTypeEnum data) => data.value;
+  List<String> encode(PartnerItemDtoBusinessTypeEnum data) => data.value;
 
   /// Decodes a [dynamic value][data] to a PartnerItemDtoBusinessTypeEnum.
   ///

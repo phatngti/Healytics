@@ -15,7 +15,6 @@ import { Partner } from './partner.entity';
  * Partner document statuses (stored as text in DB)
  */
 export const PartnerDocumentStatuses = {
-    PENDING: 'pending',
     ACCEPTED: 'accepted',
     REJECTED: 'rejected',
 } as const;
@@ -65,7 +64,7 @@ export type DocumentTypeValue = typeof DocumentTypes[keyof typeof DocumentTypes]
  * Tracks documents uploaded by partners for verification.
  * Uses TEXT columns for type and status for flexibility.
  */
-@Entity('partner_document')
+@Entity('health_partner_document')
 export class PartnerDocument {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -74,7 +73,7 @@ export class PartnerDocument {
     @Index('IDX_partner_document_partner_id')
     partnerId: string;
 
-    @ManyToOne(() => Partner, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Partner, (partner) => partner.documents, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'partner_id' })
     partner: Partner;
 
@@ -95,7 +94,7 @@ export class PartnerDocument {
     fileType: DocumentFileType;
 
     /** Document status: pending, accepted, rejected */
-    @Column({ type: 'text', default: PartnerDocumentStatuses.PENDING })
+    @Column({ type: 'text', default: PartnerDocumentStatuses.ACCEPTED })
     status: PartnerDocumentStatus;
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })

@@ -33,6 +33,17 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class SignUpFormScreen extends HookConsumerWidget {
   const SignUpFormScreen({super.key});
 
+  /// Extracts business types from form value and converts to List<String>.
+  ///
+  /// The form value can be null, a single String, or a List. This helper
+  /// normalizes all cases to a List<String> as required by the API.
+  List<String> _extractBusinessTypes(dynamic value) {
+    if (value == null) return [];
+    if (value is String) return [value];
+    if (value is List) return value.whereType<String>().toList();
+    return [];
+  }
+
   /// Extracts user-friendly error message from API exceptions.
   String _extractErrorMessage(Object error) {
     if (error is ApiException && error.message != null) {
@@ -101,7 +112,7 @@ class SignUpFormScreen extends HookConsumerWidget {
           taxCode: values['tax_code'] ?? '',
           legalName: values['legal_name'] ?? '',
           brandName: values['brand_name'] ?? '',
-          businessType: values['business_type'] ?? 'Individual Business',
+          businessType: _extractBusinessTypes(values['business_types']),
           provinceId: values['province'] ?? '',
           districtId: values['district'] ?? '',
           wardId: values['ward'] ?? '',
@@ -129,13 +140,13 @@ class SignUpFormScreen extends HookConsumerWidget {
               // Multi-document field (e.g., other_documents)
               final docKey = entry.key.replaceFirst('documents.', '');
               documents.addAll(
-                value
+                value.indexed
                     .map(
-                      (d) => PartnerDocumentVerificationEntity(
-                        fileType: d.fileType,
+                      (indexed) => PartnerDocumentVerificationEntity(
+                        fileType: indexed.$2.fileType,
                         type: docKey.toUpperCase(),
-                        documentKey: docKey,
-                        urls: [d.url],
+                        documentKey: '${docKey}_${indexed.$1 + 1}',
+                        urls: [indexed.$2.url],
                       ),
                     )
                     .toList(),

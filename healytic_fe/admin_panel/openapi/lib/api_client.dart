@@ -186,6 +186,8 @@ class ApiClient {
           return value;
         case 'AccountRequestDto':
           return AccountRequestDto.fromJson(value);
+        case 'AddressDto':
+          return AddressDto.fromJson(value);
         case 'AddressInfoDto':
           return AddressInfoDto.fromJson(value);
         case 'AdminLoginDto':
@@ -196,12 +198,14 @@ class ApiClient {
           return AttachTagResponseDto.fromJson(value);
         case 'AuthTokensDto':
           return AuthTokensDto.fromJson(value);
+        case 'BusinessInfo':
+          return BusinessInfo.fromJson(value);
         case 'BusinessInfoDto':
           return BusinessInfoDto.fromJson(value);
-        case 'BusinessTypeDto':
-          return BusinessTypeDto.fromJson(value);
-        case 'BusinessTypesResponseDto':
-          return BusinessTypesResponseDto.fromJson(value);
+        case 'BusinessServiceDto':
+          return BusinessServiceDto.fromJson(value);
+        case 'BusinessServicesResponseDto':
+          return BusinessServicesResponseDto.fromJson(value);
         case 'CategoryResponseDto':
           return CategoryResponseDto.fromJson(value);
         case 'CategorySummaryDto':
@@ -228,10 +232,6 @@ class ApiClient {
           return DeleteFileResponseDto.fromJson(value);
         case 'DoctorProfileDto':
           return DoctorProfileDto.fromJson(value);
-        case 'DocumentUpdateDto':
-          return DocumentUpdateDto.fromJson(value);
-        case 'DocumentVerificationInfoDto':
-          return DocumentVerificationInfoDto.fromJson(value);
         case 'EmployeeResponseDto':
           return EmployeeResponseDto.fromJson(value);
         case 'FileUrlResponseDto':
@@ -242,14 +242,12 @@ class ApiClient {
           return GetProvincesResponseDto.fromJson(value);
         case 'GetWardsResponseDto':
           return GetWardsResponseDto.fromJson(value);
+        case 'KycDocumentDto':
+          return KycDocumentDto.fromJson(value);
         case 'LegalRepresentativeDto':
           return LegalRepresentativeDto.fromJson(value);
-        case 'LegalRepresentativeInfoDto':
-          return LegalRepresentativeInfoDto.fromJson(value);
         case 'LegalRepresentativeRequestDto':
           return LegalRepresentativeRequestDto.fromJson(value);
-        case 'LocationDetailsInfoDto':
-          return LocationDetailsInfoDto.fromJson(value);
         case 'LocationDto':
           return LocationDto.fromJson(value);
         case 'LoginDto':
@@ -260,8 +258,6 @@ class ApiClient {
           return MyProfileResponseDto.fromJson(value);
         case 'PartnerDocumentVerificationDto':
           return PartnerDocumentVerificationDto.fromJson(value);
-        case 'PartnerInfoDto':
-          return PartnerInfoDto.fromJson(value);
         case 'PartnerItemDto':
           return PartnerItemDto.fromJson(value);
         case 'PartnerLoginDto':
@@ -312,20 +308,12 @@ class ApiClient {
           return UpdateCategoryDto.fromJson(value);
         case 'UpdateEmployeeDto':
           return UpdateEmployeeDto.fromJson(value);
-        case 'UpdateLegalRepresentativeDto':
-          return UpdateLegalRepresentativeDto.fromJson(value);
         case 'UpdatePartnerDto':
           return UpdatePartnerDto.fromJson(value);
         case 'UpdateProductDto':
           return UpdateProductDto.fromJson(value);
         case 'UpdateServiceTagDto':
           return UpdateServiceTagDto.fromJson(value);
-        case 'VerificationDocumentDto':
-          return VerificationDocumentDto.fromJson(value);
-        case 'VerificationOptionalStringFieldDto':
-          return VerificationOptionalStringFieldDto.fromJson(value);
-        case 'VerificationStringFieldDto':
-          return VerificationStringFieldDto.fromJson(value);
         case 'VerifiedField':
           return VerifiedField.fromJson(value);
         default:

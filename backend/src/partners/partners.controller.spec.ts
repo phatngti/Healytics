@@ -30,7 +30,7 @@ describe('PartnersController', () => {
         taxCode: '1234567890',
         legalName: 'Test Business',
         brandName: 'Test Brand',
-        businessType: BusinessType.MASSAGE_THERAPY,
+        businessType: [BusinessType.MASSAGE_THERAPY],
         address: {
             province: 'Hà Nội',
             district: 'Quận 1',
@@ -53,7 +53,7 @@ describe('PartnersController', () => {
                 taxCode: '1234567890',
                 brandName: 'Brand 1',
                 email: 'partner1@test.com',
-                businessType: BusinessType.MASSAGE_THERAPY,
+                businessType: [BusinessType.MASSAGE_THERAPY],
                 verificationStatus: PartnerVerificationStatus.PENDING,
                 createdAt: new Date(),
             },

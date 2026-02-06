@@ -9,6 +9,7 @@ class VerificationHeader extends StatelessWidget
   const VerificationHeader({
     required this.applicationId,
     required this.onHelpPressed,
+    this.onLogout,
     super.key,
   });
 
@@ -17,6 +18,9 @@ class VerificationHeader extends StatelessWidget
 
   /// Callback when the help button is pressed.
   final VoidCallback onHelpPressed;
+
+  /// Callback when the logout button is pressed.
+  final VoidCallback? onLogout;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -80,13 +84,22 @@ class VerificationHeader extends StatelessWidget
         ),
         // Help button
         Padding(
-          padding: const EdgeInsets.only(right: 16),
+          padding: const EdgeInsets.only(right: 8),
           child: FilledButton(
             onPressed: onHelpPressed,
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 16),
             ),
             child: const Text('Help Center'),
+          ),
+        ),
+        // Logout button
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: IconButton(
+            onPressed: onLogout,
+            tooltip: 'Logout',
+            icon: Icon(Icons.logout, color: colorScheme.onSurfaceVariant),
           ),
         ),
       ],

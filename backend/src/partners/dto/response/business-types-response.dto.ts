@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class BusinessTypeDto {
+export class BusinessServiceDto {
     @ApiProperty({
         example: 'SPA',
         description: 'Business type enum value'
@@ -21,10 +21,10 @@ export class BusinessTypeDto {
     description?: string;
 }
 
-export class BusinessTypesResponseDto {
+export class BusinessServicesResponseDto {
     @ApiProperty({
-        type: [BusinessTypeDto],
+        type: [BusinessServiceDto],
         description: 'List of all available business types'
     })
-    data: BusinessTypeDto[];
+    data: BusinessServiceDto[];
 }

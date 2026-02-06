@@ -16,21 +16,9 @@ void main() {
   // final instance = ReviewItemDto();
 
   group('test ReviewItemDto', () {
-    // Key of the field or document being reviewed
+    // Key of the field being reviewed
     // String fieldKey
     test('to test the property `fieldKey`', () async {
-      // TODO
-    });
-
-    // UUID of the document (if type is DOCUMENT)
-    // String documentKey
-    test('to test the property `documentKey`', () async {
-      // TODO
-    });
-
-    // Mark the item as valid or invalid
-    // bool isVerified
-    test('to test the property `isVerified`', () async {
       // TODO
     });
 
