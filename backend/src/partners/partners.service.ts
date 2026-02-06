@@ -3,6 +3,8 @@ import {
     ConflictException,
     BadRequestException,
     NotFoundException,
+    Inject,
+    forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
@@ -17,53 +19,49 @@ import { GetPartnersQueryDto } from './dto/request/get-partners-query.dto';
 import { RegisterPartnerResponseDto } from './dto/response/register-partner-response.dto';
 import { MyProfileResponseDto, FieldFeedbackMap } from './dto/response/my-profile-response.dto';
 import { PartnersResponseDto } from './dto/response/partners-response.dto';
-import { PartnerDetailResponseDto } from './dto/response/partner-detail-response.dto';
-import { BusinessTypesResponseDto } from './dto/response/business-types-response.dto';
 import { Role } from '@/account/enum/role.enum';
-import { BusinessType } from './enum/business-type.enum';
-import { PartnerDocument, PartnerDocumentStatuses, DocumentTypes, DocumentFileTypes } from './entities/partner-document.entity';
+import { PartnerDocument, PartnerDocumentStatuses, DocumentTypes, DocumentFileTypes, DocumentFileType } from './entities/partner-document.entity';
 import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
-import { DocumentRequirement } from './entities/document-requirement.entity';
 import { LocationsService } from '@/locations/locations.service';
 import { AuthService } from '@/auth/auth.service';
+import { BusinessServicesResponseDto } from './dto/response/business-types-response.dto';
+import { BusinessType, bussinessServices } from './enum/business-type.enum';
 
 @Injectable()
 export class PartnersService {
+
     constructor(
         @InjectRepository(Account)
         private readonly accountRepository: Repository<Account>,
         @InjectRepository(Partner)
         private readonly partnerRepository: Repository<Partner>,
-        @InjectRepository(LegalRepresentative)
-        private readonly legalRepRepository: Repository<LegalRepresentative>,
-        @InjectRepository(DocumentRequirement)
-        private readonly docRequirementRepository: Repository<DocumentRequirement>,
         @InjectRepository(PartnerReviewLog)
         private readonly reviewLogRepository: Repository<PartnerReviewLog>,
         private readonly dataSource: DataSource,
         private readonly locationsService: LocationsService,
+        @Inject(forwardRef(() => AuthService))
         private readonly authService: AuthService,
     ) { }
 
-    /**
+    /**bussinessServices
      * Get all available business types with Vietnamese labels
      */
-    getBusinessTypes(): BusinessTypesResponseDto {
+    getBusinessServices(): BusinessServicesResponseDto {
         return {
-            data: [
-                { value: BusinessType.MASSAGE_THERAPY, label: 'Massage Thư giãn' },
-                { value: BusinessType.MASSAGE_REHABILITATION, label: 'Massage Trị liệu' },
-                { value: BusinessType.SPA_BEAUTY, label: 'Spa & Làm đẹp' },
-                { value: BusinessType.FITNESS, label: 'Thể hình (Gym/Yoga)' },
-                { value: BusinessType.PHARMACY, label: 'Dược phẩm' },
-                { value: BusinessType.DENTAL, label: 'Nha khoa' },
-                { value: BusinessType.TRADITIONAL_MEDICINE, label: 'Đông y' },
-                { value: BusinessType.PSYCHOLOGY, label: 'Tâm lý & Trị liệu' },
-                { value: BusinessType.DERMATOLOGY, label: 'Da liễu & Thẩm mỹ' },
-                { value: BusinessType.NUTRITION, label: 'Dinh dưỡng' },
-                { value: BusinessType.PSYCHIATRY, label: 'Tâm thần học' },
-            ],
-        };
+            data: Array.from(bussinessServices.values())
+        }
+    }
+
+    async getPartnerProfile(userId: string): Promise<Partner> {
+        
+        const partner = await this.partnerRepository.findOne({
+            where: { accountId: userId },
+        });
+
+        if (!partner) {
+            throw new NotFoundException('Partner profile not found');
+        }
+        return partner;
     }
 
     async registerPartner(
@@ -128,7 +126,7 @@ export class PartnersService {
                 taxCode: dto.partner.taxCode,
                 legalName: dto.partner.legalName,
                 brandName: dto.partner.brandName,
-                businessType: dto.partner.businessType,
+                businessType: dto.partner.businessType as BusinessType[],
                 provinceId: dto.partner.provinceId,
                 districtId: dto.partner.districtId,
                 wardId: dto.partner.wardId,
@@ -238,12 +236,19 @@ export class PartnersService {
      * Update partner's profile - with "Smart Update" logic
      * 
      * Logic:
-     * 1. Check current vs new value
+     * 1. Check current vs new value using UpdatedField wrapper
      * 2. If changed -> Update value & Clear specific rejection detail
      * 3. If all rejection details cleared -> Reset status to PENDING
+     * 
+     * DTO Structure:
+     * - bussinessInfo: { brandName, taxRegistrationCode, serviceTags, address, username, email, phoneNumber }
+     * - legalRepresentative: { fullName, position, phoneNumber, idType, idNumber, idIssueDate }
+     * - kycDocuments: [{ fileUrl, fileType }]
+     * 
+     * Each field is wrapped in UpdatedField<T> with { fieldKey, value } structure
      */
     async updateMyProfile(accountId: string, dto: UpdatePartnerDto): Promise<MyProfileResponseDto> {
-        // 1. Lấy thông tin Partner
+        // 1. Get Partner information
         const partner = await this.getPartnerByAccountId(accountId);
         if (!partner) throw new NotFoundException('Partner not found');
 
@@ -254,63 +259,87 @@ export class PartnersService {
         try {
             let isModified = false;
 
-            // Cờ đánh dấu xem có sửa thông tin nhạy cảm không (để revoke APPROVED)
+            // Flag to track if sensitive information is modified (to revoke APPROVED)
             let hasCriticalChange = false;
 
-            // --- A. XỬ LÝ CHECK TRÙNG LẶP (TaxCode) ---
-            if (dto.taxCode && dto.taxCode !== partner.taxCode) {
-                const existing = await queryRunner.manager.findOne(Partner, { where: { taxCode: dto.taxCode } });
-                if (existing) throw new BadRequestException('Tax code already exists');
-            }
+            // Helper function to extract value from UpdatedField wrapper
+            const getValue = <T>(field: { fieldKey: string; value: T } | undefined): T | undefined => {
+                return field?.value;
+            };
 
-            // --- B. CẬP NHẬT FIELD CƠ BẢN (Text) ---
-            // Danh sách các field ánh xạ trực tiếp
-            const directFields: (keyof UpdatePartnerDto & keyof Partner)[] = [
-                'legalName', 'brandName', 'phoneNumber', 'streetAddress', 'taxCode', 'businessType'
-            ];
-            // Danh sách field nhạy cảm (Sửa phát là mất APPROVED ngay)
-            const criticalFields = ['legalName', 'streetAddress', 'taxCode', 'businessType'];
+            // --- A. PROCESS BUSINESS INFO ---
+            if (dto.bussinessInfo) {
+                const bizInfo = dto.bussinessInfo;
 
-            directFields.forEach(key => {
-                const newValue = dto[key];
-                const oldValue = partner[key]; // Lưu ý: Cần ép kiểu nếu TS báo lỗi
-
-                if (newValue !== undefined && newValue !== oldValue) {
-                    (partner as any)[key] = newValue;
+                // A.1 Check for duplicate TaxCode
+                const newTaxCode = getValue(bizInfo.taxRegistrationCode);
+                if (newTaxCode && newTaxCode !== partner.taxCode) {
+                    const existing = await queryRunner.manager.findOne(Partner, { where: { taxCode: newTaxCode } });
+                    if (existing) throw new BadRequestException('Tax code already exists');
+                    partner.taxCode = newTaxCode;
                     isModified = true;
-
-                    if (criticalFields.includes(key)) hasCriticalChange = true;
+                    hasCriticalChange = true;
                 }
-            });
 
-            // --- C. CẬP NHẬT ĐỊA CHỈ (Address Logic) ---
-            if (dto.provinceId || dto.districtId || dto.wardId) {
-                const newProvince = dto.provinceId || partner.provinceId;
-                const newDistrict = dto.districtId || partner.districtId;
-                const newWard = dto.wardId || partner.wardId;
+                // A.2 Update brand name
+                const newBrandName = getValue(bizInfo.brandName);
+                if (newBrandName !== undefined && newBrandName !== partner.brandName) {
+                    partner.brandName = newBrandName;
+                    isModified = true;
+                }
 
-                // Chỉ validate khi có đủ 3 cấp
-                if (newProvince && newDistrict && newWard) {
-                    const isAddressChanged =
-                        newProvince !== partner.provinceId ||
-                        newDistrict !== partner.districtId ||
-                        newWard !== partner.wardId;
+                // A.3 Update phone number
+                const newPhoneNumber = getValue(bizInfo.phoneNumber);
+                if (newPhoneNumber !== undefined && newPhoneNumber !== partner.phoneNumber) {
+                    partner.phoneNumber = newPhoneNumber;
+                    isModified = true;
+                }
 
-                    if (isAddressChanged) {
-                        // Gọi service validate địa chỉ có tồn tại không
-                        await this.locationsService.validateAddress(newProvince, newDistrict, newWard);
+                // A.4 Update address
+                if (bizInfo.address) {
+                    const addressDto = bizInfo.address;
+                    
+                    // Extract address values
+                    const newStreetAddress = getValue(addressDto.streetAddress);
+                    const newCity = getValue(addressDto.city);
+                    const newDistrict = getValue(addressDto.district);
+                    const newWard = getValue(addressDto.ward);
 
-                        partner.provinceId = newProvince;
-                        partner.districtId = newDistrict;
-                        partner.wardId = newWard;
-
+                    // Update street address
+                    if (newStreetAddress !== undefined && newStreetAddress !== partner.streetAddress) {
+                        partner.streetAddress = newStreetAddress;
                         isModified = true;
-                        hasCriticalChange = true; // Đổi địa chỉ luôn là critical
+                        hasCriticalChange = true;
+                    }
+
+                    // Update province/district/ward (city = province in this context)
+                    const newProvinceId = newCity?.id || partner.provinceId;
+                    const newDistrictId = newDistrict?.id || partner.districtId;
+                    const newWardId = newWard?.id || partner.wardId;
+
+                    // Only validate when we have all 3 levels
+                    if (newProvinceId && newDistrictId && newWardId) {
+                        const isAddressChanged =
+                            newProvinceId !== partner.provinceId ||
+                            newDistrictId !== partner.districtId ||
+                            newWardId !== partner.wardId;
+
+                        if (isAddressChanged) {
+                            // Validate address exists
+                            await this.locationsService.validateAddress(newProvinceId, newDistrictId, newWardId);
+
+                            partner.provinceId = newProvinceId;
+                            partner.districtId = newDistrictId;
+                            partner.wardId = newWardId;
+
+                            isModified = true;
+                            hasCriticalChange = true;
+                        }
                     }
                 }
             }
 
-            // --- D. CẬP NHẬT NGƯỜI ĐẠI DIỆN (Legal Rep) ---
+            // --- B. UPDATE LEGAL REPRESENTATIVE ---
             if (dto.legalRepresentative) {
                 const legalRep = await queryRunner.manager.findOne(LegalRepresentative, {
                     where: { partnerId: partner.id },
@@ -319,23 +348,30 @@ export class PartnersService {
                     let repModified = false;
                     const repDto = dto.legalRepresentative;
 
-                    // Hàm helper update field con
-                    const updateRep = (field: keyof LegalRepresentative, val: any, isCritical: boolean) => {
-                        if (val !== undefined && val !== legalRep[field]) {
-                            (legalRep as any)[field] = val;
+                    // Helper function to update legal representative field
+                    const updateRepField = <T>(
+                        field: keyof LegalRepresentative,
+                        updatedField: { fieldKey: string; value: T } | undefined,
+                        isCritical: boolean
+                    ) => {
+                        const newValue = getValue(updatedField);
+                        if (newValue !== undefined && newValue !== legalRep[field]) {
+                            (legalRep as any)[field] = newValue;
                             repModified = true;
                             if (isCritical) hasCriticalChange = true;
                         }
                     };
 
-                    updateRep('fullName', repDto.fullName, true);
-                    updateRep('idNumber', repDto.idNumber, true);
-                    updateRep('idType', repDto.idType, true);
-                    updateRep('phoneNumber', repDto.phoneNumber, false);
-                    updateRep('position', repDto.position, false);
+                    updateRepField('fullName', repDto.fullName, true);
+                    updateRepField('idNumber', repDto.idNumber, true);
+                    updateRepField('idType', repDto.idType, true);
+                    updateRepField('phoneNumber', repDto.phoneNumber, false);
+                    updateRepField('position', repDto.position, false);
 
-                    if (repDto.idIssueDate) {
-                        const newDate = new Date(repDto.idIssueDate);
+                    // Handle idIssueDate separately (needs Date parsing)
+                    const newIdIssueDate = getValue(repDto.idIssueDate);
+                    if (newIdIssueDate) {
+                        const newDate = new Date(newIdIssueDate);
                         const currentIssueDate = new Date(legalRep.idIssueDate);
                         if (newDate.getTime() !== currentIssueDate.getTime()) {
                             legalRep.idIssueDate = newDate;
@@ -344,10 +380,6 @@ export class PartnersService {
                         }
                     }
 
-                    // Note: Document URL updates (idFrontImgUrl, idBackImgUrl, businessLicenseUrl, etc.) 
-                    // are now handled through the PartnerDocument table, not LegalRepresentative fields
-                    // See: updateDocumentImage method for updating document images
-
                     if (repModified) {
                         await queryRunner.manager.save(legalRep);
                         isModified = true;
@@ -355,19 +387,41 @@ export class PartnersService {
                 }
             }
 
-            // --- E. CẬP NHẬT DOCUMENT (File) ---
-            // Note: With simplified schema, documents are just stored with type/fileUrl/status
-            // Document updates through this endpoint are currently not supported
-            // as the new schema focuses on KYC document uploads
+            // --- C. UPDATE KYC DOCUMENTS ---
+            if (dto.kycDocuments && dto.kycDocuments.length > 0) {
+                for (const docUpdate of dto.kycDocuments) {
+                    const docValue = docUpdate.value;
+                    if (docValue?.fileUrl) {
+                        // Create or update document based on fileType
+                        const existingDoc = await queryRunner.manager.findOne(PartnerDocument, {
+                            where: { partnerId: partner.id, fileUrl: docValue.fileUrl },
+                        });
 
-            // --- F. TÍNH TOÁN TRẠNG THÁI (Recalculate Status) ---
+                        if (!existingDoc) {
+                            // Create new document
+                            const newDoc = queryRunner.manager.create(PartnerDocument, {
+                                partnerId: partner.id,
+                                fileUrl: docValue.fileUrl,
+                                fileType: (docValue.fileType as DocumentFileType) || DocumentFileTypes.IMAGE,
+                                documentKey: docUpdate.fieldKey || 'OTHER_DOCUMENTS',
+                                type: DocumentTypes.OTHER_DOCUMENTS,
+                                status: PartnerDocumentStatuses.ACCEPTED,
+                            });
+                            await queryRunner.manager.save(newDoc);
+                            isModified = true;
+                        }
+                    }
+                }
+            }
+
+            // --- D. RECALCULATE STATUS ---
             if (isModified) {
-                // Check lại toàn bộ Document (để xem có cái nào đang rejected ko)
+                // Check all documents for rejected status
                 const allDocs = await queryRunner.manager.find(PartnerDocument, { where: { partnerId: partner.id } });
 
                 const hasRejectedDocs = allDocs.some(d => d.status === PartnerDocumentStatuses.REJECTED);
 
-                // Logic chuyển đổi trạng thái
+                // Status transition logic
                 const isClean = !hasRejectedDocs;
                 // Check if partner has completed all required fields for verification
                 const isComplete = !!partner.taxCode && !!partner.legalName && !!partner.brandName;
@@ -385,16 +439,14 @@ export class PartnersService {
                     }
                 }
 
-                // 1. Use Destructuring to separate relations from data.
-                // We extract 'documents' and 'legalRepresentative' into their own variables (which we ignore),
-                // and collect everything else into 'updateData'.
+                // Use destructuring to separate relations from data
                 const { documents, legalRepresentative, ...updateData } = partner;
 
-                // 2. Pass only the 'updateData' to TypeORM
+                // Pass only the updateData to TypeORM
                 await queryRunner.manager.update(Partner, partner.id, updateData);
             }
             await queryRunner.commitTransaction();
-            return this.getMyProfile(accountId); // Trả về data mới nhất
+            return this.getMyProfile(accountId); // Return latest data
 
         } catch (error) {
             await queryRunner.rollbackTransaction();

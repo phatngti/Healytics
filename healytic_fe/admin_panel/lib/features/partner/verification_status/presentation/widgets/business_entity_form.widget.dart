@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
+import 'package:admin_panel/features/partner/verification_status/presentation/widgets/common/verification_business_type_field.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/common/verification_form_fields.widget.dart';
 import 'package:admin_panel/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -61,11 +62,8 @@ class BusinessEntityForm extends StatelessWidget {
                   Expanded(
                     child: VerificationTextField(
                       label: 'Brand Name',
-                      fieldId: 'brand_name',
+                      fieldId: info!.brandName.fieldKey,
                       field: info!.brandName,
-                      onChanged: onFieldChanged != null
-                          ? (value) => onFieldChanged!('brand_name', value)
-                          : null,
                     ),
                   ),
                   AppDimens.horizontalLarge,
@@ -73,49 +71,36 @@ class BusinessEntityForm extends StatelessWidget {
                     child: info!.taxRegistrationCode != null
                         ? VerificationTextField(
                             label: 'Tax Code',
-                            fieldId: 'tax_registration_code',
+                            fieldId: info!.taxRegistrationCode!.fieldKey,
                             field: info!.taxRegistrationCode!,
-                            onChanged: onFieldChanged != null
-                                ? (value) => onFieldChanged!(
-                                    'tax_registration_code',
-                                    value,
-                                  )
-                                : null,
                           )
                         : const SizedBox.shrink(),
                   ),
                 ],
               ),
               AppDimens.verticalMedium,
-              // Row 2: Service Tags & Phone Number
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: VerificationTextField(
-                      label: 'Service Tags',
-                      fieldId: 'service_tags',
-                      field: info!.serviceTags,
-                      onChanged: onFieldChanged != null
-                          ? (value) => onFieldChanged!('service_tags', value)
-                          : null,
+              // Row 2: Phone Number
+              if (info!.phoneNumber != null)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: VerificationTextField(
+                        label: 'Phone Number',
+                        fieldId: info!.phoneNumber!.fieldKey,
+                        field: info!.phoneNumber!,
+                      ),
                     ),
-                  ),
-                  AppDimens.horizontalLarge,
-                  Expanded(
-                    child: info!.phoneNumber != null
-                        ? VerificationTextField(
-                            label: 'Phone Number',
-                            fieldId: 'phone_number',
-                            field: info!.phoneNumber!,
-                            onChanged: onFieldChanged != null
-                                ? (value) =>
-                                      onFieldChanged!('phone_number', value)
-                                : null,
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ],
+                    AppDimens.horizontalLarge,
+                    const Expanded(child: SizedBox.shrink()),
+                  ],
+                ),
+              AppDimens.verticalMedium,
+              // Business Types (full width, chip selection)
+              VerificationBusinessTypeField(
+                label: 'Business Types',
+                fieldId: info!.serviceTags.fieldKey,
+                field: info!.serviceTags,
               ),
             ],
           );
@@ -128,9 +113,6 @@ class BusinessEntityForm extends StatelessWidget {
               label: 'Brand Name',
               fieldId: info!.brandName.fieldKey,
               field: info!.brandName,
-              onChanged: onFieldChanged != null
-                  ? (value) => onFieldChanged!(info!.brandName.fieldKey, value)
-                  : null,
             ),
             if (info!.taxRegistrationCode != null) ...[
               AppDimens.verticalMedium,
@@ -138,36 +120,23 @@ class BusinessEntityForm extends StatelessWidget {
                 label: 'Tax Code',
                 fieldId: info!.taxRegistrationCode!.fieldKey,
                 field: info!.taxRegistrationCode!,
-                onChanged: onFieldChanged != null
-                    ? (value) => onFieldChanged!(
-                        info!.taxRegistrationCode!.fieldKey,
-                        value,
-                      )
-                    : null,
               ),
             ],
             AppDimens.verticalMedium,
-            VerificationTextField(
-              label: 'Service Tags',
-              fieldId: info!.serviceTags.fieldKey,
-              field: info!.serviceTags,
-              onChanged: onFieldChanged != null
-                  ? (value) =>
-                        onFieldChanged!(info!.serviceTags.fieldKey, value)
-                  : null,
-            ),
             if (info!.phoneNumber != null) ...[
-              AppDimens.verticalMedium,
               VerificationTextField(
                 label: 'Phone Number',
                 fieldId: info!.phoneNumber!.fieldKey,
                 field: info!.phoneNumber!,
-                onChanged: onFieldChanged != null
-                    ? (value) =>
-                          onFieldChanged!(info!.phoneNumber!.fieldKey, value)
-                    : null,
               ),
+              AppDimens.verticalMedium,
             ],
+            // Business Types (chip selection)
+            VerificationBusinessTypeField(
+              label: 'Business Types',
+              fieldId: info!.serviceTags.fieldKey,
+              field: info!.serviceTags,
+            ),
           ],
         );
       },

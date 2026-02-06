@@ -17,12 +17,12 @@ void main() {
   // final instance = PartnersApi();
 
   group('tests for PartnersApi', () {
-    // Get all business types
+    // Get all business services
     //
-    // Returns list of all business types with Vietnamese labels for dropdown selection
+    // Returns list of all business services with Vietnamese labels for dropdown selection
     //
-    //Future<BusinessTypesResponseDto> partnersControllerGetBusinessTypes() async
-    test('test partnersControllerGetBusinessTypes', () async {
+    //Future<BusinessServicesResponseDto> partnersControllerGetBusinessServices() async
+    test('test partnersControllerGetBusinessServices', () async {
       // TODO
     });
 

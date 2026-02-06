@@ -5,34 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'verification_status.provider.g.dart';
 
-/// Provider for tracking pending document uploads during resubmission.
-///
-/// Stores a map of documentKey -> [DocumentUploadResult] for documents
-/// that have been uploaded but not yet submitted to the backend.
-@riverpod
-class PendingUploads extends _$PendingUploads {
-  @override
-  Map<String, DocumentUploadResult> build() => {};
-
-  /// Adds or updates an uploaded document in the pending uploads.
-  void addUpload(DocumentUploadResult result) {
-    state = {...state, result.documentKey: result};
-  }
-
-  /// Removes a document from pending uploads.
-  void removeUpload(String documentKey) {
-    state = Map.from(state)..remove(documentKey);
-  }
-
-  /// Clears all pending uploads.
-  void clear() {
-    state = {};
-  }
-
-  /// Gets all pending upload results as a list.
-  List<DocumentUploadResult> get uploads => state.values.toList();
-}
-
 /// Provider for the current verification status.
 ///
 /// Fetches the provider's verification status from the repository
@@ -47,25 +19,42 @@ class VerificationStatus extends _$VerificationStatus {
 
   /// Resubmits the application after making requested revisions.
   ///
-  /// Collects all pending uploads and submits them along with the application.
-  /// Shows loading state during submission and refreshes the status
-  /// on success.
-  Future<void> resubmitApplication() async {
+  /// Accepts [formValues] from FormBuilder containing all edited fields
+  /// and uploaded documents. Returns a record with success status and
+  /// optional error message.
+  Future<({bool success, String? errorMessage})> resubmitApplication({
+    required Map<String, dynamic> formValues,
+  }) async {
+    final previousState = state;
     state = const AsyncValue.loading();
     try {
       final repository = ref.read(verificationStatusRepositoryProvider);
-      final pendingUploadsNotifier = ref.read(pendingUploadsProvider.notifier);
-      final uploads = pendingUploadsNotifier.uploads;
 
-      print("uploads: $uploads");
+      // Extract edits (String/List values) and uploads (DocumentUploadResult values)
+      final edits = <String, dynamic>{};
+      final uploads = <DocumentUploadResult>[];
 
-      // await repository.resubmitApplication(uploads: uploads);
+      formValues.forEach((key, value) {
+        if (value is String && value.isNotEmpty) {
+          edits[key] = value;
+        } else if (value is List) {
+          edits[key] = value;
+        } else if (value is DocumentUploadResult) {
+          uploads.add(value);
+        }
+      });
 
-      // Clear pending uploads on successful submission
-      // pendingUploadsNotifier.clear();
-      // ref.invalidateSelf();
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      // Call the repository to update the partner profile
+      await repository.resubmitApplication(uploads: uploads, edits: edits);
+
+      // Refresh the verification status
+      ref.invalidateSelf();
+
+      return (success: true, errorMessage: null);
+    } catch (e) {
+      // Restore previous state on error
+      state = previousState;
+      return (success: false, errorMessage: e.toString());
     }
   }
 }

@@ -1,6 +1,5 @@
 import 'package:admin_panel/features/authenticate/domain/location.entity.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
-import 'package:admin_panel/features/partner/verification_status/presentation/verification_status.provider.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/business_entity_form.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/document_verification_section.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/legal_representative_form.widget.dart';
@@ -23,8 +22,6 @@ class VerificationSectionCard extends ConsumerStatefulWidget {
     required this.section,
     required this.verificationStatus,
     this.provinces = const [],
-    this.districts = const [],
-    this.wards = const [],
     super.key,
   });
 
@@ -36,12 +33,6 @@ class VerificationSectionCard extends ConsumerStatefulWidget {
 
   /// List of available provinces for location dropdown selection.
   final List<LocationEntity> provinces;
-
-  /// List of available districts for location dropdown selection.
-  final List<LocationEntity> districts;
-
-  /// List of available wards for location dropdown selection.
-  final List<LocationEntity> wards;
 
   @override
   ConsumerState<VerificationSectionCard> createState() =>
@@ -213,24 +204,16 @@ class _VerificationSectionCardState
         return LocationForm(
           info: widget.verificationStatus.businessInfo.address,
           provinces: widget.provinces,
-          districts: widget.districts,
-          wards: widget.wards,
         );
       case VerificationSectionType.legalRepresentative:
         return LegalRepresentativeForm(
           section: widget.section,
           legalRepresentative: widget.verificationStatus.legalRepresentative,
           kycDocuments: widget.verificationStatus.kycDocuments,
-          onUploadComplete: (result) {
-            ref.read(pendingUploadsProvider.notifier).addUpload(result);
-          },
         );
       case VerificationSectionType.accountSecurity:
         return DocumentVerificationSection(
           documents: widget.verificationStatus.kycDocuments,
-          onUploadComplete: (result) {
-            ref.read(pendingUploadsProvider.notifier).addUpload(result);
-          },
         );
     }
   }

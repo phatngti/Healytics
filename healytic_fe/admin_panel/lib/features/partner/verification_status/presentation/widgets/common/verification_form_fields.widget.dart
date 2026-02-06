@@ -14,15 +14,15 @@ import 'package:flutter/material.dart';
 /// When [field.isVerified] is false, shows an editable text field or
 /// dropdown (if [isDropdown] is true) with error border.
 /// Otherwise, shows a read-only container with the value.
-class VerificationTextField extends StatelessWidget {
+class VerificationTextField extends StatefulWidget {
   const VerificationTextField({
     required this.label,
     required this.field,
     this.fieldId,
-    this.onChanged,
-    this.isEdited = false,
     this.isDropdown = false,
     this.dropdownItems,
+    this.onDropdownChanged,
+    this.onEditStateChanged,
     super.key,
   });
 
@@ -35,23 +35,30 @@ class VerificationTextField extends StatelessWidget {
   /// The verification field containing value, update status, and feedback.
   final VerifiedField field;
 
-  /// Callback when the field value changes.
-  final ValueChanged<String>? onChanged;
-
-  /// Whether the user has edited this field's value.
-  final bool isEdited;
-
   /// Whether to show a dropdown instead of a text field when editable.
   final bool isDropdown;
 
   /// List of items to show in the dropdown (required when [isDropdown] is true).
-  final List<String>? dropdownItems;
+  final List<dynamic>? dropdownItems;
 
-  String get _fieldKey => fieldId ?? label.toLowerCase().replaceAll(' ', '_');
+  /// Callback when dropdown value changes. Returns the selected CustomDropdownItem.
+  final ValueChanged<CustomDropdownItem>? onDropdownChanged;
+
+  /// Callback when the edit state changes (edited vs not edited).
+  final ValueChanged<bool>? onEditStateChanged;
+
+  @override
+  State<VerificationTextField> createState() => _VerificationTextFieldState();
+}
+
+class _VerificationTextFieldState extends State<VerificationTextField> {
+  bool _isEdited = false;
+
+  String get _fieldKey => widget.fieldId ?? widget.field.fieldKey;
 
   /// Gets the display value from the field value.
   String get _displayValue {
-    final value = field.value;
+    final value = widget.field.value;
     if (value is String) return value;
     if (value is Map) return value['name']?.toString() ?? value.toString();
     if (value is List) return value.join(', ');
@@ -59,7 +66,14 @@ class VerificationTextField extends StatelessWidget {
   }
 
   /// Whether the field requires an update (not verified).
-  bool get _requiresUpdate => !field.isVerified;
+  bool get _requiresUpdate => !widget.field.isVerified;
+
+  void _handleEditStateChanged(bool isEdited) {
+    if (_isEdited != isEdited) {
+      setState(() => _isEdited = isEdited);
+      widget.onEditStateChanged?.call(isEdited);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +82,10 @@ class VerificationTextField extends StatelessWidget {
 
     return VerifiableField(
       fieldId: _fieldKey,
-      title: label,
+      title: widget.label,
       requiresUpdate: _requiresUpdate,
-      isEdited: isEdited,
-      adminFeedback: field.feedback,
+      isEdited: _isEdited,
+      adminFeedback: widget.field.feedback,
       child: _buildFieldContent(
         context,
         colorScheme: colorScheme,
@@ -87,90 +101,273 @@ class VerificationTextField extends StatelessWidget {
     required TextTheme textTheme,
     required bool isEditable,
   }) {
-    // Determine border color based on edit state
-    final borderColor = isEdited ? colorScheme.primary : colorScheme.error;
-
     if (isEditable) {
-      if (isDropdown && dropdownItems != null) {
-        return FormFieldBuilders.buildDropdownField(
-          context,
-          label: '',
+      if (widget.isDropdown && widget.dropdownItems != null) {
+        final dynamic validItem = widget.dropdownItems!.firstWhere(
+          (item) => item.label == _displayValue,
+          orElse: () => CustomDropdownItem(value: '', label: ''),
+        );
+
+        return _EditableDropdownField(
           fieldKey: _fieldKey,
-          items: dropdownItems!,
-          initialValue: dropdownItems!.contains(_displayValue)
-              ? _displayValue
-              : null,
-          onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
-          hintText: field.feedback,
-          enabled: isEditable,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: borderColor),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: borderColor),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: colorScheme.primary, width: 2),
-          ),
+          initialValue: validItem,
+          items: widget.dropdownItems as List<CustomDropdownItem>,
+          hintText: widget.label,
+          onChanged: widget.onDropdownChanged,
+          onEditStateChanged: _handleEditStateChanged,
         );
       }
-      return FormFieldBuilders.buildTextField(
-        context,
-        label: '',
+      return _EditableTextField(
         fieldKey: _fieldKey,
         initialValue: _displayValue,
-        onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
-        hintText: field.feedback,
-        enabled: true,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: borderColor),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: borderColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: colorScheme.primary, width: 2),
-        ),
+        hintText: widget.label,
+        onEditStateChanged: _handleEditStateChanged,
       );
     }
 
     // Read-only display
-    return Opacity(
-      opacity: 0.6,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          border: Border.all(color: colorScheme.outlineVariant),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                _displayValue,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-            if (isDropdown)
-              Icon(
-                Icons.expand_more,
-                color: colorScheme.onSurfaceVariant,
-                size: 20,
-              ),
-          ],
-        ),
+    return _ReadOnlyField(
+      value: _displayValue,
+      showDropdownIcon: widget.isDropdown,
+      applyOpacity: true,
+    );
+  }
+}
+
+/// Private reusable editable text field with verification styling.
+///
+/// Automatically tracks edit state by comparing current value against initial.
+class _EditableTextField extends StatefulWidget {
+  const _EditableTextField({
+    required this.fieldKey,
+    required this.initialValue,
+    this.hintText,
+    this.onChanged,
+    this.onEditStateChanged,
+  });
+
+  final String fieldKey;
+  final String initialValue;
+  final String? hintText;
+  final ValueChanged<String>? onChanged;
+
+  /// Callback when the edit state changes (edited vs not edited).
+  final ValueChanged<bool>? onEditStateChanged;
+
+  @override
+  State<_EditableTextField> createState() => _EditableTextFieldState();
+}
+
+class _EditableTextFieldState extends State<_EditableTextField> {
+  bool _isEdited = false;
+
+  void _handleValueChanged(dynamic newValue) {
+    final value = (newValue as String?) ?? '';
+
+    // Determine if value differs from initial
+    final wasEdited = _isEdited;
+    final isNowEdited = value != widget.initialValue;
+
+    if (wasEdited != isNowEdited) {
+      setState(() => _isEdited = isNowEdited);
+      widget.onEditStateChanged?.call(isNowEdited);
+    }
+
+    widget.onChanged?.call(value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final borderColor = _isEdited ? colorScheme.primary : colorScheme.error;
+
+    return FormFieldBuilders.buildTextField(
+      context,
+      label: '',
+      fieldKey: widget.fieldKey,
+      initialValue: widget.initialValue,
+      onChanged: _handleValueChanged,
+      hintText: widget.hintText,
+      style: textTheme.bodyMedium?.copyWith(
+        color: colorScheme.onSurface,
+        fontWeight: FontWeight.w500,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: borderColor, width: 1.5),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: borderColor, width: 1.5),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: colorScheme.primary, width: 2),
       ),
     );
+  }
+}
+
+class CustomDropdownItem {
+  final String value;
+  final String label;
+
+  CustomDropdownItem({required this.value, required this.label});
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is CustomDropdownItem && other.value == value;
+  }
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() {
+    return 'CustomDropdownItem(value: $value, label: $label)';
+  }
+}
+
+/// Private reusable editable dropdown field with verification styling.
+///
+/// Automatically tracks edit state by comparing current value against initial.
+class _EditableDropdownField extends StatefulWidget {
+  const _EditableDropdownField({
+    required this.fieldKey,
+    required this.items,
+    this.initialValue,
+    this.hintText,
+    this.onChanged,
+    this.onEditStateChanged,
+  });
+
+  final String fieldKey;
+  final List<CustomDropdownItem> items;
+  final CustomDropdownItem? initialValue;
+  final String? hintText;
+  final ValueChanged<CustomDropdownItem>? onChanged;
+
+  /// Callback when the edit state changes (edited vs not edited).
+  final ValueChanged<bool>? onEditStateChanged;
+
+  @override
+  State<_EditableDropdownField> createState() => _EditableDropdownFieldState();
+}
+
+class _EditableDropdownFieldState extends State<_EditableDropdownField> {
+  bool _isEdited = false;
+
+  void _handleValueChanged(CustomDropdownItem? newValue) {
+    if (newValue == null) return;
+
+    // Determine if value differs from initial
+    final wasEdited = _isEdited;
+    final isNowEdited = newValue != widget.initialValue;
+
+    if (wasEdited != isNowEdited) {
+      setState(() => _isEdited = isNowEdited);
+      widget.onEditStateChanged?.call(isNowEdited);
+    }
+
+    widget.onChanged?.call(newValue);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final borderColor = _isEdited ? colorScheme.primary : colorScheme.error;
+
+    return FormFieldBuilders.buildCustomDropdownField<CustomDropdownItem>(
+      context,
+      label: '',
+      fieldKey: widget.fieldKey,
+      items: widget.items
+          .map(
+            (item) => DropdownMenuItem<CustomDropdownItem>(
+              value: item,
+              child: Text(
+                item.label,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                maxLines: 1,
+              ),
+            ),
+          )
+          .toList(),
+      initialValue: widget.initialValue,
+      onChanged: _handleValueChanged,
+      hintText: widget.hintText,
+      enabled: true,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: borderColor, width: 1.5),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: borderColor, width: 1.5),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+      ),
+    );
+  }
+}
+
+/// Private reusable read-only field container.
+class _ReadOnlyField extends StatelessWidget {
+  const _ReadOnlyField({
+    required this.value,
+    this.showDropdownIcon = false,
+    this.applyOpacity = false,
+  });
+
+  final String value;
+  final bool showDropdownIcon;
+  final bool applyOpacity;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final container = Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        border: Border.all(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              value,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          if (showDropdownIcon)
+            Icon(
+              Icons.expand_more,
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+        ],
+      ),
+    );
+
+    if (applyOpacity) {
+      return Opacity(opacity: 0.6, child: container);
+    }
+    return container;
   }
 }
 
@@ -266,13 +463,14 @@ class VerificationReadOnlyTextField extends StatelessWidget {
 /// Editable or read-only field based on [VerifiedField.isVerified].
 ///
 /// Uses [VerifiableField] wrapper for consistent status display.
-class VerificationEditableField extends StatelessWidget {
+/// Automatically tracks edit state internally.
+class VerificationEditableField extends StatefulWidget {
   const VerificationEditableField({
     required this.label,
     required this.field,
     this.fieldId,
     this.onChanged,
-    this.isEdited = false,
+    this.onEditStateChanged,
     super.key,
   });
 
@@ -288,76 +486,52 @@ class VerificationEditableField extends StatelessWidget {
   /// Callback when the field value changes.
   final ValueChanged<String>? onChanged;
 
-  /// Whether the user has edited this field's value.
-  final bool isEdited;
+  /// Callback when the edit state changes (edited vs not edited).
+  final ValueChanged<bool>? onEditStateChanged;
 
-  String get _fieldKey => fieldId ?? label.toLowerCase().replaceAll(' ', '_');
+  @override
+  State<VerificationEditableField> createState() =>
+      _VerificationEditableFieldState();
+}
+
+class _VerificationEditableFieldState extends State<VerificationEditableField> {
+  bool _isEdited = false;
+
+  String get _fieldKey =>
+      widget.fieldId ?? widget.label.toLowerCase().replaceAll(' ', '_');
 
   String get _displayValue {
-    final value = field.value;
+    final value = widget.field.value;
     if (value is String) return value;
     return value.toString();
   }
 
-  bool get _requiresUpdate => !field.isVerified;
+  bool get _requiresUpdate => !widget.field.isVerified;
+
+  void _handleEditStateChanged(bool isEdited) {
+    if (_isEdited != isEdited) {
+      setState(() => _isEdited = isEdited);
+      widget.onEditStateChanged?.call(isEdited);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final requiresAction = _requiresUpdate;
-    final borderColor = isEdited ? colorScheme.primary : colorScheme.error;
-
     return VerifiableField(
       fieldId: _fieldKey,
-      title: label,
+      title: widget.label,
       requiresUpdate: _requiresUpdate,
-      isEdited: isEdited,
-      adminFeedback: field.feedback,
-      child: requiresAction
-          ? FormFieldBuilders.buildTextField(
-              context,
-              label: '',
+      isEdited: _isEdited,
+      adminFeedback: widget.field.feedback,
+      child: _requiresUpdate
+          ? _EditableTextField(
               fieldKey: _fieldKey,
               initialValue: _displayValue,
-              onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
-              hintText: field.feedback,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w500,
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: borderColor, width: 1.5),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: borderColor, width: 1.5),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: colorScheme.primary, width: 2),
-              ),
+              hintText: widget.field.feedback,
+              onChanged: widget.onChanged,
+              onEditStateChanged: _handleEditStateChanged,
             )
-          : Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                border: Border.all(color: colorScheme.outlineVariant),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                _displayValue,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
+          : _ReadOnlyField(value: _displayValue),
     );
   }
 }
@@ -365,13 +539,14 @@ class VerificationEditableField extends StatelessWidget {
 /// Dropdown-styled field that can be editable based on verification status.
 ///
 /// Uses [VerifiableField] wrapper for consistent status display.
-class VerificationDropdownField extends StatelessWidget {
+/// Automatically tracks edit state internally.
+class VerificationDropdownField extends StatefulWidget {
   const VerificationDropdownField({
     required this.label,
     required this.field,
     this.fieldId,
     this.onChanged,
-    this.isEdited = false,
+    this.onEditStateChanged,
     super.key,
   });
 
@@ -387,88 +562,52 @@ class VerificationDropdownField extends StatelessWidget {
   /// Callback when the field value changes.
   final ValueChanged<String>? onChanged;
 
-  /// Whether the user has edited this field's value.
-  final bool isEdited;
+  /// Callback when the edit state changes (edited vs not edited).
+  final ValueChanged<bool>? onEditStateChanged;
 
-  String get _fieldKey => fieldId ?? label.toLowerCase().replaceAll(' ', '_');
+  @override
+  State<VerificationDropdownField> createState() =>
+      _VerificationDropdownFieldState();
+}
+
+class _VerificationDropdownFieldState extends State<VerificationDropdownField> {
+  bool _isEdited = false;
+
+  String get _fieldKey =>
+      widget.fieldId ?? widget.label.toLowerCase().replaceAll(' ', '_');
 
   String get _displayValue {
-    final value = field.value;
+    final value = widget.field.value;
     if (value is String) return value;
     return value.toString();
   }
 
-  bool get _requiresUpdate => !field.isVerified;
+  bool get _requiresUpdate => !widget.field.isVerified;
+
+  void _handleEditStateChanged(bool isEdited) {
+    if (_isEdited != isEdited) {
+      setState(() => _isEdited = isEdited);
+      widget.onEditStateChanged?.call(isEdited);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final requiresAction = _requiresUpdate;
-    final borderColor = isEdited ? colorScheme.primary : colorScheme.error;
-
     return VerifiableField(
       fieldId: _fieldKey,
-      title: label,
+      title: widget.label,
       requiresUpdate: _requiresUpdate,
-      isEdited: isEdited,
-      adminFeedback: field.feedback,
-      child: requiresAction
-          ? FormFieldBuilders.buildTextField(
-              context,
-              label: '',
+      isEdited: _isEdited,
+      adminFeedback: widget.field.feedback,
+      child: _requiresUpdate
+          ? _EditableTextField(
               fieldKey: _fieldKey,
               initialValue: _displayValue,
-              onChanged: onChanged != null ? (v) => onChanged!(v ?? '') : null,
-              hintText: field.feedback,
-              style: textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w500,
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
-              suffixIcon: Icon(Icons.expand_more, color: borderColor, size: 20),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: borderColor, width: 1.5),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: borderColor, width: 1.5),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: colorScheme.primary, width: 2),
-              ),
+              hintText: widget.field.feedback,
+              onChanged: widget.onChanged,
+              onEditStateChanged: _handleEditStateChanged,
             )
-          : Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                border: Border.all(color: colorScheme.outlineVariant),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _displayValue,
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.expand_more,
-                    color: colorScheme.onSurfaceVariant,
-                    size: 20,
-                  ),
-                ],
-              ),
-            ),
+          : _ReadOnlyField(value: _displayValue, showDropdownIcon: true),
     );
   }
 }

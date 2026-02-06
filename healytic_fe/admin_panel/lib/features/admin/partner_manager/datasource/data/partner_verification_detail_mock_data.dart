@@ -16,6 +16,19 @@ VerifiedFieldEntity<String> _vf(
   feedback: feedback,
 );
 
+/// Helper function to create a verified list field
+VerifiedFieldEntity<List<String>> _vfList(
+  String key,
+  List<String> value, {
+  bool isVerified = false,
+  String? feedback,
+}) => VerifiedFieldEntity(
+  fieldKey: key,
+  value: value,
+  isVerified: isVerified,
+  feedback: feedback,
+);
+
 /// Helper function to create a verified location field
 VerifiedFieldEntity<AddressLocation> _vfLocation(
   String key,
@@ -52,17 +65,6 @@ partnerVerificationDetailMockData = {
       isVerified: true,
     ),
     isTaxCodeValid: true,
-    serviceTags: const VerifiedFieldEntity(
-      fieldKey: 'serviceTags',
-      value: [
-        'Spa Treatment',
-        'Massage Therapy',
-        'Sauna',
-        'Facial Care',
-        'Body Wrap',
-      ],
-      isVerified: true,
-    ),
     address: AddressInfo(
       streetAddress: _vf(
         'streetAddress',
@@ -73,11 +75,6 @@ partnerVerificationDetailMockData = {
       district: _vfLocation('district', 'd001', 'Hoàn Kiếm', isVerified: true),
       city: _vfLocation('city', 'c001', 'Hà Nội', isVerified: true),
       country: 'Vietnam',
-    ),
-    username: const VerifiedFieldEntity(
-      fieldKey: 'username',
-      value: 'hanoispa_admin',
-      isVerified: true,
     ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',
@@ -90,6 +87,7 @@ partnerVerificationDetailMockData = {
       value: '+84 90 123 4567',
       isVerified: true,
     ),
+    businessType: _vfList('businessType', ['SPA', 'MASSAGE'], isVerified: true),
     legalRepresentative: LegalRepresentative(
       fullName: _vf('fullName', 'Nguyễn Văn An', isVerified: true),
       position: _vf('position', 'General Director', isVerified: true),
@@ -154,11 +152,6 @@ partnerVerificationDetailMockData = {
       isVerified: true,
     ),
     isTaxCodeValid: true,
-    serviceTags: const VerifiedFieldEntity(
-      fieldKey: 'serviceTags',
-      value: ['Gym', 'Yoga', 'Personal Training', 'Group Classes'],
-      isVerified: true,
-    ),
     address: AddressInfo(
       streetAddress: _vf(
         'streetAddress',
@@ -169,11 +162,6 @@ partnerVerificationDetailMockData = {
       district: _vfLocation('district', 'd001', 'Hoàn Kiếm', isVerified: true),
       city: _vfLocation('city', 'c001', 'Hà Nội', isVerified: true),
       country: 'Vietnam',
-    ),
-    username: const VerifiedFieldEntity(
-      fieldKey: 'username',
-      value: 'elitefitness_mgr',
-      isVerified: true,
     ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',
@@ -187,6 +175,7 @@ partnerVerificationDetailMockData = {
       value: '+84 91 234 5678',
       isVerified: true,
     ),
+    businessType: _vfList('businessType', ['GYM', 'FITNESS'], isVerified: true),
     legalRepresentative: LegalRepresentative(
       fullName: _vf('fullName', 'Trần Minh Đức', isVerified: true),
       position: _vf('position', 'CEO', isVerified: true),
@@ -238,11 +227,7 @@ partnerVerificationDetailMockData = {
       feedback: 'Tax registration code is invalid. Please verify.',
     ),
     isTaxCodeValid: false,
-    serviceTags: const VerifiedFieldEntity(
-      fieldKey: 'serviceTags',
-      value: ['Massage', 'Aromatherapy', 'Hot Stone'],
-      isVerified: true,
-    ),
+
     address: AddressInfo(
       streetAddress: _vf(
         'streetAddress',
@@ -253,11 +238,6 @@ partnerVerificationDetailMockData = {
       district: _vfLocation('district', 'd001', 'Hoàn Kiếm', isVerified: true),
       city: _vfLocation('city', 'c001', 'Hà Nội', isVerified: true),
       country: 'Vietnam',
-    ),
-    username: const VerifiedFieldEntity(
-      fieldKey: 'username',
-      value: 'lotus_massage',
-      isVerified: true,
     ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',
@@ -270,6 +250,7 @@ partnerVerificationDetailMockData = {
       value: '+84 92 345 6789',
       isVerified: true,
     ),
+    businessType: _vfList('businessType', ['MASSAGE'], isVerified: true),
     legalRepresentative: LegalRepresentative(
       fullName: _vf('fullName', 'Lê Thị Hoa', isVerified: true),
       position: _vf('position', 'Owner', isVerified: true),
@@ -318,11 +299,7 @@ partnerVerificationDetailMockData = {
       isVerified: true,
     ),
     isTaxCodeValid: true,
-    serviceTags: const VerifiedFieldEntity(
-      fieldKey: 'serviceTags',
-      value: ['Sauna', 'Steam Bath', 'Therapy', 'Relaxation', 'Premium'],
-      isVerified: true,
-    ),
+
     address: AddressInfo(
       streetAddress: _vf(
         'streetAddress',
@@ -333,11 +310,6 @@ partnerVerificationDetailMockData = {
       district: _vfLocation('district', 'd001', 'Hoàn Kiếm', isVerified: true),
       city: _vfLocation('city', 'c001', 'Hà Nội', isVerified: true),
       country: 'Vietnam',
-    ),
-    username: const VerifiedFieldEntity(
-      fieldKey: 'username',
-      value: 'royalsauna_vn',
-      isVerified: true,
     ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',
@@ -350,6 +322,7 @@ partnerVerificationDetailMockData = {
       value: '+84 93 456 7890',
       isVerified: true,
     ),
+    businessType: _vfList('businessType', ['SPA', 'SAUNA'], isVerified: true),
     legalRepresentative: LegalRepresentative(
       fullName: _vf('fullName', 'Phạm Quốc Bảo', isVerified: true),
       position: _vf('position', 'Managing Director', isVerified: true),
@@ -411,11 +384,7 @@ partnerVerificationDetailMockData = {
       isVerified: true,
     ),
     isTaxCodeValid: true,
-    serviceTags: const VerifiedFieldEntity(
-      fieldKey: 'serviceTags',
-      value: ['Gym', 'Weight Training', 'Cardio', 'CrossFit'],
-      isVerified: true,
-    ),
+
     address: AddressInfo(
       streetAddress: _vf(
         'streetAddress',
@@ -432,11 +401,6 @@ partnerVerificationDetailMockData = {
       city: _vfLocation('city', 'c001', 'Hà Nội', isVerified: true),
       country: 'Vietnam',
     ),
-    username: const VerifiedFieldEntity(
-      fieldKey: 'username',
-      value: 'ozone_gym',
-      isVerified: true,
-    ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',
       value: 'ozone.gym@email.com',
@@ -448,6 +412,7 @@ partnerVerificationDetailMockData = {
       value: '+84 94 567 8901',
       isVerified: true,
     ),
+    businessType: _vfList('businessType', ['GYM'], isVerified: true),
     legalRepresentative: LegalRepresentative(
       fullName: _vf('fullName', 'Hoàng Văn Cường', isVerified: true),
       position: _vf('position', 'Founder', isVerified: true),
@@ -499,12 +464,6 @@ partnerVerificationDetailMockData = {
       feedback: 'Invalid tax registration code.',
     ),
     isTaxCodeValid: false,
-    serviceTags: const VerifiedFieldEntity(
-      fieldKey: 'serviceTags',
-      value: ['Clinic'],
-      isVerified: false,
-      feedback: 'Service type not verified.',
-    ),
     address: AddressInfo(
       streetAddress: _vf(
         'streetAddress',
@@ -514,11 +473,6 @@ partnerVerificationDetailMockData = {
       ),
       city: _vfLocation('city', '', 'Unknown', isVerified: false),
       country: 'Vietnam',
-    ),
-    username: const VerifiedFieldEntity(
-      fieldKey: 'username',
-      value: 'fake_clinic',
-      isVerified: false,
     ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',
@@ -532,6 +486,12 @@ partnerVerificationDetailMockData = {
       value: '+84 00 000 0000',
       isVerified: false,
       feedback: 'Phone number is invalid.',
+    ),
+    businessType: _vfList(
+      'businessType',
+      ['CLINIC'],
+      isVerified: false,
+      feedback: 'Business type not verified',
     ),
     legalRepresentative: LegalRepresentative(
       fullName: _vf(

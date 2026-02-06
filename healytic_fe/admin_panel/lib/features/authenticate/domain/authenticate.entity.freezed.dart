@@ -1108,6 +1108,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,username,email,password);
 
+@override
+String toString() {
+  return 'AccountRequestEntity(username: $username, email: $email, password: $password)';
+}
 
 
 }
@@ -1307,6 +1311,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,username,email,password);
 
+@override
+String toString() {
+  return 'AccountRequestEntity(username: $username, email: $email, password: $password)';
+}
 
 
 }
@@ -1349,7 +1357,7 @@ as String,
 /// @nodoc
 mixin _$PartnerRequestEntity {
 
- String get taxCode; String get legalName; String get brandName; String get businessType; String get provinceId; String get districtId; String get wardId; String get streetAddress; String? get phoneNumber;
+ String get taxCode; String get legalName; String get brandName; List<String> get businessType; String get provinceId; String get districtId; String get wardId; String get streetAddress; String? get phoneNumber;
 /// Create a copy of PartnerRequestEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1362,12 +1370,12 @@ $PartnerRequestEntityCopyWith<PartnerRequestEntity> get copyWith => _$PartnerReq
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerRequestEntity&&(identical(other.taxCode, taxCode) || other.taxCode == taxCode)&&(identical(other.legalName, legalName) || other.legalName == legalName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.businessType, businessType) || other.businessType == businessType)&&(identical(other.provinceId, provinceId) || other.provinceId == provinceId)&&(identical(other.districtId, districtId) || other.districtId == districtId)&&(identical(other.wardId, wardId) || other.wardId == wardId)&&(identical(other.streetAddress, streetAddress) || other.streetAddress == streetAddress)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerRequestEntity&&(identical(other.taxCode, taxCode) || other.taxCode == taxCode)&&(identical(other.legalName, legalName) || other.legalName == legalName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&const DeepCollectionEquality().equals(other.businessType, businessType)&&(identical(other.provinceId, provinceId) || other.provinceId == provinceId)&&(identical(other.districtId, districtId) || other.districtId == districtId)&&(identical(other.wardId, wardId) || other.wardId == wardId)&&(identical(other.streetAddress, streetAddress) || other.streetAddress == streetAddress)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,taxCode,legalName,brandName,businessType,provinceId,districtId,wardId,streetAddress,phoneNumber);
+int get hashCode => Object.hash(runtimeType,taxCode,legalName,brandName,const DeepCollectionEquality().hash(businessType),provinceId,districtId,wardId,streetAddress,phoneNumber);
 
 @override
 String toString() {
@@ -1382,7 +1390,7 @@ abstract mixin class $PartnerRequestEntityCopyWith<$Res>  {
   factory $PartnerRequestEntityCopyWith(PartnerRequestEntity value, $Res Function(PartnerRequestEntity) _then) = _$PartnerRequestEntityCopyWithImpl;
 @useResult
 $Res call({
- String taxCode, String legalName, String brandName, String businessType, String provinceId, String districtId, String wardId, String streetAddress, String? phoneNumber
+ String taxCode, String legalName, String brandName, List<String> businessType, String provinceId, String districtId, String wardId, String streetAddress, String? phoneNumber
 });
 
 
@@ -1405,7 +1413,7 @@ taxCode: null == taxCode ? _self.taxCode : taxCode // ignore: cast_nullable_to_n
 as String,legalName: null == legalName ? _self.legalName : legalName // ignore: cast_nullable_to_non_nullable
 as String,brandName: null == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
 as String,businessType: null == businessType ? _self.businessType : businessType // ignore: cast_nullable_to_non_nullable
-as String,provinceId: null == provinceId ? _self.provinceId : provinceId // ignore: cast_nullable_to_non_nullable
+as List<String>,provinceId: null == provinceId ? _self.provinceId : provinceId // ignore: cast_nullable_to_non_nullable
 as String,districtId: null == districtId ? _self.districtId : districtId // ignore: cast_nullable_to_non_nullable
 as String,wardId: null == wardId ? _self.wardId : wardId // ignore: cast_nullable_to_non_nullable
 as String,streetAddress: null == streetAddress ? _self.streetAddress : streetAddress // ignore: cast_nullable_to_non_nullable
@@ -1495,7 +1503,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String taxCode,  String legalName,  String brandName,  String businessType,  String provinceId,  String districtId,  String wardId,  String streetAddress,  String? phoneNumber)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String taxCode,  String legalName,  String brandName,  List<String> businessType,  String provinceId,  String districtId,  String wardId,  String streetAddress,  String? phoneNumber)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PartnerRequestEntity() when $default != null:
 return $default(_that.taxCode,_that.legalName,_that.brandName,_that.businessType,_that.provinceId,_that.districtId,_that.wardId,_that.streetAddress,_that.phoneNumber);case _:
@@ -1516,7 +1524,7 @@ return $default(_that.taxCode,_that.legalName,_that.brandName,_that.businessType
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String taxCode,  String legalName,  String brandName,  String businessType,  String provinceId,  String districtId,  String wardId,  String streetAddress,  String? phoneNumber)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String taxCode,  String legalName,  String brandName,  List<String> businessType,  String provinceId,  String districtId,  String wardId,  String streetAddress,  String? phoneNumber)  $default,) {final _that = this;
 switch (_that) {
 case _PartnerRequestEntity():
 return $default(_that.taxCode,_that.legalName,_that.brandName,_that.businessType,_that.provinceId,_that.districtId,_that.wardId,_that.streetAddress,_that.phoneNumber);case _:
@@ -1536,7 +1544,7 @@ return $default(_that.taxCode,_that.legalName,_that.brandName,_that.businessType
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String taxCode,  String legalName,  String brandName,  String businessType,  String provinceId,  String districtId,  String wardId,  String streetAddress,  String? phoneNumber)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String taxCode,  String legalName,  String brandName,  List<String> businessType,  String provinceId,  String districtId,  String wardId,  String streetAddress,  String? phoneNumber)?  $default,) {final _that = this;
 switch (_that) {
 case _PartnerRequestEntity() when $default != null:
 return $default(_that.taxCode,_that.legalName,_that.brandName,_that.businessType,_that.provinceId,_that.districtId,_that.wardId,_that.streetAddress,_that.phoneNumber);case _:
@@ -1551,13 +1559,19 @@ return $default(_that.taxCode,_that.legalName,_that.brandName,_that.businessType
 @JsonSerializable()
 
 class _PartnerRequestEntity implements PartnerRequestEntity {
-  const _PartnerRequestEntity({required this.taxCode, required this.legalName, required this.brandName, required this.businessType, required this.provinceId, required this.districtId, required this.wardId, required this.streetAddress, this.phoneNumber});
+  const _PartnerRequestEntity({required this.taxCode, required this.legalName, required this.brandName, required final  List<String> businessType, required this.provinceId, required this.districtId, required this.wardId, required this.streetAddress, this.phoneNumber}): _businessType = businessType;
   factory _PartnerRequestEntity.fromJson(Map<String, dynamic> json) => _$PartnerRequestEntityFromJson(json);
 
 @override final  String taxCode;
 @override final  String legalName;
 @override final  String brandName;
-@override final  String businessType;
+ final  List<String> _businessType;
+@override List<String> get businessType {
+  if (_businessType is EqualUnmodifiableListView) return _businessType;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_businessType);
+}
+
 @override final  String provinceId;
 @override final  String districtId;
 @override final  String wardId;
@@ -1577,12 +1591,12 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerRequestEntity&&(identical(other.taxCode, taxCode) || other.taxCode == taxCode)&&(identical(other.legalName, legalName) || other.legalName == legalName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.businessType, businessType) || other.businessType == businessType)&&(identical(other.provinceId, provinceId) || other.provinceId == provinceId)&&(identical(other.districtId, districtId) || other.districtId == districtId)&&(identical(other.wardId, wardId) || other.wardId == wardId)&&(identical(other.streetAddress, streetAddress) || other.streetAddress == streetAddress)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerRequestEntity&&(identical(other.taxCode, taxCode) || other.taxCode == taxCode)&&(identical(other.legalName, legalName) || other.legalName == legalName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&const DeepCollectionEquality().equals(other._businessType, _businessType)&&(identical(other.provinceId, provinceId) || other.provinceId == provinceId)&&(identical(other.districtId, districtId) || other.districtId == districtId)&&(identical(other.wardId, wardId) || other.wardId == wardId)&&(identical(other.streetAddress, streetAddress) || other.streetAddress == streetAddress)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,taxCode,legalName,brandName,businessType,provinceId,districtId,wardId,streetAddress,phoneNumber);
+int get hashCode => Object.hash(runtimeType,taxCode,legalName,brandName,const DeepCollectionEquality().hash(_businessType),provinceId,districtId,wardId,streetAddress,phoneNumber);
 
 @override
 String toString() {
@@ -1597,7 +1611,7 @@ abstract mixin class _$PartnerRequestEntityCopyWith<$Res> implements $PartnerReq
   factory _$PartnerRequestEntityCopyWith(_PartnerRequestEntity value, $Res Function(_PartnerRequestEntity) _then) = __$PartnerRequestEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String taxCode, String legalName, String brandName, String businessType, String provinceId, String districtId, String wardId, String streetAddress, String? phoneNumber
+ String taxCode, String legalName, String brandName, List<String> businessType, String provinceId, String districtId, String wardId, String streetAddress, String? phoneNumber
 });
 
 
@@ -1619,8 +1633,8 @@ class __$PartnerRequestEntityCopyWithImpl<$Res>
 taxCode: null == taxCode ? _self.taxCode : taxCode // ignore: cast_nullable_to_non_nullable
 as String,legalName: null == legalName ? _self.legalName : legalName // ignore: cast_nullable_to_non_nullable
 as String,brandName: null == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
-as String,businessType: null == businessType ? _self.businessType : businessType // ignore: cast_nullable_to_non_nullable
-as String,provinceId: null == provinceId ? _self.provinceId : provinceId // ignore: cast_nullable_to_non_nullable
+as String,businessType: null == businessType ? _self._businessType : businessType // ignore: cast_nullable_to_non_nullable
+as List<String>,provinceId: null == provinceId ? _self.provinceId : provinceId // ignore: cast_nullable_to_non_nullable
 as String,districtId: null == districtId ? _self.districtId : districtId // ignore: cast_nullable_to_non_nullable
 as String,wardId: null == wardId ? _self.wardId : wardId // ignore: cast_nullable_to_non_nullable
 as String,streetAddress: null == streetAddress ? _self.streetAddress : streetAddress // ignore: cast_nullable_to_non_nullable
@@ -1926,6 +1940,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,fileType,type,documentKey,const DeepCollectionEquality().hash(urls));
 
+@override
+String toString() {
+  return 'PartnerDocumentVerificationEntity(fileType: $fileType, type: $type, documentKey: $documentKey, urls: $urls)';
+}
 
 
 }
@@ -2138,6 +2156,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,fileType,type,documentKey,const DeepCollectionEquality().hash(_urls));
 
+@override
+String toString() {
+  return 'PartnerDocumentVerificationEntity(fileType: $fileType, type: $type, documentKey: $documentKey, urls: $urls)';
+}
 
 
 }
@@ -2491,6 +2513,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,account,partner,legalRepresentative);
 
+@override
+String toString() {
+  return 'RegisterPartnerRequestEntity(account: $account, partner: $partner, legalRepresentative: $legalRepresentative)';
+}
 
 
 }
@@ -2717,6 +2743,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,account,partner,legalRepresentative);
 
+@override
+String toString() {
+  return 'RegisterPartnerRequestEntity(account: $account, partner: $partner, legalRepresentative: $legalRepresentative)';
+}
 
 
 }

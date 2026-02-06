@@ -84,8 +84,8 @@ export class PartnerDetailResponseDto {
     @ApiProperty({ example: 'Hanoi Spa' })
     brandName: string;
 
-    @ApiProperty({ enum: BusinessType, example: BusinessType.SPA_BEAUTY })
-    businessType: BusinessType;
+    @ApiProperty({ enum: BusinessType, isArray: true, example: [BusinessType.SPA_BEAUTY] })
+    businessType: BusinessType[];
 
     @ApiProperty({ type: AddressDetailDto })
     address: AddressDetailDto;
