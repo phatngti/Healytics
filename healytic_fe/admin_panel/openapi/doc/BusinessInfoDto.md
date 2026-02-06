@@ -10,9 +10,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **brandName** | [**VerifiedField**](VerifiedField.md) |  | 
 **taxRegistrationCode** | [**VerifiedField**](VerifiedField.md) |  | [optional] 
-**serviceTags** | [**VerifiedField**](VerifiedField.md) |  | 
+**businessType** | [**VerifiedField**](VerifiedField.md) |  | 
 **address** | [**AddressInfoDto**](AddressInfoDto.md) |  | [optional] 
-**username** | [**VerifiedField**](VerifiedField.md) |  | [optional] 
 **email** | [**VerifiedField**](VerifiedField.md) |  | [optional] 
 **phoneNumber** | [**VerifiedField**](VerifiedField.md) |  | [optional] 
 

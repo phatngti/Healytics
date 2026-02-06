@@ -15,8 +15,10 @@ abstract class VerificationStatusRepository {
   /// Resubmits the application after making requested revisions.
   ///
   /// [uploads] contains the list of re-uploaded documents to submit.
+  /// [edits] contains a map of field keys to their new values.
   /// Returns `true` if the resubmission was successful.
   Future<bool> resubmitApplication({
     List<DocumentUploadResult> uploads = const [],
+    Map<String, dynamic> edits = const {},
   });
 }

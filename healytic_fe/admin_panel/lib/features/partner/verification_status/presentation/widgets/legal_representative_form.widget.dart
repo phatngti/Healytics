@@ -17,6 +17,7 @@ class LegalRepresentativeForm extends StatefulWidget {
     required this.section,
     required this.legalRepresentative,
     required this.kycDocuments,
+    this.onFieldChanged,
     this.onUploadComplete,
     super.key,
   });
@@ -29,6 +30,9 @@ class LegalRepresentativeForm extends StatefulWidget {
 
   /// KYC documents as VerifiedField list.
   final List<VerifiedField> kycDocuments;
+
+  /// Callback when a field value changes.
+  final void Function(String fieldKey, String value)? onFieldChanged;
 
   /// Callback when a document upload completes successfully.
   final void Function(DocumentUploadResult result)? onUploadComplete;
@@ -172,9 +176,9 @@ class _LegalRepresentativeFormState extends State<LegalRepresentativeForm> {
                           frontRequiresUpdate
                               ? DocumentUploadCard(
                                   document: idFront,
-                                  onUploadComplete: _handleUploadComplete,
                                   uploadedPreviewUrl: frontUploadedUrl,
                                   showEditedBadge: frontUploadedUrl != null,
+                                  onUploadComplete: _handleUploadComplete,
                                 )
                               : CompletedDocumentCard(
                                   document: idFront,
@@ -196,9 +200,9 @@ class _LegalRepresentativeFormState extends State<LegalRepresentativeForm> {
                           backRequiresUpdate
                               ? DocumentUploadCard(
                                   document: idBack,
-                                  onUploadComplete: _handleUploadComplete,
                                   uploadedPreviewUrl: backUploadedUrl,
                                   showEditedBadge: backUploadedUrl != null,
+                                  onUploadComplete: _handleUploadComplete,
                                 )
                               : CompletedDocumentCard(
                                   document: idBack,
@@ -222,9 +226,9 @@ class _LegalRepresentativeFormState extends State<LegalRepresentativeForm> {
                   frontRequiresUpdate
                       ? DocumentUploadCard(
                           document: idFront,
-                          onUploadComplete: _handleUploadComplete,
                           uploadedPreviewUrl: frontUploadedUrl,
                           showEditedBadge: frontUploadedUrl != null,
+                          onUploadComplete: _handleUploadComplete,
                         )
                       : CompletedDocumentCard(
                           document: idFront,
@@ -239,9 +243,9 @@ class _LegalRepresentativeFormState extends State<LegalRepresentativeForm> {
                   backRequiresUpdate
                       ? DocumentUploadCard(
                           document: idBack,
-                          onUploadComplete: _handleUploadComplete,
                           uploadedPreviewUrl: backUploadedUrl,
                           showEditedBadge: backUploadedUrl != null,
+                          onUploadComplete: _handleUploadComplete,
                         )
                       : CompletedDocumentCard(
                           document: idBack,

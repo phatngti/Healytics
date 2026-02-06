@@ -186,6 +186,8 @@ class ApiClient {
           return value;
         case 'AccountRequestDto':
           return AccountRequestDto.fromJson(value);
+        case 'AddressDto':
+          return AddressDto.fromJson(value);
         case 'AddressInfoDto':
           return AddressInfoDto.fromJson(value);
         case 'AdminLoginDto':
@@ -196,12 +198,14 @@ class ApiClient {
           return AttachTagResponseDto.fromJson(value);
         case 'AuthTokensDto':
           return AuthTokensDto.fromJson(value);
+        case 'BusinessInfo':
+          return BusinessInfo.fromJson(value);
         case 'BusinessInfoDto':
           return BusinessInfoDto.fromJson(value);
-        case 'BusinessTypeDto':
-          return BusinessTypeDto.fromJson(value);
-        case 'BusinessTypesResponseDto':
-          return BusinessTypesResponseDto.fromJson(value);
+        case 'BusinessServiceDto':
+          return BusinessServiceDto.fromJson(value);
+        case 'BusinessServicesResponseDto':
+          return BusinessServicesResponseDto.fromJson(value);
         case 'CategoryResponseDto':
           return CategoryResponseDto.fromJson(value);
         case 'CategorySummaryDto':
@@ -228,8 +232,6 @@ class ApiClient {
           return DeleteFileResponseDto.fromJson(value);
         case 'DoctorProfileDto':
           return DoctorProfileDto.fromJson(value);
-        case 'DocumentUpdateDto':
-          return DocumentUpdateDto.fromJson(value);
         case 'EmployeeResponseDto':
           return EmployeeResponseDto.fromJson(value);
         case 'FileUrlResponseDto':
@@ -240,6 +242,8 @@ class ApiClient {
           return GetProvincesResponseDto.fromJson(value);
         case 'GetWardsResponseDto':
           return GetWardsResponseDto.fromJson(value);
+        case 'KycDocumentDto':
+          return KycDocumentDto.fromJson(value);
         case 'LegalRepresentativeDto':
           return LegalRepresentativeDto.fromJson(value);
         case 'LegalRepresentativeRequestDto':
@@ -304,8 +308,6 @@ class ApiClient {
           return UpdateCategoryDto.fromJson(value);
         case 'UpdateEmployeeDto':
           return UpdateEmployeeDto.fromJson(value);
-        case 'UpdateLegalRepresentativeDto':
-          return UpdateLegalRepresentativeDto.fromJson(value);
         case 'UpdatePartnerDto':
           return UpdatePartnerDto.fromJson(value);
         case 'UpdateProductDto':

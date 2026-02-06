@@ -1,4 +1,5 @@
 import {
+    IsArray,
     IsEnum,
     IsNotEmpty,
     IsOptional,
@@ -8,6 +9,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { BusinessType } from '../../enum/business-type.enum';
+
 
 /**
  * DTO for Partner (Business Entity) information during registration.
@@ -46,10 +48,12 @@ export class PartnerRequestDto {
     @ApiProperty({
         description: 'Type of business',
         enum: BusinessType,
-        example: BusinessType.SPA_BEAUTY,
+        isArray: true,
+        type: 'array',
+        example: [BusinessType.MASSAGE_THERAPY],
     })
-    @IsEnum(BusinessType)
-    businessType: BusinessType;
+    @IsEnum(BusinessType, { each: true })
+    businessType: BusinessType[];
 
     @ApiProperty({
         description: 'UUID of the province (from Location tree)',

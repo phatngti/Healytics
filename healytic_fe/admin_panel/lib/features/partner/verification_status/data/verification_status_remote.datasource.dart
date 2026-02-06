@@ -1,5 +1,7 @@
 import 'package:admin_openapi/api.dart' as api;
+import 'package:admin_panel/constants/field_keys.dart';
 import 'package:admin_panel/core/services/api.service.dart';
+import 'package:admin_panel/features/partner/verification_status/domain/field_category.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/document_verification_section.widget.dart';
 
@@ -11,8 +13,10 @@ abstract class VerificationStatusRemoteDataSource {
   /// Resubmits the application to the remote API.
   ///
   /// [uploads] contains the list of re-uploaded documents to submit.
+  /// [edits] contains a map of field keys to their new string values.
   Future<bool> resubmitApplication({
     List<DocumentUploadResult> uploads = const [],
+    Map<String, dynamic> edits = const {},
   });
 }
 
@@ -231,6 +235,7 @@ class VerificationStatusRemoteDataSourceMock
   @override
   Future<bool> resubmitApplication({
     List<DocumentUploadResult> uploads = const [],
+    Map<String, dynamic> edits = const {},
   }) async {
     await Future<void>.delayed(const Duration(seconds: 1));
     return true;
@@ -251,16 +256,143 @@ class VerificationStatusRemoteDataSourceImpl
     if (profile == null) {
       throw Exception('Failed to fetch partner profile');
     }
+
+    print('profile: $profile');
     return _mapToEntity(profile);
   }
 
   @override
   Future<bool> resubmitApplication({
     List<DocumentUploadResult> uploads = const [],
+    Map<String, dynamic> edits = const {},
   }) async {
-    // TODO: Implement actual API call with uploads
-    // Convert uploads to the required API format
-    throw UnimplementedError('Resubmit API not yet implemented');
+    // Build the UpdatePartnerDto from edits and uploads
+    final updateDto = _buildUpdateDto(edits: edits, uploads: uploads);
+
+    // Call the PUT /partners/me API
+    await apiService.partnersApi.partnersControllerUpdateMyProfile(updateDto);
+
+    return true;
+  }
+
+  /// Builds [api.UpdatePartnerDto] from form edits and document uploads.
+  ///
+  /// Uses [FieldCategoryLookup] to categorize field keys and build
+  /// appropriate DTO sections.
+  api.UpdatePartnerDto _buildUpdateDto({
+    required Map<String, dynamic> edits,
+    required List<DocumentUploadResult> uploads,
+  }) {
+    // Build address DTO if any address field is edited
+    api.AddressDto? addressDto;
+    final stringEdits = edits.map(
+      (key, value) => MapEntry(key, value is String ? value : value.toString()),
+    );
+    final hasAddressEdits = FieldCategoryLookup.hasEditsInCategory(
+      stringEdits,
+      FieldCategory.address,
+    );
+    if (hasAddressEdits) {
+      final addressEdits = FieldCategoryLookup.editsForCategory(
+        stringEdits,
+        FieldCategory.address,
+      );
+      addressDto = api.AddressDto(
+        streetAddress: addressEdits[FieldKeys.streetAddress],
+        ward: addressEdits[FieldKeys.ward],
+        district: addressEdits[FieldKeys.district],
+        city: addressEdits[FieldKeys.city],
+      );
+    }
+
+    // Build business info DTO if any business field is edited
+    api.BusinessInfo? businessInfo;
+    final hasBusinessEdits = FieldCategoryLookup.hasEditsInCategory(
+      stringEdits,
+      FieldCategory.businessInfo,
+    );
+    if (hasBusinessEdits || hasAddressEdits) {
+      final businessEdits = FieldCategoryLookup.editsForCategory(
+        stringEdits,
+        FieldCategory.businessInfo,
+      );
+      // Handle businessType as List<String>
+      final businessTypeValue = edits[FieldKeys.businessType];
+      List<String>? businessTypes;
+      if (businessTypeValue is List) {
+        businessTypes = businessTypeValue.cast<String>();
+      }
+
+      businessInfo = api.BusinessInfo(
+        brandName: businessEdits[FieldKeys.brandName],
+        taxRegistrationCode: businessEdits[FieldKeys.taxCode],
+        phoneNumber: businessEdits[FieldKeys.phoneNumber],
+        serviceTags: businessTypes,
+        address: addressDto,
+      );
+    }
+
+    // Build legal representative DTO if any legal rep field is edited
+    api.LegalRepresentativeDto? legalRepDto;
+    final hasLegalRepEdits = FieldCategoryLookup.hasEditsInCategory(
+      stringEdits,
+      FieldCategory.legalRepresentative,
+    );
+    if (hasLegalRepEdits) {
+      final legalEdits = FieldCategoryLookup.editsForCategory(
+        stringEdits,
+        FieldCategory.legalRepresentative,
+      );
+      legalRepDto = api.LegalRepresentativeDto(
+        fullName: api.VerifiedField(
+          fieldKey: FieldKeys.fullName,
+          value: legalEdits[FieldKeys.fullName] ?? '',
+          isVerified: false,
+        ),
+        position: legalEdits[FieldKeys.position] != null
+            ? api.VerifiedField(
+                fieldKey: FieldKeys.position,
+                value: legalEdits[FieldKeys.position]!,
+                isVerified: false,
+              )
+            : null,
+        idType: legalEdits[FieldKeys.idType] != null
+            ? api.VerifiedField(
+                fieldKey: FieldKeys.idType,
+                value: legalEdits[FieldKeys.idType]!,
+                isVerified: false,
+              )
+            : null,
+        idNumber: legalEdits[FieldKeys.idNumber] != null
+            ? api.VerifiedField(
+                fieldKey: FieldKeys.idNumber,
+                value: legalEdits[FieldKeys.idNumber]!,
+                isVerified: false,
+              )
+            : null,
+        idIssueDate: legalEdits[FieldKeys.idIssueDate] != null
+            ? api.VerifiedField(
+                fieldKey: FieldKeys.idIssueDate,
+                value: legalEdits[FieldKeys.idIssueDate]!,
+                isVerified: false,
+              )
+            : null,
+      );
+    }
+
+    // Build KYC documents from uploads
+    final kycDocuments = uploads.map((upload) {
+      return api.KycDocumentDto(
+        fileUrl: upload.url,
+        fileType: upload.documentKey,
+      );
+    }).toList();
+
+    return api.UpdatePartnerDto(
+      bussinessInfo: businessInfo,
+      legalRepresentative: legalRepDto,
+      kycDocuments: kycDocuments,
+    );
   }
 
   ProviderVerificationStatusEntity _mapToEntity(api.MyProfileResponseDto dto) {
@@ -313,11 +445,8 @@ class VerificationStatusRemoteDataSourceImpl
               'tax_registration_code',
             )
           : null,
-      serviceTags: _mapVerifiedFieldDto(dto.serviceTags, 'service_tags'),
+      serviceTags: _mapVerifiedFieldDto(dto.businessType, 'business_type'),
       address: _mapAddressInfo(dto.address),
-      username: dto.username != null
-          ? _mapVerifiedFieldDto(dto.username!, 'username')
-          : null,
       email: dto.email != null
           ? _mapVerifiedFieldDto(dto.email!, 'email')
           : null,

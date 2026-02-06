@@ -5,6 +5,7 @@ import { LegalRepresentative } from '@/partners/entities/legal-representative.en
 import { PartnerDocument } from '@/partners/entities/partner-document.entity';
 import { FieldFeedbackMap } from '../services/admin-partners.service';
 import { PartnerFieldKeys } from '@/common/constants/partner-form-keys';
+import { BusinessType } from '@/partners/enum/business-type.enum';
 
 // ============================================================================
 // Priority Enum (matching Flutter's PartnerPriority)
@@ -229,8 +230,8 @@ export class BusinessInfoDto {
     @ApiPropertyOptional({ type: VerifiedField })
     taxRegistrationCode?: VerifiedField<string>;
 
-    @ApiProperty({ type: VerifiedField })
-    serviceTags: VerifiedField<string[]>;
+    @ApiProperty({ type: VerifiedField<BusinessType[]> })
+    businessType: VerifiedField<BusinessType[]>;
 
     @ApiPropertyOptional({ type: AddressInfoDto })
     address?: AddressInfoDto;
@@ -268,8 +269,8 @@ export class BusinessInfoDto {
             dto.taxRegistrationCode = VerifiedField.of(PartnerFieldKeys.taxCode, partner.taxCode, taxCodeFb.isVerified, taxCodeFb.reason);
         }
 
-        const serviceTagsFb = getFeedback(PartnerFieldKeys.serviceTags);
-        dto.serviceTags = VerifiedField.of(PartnerFieldKeys.serviceTags, [], serviceTagsFb.isVerified, serviceTagsFb.reason);
+        const businessTypeFb = getFeedback(PartnerFieldKeys.businessType);
+        dto.businessType = VerifiedField.of(PartnerFieldKeys.businessType, partner.businessType, businessTypeFb.isVerified, businessTypeFb.reason);
 
         dto.address = AddressInfoDto.fromPartner(partner, feedbackMap);
 

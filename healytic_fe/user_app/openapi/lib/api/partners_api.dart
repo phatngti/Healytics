@@ -16,14 +16,14 @@ class PartnersApi {
 
   final ApiClient apiClient;
 
-  /// Get all business types
+  /// Get all business services
   ///
-  /// Returns list of all business types with Vietnamese labels for dropdown selection
+  /// Returns list of all business services with Vietnamese labels for dropdown selection
   ///
   /// Note: This method returns the HTTP [Response].
-  Future<Response> partnersControllerGetBusinessTypesWithHttpInfo() async {
+  Future<Response> partnersControllerGetBusinessServicesWithHttpInfo() async {
     // ignore: prefer_const_declarations
-    final path = r'/partners/business-types';
+    final path = r'/partners/business-services';
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -46,11 +46,11 @@ class PartnersApi {
     );
   }
 
-  /// Get all business types
+  /// Get all business services
   ///
-  /// Returns list of all business types with Vietnamese labels for dropdown selection
-  Future<BusinessTypesResponseDto?> partnersControllerGetBusinessTypes() async {
-    final response = await partnersControllerGetBusinessTypesWithHttpInfo();
+  /// Returns list of all business services with Vietnamese labels for dropdown selection
+  Future<BusinessServicesResponseDto?> partnersControllerGetBusinessServices() async {
+    final response = await partnersControllerGetBusinessServicesWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -58,7 +58,7 @@ class PartnersApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'BusinessTypesResponseDto',) as BusinessTypesResponseDto;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'BusinessServicesResponseDto',) as BusinessServicesResponseDto;
     
     }
     return null;

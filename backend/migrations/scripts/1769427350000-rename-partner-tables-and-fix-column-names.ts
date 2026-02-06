@@ -46,12 +46,89 @@ export class RenamePartnerTablesAndFixColumnNames1769427350000 implements Migrat
         await queryRunner.query(`DROP INDEX IF EXISTS "IDX_DOC_REQ_BUSINESS_TYPE"`);
 
         // =====================
-        // 3. Rename tables
+        // 3. Rename tables (using raw SQL to avoid automatic enum renaming which can cause conflicts)
         // =====================
-        await queryRunner.renameTable("legal_representative", "health_partner_legal_representative");
-        await queryRunner.renameTable("partner_document", "health_partner_document");
-        await queryRunner.renameTable("partner_review_log", "health_partner_review_log");
-        await queryRunner.renameTable("document_requirement", "health_partner_document_requirement");
+        // Check if legal_representative still exists before renaming (handles partial migration state)
+        const legalRepExists = await queryRunner.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                AND table_name = 'legal_representative'
+            )
+        `);
+        if (legalRepExists[0].exists) {
+            await queryRunner.query(`ALTER TABLE "legal_representative" RENAME TO "health_partner_legal_representative"`);
+        }
+
+        const partnerDocExists = await queryRunner.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                AND table_name = 'partner_document'
+            )
+        `);
+        if (partnerDocExists[0].exists) {
+            await queryRunner.query(`ALTER TABLE "partner_document" RENAME TO "health_partner_document"`);
+        }
+
+        const reviewLogExists = await queryRunner.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                AND table_name = 'partner_review_log'
+            )
+        `);
+        if (reviewLogExists[0].exists) {
+            await queryRunner.query(`ALTER TABLE "partner_review_log" RENAME TO "health_partner_review_log"`);
+        }
+
+        const docReqExists = await queryRunner.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                AND table_name = 'document_requirement'
+            )
+        `);
+        if (docReqExists[0].exists) {
+            await queryRunner.query(`ALTER TABLE "document_requirement" RENAME TO "health_partner_document_requirement"`);
+        }
+
+        // Rename enum types only if they haven't been renamed yet
+        await queryRunner.query(`
+            DO $$ BEGIN 
+                IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'legal_representative_id_type_enum') 
+                   AND NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'health_partner_legal_representative_id_type_enum') THEN 
+                    ALTER TYPE "public"."legal_representative_id_type_enum" RENAME TO "health_partner_legal_representative_id_type_enum";
+                END IF; 
+            END $$
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN 
+                IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'partner_review_log_verdict_enum') 
+                   AND NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'health_partner_review_log_verdict_enum') THEN 
+                    ALTER TYPE "public"."partner_review_log_verdict_enum" RENAME TO "health_partner_review_log_verdict_enum";
+                END IF; 
+            END $$
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN 
+                IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'document_requirement_businesstype_enum') 
+                   AND NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'health_partner_document_requirement_businesstype_enum') THEN 
+                    ALTER TYPE "public"."document_requirement_businesstype_enum" RENAME TO "health_partner_document_requirement_businesstype_enum";
+                END IF; 
+            END $$
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN 
+                IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'document_requirement_documenttype_enum') 
+                   AND NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'health_partner_document_requirement_documenttype_enum') THEN 
+                    ALTER TYPE "public"."document_requirement_documenttype_enum" RENAME TO "health_partner_document_requirement_documenttype_enum";
+                END IF; 
+            END $$
+        `);
 
         // =====================
         // 4. Remove rejectionDetails column from health_partner_profile

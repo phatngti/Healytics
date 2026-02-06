@@ -23,7 +23,8 @@ export class PartnerReviewLog {
     partner: Partner;
 
     // Review results
-    @Column({
+    @Column({   
+        name: 'verdict',
         type: 'enum',
         enum: PartnerVerificationStatus,
         comment: 'Kết quả của đợt review này (VD: REJECTED hoặc APPROVED)'

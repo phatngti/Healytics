@@ -299,19 +299,19 @@
         ]
       }
     },
-    "/partners/business-types": {
+    "/partners/business-services": {
       "get": {
-        "operationId": "PartnersController_getBusinessTypes",
-        "summary": "Get all business types",
-        "description": "Returns list of all business types with Vietnamese labels for dropdown selection",
+        "operationId": "PartnersController_getBusinessServices",
+        "summary": "Get all business services",
+        "description": "Returns list of all business services with Vietnamese labels for dropdown selection",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "List of business types retrieved successfully",
+            "description": "List of business services retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BusinessTypesResponseDto"
+                  "$ref": "#/components/schemas/BusinessServicesResponseDto"
                 }
               }
             }
@@ -2038,22 +2038,27 @@
             "maxLength": 150
           },
           "businessType": {
-            "type": "string",
+            "type": "array",
             "description": "Type of business",
-            "enum": [
-              "MASSAGE_THERAPY",
-              "MASSAGE_REHABILITATION",
-              "SPA_BEAUTY",
-              "FITNESS",
-              "PHARMACY",
-              "DENTAL",
-              "TRADITIONAL_MEDICINE",
-              "PSYCHOLOGY",
-              "DERMATOLOGY",
-              "NUTRITION",
-              "PSYCHIATRY"
+            "example": [
+              "MASSAGE_THERAPY"
             ],
-            "example": "SPA_BEAUTY"
+            "items": {
+              "type": "string",
+              "enum": [
+                "MASSAGE_THERAPY",
+                "MASSAGE_REHABILITATION",
+                "SPA_BEAUTY",
+                "FITNESS",
+                "PHARMACY",
+                "DENTAL",
+                "TRADITIONAL_MEDICINE",
+                "PSYCHOLOGY",
+                "DERMATOLOGY",
+                "NUTRITION",
+                "PSYCHIATRY"
+              ]
+            }
           },
           "provinceId": {
             "type": "string",
@@ -2418,7 +2423,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-02-02T04:29:36.192Z"
+              "submittedAt": "2026-02-06T06:32:10.122Z"
             }
           }
         },
@@ -2426,7 +2431,7 @@
           "survey"
         ]
       },
-      "BusinessTypeDto": {
+      "BusinessServiceDto": {
         "type": "object",
         "properties": {
           "value": {
@@ -2450,14 +2455,14 @@
           "label"
         ]
       },
-      "BusinessTypesResponseDto": {
+      "BusinessServicesResponseDto": {
         "type": "object",
         "properties": {
           "data": {
             "description": "List of all available business types",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BusinessTypeDto"
+              "$ref": "#/components/schemas/BusinessServiceDto"
             }
           }
         },
@@ -2531,14 +2536,11 @@
           "taxRegistrationCode": {
             "$ref": "#/components/schemas/VerifiedField"
           },
-          "serviceTags": {
+          "businessType": {
             "$ref": "#/components/schemas/VerifiedField"
           },
           "address": {
             "$ref": "#/components/schemas/AddressInfoDto"
-          },
-          "username": {
-            "$ref": "#/components/schemas/VerifiedField"
           },
           "email": {
             "$ref": "#/components/schemas/VerifiedField"
@@ -2549,7 +2551,7 @@
         },
         "required": [
           "brandName",
-          "serviceTags"
+          "businessType"
         ]
       },
       "LegalRepresentativeDto": {
@@ -2627,155 +2629,320 @@
           "createdAt"
         ]
       },
-      "UpdateLegalRepresentativeDto": {
+      "UpdatedField": {
+        "type": "object",
+        "properties": {}
+      },
+      "AddressDto": {
         "type": "object",
         "properties": {
-          "fullName": {
-            "type": "string",
-            "example": "NGUYỄN VĂN A",
-            "description": "Full name of legal representative"
+          "streetAddress": {
+            "example": {
+              "fieldKey": "streetAddress",
+              "value": "Street Address"
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
           },
-          "position": {
-            "type": "string",
-            "example": "Giám đốc",
-            "description": "Position in the company"
+          "ward": {
+            "example": {
+              "fieldKey": "ward",
+              "value": {
+                "id": "Ward ID",
+                "name": "Ward Name"
+              }
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
           },
-          "phoneNumber": {
-            "type": "string",
-            "example": "0901234567",
-            "description": "Phone number of legal representative"
+          "district": {
+            "example": {
+              "fieldKey": "district",
+              "value": {
+                "id": "District ID",
+                "name": "District Name"
+              }
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
           },
-          "idType": {
-            "type": "string",
-            "enum": [
-              "CITIZEN_ID",
-              "PASSPORT",
-              "MILITARY_ID"
-            ],
-            "example": "CITIZEN_ID",
-            "description": "Type of identification document"
-          },
-          "idNumber": {
-            "type": "string",
-            "example": "001234567890",
-            "description": "ID number (9 or 12 digits for Vietnam)"
-          },
-          "idIssueDate": {
-            "type": "string",
-            "example": "2023-01-15",
-            "description": "Date of ID issuance (ISO 8601 format)"
-          },
-          "documents": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PartnerDocumentVerificationDto"
-            }
+          "city": {
+            "example": {
+              "fieldKey": "city",
+              "value": {
+                "id": "City ID",
+                "name": "City Name"
+              }
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
           }
         }
       },
-      "DocumentUpdateDto": {
+      "BusinessInfo": {
         "type": "object",
         "properties": {
-          "documentType": {
-            "type": "string",
-            "enum": [
-              "BUSINESS_LICENSE",
-              "IDENTITY_FRONT",
-              "IDENTITY_BACK",
-              "AUTHORIZATION_LETTER",
-              "ANTT",
-              "KCB_LICENSE",
-              "GCN_FITNESS",
-              "GPP",
-              "RHM_LICENSE",
-              "MEDICAL_WASTE_CONTRACT",
-              "YHCT_LICENSE",
-              "PSYCHOLOGY_LICENSE",
-              "DERMATOLOGY_LICENSE",
-              "TECHNICAL_PORTFOLIO",
-              "NUTRITION_LICENSE",
-              "PSYCHIATRY_LICENSE"
+          "brandName": {
+            "example": {
+              "fieldKey": "brandName",
+              "value": "Brand Name"
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
             ]
           },
-          "documentUrl": {
-            "type": "string"
+          "taxRegistrationCode": {
+            "example": {
+              "fieldKey": "taxRegistrationCode",
+              "value": "Tax Registration Code"
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
+          },
+          "serviceTags": {
+            "example": {
+              "fieldKey": "serviceTags",
+              "value": [
+                "Service Tag 1",
+                "Service Tag 2"
+              ]
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
+          },
+          "address": {
+            "example": {
+              "fieldKey": "address",
+              "value": {
+                "streetAddress": "Street Address",
+                "ward": {
+                  "id": "Ward ID",
+                  "name": "Ward Name"
+                },
+                "district": {
+                  "id": "District ID",
+                  "name": "District Name"
+                },
+                "city": {
+                  "id": "City ID",
+                  "name": "City Name"
+                }
+              }
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressDto"
+              }
+            ]
+          },
+          "username": {
+            "example": {
+              "fieldKey": "username",
+              "value": "Username"
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
+          },
+          "email": {
+            "example": {
+              "fieldKey": "email",
+              "value": "Email"
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
+          },
+          "phoneNumber": {
+            "example": {
+              "fieldKey": "phoneNumber",
+              "value": "Phone Number"
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
+          }
+        }
+      },
+      "KycDocumentDto": {
+        "type": "object",
+        "properties": {
+          "fileUrl": {
+            "example": {
+              "fieldKey": "fileUrl",
+              "value": "File URL"
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
+          },
+          "fileType": {
+            "example": {
+              "fieldKey": "fileType",
+              "value": "File Type"
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdatedField"
+              }
+            ]
           }
         }
       },
       "UpdatePartnerDto": {
         "type": "object",
         "properties": {
-          "taxCode": {
-            "type": "string",
-            "example": "0123456789",
-            "description": "Tax code (updatable if rejected)"
-          },
-          "businessType": {
-            "type": "string",
-            "example": "Abc Industry",
-            "description": "Business Type",
-            "enum": [
-              "MASSAGE_THERAPY",
-              "MASSAGE_REHABILITATION",
-              "SPA_BEAUTY",
-              "FITNESS",
-              "PHARMACY",
-              "DENTAL",
-              "TRADITIONAL_MEDICINE",
-              "PSYCHOLOGY",
-              "DERMATOLOGY",
-              "NUTRITION",
-              "PSYCHIATRY"
-            ]
-          },
-          "legalName": {
-            "type": "string",
-            "example": "ABC Health Services Ltd.",
-            "description": "Legal name of the business"
-          },
-          "brandName": {
-            "type": "string",
-            "example": "Hanoi Spa & Wellness",
-            "description": "Brand name of the business"
-          },
-          "phoneNumber": {
-            "type": "string",
-            "example": "+84987654321",
-            "description": "Contact phone number"
-          },
-          "provinceId": {
-            "type": "string",
-            "example": "uuid-of-province",
-            "description": "Province ID (administrative division)"
-          },
-          "districtId": {
-            "type": "string",
-            "example": "uuid-of-district",
-            "description": "District ID (administrative division)"
-          },
-          "wardId": {
-            "type": "string",
-            "example": "uuid-of-ward",
-            "description": "Ward ID (administrative division)"
-          },
-          "streetAddress": {
-            "type": "string",
-            "example": "123 Le Loi Street",
-            "description": "Street address"
-          },
-          "legalRepresentative": {
-            "description": "Legal representative information to update",
+          "bussinessInfo": {
+            "example": {
+              "brandName": {
+                "fieldKey": "brandName",
+                "value": "Brand Name"
+              },
+              "taxRegistrationCode": {
+                "fieldKey": "taxRegistrationCode",
+                "value": "Tax Registration Code"
+              },
+              "serviceTags": {
+                "fieldKey": "serviceTags",
+                "value": [
+                  "Service Tag 1",
+                  "Service Tag 2"
+                ]
+              },
+              "address": {
+                "fieldKey": "address",
+                "value": {
+                  "streetAddress": "Street Address",
+                  "ward": {
+                    "id": "Ward ID",
+                    "name": "Ward Name"
+                  },
+                  "district": {
+                    "id": "District ID",
+                    "name": "District Name"
+                  },
+                  "city": {
+                    "id": "City ID",
+                    "name": "City Name"
+                  }
+                }
+              },
+              "username": {
+                "fieldKey": "username",
+                "value": "Username"
+              },
+              "email": {
+                "fieldKey": "email",
+                "value": "Email"
+              },
+              "phoneNumber": {
+                "fieldKey": "phoneNumber",
+                "value": "Phone Number"
+              }
+            },
             "allOf": [
               {
-                "$ref": "#/components/schemas/UpdateLegalRepresentativeDto"
+                "$ref": "#/components/schemas/BusinessInfo"
               }
             ]
           },
-          "documents": {
-            "description": "List of documents to update or upload",
+          "legalRepresentative": {
+            "example": {
+              "fullName": {
+                "fieldKey": "fullName",
+                "value": "Full Name"
+              },
+              "position": {
+                "fieldKey": "position",
+                "value": "Position"
+              },
+              "phoneNumber": {
+                "fieldKey": "phoneNumber",
+                "value": "Phone Number"
+              },
+              "idType": {
+                "fieldKey": "idType",
+                "value": "ID Type"
+              },
+              "idNumber": {
+                "fieldKey": "idNumber",
+                "value": "ID Number"
+              },
+              "idIssueDate": {
+                "fieldKey": "idIssueDate",
+                "value": "ID Issue Date"
+              }
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LegalRepresentativeDto"
+              }
+            ]
+          },
+          "kycDocuments": {
+            "example": [
+              {
+                "id": {
+                  "fieldKey": "id",
+                  "value": "ID"
+                },
+                "documentKey": {
+                  "fieldKey": "documentKey",
+                  "value": "Document Key"
+                },
+                "fileUrl": {
+                  "fieldKey": "fileUrl",
+                  "value": "File URL"
+                },
+                "type": {
+                  "fieldKey": "type",
+                  "value": "Type"
+                },
+                "fileType": {
+                  "fieldKey": "fileType",
+                  "value": "File Type"
+                },
+                "status": {
+                  "fieldKey": "status",
+                  "value": "Status"
+                },
+                "uploadedAt": {
+                  "fieldKey": "uploadedAt",
+                  "value": "Uploaded At"
+                }
+              }
+            ],
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DocumentUpdateDto"
+              "$ref": "#/components/schemas/KycDocumentDto"
             }
           }
         }
@@ -4278,21 +4445,26 @@
             "example": "partner@example.com"
           },
           "businessType": {
-            "type": "string",
-            "enum": [
-              "MASSAGE_THERAPY",
-              "MASSAGE_REHABILITATION",
-              "SPA_BEAUTY",
-              "FITNESS",
-              "PHARMACY",
-              "DENTAL",
-              "TRADITIONAL_MEDICINE",
-              "PSYCHOLOGY",
-              "DERMATOLOGY",
-              "NUTRITION",
-              "PSYCHIATRY"
+            "type": "array",
+            "example": [
+              "SPA_BEAUTY"
             ],
-            "example": "SPA_BEAUTY"
+            "items": {
+              "type": "string",
+              "enum": [
+                "MASSAGE_THERAPY",
+                "MASSAGE_REHABILITATION",
+                "SPA_BEAUTY",
+                "FITNESS",
+                "PHARMACY",
+                "DENTAL",
+                "TRADITIONAL_MEDICINE",
+                "PSYCHOLOGY",
+                "DERMATOLOGY",
+                "NUTRITION",
+                "PSYCHIATRY"
+              ]
+            }
           },
           "verificationStatus": {
             "type": "string",

@@ -35,7 +35,7 @@ void main() {
     });
 
     // Type of business
-    // String businessType
+    // List<String> businessType (default value: const [])
     test('to test the property `businessType`', () async {
       // TODO
     });
