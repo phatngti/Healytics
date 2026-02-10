@@ -1,7 +1,7 @@
 import 'package:admin_panel/constants/document_types.dart';
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_detail.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/reviewable_field.widget.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';

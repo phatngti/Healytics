@@ -1,6 +1,6 @@
 import 'package:admin_panel/features/authenticate/presentation/providers/business_services.provider.dart';
-import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:admin_openapi/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';

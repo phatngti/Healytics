@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { Product } from './entities/product.entity';
+import { Product } from '@/common/entities/product.entity';
 import { CreateProductHandler } from './application/handlers/create-product.handler';
 import { UpdateProductHandler } from './application/handlers/update-product.handler';
 import { RemoveProductHandler } from './application/handlers/remove-product.handler';

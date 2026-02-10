@@ -14,7 +14,7 @@ import { GetDistrictsResponseDto } from './dto/response/get-districts-response.d
 import { GetWardsResponseDto } from './dto/response/get-wards-response.dto';
 import { Public } from '@/common/decorators/auth/public.decorator';
 import { DataSource } from 'typeorm';
-import { seedLocations } from './seeds/location.seed';
+import { SeedLocations1770100000000 } from '../../migrations/master-data/location.seed';
 
 @ApiTags('locations')
 @Controller('locations')
@@ -74,14 +74,18 @@ export class LocationsController {
         description: 'Seeding completed successfully',
     })
     async seedData() {
+        const queryRunner = this.dataSource.createQueryRunner();
         try {
-            await seedLocations(this.dataSource);
+            const migration = new SeedLocations1770100000000();
+            await migration.up(queryRunner);
             return {
                 message: 'Seeding completed successfully',
                 status: 'success',
             };
         } catch (error) {
             throw new Error(`Seeding failed: ${error.message}`);
+        } finally {
+            await queryRunner.release();
         }
     }
 }

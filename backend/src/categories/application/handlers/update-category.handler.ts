@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { UpdateCategoryDto } from '../../dto/update-category.dto';
-import { Category } from '../../entities/category.entity';
+import { Category } from '@/common/entities/category.entity';
 
 /**
  * Handler for updating categories with transactional boundaries.

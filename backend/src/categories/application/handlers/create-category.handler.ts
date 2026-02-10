@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreateCategoryDto } from '../../dto/create-category.dto';
-import { Category } from '../../entities/category.entity';
+import { Category } from '@/common/entities/category.entity';
 
 /**
  * Handler for creating categories with transactional boundaries.

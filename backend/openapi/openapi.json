@@ -2423,7 +2423,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-02-06T06:32:10.122Z"
+              "submittedAt": "2026-02-09T14:00:53.419Z"
             }
           }
         },
@@ -4290,9 +4290,9 @@
             "example": "Tags for premium tier services"
           },
           "colorValue": {
-            "type": "number",
-            "example": 4284704497,
-            "description": "Color value as integer"
+            "type": "string",
+            "example": "#FF6366F1",
+            "description": "Color value as hex string"
           },
           "isActive": {
             "type": "boolean",
@@ -4329,8 +4329,8 @@
             "example": "Tags for premium tier services"
           },
           "colorValue": {
-            "type": "number",
-            "example": 4284704497
+            "type": "string",
+            "example": "#FF6366F1"
           },
           "usage": {
             "type": "number",
@@ -4380,9 +4380,9 @@
             "example": "Tags for premium tier services"
           },
           "colorValue": {
-            "type": "number",
-            "example": 4284704497,
-            "description": "Color value as integer"
+            "type": "string",
+            "example": "#FF6366F1",
+            "description": "Color value as hex string"
           },
           "isActive": {
             "type": "boolean",

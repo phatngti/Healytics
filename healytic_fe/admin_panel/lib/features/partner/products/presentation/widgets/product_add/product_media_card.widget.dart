@@ -1,6 +1,6 @@
 import 'package:admin_panel/core/providers/s3.provider.dart';
-import 'package:admin_panel/features/common/widgets/images/multi_picker.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/widgets/images/multi_picker.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -1,5 +1,5 @@
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 /// Data class representing an assigned staff member

@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { UpdateProductDto } from '../../dto/update-product.dto';
-import { Product } from '../../entities/product.entity';
+import { Product } from '@/common/entities/product.entity';
 import { ProductType } from '../../enums/product-type.enum';
-import { ProductMedia } from '../../entities/product-media.entity';
-import { ServiceDefinition } from '../../entities/service-definition.entity';
+import { ProductMedia } from '@/common/entities/product-media.entity';
+import { ServiceDefinition } from '@/common/entities/service-definition.entity';
 
 @Injectable()
 export class UpdateProductHandler {

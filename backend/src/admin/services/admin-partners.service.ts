@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
-import { Partner } from '@/partners/entities/partner.entity';
-import { PartnerDocument, PartnerDocumentStatuses } from '@/partners/entities/partner-document.entity';
-import { PartnerReviewLog } from '@/admin/entities/partner-review-log.entity';
-import { DocumentRequirement } from '@/partners/entities/document-requirement.entity';
+import { Partner } from '@/common/entities/partner.entity';
+import { PartnerDocument, PartnerDocumentStatuses } from '@/common/entities/partner-document.entity';
+import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
+import { DocumentRequirement } from '@/common/entities/document-requirement.entity';
 import { AdminPartnerDetailResponseDto } from '../dto/admin-partner-detail-response.dto';
 import { ReviewPartnerProfileDto, ReviewDecision } from '../dto/review-partner-profile.dto';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';

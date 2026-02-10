@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreateServiceTagDto } from '../../dto/create-service-tag.dto';
-import { ServiceTag } from '../../entities/service-tag.entity';
+import { ServiceTag } from '@/common/entities/service-tag.entity';
 
 /**
  * Handler for creating a new service tag.
@@ -34,7 +34,7 @@ export class CreateServiceTagHandler {
       const tag = queryRunner.manager.create(ServiceTag, {
         ...command,
         userId,
-        colorValue: command.colorValue ?? 0xFF6366F1,
+        colorValue: command.colorValue ?? '#FF6366F1',
         isActive: command.isActive ?? true,
         sortOrder: command.sortOrder ?? 0,
       });

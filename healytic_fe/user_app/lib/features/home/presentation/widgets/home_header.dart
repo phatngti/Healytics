@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:user_app/utils/demensions.dart';
-
-import 'name_avatar.dart';
+import 'package:common/utils/demensions.dart';
 
 class HomeHeader extends StatelessWidget {
   final String userName;
@@ -11,66 +9,81 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final hPadding = AppDimens.horizontalPadding(context);
+    final contentPad = AppDimens.contentPadding(context);
+
     return Container(
-      padding: AppDimens.paddingAllMedium,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withAlpha(204),
+      padding: EdgeInsets.only(
+        left: hPadding,
+        right: hPadding,
+        top: hPadding,
+        bottom: contentPad,
       ),
+      color: colorScheme.surface.withValues(alpha: 0.8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              // Avatar
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary.withAlpha(51),
-                    width: 2,
-                  ),
-                ),
-                child: ClipOval(
-                  child: Image.network(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuAHFOX7h9F48tcGwMIcEIfkFIO_BCb-TwyhCGYTSYlivBYYPeitHy4W3oeX4l3dEEfJb_yZupssfa2sclSZPLyXfEG5q3pl2sx39c1coakQeOePB7aFA1dAPE3Ra0lpxaiQawpTpkWJktpcY7JCrjO_VPaGyAgzVQM37ZX_Y0pjSESxXa_IpilQ3wPqplOIkK3Rv_S_u-cz9aZh75qv45DoVVZ9RQ3Jl9ta2otLB3h_v3CdJg2ZGgoU5oVyRGojV_h0ciQfIgAJaK6I',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        NameAvatar(name: userName, radius: 22),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Good morning,',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.w500,
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  height: AppDimens.avatarMd,
+                  width: AppDimens.avatarMd,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: colorScheme.primary.withValues(alpha: 0.2),
+                      width: AppDimens.borderWidthThick,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    userName,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
+                  child: ClipOval(
+                    child: Image.network(
+                      'https://lh3.googleusercontent.com/aida-public/AB6AXuAHFOX7h9F48tcGwMIcEIfkFIO_BCb-TwyhCGYTSYlivBYYPeitHy4W3oeX4l3dEEfJb_yZupssfa2sclSZPLyXfEG5q3pl2sx39c1coakQeOePB7aFA1dAPE3Ra0lpxaiQawpTpkWJktpcY7JCrjO_VPaGyAgzVQM37ZX_Y0pjSESxXa_IpilQ3wPqplOIkK3Rv_S_u-cz9aZh75qv45DoVVZ9RQ3Jl9ta2otLB3h_v3CdJg2ZGgoU5oVyRGojV_h0ciQfIgAJaK6I',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.person,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                SizedBox(width: AppDimens.spaceMd),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Good morning,',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        userName,
+                        style: textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          height: 1.0,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           Row(
             children: [
-              _HeaderButton(icon: Symbols.shopping_cart, onTap: () {}),
-              const SizedBox(width: 12),
-              _HeaderButton(icon: Symbols.settings, onTap: () {}),
+              _HeaderIconButton(icon: Symbols.shopping_cart, onTap: () {}),
+              SizedBox(width: AppDimens.spaceMd),
+              _HeaderIconButton(icon: Symbols.settings, onTap: () {}),
             ],
           ),
         ],
@@ -79,36 +92,35 @@ class HomeHeader extends StatelessWidget {
   }
 }
 
-class _HeaderButton extends StatelessWidget {
+class _HeaderIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const _HeaderButton({required this.icon, required this.onTap});
+  const _HeaderIconButton({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final colorScheme = Theme.of(context).colorScheme;
+    final pad = AppDimens.contentPadding(context);
+
+    return InkWell(
       onTap: onTap,
+      borderRadius: AppDimens.radiusPill,
       child: Container(
-        width: 44,
-        height: 44,
+        padding: EdgeInsets.all(pad),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
           shape: BoxShape.circle,
-          border: Border.all(color: Theme.of(context).colorScheme.surface),
+          border: Border.all(color: colorScheme.outlineVariant),
+          color: colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(13),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: colorScheme.shadow.withValues(alpha: 0.05),
+              blurRadius: AppDimens.spaceXxs,
+              offset: const Offset(0, 1),
             ),
           ],
         ),
-        child: Icon(
-          icon,
-          size: 24,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+        child: Icon(icon, size: AppDimens.iconLg, color: colorScheme.onSurface),
       ),
     );
   }

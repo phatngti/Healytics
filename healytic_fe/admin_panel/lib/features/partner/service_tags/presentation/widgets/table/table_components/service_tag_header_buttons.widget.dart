@@ -1,5 +1,5 @@
-import 'package:admin_panel/features/common/widgets/button/button.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/widgets/button/button.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class ServiceTagHeaderButtons {

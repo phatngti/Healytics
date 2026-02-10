@@ -6,7 +6,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { ServiceTag } from '../../entities/service-tag.entity';
+import { ServiceTag } from '@/common/entities/service-tag.entity';
 
 /**
  * Handler for removing (soft deleting) a service tag.

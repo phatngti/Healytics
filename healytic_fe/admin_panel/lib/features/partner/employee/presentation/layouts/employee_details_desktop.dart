@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/button/back_button.dart';
+import 'package:common/widgets/button/back_button.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/contact/employee_contact_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/contact/employee_notes_card.dart';
@@ -6,7 +6,7 @@ import 'package:admin_panel/features/partner/employee/presentation/widgets/emplo
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_skills_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/header/employee_header_card.dart';
 import 'package:admin_panel/router/partner_routes.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

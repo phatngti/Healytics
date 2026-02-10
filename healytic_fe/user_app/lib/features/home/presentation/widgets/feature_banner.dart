@@ -1,146 +1,220 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:common/utils/demensions.dart';
 
 class FeatureBanner extends StatelessWidget {
   const FeatureBanner({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final bannerPad = AppDimens.bannerPadding(context);
+    final cardRad = AppDimens.cardRadius(context);
+
+    // Proportional decorative elements.
+    final decorCircleSize = AppDimens.decorSize(
+      context,
+      small: 120,
+      large: 160,
+    );
+    final decorIconSize = AppDimens.decorSize(context, small: 100, large: 140);
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        borderRadius: BorderRadius.circular(cardRad),
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF13ECDA), Color(0xFF4FACFE)],
+          colors: [colorScheme.primary, colorScheme.tertiary],
         ),
-        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF06B6D4).withAlpha(51),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: colorScheme.tertiary.withValues(alpha: 0.2),
+            blurRadius: AppDimens.spaceSmMd,
+            offset: Offset(0, AppDimens.spaceXs),
           ),
         ],
       ),
-      child: Stack(
-        children: [
-          // Background blur circle
-          Positioned(
-            right: -24,
-            bottom: -24,
-            child: Container(
-              width: 160,
-              height: 160,
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha(51),
-                shape: BoxShape.circle,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(cardRad),
+        child: Stack(
+          children: [
+            // Background decorations — scaled proportionally.
+            Positioned(
+              right: -AppDimens.spaceXxl,
+              bottom: -AppDimens.spaceXxl,
+              child: Container(
+                width: decorCircleSize,
+                height: decorCircleSize,
+                decoration: BoxDecoration(
+                  color: colorScheme.onPrimary.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-          // Background icon
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: Icon(
-              Symbols.smart_toy,
-              size: 140,
-              color: Colors.white.withAlpha(51),
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Transform.translate(
+                offset: Offset(AppDimens.spaceLg, AppDimens.spaceLg),
+                child: Opacity(
+                  opacity: 0.2,
+                  child: Icon(
+                    Symbols.smart_toy,
+                    size: decorIconSize,
+                    color: colorScheme.onPrimary,
+                  ),
+                ),
+              ),
             ),
-          ),
-          // Content
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+
+            // Content
+            Padding(
+              padding: EdgeInsets.all(bannerPad),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
-                          Symbols.auto_awesome,
-                          size: 18,
-                          color: Colors.white,
+                        Row(
+                          children: [
+                            Icon(
+                              Symbols.auto_awesome,
+                              color: colorScheme.onPrimary,
+                              size: AppDimens.iconSmMd,
+                            ),
+                            SizedBox(width: AppDimens.spaceSm),
+                            Flexible(
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: AppDimens.spaceSm,
+                                  vertical: AppDimens.spaceXxs,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.onPrimary.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  borderRadius: AppDimens.radiusPill,
+                                ),
+                                child: Text(
+                                  'NEW FEATURE',
+                                  style: TextStyle(
+                                    color: colorScheme.onPrimary,
+                                    fontSize: AppDimens.adaptive(
+                                      context,
+                                      small: 9,
+                                      medium: 10,
+                                      large: 10,
+                                    ),
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
+                        SizedBox(height: AppDimens.spaceSm),
+                        Text(
+                          'AI Health Assistant',
+                          style: TextStyle(
+                            color: colorScheme.onPrimary,
+                            fontSize: AppDimens.adaptive(
+                              context,
+                              small: 17,
+                              medium: 20,
+                              large: 20,
+                            ),
+                            fontWeight: FontWeight.bold,
+                            height: 1.1,
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(51),
-                            borderRadius: BorderRadius.circular(999),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: AppDimens.spaceXs),
+                        Text(
+                          'Available 24/7 for guidance',
+                          style: TextStyle(
+                            color: colorScheme.onPrimary,
+                            fontSize: AppDimens.adaptive(
+                              context,
+                              small: 12,
+                              medium: 14,
+                              large: 14,
+                            ),
+                            fontWeight: FontWeight.w500,
                           ),
-                          child: const Text(
-                            'NEW FEATURE',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(
+                          height: AppDimens.adaptive(
+                            context,
+                            small: AppDimens.spaceMd,
+                            medium: AppDimens.spaceLg,
+                            large: AppDimens.spaceLg,
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.onPrimary,
+                            foregroundColor: colorScheme.primary,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: AppDimens.radiusPill,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: AppDimens.buttonPaddingH(context),
+                              vertical: AppDimens.buttonPaddingV(context),
+                            ),
+                          ),
+                          child: Text(
+                            'Start Chat',
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: AppDimens.adaptive(
+                                context,
+                                small: 13,
+                                medium: 14,
+                                large: 14,
+                              ),
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 1,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'AI Health Assistant',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Available 24/7 for guidance',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withAlpha(230),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(999),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withAlpha(26),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Text(
-                          'Start Chat',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0D9488),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: AppDimens.spaceSm),
+                        child: Icon(
+                          Symbols.forum,
+                          size: AppDimens.decorSize(
+                            context,
+                            small: AppDimens.avatarMd,
+                            large: 64,
                           ),
+                          color: colorScheme.onPrimary,
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const Icon(Symbols.forum, size: 64, color: Colors.white),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

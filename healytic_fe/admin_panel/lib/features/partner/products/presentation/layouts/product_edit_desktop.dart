@@ -1,13 +1,13 @@
-import 'package:admin_panel/features/common/widgets/button/back_button.dart';
-import 'package:admin_panel/features/common/widgets/button/button.dart';
-import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
-import 'package:admin_panel/features/common/widgets/quill.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/widgets/button/back_button.dart';
+import 'package:common/widgets/button/button.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:common/widgets/quill.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin_panel/core/providers/storage.provider.dart';
-import 'package:admin_panel/features/common/widgets/images/multi_picker.dart';
+import 'package:common/widgets/images/multi_picker.dart';
 
 class ProductEditDesktop extends ConsumerStatefulWidget {
   const ProductEditDesktop({

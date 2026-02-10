@@ -1,42 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:common/utils/demensions.dart';
 
 class QuickActionsSection extends StatelessWidget {
   const QuickActionsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final titleGap = AppDimens.titleGap(context);
+    final cardGap = AppDimens.adaptive(
+      context,
+      small: AppDimens.spaceSmMd,
+      medium: AppDimens.spaceLg,
+      large: AppDimens.spaceLg,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Quick Actions',
-          style: TextStyle(
-            fontSize: 20,
+          style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: titleGap),
         Row(
           children: [
             Expanded(
-              child: QuickActionCard(
+              child: _QuickActionCard(
                 icon: Symbols.calendar_add_on,
-                iconBgColor: const Color(0xFFF0FDFA),
-                iconColor: const Color(0xFF0D9488),
+                iconColor: theme.colorScheme.primary,
+                backgroundColor: theme.colorScheme.primaryContainer.withValues(
+                  alpha: 0.5,
+                ),
                 title: 'Book Appointment',
                 subtitle: 'Quick booking with AI suggestions',
                 onTap: () {},
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: cardGap),
             Expanded(
-              child: QuickActionCard(
+              child: _QuickActionCard(
                 icon: Symbols.smart_toy,
-                iconBgColor: const Color(0xFFEFF6FF),
-                iconColor: const Color(0xFF2563EB),
+                iconColor: theme.colorScheme.tertiary,
+                backgroundColor: theme.colorScheme.tertiaryContainer.withValues(
+                  alpha: 0.5,
+                ),
                 title: 'AI Health Assistant',
                 subtitle: 'Get instant health guidance',
                 onTap: () {},
@@ -49,19 +61,18 @@ class QuickActionsSection extends StatelessWidget {
   }
 }
 
-class QuickActionCard extends StatelessWidget {
+class _QuickActionCard extends StatelessWidget {
   final IconData icon;
-  final Color iconBgColor;
   final Color iconColor;
+  final Color backgroundColor;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
 
-  const QuickActionCard({
-    super.key,
+  const _QuickActionCard({
     required this.icon,
-    required this.iconBgColor,
     required this.iconColor,
+    required this.backgroundColor,
     required this.title,
     required this.subtitle,
     required this.onTap,
@@ -69,18 +80,39 @@ class QuickActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cardPad = AppDimens.cardPadding(context);
+    final cardRad = AppDimens.cardRadius(context);
+
+    // Adaptive icon container size.
+    final iconBoxSize = AppDimens.adaptive(
+      context,
+      small: AppDimens.ctaButtonMd,
+      medium: AppDimens.avatarMd,
+      large: AppDimens.avatarMd,
+    );
+
+    // Adaptive gap between icon and text.
+    final iconTextGap = AppDimens.adaptive(
+      context,
+      small: AppDimens.spaceSmMd,
+      medium: AppDimens.spaceLg,
+      large: AppDimens.spaceLg,
+    );
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(cardPad),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(cardRad),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(13),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
+              color: theme.colorScheme.shadow.withValues(alpha: 0.06),
+              blurRadius: AppDimens.spaceSm,
+              offset: Offset(0, AppDimens.spaceXs),
             ),
           ],
         ),
@@ -88,31 +120,44 @@ class QuickActionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 48,
-              height: 48,
+              height: iconBoxSize,
+              width: iconBoxSize,
               decoration: BoxDecoration(
-                color: iconBgColor,
+                color: theme.colorScheme.surface,
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.colorScheme.shadow.withValues(alpha: 0.05),
+                    blurRadius: AppDimens.spaceXxs,
+                  ),
+                ],
               ),
-              child: Icon(icon, color: iconColor, size: 24),
+              child: Icon(icon, color: iconColor, size: AppDimens.iconLg),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: iconTextGap),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 16,
+              style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: AppDimens.adaptive(
+                  context,
+                  small: AppDimens.spaceMdLg,
+                  medium: AppDimens.spaceLg,
+                  large: AppDimens.spaceLg,
+                ),
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: AppDimens.spaceXs),
             Text(
               subtitle,
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurface,
-                height: 1.4,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                height: 1.3,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

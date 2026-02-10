@@ -9,10 +9,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Account } from '@/account/entities/account.entity';
-import { Partner } from './entities/partner.entity';
-import { LegalRepresentative } from './entities/legal-representative.entity';
-import { PartnerReviewLog } from '../admin/entities/partner-review-log.entity';
+import { Account } from '@/common/entities/account.entity';
+import { Partner } from '@/common/entities/partner.entity';
+import { LegalRepresentative } from '@/common/entities/legal-representative.entity';
+import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
 import { RegisterPartnerDto } from './dto/request/register-partner.dto';
 import { UpdatePartnerDto } from './dto/request/update-partner.dto';
 import { GetPartnersQueryDto } from './dto/request/get-partners-query.dto';
@@ -20,7 +20,7 @@ import { RegisterPartnerResponseDto } from './dto/response/register-partner-resp
 import { MyProfileResponseDto, FieldFeedbackMap } from './dto/response/my-profile-response.dto';
 import { PartnersResponseDto } from './dto/response/partners-response.dto';
 import { Role } from '@/account/enum/role.enum';
-import { PartnerDocument, PartnerDocumentStatuses, DocumentTypes, DocumentFileTypes, DocumentFileType } from './entities/partner-document.entity';
+import { PartnerDocument, PartnerDocumentStatuses, DocumentTypes, DocumentFileTypes, DocumentFileType } from '@/common/entities/partner-document.entity';
 import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
 import { LocationsService } from '@/locations/locations.service';
 import { AuthService } from '@/auth/auth.service';
