@@ -12,9 +12,9 @@ import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/l
 import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/registration_submit_section.widget.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/registration_title_section.widget.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/sign_up_header.widget.dart';
-import 'package:admin_panel/features/common/widgets/toast.dart';
+import 'package:common/widgets/toast.dart';
 import 'package:admin_panel/router/admin_routes.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

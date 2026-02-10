@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:user_app/core/entities/store.entity.dart';
-import 'package:user_app/core/models/store.model.dart';
+import 'package:user_app/core/providers/auth_session.provider.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -20,7 +19,7 @@ GoRouter router(Ref ref) {
     debugLogDiagnostics: true,
     routes: [$lottieSplashRoute, $mobileWrapperRoutes],
     refreshListenable: notifier,
-    // redirect: notifier.redirect,
+    redirect: notifier.redirect,
   );
 }
 
@@ -30,17 +29,35 @@ class RouterListenable extends _$RouterListenable implements Listenable {
 
   @override
   FutureOr<void> build() {
-    // Watch auth state
-    final subscription = Store.watch(StoreKey.accessToken).listen((_) {
+    final authSessionStore = ref.watch(authSessionStoreProvider);
+    final subscription = authSessionStore.watchAccessToken().listen((_) {
       _notifyListeners();
     });
     ref.onDispose(subscription.cancel);
   }
 
   String? redirect(BuildContext context, GoRouterState state) {
-    final isLoggedIn = Store.tryGet(StoreKey.accessToken)?.isNotEmpty == true;
+    final authSessionStore = ref.watch(authSessionStoreProvider);
+    final isMockMode = authSessionStore.isMockMode;
     final path = state.uri.path;
-    print('isLoggedIn: $isLoggedIn');
+
+    // In mock mode, skip auth and allow all tab routes
+    if (isMockMode) {
+      final isTabRoute =
+          path.startsWith('/home') ||
+          path.startsWith('/orders') ||
+          path.startsWith('/chat') ||
+          path.startsWith('/notifications') ||
+          path.startsWith('/profile');
+      // Only redirect auth/onboarding routes to home
+      if (!isTabRoute) {
+        return '/home';
+      }
+      return null;
+    }
+
+    final isLoggedIn = authSessionStore.isLoggedIn;
+
     // Routes that require authentication
     final isProtectedRoute =
         path.startsWith('/home') ||
@@ -50,14 +67,16 @@ class RouterListenable extends _$RouterListenable implements Listenable {
         path.startsWith('/profile');
 
     if (isLoggedIn) {
-      // If logged in and trying to access login/onboarding, redirect to home
+      // If logged in and trying to access login/onboarding,
+      // redirect to home
       if (path == '/signin' || path == '/onboarding') {
         return '/home';
       }
     } else {
-      // If not logged in and trying to access protected route, redirect to signin
+      // If not logged in and trying to access protected route,
+      // redirect to signin
       if (isProtectedRoute) {
-        return '/home';
+        return '/signin';
       }
     }
     return null;

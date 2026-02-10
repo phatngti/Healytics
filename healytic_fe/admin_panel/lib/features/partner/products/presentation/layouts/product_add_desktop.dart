@@ -1,5 +1,5 @@
-import 'package:admin_panel/features/common/widgets/button/back_button.dart';
-import 'package:admin_panel/features/common/widgets/button/button.dart';
+import 'package:common/widgets/button/back_button.dart';
+import 'package:common/widgets/button/button.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_general_info_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_media_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_operations_card.widget.dart';
@@ -7,7 +7,7 @@ import 'package:admin_panel/features/partner/products/presentation/widgets/produ
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_pricing_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_resources_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_visibility_card.widget.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

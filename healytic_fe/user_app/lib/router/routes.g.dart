@@ -32,9 +32,9 @@ RouteBase get $mobileWrapperRoutes => StatefulShellRouteData.$route(
     StatefulShellBranchData.$branch(
       routes: [
         GoRouteData.$route(
-          path: '/chat',
-          name: 'chat',
-          factory: $ChatRoute._fromState,
+          path: '/conversation_history',
+          name: 'conversation_history',
+          factory: $ConversationHistoryRoute._fromState,
         ),
       ],
     ),
@@ -105,11 +105,12 @@ mixin $OrderApprovedRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-mixin $ChatRoute on GoRouteData {
-  static ChatRoute _fromState(GoRouterState state) => const ChatRoute();
+mixin $ConversationHistoryRoute on GoRouteData {
+  static ConversationHistoryRoute _fromState(GoRouterState state) =>
+      const ConversationHistoryRoute();
 
   @override
-  String get location => GoRouteData.$location('/chat');
+  String get location => GoRouteData.$location('/conversation_history');
 
   @override
   void go(BuildContext context) => context.go(location);

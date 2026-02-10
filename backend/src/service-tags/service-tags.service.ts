@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { ServiceTag } from './entities/service-tag.entity';
-import { ProductTag } from './entities/product-tag.entity';
+import { ServiceTag } from '@/common/entities/service-tag.entity';
+import { ProductTag } from '@/common/entities/product-tag.entity';
 import { CreateServiceTagDto } from './dto/create-service-tag.dto';
 import { UpdateServiceTagDto } from './dto/update-service-tag.dto';
 import { CreateServiceTagHandler } from './application/handlers/create-service-tag.handler';

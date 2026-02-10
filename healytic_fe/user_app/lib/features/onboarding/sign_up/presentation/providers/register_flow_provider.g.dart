@@ -74,7 +74,7 @@ final class RegisterFlowNotifierProvider
 }
 
 String _$registerFlowNotifierHash() =>
-    r'fd89ce3fb52f5409df1968fb8ad354715ec5b217';
+    r'255b3ec2b36374d9b60ed42fa4f78230d316bc1c';
 
 abstract class _$RegisterFlowNotifier
     extends $AsyncNotifier<RegisterStateData> {

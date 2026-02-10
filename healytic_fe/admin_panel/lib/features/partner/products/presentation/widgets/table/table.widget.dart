@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/table/table.dart';
+import 'package:common/widgets/table/table.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_function_buttons.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_header_buttons.widget.dart';

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EmployeesService } from './employees.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Employee } from './entities/employee.entity';
+import { Employee } from '@/common/entities/employee.entity';
 import { NotFoundException } from '@nestjs/common';
 import { EmployeeRole } from './enum/employee-role.enum';
 import { CreateDoctorHandler } from './application/handlers/create-doctor.handler';

@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Category } from './entities/category.entity';
+import { Category } from '@/common/entities/category.entity';
 import { CreateCategoryHandler } from './application/handlers/create-category.handler';
 import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
 import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';

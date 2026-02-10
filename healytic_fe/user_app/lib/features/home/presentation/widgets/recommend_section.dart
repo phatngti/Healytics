@@ -1,269 +1,386 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:user_app/features/home/presentation/provider/home_provider.dart';
+import 'package:common/utils/demensions.dart';
 
-class RecommendSection extends HookConsumerWidget {
+import 'package:user_app/features/home/domain/entities/home.entity.dart';
+import 'package:user_app/features/home/presentation/providers/home_provider.dart';
+
+/// Displays a horizontally-scrollable list of recommended services
+/// fetched from the data layer via [homeProvider].
+class RecommendSection extends ConsumerWidget {
   const RecommendSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final homeState = ref.watch(homeProvider);
     final products = homeState.recommendedProducts;
+    final titleGap = AppDimens.titleGap(context);
 
-    if (homeState.isLoading && products.isEmpty) {
-      return const SizedBox(
-        height: 280,
-        child: Center(child: CircularProgressIndicator()),
-      );
-    }
+    // Proportional card width: ~65% of screen so 1.3–1.5 cards
+    // are visible, hinting at horizontal scroll.
+    final cardWidth = AppDimens.widthFraction(context);
 
-    if (products.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    // Proportional list height scales with card width.
+    final listHeight = AppDimens.heightRatio(cardWidth, ratio: 1.08);
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              'Recommend For You',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-                letterSpacing: -0.5,
+            Flexible(
+              child: Text(
+                'Recommend For You',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.5,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             GestureDetector(
               onTap: () {},
               child: Text(
                 'See All',
-                style: TextStyle(
-                  fontSize: 14,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: titleGap),
         SizedBox(
-          height: 280,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            clipBehavior: Clip.none,
-            itemCount: products.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 16),
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return RecommendCard(
-                imageUrl: product.imageUrl,
-                title: product.name,
-                duration: product.duration,
-                category: product.category,
-                price: product.price,
-                rating: product.rating,
-                onTap: () {},
-                onAddTap: () {},
-              );
-            },
-          ),
+          height: listHeight,
+          child: homeState.isLoading
+              ? _buildLoadingList(context, cardWidth)
+              : products.isEmpty
+              ? _buildEmptyState(context)
+              : _buildProductList(context, products, cardWidth),
         ),
       ],
     );
   }
-}
 
-class RecommendCard extends StatelessWidget {
-  final String imageUrl;
-  final String title;
-  final String duration;
-  final String category;
-  final String price;
-  final String rating;
-  final VoidCallback onTap;
-  final VoidCallback onAddTap;
+  /// Builds the horizontal product cards from live/mock data.
+  Widget _buildProductList(
+    BuildContext context,
+    List<HomeProduct> products,
+    double cardWidth,
+  ) {
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      itemCount: products.length,
+      separatorBuilder: (_, __) => SizedBox(width: AppDimens.spaceLg),
+      itemBuilder: (_, index) {
+        final product = products[index];
+        return _RecommendCard(
+          width: cardWidth,
+          title: product.name,
+          imageUrl: product.imageUrl,
+          rating: product.rating,
+          duration: product.duration,
+          category: product.category,
+          price: product.price,
+        );
+      },
+    );
+  }
 
-  const RecommendCard({
-    super.key,
-    required this.imageUrl,
-    required this.title,
-    required this.duration,
-    required this.category,
-    required this.price,
-    required this.rating,
-    required this.onTap,
-    required this.onAddTap,
-  });
+  /// Shimmer-style loading placeholders while data is being
+  /// fetched.
+  Widget _buildLoadingList(BuildContext context, double cardWidth) {
+    final theme = Theme.of(context);
+    final cardRad = AppDimens.cardRadius(context);
+    final imageHeight = AppDimens.heightRatio(cardWidth);
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 260,
-        padding: const EdgeInsets.all(12),
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      itemCount: 2,
+      separatorBuilder: (_, __) => SizedBox(width: AppDimens.spaceLg),
+      itemBuilder: (_, __) => Container(
+        width: cardWidth,
+        padding: EdgeInsets.all(AppDimens.spaceMd),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(13),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(cardRad),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image with rating badge
-            Stack(
-              children: [
-                Container(
-                  height: 144,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    image: DecorationImage(
-                      image: NetworkImage(imageUrl),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+            Container(
+              height: imageHeight,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(
+                  cardRad - AppDimens.spaceXs,
                 ),
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(230),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Symbols.star,
-                          size: 14,
-                          color: Theme.of(context).colorScheme.primary,
-                          fill: 1,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          rating,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-            const SizedBox(height: 12),
-            // Content
+            SizedBox(height: AppDimens.spaceMd),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      overflow: TextOverflow.ellipsis,
+                  Container(
+                    height: AppDimens.spaceLg,
+                    width: cardWidth * 0.6,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusExtraSmall,
                     ),
-                    maxLines: 1,
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Symbols.schedule,
-                        size: 16,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        duration,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                      Text(
-                        ' • ',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                      Text(
-                        category,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                    ],
+                  SizedBox(height: AppDimens.spaceSm),
+                  Container(
+                    height: AppDimens.spaceMd,
+                    width: cardWidth * 0.45,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusExtraSmall,
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        price,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: onAddTap,
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withAlpha(77),
-                                blurRadius: 15,
-                                offset: const Offset(0, 0),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Symbols.add,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
+                  SizedBox(height: AppDimens.spaceMd),
+                  Container(
+                    height: AppDimens.spaceMdLg,
+                    width: cardWidth * 0.38,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusExtraSmall,
+                    ),
                   ),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Empty-state fallback when no recommended products are
+  /// available.
+  Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Symbols.search_off,
+            size: AppDimens.avatarMd,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          SizedBox(height: AppDimens.spaceSm),
+          Text(
+            'No recommendations yet',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecommendCard extends StatelessWidget {
+  final double width;
+  final String title;
+  final String imageUrl;
+  final String rating;
+  final String duration;
+  final String category;
+  final String price;
+
+  const _RecommendCard({
+    required this.width,
+    required this.title,
+    required this.imageUrl,
+    required this.rating,
+    required this.duration,
+    required this.category,
+    required this.price,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cardRad = AppDimens.cardRadius(context);
+
+    // Proportional image height based on card width.
+    final imageHeight = AppDimens.heightRatio(width);
+
+    return Container(
+      width: width,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(cardRad),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withValues(alpha: 0.05),
+            blurRadius: AppDimens.spaceXl,
+            offset: Offset(0, AppDimens.spaceXs),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              Container(
+                height: imageHeight,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(
+                    cardRad - AppDimens.spaceXs,
+                  ),
+                  image: DecorationImage(
+                    image: NetworkImage(imageUrl),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: AppDimens.spaceMd,
+                right: AppDimens.spaceMd,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDimens.spaceSm,
+                    vertical: AppDimens.spaceXs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface.withValues(alpha: 0.9),
+                    borderRadius: AppDimens.radiusPill,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Symbols.star,
+                        size: AppDimens.iconXs,
+                        color: theme.colorScheme.primary,
+                      ),
+                      SizedBox(width: AppDimens.spaceXs),
+                      Text(
+                        rating,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: AppDimens.spaceMd),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppDimens.adaptive(
+                      context,
+                      small: AppDimens.spaceLg,
+                      medium: AppDimens.spaceXl - 2,
+                      large: AppDimens.spaceXl - 2,
+                    ),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: AppDimens.spaceXs),
+                Row(
+                  children: [
+                    Icon(
+                      Symbols.schedule,
+                      size: AppDimens.iconSm,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    SizedBox(width: AppDimens.spaceXs),
+                    Text(
+                      duration,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    if (category.isNotEmpty) ...[
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDimens.spaceXs,
+                        ),
+                        child: Text(
+                          '•',
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        child: Text(
+                          category,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                SizedBox(height: AppDimens.spaceMd),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        price,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: AppDimens.avatarSm,
+                      width: AppDimens.avatarSm,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.secondary,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.colorScheme.secondary.withValues(
+                              alpha: 0.3,
+                            ),
+                            blurRadius: AppDimens.spaceLg - 1,
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Symbols.add,
+                        color: theme.colorScheme.onSecondary,
+                        size: AppDimens.iconMd,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

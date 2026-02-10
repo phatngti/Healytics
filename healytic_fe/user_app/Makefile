@@ -9,3 +9,6 @@ translate:
 
 run:	
 	flutter run
+
+architecture-check:
+	bash ./tool/check_architecture.sh

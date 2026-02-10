@@ -1,7 +1,7 @@
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification.entity.dart';
 import 'package:admin_panel/router/admin_routes.dart';
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 

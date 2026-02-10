@@ -1,8 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Partner } from '@/partners/entities/partner.entity';
+import { Partner } from '@/common/entities/partner.entity';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
-import { LegalRepresentative } from '@/partners/entities/legal-representative.entity';
-import { PartnerDocument } from '@/partners/entities/partner-document.entity';
+import { LegalRepresentative } from '@/common/entities/legal-representative.entity';
+import { PartnerDocument } from '@/common/entities/partner-document.entity';
 import { FieldFeedbackMap } from '../services/admin-partners.service';
 import { PartnerFieldKeys } from '@/common/constants/partner-form-keys';
 import { BusinessType } from '@/partners/enum/business-type.enum';

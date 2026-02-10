@@ -28,6 +28,18 @@ As a Senior Flutter Architect, this scope outlines the foundational architecture
     │       └── presentation/
     └── main.dart
     ```
+- **Shared Common Package:** Reusable widgets and utilities are located in the `common` package at the workspace root (`../common`). Import shared components using `package:common/...`:
+  ```dart
+  // Shared widgets
+  import 'package:common/widgets/button/button.dart';
+  import 'package:common/widgets/input/form_field_builders.dart';
+  import 'package:common/widgets/table/table.dart';
+  import 'package:common/widgets/toast.dart';
+  
+  // Shared utilities
+  import 'package:common/utils/demensions.dart';
+  ```
+  **Note:** Admin-specific layouts (responsive wrappers, sidebar, header) remain in `lib/features/common/widgets/responsive/`.
 - **Separation of Concerns:** Aim for patterns like MVC/MVVM, with defined Model (data/domain), View (presentation), and ViewModel/Controller roles. Separate UI logic from business logic.
 
 ## Layer Rules

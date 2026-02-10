@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreateProductDto } from '../../dto/create-product.dto';
-import { Product } from '../../entities/product.entity';
+import { Product } from '@/common/entities/product.entity';
 import { ProductType } from '../../enums/product-type.enum';
-import { ProductMedia } from '../../entities/product-media.entity';
-import { ServiceDefinition } from '../../entities/service-definition.entity';
-import { ServiceEmployeeEligibility } from '../../entities/service-employee-eligibility.entity';
+import { ProductMedia } from '@/common/entities/product-media.entity';
+import { ServiceDefinition } from '@/common/entities/service-definition.entity';
+import { ServiceEmployeeEligibility } from '@/common/entities/service-employee-eligibility.entity';
 
 @Injectable()
 export class CreateProductHandler {

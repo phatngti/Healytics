@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PartnersService } from './partners.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Account } from '@/account/entities/account.entity';
-import { Partner } from './entities/partner.entity';
-import { LegalRepresentative } from './entities/legal-representative.entity';
+import { Account } from '@/common/entities/account.entity';
+import { Partner } from '@/common/entities/partner.entity';
+import { LegalRepresentative } from '@/common/entities/legal-representative.entity';
 import { LocationsService } from '@/locations/locations.service';
 import { AuthService } from '@/auth/auth.service';
 import { DataSource } from 'typeorm';
@@ -14,10 +14,10 @@ import {
 } from '@nestjs/common';
 import { BusinessType } from './enum/business-type.enum';
 import { DocumentType } from './enum/document-type.enum';
-import { DocumentRequirement } from './entities/document-requirement.entity';
-import { PartnerDocument } from './entities/partner-document.entity';
+import { DocumentRequirement } from '@/common/entities/document-requirement.entity';
+import { PartnerDocument } from '@/common/entities/partner-document.entity';
 import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
-import { PartnerReviewLog } from '@/admin/entities/partner-review-log.entity';
+import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
 import { Role } from '@/account/enum/role.enum';
 
 describe('PartnersService', () => {

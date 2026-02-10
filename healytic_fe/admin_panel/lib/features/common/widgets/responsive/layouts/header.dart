@@ -1,5 +1,5 @@
-import 'package:admin_panel/features/common/widgets/images/avatar.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/widgets/images/avatar.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
