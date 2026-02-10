@@ -1,11 +1,11 @@
-import 'package:admin_panel/features/common/widgets/button/back_button.dart';
+import 'package:common/widgets/button/back_button.dart';
 
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_add_form_section.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form_actions.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form_profile_section.dart';
 import 'package:admin_panel/router/partner_routes.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';

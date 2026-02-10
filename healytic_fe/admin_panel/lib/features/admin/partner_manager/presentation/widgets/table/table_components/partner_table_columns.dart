@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/table/helper.dart';
+import 'package:common/widgets/table/helper.dart';
 import 'package:data_table_2/data_table_2.dart';
 
 /// Column definitions for the partner verification table

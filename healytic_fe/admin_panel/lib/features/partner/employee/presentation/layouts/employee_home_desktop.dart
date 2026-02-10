@@ -1,6 +1,6 @@
-import 'package:admin_panel/features/common/widgets/card/statistic_card.dart';
+import 'package:common/widgets/card/statistic_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_home/employee_management_table.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

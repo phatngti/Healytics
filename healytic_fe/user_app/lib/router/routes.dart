@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:user_app/features/bot_chat/bot_chat_page.dart';
-import 'package:user_app/features/common/adaptive_root_scraffold/adaptive_root_scraffold.dart';
-import 'package:user_app/features/home/presentation/home_page.dart';
-import 'package:user_app/features/notifications/notifications_page.dart';
-import 'package:user_app/features/onboarding/lottie_splash_screen.dart';
-import 'package:user_app/features/onboarding/onboard.dart';
+import 'package:user_app/features/bot_chat/presentation/screens/chat_page.dart';
+import 'package:common/widgets/adaptive_root_scaffold/adaptive_root_scraffold.dart';
+import 'package:user_app/features/bot_chat/presentation/screens/conversation_history_page.dart';
+import 'package:user_app/features/home/presentation/screens/home_page.screen.dart';
+import 'package:user_app/features/notifications/presentation/screens/notifications.screen.dart';
+import 'package:user_app/features/onboarding/presentation/screens/lottie_splash.screen.dart';
+import 'package:user_app/features/onboarding/presentation/screens/onboard.screen.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/email_code_confirmation.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/email_form.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/finish_sign_up.dart';
@@ -14,9 +15,9 @@ import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/steps/step_4_health_safety.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/survey_screen.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/steps/step_1_general_goals.dart';
-import 'package:user_app/features/orders/orders_page.dart';
-import 'package:user_app/features/profile/profile_page.dart';
-import 'package:user_app/features/authenticate/presentation/signin.dart';
+import 'package:user_app/features/orders/presentation/screens/orders.screen.dart';
+import 'package:user_app/features/profile/presentation/screens/profile.screen.dart';
+import 'package:user_app/features/authenticate/presentation/screens/signin.screen.dart';
 
 part 'routes.g.dart';
 
@@ -58,7 +59,12 @@ Page<void> _buildSlideTransitionPage({
       ],
     ),
     TypedStatefulShellBranch(
-      routes: [TypedGoRoute<ChatRoute>(path: "/chat", name: ChatRoute.name)],
+      routes: [
+        TypedGoRoute<ConversationHistoryRoute>(
+          path: "/conversation_history",
+          name: ConversationHistoryRoute.name,
+        ),
+      ],
     ),
     TypedStatefulShellBranch(
       routes: [
@@ -117,15 +123,16 @@ class OrderApprovedRoute extends GoRouteData with $OrderApprovedRoute {
   }
 }
 
-class ChatRoute extends GoRouteData with $ChatRoute {
-  const ChatRoute();
-  static const name = "chat";
+class ConversationHistoryRoute extends GoRouteData
+    with $ConversationHistoryRoute {
+  const ConversationHistoryRoute();
+  static const name = "conversation_history";
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const ChatPage(),
+      child: const ConversationHistoryPage(),
     );
   }
 }

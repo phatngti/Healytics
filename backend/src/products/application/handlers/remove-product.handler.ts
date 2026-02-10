@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from '../../entities/product.entity';
+import { Product } from '@/common/entities/product.entity';
 
 @Injectable()
 export class RemoveProductHandler {

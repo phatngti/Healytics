@@ -2,7 +2,7 @@ import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/table/table_components/partner_header_buttons.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/table/table_components/partner_table_columns.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/table/table_components/partner_table_source.dart';
-import 'package:admin_panel/features/common/widgets/table/table.dart';
+import 'package:common/widgets/table/table.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

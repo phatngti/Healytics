@@ -23,8 +23,8 @@ export class ServiceTagResponseDto {
   description: string | null;
 
   @Expose()
-  @ApiProperty({ example: 0xFF6366F1 })
-  colorValue: number;
+  @ApiProperty({ example: '#FF6366F1' })
+  colorValue: string;
 
   @Expose()
   @ApiProperty({ example: 5 })

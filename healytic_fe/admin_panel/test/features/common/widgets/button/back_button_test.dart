@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/button/back_button.dart';
+import 'package:common/widgets/button/back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

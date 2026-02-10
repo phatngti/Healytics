@@ -1,10 +1,10 @@
 import 'package:admin_panel/features/authenticate/presentation/providers/sign_up.provider.dart';
 import 'package:admin_panel/features/authenticate/presentation/widgets/logo.dart';
-import 'package:admin_panel/features/common/widgets/button/button.dart';
+import 'package:common/widgets/button/button.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
-import 'package:admin_panel/features/common/widgets/toast.dart';
+import 'package:common/widgets/toast.dart';
 import 'package:admin_panel/router/admin_routes.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';

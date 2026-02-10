@@ -5,7 +5,7 @@ import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
-import { Employee } from './entities/employee.entity';
+import { Employee } from '@/common/entities/employee.entity';
 import { CreateDoctorHandler } from './application/handlers/create-doctor.handler';
 import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
 import { UpdateEmployeeHandler } from './application/handlers/update-employee.handler';

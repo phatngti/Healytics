@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/table/helper.dart';
+import 'package:common/widgets/table/helper.dart';
 import 'package:flutter/material.dart';
 
 class CategoryTableColumns {

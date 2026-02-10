@@ -1,138 +1,171 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:user_app/theme/app_theme.dart';
+import 'package:common/utils/demensions.dart';
+
+/// Friendly green/mint/teal pastel colors for card backgrounds.
+const _friendlyCardColors = [
+  Color(0xFFE8F5E9), // Light green 50
+  Color(0xFFC8E6C9), // Light green 100
+  Color(0xFFE0F2F1), // Teal 50
+  Color(0xFFB2DFDB), // Teal 100
+  Color(0xFFE0F7FA), // Cyan 50
+  Color(0xFFB2EBF2), // Cyan 100
+  Color(0xFFF1F8E9), // Lime 50
+  Color(0xFFDCEDC8), // Lime 100
+  Color(0xFFE8F8F5), // Mint pastel
+  Color(0xFFD5F5E3), // Soft mint
+];
 
 class RecentActivitySection extends StatelessWidget {
   const RecentActivitySection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final semanticColors = theme.extension<SemanticColors>()!;
+    final titleGap = AppDimens.titleGap(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Recent Activity',
-          style: TextStyle(
-            fontSize: 20,
+          style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 16),
-        const ActivityItem(
-          icon: Symbols.schedule,
-          iconBgColor: Color(0xFFEFF6FF),
-          iconColor: Color(0xFF3B82F6),
-          title: 'Aromatherapy',
-          subtitle: 'Yesterday at 3:00 PM',
-          status: 'Completed',
-          statusBgColor: Color(0xFFF0FDF4),
-          statusTextColor: Color(0xFF15803D),
-        ),
-        const SizedBox(height: 12),
-        const ActivityItem(
-          icon: Symbols.check_circle,
-          iconBgColor: Color(0xFFF0FDF4),
-          iconColor: Color(0xFF16A34A),
-          title: 'Wellness Consult',
-          subtitle: 'Tomorrow at 10:00 AM',
-          status: 'Scheduled',
-          statusBgColor: Color(0xFFEFF6FF),
-          statusTextColor: Color(0xFF2563EB),
+        SizedBox(height: titleGap),
+        Column(
+          children: [
+            _ActivityCard(
+              icon: Symbols.schedule,
+              iconColor: semanticColors.info!,
+              iconBgColor: semanticColors.info!.withValues(alpha: 0.1),
+              title: 'Aromatherapy',
+              time: 'Yesterday at 3:00 PM',
+              status: 'Completed',
+              statusColor: semanticColors.success!,
+              statusBgColor: semanticColors.success!.withValues(alpha: 0.1),
+            ),
+            SizedBox(height: AppDimens.spaceMd),
+            _ActivityCard(
+              icon: Symbols.check_circle,
+              iconColor: semanticColors.success!,
+              iconBgColor: semanticColors.success!.withValues(alpha: 0.1),
+              title: 'Wellness Consult',
+              time: 'Tomorrow at 10:00 AM',
+              status: 'Scheduled',
+              statusColor: semanticColors.info!,
+              statusBgColor: semanticColors.info!.withValues(alpha: 0.1),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-class ActivityItem extends StatelessWidget {
+class _ActivityCard extends StatelessWidget {
   final IconData icon;
-  final Color iconBgColor;
   final Color iconColor;
+  final Color iconBgColor;
   final String title;
-  final String subtitle;
+  final String time;
   final String status;
+  final Color statusColor;
   final Color statusBgColor;
-  final Color statusTextColor;
 
-  const ActivityItem({
-    super.key,
+  const _ActivityCard({
     required this.icon,
-    required this.iconBgColor,
     required this.iconColor,
+    required this.iconBgColor,
     required this.title,
-    required this.subtitle,
+    required this.time,
     required this.status,
+    required this.statusColor,
     required this.statusBgColor,
-    required this.statusTextColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final contentPad = AppDimens.contentPadding(context);
+    final cardRad = AppDimens.cardRadius(context);
+    final cardColor =
+        _friendlyCardColors[Random().nextInt(_friendlyCardColors.length)];
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(contentPad),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(cardRad),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(13),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
+            color: theme.colorScheme.shadow.withValues(alpha: 0.05),
+            blurRadius: AppDimens.spaceXl,
+            offset: Offset(0, AppDimens.spaceXs),
           ),
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: iconBgColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: iconColor, size: 24),
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            height: AppDimens.avatarMd,
+            width: AppDimens.avatarMd,
+            decoration: BoxDecoration(
+              color: iconBgColor,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: iconColor),
+          ),
+          SizedBox(width: AppDimens.spaceLg),
+          // Wrap text column in Expanded to prevent overflow.
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: AppDimens.spaceXxs),
+                Text(
+                  time,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: AppDimens.spaceSm),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppDimens.spaceMd,
+              vertical: AppDimens.spaceXs,
+            ),
             decoration: BoxDecoration(
               color: statusBgColor,
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: AppDimens.radiusPill,
             ),
             child: Text(
               status,
-              style: TextStyle(
-                fontSize: 12,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: statusColor,
                 fontWeight: FontWeight.bold,
-                color: statusTextColor,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

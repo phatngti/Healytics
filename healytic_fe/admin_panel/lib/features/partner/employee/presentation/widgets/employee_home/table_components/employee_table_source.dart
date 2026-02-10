@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/table/helper.dart';
+import 'package:common/widgets/table/helper.dart';
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_home/table_components/employee_table_actions.dart';
 import 'package:flutter/material.dart';

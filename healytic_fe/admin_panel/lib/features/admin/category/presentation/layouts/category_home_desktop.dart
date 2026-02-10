@@ -1,5 +1,5 @@
 import 'package:admin_panel/features/admin/category/presentation/widgets/table/category_table.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
 import 'package:flutter/material.dart';
 

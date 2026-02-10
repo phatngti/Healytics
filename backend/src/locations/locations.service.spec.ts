@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LocationsService } from './locations.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Location } from './entities/location.entity';
-import { LocationLevel } from './entities/location-level.enum';
+import { Location } from '@/common/entities/location.entity';
+import { LocationLevel } from '@/common/entities/location-level.enum';
 import { NotFoundException } from '@nestjs/common';
 
 describe('LocationsService', () => {

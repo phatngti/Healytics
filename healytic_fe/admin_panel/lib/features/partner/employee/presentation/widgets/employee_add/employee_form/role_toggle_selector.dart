@@ -1,5 +1,5 @@
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 /// A segmented toggle button to switch between Doctor and Therapist roles

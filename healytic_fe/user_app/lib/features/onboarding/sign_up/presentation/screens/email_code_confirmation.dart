@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
-import 'package:user_app/features/common/button/button.dart';
+import 'package:common/widgets/button/button.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/router/router.dart'; // Đảm bảo import đúng Router
-import 'package:user_app/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:user_app/utils/device.dart';
 
 class EmailCodeConfirmationScreen extends HookConsumerWidget {
