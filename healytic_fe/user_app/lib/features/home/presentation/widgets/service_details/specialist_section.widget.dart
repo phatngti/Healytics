@@ -39,13 +39,48 @@ class _SpecialistSectionState extends State<SpecialistSection> {
   /// Currently selected date for viewing time slots.
   late DateTime _selectedDate;
 
+  // ── Cached schedule data ──
+  late Set<DateTime> _disabledDates;
+  late Set<DateTime> _enabledDates;
+  late List<TimeSlot> _slotsForDate;
+
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.specialists.indexWhere((s) => s.isSelected);
     if (_selectedIndex < 0) _selectedIndex = 0;
-
     _selectedDate = _today;
+    _cacheSchedules();
+  }
+
+  @override
+  void didUpdateWidget(covariant SpecialistSection old) {
+    super.didUpdateWidget(old);
+    if (old.daySchedules != widget.daySchedules) {
+      _cacheSchedules();
+    }
+  }
+
+  /// Pre-compute disabled/enabled date sets and
+  /// slots for the selected date.
+  void _cacheSchedules() {
+    _disabledDates = widget.daySchedules
+        .where((d) => !d.isAvailable)
+        .map((d) => DateTime(d.date.year, d.date.month, d.date.day))
+        .toSet();
+    _enabledDates = widget.daySchedules
+        .where((d) => d.isAvailable)
+        .map((d) => DateTime(d.date.year, d.date.month, d.date.day))
+        .toSet();
+    _updateSlotsForDate();
+  }
+
+  /// Update cached slots for [_selectedDate].
+  void _updateSlotsForDate() {
+    final schedule = widget.daySchedules.where(
+      (d) => _isSameDay(d.date, _selectedDate),
+    );
+    _slotsForDate = schedule.isEmpty ? const [] : schedule.first.timeSlots;
   }
 
   Specialist get _selected => widget.specialists[_selectedIndex];
@@ -56,37 +91,12 @@ class _SpecialistSectionState extends State<SpecialistSection> {
     return DateTime(now.year, now.month, now.day);
   }
 
-  /// Returns a [DateTime] object with time components set to midnight.
+  /// Returns a [DateTime] with time set to midnight.
   DateTime _dateOnly(DateTime date) {
     return DateTime(date.year, date.month, date.day);
   }
 
-  /// Set of dates that have no availability.
-  Set<DateTime> get _disabledDates {
-    return widget.daySchedules
-        .where((d) => !d.isAvailable)
-        .map((d) => DateTime(d.date.year, d.date.month, d.date.day))
-        .toSet();
-  }
-
-  /// Set of dates that have availability.
-  Set<DateTime> get _enabledDates {
-    return widget.daySchedules
-        .where((d) => d.isAvailable)
-        .map((d) => DateTime(d.date.year, d.date.month, d.date.day))
-        .toSet();
-  }
-
-  /// Time slots for the currently selected date.
-  List<TimeSlot> get _slotsForSelectedDate {
-    final schedule = widget.daySchedules.where(
-      (d) => _isSameDay(d.date, _selectedDate),
-    );
-    if (schedule.isEmpty) return const [];
-    return schedule.first.timeSlots;
-  }
-
-  /// Returns true if two [DateTime] objects represent the same day.
+  /// Returns true if two dates represent the same day.
   bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
@@ -100,7 +110,10 @@ class _SpecialistSectionState extends State<SpecialistSection> {
   }
 
   void _onDateSelected(DateTime date) {
-    setState(() => _selectedDate = date);
+    setState(() {
+      _selectedDate = date;
+      _updateSlotsForDate();
+    });
   }
 
   void _toggleShowMore() => setState(() => _showMore = !_showMore);
@@ -133,11 +146,12 @@ class _SpecialistSectionState extends State<SpecialistSection> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
 
-    // Determine first date from schedules or use today
+    // Determine first date from schedules
     final firstDate = widget.daySchedules.isNotEmpty
         ? DateTime(
             widget.daySchedules.first.date.year,
@@ -146,7 +160,7 @@ class _SpecialistSectionState extends State<SpecialistSection> {
           )
         : _today;
 
-    final slots = _slotsForSelectedDate;
+    final slots = _slotsForDate;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -620,97 +634,101 @@ class _SpecialistAvatar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Opacity(
-      opacity: isSelected ? 1.0 : 0.6,
-      child: SizedBox(
-        width: 80,
-        child: Column(
-          children: [
-            // Avatar with optional ring
-            SizedBox(
-              width: 64,
-              height: 64,
-              child: Stack(
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    padding: EdgeInsets.all(isSelected ? 3 : 1),
-                    decoration: isSelected
-                        ? BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colorScheme.primary,
-                              width: 2,
-                            ),
-                          )
-                        : null,
-                    child: ClipOval(
-                      child: Image.network(
-                        specialist.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: colorScheme.surfaceContainerHighest,
-                          child: Icon(
-                            Icons.person,
-                            color: colorScheme.onSurfaceVariant,
+    // Apply reduced opacity via color alpha instead
+    // of the Opacity widget to avoid an extra
+    // compositing layer.
+    final double alpha = isSelected ? 1.0 : 0.6;
+
+    return SizedBox(
+      width: 80,
+      child: Column(
+        children: [
+          // Avatar with optional ring
+          SizedBox(
+            width: 64,
+            height: 64,
+            child: Stack(
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  padding: EdgeInsets.all(isSelected ? 3 : 1),
+                  decoration: isSelected
+                      ? BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: colorScheme.primary,
+                            width: 2,
                           ),
+                        )
+                      : null,
+                  child: ClipOval(
+                    child: Image.network(
+                      specialist.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        color: colorScheme.surfaceContainerHighest,
+                        child: Icon(
+                          Icons.person,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
                   ),
-                  // Check badge
-                  if (isSelected)
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 16,
-                        height: 16,
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: colorScheme.surface,
-                            width: 2,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.check,
-                          size: 8,
-                          color: Colors.white,
+                ),
+                // Check badge
+                if (isSelected)
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: colorScheme.surface,
+                          width: 2,
                         ),
                       ),
+                      child: const Icon(
+                        Icons.check,
+                        size: 8,
+                        color: Colors.white,
+                      ),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
-            AppDimens.verticalSmall,
-            // Name
-            Text(
-              specialist.name,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: isSelected ? colorScheme.primary : null,
-              ),
+          ),
+          AppDimens.verticalSmall,
+          // Name
+          Text(
+            specialist.name,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.onSurface.withValues(alpha: alpha),
             ),
-            // Role
-            Text(
-              specialist.role.toUpperCase(),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: textTheme.labelSmall?.copyWith(
-                fontSize: 10,
-                letterSpacing: 0.5,
-                color: colorScheme.onSurfaceVariant,
-              ),
+          ),
+          // Role
+          Text(
+            specialist.role.toUpperCase(),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.labelSmall?.copyWith(
+              fontSize: 10,
+              letterSpacing: 0.5,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: alpha),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -893,9 +911,10 @@ class _SlotButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     if (!isAvailable) {
       return Container(

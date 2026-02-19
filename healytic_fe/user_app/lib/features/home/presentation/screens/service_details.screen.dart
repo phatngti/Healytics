@@ -18,8 +18,8 @@ import '../widgets/service_details/recommended_services_section.widget.dart';
 import '../widgets/service_details/reviews_section.widget.dart';
 import '../widgets/service_details/specialist_section.widget.dart';
 
-/// Full-screen service detail view composed from smaller widgets
-/// matching the new HTML design spec.
+/// Full-screen service detail view composed from smaller
+/// widgets matching the new HTML design spec.
 ///
 /// Fetches data via [serviceDetailsProvider] and renders
 /// loading / error / data states.
@@ -43,7 +43,9 @@ class ServiceDetailsScreen extends ConsumerWidget {
   }
 }
 
-/// The main scrollable body rendered once data is available.
+/// The main scrollable body rendered once data is
+/// available. Uses [CustomScrollView] with slivers so
+/// that off-screen sections are built lazily.
 class _ServiceDetailsBody extends StatefulWidget {
   const _ServiceDetailsBody({required this.details});
 
@@ -57,10 +59,20 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
   final _scrollController = ScrollController();
   final _showBlur = ValueNotifier<bool>(false);
 
+  /// Cached scroll threshold – recomputed only when
+  /// MediaQuery values change (orientation / resize).
+  double _blurThreshold = 0;
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _cacheScrollThreshold();
   }
 
   @override
@@ -72,18 +84,19 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
     super.dispose();
   }
 
-  /// Hero height minus header height gives the
-  /// scroll offset at which the header leaves the
-  /// hero area and needs a blur backdrop.
-  void _onScroll() {
+  /// Pre-compute the scroll offset at which the header
+  /// leaves the hero area and needs a blur backdrop.
+  void _cacheScrollThreshold() {
     final screenH = MediaQuery.sizeOf(context).height;
     final topPad = MediaQuery.paddingOf(context).top;
     final heroH = screenH * 0.35;
-    // header occupies topPad + spaceMd + button + spaceMd
     final headerH =
         topPad + AppDimens.spaceMd + AppDimens.ctaButtonMd + AppDimens.spaceMd;
-    final threshold = heroH - headerH;
-    final shouldBlur = _scrollController.offset > threshold;
+    _blurThreshold = heroH - headerH;
+  }
+
+  void _onScroll() {
+    final shouldBlur = _scrollController.offset > _blurThreshold;
     if (_showBlur.value != shouldBlur) {
       _showBlur.value = shouldBlur;
     }
@@ -107,21 +120,22 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
       backgroundColor: colorScheme.surface,
       body: Stack(
         children: [
-          // ── Scrollable content ──
-          SingleChildScrollView(
+          // ── Scrollable content (lazy slivers) ──
+          CustomScrollView(
             controller: _scrollController,
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: [
-                // Hero carousel
-                HeroImageCarousel(
+            slivers: [
+              // Hero carousel
+              SliverToBoxAdapter(
+                child: HeroImageCarousel(
                   images: details.images,
                   categoryLabel: details.categoryLabel,
                   title: details.title,
                 ),
+              ),
 
-                // Main content – rounded top overlapping hero
-                Transform.translate(
+              // Main content – rounded top overlap
+              SliverToBoxAdapter(
+                child: Transform.translate(
                   offset: const Offset(0, -24),
                   child: Container(
                     width: double.infinity,
@@ -136,7 +150,7 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
                       hPad,
                       AppDimens.spaceXxxl,
                       hPad,
-                      120,
+                      0,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,40 +188,67 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
                           specialists: details.specialists,
                           daySchedules: details.daySchedules,
                         ),
-                        AppDimens.verticalLargeExtra,
-
-                        // Reviews
-                        ReviewsSection(
-                          reviews: details.reviews,
-                          rating: details.rating,
-                          serviceId: details.id,
-                        ),
-                        AppDimens.verticalLargeExtra,
-
-                        // Recommended services
-                        RecommendedServicesSection(serviceId: details.id),
-                        AppDimens.verticalLargeExtra,
                       ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              // ── Lazy sections (built on scroll) ──
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: hPad),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppDimens.verticalLargeExtra,
+
+                      // Reviews
+                      ReviewsSection(
+                        reviews: details.reviews,
+                        rating: details.rating,
+                        serviceId: details.id,
+                      ),
+                      AppDimens.verticalLargeExtra,
+
+                      // Recommended services
+                      RecommendedServicesSection(serviceId: details.id),
+                      AppDimens.verticalLargeExtra,
+
+                      // Bottom spacing for booking bar
+                      const SizedBox(height: 100),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
 
           // ── Fixed header bar ──
-          _FloatingHeaderBar(onBack: _handleBack, showBlur: _showBlur),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: RepaintBoundary(
+              child: _FloatingHeaderBar(
+                onBack: _handleBack,
+                showBlur: _showBlur,
+              ),
+            ),
+          ),
 
           // ── Bottom booking bar ──
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            child: _BottomBookingBar(
-              price: details.price,
-              onConfirm: () {
-                // TODO: implement booking action
-              },
+            child: RepaintBoundary(
+              child: _BottomBookingBar(
+                price: details.price,
+                onConfirm: () {
+                  // TODO: implement booking action
+                },
+              ),
             ),
           ),
         ],
@@ -216,10 +257,12 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
   }
 }
 
-/// Fixed floating header with back, favorite and share buttons.
+/// Fixed floating header with back, favorite and share
+/// buttons.
 ///
-/// Blur backdrop activates only when the header scrolls past
-/// the hero image area (controlled by [showBlur]).
+/// Blur backdrop activates only when the header scrolls
+/// past the hero image area (controlled by [showBlur]).
+/// Uses a cached zero-blur filter to avoid allocations.
 class _FloatingHeaderBar extends StatelessWidget {
   const _FloatingHeaderBar({required this.onBack, required this.showBlur});
 
@@ -228,58 +271,59 @@ class _FloatingHeaderBar extends StatelessWidget {
   /// Whether the blurred backdrop should be visible.
   final ValueNotifier<bool> showBlur;
 
+  /// Cached identity filter – avoids allocating a new
+  /// [ImageFilter] on every rebuild when blur is off.
+  static final _noBlur = ImageFilter.blur();
+
+  /// Active blur filter for the header backdrop.
+  static final _activeBlur = ImageFilter.blur(sigmaX: 12, sigmaY: 12);
+
   @override
   Widget build(BuildContext context) {
     final topPad = MediaQuery.paddingOf(context).top;
 
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: ValueListenableBuilder<bool>(
-        valueListenable: showBlur,
-        builder: (context, blur, child) {
-          return ClipRect(
-            child: BackdropFilter(
-              filter: blur
-                  ? ImageFilter.blur(sigmaX: 12, sigmaY: 12)
-                  : ImageFilter.blur(),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                padding: EdgeInsets.fromLTRB(
-                  AppDimens.spaceXxl,
-                  topPad + AppDimens.spaceMd,
-                  AppDimens.spaceXxl,
-                  AppDimens.spaceMd,
-                ),
-                color: blur ? const Color(0x33000000) : Colors.transparent,
-                child: child,
+    return ValueListenableBuilder<bool>(
+      valueListenable: showBlur,
+      builder: (context, blur, child) {
+        return ClipRect(
+          child: BackdropFilter(
+            filter: blur ? _activeBlur : _noBlur,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              padding: EdgeInsets.fromLTRB(
+                AppDimens.spaceXxl,
+                topPad + AppDimens.spaceMd,
+                AppDimens.spaceXxl,
+                AppDimens.spaceMd,
               ),
+              color: blur ? const Color(0x33000000) : Colors.transparent,
+              child: child,
             ),
-          );
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _GlassCircleButton(icon: Icons.arrow_back, onTap: onBack),
-            Row(
-              children: [
-                _GlassCircleButton(icon: Icons.favorite_border, onTap: () {}),
-                AppDimens.horizontalMediumSmall,
-                _GlassCircleButton(icon: Icons.ios_share, onTap: () {}),
-              ],
-            ),
-          ],
-        ),
+          ),
+        );
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _GlassCircleButton(icon: Icons.arrow_back, onTap: onBack),
+          Row(
+            children: [
+              _GlassCircleButton(icon: Icons.favorite_border, onTap: () {}),
+              AppDimens.horizontalMediumSmall,
+              _GlassCircleButton(icon: Icons.ios_share, onTap: () {}),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-/// Glassmorphic circular icon button for the floating header.
+/// Circular icon button for the floating header.
 ///
-/// Dark semi-transparent background with white icon so that
-/// buttons remain visible on both light and dark themes.
+/// Uses a simple semi-transparent background instead of
+/// its own [BackdropFilter] — the parent header already
+/// applies one shared blur pass for the entire bar.
 class _GlassCircleButton extends StatelessWidget {
   const _GlassCircleButton({required this.icon, this.onTap});
 
@@ -290,26 +334,22 @@ class _GlassCircleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            width: AppDimens.ctaButtonMd,
-            height: AppDimens.ctaButtonMd,
-            decoration: const BoxDecoration(
-              color: Color(0x4D000000),
-              shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: Color(0x1A000000), blurRadius: 30)],
-            ),
-            child: Icon(icon, size: 20, color: Colors.white),
-          ),
+      child: Container(
+        width: AppDimens.ctaButtonMd,
+        height: AppDimens.ctaButtonMd,
+        decoration: const BoxDecoration(
+          color: Color(0x4D000000),
+          shape: BoxShape.circle,
+          boxShadow: [BoxShadow(color: Color(0x1A000000), blurRadius: 30)],
         ),
+        child: Icon(icon, size: 20, color: Colors.white),
       ),
     );
   }
 }
 
-/// Fixed bottom bar with total price and confirm booking button.
+/// Fixed bottom bar with total price and confirm booking
+/// button. Reads [Theme] once to avoid repeated lookups.
 class _BottomBookingBar extends StatelessWidget {
   const _BottomBookingBar({required this.price, required this.onConfirm});
 
@@ -318,9 +358,10 @@ class _BottomBookingBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
     final bottomPad = MediaQuery.paddingOf(context).bottom;
 
     return ClipRect(
