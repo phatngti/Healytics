@@ -17,7 +17,7 @@ GoRouter router(Ref ref) {
     navigatorKey: rootNavigatorKey,
     initialLocation: initialLocation,
     debugLogDiagnostics: true,
-    routes: [$lottieSplashRoute, $mobileWrapperRoutes],
+    routes: $appRoutes,
     refreshListenable: notifier,
     redirect: notifier.redirect,
   );
@@ -38,44 +38,35 @@ class RouterListenable extends _$RouterListenable implements Listenable {
 
   String? redirect(BuildContext context, GoRouterState state) {
     final authSessionStore = ref.watch(authSessionStoreProvider);
-    final isMockMode = authSessionStore.isMockMode;
+    final isLoggedIn = authSessionStore.isLoggedIn;
     final path = state.uri.path;
 
-    // In mock mode, skip auth and allow all tab routes
-    if (isMockMode) {
-      final isTabRoute =
-          path.startsWith('/home') ||
-          path.startsWith('/orders') ||
-          path.startsWith('/chat') ||
-          path.startsWith('/notifications') ||
-          path.startsWith('/profile');
-      // Only redirect auth/onboarding routes to home
-      if (!isTabRoute) {
-        return '/home';
-      }
-      return null;
-    }
-
-    final isLoggedIn = authSessionStore.isLoggedIn;
-
-    // Routes that require authentication
-    final isProtectedRoute =
-        path.startsWith('/home') ||
-        path.startsWith('/orders') ||
-        path.startsWith('/chat') ||
-        path.startsWith('/notifications') ||
-        path.startsWith('/profile');
+    final isPublicRoute =
+        (LottieSplashRoute.isPublic && path == LottieSplashRoute.pathPattern) ||
+        (OnboardingRoute.isPublic && path == OnboardingRoute.pathPattern) ||
+        (SignInRoute.isPublic && path == SignInRoute.pathPattern) ||
+        (EmailFormRoute.isPublic && path == EmailFormRoute.pathPattern) ||
+        (EmailCodeConfirmationRoute.isPublic &&
+            path == EmailCodeConfirmationRoute.pathPattern) ||
+        (FinishSignUpRoute.isPublic && path == FinishSignUpRoute.pathPattern) ||
+        (SurveyScreenRoute.isPublic && path == SurveyScreenRoute.pathPattern) ||
+        (GeneralGoalsStepRoute.isPublic &&
+            path == GeneralGoalsStepRoute.pathPattern) ||
+        (LifestyleActivityStepRoute.isPublic &&
+            path == LifestyleActivityStepRoute.pathPattern) ||
+        (BodyEnergyStepRoute.isPublic &&
+            path == BodyEnergyStepRoute.pathPattern) ||
+        (HealthSafetyStepRoute.isPublic &&
+            path == HealthSafetyStepRoute.pathPattern);
 
     if (isLoggedIn) {
-      // If logged in and trying to access login/onboarding,
-      // redirect to home
-      if (path == '/signin' || path == '/onboarding') {
+      // Logged-in user hitting a public route → send to home
+      if (isPublicRoute) {
         return '/home';
       }
     } else {
-      // If not logged in and trying to access protected route,
-      // redirect to signin
-      if (isProtectedRoute) {
+      // Not logged in and trying to access a protected route
+      if (!isPublicRoute) {
         return '/signin';
       }
     }

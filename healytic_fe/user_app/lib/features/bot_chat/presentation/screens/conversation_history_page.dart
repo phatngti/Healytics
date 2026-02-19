@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/router/routes.dart';
 
 import '../providers/conversation_history.provider.dart';
 import '../widgets/history/date_section.widget.dart';
@@ -63,7 +64,7 @@ class _ConversationHistoryPageState
       ),
       floatingActionButton: NewChatFab(
         onPressed: () {
-          // TODO: Navigate to new chat page.
+          const ChatRoute().go(context);
         },
       ),
     );

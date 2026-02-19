@@ -3,13 +3,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
 import 'package:common/utils/demensions.dart';
 
-import '../widgets/explore_services_section.dart';
-import '../widgets/feature_banner.dart';
-import '../widgets/home_header.dart';
-import '../widgets/quick_actions_section.dart';
-import '../widgets/recent_activity_section.dart';
-import '../widgets/premium_treatments_section.dart';
-import '../widgets/recommend_section.dart';
+import '../widgets/explore_services_section.widget.dart';
+import '../widgets/feature_banner.widget.dart';
+import '../widgets/home_header.widget.dart';
+import '../widgets/quick_actions_section.widget.dart';
+import '../widgets/recent_activity_section.widget.dart';
+import '../widgets/premium_treatments_section.widget.dart';
+import '../widgets/recommend_section.widget.dart';
 
 class HomeUpdatePage extends HookConsumerWidget {
   const HomeUpdatePage({super.key});

@@ -50,6 +50,25 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
         ),
         child: Row(
           children: [
+            // --- Back button ---
+            AppButton(
+              buttonType: ButtonType.text,
+              onPressed: () => Navigator.of(context).pop(),
+              primaryColor: colorScheme.onSurface,
+              customStyle: TextButton.styleFrom(
+                padding: EdgeInsets.all(AppDimens.spaceXs),
+                minimumSize: Size(AppDimens.ctaButtonMd, AppDimens.ctaButtonMd),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                shape: const CircleBorder(),
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: colorScheme.onSurface,
+                size: AppDimens.iconMd,
+              ),
+            ),
+            SizedBox(width: AppDimens.spaceXs),
+
             // --- Avatar with online dot ---
             _AvatarWithStatus(imageUrl: _avatarUrl, colorScheme: colorScheme),
             SizedBox(width: AppDimens.spaceMd),
