@@ -1,0 +1,234 @@
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/staggered_grid_view/'
+    'staggered_grid_view.dart';
+
+import 'package:user_app/features/home/domain/entities/'
+    'home.entity.dart';
+import 'package:user_app/features/home/presentation/'
+    'providers/home_provider.dart';
+import 'package:user_app/features/home/presentation/'
+    'widgets/treatment_card.widget.dart';
+
+/// Displays a 2-column grid of premium treatment cards
+/// fetched from the data layer via [homeProvider].
+class PremiumTreatmentsSection extends ConsumerWidget {
+  const PremiumTreatmentsSection({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final titleGap = AppDimens.titleGap(context);
+    final contentPad = AppDimens.contentPadding(context);
+    final homeState = ref.watch(homeProvider);
+    final products = homeState.premiumProducts;
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Flexible(
+              child: Text(
+                'Premium Treatments',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.5,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            TextButton(
+              onPressed: () {},
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceSm),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                'See All',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: titleGap),
+        if (homeState.isLoading)
+          _LoadingGrid(contentPad: contentPad)
+        else if (products.isEmpty)
+          const _EmptyState()
+        else
+          _ProductGrid(products: products, contentPad: contentPad),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// 2-column product grid
+// ─────────────────────────────────────────────────────────
+
+class _ProductGrid extends StatelessWidget {
+  final List<HomeProduct> products;
+  final double contentPad;
+
+  const _ProductGrid({required this.products, required this.contentPad});
+
+  @override
+  Widget build(BuildContext context) {
+    return MasonryGridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: contentPad,
+      crossAxisSpacing: contentPad,
+      padding: EdgeInsets.zero,
+      itemCount: products.length,
+      itemBuilder: (context, index) => TreatmentCard(product: products[index]),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// Shimmer-style loading placeholders (2×2 grid)
+// ─────────────────────────────────────────────────────────
+
+class _LoadingGrid extends StatelessWidget {
+  final double contentPad;
+
+  const _LoadingGrid({required this.contentPad});
+
+  @override
+  Widget build(BuildContext context) {
+    final cardRad = AppDimens.cardRadius(context);
+
+    return MasonryGridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: contentPad,
+      crossAxisSpacing: contentPad,
+      padding: EdgeInsets.zero,
+      itemCount: 4,
+      itemBuilder: (_, __) =>
+          _LoadingPlaceholder(cardRad: cardRad, contentPad: contentPad),
+    );
+  }
+}
+
+class _LoadingPlaceholder extends StatelessWidget {
+  final double cardRad;
+  final double contentPad;
+
+  const _LoadingPlaceholder({required this.cardRad, required this.contentPad});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(cardRad),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AspectRatio(
+            aspectRatio: 16 / 10,
+            child: Container(
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(cardRad),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(contentPad),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: AppDimens.spaceLg,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: AppDimens.radiusExtraSmall,
+                  ),
+                ),
+                SizedBox(height: AppDimens.spaceSm),
+                Container(
+                  height: AppDimens.spaceMd,
+                  width: AppDimens.avatarLg,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: AppDimens.radiusExtraSmall,
+                  ),
+                ),
+                SizedBox(height: AppDimens.spaceSm),
+                Container(
+                  height: AppDimens.spaceMd,
+                  width: AppDimens.avatarMd,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: AppDimens.radiusExtraSmall,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// Empty state
+// ─────────────────────────────────────────────────────────
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppDimens.spaceXxl),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Symbols.spa,
+              size: AppDimens.avatarMd,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            SizedBox(height: AppDimens.spaceSm),
+            Text(
+              'No premium treatments yet',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

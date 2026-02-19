@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import 'package:user_app/features/bot_chat/data/repositories/chat_repository_impl.dart';
+import 'package:flutter/foundation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/features/bot_chat/domain/repositories/chat.repository.dart';
+import 'package:user_app/features/bot_chat/data/repositories/chat_repository_impl.dart';
 import 'package:user_app/features/bot_chat/domain/entities/chat_message.entity.dart';
+
+part 'chat.provider.g.dart';
 
 /// Immutable state for the active chat conversation.
 class ChatState {
@@ -37,17 +38,17 @@ class ChatState {
 }
 
 /// Manages the message list for the active conversation.
-///
-/// Fetches messages via [ChatRepository] on construction and
-/// exposes [sendMessage] to append user messages.
-class ChatNotifier extends Notifier<ChatState> {
+@riverpod
+class Chat extends _$Chat {
   late final ChatRepository _repository;
 
   @override
-  ChatState build() {
+  ChatState build(String? conversationId) {
     _repository = ref.read(chatRepositoryProvider);
-    // Load messages for the default conversation on init.
-    Future.microtask(() => loadMessages('1'));
+    // Load messages if we have a valid conversationId.
+    if (conversationId != null && conversationId.isNotEmpty) {
+      Future.microtask(() => loadMessages(conversationId));
+    }
     return const ChatState();
   }
 
@@ -67,11 +68,12 @@ class ChatNotifier extends Notifier<ChatState> {
     }
   }
 
-  /// Sends a user [text] message in [conversationId] and
-  /// appends it to the local state optimistically.
-  Future<void> sendMessage(String conversationId, String text) async {
+  /// Sends a user [text] message and appends it to state optimistically.
+  Future<void> sendMessage(String text) async {
+    final id = conversationId ?? '1';
+
     try {
-      final message = await _repository.sendMessage(conversationId, text);
+      final message = await _repository.sendMessage(id, text);
       state = state.copyWith(messages: [...state.messages, message]);
     } catch (e, st) {
       debugPrint('Error sending message: $e\n$st');
@@ -79,8 +81,3 @@ class ChatNotifier extends Notifier<ChatState> {
     }
   }
 }
-
-/// Provider for the active chat conversation state.
-final chatProvider = NotifierProvider<ChatNotifier, ChatState>(
-  ChatNotifier.new,
-);

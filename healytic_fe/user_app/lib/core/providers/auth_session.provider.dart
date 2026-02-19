@@ -6,8 +6,10 @@ import 'package:user_app/core/models/store.model.dart';
 class AuthSessionStore {
   bool get isMockMode => Store.tryGet(StoreKey.mockFlag) == 'true';
 
+  /// Returns true if the user is logged in (has access token or
+  /// in mock mode).
   bool get isLoggedIn =>
-      Store.tryGet(StoreKey.accessToken)?.isNotEmpty == true;
+      isMockMode || Store.tryGet(StoreKey.accessToken)?.isNotEmpty == true;
 
   Stream<String?> watchAccessToken() => Store.watch(StoreKey.accessToken);
 

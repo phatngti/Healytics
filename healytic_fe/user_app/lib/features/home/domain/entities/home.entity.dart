@@ -27,6 +27,7 @@ class HomeProduct {
   final String price;
   final String rating;
   final String vendorName;
+  final String location;
   final List<String> staffAvatars;
 
   const HomeProduct({
@@ -39,6 +40,7 @@ class HomeProduct {
     required this.price,
     this.rating = '4.9',
     this.vendorName = '',
+    this.location = '',
     this.staffAvatars = const [],
     this.type = 'service',
   });
