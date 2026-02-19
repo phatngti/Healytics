@@ -20,12 +20,13 @@ import '../widgets/chat/chat_timestamp.widget.dart';
 /// All dimensions use [AppDimens] responsive helpers and
 /// [MediaQuery] text-scale clamping per the design system rules.
 class ChatPage extends HookConsumerWidget {
-  const ChatPage({super.key});
+  final String? conversationId;
+  const ChatPage({super.key, this.conversationId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final chatState = ref.watch(chatProvider);
+    final chatState = ref.watch(chatProvider(conversationId));
     final hPadding = AppDimens.horizontalPadding(context);
 
     // Bottom overlay occupies ~160–180 dp; use adaptive value.
@@ -49,6 +50,7 @@ class ChatPage extends HookConsumerWidget {
         ),
         child: _buildBody(
           context,
+          ref,
           chatState,
           colorScheme,
           hPadding,
@@ -60,6 +62,7 @@ class ChatPage extends HookConsumerWidget {
 
   Widget _buildBody(
     BuildContext context,
+    WidgetRef ref,
     ChatState chatState,
     ColorScheme colorScheme,
     double hPadding,
@@ -113,7 +116,12 @@ class ChatPage extends HookConsumerWidget {
           left: 0,
           right: 0,
           bottom: 0,
-          child: _BottomOverlay(colorScheme: colorScheme),
+          child: _BottomOverlay(
+            colorScheme: colorScheme,
+            onSend: (text) {
+              ref.read(chatProvider(conversationId).notifier).sendMessage(text);
+            },
+          ),
         ),
       ],
     );
@@ -124,7 +132,8 @@ class ChatPage extends HookConsumerWidget {
 /// and a gradient fade at the top so messages fade smoothly.
 class _BottomOverlay extends StatelessWidget {
   final ColorScheme colorScheme;
-  const _BottomOverlay({required this.colorScheme});
+  final ValueChanged<String>? onSend;
+  const _BottomOverlay({required this.colorScheme, this.onSend});
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +164,7 @@ class _BottomOverlay extends StatelessWidget {
                 padding: EdgeInsets.symmetric(
                   horizontal: AppDimens.horizontalPadding(context),
                 ),
-                child: const ChatInputBar(),
+                child: ChatInputBar(onSend: onSend),
               ),
             ],
           ),

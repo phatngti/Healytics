@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/router/routes.dart';
 
 import 'package:user_app/features/bot_chat/domain/entities/chat_conversation.entity.dart';
 
@@ -34,7 +35,7 @@ class ConversationTile extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(AppDimens.cardRadius(context)),
         onTap: () {
-          // TODO: Navigate to the conversation detail page.
+          ChatRoute(conversationId: conversation.id).push(context);
         },
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 200),

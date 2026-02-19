@@ -1,64 +1,99 @@
 ---
 trigger: always_on
+description: Engineering standards for code quality, testing, linting, and documentation in the Healytics project.
 ---
 
-This scope focuses on practices that ensure code quality, reliability, and maintainability in Flutter projects. Prioritize testing, linting, and automated workflows. Use GoRouter for navigation, proper API handling for data, and code generation for efficiency. These standards help prevent bugs and streamline collaboration.
+# Engineering Excellence
 
-## Code Quality and Best Practices
-- **Interaction Guidelines:** Assume users know programming but may be new to Dart. Explain Dart features (null safety, futures, streams) in code. Clarify ambiguous requests (functionality, platform). Explain dependency benefits.
-- **Code Structure:** Maintainable with separation of concerns. Use meaningful names; avoid abbreviations. Write concise, simple code. Functions: single purpose, <20 lines. Line length: <=80 chars. Naming: PascalCase classes, camelCase members, snake_case files.
-- **Dart Best Practices:** Follow Effective Dart (https://dart.dev/effective-dart). Organize classes in libraries; group in folders. Doc comments for public APIs; clear comments for complex code (no trailing/over-commenting). Use async/await with error handling; Futures/Streams appropriately. Null-safe code; avoid `!`. Pattern matching, records, exhaustive switches, custom exceptions, arrow functions.
-- **Flutter Best Practices:** Immutability in widgets; composition over inheritance. Private widgets over helpers. Break build methods. `ListView.builder` for performance. `compute()` for isolates. `const` constructors; no expensive ops in build.
-- **Error Handling:** Anticipate errors; no silent failures. Use try-catch.
-- **Logging:** Use `logging` package over print; or `dart:developer` for structured logs.
-  ```dart
-  import 'dart:developer' as developer;
-  developer.log('Message', error: e, stackTrace: s);
-  ```
-- **API Design:** User-centric, intuitive; essential documentation with examples.
-- **SOLID Principles:** Apply codebase-wide. Prefer functional/declarative patterns.
+## Code Quality Standards
 
-## Testing Strategies
-- **Types:**
-  - Unit: For domain/data/state with `package:test`.
-  - Widget: For UI with `package:flutter_test`.
-  - Integration: End-to-end with `package:integration_test` (add as dev_dependency: sdk: flutter).
-- **Best Practices:**
-  - AAA/Given-When-Then pattern.
-  - High coverage; test layers independently.
-  - Mocks: Prefer fakes/stubs; use `mockito`/`mocktail` if needed (avoid code-gen for mocks). Use `file`, `process`, `platform` for injectables.
-  - Run: `flutter test`.
-- **Data Layer Testing:** Use mock data sources.
+- **Functions:** Single purpose, under 20 lines.
+- **Line length:** 80 characters max.
+- **Meaningful names:** No abbreviations (`userProfile` not `usrPrf`).
+- **Prefer functional/declarative** patterns where appropriate.
+- **Immutability:** Use Freezed for entities, `const` for widgets, `final` for locals.
+
+## Testing Strategy
+
+### Test Types
+| Type | Target | Package |
+|------|--------|---------|
+| Unit | Domain logic, data layer, providers | `package:test` |
+| Widget | UI components | `package:flutter_test` |
+| Integration | End-to-end flows | `package:integration_test` |
+
+### Test Pattern (AAA / Given-When-Then)
+```dart
+test('should return user when sign in succeeds', () async {
+  // Arrange (Given)
+  final mockDataSource = AuthRemoteDataSourceMock();
+  final repo = AuthRepositoryImpl(mockDataSource);
+
+  // Act (When)
+  final result = await repo.signIn('test@email.com', 'pass');
+
+  // Assert (Then)
+  expect(result, isA<User>());
+  expect(result.email, 'test@email.com');
+});
+```
+
+### Testing Rules
+- Use the project's built-in mock data sources (no need for extra mocking libraries).
+- Test each layer independently.
+- High coverage for domain and data layers.
+- Widget tests should verify rendering and interaction.
+- Run with: `flutter test` or specific file: `flutter test test/path/to_test.dart`.
 
 ## Linting and Formatting
-- **Configuration:** `analysis_options.yaml` with `include: package:flutter_lints/flutter.yaml`. Add rules (e.g., `prefer_single_quotes: true`).
-- **Tools:** `dart analyze` for linting; `dart format` for formatting; `dart fix` for auto-fixes.
 
-## Routing
-- **Standard:** Use `go_router` for declarative routing, deep links, and redirects (e.g., auth flows).
-- **Setup:** Add dependency; configure in `MaterialApp.router`. Use redirects for auth.
-  ```dart
-  final GoRouter _router = GoRouter(routes: [GoRoute(path: '/', builder: (...) )]);
-  MaterialApp.router(routerConfig: _router);
-  ```
-- **Fallback:** Built-in `Navigator` for dialogs.
-  ```dart
-  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsScreen()));
-  ```
-- **Alternatives:** `auto_route` if needed.
+- Config: `analysis_options.yaml` includes `package:flutter_lints/flutter.yaml`.
+- Plugins: `custom_lint`, `riverpod_lint`.
+- Commands:
+  - `dart analyze` — check for lint issues.
+  - `dart format lib test` — format code.
+  - `dart fix --apply` — auto-fix.
 
-## Package Management
-- **Tools:** Use `pub` if available; else `flutter pub add <package>`, `flutter pub add dev:<package>`, `dart pub remove <package>`. Overrides: `override:<package>:version`.
-- **External Packages:** Search via `pub_dev_search` or pub.dev; choose stable ones and explain benefits.
+## Error Handling
 
-## Code Generation Workflows
-- **Tools:** `build_runner` as dev_dependency.
-- **Usage:** For Freezed, Riverpod, JSON. Run `dart run build_runner build --delete-conflicting-outputs`.
+- **No silent failures** — always handle errors.
+- Use try-catch with meaningful error types.
+- Log with `dart:developer`, never `print()`.
+- Propagate errors to UI via state (e.g., Freezed error states).
 
 ## Documentation
-- **Philosophy:** Explain 'why'; user-focused; no redundancy; consistent terms.
-- **Style:** `///` for docs; single-sentence summary; separate paragraphs; brief, no jargon; Markdown sparingly; backticks for code.
-- **What to Document:** Public APIs priority; private optional; library overviews; samples; params/returns/exceptions. Before annotations.
-- **Tools:** Use `dartdoc` for generation.
 
-Follow these to achieve robust engineering. Integrate into CI/CD for automated checks when onboarding.
+- `///` doc comments for all public APIs.
+- Explain "why", not "what".
+- Before annotations, not after.
+- Use dartdoc-compatible Markdown.
+
+## Code Generation
+
+After modifying `@riverpod`, `@freezed`, `@JsonSerializable`, or `TypedGoRoute`:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+Watch mode for active development:
+
+```bash
+dart run build_runner watch --delete-conflicting-outputs
+```
+
+## Project-Specific Quality Checks
+
+Beyond standard linting, verify:
+- No Flutter imports in `domain/` layer files.
+- No `print()` statements — use `dart:developer` `log()`.
+- File naming follows conventions (`.screen.dart`, `.widget.dart`, `.provider.dart`, `.entity.dart`).
+- Functions under 20 lines, line length under 80 chars.
+- Shared widgets imported from `package:common/...` (not re-implemented).
+- OpenAPI models from `package:user_openapi/...` (not hand-written DTOs).
+
+## Git Practices
+
+- Commit messages: imperative mood, concise subject line.
+- Feature branches from `main`.
+- PR reviews required before merge.
