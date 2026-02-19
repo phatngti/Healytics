@@ -15,9 +15,10 @@ class ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       width: double.infinity,
@@ -166,11 +167,17 @@ class _StatusBadge extends StatelessWidget {
   final ColorScheme colorScheme;
   final TextTheme textTheme;
 
+  /// Light-theme background for the badge.
+  static const _bgColor = Color(0xFFDCFCE7);
+
+  /// Foreground green for light theme text.
+  static const _fgColor = Color(0xFF15803D);
+
+  /// Dark-theme text color.
+  static const _fgColorDark = Color(0xFF4ADE80);
+
   @override
   Widget build(BuildContext context) {
-    const bgColor = Color(0xFFDCFCE7);
-    const fgColor = Color(0xFF15803D);
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -179,13 +186,13 @@ class _StatusBadge extends StatelessWidget {
         vertical: AppDimens.spaceXxs,
       ),
       decoration: BoxDecoration(
-        color: isDark ? fgColor.withValues(alpha: 0.15) : bgColor,
+        color: isDark ? _fgColor.withValues(alpha: 0.15) : _bgColor,
         borderRadius: AppDimens.radiusExtraSmall,
       ),
       child: Text(
         status,
         style: textTheme.labelSmall?.copyWith(
-          color: isDark ? const Color(0xFF4ADE80) : fgColor,
+          color: isDark ? _fgColorDark : _fgColor,
           fontSize: 10,
           fontWeight: FontWeight.w500,
         ),

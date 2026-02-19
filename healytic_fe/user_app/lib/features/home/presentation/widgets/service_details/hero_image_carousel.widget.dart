@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
-/// Hero image carousel with auto-advancing pages, gradient overlay,
-/// category badge, and title.
+/// Hero image carousel with auto-advancing pages,
+/// gradient overlay, category badge, and title.
+///
+/// Pauses auto-advance when the app is backgrounded
+/// to avoid wasted timer ticks.
 class HeroImageCarousel extends StatefulWidget {
   const HeroImageCarousel({
     super.key,
@@ -26,7 +29,8 @@ class HeroImageCarousel extends StatefulWidget {
   State<HeroImageCarousel> createState() => _HeroImageCarouselState();
 }
 
-class _HeroImageCarouselState extends State<HeroImageCarousel> {
+class _HeroImageCarouselState extends State<HeroImageCarousel>
+    with WidgetsBindingObserver {
   late final PageController _pageController;
   Timer? _autoAdvanceTimer;
   int _currentPage = 0;
@@ -35,17 +39,29 @@ class _HeroImageCarouselState extends State<HeroImageCarousel> {
   void initState() {
     super.initState();
     _pageController = PageController();
+    WidgetsBinding.instance.addObserver(this);
     _startAutoAdvance();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _autoAdvanceTimer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _autoAdvanceTimer?.cancel();
+    } else if (state == AppLifecycleState.resumed) {
+      _startAutoAdvance();
+    }
+  }
+
   void _startAutoAdvance() {
+    _autoAdvanceTimer?.cancel();
     _autoAdvanceTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!mounted) return;
       final next = (_currentPage + 1) % widget.images.length;
@@ -60,9 +76,16 @@ class _HeroImageCarouselState extends State<HeroImageCarousel> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+
+    // Pre-compute cache dimensions for images
+    final heroHeight = screenHeight * 0.35;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final cacheW = (screenWidth * dpr).round();
+    final cacheH = (heroHeight * dpr).round();
 
     return SizedBox(
-      height: screenHeight * 0.35,
+      height: heroHeight,
       width: double.infinity,
       child: Stack(
         fit: StackFit.expand,
@@ -78,6 +101,8 @@ class _HeroImageCarouselState extends State<HeroImageCarousel> {
                 Image.network(
                   widget.images[index],
                   fit: BoxFit.cover,
+                  cacheWidth: cacheW,
+                  cacheHeight: cacheH,
                   errorBuilder: (_, __, ___) => ColoredBox(
                     color: Theme.of(
                       context,

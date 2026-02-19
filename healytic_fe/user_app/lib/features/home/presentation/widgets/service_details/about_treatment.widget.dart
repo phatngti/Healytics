@@ -1,12 +1,16 @@
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
-/// "About Treatment" section with a title, clamped description,
-/// and an animated **Show more / Show less** toggle.
+/// "About Treatment" section with a title, clamped
+/// description, and an animated **Show more / Show
+/// less** toggle.
 ///
-/// The text is limited to [collapsedMaxLines] when collapsed.
-/// If the description fits within that limit the toggle is
-/// hidden automatically.
+/// The text is limited to [collapsedMaxLines] when
+/// collapsed. If the description fits within that limit
+/// the toggle is hidden automatically.
+///
+/// Text measurement is cached in state and only
+/// recomputed when the data or constraints change.
 class AboutTreatment extends StatefulWidget {
   const AboutTreatment({
     super.key,
@@ -32,6 +36,42 @@ class _AboutTreatmentState extends State<AboutTreatment>
     with SingleTickerProviderStateMixin {
   bool _expanded = false;
 
+  /// Cached overflow result – avoids running
+  /// [TextPainter] on every build during animations.
+  bool? _isOverflowing;
+
+  /// The last constraint width used for measurement.
+  double? _lastMeasuredWidth;
+
+  @override
+  void didUpdateWidget(covariant AboutTreatment old) {
+    super.didUpdateWidget(old);
+    if (old.description != widget.description ||
+        old.collapsedMaxLines != widget.collapsedMaxLines) {
+      _isOverflowing = null;
+      _lastMeasuredWidth = null;
+    }
+  }
+
+  /// Measures whether the description overflows the
+  /// given [maxWidth] at [collapsedMaxLines].
+  bool _measureOverflow(double maxWidth, TextStyle? style) {
+    if (_isOverflowing != null && _lastMeasuredWidth == maxWidth) {
+      return _isOverflowing!;
+    }
+    final textSpan = TextSpan(text: widget.description, style: style);
+    final painter = TextPainter(
+      text: textSpan,
+      maxLines: widget.collapsedMaxLines,
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: maxWidth);
+
+    _isOverflowing = painter.didExceedMaxLines;
+    _lastMeasuredWidth = maxWidth;
+    painter.dispose();
+    return _isOverflowing!;
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -55,18 +95,10 @@ class _AboutTreatmentState extends State<AboutTreatment>
         // the text actually overflows.
         LayoutBuilder(
           builder: (context, constraints) {
-            final textSpan = TextSpan(
-              text: widget.description,
-              style: descriptionStyle,
+            final isOverflowing = _measureOverflow(
+              constraints.maxWidth,
+              descriptionStyle,
             );
-
-            final textPainter = TextPainter(
-              text: textSpan,
-              maxLines: widget.collapsedMaxLines,
-              textDirection: TextDirection.ltr,
-            )..layout(maxWidth: constraints.maxWidth);
-
-            final isOverflowing = textPainter.didExceedMaxLines;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
