@@ -690,3 +690,174 @@ Hệ thống áp dụng chặt chẽ mô hình \textbf{Data Transfer Object (DTO
     
     \item \textbf{Nested Validation:} Hỗ trợ validate dữ liệu lồng nhau (ví dụ: object \texttt{profile} bên trong \texttt{register} request) thông qua \texttt{@ValidateNested} và \texttt{Type(() => RegisterProfileDto)}.
 \end{itemize}
+
+\subsection{Quy trình Đăng ký \& Xác minh Đối tác (Partner Registration \& Verification)}
+
+Module \texttt{PartnersModule} hiện thực toàn bộ luồng nghiệp vụ trọng tâm của hệ thống: từ đăng ký đối tác, nộp hồ sơ, đến phê duyệt bởi quản trị viên. Quy trình được thiết kế theo mô hình máy trạng thái (State Machine) với 5 trạng thái rõ ràng.
+
+\subsubsection{Máy trạng thái xác minh (Verification State Machine)}
+
+Trạng thái xác minh của đối tác được quản lý bởi enum \texttt{PartnerVerificationStatus}, bao gồm:
+
+\begin{itemize}
+    \item \texttt{ONBOARDING}: Đối tác vừa đăng ký, đang bổ sung hồ sơ và tài liệu.
+    \item \texttt{PENDING}: Đối tác đã nộp đầy đủ hồ sơ, đang chờ quản trị viên xét duyệt.
+    \item \texttt{APPROVED}: Đã được phê duyệt, đối tác có thể hoạt động trên nền tảng.
+    \item \texttt{REJECTED}: Bị từ chối vĩnh viễn (Terminal state), không thể khôi phục.
+    \item \texttt{REQUIRED\_RESUBMIT}: Bị yêu cầu bổ sung/sửa đổi (Soft Reject), đối tác cần chỉnh sửa và nộp lại.
+\end{itemize}
+
+Sơ đồ chuyển đổi trạng thái:
+
+\begin{center}
+\begin{tabular}{@{}r@{\;}c@{\;}l@{}}
+\texttt{ONBOARDING} $\rightarrow$ \texttt{PENDING} & $\rightarrow$ & \texttt{APPROVED} \\
+& $\searrow$ & \texttt{REJECTED} \\
+& $\searrow$ & \texttt{REQUIRED\_RESUBMIT} $\rightarrow$ \texttt{PENDING} $\rightarrow$ \ldots \\
+\end{tabular}
+\end{center}
+
+\subsubsection{Đăng ký đối tác (\texttt{registerPartner})}
+
+Hàm \texttt{registerPartner} trong \texttt{PartnersService} thực hiện quy trình đăng ký trong một giao dịch (Transaction) nguyên tử:
+
+\begin{enumerate}
+    \item \textbf{Kiểm tra trùng lặp:} Xác minh email và mã số thuế (tax code) chưa tồn tại trong hệ thống.
+    \item \textbf{Xác thực địa chỉ:} Gọi \texttt{LocationsService.validateAddress} để kiểm tra tính hợp lệ của chuỗi tỉnh/huyện/xã.
+    \item \textbf{Tạo dữ liệu:} Trong một transaction duy nhất, tạo lần lượt: \texttt{Account} (băm mật khẩu bằng \texttt{bcrypt}), \texttt{Partner} (thông tin doanh nghiệp), \texttt{LegalRepresentative} (người đại diện pháp lý), và \texttt{PartnerDocument} (các tài liệu KYC).
+    \item \textbf{Cấp phát token:} Sau khi commit thành công, gọi \texttt{AuthService.createTokensForUser} để trả về \texttt{access\_token} và \texttt{refresh\_token}.
+\end{enumerate}
+
+Trạng thái khởi tạo: \texttt{PENDING} --- đối tác ngay lập tức vào hàng đợi chờ xét duyệt.
+
+\subsubsection{Cập nhật hồ sơ --- Smart Update Logic (\texttt{updateMyProfile})}
+
+Khi đối tác cập nhật hồ sơ (đặc biệt sau khi bị yêu cầu bổ sung), hệ thống áp dụng logic ``Smart Update'':
+
+\begin{itemize}
+    \item \textbf{UpdatedField Wrapper:} Mỗi trường được bọc trong cấu trúc \texttt{\{fieldKey, value\}}, giúp hệ thống biết chính xác trường nào được thay đổi.
+    \item \textbf{Critical Change Detection:} Phân biệt thay đổi nhạy cảm (mã số thuế, địa chỉ, thông tin người đại diện) và thay đổi thông thường (số điện thoại, tên thương hiệu).
+    \item \textbf{Tự động chuyển trạng thái:}
+    \begin{itemize}
+        \item Nếu tất cả lỗi đã được sửa và hồ sơ đầy đủ: \texttt{REQUIRED\_RESUBMIT} / \texttt{ONBOARDING} $\rightarrow$ \texttt{PENDING}.
+        \item Nếu đối tác đã \texttt{APPROVED} nhưng sửa đổi thông tin nhạy cảm: \texttt{APPROVED} $\rightarrow$ \texttt{REQUIRED\_RESUBMIT} (thu hồi phê duyệt).
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Hiển thị phản hồi từ quản trị viên (\texttt{getMyProfile})}
+
+Khi đối tác xem hồ sơ, hệ thống:
+
+\begin{enumerate}
+    \item Truy xuất \texttt{PartnerReviewLog} mới nhất (sắp xếp theo \texttt{createdAt DESC}).
+    \item Xây dựng 2 bản đồ phản hồi: \texttt{fieldFeedbackMap} (phản hồi theo trường thông tin) và \texttt{documentFeedbackMap} (phản hồi theo tài liệu).
+    \item Trả về cùng hồ sơ, giúp ứng dụng Mobile/Web đánh dấu chính xác trường nào cần sửa và hiển thị lý do từ chối.
+\end{enumerate}
+
+\subsection{Module Quản trị và Nhật ký Kiểm toán (Admin Management \& Audit Trail)}
+
+\subsubsection{Xét duyệt đối tác (\texttt{AdminPartnersService.reviewPartner})}
+
+Module \texttt{AdminModule} cung cấp các API dành riêng cho quản trị viên, được bảo vệ bởi \texttt{JwtAuthGuard} kết hợp với \texttt{RolesGuard} yêu cầu role \texttt{ADMIN}.
+
+Quy trình xét duyệt hoạt động như sau:
+
+\begin{enumerate}
+    \item \textbf{Ràng buộc tiên quyết:} Chỉ cho phép xét duyệt khi trạng thái đối tác là \texttt{PENDING}. Các trạng thái khác sẽ bị từ chối với \texttt{BadRequestException}.
+
+    \item \textbf{Phân loại review items:} Quản trị viên gửi danh sách \texttt{items[]} chứa \texttt{\{fieldKey, feedback\}}. Hệ thống kiểm tra \texttt{fieldKey}:
+    \begin{itemize}
+        \item Nếu thuộc \texttt{PartnerFieldKeys} (danh sách hằng số tập trung) $\rightarrow$ xử lý như review trường thông tin.
+        \item Nếu không thuộc $\rightarrow$ xử lý như review tài liệu (khớp theo \texttt{documentKey}).
+    \end{itemize}
+
+    \item \textbf{Snapshot dữ liệu:} Với mỗi trường/tài liệu được review, hệ thống chụp lại (snapshot) giá trị hiện tại vào JSONB:
+    \begin{itemize}
+        \item Field review: \texttt{\{value (snapshot), isValid, feedback\}}
+        \item Document review: \texttt{\{documentType, url, isValid, feedback\}}
+    \end{itemize}
+
+    \item \textbf{Xác định verdict:} Logic ưu tiên:
+    \begin{itemize}
+        \item \texttt{decision = REJECTED} $\rightarrow$ \texttt{REJECTED} (từ chối vĩnh viễn, có quyền cao nhất).
+        \item Có lỗi (feedback items) $\rightarrow$ \texttt{REQUIRED\_RESUBMIT} (bất kể decision).
+        \item \texttt{decision = APPROVED} và không có lỗi $\rightarrow$ \texttt{APPROVED} (kiểm tra tài liệu bắt buộc trước).
+    \end{itemize}
+
+    \item \textbf{Tạo PartnerReviewLog:} Bản ghi bất biến (immutable) lưu trữ: \texttt{verdict}, \texttt{reviewerId}, \texttt{generalComment}, \texttt{fieldReviews} (JSONB), và \texttt{documentReviews} (JSONB).
+\end{enumerate}
+
+\subsubsection{Nhật ký kiểm toán (Audit Logging)}
+
+Module \texttt{AuditModule} ghi lại mọi hành động quan trọng của quản trị viên thông qua cơ chế \textbf{AOP (Aspect-Oriented Programming)}:
+
+\begin{itemize}
+    \item \textbf{Decorator \texttt{@Audit}:} Đánh dấu tại Controller method, ví dụ \texttt{@Audit('PARTNER\_REVIEW', 'Partner')}.
+    \item \textbf{Interceptor \texttt{AuditInterceptor}:} Tự động ghi log trước/sau khi method thực thi, bao gồm: người thực hiện (\texttt{actorId}), hành động, đối tượng bị tác động (\texttt{targetId}), và thời điểm.
+    \item \textbf{AuditService:} Lưu trữ và truy xuất log, hỗ trợ lọc theo \texttt{targetId}, \texttt{actorId}, và \texttt{action}.
+\end{itemize}
+
+Kết hợp với \texttt{PartnerReviewLog}, hệ thống đảm bảo khả năng truy vết hoàn toàn (full traceability): ai đã phê duyệt, khi nào, và dữ liệu tại thời điểm phê duyệt trông như thế nào.
+
+\subsection{Quản lý Tệp tin và Lưu trữ (S3 File Management)}
+
+Module \texttt{S3Module} tích hợp với dịch vụ lưu trữ đối tượng tương thích S3 (MinIO) để quản lý tệp tin:
+
+\begin{itemize}
+    \item \textbf{Upload:} Tạo Pre-signed URL cho phép Client upload trực tiếp đến storage mà không qua Backend, giảm tải cho server.
+    \item \textbf{Download:} Sinh Pre-signed URL có thời hạn để truy cập tệp tin (tài liệu doanh nghiệp, hình ảnh sản phẩm).
+    \item \textbf{Quản lý tài liệu đối tác:} Entity \texttt{PartnerDocument} lưu metadata (loại tài liệu, URL, trạng thái) trong PostgreSQL, trong khi nội dung tệp thực tế nằm trên Object Storage.
+\end{itemize}
+
+\subsection{Kiểm thử hệ thống (Testing)}
+
+Hệ thống áp dụng chiến lược kiểm thử đa tầng để đảm bảo chất lượng mã nguồn.
+
+\subsubsection{Kiểm thử đơn vị (Unit Tests)}
+
+Sử dụng \textbf{Jest} làm framework kiểm thử chính. Mỗi module đều có các tệp \texttt{*.spec.ts} tương ứng cho cả \texttt{Controller} và \texttt{Service}. Tổng cộng hệ thống có \textbf{23 tệp unit test} bao phủ toàn bộ các module:
+
+\begin{itemize}
+    \item \texttt{auth}: Kiểm thử đăng ký, đăng nhập, refresh token, JWT strategy.
+    \item \texttt{partners}: Kiểm thử đăng ký đối tác, cập nhật hồ sơ, chuyển đổi trạng thái.
+    \item \texttt{admin}: Kiểm thử quy trình xét duyệt, xác định verdict, tạo review log.
+    \item \texttt{audit}: Kiểm thử interceptor, decorator, và service ghi log.
+    \item \texttt{employees}, \texttt{products}, \texttt{categories}, \texttt{locations}, \texttt{service-tags}, \texttt{s3}: Kiểm thử CRUD và business logic tương ứng.
+\end{itemize}
+
+Các unit test sử dụng kỹ thuật:
+
+\begin{itemize}
+    \item \textbf{Mock Repository:} Thay thế TypeORM Repository bằng các mock object sử dụng \texttt{@nestjs/testing} và \texttt{getRepositoryToken}.
+    \item \textbf{DI Override:} Ghi đè Dependency Injection trong test module để cô lập từng lớp logic.
+    \item \textbf{AAA Pattern:} Tuân thủ mô hình Arrange--Act--Assert cho mọi test case.
+\end{itemize}
+
+\subsubsection{Kiểm thử tích hợp (End-to-End Tests)}
+
+Các test E2E được tách riêng trong thư mục \texttt{test/e2e/}, sử dụng \texttt{Supertest} kết hợp với \texttt{@nestjs/testing} để khởi tạo toàn bộ ứng dụng NestJS và gửi HTTP request thực:
+
+\begin{itemize}
+    \item \texttt{auth/}: Kiểm thử luồng đăng ký $\rightarrow$ đăng nhập $\rightarrow$ refresh token hoàn chỉnh.
+    \item \texttt{account/}: Kiểm thử cập nhật hồ sơ cá nhân.
+    \item \texttt{categories/}, \texttt{employees/}, \texttt{products/}: Kiểm thử các API CRUD end-to-end.
+\end{itemize}
+
+Cấu trúc test hỗ trợ tái sử dụng thông qua:
+
+\begin{itemize}
+    \item \texttt{test/factories/}: Factory pattern để tạo dữ liệu test nhất quán.
+    \item \texttt{test/fixtures/}: Dữ liệu mẫu cố định cho các trường hợp kiểm thử.
+    \item \texttt{test/mocks/}: Các mock service dùng chung giữa các test suite.
+    \item \texttt{test/helpers/}: Hàm tiện ích hỗ trợ setup và teardown.
+\end{itemize}
+
+\subsubsection{Công cụ và lệnh kiểm thử}
+
+\begin{itemize}
+    \item \textbf{Chạy unit test:} \texttt{npm test} hoặc \texttt{npx jest}
+    \item \textbf{Chạy E2E test:} \texttt{npm run test:e2e}
+    \item \textbf{Xem coverage:} \texttt{npm run test:cov}
+    \item \textbf{Kiểm tra linting:} \texttt{npx eslint src/}
+    \item \textbf{Định dạng mã:} \texttt{npx prettier --write src/}
+\end{itemize}
