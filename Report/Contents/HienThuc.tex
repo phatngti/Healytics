@@ -690,3 +690,117 @@ Hệ thống áp dụng chặt chẽ mô hình \textbf{Data Transfer Object (DTO
     
     \item \textbf{Nested Validation:} Hỗ trợ validate dữ liệu lồng nhau (ví dụ: object \texttt{profile} bên trong \texttt{register} request) thông qua \texttt{@ValidateNested} và \texttt{Type(() => RegisterProfileDto)}.
 \end{itemize}
+
+\subsection{Quy trình Đăng ký \& Xác minh Đối tác (Partner Registration \& Verification)}
+
+Module \texttt{PartnersModule} quản lý toàn bộ quy trình từ lúc đối tác đăng ký tài khoản, nộp hồ sơ kinh doanh, cho đến khi được quản trị viên phê duyệt hoặc yêu cầu bổ sung. Toàn bộ quy trình được vận hành theo mô hình máy trạng thái (State Machine) gồm 5 trạng thái.
+
+\subsubsection{Các trạng thái xác minh đối tác}
+
+Mỗi đối tác luôn ở một trong 5 trạng thái sau, được định nghĩa trong enum \texttt{PartnerVerificationStatus}:
+
+\begin{itemize}
+    \item \texttt{ONBOARDING}: Đối tác vừa tạo tài khoản, đang trong quá trình bổ sung thông tin và tải lên giấy tờ.
+    \item \texttt{PENDING}: Hồ sơ đã được nộp đầy đủ, đang chờ quản trị viên xem xét.
+    \item \texttt{APPROVED}: Hồ sơ đã được chấp thuận, đối tác có thể bắt đầu cung cấp dịch vụ trên nền tảng.
+    \item \texttt{REJECTED}: Hồ sơ bị từ chối vĩnh viễn, không thể nộp lại.
+    \item \texttt{REQUIRED\_RESUBMIT}: Hồ sơ cần chỉnh sửa hoặc bổ sung thêm tài liệu trước khi nộp lại.
+\end{itemize}
+
+Sơ đồ chuyển đổi trạng thái:
+
+\begin{center}
+\begin{tabular}{@{}r@{\;}c@{\;}l@{}}
+\texttt{ONBOARDING} $\rightarrow$ \texttt{PENDING} & $\rightarrow$ & \texttt{APPROVED} \\
+& $\searrow$ & \texttt{REJECTED} \\
+& $\searrow$ & \texttt{REQUIRED\_RESUBMIT} $\rightarrow$ \texttt{PENDING} $\rightarrow$ \ldots \\
+\end{tabular}
+\end{center}
+
+\subsubsection{Đăng ký đối tác}
+
+Khi đối tác đăng ký, hệ thống thực hiện các bước sau trong cùng một giao dịch (transaction) để đảm bảo tính toàn vẹn dữ liệu:
+
+\begin{enumerate}
+    \item \textbf{Kiểm tra trùng lặp:} Đảm bảo email và mã số thuế chưa có trong hệ thống.
+    \item \textbf{Kiểm tra địa chỉ:} Xác nhận thông tin tỉnh/huyện/xã hợp lệ thông qua \texttt{LocationsService}.
+    \item \textbf{Khởi tạo dữ liệu:} Khởi tạo thông tin tài khoản, thông tin doanh nghiệp, người đại diện pháp lý, và các giấy tờ KYC ban đầu.
+    \item \textbf{Cấp quyền truy cập:} Tạo token truy cập để đối tác có thể đăng nhập ngay.
+\end{enumerate}
+
+Sau khi đăng ký thành công, đối tác được gán trạng thái \texttt{PENDING} và tự động vào hàng đợi chờ xét duyệt.
+
+\subsubsection{Cập nhật hồ sơ thông minh }
+
+Khi đối tác chỉnh sửa hồ sơ (đặc biệt sau khi bị yêu cầu bổ sung), hệ thống áp dụng cơ chế cập nhật thông minh (Smart Update) gồm 3 bước:
+
+\begin{itemize}
+    \item \textbf{Nhận diện thay đổi:} Mỗi trường gửi lên đều kèm theo \texttt{fieldKey}, giúp hệ thống biết chính xác trường nào đã được sửa mà không cần so sánh toàn bộ dữ liệu.
+    \item \textbf{Phân loại mức độ quan trọng:} Hệ thống phân biệt rõ giữa thay đổi nhạy cảm (mã số thuế, địa chỉ, thông tin người đại diện) và thay đổi thông thường (số điện thoại, tên thương hiệu).
+    \item \textbf{Tự động chuyển trạng thái:}
+    \begin{itemize}
+        \item Nếu đối tác đang ở trạng thái \texttt{REQUIRED\_RESUBMIT} hoặc \texttt{ONBOARDING} và đã sửa hết các lỗi $\rightarrow$ tự động chuyển sang \texttt{PENDING} để chờ xét duyệt lại.
+        \item Nếu đối tác đã được \texttt{APPROVED} nhưng sửa thông tin nhạy cảm $\rightarrow$ thu hồi phê duyệt và chuyển về \texttt{REQUIRED\_RESUBMIT} để quản trị viên xem xét lại.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Hiển thị phản hồi từ quản trị viên}
+
+Khi đối tác mở xem hồ sơ của mình, hệ thống sẽ:
+
+\begin{enumerate}
+    \item Lấy bản đánh giá gần nhất từ bảng \texttt{PartnerReviewLog}.
+    \item Tổng hợp phản hồi thành 2 danh sách: phản hồi theo từng trường thông tin (\texttt{fieldFeedbackMap}) và phản hồi theo từng tài liệu (\texttt{documentFeedbackMap}).
+    \item Trả về kèm theo hồ sơ, giúp ứng dụng đánh dấu trực quan những mục cần sửa và hiển thị lý do cụ thể từ quản trị viên.
+\end{enumerate}
+
+\subsection{Module Quản trị và Nhật ký Kiểm toán (Admin Management \& Audit Trail)}
+
+\subsubsection{Xét duyệt đối tác (\texttt{reviewPartner})}
+
+Các API quản trị nằm trong \texttt{AdminModule}, chỉ cho phép truy cập bởi người dùng có vai trò \texttt{ADMIN} (được bảo vệ bằng \texttt{JwtAuthGuard} và \texttt{RolesGuard}).
+
+Khi quản trị viên xét duyệt một hồ sơ đối tác, hệ thống xử lý theo các bước:
+
+\begin{enumerate}
+    \item \textbf{Kiểm tra điều kiện:} Chỉ cho phép xét duyệt khi đối tác đang ở trạng thái \texttt{PENDING}. Nếu không, hệ thống trả về lỗi.
+
+    \item \textbf{Phân loại đánh giá:} Quản trị viên gửi danh sách các mục cần đánh giá, mỗi mục gồm \texttt{fieldKey} và \texttt{feedback}. Hệ thống tự động phân loại:
+    \begin{itemize}
+        \item Nếu \texttt{fieldKey} nằm trong danh sách trường thông tin đã biết $\rightarrow$ đánh giá trường hồ sơ.
+        \item Nếu không $\rightarrow$ đánh giá tài liệu (khớp theo mã tài liệu).
+    \end{itemize}
+
+    \item \textbf{Lưu ảnh chụp dữ liệu:} Với mỗi mục được đánh giá, hệ thống lưu lại giá trị hiện tại (snapshot) kèm kết quả hợp lệ hay không và phản hồi chi tiết. Điều này giúp truy vết lại chính xác dữ liệu tại thời điểm xét duyệt.
+
+    \item \textbf{Xác định kết quả cuối cùng:} Hệ thống áp dụng quy tắc ưu tiên:
+    \begin{itemize}
+        \item Nếu quản trị viên chọn từ chối $\rightarrow$ \texttt{REJECTED} (ưu tiên cao nhất, không thể đảo ngược).
+        \item Nếu có bất kỳ mục nào bị đánh dấu lỗi $\rightarrow$ \texttt{REQUIRED\_RESUBMIT} (yêu cầu sửa lại).
+        \item Nếu tất cả hợp lệ và đủ tài liệu bắt buộc $\rightarrow$ \texttt{APPROVED}.
+    \end{itemize}
+
+    \item \textbf{Ghi nhận lịch sử:} Toàn bộ kết quả xét duyệt được lưu vào bảng \texttt{PartnerReviewLog} dưới dạng bản ghi không thể sửa đổi, bao gồm: kết quả, người duyệt, nhận xét chung, và chi tiết đánh giá từng trường/tài liệu.
+\end{enumerate}
+
+\subsubsection{Nhật ký kiểm toán (Audit Logging)}
+
+Ngoài lịch sử xét duyệt, hệ thống còn ghi lại mọi thao tác quan trọng của quản trị viên thông qua module \texttt{AuditModule}:
+
+\begin{itemize}
+    \item \textbf{Đánh dấu hành động:} Sử dụng decorator \texttt{@Audit} gắn trực tiếp trên các API cần theo dõi, ví dụ: \texttt{@Audit('PARTNER\_REVIEW', 'Partner')}.
+    \item \textbf{Tự động ghi nhận:} \texttt{AuditInterceptor} tự động thu thập thông tin trước và sau khi API được thực thi, bao gồm: ai thực hiện, thao tác gì, tác động đến đối tượng nào, và thời điểm cụ thể.
+    \item \textbf{Tra cứu linh hoạt:} \texttt{AuditService} cho phép tìm kiếm nhật ký theo người thực hiện, đối tượng bị tác động, hoặc loại hành động.
+\end{itemize}
+
+Nhờ kết hợp giữa \texttt{PartnerReviewLog} và \texttt{AuditLog}, hệ thống đảm bảo khả năng truy vết toàn diện: ai đã duyệt hồ sơ nào, vào lúc nào, và dữ liệu lúc đó trông ra sao.
+
+\subsection{Quản lý Tệp tin và Lưu trữ (S3 File Management)}
+
+Module \texttt{S3Module} tích hợp với dịch vụ lưu trữ đối tượng tương thích S3 (MinIO) để quản lý tệp tin:
+
+\begin{itemize}
+    \item \textbf{Upload:} Tạo Pre-signed URL cho phép Client upload trực tiếp đến storage mà không qua Backend, giảm tải cho server.
+    \item \textbf{Download:} Sinh Pre-signed URL có thời hạn để truy cập tệp tin (tài liệu doanh nghiệp, hình ảnh sản phẩm).
+    \item \textbf{Quản lý tài liệu đối tác:} Thực thể \texttt{PartnerDocument} lưu metadata (loại tài liệu, URL, trạng thái) trong PostgreSQL, trong khi nội dung tệp thực tế nằm trên Object Storage.
+\end{itemize}
