@@ -1,7 +1,7 @@
-import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -510,13 +510,6 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
   }
 }
 
-class _Resource {
-  final String resourceId;
-  final int quantity;
-
-  _Resource({required this.resourceId, required this.quantity});
-}
-
 class _StaffAllocationOption extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -605,7 +598,8 @@ class _EmployeeStaffChip extends StatelessWidget {
           if (employee.avatar.isNotEmpty)
             CircleAvatar(
               radius: 10,
-              backgroundImage: NetworkImage(employee.avatar),
+              backgroundImage: NetworkImage(employee.avatar, headers: const {}),
+              onBackgroundImageError: (_, __) {},
             )
           else
             Container(
@@ -713,136 +707,6 @@ class _IconTextField extends StatelessWidget {
   }
 }
 
-class _ResourceRow extends StatelessWidget {
-  final _Resource resource;
-  final VoidCallback onRemove;
-  final ValueChanged<_Resource> onChanged;
-
-  const _ResourceRow({
-    required this.resource,
-    required this.onRemove,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Row(
-      children: [
-        Expanded(
-          flex: 3,
-          child: DropdownButtonFormField<String>(
-            isExpanded: true,
-            value: resource.resourceId.isEmpty ? null : resource.resourceId,
-            items: const [
-              DropdownMenuItem(value: 'room_std', child: Text('Standard Room')),
-              DropdownMenuItem(
-                value: 'room_prem',
-                child: Text('Premium Suite'),
-              ),
-              DropdownMenuItem(value: 'laser', child: Text('Laser Machine')),
-            ],
-            onChanged: (value) {
-              if (value != null) {
-                onChanged(
-                  _Resource(resourceId: value, quantity: resource.quantity),
-                );
-              }
-            },
-            decoration: InputDecoration(
-              hintText: 'Select Resource...',
-              filled: true,
-              fillColor: colorScheme.surface,
-              border: OutlineInputBorder(
-                borderRadius: AppDimens.radiusSmall,
-                borderSide: BorderSide(color: colorScheme.outlineVariant),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: AppDimens.radiusSmall,
-                borderSide: BorderSide(color: colorScheme.outlineVariant),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: AppDimens.radiusSmall,
-                borderSide: BorderSide(color: colorScheme.primary),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 10,
-              ),
-            ),
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ),
-        AppDimens.horizontalSmall,
-        Expanded(
-          flex: 2,
-          child: Stack(
-            children: [
-              TextFormField(
-                initialValue: resource.quantity.toString(),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  final qty = int.tryParse(value) ?? 1;
-                  onChanged(
-                    _Resource(resourceId: resource.resourceId, quantity: qty),
-                  );
-                },
-                decoration: InputDecoration(
-                  hintText: '1',
-                  filled: true,
-                  fillColor: colorScheme.surface,
-                  border: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSmall,
-                    borderSide: BorderSide(color: colorScheme.outlineVariant),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSmall,
-                    borderSide: BorderSide(color: colorScheme.outlineVariant),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSmall,
-                    borderSide: BorderSide(color: colorScheme.primary),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 10,
-                  ),
-                ),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              Positioned(
-                right: 8,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: Text(
-                    'qty',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontSize: 10,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        AppDimens.horizontalSmall,
-        IconButton(
-          onPressed: onRemove,
-          icon: Icon(
-            Icons.delete_outline,
-            size: 18,
-            color: colorScheme.onSurfaceVariant,
-          ),
-          style: IconButton.styleFrom(backgroundColor: colorScheme.surface),
-        ),
-      ],
-    );
-  }
-}
-
 /// Dialog for selecting staff members from EmployeeEntity list
 class _EmployeeSelectionDialog extends StatefulWidget {
   final List<EmployeeEntity> allStaff;
@@ -910,6 +774,7 @@ class _EmployeeSelectionDialogState extends State<_EmployeeSelectionDialog> {
                       CircleAvatar(
                         radius: 14,
                         backgroundImage: NetworkImage(staff.avatar),
+                        onBackgroundImageError: (_, __) {},
                       )
                     else
                       Container(

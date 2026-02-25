@@ -11,8 +11,8 @@ import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@/account/enum/role.enum';
-import { UserProfile } from '@/account/entities/user-profile.entity';
-import { Account } from '@/account/entities/account.entity';
+import { UserProfile } from '@/common/entities/user-profile.entity';
+import { Account } from '@/common/entities/account.entity';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { PartnersService } from '@/partners/partners.service';
 
@@ -301,27 +301,5 @@ export class AuthService {
       user.userProfile,
     );
     return tokens;
-  }
-
-  /**
-   * Creates default admin account if none exists.
-   */
-  async createDefaultAdmin(): Promise<void> {
-    const adminEmail = process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.com';
-    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin@123';
-    const existingAdmin = await this.accountService.findByEmail(adminEmail);
-    if (!existingAdmin) {
-      this.logger.log(`Creating default admin account: ${adminEmail}`);
-      const hashedPassword = await bcrypt.hash(adminPassword, 10);
-      await this.accountService.create({
-        email: adminEmail,
-        passwordHash: hashedPassword,
-        role: Role.ADMIN,
-        isActive: true,
-      });
-      this.logger.log('Default admin account created successfully.');
-    } else {
-      this.logger.log('Admin account already exists.');
-    }
   }
 }

@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { Category } from '../../entities/category.entity';
+import { Category } from '@/common/entities/category.entity';
 
 /**
  * Handler for removing categories using soft delete.

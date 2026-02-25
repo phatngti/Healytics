@@ -13,7 +13,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { IdType } from '@/partners/enum/id-type.enum';
-import { DocumentFileType, DocumentFileTypes, DocumentTypes, DocumentTypeValue } from '@/partners/entities/partner-document.entity';
+import { DocumentFileType, DocumentFileTypes, DocumentTypes, DocumentTypeValue } from '@/common/entities/partner-document.entity';
 
 
 export class PartnerDocumentVerificationDto {

@@ -1,6 +1,6 @@
 import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/sign_up_header.widget.dart';
 import 'package:admin_panel/router/admin_routes.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

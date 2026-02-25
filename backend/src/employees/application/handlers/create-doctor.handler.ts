@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreateDoctorDto } from '../../dto/create-doctor.dto';
-import { Employee } from '../../entities/employee.entity';
-import { DoctorProfile } from '../../entities/doctor-profile.entity';
+import { Employee } from '@/common/entities/employee.entity';
+import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { EmployeeRole } from '../../enum/employee-role.enum';
 
 /**

@@ -84,7 +84,7 @@ export class PartnerDetailResponseDto {
     @ApiProperty({ example: 'Hanoi Spa' })
     brandName: string;
 
-    @ApiProperty({ enum: BusinessType, isArray: true, example: [BusinessType.SPA_BEAUTY] })
+    @ApiProperty({ enum: BusinessType, enumName: 'BusinessType', isArray: true, example: [BusinessType.SPA_BEAUTY] })
     businessType: BusinessType[];
 
     @ApiProperty({ type: AddressDetailDto })
@@ -93,7 +93,7 @@ export class PartnerDetailResponseDto {
     @ApiProperty({ type: LegalRepDetailDto })
     legalRepresentative: LegalRepDetailDto;
 
-    @ApiProperty({ enum: PartnerVerificationStatus, example: PartnerVerificationStatus.PENDING })
+    @ApiProperty({ enum: PartnerVerificationStatus, enumName: 'PartnerVerificationStatus', example: PartnerVerificationStatus.PENDING })
     verificationStatus: PartnerVerificationStatus;
 
     @ApiProperty({ example: null, nullable: true })

@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { Account } from '../../entities/account.entity';
+import { Account } from '@/common/entities/account.entity';
 
 /**
  * Handler for setting refresh token hash with transactional boundaries.

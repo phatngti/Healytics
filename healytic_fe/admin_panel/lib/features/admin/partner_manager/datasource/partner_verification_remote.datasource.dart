@@ -1,4 +1,5 @@
-import 'package:admin_openapi/api.dart';
+import 'package:admin_openapi/api.dart' hide PartnerVerificationStatus;
+import 'package:admin_openapi/api.dart' as openapi;
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/providers/api.provider.dart';
@@ -329,15 +330,15 @@ class PartnerVerificationRemoteDataSourceImpl
 
   /// Maps verification status enum from list DTO
   PartnerVerificationStatus _mapItemVerificationStatus(
-    PartnerItemDtoVerificationStatusEnum status,
+    openapi.PartnerVerificationStatus status,
   ) {
     return switch (status) {
-      PartnerItemDtoVerificationStatusEnum.PENDING ||
-      PartnerItemDtoVerificationStatusEnum.REQUIRED_RESUBMIT =>
+      openapi.PartnerVerificationStatus.PENDING ||
+      openapi.PartnerVerificationStatus.REQUIRED_RESUBMIT =>
         PartnerVerificationStatus.pending,
-      PartnerItemDtoVerificationStatusEnum.APPROVED =>
+      openapi.PartnerVerificationStatus.APPROVED =>
         PartnerVerificationStatus.approved,
-      PartnerItemDtoVerificationStatusEnum.REJECTED =>
+      openapi.PartnerVerificationStatus.REJECTED =>
         PartnerVerificationStatus.rejected,
       _ => PartnerVerificationStatus.pending,
     };

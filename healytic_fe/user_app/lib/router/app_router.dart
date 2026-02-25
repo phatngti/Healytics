@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:user_app/core/entities/store.entity.dart';
-import 'package:user_app/core/models/store.model.dart';
+import 'package:user_app/core/providers/auth_session.provider.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -18,9 +17,9 @@ GoRouter router(Ref ref) {
     navigatorKey: rootNavigatorKey,
     initialLocation: initialLocation,
     debugLogDiagnostics: true,
-    routes: [$lottieSplashRoute, $mobileWrapperRoutes],
+    routes: $appRoutes,
     refreshListenable: notifier,
-    // redirect: notifier.redirect,
+    redirect: notifier.redirect,
   );
 }
 
@@ -30,34 +29,45 @@ class RouterListenable extends _$RouterListenable implements Listenable {
 
   @override
   FutureOr<void> build() {
-    // Watch auth state
-    final subscription = Store.watch(StoreKey.accessToken).listen((_) {
+    final authSessionStore = ref.watch(authSessionStoreProvider);
+    final subscription = authSessionStore.watchAccessToken().listen((_) {
       _notifyListeners();
     });
     ref.onDispose(subscription.cancel);
   }
 
   String? redirect(BuildContext context, GoRouterState state) {
-    final isLoggedIn = Store.tryGet(StoreKey.accessToken)?.isNotEmpty == true;
+    final authSessionStore = ref.watch(authSessionStoreProvider);
+    final isLoggedIn = authSessionStore.isLoggedIn;
     final path = state.uri.path;
-    print('isLoggedIn: $isLoggedIn');
-    // Routes that require authentication
-    final isProtectedRoute =
-        path.startsWith('/home') ||
-        path.startsWith('/orders') ||
-        path.startsWith('/chat') ||
-        path.startsWith('/notifications') ||
-        path.startsWith('/profile');
+
+    final isPublicRoute =
+        (LottieSplashRoute.isPublic && path == LottieSplashRoute.pathPattern) ||
+        (OnboardingRoute.isPublic && path == OnboardingRoute.pathPattern) ||
+        (SignInRoute.isPublic && path == SignInRoute.pathPattern) ||
+        (EmailFormRoute.isPublic && path == EmailFormRoute.pathPattern) ||
+        (EmailCodeConfirmationRoute.isPublic &&
+            path == EmailCodeConfirmationRoute.pathPattern) ||
+        (FinishSignUpRoute.isPublic && path == FinishSignUpRoute.pathPattern) ||
+        (SurveyScreenRoute.isPublic && path == SurveyScreenRoute.pathPattern) ||
+        (GeneralGoalsStepRoute.isPublic &&
+            path == GeneralGoalsStepRoute.pathPattern) ||
+        (LifestyleActivityStepRoute.isPublic &&
+            path == LifestyleActivityStepRoute.pathPattern) ||
+        (BodyEnergyStepRoute.isPublic &&
+            path == BodyEnergyStepRoute.pathPattern) ||
+        (HealthSafetyStepRoute.isPublic &&
+            path == HealthSafetyStepRoute.pathPattern);
 
     if (isLoggedIn) {
-      // If logged in and trying to access login/onboarding, redirect to home
-      if (path == '/signin' || path == '/onboarding') {
+      // Logged-in user hitting a public route → send to home
+      if (isPublicRoute) {
         return '/home';
       }
     } else {
-      // If not logged in and trying to access protected route, redirect to signin
-      if (isProtectedRoute) {
-        return '/home';
+      // Not logged in and trying to access a protected route
+      if (!isPublicRoute) {
+        return '/signin';
       }
     }
     return null;

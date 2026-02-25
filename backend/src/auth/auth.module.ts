@@ -1,4 +1,4 @@
-import { Module, OnModuleInit, forwardRef } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -24,10 +24,4 @@ import { PartnersModule } from '@/partners/partners.module';
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
 })
-export class AuthModule implements OnModuleInit {
-  constructor(private readonly authService: AuthService) {}
-
-  async onModuleInit() {
-    await this.authService.createDefaultAdmin();
-  }
-}
+export class AuthModule {}

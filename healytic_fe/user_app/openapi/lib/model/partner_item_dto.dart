@@ -33,9 +33,9 @@ class PartnerItemDto {
 
   String email;
 
-  List<BusinessTypeEnum> businessType;
+  List<BusinessType> businessType;
 
-  PartnerItemDtoVerificationStatusEnum verificationStatus;
+  PartnerVerificationStatus verificationStatus;
 
   DateTime createdAt;
 
@@ -72,7 +72,7 @@ class PartnerItemDto {
       json[r'brandName'] = this.brandName;
       json[r'legalName'] = this.legalName;
       json[r'email'] = this.email;
-      json[r'businessType'] = this.businessType.map((e) => e.toJson()).toList();
+      json[r'businessType'] = this.businessType;
       json[r'verificationStatus'] = this.verificationStatus;
       json[r'createdAt'] = this.createdAt.toUtc().toIso8601String();
     return json;
@@ -102,8 +102,8 @@ class PartnerItemDto {
         brandName: mapValueOfType<String>(json, r'brandName')!,
         legalName: mapValueOfType<String>(json, r'legalName')!,
         email: mapValueOfType<String>(json, r'email')!,
-        businessType: PartnerItemDtoBusinessTypeEnum.listFromJson(json[r'businessType']),
-        verificationStatus: PartnerItemDtoVerificationStatusEnum.fromJson(json[r'verificationStatus'])!,
+        businessType: BusinessType.listFromJson(json[r'businessType']),
+        verificationStatus: PartnerVerificationStatus.fromJson(json[r'verificationStatus'])!,
         createdAt: mapDateTime(json, r'createdAt', r'')!,
       );
     }
@@ -162,188 +162,4 @@ class PartnerItemDto {
     'createdAt',
   };
 }
-
-
-class PartnerItemDtoBusinessTypeEnum {
-  /// Instantiate a new enum with the provided [value].
-  const PartnerItemDtoBusinessTypeEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final List<String> value;
-
-  @override
-  String toString() => value.toString();
-
-  List<String> toJson() => value;
-
-  static const MASSAGE_THERAPY = PartnerItemDtoBusinessTypeEnum._(r'MASSAGE_THERAPY');
-  static const MASSAGE_REHABILITATION = PartnerItemDtoBusinessTypeEnum._(r'MASSAGE_REHABILITATION');
-  static const SPA_BEAUTY = PartnerItemDtoBusinessTypeEnum._(r'SPA_BEAUTY');
-  static const FITNESS = PartnerItemDtoBusinessTypeEnum._(r'FITNESS');
-  static const PHARMACY = PartnerItemDtoBusinessTypeEnum._(r'PHARMACY');
-  static const DENTAL = PartnerItemDtoBusinessTypeEnum._(r'DENTAL');
-  static const TRADITIONAL_MEDICINE = PartnerItemDtoBusinessTypeEnum._(r'TRADITIONAL_MEDICINE');
-  static const PSYCHOLOGY = PartnerItemDtoBusinessTypeEnum._(r'PSYCHOLOGY');
-  static const DERMATOLOGY = PartnerItemDtoBusinessTypeEnum._(r'DERMATOLOGY');
-  static const NUTRITION = PartnerItemDtoBusinessTypeEnum._(r'NUTRITION');
-  static const PSYCHIATRY = PartnerItemDtoBusinessTypeEnum._(r'PSYCHIATRY');
-
-  /// List of all possible values in this [enum][PartnerItemDtoBusinessTypeEnum].
-  static const values = <PartnerItemDtoBusinessTypeEnum>[
-    MASSAGE_THERAPY,
-    MASSAGE_REHABILITATION,
-    SPA_BEAUTY,
-    FITNESS,
-    PHARMACY,
-    DENTAL,
-    TRADITIONAL_MEDICINE,
-    PSYCHOLOGY,
-    DERMATOLOGY,
-    NUTRITION,
-    PSYCHIATRY,
-  ];
-
-  static PartnerItemDtoBusinessTypeEnum? fromJson(dynamic value) => PartnerItemDtoBusinessTypeEnumTypeTransformer().decode(value);
-
-  static List<PartnerItemDtoBusinessTypeEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <PartnerItemDtoBusinessTypeEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = PartnerItemDtoBusinessTypeEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [PartnerItemDtoBusinessTypeEnum] to List<String>,
-/// and [decode] dynamic data back to [PartnerItemDtoBusinessTypeEnum].
-class PartnerItemDtoBusinessTypeEnumTypeTransformer {
-  factory PartnerItemDtoBusinessTypeEnumTypeTransformer() => _instance ??= const PartnerItemDtoBusinessTypeEnumTypeTransformer._();
-
-  const PartnerItemDtoBusinessTypeEnumTypeTransformer._();
-
-  List<String> encode(PartnerItemDtoBusinessTypeEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a PartnerItemDtoBusinessTypeEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  PartnerItemDtoBusinessTypeEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'MASSAGE_THERAPY': return PartnerItemDtoBusinessTypeEnum.MASSAGE_THERAPY;
-        case r'MASSAGE_REHABILITATION': return PartnerItemDtoBusinessTypeEnum.MASSAGE_REHABILITATION;
-        case r'SPA_BEAUTY': return PartnerItemDtoBusinessTypeEnum.SPA_BEAUTY;
-        case r'FITNESS': return PartnerItemDtoBusinessTypeEnum.FITNESS;
-        case r'PHARMACY': return PartnerItemDtoBusinessTypeEnum.PHARMACY;
-        case r'DENTAL': return PartnerItemDtoBusinessTypeEnum.DENTAL;
-        case r'TRADITIONAL_MEDICINE': return PartnerItemDtoBusinessTypeEnum.TRADITIONAL_MEDICINE;
-        case r'PSYCHOLOGY': return PartnerItemDtoBusinessTypeEnum.PSYCHOLOGY;
-        case r'DERMATOLOGY': return PartnerItemDtoBusinessTypeEnum.DERMATOLOGY;
-        case r'NUTRITION': return PartnerItemDtoBusinessTypeEnum.NUTRITION;
-        case r'PSYCHIATRY': return PartnerItemDtoBusinessTypeEnum.PSYCHIATRY;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [PartnerItemDtoBusinessTypeEnumTypeTransformer] instance.
-  static PartnerItemDtoBusinessTypeEnumTypeTransformer? _instance;
-}
-
-
-
-class PartnerItemDtoVerificationStatusEnum {
-  /// Instantiate a new enum with the provided [value].
-  const PartnerItemDtoVerificationStatusEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const ONBOARDING = PartnerItemDtoVerificationStatusEnum._(r'ONBOARDING');
-  static const PENDING = PartnerItemDtoVerificationStatusEnum._(r'PENDING');
-  static const APPROVED = PartnerItemDtoVerificationStatusEnum._(r'APPROVED');
-  static const REJECTED = PartnerItemDtoVerificationStatusEnum._(r'REJECTED');
-  static const REQUIRED_RESUBMIT = PartnerItemDtoVerificationStatusEnum._(r'REQUIRED_RESUBMIT');
-
-  /// List of all possible values in this [enum][PartnerItemDtoVerificationStatusEnum].
-  static const values = <PartnerItemDtoVerificationStatusEnum>[
-    ONBOARDING,
-    PENDING,
-    APPROVED,
-    REJECTED,
-    REQUIRED_RESUBMIT,
-  ];
-
-  static PartnerItemDtoVerificationStatusEnum? fromJson(dynamic value) => PartnerItemDtoVerificationStatusEnumTypeTransformer().decode(value);
-
-  static List<PartnerItemDtoVerificationStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <PartnerItemDtoVerificationStatusEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = PartnerItemDtoVerificationStatusEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [PartnerItemDtoVerificationStatusEnum] to String,
-/// and [decode] dynamic data back to [PartnerItemDtoVerificationStatusEnum].
-class PartnerItemDtoVerificationStatusEnumTypeTransformer {
-  factory PartnerItemDtoVerificationStatusEnumTypeTransformer() => _instance ??= const PartnerItemDtoVerificationStatusEnumTypeTransformer._();
-
-  const PartnerItemDtoVerificationStatusEnumTypeTransformer._();
-
-  String encode(PartnerItemDtoVerificationStatusEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a PartnerItemDtoVerificationStatusEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  PartnerItemDtoVerificationStatusEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'ONBOARDING': return PartnerItemDtoVerificationStatusEnum.ONBOARDING;
-        case r'PENDING': return PartnerItemDtoVerificationStatusEnum.PENDING;
-        case r'APPROVED': return PartnerItemDtoVerificationStatusEnum.APPROVED;
-        case r'REJECTED': return PartnerItemDtoVerificationStatusEnum.REJECTED;
-        case r'REQUIRED_RESUBMIT': return PartnerItemDtoVerificationStatusEnum.REQUIRED_RESUBMIT;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [PartnerItemDtoVerificationStatusEnumTypeTransformer] instance.
-  static PartnerItemDtoVerificationStatusEnumTypeTransformer? _instance;
-}
-
 

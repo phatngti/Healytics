@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/images/circular.dart';
+import 'package:common/widgets/images/circular.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

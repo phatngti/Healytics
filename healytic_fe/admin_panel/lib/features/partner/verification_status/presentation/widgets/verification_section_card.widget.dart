@@ -5,7 +5,7 @@ import 'package:admin_panel/features/partner/verification_status/presentation/wi
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/legal_representative_form.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/location_form.widget.dart';
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

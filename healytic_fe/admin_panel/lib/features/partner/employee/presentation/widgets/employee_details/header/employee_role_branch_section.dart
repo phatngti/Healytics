@@ -1,6 +1,6 @@
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeRoleBranchSection extends StatelessWidget {

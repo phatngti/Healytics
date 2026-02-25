@@ -21,14 +21,17 @@ part 'admin_routes.g.dart';
   ],
 )
 class SignInRoute extends GoRouteData with $SignInRoute {
-  const SignInRoute();
+  const SignInRoute({this.autofill});
   static const name = "signin";
+
+  /// Dev flag: `?autofill=true` pre-fills email & password.
+  final bool? autofill;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const SignInScreen(),
+      child: SignInScreen(autofill: autofill ?? false),
     );
   }
 }
@@ -197,14 +200,17 @@ class CategoryHomeRoute extends GoRouteData with $CategoryHomeRoute {
 }
 
 class CategoryAddRoute extends GoRouteData with $CategoryAddRoute {
-  const CategoryAddRoute();
+  const CategoryAddRoute({this.autofill});
   static const name = "admin-category-add";
+
+  /// Dev flag: `?autofill=true` pre-fills all category fields.
+  final bool? autofill;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const CategoryAddScreen(),
+      child: CategoryAddScreen(autofill: autofill ?? false),
     );
   }
 }

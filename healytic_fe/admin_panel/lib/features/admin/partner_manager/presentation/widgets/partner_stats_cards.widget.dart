@@ -1,6 +1,6 @@
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_stats.entity.dart';
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
