@@ -6,6 +6,7 @@ import 'package:admin_panel/features/partner/products/data/product_impl.reposito
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
+import 'package:admin_openapi/api.dart';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -61,7 +62,8 @@ class ProductNotifier extends _$ProductNotifier {
     return repo.getProductById(id);
   }
 
-  /// Get list of staff/employees available for product assignment
+  /// Get list of staff/employees available for
+  /// product assignment
   Future<List<EmployeeEntity>> getStaffForProduct({String? role}) async {
     final employeeRepo = ref.read(employeeRepositoryProvider);
 
@@ -69,7 +71,6 @@ class ProductNotifier extends _$ProductNotifier {
       return employeeRepo.getEmployeesByRole(role: role);
     }
 
-    // Get all employees (using a reasonable count for selection)
     final totalRows = await employeeRepo.getTotalRows();
     final employees = await employeeRepo.getEmployeesList(
       startingAt: 0,
@@ -82,5 +83,11 @@ class ProductNotifier extends _$ProductNotifier {
   Future<List<CategoryEntity>> getCategoriesForProduct() async {
     final repo = ref.read(productRepositoryProvider);
     return repo.getCategories();
+  }
+
+  /// Get active service tags for product tagging
+  Future<List<ServiceTagResponseDto>> getServiceTagsForProduct() async {
+    final repo = ref.read(productRepositoryProvider);
+    return repo.getServiceTags();
   }
 }

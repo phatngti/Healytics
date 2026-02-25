@@ -419,7 +419,7 @@ class _EmployeeDetailsDocumentsCardState
       decoration: BoxDecoration(
         color: isEnabled
             ? null
-            : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            : colorScheme.surfaceContainerHighest.withAlpha(128),
         borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.outlineVariant),
       ),
@@ -490,7 +490,7 @@ class _EmployeeDetailsDocumentsCardState
       decoration: BoxDecoration(
         color: isEnabled
             ? null
-            : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            : colorScheme.surfaceContainerHighest.withAlpha(128),
         borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colorScheme.primary),
       ),

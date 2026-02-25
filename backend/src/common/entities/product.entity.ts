@@ -18,6 +18,8 @@ import { ProductStatus } from '@/products/enums/product-status.enum';
 import { ServiceDefinition } from './service-definition.entity';
 import { ServiceEmployeeEligibility } from './service-employee-eligibility.entity';
 import { ProductTag } from './product-tag.entity';
+import { ProductReview } from './product-review.entity';
+import { ProductFacilityImage } from './product-facility-image.entity';
 
 @Entity('products')
 @Index('IDX_PRODUCT_MERCHANT_SLUG', ['slug'])
@@ -33,7 +35,7 @@ export class Product {
   @Column({ length: 255 })
   name: string;
 
-  @Column({ length: 255, unique: true })
+  @Column({ length: 255 })
   slug: string;
 
   @Column({ type: 'text', nullable: true })
@@ -96,5 +98,11 @@ export class Product {
 
   @OneToMany(() => ProductTag, (pt) => pt.product)
   productTags: ProductTag[];
+
+  @OneToMany(() => ProductReview, (review) => review.product, { cascade: true })
+  reviews: ProductReview[];
+
+  @OneToMany(() => ProductFacilityImage, (fi) => fi.product, { cascade: true })
+  facilityImages: ProductFacilityImage[];
 }
 

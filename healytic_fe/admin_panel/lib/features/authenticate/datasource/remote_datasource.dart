@@ -9,6 +9,7 @@ import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/authenticate/domain/authenticate.entity.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:admin_panel/core/entities/role.entity.dart';
 
 part 'remote_datasource.g.dart';
 
@@ -62,15 +63,15 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
   ) async {
     AuthTokensDto? response;
 
-    if (role == 'admin') {
+    if (role == Role.admin.value) {
       response = await _authApi.authControllerLoginAdmin(
         AdminLoginDto(email: request.email, password: request.password),
       );
-    } else if (role == 'user') {
+    } else if (role == Role.user.value) {
       response = await _authApi.authControllerLoginUser(
         LoginDto(email: request.email, password: request.password),
       );
-    } else if (role == 'health_partner') {
+    } else if (role == Role.health_partner.value) {
       response = await _authApi.authControllerLoginPartner(
         PartnerLoginDto(email: request.email, password: request.password),
       );
@@ -97,7 +98,7 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
     }
 
     // Extract verificationCompletedAt for health_partner role
-    if (tokenRole == 'health_partner') {
+    if (tokenRole == Role.health_partner.value) {
       final rawVerificationCompletedAt =
           decodedToken['verificationCompletedAt'];
       if (rawVerificationCompletedAt != null) {
@@ -207,25 +208,21 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
   // Private Helper Methods
   // ===========================================================================
 
-  List<PartnerRequestDtoBusinessTypeEnum> _mapBusinessTypes(
-    List<String> businessTypes,
-  ) {
+  List<BusinessType> _mapBusinessTypes(List<String> businessTypes) {
     return businessTypes.map((type) {
       return switch (type.toUpperCase()) {
-        'MASSAGE_THERAPY' => PartnerRequestDtoBusinessTypeEnum.MASSAGE_THERAPY,
-        'MASSAGE_REHABILITATION' =>
-          PartnerRequestDtoBusinessTypeEnum.MASSAGE_REHABILITATION,
-        'SPA_BEAUTY' => PartnerRequestDtoBusinessTypeEnum.SPA_BEAUTY,
-        'FITNESS' => PartnerRequestDtoBusinessTypeEnum.FITNESS,
-        'PHARMACY' => PartnerRequestDtoBusinessTypeEnum.PHARMACY,
-        'DENTAL' => PartnerRequestDtoBusinessTypeEnum.DENTAL,
-        'TRADITIONAL_MEDICINE' =>
-          PartnerRequestDtoBusinessTypeEnum.TRADITIONAL_MEDICINE,
-        'PSYCHOLOGY' => PartnerRequestDtoBusinessTypeEnum.PSYCHOLOGY,
-        'DERMATOLOGY' => PartnerRequestDtoBusinessTypeEnum.DERMATOLOGY,
-        'NUTRITION' => PartnerRequestDtoBusinessTypeEnum.NUTRITION,
-        'PSYCHIATRY' => PartnerRequestDtoBusinessTypeEnum.PSYCHIATRY,
-        _ => PartnerRequestDtoBusinessTypeEnum.SPA_BEAUTY,
+        'MASSAGE_THERAPY' => BusinessType.MASSAGE_THERAPY,
+        'MASSAGE_REHABILITATION' => BusinessType.MASSAGE_REHABILITATION,
+        'SPA_BEAUTY' => BusinessType.SPA_BEAUTY,
+        'FITNESS' => BusinessType.FITNESS,
+        'PHARMACY' => BusinessType.PHARMACY,
+        'DENTAL' => BusinessType.DENTAL,
+        'TRADITIONAL_MEDICINE' => BusinessType.TRADITIONAL_MEDICINE,
+        'PSYCHOLOGY' => BusinessType.PSYCHOLOGY,
+        'DERMATOLOGY' => BusinessType.DERMATOLOGY,
+        'NUTRITION' => BusinessType.NUTRITION,
+        'PSYCHIATRY' => BusinessType.PSYCHIATRY,
+        _ => BusinessType.SPA_BEAUTY,
       };
     }).toList();
   }

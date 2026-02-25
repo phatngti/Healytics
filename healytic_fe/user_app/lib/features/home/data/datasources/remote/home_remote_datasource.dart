@@ -133,7 +133,7 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
               id: dto.id,
               name: dto.name,
               description: dto.description?.toString(),
-              colorValue: dto.colorValue.toInt(),
+              colorValue: int.tryParse(dto.colorValue) ?? 0,
               usage: dto.usage.toInt(),
               isActive: dto.isActive,
               sortOrder: dto.sortOrder.toInt(),

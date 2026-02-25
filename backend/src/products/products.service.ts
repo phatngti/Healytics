@@ -1,12 +1,13 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from '@/common/entities/product.entity';
 import { CreateProductHandler } from './application/handlers/create-product.handler';
 import { UpdateProductHandler } from './application/handlers/update-product.handler';
 import { RemoveProductHandler } from './application/handlers/remove-product.handler';
+import { ProductDetailResponseDto } from './dto/product-detail-response.dto';
 
 @Injectable()
 export class ProductsService {
@@ -78,6 +79,49 @@ export class ProductsService {
     }
 
     return product;
+  }
+
+  /**
+   * Returns an enriched product detail response by slug.
+   * Loads all relations and queries recommended services from the same category.
+   */
+  async getProductDetails(slug: string): Promise<ProductDetailResponseDto> {
+    const product = await this.productRepository.findOne({
+      where: { slug },
+      relations: [
+        'category',
+        'media',
+        'serviceDefinition',
+        'serviceEmployeeEligibilities',
+        'serviceEmployeeEligibilities.employee',
+        'serviceEmployeeEligibilities.employee.doctorProfile',
+        'productTags',
+        'productTags.tag',
+        'reviews',
+        'facilityImages',
+      ],
+    });
+
+    if (!product) {
+      this.logger.warn(`Product slug not found for details: ${slug}`);
+      throw new NotFoundException(`Product with slug "${slug}" not found`);
+    }
+
+    // Query recommended services (same category, exclude self, limit 3)
+    let recommended: Product[] = [];
+    if (product.categoryId) {
+      recommended = await this.productRepository.find({
+        where: {
+          categoryId: product.categoryId,
+          id: Not(product.id),
+        },
+        relations: ['media'],
+        take: 3,
+        order: { createdAt: 'DESC' },
+      });
+    }
+
+    return ProductDetailResponseDto.fromEntity(product, recommended);
   }
 
   /**

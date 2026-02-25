@@ -37,7 +37,7 @@ class EmployeeScheduleSection extends StatelessWidget {
         AppDimens.verticalMedium,
         Container(
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            color: colorScheme.surfaceContainerHighest.withAlpha(128),
             borderRadius: AppDimens.radiusSmall,
             border: Border.all(color: colorScheme.outlineVariant),
           ),

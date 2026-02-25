@@ -1,10 +1,13 @@
+import 'dart:developer';
+
+import 'package:admin_panel/core/entities/role.entity.dart';
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/utils/user_role_helper.dart';
+import 'package:admin_panel/router/admin_routes.dart' as admin;
 import 'package:admin_panel/router/partner_routes.dart' as partner;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:admin_panel/router/admin_routes.dart' as admin;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -54,16 +57,30 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
 @riverpod
 GoRouter router(Ref ref) {
   final notifier = ref.watch(routerListenableProvider.notifier);
-  String initialLocation =
-      Store.get(StoreKey.mockRole, 'provider') == 'provider'
-      ? '/provider/dashboard'
-      : '/admin/dashboard';
+
+  // Fall back to login if not authenticated on cold start.
+  final String initialLocation;
+  if (!UserRoleHelper.isLoggedIn()) {
+    initialLocation = '/';
+  } else if (Store.get(StoreKey.mockRole, Role.health_partner.value) ==
+      Role.health_partner.value) {
+    initialLocation = '/provider/dashboard';
+  } else {
+    initialLocation = '/admin/dashboard';
+  }
 
   String? redirect(BuildContext context, GoRouterState state) {
     final isLoggedIn = UserRoleHelper.isLoggedIn();
     final role = UserRoleHelper.getRole();
     final path = state.uri.path;
     final isProviderVerified = UserRoleHelper.isProviderVerified();
+
+    log(
+      'Router redirect — isLoggedIn: $isLoggedIn, '
+      'role: $role, path: $path, '
+      'isProviderVerified: $isProviderVerified',
+      name: 'AppRouter',
+    );
 
     final isPublicRoute =
         path == '/' ||
@@ -74,30 +91,26 @@ GoRouter router(Ref ref) {
     final isVerificationRoute = path == '/provider/verification-status';
 
     if (isLoggedIn) {
+      // Authenticated user on a public route → send to home.
       if (isPublicRoute) {
-        if (role == 'admin') {
+        if (role == Role.admin.value) {
           return '/admin/dashboard';
-        } else {
-          // Provider: check verification status
-          if (isProviderVerified) {
-            return '/provider/dashboard';
-          } else {
-            return '/provider/verification-status';
-          }
         }
+        return isProviderVerified
+            ? '/provider/dashboard'
+            : '/provider/verification-status';
       }
 
-      // health_partner-specific verification redirect logic
-      if (role == 'health_partner') {
+      // Unverified provider trying to access protected routes.
+      if (role == Role.health_partner.value) {
         if (!isProviderVerified && !isVerificationRoute) {
-          // Unverified health_partner trying to access other routes
           return '/provider/verification-status';
         } else if (isProviderVerified && isVerificationRoute) {
-          // Verified health_partner trying to access verification page
           return '/provider/dashboard';
         }
       }
     } else {
+      // Unauthenticated user on a protected route → login.
       if (!isPublicRoute) {
         return '/';
       }

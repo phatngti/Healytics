@@ -10,8 +10,14 @@ import 'package:go_router/go_router.dart';
 class CategoryAddDesktop extends StatefulWidget {
   final VoidCallback? onCancel;
   final ValueChanged<Map<String, dynamic>>? onSubmit;
+  final Map<String, dynamic> initialValue;
 
-  const CategoryAddDesktop({super.key, this.onCancel, this.onSubmit});
+  const CategoryAddDesktop({
+    super.key,
+    this.onCancel,
+    this.onSubmit,
+    this.initialValue = const {},
+  });
 
   @override
   State<CategoryAddDesktop> createState() => _CategoryAddDesktopState();
@@ -41,6 +47,7 @@ class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
 
     return FormBuilder(
       key: _formKey,
+      initialValue: widget.initialValue,
       child: Stack(
         children: [
           // Scrollable content

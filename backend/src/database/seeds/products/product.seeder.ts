@@ -10,6 +10,8 @@ import { ServiceEmployeeEligibility } from '@/common/entities/service-employee-e
 import { ServiceTag } from '@/common/entities/service-tag.entity';
 import { ProductTag } from '@/common/entities/product-tag.entity';
 import { Employee } from '@/common/entities/employee.entity';
+import { ProductReview } from '@/common/entities/product-review.entity';
+import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 import { Account } from '@/common/entities/account.entity';
 import { Role } from '@/account/enum/role.enum';
 import { ProductType } from '@/products/enums/product-type.enum';
@@ -46,6 +48,41 @@ const SEED_PRODUCTS = [
     eligibleEmployees: [
       { code: 'EMP-002', isPrimary: true },
     ],
+    facilityImages: [
+      { imageUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbec6e', label: 'Main Massage Hall' },
+      { imageUrl: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2', label: 'Treatment Suite A' },
+      { imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d', label: 'Relaxation Lounge' },
+      { imageUrl: 'https://images.unsplash.com/photo-1507652313519-d4e9174996dd', label: 'Aromatherapy Room' },
+    ],
+    reviews: [
+      {
+        reviewerName: 'Nguyen Van A',
+        avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+        rating: 5,
+        status: 'Completed',
+        date: '2025-05-11',
+        text: 'Excellent full body massage! The therapist was very skilled and the ambiance was perfect. Highly recommend!',
+        imageUrls: ['https://images.unsplash.com/photo-1544161515-4ab6ce6db874'],
+      },
+      {
+        reviewerName: 'Tran Thi B',
+        avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
+        rating: 4,
+        status: 'Completed',
+        date: '2025-05-08',
+        text: 'Great experience overall. The room was clean and the massage technique was professional.',
+        imageUrls: [],
+      },
+      {
+        reviewerName: 'Le Van C',
+        avatarUrl: 'https://randomuser.me/api/portraits/men/67.jpg',
+        rating: 5,
+        status: 'Completed',
+        date: '2025-04-22',
+        text: 'Best massage in the city! Will definitely come back again.',
+        imageUrls: [],
+      },
+    ],
   },
   {
     name: 'Neck & Shoulder Therapy',
@@ -68,6 +105,21 @@ const SEED_PRODUCTS = [
     eligibleEmployees: [
       { code: 'EMP-001', isPrimary: true },
       { code: 'EMP-002', isPrimary: false },
+    ],
+    facilityImages: [
+      { imageUrl: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09', label: 'Therapy Room' },
+      { imageUrl: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91', label: 'Equipment Area' },
+    ],
+    reviews: [
+      {
+        reviewerName: 'Pham Duc D',
+        avatarUrl: 'https://randomuser.me/api/portraits/men/22.jpg',
+        rating: 5,
+        status: 'Completed',
+        date: '2025-05-10',
+        text: 'My neck pain has significantly improved after just one session. The therapist was extremely knowledgeable.',
+        imageUrls: [],
+      },
     ],
   },
   {
@@ -158,6 +210,12 @@ export class ProductSeeder implements ISeeder {
 
     @InjectRepository(Employee)
     private readonly employeeRepo: Repository<Employee>,
+
+    @InjectRepository(ProductReview)
+    private readonly reviewRepo: Repository<ProductReview>,
+
+    @InjectRepository(ProductFacilityImage)
+    private readonly facilityImageRepo: Repository<ProductFacilityImage>,
 
     @InjectRepository(Account)
     private readonly accountRepo: Repository<Account>,
@@ -291,6 +349,38 @@ export class ProductSeeder implements ISeeder {
           await this.eligibilityRepo.save(eligibility);
           this.logger.log(`    👤 Employee "${emp.code}" eligible${emp.isPrimary ? ' (primary)' : ''}`);
         }
+      }
+
+      // 6. Facility Images
+      if ((prodData as any).facilityImages?.length) {
+        for (const fi of (prodData as any).facilityImages) {
+          const facilityImage = this.facilityImageRepo.create({
+            productId: product.id,
+            imageUrl: fi.imageUrl,
+            label: fi.label,
+            sortOrder: fi.sortOrder ?? 0,
+          });
+          await this.facilityImageRepo.save(facilityImage);
+        }
+        this.logger.log(`    🏢 Added ${(prodData as any).facilityImages.length} facility image(s)`);
+      }
+
+      // 7. Reviews
+      if ((prodData as any).reviews?.length) {
+        for (const rev of (prodData as any).reviews) {
+          const review = this.reviewRepo.create({
+            productId: product.id,
+            reviewerName: rev.reviewerName,
+            avatarUrl: rev.avatarUrl,
+            rating: rev.rating,
+            status: rev.status ?? 'Completed',
+            date: new Date(rev.date),
+            text: rev.text,
+            imageUrls: rev.imageUrls ?? [],
+          });
+          await this.reviewRepo.save(review);
+        }
+        this.logger.log(`    ⭐ Added ${(prodData as any).reviews.length} review(s)`);
       }
     }
 

@@ -4,7 +4,11 @@ import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class ProductGeneralInfoCard extends StatefulWidget {
-  const ProductGeneralInfoCard({super.key});
+  const ProductGeneralInfoCard({super.key, this.initialDescription});
+
+  /// Initial JSON-encoded Delta content for the
+  /// description Quill editor (used by dev autofill).
+  final String? initialDescription;
 
   @override
   State<ProductGeneralInfoCard> createState() => _ProductGeneralInfoCardState();
@@ -51,7 +55,8 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
                 ),
                 AppDimens.verticalExtraSmall,
                 Text(
-                  'Basic details about your product or service.',
+                  'Basic details about your product '
+                  'or service.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -78,6 +83,7 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
                 FormFieldBuilders.buildQuillEditor(
                   context,
                   label: 'Description',
+                  initialValue: widget.initialDescription,
                 ),
               ],
             ),

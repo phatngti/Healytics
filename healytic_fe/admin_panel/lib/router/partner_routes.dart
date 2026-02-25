@@ -113,14 +113,18 @@ class ProductDetailsRoute extends GoRouteData with $ProductDetailsRoute {
 }
 
 class ProductAddRoute extends GoRouteData with $ProductAddRoute {
-  const ProductAddRoute();
+  const ProductAddRoute({this.autofill});
   static const name = "provider-product-add";
+
+  /// Optional dev flag: `?autofill=true` pre-fills the form
+  /// with sample data. Only active in debug builds.
+  final bool? autofill;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const ProductAddScreen(),
+      child: ProductAddScreen(autofill: autofill ?? false),
     );
   }
 }
@@ -181,14 +185,17 @@ class EmployeeEditRoute extends GoRouteData with $EmployeeEditRoute {
 }
 
 class EmployeeAddRoute extends GoRouteData with $EmployeeAddRoute {
-  const EmployeeAddRoute();
+  const EmployeeAddRoute({this.autofill});
   static const name = "provider-employee-add";
+
+  /// Dev flag: `?autofill=true` pre-fills all employee fields.
+  final bool? autofill;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const EmployeeAddScreen(),
+      child: EmployeeAddScreen(autofill: autofill ?? false),
     );
   }
 }

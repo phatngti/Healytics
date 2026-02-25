@@ -1,18 +1,25 @@
+import 'package:admin_panel/core/entities/store.entity.dart';
+import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
 import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
+import 'package:admin_panel/features/partner/employee/presentation/autofill/employee_add.autofill.dart';
 import 'package:admin_panel/features/partner/employee/presentation/layouts/employee_add_desktop.dart';
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:admin_panel/theme/app_theme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 class EmployeeAddScreen extends ConsumerStatefulWidget {
-  const EmployeeAddScreen({super.key});
+  const EmployeeAddScreen({super.key, this.autofill = false});
+
+  /// Pre-fill all fields in debug builds when `?autofill=true` is in URL.
+  final bool autofill;
 
   @override
   ConsumerState<EmployeeAddScreen> createState() => _EmployeeAddScreenState();
@@ -88,8 +95,6 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
           values['emergency_contact_phone']?.toString() ?? 'Unknown',
       employmentType: values['employment_type']?.toString() ?? 'Full-Time',
       startDate: values['start_date']?.toString() ?? DateTime.now().toString(),
-      branch:
-          values['branch_id']?.toString() ?? '', // TODO: Add branch selection
       jobTitle: values['job_title']?.toString().trim() ?? 'Doctor',
       medicalLicense: values['medical_license']?.toString().trim() ?? '',
       experienceYears: int.tryParse(
@@ -146,7 +151,6 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         values['employment_type']?.toString() ?? 'Full-Time';
     final commonStartDate =
         values['start_date']?.toString() ?? DateTime.now().toString();
-    final commonBranch = values['branch_id']?.toString() ?? '';
     final commonJobTitle =
         values['job_title']?.toString().trim() ?? 'Therapist';
     final commonDescription = values['description']?.toString();
@@ -180,7 +184,6 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         employmentType: commonEmploymentType,
         startDate: commonStartDate,
         avatar: commonAvatar,
-        branch: commonBranch,
         jobTitle: commonJobTitle,
         therapistLevel: level,
         commissionRate: commissionRate,
@@ -217,7 +220,6 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         employmentType: commonEmploymentType,
         startDate: commonStartDate,
         avatar: commonAvatar,
-        branch: commonBranch,
         jobTitle: commonJobTitle,
         therapistLevel: level,
         strengthLevel: strengthLevel,
@@ -245,13 +247,29 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
     context.goNamed(EmployeeHomeRoute.name);
   }
 
+  /// Sample data map for all [EmployeeAddDesktop] `FormBuilder`
+  /// fields. Delegates to [EmployeeAddAutofill.forRole].
+  static Map<String, dynamic> _buildAutofillValues([
+    String role = 'THERAPIST',
+  ]) => EmployeeAddAutofill.forRole(role);
+
   @override
   Widget build(BuildContext context) {
+    final shouldAutofill =
+        kDebugMode &&
+        (widget.autofill || (Store.tryGet(StoreKey.autoFill) ?? false));
+    final initialValue = shouldAutofill
+        ? _buildAutofillValues()
+        : const <String, dynamic>{};
+
     return ResponsiveWrapper(
       useLayout: true,
       desktop: EmployeeAddDesktop(
         onCancel: _handleCancel,
         onSubmit: _handleSubmit,
+        initialValue: initialValue,
+        shouldAutofill: shouldAutofill,
+        onBuildAutofillValues: _buildAutofillValues,
       ),
     );
   }

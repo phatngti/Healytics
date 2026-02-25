@@ -41,12 +41,12 @@ void main() {
       // TODO
     });
 
-    // List<String> businessType (default value: const [])
+    // List<BusinessType> businessType (default value: const [])
     test('to test the property `businessType`', () async {
       // TODO
     });
 
-    // String verificationStatus
+    // PartnerVerificationStatus verificationStatus
     test('to test the property `verificationStatus`', () async {
       // TODO
     });

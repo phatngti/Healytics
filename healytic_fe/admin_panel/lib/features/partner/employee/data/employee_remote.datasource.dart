@@ -101,15 +101,12 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       return [];
     }
 
-    final employees = response.map((item) {
-      final json = item as Map<String, dynamic>;
-      return _mapToEmployeeEntity(json);
-    }).toList();
-
     developer.log(
-      'Fetched ${employees.length} employees',
+      'Fetched ${response.length} employees',
       name: 'EmployeeRemoteDataSource',
     );
+
+    final employees = response.map(_mapToEmployeeEntity).toList();
 
     final endIndex = (startingAt + count) > employees.length
         ? employees.length
@@ -142,7 +139,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     if (response == null) {
       throw EmployeeNotFoundException(id);
     }
-    return _mapToEmployeeEntity(response as Map<String, dynamic>);
+    return _mapToEmployeeEntity(response);
   }
 
   @override
@@ -198,7 +195,6 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       dob: request.dateOfBirth,
       gender: _mapDoctorGender(request.gender),
       status: CreateDoctorDtoStatusEnum.ACTIVE,
-      branchId: request.branch,
       profile: profile,
     );
 
@@ -208,11 +204,12 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     }
 
     developer.log(
-      'Created doctor: ${request.firstName} ${request.lastName}',
+      'Created doctor: '
+      '${request.firstName} ${request.lastName}',
       name: 'EmployeeRemoteDataSource',
     );
 
-    return _mapToEmployeeEntity(response as Map<String, dynamic>);
+    return _mapToEmployeeEntity(response);
   }
 
   @override
@@ -222,7 +219,6 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     final profile = TherapistProfileDto(
       level: request.therapistLevel,
       type: TherapistType.spa.apiValue,
-      strengthLevel: null,
       commissionRate: request.commissionRate,
       healthCheckDate: _parseDateTime(request.healthCheckDate),
       skills: request.skills,
@@ -238,7 +234,6 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       dob: request.dateOfBirth,
       gender: _mapTherapistGender(request.gender),
       status: CreateTherapistDtoStatusEnum.ACTIVE,
-      branchId: request.branch,
       profile: profile,
     );
 
@@ -250,11 +245,12 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     }
 
     developer.log(
-      'Created spa therapist: ${request.firstName} ${request.lastName}',
+      'Created spa therapist: '
+      '${request.firstName} ${request.lastName}',
       name: 'EmployeeRemoteDataSource',
     );
 
-    return _mapToEmployeeEntity(response as Map<String, dynamic>);
+    return _mapToEmployeeEntity(response);
   }
 
   @override
@@ -280,7 +276,6 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       dob: request.dateOfBirth,
       gender: _mapTherapistGender(request.gender),
       status: CreateTherapistDtoStatusEnum.ACTIVE,
-      branchId: request.branch,
       profile: profile,
     );
 
@@ -292,11 +287,12 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     }
 
     developer.log(
-      'Created massage therapist: ${request.firstName} ${request.lastName}',
+      'Created massage therapist: '
+      '${request.firstName} ${request.lastName}',
       name: 'EmployeeRemoteDataSource',
     );
 
-    return _mapToEmployeeEntity(response as Map<String, dynamic>);
+    return _mapToEmployeeEntity(response);
   }
 
   @override
@@ -304,208 +300,181 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     required String role,
     int? limit,
   }) async {
-    final allEmployees = await getEmployees(0, 1000, null, null);
+    final response = await _employeesApi.employeesControllerFindAll(role: role);
+    if (response == null) return [];
 
-    final filtered = allEmployees.where((e) {
-      return e.role.toUpperCase() == role.toUpperCase();
-    }).toList();
+    final employees = response.map(_mapToEmployeeEntity).toList();
 
-    if (limit != null && filtered.length > limit) {
-      return filtered.sublist(0, limit);
+    if (limit != null && employees.length > limit) {
+      return employees.sublist(0, limit);
     }
 
-    return filtered;
+    return employees;
   }
 
   @override
   Future<Map<String, String>> getDeviceProficiency() async {
-    // TODO(api): Implement API call when endpoint is available
+    // TODO(api): Implement when endpoint is available
     return {};
   }
 
   @override
   Future<Map<String, String>> getSpaSkills() async {
-    // TODO(api): Implement API call when endpoint is available
+    // TODO(api): Implement when endpoint is available
     return {};
   }
 
-  // ===========================================================================
+  // ==========================================================
   // Private Helper Methods
-  // ===========================================================================
+  // ==========================================================
 
-  EmployeeEntity _mapToEmployeeEntity(Map<String, dynamic> json) {
-    final role = json['role']?.toString().toUpperCase() ?? '';
-    final profile = json['profile'] as Map<String, dynamic>? ?? {};
-    final id = EmployeeId(json['id']?.toString() ?? '');
-    final common = _mapCommonFields(json);
+  /// Maps an [EmployeeResponseDto] to [EmployeeEntity].
+  EmployeeEntity _mapToEmployeeEntity(EmployeeResponseDto dto) {
+    final role = dto.role.value.toUpperCase();
+    final id = EmployeeId(dto.id);
+    final common = _mapCommonFields(dto);
 
-    if (role == 'DOCTOR') {
+    if (role == 'DOCTOR' && dto.doctorProfile != null) {
+      final profile = dto.doctorProfile!;
       return DoctorEntity(
         id: id,
-        fullName: common['fullName'],
-        displayName: common['displayName'],
-        avatar: common['avatar'],
+        fullName: common.fullName,
+        displayName: common.displayName,
+        avatar: common.avatar,
         role: role,
-        position: common['position'],
-        rating: common['rating'],
-        reviewCount: common['reviewCount'],
-        status: common['status'],
-        email: common['email'],
-        phone: common['phone'],
-        address: common['address'],
-        city: common['city'],
-        state: common['state'],
-        country: common['country'],
-        licenseUrl: common['licenseUrl'],
-        idCardUrl: common['idCardUrl'],
-        description: json['description']?.toString(),
-        documents: common['documents'],
-        dateOfBirth: common['dateOfBirth'],
-        gender: common['gender'],
-        employmentType: common['employmentType'],
-        startDate: common['startDate'],
-        jobTitle: profile['title']?.toString() ?? '',
-        medicalLicense: profile['medicalLicense']?.toString() ?? '',
-        experienceYears: int.tryParse(
-          profile['experienceYears']?.toString() ?? '',
-        ),
-        consultationFee: double.tryParse(
-          profile['consultationFee']?.toString() ?? '',
-        ),
-        specializations: _parseList(profile['specializations']),
-        education: _parseList(profile['education']),
-        certifications: _parseList(profile['certifications']),
+        position: common.position,
+        rating: common.rating,
+        reviewCount: common.reviewCount,
+        status: common.status,
+        email: common.email,
+        phone: common.phone,
+        address: '',
+        city: '',
+        state: '',
+        country: '',
+        description: dto.description?.toString(),
+        documents: const [],
+        dateOfBirth: common.dateOfBirth,
+        gender: common.gender,
+        employmentType: common.employmentType,
+        startDate: common.startDate,
+        jobTitle: profile.title ?? '',
+        medicalLicense: profile.medicalLicense,
+        experienceYears: profile.experienceYears?.toInt(),
+        consultationFee: profile.consultationFee?.toDouble(),
+        specializations: profile.specializations,
+        education: profile.education,
+        certifications: profile.certifications,
       );
-    } else if (role == 'THERAPIST') {
-      final type = profile['type']?.toString().toUpperCase();
+    } else if (role == 'THERAPIST' && dto.therapistProfile != null) {
+      final profile = dto.therapistProfile!;
+      final type = profile.type?.toUpperCase() ?? '';
+
       if (type == 'SPA') {
         return SpaTherapistEntity(
           id: id,
-          fullName: common['fullName'],
-          displayName: common['displayName'],
-          avatar: common['avatar'],
+          fullName: common.fullName,
+          displayName: common.displayName,
+          avatar: common.avatar,
           role: role,
-          position: common['position'],
-          rating: common['rating'],
-          reviewCount: common['reviewCount'],
-          status: common['status'],
-          email: common['email'],
-          phone: common['phone'],
-          address: common['address'],
-          city: common['city'],
-          state: common['state'],
-          country: common['country'],
-          licenseUrl: common['licenseUrl'],
-          idCardUrl: common['idCardUrl'],
-          description: json['description']?.toString(),
-          documents: common['documents'],
-          dateOfBirth: common['dateOfBirth'],
-          gender: common['gender'],
-          employmentType: common['employmentType'],
-          startDate: common['startDate'],
+          position: common.position,
+          rating: common.rating,
+          reviewCount: common.reviewCount,
+          status: common.status,
+          email: common.email,
+          phone: common.phone,
+          address: '',
+          city: '',
+          state: '',
+          country: '',
+          description: dto.description?.toString(),
+          documents: const [],
+          dateOfBirth: common.dateOfBirth,
+          gender: common.gender,
+          employmentType: common.employmentType,
+          startDate: common.startDate,
           jobTitle: 'Spa Therapist',
-          therapistLevel: profile['level']?.toString(),
-          commissionRate:
-              double.tryParse(profile['commissionRate']?.toString() ?? '0.0') ??
-              0.0,
-          healthCheckDate: profile['healthCheckDate']?.toString(),
-          skills: _parseList(profile['skills']),
-          deviceProficiency: _parseList(profile['deviceProficiency']),
+          therapistLevel: profile.level,
+          commissionRate: profile.commissionRate?.toDouble() ?? 0.0,
+          healthCheckDate: profile.healthCheckDate?.toIso8601String(),
+          skills: profile.skills,
+          deviceProficiency: profile.deviceProficiency,
         );
       } else if (type == 'MASSAGE') {
         return MassageTherapistEntity(
           id: id,
-          fullName: common['fullName'],
-          displayName: common['displayName'],
-          avatar: common['avatar'],
+          fullName: common.fullName,
+          displayName: common.displayName,
+          avatar: common.avatar,
           role: role,
-          position: common['position'],
-          rating: common['rating'],
-          reviewCount: common['reviewCount'],
-          status: common['status'],
-          email: common['email'],
-          phone: common['phone'],
-          address: common['address'],
-          city: common['city'],
-          state: common['state'],
-          country: common['country'],
-          licenseUrl: common['licenseUrl'],
-          idCardUrl: common['idCardUrl'],
-          description: json['description']?.toString(),
-          documents: common['documents'],
-          dateOfBirth: common['dateOfBirth'],
-          gender: common['gender'],
-          employmentType: common['employmentType'],
-          startDate: common['startDate'],
+          position: common.position,
+          rating: common.rating,
+          reviewCount: common.reviewCount,
+          status: common.status,
+          email: common.email,
+          phone: common.phone,
+          address: '',
+          city: '',
+          state: '',
+          country: '',
+          description: dto.description?.toString(),
+          documents: const [],
+          dateOfBirth: common.dateOfBirth,
+          gender: common.gender,
+          employmentType: common.employmentType,
+          startDate: common.startDate,
           jobTitle: 'Massage Therapist',
-          therapistLevel: profile['level']?.toString(),
-          commissionRate:
-              double.tryParse(profile['commissionRate']?.toString() ?? '0.0') ??
-              0.0,
-          healthCheckDate: profile['healthCheckDate']?.toString(),
-          skills: _parseList(profile['skills']),
-          strengthLevel: profile['strengthLevel']?.toString(),
+          therapistLevel: profile.level,
+          commissionRate: profile.commissionRate?.toDouble() ?? 0.0,
+          healthCheckDate: profile.healthCheckDate?.toIso8601String(),
+          skills: profile.skills,
+          strengthLevel: profile.strengthLevel,
         );
       }
     }
 
     return BasicEmployeeEntity(
       id: id,
-      fullName: common['fullName'],
-      displayName: common['displayName'],
-      avatar: common['avatar'],
+      fullName: common.fullName,
+      displayName: common.displayName,
+      avatar: common.avatar,
       role: role,
-      position: common['position'],
-      rating: common['rating'],
-      reviewCount: common['reviewCount'],
-      status: common['status'],
-      email: common['email'],
-      phone: common['phone'],
-      address: common['address'],
-      city: common['city'],
-      state: common['state'],
-      country: common['country'],
-      licenseUrl: common['licenseUrl'],
-      idCardUrl: common['idCardUrl'],
-      description: json['description']?.toString(),
-      documents: common['documents'],
-      dateOfBirth: common['dateOfBirth'],
-      gender: common['gender'],
-      employmentType: common['employmentType'],
-      startDate: common['startDate'],
+      position: common.position,
+      rating: common.rating,
+      reviewCount: common.reviewCount,
+      status: common.status,
+      email: common.email,
+      phone: common.phone,
+      address: '',
+      city: '',
+      state: '',
+      country: '',
+      description: dto.description?.toString(),
+      documents: const [],
+      dateOfBirth: common.dateOfBirth,
+      gender: common.gender,
+      employmentType: common.employmentType,
+      startDate: common.startDate,
     );
   }
 
-  Map<String, dynamic> _mapCommonFields(Map<String, dynamic> json) {
-    return {
-      'fullName': json['fullName']?.toString() ?? '',
-      'displayName': json['displayName']?.toString() ?? '',
-      'avatar': json['avatarUrl']?.toString() ?? '',
-      'position': json['role']?.toString() ?? '',
-      'rating': double.tryParse(json['rating']?.toString() ?? '0.0') ?? 0.0,
-      'reviewCount': (json['reviewCount'] as num?)?.toInt() ?? 0,
-      'status': json['status']?.toString() ?? 'ACTIVE',
-      'email': json['email']?.toString() ?? '',
-      'phone': json['phone']?.toString() ?? '',
-      'address': '',
-      'city': '',
-      'state': '',
-      'country': '',
-      'licenseUrl': json['licenseUrl']?.toString(),
-      'idCardUrl': json['idCardUrl']?.toString(),
-      'documents': _parseList(json['documents']),
-      'dateOfBirth': json['dob']?.toString(),
-      'gender': json['gender']?.toString(),
-      'employmentType': json['employmentType']?.toString(),
-      'startDate': json['startDate']?.toString(),
-    };
-  }
-
-  List<String> _parseList(dynamic list) {
-    if (list is List) {
-      return list.map((e) => e.toString()).toList();
-    }
-    return [];
+  /// Extracts common fields from [EmployeeResponseDto].
+  _CommonFields _mapCommonFields(EmployeeResponseDto dto) {
+    return _CommonFields(
+      fullName: dto.fullName,
+      displayName: dto.displayName?.toString() ?? '',
+      avatar: dto.avatarUrl?.toString() ?? '',
+      position: dto.role.value,
+      rating: dto.rating.toDouble(),
+      reviewCount: dto.reviewCount.toInt(),
+      status: dto.status.value,
+      email: dto.email,
+      phone: dto.phone?.toString() ?? '',
+      dateOfBirth: dto.dob?.toString(),
+      gender: dto.gender?.value,
+      employmentType: dto.employmentType?.toString(),
+      startDate: dto.startDate?.toString(),
+    );
   }
 
   UpdateEmployeeDtoRoleEnum? _mapUpdateRole(String role) {
@@ -547,11 +516,46 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     };
   }
 
-  /// Parses a string to DateTime, returns null if parsing fails.
+  /// Parses a string to DateTime, returns null.
   DateTime? _parseDateTime(String? dateString) {
-    if (dateString == null || dateString.isEmpty) return null;
+    if (dateString == null || dateString.isEmpty) {
+      return null;
+    }
     return DateTime.tryParse(dateString);
   }
+}
+
+/// Helper class for common employee fields.
+class _CommonFields {
+  const _CommonFields({
+    required this.fullName,
+    required this.displayName,
+    required this.avatar,
+    required this.position,
+    required this.rating,
+    required this.reviewCount,
+    required this.status,
+    required this.email,
+    required this.phone,
+    this.dateOfBirth,
+    this.gender,
+    this.employmentType,
+    this.startDate,
+  });
+
+  final String fullName;
+  final String displayName;
+  final String avatar;
+  final String position;
+  final double rating;
+  final int reviewCount;
+  final String status;
+  final String email;
+  final String phone;
+  final String? dateOfBirth;
+  final String? gender;
+  final String? employmentType;
+  final String? startDate;
 }
 
 // ============================================================================
