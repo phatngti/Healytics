@@ -1,3 +1,6 @@
+import 'package:admin_panel/core/entities/store.entity.dart';
+import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/features/authenticate/presentation/autofill/sign_in.autofill.dart';
 import 'package:admin_panel/features/authenticate/presentation/widgets/logo.dart';
 import 'package:admin_panel/features/authenticate/presentation/providers/sign_in.provider.dart';
 import 'package:common/widgets/button/button.dart';
@@ -8,20 +11,29 @@ import 'package:common/widgets/toast.dart';
 import 'package:admin_panel/router/admin_routes.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
+import 'package:admin_panel/core/entities/role.entity.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' hide Store;
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SignInScreen extends HookConsumerWidget {
-  const SignInScreen({super.key});
+  const SignInScreen({super.key, this.autofill = false});
+
+  /// When `true` (debug builds only), pre-fills email & password.
+  /// Activate via `/?autofill=true`.
+  final bool autofill;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final roles = [
-      SelectorSwitchOption(label: 'Admin', value: 'admin'),
-      SelectorSwitchOption(label: 'Partner', value: 'health_partner'),
+      SelectorSwitchOption(label: Role.admin.label, value: Role.admin.value),
+      SelectorSwitchOption(
+        label: Role.health_partner.label,
+        value: Role.health_partner.value,
+      ),
     ];
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final emailController = useTextEditingController();
@@ -29,6 +41,19 @@ class SignInScreen extends HookConsumerWidget {
     final isPasswordVisible = useState(false);
     final scrollController = useScrollController();
     final signInState = ref.watch(signInProviderProvider);
+
+    // Pre-fill credentials in debug builds when ?autofill=true
+    // or store config autoFill flag is true.
+    useEffect(() {
+      final shouldAutofill =
+          kDebugMode &&
+          (autofill || (Store.tryGet(StoreKey.autoFill) ?? false));
+      if (shouldAutofill) {
+        emailController.text = SignInAutofill.email;
+        passwordController.text = SignInAutofill.password;
+      }
+      return null;
+    }, []);
 
     ref.listen(signInProviderProvider, (previous, next) {
       next.whenOrNull(
@@ -51,7 +76,7 @@ class SignInScreen extends HookConsumerWidget {
       if (formKey.currentState!.saveAndValidate()) {
         final email = emailController.text;
         final password = passwordController.text;
-        final role = roleController.value?.value ?? 'admin';
+        final role = roleController.value?.value ?? Role.admin.value;
         await ref
             .read(signInProviderProvider.notifier)
             .signIn(email, password, role);

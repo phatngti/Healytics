@@ -1,21 +1,39 @@
+import 'package:admin_panel/core/entities/store.entity.dart';
+import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
+import 'package:admin_panel/features/partner/products/domain/facility_image.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/review.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/layouts/product_add_desktop.dart';
+import 'package:admin_panel/features/partner/products/presentation/autofill/product_add.autofill.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:admin_panel/router/partner_routes.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' hide Store;
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProductAddScreen extends HookConsumerWidget {
-  const ProductAddScreen({super.key});
+  const ProductAddScreen({super.key, this.autofill = false});
+
+  /// When `true` (and in debug builds only), the form is pre-populated
+  /// with sample data. Activate via `?autofill=true` in the URL.
+  final bool autofill;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final isSubmitting = useState(false);
+
+    // Build initial values in debug mode only.
+    // Triggered by URL param OR store config flag.
+    final shouldAutofill =
+        kDebugMode && (autofill || (Store.tryGet(StoreKey.autoFill) ?? false));
+    final initialValue = useMemoized(
+      () => shouldAutofill ? _buildAutofillValues() : const <String, dynamic>{},
+    );
 
     Future<void> handleSubmit() async {
       if (formKey.currentState?.saveAndValidate() ?? false) {
@@ -66,6 +84,11 @@ class ProductAddScreen extends HookConsumerWidget {
                   .toList() ??
               [];
 
+          // Facility Images
+          final facilityImages = _extractFacilityImages(
+            formData['facility_images'],
+          );
+
           // Create and submit the product
           final request = CreateProductRequest(
             name: name,
@@ -83,6 +106,7 @@ class ProductAddScreen extends HookConsumerWidget {
             staffAllocation: staffAllocation,
             staffIds: selectedStaffIds,
             images: productImages,
+            facilityImages: facilityImages,
           );
 
           await ref.read(productProvider.notifier).addProduct(request);
@@ -106,7 +130,9 @@ class ProductAddScreen extends HookConsumerWidget {
             );
           }
         } finally {
-          isSubmitting.value = false;
+          if (context.mounted) {
+            isSubmitting.value = false;
+          }
         }
       }
     }
@@ -117,13 +143,51 @@ class ProductAddScreen extends HookConsumerWidget {
 
     return FormBuilder(
       key: formKey,
+      initialValue: initialValue,
       child: ResponsiveWrapper(
         useLayout: true,
         desktop: ProductAddDesktop(
           onCancel: handleCancel,
           onSubmit: isSubmitting.value ? null : () => handleSubmit(),
+          initialStatus: shouldAutofill ? ProductAddAutofill.status : 'draft',
+          initialOnlineStore: shouldAutofill
+              ? ProductAddAutofill.onlineStore
+              : false,
+          initialDescription: shouldAutofill
+              ? ProductAddAutofill.description
+              : null,
         ),
       ),
     );
+  }
+
+  /// Sample data map for all simple `FormBuilderTextField` /
+  /// `FormBuilderDropdown` fields. Only used when autofill is active.
+  static Map<String, dynamic> _buildAutofillValues() => {
+    'product_name': ProductAddAutofill.name,
+    'product_type': ProductAddAutofill.productType,
+    'base_price': ProductAddAutofill.basePrice,
+    'sale_price': ProductAddAutofill.salePrice,
+    'duration': ProductAddAutofill.duration,
+    'buffer': ProductAddAutofill.buffer,
+    'capacity': ProductAddAutofill.capacity,
+    'lead_time': ProductAddAutofill.leadTime,
+    'product_images': ProductAddAutofill.productImages,
+    'facility_images': ProductAddAutofill.facilityImages,
+  };
+
+  /// Extract facility images from form data
+  static List<FacilityImageEntity> _extractFacilityImages(dynamic raw) {
+    if (raw is! List) return [];
+    return raw
+        .whereType<Map<String, dynamic>>()
+        .where((m) => (m['imageUrl'] as String?)?.isNotEmpty == true)
+        .map(
+          (m) => FacilityImageEntity(
+            imageUrl: m['imageUrl'] as String? ?? '',
+            label: m['label'] as String? ?? '',
+          ),
+        )
+        .toList();
   }
 }

@@ -160,6 +160,7 @@ class _EmployeeProfileImageCardState
                                     ? DecorationImage(
                                         image: imageProvider,
                                         fit: BoxFit.cover,
+                                        onError: (_, __) {},
                                       )
                                     : null,
                               ),

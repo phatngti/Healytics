@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **String** | Tag name | 
 **description** | **String** |  | [optional] 
-**colorValue** | **num** | Color value as integer | [optional] 
+**colorValue** | **String** | Color value as hex string | [optional] 
 **isActive** | **bool** | Whether the tag is active | [optional] 
 **sortOrder** | **num** | Sort order for display | [optional] 
 

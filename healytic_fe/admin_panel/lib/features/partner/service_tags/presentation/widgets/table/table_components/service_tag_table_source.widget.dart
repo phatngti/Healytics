@@ -30,6 +30,7 @@ class ServiceTagTableSource {
           sortedBy: null,
           sortedAsc: true,
         );
+    print("tags $tags");
     final rows = tags.map((tag) {
       return DataRow(
         key: ValueKey<String>(tag.id.value),

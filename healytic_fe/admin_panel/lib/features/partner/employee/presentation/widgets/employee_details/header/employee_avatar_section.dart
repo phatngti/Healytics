@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:common/utils/demensions.dart';
@@ -34,6 +36,7 @@ class EmployeeAvatarSection extends StatelessWidget {
               backgroundImage: avatar.isNotEmpty
                   ? CachedNetworkImageProvider(avatar)
                   : null,
+              onBackgroundImageError: (_, __) {},
               child: avatar.isEmpty
                   ? Text(
                       _getInitials(fullName),
@@ -87,7 +90,7 @@ class EmployeeAvatarSection extends StatelessWidget {
                 border: Border.all(color: colorScheme.outlineVariant),
               ),
               child: Text(
-                'EMP-${employeeId.value.substring(0, 6).toUpperCase()}',
+                'EMP-${employeeId.value.substring(0, math.min(6, employeeId.value.length)).toUpperCase()}',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   fontFamily: 'monospace',
                   color: colorScheme.onSurfaceVariant,

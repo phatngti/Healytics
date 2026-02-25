@@ -5,7 +5,8 @@
         "deviceType": "iOS"
     },
     "mockFlag": "false",
-    "mockRole": "admin",
-    "partnerVerified": "false",
+    "mockRole": "health_partner",
+    "autoFill": "true",
+    "partnerVerified": "true",
     "r2PublicBaseUrl": "https://pub-58a545087a6b4221b1b0dab10d8d3517.r2.dev"
 }

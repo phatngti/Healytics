@@ -1,10 +1,12 @@
 import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
+import 'package:admin_openapi/api.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// Card widget for product organization (category & tags).
 class ProductOrganizationCard extends ConsumerStatefulWidget {
   final String? initialCategory;
   final List<String> initialTags;
@@ -27,60 +29,19 @@ class ProductOrganizationCard extends ConsumerStatefulWidget {
 class _ProductOrganizationCardState
     extends ConsumerState<ProductOrganizationCard> {
   late String? _category;
-  late List<String> _tags;
-  final TextEditingController _tagController = TextEditingController();
-  List<CategoryEntity> _categories = [];
-  bool _isLoadingCategories = true;
+  late List<String> _selectedTags;
+  late Future<List<CategoryEntity>> _categoriesFuture;
+  late Future<List<ServiceTagResponseDto>> _tagsFuture;
 
   @override
   void initState() {
     super.initState();
     _category = widget.initialCategory;
-    _tags = List.from(widget.initialTags);
-    _loadCategories();
-  }
+    _selectedTags = List.from(widget.initialTags);
 
-  Future<void> _loadCategories() async {
-    try {
-      final categories = await ref
-          .read(productProvider.notifier)
-          .getCategoriesForProduct();
-      if (mounted) {
-        setState(() {
-          _categories = categories;
-          _isLoadingCategories = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoadingCategories = false;
-        });
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _tagController.dispose();
-    super.dispose();
-  }
-
-  void _addTag(String tag) {
-    if (tag.isNotEmpty && !_tags.contains(tag)) {
-      setState(() {
-        _tags.add(tag);
-      });
-      _tagController.clear();
-      widget.onTagsChanged?.call(_tags);
-    }
-  }
-
-  void _removeTag(String tag) {
-    setState(() {
-      _tags.remove(tag);
-    });
-    widget.onTagsChanged?.call(_tags);
+    final notifier = ref.read(productProvider.notifier);
+    _categoriesFuture = notifier.getCategoriesForProduct();
+    _tagsFuture = notifier.getServiceTagsForProduct();
   }
 
   @override
@@ -113,138 +74,187 @@ class _ProductOrganizationCardState
             ),
           ),
           AppDimens.verticalMedium,
-          // Category Dropdown
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Category',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 6),
-              _isLoadingCategories
-                  ? const Center(
-                      child: Padding(
-                        padding: AppDimens.paddingAllSmall,
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                  : FormFieldBuilders.buildCustomDropdownField<String>(
-                      context,
-                      fieldKey: 'category',
-                      hintText: 'Select category...',
-                      initialValue: _category,
-                      label: 'Category',
-                      items: _categories
-                          .map(
-                            (cat) => DropdownMenuItem(
-                              value: cat.id,
-                              child: Text(cat.name),
-                            ),
-                          )
-                          .toList(),
-                    ),
-            ],
-          ),
+          _buildCategoryDropdown(),
           AppDimens.verticalMedium,
-          // Tags
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Tags',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 6),
-              TextFormField(
-                controller: _tagController,
-                decoration: InputDecoration(
-                  hintText: 'Add tags...',
-                  filled: true,
-                  fillColor: colorScheme.surface,
-                  border: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSmall,
-                    borderSide: BorderSide(color: colorScheme.outlineVariant),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSmall,
-                    borderSide: BorderSide(color: colorScheme.outlineVariant),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSmall,
-                    borderSide: BorderSide(color: colorScheme.primary),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 12,
-                  ),
-                ),
-                onFieldSubmitted: _addTag,
-              ),
-              if (_tags.isNotEmpty) ...[
-                AppDimens.verticalSmall,
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _tags
-                      .map(
-                        (tag) =>
-                            _TagChip(tag: tag, onRemove: () => _removeTag(tag)),
-                      )
-                      .toList(),
-                ),
-              ],
-            ],
-          ),
+          _buildTagsField(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryDropdown() {
+    return FutureBuilder<List<CategoryEntity>>(
+      future: _categoriesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        final categories = snapshot.data ?? [];
+
+        return FormFieldBuilders.buildCustomDropdownField<String>(
+          context,
+          fieldKey: 'category',
+          hintText: 'Select category...',
+          initialValue: _category,
+          label: 'Category',
+          items: categories
+              .map(
+                (cat) => DropdownMenuItem(value: cat.id, child: Text(cat.name)),
+              )
+              .toList(),
+          onChanged: (val) {
+            setState(() => _category = val);
+            widget.onCategoryChanged?.call(val);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildTagsField() {
+    return FutureBuilder<List<ServiceTagResponseDto>>(
+      future: _tagsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        final allTags = snapshot.data ?? [];
+
+        return FormFieldBuilders.buildChipSelectorField(
+          context,
+          label: 'Tags',
+          emptyPlaceholder: 'Select tags...',
+          chips: _selectedTags
+              .map(
+                (tag) => Chip(
+                  label: Text(tag),
+                  deleteIcon: const Icon(Icons.close, size: 14),
+                  onDeleted: () {
+                    setState(() {
+                      _selectedTags.remove(tag);
+                    });
+                    widget.onTagsChanged?.call(_selectedTags);
+                  },
+                ),
+              )
+              .toList(),
+          onTap: () => _showTagSelectionDialog(context, allTags),
+        );
+      },
+    );
+  }
+
+  /// Shows a dialog for selecting tags.
+  void _showTagSelectionDialog(
+    BuildContext context,
+    List<ServiceTagResponseDto> allTags,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => _TagSelectionDialog(
+        allTags: allTags,
+        selectedTags: _selectedTags,
+        onConfirm: (selected) {
+          setState(() {
+            _selectedTags = selected;
+          });
+          widget.onTagsChanged?.call(_selectedTags);
+        },
       ),
     );
   }
 }
 
-class _TagChip extends StatelessWidget {
-  final String tag;
-  final VoidCallback onRemove;
+/// Dialog for selecting tags from available options.
+class _TagSelectionDialog extends StatefulWidget {
+  final List<ServiceTagResponseDto> allTags;
+  final List<String> selectedTags;
+  final ValueChanged<List<String>> onConfirm;
 
-  const _TagChip({required this.tag, required this.onRemove});
+  const _TagSelectionDialog({
+    required this.allTags,
+    required this.selectedTags,
+    required this.onConfirm,
+  });
+
+  @override
+  State<_TagSelectionDialog> createState() => _TagSelectionDialogState();
+}
+
+class _TagSelectionDialogState extends State<_TagSelectionDialog> {
+  late List<String> _tempSelected;
+
+  @override
+  void initState() {
+    super.initState();
+    _tempSelected = List.from(widget.selectedTags);
+  }
+
+  void _toggleTag(String tagName) {
+    setState(() {
+      if (_tempSelected.contains(tagName)) {
+        _tempSelected.remove(tagName);
+      } else {
+        _tempSelected.add(tagName);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      padding:
-          AppDimens.paddingHorizontalSmall +
-          AppDimens.paddingVerticalExtraSmall,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: AppDimens.radiusExtraSmall,
-        border: Border.all(color: colorScheme.outlineVariant),
+    return AlertDialog(
+      title: Text(
+        'Select Tags',
+        style: Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            tag,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
+      content: SizedBox(
+        width: 300,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: widget.allTags.map((tag) {
+              final isSelected = _tempSelected.contains(tag.name);
+              return CheckboxListTile(
+                value: isSelected,
+                onChanged: (_) => _toggleTag(tag.name),
+                title: Text(
+                  tag.name,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                activeColor: colorScheme.primary,
+                dense: true,
+              );
+            }).toList(),
           ),
-          AppDimens.horizontalExtraSmall,
-          InkWell(
-            onTap: onRemove,
-            child: Icon(
-              Icons.close,
-              size: 14,
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
+        ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () {
+            widget.onConfirm(_tempSelected);
+            Navigator.of(context).pop();
+          },
+          child: const Text('Confirm'),
+        ),
+      ],
     );
   }
 }

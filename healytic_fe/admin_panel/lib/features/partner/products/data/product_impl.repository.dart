@@ -4,6 +4,7 @@ import 'package:admin_panel/features/partner/products/domain/create_product.requ
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/product.repository.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
+import 'package:admin_openapi/api.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -52,6 +53,11 @@ class ProductImplRepository implements ProductRepository {
   @override
   Future<List<CategoryEntity>> getCategories() {
     return remoteDataSource.getCategories();
+  }
+
+  @override
+  Future<List<ServiceTagResponseDto>> getServiceTags() {
+    return remoteDataSource.getServiceTags();
   }
 }
 

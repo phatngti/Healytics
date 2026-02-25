@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **userId** | **String** |  | 
 **name** | **String** |  | 
 **description** | [**Object**](.md) |  | [optional] 
-**colorValue** | **num** |  | 
+**colorValue** | **String** |  | 
 **usage** | **num** |  | 
 **isActive** | **bool** |  | 
 **sortOrder** | **num** |  | 

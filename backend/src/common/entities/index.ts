@@ -31,6 +31,8 @@ export { DocumentRequirement } from './document-requirement.entity';
 // Products
 export { Product } from './product.entity';
 export { ProductMedia } from './product-media.entity';
+export { ProductReview } from './product-review.entity';
+export { ProductFacilityImage } from './product-facility-image.entity';
 export { ResourceType } from './resource-type.entity';
 export { ServiceDefinition } from './service-definition.entity';
 export { ServiceEmployeeEligibility } from './service-employee-eligibility.entity';

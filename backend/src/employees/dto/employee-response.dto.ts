@@ -30,16 +30,16 @@ class DoctorProfileDto {
   consultationFee?: number;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'List of specializations' })
+  @ApiPropertyOptional({ type: [String], description: 'List of specializations' })
   specializations?: string[];
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Education history' })
-  education?: any[];
+  @ApiPropertyOptional({ type: [String], description: 'Education history' })
+  education?: string[];
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Certifications' })
-  certifications?: any[];
+  @ApiPropertyOptional({ type: [String], description: 'Certifications' })
+  certifications?: string[];
 }
 
 /**
@@ -72,11 +72,11 @@ class TherapistProfileDto {
   healthCheckDate?: Date;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'List of skills' })
+  @ApiPropertyOptional({ type: [String], description: 'List of skills' })
   skills?: string[];
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Device proficiency list' })
+  @ApiPropertyOptional({ type: [String], description: 'Device proficiency list' })
   deviceProficiency?: string[];
 
   @Expose()

@@ -179,7 +179,6 @@ class _AppTextField extends StatelessWidget {
                   ),
                 ),
               TextFormField(
-                key: key,
                 initialValue: controller != null
                     ? null
                     : field.value?.toString(),

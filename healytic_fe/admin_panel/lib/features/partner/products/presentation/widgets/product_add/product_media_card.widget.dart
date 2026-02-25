@@ -9,9 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 
 class ProductMediaCard extends ConsumerStatefulWidget {
-  final List<dynamic> initialImages;
-
-  const ProductMediaCard({super.key, this.initialImages = const []});
+  const ProductMediaCard({super.key});
 
   @override
   ConsumerState<ProductMediaCard> createState() => _ProductMediaCardState();
@@ -24,7 +22,6 @@ class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
 
     return FormBuilderField<List<dynamic>>(
       name: 'product_images',
-      initialValue: widget.initialImages,
       builder: (FormFieldState<List<dynamic>> field) {
         final currentImages = field.value ?? [];
 

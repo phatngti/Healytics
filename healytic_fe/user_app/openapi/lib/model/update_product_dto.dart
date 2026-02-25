@@ -26,6 +26,8 @@ class UpdateProductDto {
     this.employeeIds = const [],
     this.media = const [],
     this.serviceDefinition,
+    this.facilityImages = const [],
+    this.reviews = const [],
   });
 
   ///
@@ -110,6 +112,12 @@ class UpdateProductDto {
   ///
   CreateServiceDefinitionDto? serviceDefinition;
 
+  /// Facility/clinic images
+  List<CreateProductFacilityImageDto> facilityImages;
+
+  /// Product reviews
+  List<CreateProductReviewDto> reviews;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is UpdateProductDto &&
     other.categoryId == categoryId &&
@@ -124,7 +132,9 @@ class UpdateProductDto {
     other.isVisibleOnline == isVisibleOnline &&
     _deepEquality.equals(other.employeeIds, employeeIds) &&
     _deepEquality.equals(other.media, media) &&
-    other.serviceDefinition == serviceDefinition;
+    other.serviceDefinition == serviceDefinition &&
+    _deepEquality.equals(other.facilityImages, facilityImages) &&
+    _deepEquality.equals(other.reviews, reviews);
 
   @override
   int get hashCode =>
@@ -141,10 +151,12 @@ class UpdateProductDto {
     (isVisibleOnline == null ? 0 : isVisibleOnline!.hashCode) +
     (employeeIds.hashCode) +
     (media.hashCode) +
-    (serviceDefinition == null ? 0 : serviceDefinition!.hashCode);
+    (serviceDefinition == null ? 0 : serviceDefinition!.hashCode) +
+    (facilityImages.hashCode) +
+    (reviews.hashCode);
 
   @override
-  String toString() => 'UpdateProductDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, serviceDefinition=$serviceDefinition]';
+  String toString() => 'UpdateProductDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, serviceDefinition=$serviceDefinition, facilityImages=$facilityImages, reviews=$reviews]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -205,6 +217,8 @@ class UpdateProductDto {
     } else {
       json[r'serviceDefinition'] = null;
     }
+      json[r'facilityImages'] = this.facilityImages;
+      json[r'reviews'] = this.reviews;
     return json;
   }
 
@@ -242,6 +256,8 @@ class UpdateProductDto {
             : const [],
         media: CreateProductMediaDto.listFromJson(json[r'media']),
         serviceDefinition: CreateServiceDefinitionDto.fromJson(json[r'serviceDefinition']),
+        facilityImages: CreateProductFacilityImageDto.listFromJson(json[r'facilityImages']),
+        reviews: CreateProductReviewDto.listFromJson(json[r'reviews']),
       );
     }
     return null;

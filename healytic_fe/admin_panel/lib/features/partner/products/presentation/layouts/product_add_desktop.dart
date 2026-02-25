@@ -5,25 +5,45 @@ import 'package:admin_panel/features/partner/products/presentation/widgets/produ
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_operations_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_organization_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_pricing_card.widget.dart';
-import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_resources_card.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_facility_images_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_visibility_card.widget.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProductAddDesktop extends ConsumerStatefulWidget {
-  const ProductAddDesktop({super.key, this.onSubmit, required this.onCancel});
+  const ProductAddDesktop({
+    super.key,
+    this.onSubmit,
+    required this.onCancel,
+    this.initialStatus = 'draft',
+    this.initialOnlineStore = false,
+    this.initialDescription,
+  });
 
   final VoidCallback? onSubmit;
   final VoidCallback onCancel;
+  final String initialStatus;
+  final bool initialOnlineStore;
+
+  /// Initial Quill Delta JSON for the description editor.
+  final String? initialDescription;
 
   @override
   ConsumerState<ProductAddDesktop> createState() => _ProductAddDesktopState();
 }
 
 class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
-  String _status = 'draft';
+  late String _status;
+  late bool _onlineStore;
   String? _category;
+
+  @override
+  void initState() {
+    super.initState();
+    _status = widget.initialStatus;
+    _onlineStore = widget.initialOnlineStore;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,65 +52,75 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
     return Stack(
       children: [
         // Scrollable content
-        SingleChildScrollView(
-          padding: EdgeInsets.only(
-            left: AppDimens.paddingAllLarge.left,
-            right: AppDimens.paddingAllLarge.right,
-            bottom: AppDimens.paddingAllLarge.bottom,
-            top: 100, // Height for the floating header
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Left Column - Main Content (2/3)
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      children: [
-                        const ProductGeneralInfoCard(),
-                        AppDimens.verticalMedium,
-                        const ProductOperationsCard(),
-                        AppDimens.verticalMedium,
-                        const ProductPricingCard(),
-                        AppDimens.verticalMedium,
-                        const ProductMediaCard(),
-                        AppDimens.verticalMedium,
-                        const ProductResourcesCard(),
-                      ],
+        Positioned.fill(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(
+              left: AppDimens.paddingAllLarge.left,
+              right: AppDimens.paddingAllLarge.right,
+              bottom: AppDimens.paddingAllLarge.bottom,
+              top: 100, // Height for the floating header
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left Column - Main Content (2/3)
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        children: [
+                          ProductGeneralInfoCard(
+                            initialDescription: widget.initialDescription,
+                          ),
+                          AppDimens.verticalMedium,
+                          const ProductOperationsCard(),
+                          AppDimens.verticalMedium,
+                          const ProductPricingCard(),
+                          AppDimens.verticalMedium,
+                          const ProductMediaCard(),
+                          AppDimens.verticalMedium,
+                          const ProductFacilityImagesCard(),
+                        ],
+                      ),
                     ),
-                  ),
-                  AppDimens.horizontalLarge,
-                  // Right Column - Sidebar (1/3)
-                  SizedBox(
-                    width: 320,
-                    child: Column(
-                      children: [
-                        ProductVisibilityCard(
-                          initialStatus: _status,
-                          onStatusChanged: (status) {
-                            setState(() {
-                              _status = status;
-                            });
-                          },
-                        ),
-                        AppDimens.verticalMedium,
-                        ProductOrganizationCard(
-                          initialCategory: _category,
-                          onCategoryChanged: (category) {
-                            setState(() {
-                              _category = category;
-                            });
-                          },
-                        ),
-                      ],
+                    AppDimens.horizontalLarge,
+                    // Right Column - Sidebar (1/3)
+                    SizedBox(
+                      width: 320,
+                      child: Column(
+                        children: [
+                          ProductVisibilityCard(
+                            initialStatus: _status,
+                            initialOnlineStore: _onlineStore,
+                            onStatusChanged: (status) {
+                              setState(() {
+                                _status = status;
+                              });
+                            },
+                            onOnlineStoreChanged: (value) {
+                              setState(() {
+                                _onlineStore = value;
+                              });
+                            },
+                          ),
+                          AppDimens.verticalMedium,
+                          ProductOrganizationCard(
+                            initialCategory: _category,
+                            onCategoryChanged: (category) {
+                              setState(() {
+                                _category = category;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         // Floating header

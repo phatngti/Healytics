@@ -145,6 +145,7 @@ class _AppSelectionField<T> extends StatelessWidget {
                   ),
                 ),
               DropdownButtonFormField<T>(
+                key: ValueKey(field.value),
                 initialValue:
                     (field.value != null &&
                         items.any((e) => e.value == field.value))
