@@ -6,8 +6,9 @@ enum StoreKey<T> {
   customHeaders<String>._(4),
   mockFlag<bool>._(5),
   mockRole<String>._(6),
-  partnerVerified<bool>._(7),
-  r2PublicBaseUrl<String>._(8);
+  autoFill<bool>._(7),
+  partnerVerified<bool>._(8),
+  r2PublicBaseUrl<String>._(9);
 
   const StoreKey._(this.id);
   final int id;

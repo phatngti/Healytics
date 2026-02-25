@@ -33,8 +33,7 @@ class PartnerRequestDto {
   /// Brand name of the business
   String brandName;
 
-  /// Type of business
-  List<PartnerRequestDtoBusinessTypeEnum> businessType;
+  List<BusinessType> businessType;
 
   /// UUID of the province (from Location tree)
   String provinceId;
@@ -90,7 +89,7 @@ class PartnerRequestDto {
       json[r'taxCode'] = this.taxCode;
       json[r'legalName'] = this.legalName;
       json[r'brandName'] = this.brandName;
-      json[r'businessType'] = this.businessType.map((e) => e.toJson()).toList();
+      json[r'businessType'] = this.businessType;
       json[r'provinceId'] = this.provinceId;
       json[r'districtId'] = this.districtId;
       json[r'wardId'] = this.wardId;
@@ -125,7 +124,7 @@ class PartnerRequestDto {
         taxCode: mapValueOfType<String>(json, r'taxCode')!,
         legalName: mapValueOfType<String>(json, r'legalName')!,
         brandName: mapValueOfType<String>(json, r'brandName')!,
-        businessType: PartnerRequestDtoBusinessTypeEnum.listFromJson(json[r'businessType']),
+        businessType: BusinessType.listFromJson(json[r'businessType']),
         provinceId: mapValueOfType<String>(json, r'provinceId')!,
         districtId: mapValueOfType<String>(json, r'districtId')!,
         wardId: mapValueOfType<String>(json, r'wardId')!,
@@ -188,105 +187,4 @@ class PartnerRequestDto {
     'streetAddress',
   };
 }
-
-/// Type of business
-class PartnerRequestDtoBusinessTypeEnum {
-  /// Instantiate a new enum with the provided [value].
-  const PartnerRequestDtoBusinessTypeEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final List<String> value;
-
-  @override
-  String toString() => value.toString();
-
-  List<String> toJson() => value;
-
-  static const MASSAGE_THERAPY = PartnerRequestDtoBusinessTypeEnum._(r'MASSAGE_THERAPY');
-  static const MASSAGE_REHABILITATION = PartnerRequestDtoBusinessTypeEnum._(r'MASSAGE_REHABILITATION');
-  static const SPA_BEAUTY = PartnerRequestDtoBusinessTypeEnum._(r'SPA_BEAUTY');
-  static const FITNESS = PartnerRequestDtoBusinessTypeEnum._(r'FITNESS');
-  static const PHARMACY = PartnerRequestDtoBusinessTypeEnum._(r'PHARMACY');
-  static const DENTAL = PartnerRequestDtoBusinessTypeEnum._(r'DENTAL');
-  static const TRADITIONAL_MEDICINE = PartnerRequestDtoBusinessTypeEnum._(r'TRADITIONAL_MEDICINE');
-  static const PSYCHOLOGY = PartnerRequestDtoBusinessTypeEnum._(r'PSYCHOLOGY');
-  static const DERMATOLOGY = PartnerRequestDtoBusinessTypeEnum._(r'DERMATOLOGY');
-  static const NUTRITION = PartnerRequestDtoBusinessTypeEnum._(r'NUTRITION');
-  static const PSYCHIATRY = PartnerRequestDtoBusinessTypeEnum._(r'PSYCHIATRY');
-
-  /// List of all possible values in this [enum][PartnerRequestDtoBusinessTypeEnum].
-  static const values = <PartnerRequestDtoBusinessTypeEnum>[
-    MASSAGE_THERAPY,
-    MASSAGE_REHABILITATION,
-    SPA_BEAUTY,
-    FITNESS,
-    PHARMACY,
-    DENTAL,
-    TRADITIONAL_MEDICINE,
-    PSYCHOLOGY,
-    DERMATOLOGY,
-    NUTRITION,
-    PSYCHIATRY,
-  ];
-
-  static PartnerRequestDtoBusinessTypeEnum? fromJson(dynamic value) => PartnerRequestDtoBusinessTypeEnumTypeTransformer().decode(value);
-
-  static List<PartnerRequestDtoBusinessTypeEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <PartnerRequestDtoBusinessTypeEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = PartnerRequestDtoBusinessTypeEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [PartnerRequestDtoBusinessTypeEnum] to List<String>,
-/// and [decode] dynamic data back to [PartnerRequestDtoBusinessTypeEnum].
-class PartnerRequestDtoBusinessTypeEnumTypeTransformer {
-  factory PartnerRequestDtoBusinessTypeEnumTypeTransformer() => _instance ??= const PartnerRequestDtoBusinessTypeEnumTypeTransformer._();
-
-  const PartnerRequestDtoBusinessTypeEnumTypeTransformer._();
-
-  List<String> encode(PartnerRequestDtoBusinessTypeEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a PartnerRequestDtoBusinessTypeEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  PartnerRequestDtoBusinessTypeEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'MASSAGE_THERAPY': return PartnerRequestDtoBusinessTypeEnum.MASSAGE_THERAPY;
-        case r'MASSAGE_REHABILITATION': return PartnerRequestDtoBusinessTypeEnum.MASSAGE_REHABILITATION;
-        case r'SPA_BEAUTY': return PartnerRequestDtoBusinessTypeEnum.SPA_BEAUTY;
-        case r'FITNESS': return PartnerRequestDtoBusinessTypeEnum.FITNESS;
-        case r'PHARMACY': return PartnerRequestDtoBusinessTypeEnum.PHARMACY;
-        case r'DENTAL': return PartnerRequestDtoBusinessTypeEnum.DENTAL;
-        case r'TRADITIONAL_MEDICINE': return PartnerRequestDtoBusinessTypeEnum.TRADITIONAL_MEDICINE;
-        case r'PSYCHOLOGY': return PartnerRequestDtoBusinessTypeEnum.PSYCHOLOGY;
-        case r'DERMATOLOGY': return PartnerRequestDtoBusinessTypeEnum.DERMATOLOGY;
-        case r'NUTRITION': return PartnerRequestDtoBusinessTypeEnum.NUTRITION;
-        case r'PSYCHIATRY': return PartnerRequestDtoBusinessTypeEnum.PSYCHIATRY;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [PartnerRequestDtoBusinessTypeEnumTypeTransformer] instance.
-  static PartnerRequestDtoBusinessTypeEnumTypeTransformer? _instance;
-}
-
 

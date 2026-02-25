@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **taxCode** | **String** | Tax code of the business (unique identifier) | 
 **legalName** | **String** | Legal name of the business | 
 **brandName** | **String** | Brand name of the business | 
-**businessType** | **List<String>** | Type of business | [default to const []]
+**businessType** | [**List<BusinessType>**](BusinessType.md) |  | [default to const []]
 **provinceId** | **String** | UUID of the province (from Location tree) | 
 **districtId** | **String** | UUID of the district (from Location tree) | 
 **wardId** | **String** | UUID of the ward (from Location tree) | 

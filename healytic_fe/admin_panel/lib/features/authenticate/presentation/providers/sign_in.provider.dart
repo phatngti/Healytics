@@ -1,3 +1,5 @@
+import 'package:admin_panel/core/entities/role.entity.dart';
+import 'package:admin_panel/core/utils/user_role_helper.dart';
 import 'package:admin_panel/features/authenticate/domain/authenticate.entity.dart';
 import 'package:admin_panel/features/authenticate/datasource/repository_implement.dart';
 import 'package:admin_panel/core/entities/store.entity.dart';
@@ -25,9 +27,9 @@ class SignInProvider extends _$SignInProvider {
       await Store.put(StoreKey.accessToken, response.accessToken);
 
       // For health_partner role, determine verification status
-      if (role == 'health_partner') {
+      if (role == Role.health_partner.value) {
         final isVerified = response.verificationCompletedAt != null;
-        await Store.put(StoreKey.partnerVerified, isVerified);
+        UserRoleHelper.setPartnerVerified(isVerified);
       }
 
       return response;

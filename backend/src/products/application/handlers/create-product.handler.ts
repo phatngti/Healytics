@@ -6,11 +6,13 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreateProductDto } from '../../dto/create-product.dto';
-import { Product } from '../../entities/product.entity';
+import { Product } from '@/common/entities/product.entity';
 import { ProductType } from '../../enums/product-type.enum';
-import { ProductMedia } from '../../entities/product-media.entity';
-import { ServiceDefinition } from '../../entities/service-definition.entity';
-import { ServiceEmployeeEligibility } from '../../entities/service-employee-eligibility.entity';
+import { ProductMedia } from '@/common/entities/product-media.entity';
+import { ServiceDefinition } from '@/common/entities/service-definition.entity';
+import { ServiceEmployeeEligibility } from '@/common/entities/service-employee-eligibility.entity';
+import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
+import { ProductReview } from '@/common/entities/product-review.entity';
 
 @Injectable()
 export class CreateProductHandler {
@@ -25,7 +27,7 @@ export class CreateProductHandler {
     await queryRunner.startTransaction();
 
     try {
-      const { media, serviceDefinition, employeeIds, ...baseData } = command;
+      const { media, serviceDefinition, employeeIds, facilityImages, reviews, ...baseData } = command;
 
       // 1. Invariant Check (Validate)
       if (baseData.type === ProductType.SERVICE && !serviceDefinition) {
@@ -83,6 +85,28 @@ export class CreateProductHandler {
         );
       }
 
+      // Handle Facility Images — Relation Management
+      if (facilityImages && facilityImages.length > 0) {
+        const facilityEntities = facilityImages.map((f) =>
+          queryRunner.manager.create(ProductFacilityImage, {
+            ...f,
+            productId: savedProduct.id,
+          }),
+        );
+        await queryRunner.manager.save(ProductFacilityImage, facilityEntities);
+      }
+
+      // Handle Reviews — Relation Management
+      if (reviews && reviews.length > 0) {
+        const reviewEntities = reviews.map((r) =>
+          queryRunner.manager.create(ProductReview, {
+            ...r,
+            productId: savedProduct.id,
+          }),
+        );
+        await queryRunner.manager.save(ProductReview, reviewEntities);
+      }
+
       await queryRunner.commitTransaction();
       this.logger.log(`Product created successfully: ${savedProduct.id}`);
 
@@ -102,6 +126,10 @@ export class CreateProductHandler {
           'serviceDefinition',
           'serviceEmployeeEligibilities',
           'serviceEmployeeEligibilities.employee',
+          'productTags',
+          'productTags.tag',
+          'reviews',
+          'facilityImages',
         ],
       });
       

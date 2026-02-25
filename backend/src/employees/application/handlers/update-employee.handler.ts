@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { UpdateEmployeeDto } from '../../dto/update-employee.dto';
-import { Employee } from '../../entities/employee.entity';
-import { DoctorProfile } from '../../entities/doctor-profile.entity';
-import { TherapistProfile } from '../../entities/therapist-profile.entity';
+import { Employee } from '@/common/entities/employee.entity';
+import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
+import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
 import { EmployeeRole } from '../../enum/employee-role.enum';
 
 /**

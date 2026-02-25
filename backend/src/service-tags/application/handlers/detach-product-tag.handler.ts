@@ -5,8 +5,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { ServiceTag } from '../../entities/service-tag.entity';
-import { ProductTag } from '../../entities/product-tag.entity';
+import { ServiceTag } from '@/common/entities/service-tag.entity';
+import { ProductTag } from '@/common/entities/product-tag.entity';
 
 /**
  * Handler for detaching a service tag from a product.

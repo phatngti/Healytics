@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { UpdateServiceTagDto } from '../../dto/update-service-tag.dto';
-import { ServiceTag } from '../../entities/service-tag.entity';
+import { ServiceTag } from '@/common/entities/service-tag.entity';
 
 /**
  * Handler for updating an existing service tag.

@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdminPartnersService } from './admin-partners.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Partner } from '@/partners/entities/partner.entity';
-import { PartnerDocument } from '@/partners/entities/partner-document.entity';
-import { PartnerReviewLog } from '@/admin/entities/partner-review-log.entity';
-import { DocumentRequirement } from '@/partners/entities/document-requirement.entity';
+import { Partner } from '@/common/entities/partner.entity';
+import { PartnerDocument } from '@/common/entities/partner-document.entity';
+import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
+import { DocumentRequirement } from '@/common/entities/document-requirement.entity';
 import { DataSource, Repository } from 'typeorm';
 import { PartnersService } from '@/partners/partners.service';
 import { ReviewDecision, ReviewPartnerProfileDto } from '../dto/review-partner-profile.dto';

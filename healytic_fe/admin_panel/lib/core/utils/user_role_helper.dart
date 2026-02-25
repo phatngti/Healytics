@@ -1,3 +1,4 @@
+import 'package:admin_panel/core/entities/role.entity.dart';
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -38,12 +39,12 @@ class UserRoleHelper {
 
   /// Returns true if the current user has admin role.
   static bool isAdmin() {
-    return getRole() == 'admin';
+    return getRole() == Role.admin.value;
   }
 
   /// Returns true if the current user has provider role.
   static bool isProvider() {
-    return getRole() == 'provider';
+    return getRole() == Role.health_partner.value;
   }
 
   /// Returns true if the user is logged in (has access token or in mock mode).
@@ -62,5 +63,10 @@ class UserRoleHelper {
   /// In production mode, uses the stored verification status.
   static bool isProviderVerified() {
     return Store.tryGet(StoreKey.partnerVerified) ?? false;
+  }
+
+  // Set the partner verified status
+  static void setPartnerVerified(bool verified) {
+    Store.put(StoreKey.partnerVerified, verified);
   }
 }

@@ -1,9 +1,9 @@
 import 'package:admin_panel/features/admin/category/domain/category.entity.dart';
 import 'package:admin_panel/features/admin/category/presentation/providers/category.provider.dart';
-import 'package:admin_panel/features/common/widgets/table/helper.dart';
+import 'package:common/widgets/table/helper.dart';
 import 'package:admin_panel/features/admin/category/presentation/widgets/table/table_components/category_table_actions.dart';
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

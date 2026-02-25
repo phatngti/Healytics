@@ -1,3 +1,5 @@
+import 'package:admin_panel/features/partner/products/domain/facility_image.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/review.entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'create_product.request.freezed.dart';
@@ -37,6 +39,12 @@ abstract class CreateProductRequest with _$CreateProductRequest {
 
     // Media
     @Default([]) List<String> images,
+
+    // Facility Images
+    @Default([]) List<FacilityImageEntity> facilityImages,
+
+    // Reviews
+    @Default([]) List<ReviewEntity> reviews,
   }) = _CreateProductRequest;
 
   factory CreateProductRequest.fromJson(Map<String, dynamic> json) =>

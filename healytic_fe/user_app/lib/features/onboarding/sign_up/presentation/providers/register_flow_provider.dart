@@ -4,10 +4,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/survey_entity.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/user_entity.dart';
-import 'package:user_app/features/onboarding/sign_up/domain/usecases/completed_resgistration.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/usecases/otp.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/usecases/persistence.dart';
-import 'package:user_app/features/onboarding/sign_up/domain/usecases/surver.dart';
+import 'package:user_app/features/onboarding/sign_up/domain/usecases/survey.dart';
+import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_usecases.provider.dart';
 
 part 'register_flow_provider.freezed.dart';
 part 'register_flow_provider.g.dart';
@@ -122,7 +122,7 @@ class RegisterFlowNotifier extends _$RegisterFlowNotifier {
       final email = state.value?.user?.email;
       if (email == null) throw Exception("Email cannot be null");
       final authenTokens = await ref
-          .read(completedResgistrationUsecaseProvider)
+          .read(completedRegistrationUseCaseProvider)
           .call(user: updatedUser.copyWith(email: email));
 
       debugPrint('completeRegistration: got tokens');
@@ -165,7 +165,9 @@ class RegisterFlowNotifier extends _$RegisterFlowNotifier {
 
   Future<void> completeSurvey() async {
     try {
-      print('isRegistrationCompleted ${state.value?.isRegistrationCompleted}');
+      debugPrint(
+        'isRegistrationCompleted ${state.value?.isRegistrationCompleted}',
+      );
       if (state.value?.isRegistrationCompleted ?? false) {
         final surveys = state.value?.surveys ?? <String, List<SurveyEntity>>{};
         await ref.read(surveyUseCaseProvider).completeSurvey(surveys: surveys);

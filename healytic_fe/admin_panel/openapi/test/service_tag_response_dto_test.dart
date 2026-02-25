@@ -36,7 +36,7 @@ void main() {
       // TODO
     });
 
-    // num colorValue
+    // String colorValue
     test('to test the property `colorValue`', () async {
       // TODO
     });

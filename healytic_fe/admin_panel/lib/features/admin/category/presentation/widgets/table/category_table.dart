@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/table/table.dart';
+import 'package:common/widgets/table/table.dart';
 import 'package:admin_panel/features/admin/category/presentation/widgets/table/table_components/category_function_buttons.dart';
 import 'package:admin_panel/features/admin/category/presentation/widgets/table/table_components/category_header_buttons.dart';
 import 'package:admin_panel/features/admin/category/presentation/widgets/table/table_components/category_table_columns.dart';

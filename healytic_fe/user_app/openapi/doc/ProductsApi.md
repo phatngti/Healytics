@@ -9,60 +9,11 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**productsControllerCreate**](ProductsApi.md#productscontrollercreate) | **POST** /products | Create a new product
 [**productsControllerFindAll**](ProductsApi.md#productscontrollerfindall) | **GET** /products | Get all products
 [**productsControllerFindBySlug**](ProductsApi.md#productscontrollerfindbyslug) | **GET** /products/slug/{slug} | Get a product by slug
 [**productsControllerFindOne**](ProductsApi.md#productscontrollerfindone) | **GET** /products/{id} | Get a product by id
-[**productsControllerRemove**](ProductsApi.md#productscontrollerremove) | **DELETE** /products/{id} | Delete a product
-[**productsControllerUpdate**](ProductsApi.md#productscontrollerupdate) | **PATCH** /products/{id} | Update a product
+[**productsControllerGetDetails**](ProductsApi.md#productscontrollergetdetails) | **GET** /products/slug/{slug}/details | Get full product details by slug
 
-
-# **productsControllerCreate**
-> ProductResponseDto productsControllerCreate(createProductDto)
-
-Create a new product
-
-### Example
-```dart
-import 'package:user_openapi/api.dart';
-// TODO Configure HTTP Bearer authorization: bearer
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
-
-final api_instance = ProductsApi();
-final createProductDto = CreateProductDto(); // CreateProductDto | 
-
-try {
-    final result = api_instance.productsControllerCreate(createProductDto);
-    print(result);
-} catch (e) {
-    print('Exception when calling ProductsApi->productsControllerCreate: $e\n');
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **createProductDto** | [**CreateProductDto**](CreateProductDto.md)|  | 
-
-### Return type
-
-[**ProductResponseDto**](ProductResponseDto.md)
-
-### Authorization
-
-[bearer](../README.md#bearer)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsControllerFindAll**
 > List<ProductResponseDto> productsControllerFindAll()
@@ -72,12 +23,6 @@ Get all products
 ### Example
 ```dart
 import 'package:user_openapi/api.dart';
-// TODO Configure HTTP Bearer authorization: bearer
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = ProductsApi();
 
@@ -98,7 +43,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
@@ -115,12 +60,6 @@ Get a product by slug
 ### Example
 ```dart
 import 'package:user_openapi/api.dart';
-// TODO Configure HTTP Bearer authorization: bearer
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = ProductsApi();
 final slug = slug_example; // String | 
@@ -145,7 +84,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
@@ -162,12 +101,6 @@ Get a product by id
 ### Example
 ```dart
 import 'package:user_openapi/api.dart';
-// TODO Configure HTTP Bearer authorization: bearer
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = ProductsApi();
 final id = id_example; // String | 
@@ -192,7 +125,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
@@ -201,28 +134,23 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **productsControllerRemove**
-> productsControllerRemove(id)
+# **productsControllerGetDetails**
+> ProductDetailResponseDto productsControllerGetDetails(slug)
 
-Delete a product
+Get full product details by slug
 
 ### Example
 ```dart
 import 'package:user_openapi/api.dart';
-// TODO Configure HTTP Bearer authorization: bearer
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = ProductsApi();
-final id = id_example; // String | 
+final slug = slug_example; // String | 
 
 try {
-    api_instance.productsControllerRemove(id);
+    final result = api_instance.productsControllerGetDetails(slug);
+    print(result);
 } catch (e) {
-    print('Exception when calling ProductsApi->productsControllerRemove: $e\n');
+    print('Exception when calling ProductsApi->productsControllerGetDetails: $e\n');
 }
 ```
 
@@ -230,68 +158,19 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **slug** | **String**|  | 
 
 ### Return type
 
-void (empty response body)
+[**ProductDetailResponseDto**](ProductDetailResponseDto.md)
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **productsControllerUpdate**
-> ProductResponseDto productsControllerUpdate(id, updateProductDto)
-
-Update a product
-
-### Example
-```dart
-import 'package:user_openapi/api.dart';
-// TODO Configure HTTP Bearer authorization: bearer
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
-
-final api_instance = ProductsApi();
-final id = id_example; // String | 
-final updateProductDto = UpdateProductDto(); // UpdateProductDto | 
-
-try {
-    final result = api_instance.productsControllerUpdate(id, updateProductDto);
-    print(result);
-} catch (e) {
-    print('Exception when calling ProductsApi->productsControllerUpdate: $e\n');
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **updateProductDto** | [**UpdateProductDto**](UpdateProductDto.md)|  | 
-
-### Return type
-
-[**ProductResponseDto**](ProductResponseDto.md)
-
-### Authorization
-
-[bearer](../README.md#bearer)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

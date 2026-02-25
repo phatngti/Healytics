@@ -5,6 +5,7 @@ import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/partner/service_tags/data/data/service_tag_mock_data.dart';
 import 'package:admin_panel/features/partner/service_tags/domain/service_tag.entity.dart';
 import 'package:admin_panel/features/partner/service_tags/domain/create_service_tag.request.dart';
+import 'package:admin_openapi/api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -60,34 +61,105 @@ class ServiceTagRemoteDataSourceImpl implements ServiceTagRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   }) async {
-    // TODO: Implement real API call when endpoint is available
-    debugPrint(
-      'ServiceTagRemoteDataSourceImpl.getServiceTags called - API not implemented yet',
-    );
-    return [];
+    final response = await _serviceTagsApi.serviceTagsControllerFindAll();
+
+    if (response == null) return [];
+
+    var entities = response.map(_mapResponseToEntity).toList();
+
+    // Apply sorting if requested
+    if (sortedBy != null) {
+      entities.sort((a, b) {
+        final cmp = _compareByField(a, b, sortedBy);
+        return (sortedAsc ?? true) ? cmp : -cmp;
+      });
+    }
+
+    // Apply pagination
+    final end = (startingAt + count).clamp(0, entities.length);
+    return entities.sublist(startingAt.clamp(0, entities.length), end);
+  }
+
+  /// Compares two [ServiceTagEntity] by [field] name.
+  int _compareByField(ServiceTagEntity a, ServiceTagEntity b, String field) {
+    switch (field) {
+      case 'name':
+        return a.name.compareTo(b.name);
+      case 'sortOrder':
+        return a.sortOrder.compareTo(b.sortOrder);
+      case 'usage':
+        return a.usage.compareTo(b.usage);
+      case 'isActive':
+        return (a.isActive ? 1 : 0).compareTo(b.isActive ? 1 : 0);
+      case 'createdAt':
+        return (a.createdAt ?? '').compareTo(b.createdAt ?? '');
+      default:
+        return 0;
+    }
   }
 
   @override
   Future<int> getTotalRows() async {
-    // TODO: Implement real API call
-    debugPrint(
-      'ServiceTagRemoteDataSourceImpl.getTotalRows called - API not implemented yet',
-    );
-    return 0;
+    final response = await _serviceTagsApi.serviceTagsControllerFindAll();
+    return response?.length ?? 0;
   }
 
   @override
   Future<ServiceTagEntity> getServiceTagById(ServiceTagId id) async {
-    // TODO: Implement real API call
-    throw UnimplementedError('ServiceTag API not implemented yet');
+    final response = await _serviceTagsApi.serviceTagsControllerFindOne(
+      id.value,
+    );
+
+    if (response == null) {
+      throw Exception('Service tag not found: ${id.value}');
+    }
+
+    return _mapResponseToEntity(response);
   }
+
+  ServiceTagsApi get _serviceTagsApi => apiService.serviceTagsApi;
 
   @override
   Future<ServiceTagEntity> createServiceTag(
     CreateServiceTagRequest request,
   ) async {
-    // TODO: Implement real API call
-    throw UnimplementedError('ServiceTag API not implemented yet');
+    final dto = CreateServiceTagDto(
+      name: request.name,
+      description: request.description,
+      colorValue: request.colorValue
+          .toRadixString(16)
+          .toUpperCase()
+          .padLeft(8, '0'),
+      isActive: request.isActive,
+      sortOrder: request.sortOrder,
+    );
+
+    final response = await _serviceTagsApi.serviceTagsControllerCreate(dto);
+
+    if (response == null) {
+      throw Exception('Failed to create service tag');
+    }
+
+    return _mapResponseToEntity(response);
+  }
+
+  /// Maps [ServiceTagResponseDto] → [ServiceTagEntity].
+  ServiceTagEntity _mapResponseToEntity(ServiceTagResponseDto dto) {
+    final colorStr = dto.colorValue.toString();
+    final colorInt =
+        int.tryParse(colorStr.replaceFirst('#', ''), radix: 16) ?? 0xFF6366F1;
+
+    return ServiceTagEntity(
+      id: ServiceTagId(dto.id),
+      name: dto.name,
+      description: dto.description?.toString() ?? '',
+      colorValue: colorInt,
+      usage: dto.usage.toInt(),
+      isActive: dto.isActive,
+      sortOrder: dto.sortOrder.toInt(),
+      createdAt: dto.createdAt.toIso8601String(),
+      updatedAt: dto.updatedAt.toIso8601String(),
+    );
   }
 
   @override
@@ -99,20 +171,29 @@ class ServiceTagRemoteDataSourceImpl implements ServiceTagRemoteDataSource {
     bool? isActive,
     int? sortOrder,
   }) async {
-    // TODO: Implement real API call
-    throw UnimplementedError('ServiceTag API not implemented yet');
+    final dto = UpdateServiceTagDto(
+      name: name,
+      description: description,
+      colorValue: colorValue?.toRadixString(16).toUpperCase().padLeft(8, '0'),
+      isActive: isActive,
+      sortOrder: sortOrder,
+    );
+
+    await _serviceTagsApi.serviceTagsControllerUpdate(id.value, dto);
   }
 
   @override
   Future<void> deleteServiceTag(ServiceTagId id) async {
-    // TODO: Implement real API call
-    throw UnimplementedError('ServiceTag API not implemented yet');
+    await _serviceTagsApi.serviceTagsControllerRemove(id.value);
   }
 
   @override
   Future<List<ServiceTagEntity>> getActiveServiceTags() async {
-    final all = await getServiceTags(startingAt: 0, count: 1000);
-    return all.where((t) => t.isActive).toList();
+    final response = await _serviceTagsApi.serviceTagsControllerFindActive();
+
+    if (response == null) return [];
+
+    return response.map(_mapResponseToEntity).toList();
   }
 }
 

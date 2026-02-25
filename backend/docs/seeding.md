@@ -1,69 +1,34 @@
 # Database Seeding Guide
 
-This guide explains how to seed initial data for the Healytics application, specifically for Administrative Units (Locations) and Document Requirements.
+Master data (locations, document requirements) is now seeded via **TypeORM migrations** inside `migrations/master-data/`.
 
-## Prerequisites
+## How It Works
 
-Ensure your `.env` file is correctly configured with your database credentials.
+Seeds are `MigrationInterface` classes that run automatically with schema migrations:
 
-## 1. Seeding Locations (Administrative Units)
-
-The location seeder populates the database with Vietnam's administrative units (Provinces, Districts, Wards) using a hierarchical tree structure (Closure Table pattern).
-
-### Command
 ```bash
-npm run seed:locations
+npm run migration:run
 ```
 
-### Source File
-- **Script:** `seed-data/seed-locations.ts`
-- **Logic:** `src/locations/seeds/location.seed.ts`
+This runs **all** pending migrations in order, including:
+1. Schema migrations (`migrations/scripts/`)
+2. Master data seeds (`migrations/master-data/`)
 
-### What it does:
-1.  **Connects** to the database.
-2.  **Synchronizes** the schema (creating tables if they don't exist).
-3.  **Populates** the `administrative_unit` table using the `vn-provinces` library.
-4.  **Builds** the `administrative_unit_closure` table to support efficient tree-based queries (ancestors/descendants).
+## Seed Migrations
 
----
+| Migration Class | File | Purpose |
+|:---|:---|:---|
+| `SeedLocations1770100000000` | `migrations/master-data/location.seed.ts` | Seeds Vietnam administrative units (Provinces, Districts, Wards) |
+| `SeedDocumentRequirements1770100000001` | `migrations/master-data/document-requirements.seed.ts` | Seeds document requirement rules per business type |
 
-## 2. Seeding Document Requirements
+## Reverting Seeds
 
-The document requirement seeder populates the rules for which documents are required for different partner types.
+To revert the last migration (including seeds):
 
-### Command
 ```bash
-npm run seed:documents
+npm run migration:revert
 ```
 
-### Source File
-- **Script:** `seed-data/seed-document-requirements.ts`
-- **Logic:** `src/partners/seeds/document-requirements.seed.ts`
+## Manual Seed Endpoint
 
-### What it does:
-1.  **Connects** to the database.
-2.  **Synchronizes** the schema.
-3.  **Populates** the `document_requirement` table.
-4.  **Defines** requirements mapping:
-    - **Partner Type:** (e.g., PHARMACY, CLINIC, INDIVIDUAL)
-    - **Document Type:** (e.g., BUSINESS_LICENSE, GPP, IDENTITY_FRONT)
-    - **Required:** Boolean flag indicating if it's mandatory.
-
-### Requirement Matrix (Common Examples)
-
-| Partner Type | Document Type | Required |
-| :--- | :--- | :--- |
-| **PHARMACY** | BUSINESS_LICENSE | Yes |
-| **PHARMACY** | GPP | Yes |
-| **CLINIC** | BUSINESS_LICENSE | Yes |
-| **CLINIC** | OPERATION_LICENSE (RHM/YHCT) | Yes |
-| **INDIVIDUAL** | IDENTITY_FRONT | Yes |
-| **INDIVIDUAL** | IDENTITY_BACK | Yes |
-| **INDIVIDUAL** | AUTHORIZATION_LETTER | No |
-
-## Running All Seeds
-
-To ensure a fully populated database for development, run the seeds in the following order:
-
-1.  `npm run seed:locations`
-2.  `npm run seed:documents`
+The `POST /locations/seed` endpoint is still available to re-seed locations on demand.

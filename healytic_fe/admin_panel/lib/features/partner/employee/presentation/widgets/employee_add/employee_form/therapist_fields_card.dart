@@ -1,7 +1,7 @@
 import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/massage_therapist_fields.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/spa_therapist_fields.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
