@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/button/selector_switch.dart';
+import 'package:common/widgets/button/selector_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -11,7 +11,7 @@ import 'package:admin_panel/features/partner/verification_status/presentation/wi
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/verification_bottom_bar.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/verification_header.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/verification_section_card.widget.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';

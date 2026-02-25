@@ -1,5 +1,5 @@
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeScheduleSection extends StatelessWidget {
@@ -37,7 +37,7 @@ class EmployeeScheduleSection extends StatelessWidget {
         AppDimens.verticalMedium,
         Container(
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            color: colorScheme.surfaceContainerHighest.withAlpha(128),
             borderRadius: AppDimens.radiusSmall,
             border: Border.all(color: colorScheme.outlineVariant),
           ),

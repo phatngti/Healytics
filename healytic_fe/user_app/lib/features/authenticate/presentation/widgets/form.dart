@@ -1,14 +1,15 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:user_app/features/authenticate/presentation/provider/authenticate.provider.dart';
-import 'package:user_app/features/common/button/button.dart';
-import 'package:user_app/features/common/field/text_field.dart';
-import 'package:user_app/features/common/toast.dart';
+import 'package:user_app/features/authenticate/presentation/providers/authenticate.provider.dart';
+import 'package:common/widgets/button/button.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:common/widgets/toast.dart';
 import 'package:user_app/router/routes.dart';
-import 'package:user_app/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 
 class LoginForm extends HookConsumerWidget {
   const LoginForm({super.key});
@@ -23,7 +24,7 @@ class LoginForm extends HookConsumerWidget {
     final passwordController = useTextEditingController();
 
     ref.listen(authenticateProvider, (previous, next) {
-      print('next: ${next}');
+      developer.log('Auth state: $next');
       if (next.hasError && !next.isLoading) {
         if (context.mounted) {
           ToastContext.showToast(
@@ -68,28 +69,32 @@ class LoginForm extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppTextField(
+            FormFieldBuilders.buildTextField(
+              context,
               fieldKey: 'email',
               label: 'Email',
               controller: emailController,
               suffixIcon: Icon(Icons.email),
+              uppercaseLabel: false,
               validator: (value) {
-                if (value == null || value.isEmpty) {
+                if (value == null || value.toString().isEmpty) {
                   return 'Please enter your email address';
                 }
                 final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                if (!emailRegex.hasMatch(value)) {
+                if (!emailRegex.hasMatch(value.toString())) {
                   return 'Please enter a valid email address';
                 }
                 return null;
               },
             ),
             AppDimens.verticalSmall,
-            AppTextField(
+            FormFieldBuilders.buildTextField(
+              context,
               fieldKey: 'password',
               label: 'Password',
               controller: passwordController,
               obscureText: !isPasswordVisible.value,
+              uppercaseLabel: false,
               suffixIcon: IconButton(
                 onPressed: () {
                   isPasswordVisible.value = !isPasswordVisible.value;
@@ -99,15 +104,14 @@ class LoginForm extends HookConsumerWidget {
                     : Icon(Icons.visibility),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
+                if (value == null || value.toString().isEmpty) {
                   return 'Please enter your password';
                 }
-                if (value.length < 6) {
+                if (value.toString().length < 6) {
                   return 'Password must be at least 6 characters long';
                 }
                 return null;
               },
-              // formKey: formKey,
             ),
             // AppDimens.verticalSmall,
             SizedBox(

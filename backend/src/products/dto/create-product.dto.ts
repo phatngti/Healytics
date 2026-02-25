@@ -10,6 +10,8 @@ import {
   ValidateNested,
   MaxLength,
   Min,
+  Max,
+  IsDateString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -72,6 +74,64 @@ export class CreateServiceDefinitionDto {
   @IsEnum(StaffAssignmentType)
   @IsOptional()
   staffAssignmentType?: StaffAssignmentType;
+}
+
+export class CreateProductFacilityImageDto {
+  @ApiProperty({ example: 'https://example.com/facility.jpg' })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(500)
+  imageUrl: string;
+
+  @ApiProperty({ example: 'Treatment Room A' })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  label: string;
+
+  @ApiPropertyOptional({ example: 0 })
+  @IsNumber()
+  @IsOptional()
+  sortOrder?: number;
+}
+
+export class CreateProductReviewDto {
+  @ApiProperty({ example: 'John Smith' })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  reviewerName: string;
+
+  @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg' })
+  @IsString()
+  @IsOptional()
+  avatarUrl?: string;
+
+  @ApiProperty({ example: 5, description: 'Rating from 1 to 5' })
+  @IsNumber()
+  @Min(1)
+  @Max(5)
+  rating: number;
+
+  @ApiPropertyOptional({ example: 'Completed' })
+  @IsString()
+  @IsOptional()
+  status?: string;
+
+  @ApiProperty({ example: '2025-05-11' })
+  @IsDateString()
+  date: string;
+
+  @ApiProperty({ example: 'Excellent service and amazing results!' })
+  @IsString()
+  @IsNotEmpty()
+  text: string;
+
+  @ApiPropertyOptional({ type: [String], example: ['https://example.com/review-img.jpg'] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  imageUrls?: string[];
 }
 
 // Main Product DTO
@@ -152,4 +212,18 @@ export class CreateProductDto {
   @ValidateNested()
   @Type(() => CreateServiceDefinitionDto)
   serviceDefinition?: CreateServiceDefinitionDto;
+
+  @ApiPropertyOptional({ type: [CreateProductFacilityImageDto], description: 'Facility/clinic images' })
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => CreateProductFacilityImageDto)
+  facilityImages?: CreateProductFacilityImageDto[];
+
+  @ApiPropertyOptional({ type: [CreateProductReviewDto], description: 'Product reviews' })
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => CreateProductReviewDto)
+  reviews?: CreateProductReviewDto[];
 }

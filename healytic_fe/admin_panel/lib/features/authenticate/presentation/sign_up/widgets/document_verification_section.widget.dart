@@ -3,7 +3,7 @@ import 'dart:developer' as developer;
 import 'package:admin_panel/core/providers/s3.provider.dart';
 import 'package:admin_panel/constants/document_types.dart';
 import 'package:admin_panel/constants/file_type.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:admin_panel/utils/url_utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';

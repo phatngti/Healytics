@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { Role } from '@/account/enum/role.enum';
-import { AuditLog } from './entities/audit-log.entity';
+import { AuditLog } from '@/common/entities/audit-log.entity';
 
 @ApiTags('Audit Logs')
 @Controller('audit-logs')

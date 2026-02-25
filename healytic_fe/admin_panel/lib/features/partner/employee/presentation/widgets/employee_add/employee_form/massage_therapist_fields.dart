@@ -1,5 +1,7 @@
-import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:admin_panel/features/partner/employee/domain/massage_strength_level.dart';
+import 'package:admin_panel/features/partner/employee/domain/therapist_level.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -18,10 +20,12 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
   @override
   void initState() {
     super.initState();
-    _selectedStrength = widget.initialStrengthLevel ?? 'MEDIUM';
+    _selectedStrength =
+        widget.initialStrengthLevel ?? MassageStrengthLevel.medium.apiValue;
   }
 
-  static const List<String> _therapistLevels = ['Junior', 'Senior', 'Master'];
+  static List<String> get _therapistLevels =>
+      TherapistLevel.values.map((e) => e.displayName).toList();
 
   static const Map<String, String> _massageSkills = {
     'swedish_massage': 'Swedish Massage',
@@ -99,37 +103,46 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
                 child: Row(
                   children: [
                     _StrengthButton(
-                      label: 'Soft',
-                      isSelected: _selectedStrength == 'SOFT',
+                      label: MassageStrengthLevel.soft.displayName,
+                      isSelected:
+                          _selectedStrength ==
+                          MassageStrengthLevel.soft.apiValue,
                       isEnabled: formEnabled,
                       onTap: () {
                         if (formEnabled) {
                           setState(() {
-                            _selectedStrength = 'SOFT';
+                            _selectedStrength =
+                                MassageStrengthLevel.soft.apiValue;
                           });
                         }
                       },
                     ),
                     _StrengthButton(
-                      label: 'Medium',
-                      isSelected: _selectedStrength == 'MEDIUM',
+                      label: MassageStrengthLevel.medium.displayName,
+                      isSelected:
+                          _selectedStrength ==
+                          MassageStrengthLevel.medium.apiValue,
                       isEnabled: formEnabled,
                       onTap: () {
                         if (formEnabled) {
                           setState(() {
-                            _selectedStrength = 'MEDIUM';
+                            _selectedStrength =
+                                MassageStrengthLevel.medium.apiValue;
                           });
                         }
                       },
                     ),
                     _StrengthButton(
-                      label: 'Strong',
-                      isSelected: _selectedStrength == 'STRONG',
+                      label: MassageStrengthLevel.strong.displayName,
+                      isSelected:
+                          _selectedStrength ==
+                          MassageStrengthLevel.strong.apiValue,
                       isEnabled: formEnabled,
                       onTap: () {
                         if (formEnabled) {
                           setState(() {
-                            _selectedStrength = 'STRONG';
+                            _selectedStrength =
+                                MassageStrengthLevel.strong.apiValue;
                           });
                         }
                       },

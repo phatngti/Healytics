@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/table/table.dart';
+import 'package:common/widgets/table/table.dart';
 import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_function_buttons.widget.dart';
 import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_header_buttons.widget.dart';
 import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_table_columns.widget.dart';
@@ -27,7 +27,7 @@ class ServiceTagsTable extends ConsumerWidget {
               count,
             ),
         defaultRowsPerPage: 10,
-        buttons: ServiceTagHeaderButtons.buildTableButtons(context),
+        buttons: ServiceTagHeaderButtons.buildTableButtons(context, ref),
         onSearchChanged: (value) {
           // TODO: Implement search functionality
         },

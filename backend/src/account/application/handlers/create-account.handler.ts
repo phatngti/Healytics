@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { Account } from '../../entities/account.entity';
+import { Account } from '@/common/entities/account.entity';
 
 /**
  * Handler for creating accounts with transactional boundaries.

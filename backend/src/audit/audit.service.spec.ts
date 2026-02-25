@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuditService } from './audit.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { AuditLog } from './entities/audit-log.entity';
+import { AuditLog } from '@/common/entities/audit-log.entity';
 import { CreateAuditLogDto } from './dto/create-audit-log.dto';
 
 describe('AuditService', () => {

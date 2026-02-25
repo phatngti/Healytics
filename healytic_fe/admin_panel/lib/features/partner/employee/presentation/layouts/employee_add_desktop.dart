@@ -1,20 +1,40 @@
-import 'package:admin_panel/features/common/widgets/button/back_button.dart';
+import 'package:common/widgets/button/back_button.dart';
 
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_add_form_section.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form_actions.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form_profile_section.dart';
 import 'package:admin_panel/router/partner_routes.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';
 
+/// Callback that returns autofill values for the given role.
+typedef AutofillBuilder = Map<String, dynamic> Function(String role);
+
 class EmployeeAddDesktop extends StatefulWidget {
   final VoidCallback? onCancel;
   final ValueChanged<Map<String, dynamic>>? onSubmit;
+  final Map<String, dynamic> initialValue;
 
-  const EmployeeAddDesktop({super.key, this.onCancel, this.onSubmit});
+  /// Whether to re-fill form fields on role change.
+  /// Only active in debug/staging builds.
+  final bool shouldAutofill;
+
+  /// Builds role-specific autofill values.
+  /// Required when [shouldAutofill] is `true`.
+  final AutofillBuilder? onBuildAutofillValues;
+
+  const EmployeeAddDesktop({
+    super.key,
+    this.onCancel,
+    this.onSubmit,
+    this.initialValue = const {},
+    this.shouldAutofill = false,
+    this.onBuildAutofillValues,
+  });
 
   @override
   State<EmployeeAddDesktop> createState() => _EmployeeAddDesktopState();
@@ -36,6 +56,17 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
     setState(() {
       _selectedRole = role;
     });
+
+    // Re-patch form with role-specific autofill data
+    // in debug / staging builds.
+    if (widget.shouldAutofill) {
+      final values = widget.onBuildAutofillValues?.call(role.apiValue);
+      if (values != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _formKey.currentState?.patchValue(values);
+        });
+      }
+    }
   }
 
   @override
@@ -44,6 +75,7 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
 
     return FormBuilder(
       key: _formKey,
+      initialValue: widget.initialValue,
       child: Stack(
         children: [
           // Scrollable content

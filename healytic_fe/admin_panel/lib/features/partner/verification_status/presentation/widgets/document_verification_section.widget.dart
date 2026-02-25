@@ -3,7 +3,7 @@ import 'package:admin_panel/features/partner/verification_status/domain/verifica
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/common/document_cards.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/common/verification_form_fields.widget.dart';
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 // Re-export DocumentUploadResult for external use

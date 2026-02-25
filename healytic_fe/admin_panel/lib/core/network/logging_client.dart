@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:admin_panel/core/entities/store.entity.dart';
+import 'package:admin_panel/core/models/store.model.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
 
@@ -14,11 +18,14 @@ class LoggingClient extends BaseClient {
       final response = await _inner.send(request);
       stopwatch.stop();
 
-      if (response.statusCode < 200 || response.statusCode >= 300) {
+      if (response.statusCode == 401) {
+        _handleUnauthorized(request);
+      } else if (response.statusCode < 200 || response.statusCode >= 300) {
         _logError(request, response, stopwatch.elapsed);
       } else {
         _log.finer(
-          'Success: ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)',
+          'Success: ${request.method} ${request.url}'
+          ' (${stopwatch.elapsedMilliseconds}ms)',
         );
       }
 
@@ -26,12 +33,23 @@ class LoggingClient extends BaseClient {
     } catch (e, stackTrace) {
       stopwatch.stop();
       _log.severe(
-        'Exception: ${request.method} ${request.url} (${stopwatch.elapsedMilliseconds}ms)',
+        'Exception: ${request.method} ${request.url}'
+        ' (${stopwatch.elapsedMilliseconds}ms)',
         e,
         stackTrace,
       );
       rethrow;
     }
+  }
+
+  /// Clears the stored access token so [RouterListenable] triggers a
+  /// GoRouter refresh, which redirects the user to the login page.
+  void _handleUnauthorized(BaseRequest request) {
+    log(
+      '401 Unauthorized — clearing session: ${request.url}',
+      name: 'LoggingClient',
+    );
+    Store.delete(StoreKey.accessToken);
   }
 
   void _logError(

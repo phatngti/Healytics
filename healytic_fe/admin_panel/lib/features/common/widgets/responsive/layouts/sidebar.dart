@@ -1,8 +1,8 @@
 import 'package:admin_panel/core/utils/user_role_helper.dart';
-import 'package:admin_panel/features/common/widgets/images/circular.dart';
+import 'package:common/widgets/images/circular.dart';
 import 'package:admin_panel/features/common/widgets/responsive/layouts/widgets/menu_item.dart';
 import 'package:admin_panel/router/app_router.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

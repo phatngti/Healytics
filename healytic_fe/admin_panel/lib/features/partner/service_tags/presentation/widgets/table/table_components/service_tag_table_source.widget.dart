@@ -1,9 +1,9 @@
 import 'package:admin_panel/features/partner/service_tags/domain/service_tag.entity.dart';
 import 'package:admin_panel/features/partner/service_tags/presentation/providers/service_tag.provider.dart';
-import 'package:admin_panel/features/common/widgets/table/helper.dart';
+import 'package:common/widgets/table/helper.dart';
 import 'package:admin_panel/features/partner/service_tags/presentation/widgets/table/table_components/service_tag_table_actions.widget.dart';
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -30,6 +30,7 @@ class ServiceTagTableSource {
           sortedBy: null,
           sortedAsc: true,
         );
+    print("tags $tags");
     final rows = tags.map((tag) {
       return DataRow(
         key: ValueKey<String>(tag.id.value),

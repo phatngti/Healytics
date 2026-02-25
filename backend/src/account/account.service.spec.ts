@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AccountService } from './account.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Account } from './entities/account.entity';
+import { Account } from '@/common/entities/account.entity';
 import { CreateAccountHandler } from './application/handlers/create-account.handler';
 import { SetSurveyHandler } from './application/handlers/set-survey.handler';
 import { SetRefreshTokenHandler } from './application/handlers/set-refresh-token.handler';

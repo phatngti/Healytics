@@ -1,8 +1,8 @@
-import 'package:admin_panel/features/common/widgets/button/back_button.dart';
-import 'package:admin_panel/features/common/widgets/button/button.dart';
-import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
+import 'package:common/widgets/button/back_button.dart';
+import 'package:common/widgets/button/button.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/router/admin_routes.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';
@@ -10,8 +10,14 @@ import 'package:go_router/go_router.dart';
 class CategoryAddDesktop extends StatefulWidget {
   final VoidCallback? onCancel;
   final ValueChanged<Map<String, dynamic>>? onSubmit;
+  final Map<String, dynamic> initialValue;
 
-  const CategoryAddDesktop({super.key, this.onCancel, this.onSubmit});
+  const CategoryAddDesktop({
+    super.key,
+    this.onCancel,
+    this.onSubmit,
+    this.initialValue = const {},
+  });
 
   @override
   State<CategoryAddDesktop> createState() => _CategoryAddDesktopState();
@@ -41,6 +47,7 @@ class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
 
     return FormBuilder(
       key: _formKey,
+      initialValue: widget.initialValue,
       child: Stack(
         children: [
           // Scrollable content

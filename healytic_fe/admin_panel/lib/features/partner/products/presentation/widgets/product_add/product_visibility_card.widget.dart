@@ -1,5 +1,5 @@
-import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class ProductVisibilityCard extends StatefulWidget {
@@ -65,13 +65,6 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Status',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 6),
               FormFieldBuilders.buildCustomDropdownField<String>(
                 context,
                 fieldKey: 'status',
@@ -127,7 +120,6 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
                     });
                     widget.onOnlineStoreChanged?.call(value);
                   },
-                  activeColor: colorScheme.primary,
                 ),
               ],
             ),

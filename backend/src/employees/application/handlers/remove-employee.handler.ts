@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { Employee } from '../../entities/employee.entity';
+import { Employee } from '@/common/entities/employee.entity';
 
 /**
  * Handler for removing employees using soft delete.

@@ -1,7 +1,7 @@
 import 'package:admin_panel/features/authenticate/presentation/providers/sign_up.provider.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/sign_up_email_form.widget.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
-import 'package:admin_panel/features/common/widgets/toast.dart';
+import 'package:common/widgets/toast.dart';
 import 'package:admin_panel/router/admin_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';

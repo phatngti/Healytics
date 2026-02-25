@@ -1,5 +1,5 @@
 import 'package:admin_panel/features/common/widgets/responsive/layout_scope.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class DesktopLayout extends StatelessWidget {

@@ -39,7 +39,7 @@ class ServiceTagResponseDto {
   ///
   Object? description;
 
-  num colorValue;
+  String colorValue;
 
   num usage;
 
@@ -123,7 +123,7 @@ class ServiceTagResponseDto {
         userId: mapValueOfType<String>(json, r'userId')!,
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<Object>(json, r'description'),
-        colorValue: num.parse('${json[r'colorValue']}'),
+        colorValue: mapValueOfType<String>(json, r'colorValue')!,
         usage: num.parse('${json[r'usage']}'),
         isActive: mapValueOfType<bool>(json, r'isActive')!,
         sortOrder: num.parse('${json[r'sortOrder']}'),

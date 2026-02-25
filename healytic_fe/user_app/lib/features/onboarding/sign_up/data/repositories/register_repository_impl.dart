@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:user_app/features/onboarding/sign_up/data/datasouces/local/share_preferences_register_local_datasouce.dart';
-import 'package:user_app/features/onboarding/sign_up/data/datasouces/remote/register_remote_datasource.dart';
+import 'package:user_app/features/onboarding/sign_up/data/datasources/local/share_preferences_register_local_datasource.dart';
+import 'package:user_app/features/onboarding/sign_up/data/datasources/remote/register_remote_datasource.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/survey_entity.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/user_entity.dart';
-import 'package:user_app/features/onboarding/sign_up/domain/repositories/register_repo.dart';
+import 'package:user_app/features/onboarding/sign_up/domain/repositories/register_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'register_repository_impl.g.dart';
@@ -79,7 +79,7 @@ class RegisterRepositoryImpl implements RegisterRepository {
     try {
       return await _remoteDatasource.completeSurvey(jsonSurveys: jsonSurveys);
     } catch (e) {
-      print("Error completing survey: $e");
+      debugPrint("Error completing survey: $e");
       throw Exception("Failed to complete survey");
     }
   }

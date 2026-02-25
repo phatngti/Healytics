@@ -21,7 +21,7 @@ export class CreateServiceTagsSchema1767800000000 implements MigrationInterface 
                 { name: "user_id", type: "uuid" },
                 { name: "name", type: "varchar", length: "100" },
                 { name: "description", type: "text", isNullable: true },
-                { name: "color_value", type: "int", default: 0xFF6366F1 },
+                { name: "color_value", type: "varchar", default: "'#FF6366F1'" },
                 { name: "usage", type: "int", default: 0 },
                 { name: "is_active", type: "boolean", default: true },
                 { name: "sort_order", type: "int", default: 0 },

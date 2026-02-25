@@ -72,6 +72,7 @@ export class EmployeesController {
   createTherapist(
     @Body() createTherapistDto: CreateTherapistDto,
   ): Promise<EmployeeResponseDto> {
+    console.log(createTherapistDto);
     return this.employeesService.createTherapist(createTherapistDto);
   }
 
@@ -84,8 +85,10 @@ export class EmployeesController {
     description: 'Return all employees.',
     type: [EmployeeResponseDto],
   })
-  findAll(@Query() query: GetEmployeesQueryDto): Promise<EmployeeResponseDto[]> {
-    return this.employeesService.findAll(query);
+  async findAll(@Query() query: GetEmployeesQueryDto): Promise<EmployeeResponseDto[]> {
+    const employees = await this.employeesService.findAll(query);
+    console.log(employees);
+    return employees;
   }
 
   /**

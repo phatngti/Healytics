@@ -1,3 +1,4 @@
+import 'package:admin_openapi/api.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 
@@ -29,4 +30,7 @@ abstract class ProductRepository {
   Future<void> deleteProduct(ProductId id);
 
   Future<List<CategoryEntity>> getCategories();
+
+  /// Get active service tags for product tagging
+  Future<List<ServiceTagResponseDto>> getServiceTags();
 }

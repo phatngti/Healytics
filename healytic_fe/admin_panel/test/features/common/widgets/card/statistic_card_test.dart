@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/card/statistic_card.dart';
+import 'package:common/widgets/card/statistic_card.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

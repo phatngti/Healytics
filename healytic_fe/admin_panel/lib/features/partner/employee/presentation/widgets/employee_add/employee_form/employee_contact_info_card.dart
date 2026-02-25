@@ -1,5 +1,6 @@
-import 'package:admin_panel/features/common/widgets/input/form_field_builders.dart';
-import 'package:admin_panel/utils/demensions.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_gender.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeContactInfoCard extends StatelessWidget {
@@ -98,13 +99,9 @@ class EmployeeContactInfoCard extends StatelessWidget {
                 child: FormFieldBuilders.buildDropdownField(
                   context,
                   label: 'Gender',
-                  items: [
-                    'Select...',
-                    'Female',
-                    'Male',
-                    'Non-binary',
-                    'Prefer not to say',
-                  ],
+                  items: EmployeeGender.values
+                      .map((e) => e.displayName)
+                      .toList(),
                 ),
               ),
             ],
@@ -131,12 +128,14 @@ class EmployeeContactInfoCard extends StatelessWidget {
                 AppDimens.verticalMediumSmall,
                 FormFieldBuilders.buildTextField(
                   context,
+                  fieldKey: 'emergency_contact_name',
                   label: '',
                   hintText: 'Contact Name',
                 ),
                 AppDimens.verticalMediumSmall,
                 FormFieldBuilders.buildTextField(
                   context,
+                  fieldKey: 'emergency_contact_phone',
                   label: '',
                   hintText: 'Contact Phone',
                   prefixIcon: Icons.phone_in_talk_outlined,
