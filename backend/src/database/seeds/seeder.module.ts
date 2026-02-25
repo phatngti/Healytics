@@ -13,6 +13,8 @@ import { ServiceResourceRequirement } from '@/common/entities/service-resource-r
 import { ResourceType } from '@/common/entities/resource-type.entity';
 import { ServiceEmployeeEligibility } from '@/common/entities/service-employee-eligibility.entity';
 import { Partner } from '@/common/entities/partner.entity';
+import { ProductReview } from '@/common/entities/product-review.entity';
+import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 import { UserSeeder } from './users/user.seeder';
 import { CategorySeeder } from './categories/category.seeder';
 import { ServiceTagSeeder } from './service-tags/service-tag.seeder';
@@ -37,6 +39,8 @@ import { SeederService } from './seeder.service';
       ResourceType,
       ServiceEmployeeEligibility,
       Partner,
+      ProductReview,
+      ProductFacilityImage,
     ]),
   ],
   providers: [

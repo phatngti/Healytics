@@ -27,8 +27,8 @@ void main() {
       // TODO
     });
 
-    // Color value as integer
-    // num colorValue
+    // Color value as hex string
+    // String colorValue
     test('to test the property `colorValue`', () async {
       // TODO
     });

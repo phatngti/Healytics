@@ -27,7 +27,7 @@ class ServiceTagsTable extends ConsumerWidget {
               count,
             ),
         defaultRowsPerPage: 10,
-        buttons: ServiceTagHeaderButtons.buildTableButtons(context),
+        buttons: ServiceTagHeaderButtons.buildTableButtons(context, ref),
         onSearchChanged: (value) {
           // TODO: Implement search functionality
         },

@@ -38,6 +38,8 @@ export class CreateTherapistHandler {
         ...employeeData,
         role: EmployeeRole.THERAPIST,
       });
+
+      console.log(employee);
       const savedEmployee = await queryRunner.manager.save(Employee, employee);
 
       // 2. Domain Action: Create TherapistProfile entity

@@ -33,6 +33,8 @@ abstract class ProductRemoteDataSource {
   Future<void> deleteProduct(ProductId id);
 
   Future<List<CategoryEntity>> getCategories();
+
+  Future<List<ServiceTagResponseDto>> getServiceTags();
 }
 
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
@@ -41,7 +43,9 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   ProductRemoteDataSourceImpl({required this.apiService});
 
   ProductsApi get _productsApi => apiService.productsApi;
+  PartnerProductsApi get _partnerProductsApi => apiService.partnerProductsApi;
   CategoriesApi get _categoriesApi => apiService.categoriesApi;
+  ServiceTagsApi get _serviceTagsApi => apiService.serviceTagsApi;
 
   @override
   Future<List<CategoryEntity>> getCategories() async {
@@ -52,8 +56,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     }
 
     return response.map((e) {
-      final map = e as Map<String, dynamic>;
-      return CategoryEntity.fromJson(map);
+      return CategoryEntity(id: e.id, name: e.name, slug: e.slug);
     }).toList();
   }
 
@@ -73,9 +76,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       return [];
     }
 
-    final products = response.map((item) {
-      return _mapToProduct(item as Map<String, dynamic>);
-    }).toList();
+    final products = response.map(_mapToProduct).toList();
 
     // Local pagination since API doesn't support it yet
     if (startingAt >= products.length) return [];
@@ -104,7 +105,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       throw Exception('Product not found');
     }
 
-    return _mapToProduct(response as Map<String, dynamic>);
+    return _mapToProduct(response);
   }
 
   @override
@@ -133,25 +134,54 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       status: _mapStatus(request.status),
       isVisibleOnline: request.onlineStore,
       employeeIds: request.staffIds,
-
       serviceDefinition: serviceDefinition,
-      media: request.images.asMap().entries.map((entry) {
-        return CreateProductMediaDto(
-          url: entry.value,
-          mediaType: CreateProductMediaDtoMediaTypeEnum.image,
-          isThumbnail: entry.key == 0,
-          sortOrder: entry.key,
-        );
-      }).toList(),
+      media: request.images
+          .asMap()
+          .entries
+          .map(
+            (entry) => CreateProductMediaDto(
+              url: entry.value,
+              mediaType: CreateProductMediaDtoMediaTypeEnum.image,
+              isThumbnail: entry.key == 0,
+              sortOrder: entry.key,
+            ),
+          )
+          .toList(),
+      facilityImages: request.facilityImages
+          .asMap()
+          .entries
+          .map(
+            (entry) => CreateProductFacilityImageDto(
+              imageUrl: entry.value.imageUrl,
+              label: entry.value.label,
+              sortOrder: entry.key,
+            ),
+          )
+          .toList(),
+      reviews: request.reviews
+          .map(
+            (review) => CreateProductReviewDto(
+              reviewerName: review.reviewerName,
+              avatarUrl: review.avatarUrl,
+              rating: review.rating,
+              status: review.status,
+              date: review.date,
+              text: review.text,
+              imageUrls: review.imageUrls,
+            ),
+          )
+          .toList(),
     );
 
-    final response = await _productsApi.productsControllerCreate(dto);
+    final response = await _partnerProductsApi.partnerProductsControllerCreate(
+      dto,
+    );
 
     if (response == null) {
       throw Exception('Failed to create product');
     }
 
-    return _mapToProduct(response as Map<String, dynamic>);
+    return _mapToProduct(response);
   }
 
   @override
@@ -174,7 +204,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           [],
     );
 
-    await _productsApi.productsControllerUpdate(
+    await _partnerProductsApi.partnerProductsControllerUpdate(
       request.id.value.toString(),
       dto,
     );
@@ -182,45 +212,37 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   @override
   Future<void> deleteProduct(ProductId id) async {
-    await _productsApi.productsControllerRemove(id.value.toString());
+    await _partnerProductsApi.partnerProductsControllerRemove(
+      id.value.toString(),
+    );
   }
 
-  Product _mapToProduct(Map<String, dynamic> json) {
-    final physical = json['physicalDetails'] as Map<String, dynamic>?;
-    final service = json['serviceDefinition'] as Map<String, dynamic>?;
-    final category = json['category'] as Map<String, dynamic>?;
+  Product _mapToProduct(ProductResponseDto dto) {
+    final service = dto.serviceDefinition;
+    final category = dto.category;
 
     return Product(
-      id: ProductId(json['id']?.toString() ?? ''),
-      name: json['name']?.toString() ?? '',
-      description: json['description']?.toString() ?? '',
-      basePrice: double.tryParse(json['basePrice']?.toString() ?? '0') ?? 0.0,
-      salePrice: double.tryParse(json['salePrice']?.toString() ?? '0'),
-      productType: json['type']?.toString().toLowerCase() ?? 'service',
-      status: json['status']?.toString().toLowerCase() ?? 'draft',
+      id: ProductId(dto.id),
+      name: dto.name,
+      description: dto.description?.toString() ?? '',
+      basePrice: dto.basePrice.toDouble(),
+      salePrice: double.tryParse(dto.salePrice?.toString() ?? ''),
+      productType: dto.type.value.toLowerCase(),
+      status: dto.status.value.toLowerCase(),
       category: CategoryEntity(
-        id: category?['id']?.toString() ?? '',
-        name: category?['name']?.toString() ?? '',
-        slug: category?['slug']?.toString() ?? '',
+        id: category?.id ?? '',
+        name: category?.name ?? '',
+        slug: category?.slug ?? '',
       ),
-      onlineStore: json['isVisibleOnline'] as bool? ?? false,
-      images:
-          (json['media'] as List<dynamic>?)
-              ?.map((m) => m['url']?.toString() ?? '')
-              .where((s) => s.isNotEmpty)
-              .toList() ??
-          [],
-
-      // Physical details
-      costPerItem: double.tryParse(physical?['costPerItem']?.toString() ?? ''),
+      onlineStore: dto.isVisibleOnline,
+      images: dto.media.map((m) => m.url).where((s) => s.isNotEmpty).toList(),
 
       // Service details
-      duration: int.tryParse(service?['durationMinutes']?.toString() ?? ''),
-      buffer: int.tryParse(service?['bufferMinutes']?.toString() ?? ''),
-      capacity: int.tryParse(service?['maxCapacity']?.toString() ?? ''),
-      leadTime: int.tryParse(service?['minLeadTimeHours']?.toString() ?? ''),
-      staffAllocation:
-          service?['staffAssignmentType']?.toString().toLowerCase() ?? 'any',
+      duration: service?.durationMinutes.toInt(),
+      buffer: service?.bufferMinutes?.toInt(),
+      capacity: service?.maxCapacity?.toInt(),
+      leadTime: service?.minLeadTimeHours?.toInt(),
+      staffAllocation: service?.staffAssignmentType?.toLowerCase() ?? 'any',
     );
   }
 
@@ -256,6 +278,12 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       default:
         return CreateServiceDefinitionDtoStaffAssignmentTypeEnum.any;
     }
+  }
+
+  @override
+  Future<List<ServiceTagResponseDto>> getServiceTags() async {
+    final response = await _serviceTagsApi.serviceTagsControllerFindActive();
+    return response ?? [];
   }
 }
 
@@ -366,6 +394,46 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
         slug: 'category-$index',
       ),
     );
+  }
+
+  @override
+  Future<List<ServiceTagResponseDto>> getServiceTags() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return [
+      ServiceTagResponseDto(
+        id: 'tag-1',
+        userId: 'mock-user',
+        name: 'Relaxation',
+        colorValue: '#4CAF50',
+        usage: 0,
+        isActive: true,
+        sortOrder: 0,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+      ServiceTagResponseDto(
+        id: 'tag-2',
+        userId: 'mock-user',
+        name: 'Deep Tissue',
+        colorValue: '#2196F3',
+        usage: 0,
+        isActive: true,
+        sortOrder: 1,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+      ServiceTagResponseDto(
+        id: 'tag-3',
+        userId: 'mock-user',
+        name: 'Premium',
+        colorValue: '#FF9800',
+        usage: 0,
+        isActive: true,
+        sortOrder: 2,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    ];
   }
 }
 

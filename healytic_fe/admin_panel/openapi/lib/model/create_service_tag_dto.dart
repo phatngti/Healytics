@@ -31,14 +31,14 @@ class CreateServiceTagDto {
   ///
   String? description;
 
-  /// Color value as integer
+  /// Color value as hex string
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  num? colorValue;
+  String? colorValue;
 
   /// Whether the tag is active
   ///
@@ -125,7 +125,7 @@ class CreateServiceTagDto {
       return CreateServiceTagDto(
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description'),
-        colorValue: num.parse('${json[r'colorValue']}'),
+        colorValue: mapValueOfType<String>(json, r'colorValue'),
         isActive: mapValueOfType<bool>(json, r'isActive'),
         sortOrder: num.parse('${json[r'sortOrder']}'),
       );

@@ -17,13 +17,6 @@ void main() {
   // final instance = ProductsApi();
 
   group('tests for ProductsApi', () {
-    // Create a new product
-    //
-    //Future<ProductResponseDto> productsControllerCreate(CreateProductDto createProductDto) async
-    test('test productsControllerCreate', () async {
-      // TODO
-    });
-
     // Get all products
     //
     //Future<List<ProductResponseDto>> productsControllerFindAll() async
@@ -45,17 +38,10 @@ void main() {
       // TODO
     });
 
-    // Delete a product
+    // Get full product details by slug
     //
-    //Future productsControllerRemove(String id) async
-    test('test productsControllerRemove', () async {
-      // TODO
-    });
-
-    // Update a product
-    //
-    //Future<ProductResponseDto> productsControllerUpdate(String id, UpdateProductDto updateProductDto) async
-    test('test productsControllerUpdate', () async {
+    //Future<ProductDetailResponseDto> productsControllerGetDetails(String slug) async
+    test('test productsControllerGetDetails', () async {
       // TODO
     });
 

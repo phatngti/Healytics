@@ -84,6 +84,8 @@ Class | Method | HTTP request | Description
 *CategoriesApi* | [**categoriesControllerFindOne**](doc//CategoriesApi.md#categoriescontrollerfindone) | **GET** /categories/{id} | Get a category by id
 *CategoriesApi* | [**categoriesControllerRemove**](doc//CategoriesApi.md#categoriescontrollerremove) | **DELETE** /categories/{id} | Delete a category
 *CategoriesApi* | [**categoriesControllerUpdate**](doc//CategoriesApi.md#categoriescontrollerupdate) | **PATCH** /categories/{id} | Update a category
+*ChatbotApi* | [**chatbotControllerSendMessage**](doc//ChatbotApi.md#chatbotcontrollersendmessage) | **POST** /chatbot/send | Send a message to the chatbot
+*ChatbotApi* | [**chatbotControllerStreamChat**](doc//ChatbotApi.md#chatbotcontrollerstreamchat) | **GET** /chatbot/stream/{conversationId} | Stream chatbot response via SSE
 *EmployeesApi* | [**employeesControllerCreateDoctor**](doc//EmployeesApi.md#employeescontrollercreatedoctor) | **POST** /employees/doctors | Create a new doctor
 *EmployeesApi* | [**employeesControllerCreateTherapist**](doc//EmployeesApi.md#employeescontrollercreatetherapist) | **POST** /employees/therapists | Create a new therapist
 *EmployeesApi* | [**employeesControllerFindAll**](doc//EmployeesApi.md#employeescontrollerfindall) | **GET** /employees | Get all employees
@@ -94,15 +96,16 @@ Class | Method | HTTP request | Description
 *LocationsApi* | [**locationsControllerGetProvinces**](doc//LocationsApi.md#locationscontrollergetprovinces) | **GET** /locations/provinces | Get all provinces in Vietnam
 *LocationsApi* | [**locationsControllerGetWards**](doc//LocationsApi.md#locationscontrollergetwards) | **GET** /locations/districts/{districtId}/wards | Get all wards in a district
 *LocationsApi* | [**locationsControllerSeedData**](doc//LocationsApi.md#locationscontrollerseeddata) | **POST** /locations/seed | Seed Vietnam administrative divisions data
+*PartnerProductsApi* | [**partnerProductsControllerCreate**](doc//PartnerProductsApi.md#partnerproductscontrollercreate) | **POST** /partner/products | Create a new product
+*PartnerProductsApi* | [**partnerProductsControllerRemove**](doc//PartnerProductsApi.md#partnerproductscontrollerremove) | **DELETE** /partner/products/{id} | Delete a product
+*PartnerProductsApi* | [**partnerProductsControllerUpdate**](doc//PartnerProductsApi.md#partnerproductscontrollerupdate) | **PATCH** /partner/products/{id} | Update a product
 *PartnersApi* | [**partnersControllerGetBusinessServices**](doc//PartnersApi.md#partnerscontrollergetbusinessservices) | **GET** /partners/business-services | Get all business services
 *PartnersApi* | [**partnersControllerGetMyProfile**](doc//PartnersApi.md#partnerscontrollergetmyprofile) | **GET** /partners/me | Get own business profile
 *PartnersApi* | [**partnersControllerUpdateMyProfile**](doc//PartnersApi.md#partnerscontrollerupdatemyprofile) | **PUT** /partners/me | Update own business profile
-*ProductsApi* | [**productsControllerCreate**](doc//ProductsApi.md#productscontrollercreate) | **POST** /products | Create a new product
 *ProductsApi* | [**productsControllerFindAll**](doc//ProductsApi.md#productscontrollerfindall) | **GET** /products | Get all products
 *ProductsApi* | [**productsControllerFindBySlug**](doc//ProductsApi.md#productscontrollerfindbyslug) | **GET** /products/slug/{slug} | Get a product by slug
 *ProductsApi* | [**productsControllerFindOne**](doc//ProductsApi.md#productscontrollerfindone) | **GET** /products/{id} | Get a product by id
-*ProductsApi* | [**productsControllerRemove**](doc//ProductsApi.md#productscontrollerremove) | **DELETE** /products/{id} | Delete a product
-*ProductsApi* | [**productsControllerUpdate**](doc//ProductsApi.md#productscontrollerupdate) | **PATCH** /products/{id} | Update a product
+*ProductsApi* | [**productsControllerGetDetails**](doc//ProductsApi.md#productscontrollergetdetails) | **GET** /products/slug/{slug}/details | Get full product details by slug
 *S3Api* | [**s3ControllerDeleteFile**](doc//S3Api.md#s3controllerdeletefile) | **DELETE** /s3/{key} | Delete file
 *S3Api* | [**s3ControllerGetFileUrl**](doc//S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file URL
 *S3Api* | [**s3ControllerPreSign**](doc//S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload URL
@@ -130,20 +133,28 @@ Class | Method | HTTP request | Description
  - [BusinessInfoDto](doc//BusinessInfoDto.md)
  - [BusinessServiceDto](doc//BusinessServiceDto.md)
  - [BusinessServicesResponseDto](doc//BusinessServicesResponseDto.md)
+ - [BusinessType](doc//BusinessType.md)
  - [CategoryResponseDto](doc//CategoryResponseDto.md)
  - [CategorySummaryDto](doc//CategorySummaryDto.md)
+ - [ChatMessageResponseDto](doc//ChatMessageResponseDto.md)
+ - [ClinicDto](doc//ClinicDto.md)
  - [CreateCategoryDto](doc//CreateCategoryDto.md)
  - [CreateDoctorDto](doc//CreateDoctorDto.md)
  - [CreateDoctorProfileDto](doc//CreateDoctorProfileDto.md)
  - [CreateProductDto](doc//CreateProductDto.md)
+ - [CreateProductFacilityImageDto](doc//CreateProductFacilityImageDto.md)
  - [CreateProductMediaDto](doc//CreateProductMediaDto.md)
+ - [CreateProductReviewDto](doc//CreateProductReviewDto.md)
  - [CreateServiceDefinitionDto](doc//CreateServiceDefinitionDto.md)
  - [CreateServiceTagDto](doc//CreateServiceTagDto.md)
  - [CreateTherapistDto](doc//CreateTherapistDto.md)
  - [CreateTherapistProfileDto](doc//CreateTherapistProfileDto.md)
+ - [DayScheduleDto](doc//DayScheduleDto.md)
  - [DeleteFileResponseDto](doc//DeleteFileResponseDto.md)
  - [DoctorProfileDto](doc//DoctorProfileDto.md)
  - [EmployeeResponseDto](doc//EmployeeResponseDto.md)
+ - [FacilityImageDto](doc//FacilityImageDto.md)
+ - [FeatureTagDto](doc//FeatureTagDto.md)
  - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
  - [GetDistrictsResponseDto](doc//GetDistrictsResponseDto.md)
  - [GetProvincesResponseDto](doc//GetProvincesResponseDto.md)
@@ -159,25 +170,33 @@ Class | Method | HTTP request | Description
  - [PartnerItemDto](doc//PartnerItemDto.md)
  - [PartnerLoginDto](doc//PartnerLoginDto.md)
  - [PartnerRequestDto](doc//PartnerRequestDto.md)
+ - [PartnerVerificationStatus](doc//PartnerVerificationStatus.md)
  - [PartnersResponseDto](doc//PartnersResponseDto.md)
  - [PresignRequestDto](doc//PresignRequestDto.md)
  - [PresignResponseDto](doc//PresignResponseDto.md)
+ - [ProductDetailResponseDto](doc//ProductDetailResponseDto.md)
  - [ProductMediaDto](doc//ProductMediaDto.md)
  - [ProductResponseDto](doc//ProductResponseDto.md)
+ - [RecommendedServiceDto](doc//RecommendedServiceDto.md)
  - [RefreshTokenRequestDto](doc//RefreshTokenRequestDto.md)
  - [RegisterDto](doc//RegisterDto.md)
  - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
  - [RegisterPartnerResponseDto](doc//RegisterPartnerResponseDto.md)
  - [RegisterProfileDto](doc//RegisterProfileDto.md)
+ - [ReviewDto](doc//ReviewDto.md)
  - [ReviewItemDto](doc//ReviewItemDto.md)
  - [ReviewPartnerProfileDto](doc//ReviewPartnerProfileDto.md)
  - [ReviewPartnerResponseDto](doc//ReviewPartnerResponseDto.md)
+ - [SendMessageDto](doc//SendMessageDto.md)
+ - [SendMessageResponseDto](doc//SendMessageResponseDto.md)
  - [ServiceDefinitionDto](doc//ServiceDefinitionDto.md)
  - [ServiceEmployeeEligibilityDto](doc//ServiceEmployeeEligibilityDto.md)
  - [ServiceTagResponseDto](doc//ServiceTagResponseDto.md)
+ - [SpecialistDto](doc//SpecialistDto.md)
  - [SurveyDto](doc//SurveyDto.md)
  - [SurveyResponseDto](doc//SurveyResponseDto.md)
  - [TherapistProfileDto](doc//TherapistProfileDto.md)
+ - [TimeSlotDto](doc//TimeSlotDto.md)
  - [TotalPartnersResponseDto](doc//TotalPartnersResponseDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)
  - [UpdateEmployeeDto](doc//UpdateEmployeeDto.md)

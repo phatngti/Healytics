@@ -93,6 +93,7 @@ export class PartnerSeeder implements ISeeder {
         streetAddress: partnerData.streetAddress,
         phoneNumber: partnerData.phoneNumber,
         verificationStatus: partnerData.verificationStatus,
+        verificationCompletedAt: new Date(),
         accountId: account.id,
         // Location FKs — left null for seed data
         provinceId: null,

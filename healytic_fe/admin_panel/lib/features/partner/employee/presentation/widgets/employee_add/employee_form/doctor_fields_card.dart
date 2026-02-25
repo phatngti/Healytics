@@ -1,3 +1,5 @@
+import 'package:admin_panel/features/partner/employee/domain/medical_education.dart';
+import 'package:admin_panel/features/partner/employee/domain/medical_specialization.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/theme/app_theme.dart';
@@ -173,13 +175,7 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
             context,
             fieldKey: 'specializations',
             label: 'Specializations',
-            availableOptions: const {
-              'cardiology': 'Cardiology',
-              'dermatology': 'Dermatology',
-              'orthopedics': 'Orthopedics',
-              'pediatrics': 'Pediatrics',
-              'neurology': 'Neurology',
-            },
+            availableOptions: MedicalSpecialization.optionsMap,
             searchHint: 'Search or add specialization...',
             allowCreate: true,
             width: double.infinity,
@@ -191,13 +187,7 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
             context,
             fieldKey: 'education',
             label: 'Education',
-            items: const [
-              'Doctor of Medicine',
-              'Master of Medicine',
-              'Bachelor of Medicine',
-              'Associate Degree',
-              'Other',
-            ],
+            items: MedicalEducation.values.map((e) => e.displayName).toList(),
             enabled: widget.isEditing,
             initialValue: widget.doctor?.education.firstOrNull,
           ),

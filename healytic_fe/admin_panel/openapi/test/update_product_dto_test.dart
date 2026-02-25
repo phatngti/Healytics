@@ -83,6 +83,18 @@ void main() {
       // TODO
     });
 
+    // Facility/clinic images
+    // List<CreateProductFacilityImageDto> facilityImages (default value: const [])
+    test('to test the property `facilityImages`', () async {
+      // TODO
+    });
+
+    // Product reviews
+    // List<CreateProductReviewDto> reviews (default value: const [])
+    test('to test the property `reviews`', () async {
+      // TODO
+    });
+
 
   });
 

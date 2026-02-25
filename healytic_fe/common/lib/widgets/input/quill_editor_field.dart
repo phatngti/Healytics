@@ -50,7 +50,9 @@ class _AppQuillEditorField extends StatelessWidget {
           try {
             final decoded = jsonDecode(field.value!);
             if (decoded is List) {
-              initialContent = decoded.cast<Map<String, Object>>();
+              initialContent = decoded
+                  .map((e) => Map<String, Object>.from(e as Map))
+                  .toList();
             }
           } catch (e) {
             // Fallback for plain text

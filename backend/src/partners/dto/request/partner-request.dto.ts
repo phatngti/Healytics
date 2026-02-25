@@ -48,6 +48,7 @@ export class PartnerRequestDto {
     @ApiProperty({
         description: 'Type of business',
         enum: BusinessType,
+        enumName: 'BusinessType',
         isArray: true,
         type: 'array',
         example: [BusinessType.MASSAGE_THERAPY],

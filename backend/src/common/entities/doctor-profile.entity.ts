@@ -28,10 +28,10 @@ export class DoctorProfile {
   specializations: string[];
 
   @Column({ type: 'jsonb', nullable: true })
-  education: any[];
+  education: string[];
 
   @Column({ type: 'jsonb', nullable: true })
-  certifications: any[];
+  certifications: string[];
 
   @OneToOne(() => Employee, (employee) => employee.doctorProfile, {
     onDelete: 'CASCADE',

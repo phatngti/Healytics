@@ -63,12 +63,12 @@ const SEED_DOCTOR_PROFILES: Record<string, Partial<Omit<DoctorProfile, 'employee
     consultationFee: 350000,
     specializations: ['Internal Medicine', 'Preventive Care', 'Chronic Disease Management'],
     education: [
-      { degree: 'Doctor of Medicine', institution: 'University of Medicine HCMC', year: 2014 },
-      { degree: 'Residency – Internal Medicine', institution: 'Cho Ray Hospital', year: 2017 },
+      'Doctor of Medicine - University of Medicine HCMC (2014)',
+      'Residency – Internal Medicine - Cho Ray Hospital (2017)',
     ],
     certifications: [
-      { name: 'Board Certified – Internal Medicine', issuedBy: 'Vietnam Medical Council', year: 2018 },
-      { name: 'Advanced Cardiac Life Support', issuedBy: 'AHA', year: 2023 },
+      'Board Certified – Internal Medicine - Vietnam Medical Council (2018)',
+      'Advanced Cardiac Life Support - AHA (2023)',
     ],
   },
 };
