@@ -1,6 +1,6 @@
 from enum import Enum
 
-class EventType(str, Enum):
+class SSEEventType(str, Enum):
     TOKEN = "token"
     NER = "ner"
     RECOMMENDATION = "recommendation"
