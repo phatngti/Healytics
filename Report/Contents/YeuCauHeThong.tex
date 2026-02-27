@@ -20,7 +20,7 @@ Các chức năng chính bao gồm:
         \item \textbf{Mục đích: }Đóng vai trò trợ lý ảo 24/7, giúp người dùng xác định vấn đề và tìm ra giải pháp dịch vụ phù hợp một cách tự nhiên qua hội thoại.
         \item \textbf{Chức năng cốt lõi:}
         \begin{itemize}
-            \item \textbf{Xử lý ngôn ngữ tự nhiên (NLP):} ): Hiểu và phân tích các yêu cầu đa dạng của người dùng.
+            \item \textbf{Xử lý ngôn ngữ tự nhiên (NLP):} Hiểu và phân tích các yêu cầu đa dạng của người dùng.
             \item \textbf{Tư vấn theo ngữ cảnh:} Đặt câu hỏi dẫn dắt để làm rõ nhu cầu và đối chiếu với cơ sở dữ liệu dịch vụ.
             \item  \textbf{Đề xuất thông minh: }Trả về các gợi ý dịch vụ phù hợp nhất kèm thông tin tóm tắt (đánh giá, giá, vị trí) và hỗ trợ điều hướng đến trang đặt lịch.
         \end{itemize}
@@ -59,7 +59,7 @@ Các chức năng chính bao gồm:
     \item \textbf{AI trong Quản trị \& Tương tác thông minh}
     \begin{itemize}
         \item \textbf{Mục đích:} Tối ưu hóa hiệu quả vận hành cho nhà quản trị và tăng cường sự gắn kết với người dùng thông qua các tương tác cá nhân hóa.
-        \item \textbf{Chức năng cốt lỏi}:
+        \item \textbf{Chức năng cốt lõi}:
         \begin{itemize}
             \item \textbf{Dashboard phân tích:} Cung cấp cho admin các báo cáo, biểu đồ trực quan về hiệu suất kinh doanh và hành vi người dùng.
             \item \textbf{Phân khúc khách hàng tự động:} AI tự động nhóm người dùng dựa trên hành vi để triển khai các chiến dịch phù hợp.
@@ -204,32 +204,53 @@ Các chức năng chính bao gồm:
 \begin{enumerate}
     \item \textbf{Hiệu suất (Performance):}
     \begin{itemize}
-        \item \textbf{Thời gian phản hồi (Response Time):} Mọi tương tác trên ứng dụng (tải trang, tìm kiếm, lọc) phải hoàn thành dưới 2 giây. API response time phải dưới 200ms.
-        \item \textbf{Tải trọng (Load):} Hệ thống phải có khả năng phục vụ đồng thời ít nhất 1.000 người dùng (concurrent users) trong giờ cao điểm mà không suy giảm hiệu suất.
+        \item \textbf{Thời gian phản hồi (Response Time):} Mọi tương tác trên ứng dụng (tải trang, tìm kiếm, lọc) phải hoàn thành dưới \textbf{2 giây}. API response time trung bình phải dưới \textbf{200ms} và tối đa (P95) không vượt \textbf{500ms}.
+        \item \textbf{Tải trọng (Load):} Hệ thống phải có khả năng phục vụ đồng thời ít nhất \textbf{1.000 người dùng} (concurrent users) trong giờ cao điểm mà không suy giảm hiệu suất đáng kể (< 10\% tăng latency).
+        \item \textbf{Throughput:} Hệ thống backend phải xử lý được tối thiểu \textbf{500 requests/giây} cho các API chính (tìm kiếm, đặt lịch, thanh toán).
+        \item \textbf{Hiệu suất AI Chatbot:} Thời gian phản hồi của chatbot AI (bao gồm truy xuất RAG và sinh văn bản) không vượt quá \textbf{5 giây} cho mỗi lượt hội thoại. Tỷ lệ phản hồi chính xác (relevance) đạt tối thiểu \textbf{85\%}.
+        \item \textbf{Tối ưu hóa mobile:} Ứng dụng di động phải khởi động (cold start) trong vòng \textbf{3 giây} trên các thiết bị tầm trung. Kích thước bộ nhớ (RAM) sử dụng không vượt \textbf{150MB} trong quá trình hoạt động bình thường.
     \end{itemize}
     \item \textbf{Bảo mật (Security):}
     \begin{itemize}
-        \item \textbf{Mã hóa dữ liệu:} Toàn bộ dữ liệu phải được mã hóa khi truyền (SSL/TLS) và khi lưu trữ (encryption at rest), đặc biệt là thông tin cá nhân và lịch sử sức khỏe của người dùng.
-        \item \textbf{Xác thực \& Phân quyền:} Sử dụng các tiêu chuẩn xác thực mạnh (ví dụ: JWT). Áp dụng chặt chẽ cơ chế phân quyền theo vai trò (Role-Based Access Control - RBAC) cho Admin và Đối tác.
-        \item \textbf{Tuân thủ:} Hệ thống phải tuân thủ các tiêu chuẩn bảo mật phổ biến như OWASP Top 10 và các quy định về bảo vệ dữ liệu cá nhân tại Việt Nam.
+        \item \textbf{Mã hóa dữ liệu:} Toàn bộ dữ liệu phải được mã hóa khi truyền (\textbf{TLS 1.2+}) và khi lưu trữ (\textbf{AES-256} encryption at rest), đặc biệt là thông tin cá nhân và lịch sử sức khỏe của người dùng.
+        \item \textbf{Xác thực \& Phân quyền:} Sử dụng JWT (JSON Web Token) với thời gian hết hạn ngắn (access token \textbf{15 phút}, refresh token \textbf{7 ngày}). Áp dụng chặt chẽ cơ chế phân quyền theo vai trò (\textbf{RBAC}) với tối thiểu 4 vai trò: User, Partner, Staff, Admin.
+        \item \textbf{Bảo vệ API:} Triển khai \textbf{rate limiting} (tối đa 100 requests/phút/user), \textbf{input validation} trên mọi endpoint, và bảo vệ chống các cuộc tấn công phổ biến (SQL Injection, XSS, CSRF).
+        \item \textbf{Tuân thủ:} Hệ thống phải tuân thủ các tiêu chuẩn bảo mật \textbf{OWASP Top 10} và các quy định về bảo vệ dữ liệu cá nhân tại Việt Nam (Nghị định 13/2023/NĐ-CP).
+        \item \textbf{Audit Log:} Mọi hành động quan trọng (đăng nhập, thay đổi quyền, xác thực đối tác, giao dịch tài chính) phải được ghi nhận vào hệ thống nhật ký kiểm toán, lưu trữ tối thiểu \textbf{12 tháng}.
     \end{itemize}
     \item \textbf{Độ sẵn sàng (Availability):}
     \begin{itemize}
-        \item \textbf{Uptime:} Hệ thống phải đảm bảo thời gian hoạt động 99.9\% (tức là thời gian downtime không quá 43 phút/tháng). Cần có cơ chế sao lưu và phục hồi dữ liệu tự động.
+        \item \textbf{Uptime:} Hệ thống phải đảm bảo thời gian hoạt động \textbf{99.9\%} (tức là thời gian downtime không quá \textbf{43 phút/tháng}), không bao gồm thời gian bảo trì theo lịch.
+        \item \textbf{Sao lưu dữ liệu:} Cơ sở dữ liệu phải được sao lưu tự động (\textbf{automated backup}) ít nhất \textbf{1 lần/ngày}, với khả năng phục hồi (RTO) trong vòng \textbf{1 giờ} và điểm phục hồi (RPO) không quá \textbf{4 giờ}.
+        \item \textbf{Graceful Degradation:} Khi một thành phần phụ (ví dụ: AI Service, Notification Service) gặp sự cố, các chức năng cốt lõi (đặt lịch, thanh toán) vẫn phải hoạt động bình thường.
     \end{itemize}
     \item \textbf{Khả năng mở rộng (Scalability):}
     \begin{itemize}
-        \item Kiến trúc hệ thống (đặc biệt là server và database) phải được thiết kế để có thể mở rộng theo chiều ngang (horizontal scaling), sẵn sàng đáp ứng khi số lượng người dùng và đối tác tăng lên hàng triệu.
+        \item \textbf{Horizontal Scaling:} Kiến trúc Microservices cho phép mở rộng theo chiều ngang, mỗi service có thể scale độc lập dựa trên nhu cầu thực tế (ví dụ: AI Service có thể scale riêng khi lượng truy vấn chatbot tăng).
+        \item \textbf{Database Scaling:} PostgreSQL phải hỗ trợ \textbf{read replicas} để phân tải truy vấn đọc và \textbf{connection pooling} untuk quản lý kết nối hiệu quả.
+        \item \textbf{Mục tiêu dài hạn:} Hệ thống phải sẵn sàng phục vụ tối thiểu \textbf{100.000 người dùng} và \textbf{1.000 đối tác} trong vòng 12 tháng sau khi ra mắt mà không cần tái cấu trúc kiến trúc.
     \end{itemize}
     \item \textbf{Tính khả dụng \& Trải nghiệm người dùng (Usability \& UX):}
     \begin{itemize}
-        \item \textbf{Tương thích:} Ứng dụng phải hoạt động mượt mà trên 95\% các thiết bị iOS và Android phổ biến trên thị trường.
-        \item \textbf{Nhất quán:} Giao diện và trải nghiệm người dùng phải nhất quán giữa các màn hình và nền tảng (User App, Partner Portal, Admin Dashboard).
-        \item \textbf{Hỗ trợ người dùng:} Cung cấp tài liệu hướng dẫn (FAQ) và các kênh hỗ trợ dễ tiếp cận ngay trong ứng dụng/portal.
+        \item \textbf{Tương thích thiết bị:} Ứng dụng phải hoạt động mượt mà trên \textbf{95\%} các thiết bị iOS (từ iOS 14+) và Android (từ Android 8+) phổ biến trên thị trường.
+        \item \textbf{Nhất quán giao diện:} Giao diện và trải nghiệm người dùng phải nhất quán giữa các màn hình và nền tảng (User App, Partner Portal, Admin Dashboard), tuân thủ Material Design Guidelines.
+        \item \textbf{Hỗ trợ người dùng:} Cung cấp tài liệu hướng dẫn (FAQ), tooltip trên các chức năng phức tạp, và các kênh hỗ trợ dễ tiếp cận ngay trong ứng dụng/portal.
+        %\item \textbf{Accessibility:} Giao diện phải đảm bảo tỷ lệ tương phản tối thiểu \textbf{4.5:1} cho văn bản, hỗ trợ cỡ chữ linh hoạt (text scaling), và tương thích với các công cụ hỗ trợ người khuyết tật (screen reader).
+        %\item \textbf{Đa ngôn ngữ:} Hệ thống phải hỗ trợ tối thiểu \textbf{tiếng Việt} (mặc định) và \textbf{tiếng Anh}, với khả năng mở rộng thêm ngôn ngữ trong tương lai.
     \end{itemize}
     \item \textbf{Khả năng bảo trì (Maintainability):}
     \begin{itemize}
-        \item Mã nguồn phải được viết sạch, tuân thủ coding convention, có tài liệu và comment rõ ràng để dễ dàng sửa lỗi và phát triển các tính năng mới trong tương lai.
+        \item \textbf{Code Quality:} Mã nguồn phải được viết sạch, tuân thủ coding convention (ESLint/Prettier cho TypeScript, Dart Analyzer cho Flutter), có tài liệu và comment rõ ràng.
+        \item \textbf{Kiến trúc module hóa:} Áp dụng Clean Architecture với phân tách rõ ràng giữa các layer (Presentation, Domain, Data), cho phép thay đổi một layer mà không ảnh hưởng đến các layer khác.
+        %\item \textbf{CI/CD:} Triển khai pipeline tự động hóa cho việc build, test, và deploy. Mỗi commit phải qua ít nhất \textbf{unit test} và \textbf{lint check} trước khi merge.
+        \item \textbf{Logging \& Monitoring:} Hệ thống phải tích hợp logging có cấu trúc (structured logging) và monitoring dashboard để theo dõi health check, error rate, và các metrics quan trọng theo thời gian thực.
+    \end{itemize}
+
+    \item \textbf{Độ tin cậy (Reliability):}
+    \begin{itemize}
+        \item \textbf{Tính toàn vẹn dữ liệu:} Mọi giao dịch quan trọng (đặt lịch, thanh toán) phải đảm bảo tính ACID. Sử dụng cơ chế \textbf{idempotency} cho các API thanh toán để tránh trùng lặp giao dịch.
+        \item \textbf{Error Handling:} Hệ thống phải có cơ chế xử lý lỗi thống nhất, trả về mã lỗi rõ ràng (theo chuẩn HTTP status codes) và thông báo thân thiện với người dùng. Tỷ lệ lỗi hệ thống (5xx errors) không vượt quá \textbf{0.1\%} tổng số requests.
+        \item \textbf{Retry \& Circuit Breaker:} Các lời gọi đến dịch vụ bên thứ ba (Payment Gateway, Push Notification) phải có cơ chế retry tự động (tối đa 3 lần) và circuit breaker để ngăn cascading failure.
     \end{itemize}
 \end{enumerate}
 
