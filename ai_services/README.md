@@ -33,10 +33,6 @@ Browser EventSource
   "conversation_id": "uuid-string",
   "user_id": "user-123",
   "message": "Tôi bị đau lưng ở quận 1",
-  "history": [
-    {"role": "user", "content": "Xin chào"},
-    {"role": "assistant", "content": "Chào bạn"}
-  ],
   "top_k": 3,
   "enable_recommendation": true,
   "enable_ner": true
