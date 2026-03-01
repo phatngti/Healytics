@@ -68,7 +68,6 @@ Repositories layer chịu trách nhiệm:
 Chỉ làm nhiệm vụ CRUD cho:
 - Conversation
 - Message
-- Recommended Services (attach vào message)
 
 Orchestrator sẽ gọi các hàm trong repositories.
 Repositories không được gọi ngược lên orchestrator.
@@ -99,20 +98,6 @@ Fields:
 - content (text)
 - created_at (timestamp)
 
-Relationship:
-1 message -> many recommended services (optional)
-
-
-3) recommended_service table (optional but recommended)
-
-Fields:
-- id (string / uuid)
-- message_id (string) FOREIGN KEY -> message.id
-- service_id (string)
-- name (string)
-- rating (float)
-- price (float)
-- metadata_json (json) optional
 
 
 ========================================
@@ -122,7 +107,6 @@ II. FOLDER STRUCTURE
 repositories/
     conversation_repo.py
     message_repo.py
-    service_repo.py
 
 
 ========================================
@@ -190,33 +174,6 @@ async def get_messages_by_conversation(
     """
 
 
-----------------------------------------
-3) service_repo.py
-----------------------------------------
-
-Purpose:
-Attach recommended services to assistant message.
-
-
-async def attach_services_to_message(
-    session,
-    message_id: str,
-    services: list[dict]
-):
-    """
-    Insert multiple recommended services
-    services format example:
-
-    [
-        {
-            "service_id": "svc-001",
-            "name": "Clinic A",
-            "rating": 4.8,
-            "price": 500000
-        }
-    ]
-    """
-
 
 ========================================
 IV. HOW ORCHESTRATOR WILL USE THIS
@@ -245,31 +202,6 @@ Example Flow:
         content=full_llm_response
     )
 
-4) Recommendation result available
-
-    await service_repo.attach_services_to_message(
-        session,
-        message_id=assistant_msg.id,
-        services=recommended_services
-    )
-
-
-Repositories do NOT:
-- Format SSE
-- Call other services
-- Do NER
-- Do business validation
-
-
-========================================
-V. TECHNICAL REQUIREMENTS
-========================================
-
-- Use async SQLAlchemy (or chosen async ORM)
-- All functions must receive "session" from outside
-- Do NOT create session inside repository
-- Do NOT commit inside small functions (optional depending on design)
-- Let orchestrator manage transaction if needed
 
 
 ========================================
@@ -280,7 +212,7 @@ VI. IMPORTANT DESIGN RULES
 2) No HTTP logic
 3) No try/except swallowing errors silently
 4) Keep functions small and atomic
-5) Repository returns DB model or Pydantic model (decide one consistent way)
+5) Repository returns DB model
 
 
 ========================================
@@ -290,7 +222,6 @@ VII. MINIMAL SUCCESS CRITERIA
 ✔ Can create conversation
 ✔ Can create user message
 ✔ Can create assistant message
-✔ Can attach recommended services
 ✔ Can query conversation history
 
 That is enough for Phase 1 implementation.
@@ -298,6 +229,3 @@ That is enough for Phase 1 implementation.
 
 END OF SPEC
 
-
-# Công việc 2
-- Khi hiện thực recommender các services thì UI yêu cầu phải trả ra đầy đủ các trường (name, image, price, staff_name, rating, location, slots). Nên Hưng sẽ hiện thực recommender system rồi trả về service_id, Nguyên hãy dựa vào service_id và lấy các trường bên trên để trả về UI.
