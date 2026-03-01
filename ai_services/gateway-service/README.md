@@ -167,7 +167,8 @@ async def create_message(
 
 async def get_messages_by_conversation(
     session,
-    conversation_id: str
+    conversation_id: str,
+    limit: int | None = None
 ):
     """
     Return list of messages ordered by created_at ASC
