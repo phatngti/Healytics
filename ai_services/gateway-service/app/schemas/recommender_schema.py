@@ -20,9 +20,9 @@ class HomeRecommenderRequest(BaseModel):
 
     user_id: str
 
-    user_profile: Dict[str, List[str]]
+    # user_profile: Dict[str, List[str]]
 
-    selected_services: List[str] = Field(default_factory=list)
+    # selected_services: List[str] = Field(default_factory=list)
 
     top_k: int = Field(default=5, ge=1, le=20)
 
