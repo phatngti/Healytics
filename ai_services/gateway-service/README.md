@@ -210,7 +210,7 @@ VI. IMPORTANT DESIGN RULES
 ========================================
 
 1) No business logic in repository
-2) No HTTP logic
+2) No HTTP logicNguyên nhớ 
 3) No try/except swallowing errors silently
 4) Keep functions small and atomic
 5) Repository returns DB model

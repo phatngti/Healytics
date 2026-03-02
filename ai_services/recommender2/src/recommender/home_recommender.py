@@ -36,11 +36,11 @@ if __name__ == "__main__":
     health_conditions = ["tim mạch", "huyết áp cao"]
     interests = ["yoga", "thiền", "chạy bộ"]
     goals = ["giảm cân", "khỏe mạnh hơn"]
-    services_history = ["SV001", "SV002"]
+    service_history_ids = ["SV001", "SV002"]
 
     # Khởi tạo trang home
     home = Home_Recommender("healytics_collection")
     print(home.build_service_history_texts(services_history))
     
-    results = home.recommend(health_conditions, interests, services_history)
+    results = home.recommend(health_conditions, interests, goals, services_history)
     print(results)

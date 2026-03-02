@@ -11,9 +11,9 @@ class Chatbot_Recommender:
         self.vector_database = Vector_Database(db_name = database_name)
         self.embedding_model = Embedding_Model()
 
-    def recommend(self, query):
+    def recommend(self, query, top_k):
         query_embedding = self.embedding_model.encode(query)
-        results = self.vector_database.search_similarity_services(query_embedding, n_results = settings.TOP_K_CHATBOT_RESULTS)
+        results = self.vector_database.search_similarity_services(query_embedding, n_results = top_k)
         return results
 
 if __name__ == "__main__":
