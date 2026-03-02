@@ -19,12 +19,13 @@ class Home_Recommender:
         return service_history_texts
 
     # Recommender base on health conditions, interests, service_history
-    def recommend(self, health_conditions, interests, service_history_ids, top_k_home_results = settings.TOP_K_HOME_RESULTS):
+    def recommend(self, health_conditions, interests, goals, service_history_ids, top_k_home_results = settings.TOP_K_HOME_RESULTS):
         service_history_texts = self.build_service_history_texts(service_history_ids)
         # Nối thành 1 string
         user_profile_query = " ".join(
             (health_conditions or []) +
             (interests or []) +
+            (goals or []) +
             (service_history_texts or [])
         )
         user_profile_embedding = self.embedding_model.encode(user_profile_query)
@@ -34,11 +35,12 @@ class Home_Recommender:
 if __name__ == "__main__":
     health_conditions = ["tim mạch", "huyết áp cao"]
     interests = ["yoga", "thiền", "chạy bộ"]
+    goals = ["giảm cân", "khỏe mạnh hơn"]
     services_history = ["SV001", "SV002"]
 
     # Khởi tạo trang home
-    # home = Home_Recommender("healytics_collection")
-    # print(home.build_service_history_texts(services_history))
+    home = Home_Recommender("healytics_collection")
+    print(home.build_service_history_texts(services_history))
     
     results = home.recommend(health_conditions, interests, services_history)
     print(results)
