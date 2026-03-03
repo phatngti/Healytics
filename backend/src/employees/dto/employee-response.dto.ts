@@ -158,6 +158,10 @@ export class EmployeeResponseDto {
   reviewCount: number;
 
   @Expose()
+  @ApiPropertyOptional({ description: 'Partner ID the employee belongs to' })
+  partnerId: string | null;
+
+  @Expose()
   @ApiProperty({ description: 'Creation timestamp' })
   createdAt: Date;
 

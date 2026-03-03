@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreateServiceTagDto } from '../../dto/create-service-tag.dto';
-import { ServiceTag } from '@/common/entities/service-tag.entity';
+import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
 
 /**
  * Handler for creating a new service tag.
@@ -23,15 +23,15 @@ export class CreateServiceTagHandler {
    * @param userId - The ID of the user (partner) creating the tag
    * @returns The created ServiceTag entity
    */
-  async execute(command: CreateServiceTagDto, userId: string): Promise<ServiceTag> {
-    this.logger.log(`Executing CreateServiceTagHandler for user: ${userId}`);
+  async execute(command: CreateServiceTagDto, userId: string): Promise<ProductFeatureTag> {
+    this.logger.log(`Executing CreateProductFeatureTagHandler for user: ${userId}`);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
       // 1. Domain Action (Prepare Entity)
-      const tag = queryRunner.manager.create(ServiceTag, {
+      const tag = queryRunner.manager.create(ProductFeatureTag, {
         ...command,
         userId,
         colorValue: command.colorValue ?? '#FF6366F1',
@@ -40,7 +40,7 @@ export class CreateServiceTagHandler {
       });
 
       // 2. Persistence
-      const savedTag = await queryRunner.manager.save(ServiceTag, tag);
+      const savedTag = await queryRunner.manager.save(ProductFeatureTag, tag);
 
       await queryRunner.commitTransaction();
       this.logger.log(`Service tag created successfully: ${savedTag.id}`);

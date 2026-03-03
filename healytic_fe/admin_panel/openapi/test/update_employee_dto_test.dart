@@ -88,6 +88,12 @@ void main() {
       // TODO
     });
 
+    // Partner ID the employee belongs to
+    // String partnerId
+    test('to test the property `partnerId`', () async {
+      // TODO
+    });
+
     // Doctor profile data if role is DOCTOR
     // CreateDoctorProfileDto doctorProfile
     test('to test the property `doctorProfile`', () async {

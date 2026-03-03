@@ -7,10 +7,10 @@ import {
   Index,
 } from 'typeorm';
 import { Product } from './product.entity';
-import { ServiceTag } from './service-tag.entity';
+import { ProductFeatureTag } from './product-feature-tag.entity';
 
 /**
- * Junction table entity for many-to-many relationship between products and service tags.
+ * Junction table entity for many-to-many relationship between products and feature tags.
  */
 @Entity('product_tags')
 export class ProductTag {
@@ -30,7 +30,7 @@ export class ProductTag {
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
-  @ManyToOne(() => ServiceTag, (tag) => tag.productTags, { onDelete: 'CASCADE' })
+  @ManyToOne(() => ProductFeatureTag, (tag) => tag.productTags, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'tag_id' })
-  tag: ServiceTag;
+  tag: ProductFeatureTag;
 }

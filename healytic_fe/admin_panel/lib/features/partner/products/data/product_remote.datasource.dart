@@ -14,6 +14,7 @@ import 'package:flutter/foundation.dart';
 
 part 'product_remote.datasource.g.dart';
 
+/// Contract for product remote data operations.
 abstract class ProductRemoteDataSource {
   Future<List<Product>> getProducts(
     int startingAt,
@@ -37,12 +38,12 @@ abstract class ProductRemoteDataSource {
   Future<List<ServiceTagResponseDto>> getServiceTags();
 }
 
+/// Real implementation using the Partner Products API.
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   final ApiService apiService;
 
   ProductRemoteDataSourceImpl({required this.apiService});
 
-  ProductsApi get _productsApi => apiService.productsApi;
   PartnerProductsApi get _partnerProductsApi => apiService.partnerProductsApi;
   CategoriesApi get _categoriesApi => apiService.categoriesApi;
   ServiceTagsApi get _serviceTagsApi => apiService.serviceTagsApi;
@@ -67,10 +68,8 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    // TODO: Replace 'default' with actual merchantId from auth/store
-    final response = await _productsApi.productsControllerFindAll(
-      // merchantId: 'default',
-    );
+    final response = await _partnerProductsApi
+        .partnerProductsControllerFindAll();
 
     if (response == null) {
       return [];
@@ -78,7 +77,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
     final products = response.map(_mapToProduct).toList();
 
-    // Local pagination since API doesn't support it yet
+    // Local pagination since API doesn't support it
     if (startingAt >= products.length) return [];
     int end = startingAt + count;
     if (end > products.length) end = products.length;
@@ -88,33 +87,36 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   @override
   Future<int> getTotalRows() async {
-    // TODO: Replace 'default' with actual merchantId from auth/store
-    final response = await _productsApi.productsControllerFindAll(
-      // merchantId: 'default',
-    );
+    final response = await _partnerProductsApi
+        .partnerProductsControllerFindAll();
     return response?.length ?? 0;
   }
 
   @override
   Future<Product> getProductById(ProductId id) async {
-    final response = await _productsApi.productsControllerFindOne(
-      id.value.toString(),
-    );
+    final response = await _partnerProductsApi
+        .partnerProductsControllerFindAll();
 
     if (response == null) {
       throw Exception('Product not found');
     }
 
-    return _mapToProduct(response);
+    final match = response.where((dto) => dto.id == id.value.toString());
+
+    if (match.isEmpty) {
+      throw Exception('Product not found');
+    }
+
+    return _mapToProduct(match.first);
   }
 
   @override
   Future<Product> createProduct(CreateProductRequest request) async {
     final typeEnum = _mapProductType(request.productType);
 
-    CreateServiceDefinitionDto? serviceDefinition;
-    if (typeEnum == CreateProductDtoTypeEnum.service) {
-      serviceDefinition = CreateServiceDefinitionDto(
+    CreatePartnerProductDefinitionDto? productDefinition;
+    if (typeEnum == CreatePartnerProductDtoTypeEnum.service) {
+      productDefinition = CreatePartnerProductDefinitionDto(
         durationMinutes: request.duration ?? 60,
         bufferMinutes: request.buffer,
         maxCapacity: request.capacity,
@@ -123,7 +125,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       );
     }
 
-    final dto = CreateProductDto(
+    final dto = CreatePartnerProductDto(
       name: request.name,
       description: request.description,
       categoryId: request.category,
@@ -134,14 +136,14 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       status: _mapStatus(request.status),
       isVisibleOnline: request.onlineStore,
       employeeIds: request.staffIds,
-      serviceDefinition: serviceDefinition,
+      productDefinition: productDefinition,
       media: request.images
           .asMap()
           .entries
           .map(
-            (entry) => CreateProductMediaDto(
+            (entry) => CreatePartnerProductMediaDto(
               url: entry.value,
-              mediaType: CreateProductMediaDtoMediaTypeEnum.image,
+              mediaType: CreatePartnerProductMediaDtoMediaTypeEnum.image,
               isThumbnail: entry.key == 0,
               sortOrder: entry.key,
             ),
@@ -151,7 +153,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           .asMap()
           .entries
           .map(
-            (entry) => CreateProductFacilityImageDto(
+            (entry) => CreatePartnerProductFacilityImageDto(
               imageUrl: entry.value.imageUrl,
               label: entry.value.label,
               sortOrder: entry.key,
@@ -160,7 +162,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           .toList(),
       reviews: request.reviews
           .map(
-            (review) => CreateProductReviewDto(
+            (review) => CreatePartnerProductReviewDto(
               reviewerName: review.reviewerName,
               avatarUrl: review.avatarUrl,
               rating: review.rating,
@@ -186,7 +188,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   @override
   Future<void> updateProduct(UpdateProductRequest request) async {
-    final dto = UpdateProductDto(
+    final dto = UpdatePartnerProductDto(
       name: request.name,
       basePrice: request.basePrice,
       description: request.description,
@@ -194,9 +196,9 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       employeeIds: request.staffIds ?? [],
       media:
           request.images?.asMap().entries.map((entry) {
-            return CreateProductMediaDto(
+            return CreatePartnerProductMediaDto(
               url: entry.value,
-              mediaType: CreateProductMediaDtoMediaTypeEnum.image,
+              mediaType: CreatePartnerProductMediaDtoMediaTypeEnum.image,
               isThumbnail: entry.key == 0,
               sortOrder: entry.key,
             );
@@ -217,8 +219,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     );
   }
 
-  Product _mapToProduct(ProductResponseDto dto) {
-    final service = dto.serviceDefinition;
+  /// Maps a [PartnerProductResponseDto] to the
+  /// domain [Product] entity.
+  Product _mapToProduct(PartnerProductResponseDto dto) {
+    final service = dto.productDefinition;
     final category = dto.category;
 
     return Product(
@@ -246,37 +250,39 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     );
   }
 
-  CreateProductDtoTypeEnum _mapProductType(String type) {
+  CreatePartnerProductDtoTypeEnum _mapProductType(String type) {
     switch (type.toLowerCase()) {
       case 'physical':
-        return CreateProductDtoTypeEnum.physical;
+        return CreatePartnerProductDtoTypeEnum.physical;
       case 'service':
       default:
-        return CreateProductDtoTypeEnum.service;
+        return CreatePartnerProductDtoTypeEnum.service;
     }
   }
 
-  CreateProductDtoStatusEnum _mapStatus(String status) {
+  CreatePartnerProductDtoStatusEnum _mapStatus(String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return CreateProductDtoStatusEnum.active;
+        return CreatePartnerProductDtoStatusEnum.active;
       case 'archived':
-        return CreateProductDtoStatusEnum.archived;
+        return CreatePartnerProductDtoStatusEnum.archived;
       case 'draft':
       default:
-        return CreateProductDtoStatusEnum.draft;
+        return CreatePartnerProductDtoStatusEnum.draft;
     }
   }
 
-  CreateServiceDefinitionDtoStaffAssignmentTypeEnum? _mapStaffAssignment(
+  // ignore: lines_longer_than_80_chars
+  CreatePartnerProductDefinitionDtoStaffAssignmentTypeEnum? _mapStaffAssignment(
     String assignment,
   ) {
     switch (assignment.toLowerCase()) {
       case 'specific':
-        return CreateServiceDefinitionDtoStaffAssignmentTypeEnum.specific;
+        return CreatePartnerProductDefinitionDtoStaffAssignmentTypeEnum
+            .specific;
       case 'any':
       default:
-        return CreateServiceDefinitionDtoStaffAssignmentTypeEnum.any;
+        return CreatePartnerProductDefinitionDtoStaffAssignmentTypeEnum.any;
     }
   }
 
@@ -301,7 +307,9 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
       (index) => Product(
         id: ProductId('mock-id-${startingAt + index}'),
         name: 'Mock Product ${startingAt + index}',
-        description: 'Description for mock product ${startingAt + index}',
+        description:
+            'Description for mock product '
+            '${startingAt + index}',
         basePrice: 100.0 + index,
         salePrice: 90.0 + index,
         productType: index % 2 == 0 ? 'service' : 'physical',
@@ -312,7 +320,10 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
           slug: 'category-${index % 5}',
         ),
         onlineStore: true,
-        images: ['https://picsum.photos/200/300?random=${startingAt + index}'],
+        images: [
+          'https://picsum.photos/200/300'
+              '?random=${startingAt + index}',
+        ],
         costPerItem: index % 2 != 0 ? 50.0 : null,
         duration: index % 2 == 0 ? 60 : null,
         buffer: index % 2 == 0 ? 15 : null,
@@ -333,10 +344,8 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
   Future<Product> getProductById(ProductId id) async {
     await Future.delayed(const Duration(seconds: 1));
 
-    // Return matching mock product or a default one
     final product = productMockData[id.value] ?? productMockDefault;
 
-    // Ensure ID matches requested ID if falling back to default
     if (product.id != id) {
       return product.copyWith(id: id);
     }

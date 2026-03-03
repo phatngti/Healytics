@@ -13,6 +13,8 @@ describe('ProductsController', () => {
       findAll: jest.fn(),
       findOne: jest.fn(),
       findBySlug: jest.fn(),
+      getPremiumTreatments: jest.fn(),
+      getHomeRecommend: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -33,50 +35,37 @@ describe('ProductsController', () => {
     jest.clearAllMocks();
   });
 
-  describe('findAll', () => {
-    it('should call service.findAll and return all products', async () => {
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
+
+  describe('getPremiumTreatments', () => {
+    it('should delegate to productsService.getPremiumTreatments', async () => {
       // Arrange
-      const expectedProducts = [{ id: '1' }, { id: '2' }];
-      productsService.findAll!.mockResolvedValue(expectedProducts);
+      const expected = [{ id: 'uuid-1', name: 'Test' }];
+      productsService.getPremiumTreatments!.mockResolvedValue(expected);
 
       // Act
-      const result = await controller.findAll();
+      const result = await controller.getPremiumTreatments();
 
       // Assert
-      expect(result).toEqual(expectedProducts);
-      expect(productsService.findAll).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(expected);
+      expect(productsService.getPremiumTreatments!).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe('findOne', () => {
-    it('should call service.findOne with ID and return the product', async () => {
+  describe('getHomeRecommend', () => {
+    it('should delegate to productsService.getHomeRecommend', async () => {
       // Arrange
-      const id = 'uuid-1';
-      const expectedProduct = { id, name: 'Product' };
-      productsService.findOne!.mockResolvedValue(expectedProduct);
+      const expected = [{ id: 'uuid-2', name: 'Recommend' }];
+      productsService.getHomeRecommend!.mockResolvedValue(expected);
 
       // Act
-      const result = await controller.findOne(id);
+      const result = await controller.getHomeRecommend();
 
       // Assert
-      expect(result).toEqual(expectedProduct);
-      expect(productsService.findOne).toHaveBeenCalledWith(id);
-    });
-  });
-
-  describe('findBySlug', () => {
-    it('should call service.findBySlug with slug and return the product', async () => {
-      // Arrange
-      const slug = 'test-product';
-      const expectedProduct = { id: 'uuid-1', slug };
-      productsService.findBySlug!.mockResolvedValue(expectedProduct);
-
-      // Act
-      const result = await controller.findBySlug(slug);
-
-      // Assert
-      expect(result).toEqual(expectedProduct);
-      expect(productsService.findBySlug).toHaveBeenCalledWith(slug);
+      expect(result).toEqual(expected);
+      expect(productsService.getHomeRecommend!).toHaveBeenCalledTimes(1);
     });
   });
 });
