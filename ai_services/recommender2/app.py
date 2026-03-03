@@ -1,3 +1,4 @@
+# recommender2/app.py
 from fastapi import FastAPI
 from src.recommender.home_recommender import Home_Recommender
 from src.recommender.chatbot_recommender import Chatbot_Recommender
