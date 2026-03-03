@@ -11,6 +11,7 @@ List<RouteBase> get $appRoutes => [
   $chatRoute,
   $serviceDetailsRoute,
   $reviewsRoute,
+  $checkoutRoute,
   $lottieSplashRoute,
   $onboardingRoute,
   $signInRoute,
@@ -266,6 +267,32 @@ mixin $ReviewsRoute on GoRouteData {
     '/reviews',
     queryParams: {'service-id': _self.serviceId},
   );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $checkoutRoute => GoRouteData.$route(
+  path: '/checkout',
+  name: 'checkout',
+  factory: $CheckoutRoute._fromState,
+);
+
+mixin $CheckoutRoute on GoRouteData {
+  static CheckoutRoute _fromState(GoRouterState state) => const CheckoutRoute();
+
+  @override
+  String get location => GoRouteData.$location('/checkout');
 
   @override
   void go(BuildContext context) => context.go(location);

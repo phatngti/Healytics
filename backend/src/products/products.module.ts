@@ -10,10 +10,12 @@ import { Product } from '@/common/entities/product.entity';
 import { ProductMedia } from '@/common/entities/product-media.entity';
 import { ProductReview } from '@/common/entities/product-review.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
-import { ServiceDefinition } from '@/common/entities/service-definition.entity';
+import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { ResourceType } from '@/common/entities/resource-type.entity';
-import { ServiceResourceRequirement } from '@/common/entities/service-resource-requirement.entity';
-import { ServiceEmployeeEligibility } from '@/common/entities/service-employee-eligibility.entity';
+import { ProductResourceRequirement } from '@/common/entities/product-resource-requirement.entity';
+import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
+import { Employee } from '@/common/entities/employee.entity';
+import { PartnersModule } from '@/partners/partners.module';
 
 @Module({
   imports: [
@@ -22,11 +24,13 @@ import { ServiceEmployeeEligibility } from '@/common/entities/service-employee-e
       ProductMedia,
       ProductReview,
       ProductFacilityImage,
-      ServiceDefinition,
+      ProductDefinition,
       ResourceType,
-      ServiceResourceRequirement,
-      ServiceEmployeeEligibility,
+      ProductResourceRequirement,
+      ProductEmployeeEligibility,
+      Employee,
     ]),
+    PartnersModule,
   ],
   controllers: [ProductsController, PartnerProductsController],
   providers: [

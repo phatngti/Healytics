@@ -9,92 +9,17 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**productsControllerFindAll**](ProductsApi.md#productscontrollerfindall) | **GET** /products | Get all products
-[**productsControllerFindBySlug**](ProductsApi.md#productscontrollerfindbyslug) | **GET** /products/slug/{slug} | Get a product by slug
 [**productsControllerFindOne**](ProductsApi.md#productscontrollerfindone) | **GET** /products/{id} | Get a product by id
-[**productsControllerGetDetails**](ProductsApi.md#productscontrollergetdetails) | **GET** /products/slug/{slug}/details | Get full product details by slug
+[**productsControllerGetHomeRecommend**](ProductsApi.md#productscontrollergethomerecommend) | **GET** /products/home-recommend | Get home recommendations
+[**productsControllerGetPremiumTreatments**](ProductsApi.md#productscontrollergetpremiumtreatments) | **GET** /products/premium-treatments | Get premium treatments
+[**productsControllerGetProductEmployees**](ProductsApi.md#productscontrollergetproductemployees) | **GET** /products/{id}/employees | Get employees for a product
+[**productsControllerGetProductInfo**](ProductsApi.md#productscontrollergetproductinfo) | **GET** /products/{id}/info | Get product info by ID
+[**productsControllerGetProductReviews**](ProductsApi.md#productscontrollergetproductreviews) | **GET** /products/{id}/reviews | Get reviews for a product
+[**productsControllerGetRecommendedProducts**](ProductsApi.md#productscontrollergetrecommendedproducts) | **GET** /products/{id}/recommended | Get recommended products
 
-
-# **productsControllerFindAll**
-> List<ProductResponseDto> productsControllerFindAll()
-
-Get all products
-
-### Example
-```dart
-import 'package:user_openapi/api.dart';
-
-final api_instance = ProductsApi();
-
-try {
-    final result = api_instance.productsControllerFindAll();
-    print(result);
-} catch (e) {
-    print('Exception when calling ProductsApi->productsControllerFindAll: $e\n');
-}
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-[**List<ProductResponseDto>**](ProductResponseDto.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **productsControllerFindBySlug**
-> ProductResponseDto productsControllerFindBySlug(slug)
-
-Get a product by slug
-
-### Example
-```dart
-import 'package:user_openapi/api.dart';
-
-final api_instance = ProductsApi();
-final slug = slug_example; // String | 
-
-try {
-    final result = api_instance.productsControllerFindBySlug(slug);
-    print(result);
-} catch (e) {
-    print('Exception when calling ProductsApi->productsControllerFindBySlug: $e\n');
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **slug** | **String**|  | 
-
-### Return type
-
-[**ProductResponseDto**](ProductResponseDto.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsControllerFindOne**
-> ProductResponseDto productsControllerFindOne(id)
+> PublicProductResponseDto productsControllerFindOne(id)
 
 Get a product by id
 
@@ -121,7 +46,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**ProductResponseDto**](ProductResponseDto.md)
+[**PublicProductResponseDto**](PublicProductResponseDto.md)
 
 ### Authorization
 
@@ -134,23 +59,97 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **productsControllerGetDetails**
-> ProductDetailResponseDto productsControllerGetDetails(slug)
+# **productsControllerGetHomeRecommend**
+> List<PublicProductCardResponseDto> productsControllerGetHomeRecommend()
 
-Get full product details by slug
+Get home recommendations
 
 ### Example
 ```dart
 import 'package:user_openapi/api.dart';
 
 final api_instance = ProductsApi();
-final slug = slug_example; // String | 
 
 try {
-    final result = api_instance.productsControllerGetDetails(slug);
+    final result = api_instance.productsControllerGetHomeRecommend();
     print(result);
 } catch (e) {
-    print('Exception when calling ProductsApi->productsControllerGetDetails: $e\n');
+    print('Exception when calling ProductsApi->productsControllerGetHomeRecommend: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**List<PublicProductCardResponseDto>**](PublicProductCardResponseDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **productsControllerGetPremiumTreatments**
+> List<PublicProductCardResponseDto> productsControllerGetPremiumTreatments()
+
+Get premium treatments
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+
+final api_instance = ProductsApi();
+
+try {
+    final result = api_instance.productsControllerGetPremiumTreatments();
+    print(result);
+} catch (e) {
+    print('Exception when calling ProductsApi->productsControllerGetPremiumTreatments: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**List<PublicProductCardResponseDto>**](PublicProductCardResponseDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **productsControllerGetProductEmployees**
+> List<PublicProductEmployeeResponseDto> productsControllerGetProductEmployees(id)
+
+Get employees for a product
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+
+final api_instance = ProductsApi();
+final id = id_example; // String | 
+
+try {
+    final result = api_instance.productsControllerGetProductEmployees(id);
+    print(result);
+} catch (e) {
+    print('Exception when calling ProductsApi->productsControllerGetProductEmployees: $e\n');
 }
 ```
 
@@ -158,11 +157,134 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **slug** | **String**|  | 
+ **id** | **String**|  | 
 
 ### Return type
 
-[**ProductDetailResponseDto**](ProductDetailResponseDto.md)
+[**List<PublicProductEmployeeResponseDto>**](PublicProductEmployeeResponseDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **productsControllerGetProductInfo**
+> PublicProductInfoResponseDto productsControllerGetProductInfo(id)
+
+Get product info by ID
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+
+final api_instance = ProductsApi();
+final id = id_example; // String | 
+
+try {
+    final result = api_instance.productsControllerGetProductInfo(id);
+    print(result);
+} catch (e) {
+    print('Exception when calling ProductsApi->productsControllerGetProductInfo: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
+
+### Return type
+
+[**PublicProductInfoResponseDto**](PublicProductInfoResponseDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **productsControllerGetProductReviews**
+> List<PublicProductReviewResponseDto> productsControllerGetProductReviews(id)
+
+Get reviews for a product
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+
+final api_instance = ProductsApi();
+final id = id_example; // String | 
+
+try {
+    final result = api_instance.productsControllerGetProductReviews(id);
+    print(result);
+} catch (e) {
+    print('Exception when calling ProductsApi->productsControllerGetProductReviews: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
+
+### Return type
+
+[**List<PublicProductReviewResponseDto>**](PublicProductReviewResponseDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **productsControllerGetRecommendedProducts**
+> List<PublicProductRecommendedResponseDto> productsControllerGetRecommendedProducts(id)
+
+Get recommended products
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+
+final api_instance = ProductsApi();
+final id = id_example; // String | 
+
+try {
+    final result = api_instance.productsControllerGetRecommendedProducts(id);
+    print(result);
+} catch (e) {
+    print('Exception when calling ProductsApi->productsControllerGetRecommendedProducts: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
+
+### Return type
+
+[**List<PublicProductRecommendedResponseDto>**](PublicProductRecommendedResponseDto.md)
 
 ### Authorization
 

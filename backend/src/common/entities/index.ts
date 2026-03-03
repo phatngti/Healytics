@@ -34,10 +34,10 @@ export { ProductMedia } from './product-media.entity';
 export { ProductReview } from './product-review.entity';
 export { ProductFacilityImage } from './product-facility-image.entity';
 export { ResourceType } from './resource-type.entity';
-export { ServiceDefinition } from './service-definition.entity';
-export { ServiceEmployeeEligibility } from './service-employee-eligibility.entity';
-export { ServiceResourceRequirement } from './service-resource-requirement.entity';
+export { ProductDefinition } from './product-definition.entity';
+export { ProductEmployeeEligibility } from './product-employee-eligibility.entity';
+export { ProductResourceRequirement } from './product-resource-requirement.entity';
 
-// Service Tags
-export { ServiceTag } from './service-tag.entity';
+// Product Tags
+export { ProductFeatureTag } from './product-feature-tag.entity';
 export { ProductTag } from './product-tag.entity';

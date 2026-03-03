@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { ServiceTag } from '@/common/entities/service-tag.entity';
+import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
 import { ProductTag } from '@/common/entities/product-tag.entity';
 
 /**
@@ -32,7 +32,7 @@ export class DetachProductTagHandler {
 
     try {
       // 1. Hydration - Verify tag ownership
-      const tag = await queryRunner.manager.findOne(ServiceTag, {
+      const tag = await queryRunner.manager.findOne(ProductFeatureTag, {
         where: { id: tagId },
       });
 
@@ -59,7 +59,7 @@ export class DetachProductTagHandler {
 
       // 5. Side Effect - Decrement usage counter
       if (tag.usage > 0) {
-        await queryRunner.manager.decrement(ServiceTag, { id: tagId }, 'usage', 1);
+        await queryRunner.manager.decrement(ProductFeatureTag, { id: tagId }, 'usage', 1);
       }
 
       await queryRunner.commitTransaction();

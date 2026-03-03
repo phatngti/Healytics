@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:common/utils/demensions.dart';
-import 'package:common/widgets/button/button.dart';
 
-/// The bottom text-input bar containing an attachment button,
-/// expandable text field, microphone button, and send button.
+/// Telegram-style input bar: clean, minimal, with an
+/// attachment button, expandable text field, and a send
+/// button that morphs from a mic icon.
 ///
-/// Uses [AppButton] from the common package for all interactive
-/// elements and [AppDimens] for responsive dimensions.
-///
-/// [onSend] fires with the current text when the send button is
-/// pressed and the field is non-empty.
+/// [onSend] fires with the current text when the send
+/// button is pressed and the field is non-empty.
 class ChatInputBar extends StatefulWidget {
   final ValueChanged<String>? onSend;
 
@@ -26,12 +23,14 @@ class _ChatInputBarState extends State<ChatInputBar> {
   @override
   void initState() {
     super.initState();
-    _controller.addListener(() {
-      final nonEmpty = _controller.text.trim().isNotEmpty;
-      if (nonEmpty != _hasText) {
-        setState(() => _hasText = nonEmpty);
-      }
-    });
+    _controller.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    final nonEmpty = _controller.text.trim().isNotEmpty;
+    if (nonEmpty != _hasText) {
+      setState(() => _hasText = nonEmpty);
+    }
   }
 
   @override
@@ -51,112 +50,124 @@ class _ChatInputBarState extends State<ChatInputBar> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final inputBarRadius = AppDimens.adaptive(
-      context,
-      small: 24,
-      medium: 26,
-      large: 28,
-    );
 
     return Container(
-      padding: EdgeInsets.all(AppDimens.spaceSm),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(inputBarRadius),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
-          width: AppDimens.borderWidth,
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.25),
+          ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.08),
-            blurRadius: AppDimens.spaceLg,
-            offset: Offset(0, AppDimens.spaceXs),
-          ),
-        ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // Attachment button — uses AppButton.text
-          AppButton(
-            buttonType: ButtonType.text,
-            onPressed: () {},
-            customStyle: TextButton.styleFrom(
-              padding: EdgeInsets.all(AppDimens.spaceSmMd),
-              minimumSize: Size(AppDimens.ctaButtonMd, AppDimens.ctaButtonMd),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: const CircleBorder(),
-            ),
-            child: Icon(
-              Icons.add_circle_outline,
-              color: colorScheme.onSurfaceVariant,
-              size: AppDimens.iconLg,
-            ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppDimens.spaceSm,
+            vertical: AppDimens.spaceXs,
           ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Attachment
+              _CircleIconButton(
+                icon: Icons.attach_file_rounded,
+                color: colorScheme.onSurfaceVariant,
+                onTap: () {},
+              ),
+              SizedBox(width: AppDimens.spaceXs),
 
-          // Text field — raw TextField (AppTextField needs FormBuilder)
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: AppDimens.spaceXs),
-              child: TextField(
-                controller: _controller,
-                maxLines: 4,
-                minLines: 1,
-                textCapitalization: TextCapitalization.sentences,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Type your symptoms...',
-                  hintStyle: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              // Text field
+              Expanded(
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 40),
+                  child: TextField(
+                    controller: _controller,
+                    maxLines: 5,
+                    minLines: 1,
+                    textCapitalization: TextCapitalization.sentences,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Message',
+                      hintStyle: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.5,
+                        ),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: AppDimens.spaceMd,
+                        vertical: AppDimens.spaceSm,
+                      ),
+                      isDense: true,
+                    ),
                   ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: AppDimens.spaceXs,
-                    vertical: AppDimens.spaceSm,
-                  ),
-                  isDense: true,
                 ),
               ),
-            ),
-          ),
+              SizedBox(width: AppDimens.spaceXs),
 
-          // Mic button — uses AppButton.text
-          AppButton(
-            buttonType: ButtonType.text,
-            onPressed: () {},
-            customStyle: TextButton.styleFrom(
-              padding: EdgeInsets.all(AppDimens.spaceSmMd),
-              minimumSize: Size(AppDimens.ctaButtonMd, AppDimens.ctaButtonMd),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: const CircleBorder(),
-            ),
-            child: Icon(
-              Icons.mic,
-              color: colorScheme.onSurfaceVariant,
-              size: AppDimens.iconLg,
-            ),
+              // Send / Mic toggle
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                transitionBuilder: (child, anim) =>
+                    ScaleTransition(scale: anim, child: child),
+                child: _hasText
+                    ? _CircleIconButton(
+                        key: const ValueKey('send'),
+                        icon: Icons.send_rounded,
+                        color: colorScheme.onPrimary,
+                        backgroundColor: colorScheme.primary,
+                        onTap: _handleSend,
+                      )
+                    : _CircleIconButton(
+                        key: const ValueKey('mic'),
+                        icon: Icons.mic_rounded,
+                        color: colorScheme.onSurfaceVariant,
+                        onTap: () {},
+                      ),
+              ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+}
 
-          // Send button — uses AppButton.elevated
-          AppButton(
-            buttonType: ButtonType.elevated,
-            onPressed: _hasText ? _handleSend : null,
-            primaryColor: colorScheme.primary,
-            onPrimaryColor: colorScheme.onPrimary,
-            customStyle: ElevatedButton.styleFrom(
-              padding: EdgeInsets.all(AppDimens.spaceSmMd),
-              minimumSize: Size(AppDimens.ctaButtonMd, AppDimens.ctaButtonMd),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: const CircleBorder(),
-              elevation: _hasText ? 3 : 0,
-              shadowColor: colorScheme.primary.withValues(alpha: 0.4),
-            ),
-            child: Icon(Icons.send, size: AppDimens.iconMd),
-          ),
-        ],
+/// Simple circular icon button used for attach, mic,
+/// and send actions.
+class _CircleIconButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final Color? backgroundColor;
+  final VoidCallback? onTap;
+
+  const _CircleIconButton({
+    super.key,
+    required this.icon,
+    required this.color,
+    this.backgroundColor,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: backgroundColor ?? Colors.transparent,
+      shape: const CircleBorder(),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: Padding(
+          padding: EdgeInsets.all(AppDimens.spaceSm),
+          child: Icon(icon, color: color, size: AppDimens.iconLg),
+        ),
       ),
     );
   }
