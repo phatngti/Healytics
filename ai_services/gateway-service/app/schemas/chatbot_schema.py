@@ -1,6 +1,8 @@
+# ai_services/gateway-service/app/schemas/chatbot_schema.py
 from typing import List
 from uuid import UUID
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 from app.core.enums import SSEEventType
 
@@ -26,7 +28,7 @@ class TokenEvent(BaseModel):
 
     conversation_id: UUID
     text: str
-    index: int
+    timestamp: datetime
 
 
 
@@ -41,6 +43,7 @@ class NerEvent(BaseModel):
 
     conversation_id: UUID
     entities: List[NerEntity]
+    timestamp: datetime
 
 
 class RecommendationItem(BaseModel):
@@ -54,6 +57,7 @@ class RecommendationEvent(BaseModel):
     conversation_id: UUID
     recommendations: List[RecommendationItem]
     total: int
+    timestamp: datetime
 
 
 class DoneEvent(BaseModel):
@@ -61,6 +65,7 @@ class DoneEvent(BaseModel):
 
     conversation_id: UUID
     status: str = "completed"
+    timestamp: datetime
 
 class ErrorEvent(BaseModel):
     event: SSEEventType = SSEEventType.ERROR
@@ -68,3 +73,4 @@ class ErrorEvent(BaseModel):
     conversation_id: UUID
     error_code: str
     message: str
+    timestamp: datetime
