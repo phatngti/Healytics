@@ -61,7 +61,7 @@ Description: Connects a new API endpoint to the app following the data source pa
 
 6. **Implement repository:** In `*_impl.repository.dart`, delegate to data source.
 
-7. **Create/update provider:** Ensure the repository provider wires the data source correctly with mock switching.
+7. **Create/update provider:** Ensure the repository provider uses `Ref ref` and wires the data source correctly with mock switching.
 
 8. **Update presentation:** Connect the new data to the UI via the presentation provider.
 

@@ -1,10 +1,11 @@
 import 'package:user_app/features/bot_chat/domain/entities/chat_conversation.entity.dart';
 import 'package:user_app/features/bot_chat/domain/entities/chat_message.entity.dart';
+import 'package:user_app/features/bot_chat/domain/entities/chat_sse_event.entity.dart';
 
 /// Abstract repository for bot chat operations.
 ///
-/// Implemented in the data layer; consumed by presentation
-/// notifiers via Riverpod providers.
+/// Implemented in the data layer; consumed by
+/// presentation notifiers via Riverpod providers.
 abstract class ChatRepository {
   /// Returns all past conversation sessions for the
   /// current user.
@@ -13,7 +14,12 @@ abstract class ChatRepository {
   /// Returns the messages within [conversationId].
   Future<List<ChatMessage>> getMessages(String conversationId);
 
-  /// Sends a user [text] message in [conversationId] and
-  /// returns the created message entity.
-  Future<ChatMessage> sendMessage(String conversationId, String text);
+  /// Sends a user [text] message and returns an SSE
+  /// stream of chatbot response events.
+  ///
+  /// [conversationId] may be null for new conversations.
+  Stream<ChatSseEvent> sendMessageAndStream(
+    String? conversationId,
+    String text,
+  );
 }

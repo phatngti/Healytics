@@ -4,6 +4,8 @@ import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:user_app/features/checkout/domain/entities/booking_params.entity.dart';
+import 'package:user_app/features/checkout/presentation/providers/checkout.provider.dart';
 import 'package:user_app/features/home/domain/entities/service_details.entity.dart';
 import 'package:user_app/features/home/presentation/providers/service_details.provider.dart';
 import 'package:user_app/router/routes.dart';
@@ -31,14 +33,17 @@ class ServiceDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncDetails = ref.watch(serviceDetailsProvider(serviceId));
+    final asyncDetails = ref.watch(
+      serviceDetailsProvider(serviceId: serviceId),
+    );
 
     return asyncDetails.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, _) =>
           Scaffold(body: Center(child: Text('Failed to load details: $error'))),
-      data: (details) => _ServiceDetailsBody(details: details),
+      data: (details) =>
+          _ServiceDetailsBody(details: details, serviceId: serviceId),
     );
   }
 }
@@ -46,22 +51,30 @@ class ServiceDetailsScreen extends ConsumerWidget {
 /// The main scrollable body rendered once data is
 /// available. Uses [CustomScrollView] with slivers so
 /// that off-screen sections are built lazily.
-class _ServiceDetailsBody extends StatefulWidget {
-  const _ServiceDetailsBody({required this.details});
+class _ServiceDetailsBody extends ConsumerStatefulWidget {
+  const _ServiceDetailsBody({required this.details, required this.serviceId});
 
   final ServiceDetailsEntity details;
+  final String serviceId;
 
   @override
-  State<_ServiceDetailsBody> createState() => _ServiceDetailsBodyState();
+  ConsumerState<_ServiceDetailsBody> createState() =>
+      _ServiceDetailsBodyState();
 }
 
-class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
+class _ServiceDetailsBodyState extends ConsumerState<_ServiceDetailsBody> {
   final _scrollController = ScrollController();
   final _showBlur = ValueNotifier<bool>(false);
 
   /// Cached scroll threshold – recomputed only when
   /// MediaQuery values change (orientation / resize).
   double _blurThreshold = 0;
+
+  // ── Selected specialist state ──
+  String? _selectedEmployeeId;
+  String? _selectedEmployeeName;
+  DateTime? _selectedDate;
+  String? _selectedSlotLabel;
 
   @override
   void initState() {
@@ -108,6 +121,62 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
     } else {
       const HomeRoute().go(context);
     }
+  }
+
+  void _onSpecialistChanged(String employeeId, String employeeName) {
+    _selectedEmployeeId = employeeId;
+    _selectedEmployeeName = employeeName;
+    // Reset slot when specialist changes.
+    _selectedDate = null;
+    _selectedSlotLabel = null;
+  }
+
+  void _onSlotSelected(DateTime date, String slotLabel) {
+    _selectedDate = date;
+    _selectedSlotLabel = slotLabel;
+  }
+
+  void _handleConfirmBooking() {
+    final details = widget.details;
+
+    // Validate that a specialist and time slot
+    // have been selected.
+    if (_selectedEmployeeId == null ||
+        _selectedSlotLabel == null ||
+        _selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Please select a specialist and '
+            'time slot before booking.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final params = BookingParams(
+      serviceId: details.id,
+      serviceName: details.title,
+      serviceImageUrl: details.images.isNotEmpty ? details.images.first : '',
+      price: details.price,
+      clinicName: details.clinic.name,
+      clinicAddress: details.clinic.address,
+      clinicImageUrl: details.clinic.imageUrl,
+      employeeId: _selectedEmployeeId!,
+      employeeName: _selectedEmployeeName!,
+      selectedDate: _selectedDate!,
+      selectedTimeSlot: _selectedSlotLabel!,
+    );
+
+    // Set booking params and navigate.
+    ref.read(bookingParamsProvider.notifier).set(params);
+
+    // Invalidate checkout so it rebuilds with
+    // the new booking params.
+    ref.invalidate(checkoutProvider);
+
+    const CheckoutRoute().push(context);
   }
 
   @override
@@ -162,31 +231,40 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
                           price: details.price,
                           isVerified: details.isVerified,
                         ),
-                        AppDimens.verticalLarge,
 
                         // Feature tags
-                        FeatureTagsRow(tags: details.featureTags),
-                        AppDimens.verticalLargeExtra,
+                        if (details.featureTags.isNotEmpty) ...[
+                          AppDimens.verticalLarge,
+                          FeatureTagsRow(tags: details.featureTags),
+                        ],
 
                         // About treatment
-                        AboutTreatment(description: details.description),
-                        AppDimens.verticalLargeExtra,
+                        if (details.description.isNotEmpty) ...[
+                          AppDimens.verticalLargeExtra,
+                          AboutTreatment(description: details.description),
+                        ],
 
                         // Facility tour
-                        FacilityTourSection(images: details.facilityImages),
-                        AppDimens.verticalLargeExtra,
+                        if (details.facilityImages.isNotEmpty) ...[
+                          AppDimens.verticalLargeExtra,
+                          FacilityTourSection(images: details.facilityImages),
+                        ],
 
                         // Clinic card
-                        ClinicCard(
-                          clinicName: details.clinic.name,
-                          address: details.clinic.address,
-                        ),
+                        if (details.clinic.name.isNotEmpty) ...[
+                          AppDimens.verticalLargeExtra,
+                          ClinicCard(
+                            clinicName: details.clinic.name,
+                            address: details.clinic.address,
+                          ),
+                        ],
                         AppDimens.verticalLargeExtra,
 
                         // Specialist section
                         SpecialistSection(
-                          specialists: details.specialists,
-                          daySchedules: details.daySchedules,
+                          serviceId: widget.serviceId,
+                          onSpecialistChanged: _onSpecialistChanged,
+                          onSlotSelected: _onSlotSelected,
                         ),
                       ],
                     ),
@@ -204,15 +282,14 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
                       AppDimens.verticalLargeExtra,
 
                       // Reviews
-                      ReviewsSection(
-                        reviews: details.reviews,
+                      _ReviewsSectionLoader(
+                        serviceId: widget.serviceId,
                         rating: details.rating,
-                        serviceId: details.id,
                       ),
                       AppDimens.verticalLargeExtra,
 
                       // Recommended services
-                      RecommendedServicesSection(serviceId: details.id),
+                      RecommendedServicesSection(serviceId: widget.serviceId),
                       AppDimens.verticalLargeExtra,
 
                       // Bottom spacing for booking bar
@@ -245,9 +322,7 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
             child: RepaintBoundary(
               child: _BottomBookingBar(
                 price: details.price,
-                onConfirm: () {
-                  // TODO: implement booking action
-                },
+                onConfirm: _handleConfirmBooking,
               ),
             ),
           ),
@@ -445,6 +520,32 @@ class _BottomBookingBar extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Loads reviews from [serviceReviewsProvider]
+/// and renders [ReviewsSection] once available.
+class _ReviewsSectionLoader extends ConsumerWidget {
+  const _ReviewsSectionLoader({required this.serviceId, required this.rating});
+
+  final String serviceId;
+  final double rating;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncReviews = ref.watch(
+      serviceReviewsProvider(serviceId: serviceId),
+    );
+
+    return asyncReviews.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (reviews) => ReviewsSection(
+        reviews: reviews,
+        rating: rating,
+        serviceId: serviceId,
       ),
     );
   }

@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserSeeder } from './users/user.seeder';
-import { CategorySeeder } from './categories/category.seeder';
 import { ServiceTagSeeder } from './service-tags/service-tag.seeder';
 import { EmployeeSeeder } from './employees/employee.seeder';
 import { ProductSeeder } from './products/product.seeder';
 import { PartnerSeeder } from './partners/partner.seeder';
+import { CategorySeeder } from './categories/category.seeder';
 import { ISeeder } from './seeder.interface';
 
 /**
@@ -13,11 +13,11 @@ import { ISeeder } from './seeder.interface';
  *
  * Dependency graph:
  *   UserSeeder       ← no deps
- *   CategorySeeder   ← no deps
- *   EmployeeSeeder   ← no deps
- *   ServiceTagSeeder ← depends on Account (UserSeeder)
- *   ProductSeeder    ← depends on Category, ServiceTag, Employee, ResourceType
  *   PartnerSeeder    ← depends on Account (UserSeeder)
+ *   EmployeeSeeder   ← depends on Partner (PartnerSeeder)
+ *   ServiceTagSeeder ← depends on Account (UserSeeder)
+ *   CategorySeeder   ← no deps
+ *   ProductSeeder    ← depends on Category, ServiceTag, Employee, ResourceType
  */
 @Injectable()
 export class SeederService {
@@ -26,20 +26,20 @@ export class SeederService {
 
   constructor(
     private readonly userSeeder: UserSeeder,
-    private readonly categorySeeder: CategorySeeder,
     private readonly employeeSeeder: EmployeeSeeder,
     private readonly serviceTagSeeder: ServiceTagSeeder,
     private readonly productSeeder: ProductSeeder,
     private readonly partnerSeeder: PartnerSeeder,
+    private readonly categorySeeder: CategorySeeder,
   ) {
     // ⚠️ ORDER MATTERS — seeders with dependencies come AFTER their dependencies
     this.seeders = [
       this.userSeeder,        // 1. no deps
-      this.categorySeeder,    // 2. no deps
-      this.employeeSeeder,    // 3. no deps
+      this.partnerSeeder,     // 2. depends on users
+      this.employeeSeeder,    // 3. depends on partners
       this.serviceTagSeeder,  // 4. depends on users
-      this.productSeeder,     // 5. depends on categories
-      this.partnerSeeder,     // 6. depends on users
+      this.categorySeeder,    // 5. no deps (but logically before products)
+      this.productSeeder,     // 6. depends on categories, tags, employees
     ];
   }
 

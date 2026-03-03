@@ -17,6 +17,7 @@ import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-
 import { PartnerDocument } from './partner-document.entity';
 import { PartnerReviewLog } from './partner-review-log.entity';
 import { LegalRepresentative } from './legal-representative.entity';
+import { Employee } from './employee.entity';
 
 @Entity('health_partner_profile')
 export class Partner {
@@ -99,6 +100,9 @@ export class Partner {
 
     @OneToMany(() => PartnerReviewLog, (log) => log.partner)
     reviewLogs: PartnerReviewLog[];
+
+    @OneToMany(() => Employee, (employee) => employee.partner)
+    employees: Employee[];
     // --- Verification Logic ---
 
     @Column({

@@ -6,7 +6,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { ServiceTag } from '@/common/entities/service-tag.entity';
+import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
 
 /**
  * Handler for removing (soft deleting) a service tag.
@@ -24,14 +24,14 @@ export class RemoveServiceTagHandler {
    * @param userId - The ID of the user requesting the deletion
    */
   async execute(id: string, userId: string): Promise<void> {
-    this.logger.log(`Executing RemoveServiceTagHandler for tag: ${id}`);
+    this.logger.log(`Executing RemoveProductFeatureTagHandler for tag: ${id}`);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
       // 1. Hydration (Load)
-      const tag = await queryRunner.manager.findOne(ServiceTag, {
+      const tag = await queryRunner.manager.findOne(ProductFeatureTag, {
         where: { id },
       });
 
@@ -45,7 +45,7 @@ export class RemoveServiceTagHandler {
       }
 
       // 3. Domain Action & Persistence (Soft Delete)
-      await queryRunner.manager.softDelete(ServiceTag, id);
+      await queryRunner.manager.softDelete(ProductFeatureTag, id);
 
       await queryRunner.commitTransaction();
       this.logger.log(`Service tag soft deleted successfully: ${id}`);

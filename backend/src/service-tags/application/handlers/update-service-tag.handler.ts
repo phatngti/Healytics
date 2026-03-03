@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { UpdateServiceTagDto } from '../../dto/update-service-tag.dto';
-import { ServiceTag } from '@/common/entities/service-tag.entity';
+import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
 
 /**
  * Handler for updating an existing service tag.
@@ -30,15 +30,15 @@ export class UpdateServiceTagHandler {
     id: string,
     command: UpdateServiceTagDto,
     userId: string,
-  ): Promise<ServiceTag> {
-    this.logger.log(`Executing UpdateServiceTagHandler for tag: ${id}`);
+  ): Promise<ProductFeatureTag> {
+    this.logger.log(`Executing UpdateProductFeatureTagHandler for tag: ${id}`);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
       // 1. Hydration (Load with pessimistic lock)
-      const tag = await queryRunner.manager.findOne(ServiceTag, {
+      const tag = await queryRunner.manager.findOne(ProductFeatureTag, {
         where: { id },
         lock: { mode: 'pessimistic_write' },
       });
@@ -56,7 +56,7 @@ export class UpdateServiceTagHandler {
       Object.assign(tag, command);
 
       // 4. Persistence
-      const updatedTag = await queryRunner.manager.save(ServiceTag, tag);
+      const updatedTag = await queryRunner.manager.save(ProductFeatureTag, tag);
 
       await queryRunner.commitTransaction();
       this.logger.log(`Service tag updated successfully: ${updatedTag.id}`);
