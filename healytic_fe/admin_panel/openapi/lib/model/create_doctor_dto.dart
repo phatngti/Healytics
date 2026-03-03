@@ -24,6 +24,7 @@ class CreateDoctorDto {
     this.gender,
     this.status,
     this.branchId,
+    this.partnerId,
     required this.profile,
   });
 
@@ -96,6 +97,15 @@ class CreateDoctorDto {
   ///
   String? branchId;
 
+  /// Partner ID the employee belongs to
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? partnerId;
+
   /// Doctor profile information
   DoctorProfileDto profile;
 
@@ -112,6 +122,7 @@ class CreateDoctorDto {
     other.gender == gender &&
     other.status == status &&
     other.branchId == branchId &&
+    other.partnerId == partnerId &&
     other.profile == profile;
 
   @override
@@ -128,10 +139,11 @@ class CreateDoctorDto {
     (gender == null ? 0 : gender!.hashCode) +
     (status == null ? 0 : status!.hashCode) +
     (branchId == null ? 0 : branchId!.hashCode) +
+    (partnerId == null ? 0 : partnerId!.hashCode) +
     (profile.hashCode);
 
   @override
-  String toString() => 'CreateDoctorDto[authId=$authId, employeeCode=$employeeCode, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, status=$status, branchId=$branchId, profile=$profile]';
+  String toString() => 'CreateDoctorDto[authId=$authId, employeeCode=$employeeCode, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, status=$status, branchId=$branchId, partnerId=$partnerId, profile=$profile]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -178,6 +190,11 @@ class CreateDoctorDto {
     } else {
       json[r'branchId'] = null;
     }
+    if (this.partnerId != null) {
+      json[r'partnerId'] = this.partnerId;
+    } else {
+      json[r'partnerId'] = null;
+    }
       json[r'profile'] = this.profile;
     return json;
   }
@@ -212,6 +229,7 @@ class CreateDoctorDto {
         gender: CreateDoctorDtoGenderEnum.fromJson(json[r'gender']),
         status: CreateDoctorDtoStatusEnum.fromJson(json[r'status']),
         branchId: mapValueOfType<String>(json, r'branchId'),
+        partnerId: mapValueOfType<String>(json, r'partnerId'),
         profile: DoctorProfileDto.fromJson(json[r'profile'])!,
       );
     }

@@ -5,11 +5,11 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { UpdateProductDto } from '../../dto/update-product.dto';
+import { UpdatePartnerProductDto } from '../../dto/partner/update-partner-product.dto';
 import { Product } from '@/common/entities/product.entity';
 import { ProductType } from '../../enums/product-type.enum';
 import { ProductMedia } from '@/common/entities/product-media.entity';
-import { ServiceDefinition } from '@/common/entities/service-definition.entity';
+import { ProductDefinition } from '@/common/entities/product-definition.entity';
 
 @Injectable()
 export class UpdateProductHandler {
@@ -17,24 +17,24 @@ export class UpdateProductHandler {
 
   constructor(private readonly dataSource: DataSource) {}
 
-  async execute(id: string, command: UpdateProductDto): Promise<Product> {
+  async execute(id: string, command: UpdatePartnerProductDto): Promise<Product> {
     this.logger.log(`Executing UpdateProductHandler for ID: ${id}`);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      // 1. Hydration (Load) with pessimistic lock if needed (not strictly needed here unless high concurrency expected)
+      // 1. Hydration (Load)
       const existingProduct = await queryRunner.manager.findOne(Product, {
         where: { id },
-        relations: ['serviceDefinition'],
+        relations: ['productDefinition'],
       });
 
       if (!existingProduct) {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
 
-      const { media, serviceDefinition, ...updateData } = command;
+      const { media, productDefinition, ...updateData } = command;
 
       // 2. Domain Action (Mutate)
       if (Object.keys(updateData).length > 0) {
@@ -42,21 +42,21 @@ export class UpdateProductHandler {
         await queryRunner.manager.save(Product, existingProduct);
       }
 
-      // 3. Update Service Definition
-      if (existingProduct.type === ProductType.SERVICE && serviceDefinition) {
-        const existingDef = await queryRunner.manager.findOne(ServiceDefinition, {
+      // 3. Update Product Definition
+      if (existingProduct.type === ProductType.SERVICE && productDefinition) {
+        const existingDef = await queryRunner.manager.findOne(ProductDefinition, {
           where: { productId: id },
         });
 
         if (existingDef) {
-          Object.assign(existingDef, serviceDefinition);
-          await queryRunner.manager.save(ServiceDefinition, existingDef);
+          Object.assign(existingDef, productDefinition);
+          await queryRunner.manager.save(ProductDefinition, existingDef);
         } else {
-          const newDef = queryRunner.manager.create(ServiceDefinition, {
-            ...serviceDefinition,
+          const newDef = queryRunner.manager.create(ProductDefinition, {
+            ...productDefinition,
             productId: id,
           });
-          await queryRunner.manager.save(ServiceDefinition, newDef);
+          await queryRunner.manager.save(ProductDefinition, newDef);
         }
       }
 
@@ -86,9 +86,9 @@ export class UpdateProductHandler {
         relations: [
           'category',
           'media',
-          'serviceDefinition',
-          'serviceEmployeeEligibilities',
-          'serviceEmployeeEligibilities.employee',
+          'productDefinition',
+          'productEmployeeEligibilities',
+          'productEmployeeEligibilities.employee',
         ],
       });
       return updatedProduct!;

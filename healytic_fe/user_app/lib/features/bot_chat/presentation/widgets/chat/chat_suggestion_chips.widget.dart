@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:common/utils/demensions.dart';
-import 'package:common/widgets/button/button.dart';
 
-/// A horizontally scrollable row of quick-action suggestion chips.
+/// Telegram-style horizontally scrollable suggestion chips.
 ///
-/// Each chip uses [AppButton] from the common package with the
-/// [ButtonType.outline] variant. All dimensions use [AppDimens]
-/// responsive helpers.
+/// Clean pill-shaped buttons with a subtle tinted
+/// background and no heavy effects.
 ///
-/// [onChipTapped] fires with the label text when pressed.
+/// [onChipTapped] fires with the label text on press.
 class ChatSuggestionChips extends StatelessWidget {
   final ValueChanged<String>? onChipTapped;
 
@@ -24,15 +22,10 @@ class ChatSuggestionChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final chipHeight = AppDimens.adaptive(
-      context,
-      small: 36,
-      medium: 38,
-      large: 40,
-    );
+    final textTheme = Theme.of(context).textTheme;
 
     return SizedBox(
-      height: chipHeight,
+      height: 38,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(
@@ -42,29 +35,31 @@ class ChatSuggestionChips extends StatelessWidget {
         separatorBuilder: (_, __) => SizedBox(width: AppDimens.spaceSm),
         itemBuilder: (context, index) {
           final (emoji, label) = _suggestions[index];
-          return AppButton(
-            buttonType: ButtonType.outline,
-            onPressed: () => onChipTapped?.call(label),
-            customStyle: OutlinedButton.styleFrom(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppDimens.buttonPaddingH(context),
-                vertical: AppDimens.buttonPaddingV(context),
-              ),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              side: BorderSide(
-                color: colorScheme.primary.withValues(alpha: 0.2),
-                width: AppDimens.borderWidth,
-              ),
-              shape: const StadiumBorder(),
-              backgroundColor: colorScheme.surface,
-              elevation: 0,
-            ),
-            child: Text(
-              '$emoji $label',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: colorScheme.primary,
-                fontWeight: AppDimens.fontWeightSemiBold,
+          return Material(
+            color: colorScheme.primaryContainer.withValues(alpha: 0.35),
+            borderRadius: BorderRadius.circular(999),
+            child: InkWell(
+              onTap: () => onChipTapped?.call(label),
+              borderRadius: BorderRadius.circular(999),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDimens.spaceMd,
+                  vertical: AppDimens.spaceXs,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(emoji),
+                    SizedBox(width: AppDimens.spaceXs),
+                    Text(
+                      label,
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:user_app/core/entities/store.entity.dart';
+import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/utils/error_message_code.dart';
 import 'package:user_app/features/authenticate/data/repositories/authenticate_repository_impl.dart';
 import 'package:user_app/features/authenticate/domain/entities/authenticate.entity.dart';
@@ -30,6 +32,11 @@ class AuthenticateNotifier extends _$AuthenticateNotifier {
       final authenticate = await ref
           .read(authenticateRepositoryProvider)
           .login(email: email, password: password);
+
+      // Persist tokens so the router guard recognises
+      // the session as authenticated.
+      await Store.put(StoreKey.accessToken, authenticate.accessToken);
+
       state = AsyncData(AuthenticateStateData(authenticate: authenticate));
     } on ApiException catch (e) {
       state = AsyncError<AuthenticateStateData>(

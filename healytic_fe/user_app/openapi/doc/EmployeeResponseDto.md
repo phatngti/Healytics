@@ -25,6 +25,7 @@ Name | Type | Description | Notes
 **status** | **String** | Employee status | 
 **rating** | **num** | Rating (0-5) | 
 **reviewCount** | **num** | Number of reviews | 
+**partnerId** | [**Object**](.md) | Partner ID the employee belongs to | [optional] 
 **createdAt** | [**DateTime**](DateTime.md) | Creation timestamp | 
 **updatedAt** | [**DateTime**](DateTime.md) | Last update timestamp | 
 **doctorProfile** | [**DoctorProfileDto**](DoctorProfileDto.md) | Doctor profile | [optional] 

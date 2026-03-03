@@ -82,6 +82,12 @@ void main() {
       // TODO
     });
 
+    // Partner ID the employee belongs to
+    // String partnerId
+    test('to test the property `partnerId`', () async {
+      // TODO
+    });
+
     // Therapist profile information
     // TherapistProfileDto profile
     test('to test the property `profile`', () async {

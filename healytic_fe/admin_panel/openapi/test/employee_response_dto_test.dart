@@ -118,6 +118,12 @@ void main() {
       // TODO
     });
 
+    // Partner ID the employee belongs to
+    // Object partnerId
+    test('to test the property `partnerId`', () async {
+      // TODO
+    });
+
     // Creation timestamp
     // DateTime createdAt
     test('to test the property `createdAt`', () async {

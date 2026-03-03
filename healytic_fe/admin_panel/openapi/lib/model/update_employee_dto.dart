@@ -25,6 +25,7 @@ class UpdateEmployeeDto {
     this.role,
     this.status,
     this.branchId,
+    this.partnerId,
     this.doctorProfile,
     this.therapistProfile,
   });
@@ -119,6 +120,15 @@ class UpdateEmployeeDto {
   ///
   String? branchId;
 
+  /// Partner ID the employee belongs to
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? partnerId;
+
   /// Doctor profile data if role is DOCTOR
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -151,6 +161,7 @@ class UpdateEmployeeDto {
     other.role == role &&
     other.status == status &&
     other.branchId == branchId &&
+    other.partnerId == partnerId &&
     other.doctorProfile == doctorProfile &&
     other.therapistProfile == therapistProfile;
 
@@ -169,11 +180,12 @@ class UpdateEmployeeDto {
     (role == null ? 0 : role!.hashCode) +
     (status == null ? 0 : status!.hashCode) +
     (branchId == null ? 0 : branchId!.hashCode) +
+    (partnerId == null ? 0 : partnerId!.hashCode) +
     (doctorProfile == null ? 0 : doctorProfile!.hashCode) +
     (therapistProfile == null ? 0 : therapistProfile!.hashCode);
 
   @override
-  String toString() => 'UpdateEmployeeDto[authId=$authId, employeeCode=$employeeCode, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, role=$role, status=$status, branchId=$branchId, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
+  String toString() => 'UpdateEmployeeDto[authId=$authId, employeeCode=$employeeCode, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, role=$role, status=$status, branchId=$branchId, partnerId=$partnerId, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -237,6 +249,11 @@ class UpdateEmployeeDto {
     } else {
       json[r'branchId'] = null;
     }
+    if (this.partnerId != null) {
+      json[r'partnerId'] = this.partnerId;
+    } else {
+      json[r'partnerId'] = null;
+    }
     if (this.doctorProfile != null) {
       json[r'doctorProfile'] = this.doctorProfile;
     } else {
@@ -281,6 +298,7 @@ class UpdateEmployeeDto {
         role: UpdateEmployeeDtoRoleEnum.fromJson(json[r'role']),
         status: UpdateEmployeeDtoStatusEnum.fromJson(json[r'status']),
         branchId: mapValueOfType<String>(json, r'branchId'),
+        partnerId: mapValueOfType<String>(json, r'partnerId'),
         doctorProfile: CreateDoctorProfileDto.fromJson(json[r'doctorProfile']),
         therapistProfile: CreateTherapistProfileDto.fromJson(json[r'therapistProfile']),
       );

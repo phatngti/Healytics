@@ -19,6 +19,7 @@ import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/steps/step_1_general_goals.dart';
 import 'package:user_app/features/orders/presentation/screens/orders.screen.dart';
 import 'package:user_app/features/profile/presentation/screens/profile.screen.dart';
+import 'package:user_app/features/checkout/presentation/screens/checkout.screen.dart';
 import 'package:user_app/features/authenticate/presentation/screens/signin.screen.dart';
 
 part 'routes.g.dart';
@@ -215,6 +216,22 @@ class ReviewsRoute extends GoRouteData with $ReviewsRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ReviewsScreen(serviceId: serviceId),
+    );
+  }
+}
+
+// --- CHECKOUT ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<CheckoutRoute>(path: '/checkout', name: CheckoutRoute.name)
+class CheckoutRoute extends GoRouteData with $CheckoutRoute {
+  const CheckoutRoute();
+  static const name = 'checkout';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const CheckoutScreen(),
     );
   }
 }

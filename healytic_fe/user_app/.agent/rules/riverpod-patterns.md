@@ -1,10 +1,10 @@
 ---
 trigger: glob
 globs: ["**/*.provider.dart", "**/providers/**"]
-description: Riverpod state management patterns and conventions. Applied to provider files and provider directories.
+description: Riverpod 3.0 state management patterns and conventions. Applied to provider files and provider directories.
 ---
 
-# Riverpod State Management Patterns
+# Riverpod 3.0 State Management Patterns
 
 ## Code Generation (Required)
 
@@ -16,8 +16,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'example.provider.g.dart';
 
 // Simple provider (auto-dispose by default)
+// NOTE: Use unified `Ref` — no more typed refs
 @riverpod
-Future<List<Product>> products(ref) async {
+Future<List<Product>> products(Ref ref) async {
   final repo = ref.read(productRepositoryProvider);
   return repo.getAll();
 }
@@ -33,8 +34,11 @@ class AuthNotifier extends _$AuthNotifier {
     try {
       final repo = ref.read(authRepositoryProvider);
       final user = await repo.signIn(email, password);
+      // Check mounted after every async gap
+      if (!ref.mounted) return;
       state = AuthState.authenticated(user);
     } catch (e) {
+      if (!ref.mounted) return;
       state = AuthState.error(e.toString());
     }
   }
@@ -51,17 +55,46 @@ class AuthNotifier extends _$AuthNotifier {
 
 ## Consuming Providers in Widgets
 
+### AsyncValue (Sealed — Exhaustive Matching)
+
+`AsyncValue` is now sealed. Use pattern matching instead of `.when()`:
+
+```dart
+final asyncProducts = ref.watch(productsProvider);
+return switch (asyncProducts) {
+  AsyncData(:final value) => ProductList(products: value),
+  AsyncError(:final error) => ErrorWidget(error.toString()),
+  AsyncLoading() => const CircularProgressIndicator(),
+};
+```
+
+### Watch / Read / Listen
+
 ```dart
 // Watch (rebuilds on change) — use in build()
 final state = ref.watch(authNotifierProvider);
 
 // Read (one-time) — use in callbacks
-ref.read(authNotifierProvider.notifier).signIn(email, password);
+ref.read(authNotifierProvider.notifier).signIn(
+  email, password,
+);
 
-// Listen (side effects) — use for navigation, snackbars
+// Listen (side effects) — navigation, snackbars
 ref.listen(authNotifierProvider, (prev, next) {
   if (next.isError) showSnackbar(next.errorMessage);
 });
+```
+
+## Async Safety: `ref.mounted`
+
+Always check `ref.mounted` after every `await` in notifier methods:
+
+```dart
+Future<void> doSomething() async {
+  await someAsyncWork();
+  if (!ref.mounted) return;
+  state = newState;
+}
 ```
 
 ## Provider Organization
@@ -72,7 +105,7 @@ ref.listen(authNotifierProvider, (prev, next) {
 
 ```dart
 @riverpod
-ProductRepository productRepository(ref) {
+ProductRepository productRepository(Ref ref) {
   final api = ref.read(apiServiceProvider);
   final useMock = ref.read(useMockProvider);
   final dataSource = useMock
@@ -111,10 +144,75 @@ switch (authState) {
 }
 ```
 
+## AsyncValue Changes (3.0)
+
+- **Sealed class** — exhaustive pattern matching with `switch`.
+- **`.value`** replaces `.valueOrNull` (global search-and-replace).
+- **`AsyncLoading(progress:)`** — optional progress tracking.
+- **`.isFromCache`** — flag for offline persistence.
+
+```dart
+// Progress tracking in notifiers
+state = AsyncLoading(progress: 0.0);
+await fetchSomething();
+state = AsyncLoading(progress: 0.5);
+```
+
+## Error Handling: `ProviderException`
+
+Errors from providers are now wrapped in `ProviderException`:
+
+```dart
+try {
+  ref.watch(failingProvider);
+} on ProviderException catch (e) {
+  switch (e.exception) {
+    case SomeSpecificError():
+      // Handle specific error
+    default:
+      rethrow;
+  }
+}
+```
+
+`AsyncValue.error`, `ref.listen(..., onError: ...)` and
+`ProviderObserver` still receive the unaltered original error.
+
+## Automatic Retry
+
+Providers that fail during initialization automatically retry
+with exponential backoff (200ms → 6.4s). Customize globally:
+
+```dart
+ProviderScope(
+  retry: (retryCount, error) {
+    if (error is ProviderException) return null;
+    if (retryCount > 5) return null;
+    return Duration(seconds: retryCount * 2);
+  },
+  child: MyApp(),
+)
+```
+
+Or per-provider with code generation:
+
+```dart
+Duration retry(int retryCount, Object error) {
+  if (retryCount > 3) return null;
+  return Duration(seconds: retryCount * 2);
+}
+
+@Riverpod(retry: retry)
+Future<List<Product>> products(Ref ref) async { ... }
+```
+
 ## Rules
 
 - Run `dart run build_runner build -d` after creating/modifying providers.
-- Never access `ref` outside of `build()` or provider callbacks.
+- Always use unified `Ref ref` — never typed refs like `ProductsRef`.
+- Always check `ref.mounted` after `await` in notifier methods.
 - Prefer `ref.watch` over `ref.read` in build methods.
 - Keep notifier methods focused — delegate to repositories.
-- Use `AsyncValue` helpers: `.when()`, `.whenData()`, `.hasError`.
+- Use sealed `AsyncValue` pattern matching: `switch` > `.when()`.
+- Use `.value` not `.valueOrNull` (removed in 3.0).
+- Legacy `StateProvider`/`StateNotifierProvider` → `riverpod/legacy.dart`.

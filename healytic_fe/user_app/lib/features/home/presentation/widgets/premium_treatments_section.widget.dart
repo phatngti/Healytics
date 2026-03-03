@@ -8,12 +8,12 @@ import 'package:common/widgets/staggered_grid_view/'
 import 'package:user_app/features/home/domain/entities/'
     'home.entity.dart';
 import 'package:user_app/features/home/presentation/'
-    'providers/home_provider.dart';
+    'providers/home.provider.dart';
 import 'package:user_app/features/home/presentation/'
     'widgets/treatment_card.widget.dart';
 
 /// Displays a 2-column grid of premium treatment cards
-/// fetched from the data layer via [homeProvider].
+/// fetched via [productsProvider].
 class PremiumTreatmentsSection extends ConsumerWidget {
   const PremiumTreatmentsSection({super.key});
 
@@ -22,8 +22,7 @@ class PremiumTreatmentsSection extends ConsumerWidget {
     final theme = Theme.of(context);
     final titleGap = AppDimens.titleGap(context);
     final contentPad = AppDimens.contentPadding(context);
-    final homeState = ref.watch(homeProvider);
-    final products = homeState.premiumProducts;
+    final productsAsync = ref.watch(premiumTreatmentsProvider);
 
     return Column(
       children: [
@@ -60,12 +59,16 @@ class PremiumTreatmentsSection extends ConsumerWidget {
           ],
         ),
         SizedBox(height: titleGap),
-        if (homeState.isLoading)
-          _LoadingGrid(contentPad: contentPad)
-        else if (products.isEmpty)
-          const _EmptyState()
-        else
-          _ProductGrid(products: products, contentPad: contentPad),
+        productsAsync.when(
+          loading: () => _LoadingGrid(contentPad: contentPad),
+          error: (_, __) => const _EmptyState(),
+          data: (products) {
+            if (products.isEmpty) {
+              return const _EmptyState();
+            }
+            return _ProductGrid(products: products, contentPad: contentPad);
+          },
+        ),
       ],
     );
   }
