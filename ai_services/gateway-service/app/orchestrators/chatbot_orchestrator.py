@@ -44,7 +44,7 @@ class ChatbotOrchestrator:
         # 1. Get or create conversation
         conversation = await conversation_repo.get_or_create_conversation(
             session=session,
-            conversation_id=request.conversation_id,
+            conversation_id_str = str(request.conversation_id),
             user_id=getattr(request, "user_id", None),
         )
 
@@ -66,7 +66,7 @@ class ChatbotOrchestrator:
         ner_result = None
         if request.enable_ner:
             ner_result = await self._call_ner_safe(
-                conversation_id=request.conversation_id,
+                conversation_id=str(request.conversation_id),
                 message=request.message,
             )
 
@@ -74,9 +74,9 @@ class ChatbotOrchestrator:
                 yield SSEEvent(
                     SSEEventType.NER,
                     {
-                        "conversation_id": request.conversation_id,
+                        "conversation_id": str(request.conversation_id),
                         "entities": ner_result.get("entities", []),
-                        "timestamp": datetime.now(timezone.utc),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                     },
                 )
 
@@ -102,9 +102,9 @@ class ChatbotOrchestrator:
                 yield SSEEvent(
                     SSEEventType.TOKEN,
                     {
-                        "conversation_id": request.conversation_id,
+                        "conversation_id": str(request.conversation_id),
                         "text": chunk,
-                        "timestamp": datetime.now(timezone.utc),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                     },
                 )
 
@@ -114,25 +114,27 @@ class ChatbotOrchestrator:
                 SSEEventType.RECOMMENDATION,
                 {
                     **recommendation,
-                    "timestamp": datetime.now(timezone.utc),
+                    "conversation_id": str(request.conversation_id),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                 },
             )
 
         # 9️. Persist assistant message
-        await message_repo.create_message(
-            session=session,
-            conversation_id=conversation.id,
-            role="assistant",
-            content=full_response,
-        )
+        if full_response:
+            await message_repo.create_message(
+                session=session,
+                conversation_id=conversation.id,
+                role="assistant",
+                content=full_response,
+            )
 
         # 10. Emit DONE
         yield SSEEvent(
             SSEEventType.DONE,
             {
-                "conversation_id": request.conversation_id,
+                "conversation_id": str(request.conversation_id),
                 "status": "completed",
-                "timestamp": datetime.now(timezone.utc),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             },
         )
 

@@ -19,7 +19,7 @@ class RecommendationOrchestrator:
 
         result = await self.recommender_client.recommend_home(payload)
 
-        result["timestamp"] = datetime.now(timezone.utc)
+        result["timestamp"] = datetime.now(timezone.utc).isoformat()
 
         return result
 
@@ -33,6 +33,6 @@ class RecommendationOrchestrator:
 
         result = await self.recommender_client.recommend_chatbot(payload)
 
-        result["timestamp"] = datetime.now(timezone.utc)
+        result["timestamp"] = datetime.now(timezone.utc).isoformat()
 
         return result
