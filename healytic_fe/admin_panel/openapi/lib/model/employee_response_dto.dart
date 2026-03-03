@@ -30,6 +30,7 @@ class EmployeeResponseDto {
     required this.status,
     required this.rating,
     required this.reviewCount,
+    this.partnerId,
     required this.createdAt,
     required this.updatedAt,
     this.doctorProfile,
@@ -135,6 +136,15 @@ class EmployeeResponseDto {
   /// Number of reviews
   num reviewCount;
 
+  /// Partner ID the employee belongs to
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  Object? partnerId;
+
   /// Creation timestamp
   DateTime createdAt;
 
@@ -178,6 +188,7 @@ class EmployeeResponseDto {
     other.status == status &&
     other.rating == rating &&
     other.reviewCount == reviewCount &&
+    other.partnerId == partnerId &&
     other.createdAt == createdAt &&
     other.updatedAt == updatedAt &&
     other.doctorProfile == doctorProfile &&
@@ -203,13 +214,14 @@ class EmployeeResponseDto {
     (status.hashCode) +
     (rating.hashCode) +
     (reviewCount.hashCode) +
+    (partnerId == null ? 0 : partnerId!.hashCode) +
     (createdAt.hashCode) +
     (updatedAt.hashCode) +
     (doctorProfile == null ? 0 : doctorProfile!.hashCode) +
     (therapistProfile == null ? 0 : therapistProfile!.hashCode);
 
   @override
-  String toString() => 'EmployeeResponseDto[id=$id, employeeCode=$employeeCode, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, description=$description, dob=$dob, gender=$gender, role=$role, status=$status, rating=$rating, reviewCount=$reviewCount, createdAt=$createdAt, updatedAt=$updatedAt, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
+  String toString() => 'EmployeeResponseDto[id=$id, employeeCode=$employeeCode, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, description=$description, dob=$dob, gender=$gender, role=$role, status=$status, rating=$rating, reviewCount=$reviewCount, partnerId=$partnerId, createdAt=$createdAt, updatedAt=$updatedAt, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -266,6 +278,11 @@ class EmployeeResponseDto {
       json[r'status'] = this.status;
       json[r'rating'] = this.rating;
       json[r'reviewCount'] = this.reviewCount;
+    if (this.partnerId != null) {
+      json[r'partnerId'] = this.partnerId;
+    } else {
+      json[r'partnerId'] = null;
+    }
       json[r'createdAt'] = this.createdAt.toUtc().toIso8601String();
       json[r'updatedAt'] = this.updatedAt.toUtc().toIso8601String();
     if (this.doctorProfile != null) {
@@ -317,6 +334,7 @@ class EmployeeResponseDto {
         status: EmployeeResponseDtoStatusEnum.fromJson(json[r'status'])!,
         rating: num.parse('${json[r'rating']}'),
         reviewCount: num.parse('${json[r'reviewCount']}'),
+        partnerId: mapValueOfType<Object>(json, r'partnerId'),
         createdAt: mapDateTime(json, r'createdAt', r'')!,
         updatedAt: mapDateTime(json, r'updatedAt', r'')!,
         doctorProfile: DoctorProfileDto.fromJson(json[r'doctorProfile']),

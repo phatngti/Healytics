@@ -16,6 +16,73 @@ class ChatbotApi {
 
   final ApiClient apiClient;
 
+  /// Get paginated list of conversations
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [num] page:
+  ///   Page number (1-indexed)
+  ///
+  /// * [num] limit:
+  ///   Number of items per page
+  Future<Response> chatbotControllerListConversationsWithHttpInfo({ num? page, num? limit, }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/chatbot/conversations';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (page != null) {
+      queryParams.addAll(_queryParams('', 'page', page));
+    }
+    if (limit != null) {
+      queryParams.addAll(_queryParams('', 'limit', limit));
+    }
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get paginated list of conversations
+  ///
+  /// Parameters:
+  ///
+  /// * [num] page:
+  ///   Page number (1-indexed)
+  ///
+  /// * [num] limit:
+  ///   Number of items per page
+  Future<ConversationListResponseDto?> chatbotControllerListConversations({ num? page, num? limit, }) async {
+    final response = await chatbotControllerListConversationsWithHttpInfo( page: page, limit: limit, );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ConversationListResponseDto',) as ConversationListResponseDto;
+    
+    }
+    return null;
+  }
+
   /// Send a message to the chatbot
   ///
   /// Note: This method returns the HTTP [Response].
@@ -106,18 +173,10 @@ class ChatbotApi {
   /// Parameters:
   ///
   /// * [String] conversationId (required):
-  Future<ChatMessageResponseDto?> chatbotControllerStreamChat(String conversationId,) async {
+  Future<void> chatbotControllerStreamChat(String conversationId,) async {
     final response = await chatbotControllerStreamChatWithHttpInfo(conversationId,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ChatMessageResponseDto',) as ChatMessageResponseDto;
-    
-    }
-    return null;
   }
 }

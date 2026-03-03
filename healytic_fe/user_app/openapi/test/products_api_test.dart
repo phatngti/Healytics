@@ -17,31 +17,52 @@ void main() {
   // final instance = ProductsApi();
 
   group('tests for ProductsApi', () {
-    // Get all products
-    //
-    //Future<List<ProductResponseDto>> productsControllerFindAll() async
-    test('test productsControllerFindAll', () async {
-      // TODO
-    });
-
-    // Get a product by slug
-    //
-    //Future<ProductResponseDto> productsControllerFindBySlug(String slug) async
-    test('test productsControllerFindBySlug', () async {
-      // TODO
-    });
-
     // Get a product by id
     //
-    //Future<ProductResponseDto> productsControllerFindOne(String id) async
+    //Future<PublicProductResponseDto> productsControllerFindOne(String id) async
     test('test productsControllerFindOne', () async {
       // TODO
     });
 
-    // Get full product details by slug
+    // Get home recommendations
     //
-    //Future<ProductDetailResponseDto> productsControllerGetDetails(String slug) async
-    test('test productsControllerGetDetails', () async {
+    //Future<List<PublicProductCardResponseDto>> productsControllerGetHomeRecommend() async
+    test('test productsControllerGetHomeRecommend', () async {
+      // TODO
+    });
+
+    // Get premium treatments
+    //
+    //Future<List<PublicProductCardResponseDto>> productsControllerGetPremiumTreatments() async
+    test('test productsControllerGetPremiumTreatments', () async {
+      // TODO
+    });
+
+    // Get employees for a product
+    //
+    //Future<List<PublicProductEmployeeResponseDto>> productsControllerGetProductEmployees(String id) async
+    test('test productsControllerGetProductEmployees', () async {
+      // TODO
+    });
+
+    // Get product info by ID
+    //
+    //Future<PublicProductInfoResponseDto> productsControllerGetProductInfo(String id) async
+    test('test productsControllerGetProductInfo', () async {
+      // TODO
+    });
+
+    // Get reviews for a product
+    //
+    //Future<List<PublicProductReviewResponseDto>> productsControllerGetProductReviews(String id) async
+    test('test productsControllerGetProductReviews', () async {
+      // TODO
+    });
+
+    // Get recommended products
+    //
+    //Future<List<PublicProductRecommendedResponseDto>> productsControllerGetRecommendedProducts(String id) async
+    test('test productsControllerGetRecommendedProducts', () async {
       // TODO
     });
 

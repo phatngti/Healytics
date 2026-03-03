@@ -1,21 +1,33 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:user_app/features/home/data/datasources/remote/home_remote_datasource.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:user_app/features/home/data/provider/home.provider.dart';
 import 'package:user_app/features/home/domain/entities/home.entity.dart';
 
-/// Provider for fetching categories from the API.
-final categoriesProvider = FutureProvider<List<HomeCategory>>((ref) async {
-  final datasource = ref.read(homeRemoteDatasourceProvider);
-  return datasource.getCategories();
-});
+part 'home.provider.g.dart';
 
-/// Provider for fetching products from the API.
-final productsProvider = FutureProvider<List<HomeProduct>>((ref) async {
-  final datasource = ref.read(homeRemoteDatasourceProvider);
-  return datasource.getProducts();
-});
+/// Provider for fetching categories via the repository.
+@riverpod
+Future<List<HomeCategory>> categories(Ref ref) async {
+  final repository = ref.read(homeRepositoryProvider);
+  return repository.getCategories();
+}
 
-/// Provider for fetching service tags from the API.
-final serviceTagsProvider = FutureProvider<List<ServiceTag>>((ref) async {
-  final datasource = ref.read(homeRemoteDatasourceProvider);
-  return datasource.getServiceTags();
-});
+/// Provider for fetching home-recommend products.
+@riverpod
+Future<List<HomeProduct>> recommendedProducts(Ref ref) async {
+  final repository = ref.read(homeRepositoryProvider);
+  return repository.getRecommendedProducts();
+}
+
+/// Provider for fetching premium treatments.
+@riverpod
+Future<List<HomeProduct>> premiumTreatments(Ref ref) async {
+  final repository = ref.read(homeRepositoryProvider);
+  return repository.getPremiumTreatments();
+}
+
+/// Provider for fetching service tags.
+@riverpod
+Future<List<ServiceTag>> serviceTags(Ref ref) async {
+  final repository = ref.read(homeRepositoryProvider);
+  return repository.getServiceTags();
+}

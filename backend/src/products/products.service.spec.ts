@@ -3,11 +3,12 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from '@/common/entities/product.entity';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreatePartnerProductDto } from './dto/partner/create-partner-product.dto';
+import { UpdatePartnerProductDto } from './dto/partner/update-partner-product.dto';
 import { CreateProductHandler } from './application/handlers/create-product.handler';
 import { UpdateProductHandler } from './application/handlers/update-product.handler';
 import { RemoveProductHandler } from './application/handlers/remove-product.handler';
+import { PartnersService } from '@/partners/partners.service';
 import {
   MockRepository,
   MockHandler,
@@ -48,6 +49,10 @@ describe('ProductsService', () => {
           provide: RemoveProductHandler,
           useValue: removeProductHandler,
         },
+        {
+          provide: PartnersService,
+          useValue: { getFirstHealthPartner: jest.fn().mockResolvedValue(null) },
+        },
       ],
     }).compile();
 
@@ -61,7 +66,7 @@ describe('ProductsService', () => {
   describe('create', () => {
     it('should delegate to CreateProductHandler and return created product', async () => {
       // Arrange
-      const dto: CreateProductDto = { name: 'Test Product' } as CreateProductDto;
+      const dto: CreatePartnerProductDto = { name: 'Test Product' } as CreatePartnerProductDto;
       const expectedProduct = { id: 'uuid-1', name: 'Test Product' };
       createProductHandler.execute.mockResolvedValue(expectedProduct);
 
@@ -79,7 +84,7 @@ describe('ProductsService', () => {
     it('should delegate to UpdateProductHandler and return updated product', async () => {
       // Arrange
       const id = 'uuid-1';
-      const dto: UpdateProductDto = { name: 'Updated Product' } as UpdateProductDto;
+      const dto: UpdatePartnerProductDto = { name: 'Updated Product' } as UpdatePartnerProductDto;
       const expectedProduct = { id, name: 'Updated Product' };
       updateProductHandler.execute.mockResolvedValue(expectedProduct);
 
@@ -195,6 +200,74 @@ describe('ProductsService', () => {
       // Act & Assert
       await expect(service.findBySlug(slug)).rejects.toThrow(NotFoundException);
       await expect(service.findBySlug(slug)).rejects.toThrow(`Product with slug "${slug}" not found`);
+    });
+  });
+
+  describe('getPremiumTreatments', () => {
+    it('should query active visible products and return card DTOs', async () => {
+      // Arrange
+      const mockProducts = [
+        { id: 'uuid-1', name: 'Product 1', type: 'service', basePrice: 500000, media: [], reviews: [], productEmployeeEligibilities: [] },
+      ];
+      productRepository.find.mockResolvedValue(mockProducts);
+
+      // Act
+      const result = await service.getPremiumTreatments();
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+      expect(productRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { status: 'active', isVisibleOnline: true },
+          take: 10,
+        }),
+      );
+    });
+
+    it('should return empty array when no products exist', async () => {
+      // Arrange
+      productRepository.find.mockResolvedValue([]);
+
+      // Act
+      const result = await service.getPremiumTreatments();
+
+      // Assert
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('getHomeRecommend', () => {
+    it('should query active visible products and return card DTOs', async () => {
+      // Arrange
+      const mockProducts = [
+        { id: 'uuid-2', name: 'Product 2', type: 'package', basePrice: 750000, media: [], reviews: [], productEmployeeEligibilities: [] },
+      ];
+      productRepository.find.mockResolvedValue(mockProducts);
+
+      // Act
+      const result = await service.getHomeRecommend();
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+      expect(productRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { status: 'active', isVisibleOnline: true },
+          take: 10,
+        }),
+      );
+    });
+
+    it('should return empty array when no products exist', async () => {
+      // Arrange
+      productRepository.find.mockResolvedValue([]);
+
+      // Act
+      const result = await service.getHomeRecommend();
+
+      // Assert
+      expect(result).toEqual([]);
     });
   });
 });

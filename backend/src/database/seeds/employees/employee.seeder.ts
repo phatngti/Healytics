@@ -4,6 +4,7 @@ import { In, Repository } from 'typeorm';
 import { Employee } from '@/common/entities/employee.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
+import { Partner } from '@/common/entities/partner.entity';
 import { EmployeeRole } from '@/employees/enum/employee-role.enum';
 import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
 import { Gender } from '@/employees/enum/gender.enum';
@@ -97,10 +98,21 @@ export class EmployeeSeeder implements ISeeder {
     private readonly doctorProfileRepo: Repository<DoctorProfile>,
     @InjectRepository(TherapistProfile)
     private readonly therapistProfileRepo: Repository<TherapistProfile>,
+    @InjectRepository(Partner)
+    private readonly partnerRepo: Repository<Partner>,
   ) {}
 
   async seed(): Promise<void> {
     this.logger.log('Seeding employees...');
+
+    // Resolve partner FK — assign all seed employees to the first APPROVED partner
+    const partner = await this.partnerRepo.findOne({
+      where: { taxCode: '0123456789' }, // "Healytics Spa & Wellness"
+    });
+
+    if (!partner) {
+      this.logger.warn('  ⚠ No partner found with taxCode "0123456789" — employees will have no partner. Run PartnerSeeder first.');
+    }
 
     for (const empData of SEED_EMPLOYEES) {
       const exists = await this.employeeRepo.findOne({
@@ -118,11 +130,12 @@ export class EmployeeSeeder implements ISeeder {
         status: EmployeeStatus.ACTIVE,
         rating: 0,
         reviewCount: 0,
+        partnerId: partner?.id ?? null,
         // branchId is nullable — left null for seed data
       });
 
       await this.employeeRepo.save(employee);
-      this.logger.log(`  ✅ Created employee "${empData.fullName}" (${empData.role})`);
+      this.logger.log(`  ✅ Created employee "${empData.fullName}" (${empData.role}) → partner: ${partner?.brandName ?? 'none'}`);
 
       await this.seedProfiles(employee);
     }

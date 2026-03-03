@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { ServiceTag } from '@/common/entities/service-tag.entity';
+import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
 import { ProductTag } from '@/common/entities/product-tag.entity';
 import { CreateServiceTagDto } from './dto/create-service-tag.dto';
 import { UpdateServiceTagDto } from './dto/update-service-tag.dto';
@@ -26,8 +26,8 @@ export class ServiceTagsService {
   private readonly logger = new Logger(ServiceTagsService.name);
 
   constructor(
-    @InjectRepository(ServiceTag)
-    private readonly serviceTagRepository: Repository<ServiceTag>,
+    @InjectRepository(ProductFeatureTag)
+    private readonly serviceTagRepository: Repository<ProductFeatureTag>,
     @InjectRepository(ProductTag)
     private readonly productTagRepository: Repository<ProductTag>,
     private readonly dataSource: DataSource,
@@ -41,14 +41,14 @@ export class ServiceTagsService {
   /**
    * Creates a new service tag for a user.
    */
-  async create(dto: CreateServiceTagDto, userId: string): Promise<ServiceTag> {
+  async create(dto: CreateServiceTagDto, userId: string): Promise<ProductFeatureTag> {
     return this.createServiceTagHandler.execute(dto, userId);
   }
 
   /**
    * Finds all service tags for a user.
    */
-  async findAllByUser(userId: string): Promise<ServiceTag[]> {
+  async findAllByUser(userId: string): Promise<ProductFeatureTag[]> {
     this.logger.log(`Finding all service tags for user: ${userId}`);
     return this.serviceTagRepository.find({
       where: { userId },
@@ -59,7 +59,7 @@ export class ServiceTagsService {
   /**
    * Finds active service tags for a user.
    */
-  async findActiveByUser(userId: string): Promise<ServiceTag[]> {
+  async findActiveByUser(userId: string): Promise<ProductFeatureTag[]> {
     this.logger.log(`Finding active service tags for user: ${userId}`);
     return this.serviceTagRepository.find({
       where: { userId, isActive: true },
@@ -70,7 +70,7 @@ export class ServiceTagsService {
   /**
    * Finds a service tag by ID.
    */
-  async findOne(id: string): Promise<ServiceTag> {
+  async findOne(id: string): Promise<ProductFeatureTag> {
     const tag = await this.serviceTagRepository.findOne({
       where: { id },
       relations: ['productTags'],
@@ -91,7 +91,7 @@ export class ServiceTagsService {
     id: string,
     dto: UpdateServiceTagDto,
     userId: string,
-  ): Promise<ServiceTag> {
+  ): Promise<ProductFeatureTag> {
     return this.updateServiceTagHandler.execute(id, dto, userId);
   }
 
@@ -127,7 +127,7 @@ export class ServiceTagsService {
   /**
    * Gets all tags attached to a product.
    */
-  async getTagsForProduct(productId: string): Promise<ServiceTag[]> {
+  async getTagsForProduct(productId: string): Promise<ProductFeatureTag[]> {
     const productTags = await this.productTagRepository.find({
       where: { productId },
       relations: ['tag'],
