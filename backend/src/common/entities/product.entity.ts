@@ -15,8 +15,8 @@ import { ProductType } from '@/products/enums/product-type.enum';
 import { Category } from './category.entity';
 import { ProductMedia } from './product-media.entity';
 import { ProductStatus } from '@/products/enums/product-status.enum';
-import { ServiceDefinition } from './service-definition.entity';
-import { ServiceEmployeeEligibility } from './service-employee-eligibility.entity';
+import { ProductDefinition } from './product-definition.entity';
+import { ProductEmployeeEligibility } from './product-employee-eligibility.entity';
 import { ProductTag } from './product-tag.entity';
 import { ProductReview } from './product-review.entity';
 import { ProductFacilityImage } from './product-facility-image.entity';
@@ -83,18 +83,18 @@ export class Product {
 
 
 
-  @OneToOne(() => ServiceDefinition, (definition) => definition.product, {
+  @OneToOne(() => ProductDefinition, (definition) => definition.product, {
     cascade: true,
     eager: false,
   })
-  serviceDefinition: ServiceDefinition | null;
+  productDefinition: ProductDefinition | null;
 
   @OneToMany(
-    () => ServiceEmployeeEligibility,
+    () => ProductEmployeeEligibility,
     (eligibility) => eligibility.product,
     { cascade: true },
   )
-  serviceEmployeeEligibilities: ServiceEmployeeEligibility[];
+  productEmployeeEligibilities: ProductEmployeeEligibility[];
 
   @OneToMany(() => ProductTag, (pt) => pt.product)
   productTags: ProductTag[];

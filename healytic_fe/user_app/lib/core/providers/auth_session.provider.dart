@@ -6,19 +6,19 @@ import 'package:user_app/core/models/store.model.dart';
 class AuthSessionStore {
   bool get isMockMode => Store.tryGet(StoreKey.mockFlag) == 'true';
 
-  /// Returns true if the user is logged in (has access token or
-  /// in mock mode).
-  bool get isLoggedIn =>
-      isMockMode || Store.tryGet(StoreKey.accessToken)?.isNotEmpty == true;
+  /// Returns true if the user is logged in (has a valid,
+  /// non-expired access token or is in mock mode).
+  bool get isLoggedIn => isMockMode || _isTokenValid();
 
   Stream<String?> watchAccessToken() => Store.watch(StoreKey.accessToken);
 
-  String get currentUserDisplayName {
-    final accessToken = Store.tryGet(StoreKey.accessToken);
-    if (accessToken == null || accessToken.isEmpty) {
-      return 'Sarah';
+  String? get currentUserDisplayName {
+    if (!_isTokenValid()) {
+      _clearSession();
+      return null;
     }
 
+    final accessToken = Store.tryGet(StoreKey.accessToken)!;
     try {
       final claims = JwtDecoder.decode(accessToken);
       final candidate =
@@ -31,10 +31,28 @@ class AuthSessionStore {
         return candidate;
       }
     } catch (_) {
-      // Keep fallback when token payload is not decodable.
+      // Fallback when token payload is not decodable.
     }
 
-    return 'Sarah';
+    _clearSession();
+    return null;
+  }
+
+  /// Validates the stored access token exists and has
+  /// not expired.
+  bool _isTokenValid() {
+    final token = Store.tryGet(StoreKey.accessToken);
+    if (token == null || token.isEmpty) return false;
+
+    try {
+      return !JwtDecoder.isExpired(token);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  void _clearSession() {
+    Store.delete(StoreKey.accessToken);
   }
 }
 
@@ -42,6 +60,6 @@ final authSessionStoreProvider = Provider<AuthSessionStore>((ref) {
   return AuthSessionStore();
 });
 
-final currentUserDisplayNameProvider = Provider<String>((ref) {
+final currentUserDisplayNameProvider = Provider<String?>((ref) {
   return ref.watch(authSessionStoreProvider).currentUserDisplayName;
 });

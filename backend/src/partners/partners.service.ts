@@ -208,6 +208,23 @@ export class PartnersService {
     }
 
     /**
+     * Returns the first health partner profile with location relations.
+     * Used to populate clinic/location info on public product detail screens.
+     */
+    async getFirstHealthPartner(): Promise<Partner | null> {
+        const account = await this.accountRepository.findOne({
+            where: { role: Role.HEALTH_PARTNER },
+        });
+
+        if (!account) return null;
+
+        return this.partnerRepository.findOne({
+            where: { accountId: account.id },
+            relations: ['province', 'district', 'ward'],
+        });
+    }
+
+    /**
      * Get partner's own profile with verification fields including requiresUpdate, adminFeedback, and isVerified
      */
     async getMyProfile(accountId: string): Promise<MyProfileResponseDto> {

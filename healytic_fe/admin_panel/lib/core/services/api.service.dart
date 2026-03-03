@@ -18,7 +18,7 @@ class ApiService implements Authentication {
   late ApiClient _apiClient;
   late AuthenticationApi authenticateApi;
   late AccountApi accountApi;
-  late EmployeesApi employeesApi;
+  late PartnerEmployeesApi employeesApi;
   late ProductsApi productsApi;
   late CategoriesApi categoriesApi;
   late LocationsApi locationsApi;
@@ -62,7 +62,7 @@ class ApiService implements Authentication {
     }
     authenticateApi = AuthenticationApi(_apiClient);
     accountApi = AccountApi(_apiClient);
-    employeesApi = EmployeesApi(_apiClient);
+    employeesApi = PartnerEmployeesApi(_apiClient);
     productsApi = ProductsApi(_apiClient);
     categoriesApi = CategoriesApi(_apiClient);
     locationsApi = LocationsApi(_apiClient);

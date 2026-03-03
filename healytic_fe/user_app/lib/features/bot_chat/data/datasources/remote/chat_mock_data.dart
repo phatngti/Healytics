@@ -66,6 +66,102 @@ final List<ChatConversation> kMockConversations = [
 ];
 
 // ─────────────────────────────────────────────────────────────────
+// Mock SSE Tokens
+// ─────────────────────────────────────────────────────────────────
+
+/// Token words used by the mock datasource to simulate
+/// word-by-word SSE streaming (first text segment).
+const List<String> kMockSseTokenWords = [
+  'Based',
+  'on',
+  'your',
+  'symptoms,',
+  'I',
+  'recommend',
+  'visiting',
+  'a',
+  'specialist',
+  'nearby.',
+  'Here',
+  'are',
+  'some',
+  'options:',
+];
+
+/// Token words for the continuation after the rich
+/// event (second text segment).
+const List<String> kMockSseFollowUpWords = [
+  'Would',
+  'you',
+  'like',
+  'me',
+  'to',
+  'schedule',
+  'an',
+  'appointment',
+  'for',
+  'you?',
+];
+
+// ─────────────────────────────────────────────────────────────────
+// Mock Service Recommendation Data
+// ─────────────────────────────────────────────────────────────────
+
+/// Mock service recommendation payload matching the
+/// SSE `service_recommendation` event schema.
+const Map<String, dynamic> kMockServiceRecommendation = {
+  'total': 2,
+  'recommendations': [
+    {
+      'service_id': 'SV002',
+      'name': 'Phục hồi cột sống chuyên sâu',
+      'image_url':
+          'https://images.unsplash.com/photo'
+          '-1519494026892-80bbd2d6fd0d'
+          '?w=400&h=300&fit=crop',
+      'badge': 'Premium',
+      'booked_count': 1200,
+      'price': {'amount': 800000, 'currency': 'VND'},
+      'staff_name': 'BS Nguyễn Văn A',
+      'rating': {'average': 4.8, 'total_reviews': 124},
+      'location': {
+        'address': '123 Nguyễn Huệ',
+        'district': 'Quận 1',
+        'city': 'Hồ Chí Minh',
+      },
+      'slots': ['2026-02-21T09:00:00', '2026-02-21T14:00:00'],
+    },
+    {
+      'service_id': 'SV005',
+      'name': 'Vật lý trị liệu phục hồi chức năng',
+      'image_url':
+          'https://images.unsplash.com/photo'
+          '-1576091160550-2173dba999ef'
+          '?w=400&h=300&fit=crop',
+      'booked_count': 850,
+      'price': {'amount': 550000, 'currency': 'VND'},
+      'staff_name': 'BS Trần Thị B',
+      'rating': {'average': 4.6, 'total_reviews': 89},
+      'location': {
+        'address': '456 Lê Lợi',
+        'district': 'Quận 3',
+        'city': 'Hồ Chí Minh',
+      },
+      'slots': ['2026-02-22T10:00:00'],
+    },
+  ],
+};
+
+/// Mock NER location entities matching the
+/// SSE `ner_location` event schema.
+const Map<String, dynamic> kMockNerLocation = {
+  'entities': [
+    {'type': 'LOCATION', 'value': 'Quận 1', 'confidence': 0.93},
+    {'type': 'LOCATION', 'value': 'Hồ Chí Minh', 'confidence': 0.97},
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────────
 // Mock Messages
 // ─────────────────────────────────────────────────────────────────
 

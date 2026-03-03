@@ -1,8 +1,10 @@
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/horizontal_date_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:user_app/features/home/domain/entities/service_details.entity.dart';
+import 'package:user_app/features/home/presentation/providers/service_details.provider.dart';
 
 /// Type aliases for backward compatibility within this file.
 typedef Specialist = SpecialistEntity;
@@ -12,27 +14,36 @@ typedef TimeSlot = TimeSlotEntity;
 /// with expandable "Show More" panel, date selector, and
 /// time-slot grid.
 ///
-/// Tapping an avatar switches the selected specialist and
-/// resets the expanded state.
-class SpecialistSection extends StatefulWidget {
+/// Watches [serviceEmployeesProvider] via [serviceId] to
+/// load specialist data. Tapping an avatar switches the
+/// selected specialist and resets the expanded state.
+class SpecialistSection extends ConsumerStatefulWidget {
   const SpecialistSection({
     super.key,
-    required this.specialists,
-    required this.daySchedules,
+    required this.serviceId,
     this.onViewAll,
+    this.onSpecialistChanged,
+    this.onSlotSelected,
   });
 
-  final List<Specialist> specialists;
-
-  /// Per-day schedules containing time slots.
-  final List<DayScheduleEntity> daySchedules;
+  /// Service identifier used to fetch employees.
+  final String serviceId;
   final VoidCallback? onViewAll;
 
+  /// Fires when the selected specialist changes.
+  /// Provides (employeeId, employeeName).
+  final void Function(String employeeId, String employeeName)?
+  onSpecialistChanged;
+
+  /// Fires when a time slot is tapped.
+  /// Provides (selectedDate, slotLabel).
+  final void Function(DateTime selectedDate, String slotLabel)? onSlotSelected;
+
   @override
-  State<SpecialistSection> createState() => _SpecialistSectionState();
+  ConsumerState<SpecialistSection> createState() => _SpecialistSectionState();
 }
 
-class _SpecialistSectionState extends State<SpecialistSection> {
+class _SpecialistSectionState extends ConsumerState<SpecialistSection> {
   late int _selectedIndex;
   bool _showMore = false;
 
@@ -40,50 +51,56 @@ class _SpecialistSectionState extends State<SpecialistSection> {
   late DateTime _selectedDate;
 
   // ── Cached schedule data ──
-  late Set<DateTime> _disabledDates;
-  late Set<DateTime> _enabledDates;
-  late List<TimeSlot> _slotsForDate;
+  Set<DateTime> _disabledDates = {};
+  Set<DateTime> _enabledDates = {};
+  List<TimeSlot> _slotsForDate = const [];
+
+  /// Currently selected time-slot label (e.g. "09:00 AM").
+  String? _selectedSlotLabel;
+
+  /// The last specialist list used to compute caches.
+  List<Specialist> _lastSpecialists = const [];
 
   @override
   void initState() {
     super.initState();
-    _selectedIndex = widget.specialists.indexWhere((s) => s.isSelected);
-    if (_selectedIndex < 0) _selectedIndex = 0;
     _selectedDate = _today;
-    _cacheSchedules();
   }
 
-  @override
-  void didUpdateWidget(covariant SpecialistSection old) {
-    super.didUpdateWidget(old);
-    if (old.daySchedules != widget.daySchedules) {
-      _cacheSchedules();
-    }
+  /// Initialise the selected index the first time data
+  /// arrives, and re-cache schedules when the specialists
+  /// list changes.
+  void _syncWithSpecialists(List<Specialist> specialists) {
+    if (identical(specialists, _lastSpecialists)) return;
+    _lastSpecialists = specialists;
+
+    _selectedIndex = specialists.indexWhere((s) => s.isSelected);
+    if (_selectedIndex < 0) _selectedIndex = 0;
+    _cacheSchedules(specialists[_selectedIndex].daySchedules);
+    _notifySpecialistChanged(specialists[_selectedIndex]);
   }
 
   /// Pre-compute disabled/enabled date sets and
   /// slots for the selected date.
-  void _cacheSchedules() {
-    _disabledDates = widget.daySchedules
+  void _cacheSchedules(List<DayScheduleEntity> daySchedules) {
+    _disabledDates = daySchedules
         .where((d) => !d.isAvailable)
         .map((d) => DateTime(d.date.year, d.date.month, d.date.day))
         .toSet();
-    _enabledDates = widget.daySchedules
+    _enabledDates = daySchedules
         .where((d) => d.isAvailable)
         .map((d) => DateTime(d.date.year, d.date.month, d.date.day))
         .toSet();
-    _updateSlotsForDate();
+    _updateSlotsForDate(daySchedules);
   }
 
   /// Update cached slots for [_selectedDate].
-  void _updateSlotsForDate() {
-    final schedule = widget.daySchedules.where(
+  void _updateSlotsForDate(List<DayScheduleEntity> daySchedules) {
+    final schedule = daySchedules.where(
       (d) => _isSameDay(d.date, _selectedDate),
     );
     _slotsForDate = schedule.isEmpty ? const [] : schedule.first.timeSlots;
   }
-
-  Specialist get _selected => widget.specialists[_selectedIndex];
 
   /// Today at midnight.
   DateTime get _today {
@@ -101,31 +118,44 @@ class _SpecialistSectionState extends State<SpecialistSection> {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  void _onAvatarTap(int index) {
+  void _onAvatarTap(int index, List<Specialist> specialists) {
     if (index == _selectedIndex) return;
     setState(() {
       _selectedIndex = index;
       _showMore = false;
+      _selectedSlotLabel = null;
+      _cacheSchedules(specialists[index].daySchedules);
+    });
+    _notifySpecialistChanged(specialists[index]);
+  }
+
+  void _onDateSelected(DateTime date, List<DayScheduleEntity> daySchedules) {
+    setState(() {
+      _selectedDate = date;
+      _selectedSlotLabel = null;
+      _updateSlotsForDate(daySchedules);
     });
   }
 
-  void _onDateSelected(DateTime date) {
-    setState(() {
-      _selectedDate = date;
-      _updateSlotsForDate();
-    });
+  void _onSlotTap(String label) {
+    setState(() => _selectedSlotLabel = label);
+    widget.onSlotSelected?.call(_selectedDate, label);
+  }
+
+  void _notifySpecialistChanged(Specialist specialist) {
+    widget.onSpecialistChanged?.call(specialist.id, specialist.name);
   }
 
   void _toggleShowMore() => setState(() => _showMore = !_showMore);
 
   /// Opens the material date picker modal with
   /// disabled dates grayed out.
-  Future<void> _showCalendarModal() async {
-    final firstDate = widget.daySchedules.isNotEmpty
-        ? _dateOnly(widget.daySchedules.first.date)
+  Future<void> _showCalendarModal(List<DayScheduleEntity> daySchedules) async {
+    final firstDate = daySchedules.isNotEmpty
+        ? _dateOnly(daySchedules.first.date)
         : _today;
-    final lastDate = widget.daySchedules.isNotEmpty
-        ? _dateOnly(widget.daySchedules.last.date)
+    final lastDate = daySchedules.isNotEmpty
+        ? _dateOnly(daySchedules.last.date)
         : _today.add(const Duration(days: 30));
 
     final enabled = _enabledDates;
@@ -140,23 +170,49 @@ class _SpecialistSectionState extends State<SpecialistSection> {
       },
     );
     if (picked != null && mounted) {
-      _onDateSelected(picked);
+      _onDateSelected(picked, daySchedules);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final asyncEmployees = ref.watch(
+      serviceEmployeesProvider(serviceId: widget.serviceId),
+    );
+
+    return asyncEmployees.when(
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(AppDimens.spaceLg),
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (specialists) {
+        if (specialists.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        _syncWithSpecialists(specialists);
+        return _buildContent(context, specialists);
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, List<Specialist> specialists) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
 
+    final selected = specialists[_selectedIndex];
+    final daySchedules = selected.daySchedules;
+
     // Determine first date from schedules
-    final firstDate = widget.daySchedules.isNotEmpty
+    final firstDate = daySchedules.isNotEmpty
         ? DateTime(
-            widget.daySchedules.first.date.year,
-            widget.daySchedules.first.date.month,
-            widget.daySchedules.first.date.day,
+            daySchedules.first.date.year,
+            daySchedules.first.date.month,
+            daySchedules.first.date.day,
           )
         : _today;
 
@@ -195,12 +251,12 @@ class _SpecialistSectionState extends State<SpecialistSection> {
           clipBehavior: Clip.none,
           child: Row(
             children: [
-              for (int i = 0; i < widget.specialists.length; i++) ...[
+              for (int i = 0; i < specialists.length; i++) ...[
                 if (i > 0) AppDimens.horizontalMedium,
                 GestureDetector(
-                  onTap: () => _onAvatarTap(i),
+                  onTap: () => _onAvatarTap(i, specialists),
                   child: _SpecialistAvatar(
-                    specialist: widget.specialists[i],
+                    specialist: specialists[i],
                     isSelected: i == _selectedIndex,
                   ),
                 ),
@@ -212,7 +268,7 @@ class _SpecialistSectionState extends State<SpecialistSection> {
 
         // Quote card + expandable details
         _QuoteCard(
-          specialist: _selected,
+          specialist: selected,
           showMore: _showMore,
           onToggle: _toggleShowMore,
           isDark: isDark,
@@ -230,10 +286,10 @@ class _SpecialistSectionState extends State<SpecialistSection> {
         HorizontalDateSelector(
           firstDate: firstDate,
           selectedDate: _selectedDate,
-          onDateSelected: _onDateSelected,
+          onDateSelected: (d) => _onDateSelected(d, daySchedules),
           dayCount: 7,
           disabledDates: _disabledDates,
-          onShowMore: _showCalendarModal,
+          onShowMore: () => _showCalendarModal(daySchedules),
         ),
         AppDimens.verticalExtraLarge,
 
@@ -273,6 +329,8 @@ class _SpecialistSectionState extends State<SpecialistSection> {
               : _MorningAfternoonSlots(
                   key: ValueKey('slots-$_selectedDate'),
                   slots: slots,
+                  selectedLabel: _selectedSlotLabel,
+                  onSlotTap: _onSlotTap,
                 ),
         ),
       ],
@@ -742,9 +800,16 @@ class _SpecialistAvatar extends StatelessWidget {
 /// (PM) groups, rendering each in its own labeled grid
 /// with independent expand/collapse.
 class _MorningAfternoonSlots extends StatefulWidget {
-  const _MorningAfternoonSlots({super.key, required this.slots});
+  const _MorningAfternoonSlots({
+    super.key,
+    required this.slots,
+    this.selectedLabel,
+    this.onSlotTap,
+  });
 
   final List<TimeSlot> slots;
+  final String? selectedLabel;
+  final ValueChanged<String>? onSlotTap;
 
   @override
   State<_MorningAfternoonSlots> createState() => _MorningAfternoonSlotsState();
@@ -784,6 +849,8 @@ class _MorningAfternoonSlotsState extends State<_MorningAfternoonSlots> {
             slots: _morningExpanded
                 ? morning
                 : morning.take(_maxCollapsed).toList(),
+            selectedLabel: widget.selectedLabel,
+            onSlotTap: widget.onSlotTap,
           ),
         ],
         if (afternoon.isNotEmpty) ...[
@@ -802,6 +869,8 @@ class _MorningAfternoonSlotsState extends State<_MorningAfternoonSlots> {
             slots: _afternoonExpanded
                 ? afternoon
                 : afternoon.take(_maxCollapsed).toList(),
+            selectedLabel: widget.selectedLabel,
+            onSlotTap: widget.onSlotTap,
           ),
         ],
       ],
@@ -879,9 +948,15 @@ class _SectionHeader extends StatelessWidget {
 
 /// 3-column grid of time-slot buttons.
 class _TimeSlotsGrid extends StatelessWidget {
-  const _TimeSlotsGrid({required this.slots});
+  const _TimeSlotsGrid({
+    required this.slots,
+    this.selectedLabel,
+    this.onSlotTap,
+  });
 
   final List<TimeSlot> slots;
+  final String? selectedLabel;
+  final ValueChanged<String>? onSlotTap;
 
   @override
   Widget build(BuildContext context) {
@@ -895,7 +970,12 @@ class _TimeSlotsGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       children: [
         for (final slot in slots)
-          _SlotButton(label: slot.label, isAvailable: slot.isAvailable),
+          _SlotButton(
+            label: slot.label,
+            isAvailable: slot.isAvailable,
+            isSelected: slot.label == selectedLabel,
+            onTap: slot.isAvailable ? () => onSlotTap?.call(slot.label) : null,
+          ),
       ],
     );
   }
@@ -904,10 +984,17 @@ class _TimeSlotsGrid extends StatelessWidget {
 /// Individual time-slot button — filled primary if
 /// available, grey if unavailable.
 class _SlotButton extends StatelessWidget {
-  const _SlotButton({required this.label, required this.isAvailable});
+  const _SlotButton({
+    required this.label,
+    required this.isAvailable,
+    this.isSelected = false,
+    this.onTap,
+  });
 
   final String label;
   final bool isAvailable;
+  final bool isSelected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -916,6 +1003,7 @@ class _SlotButton extends StatelessWidget {
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
 
+    // Unavailable slot — greyed out, not tappable.
     if (!isAvailable) {
       return Container(
         decoration: BoxDecoration(
@@ -935,22 +1023,29 @@ class _SlotButton extends StatelessWidget {
       );
     }
 
-    return Material(
-      color: colorScheme.primary,
-      borderRadius: AppDimens.radiusMediumSmall,
-      elevation: 2,
-      shadowColor: colorScheme.primary.withValues(alpha: 0.2),
-      child: InkWell(
-        borderRadius: AppDimens.radiusMediumSmall,
-        onTap: () {},
-        child: Container(
-          alignment: Alignment.center,
-          child: Text(
-            label,
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.w500,
-            ),
+    // Selected slot — filled primary with ring.
+    // Available slot — outlined primary.
+    final bgColor = isSelected ? colorScheme.primary : Colors.transparent;
+    final textColor = isSelected ? colorScheme.onPrimary : colorScheme.primary;
+    final border = isSelected
+        ? null
+        : Border.all(color: colorScheme.primary.withValues(alpha: 0.4));
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: AppDimens.radiusMediumSmall,
+          border: border,
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: textTheme.bodySmall?.copyWith(
+            color: textColor,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),

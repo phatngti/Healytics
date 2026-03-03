@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { ServiceTagsService } from './service-tags.service';
-import { ServiceTag } from '@/common/entities/service-tag.entity';
+import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
 import { ProductTag } from '@/common/entities/product-tag.entity';
 import { CreateServiceTagHandler } from './application/handlers/create-service-tag.handler';
 import { UpdateServiceTagHandler } from './application/handlers/update-service-tag.handler';
@@ -19,7 +19,7 @@ import {
 
 describe('ServiceTagsService', () => {
   let service: ServiceTagsService;
-  let serviceTagRepository: MockRepository<ServiceTag>;
+  let serviceTagRepository: MockRepository<ProductFeatureTag>;
   let productTagRepository: MockRepository<ProductTag>;
   let createServiceTagHandler: MockHandler;
   let updateServiceTagHandler: MockHandler;
@@ -29,7 +29,7 @@ describe('ServiceTagsService', () => {
 
   beforeEach(async () => {
     // Arrange - Create fresh mocks for each test
-    serviceTagRepository = createMockRepository<ServiceTag>();
+    serviceTagRepository = createMockRepository<ProductFeatureTag>();
     productTagRepository = createMockRepository<ProductTag>();
     createServiceTagHandler = createMockHandler();
     updateServiceTagHandler = createMockHandler();
@@ -41,7 +41,7 @@ describe('ServiceTagsService', () => {
       providers: [
         ServiceTagsService,
         {
-          provide: getRepositoryToken(ServiceTag),
+          provide: getRepositoryToken(ProductFeatureTag),
           useValue: serviceTagRepository,
         },
         {

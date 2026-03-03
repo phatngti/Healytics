@@ -19,6 +19,7 @@ Name | Type | Description | Notes
 **gender** | **String** | Gender | [optional] 
 **status** | **String** | Status of the employee | [optional] 
 **branchId** | **String** | Branch ID the employee belongs to | [optional] 
+**partnerId** | **String** | Partner ID the employee belongs to | [optional] 
 **profile** | [**TherapistProfileDto**](TherapistProfileDto.md) | Therapist profile information | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

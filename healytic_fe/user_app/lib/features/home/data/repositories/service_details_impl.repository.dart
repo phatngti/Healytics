@@ -1,4 +1,3 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/home/data/datasources/remote/service_details_remote_datasource.dart';
 import 'package:user_app/features/home/domain/entities/service_details.entity.dart';
 import 'package:user_app/features/home/domain/repositories/service_details.repository.dart';
@@ -14,12 +13,21 @@ class ServiceDetailsImplRepository implements ServiceDetailsRepository {
   Future<ServiceDetailsEntity> getServiceDetails(String serviceId) async {
     return remoteDatasource.getServiceDetails(serviceId);
   }
-}
 
-/// Provider wiring the repository to its datasource.
-final serviceDetailsRepositoryProvider = Provider<ServiceDetailsRepository>((
-  ref,
-) {
-  final remoteDatasource = ref.read(serviceDetailsRemoteDatasourceProvider);
-  return ServiceDetailsImplRepository(remoteDatasource: remoteDatasource);
-});
+  @override
+  Future<List<SpecialistEntity>> getServiceEmployees(String serviceId) async {
+    return remoteDatasource.getServiceEmployees(serviceId);
+  }
+
+  @override
+  Future<List<ReviewEntity>> getServiceReviews(String serviceId) async {
+    return remoteDatasource.getServiceReviews(serviceId);
+  }
+
+  @override
+  Future<List<RecommendedServiceEntity>> getRecommendedServices(
+    String serviceId,
+  ) async {
+    return remoteDatasource.getRecommendedServices(serviceId);
+  }
+}

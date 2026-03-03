@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/utils/demensions.dart';
 
 import '../providers/chat.provider.dart';
+import '../widgets/chat/chat_empty_state.widget.dart';
 import '../widgets/chat/chat_header.widget.dart';
 import '../widgets/chat/chat_input_bar.widget.dart';
 import '../widgets/chat/chat_message_bubble.widget.dart';
+import '../widgets/chat/chat_scroll_to_bottom_fab.widget.dart';
 import '../widgets/chat/chat_suggestion_chips.widget.dart';
 import '../widgets/chat/chat_timestamp.widget.dart';
+import '../widgets/chat/chat_typing_indicator.widget.dart';
 
-/// The main chatbot screen that composes all chat sub-widgets.
+/// Telegram-style chatbot screen.
 ///
-/// Structure:
-/// - [ChatHeader] as appBar
-/// - Body: [Stack] with a [ListView] of messages and a bottom-
-///   pinned overlay containing [ChatSuggestionChips] and
-///   [ChatInputBar].
-///
-/// All dimensions use [AppDimens] responsive helpers and
-/// [MediaQuery] text-scale clamping per the design system rules.
+/// Composed of:
+/// - [ChatHeader] appBar (frosted glass)
+/// - Message list (scrollable)
+/// - Sticky bottom with suggestion chips + input bar
+/// - Scroll-to-bottom FAB when scrolled up
+/// - Empty state when no messages exist
+/// - Typing indicator while bot is responding
 class ChatPage extends HookConsumerWidget {
   final String? conversationId;
   const ChatPage({super.key, this.conversationId});
@@ -29,147 +32,187 @@ class ChatPage extends HookConsumerWidget {
     final chatState = ref.watch(chatProvider(conversationId));
     final hPadding = AppDimens.horizontalPadding(context);
 
-    // Bottom overlay occupies ~160–180 dp; use adaptive value.
-    final bottomOverlaySpace = AppDimens.adaptive(
-      context,
-      small: 160,
-      medium: 170,
-      large: 180,
-    );
+    final scrollController = useScrollController();
+    final showFab = useState(false);
+
+    // Toggle FAB visibility on scroll.
+    useEffect(() {
+      void listener() {
+        if (!scrollController.hasClients) return;
+        final pos = scrollController.position;
+        showFab.value = pos.pixels < pos.maxScrollExtent - 80;
+      }
+
+      scrollController.addListener(listener);
+      return () => scrollController.removeListener(listener);
+    }, [scrollController]);
+
+    // Auto-scroll on new messages or streaming updates.
+    final prevCount = useRef(0);
+    final prevLastText = useRef('');
+    useEffect(() {
+      final count = chatState.messages.length;
+      final lastText = count > 0 ? chatState.messages.last.text : '';
+      final shouldScroll =
+          count > prevCount.value || lastText != prevLastText.value;
+
+      if (shouldScroll && scrollController.hasClients) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!scrollController.hasClients) return;
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+          );
+        });
+      }
+      prevCount.value = count;
+      prevLastText.value = lastText;
+      return null;
+    }, [chatState.messages]);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: const ChatHeader(),
       body: MediaQuery(
-        // Clamp text scale to prevent layout breaks on extreme
-        // system font sizes (0.8× – 1.3×).
         data: MediaQuery.of(context).copyWith(
           textScaler: MediaQuery.of(
             context,
           ).textScaler.clamp(minScaleFactor: 0.8, maxScaleFactor: 1.3),
         ),
-        child: _buildBody(
-          context,
-          ref,
-          chatState,
-          colorScheme,
-          hPadding,
-          bottomOverlaySpace,
+        child: Column(
+          children: [
+            // Messages area
+            Expanded(
+              child: _buildMessageArea(
+                context,
+                ref,
+                chatState,
+                colorScheme,
+                hPadding,
+                scrollController,
+                showFab.value,
+              ),
+            ),
+
+            // Suggestion chips
+            if (chatState.messages.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(top: AppDimens.spaceXs),
+                child: const ChatSuggestionChips(),
+              ),
+
+            // Input bar
+            ChatInputBar(
+              onSend: (text) => ref
+                  .read(chatProvider(conversationId).notifier)
+                  .sendMessage(text),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildBody(
+  Widget _buildMessageArea(
     BuildContext context,
     WidgetRef ref,
     ChatState chatState,
     ColorScheme colorScheme,
     double hPadding,
-    double bottomOverlaySpace,
+    ScrollController scrollController,
+    bool showFab,
   ) {
+    // Loading state
     if (chatState.isLoading && chatState.messages.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
 
+    // Error state
     if (chatState.error != null && chatState.messages.isEmpty) {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(hPadding),
-          child: Text(
-            chatState.error!,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: colorScheme.error),
-            textAlign: TextAlign.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                size: 48,
+                color: colorScheme.error.withValues(alpha: 0.6),
+              ),
+              SizedBox(height: AppDimens.spaceMd),
+              Text(
+                chatState.error!,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       );
     }
 
+    // Empty state
+    if (chatState.messages.isEmpty) {
+      return ChatEmptyState(
+        onSend: (text) =>
+            ref.read(chatProvider(conversationId).notifier).sendMessage(text),
+      );
+    }
+
+    // Messages list
     final messages = chatState.messages;
+    final itemCount = messages.length + 1 + (chatState.isLoading ? 1 : 0);
 
     return Stack(
       children: [
-        // ── Message list ──────────────────────────────────
-        ListView.separated(
-          padding: EdgeInsets.only(
-            left: hPadding,
-            right: hPadding,
-            top: AppDimens.spaceLg,
-            // Extra space so content doesn't hide behind
-            // the bottom overlay.
-            bottom: bottomOverlaySpace,
+        ListView.builder(
+          controller: scrollController,
+          padding: EdgeInsets.symmetric(
+            horizontal: hPadding,
+            vertical: AppDimens.spaceMd,
           ),
-          itemCount: messages.length + 1, // +1 for timestamp
-          separatorBuilder: (_, __) => SizedBox(height: AppDimens.spaceXl),
+          itemCount: itemCount,
           itemBuilder: (context, index) {
             if (index == 0) {
-              return const ChatTimestamp(label: 'Today, 9:41 AM');
+              return Padding(
+                padding: EdgeInsets.only(bottom: AppDimens.spaceMd),
+                child: const ChatTimestamp(label: 'Today, 9:41 AM'),
+              );
             }
-            return ChatMessageBubble(message: messages[index - 1]);
+            if (chatState.isLoading && index == messages.length + 1) {
+              return Padding(
+                padding: EdgeInsets.only(top: AppDimens.spaceSm),
+                child: const ChatTypingIndicator(),
+              );
+            }
+            return Padding(
+              padding: EdgeInsets.only(bottom: AppDimens.spaceSm),
+              child: ChatMessageBubble(
+                key: ValueKey(messages[index - 1].id),
+                message: messages[index - 1],
+              ),
+            );
           },
         ),
 
-        // ── Bottom overlay ────────────────────────────────
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: _BottomOverlay(
-            colorScheme: colorScheme,
-            onSend: (text) {
-              ref.read(chatProvider(conversationId).notifier).sendMessage(text);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Sticky bottom section containing suggestion chips, input bar,
-/// and a gradient fade at the top so messages fade smoothly.
-class _BottomOverlay extends StatelessWidget {
-  final ColorScheme colorScheme;
-  final ValueChanged<String>? onSend;
-  const _BottomOverlay({required this.colorScheme, this.onSend});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: const [0.0, 0.25, 1.0],
-          colors: [
-            colorScheme.surface.withValues(alpha: 0.0),
-            colorScheme.surface.withValues(alpha: 0.95),
-            colorScheme.surface,
-          ],
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.only(bottom: AppDimens.spaceSm),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AppDimens.verticalMedium,
-              const ChatSuggestionChips(),
-              AppDimens.verticalMediumSmall,
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDimens.horizontalPadding(context),
-                ),
-                child: ChatInputBar(onSend: onSend),
+        // Scroll-to-bottom FAB
+        if (showFab)
+          Positioned(
+            right: hPadding,
+            bottom: AppDimens.spaceSm,
+            child: ChatScrollToBottomFab(
+              onTap: () => scrollController.animateTo(
+                scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+      ],
     );
   }
 }

@@ -6,7 +6,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { ServiceTag } from '@/common/entities/service-tag.entity';
+import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
 import { ProductTag } from '@/common/entities/product-tag.entity';
 
 /**
@@ -34,7 +34,7 @@ export class AttachProductTagHandler {
 
     try {
       // 1. Hydration - Load aggregate with verification
-      const tag = await queryRunner.manager.findOne(ServiceTag, {
+      const tag = await queryRunner.manager.findOne(ProductFeatureTag, {
         where: { id: tagId },
       });
 
@@ -65,7 +65,7 @@ export class AttachProductTagHandler {
       const savedProductTag = await queryRunner.manager.save(ProductTag, productTag);
 
       // 5. Side Effect - Increment usage counter
-      await queryRunner.manager.increment(ServiceTag, { id: tagId }, 'usage', 1);
+      await queryRunner.manager.increment(ProductFeatureTag, { id: tagId }, 'usage', 1);
 
       await queryRunner.commitTransaction();
       this.logger.log(`Tag ${tagId} attached to product ${productId}`);
