@@ -18,6 +18,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, String, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
+from datetime import datetime, timezone
 
 from app.core.database import Base
 
@@ -47,7 +48,7 @@ class Conversation(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=text("now()"),
-        onupdate=datetime.utcnow,
+        onupdate=lambda: datetime.now(tz=timezone.utc),
     )
 
     def __repr__(self) -> str:
