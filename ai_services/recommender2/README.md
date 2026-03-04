@@ -2,6 +2,13 @@
 
 Hệ thống gợi ý dịch vụ sức khỏe sử dụng Vector Search 
 
+uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+
+user_id_samples:
+ 1fddc673-84d8-47c8-9ad1-d0db0d35b172
+ b02b2d8a-4aff-484c-90f2-867bc3f9d40b
+ 4a0bddc5-6fa9-4558-b31d-2896170091de
+
 ## 📁 Cấu trúc thư mục
 
 ```

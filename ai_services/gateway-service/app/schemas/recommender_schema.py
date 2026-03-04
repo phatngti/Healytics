@@ -13,7 +13,7 @@ class RecommendationItem(BaseModel):
 class RecommendationResponse(BaseModel):
     recommendations: List[RecommendationItem]
     total: int
-    timestamp: datetime
+    timestamp: str
 
 
 class HomeRecommenderRequest(BaseModel):

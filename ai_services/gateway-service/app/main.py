@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from app.api import chatbot_routes, recommender_routes, ner_routes, health_routes
-from app.database import engine, Base
+from app.core.database import engine, Base
 
 
 # ============================================================
@@ -16,15 +16,7 @@ from app.database import engine, Base
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
-    # ── STARTUP ──────────────────────────────────────────────
-    # Tạo tất cả bảng nếu chưa tồn tại
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-    yield  
-
-    # ── SHUTDOWN ─────────────────────────────────────────────
+    yield  # không cần startup logic
     await engine.dispose()
 
 
