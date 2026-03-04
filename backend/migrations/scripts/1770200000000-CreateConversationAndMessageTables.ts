@@ -90,7 +90,7 @@ export class CreateConversationAndMessageTables1770200000000
                     },
                     {
                         name: "created_at",
-                        type: "timestamp",
+                        type: "timestamptz",
                         default: "now()",
                     },
                 ],
