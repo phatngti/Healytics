@@ -19,6 +19,7 @@ class Chatbot_Recommender:
 if __name__ == "__main__":
     chatbot = Chatbot_Recommender("healytics_collection")
     results = chatbot.recommend(
-        "Bạn có thể gợi ý cho tôi các dịch vụ liên quan đến yoga không ?"
+        "Bạn có thể gợi ý cho tôi các dịch vụ liên quan đến yoga không ?",
+        top_k=3
     )
     print(results)

@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     # Khởi tạo trang home
     home = Home_Recommender("healytics_collection")
-    print(home.build_service_history_texts(services_history))
+    # print(home.build_service_history_texts(services_history))
     
-    results = home.recommend(health_conditions, interests, goals, services_history)
+    results = home.recommend(health_conditions, interests, goals, services_history_ids)
     print(results)
