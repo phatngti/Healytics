@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 from app.core.enums import SSEEventType
+from app.schemas.recommender_schema import ServiceDetail
 
 class ChatbotRequest(BaseModel):
     """
@@ -53,9 +54,8 @@ class RecommendationItem(BaseModel):
 
 class RecommendationEvent(BaseModel):
     event: SSEEventType = SSEEventType.RECOMMENDATION
-
     conversation_id: UUID
-    recommendations: List[RecommendationItem]
+    recommendations: List[ServiceDetail]   # ← đổi từ List[RecommendationItem]
     total: int
     timestamp: datetime
 
