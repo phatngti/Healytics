@@ -73,7 +73,7 @@ app.include_router(
 )
 
 # POST /ner/extract
-app.include_router(
-    ner_routes.router,
-    tags=["NER"],
-)
+# app.include_router(
+#     ner_routes.router,
+#     tags=["NER"],
+# )

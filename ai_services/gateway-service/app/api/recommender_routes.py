@@ -5,7 +5,7 @@ from app.schemas.recommender_schema import (
     HomeRecommenderRequest,
     ChatbotRecommenderRequest,
     RecommendationResponse, 
-    ChatbotRecommenderResponse,
+    ChatbotRecommendationResponse,
 )
 from app.orchestrators.recommendation_orchestrator import RecommendationOrchestrator
 
