@@ -20,6 +20,7 @@ Name | Type | Description | Notes
 **role** | **String** | Role of the employee | [optional] 
 **status** | **String** | Status of the employee | [optional] 
 **branchId** | **String** | Branch ID the employee belongs to | [optional] 
+**partnerId** | **String** | Partner ID the employee belongs to | [optional] 
 **doctorProfile** | [**CreateDoctorProfileDto**](CreateDoctorProfileDto.md) | Doctor profile data if role is DOCTOR | [optional] 
 **therapistProfile** | [**CreateTherapistProfileDto**](CreateTherapistProfileDto.md) | Therapist profile data if role is THERAPIST | [optional] 
 

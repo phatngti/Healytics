@@ -99,10 +99,9 @@ final List<ServiceTag> kMockServiceTags = [
   ),
 ];
 
-/// Mock products for development and testing.
+/// All mock products for development and testing.
 ///
-/// Includes both `service` and `physical` types so
-/// [HomeNotifier] can correctly split recommended vs premium.
+/// Includes both `service` and `physical` types.
 final List<HomeProduct> kMockProducts = [
   const HomeProduct(
     id: 'prod-1',
@@ -201,3 +200,13 @@ final List<HomeProduct> kMockProducts = [
     type: 'physical',
   ),
 ];
+
+/// Mock recommended products (non-service items).
+final List<HomeProduct> kMockRecommendedProducts = kMockProducts
+    .where((p) => p.type != 'service')
+    .toList();
+
+/// Mock premium treatments (service items).
+final List<HomeProduct> kMockPremiumTreatments = kMockProducts
+    .where((p) => p.type == 'service')
+    .toList();

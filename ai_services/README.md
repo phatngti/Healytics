@@ -18,10 +18,10 @@ StreamingResponse (SSE)
    ▼
 Browser EventSource
 
+
+
 2. Define request từ backend --> AI: CHATBOT
-- Đầu tiên User mở phiên chat:
-	+ Case 1: Chat mới thì UI gọi POST /generative_ai/stream và để trường history = None
-	+ Case 2: Chat cũ thì UI truy cập database để lấy history rồi truyền vào Request body
+
 
 - UI gọi:
 	POST /generative_ai/stream
@@ -29,7 +29,6 @@ Browser EventSource
 
 - Request body: 
 {
-  "request_id": "uuid-string",
   "conversation_id": "uuid-string",
   "user_id": "user-123",
   "message": "Tôi bị đau lưng ở quận 1",
@@ -43,7 +42,6 @@ Browser EventSource
    a. Streaming token
 	event: token
 	data: {
-	  "request_id": "uuid",
 	  "conversation_id": "uuid",
 	  "text": "Bạn",
 	  "index": 1
@@ -52,7 +50,6 @@ Browser EventSource
   b. NER location event
 	event: ner_location
 	data: {
-	  "request_id": "uuid",
 	  "conversation_id": "uuid",
 	  "entities": [
 	    {
@@ -79,7 +76,6 @@ Browser EventSource
   d. Done event
 	event: done
 	data: {
-	  "request_id": "uuid",
 	  "conversation_id": "uuid"
 	  "status": "completed"
 	}
@@ -87,7 +83,6 @@ Browser EventSource
   e. Error event
 	event: error
 	data: {
-	  "request_id": "uuid",
 	  "conversation_id": "uuid",
 	  "error_code": "MODEL_TIMEOUT" # Hoặc các lỗi khác như : RETRIEVER_ERROR, INVALID_INPUT, INTERNAL_ERROR
 	  "message": "Generation timeout"
@@ -101,14 +96,7 @@ Browser EventSource
 
 - Request body:
 {
-  "request_id": "uuid-string",
   "user_id": "user-123",
-  "user_profile": {
-    "health_conditions": ["tim mạch", "huyết áp cao"],
-    "interests": ["dinh dưỡng"],
-    "goals": ["giảm cholesterol", "ăn uống lành mạnh"]
-  },
-  "selected_services": ["SV001"],
   "top_k": 5
 }
 
@@ -130,7 +118,6 @@ Browser EventSource
 
 - Request body:
 {
-  "request_id": "uuid-string",
   "conversation_id": "conv-001",
   "query": "Tôi bị đau lưng mãn tính, cần tìm dịch vụ phục hồi",
   "top_k": 3

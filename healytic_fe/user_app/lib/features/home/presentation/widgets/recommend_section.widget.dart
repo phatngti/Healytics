@@ -3,19 +3,20 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
-import 'package:user_app/features/home/domain/entities/home.entity.dart';
-import 'package:user_app/features/home/presentation/providers/home_provider.dart';
+import 'package:user_app/features/home/domain/entities/'
+    'home.entity.dart';
+import 'package:user_app/features/home/presentation/'
+    'providers/home.provider.dart';
 
 /// Displays a horizontally-scrollable list of recommended
-/// services fetched from the data layer via [homeProvider].
+/// services fetched via [productsProvider].
 class RecommendSection extends ConsumerWidget {
   const RecommendSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final homeState = ref.watch(homeProvider);
-    final products = homeState.recommendedProducts;
+    final productsAsync = ref.watch(recommendedProductsProvider);
     final titleGap = AppDimens.titleGap(context);
 
     // Proportional card width: ~65 % of screen so
@@ -57,11 +58,16 @@ class RecommendSection extends ConsumerWidget {
         SizedBox(height: titleGap),
         SizedBox(
           height: listHeight,
-          child: homeState.isLoading
-              ? _LoadingList(cardWidth: cardWidth)
-              : products.isEmpty
-              ? const _EmptyState()
-              : _ProductList(products: products, cardWidth: cardWidth),
+          child: productsAsync.when(
+            loading: () => _LoadingList(cardWidth: cardWidth),
+            error: (_, __) => const _EmptyState(),
+            data: (products) {
+              if (products.isEmpty) {
+                return const _EmptyState();
+              }
+              return _ProductList(products: products, cardWidth: cardWidth);
+            },
+          ),
         ),
       ],
     );

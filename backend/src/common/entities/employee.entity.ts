@@ -6,6 +6,8 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToOne,
+  ManyToOne,
+  JoinColumn,
   Index,
 } from 'typeorm';
 import { EmployeeRole } from '@/employees/enum/employee-role.enum';
@@ -13,6 +15,7 @@ import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
 import { Gender } from '@/employees/enum/gender.enum';
 import { DoctorProfile } from './doctor-profile.entity';
 import { TherapistProfile } from './therapist-profile.entity';
+import { Partner } from './partner.entity';
 
 @Entity('employees')
 export class Employee {
@@ -89,6 +92,14 @@ export class Employee {
   @Index()
   @Column({ name: 'branch_id', type: 'uuid', nullable: true })
   branchId: string;
+
+  @Index()
+  @Column({ name: 'partner_id', type: 'uuid', nullable: true })
+  partnerId: string | null;
+
+  @ManyToOne(() => Partner, (partner) => partner.employees, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'partner_id' })
+  partner: Partner | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
