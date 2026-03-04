@@ -1,6 +1,7 @@
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:user_app/features/home/domain/entities/service_details.entity.dart';
 import 'package:user_app/features/home/presentation/providers/service_details.provider.dart';
 import 'package:user_app/features/home/presentation/widgets/service_details/review_card.widget.dart';
 
@@ -16,7 +17,12 @@ class ReviewsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncDetails = ref.watch(serviceDetailsProvider(serviceId));
+    final asyncReviews = ref.watch(
+      serviceReviewsProvider(serviceId: serviceId),
+    );
+    final asyncDetails = ref.watch(
+      serviceDetailsProvider(serviceId: serviceId),
+    );
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -28,12 +34,12 @@ class ReviewsScreen extends ConsumerWidget {
         backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
       ),
-      body: asyncDetails.when(
+      body: asyncReviews.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) =>
             Center(child: Text('Failed to load reviews: $error')),
-        data: (details) {
-          if (details.reviews.isEmpty) {
+        data: (reviews) {
+          if (reviews.isEmpty) {
             return Center(
               child: Text(
                 'No reviews yet',
@@ -44,8 +50,11 @@ class ReviewsScreen extends ConsumerWidget {
             );
           }
 
+          final rating = asyncDetails.value?.rating ?? 0.0;
+
           return _ReviewsList(
-            details: details,
+            reviews: reviews,
+            rating: rating,
             colorScheme: colorScheme,
             textTheme: textTheme,
           );
@@ -59,12 +68,14 @@ class ReviewsScreen extends ConsumerWidget {
 /// review cards.
 class _ReviewsList extends StatelessWidget {
   const _ReviewsList({
-    required this.details,
+    required this.reviews,
+    required this.rating,
     required this.colorScheme,
     required this.textTheme,
   });
 
-  final dynamic details;
+  final List<ReviewEntity> reviews;
+  final double rating;
   final ColorScheme colorScheme;
   final TextTheme textTheme;
 
@@ -77,15 +88,15 @@ class _ReviewsList extends StatelessWidget {
         horizontal: hPad,
         vertical: AppDimens.spaceLg,
       ),
-      itemCount: details.reviews.length + 1,
+      itemCount: reviews.length + 1,
       itemBuilder: (context, index) {
         // ── Rating summary header ──
         if (index == 0) {
           return Padding(
             padding: const EdgeInsets.only(bottom: AppDimens.spaceLg),
             child: _RatingSummary(
-              rating: details.rating,
-              reviewCount: details.reviews.length,
+              rating: rating,
+              reviewCount: reviews.length,
               colorScheme: colorScheme,
               textTheme: textTheme,
             ),
@@ -95,7 +106,7 @@ class _ReviewsList extends StatelessWidget {
         // ── Review card ──
         return Padding(
           padding: const EdgeInsets.only(bottom: AppDimens.spaceLg),
-          child: ReviewCard(review: details.reviews[index - 1]),
+          child: ReviewCard(review: reviews[index - 1]),
         );
       },
     );

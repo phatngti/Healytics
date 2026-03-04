@@ -39,7 +39,7 @@ class HomeUpdatePage extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                HomeHeader(userName: userName),
+                HomeHeader(userName: userName ?? ''),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: hPadding),
                   child: Column(

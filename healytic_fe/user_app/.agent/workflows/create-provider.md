@@ -1,6 +1,6 @@
 # Create Provider
 
-Description: Creates a new Riverpod provider using code generation, following project patterns for either data or presentation layer.
+Description: Creates a new Riverpod 3.0 provider using code generation, following project patterns for either data or presentation layer.
 
 ## Input Required
 - `<provider_name>`: Provider name (PascalCase, e.g., `ProductList`)
@@ -21,7 +21,7 @@ Description: Creates a new Riverpod provider using code generation, following pr
    part '<name>.provider.g.dart';
 
    @riverpod
-   <RepositoryType> <repositoryName>(ref) {
+   <RepositoryType> <repositoryName>(Ref ref) {
      final useMock = ref.read(useMockProvider);
      final dataSource = useMock
          ? <DataSourceMock>()
@@ -41,7 +41,7 @@ Description: Creates a new Riverpod provider using code generation, following pr
    part '<name>.provider.g.dart';
 
    @riverpod
-   Future<List<ItemEntity>> <providerName>(ref) async {
+   Future<List<ItemEntity>> <providerName>(Ref ref) async {
      final repo = ref.read(<repository>Provider);
      return repo.getItems();
    }
@@ -63,8 +63,11 @@ Description: Creates a new Riverpod provider using code generation, following pr
        try {
          final repo = ref.read(<repository>Provider);
          final data = await repo.getData();
+         // Always check mounted after await
+         if (!ref.mounted) return;
          state = <StateType>.loaded(data);
        } catch (e) {
+         if (!ref.mounted) return;
          state = <StateType>.error(e.toString());
        }
      }
@@ -88,6 +91,8 @@ Description: Creates a new Riverpod provider using code generation, following pr
 
 ## Rules
 - Always use `@riverpod` annotations — never write providers manually.
+- Always use unified `Ref ref` — never typed refs like `<Name>Ref`.
+- Always check `ref.mounted` after `await` in notifier methods.
 - Data providers inject data sources into repositories.
 - Presentation providers call repositories, never data sources directly.
 - Use `ref.watch` in `build()`, `ref.read` in callbacks.

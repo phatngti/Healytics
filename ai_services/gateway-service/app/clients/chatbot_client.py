@@ -1,4 +1,4 @@
-# app/clients/chatbot_client.py
+# ai_services/gateway-service/app/clients/chatbot_client.py
 
 from typing import AsyncGenerator, Dict, Any
 import httpx
@@ -15,6 +15,7 @@ class ChatbotClient(BaseClient):
     def __init__(self):
         super().__init__(settings.CHATBOT_SERVICE_URL)
 
+    # Ta cần cung cấp (history, current_user_message, recommendation)
     async def stream_chat(self, payload: Dict[str, Any],) -> AsyncGenerator[str, None]:
         """
         Stream raw token từ chatbot-service.

@@ -5,16 +5,36 @@ import { Category } from '@/common/entities/category.entity';
 import { ISeeder } from '../seeder.interface';
 
 const SEED_CATEGORIES = [
-  { name: 'Rehabilitation Massage', slug: 'rehabilitation-massage', description: 'Therapeutic rehabilitation massage services' },
-  { name: 'Relaxation Massage', slug: 'relaxation-massage', description: 'Relaxation and stress-relief massage services' },
-  { name: 'Spa & Beauty', slug: 'spa-beauty', description: 'Spa treatments and beauty care services' },
-  { name: 'Dental', slug: 'dental', description: 'General and cosmetic dental services' },
-  { name: 'Dermatology', slug: 'dermatology', description: 'Dermatology and aesthetic skin treatments' },
-  { name: 'Traditional Medicine', slug: 'traditional-medicine', description: 'Traditional and herbal medicine services' },
-  { name: 'Psychology', slug: 'psychology', description: 'Psychology and mental health therapy services' },
-  { name: 'Nutrition', slug: 'nutrition', description: 'Nutritional counseling and dietary services' },
-  { name: 'Fitness', slug: 'fitness', description: 'Fitness, gym and yoga services' },
-  { name: 'Pharmacy', slug: 'pharmacy', description: 'Pharmaceutical products and services' },
+  {
+    name: 'Relaxation Massage',
+    slug: 'relaxation-massage',
+    description: 'Stress-relief and relaxation massage services',
+    imageUrl: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600',
+  },
+  {
+    name: 'Rehabilitation Massage',
+    slug: 'rehabilitation-massage',
+    description: 'Therapeutic and rehabilitation massage services',
+    imageUrl: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600',
+  },
+  {
+    name: 'Spa & Beauty',
+    slug: 'spa-beauty',
+    description: 'Facial care, beauty treatments and spa services',
+    imageUrl: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600',
+  },
+  {
+    name: 'Dental Care',
+    slug: 'dental',
+    description: 'Professional dental treatment services',
+    imageUrl: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600',
+  },
+  {
+    name: 'Dermatology',
+    slug: 'dermatology',
+    description: 'Skincare and dermatology products',
+    imageUrl: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600',
+  },
 ];
 
 @Injectable()
@@ -43,6 +63,7 @@ export class CategorySeeder implements ISeeder {
         name: catData.name,
         slug: catData.slug,
         description: catData.description,
+        imageUrl: catData.imageUrl,
         isActive: true,
       });
 

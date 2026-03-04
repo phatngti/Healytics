@@ -86,7 +86,7 @@ class ProductRepositoryImpl implements ProductRepository {
 
 ```dart
 @riverpod
-ProductRepository productRepository(ref) {
+ProductRepository productRepository(Ref ref) {
   final useMock = ref.read(useMockProvider);
   final dataSource = useMock
       ? ProductRemoteDataSourceMock()

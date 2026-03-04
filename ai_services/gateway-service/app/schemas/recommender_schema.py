@@ -1,6 +1,8 @@
+# ai_services/gateway-service/app/schemas/recommender_schema.py
 from typing import List, Dict
 from uuid import UUID
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 
 class RecommendationItem(BaseModel):
@@ -11,6 +13,7 @@ class RecommendationItem(BaseModel):
 class RecommendationResponse(BaseModel):
     recommendations: List[RecommendationItem]
     total: int
+    timestamp: datetime
 
 
 class HomeRecommenderRequest(BaseModel):

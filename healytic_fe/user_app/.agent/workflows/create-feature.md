@@ -98,7 +98,7 @@ Description: Scaffolds a complete new feature module following Clean Architectur
 
 6. **Create repository implementation:** In `data/repositories/<feature_name>_impl.repository.dart`, implement the domain repository interface using the data source.
 
-7. **Create data provider:** In `data/provider/<feature_name>.provider.dart`, create a `@riverpod` provider that instantiates the repository with mock/real switching.
+7. **Create data provider:** In `data/provider/<feature_name>.provider.dart`, create a `@riverpod` provider (using `Ref ref`) that instantiates the repository with mock/real switching.
 
 8. **Create presentation provider:** In `presentation/providers/<feature_name>.provider.dart`, create a `@riverpod` notifier that manages the feature's UI state, calling the repository.
 
