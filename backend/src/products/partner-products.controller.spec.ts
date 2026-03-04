@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PartnerProductsController } from './partner-products.controller';
 import { ProductsService } from './products.service';
 import { MockType } from '../../test/mocks/mock-types';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreatePartnerProductDto } from './dto/partner/create-partner-product.dto';
+import { UpdatePartnerProductDto } from './dto/partner/update-partner-product.dto';
 import { ProductType } from './enums/product-type.enum';
 
 describe('PartnerProductsController', () => {
@@ -39,7 +39,7 @@ describe('PartnerProductsController', () => {
   describe('create', () => {
     it('should call service.create with DTO and return the created product', async () => {
       // Arrange
-      const createDto: CreateProductDto = {
+      const createDto: CreatePartnerProductDto = {
         name: 'Thai Massage',
         slug: 'thai-massage',
         type: ProductType.SERVICE,
@@ -61,7 +61,7 @@ describe('PartnerProductsController', () => {
     it('should call service.update with ID and DTO and return the updated product', async () => {
       // Arrange
       const id = 'uuid-1';
-      const updateDto: UpdateProductDto = { name: 'Updated Massage' };
+      const updateDto: UpdatePartnerProductDto = { name: 'Updated Massage' };
       const expectedProduct = { id, name: 'Updated Massage' };
       productsService.update!.mockResolvedValue(expectedProduct);
 

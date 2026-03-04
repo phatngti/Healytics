@@ -1,6 +1,8 @@
+# ai_services/gateway-service/app/schemas/ner_schema.py
 from typing import List
 from uuid import UUID
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 class NerRequest(BaseModel):
     conversation_id: UUID

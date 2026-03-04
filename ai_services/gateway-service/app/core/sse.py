@@ -1,4 +1,4 @@
-# app/core/sse.py
+# ai_services/gateway-service/app/core/sse.py
 """
 SSE (Server-Sent Events) Infrastructure Layer
 

@@ -17,6 +17,13 @@ void main() {
   // final instance = ChatbotApi();
 
   group('tests for ChatbotApi', () {
+    // Get paginated list of conversations
+    //
+    //Future<ConversationListResponseDto> chatbotControllerListConversations({ num page, num limit }) async
+    test('test chatbotControllerListConversations', () async {
+      // TODO
+    });
+
     // Send a message to the chatbot
     //
     //Future<SendMessageResponseDto> chatbotControllerSendMessage(SendMessageDto sendMessageDto) async
@@ -26,7 +33,7 @@ void main() {
 
     // Stream chatbot response via SSE
     //
-    //Future<ChatMessageResponseDto> chatbotControllerStreamChat(String conversationId) async
+    //Future chatbotControllerStreamChat(String conversationId) async
     test('test chatbotControllerStreamChat', () async {
       // TODO
     });

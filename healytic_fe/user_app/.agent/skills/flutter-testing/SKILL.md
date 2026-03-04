@@ -1,9 +1,9 @@
 ---
 name: flutter-testing
-description: Comprehensive testing skill for Flutter apps using the project's mock data source pattern. Covers unit tests, widget tests, integration tests, and Riverpod provider testing. Use when writing, reviewing, or debugging tests.
+description: Comprehensive testing skill for Flutter apps using the project's mock data source pattern. Covers unit tests, widget tests, integration tests, and Riverpod 3.0 provider testing with ProviderContainer.test, overrideWithBuild, and WidgetTester.container.
 ---
 
-# Flutter Testing
+# Flutter Testing (Riverpod 3.0)
 
 ## When to Use
 - Writing tests for new features or bug fixes.
@@ -98,27 +98,30 @@ void main() {
 
 **Important:** Use the project's built-in mock data source classes. They already exist in every `*_remote_datasource.dart` file. No need for mockito/mocktail unless testing edge cases the mock doesn't cover.
 
-## Riverpod Provider Tests
+## Riverpod 3.0 Provider Tests
+
+### `ProviderContainer.test` (auto-dispose)
+
+Replaces manual `ProviderContainer` + `addTearDown(dispose)`:
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   group('ProductListNotifier', () {
-    late ProviderContainer container;
-
-    setUp(() {
-      container = ProviderContainer(overrides: [
-        productRepositoryProvider.overrideWithValue(
-          ProductRepositoryImpl(ProductRemoteDataSourceMock()),
-        ),
-      ]);
-    });
-
-    tearDown(() => container.dispose());
-
     test('initial state loads products', () async {
+      // Auto-disposes after test — no tearDown needed
+      final container = ProviderContainer.test(
+        overrides: [
+          productRepositoryProvider.overrideWithValue(
+            ProductRepositoryImpl(
+              ProductRemoteDataSourceMock(),
+            ),
+          ),
+        ],
+      );
+
       final future = container.read(
         productListNotifierProvider.future,
       );
@@ -127,23 +130,78 @@ void main() {
     });
 
     test('refresh reloads data', () async {
+      final container = ProviderContainer.test(
+        overrides: [
+          productRepositoryProvider.overrideWithValue(
+            ProductRepositoryImpl(
+              ProductRemoteDataSourceMock(),
+            ),
+          ),
+        ],
+      );
+
       final notifier = container.read(
         productListNotifierProvider.notifier,
       );
       await notifier.refresh();
-      final state = container.read(productListNotifierProvider);
+      final state = container.read(
+        productListNotifierProvider,
+      );
       expect(state.hasValue, isTrue);
     });
   });
 }
 ```
 
+### `overrideWithBuild` — Mock Only `build()`
+
+Mock the initial state without replacing the whole notifier:
+
+```dart
+test('notifier starts with custom state', () {
+  final container = ProviderContainer.test(
+    overrides: [
+      myNotifierProvider.overrideWithBuild((ref) {
+        // Custom initial state; methods still work
+        return 42;
+      }),
+    ],
+  );
+
+  expect(container.read(myNotifierProvider), 42);
+  // Notifier methods like increment() still function
+  container.read(myNotifierProvider.notifier).increment();
+  expect(container.read(myNotifierProvider), 43);
+});
+```
+
+### `overrideWithValue` for Future/Stream Providers
+
+```dart
+test('override async provider with value', () {
+  final container = ProviderContainer.test(
+    overrides: [
+      myFutureProvider.overrideWithValue(
+        AsyncValue.data(42),
+      ),
+    ],
+  );
+
+  final state = container.read(myFutureProvider);
+  expect(state.value, 42);
+});
+```
+
 ## Widget Tests
+
+### Using `WidgetTester.container`
+
+Access the `ProviderContainer` inside widget tests:
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   group('ProductListScreen', () {
@@ -164,13 +222,23 @@ void main() {
       );
 
       // Initially shows loading
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(
+        find.byType(CircularProgressIndicator),
+        findsOneWidget,
+      );
 
       // Pump until async completes
       await tester.pumpAndSettle();
 
       // Shows products
       expect(find.byType(ProductCard), findsWidgets);
+
+      // Access container for assertions
+      final container = tester.container();
+      final state = container.read(
+        productListNotifierProvider,
+      );
+      expect(state.hasValue, isTrue);
     });
 
     testWidgets('tapping product navigates', (tester) async {
@@ -191,7 +259,9 @@ void main() {
 
 - **AAA Pattern:** Arrange (setUp), Act (call method), Assert (expect).
 - **Group related tests** with `group()`.
-- **Use setUp/tearDown** for common initialization.
+- **Use `ProviderContainer.test`** — no manual `dispose()` / `tearDown`.
+- **Use `overrideWithBuild`** to test notifier methods with custom initial state.
+- **Use `overrideWithValue`** for deterministic async provider states.
 - **Test error paths** — not just happy paths.
 - **Prefer built-in mocks** from data sources over mocking libraries.
 - **Widget tests:** Always wrap in `MaterialApp` and `ProviderScope`.
@@ -210,8 +280,10 @@ flutter test --name "should return products"    # By name
 
 - [ ] Tests cover happy path and error cases
 - [ ] Using project's built-in mock data sources
-- [ ] Provider tests use `ProviderContainer` with overrides
+- [ ] Provider tests use `ProviderContainer.test` (not manual container)
+- [ ] Using `overrideWithBuild` for notifier state mocking
 - [ ] Widget tests wrapped in `MaterialApp` + `ProviderScope`
+- [ ] `WidgetTester.container()` for in-test assertions
 - [ ] Async operations properly awaited
 - [ ] Test files follow naming: `*_test.dart`
 - [ ] Tests in mirror structure under `test/`

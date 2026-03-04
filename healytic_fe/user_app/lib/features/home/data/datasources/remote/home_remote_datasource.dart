@@ -10,19 +10,20 @@ import 'package:user_openapi/api.dart';
 
 abstract class HomeRemoteDatasource {
   Future<List<HomeCategory>> getCategories();
-  Future<List<HomeProduct>> getProducts();
+  Future<List<HomeProduct>> getRecommendedProducts();
+  Future<List<HomeProduct>> getPremiumTreatments();
   Future<List<ServiceTag>> getServiceTags();
 }
 
 class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   final CategoriesApi _categoriesApi;
-  final ProductsApi _productsApi;
   final ServiceTagsApi _serviceTagsApi;
+  final ProductsApi _productsApi;
 
   HomeRemoteDatasourceImpl(
     this._categoriesApi,
-    this._productsApi,
     this._serviceTagsApi,
+    this._productsApi,
   );
 
   @override
@@ -53,65 +54,66 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   }
 
   @override
-  Future<List<HomeProduct>> getProducts() async {
+  Future<List<HomeProduct>> getRecommendedProducts() async {
     try {
-      final response = await _productsApi.productsControllerFindAll();
+      final response = await _productsApi.productsControllerGetHomeRecommend();
+
       if (response == null) return [];
-
-      return response.map((dto) {
-        // Extract first media URL or fallback placeholder.
-        final imageUrl = dto.media.isNotEmpty
-            ? dto.media.first.url
-            : 'https://via.placeholder.com/150';
-
-        // Duration from service definition, default 30 min.
-        final durationMinutes = dto.serviceDefinition?.durationMinutes;
-        final duration = durationMinutes != null
-            ? '${durationMinutes.toInt()} min'
-            : '30 min';
-
-        final categoryName = dto.category?.name ?? 'Treatment';
-        final vendorName = dto.vendorName?.toString() ?? '';
-
-        // Map staff avatars from eligibilities.
-        final staffAvatars = dto.serviceEmployeeEligibilities
-            .map((e) => e.toJson()['employee'])
-            .whereType<Map<String, dynamic>>()
-            .map((emp) => emp['avatarUrl'] as String?)
-            .where((url) => url != null && url.isNotEmpty)
-            .cast<String>()
-            .toList();
-
-        return HomeProduct(
-          id: dto.id,
-          name: dto.name,
-          slug: dto.slug,
-          imageUrl: imageUrl,
-          category: categoryName,
-          duration: duration,
-          price: '${dto.basePrice.toInt()} ${dto.currency}',
-          rating: '4.9',
-          vendorName: vendorName,
-          staffAvatars: staffAvatars,
-          type: dto.type.value,
-        );
-      }).toList();
+      return response.map(_mapDtoToProduct).toList();
     } catch (e) {
-      debugPrint('Error fetching products: $e');
+      debugPrint('Error fetching recommended products: $e');
       return [];
     }
   }
 
+  @override
+  Future<List<HomeProduct>> getPremiumTreatments() async {
+    try {
+      final response = await _productsApi
+          .productsControllerGetPremiumTreatments();
+
+      if (response == null) return [];
+      return response.map(_mapDtoToProduct).toList();
+    } catch (e) {
+      debugPrint('Error fetching premium treatments: $e');
+      return [];
+    }
+  }
+
+  /// Maps a [PublicProductCardResponseDto] to a domain
+  /// [HomeProduct] entity.
+  HomeProduct _mapDtoToProduct(PublicProductCardResponseDto dto) {
+    return HomeProduct(
+      id: dto.id,
+      name: dto.name,
+      slug: dto.slug,
+      imageUrl: dto.imageUrl?.toString() ?? '',
+      category: dto.category,
+      duration: dto.duration,
+      price: dto.price,
+      rating: dto.rating,
+      vendorName: dto.vendorName,
+      location: dto.location,
+      staffAvatars: dto.staffAvatars,
+      type: dto.type,
+    );
+  }
+
   IconData _getIconForCategory(String slug) {
     if (slug.contains('spa')) return Symbols.spa;
-    if (slug.contains('wellness')) return Symbols.self_improvement;
-    if (slug.contains('fitness')) return Symbols.fitness_center;
+    if (slug.contains('wellness')) {
+      return Symbols.self_improvement;
+    }
+    if (slug.contains('fitness')) {
+      return Symbols.fitness_center;
+    }
     if (slug.contains('mental')) return Symbols.psychology;
-    if (slug.contains('therapy')) return Symbols.accessibility_new;
+    if (slug.contains('therapy')) {
+      return Symbols.accessibility_new;
+    }
     return Symbols.medical_services;
   }
 
-  // Note: These return category types that will map to theme colors in the UI
   String _getCategoryType(String slug) {
     if (slug.contains('spa')) return 'primary';
     if (slug.contains('wellness')) return 'secondary';
@@ -158,9 +160,15 @@ class HomeRemoteDatasourceMock implements HomeRemoteDatasource {
   }
 
   @override
-  Future<List<HomeProduct>> getProducts() async {
+  Future<List<HomeProduct>> getRecommendedProducts() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return kMockProducts;
+    return kMockRecommendedProducts;
+  }
+
+  @override
+  Future<List<HomeProduct>> getPremiumTreatments() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return kMockPremiumTreatments;
   }
 
   @override
@@ -182,7 +190,7 @@ final homeRemoteDatasourceProvider = Provider<HomeRemoteDatasource>((ref) {
   final apiService = ref.read(apiServiceProvider);
   return HomeRemoteDatasourceImpl(
     CategoriesApi(apiService.apiClient),
-    ProductsApi(apiService.apiClient),
     ServiceTagsApi(apiService.apiClient),
+    ProductsApi(apiService.apiClient),
   );
 });

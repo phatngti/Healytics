@@ -2,7 +2,7 @@ import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/home/domain/entities/service_details.entity.dart';
-import 'package:user_app/features/home/presentation/providers/recommended_services.provider.dart';
+import 'package:user_app/features/home/presentation/providers/service_details.provider.dart';
 
 /// Horizontally-scrollable "Recommended Services" carousel.
 ///
@@ -27,7 +27,9 @@ class RecommendedServicesSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncServices = ref.watch(recommendedServicesProvider(serviceId));
+    final asyncServices = ref.watch(
+      recommendedServicesProvider(serviceId: serviceId),
+    );
 
     return asyncServices.when(
       loading: SizedBox.shrink,

@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsDateString,
   IsNotEmpty,
+  IsUUID,
   ValidateNested,
   IsNumber,
   IsArray,
@@ -150,6 +151,11 @@ export class CreateEmployeeDto {
   @IsString()
   @IsOptional()
   branchId?: string;
+
+  @ApiPropertyOptional({ example: 'uuid-partner-id', description: 'Partner ID the employee belongs to' })
+  @IsUUID()
+  @IsOptional()
+  partnerId?: string;
 
   @ApiPropertyOptional({ type: CreateDoctorProfileDto, description: 'Doctor profile data if role is DOCTOR' })
   @IsOptional()

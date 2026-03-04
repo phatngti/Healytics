@@ -19,8 +19,29 @@ void main() {
   group('tests for PartnerProductsApi', () {
     // Create a new product
     //
-    //Future<ProductResponseDto> partnerProductsControllerCreate(CreateProductDto createProductDto) async
+    //Future<PartnerProductResponseDto> partnerProductsControllerCreate(CreatePartnerProductDto createPartnerProductDto) async
     test('test partnerProductsControllerCreate', () async {
+      // TODO
+    });
+
+    // Get all products
+    //
+    //Future<List<PartnerProductResponseDto>> partnerProductsControllerFindAll() async
+    test('test partnerProductsControllerFindAll', () async {
+      // TODO
+    });
+
+    // Get a product by slug
+    //
+    //Future<PartnerProductResponseDto> partnerProductsControllerFindBySlug(String slug) async
+    test('test partnerProductsControllerFindBySlug', () async {
+      // TODO
+    });
+
+    // Get full product details by slug
+    //
+    //Future<PartnerProductDetailResponseDto> partnerProductsControllerGetDetails(String slug) async
+    test('test partnerProductsControllerGetDetails', () async {
       // TODO
     });
 
@@ -33,7 +54,7 @@ void main() {
 
     // Update a product
     //
-    //Future<ProductResponseDto> partnerProductsControllerUpdate(String id, UpdateProductDto updateProductDto) async
+    //Future<PartnerProductResponseDto> partnerProductsControllerUpdate(String id, UpdatePartnerProductDto updatePartnerProductDto) async
     test('test partnerProductsControllerUpdate', () async {
       // TODO
     });

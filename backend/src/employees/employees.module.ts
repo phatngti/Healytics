@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeesService } from './employees.service';
-import { EmployeesController } from './employees.controller';
+import { PartnerEmployeesController } from './partner-employees.controller';
+import { UserEmployeesController } from './user-employees.controller';
 import { Employee } from '@/common/entities/employee.entity';
+import { Partner } from '@/common/entities/partner.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
 import { CreateDoctorHandler } from './application/handlers/create-doctor.handler';
@@ -12,9 +14,9 @@ import { RemoveEmployeeHandler } from './application/handlers/remove-employee.ha
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Employee, DoctorProfile, TherapistProfile]),
+    TypeOrmModule.forFeature([Employee, Partner, DoctorProfile, TherapistProfile]),
   ],
-  controllers: [EmployeesController],
+  controllers: [PartnerEmployeesController, UserEmployeesController],
   providers: [
     EmployeesService,
     CreateDoctorHandler,

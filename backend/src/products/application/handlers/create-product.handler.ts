@@ -5,12 +5,12 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { CreateProductDto } from '../../dto/create-product.dto';
+import { CreatePartnerProductDto } from '../../dto/partner/create-partner-product.dto';
 import { Product } from '@/common/entities/product.entity';
 import { ProductType } from '../../enums/product-type.enum';
 import { ProductMedia } from '@/common/entities/product-media.entity';
-import { ServiceDefinition } from '@/common/entities/service-definition.entity';
-import { ServiceEmployeeEligibility } from '@/common/entities/service-employee-eligibility.entity';
+import { ProductDefinition } from '@/common/entities/product-definition.entity';
+import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 import { ProductReview } from '@/common/entities/product-review.entity';
 
@@ -20,24 +20,23 @@ export class CreateProductHandler {
 
   constructor(private readonly dataSource: DataSource) {}
 
-  async execute(command: CreateProductDto): Promise<Product> {
+  async execute(command: CreatePartnerProductDto): Promise<Product> {
     this.logger.log(`Executing CreateProductHandler with name: ${command.name}`);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const { media, serviceDefinition, employeeIds, facilityImages, reviews, ...baseData } = command;
+      const { media, productDefinition, employeeIds, facilityImages, reviews, ...baseData } = command;
 
       // 1. Invariant Check (Validate)
-      if (baseData.type === ProductType.SERVICE && !serviceDefinition) {
+      if (baseData.type === ProductType.SERVICE && !productDefinition) {
         throw new ConflictException(
-          'Service definition is required for SERVICE type products',
+          'Product definition is required for SERVICE type products',
         );
       }
 
       // 2. Domain Action (Prepare Entity)
-      // Note: In strict DDD, this would be Product.create(...)
       const product = queryRunner.manager.create(Product, {
         ...baseData,
         currency: 'VND', // Hardcoded as per business rule defaults
@@ -57,13 +56,13 @@ export class CreateProductHandler {
         await queryRunner.manager.save(ProductMedia, mediaEntities);
       }
 
-      // Handle Service Definition - Relation Management
-      if (baseData.type === ProductType.SERVICE && serviceDefinition) {
-        const definitionEntity = queryRunner.manager.create(ServiceDefinition, {
-          ...serviceDefinition,
+      // Handle Product Definition - Relation Management
+      if (baseData.type === ProductType.SERVICE && productDefinition) {
+        const definitionEntity = queryRunner.manager.create(ProductDefinition, {
+          ...productDefinition,
           productId: savedProduct.id,
         });
-        await queryRunner.manager.save(ServiceDefinition, definitionEntity);
+        await queryRunner.manager.save(ProductDefinition, definitionEntity);
       }
 
       // Handle Staff Eligibility - Relation Management
@@ -73,14 +72,14 @@ export class CreateProductHandler {
         employeeIds.length > 0
       ) {
         const eligibilityEntities = employeeIds.map((eid) =>
-          queryRunner.manager.create(ServiceEmployeeEligibility, {
+          queryRunner.manager.create(ProductEmployeeEligibility, {
             productId: savedProduct.id,
             employeeId: eid,
             isPrimary: false,
           }),
         );
         await queryRunner.manager.save(
-          ServiceEmployeeEligibility,
+          ProductEmployeeEligibility,
           eligibilityEntities,
         );
       }
@@ -110,22 +109,14 @@ export class CreateProductHandler {
       await queryRunner.commitTransaction();
       this.logger.log(`Product created successfully: ${savedProduct.id}`);
 
-      // Re-fetch to return complete aggregate (or delegate this to a Query Handler/Service)
-      // The original service returned findOne(savedProduct.id).
-      // Ideally, Command Handlers return void or the ID, but for compatibility we return the entity.
-      // Since we are inside a transaction, we can fetch it using the queryRunner manager to be safe/consistent,
-      // but findOne usually queries cleanly. The original service called `this.findOne(savedProduct.id)`.
-      // We will duplicate the find logic here using the manager to ensure we see the uncommitted data if we weren't committing yet,
-      // but we just committed. So we can use the manager or just return what we have (but we need relations).
-      
       const completeProduct = await this.dataSource.manager.findOne(Product, {
         where: { id: savedProduct.id },
         relations: [
           'category',
           'media',
-          'serviceDefinition',
-          'serviceEmployeeEligibilities',
-          'serviceEmployeeEligibilities.employee',
+          'productDefinition',
+          'productEmployeeEligibilities',
+          'productEmployeeEligibilities.employee',
           'productTags',
           'productTags.tag',
           'reviews',

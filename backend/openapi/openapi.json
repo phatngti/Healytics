@@ -587,9 +587,9 @@
         ]
       }
     },
-    "/employees/doctors": {
+    "/partner/employees/doctors": {
       "post": {
-        "operationId": "EmployeesController_createDoctor",
+        "operationId": "PartnerEmployeesController_createDoctor",
         "summary": "Create a new doctor",
         "parameters": [],
         "requestBody": {
@@ -615,7 +615,7 @@
           }
         },
         "tags": [
-          "employees"
+          "Partner Employees"
         ],
         "security": [
           {
@@ -624,9 +624,9 @@
         ]
       }
     },
-    "/employees/therapists": {
+    "/partner/employees/therapists": {
       "post": {
-        "operationId": "EmployeesController_createTherapist",
+        "operationId": "PartnerEmployeesController_createTherapist",
         "summary": "Create a new therapist",
         "parameters": [],
         "requestBody": {
@@ -652,7 +652,7 @@
           }
         },
         "tags": [
-          "employees"
+          "Partner Employees"
         ],
         "security": [
           {
@@ -661,10 +661,10 @@
         ]
       }
     },
-    "/employees": {
+    "/partner/employees": {
       "get": {
-        "operationId": "EmployeesController_findAll",
-        "summary": "Get all employees",
+        "operationId": "PartnerEmployeesController_findAll",
+        "summary": "Get all employees for this partner",
         "parameters": [
           {
             "name": "role",
@@ -683,7 +683,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Return all employees.",
+            "description": "Return all employees for the authenticated partner.",
             "content": {
               "application/json": {
                 "schema": {
@@ -697,7 +697,7 @@
           }
         },
         "tags": [
-          "employees"
+          "Partner Employees"
         ],
         "security": [
           {
@@ -706,9 +706,9 @@
         ]
       }
     },
-    "/employees/{id}": {
+    "/partner/employees/{id}": {
       "get": {
-        "operationId": "EmployeesController_findOne",
+        "operationId": "PartnerEmployeesController_findOne",
         "summary": "Get an employee by id",
         "parameters": [
           {
@@ -736,7 +736,7 @@
           }
         },
         "tags": [
-          "employees"
+          "Partner Employees"
         ],
         "security": [
           {
@@ -745,7 +745,7 @@
         ]
       },
       "patch": {
-        "operationId": "EmployeesController_update",
+        "operationId": "PartnerEmployeesController_update",
         "summary": "Update an employee",
         "parameters": [
           {
@@ -783,7 +783,7 @@
           }
         },
         "tags": [
-          "employees"
+          "Partner Employees"
         ],
         "security": [
           {
@@ -792,7 +792,7 @@
         ]
       },
       "delete": {
-        "operationId": "EmployeesController_remove",
+        "operationId": "PartnerEmployeesController_remove",
         "summary": "Delete an employee",
         "parameters": [
           {
@@ -813,7 +813,91 @@
           }
         },
         "tags": [
-          "employees"
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/employees": {
+      "get": {
+        "operationId": "UserEmployeesController_findAll",
+        "summary": "Get all employees",
+        "parameters": [
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "DOCTOR",
+                "THERAPIST",
+                "RECEPTIONIST",
+                "MANAGER"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return all employees.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmployeeResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/employees/{id}": {
+      "get": {
+        "operationId": "UserEmployeesController_findOne",
+        "summary": "Get an employee by id",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return the employee.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found."
+          }
+        },
+        "tags": [
+          "User Employees"
         ],
         "security": [
           {
@@ -1053,24 +1137,194 @@
         ]
       }
     },
-    "/products": {
+    "/products/premium-treatments": {
       "get": {
-        "operationId": "ProductsController_findAll",
-        "summary": "Get all products",
+        "operationId": "ProductsController_getPremiumTreatments",
+        "summary": "Get premium treatments",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Return all products.",
+            "description": "Return list of premium treatments.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ProductResponseDto"
+                    "$ref": "#/components/schemas/PublicProductCardResponseDto"
                   }
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/products/home-recommend": {
+      "get": {
+        "operationId": "ProductsController_getHomeRecommend",
+        "summary": "Get home recommendations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return list of home recommended products.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicProductCardResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/products/{id}/info": {
+      "get": {
+        "operationId": "ProductsController_getProductInfo",
+        "summary": "Get product info by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return product info for the detail screen.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicProductInfoResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found."
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/products/{id}/employees": {
+      "get": {
+        "operationId": "ProductsController_getProductEmployees",
+        "summary": "Get employees for a product",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of eligible employees.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicProductEmployeeResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found."
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/products/{id}/reviews": {
+      "get": {
+        "operationId": "ProductsController_getProductReviews",
+        "summary": "Get reviews for a product",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of reviews.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicProductReviewResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found."
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/products/{id}/recommended": {
+      "get": {
+        "operationId": "ProductsController_getRecommendedProducts",
+        "summary": "Get recommended products",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of recommended products.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicProductRecommendedResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found."
           }
         },
         "tags": [
@@ -1098,7 +1352,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductResponseDto"
+                  "$ref": "#/components/schemas/PublicProductResponseDto"
                 }
               }
             }
@@ -1112,9 +1366,74 @@
         ]
       }
     },
-    "/products/slug/{slug}/details": {
+    "/partner/products": {
       "get": {
-        "operationId": "ProductsController_getDetails",
+        "operationId": "PartnerProductsController_findAll",
+        "summary": "Get all products",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return all products.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartnerProductResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "PartnerProductsController_create",
+        "summary": "Create a new product",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePartnerProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The product has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerProductResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/products/slug/{slug}/details": {
+      "get": {
+        "operationId": "PartnerProductsController_getDetails",
         "summary": "Get full product details by slug",
         "parameters": [
           {
@@ -1132,7 +1451,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductDetailResponseDto"
+                  "$ref": "#/components/schemas/PartnerProductDetailResponseDto"
                 }
               }
             }
@@ -1142,13 +1461,18 @@
           }
         },
         "tags": [
-          "Products"
+          "Partner Products"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
-    "/products/slug/{slug}": {
+    "/partner/products/slug/{slug}": {
       "get": {
-        "operationId": "ProductsController_findBySlug",
+        "operationId": "PartnerProductsController_findBySlug",
         "summary": "Get a product by slug",
         "parameters": [
           {
@@ -1166,45 +1490,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductResponseDto"
+                  "$ref": "#/components/schemas/PartnerProductResponseDto"
                 }
               }
             }
           },
           "404": {
             "description": "Product not found."
-          }
-        },
-        "tags": [
-          "Products"
-        ]
-      }
-    },
-    "/partner/products": {
-      "post": {
-        "operationId": "PartnerProductsController_create",
-        "summary": "Create a new product",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateProductDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The product has been successfully created.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProductResponseDto"
-                }
-              }
-            }
           }
         },
         "tags": [
@@ -1236,7 +1528,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateProductDto"
+                "$ref": "#/components/schemas/UpdatePartnerProductDto"
               }
             }
           }
@@ -1247,7 +1539,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductResponseDto"
+                  "$ref": "#/components/schemas/PartnerProductResponseDto"
                 }
               }
             }
@@ -1892,6 +2184,59 @@
         ]
       }
     },
+    "/chatbot/conversations": {
+      "get": {
+        "operationId": "ChatbotController_listConversations",
+        "summary": "Get paginated list of conversations",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated conversation list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "chatbot"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/chatbot/send": {
       "post": {
         "operationId": "ChatbotController_sendMessage",
@@ -1945,14 +2290,7 @@
         ],
         "responses": {
           "200": {
-            "description": "SSE stream of chat response tokens",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChatMessageResponseDto"
-                }
-              }
-            }
+            "description": "SSE stream of chatbot events"
           },
           "404": {
             "description": "Conversation not found or already consumed"
@@ -2524,7 +2862,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-02-24T15:45:25.677Z"
+              "submittedAt": "2026-03-03T05:48:12.294Z"
             }
           }
         },
@@ -3329,6 +3667,11 @@
             "example": "uuid-branch-id",
             "description": "Branch ID the employee belongs to"
           },
+          "partnerId": {
+            "type": "string",
+            "example": "uuid-partner-id",
+            "description": "Partner ID the employee belongs to"
+          },
           "profile": {
             "description": "Doctor profile information",
             "allOf": [
@@ -3480,6 +3823,10 @@
             "type": "number",
             "description": "Number of reviews"
           },
+          "partnerId": {
+            "type": "object",
+            "description": "Partner ID the employee belongs to"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
@@ -3587,6 +3934,11 @@
             "type": "string",
             "example": "uuid-branch-id",
             "description": "Branch ID the employee belongs to"
+          },
+          "partnerId": {
+            "type": "string",
+            "example": "uuid-partner-id",
+            "description": "Partner ID the employee belongs to"
           },
           "profile": {
             "description": "Therapist profile information",
@@ -3786,6 +4138,11 @@
             "example": "uuid-branch-id",
             "description": "Branch ID the employee belongs to"
           },
+          "partnerId": {
+            "type": "string",
+            "example": "uuid-partner-id",
+            "description": "Partner ID the employee belongs to"
+          },
           "doctorProfile": {
             "description": "Doctor profile data if role is DOCTOR",
             "allOf": [
@@ -3959,7 +4316,449 @@
           }
         }
       },
-      "ProductMediaDto": {
+      "PublicProductCardResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "name": {
+            "type": "string",
+            "example": "Deep Tissue Massage"
+          },
+          "slug": {
+            "type": "string",
+            "example": "deep-tissue-massage"
+          },
+          "imageUrl": {
+            "type": "object",
+            "example": "https://example.com/image.jpg"
+          },
+          "category": {
+            "type": "string",
+            "example": "Massage"
+          },
+          "duration": {
+            "type": "string",
+            "example": "60 min"
+          },
+          "price": {
+            "type": "string",
+            "example": "₫500,000"
+          },
+          "rating": {
+            "type": "string",
+            "example": "4.9"
+          },
+          "vendorName": {
+            "type": "string",
+            "example": "Healytics Spa"
+          },
+          "location": {
+            "type": "string",
+            "example": "District 1, HCMC"
+          },
+          "staffAvatars": {
+            "example": [
+              "https://example.com/avatar1.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "type": {
+            "type": "string",
+            "example": "service"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "category",
+          "duration",
+          "price",
+          "rating",
+          "vendorName",
+          "location",
+          "staffAvatars",
+          "type"
+        ]
+      },
+      "PublicCategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "name": {
+            "type": "string",
+            "example": "Spa & Massage"
+          },
+          "slug": {
+            "type": "string",
+            "example": "spa-massage"
+          },
+          "imageUrl": {
+            "type": "object",
+            "example": "https://example.com/category.jpg"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ]
+      },
+      "PublicFeatureTagDto": {
+        "type": "object",
+        "properties": {
+          "iconName": {
+            "type": "string",
+            "example": "schedule"
+          },
+          "label": {
+            "type": "string",
+            "example": "Pain Relief"
+          }
+        },
+        "required": [
+          "iconName",
+          "label"
+        ]
+      },
+      "PublicClinicDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Healytics Wellness Center"
+          },
+          "address": {
+            "type": "string",
+            "example": "123 Health Street, District 1, HCMC"
+          }
+        },
+        "required": [
+          "name",
+          "address"
+        ]
+      },
+      "PublicFacilityImageDto": {
+        "type": "object",
+        "properties": {
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/facility.jpg"
+          },
+          "label": {
+            "type": "string",
+            "example": "Treatment Room"
+          }
+        },
+        "required": [
+          "imageUrl",
+          "label"
+        ]
+      },
+      "PublicServiceTagDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "name": {
+            "type": "string",
+            "example": "Pain Relief"
+          },
+          "colorValue": {
+            "type": "string",
+            "example": "#FF4CAF50"
+          },
+          "description": {
+            "type": "object",
+            "example": "Pain management and relief services"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "colorValue"
+        ]
+      },
+      "PublicProductInfoResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/PublicCategoryDto"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.9
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 124
+          },
+          "price": {
+            "type": "string",
+            "example": "$350.00"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "example": true
+          },
+          "description": {
+            "type": "object"
+          },
+          "featureTags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicFeatureTagDto"
+            }
+          },
+          "clinic": {
+            "$ref": "#/components/schemas/PublicClinicDto"
+          },
+          "facilityImages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicFacilityImageDto"
+            }
+          },
+          "serviceTags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicServiceTagDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "category",
+          "images",
+          "rating",
+          "reviewCount",
+          "price",
+          "isVerified",
+          "featureTags",
+          "clinic",
+          "facilityImages",
+          "serviceTags"
+        ]
+      },
+      "PublicEmployeeTimeSlotDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "7:00 AM"
+          },
+          "isAvailable": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "label",
+          "isAvailable"
+        ]
+      },
+      "PublicProductEmployeeDayScheduleDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-02-25T00:00:00.000Z"
+          },
+          "isAvailable": {
+            "type": "boolean",
+            "example": true
+          },
+          "timeSlots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicEmployeeTimeSlotDto"
+            }
+          }
+        },
+        "required": [
+          "date",
+          "isAvailable",
+          "timeSlots"
+        ]
+      },
+      "PublicProductEmployeeResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "object"
+          },
+          "isSelected": {
+            "type": "boolean",
+            "example": false
+          },
+          "quote": {
+            "type": "object"
+          },
+          "degrees": {
+            "type": "object"
+          },
+          "languages": {
+            "type": "object"
+          },
+          "experience": {
+            "type": "object",
+            "example": "12 years"
+          },
+          "specializations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bio": {
+            "type": "object"
+          },
+          "daySchedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicProductEmployeeDayScheduleDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role",
+          "isSelected",
+          "daySchedules"
+        ]
+      },
+      "PublicProductReviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "reviewerName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5
+          },
+          "status": {
+            "type": "string",
+            "example": "Completed"
+          },
+          "date": {
+            "type": "string",
+            "example": "2025-05-11T00:00:00.000Z"
+          },
+          "text": {
+            "type": "string"
+          },
+          "imageUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "reviewerName",
+          "rating",
+          "status",
+          "date",
+          "text",
+          "imageUrls"
+        ]
+      },
+      "PublicProductRecommendedResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "object"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.9
+          },
+          "reviewLabel": {
+            "type": "string",
+            "example": "(500+ Reviews)"
+          },
+          "bookedLabel": {
+            "type": "string",
+            "example": "1.2k+ Booked"
+          },
+          "price": {
+            "type": "string",
+            "example": "350.000₫"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "rating",
+          "reviewLabel",
+          "bookedLabel",
+          "price"
+        ]
+      },
+      "PublicCategorySummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ]
+      },
+      "PublicProductMediaDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -3989,7 +4788,7 @@
           "sortOrder"
         ]
       },
-      "ServiceDefinitionDto": {
+      "PublicProductDefinitionDto": {
         "type": "object",
         "properties": {
           "productId": {
@@ -4022,7 +4821,7 @@
           "durationMinutes"
         ]
       },
-      "ServiceEmployeeEligibilityDto": {
+      "PublicProductEmployeeEligibilityDto": {
         "type": "object",
         "properties": {
           "productId": {
@@ -4044,7 +4843,7 @@
           "isPrimary"
         ]
       },
-      "ProductResponseDto": {
+      "PublicProductResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4114,7 +4913,7 @@
             "description": "Product category",
             "allOf": [
               {
-                "$ref": "#/components/schemas/CategorySummaryDto"
+                "$ref": "#/components/schemas/PublicCategorySummaryDto"
               }
             ]
           },
@@ -4122,22 +4921,22 @@
             "description": "Product media assets",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ProductMediaDto"
+              "$ref": "#/components/schemas/PublicProductMediaDto"
             }
           },
-          "serviceDefinition": {
-            "description": "Service definition for service products",
+          "productDefinition": {
+            "description": "Product definition for service products",
             "allOf": [
               {
-                "$ref": "#/components/schemas/ServiceDefinitionDto"
+                "$ref": "#/components/schemas/PublicProductDefinitionDto"
               }
             ]
           },
-          "serviceEmployeeEligibilities": {
+          "productEmployeeEligibilities": {
             "description": "Eligible employees for service",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ServiceEmployeeEligibilityDto"
+              "$ref": "#/components/schemas/PublicProductEmployeeEligibilityDto"
             }
           }
         },
@@ -4154,7 +4953,221 @@
           "updatedAt"
         ]
       },
-      "FeatureTagDto": {
+      "PartnerCategorySummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ]
+      },
+      "PartnerProductMediaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique media identifier"
+          },
+          "url": {
+            "type": "string",
+            "description": "Media URL"
+          },
+          "mediaType": {
+            "type": "string",
+            "description": "Media type (image, video, etc.)"
+          },
+          "isThumbnail": {
+            "type": "boolean",
+            "description": "Whether this is the thumbnail"
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "Sort order for display"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "sortOrder"
+        ]
+      },
+      "PartnerProductDefinitionDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "Product ID (primary key)"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "description": "Service duration in minutes"
+          },
+          "bufferMinutes": {
+            "type": "number",
+            "description": "Buffer time between appointments"
+          },
+          "maxCapacity": {
+            "type": "number",
+            "description": "Maximum capacity per slot"
+          },
+          "minLeadTimeHours": {
+            "type": "number",
+            "description": "Minimum lead time for booking (hours)"
+          },
+          "staffAssignmentType": {
+            "type": "string",
+            "description": "Staff assignment type"
+          }
+        },
+        "required": [
+          "productId",
+          "durationMinutes"
+        ]
+      },
+      "PartnerProductEmployeeEligibilityDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "Product ID"
+          },
+          "employeeId": {
+            "type": "string",
+            "description": "Employee ID"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary employee"
+          }
+        },
+        "required": [
+          "productId",
+          "employeeId",
+          "isPrimary"
+        ]
+      },
+      "PartnerProductResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique product identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Product name"
+          },
+          "slug": {
+            "type": "string",
+            "description": "URL-friendly slug"
+          },
+          "description": {
+            "type": "object",
+            "description": "Product description"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "physical",
+              "service"
+            ],
+            "description": "Product type"
+          },
+          "basePrice": {
+            "type": "number",
+            "description": "Base price in specified currency"
+          },
+          "salePrice": {
+            "type": "object",
+            "description": "Sale price if on discount"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code (ISO 4217)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "active",
+              "archived"
+            ],
+            "description": "Product status"
+          },
+          "isVisibleOnline": {
+            "type": "boolean",
+            "description": "Whether product is visible online"
+          },
+          "vendorName": {
+            "type": "object",
+            "description": "Vendor name"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update timestamp"
+          },
+          "category": {
+            "description": "Product category",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerCategorySummaryDto"
+              }
+            ]
+          },
+          "media": {
+            "description": "Product media assets",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerProductMediaDto"
+            }
+          },
+          "productDefinition": {
+            "description": "Product definition for service products",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerProductDefinitionDto"
+              }
+            ]
+          },
+          "productEmployeeEligibilities": {
+            "description": "Eligible employees for service",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerProductEmployeeEligibilityDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "type",
+          "basePrice",
+          "currency",
+          "status",
+          "isVisibleOnline",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PartnerFeatureTagDto": {
         "type": "object",
         "properties": {
           "iconName": {
@@ -4171,7 +5184,7 @@
           "label"
         ]
       },
-      "ClinicDto": {
+      "PartnerClinicDto": {
         "type": "object",
         "properties": {
           "name": {
@@ -4192,7 +5205,7 @@
           "address"
         ]
       },
-      "SpecialistDto": {
+      "PartnerSpecialistDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4238,7 +5251,7 @@
           "role"
         ]
       },
-      "TimeSlotDto": {
+      "PartnerTimeSlotDto": {
         "type": "object",
         "properties": {
           "time": {
@@ -4255,7 +5268,7 @@
           "available"
         ]
       },
-      "DayScheduleDto": {
+      "PartnerDayScheduleDto": {
         "type": "object",
         "properties": {
           "day": {
@@ -4269,7 +5282,7 @@
           "slots": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TimeSlotDto"
+              "$ref": "#/components/schemas/PartnerTimeSlotDto"
             }
           }
         },
@@ -4279,7 +5292,7 @@
           "slots"
         ]
       },
-      "FacilityImageDto": {
+      "PartnerFacilityImageDto": {
         "type": "object",
         "properties": {
           "imageUrl": {
@@ -4294,7 +5307,7 @@
           "label"
         ]
       },
-      "ReviewDto": {
+      "PartnerReviewDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4334,7 +5347,7 @@
           "text"
         ]
       },
-      "RecommendedServiceDto": {
+      "PartnerRecommendedServiceDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4364,7 +5377,7 @@
           "price"
         ]
       },
-      "ProductDetailResponseDto": {
+      "PartnerProductDetailResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4403,40 +5416,40 @@
           "featureTags": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/FeatureTagDto"
+              "$ref": "#/components/schemas/PartnerFeatureTagDto"
             }
           },
           "clinic": {
-            "$ref": "#/components/schemas/ClinicDto"
+            "$ref": "#/components/schemas/PartnerClinicDto"
           },
           "specialists": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SpecialistDto"
+              "$ref": "#/components/schemas/PartnerSpecialistDto"
             }
           },
           "daySchedules": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DayScheduleDto"
+              "$ref": "#/components/schemas/PartnerDayScheduleDto"
             }
           },
           "facilityImages": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/FacilityImageDto"
+              "$ref": "#/components/schemas/PartnerFacilityImageDto"
             }
           },
           "reviews": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ReviewDto"
+              "$ref": "#/components/schemas/PartnerReviewDto"
             }
           },
           "recommendedServices": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RecommendedServiceDto"
+              "$ref": "#/components/schemas/PartnerRecommendedServiceDto"
             }
           }
         },
@@ -4459,7 +5472,7 @@
           "recommendedServices"
         ]
       },
-      "CreateProductMediaDto": {
+      "CreatePartnerProductMediaDto": {
         "type": "object",
         "properties": {
           "url": {
@@ -4487,7 +5500,7 @@
           "url"
         ]
       },
-      "CreateServiceDefinitionDto": {
+      "CreatePartnerProductDefinitionDto": {
         "type": "object",
         "properties": {
           "durationMinutes": {
@@ -4520,7 +5533,7 @@
           "durationMinutes"
         ]
       },
-      "CreateProductFacilityImageDto": {
+      "CreatePartnerProductFacilityImageDto": {
         "type": "object",
         "properties": {
           "imageUrl": {
@@ -4541,7 +5554,7 @@
           "label"
         ]
       },
-      "CreateProductReviewDto": {
+      "CreatePartnerProductReviewDto": {
         "type": "object",
         "properties": {
           "reviewerName": {
@@ -4586,7 +5599,7 @@
           "text"
         ]
       },
-      "CreateProductDto": {
+      "CreatePartnerProductDto": {
         "type": "object",
         "properties": {
           "categoryId": {
@@ -4652,14 +5665,14 @@
             "description": "Product media (images/videos)",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreateProductMediaDto"
+              "$ref": "#/components/schemas/CreatePartnerProductMediaDto"
             }
           },
-          "serviceDefinition": {
-            "description": "Service definition (required if type is service)",
+          "productDefinition": {
+            "description": "Product definition (required if type is service)",
             "allOf": [
               {
-                "$ref": "#/components/schemas/CreateServiceDefinitionDto"
+                "$ref": "#/components/schemas/CreatePartnerProductDefinitionDto"
               }
             ]
           },
@@ -4667,14 +5680,14 @@
             "description": "Facility/clinic images",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreateProductFacilityImageDto"
+              "$ref": "#/components/schemas/CreatePartnerProductFacilityImageDto"
             }
           },
           "reviews": {
             "description": "Product reviews",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreateProductReviewDto"
+              "$ref": "#/components/schemas/CreatePartnerProductReviewDto"
             }
           }
         },
@@ -4684,7 +5697,7 @@
           "type"
         ]
       },
-      "UpdateProductDto": {
+      "UpdatePartnerProductDto": {
         "type": "object",
         "properties": {
           "categoryId": {
@@ -4750,14 +5763,14 @@
             "description": "Product media (images/videos)",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreateProductMediaDto"
+              "$ref": "#/components/schemas/CreatePartnerProductMediaDto"
             }
           },
-          "serviceDefinition": {
-            "description": "Service definition (required if type is service)",
+          "productDefinition": {
+            "description": "Product definition (required if type is service)",
             "allOf": [
               {
-                "$ref": "#/components/schemas/CreateServiceDefinitionDto"
+                "$ref": "#/components/schemas/CreatePartnerProductDefinitionDto"
               }
             ]
           },
@@ -4765,14 +5778,14 @@
             "description": "Facility/clinic images",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreateProductFacilityImageDto"
+              "$ref": "#/components/schemas/CreatePartnerProductFacilityImageDto"
             }
           },
           "reviews": {
             "description": "Product reviews",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreateProductReviewDto"
+              "$ref": "#/components/schemas/CreatePartnerProductReviewDto"
             }
           }
         }
@@ -5143,6 +6156,86 @@
         "type": "object",
         "properties": {}
       },
+      "ConversationListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Conversation identifier",
+            "example": "conv_001"
+          },
+          "title": {
+            "type": "string",
+            "description": "Auto-generated conversation title",
+            "example": "Headache treatment options"
+          },
+          "lastMessage": {
+            "type": "string",
+            "description": "Last message text in the conversation",
+            "example": "Try resting and staying hydrated."
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "ISO 8601 timestamp of the last message",
+            "example": "2026-03-01T14:30:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "lastMessage",
+          "timestamp"
+        ]
+      },
+      "ConversationListMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "description": "Current page number",
+            "example": 1
+          },
+          "limit": {
+            "type": "number",
+            "description": "Items per page",
+            "example": 10
+          },
+          "total": {
+            "type": "number",
+            "description": "Total number of conversations",
+            "example": 42
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total number of pages",
+            "example": 5
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "ConversationListResponseDto": {
+        "type": "object",
+        "properties": {
+          "conversations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConversationListItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/ConversationListMetaDto"
+          }
+        },
+        "required": [
+          "conversations",
+          "meta"
+        ]
+      },
       "SendMessageDto": {
         "type": "object",
         "properties": {
@@ -5178,43 +6271,6 @@
         "required": [
           "conversationId",
           "streamUrl"
-        ]
-      },
-      "ChatMessageResponseDto": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "The type of SSE event",
-            "enum": [
-              "start",
-              "token",
-              "end",
-              "error"
-            ],
-            "example": "token"
-          },
-          "content": {
-            "type": "string",
-            "description": "The content payload — a single token for \"token\" events, full message for \"end\"",
-            "example": "Regular"
-          },
-          "conversationId": {
-            "type": "string",
-            "description": "The conversation identifier",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "ISO 8601 timestamp of the event",
-            "example": "2026-02-20T12:30:00.000Z"
-          }
-        },
-        "required": [
-          "type",
-          "content",
-          "conversationId",
-          "timestamp"
         ]
       }
     }

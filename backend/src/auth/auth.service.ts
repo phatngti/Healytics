@@ -187,7 +187,7 @@ export class AuthService {
     const userEmail = user.email;
     const userRole = user.role;
     if (!userId) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('User ID is missing');
     }
     if (user.roleNotAllowed) {
       throw new ForbiddenException(
@@ -213,7 +213,7 @@ export class AuthService {
     const userEmail = user.email;
     const userRole = user.role;
     if (!userId) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Admin ID is missing');
     }
     if (user.roleNotAllowed) {
       throw new ForbiddenException(
@@ -240,7 +240,7 @@ export class AuthService {
     const userRole = user.role;
 
     if (!userId) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Partner ID is missing');
     }
 
     if (user.roleNotAllowed || userRole !== Role.HEALTH_PARTNER) {

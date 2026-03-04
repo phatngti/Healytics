@@ -1,4 +1,4 @@
-# app/clients/ner_client.py
+# ai_services/gateway-service/app/clients/ner_client.py
 
 from typing import Dict, Any
 

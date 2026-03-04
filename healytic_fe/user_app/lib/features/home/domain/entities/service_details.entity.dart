@@ -3,7 +3,12 @@
 // These classes are platform-agnostic — no Flutter or Riverpod
 // imports — keeping the domain layer testable in isolation.
 
-/// Aggregated data needed to render [ServiceDetailsScreen].
+/// Core service information returned by the
+/// service-info endpoint.
+///
+/// Does **not** include specialists, reviews, or
+/// recommendations — those come from separate
+/// API calls.
 class ServiceDetailsEntity {
   const ServiceDetailsEntity({
     required this.id,
@@ -17,11 +22,7 @@ class ServiceDetailsEntity {
     required this.description,
     required this.featureTags,
     required this.clinic,
-    required this.specialists,
-    required this.daySchedules,
     required this.facilityImages,
-    this.reviews = const [],
-    this.recommendedServices = const [],
   });
 
   final String id;
@@ -35,17 +36,7 @@ class ServiceDetailsEntity {
   final String description;
   final List<FeatureTagEntity> featureTags;
   final ClinicEntity clinic;
-  final List<SpecialistEntity> specialists;
-
-  /// Per-day schedules with bookable time slots.
-  final List<DayScheduleEntity> daySchedules;
   final List<FacilityImageEntity> facilityImages;
-
-  /// User-submitted reviews for this service.
-  final List<ReviewEntity> reviews;
-
-  /// Other services the user might be interested in.
-  final List<RecommendedServiceEntity> recommendedServices;
 
   @override
   String toString() {
@@ -58,11 +49,7 @@ class ServiceDetailsEntity {
         'description: $description, '
         'featureTags: $featureTags, '
         'clinic: $clinic, '
-        'specialists: $specialists, '
-        'daySchedules: $daySchedules, '
-        'facilityImages: $facilityImages, '
-        'reviews: $reviews, '
-        'recommendedServices: $recommendedServices)';
+        'facilityImages: $facilityImages)';
   }
 }
 
@@ -101,9 +88,14 @@ class RecommendedServiceEntity {
   final String price;
 }
 
-/// A specialist who can perform the treatment.
+/// A specialist (employee) who can perform the
+/// treatment.
+///
+/// Returned as a list from the
+/// `GET /services/:id/employees` endpoint.
 class SpecialistEntity {
   const SpecialistEntity({
+    required this.id,
     required this.name,
     required this.role,
     required this.imageUrl,
@@ -114,8 +106,11 @@ class SpecialistEntity {
     this.experience,
     this.specializations,
     this.bio,
+    this.daySchedules = const [],
   });
 
+  /// Unique employee identifier.
+  final String id;
   final String name;
   final String role;
   final String imageUrl;
@@ -132,6 +127,10 @@ class SpecialistEntity {
 
   /// Extended biography shown in the "Show More" panel.
   final String? bio;
+
+  /// Per-day schedules with bookable time slots
+  /// specific to this employee.
+  final List<DayScheduleEntity> daySchedules;
 }
 
 /// One day's schedule of bookable time slots.
@@ -193,10 +192,17 @@ class FacilityImageEntity {
 
 /// Basic clinic information.
 class ClinicEntity {
-  const ClinicEntity({required this.name, required this.address});
+  const ClinicEntity({
+    required this.name,
+    required this.address,
+    this.imageUrl = '',
+  });
 
   final String name;
   final String address;
+
+  /// Clinic cover / logo image URL.
+  final String imageUrl;
 }
 
 /// A user-submitted review for a service.

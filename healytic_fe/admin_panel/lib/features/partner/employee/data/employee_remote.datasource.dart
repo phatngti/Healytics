@@ -87,7 +87,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   /// The API service for making network requests.
   final ApiService apiService;
 
-  EmployeesApi get _employeesApi => apiService.employeesApi;
+  PartnerEmployeesApi get _employeesApi => apiService.employeesApi;
 
   @override
   Future<List<EmployeeEntity>> getEmployees(
@@ -96,7 +96,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    final response = await _employeesApi.employeesControllerFindAll();
+    final response = await _employeesApi.partnerEmployeesControllerFindAll();
     if (response == null) {
       return [];
     }
@@ -120,7 +120,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
   @override
   Future<int> getTotalRows() async {
-    final response = await _employeesApi.employeesControllerFindAll();
+    final response = await _employeesApi.partnerEmployeesControllerFindAll();
     final count = response?.length ?? 0;
 
     developer.log(
@@ -133,7 +133,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
   @override
   Future<EmployeeEntity> getEmployeeById(EmployeeId id) async {
-    final response = await _employeesApi.employeesControllerFindOne(
+    final response = await _employeesApi.partnerEmployeesControllerFindOne(
       id.value.toString(),
     );
     if (response == null) {
@@ -155,7 +155,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       branchId: request.branch,
     );
 
-    await _employeesApi.employeesControllerUpdate(
+    await _employeesApi.partnerEmployeesControllerUpdate(
       request.id.value.toString(),
       dto,
     );
@@ -168,7 +168,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
   @override
   Future<void> deleteEmployee(EmployeeId id) async {
-    await _employeesApi.employeesControllerRemove(id.value.toString());
+    await _employeesApi.partnerEmployeesControllerRemove(id.value.toString());
 
     developer.log('Deleted employee: $id', name: 'EmployeeRemoteDataSource');
   }
@@ -198,7 +198,9 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       profile: profile,
     );
 
-    final response = await _employeesApi.employeesControllerCreateDoctor(dto);
+    final response = await _employeesApi.partnerEmployeesControllerCreateDoctor(
+      dto,
+    );
     if (response == null) {
       throw EmployeeCreationException('Failed to create doctor');
     }
@@ -237,9 +239,8 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       profile: profile,
     );
 
-    final response = await _employeesApi.employeesControllerCreateTherapist(
-      dto,
-    );
+    final response = await _employeesApi
+        .partnerEmployeesControllerCreateTherapist(dto);
     if (response == null) {
       throw EmployeeCreationException('Failed to create spa therapist');
     }
@@ -279,9 +280,8 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       profile: profile,
     );
 
-    final response = await _employeesApi.employeesControllerCreateTherapist(
-      dto,
-    );
+    final response = await _employeesApi
+        .partnerEmployeesControllerCreateTherapist(dto);
     if (response == null) {
       throw EmployeeCreationException('Failed to create massage therapist');
     }
@@ -300,7 +300,9 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     required String role,
     int? limit,
   }) async {
-    final response = await _employeesApi.employeesControllerFindAll(role: role);
+    final response = await _employeesApi.partnerEmployeesControllerFindAll(
+      role: role,
+    );
     if (response == null) return [];
 
     final employees = response.map(_mapToEmployeeEntity).toList();

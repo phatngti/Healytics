@@ -8,14 +8,38 @@ part of 'chat.provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Manages the message list for the active conversation.
+/// Manages the message list for the active conversation
+/// with SSE streaming support.
+///
+/// Each SSE stream can produce **multiple** bot messages:
+/// - `token` events accumulate into a text message
+/// - `service_recommendation` / `ner_location` events
+///   each create a separate message
+/// - If tokens arrive after a rich event, a new text
+///   segment begins
 
 @ProviderFor(Chat)
 const chatProvider = ChatFamily._();
 
-/// Manages the message list for the active conversation.
+/// Manages the message list for the active conversation
+/// with SSE streaming support.
+///
+/// Each SSE stream can produce **multiple** bot messages:
+/// - `token` events accumulate into a text message
+/// - `service_recommendation` / `ner_location` events
+///   each create a separate message
+/// - If tokens arrive after a rich event, a new text
+///   segment begins
 final class ChatProvider extends $NotifierProvider<Chat, ChatState> {
-  /// Manages the message list for the active conversation.
+  /// Manages the message list for the active conversation
+  /// with SSE streaming support.
+  ///
+  /// Each SSE stream can produce **multiple** bot messages:
+  /// - `token` events accumulate into a text message
+  /// - `service_recommendation` / `ner_location` events
+  ///   each create a separate message
+  /// - If tokens arrive after a rich event, a new text
+  ///   segment begins
   const ChatProvider._({
     required ChatFamily super.from,
     required String? super.argument,
@@ -60,9 +84,17 @@ final class ChatProvider extends $NotifierProvider<Chat, ChatState> {
   }
 }
 
-String _$chatHash() => r'41057236b426aea84029b539ed40b87eb279d0bb';
+String _$chatHash() => r'71030df5acf3b46010276abba4455d9faa228f05';
 
-/// Manages the message list for the active conversation.
+/// Manages the message list for the active conversation
+/// with SSE streaming support.
+///
+/// Each SSE stream can produce **multiple** bot messages:
+/// - `token` events accumulate into a text message
+/// - `service_recommendation` / `ner_location` events
+///   each create a separate message
+/// - If tokens arrive after a rich event, a new text
+///   segment begins
 
 final class ChatFamily extends $Family
     with $ClassFamilyOverride<Chat, ChatState, ChatState, ChatState, String?> {
@@ -75,7 +107,15 @@ final class ChatFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// Manages the message list for the active conversation.
+  /// Manages the message list for the active conversation
+  /// with SSE streaming support.
+  ///
+  /// Each SSE stream can produce **multiple** bot messages:
+  /// - `token` events accumulate into a text message
+  /// - `service_recommendation` / `ner_location` events
+  ///   each create a separate message
+  /// - If tokens arrive after a rich event, a new text
+  ///   segment begins
 
   ChatProvider call(String? conversationId) =>
       ChatProvider._(argument: conversationId, from: this);
@@ -84,7 +124,15 @@ final class ChatFamily extends $Family
   String toString() => r'chatProvider';
 }
 
-/// Manages the message list for the active conversation.
+/// Manages the message list for the active conversation
+/// with SSE streaming support.
+///
+/// Each SSE stream can produce **multiple** bot messages:
+/// - `token` events accumulate into a text message
+/// - `service_recommendation` / `ner_location` events
+///   each create a separate message
+/// - If tokens arrive after a rich event, a new text
+///   segment begins
 
 abstract class _$Chat extends $Notifier<ChatState> {
   late final _$args = ref.$arg as String?;
