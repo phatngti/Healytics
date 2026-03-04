@@ -1,42 +1,26 @@
-# ai_services/gateway-service/app/orchestrators/chatbot_orchestrator.py
-"""
-1. get_or_create_conversation
-2. create_message (user)
-3. get_messages_by_conversation
-4. call ner_client (Hiện tại chưa cần thiết)
-5. call recommender_client (Bỏ vào prompt để chatbot giải thích + trả về event:service_recommendation để trả về cards trên UI)
-6. build enriched prompt
-7. chatbot_client.stream_chat()
-8. stream token → SSE (Chú ý là trả các event:token trước, sau khi chatbot trả lời hoàn chỉnh mới trả về event:recommendation để hiển thị cards sau)
-9. collect full response
-10. create_message (assistant)
-11. emit DONE
-"""
-
-
+# app/orchestrators/chatbot_orchestrator.py
+import logging
 from typing import AsyncGenerator, Optional, Dict, Any, List
 from datetime import datetime, timezone
 
 from app.repositories import conversation_repo, message_repo
 from app.clients.chatbot_client import ChatbotClient
 from app.clients.recommender_client import RecommenderClient
-from app.clients.ner_client import NERClient
 from app.core.sse import SSEEvent
 from app.core.enums import SSEEventType
 
+logger = logging.getLogger(__name__)
 
-
-# ---------------------------------------------------------------------------
-# Main chat orchestrator
-# ---------------------------------------------------------------------------
 
 class ChatbotOrchestrator:
-
 
     def __init__(self):
         self.chatbot_client = ChatbotClient()
         self.recommender_client = RecommenderClient()
-        self.ner_client = NERClient()
+
+        # Import ở đây để tránh circular import
+        from app.orchestrators.recommendation_orchestrator import RecommendationOrchestrator
+        self.recommendation_orchestrator = RecommendationOrchestrator()
 
     # ============================================
     # PUBLIC ENTRYPOINT
@@ -51,7 +35,7 @@ class ChatbotOrchestrator:
         # 1. Get or create conversation
         conversation = await conversation_repo.get_or_create_conversation(
             session=session,
-            conversation_id = str(request.conversation_id),
+            conversation_id=str(request.conversation_id),
             user_id=getattr(request, "user_id", None),
         )
 
@@ -63,49 +47,29 @@ class ChatbotOrchestrator:
             content=request.message,
         )
 
-        # 3️. Load conversation history
+        # 3. Load conversation history
         history = await message_repo.get_messages_by_conversation(
             session=session,
             conversation_id=conversation.id,
         )
 
-        # 4️. Call NER (optional)
-        ner_result = None
-        if request.enable_ner:
-            ner_result = await self._call_ner_safe(
-                conversation_id=str(request.conversation_id),
-                message=request.message,
-            )
-
-            if ner_result:
-                yield SSEEvent(
-                    SSEEventType.NER,
-                    {
-                        "conversation_id": str(request.conversation_id),
-                        "entities": ner_result.get("entities", []),
-                        "timestamp": datetime.now(timezone.utc).isoformat(),
-                    },
-                )
-
-        # 5️. Call Recommender (safe)
+        # 4. Call Recommender (optional)
         recommendation = None
         if request.enable_recommendation:
             recommendation = await self._call_recommender_safe(request)
 
-        # 6️. Build enriched prompt
+        # 5. Build enriched prompt — dùng thông tin chi tiết
         enriched_payload = self._build_chatbot_payload(
             history=history,
             user_message=request.message,
             recommendation=recommendation,
         )
 
-        # 7️. Stream LLM
+        # 6. Stream LLM tokens
         full_response = ""
-
         async for chunk in self.chatbot_client.stream_chat(enriched_payload):
             if chunk:
                 full_response += chunk
-
                 yield SSEEvent(
                     SSEEventType.TOKEN,
                     {
@@ -115,18 +79,20 @@ class ChatbotOrchestrator:
                     },
                 )
 
-        # 8️. Emit recommendation AFTER chatbot finished
+        # 7. Emit recommendation AFTER chatbot finished
+        # SSE trả về thông tin chi tiết để UI hiển thị cards
         if recommendation:
             yield SSEEvent(
                 SSEEventType.RECOMMENDATION,
                 {
-                    **recommendation,
                     "conversation_id": str(request.conversation_id),
+                    "recommendations": recommendation["services"],   # list service detail
+                    "total": len(recommendation["services"]),
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                 },
             )
 
-        # 9️. Persist assistant message
+        # 8. Persist assistant message
         if full_response:
             await message_repo.create_message(
                 session=session,
@@ -135,7 +101,7 @@ class ChatbotOrchestrator:
                 content=full_response,
             )
 
-        # 10. Emit DONE
+        # 9. Emit DONE
         yield SSEEvent(
             SSEEventType.DONE,
             {
@@ -149,37 +115,32 @@ class ChatbotOrchestrator:
     # PRIVATE HELPERS
     # ============================================
 
-    async def _call_ner_safe(
-        self,
-        conversation_id,
-        message: str,
-    ) -> Optional[Dict[str, Any]]:
-
-        try:
-            payload = {
-                "conversation_id": conversation_id,
-                "text": message,
-            }
-
-            return await self.ner_client.extract_entities(payload)
-
-        except Exception:
-            return None
-
-    async def _call_recommender_safe(self, request: Any):
-
+    async def _call_recommender_safe(self, request: Any) -> Optional[Dict[str, Any]]:
         try:
             payload = {
                 "conversation_id": str(request.conversation_id),
                 "query": request.message,
                 "top_k": request.top_k,
             }
+            result = await self.recommender_client.recommend_chatbot(payload=payload)
 
-            return await self.recommender_client.recommend_chatbot(
-                payload=payload
+            # Lấy service_ids từ kết quả thô
+            service_ids = (
+                result["recommendations"][0]["service_ids"]
+                if result.get("recommendations") else []
             )
 
-        except Exception:
+            # Enrich thành thông tin chi tiết
+            services = self.recommendation_orchestrator.get_enriched_services(service_ids)
+            services_text = self.recommendation_orchestrator.get_enriched_services_for_prompt(service_ids)
+
+            return {
+                "services": services,        # list dict chi tiết → dùng cho SSE
+                "services_text": services_text,  # string mô tả → dùng cho prompt
+            }
+
+        except Exception as e:
+            logger.warning(f"Recommender call failed: {e}")
             return None
 
     def _build_chatbot_payload(
@@ -189,23 +150,19 @@ class ChatbotOrchestrator:
         recommendation: Optional[Dict[str, Any]],
     ) -> Dict[str, Any]:
 
-        # Format history thành string
+        # Format history
         history_text = ""
         for msg in history:
             role = "User" if msg.role == "user" else "Assistant"
             history_text += f"{role}: {msg.content}\n"
 
-        # Format services — nếu không có thì để chuỗi rỗng
-        services_text = ""
-        if recommendation:
-            items = recommendation.get("recommendations", [])
-            for item in items:
-                ids = ", ".join(item.get("service_ids", []))
-                scores = item.get("scores", [])
-                services_text += f"- Service IDs: {ids} (scores: {scores})\n"
+        # Dùng thông tin chi tiết cho prompt — chatbot giải thích tốt hơn
+        services_text = recommendation["services_text"] if recommendation else ""
 
         return {
             "history": history_text,
             "services": services_text,   # rỗng → chatbot không đề cập gợi ý
             "question": user_message,
         }
+
+
