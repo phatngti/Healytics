@@ -230,3 +230,77 @@ That is enough for Phase 1 implementation.
 
 END OF SPEC
 
+
+========================================
+VIII. DATABASE SESSION — HOW IT WORKS
+========================================
+
+Common question: Is the session passed automatically?
+
+NO. FastAPI injects the session automatically into the endpoint function,
+but from there you must pass it down manually through each layer.
+
+
+Flow:
+
+    FastAPI request
+        │
+        ▼
+    Endpoint function
+        db: AsyncSession = Depends(get_db)
+        │   ↑ FastAPI creates and injects this automatically.
+        │     get_db commits on success, rolls back on error.
+        ▼
+    Orchestrator(session=db, ...)
+        │   ↑ You pass the session manually to the orchestrator.
+        │
+        ├── conversation_repo.get_or_create_conversation(db, ...)
+        ├── message_repo.create_message(db, ...)
+        └── message_repo.create_message(db, ...)
+            ↑ Repos receive session as a plain argument.
+
+
+Example endpoint:
+
+    @router.post("/chat/stream")
+    async def chat_stream(
+        request: ChatRequest,
+        db: AsyncSession = Depends(get_db),  # ← injected automatically by FastAPI
+    ):
+        return await chatbot_orchestrator.run(db, request)  # ← passed manually
+
+
+Example orchestrator:
+
+    async def run(session: AsyncSession, request: ChatRequest):
+        conv = await conversation_repo.get_or_create_conversation(
+            session, request.conversation_id, request.user_id
+        )
+        user_msg = await message_repo.create_message(
+            session,
+            conversation_id=conv.id,
+            role="user",
+            content=request.message,
+        )
+        # ... call LLM, stream response ...
+        await message_repo.create_message(
+            session,
+            conversation_id=conv.id,
+            role="assistant",
+            content=full_response,
+        )
+
+
+Why pass it manually?
+
+    All repo calls within one request share the same session
+    = the same transaction. If any step fails, get_db rolls
+    back everything — no partial writes are left committed.
+
+Important rules:
+
+    - Repos only call session.flush()  → writes to DB inside the transaction,
+      does NOT commit.
+    - The commit() is handled by get_db after the endpoint returns successfully.
+    - Never call session.commit() inside a repo.
+
