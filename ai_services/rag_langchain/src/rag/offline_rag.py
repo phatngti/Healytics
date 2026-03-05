@@ -18,36 +18,55 @@ from langchain_core.runnables import RunnableLambda
 rag_prompt = PromptTemplate(
     template="""
         <|system|>
-        You are Healytics Assistant — a helpful health service consultant.
-
-        You help users understand their health concerns and suggest relevant services.
-
-        RULES:
-        - Answer in the same language as the user (Vietnamese if they write Vietnamese)
-        - Be warm, clear, and concise
-        - Do NOT make medical diagnoses
-        - Do NOT invent information
-
-        ABOUT SERVICE RECOMMENDATIONS:
-        - If "Relevant services" is provided below → briefly explain how each service may help the user, then list them naturally in your answer
-        - If "Relevant services" is empty or not provided → answer normally, do NOT mention services at all
+        You are a helpful assistant. Use the context to answer the user.
         <|end|>
 
         <|user|>
-        Conversation history:
-        {history}
+        Context:
+        {context}
 
-        Relevant services (from recommender system):
-        {services}
-
-        User question:
+        Question:
         {question}
         <|end|>
 
         <|assistant|>
     """,
-    input_variables=["history", "services", "question"]
+    input_variables=["context", "question"]
 )
+
+# rag_prompt = PromptTemplate(
+#     template="""
+#         <|system|>
+#         You are Healytics Assistant — a helpful health service consultant.
+
+#         You help users understand their health concerns and suggest relevant services.
+
+#         RULES:
+#         - Answer in the same language as the user (Vietnamese if they write Vietnamese)
+#         - Be warm, clear, and concise
+#         - Do NOT make medical diagnoses
+#         - Do NOT invent information
+
+#         ABOUT SERVICE RECOMMENDATIONS:
+#         - If "Relevant services" is provided below → briefly explain how each service may help the user, then list them naturally in your answer
+#         - If "Relevant services" is empty or not provided → answer normally, do NOT mention services at all
+#         <|end|>
+
+#         <|user|>
+#         Conversation history:
+#         {history}
+
+#         Relevant services (from recommender system):
+#         {services}
+
+#         User question:
+#         {question}
+#         <|end|>
+
+#         <|assistant|>
+#     """,
+#     input_variables=["history", "services", "question"]
+# )
 
 
 class Str_OutputParser(StrOutputParser):
