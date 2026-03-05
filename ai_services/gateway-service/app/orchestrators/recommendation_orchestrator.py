@@ -111,11 +111,13 @@ class RecommendationOrchestrator:
         result = await self.recommender_client.recommend_home(payload)
 
         service_ids = result["recommendations"][0]["service_ids"] if result.get("recommendations") else []
-        scores = result["recommendations"][0]["scores"] if result.get("recommendations") else []
+
+        # Enrich service_ids → ServiceDetail
+        services = _enrich_with_service_info(service_ids)
 
         return {
-            "recommendations": [{"service_ids": service_ids, "scores": scores}],
-            "total": len(service_ids),
+            "recommendations": services,   # ← list ServiceDetail, không phải list RecommendationItem
+            "total": len(services),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
@@ -128,12 +130,14 @@ class RecommendationOrchestrator:
         result = await self.recommender_client.recommend_chatbot(payload)
 
         service_ids = result["recommendations"][0]["service_ids"] if result.get("recommendations") else []
-        scores = result["recommendations"][0]["scores"] if result.get("recommendations") else []
+
+        # Enrich
+        services = _enrich_with_service_info(service_ids)
 
         return {
             "conversation_id": str(request.conversation_id),
-            "recommendations": [{"service_ids": service_ids, "scores": scores}],
-            "total": len(service_ids),
+            "recommendations": services,   # ← list ServiceDetail
+            "total": len(services),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
