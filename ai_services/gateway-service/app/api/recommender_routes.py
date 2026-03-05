@@ -20,7 +20,7 @@ async def recommend_home(request: HomeRecommenderRequest):
     return await orchestrator.recommend_home(request)
 
 
-@router.post("/recommender/chatbot", response_model=ChatbotRecommenderResponse)
+@router.post("/recommender/chatbot", response_model=ChatbotRecommendationResponse)
 async def recommend_chatbot(request: ChatbotRecommenderRequest):
     """
     Chatbot recommender (non-stream).

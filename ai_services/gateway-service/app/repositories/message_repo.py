@@ -39,7 +39,7 @@ async def create_message(
         conversation_id=conversation_id,
         role=role,
         content=content,
-        created_at=datetime.now(tz=timezone.utc),
+        created_at=datetime.utcnow(),
     )
     session.add(message)
     await session.flush()  # SQLAlchemy backfills DB-generated values on flush
