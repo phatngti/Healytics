@@ -161,7 +161,7 @@ class ChatbotOrchestrator:
 
         return {
             "history": history_text,
-            "services": services_text,   # rỗng → chatbot không đề cập gợi ý
+            "services": services_text,   
             "question": user_message,
         }
 

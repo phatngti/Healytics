@@ -68,34 +68,6 @@ class ChatStreamRequest(BaseModel):
 
 
 # ============================================================
-# PROMPT BUILDER
-# ============================================================
-
-def build_prompt(history: str, services: str, question: str) -> str:
-    """
-    Ghép history + services + question thành một câu hỏi đơn
-    để đưa vào RAG chain hiện tại (chain chỉ nhận `question`).
-
-    Nếu services rỗng → bỏ phần gợi ý dịch vụ.
-    Nếu history rỗng  → bỏ phần lịch sử.
-    """
-    parts = []
-
-    if history.strip():
-        parts.append(f"Lịch sử hội thoại:\n{history.strip()}")
-
-    if services.strip():
-        parts.append(
-            f"Các dịch vụ liên quan (từ hệ thống gợi ý):\n{services.strip()}\n"
-            "Hãy nhắc đến các dịch vụ này một cách tự nhiên trong câu trả lời nếu phù hợp."
-        )
-
-    parts.append(f"Câu hỏi hiện tại: {question.strip()}")
-
-    return "\n\n".join(parts)
-
-
-# ============================================================
 # RESPONSE PARSER  (giữ nguyên logic của app.py gốc)
 # ============================================================
 
@@ -179,11 +151,11 @@ async def chat_stream(request: ChatStreamRequest):
     """
 
     # 1. Build enriched question từ context gateway gửi xuống
-    enriched_question = build_prompt(
-        history=request.history,
-        services=request.services,
-        question=request.question,
-    )
+    enriched_question = {
+        "history": request.history,
+        "services": request.services,
+        "question": request.question,
+    }
 
     # 2. Gọi RAG chain → lấy full answer (blocking, chạy trong thread pool)
     #    Dùng asyncio.to_thread để không block event loop FastAPI
