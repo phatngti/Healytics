@@ -39,4 +39,5 @@ COPY . /app
 EXPOSE 8000
 
 # 7. Command 
-CMD ["python", "main.py"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
+
