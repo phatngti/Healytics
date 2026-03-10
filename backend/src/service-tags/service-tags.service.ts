@@ -2,8 +2,6 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  ForbiddenException,
-  ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
@@ -11,6 +9,8 @@ import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity'
 import { ProductTag } from '@/common/entities/product-tag.entity';
 import { CreateServiceTagDto } from './dto/create-service-tag.dto';
 import { UpdateServiceTagDto } from './dto/update-service-tag.dto';
+import { ServiceTagResponseDto } from './dto/service-tag-response.dto';
+import { AttachTagResponseDto } from './dto/attach-tag-response.dto';
 import { CreateServiceTagHandler } from './application/handlers/create-service-tag.handler';
 import { UpdateServiceTagHandler } from './application/handlers/update-service-tag.handler';
 import { RemoveServiceTagHandler } from './application/handlers/remove-service-tag.handler';
@@ -20,6 +20,7 @@ import { DetachProductTagHandler } from './application/handlers/detach-product-t
 /**
  * Service facade for service tag operations.
  * Delegates mutations to handlers and provides read operations.
+ * Always returns Response DTOs — never raw entities.
  */
 @Injectable()
 export class ServiceTagsService {
@@ -38,50 +39,16 @@ export class ServiceTagsService {
     private readonly detachProductTagHandler: DetachProductTagHandler,
   ) {}
 
+  // ============================================================================
+  // Mutations — delegated to handlers
+  // ============================================================================
+
   /**
    * Creates a new service tag for a user.
    */
-  async create(dto: CreateServiceTagDto, userId: string): Promise<ProductFeatureTag> {
-    return this.createServiceTagHandler.execute(dto, userId);
-  }
-
-  /**
-   * Finds all service tags for a user.
-   */
-  async findAllByUser(userId: string): Promise<ProductFeatureTag[]> {
-    this.logger.log(`Finding all service tags for user: ${userId}`);
-    return this.serviceTagRepository.find({
-      where: { userId },
-      order: { sortOrder: 'ASC', createdAt: 'DESC' },
-    });
-  }
-
-  /**
-   * Finds active service tags for a user.
-   */
-  async findActiveByUser(userId: string): Promise<ProductFeatureTag[]> {
-    this.logger.log(`Finding active service tags for user: ${userId}`);
-    return this.serviceTagRepository.find({
-      where: { userId, isActive: true },
-      order: { sortOrder: 'ASC', createdAt: 'DESC' },
-    });
-  }
-
-  /**
-   * Finds a service tag by ID.
-   */
-  async findOne(id: string): Promise<ProductFeatureTag> {
-    const tag = await this.serviceTagRepository.findOne({
-      where: { id },
-      relations: ['productTags'],
-    });
-
-    if (!tag) {
-      this.logger.warn(`Service tag not found: ${id}`);
-      throw new NotFoundException(`Service tag with ID ${id} not found`);
-    }
-
-    return tag;
+  async create(dto: CreateServiceTagDto, userId: string): Promise<ServiceTagResponseDto> {
+    const entity = await this.createServiceTagHandler.execute(dto, userId);
+    return ServiceTagResponseDto.fromEntity(entity);
   }
 
   /**
@@ -91,8 +58,9 @@ export class ServiceTagsService {
     id: string,
     dto: UpdateServiceTagDto,
     userId: string,
-  ): Promise<ProductFeatureTag> {
-    return this.updateServiceTagHandler.execute(id, dto, userId);
+  ): Promise<ServiceTagResponseDto> {
+    const entity = await this.updateServiceTagHandler.execute(id, dto, userId);
+    return ServiceTagResponseDto.fromEntity(entity);
   }
 
   /**
@@ -103,18 +71,23 @@ export class ServiceTagsService {
   }
 
   /**
-   * Facade: Delegates to AttachProductTagHandler.
+   * Attaches a tag to a product. Returns the response DTO directly.
    */
   async attachToProduct(
     tagId: string,
     productId: string,
     userId: string,
-  ): Promise<ProductTag> {
-    return this.attachProductTagHandler.execute(tagId, productId, userId);
+  ): Promise<AttachTagResponseDto> {
+    const productTag = await this.attachProductTagHandler.execute(tagId, productId, userId);
+    const dto = new AttachTagResponseDto();
+    dto.tagId = productTag.tagId;
+    dto.productId = productTag.productId;
+    dto.createdAt = productTag.createdAt;
+    return dto;
   }
 
   /**
-   * Facade: Delegates to DetachProductTagHandler.
+   * Detaches a tag from a product.
    */
   async detachFromProduct(
     tagId: string,
@@ -124,15 +97,61 @@ export class ServiceTagsService {
     return this.detachProductTagHandler.execute(tagId, productId, userId);
   }
 
+  // ============================================================================
+  // Queries — return Response DTOs
+  // ============================================================================
+
+  /**
+   * Finds all service tags for a user.
+   */
+  async findAllByUser(userId: string): Promise<ServiceTagResponseDto[]> {
+    this.logger.log(`Finding all service tags for user: ${userId}`);
+    const entities = await this.serviceTagRepository.find({
+      where: { userId },
+      order: { sortOrder: 'ASC', createdAt: 'DESC' },
+    });
+    return ServiceTagResponseDto.fromEntities(entities);
+  }
+
+  /**
+   * Finds active service tags for a user.
+   */
+  async findActiveByUser(userId: string): Promise<ServiceTagResponseDto[]> {
+    this.logger.log(`Finding active service tags for user: ${userId}`);
+    const entities = await this.serviceTagRepository.find({
+      where: { userId, isActive: true },
+      order: { sortOrder: 'ASC', createdAt: 'DESC' },
+    });
+    return ServiceTagResponseDto.fromEntities(entities);
+  }
+
+  /**
+   * Finds a service tag by ID.
+   */
+  async findOne(id: string): Promise<ServiceTagResponseDto> {
+    const tag = await this.serviceTagRepository.findOne({
+      where: { id },
+      relations: ['productTags'],
+    });
+
+    if (!tag) {
+      this.logger.warn(`Service tag not found: ${id}`);
+      throw new NotFoundException(`Service tag with ID ${id} not found`);
+    }
+
+    return ServiceTagResponseDto.fromEntity(tag);
+  }
+
   /**
    * Gets all tags attached to a product.
    */
-  async getTagsForProduct(productId: string): Promise<ProductFeatureTag[]> {
+  async getTagsForProduct(productId: string): Promise<ServiceTagResponseDto[]> {
     const productTags = await this.productTagRepository.find({
       where: { productId },
       relations: ['tag'],
     });
 
-    return productTags.map((pt) => pt.tag);
+    const entities = productTags.map((pt) => pt.tag);
+    return ServiceTagResponseDto.fromEntities(entities);
   }
 }

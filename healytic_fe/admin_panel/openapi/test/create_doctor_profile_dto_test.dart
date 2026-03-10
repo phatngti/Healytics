@@ -22,9 +22,15 @@ void main() {
       // TODO
     });
 
-    // Medical license number
-    // String medicalLicense
-    test('to test the property `medicalLicense`', () async {
+    // Medical titles
+    // List<String> medicalTitles (default value: const [])
+    test('to test the property `medicalTitles`', () async {
+      // TODO
+    });
+
+    // Medical license numbers
+    // List<String> medicalLicenses (default value: const [])
+    test('to test the property `medicalLicenses`', () async {
       // TODO
     });
 

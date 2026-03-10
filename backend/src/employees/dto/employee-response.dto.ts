@@ -3,12 +3,13 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EmployeeRole } from '../enum/employee-role.enum';
 import { EmployeeStatus } from '../enum/employee-status.enum';
 import { Gender } from '../enum/gender.enum';
+import { WorkScheduleEntryDto } from './work-schedule-entry.dto';
 
 /**
  * Doctor profile response DTO.
  * Matches DoctorProfile entity structure.
  */
-class DoctorProfileDto {
+class DoctorProfileResponseDto {
   @Expose()
   @ApiPropertyOptional({ description: 'Employee ID (primary key)' })
   employeeId?: string;
@@ -18,8 +19,12 @@ class DoctorProfileDto {
   title?: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Medical license number' })
-  medicalLicense?: string;
+  @ApiPropertyOptional({ type: [String], description: 'Medical titles' })
+  medicalTitles?: string[];
+
+  @Expose()
+  @ApiPropertyOptional({ type: [String], description: 'Medical license numbers' })
+  medicalLicenses?: string[];
 
   @Expose()
   @ApiPropertyOptional({ description: 'Years of experience' })
@@ -46,7 +51,7 @@ class DoctorProfileDto {
  * Therapist profile response DTO.
  * Matches TherapistProfile entity structure.
  */
-class TherapistProfileDto {
+class TherapistProfileResponseDto {
   @Expose()
   @ApiPropertyOptional({ description: 'Employee ID (primary key)' })
   employeeId?: string;
@@ -98,6 +103,14 @@ export class EmployeeResponseDto {
   employeeCode: string;
 
   @Expose()
+  @ApiPropertyOptional({ description: 'First name' })
+  firstName: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Last name' })
+  lastName: string | null;
+
+  @Expose()
   @ApiProperty({ description: 'Full name' })
   fullName: string;
 
@@ -132,6 +145,23 @@ export class EmployeeResponseDto {
   @Expose()
   @ApiPropertyOptional({ description: 'Description/bio' })
   description: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Emergency contact name' })
+  emergencyContactName: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Emergency contact phone' })
+  emergencyContactPhone: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'ID card URL' })
+  idCardUrl: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({ type: [WorkScheduleEntryDto], description: 'Work schedule' })
+  @Type(() => WorkScheduleEntryDto)
+  schedule: WorkScheduleEntryDto[] | null;
 
   @Expose()
   @ApiPropertyOptional({ description: 'Date of birth' })
@@ -170,12 +200,12 @@ export class EmployeeResponseDto {
   updatedAt: Date;
 
   @Expose()
-  @Type(() => DoctorProfileDto)
-  @ApiPropertyOptional({ type: DoctorProfileDto, description: 'Doctor profile' })
-  doctorProfile: DoctorProfileDto | null;
+  @Type(() => DoctorProfileResponseDto)
+  @ApiPropertyOptional({ type: DoctorProfileResponseDto, description: 'Doctor profile' })
+  doctorProfile: DoctorProfileResponseDto | null;
 
   @Expose()
-  @Type(() => TherapistProfileDto)
-  @ApiPropertyOptional({ type: TherapistProfileDto, description: 'Therapist profile' })
-  therapistProfile: TherapistProfileDto | null;
+  @Type(() => TherapistProfileResponseDto)
+  @ApiPropertyOptional({ type: TherapistProfileResponseDto, description: 'Therapist profile' })
+  therapistProfile: TherapistProfileResponseDto | null;
 }

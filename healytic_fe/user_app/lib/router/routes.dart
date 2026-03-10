@@ -17,7 +17,9 @@ import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/steps/step_4_health_safety.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/survey_screen.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/steps/step_1_general_goals.dart';
+import 'package:user_app/features/orders/presentation/screens/order_details.screen.dart';
 import 'package:user_app/features/orders/presentation/screens/orders.screen.dart';
+import 'package:user_app/features/orders/presentation/screens/service_manual.screen.dart';
 import 'package:user_app/features/profile/presentation/screens/profile.screen.dart';
 import 'package:user_app/features/checkout/presentation/screens/checkout.screen.dart';
 import 'package:user_app/features/authenticate/presentation/screens/signin.screen.dart';
@@ -236,7 +238,45 @@ class CheckoutRoute extends GoRouteData with $CheckoutRoute {
   }
 }
 
-// --- AUTH & ONBOARDING ROUTES (No Navigation Bar) ---
+// --- ORDER DETAILS ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<OrderDetailsRoute>(
+  path: '/order_details',
+  name: OrderDetailsRoute.name,
+)
+class OrderDetailsRoute extends GoRouteData with $OrderDetailsRoute {
+  final String appointmentId;
+  const OrderDetailsRoute({required this.appointmentId});
+  static const name = 'order_details';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: OrderDetailsScreen(appointmentId: appointmentId),
+    );
+  }
+}
+
+// --- SERVICE MANUAL ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ServiceManualRoute>(
+  path: '/service_manual',
+  name: ServiceManualRoute.name,
+)
+class ServiceManualRoute extends GoRouteData with $ServiceManualRoute {
+  final String appointmentId;
+  const ServiceManualRoute({required this.appointmentId});
+  static const name = 'service_manual';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ServiceManualScreen(appointmentId: appointmentId),
+    );
+  }
+}
 
 @TypedGoRoute<LottieSplashRoute>(path: '/', name: LottieSplashRoute.name)
 class LottieSplashRoute extends GoRouteData with $LottieSplashRoute {

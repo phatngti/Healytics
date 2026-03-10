@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { MediaType } from '@/products/enums/media-type.enum';
+import { MediaType } from '@/health-service/enums/media-type.enum';
 import { Product } from './product.entity';
 
 @Entity('product_media')

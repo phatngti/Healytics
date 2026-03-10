@@ -497,6 +497,8 @@ final Map<String, List<ReviewEntity>> kMockReviewsMap = {
           'aN2dBW_fnd9lKlB6MYwJCv1guzLLQvmjdLJVcOtG3OAET6J',
       rating: 5,
       date: DateTime(2025, 5, 11),
+      location: 'District 1, HCM',
+      serviceName: 'Laser CO2',
       text:
           'Excellent service and amazing results! '
           'I would definitely book again.',
@@ -514,6 +516,8 @@ final Map<String, List<ReviewEntity>> kMockReviewsMap = {
           'EfRYi',
       rating: 5,
       date: DateTime(2025, 5, 11),
+      location: 'District 3, HCM',
+      serviceName: 'Laser CO2',
       text:
           'Excellent experience from start to '
           'finish. Highly recommend.',
@@ -528,6 +532,8 @@ final Map<String, List<ReviewEntity>> kMockReviewsMap = {
           '?w=100&h=100&fit=crop',
       rating: 5,
       date: DateTime(2025, 4, 20),
+      location: 'District 1, HCM',
+      serviceName: 'Deep Tissue Massage',
       text:
           'Best deep tissue massage I have ever '
           'had. Highly recommend.',
@@ -540,6 +546,8 @@ final Map<String, List<ReviewEntity>> kMockReviewsMap = {
           '?w=100&h=100&fit=crop',
       rating: 4,
       date: DateTime(2025, 3, 15),
+      location: 'Thu Duc City',
+      serviceName: 'Deep Tissue Massage',
       text:
           'Great experience overall. The pressure '
           'was perfect. Will come back.',
@@ -554,6 +562,8 @@ final Map<String, List<ReviewEntity>> kMockReviewsMap = {
           '?w=100&h=100&fit=crop',
       rating: 5,
       date: DateTime(2025, 5, 2),
+      location: 'Thao Dien, Thu Duc',
+      serviceName: 'Yoga & Meditation',
       text: 'The guided meditation was amazing.',
     ),
   ],
@@ -566,6 +576,8 @@ final Map<String, List<ReviewEntity>> kMockReviewsMap = {
           '?w=100&h=100&fit=crop',
       rating: 5,
       date: DateTime(2025, 5, 8),
+      location: 'District 7, HCM',
+      serviceName: 'Personal Training',
       text: 'Lost 5 kg in the first month!',
     ),
   ],
@@ -578,6 +590,8 @@ final Map<String, List<ReviewEntity>> kMockReviewsMap = {
           '?w=100&h=100&fit=crop',
       rating: 5,
       date: DateTime(2025, 5, 10),
+      location: 'District 3, HCM',
+      serviceName: 'Hot Stone Therapy',
       text:
           'Absolute luxury. Best spa experience '
           'in Saigon.',

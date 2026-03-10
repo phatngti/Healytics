@@ -3,8 +3,8 @@
  * Provides factory functions to create test entities with sensible defaults.
  */
 
-import { ProductType } from '@/products/enums/product-type.enum';
-import { ProductStatus } from '@/products/enums/product-status.enum';
+import { HealthServiceType } from '@/health-service/enums/health-service-type.enum';
+import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
 import { EmployeeRole } from '@/employees/enum/employee-role.enum';
 import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
 import { Role } from '@/account/enum/role.enum';
@@ -39,11 +39,11 @@ export interface TestProductData {
   name?: string;
   slug?: string;
   description?: string;
-  type?: ProductType;
+  type?: HealthServiceType;
   basePrice?: number;
   salePrice?: number | null;
   currency?: string;
-  status?: ProductStatus;
+  status?: HealthServiceStatus;
   isVisibleOnline?: boolean;
   categoryId?: string | null;
   createdAt?: Date;
@@ -58,11 +58,11 @@ export const createTestProduct = (overrides: TestProductData = {}): TestProductD
   name: 'Test Product',
   slug: 'test-product',
   description: 'A test product description',
-  type: ProductType.PHYSICAL,
+  type: HealthServiceType.PHYSICAL,
   basePrice: 100.00,
   salePrice: null,
   currency: 'VND',
-  status: ProductStatus.DRAFT,
+  status: HealthServiceStatus.DRAFT,
   isVisibleOnline: false,
   categoryId: null,
   createdAt: new Date(),

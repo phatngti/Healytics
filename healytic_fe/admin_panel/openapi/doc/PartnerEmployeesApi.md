@@ -10,7 +10,8 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**partnerEmployeesControllerCreateDoctor**](PartnerEmployeesApi.md#partneremployeescontrollercreatedoctor) | **POST** /partner/employees/doctors | Create a new doctor
-[**partnerEmployeesControllerCreateTherapist**](PartnerEmployeesApi.md#partneremployeescontrollercreatetherapist) | **POST** /partner/employees/therapists | Create a new therapist
+[**partnerEmployeesControllerCreateMassageTherapist**](PartnerEmployeesApi.md#partneremployeescontrollercreatemassagetherapist) | **POST** /partner/employees/massage-therapists | Create a new massage therapist
+[**partnerEmployeesControllerCreateSpaTherapist**](PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
 [**partnerEmployeesControllerFindAll**](PartnerEmployeesApi.md#partneremployeescontrollerfindall) | **GET** /partner/employees | Get all employees for this partner
 [**partnerEmployeesControllerFindOne**](PartnerEmployeesApi.md#partneremployeescontrollerfindone) | **GET** /partner/employees/{id} | Get an employee by id
 [**partnerEmployeesControllerRemove**](PartnerEmployeesApi.md#partneremployeescontrollerremove) | **DELETE** /partner/employees/{id} | Delete an employee
@@ -64,10 +65,10 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **partnerEmployeesControllerCreateTherapist**
-> EmployeeResponseDto partnerEmployeesControllerCreateTherapist(createTherapistDto)
+# **partnerEmployeesControllerCreateMassageTherapist**
+> EmployeeResponseDto partnerEmployeesControllerCreateMassageTherapist(createMassageTherapistDto)
 
-Create a new therapist
+Create a new massage therapist
 
 ### Example
 ```dart
@@ -80,13 +81,13 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final createTherapistDto = CreateTherapistDto(); // CreateTherapistDto | 
+final createMassageTherapistDto = CreateMassageTherapistDto(); // CreateMassageTherapistDto | 
 
 try {
-    final result = api_instance.partnerEmployeesControllerCreateTherapist(createTherapistDto);
+    final result = api_instance.partnerEmployeesControllerCreateMassageTherapist(createMassageTherapistDto);
     print(result);
 } catch (e) {
-    print('Exception when calling PartnerEmployeesApi->partnerEmployeesControllerCreateTherapist: $e\n');
+    print('Exception when calling PartnerEmployeesApi->partnerEmployeesControllerCreateMassageTherapist: $e\n');
 }
 ```
 
@@ -94,7 +95,54 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createTherapistDto** | [**CreateTherapistDto**](CreateTherapistDto.md)|  | 
+ **createMassageTherapistDto** | [**CreateMassageTherapistDto**](CreateMassageTherapistDto.md)|  | 
+
+### Return type
+
+[**EmployeeResponseDto**](EmployeeResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **partnerEmployeesControllerCreateSpaTherapist**
+> EmployeeResponseDto partnerEmployeesControllerCreateSpaTherapist(createSpaTherapistDto)
+
+Create a new spa therapist
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = PartnerEmployeesApi();
+final createSpaTherapistDto = CreateSpaTherapistDto(); // CreateSpaTherapistDto | 
+
+try {
+    final result = api_instance.partnerEmployeesControllerCreateSpaTherapist(createSpaTherapistDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling PartnerEmployeesApi->partnerEmployeesControllerCreateSpaTherapist: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **createSpaTherapistDto** | [**CreateSpaTherapistDto**](CreateSpaTherapistDto.md)|  | 
 
 ### Return type
 

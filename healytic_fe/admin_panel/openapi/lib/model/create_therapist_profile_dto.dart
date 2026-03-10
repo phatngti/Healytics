@@ -19,6 +19,8 @@ class CreateTherapistProfileDto {
     this.commissionRate,
     this.healthCheckDate,
     this.skills = const [],
+    this.deviceProficiency = const [],
+    this.licenseUrl,
   });
 
   /// Therapist level
@@ -57,6 +59,18 @@ class CreateTherapistProfileDto {
   /// Therapist skills
   List<String> skills;
 
+  /// Device proficiency list
+  List<String> deviceProficiency;
+
+  /// License URL
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? licenseUrl;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is CreateTherapistProfileDto &&
     other.level == level &&
@@ -64,7 +78,9 @@ class CreateTherapistProfileDto {
     other.strengthLevel == strengthLevel &&
     other.commissionRate == commissionRate &&
     other.healthCheckDate == healthCheckDate &&
-    _deepEquality.equals(other.skills, skills);
+    _deepEquality.equals(other.skills, skills) &&
+    _deepEquality.equals(other.deviceProficiency, deviceProficiency) &&
+    other.licenseUrl == licenseUrl;
 
   @override
   int get hashCode =>
@@ -74,10 +90,12 @@ class CreateTherapistProfileDto {
     (strengthLevel == null ? 0 : strengthLevel!.hashCode) +
     (commissionRate == null ? 0 : commissionRate!.hashCode) +
     (healthCheckDate == null ? 0 : healthCheckDate!.hashCode) +
-    (skills.hashCode);
+    (skills.hashCode) +
+    (deviceProficiency.hashCode) +
+    (licenseUrl == null ? 0 : licenseUrl!.hashCode);
 
   @override
-  String toString() => 'CreateTherapistProfileDto[level=$level, type=$type, strengthLevel=$strengthLevel, commissionRate=$commissionRate, healthCheckDate=$healthCheckDate, skills=$skills]';
+  String toString() => 'CreateTherapistProfileDto[level=$level, type=$type, strengthLevel=$strengthLevel, commissionRate=$commissionRate, healthCheckDate=$healthCheckDate, skills=$skills, deviceProficiency=$deviceProficiency, licenseUrl=$licenseUrl]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -107,6 +125,12 @@ class CreateTherapistProfileDto {
       json[r'healthCheckDate'] = null;
     }
       json[r'skills'] = this.skills;
+      json[r'deviceProficiency'] = this.deviceProficiency;
+    if (this.licenseUrl != null) {
+      json[r'licenseUrl'] = this.licenseUrl;
+    } else {
+      json[r'licenseUrl'] = null;
+    }
     return json;
   }
 
@@ -137,6 +161,10 @@ class CreateTherapistProfileDto {
         skills: json[r'skills'] is Iterable
             ? (json[r'skills'] as Iterable).cast<String>().toList(growable: false)
             : const [],
+        deviceProficiency: json[r'deviceProficiency'] is Iterable
+            ? (json[r'deviceProficiency'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        licenseUrl: mapValueOfType<String>(json, r'licenseUrl'),
       );
     }
     return null;

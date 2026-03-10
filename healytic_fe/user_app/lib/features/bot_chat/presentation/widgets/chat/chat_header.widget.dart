@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/button/button.dart';
 
@@ -55,7 +56,13 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
                 // Back
                 AppButton(
                   buttonType: ButtonType.text,
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go('/conversation_history');
+                    }
+                  },
                   primaryColor: colorScheme.primary,
                   customStyle: TextButton.styleFrom(
                     padding: EdgeInsets.all(AppDimens.spaceSm),

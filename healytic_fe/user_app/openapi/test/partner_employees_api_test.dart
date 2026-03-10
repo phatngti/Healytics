@@ -24,10 +24,17 @@ void main() {
       // TODO
     });
 
-    // Create a new therapist
+    // Create a new massage therapist
     //
-    //Future<EmployeeResponseDto> partnerEmployeesControllerCreateTherapist(CreateTherapistDto createTherapistDto) async
-    test('test partnerEmployeesControllerCreateTherapist', () async {
+    //Future<EmployeeResponseDto> partnerEmployeesControllerCreateMassageTherapist(CreateMassageTherapistDto createMassageTherapistDto) async
+    test('test partnerEmployeesControllerCreateMassageTherapist', () async {
+      // TODO
+    });
+
+    // Create a new spa therapist
+    //
+    //Future<EmployeeResponseDto> partnerEmployeesControllerCreateSpaTherapist(CreateSpaTherapistDto createSpaTherapistDto) async
+    test('test partnerEmployeesControllerCreateSpaTherapist', () async {
       // TODO
     });
 

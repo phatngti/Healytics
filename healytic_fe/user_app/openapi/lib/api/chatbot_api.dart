@@ -83,19 +83,19 @@ class ChatbotApi {
     return null;
   }
 
-  /// Send a message to the chatbot
+  /// Generative Ai Stream
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
-  /// * [SendMessageDto] sendMessageDto (required):
-  Future<Response> chatbotControllerSendMessageWithHttpInfo(SendMessageDto sendMessageDto,) async {
+  /// * [ChatbotRequest] chatbotRequest (required):
+  Future<Response> generativeAiStreamGenerativeAiStreamPostWithHttpInfo(ChatbotRequest chatbotRequest,) async {
     // ignore: prefer_const_declarations
-    final path = r'/chatbot/send';
+    final path = r'/generative_ai/stream';
 
     // ignore: prefer_final_locals
-    Object? postBody = sendMessageDto;
+    Object? postBody = chatbotRequest;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
@@ -115,13 +115,13 @@ class ChatbotApi {
     );
   }
 
-  /// Send a message to the chatbot
+  /// Generative Ai Stream
   ///
   /// Parameters:
   ///
-  /// * [SendMessageDto] sendMessageDto (required):
-  Future<SendMessageResponseDto?> chatbotControllerSendMessage(SendMessageDto sendMessageDto,) async {
-    final response = await chatbotControllerSendMessageWithHttpInfo(sendMessageDto,);
+  /// * [ChatbotRequest] chatbotRequest (required):
+  Future<Object?> generativeAiStreamGenerativeAiStreamPost(ChatbotRequest chatbotRequest,) async {
+    final response = await generativeAiStreamGenerativeAiStreamPostWithHttpInfo(chatbotRequest,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -129,54 +129,9 @@ class ChatbotApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SendMessageResponseDto',) as SendMessageResponseDto;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
     
     }
     return null;
-  }
-
-  /// Stream chatbot response via SSE
-  ///
-  /// Note: This method returns the HTTP [Response].
-  ///
-  /// Parameters:
-  ///
-  /// * [String] conversationId (required):
-  Future<Response> chatbotControllerStreamChatWithHttpInfo(String conversationId,) async {
-    // ignore: prefer_const_declarations
-    final path = r'/chatbot/stream/{conversationId}'
-      .replaceAll('{conversationId}', conversationId);
-
-    // ignore: prefer_final_locals
-    Object? postBody;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-    const contentTypes = <String>[];
-
-
-    return apiClient.invokeAPI(
-      path,
-      'GET',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
-    );
-  }
-
-  /// Stream chatbot response via SSE
-  ///
-  /// Parameters:
-  ///
-  /// * [String] conversationId (required):
-  Future<void> chatbotControllerStreamChat(String conversationId,) async {
-    final response = await chatbotControllerStreamChatWithHttpInfo(conversationId,);
-    if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
-    }
   }
 }

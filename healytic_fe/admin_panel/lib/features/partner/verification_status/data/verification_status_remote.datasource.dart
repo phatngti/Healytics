@@ -251,8 +251,8 @@ class VerificationStatusRemoteDataSourceImpl
 
   @override
   Future<ProviderVerificationStatusEntity> getVerificationStatus() async {
-    final profile = await apiService.partnersApi
-        .partnersControllerGetMyProfile();
+    final profile = await apiService.partnerPartnersApi
+        .partnerSelfControllerGetMyProfile();
     if (profile == null) {
       throw Exception('Failed to fetch partner profile');
     }
@@ -270,7 +270,10 @@ class VerificationStatusRemoteDataSourceImpl
     final updateDto = _buildUpdateDto(edits: edits, uploads: uploads);
 
     // Call the PUT /partners/me API
-    await apiService.partnersApi.partnersControllerUpdateMyProfile(updateDto);
+    await apiService.partnerPartnersApi
+        .partnerSelfControllerUpdateMyProfile(
+          updateDto,
+        );
 
     return true;
   }

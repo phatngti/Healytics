@@ -160,7 +160,14 @@ class {{{classname}}} {
           :  {{#isNullable}}null{{/isNullable}}{{^isNullable}}const []{{/isNullable}},
             {{/items.isArray}}
             {{^items.isArray}}
+              {{#isFreeFormObject}}
+        {{{name}}}: json[r'{{{baseName}}}'] is List
+            ? (json[r'{{{baseName}}}'] as List).cast<Map<String, dynamic>>().toList(growable: false)
+            : {{#defaultValue}}{{{.}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}},
+              {{/isFreeFormObject}}
+              {{^isFreeFormObject}}
         {{{name}}}: {{{complexType}}}.listFromJson(json[r'{{{baseName}}}']){{#uniqueItems}}.toSet(){{/uniqueItems}},
+              {{/isFreeFormObject}}
             {{/items.isArray}}
           {{/isArray}}
           {{^isArray}}

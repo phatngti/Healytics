@@ -11,10 +11,10 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { ProductType } from '@/products/enums/product-type.enum';
+import { HealthServiceType } from '@/health-service/enums/health-service-type.enum';
 import { Category } from './category.entity';
 import { ProductMedia } from './product-media.entity';
-import { ProductStatus } from '@/products/enums/product-status.enum';
+import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
 import { ProductDefinition } from './product-definition.entity';
 import { ProductEmployeeEligibility } from './product-employee-eligibility.entity';
 import { ProductTag } from './product-tag.entity';
@@ -42,7 +42,7 @@ export class Product {
   description: string | null;
 
   @Column({ length: 50 })
-  type: ProductType;
+  type: HealthServiceType;
 
   // Pricing
   @Column({ name: 'base_price', type: 'decimal', precision: 15, scale: 2, default: 0 })
@@ -55,8 +55,8 @@ export class Product {
   currency: string;
 
   // Status & Visibility
-  @Column({ length: 20, default: ProductStatus.DRAFT })
-  status: ProductStatus;
+  @Column({ length: 20, default: HealthServiceStatus.DRAFT })
+  status: HealthServiceStatus;
 
   @Column({ name: 'is_visible_online', default: false })
   isVisibleOnline: boolean;
