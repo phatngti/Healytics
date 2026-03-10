@@ -28,6 +28,18 @@ void main() {
       // TODO
     });
 
+    // First name
+    // Object firstName
+    test('to test the property `firstName`', () async {
+      // TODO
+    });
+
+    // Last name
+    // Object lastName
+    test('to test the property `lastName`', () async {
+      // TODO
+    });
+
     // Full name
     // String fullName
     test('to test the property `fullName`', () async {
@@ -79,6 +91,30 @@ void main() {
     // Description/bio
     // Object description
     test('to test the property `description`', () async {
+      // TODO
+    });
+
+    // Emergency contact name
+    // Object emergencyContactName
+    test('to test the property `emergencyContactName`', () async {
+      // TODO
+    });
+
+    // Emergency contact phone
+    // Object emergencyContactPhone
+    test('to test the property `emergencyContactPhone`', () async {
+      // TODO
+    });
+
+    // ID card URL
+    // Object idCardUrl
+    test('to test the property `idCardUrl`', () async {
+      // TODO
+    });
+
+    // Work schedule
+    // List<WorkScheduleEntryDto> schedule (default value: const [])
+    test('to test the property `schedule`', () async {
       // TODO
     });
 
@@ -137,13 +173,13 @@ void main() {
     });
 
     // Doctor profile
-    // DoctorProfileDto doctorProfile
+    // DoctorProfileResponseDto doctorProfile
     test('to test the property `doctorProfile`', () async {
       // TODO
     });
 
     // Therapist profile
-    // TherapistProfileDto therapistProfile
+    // TherapistProfileResponseDto therapistProfile
     test('to test the property `therapistProfile`', () async {
       // TODO
     });

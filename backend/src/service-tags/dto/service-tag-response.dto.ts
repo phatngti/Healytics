@@ -1,5 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
 
 /**
  * Response DTO for service tag data.
@@ -47,4 +48,23 @@ export class ServiceTagResponseDto {
   @Type(() => Date)
   @ApiProperty({ example: '2026-01-14T22:45:00.000Z' })
   updatedAt: Date;
+
+  static fromEntity(entity: ProductFeatureTag): ServiceTagResponseDto {
+    const dto = new ServiceTagResponseDto();
+    dto.id = entity.id;
+    dto.userId = entity.userId;
+    dto.name = entity.name;
+    dto.description = entity.description ?? null;
+    dto.colorValue = entity.colorValue;
+    dto.usage = entity.usage;
+    dto.isActive = entity.isActive;
+    dto.sortOrder = entity.sortOrder;
+    dto.createdAt = entity.createdAt;
+    dto.updatedAt = entity.updatedAt;
+    return dto;
+  }
+
+  static fromEntities(entities: ProductFeatureTag[]): ServiceTagResponseDto[] {
+    return entities.map((e) => this.fromEntity(e));
+  }
 }

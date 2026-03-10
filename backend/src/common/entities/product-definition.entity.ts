@@ -5,7 +5,7 @@ import {
   JoinColumn,
   PrimaryColumn,
 } from 'typeorm';
-import { StaffAssignmentType } from '@/products/enums/staff-assignment-type.enum';
+import { StaffAssignmentType } from '@/health-service/enums/staff-assignment-type.enum';
 import { Product } from './product.entity';
 
 @Entity('product_definitions')

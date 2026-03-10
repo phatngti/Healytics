@@ -1,13 +1,24 @@
+import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 import '../employee_schedule_section.dart';
 import '../employee_services_section.dart';
 
+/// Card displaying operational info: services and
+/// work schedule for an employee.
 class EmployeeOperationalCard extends StatelessWidget {
+  /// The employee entity to display data for.
+  final EmployeeEntity employee;
+
+  /// Whether the parent form is in editing mode.
   final bool isEditing;
 
-  const EmployeeOperationalCard({super.key, this.isEditing = false});
+  const EmployeeOperationalCard({
+    super.key,
+    required this.employee,
+    this.isEditing = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +42,17 @@ class EmployeeOperationalCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 16,
+            ),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest.withAlpha(128),
+              color: colorScheme.surfaceContainerHighest
+                  .withAlpha(128),
               border: Border(
-                bottom: BorderSide(color: colorScheme.outlineVariant),
+                bottom: BorderSide(
+                  color: colorScheme.outlineVariant,
+                ),
               ),
             ),
             child: Row(
@@ -54,9 +71,16 @@ class EmployeeOperationalCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                EmployeeServicesSection(isEditing: isEditing),
+                EmployeeServicesSection(
+                  employee: employee,
+                  isEditing: isEditing,
+                ),
                 AppDimens.verticalExtraLarge,
-                EmployeeScheduleSection(isEditing: isEditing),
+                EmployeeScheduleSection(
+                  schedule: employee.workSchedule,
+                  employmentType: employee.employmentType,
+                  isEditing: isEditing,
+                ),
               ],
             ),
           ),

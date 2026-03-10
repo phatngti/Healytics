@@ -16,27 +16,15 @@ void main() {
   // final instance = CreateDoctorDto();
 
   group('test CreateDoctorDto', () {
-    // Authentication ID from external provider
-    // String authId
-    test('to test the property `authId`', () async {
+    // First name
+    // String firstName
+    test('to test the property `firstName`', () async {
       // TODO
     });
 
-    // Unique employee code
-    // String employeeCode
-    test('to test the property `employeeCode`', () async {
-      // TODO
-    });
-
-    // Full name of the doctor
-    // String fullName
-    test('to test the property `fullName`', () async {
-      // TODO
-    });
-
-    // Display name
-    // String displayName
-    test('to test the property `displayName`', () async {
+    // Last name
+    // String lastName
+    test('to test the property `lastName`', () async {
       // TODO
     });
 
@@ -52,15 +40,9 @@ void main() {
       // TODO
     });
 
-    // Avatar URL
-    // String avatarUrl
-    test('to test the property `avatarUrl`', () async {
-      // TODO
-    });
-
     // Date of birth
-    // String dob
-    test('to test the property `dob`', () async {
+    // String dateOfBirth
+    test('to test the property `dateOfBirth`', () async {
       // TODO
     });
 
@@ -70,27 +52,129 @@ void main() {
       // TODO
     });
 
-    // Status of the employee
+    // Emergency contact name
+    // String emergencyContactName
+    test('to test the property `emergencyContactName`', () async {
+      // TODO
+    });
+
+    // Emergency contact phone
+    // String emergencyContactPhone
+    test('to test the property `emergencyContactPhone`', () async {
+      // TODO
+    });
+
+    // Unique employee identifier code
+    // String employeeId
+    test('to test the property `employeeId`', () async {
+      // TODO
+    });
+
+    // Employment type
+    // String employmentType
+    test('to test the property `employmentType`', () async {
+      // TODO
+    });
+
+    // Start date
+    // String startDate
+    test('to test the property `startDate`', () async {
+      // TODO
+    });
+
+    // Weekly work schedule
+    // List<WorkScheduleEntryDto> schedule (default value: const [])
+    test('to test the property `schedule`', () async {
+      // TODO
+    });
+
+    // Avatar URL
+    // String avatar
+    test('to test the property `avatar`', () async {
+      // TODO
+    });
+
+    // ID card URL
+    // String idCardUrl
+    test('to test the property `idCardUrl`', () async {
+      // TODO
+    });
+
+    // Employee status
     // String status
     test('to test the property `status`', () async {
       // TODO
     });
 
-    // Branch ID the employee belongs to
-    // String branchId
-    test('to test the property `branchId`', () async {
+    // Branch ID or name
+    // String branch
+    test('to test the property `branch`', () async {
       // TODO
     });
 
-    // Partner ID the employee belongs to
+    // Account password
+    // String password
+    test('to test the property `password`', () async {
+      // TODO
+    });
+
+    // Bio / description
+    // String description
+    test('to test the property `description`', () async {
+      // TODO
+    });
+
+    // Job title
+    // String jobTitle
+    test('to test the property `jobTitle`', () async {
+      // TODO
+    });
+
+    // Medical titles
+    // List<String> medicalTitles (default value: const [])
+    test('to test the property `medicalTitles`', () async {
+      // TODO
+    });
+
+    // Medical license numbers
+    // List<String> medicalLicenses (default value: const [])
+    test('to test the property `medicalLicenses`', () async {
+      // TODO
+    });
+
+    // Years of experience
+    // num experienceYears
+    test('to test the property `experienceYears`', () async {
+      // TODO
+    });
+
+    // Consultation fee
+    // num consultationFee
+    test('to test the property `consultationFee`', () async {
+      // TODO
+    });
+
+    // Specializations
+    // List<String> specializations (default value: const [])
+    test('to test the property `specializations`', () async {
+      // TODO
+    });
+
+    // Education history
+    // List<String> education (default value: const [])
+    test('to test the property `education`', () async {
+      // TODO
+    });
+
+    // Certifications
+    // List<String> certifications (default value: const [])
+    test('to test the property `certifications`', () async {
+      // TODO
+    });
+
+    // Partner ID (auto-injected)
     // String partnerId
     test('to test the property `partnerId`', () async {
-      // TODO
-    });
-
-    // Doctor profile information
-    // DoctorProfileDto profile
-    test('to test the property `profile`', () async {
       // TODO
     });
 

@@ -110,5 +110,5 @@ export class UpdatePartnerDto {
     @IsOptional()
     @Type(() => KycDocumentDto)
     @ValidateNested({ each: true })
-    kycDocuments: UpdatedField<KycDocumentDto>[];
+    kycDocuments: KycDocumentDto[];
 }

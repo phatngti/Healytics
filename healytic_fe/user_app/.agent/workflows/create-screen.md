@@ -44,7 +44,11 @@ Description: Adds a new screen to an existing feature with routing, provider, an
    }
    ```
 
-2. **Create supporting widgets:** If the screen has complex sections, create widget files in `presentation/widgets/<screen_name>/`.
+2. **Create supporting widgets:** If the screen has complex sections (3+ sub-widgets or >150 lines), create widget files in `presentation/widgets/<screen_name>/`:
+   - Each sub-widget gets its own `<widget_name>.widget.dart` file
+   - Closely-related private helpers can share a file (e.g., `_TimeColumn` inside `check_in_out_card.widget.dart`)
+   - Widgets shared across multiple screens stay in flat `widgets/` root
+   - See `/refactor-screen-widgets` workflow for detailed extraction steps
 
 3. **Create presentation provider (if needed):** Add a `@riverpod` notifier in `presentation/providers/<screen_name>.provider.dart` for screen-specific state.
 

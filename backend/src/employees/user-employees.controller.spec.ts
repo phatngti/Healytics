@@ -12,7 +12,8 @@ describe('UserEmployeesController', () => {
   beforeEach(async () => {
     const mockEmployeesService: MockType<EmployeesService> = {
       createDoctor: jest.fn(),
-      createTherapist: jest.fn(),
+      createSpaTherapist: jest.fn(),
+      createMassageTherapist: jest.fn(),
       findAll: jest.fn(),
       findOne: jest.fn(),
       update: jest.fn(),

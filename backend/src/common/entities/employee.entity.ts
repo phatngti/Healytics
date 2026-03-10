@@ -9,6 +9,8 @@ import {
   ManyToOne,
   JoinColumn,
   Index,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { EmployeeRole } from '@/employees/enum/employee-role.enum';
 import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
@@ -28,6 +30,12 @@ export class Employee {
   @Index()
   @Column({ name: 'employee_code', unique: true, length: 50 })
   employeeCode: string;
+
+  @Column({ name: 'first_name', length: 50, nullable: true })
+  firstName: string;
+
+  @Column({ name: 'last_name', length: 50, nullable: true })
+  lastName: string;
 
   @Column({ name: 'full_name', length: 100 })
   fullName: string;
@@ -66,6 +74,12 @@ export class Employee {
 
   @Column({ type: 'text', nullable: true })
   description: string;
+
+  @Column({ length: 255, nullable: true })
+  password: string;
+
+  @Column({ type: 'jsonb', nullable: true })
+  schedule: { day: string; start: string; end: string; isWorking: boolean }[];
 
   @Column({ type: 'date', nullable: true })
   dob: Date;
@@ -121,4 +135,14 @@ export class Employee {
     eager: false,
   })
   therapistProfile: TherapistProfile;
+
+  // ── Lifecycle hooks ──────────────────────────────────────────
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  computeFullName() {
+    if (this.firstName || this.lastName) {
+      this.fullName = [this.firstName, this.lastName].filter(Boolean).join(' ');
+    }
+  }
 }

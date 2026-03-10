@@ -24,7 +24,8 @@ class StoreService {
   static Future<StoreService> init({
     required DriftStoreRepository storeRepository,
   }) async {
-    _instance ??= await create(storeRepository: storeRepository);
+    _instance?.dispose();
+    _instance = await create(storeRepository: storeRepository);
     return _instance!;
   }
 

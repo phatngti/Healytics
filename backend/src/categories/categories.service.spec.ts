@@ -34,6 +34,20 @@ describe('CategoriesService', () => {
     execute: jest.fn(),
   };
 
+  // Full mock entity for realistic DTO mapping
+  const mockCategoryEntity: Partial<Category> = {
+    id: 'uuid-1',
+    name: 'Test Category',
+    slug: 'test-category',
+    description: 'A description',
+    imageUrl: null,
+    isActive: true,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-01-01'),
+    parent: null,
+    children: [],
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -69,32 +83,35 @@ describe('CategoriesService', () => {
   });
 
   describe('create', () => {
-    it('should delegate to CreateCategoryHandler', async () => {
+    it('should delegate to CreateCategoryHandler and return DTO', async () => {
       // Arrange
       const inputDto = { name: 'Test Category', slug: 'test-category' };
-      const expectedCategory = { id: 'uuid-1', ...inputDto };
-      mockCreateCategoryHandler.execute.mockResolvedValue(expectedCategory);
+      mockCreateCategoryHandler.execute.mockResolvedValue(mockCategoryEntity);
 
       // Act
       const result = await service.create(inputDto as any);
 
       // Assert
-      expect(result).toEqual(expectedCategory);
+      expect(result.id).toBe('uuid-1');
+      expect(result.name).toBe('Test Category');
+      expect(result.slug).toBe('test-category');
       expect(mockCreateCategoryHandler.execute).toHaveBeenCalledWith(inputDto);
     });
   });
 
   describe('findAll', () => {
-    it('should return an array of categories', async () => {
+    it('should return an array of CategoryResponseDto', async () => {
       // Arrange
-      const expectedCategories = [{ id: '1', name: 'Category 1' }];
-      mockCategoryRepository.find.mockResolvedValue(expectedCategories);
+      const entities = [mockCategoryEntity];
+      mockCategoryRepository.find.mockResolvedValue(entities);
 
       // Act
       const result = await service.findAll();
 
       // Assert
-      expect(result).toEqual(expectedCategories);
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('uuid-1');
+      expect(result[0].name).toBe('Test Category');
       expect(mockCategoryRepository.find).toHaveBeenCalledWith(
         expect.objectContaining({
           relations: ['parent', 'children'],
@@ -104,16 +121,16 @@ describe('CategoriesService', () => {
   });
 
   describe('findOne', () => {
-    it('should return a category when found', async () => {
+    it('should return a CategoryResponseDto when found', async () => {
       // Arrange
-      const expectedCategory = { id: 'uuid-1', name: 'Test' };
-      mockCategoryRepository.findOne.mockResolvedValue(expectedCategory);
+      mockCategoryRepository.findOne.mockResolvedValue(mockCategoryEntity);
 
       // Act
       const result = await service.findOne('uuid-1');
 
       // Assert
-      expect(result).toEqual(expectedCategory);
+      expect(result.id).toBe('uuid-1');
+      expect(result.name).toBe('Test Category');
     });
 
     it('should throw NotFoundException when not found', async () => {
@@ -126,16 +143,16 @@ describe('CategoriesService', () => {
   });
 
   describe('findBySlug', () => {
-    it('should return a category when found', async () => {
+    it('should return a CategoryResponseDto when found', async () => {
       // Arrange
-      const expectedCategory = { id: 'uuid-1', slug: 'test-slug' };
-      mockCategoryRepository.findOne.mockResolvedValue(expectedCategory);
+      mockCategoryRepository.findOne.mockResolvedValue(mockCategoryEntity);
 
       // Act
-      const result = await service.findBySlug('test-slug');
+      const result = await service.findBySlug('test-category');
 
       // Assert
-      expect(result).toEqual(expectedCategory);
+      expect(result.id).toBe('uuid-1');
+      expect(result.slug).toBe('test-category');
     });
 
     it('should throw NotFoundException when not found', async () => {
@@ -148,17 +165,18 @@ describe('CategoriesService', () => {
   });
 
   describe('update', () => {
-    it('should delegate to UpdateCategoryHandler', async () => {
+    it('should delegate to UpdateCategoryHandler and return DTO', async () => {
       // Arrange
       const updateDto = { name: 'New Name' };
-      const expectedCategory = { id: 'uuid-1', name: 'New Name' };
-      mockUpdateCategoryHandler.execute.mockResolvedValue(expectedCategory);
+      const updatedEntity = { ...mockCategoryEntity, name: 'New Name' };
+      mockUpdateCategoryHandler.execute.mockResolvedValue(updatedEntity);
 
       // Act
       const result = await service.update('uuid-1', updateDto as any);
 
       // Assert
-      expect(result).toEqual(expectedCategory);
+      expect(result.id).toBe('uuid-1');
+      expect(result.name).toBe('New Name');
       expect(mockUpdateCategoryHandler.execute).toHaveBeenCalledWith('uuid-1', updateDto);
     });
   });

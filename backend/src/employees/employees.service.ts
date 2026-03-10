@@ -2,7 +2,7 @@ import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nest
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere } from 'typeorm';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
-import { CreateTherapistDto } from './dto/create-therapist.dto';
+import { CreateSpaTherapistDto, CreateMassageTherapistDto } from './dto/create-therapist.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { Employee } from '@/common/entities/employee.entity';
@@ -59,34 +59,43 @@ export class EmployeesService {
 
   /**
    * Facade: Delegates to CreateDoctorHandler.
-   * @param createDoctorDto - The doctor data
-   * @param partnerId - The owning partner ID
-   * @returns The created employee with doctor profile
    */
   async createDoctor(
     createDoctorDto: CreateDoctorDto,
     partnerId?: string,
   ): Promise<Employee> {
-    if (partnerId) {
-      (createDoctorDto as any).partnerId = partnerId;
-    }
-    return this.createDoctorHandler.execute(createDoctorDto);
+    const dtoWithPartner = partnerId
+      ? { ...createDoctorDto, partnerId }
+      : createDoctorDto;
+    return this.createDoctorHandler.execute(dtoWithPartner as CreateDoctorDto);
   }
 
   /**
-   * Facade: Delegates to CreateTherapistHandler.
-   * @param createTherapistDto - The therapist data
-   * @param partnerId - The owning partner ID
-   * @returns The created employee with therapist profile
+   * Facade: Delegates to CreateTherapistHandler for SPA type.
    */
-  async createTherapist(
-    createTherapistDto: CreateTherapistDto,
+  async createSpaTherapist(
+    dto: CreateSpaTherapistDto,
     partnerId?: string,
   ): Promise<Employee> {
-    if (partnerId) {
-      (createTherapistDto as any).partnerId = partnerId;
-    }
-    return this.createTherapistHandler.execute(createTherapistDto);
+    const dtoWithPartner = partnerId ? { ...dto, partnerId } : dto;
+    return this.createTherapistHandler.execute(
+      dtoWithPartner as CreateSpaTherapistDto,
+      'SPA',
+    );
+  }
+
+  /**
+   * Facade: Delegates to CreateTherapistHandler for MASSAGE type.
+   */
+  async createMassageTherapist(
+    dto: CreateMassageTherapistDto,
+    partnerId?: string,
+  ): Promise<Employee> {
+    const dtoWithPartner = partnerId ? { ...dto, partnerId } : dto;
+    return this.createTherapistHandler.execute(
+      dtoWithPartner as CreateMassageTherapistDto,
+      'MASSAGE',
+    );
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -95,9 +104,6 @@ export class EmployeesService {
 
   /**
    * Retrieves all employees with optional role filter.
-   * @param query - Query parameters
-   * @param partnerId - Optional partner scope (required for partner API)
-   * @returns Array of employees
    */
   async findAll(
     query?: GetEmployeesQueryDto,
@@ -119,9 +125,6 @@ export class EmployeesService {
 
   /**
    * Finds an employee by ID.
-   * @param id - The employee ID
-   * @returns The employee with relations
-   * @throws NotFoundException if not found
    */
   async findOne(id: string): Promise<Employee> {
     const employee = await this.employeeRepository.findOne({
@@ -137,10 +140,6 @@ export class EmployeesService {
 
   /**
    * Finds an employee by ID scoped to a specific partner.
-   * @param id - The employee ID
-   * @param partnerId - The owning partner ID
-   * @returns The employee with relations
-   * @throws NotFoundException if not found or not owned by partner
    */
   async findOneForPartner(id: string, partnerId: string): Promise<Employee> {
     const employee = await this.employeeRepository.findOne({
@@ -162,9 +161,6 @@ export class EmployeesService {
 
   /**
    * Facade: Delegates to UpdateEmployeeHandler.
-   * @param id - The employee ID
-   * @param updateEmployeeDto - The update data
-   * @returns The updated employee
    */
   async update(
     id: string,
@@ -188,7 +184,6 @@ export class EmployeesService {
 
   /**
    * Facade: Delegates to RemoveEmployeeHandler.
-   * @param id - The employee ID
    */
   async remove(id: string): Promise<void> {
     return this.removeEmployeeHandler.execute(id);
