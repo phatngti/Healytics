@@ -5,6 +5,7 @@ import {
   UseGuards,
   Req,
   HttpCode,
+  HttpStatus,
   Inject,
   forwardRef,
 } from '@nestjs/common';
@@ -18,13 +19,14 @@ import {
   ApiOkResponse,
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
+  ApiBadRequestResponse,
+  ApiConflictResponse,
   ApiTags,
   ApiOperation,
-  ApiResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
-import { AccountService } from '@/account/account.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from '../common/decorators/auth/public.decorator';
 import { LoginDto } from './dto/request/login.dto';
@@ -37,16 +39,19 @@ import { RegisterPartnerResponseDto } from '@/partners/dto/response/register-par
 /**
  * Controller for authentication endpoints.
  * Handles user/admin/partner login, registration, and token management.
+ *
+ * Security: All endpoints are @Public() (no JWT required).
+ * Rate limiting: Applied to all login/register endpoints.
+ * Route prefix: /v1/auth
  */
 @ApiTags('Authentication')
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private accountService: AccountService,
     @Inject(forwardRef(() => PartnersService))
     private partnersService: PartnersService,
-  ) { }
+  ) {}
 
   // ============================================================================
   // User Authentication (Mobile App / End Users)
@@ -55,13 +60,15 @@ export class AuthController {
   /**
    * Registers a new user and returns authentication tokens.
    */
+  @Post('user/register')
   @Public()
-  @ApiBody({ type: RegisterDto })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @ApiOperation({ summary: 'Register a new user' })
   @ApiCreatedResponse({
-    description: 'Registration returns access and refresh tokens',
+    description: 'Registration returns access and refresh tokens.',
     type: AuthTokensDto,
   })
-  @Post('user/register')
+  @ApiConflictResponse({ description: 'Email already in use.' })
   async registerUser(@Body() dto: RegisterDto): Promise<AuthTokensDto> {
     return this.authService.register(dto);
   }
@@ -69,21 +76,19 @@ export class AuthController {
   /**
    * Logs in a user and returns authentication tokens.
    */
+  @Post('user/login')
   @Public()
   @UseGuards(LocalAuthGuard)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login as a user' })
   @ApiBody({ type: LoginDto })
   @ApiOkResponse({
-    description: 'User login returns access and refresh tokens',
+    description: 'User login returns access and refresh tokens.',
     type: AuthTokensDto,
   })
-  @ApiForbiddenResponse({
-    description: 'Account is not authorized for user login',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid credentials',
-  })
-  @HttpCode(200)
-  @Post('user/login')
+  @ApiForbiddenResponse({ description: 'Account not authorized for user login.' })
+  @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginUser(@Req() req): Promise<AuthTokensDto> {
     return this.authService.loginUser(req.user);
   }
@@ -95,25 +100,20 @@ export class AuthController {
   /**
    * Registers a new business partner and returns authentication tokens.
    */
+  @Post('partner/register')
   @Public()
-  @HttpCode(201)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Register a new business partner',
-    description: 'Creates business entity, legal representative, and returns auth tokens immediately',
+    description: 'Creates business entity, legal representative, and returns auth tokens immediately.',
   })
   @ApiCreatedResponse({
-    description: 'Partner registration successful - returns tokens and business data',
+    description: 'Partner registration successful.',
     type: RegisterPartnerResponseDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid input data or address hierarchy',
-  })
-  @ApiResponse({
-    status: 409,
-    description: 'Email or tax code already exists',
-  })
-  @Post('partner/register')
+  @ApiBadRequestResponse({ description: 'Invalid input data or address hierarchy.' })
+  @ApiConflictResponse({ description: 'Email or tax code already exists.' })
   async registerPartner(@Body() dto: RegisterPartnerDto): Promise<RegisterPartnerResponseDto> {
     return this.partnersService.registerPartner(dto);
   }
@@ -121,48 +121,58 @@ export class AuthController {
   /**
    * Logs in a partner and returns authentication tokens.
    */
+  @Post('partner/login')
   @Public()
   @UseGuards(LocalAuthGuard)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login as a partner' })
   @ApiBody({ type: PartnerLoginDto })
   @ApiOkResponse({
-    description: 'Partner login returns access and refresh tokens',
+    description: 'Partner login returns access and refresh tokens.',
     type: AuthTokensDto,
   })
-  @ApiForbiddenResponse({
-    description: 'Account is not authorized for partner login',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid credentials',
-  })
-  @HttpCode(200)
-  @Post('partner/login')
+  @ApiForbiddenResponse({ description: 'Account not authorized for partner login.' })
+  @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginPartner(@Req() req): Promise<AuthTokensDto> {
     return this.authService.loginPartner(req.user);
   }
 
   /**
-   * Logs in an admin and returns authentication tokens.
+   * Refreshes authentication tokens for a partner, including verification info.
    */
+  @Post('partner/refresh')
   @Public()
-  @UseGuards(LocalAuthGuard)
-  @ApiBody({ type: AdminLoginDto })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh partner tokens with verification info' })
   @ApiOkResponse({
-    description: 'Admin/Partner login returns access and refresh tokens',
+    description: 'New pair of tokens with partner verification info.',
     type: AuthTokensDto,
   })
-  @ApiForbiddenResponse({
-    description: 'Account is not authorized for admin login',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid credentials',
-  })
-  @HttpCode(200)
+  @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token.' })
+  async refreshPartner(@Body() dto: RefreshTokenRequestDto): Promise<AuthTokensDto> {
+    return this.authService.refreshPartner(dto.refresh_token);
+  }
+
+  /**
+   * Logs in an admin and returns authentication tokens.
+   */
   @Post('admin/login')
+  @Public()
+  @UseGuards(LocalAuthGuard)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login as admin' })
+  @ApiBody({ type: AdminLoginDto })
+  @ApiOkResponse({
+    description: 'Admin login returns access and refresh tokens.',
+    type: AuthTokensDto,
+  })
+  @ApiForbiddenResponse({ description: 'Account not authorized for admin login.' })
+  @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginAdmin(@Req() req): Promise<AuthTokensDto> {
     return this.authService.loginAdmin(req.user);
   }
-
-
 
   // ============================================================================
   // Common Authentication Endpoints
@@ -171,33 +181,27 @@ export class AuthController {
   /**
    * Logs out the current user by invalidating their refresh token.
    */
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(200)
   @Post('logout')
-  @ApiOkResponse({
-    description: 'Logout confirmation',
-    type: LogoutResponseDto,
-  })
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout current user' })
+  @ApiOkResponse({ description: 'Logout confirmation.', type: LogoutResponseDto })
   async logout(@Req() req): Promise<LogoutResponseDto> {
-    try {
-      const uid = req.user?.id;
-      if (uid) await this.accountService.removeRefreshToken(uid);
-    } catch (_) { }
-
-    return { message: 'Logged out successfully' };
+    return this.authService.logout(req.user?.id);
   }
 
   /**
    * Refreshes authentication tokens using a valid refresh token.
    */
-  @Public()
-  @HttpCode(200)
   @Post('refresh')
-  @ApiBody({ type: RefreshTokenRequestDto })
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh authentication tokens' })
   @ApiOkResponse({
-    description: 'Refresh returns new pair of tokens',
+    description: 'New pair of tokens.',
     type: AuthTokensDto,
   })
+  @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token.' })
   async refresh(@Body() dto: RefreshTokenRequestDto): Promise<AuthTokensDto> {
     return this.authService.refresh(dto.refresh_token);
   }

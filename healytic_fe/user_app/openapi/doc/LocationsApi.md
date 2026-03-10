@@ -12,20 +12,25 @@ Method | HTTP request | Description
 [**locationsControllerGetDistricts**](LocationsApi.md#locationscontrollergetdistricts) | **GET** /locations/provinces/{provinceId}/districts | Get all districts in a province
 [**locationsControllerGetProvinces**](LocationsApi.md#locationscontrollergetprovinces) | **GET** /locations/provinces | Get all provinces in Vietnam
 [**locationsControllerGetWards**](LocationsApi.md#locationscontrollergetwards) | **GET** /locations/districts/{districtId}/wards | Get all wards in a district
-[**locationsControllerSeedData**](LocationsApi.md#locationscontrollerseeddata) | **POST** /locations/seed | Seed Vietnam administrative divisions data
 
 
 # **locationsControllerGetDistricts**
-> GetDistrictsResponseDto locationsControllerGetDistricts(provinceId)
+> LocationListResponseDto locationsControllerGetDistricts(provinceId)
 
 Get all districts in a province
 
 ### Example
 ```dart
 import 'package:user_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = LocationsApi();
-final provinceId = uuid; // String | 
+final provinceId = provinceId_example; // String | 
 
 try {
     final result = api_instance.locationsControllerGetDistricts(provinceId);
@@ -43,11 +48,11 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**GetDistrictsResponseDto**](GetDistrictsResponseDto.md)
+[**LocationListResponseDto**](LocationListResponseDto.md)
 
 ### Authorization
 
-No authorization required
+[bearer](../README.md#bearer)
 
 ### HTTP request headers
 
@@ -57,13 +62,19 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **locationsControllerGetProvinces**
-> GetProvincesResponseDto locationsControllerGetProvinces()
+> LocationListResponseDto locationsControllerGetProvinces()
 
 Get all provinces in Vietnam
 
 ### Example
 ```dart
 import 'package:user_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = LocationsApi();
 
@@ -80,11 +91,11 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**GetProvincesResponseDto**](GetProvincesResponseDto.md)
+[**LocationListResponseDto**](LocationListResponseDto.md)
 
 ### Authorization
 
-No authorization required
+[bearer](../README.md#bearer)
 
 ### HTTP request headers
 
@@ -94,16 +105,22 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **locationsControllerGetWards**
-> GetWardsResponseDto locationsControllerGetWards(districtId)
+> LocationListResponseDto locationsControllerGetWards(districtId)
 
 Get all wards in a district
 
 ### Example
 ```dart
 import 'package:user_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = LocationsApi();
-final districtId = uuid; // String | 
+final districtId = districtId_example; // String | 
 
 try {
     final result = api_instance.locationsControllerGetWards(districtId);
@@ -121,52 +138,16 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**GetWardsResponseDto**](GetWardsResponseDto.md)
+[**LocationListResponseDto**](LocationListResponseDto.md)
 
 ### Authorization
 
-No authorization required
+[bearer](../README.md#bearer)
 
 ### HTTP request headers
 
  - **Content-Type**: Not defined
  - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **locationsControllerSeedData**
-> locationsControllerSeedData()
-
-Seed Vietnam administrative divisions data
-
-### Example
-```dart
-import 'package:user_openapi/api.dart';
-
-final api_instance = LocationsApi();
-
-try {
-    api_instance.locationsControllerSeedData();
-} catch (e) {
-    print('Exception when calling LocationsApi->locationsControllerSeedData: $e\n');
-}
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-void (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

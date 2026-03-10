@@ -59,7 +59,8 @@ const SEED_EMPLOYEES = [
 const SEED_DOCTOR_PROFILES: Record<string, Partial<Omit<DoctorProfile, 'employeeId' | 'employee'>>> = {
   'EMP-001': {
     title: 'M.D.',
-    medicalLicense: 'ML-2024-001',
+    medicalTitles: ['M.D.'],
+    medicalLicenses: ['ML-2024-001'],
     experienceYears: 12,
     consultationFee: 350000,
     specializations: ['Internal Medicine', 'Preventive Care', 'Chronic Disease Management'],

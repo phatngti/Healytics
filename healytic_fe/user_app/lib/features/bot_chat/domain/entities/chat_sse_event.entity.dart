@@ -60,8 +60,7 @@ class ChatSseEvent {
   static ChatSseEventType? parseType(String raw) {
     return switch (raw) {
       'token' => ChatSseEventType.token,
-      'ner_location' => ChatSseEventType.nerLocation,
-      'service_recommendation' => ChatSseEventType.serviceRecommendation,
+      'recommendation' => ChatSseEventType.serviceRecommendation,
       'done' => ChatSseEventType.done,
       'error' => ChatSseEventType.error,
       _ => null,

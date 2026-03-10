@@ -7,7 +7,7 @@ import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
 import { EmployeesModule } from './employees/employees.module';
 import { CategoriesModule } from './categories/categories.module';
-import { ProductsModule } from './products/products.module';
+import { HealthServiceModule } from './health-service/health-service.module';
 import { ServiceTagsModule } from './service-tags/service-tags.module';
 import { S3Module } from './s3/s3.module';
 import { LocationsModule } from './locations/locations.module';
@@ -53,7 +53,7 @@ import { PublicThrottlerGuard } from './common/guards';
     AccountModule,
     EmployeesModule,
     CategoriesModule,
-    ProductsModule,
+    HealthServiceModule,
     ServiceTagsModule,
     S3Module,
     LocationsModule,

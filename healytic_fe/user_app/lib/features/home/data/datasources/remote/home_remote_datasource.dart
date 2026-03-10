@@ -4,6 +4,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/providers/api.provider.dart';
+import 'package:user_app/core/services/api.service.dart';
 import 'home_mock_data.dart';
 import 'package:user_app/features/home/domain/entities/home.entity.dart';
 import 'package:user_openapi/api.dart';
@@ -16,22 +17,15 @@ abstract class HomeRemoteDatasource {
 }
 
 class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
-  final CategoriesApi _categoriesApi;
-  final ServiceTagsApi _serviceTagsApi;
-  final ProductsApi _productsApi;
+  final ApiService _apiService;
 
-  HomeRemoteDatasourceImpl(
-    this._categoriesApi,
-    this._serviceTagsApi,
-    this._productsApi,
-  );
+  HomeRemoteDatasourceImpl(this._apiService);
 
   @override
   Future<List<HomeCategory>> getCategories() async {
     try {
-      final response = await _categoriesApi.categoriesControllerFindAll(
-        rootsOnly: true,
-      );
+      final response = await _apiService.categoriesApi
+          .categoriesControllerFindAll(rootsOnly: true);
 
       if (response == null) return [];
 
@@ -56,7 +50,8 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   @override
   Future<List<HomeProduct>> getRecommendedProducts() async {
     try {
-      final response = await _productsApi.productsControllerGetHomeRecommend();
+      final response = await _apiService.healthServicesApi
+          .healthServiceControllerGetHomeRecommend();
 
       if (response == null) return [];
       return response.map(_mapDtoToProduct).toList();
@@ -69,8 +64,8 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   @override
   Future<List<HomeProduct>> getPremiumTreatments() async {
     try {
-      final response = await _productsApi
-          .productsControllerGetPremiumTreatments();
+      final response = await _apiService.healthServicesApi
+          .healthServiceControllerGetPremiumTreatments();
 
       if (response == null) return [];
       return response.map(_mapDtoToProduct).toList();
@@ -80,9 +75,11 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
     }
   }
 
-  /// Maps a [PublicProductCardResponseDto] to a domain
-  /// [HomeProduct] entity.
-  HomeProduct _mapDtoToProduct(PublicProductCardResponseDto dto) {
+  /// Maps a [PublicHealthServiceCardResponseDto] to a
+  /// domain [HomeProduct] entity.
+  HomeProduct _mapDtoToProduct(
+    PublicHealthServiceCardResponseDto dto,
+  ) {
     return HomeProduct(
       id: dto.id,
       name: dto.name,
@@ -126,7 +123,9 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   @override
   Future<List<ServiceTag>> getServiceTags() async {
     try {
-      final response = await _serviceTagsApi.serviceTagsControllerFindActive();
+      final response = await _apiService
+          .partnerServiceTagsApi
+          .serviceTagsControllerFindActive();
       if (response == null || response.isEmpty) return [];
 
       return response
@@ -188,9 +187,5 @@ final homeRemoteDatasourceProvider = Provider<HomeRemoteDatasource>((ref) {
   }
 
   final apiService = ref.read(apiServiceProvider);
-  return HomeRemoteDatasourceImpl(
-    CategoriesApi(apiService.apiClient),
-    ServiceTagsApi(apiService.apiClient),
-    ProductsApi(apiService.apiClient),
-  );
+  return HomeRemoteDatasourceImpl(apiService);
 });

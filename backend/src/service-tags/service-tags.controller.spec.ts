@@ -140,20 +140,20 @@ describe('ServiceTagsController', () => {
   });
 
   describe('attachToProduct', () => {
-    it('should call service.attachToProduct with tagId, productId, and userId', async () => {
+    it('should call service.attachToProduct and return DTO directly', async () => {
       // Arrange
       const tagId = 'tag-uuid-1';
       const productId = 'product-uuid-1';
       const userId = 'user-uuid-1';
       const mockCreatedAt = new Date('2026-01-14T22:45:00.000Z');
-      const serviceProductTag = { id: 'pt-1', tagId, productId, createdAt: mockCreatedAt };
-      serviceTagsService.attachToProduct!.mockResolvedValue(serviceProductTag);
+      const expectedDto = { tagId, productId, createdAt: mockCreatedAt };
+      serviceTagsService.attachToProduct!.mockResolvedValue(expectedDto);
 
       // Act
       const result = await controller.attachToProduct(tagId, productId, userId);
 
       // Assert
-      expect(result).toEqual({ tagId, productId, createdAt: mockCreatedAt });
+      expect(result).toEqual(expectedDto);
       expect(serviceTagsService.attachToProduct).toHaveBeenCalledWith(tagId, productId, userId);
     });
   });

@@ -105,6 +105,12 @@ sealed class EmployeeEntity {
   /// Employment start date in ISO 8601 format.
   String? get startDate;
 
+  /// Emergency contact person's name.
+  String? get emergencyContactName;
+
+  /// Emergency contact person's phone number.
+  String? get emergencyContactPhone;
+
   /// Creates an [EmployeeEntity] from JSON data.
   ///
   /// Automatically determines the correct subtype based on the
@@ -150,7 +156,8 @@ abstract class DoctorEntity with _$DoctorEntity implements EmployeeEntity {
     required String state,
     required String country,
     required String jobTitle,
-    required String medicalLicense,
+    @Default([]) List<String> medicalTitles,
+    @Default([]) List<String> medicalLicenses,
     @Default([]) List<String> specializations,
     @Default([]) List<String> education,
     @Default([]) List<String> certifications,
@@ -165,6 +172,8 @@ abstract class DoctorEntity with _$DoctorEntity implements EmployeeEntity {
     String? gender,
     String? employmentType,
     String? startDate,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
   }) = _DoctorEntity;
 
   /// Creates a [DoctorEntity] from JSON data.
@@ -212,6 +221,8 @@ abstract class SpaTherapistEntity
     String? gender,
     String? employmentType,
     String? startDate,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
   }) = _SpaTherapistEntity;
 
   /// Creates a [SpaTherapistEntity] from JSON data.
@@ -259,6 +270,8 @@ abstract class MassageTherapistEntity
     String? gender,
     String? employmentType,
     String? startDate,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
   }) = _MassageTherapistEntity;
 
   /// Creates a [MassageTherapistEntity] from JSON data.
@@ -300,6 +313,8 @@ abstract class BasicEmployeeEntity
     String? gender,
     String? employmentType,
     String? startDate,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
   }) = _BasicEmployeeEntity;
 
   /// Creates a [BasicEmployeeEntity] from JSON data.

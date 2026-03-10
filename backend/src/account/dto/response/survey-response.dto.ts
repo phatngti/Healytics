@@ -1,4 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 export class SurveyResponseDto {
   @ApiPropertyOptional({
@@ -17,5 +18,6 @@ export class SurveyResponseDto {
       submittedAt: '2025-11-22T12:34:56.789Z',
     },
   })
+  @Expose()
   survey?: Record<string, any> | null;
 }

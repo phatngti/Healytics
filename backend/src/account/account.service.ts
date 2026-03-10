@@ -1,10 +1,12 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, ConflictException } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Account } from '@/common/entities/account.entity';
 import { CreateAccountHandler } from './application/handlers/create-account.handler';
 import { SetSurveyHandler } from './application/handlers/set-survey.handler';
 import { SetRefreshTokenHandler } from './application/handlers/set-refresh-token.handler';
+import { SurveyResponseDto } from './dto/response/survey-response.dto';
 
 /**
  * Service facade for managing user accounts.
@@ -43,6 +45,42 @@ export class AccountService {
       select: ['id', 'survey'],
     });
     return account?.survey ?? null;
+  }
+
+  /**
+   * Returns survey data wrapped in SurveyResponseDto.
+   * Used by the controller as a dumb adapter.
+   * @param accountId - The account ID
+   * @returns SurveyResponseDto
+   */
+  async getSurveyResponse(accountId: string): Promise<SurveyResponseDto> {
+    const survey = await this.getSurvey(accountId);
+    const response = new SurveyResponseDto();
+    response.survey = survey ?? null;
+    return response;
+  }
+
+  /**
+   * Creates a one-shot survey for the current user.
+   * Throws ConflictException if survey already exists.
+   * Business logic moved from controller per enterprise pattern §10.
+   * @param accountId - The account ID
+   * @param survey - The survey data
+   * @returns SurveyResponseDto
+   */
+  async createSurvey(
+    accountId: string,
+    survey: Record<string, unknown>,
+  ): Promise<SurveyResponseDto> {
+    const existing = await this.getSurvey(accountId);
+    if (existing !== null) {
+      this.logger.warn(`Survey already exists for account: ${accountId}`);
+      throw new ConflictException('Survey already exists');
+    }
+    const updated = await this.setSurveyHandler.execute(accountId, survey);
+    const response = new SurveyResponseDto();
+    response.survey = updated.survey ?? null;
+    return response;
   }
 
   /**

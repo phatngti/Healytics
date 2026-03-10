@@ -24,19 +24,5 @@ void main() {
       // TODO
     });
 
-    // Send a message to the chatbot
-    //
-    //Future<SendMessageResponseDto> chatbotControllerSendMessage(SendMessageDto sendMessageDto) async
-    test('test chatbotControllerSendMessage', () async {
-      // TODO
-    });
-
-    // Stream chatbot response via SSE
-    //
-    //Future chatbotControllerStreamChat(String conversationId) async
-    test('test chatbotControllerStreamChat', () async {
-      // TODO
-    });
-
   });
 }

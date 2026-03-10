@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditLog } from '@/common/entities/audit-log.entity';
 import { CreateAuditLogDto } from './dto/create-audit-log.dto';
+import { GetAuditLogsQueryDto } from './dto/get-audit-logs-query.dto';
 
 @Injectable()
 export class AuditService {
@@ -16,7 +17,7 @@ export class AuditService {
         return this.auditLogRepo.save(log);
     }
 
-    async findAll(query: any): Promise<AuditLog[]> {
+    async findAll(query: GetAuditLogsQueryDto): Promise<AuditLog[]> {
         const qb = this.auditLogRepo.createQueryBuilder('audit');
 
         if (query.targetId) {

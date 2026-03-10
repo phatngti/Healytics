@@ -19,29 +19,22 @@ void main() {
   group('tests for LocationsApi', () {
     // Get all districts in a province
     //
-    //Future<GetDistrictsResponseDto> locationsControllerGetDistricts(String provinceId) async
+    //Future<LocationListResponseDto> locationsControllerGetDistricts(String provinceId) async
     test('test locationsControllerGetDistricts', () async {
       // TODO
     });
 
     // Get all provinces in Vietnam
     //
-    //Future<GetProvincesResponseDto> locationsControllerGetProvinces() async
+    //Future<LocationListResponseDto> locationsControllerGetProvinces() async
     test('test locationsControllerGetProvinces', () async {
       // TODO
     });
 
     // Get all wards in a district
     //
-    //Future<GetWardsResponseDto> locationsControllerGetWards(String districtId) async
+    //Future<LocationListResponseDto> locationsControllerGetWards(String districtId) async
     test('test locationsControllerGetWards', () async {
-      // TODO
-    });
-
-    // Seed Vietnam administrative divisions data
-    //
-    //Future locationsControllerSeedData() async
-    test('test locationsControllerSeedData', () async {
       // TODO
     });
 

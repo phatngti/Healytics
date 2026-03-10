@@ -27,6 +27,21 @@ describe('ServiceTagsService', () => {
   let attachProductTagHandler: MockHandler;
   let detachProductTagHandler: MockHandler;
 
+  // Helper to create a mock entity for testing
+  const createMockTagEntity = (overrides: Partial<ProductFeatureTag> = {}): ProductFeatureTag => ({
+    id: 'tag-uuid-1',
+    userId: 'user-uuid-1',
+    name: 'Test Tag',
+    description: 'A test tag',
+    colorValue: '#FF6366F1',
+    usage: 0,
+    isActive: true,
+    sortOrder: 0,
+    createdAt: new Date('2026-01-14T22:45:00.000Z'),
+    updatedAt: new Date('2026-01-14T22:45:00.000Z'),
+    ...overrides,
+  } as ProductFeatureTag);
+
   beforeEach(async () => {
     // Arrange - Create fresh mocks for each test
     serviceTagRepository = createMockRepository<ProductFeatureTag>();
@@ -83,38 +98,42 @@ describe('ServiceTagsService', () => {
   });
 
   describe('create', () => {
-    it('should delegate to CreateServiceTagHandler', async () => {
+    it('should delegate to CreateServiceTagHandler and return response DTO', async () => {
       // Arrange
       const dto = { name: 'Test Tag' };
       const userId = 'user-uuid-1';
-      const expectedTag = { id: 'tag-uuid-1', name: 'Test Tag', userId };
-      createServiceTagHandler.execute.mockResolvedValue(expectedTag);
+      const mockEntity = createMockTagEntity({ name: 'Test Tag', userId });
+      createServiceTagHandler.execute.mockResolvedValue(mockEntity);
 
       // Act
       const result = await service.create(dto as any, userId);
 
       // Assert
-      expect(result).toEqual(expectedTag);
+      expect(result.id).toBe(mockEntity.id);
+      expect(result.name).toBe('Test Tag');
+      expect(result.userId).toBe(userId);
       expect(createServiceTagHandler.execute).toHaveBeenCalledWith(dto, userId);
       expect(createServiceTagHandler.execute).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('findAllByUser', () => {
-    it('should return all service tags for the user', async () => {
+    it('should return response DTOs for all service tags', async () => {
       // Arrange
       const userId = 'user-uuid-1';
-      const expectedTags = [
-        { id: 'tag-1', name: 'Tag 1', userId },
-        { id: 'tag-2', name: 'Tag 2', userId },
+      const entities = [
+        createMockTagEntity({ id: 'tag-1', name: 'Tag 1', userId }),
+        createMockTagEntity({ id: 'tag-2', name: 'Tag 2', userId }),
       ];
-      serviceTagRepository.find.mockResolvedValue(expectedTags);
+      serviceTagRepository.find.mockResolvedValue(entities);
 
       // Act
       const result = await service.findAllByUser(userId);
 
       // Assert
-      expect(result).toEqual(expectedTags);
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('tag-1');
+      expect(result[1].id).toBe('tag-2');
       expect(serviceTagRepository.find).toHaveBeenCalledWith({
         where: { userId },
         order: { sortOrder: 'ASC', createdAt: 'DESC' },
@@ -135,17 +154,18 @@ describe('ServiceTagsService', () => {
   });
 
   describe('findActiveByUser', () => {
-    it('should return only active service tags for the user', async () => {
+    it('should return only active service tags as response DTOs', async () => {
       // Arrange
       const userId = 'user-uuid-1';
-      const expectedTags = [{ id: 'tag-1', name: 'Active Tag', isActive: true }];
-      serviceTagRepository.find.mockResolvedValue(expectedTags);
+      const entities = [createMockTagEntity({ id: 'tag-1', name: 'Active Tag', isActive: true })];
+      serviceTagRepository.find.mockResolvedValue(entities);
 
       // Act
       const result = await service.findActiveByUser(userId);
 
       // Assert
-      expect(result).toEqual(expectedTags);
+      expect(result).toHaveLength(1);
+      expect(result[0].isActive).toBe(true);
       expect(serviceTagRepository.find).toHaveBeenCalledWith({
         where: { userId, isActive: true },
         order: { sortOrder: 'ASC', createdAt: 'DESC' },
@@ -154,17 +174,18 @@ describe('ServiceTagsService', () => {
   });
 
   describe('findOne', () => {
-    it('should return a service tag when found', async () => {
+    it('should return a response DTO when tag found', async () => {
       // Arrange
       const tagId = 'tag-uuid-1';
-      const expectedTag = { id: tagId, name: 'Test Tag' };
-      serviceTagRepository.findOne.mockResolvedValue(expectedTag);
+      const entity = createMockTagEntity({ id: tagId });
+      serviceTagRepository.findOne.mockResolvedValue(entity);
 
       // Act
       const result = await service.findOne(tagId);
 
       // Assert
-      expect(result).toEqual(expectedTag);
+      expect(result.id).toBe(tagId);
+      expect(result.name).toBe('Test Tag');
       expect(serviceTagRepository.findOne).toHaveBeenCalledWith({
         where: { id: tagId },
         relations: ['productTags'],
@@ -185,19 +206,20 @@ describe('ServiceTagsService', () => {
   });
 
   describe('update', () => {
-    it('should delegate to UpdateServiceTagHandler', async () => {
+    it('should delegate to UpdateServiceTagHandler and return response DTO', async () => {
       // Arrange
       const tagId = 'tag-uuid-1';
       const userId = 'user-uuid-1';
       const dto = { name: 'Updated Name' };
-      const expectedTag = { id: tagId, name: 'Updated Name' };
-      updateServiceTagHandler.execute.mockResolvedValue(expectedTag);
+      const mockEntity = createMockTagEntity({ id: tagId, name: 'Updated Name' });
+      updateServiceTagHandler.execute.mockResolvedValue(mockEntity);
 
       // Act
       const result = await service.update(tagId, dto as any, userId);
 
       // Assert
-      expect(result).toEqual(expectedTag);
+      expect(result.id).toBe(tagId);
+      expect(result.name).toBe('Updated Name');
       expect(updateServiceTagHandler.execute).toHaveBeenCalledWith(tagId, dto, userId);
     });
   });
@@ -218,19 +240,22 @@ describe('ServiceTagsService', () => {
   });
 
   describe('attachToProduct', () => {
-    it('should delegate to AttachProductTagHandler', async () => {
+    it('should delegate to handler and return AttachTagResponseDto', async () => {
       // Arrange
       const tagId = 'tag-uuid-1';
       const productId = 'product-uuid-1';
       const userId = 'user-uuid-1';
-      const expectedProductTag = { id: 'pt-1', tagId, productId };
-      attachProductTagHandler.execute.mockResolvedValue(expectedProductTag);
+      const mockCreatedAt = new Date('2026-01-14T22:45:00.000Z');
+      const mockProductTag = { id: 'pt-1', tagId, productId, createdAt: mockCreatedAt };
+      attachProductTagHandler.execute.mockResolvedValue(mockProductTag);
 
       // Act
       const result = await service.attachToProduct(tagId, productId, userId);
 
       // Assert
-      expect(result).toEqual(expectedProductTag);
+      expect(result.tagId).toBe(tagId);
+      expect(result.productId).toBe(productId);
+      expect(result.createdAt).toEqual(mockCreatedAt);
       expect(attachProductTagHandler.execute).toHaveBeenCalledWith(tagId, productId, userId);
     });
   });
@@ -252,11 +277,11 @@ describe('ServiceTagsService', () => {
   });
 
   describe('getTagsForProduct', () => {
-    it('should return all tags for a product', async () => {
+    it('should return response DTOs for all tags on a product', async () => {
       // Arrange
       const productId = 'product-uuid-1';
-      const tag1 = { id: 'tag-1', name: 'Tag 1' };
-      const tag2 = { id: 'tag-2', name: 'Tag 2' };
+      const tag1 = createMockTagEntity({ id: 'tag-1', name: 'Tag 1' });
+      const tag2 = createMockTagEntity({ id: 'tag-2', name: 'Tag 2' });
       const productTags = [
         { id: 'pt-1', productId, tag: tag1 },
         { id: 'pt-2', productId, tag: tag2 },
@@ -267,7 +292,9 @@ describe('ServiceTagsService', () => {
       const result = await service.getTagsForProduct(productId);
 
       // Assert
-      expect(result).toEqual([tag1, tag2]);
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('tag-1');
+      expect(result[1].id).toBe('tag-2');
       expect(productTagRepository.find).toHaveBeenCalledWith({
         where: { productId },
         relations: ['tag'],

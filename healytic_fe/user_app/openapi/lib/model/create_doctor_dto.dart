@@ -13,44 +13,40 @@ part of openapi.api;
 class CreateDoctorDto {
   /// Returns a new [CreateDoctorDto] instance.
   CreateDoctorDto({
-    this.authId,
-    required this.employeeCode,
-    required this.fullName,
-    this.displayName,
+    required this.firstName,
+    required this.lastName,
     required this.email,
     this.phone,
-    this.avatarUrl,
-    this.dob,
+    this.dateOfBirth,
     this.gender,
+    this.emergencyContactName,
+    this.emergencyContactPhone,
+    required this.employeeId,
+    this.employmentType,
+    this.startDate,
+    this.schedule = const [],
+    this.avatar,
+    this.idCardUrl,
     this.status,
-    this.branchId,
+    this.branch,
+    this.password,
+    this.description,
+    this.jobTitle,
+    this.medicalTitles = const [],
+    this.medicalLicenses = const [],
+    this.experienceYears,
+    this.consultationFee,
+    this.specializations = const [],
+    this.education = const [],
+    this.certifications = const [],
     this.partnerId,
-    required this.profile,
   });
 
-  /// Authentication ID from external provider
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? authId;
+  /// First name
+  String firstName;
 
-  /// Unique employee code
-  String employeeCode;
-
-  /// Full name of the doctor
-  String fullName;
-
-  /// Display name
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? displayName;
+  /// Last name
+  String lastName;
 
   /// Email address
   String email;
@@ -64,15 +60,6 @@ class CreateDoctorDto {
   ///
   String? phone;
 
-  /// Avatar URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? avatarUrl;
-
   /// Date of birth
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -80,24 +67,144 @@ class CreateDoctorDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? dob;
+  String? dateOfBirth;
 
   /// Gender
   CreateDoctorDtoGenderEnum? gender;
 
-  /// Status of the employee
-  CreateDoctorDtoStatusEnum? status;
-
-  /// Branch ID the employee belongs to
+  /// Emergency contact name
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? branchId;
+  String? emergencyContactName;
 
-  /// Partner ID the employee belongs to
+  /// Emergency contact phone
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? emergencyContactPhone;
+
+  /// Unique employee identifier code
+  String employeeId;
+
+  /// Employment type
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? employmentType;
+
+  /// Start date
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? startDate;
+
+  /// Weekly work schedule
+  List<WorkScheduleEntryDto> schedule;
+
+  /// Avatar URL
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? avatar;
+
+  /// ID card URL
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? idCardUrl;
+
+  /// Employee status
+  CreateDoctorDtoStatusEnum? status;
+
+  /// Branch ID or name
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? branch;
+
+  /// Account password
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? password;
+
+  /// Bio / description
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? description;
+
+  /// Job title
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? jobTitle;
+
+  /// Medical titles
+  List<String> medicalTitles;
+
+  /// Medical license numbers
+  List<String> medicalLicenses;
+
+  /// Years of experience
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  num? experienceYears;
+
+  /// Consultation fee
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  num? consultationFee;
+
+  /// Specializations
+  List<String> specializations;
+
+  /// Education history
+  List<String> education;
+
+  /// Certifications
+  List<String> certifications;
+
+  /// Partner ID (auto-injected)
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -106,96 +213,167 @@ class CreateDoctorDto {
   ///
   String? partnerId;
 
-  /// Doctor profile information
-  DoctorProfileDto profile;
-
   @override
   bool operator ==(Object other) => identical(this, other) || other is CreateDoctorDto &&
-    other.authId == authId &&
-    other.employeeCode == employeeCode &&
-    other.fullName == fullName &&
-    other.displayName == displayName &&
+    other.firstName == firstName &&
+    other.lastName == lastName &&
     other.email == email &&
     other.phone == phone &&
-    other.avatarUrl == avatarUrl &&
-    other.dob == dob &&
+    other.dateOfBirth == dateOfBirth &&
     other.gender == gender &&
+    other.emergencyContactName == emergencyContactName &&
+    other.emergencyContactPhone == emergencyContactPhone &&
+    other.employeeId == employeeId &&
+    other.employmentType == employmentType &&
+    other.startDate == startDate &&
+    _deepEquality.equals(other.schedule, schedule) &&
+    other.avatar == avatar &&
+    other.idCardUrl == idCardUrl &&
     other.status == status &&
-    other.branchId == branchId &&
-    other.partnerId == partnerId &&
-    other.profile == profile;
+    other.branch == branch &&
+    other.password == password &&
+    other.description == description &&
+    other.jobTitle == jobTitle &&
+    _deepEquality.equals(other.medicalTitles, medicalTitles) &&
+    _deepEquality.equals(other.medicalLicenses, medicalLicenses) &&
+    other.experienceYears == experienceYears &&
+    other.consultationFee == consultationFee &&
+    _deepEquality.equals(other.specializations, specializations) &&
+    _deepEquality.equals(other.education, education) &&
+    _deepEquality.equals(other.certifications, certifications) &&
+    other.partnerId == partnerId;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (authId == null ? 0 : authId!.hashCode) +
-    (employeeCode.hashCode) +
-    (fullName.hashCode) +
-    (displayName == null ? 0 : displayName!.hashCode) +
+    (firstName.hashCode) +
+    (lastName.hashCode) +
     (email.hashCode) +
     (phone == null ? 0 : phone!.hashCode) +
-    (avatarUrl == null ? 0 : avatarUrl!.hashCode) +
-    (dob == null ? 0 : dob!.hashCode) +
+    (dateOfBirth == null ? 0 : dateOfBirth!.hashCode) +
     (gender == null ? 0 : gender!.hashCode) +
+    (emergencyContactName == null ? 0 : emergencyContactName!.hashCode) +
+    (emergencyContactPhone == null ? 0 : emergencyContactPhone!.hashCode) +
+    (employeeId.hashCode) +
+    (employmentType == null ? 0 : employmentType!.hashCode) +
+    (startDate == null ? 0 : startDate!.hashCode) +
+    (schedule.hashCode) +
+    (avatar == null ? 0 : avatar!.hashCode) +
+    (idCardUrl == null ? 0 : idCardUrl!.hashCode) +
     (status == null ? 0 : status!.hashCode) +
-    (branchId == null ? 0 : branchId!.hashCode) +
-    (partnerId == null ? 0 : partnerId!.hashCode) +
-    (profile.hashCode);
+    (branch == null ? 0 : branch!.hashCode) +
+    (password == null ? 0 : password!.hashCode) +
+    (description == null ? 0 : description!.hashCode) +
+    (jobTitle == null ? 0 : jobTitle!.hashCode) +
+    (medicalTitles.hashCode) +
+    (medicalLicenses.hashCode) +
+    (experienceYears == null ? 0 : experienceYears!.hashCode) +
+    (consultationFee == null ? 0 : consultationFee!.hashCode) +
+    (specializations.hashCode) +
+    (education.hashCode) +
+    (certifications.hashCode) +
+    (partnerId == null ? 0 : partnerId!.hashCode);
 
   @override
-  String toString() => 'CreateDoctorDto[authId=$authId, employeeCode=$employeeCode, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, status=$status, branchId=$branchId, partnerId=$partnerId, profile=$profile]';
+  String toString() => 'CreateDoctorDto[firstName=$firstName, lastName=$lastName, email=$email, phone=$phone, dateOfBirth=$dateOfBirth, gender=$gender, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, employeeId=$employeeId, employmentType=$employmentType, startDate=$startDate, schedule=$schedule, avatar=$avatar, idCardUrl=$idCardUrl, status=$status, branch=$branch, password=$password, description=$description, jobTitle=$jobTitle, medicalTitles=$medicalTitles, medicalLicenses=$medicalLicenses, experienceYears=$experienceYears, consultationFee=$consultationFee, specializations=$specializations, education=$education, certifications=$certifications, partnerId=$partnerId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.authId != null) {
-      json[r'authId'] = this.authId;
-    } else {
-      json[r'authId'] = null;
-    }
-      json[r'employeeCode'] = this.employeeCode;
-      json[r'fullName'] = this.fullName;
-    if (this.displayName != null) {
-      json[r'displayName'] = this.displayName;
-    } else {
-      json[r'displayName'] = null;
-    }
+      json[r'firstName'] = this.firstName;
+      json[r'lastName'] = this.lastName;
       json[r'email'] = this.email;
     if (this.phone != null) {
       json[r'phone'] = this.phone;
     } else {
       json[r'phone'] = null;
     }
-    if (this.avatarUrl != null) {
-      json[r'avatarUrl'] = this.avatarUrl;
+    if (this.dateOfBirth != null) {
+      json[r'dateOfBirth'] = this.dateOfBirth;
     } else {
-      json[r'avatarUrl'] = null;
-    }
-    if (this.dob != null) {
-      json[r'dob'] = this.dob;
-    } else {
-      json[r'dob'] = null;
+      json[r'dateOfBirth'] = null;
     }
     if (this.gender != null) {
       json[r'gender'] = this.gender;
     } else {
       json[r'gender'] = null;
     }
+    if (this.emergencyContactName != null) {
+      json[r'emergencyContactName'] = this.emergencyContactName;
+    } else {
+      json[r'emergencyContactName'] = null;
+    }
+    if (this.emergencyContactPhone != null) {
+      json[r'emergencyContactPhone'] = this.emergencyContactPhone;
+    } else {
+      json[r'emergencyContactPhone'] = null;
+    }
+      json[r'employeeId'] = this.employeeId;
+    if (this.employmentType != null) {
+      json[r'employmentType'] = this.employmentType;
+    } else {
+      json[r'employmentType'] = null;
+    }
+    if (this.startDate != null) {
+      json[r'startDate'] = this.startDate;
+    } else {
+      json[r'startDate'] = null;
+    }
+      json[r'schedule'] = this.schedule;
+    if (this.avatar != null) {
+      json[r'avatar'] = this.avatar;
+    } else {
+      json[r'avatar'] = null;
+    }
+    if (this.idCardUrl != null) {
+      json[r'idCardUrl'] = this.idCardUrl;
+    } else {
+      json[r'idCardUrl'] = null;
+    }
     if (this.status != null) {
       json[r'status'] = this.status;
     } else {
       json[r'status'] = null;
     }
-    if (this.branchId != null) {
-      json[r'branchId'] = this.branchId;
+    if (this.branch != null) {
+      json[r'branch'] = this.branch;
     } else {
-      json[r'branchId'] = null;
+      json[r'branch'] = null;
     }
+    if (this.password != null) {
+      json[r'password'] = this.password;
+    } else {
+      json[r'password'] = null;
+    }
+    if (this.description != null) {
+      json[r'description'] = this.description;
+    } else {
+      json[r'description'] = null;
+    }
+    if (this.jobTitle != null) {
+      json[r'jobTitle'] = this.jobTitle;
+    } else {
+      json[r'jobTitle'] = null;
+    }
+      json[r'medicalTitles'] = this.medicalTitles;
+      json[r'medicalLicenses'] = this.medicalLicenses;
+    if (this.experienceYears != null) {
+      json[r'experienceYears'] = this.experienceYears;
+    } else {
+      json[r'experienceYears'] = null;
+    }
+    if (this.consultationFee != null) {
+      json[r'consultationFee'] = this.consultationFee;
+    } else {
+      json[r'consultationFee'] = null;
+    }
+      json[r'specializations'] = this.specializations;
+      json[r'education'] = this.education;
+      json[r'certifications'] = this.certifications;
     if (this.partnerId != null) {
       json[r'partnerId'] = this.partnerId;
     } else {
       json[r'partnerId'] = null;
     }
-      json[r'profile'] = this.profile;
     return json;
   }
 
@@ -218,19 +396,43 @@ class CreateDoctorDto {
       }());
 
       return CreateDoctorDto(
-        authId: mapValueOfType<String>(json, r'authId'),
-        employeeCode: mapValueOfType<String>(json, r'employeeCode')!,
-        fullName: mapValueOfType<String>(json, r'fullName')!,
-        displayName: mapValueOfType<String>(json, r'displayName'),
+        firstName: mapValueOfType<String>(json, r'firstName')!,
+        lastName: mapValueOfType<String>(json, r'lastName')!,
         email: mapValueOfType<String>(json, r'email')!,
         phone: mapValueOfType<String>(json, r'phone'),
-        avatarUrl: mapValueOfType<String>(json, r'avatarUrl'),
-        dob: mapValueOfType<String>(json, r'dob'),
+        dateOfBirth: mapValueOfType<String>(json, r'dateOfBirth'),
         gender: CreateDoctorDtoGenderEnum.fromJson(json[r'gender']),
+        emergencyContactName: mapValueOfType<String>(json, r'emergencyContactName'),
+        emergencyContactPhone: mapValueOfType<String>(json, r'emergencyContactPhone'),
+        employeeId: mapValueOfType<String>(json, r'employeeId')!,
+        employmentType: mapValueOfType<String>(json, r'employmentType'),
+        startDate: mapValueOfType<String>(json, r'startDate'),
+        schedule: WorkScheduleEntryDto.listFromJson(json[r'schedule']),
+        avatar: mapValueOfType<String>(json, r'avatar'),
+        idCardUrl: mapValueOfType<String>(json, r'idCardUrl'),
         status: CreateDoctorDtoStatusEnum.fromJson(json[r'status']),
-        branchId: mapValueOfType<String>(json, r'branchId'),
+        branch: mapValueOfType<String>(json, r'branch'),
+        password: mapValueOfType<String>(json, r'password'),
+        description: mapValueOfType<String>(json, r'description'),
+        jobTitle: mapValueOfType<String>(json, r'jobTitle'),
+        medicalTitles: json[r'medicalTitles'] is Iterable
+            ? (json[r'medicalTitles'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        medicalLicenses: json[r'medicalLicenses'] is Iterable
+            ? (json[r'medicalLicenses'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        experienceYears: num.parse('${json[r'experienceYears']}'),
+        consultationFee: num.parse('${json[r'consultationFee']}'),
+        specializations: json[r'specializations'] is Iterable
+            ? (json[r'specializations'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        education: json[r'education'] is Iterable
+            ? (json[r'education'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        certifications: json[r'certifications'] is Iterable
+            ? (json[r'certifications'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
         partnerId: mapValueOfType<String>(json, r'partnerId'),
-        profile: DoctorProfileDto.fromJson(json[r'profile'])!,
       );
     }
     return null;
@@ -278,10 +480,10 @@ class CreateDoctorDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'employeeCode',
-    'fullName',
+    'firstName',
+    'lastName',
     'email',
-    'profile',
+    'employeeId',
   };
 }
 
@@ -362,7 +564,7 @@ class CreateDoctorDtoGenderEnumTypeTransformer {
 }
 
 
-/// Status of the employee
+/// Employee status
 class CreateDoctorDtoStatusEnum {
   /// Instantiate a new enum with the provided [value].
   const CreateDoctorDtoStatusEnum._(this.value);

@@ -1,20 +1,15 @@
 import {
-  Controller,
   Get,
   Post,
   Body,
   Patch,
   Param,
   Delete,
-  UseGuards,
-  UseInterceptors,
-  ClassSerializerInterceptor,
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import {
-  ApiTags,
   ApiOperation,
   ApiCreatedResponse,
   ApiOkResponse,
@@ -22,30 +17,21 @@ import {
   ApiNotFoundResponse,
   ApiForbiddenResponse,
   ApiConflictResponse,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import { PartnerApi } from '@/common/decorators/api/partner-api.decorator';
+import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { ServiceTagsService } from './service-tags.service';
 import { CreateServiceTagDto } from './dto/create-service-tag.dto';
 import { UpdateServiceTagDto } from './dto/update-service-tag.dto';
 import { ServiceTagResponseDto } from './dto/service-tag-response.dto';
 import { AttachTagResponseDto } from './dto/attach-tag-response.dto';
-import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
-import { RolesGuard } from '@/auth/guards/roles.guard';
-import { Roles } from '@/common/decorators/auth/roles.decorator';
-import { Role } from '@/account/enum/role.enum';
-import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 
 /**
  * Controller for service tag management endpoints.
- * API Version 1.
- * Accessible by ADMIN and HEALTH_PARTNER roles.
+ * Uses @PartnerApi composite decorator → HEALTH_PARTNER role, /v1/partner/service-tags.
  */
-@ApiTags('service-tags')
-@ApiBearerAuth()
-@Controller({ path: 'service-tags', version: '1' })
-@UseGuards(JwtAuthGuard, RolesGuard)
-@UseInterceptors(ClassSerializerInterceptor)
-@Roles(Role.ADMIN, Role.HEALTH_PARTNER)
+@PartnerApi('service-tags')
 export class ServiceTagsController {
   constructor(private readonly serviceTagsService: ServiceTagsService) {}
 
@@ -53,6 +39,7 @@ export class ServiceTagsController {
    * Creates a new service tag for the current user.
    */
   @Post()
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Create a new service tag' })
   @ApiCreatedResponse({
     description: 'The service tag has been successfully created.',
@@ -109,6 +96,7 @@ export class ServiceTagsController {
    * Updates a service tag.
    */
   @Patch(':id')
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Update a service tag' })
   @ApiOkResponse({
     description: 'The service tag has been successfully updated.',
@@ -129,6 +117,7 @@ export class ServiceTagsController {
    */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Delete a service tag' })
   @ApiNoContentResponse({
     description: 'The service tag has been successfully deleted.',
@@ -146,6 +135,7 @@ export class ServiceTagsController {
    * Attaches a tag to a product.
    */
   @Post(':id/products/:productId')
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Attach a tag to a product' })
   @ApiCreatedResponse({
     description: 'Tag attached to product successfully.',
@@ -156,17 +146,12 @@ export class ServiceTagsController {
   @ApiConflictResponse({
     description: 'Tag is already attached to this product.',
   })
-  async attachToProduct(
+  attachToProduct(
     @Param('id', ParseUUIDPipe) tagId: string,
     @Param('productId', ParseUUIDPipe) productId: string,
     @CurrentUser('id') userId: string,
   ): Promise<AttachTagResponseDto> {
-    const productTag = await this.serviceTagsService.attachToProduct(tagId, productId, userId);
-    return {
-      tagId: productTag.tagId,
-      productId: productTag.productId,
-      createdAt: productTag.createdAt,
-    };
+    return this.serviceTagsService.attachToProduct(tagId, productId, userId);
   }
 
   /**
@@ -174,6 +159,7 @@ export class ServiceTagsController {
    */
   @Delete(':id/products/:productId')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Detach a tag from a product' })
   @ApiNoContentResponse({
     description: 'Tag detached from product successfully.',

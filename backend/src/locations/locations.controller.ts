@@ -1,91 +1,74 @@
 import {
-    Controller,
-    Post,
-    Get,
-    Param,
-    HttpCode,
-    HttpStatus,
-    ParseUUIDPipe,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiOkResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger';
 import { LocationsService } from './locations.service';
-import { GetProvincesResponseDto } from './dto/response/get-provinces-response.dto';
-import { GetDistrictsResponseDto } from './dto/response/get-districts-response.dto';
-import { GetWardsResponseDto } from './dto/response/get-wards-response.dto';
+import { LocationListResponseDto } from './dto/response/location-response.dto';
 import { Public } from '@/common/decorators/auth/public.decorator';
-import { DataSource } from 'typeorm';
-import { SeedLocations1770100000000 } from '../../migrations/master-data/location.seed';
+import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '@/auth/guards/roles.guard';
 
-@ApiTags('locations')
-@Controller('locations')
-@Public()
+/**
+ * Controller for Vietnam administrative location endpoints.
+ * All endpoints are public (read-only reference data).
+ * API Version 1.
+ */
+@ApiTags('Locations')
+@ApiBearerAuth()
+@Controller({ path: 'locations', version: '1' })
+@UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(ClassSerializerInterceptor)
 export class LocationsController {
-    constructor(
-        private readonly locationsService: LocationsService,
-        private readonly dataSource: DataSource,
-    ) { }
+  constructor(private readonly locationsService: LocationsService) {}
 
-    @Get('provinces')
-    @ApiOperation({ summary: 'Get all provinces in Vietnam' })
-    @ApiResponse({
-        status: 200,
-        description: 'List of all provinces',
-        type: GetProvincesResponseDto,
-    })
-    async getProvinces(): Promise<GetProvincesResponseDto> {
-        return this.locationsService.getAllProvinces();
-    }
+  @Get('provinces')
+  @Public()
+  @ApiOperation({ summary: 'Get all provinces in Vietnam' })
+  @ApiOkResponse({
+    description: 'List of all provinces',
+    type: LocationListResponseDto,
+  })
+  getProvinces(): Promise<LocationListResponseDto> {
+    return this.locationsService.getAllProvinces();
+  }
 
-    @Get('provinces/:provinceId/districts')
-    @ApiOperation({ summary: 'Get all districts in a province' })
-    @ApiParam({ name: 'provinceId', type: 'string', example: 'uuid' })
-    @ApiResponse({
-        status: 200,
-        description: 'List of districts in the province',
-        type: GetDistrictsResponseDto,
-    })
-    @ApiResponse({ status: 404, description: 'Province not found' })
-    async getDistricts(
-        @Param('provinceId', ParseUUIDPipe) provinceId: string,
-    ): Promise<GetDistrictsResponseDto> {
-        return this.locationsService.getDistrictsByProvinceId(provinceId);
-    }
+  @Get('provinces/:provinceId/districts')
+  @Public()
+  @ApiOperation({ summary: 'Get all districts in a province' })
+  @ApiOkResponse({
+    description: 'List of districts in the province',
+    type: LocationListResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'Province not found' })
+  getDistricts(
+    @Param('provinceId', ParseUUIDPipe) provinceId: string,
+  ): Promise<LocationListResponseDto> {
+    return this.locationsService.getDistrictsByProvinceId(provinceId);
+  }
 
-    @Get('districts/:districtId/wards')
-    @ApiOperation({ summary: 'Get all wards in a district' })
-    @ApiParam({ name: 'districtId', type: 'string', example: 'uuid' })
-    @ApiResponse({
-        status: 200,
-        description: 'List of wards in the district',
-        type: GetWardsResponseDto,
-    })
-    @ApiResponse({ status: 404, description: 'District not found' })
-    async getWards(
-        @Param('districtId', ParseUUIDPipe) districtId: string,
-    ): Promise<GetWardsResponseDto> {
-        return this.locationsService.getWardsByDistrictId(districtId);
-    }
-
-    @Post('seed')
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Seed Vietnam administrative divisions data' })
-    @ApiResponse({
-        status: 200,
-        description: 'Seeding completed successfully',
-    })
-    async seedData() {
-        const queryRunner = this.dataSource.createQueryRunner();
-        try {
-            const migration = new SeedLocations1770100000000();
-            await migration.up(queryRunner);
-            return {
-                message: 'Seeding completed successfully',
-                status: 'success',
-            };
-        } catch (error) {
-            throw new Error(`Seeding failed: ${error.message}`);
-        } finally {
-            await queryRunner.release();
-        }
-    }
+  @Get('districts/:districtId/wards')
+  @Public()
+  @ApiOperation({ summary: 'Get all wards in a district' })
+  @ApiOkResponse({
+    description: 'List of wards in the district',
+    type: LocationListResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'District not found' })
+  getWards(
+    @Param('districtId', ParseUUIDPipe) districtId: string,
+  ): Promise<LocationListResponseDto> {
+    return this.locationsService.getWardsByDistrictId(districtId);
+  }
 }

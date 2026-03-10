@@ -68,19 +68,19 @@ class PartnerEmployeesApi {
     return null;
   }
 
-  /// Create a new therapist
+  /// Create a new massage therapist
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
-  /// * [CreateTherapistDto] createTherapistDto (required):
-  Future<Response> partnerEmployeesControllerCreateTherapistWithHttpInfo(CreateTherapistDto createTherapistDto,) async {
+  /// * [CreateMassageTherapistDto] createMassageTherapistDto (required):
+  Future<Response> partnerEmployeesControllerCreateMassageTherapistWithHttpInfo(CreateMassageTherapistDto createMassageTherapistDto,) async {
     // ignore: prefer_const_declarations
-    final path = r'/partner/employees/therapists';
+    final path = r'/partner/employees/massage-therapists';
 
     // ignore: prefer_final_locals
-    Object? postBody = createTherapistDto;
+    Object? postBody = createMassageTherapistDto;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
@@ -100,13 +100,65 @@ class PartnerEmployeesApi {
     );
   }
 
-  /// Create a new therapist
+  /// Create a new massage therapist
   ///
   /// Parameters:
   ///
-  /// * [CreateTherapistDto] createTherapistDto (required):
-  Future<EmployeeResponseDto?> partnerEmployeesControllerCreateTherapist(CreateTherapistDto createTherapistDto,) async {
-    final response = await partnerEmployeesControllerCreateTherapistWithHttpInfo(createTherapistDto,);
+  /// * [CreateMassageTherapistDto] createMassageTherapistDto (required):
+  Future<EmployeeResponseDto?> partnerEmployeesControllerCreateMassageTherapist(CreateMassageTherapistDto createMassageTherapistDto,) async {
+    final response = await partnerEmployeesControllerCreateMassageTherapistWithHttpInfo(createMassageTherapistDto,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
+    
+    }
+    return null;
+  }
+
+  /// Create a new spa therapist
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [CreateSpaTherapistDto] createSpaTherapistDto (required):
+  Future<Response> partnerEmployeesControllerCreateSpaTherapistWithHttpInfo(CreateSpaTherapistDto createSpaTherapistDto,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/partner/employees/spa-therapists';
+
+    // ignore: prefer_final_locals
+    Object? postBody = createSpaTherapistDto;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Create a new spa therapist
+  ///
+  /// Parameters:
+  ///
+  /// * [CreateSpaTherapistDto] createSpaTherapistDto (required):
+  Future<EmployeeResponseDto?> partnerEmployeesControllerCreateSpaTherapist(CreateSpaTherapistDto createSpaTherapistDto,) async {
+    final response = await partnerEmployeesControllerCreateSpaTherapistWithHttpInfo(createSpaTherapistDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
