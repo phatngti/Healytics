@@ -1,5 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Category } from '@/common/entities/category.entity';
 
 /**
  * Summary DTO for nested category relations (parent/children).
@@ -16,6 +17,14 @@ class CategorySummaryDto {
   @Expose()
   @ApiProperty()
   slug: string;
+
+  static fromEntity(entity: Category): CategorySummaryDto {
+    const dto = new CategorySummaryDto();
+    dto.id = entity.id;
+    dto.name = entity.name;
+    dto.slug = entity.slug;
+    return dto;
+  }
 }
 
 /**
@@ -64,4 +73,25 @@ export class CategoryResponseDto {
   @Type(() => CategorySummaryDto)
   @ApiPropertyOptional({ type: [CategorySummaryDto], description: 'Child categories' })
   children: CategorySummaryDto[];
+
+  static fromEntity(entity: Category): CategoryResponseDto {
+    const dto = new CategoryResponseDto();
+    dto.id = entity.id;
+    dto.name = entity.name;
+    dto.slug = entity.slug;
+    dto.description = entity.description;
+    dto.imageUrl = entity.imageUrl;
+    dto.isActive = entity.isActive;
+    dto.createdAt = entity.createdAt;
+    dto.updatedAt = entity.updatedAt;
+    dto.parent = entity.parent
+      ? CategorySummaryDto.fromEntity(entity.parent)
+      : null;
+    dto.children = entity.children?.map(CategorySummaryDto.fromEntity) ?? [];
+    return dto;
+  }
+
+  static fromEntities(entities: Category[]): CategoryResponseDto[] {
+    return entities.map((e) => this.fromEntity(e));
+  }
 }

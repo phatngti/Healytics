@@ -12,6 +12,8 @@ List<RouteBase> get $appRoutes => [
   $serviceDetailsRoute,
   $reviewsRoute,
   $checkoutRoute,
+  $orderDetailsRoute,
+  $serviceManualRoute,
   $lottieSplashRoute,
   $onboardingRoute,
   $signInRoute,
@@ -293,6 +295,73 @@ mixin $CheckoutRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/checkout');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $orderDetailsRoute => GoRouteData.$route(
+  path: '/order_details',
+  name: 'order_details',
+  factory: $OrderDetailsRoute._fromState,
+);
+
+mixin $OrderDetailsRoute on GoRouteData {
+  static OrderDetailsRoute _fromState(GoRouterState state) => OrderDetailsRoute(
+    appointmentId: state.uri.queryParameters['appointment-id']!,
+  );
+
+  OrderDetailsRoute get _self => this as OrderDetailsRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/order_details',
+    queryParams: {'appointment-id': _self.appointmentId},
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $serviceManualRoute => GoRouteData.$route(
+  path: '/service_manual',
+  name: 'service_manual',
+  factory: $ServiceManualRoute._fromState,
+);
+
+mixin $ServiceManualRoute on GoRouteData {
+  static ServiceManualRoute _fromState(GoRouterState state) =>
+      ServiceManualRoute(
+        appointmentId: state.uri.queryParameters['appointment-id']!,
+      );
+
+  ServiceManualRoute get _self => this as ServiceManualRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/service_manual',
+    queryParams: {'appointment-id': _self.appointmentId},
+  );
 
   @override
   void go(BuildContext context) => context.go(location);

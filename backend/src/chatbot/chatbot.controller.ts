@@ -74,84 +74,84 @@ export class ChatbotController {
     return this.chatbotService.getConversations(query.page, query.limit);
   }
 
-  /**
-   * Submit a message to the chatbot.
-   * Returns a conversation ID and the SSE stream URL to connect to.
-   */
-  @Post('send')
-  @Roles(Role.USER)
-  @ApiOperation({ summary: 'Send a message to the chatbot' })
-  @ApiCreatedResponse({
-    description: 'Message accepted. Use the streamUrl to connect to the SSE response stream.',
-    type: SendMessageResponseDto,
-  })
-  sendMessage(@Body() dto: SendMessageDto): SendMessageResponseDto {
-    const conversationId = this.chatbotService.storeMessage(
-      dto.message,
-      dto.conversationId,
-    );
+  // /**
+  //  * Submit a message to the chatbot.
+  //  * Returns a conversation ID and the SSE stream URL to connect to.
+  //  */
+  // @Post('send')
+  // @Roles(Role.USER)
+  // @ApiOperation({ summary: 'Send a message to the chatbot' })
+  // @ApiCreatedResponse({
+  //   description: 'Message accepted. Use the streamUrl to connect to the SSE response stream.',
+  //   type: SendMessageResponseDto,
+  // })
+  // sendMessage(@Body() dto: SendMessageDto): SendMessageResponseDto {
+  //   const conversationId = this.chatbotService.storeMessage(
+  //     dto.message,
+  //     dto.conversationId,
+  //   );
 
-    return {
-      conversationId,
-      streamUrl: `/chatbot/stream/${conversationId}`,
-    };
-  }
+  //   return {
+  //     conversationId,
+  //     streamUrl: `/chatbot/stream/${conversationId}`,
+  //   };
+  // }
 
-  /**
-   * SSE endpoint that streams the chatbot response as structured events.
-   *
-   * Event types:
-   * - `token`                  — incremental text token
-   * - `ner_location`           — named-entity recognition for locations
-   * - `service_recommendation` — ranked service recommendations
-   * - `done`                   — stream completed
-   * - `error`                  — stream encountered an error
-   */
-  @Sse('stream/:conversationId')
-  @Roles(Role.USER)
-  @ApiOperation({ summary: 'Stream chatbot response via SSE' })
-  @ApiOkResponse({ description: 'SSE stream of chatbot events' })
-  @ApiNotFoundResponse({ description: 'Conversation not found or already consumed' })
-  streamChat(
-    @Param('conversationId', ParseUUIDPipe) conversationId: string,
-  ): Observable<MessageEvent> {
-    const message = this.chatbotService.getMessage(conversationId);
+  // /**
+  //  * SSE endpoint that streams the chatbot response as structured events.
+  //  *
+  //  * Event types:
+  //  * - `token`                  — incremental text token
+  //  * - `ner_location`           — named-entity recognition for locations
+  //  * - `service_recommendation` — ranked service recommendations
+  //  * - `done`                   — stream completed
+  //  * - `error`                  — stream encountered an error
+  //  */
+  // @Sse('stream/:conversationId')
+  // @Roles(Role.USER)
+  // @ApiOperation({ summary: 'Stream chatbot response via SSE' })
+  // @ApiOkResponse({ description: 'SSE stream of chatbot events' })
+  // @ApiNotFoundResponse({ description: 'Conversation not found or already consumed' })
+  // streamChat(
+  //   @Param('conversationId', ParseUUIDPipe) conversationId: string,
+  // ): Observable<MessageEvent> {
+  //   const message = this.chatbotService.getMessage(conversationId);
 
-    if (!message) {
-      this.logger.warn(
-        `SSE connect FAILED — conversation ${conversationId} not found or already consumed`,
-      );
-      throw new NotFoundException(
-        `Conversation ${conversationId} not found or already consumed`,
-      );
-    }
+  //   if (!message) {
+  //     this.logger.warn(
+  //       `SSE connect FAILED — conversation ${conversationId} not found or already consumed`,
+  //     );
+  //     throw new NotFoundException(
+  //       `Conversation ${conversationId} not found or already consumed`,
+  //     );
+  //   }
 
-    this.logger.log(
-      `SSE connect OK — conversation ${conversationId}, message: "${message.substring(0, 80)}"`,
-    );
+  //   this.logger.log(
+  //     `SSE connect OK — conversation ${conversationId}, message: "${message.substring(0, 80)}"`,
+  //   );
 
-    return this.chatbotService.streamResponse(message, conversationId).pipe(
-      tap((event) =>
-        this.logger.debug(
-          `SSE event [${event.type ?? 'message'}] → conversation ${conversationId}`,
-        ),
-      ),
-      catchError((error) => {
-        this.logger.error(
-          `SSE stream ERROR — conversation ${conversationId}: ${error.message}`,
-          error.stack,
-        );
-        const errorEvent: MessageEvent = {
-          type: 'error',
-          data: { error: error.message },
-        } as unknown as MessageEvent;
-        return of(errorEvent);
-      }),
-      finalize(() =>
-        this.logger.log(
-          `SSE disconnect — conversation ${conversationId} (client disconnected or stream ended)`,
-        ),
-      ),
-    );
-  }
+  //   return this.chatbotService.streamResponse(message, conversationId).pipe(
+  //     tap((event) =>
+  //       this.logger.debug(
+  //         `SSE event [${event.type ?? 'message'}] → conversation ${conversationId}`,
+  //       ),
+  //     ),
+  //     catchError((error) => {
+  //       this.logger.error(
+  //         `SSE stream ERROR — conversation ${conversationId}: ${error.message}`,
+  //         error.stack,
+  //       );
+  //       const errorEvent: MessageEvent = {
+  //         type: 'error',
+  //         data: { error: error.message },
+  //       } as unknown as MessageEvent;
+  //       return of(errorEvent);
+  //     }),
+  //     finalize(() =>
+  //       this.logger.log(
+  //         `SSE disconnect — conversation ${conversationId} (client disconnected or stream ended)`,
+  //       ),
+  //     ),
+  //   );
+  // }
 }

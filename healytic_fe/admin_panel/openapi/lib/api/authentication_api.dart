@@ -16,7 +16,10 @@ class AuthenticationApi {
 
   final ApiClient apiClient;
 
-  /// Performs an HTTP 'POST /auth/admin/login' operation and returns the [Response].
+  /// Login as admin
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
   /// Parameters:
   ///
   /// * [AdminLoginDto] adminLoginDto (required):
@@ -45,6 +48,8 @@ class AuthenticationApi {
     );
   }
 
+  /// Login as admin
+  ///
   /// Parameters:
   ///
   /// * [AdminLoginDto] adminLoginDto (required):
@@ -63,7 +68,10 @@ class AuthenticationApi {
     return null;
   }
 
-  /// Performs an HTTP 'POST /auth/partner/login' operation and returns the [Response].
+  /// Login as a partner
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
   /// Parameters:
   ///
   /// * [PartnerLoginDto] partnerLoginDto (required):
@@ -92,6 +100,8 @@ class AuthenticationApi {
     );
   }
 
+  /// Login as a partner
+  ///
   /// Parameters:
   ///
   /// * [PartnerLoginDto] partnerLoginDto (required):
@@ -110,7 +120,10 @@ class AuthenticationApi {
     return null;
   }
 
-  /// Performs an HTTP 'POST /auth/user/login' operation and returns the [Response].
+  /// Login as a user
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
   /// Parameters:
   ///
   /// * [LoginDto] loginDto (required):
@@ -139,6 +152,8 @@ class AuthenticationApi {
     );
   }
 
+  /// Login as a user
+  ///
   /// Parameters:
   ///
   /// * [LoginDto] loginDto (required):
@@ -157,7 +172,9 @@ class AuthenticationApi {
     return null;
   }
 
-  /// Performs an HTTP 'POST /auth/logout' operation and returns the [Response].
+  /// Logout current user
+  ///
+  /// Note: This method returns the HTTP [Response].
   Future<Response> authControllerLogoutWithHttpInfo() async {
     // ignore: prefer_const_declarations
     final path = r'/auth/logout';
@@ -183,6 +200,7 @@ class AuthenticationApi {
     );
   }
 
+  /// Logout current user
   Future<LogoutResponseDto?> authControllerLogout() async {
     final response = await authControllerLogoutWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -198,7 +216,10 @@ class AuthenticationApi {
     return null;
   }
 
-  /// Performs an HTTP 'POST /auth/refresh' operation and returns the [Response].
+  /// Refresh authentication tokens
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
   /// Parameters:
   ///
   /// * [RefreshTokenRequestDto] refreshTokenRequestDto (required):
@@ -227,6 +248,8 @@ class AuthenticationApi {
     );
   }
 
+  /// Refresh authentication tokens
+  ///
   /// Parameters:
   ///
   /// * [RefreshTokenRequestDto] refreshTokenRequestDto (required):
@@ -245,9 +268,61 @@ class AuthenticationApi {
     return null;
   }
 
+  /// Refresh partner tokens with verification info
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [RefreshTokenRequestDto] refreshTokenRequestDto (required):
+  Future<Response> authControllerRefreshPartnerWithHttpInfo(RefreshTokenRequestDto refreshTokenRequestDto,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/auth/partner/refresh';
+
+    // ignore: prefer_final_locals
+    Object? postBody = refreshTokenRequestDto;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Refresh partner tokens with verification info
+  ///
+  /// Parameters:
+  ///
+  /// * [RefreshTokenRequestDto] refreshTokenRequestDto (required):
+  Future<AuthTokensDto?> authControllerRefreshPartner(RefreshTokenRequestDto refreshTokenRequestDto,) async {
+    final response = await authControllerRefreshPartnerWithHttpInfo(refreshTokenRequestDto,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
+    
+    }
+    return null;
+  }
+
   /// Register a new business partner
   ///
-  /// Creates business entity, legal representative, and returns auth tokens immediately
+  /// Creates business entity, legal representative, and returns auth tokens immediately.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -281,7 +356,7 @@ class AuthenticationApi {
 
   /// Register a new business partner
   ///
-  /// Creates business entity, legal representative, and returns auth tokens immediately
+  /// Creates business entity, legal representative, and returns auth tokens immediately.
   ///
   /// Parameters:
   ///
@@ -301,7 +376,10 @@ class AuthenticationApi {
     return null;
   }
 
-  /// Performs an HTTP 'POST /auth/user/register' operation and returns the [Response].
+  /// Register a new user
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
   /// Parameters:
   ///
   /// * [RegisterDto] registerDto (required):
@@ -330,6 +408,8 @@ class AuthenticationApi {
     );
   }
 
+  /// Register a new user
+  ///
   /// Parameters:
   ///
   /// * [RegisterDto] registerDto (required):

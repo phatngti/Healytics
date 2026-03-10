@@ -161,7 +161,6 @@ class _EmployeeProfessionalRoleCardState
 
   Widget _buildContent(BuildContext context, bool isReadOnly) {
     final colorScheme = Theme.of(context).colorScheme;
-    print('description: ${widget.employee?.description}');
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(

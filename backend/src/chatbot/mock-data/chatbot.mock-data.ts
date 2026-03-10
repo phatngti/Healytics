@@ -144,12 +144,12 @@ export const MOCK_CONVERSATION_SCRIPTS: MockConversationScript[] = [
     turns: [
       // Turn 1: Acupuncture + cupping — Phú Nhuận
       {
-        response: [
+        response: [[
           'Tôi nhận thấy bạn đang gặp vấn đề về vai gáy — đây là triệu chứng rất phổ biến ở dân văn phòng.',
           'Nguyên nhân thường do ngồi sai tư thế, sử dụng máy tính kéo dài hoặc căng thẳng tích tụ ở vùng cổ vai.',
           'Phương pháp châm cứu kết hợp giác hơi tại Quận Phú Nhuận đã giúp nhiều bệnh nhân cải thiện rõ rệt.',
           'BS Lê Thị C tại đây có hơn 10 năm kinh nghiệm trong lĩnh vực y học cổ truyền, bạn có thể yên tâm!',
-        ],
+        ].join(' ')],
         entities: [
           { type: 'LOCATION', value: 'Phú Nhuận', confidence: 0.90 },
           { type: 'SYMPTOM', value: 'đau vai gáy', confidence: 0.85 },
@@ -171,12 +171,12 @@ export const MOCK_CONVERSATION_SCRIPTS: MockConversationScript[] = [
       },
       // Turn 2: Full-body massage — Quận 5
       {
-        response: [
+        response: [[
           'Ngoài vấn đề vai gáy, tôi thấy bạn cũng đề cập đến tình trạng mệt mỏi toàn thân.',
           'Massage trị liệu toàn thân là phương pháp hiệu quả giúp giải phóng căng cơ và cải thiện tuần hoàn máu.',
           'Hiện có chương trình ưu đãi tại Quận 5 mà bạn nên tham khảo, giá rất hợp lý.',
           'Bên cạnh đó, Yoga trị liệu kết hợp thiền định cũng là lựa chọn tuyệt vời để duy trì sức khỏe lâu dài.',
-        ],
+        ].join(' ')],
         entities: [{ type: 'LOCATION', value: 'Quận 5', confidence: 0.87 }],
         recommendations: [
           {
@@ -214,11 +214,11 @@ export const MOCK_CONVERSATION_SCRIPTS: MockConversationScript[] = [
     turns: [
       // Turn 1: Chronic headache — Quận 10
       {
-        response: [
+        response: [[
           'Chào bạn, đau đầu mãn tính là vấn đề cần được quan tâm nghiêm túc.',
           'Triệu chứng này có thể liên quan đến tư thế ngồi sai, thiếu ngủ, hoặc căng thẳng kéo dài.',
           'Tôi khuyên bạn nên đặt lịch khám chuyên khoa thần kinh tại Quận 10 để được chẩn đoán chính xác.',
-        ],
+        ].join(' ')],
         entities: [
           { type: 'LOCATION', value: 'Quận 10', confidence: 0.86 },
           { type: 'SYMPTOM', value: 'đau đầu', confidence: 0.92 },
@@ -252,12 +252,12 @@ export const MOCK_CONVERSATION_SCRIPTS: MockConversationScript[] = [
       },
       // Turn 2: Yoga + meditation — Bình Thạnh
       {
-        response: [
+        response: [[
           'Dựa trên cuộc trò chuyện của chúng ta, tôi nhận thấy căng thẳng là yếu tố chính gây ra đau đầu của bạn.',
           'Quản lý căng thẳng đóng vai trò then chốt trong việc cải thiện sức khỏe tổng thể và giảm tần suất đau đầu.',
           'Thiền và yoga trị liệu tại trung tâm Bình Thạnh là giải pháp tự nhiên, không dùng thuốc mà rất hiệu quả.',
           'Nhiều bệnh nhân đã giảm đáng kể triệu chứng sau 2-3 tuần tập luyện đều đặn.',
-        ],
+        ].join(' ')],
         entities: [{ type: 'LOCATION', value: 'Bình Thạnh', confidence: 0.87 }],
         recommendations: [
           {
@@ -283,12 +283,12 @@ export const MOCK_CONVERSATION_SCRIPTS: MockConversationScript[] = [
     turns: [
       // Turn 1: Numbness — Thủ Đức
       {
-        response: [
+        response: [[ 
           'Triệu chứng tê bì chân tay mà bạn mô tả cần được kiểm tra sớm để loại trừ các nguyên nhân nghiêm trọng.',
           'Tê bì có thể do chèn ép dây thần kinh, thiếu vitamin B12, hoặc vấn đề về tuần hoàn máu.',
           'Tôi gợi ý phòng khám vật lý trị liệu ở Thủ Đức — nơi đây có trang thiết bị hiện đại để chẩn đoán chính xác.',
           'Trong thời gian chờ đợi, bạn nên tránh ngồi xổm và hạn chế mang vác nặng nhé!',
-        ],
+        ].join(' ')],
         entities: [
           { type: 'LOCATION', value: 'Thủ Đức', confidence: 0.85 },
           { type: 'SYMPTOM', value: 'tê bì chân tay', confidence: 0.90 },
@@ -334,12 +334,12 @@ export const MOCK_CONVERSATION_SCRIPTS: MockConversationScript[] = [
       },
       // Turn 2: Knee arthritis — Quận 1
       {
-        response: [
+        response: [[ 
           'Về triệu chứng viêm khớp gối bạn vừa đề cập, đây là tình trạng khá phổ biến và hoàn toàn có thể điều trị được.',
           'Phương pháp sóng xung kích (Shockwave Therapy) đang là xu hướng điều trị viêm khớp hiệu quả nhất hiện nay.',
           'Dịch vụ này được đánh giá rất cao tại Quận 1, do PGS.TS Hoàng Minh E trực tiếp thực hiện.',
           'Liệu trình thường kéo dài 4-6 buổi, mỗi buổi cách nhau 1 tuần để đạt kết quả tối ưu.',
-        ],
+        ].join(' ')],
         entities: [
           { type: 'LOCATION', value: 'Quận 1', confidence: 0.93 },
           { type: 'SYMPTOM', value: 'viêm khớp gối', confidence: 0.91 },
@@ -379,10 +379,10 @@ export const MOCK_CONVERSATION_SCRIPTS: MockConversationScript[] = [
     title: 'Tư vấn tổng quát sức khỏe toàn diện',
     turns: [
       {
-        response: [
+        response: [[ 
           'Chào bạn! Sau khi xem xét kỹ lưỡng các thông tin sức khỏe mà bạn đã cung cấp, tôi muốn chia sẻ một số nhận định quan trọng. Trước hết, chỉ số BMI của bạn cho thấy bạn đang ở ngưỡng thừa cân nhẹ, điều này có thể ảnh hưởng đến sức khỏe tim mạch và hệ cơ xương khớp trong dài hạn. Huyết áp của bạn ở mức 130/85 mmHg — đây là mức tiền tăng huyết áp cần được theo dõi thường xuyên. Về mặt dinh dưỡng, tôi nhận thấy chế độ ăn hiện tại của bạn thiếu hụt vitamin D và omega-3, hai dưỡng chất quan trọng cho sức khỏe xương và não bộ. Bên cạnh đó, mức cholesterol LDL hơi cao có thể liên quan đến thói quen ăn uống nhiều chất béo bão hòa. Tôi khuyên bạn nên bắt đầu một chương trình tập luyện nhẹ nhàng, kết hợp đi bộ nhanh 30 phút mỗi ngày với các bài tập stretching cơ bản. Đồng thời, hãy bổ sung thêm rau xanh, cá hồi, và các loại hạt vào bữa ăn hàng ngày. Việc giảm muối và đường cũng là điều cần thiết để kiểm soát huyết áp và cân nặng hiệu quả hơn.',
           'Ngoài ra, tôi cũng muốn đề cập đến vấn đề giấc ngủ mà bạn đã chia sẻ. Chất lượng giấc ngủ kém không chỉ ảnh hưởng đến năng suất làm việc mà còn tác động trực tiếp đến hệ miễn dịch và quá trình phục hồi cơ thể. Theo nghiên cứu mới nhất, người trưởng thành cần từ 7-9 tiếng ngủ mỗi đêm, và quan trọng hơn cả là duy trì thời gian đi ngủ và thức dậy đều đặn. Tôi gợi ý bạn nên thiết lập một routine trước khi ngủ: tắt các thiết bị điện tử ít nhất 1 tiếng trước giờ ngủ, uống trà hoa cúc hoặc thực hiện các bài tập thở sâu để giúp cơ thể thư giãn. Nếu tình trạng mất ngủ kéo dài hơn 2 tuần, bạn nên đặt lịch khám chuyên khoa giấc ngủ để được tư vấn và điều trị chuyên sâu. Trung tâm y tế tại Quận 7 có phòng khám rối loạn giấc ngủ được trang bị máy đo đa ký giấc ngủ hiện đại, giúp chẩn đoán chính xác nguyên nhân và đưa ra phác đồ điều trị phù hợp nhất cho từng cá nhân.',
-        ],
+        ].join(' ')],
         entities: [
           { type: 'LOCATION', value: 'Quận 7', confidence: 0.88 },
           { type: 'SYMPTOM', value: 'mất ngủ', confidence: 0.91 },

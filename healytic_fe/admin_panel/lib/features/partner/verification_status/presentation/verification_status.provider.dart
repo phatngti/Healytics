@@ -1,3 +1,10 @@
+import 'dart:developer' as developer;
+
+import 'package:admin_openapi/api.dart';
+import 'package:admin_panel/core/entities/store.entity.dart';
+import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/providers/api.provider.dart';
+import 'package:admin_panel/core/utils/user_role_helper.dart';
 import 'package:admin_panel/features/partner/verification_status/data/verification_status_impl.repository.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/document_verification_section.widget.dart';
@@ -13,8 +20,38 @@ part 'verification_status.provider.g.dart';
 class VerificationStatus extends _$VerificationStatus {
   @override
   Future<ProviderVerificationStatusEntity> build() async {
+    await _refreshAuthTokens();
     final repository = ref.watch(verificationStatusRepositoryProvider);
-    return repository.getVerificationStatus();
+    final status = await repository.getVerificationStatus();
+
+    // Sync local verified flag so the router can
+    // redirect away from this page when approved.
+    final isVerified =
+        status.verificationStatus == VerificationRevisionStatus.approved;
+    UserRoleHelper.setPartnerVerified(isVerified);
+
+    return status;
+  }
+
+  /// Calls `POST /auth/partner/refresh` to obtain fresh
+  /// tokens before fetching the verification status.
+  Future<void> _refreshAuthTokens() async {
+    final refreshToken = Store.tryGet(StoreKey.refreshToken);
+    if (refreshToken == null) return;
+
+    try {
+      final apiService = ref.read(apiServiceProvider);
+      final response = await apiService.authenticateApi
+          .authControllerRefreshPartner(
+            RefreshTokenRequestDto(refreshToken: refreshToken),
+          );
+      if (response != null) {
+        await apiService.setAccessToken(response.accessToken);
+        await Store.put(StoreKey.refreshToken, response.refreshToken);
+      }
+    } catch (e) {
+      developer.log('Token refresh failed: $e', name: 'VerificationStatus');
+    }
   }
 
   /// Resubmits the application after making requested revisions.

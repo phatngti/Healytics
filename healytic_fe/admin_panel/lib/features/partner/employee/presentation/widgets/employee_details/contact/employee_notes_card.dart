@@ -2,16 +2,29 @@ import 'package:admin_panel/theme/app_theme.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
+/// Displays manager notes / description for an employee.
 class EmployeeNotesCard extends StatelessWidget {
+  /// Employee description or manager notes.
+  final String? description;
+
+  /// Whether the parent form is in editing mode.
   final bool isEditing;
 
-  const EmployeeNotesCard({super.key, this.isEditing = false});
+  const EmployeeNotesCard({
+    super.key,
+    this.description,
+    this.isEditing = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
+    final semanticColors =
+        Theme.of(context).extension<SemanticColors>()!;
+
+    final hasNotes =
+        description != null && description!.trim().isNotEmpty;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -19,8 +32,7 @@ class EmployeeNotesCard extends StatelessWidget {
         color: semanticColors.warning?.withAlpha(25),
         borderRadius: AppDimens.radiusMedium,
         border: Border.all(
-          color:
-              semanticColors.warning?.withAlpha(50) ??
+          color: semanticColors.warning?.withAlpha(50) ??
               colorScheme.outlineVariant,
         ),
       ),
@@ -46,7 +58,9 @@ class EmployeeNotesCard extends StatelessWidget {
           ),
           AppDimens.verticalSmall,
           Text(
-            'Sarah is exceptionally skilled in deep tissue. Clients often request her for back pain relief. Prefers morning shifts.',
+            hasNotes
+                ? description!
+                : 'No manager notes available.',
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurface,
               height: 1.5,

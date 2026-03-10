@@ -31,6 +31,11 @@ function generate_dart {
 
 function user_app {
   echo "Generating for user_app..."
+
+  # Merge ai_apis.json into user_apis.json before generation
+  echo "Merging ai_apis.json → user_apis.json..."
+  node $BASE_DIR/open-api/bin/merge-apis.js ai_apis.json user_apis.json
+
   generate_dart $BASE_DIR/user_app/openapi $BASE_DIR/open-api/user_apis.json user_openapi
 }
 

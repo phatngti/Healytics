@@ -4,6 +4,7 @@ import 'package:admin_panel/features/partner/employee/domain/employee.entity.dar
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
 import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/doctor_fields_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/doctor_experience_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_professional_role_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_work_schedule_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/therapist_fields_card.dart';
@@ -202,12 +203,23 @@ class _RightColumn extends StatelessWidget {
               initialTherapistType: _getTherapistType(employee),
               initialStrengthLevel: _getStrengthLevel(employee),
             ),
-            EmployeeRole.doctor => DoctorFieldsCard(
+            EmployeeRole.doctor => Column(
               key: const ValueKey('doctor'),
-              isEditing: isEditing,
-              doctor: employee is DoctorEntity
-                  ? employee as DoctorEntity
-                  : null,
+              children: [
+                DoctorFieldsCard(
+                  isEditing: isEditing,
+                  doctor: employee is DoctorEntity
+                      ? employee as DoctorEntity
+                      : null,
+                ),
+                AppDimens.verticalMedium,
+                DoctorExperienceCard(
+                  isEditing: isEditing,
+                  doctor: employee is DoctorEntity
+                      ? employee as DoctorEntity
+                      : null,
+                ),
+              ],
             ),
             _ => const SizedBox.shrink(),
           },

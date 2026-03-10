@@ -9,6 +9,7 @@ import { Repository, IsNull } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from '@/common/entities/category.entity';
+import { CategoryResponseDto } from './dto/category-response.dto';
 import { CreateCategoryHandler } from './application/handlers/create-category.handler';
 import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
 import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';
@@ -71,32 +72,35 @@ export class CategoriesService implements OnModuleInit {
   /**
    * Facade: Delegates to CreateCategoryHandler.
    * @param createCategoryDto - The category data
-   * @returns The created category
+   * @returns The created category response DTO
    */
-  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    return this.createCategoryHandler.execute(createCategoryDto);
+  async create(createCategoryDto: CreateCategoryDto): Promise<CategoryResponseDto> {
+    const entity = await this.createCategoryHandler.execute(createCategoryDto);
+    return CategoryResponseDto.fromEntity(entity);
   }
 
   /**
    * Retrieves all categories with their relations.
    * @param rootsOnly - If true, return only root categories
-   * @returns Array of all categories or root categories
+   * @returns Array of category response DTOs
    */
-  async findAll(rootsOnly = false): Promise<Category[]> {
+  async findAll(rootsOnly = false): Promise<CategoryResponseDto[]> {
     if (rootsOnly) {
-      return this.findRoots();
+      const roots = await this.findRoots();
+      return CategoryResponseDto.fromEntities(roots);
     }
-    return this.categoryRepository.find({
+    const categories = await this.categoryRepository.find({
       relations: ['parent', 'children'],
       order: { name: 'ASC' },
     });
+    return CategoryResponseDto.fromEntities(categories);
   }
 
   /**
    * Retrieves only root categories (those without a parent).
-   * @returns Array of root categories
+   * @returns Array of root categories (raw entities for internal use)
    */
-  async findRoots(): Promise<Category[]> {
+  private async findRoots(): Promise<Category[]> {
     return this.categoryRepository.find({
       where: { parentId: IsNull() },
       relations: ['children'],
@@ -107,10 +111,10 @@ export class CategoriesService implements OnModuleInit {
   /**
    * Finds a category by ID.
    * @param id - The category ID
-   * @returns The category
+   * @returns The category response DTO
    * @throws NotFoundException if not found
    */
-  async findOne(id: string): Promise<Category> {
+  async findOne(id: string): Promise<CategoryResponseDto> {
     const category = await this.categoryRepository.findOne({
       where: { id },
       relations: ['parent', 'children'],
@@ -119,16 +123,16 @@ export class CategoriesService implements OnModuleInit {
       this.logger.warn(`Category not found: ${id}`);
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
-    return category;
+    return CategoryResponseDto.fromEntity(category);
   }
 
   /**
    * Finds a category by slug.
    * @param slug - The category slug
-   * @returns The category
+   * @returns The category response DTO
    * @throws NotFoundException if not found
    */
-  async findBySlug(slug: string): Promise<Category> {
+  async findBySlug(slug: string): Promise<CategoryResponseDto> {
     const category = await this.categoryRepository.findOne({
       where: { slug },
       relations: ['parent', 'children'],
@@ -137,20 +141,21 @@ export class CategoriesService implements OnModuleInit {
       this.logger.warn(`Category slug not found: ${slug}`);
       throw new NotFoundException(`Category with slug "${slug}" not found`);
     }
-    return category;
+    return CategoryResponseDto.fromEntity(category);
   }
 
   /**
    * Facade: Delegates to UpdateCategoryHandler.
    * @param id - The category ID
    * @param updateCategoryDto - The update data
-   * @returns The updated category
+   * @returns The updated category response DTO
    */
   async update(
     id: string,
     updateCategoryDto: UpdateCategoryDto,
-  ): Promise<Category> {
-    return this.updateCategoryHandler.execute(id, updateCategoryDto);
+  ): Promise<CategoryResponseDto> {
+    const entity = await this.updateCategoryHandler.execute(id, updateCategoryDto);
+    return CategoryResponseDto.fromEntity(entity);
   }
 
   /**

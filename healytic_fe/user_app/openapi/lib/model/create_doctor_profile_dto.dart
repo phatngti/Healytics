@@ -14,7 +14,8 @@ class CreateDoctorProfileDto {
   /// Returns a new [CreateDoctorProfileDto] instance.
   CreateDoctorProfileDto({
     this.title,
-    required this.medicalLicense,
+    this.medicalTitles = const [],
+    this.medicalLicenses = const [],
     this.experienceYears,
     this.consultationFee,
     this.specializations = const [],
@@ -31,8 +32,11 @@ class CreateDoctorProfileDto {
   ///
   String? title;
 
-  /// Medical license number
-  String medicalLicense;
+  /// Medical titles
+  List<String> medicalTitles;
+
+  /// Medical license numbers
+  List<String> medicalLicenses;
 
   /// Years of experience
   ///
@@ -64,7 +68,8 @@ class CreateDoctorProfileDto {
   @override
   bool operator ==(Object other) => identical(this, other) || other is CreateDoctorProfileDto &&
     other.title == title &&
-    other.medicalLicense == medicalLicense &&
+    _deepEquality.equals(other.medicalTitles, medicalTitles) &&
+    _deepEquality.equals(other.medicalLicenses, medicalLicenses) &&
     other.experienceYears == experienceYears &&
     other.consultationFee == consultationFee &&
     _deepEquality.equals(other.specializations, specializations) &&
@@ -75,7 +80,8 @@ class CreateDoctorProfileDto {
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (title == null ? 0 : title!.hashCode) +
-    (medicalLicense.hashCode) +
+    (medicalTitles.hashCode) +
+    (medicalLicenses.hashCode) +
     (experienceYears == null ? 0 : experienceYears!.hashCode) +
     (consultationFee == null ? 0 : consultationFee!.hashCode) +
     (specializations.hashCode) +
@@ -83,7 +89,7 @@ class CreateDoctorProfileDto {
     (certifications.hashCode);
 
   @override
-  String toString() => 'CreateDoctorProfileDto[title=$title, medicalLicense=$medicalLicense, experienceYears=$experienceYears, consultationFee=$consultationFee, specializations=$specializations, education=$education, certifications=$certifications]';
+  String toString() => 'CreateDoctorProfileDto[title=$title, medicalTitles=$medicalTitles, medicalLicenses=$medicalLicenses, experienceYears=$experienceYears, consultationFee=$consultationFee, specializations=$specializations, education=$education, certifications=$certifications]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -92,7 +98,8 @@ class CreateDoctorProfileDto {
     } else {
       json[r'title'] = null;
     }
-      json[r'medicalLicense'] = this.medicalLicense;
+      json[r'medicalTitles'] = this.medicalTitles;
+      json[r'medicalLicenses'] = this.medicalLicenses;
     if (this.experienceYears != null) {
       json[r'experienceYears'] = this.experienceYears;
     } else {
@@ -129,7 +136,12 @@ class CreateDoctorProfileDto {
 
       return CreateDoctorProfileDto(
         title: mapValueOfType<String>(json, r'title'),
-        medicalLicense: mapValueOfType<String>(json, r'medicalLicense')!,
+        medicalTitles: json[r'medicalTitles'] is Iterable
+            ? (json[r'medicalTitles'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        medicalLicenses: json[r'medicalLicenses'] is Iterable
+            ? (json[r'medicalLicenses'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
         experienceYears: num.parse('${json[r'experienceYears']}'),
         consultationFee: num.parse('${json[r'consultationFee']}'),
         specializations: json[r'specializations'] is Iterable
@@ -188,7 +200,6 @@ class CreateDoctorProfileDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'medicalLicense',
   };
 }
 

@@ -11,7 +11,7 @@ import {
     Matches,
     IsArray,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IdType } from '@/partners/enum/id-type.enum';
 import { DocumentFileType, DocumentFileTypes, DocumentTypes, DocumentTypeValue } from '@/common/entities/partner-document.entity';
 
@@ -45,6 +45,23 @@ export class PartnerDocumentVerificationDto {
         type: [String],
     })
     @IsArray()
+    @Transform(({ value }) =>
+        Array.isArray(value)
+            ? value.map((url: string) => {
+                  try {
+                      const parsed = new URL(url);
+                      // Re-encode only the pathname to handle spaces / special chars in filenames
+                      parsed.pathname = parsed.pathname
+                          .split('/')
+                          .map((segment) => encodeURIComponent(decodeURIComponent(segment)))
+                          .join('/');
+                      return parsed.toString();
+                  } catch {
+                      return url;
+                  }
+              })
+            : value,
+    )
     @IsUrl({}, { each: true })
     urls: string[];
 }
