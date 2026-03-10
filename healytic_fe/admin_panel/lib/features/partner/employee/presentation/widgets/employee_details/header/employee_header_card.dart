@@ -47,7 +47,14 @@ class EmployeeHeaderCard extends StatelessWidget {
               isEditing: isEditing,
             ),
           ),
-          EmployeeStatsActionsSection(isEditing: isEditing, onEdit: onEdit),
+          EmployeeStatsActionsSection(
+            rating: employee.rating,
+            reviewCount: employee.reviewCount,
+            gender: employee.gender,
+            dateOfBirth: employee.dateOfBirth,
+            isEditing: isEditing,
+            onEdit: onEdit,
+          ),
         ],
       ),
     );

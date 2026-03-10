@@ -54,7 +54,7 @@ class LocationsApi {
   /// Parameters:
   ///
   /// * [String] provinceId (required):
-  Future<GetDistrictsResponseDto?> locationsControllerGetDistricts(String provinceId,) async {
+  Future<LocationListResponseDto?> locationsControllerGetDistricts(String provinceId,) async {
     final response = await locationsControllerGetDistrictsWithHttpInfo(provinceId,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -63,7 +63,7 @@ class LocationsApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetDistrictsResponseDto',) as GetDistrictsResponseDto;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'LocationListResponseDto',) as LocationListResponseDto;
     
     }
     return null;
@@ -98,7 +98,7 @@ class LocationsApi {
   }
 
   /// Get all provinces in Vietnam
-  Future<GetProvincesResponseDto?> locationsControllerGetProvinces() async {
+  Future<LocationListResponseDto?> locationsControllerGetProvinces() async {
     final response = await locationsControllerGetProvincesWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -107,7 +107,7 @@ class LocationsApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetProvincesResponseDto',) as GetProvincesResponseDto;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'LocationListResponseDto',) as LocationListResponseDto;
     
     }
     return null;
@@ -151,7 +151,7 @@ class LocationsApi {
   /// Parameters:
   ///
   /// * [String] districtId (required):
-  Future<GetWardsResponseDto?> locationsControllerGetWards(String districtId,) async {
+  Future<LocationListResponseDto?> locationsControllerGetWards(String districtId,) async {
     final response = await locationsControllerGetWardsWithHttpInfo(districtId,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -160,45 +160,9 @@ class LocationsApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GetWardsResponseDto',) as GetWardsResponseDto;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'LocationListResponseDto',) as LocationListResponseDto;
     
     }
     return null;
-  }
-
-  /// Seed Vietnam administrative divisions data
-  ///
-  /// Note: This method returns the HTTP [Response].
-  Future<Response> locationsControllerSeedDataWithHttpInfo() async {
-    // ignore: prefer_const_declarations
-    final path = r'/locations/seed';
-
-    // ignore: prefer_final_locals
-    Object? postBody;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-    const contentTypes = <String>[];
-
-
-    return apiClient.invokeAPI(
-      path,
-      'POST',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
-    );
-  }
-
-  /// Seed Vietnam administrative divisions data
-  Future<void> locationsControllerSeedData() async {
-    final response = await locationsControllerSeedDataWithHttpInfo();
-    if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
-    }
   }
 }

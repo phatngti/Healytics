@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -12,14 +13,42 @@ import 'package:user_app/core/utils/url_helper.dart';
 import 'package:user_app/core/utils/user_agent.dart';
 import 'package:user_openapi/api.dart';
 
+/// Prefixes for different backend services behind
+/// the API gateway (Kong).
+///
+/// Each value maps to a path segment appended to the
+/// base endpoint URL when creating its [ApiClient].
+enum ServicePrefix {
+  /// NestJS main backend: `/backend`
+  backend('/backend'),
+
+  /// AI / chatbot service: `/ai`
+  ai('/ai');
+
+  const ServicePrefix(this.path);
+
+  /// The URL path segment for this service.
+  final String path;
+}
+
 class ApiService implements Authentication {
-  late ApiClient _apiClient;
+  final _clients = <ServicePrefix, ApiClient>{};
+
+  // ── Authentication & Account ──────────────────────
   late AuthenticationApi authenticateApi;
   late AccountApi accountApi;
 
+  // ── Home / Products ───────────────────────────────
+  late CategoriesApi categoriesApi;
+  late PartnerServiceTagsApi partnerServiceTagsApi;
+  late HealthServicesApi healthServicesApi;
+
+  // ── Chatbot (AI service) ──────────────────────────
+  late ChatbotApi chatbotApi;
+
   ApiService() {
-    // The below line ensures that the api clients are initialized when the service is instantiated
-    // This is required to avoid late initialization errors when the clients are access before the endpoint is resolved
+    // Eagerly initialise so late fields are never
+    // accessed before the endpoint is resolved.
     setEndpoint('');
     final endpoint = Store.tryGet(StoreKey.serverEndpoint);
     if (endpoint != null && endpoint.isNotEmpty) {
@@ -27,7 +56,15 @@ class ApiService implements Authentication {
     }
   }
 
-  ApiClient get apiClient => _apiClient;
+  /// Returns the **backend** [ApiClient].
+  ///
+  /// Prefer [clientFor] when you need a specific
+  /// service prefix.
+  ApiClient get apiClient => _clients[ServicePrefix.backend]!;
+
+  /// Returns the [ApiClient] for [prefix].
+  ApiClient clientFor(ServicePrefix prefix) => _clients[prefix]!;
+
   String? _accessToken;
   final _log = Logger('ApiService');
 
@@ -37,25 +74,48 @@ class ApiService implements Authentication {
     Map<String, String> headerParams,
   ) {
     return Future<void>(() {
-      var headers = ApiService.getRequestHeaders();
+      final headers = ApiService.getRequestHeaders();
       headerParams.addAll(headers);
     });
   }
 
+  // ── Endpoint management ───────────────────────────
+
   dynamic setEndpoint(String endPoint) {
-    _apiClient = ApiClient(basePath: endPoint, authentication: this);
-    _setUserAgentHeader();
+    // Create one ApiClient per service prefix.
+    for (final prefix in ServicePrefix.values) {
+      _clients[prefix] = ApiClient(
+        basePath: '$endPoint${prefix.path}',
+        authentication: this,
+      );
+    }
+
+    _setUserAgentHeaders();
 
     if (_accessToken != null) {
       setAccessToken(_accessToken!);
     }
-    authenticateApi = AuthenticationApi(_apiClient);
-    accountApi = AccountApi(_apiClient);
+
+    final backend = clientFor(ServicePrefix.backend);
+    final ai = clientFor(ServicePrefix.ai);
+
+    // ── Backend APIs ────────────────────────────────
+    authenticateApi = AuthenticationApi(backend);
+    accountApi = AccountApi(backend);
+    categoriesApi = CategoriesApi(backend);
+    partnerServiceTagsApi = PartnerServiceTagsApi(backend);
+    healthServicesApi = HealthServicesApi(backend);
+
+    // ── AI APIs ─────────────────────────────────────
+    chatbotApi = ChatbotApi(ai);
   }
 
-  Future<void> _setUserAgentHeader() async {
+  /// Applies the User-Agent header to every client.
+  Future<void> _setUserAgentHeaders() async {
     final userAgent = await getUserAgentString();
-    _apiClient.addDefaultHeader('User-Agent', userAgent);
+    for (final client in _clients.values) {
+      client.addDefaultHeader('User-Agent', userAgent);
+    }
   }
 
   Future<String> resolveAndSetEndpoint(String serverUrl) async {
@@ -67,7 +127,7 @@ class ApiService implements Authentication {
     return endpoint;
   }
 
-  /// Takes a server URL and attempts to resolve the API endpoint.
+  /// Takes a server URL and resolves the API endpoint.
   ///
   /// Input: [schema://]host[:port][/path]
   ///  schema - optional (default: https)
@@ -87,18 +147,12 @@ class ApiService implements Authentication {
       throw ApiException(503, "Server is not reachable");
     }
 
-    // Otherwise, assume the URL provided is the api endpoint
     return url;
   }
 
   Future<bool> _isEndpointAvailable(String serverUrl) async {
-    if (!serverUrl.endsWith('/api')) {
-      serverUrl += '/api';
-    }
-
     try {
       await setEndpoint(serverUrl);
-      // await serverInfoApi.pingServer().timeout(const Duration(seconds: 5));
     } on TimeoutException catch (_) {
       return false;
     } on SocketException catch (_) {
@@ -130,13 +184,15 @@ class ApiService implements Authentication {
         final endpoint = data['api']['endpoint'].toString();
 
         if (endpoint.startsWith('/')) {
-          // Full URL is relative to base
           return "$baseUrl$endpoint";
         }
         return endpoint;
       }
     } catch (e) {
-      debugPrint("Could not locate /.well-known/immich at $baseUrl");
+      debugPrint(
+        "Could not locate /.well-known/immich "
+        "at $baseUrl",
+      );
     }
 
     return "";
@@ -145,38 +201,31 @@ class ApiService implements Authentication {
   Future<void> setAccessToken(String accessToken) async {
     _accessToken = accessToken;
     await Store.put(StoreKey.accessToken, accessToken);
-    final updatedAccessToken = Store.get(StoreKey.accessToken, "");
-    print('updated token $updatedAccessToken');
+    log('Access token updated', name: 'ApiService');
   }
 
   Future<void> setDeviceInfoHeader() async {
-    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    final deviceInfo = DeviceInfoPlugin();
+    final backend = clientFor(ServicePrefix.backend);
 
     if (Platform.isIOS) {
-      final iosInfo = await deviceInfoPlugin.iosInfo;
-      authenticateApi.apiClient.addDefaultHeader(
-        'deviceModel',
-        iosInfo.utsname.machine,
-      );
-      authenticateApi.apiClient.addDefaultHeader('deviceType', 'iOS');
+      final iosInfo = await deviceInfo.iosInfo;
+      backend.addDefaultHeader('deviceModel', iosInfo.utsname.machine);
+      backend.addDefaultHeader('deviceType', 'iOS');
     } else if (Platform.isAndroid) {
-      final androidInfo = await deviceInfoPlugin.androidInfo;
-      authenticateApi.apiClient.addDefaultHeader(
-        'deviceModel',
-        androidInfo.model,
-      );
-      authenticateApi.apiClient.addDefaultHeader('deviceType', 'Android');
+      final androidInfo = await deviceInfo.androidInfo;
+      backend.addDefaultHeader('deviceModel', androidInfo.model);
+      backend.addDefaultHeader('deviceType', 'Android');
     } else {
-      authenticateApi.apiClient.addDefaultHeader('deviceModel', 'Unknown');
-      authenticateApi.apiClient.addDefaultHeader('deviceType', 'Unknown');
+      backend.addDefaultHeader('deviceModel', 'Unknown');
+      backend.addDefaultHeader('deviceType', 'Unknown');
     }
   }
 
   static Map<String, String> getRequestHeaders() {
-    var accessToken = Store.get(StoreKey.accessToken, "");
-    print('accessToken $accessToken');
-    var customHeadersStr = Store.get(StoreKey.customHeaders, "");
-    var header = <String, String>{};
+    final accessToken = Store.get(StoreKey.accessToken, "");
+    final customHeadersStr = Store.get(StoreKey.customHeaders, "");
+    final header = <String, String>{};
     if (accessToken.isNotEmpty) {
       header['Authorization'] = "Bearer $accessToken";
     }
@@ -185,7 +234,7 @@ class ApiService implements Authentication {
       return header;
     }
 
-    var customHeaders = jsonDecode(customHeadersStr) as Map;
+    final customHeaders = jsonDecode(customHeadersStr) as Map;
     customHeaders.forEach((key, value) {
       header[key] = value;
     });

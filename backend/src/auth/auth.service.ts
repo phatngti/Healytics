@@ -8,6 +8,7 @@ import {
 import { AccountService } from '@/account/account.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
+import { LogoutResponseDto } from './dto/response/logout-response.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@/account/enum/role.enum';
@@ -85,7 +86,7 @@ export class AuthService {
       payload.profileCompleted = profile.profileCompleted;
     }
 
-    console.log('partnerVerification', partnerVerification);
+    this.logger.debug(`Partner verification info: ${JSON.stringify(partnerVerification)}`);
     if (partnerVerification) {
       payload.verificationStatus = partnerVerification.verificationStatus;
       payload.verificationCompletedAt = partnerVerification.verificationCompletedAt?.toISOString() ?? null;
@@ -264,6 +265,64 @@ export class AuthService {
   }
 
 
+  /**
+   * Refreshes authentication tokens for a partner, including verification info.
+   * @param refreshToken - The refresh token
+   * @returns New authentication tokens with partner verification data
+   */
+  async refreshPartner(refreshToken: string): Promise<AuthTokensDto> {
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
+    let payload: AuthJwtPayload;
+    try {
+      payload = this.jwtService.verify(refreshToken);
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    const userId = payload?.sub;
+    if (!userId) {
+      throw new UnauthorizedException('Invalid token payload');
+    }
+    const user = await this.accountService.findOneWithRefreshHash(userId);
+    if (!user || !user.refreshTokenHash) {
+      throw new UnauthorizedException('Refresh token revoked');
+    }
+    const match = await bcrypt.compare(refreshToken, user.refreshTokenHash || '');
+    if (!match) {
+      await this.accountService.removeRefreshToken(userId).catch(() => { });
+      throw new UnauthorizedException('Refresh token does not match');
+    }
+
+    // Ensure the user is a partner
+    if (user.role !== Role.HEALTH_PARTNER) {
+      throw new ForbiddenException('This account is not a partner account');
+    }
+
+    // Fetch partner profile for verification info
+    let partnerVerification: PartnerVerificationInfo | undefined;
+    try {
+      const partnerProfile = await this.partnerService.getPartnerProfile(userId);
+      if (partnerProfile) {
+        partnerVerification = {
+          verificationStatus: partnerProfile.verificationStatus,
+          verificationCompletedAt: partnerProfile.verificationCompletedAt,
+        };
+      }
+    } catch {
+      // Partner profile may not exist yet — continue without verification info
+    }
+
+    this.logger.log(`Partner token refreshed for user: ${userId}`);
+    return this.createTokensForUser(
+      userId,
+      user.email,
+      user.role,
+      user.userProfile,
+      partnerVerification,
+    );
+  }
+
 
   /**
    * Refreshes authentication tokens.
@@ -301,5 +360,26 @@ export class AuthService {
       user.userProfile,
     );
     return tokens;
+  }
+
+  /**
+   * Logs out the current user by invalidating their refresh token.
+   * Business logic moved from controller per enterprise pattern §10.
+   * @param userId - The user's ID
+   * @returns Logout confirmation
+   */
+  async logout(userId?: string): Promise<LogoutResponseDto> {
+    try {
+      if (userId) {
+        await this.accountService.removeRefreshToken(userId);
+        this.logger.log(`User logged out: ${userId}`);
+      }
+    } catch (error) {
+      this.logger.warn(`Logout cleanup failed for user: ${userId}`, error.message);
+    }
+
+    const response = new LogoutResponseDto();
+    response.message = 'Logged out successfully';
+    return response;
   }
 }

@@ -7,7 +7,6 @@ import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/partner/employee/data/employee_mock_data.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
-import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 import 'package:admin_openapi/api.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -175,27 +174,24 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
   @override
   Future<EmployeeEntity> createDoctor(CreateDoctorRequest request) async {
-    final profile = DoctorProfileDto(
-      title: request.jobTitle,
-      medicalLicense: request.medicalLicense,
+    final dto = CreateDoctorDto(
+      firstName: request.firstName,
+      lastName: request.lastName,
+      email: request.email,
+      employeeId: request.employeeId,
+      phone: request.phone,
+      avatar: request.avatar,
+      dateOfBirth: request.dateOfBirth,
+      gender: _mapDoctorGender(request.gender),
+      status: CreateDoctorDtoStatusEnum.ACTIVE,
+      jobTitle: request.jobTitle,
+      medicalTitles: request.medicalTitles,
+      medicalLicenses: request.medicalLicenses,
       experienceYears: request.experienceYears,
       consultationFee: request.consultationFee,
       specializations: request.specializations,
       education: request.education,
       certifications: request.certifications,
-    );
-
-    final dto = CreateDoctorDto(
-      employeeCode: request.employeeId,
-      fullName: '${request.firstName} ${request.lastName}',
-      displayName: '${request.firstName} ${request.lastName}',
-      email: request.email,
-      phone: request.phone,
-      avatarUrl: request.avatar,
-      dob: request.dateOfBirth,
-      gender: _mapDoctorGender(request.gender),
-      status: CreateDoctorDtoStatusEnum.ACTIVE,
-      profile: profile,
     );
 
     final response = await _employeesApi.partnerEmployeesControllerCreateDoctor(
@@ -218,29 +214,26 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   Future<EmployeeEntity> createSpaTherapist(
     CreateSpaTherapistRequest request,
   ) async {
-    final profile = TherapistProfileDto(
-      level: request.therapistLevel,
-      type: TherapistType.spa.apiValue,
-      commissionRate: request.commissionRate,
-      healthCheckDate: _parseDateTime(request.healthCheckDate),
-      skills: request.skills,
-    );
-
-    final dto = CreateTherapistDto(
-      employeeCode: request.employeeId,
-      fullName: '${request.firstName} ${request.lastName}',
-      displayName: '${request.firstName} ${request.lastName}',
+    final dto = CreateSpaTherapistDto(
+      firstName: request.firstName,
+      lastName: request.lastName,
       email: request.email,
+      employeeId: request.employeeId,
       phone: request.phone,
-      avatarUrl: request.avatar,
-      dob: request.dateOfBirth,
-      gender: _mapTherapistGender(request.gender),
-      status: CreateTherapistDtoStatusEnum.ACTIVE,
-      profile: profile,
+      avatar: request.avatar,
+      dateOfBirth: request.dateOfBirth,
+      gender: _mapSpaGender(request.gender),
+      status: CreateSpaTherapistDtoStatusEnum.ACTIVE,
+      jobTitle: request.jobTitle,
+      therapistLevel: _mapSpaLevel(request.therapistLevel),
+      commissionRate: request.commissionRate,
+      healthCheckDate: request.healthCheckDate,
+      skills: request.skills,
+      deviceProficiency: request.deviceProficiency,
     );
 
     final response = await _employeesApi
-        .partnerEmployeesControllerCreateTherapist(dto);
+        .partnerEmployeesControllerCreateSpaTherapist(dto);
     if (response == null) {
       throw EmployeeCreationException('Failed to create spa therapist');
     }
@@ -258,30 +251,26 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   Future<EmployeeEntity> createMassageTherapist(
     CreateMassageTherapistRequest request,
   ) async {
-    final profile = TherapistProfileDto(
-      level: request.therapistLevel,
-      type: TherapistType.massage.apiValue,
-      strengthLevel: request.strengthLevel,
+    final dto = CreateMassageTherapistDto(
+      firstName: request.firstName,
+      lastName: request.lastName,
+      email: request.email,
+      employeeId: request.employeeId,
+      phone: request.phone,
+      avatar: request.avatar,
+      dateOfBirth: request.dateOfBirth,
+      gender: _mapMassageGender(request.gender),
+      status: CreateMassageTherapistDtoStatusEnum.ACTIVE,
+      jobTitle: request.jobTitle,
+      therapistLevel: _mapMassageLevel(request.therapistLevel),
+      strengthLevel: _mapMassageStrength(request.strengthLevel),
       commissionRate: request.commissionRate,
-      healthCheckDate: _parseDateTime(request.healthCheckDate),
+      healthCheckDate: request.healthCheckDate,
       skills: request.skills,
     );
 
-    final dto = CreateTherapistDto(
-      employeeCode: request.employeeId,
-      fullName: '${request.firstName} ${request.lastName}',
-      displayName: '${request.firstName} ${request.lastName}',
-      email: request.email,
-      phone: request.phone,
-      avatarUrl: request.avatar,
-      dob: request.dateOfBirth,
-      gender: _mapTherapistGender(request.gender),
-      status: CreateTherapistDtoStatusEnum.ACTIVE,
-      profile: profile,
-    );
-
     final response = await _employeesApi
-        .partnerEmployeesControllerCreateTherapist(dto);
+        .partnerEmployeesControllerCreateMassageTherapist(dto);
     if (response == null) {
       throw EmployeeCreationException('Failed to create massage therapist');
     }
@@ -361,7 +350,9 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         employmentType: common.employmentType,
         startDate: common.startDate,
         jobTitle: profile.title ?? '',
-        medicalLicense: profile.medicalLicense,
+
+        medicalLicenses: profile.medicalLicenses,
+        medicalTitles: profile.medicalTitles,
         experienceYears: profile.experienceYears?.toInt(),
         consultationFee: profile.consultationFee?.toDouble(),
         specializations: profile.specializations,
@@ -508,22 +499,56 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     };
   }
 
-  CreateTherapistDtoGenderEnum? _mapTherapistGender(String? gender) {
+  CreateSpaTherapistDtoGenderEnum? _mapSpaGender(String? gender) {
     if (gender == null) return null;
     return switch (gender.toUpperCase()) {
-      'MALE' => CreateTherapistDtoGenderEnum.MALE,
-      'FEMALE' => CreateTherapistDtoGenderEnum.FEMALE,
-      'OTHER' => CreateTherapistDtoGenderEnum.OTHER,
+      'MALE' => CreateSpaTherapistDtoGenderEnum.MALE,
+      'FEMALE' => CreateSpaTherapistDtoGenderEnum.FEMALE,
+      'OTHER' => CreateSpaTherapistDtoGenderEnum.OTHER,
       _ => null,
     };
   }
 
-  /// Parses a string to DateTime, returns null.
-  DateTime? _parseDateTime(String? dateString) {
-    if (dateString == null || dateString.isEmpty) {
-      return null;
-    }
-    return DateTime.tryParse(dateString);
+  CreateMassageTherapistDtoGenderEnum? _mapMassageGender(String? gender) {
+    if (gender == null) return null;
+    return switch (gender.toUpperCase()) {
+      'MALE' => CreateMassageTherapistDtoGenderEnum.MALE,
+      'FEMALE' => CreateMassageTherapistDtoGenderEnum.FEMALE,
+      'OTHER' => CreateMassageTherapistDtoGenderEnum.OTHER,
+      _ => null,
+    };
+  }
+
+  CreateSpaTherapistDtoTherapistLevelEnum? _mapSpaLevel(String? level) {
+    if (level == null) return null;
+    return switch (level.toUpperCase()) {
+      'JUNIOR' => CreateSpaTherapistDtoTherapistLevelEnum.JUNIOR,
+      'SENIOR' => CreateSpaTherapistDtoTherapistLevelEnum.SENIOR,
+      'MASTER' => CreateSpaTherapistDtoTherapistLevelEnum.MASTER,
+      _ => null,
+    };
+  }
+
+  CreateMassageTherapistDtoTherapistLevelEnum? _mapMassageLevel(String? level) {
+    if (level == null) return null;
+    return switch (level.toUpperCase()) {
+      'JUNIOR' => CreateMassageTherapistDtoTherapistLevelEnum.JUNIOR,
+      'SENIOR' => CreateMassageTherapistDtoTherapistLevelEnum.SENIOR,
+      'MASTER' => CreateMassageTherapistDtoTherapistLevelEnum.MASTER,
+      _ => null,
+    };
+  }
+
+  CreateMassageTherapistDtoStrengthLevelEnum? _mapMassageStrength(
+    String? level,
+  ) {
+    if (level == null) return null;
+    return switch (level.toUpperCase()) {
+      'SOFT' => CreateMassageTherapistDtoStrengthLevelEnum.SOFT,
+      'MEDIUM' => CreateMassageTherapistDtoStrengthLevelEnum.MEDIUM,
+      'STRONG' => CreateMassageTherapistDtoStrengthLevelEnum.STRONG,
+      _ => null,
+    };
   }
 }
 
@@ -568,157 +593,6 @@ class _CommonFields {
 ///
 /// Provides rich static data with simulated network delays.
 class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
-  static const _workSchedule = employeeMockWorkSchedule;
-
-  Map<String, dynamic> _getCommonFields(String idSuffix, String role) {
-    final imageIndex = idSuffix.hashCode.abs() % employeeMockAvatarPaths.length;
-    final avatarUrl = employeeMockAvatarPaths[imageIndex];
-
-    return {
-      'fullName': 'Mock $role Name $idSuffix',
-      'displayName': 'Mock $role $idSuffix',
-      'avatar': avatarUrl,
-      'role': role.toUpperCase(),
-      'position': role == 'Doctor' ? 'Specialist Doctor' : '$role Therapist',
-      'rating': 4.5,
-      'reviewCount': 100,
-      'status': 'ACTIVE',
-      'email': 'mock.$role.$idSuffix@example.com',
-      'phone': '0901234567',
-      'address': '123 Mock Street, District 1',
-      'city': 'Ho Chi Minh City',
-      'state': 'Ho Chi Minh',
-      'country': 'Vietnam',
-      'licenseUrl': employeeMockPdfUrl,
-      'idCardUrl': employeeMockPdfUrl,
-      'documents': employeeMockDocuments,
-      'description': employeeMockDescription,
-      'dateOfBirth': '1990-05-15',
-      'gender': 'FEMALE',
-      'employmentType': 'Full-Time',
-      'startDate': '2023-01-01',
-    };
-  }
-
-  DoctorEntity _createDoctor(EmployeeId id) {
-    final common = _getCommonFields(id.value, 'Doctor');
-    return DoctorEntity(
-      id: id,
-      fullName: common['fullName'],
-      displayName: common['displayName'],
-      avatar: common['avatar'],
-      role: 'DOCTOR',
-      position: 'Senior Doctor',
-      rating: common['rating'],
-      reviewCount: common['reviewCount'],
-      status: common['status'],
-      email: common['email'],
-      phone: common['phone'],
-      address: common['address'],
-      city: common['city'],
-      state: common['state'],
-      country: common['country'],
-      licenseUrl: common['licenseUrl'],
-      idCardUrl: common['idCardUrl'],
-      description: common['description'],
-      documents: common['documents'],
-      dateOfBirth: common['dateOfBirth'],
-      gender: common['gender'],
-      employmentType: common['employmentType'],
-      startDate: common['startDate'],
-      jobTitle: 'Dermatologist',
-      medicalLicense: 'MED-LICENSE-${id.value}',
-      experienceYears: 12,
-      consultationFee: 500000.0,
-      specializations: ['Dermatology', 'Cosmetic Surgery', 'Laser Treatments'],
-      education: [
-        'MD - University of Medicine and Pharmacy',
-        'PhD - Dermatological Research Institute',
-      ],
-      certifications: [
-        'Board Certified Dermatologist',
-        'Advanced Laser Safety Officer',
-      ],
-      workSchedule: _workSchedule,
-    );
-  }
-
-  SpaTherapistEntity _createSpaTherapist(EmployeeId id) {
-    final common = _getCommonFields(id.value, 'Spa');
-    return SpaTherapistEntity(
-      id: id,
-      fullName: common['fullName'],
-      displayName: common['displayName'],
-      avatar: common['avatar'],
-      role: 'THERAPIST',
-      position: 'Spa Therapist',
-      rating: common['rating'],
-      reviewCount: common['reviewCount'],
-      status: common['status'],
-      email: common['email'],
-      phone: common['phone'],
-      address: common['address'],
-      city: common['city'],
-      state: common['state'],
-      country: common['country'],
-      licenseUrl: common['licenseUrl'],
-      idCardUrl: common['idCardUrl'],
-      description: common['description'],
-      documents: common['documents'],
-      dateOfBirth: common['dateOfBirth'],
-      gender: common['gender'],
-      employmentType: common['employmentType'],
-      startDate: common['startDate'],
-      jobTitle: 'Senior Spa Therapist',
-      therapistLevel: 'SENIOR',
-      commissionRate: 15.0,
-      healthCheckDate: DateTime.now()
-          .subtract(const Duration(days: 30))
-          .toIso8601String(),
-      skills: ['Facial', 'Body Wrap', 'Aromatherapy', 'Skin Care'],
-      deviceProficiency: ['Laser Machine', 'HIFU Device', 'Skin Analyzer'],
-      workSchedule: _workSchedule,
-    );
-  }
-
-  MassageTherapistEntity _createMassageTherapist(EmployeeId id) {
-    final common = _getCommonFields(id.value, 'Massage');
-    return MassageTherapistEntity(
-      id: id,
-      fullName: common['fullName'],
-      displayName: common['displayName'],
-      avatar: common['avatar'],
-      role: 'THERAPIST',
-      position: 'Massage Therapist',
-      rating: common['rating'],
-      reviewCount: common['reviewCount'],
-      status: common['status'],
-      email: common['email'],
-      phone: common['phone'],
-      address: common['address'],
-      city: common['city'],
-      state: common['state'],
-      country: common['country'],
-      licenseUrl: common['licenseUrl'],
-      idCardUrl: common['idCardUrl'],
-      description: common['description'],
-      documents: common['documents'],
-      dateOfBirth: common['dateOfBirth'],
-      gender: common['gender'],
-      employmentType: common['employmentType'],
-      startDate: common['startDate'],
-      jobTitle: 'Master Massage Therapist',
-      therapistLevel: 'MASTER',
-      strengthLevel: 'STRONG',
-      commissionRate: 20.0,
-      healthCheckDate: DateTime.now()
-          .subtract(const Duration(days: 15))
-          .toIso8601String(),
-      skills: ['Thai Massage', 'Shiatsu', 'Deep Tissue', 'Reflexology'],
-      workSchedule: _workSchedule,
-    );
-  }
-
   @override
   Future<List<EmployeeEntity>> getEmployees(
     int startingAt,
@@ -733,11 +607,11 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       final id = EmployeeId('mock-id-$i');
 
       if (type == 0) {
-        return _createDoctor(id);
+        return createMockDoctor(id);
       } else if (type == 1) {
-        return _createSpaTherapist(id);
+        return createMockSpaTherapist(id);
       } else {
-        return _createMassageTherapist(id);
+        return createMockMassageTherapist(id);
       }
     });
   }
@@ -754,11 +628,11 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
     final idVal = id.value.toLowerCase();
 
     if (idVal.contains('doctor')) {
-      return _createDoctor(id);
+      return createMockDoctor(id);
     } else if (idVal.contains('spa')) {
-      return _createSpaTherapist(id);
+      return createMockSpaTherapist(id);
     } else if (idVal.contains('massage')) {
-      return _createMassageTherapist(id);
+      return createMockMassageTherapist(id);
     }
 
     final hashInfo = idVal.codeUnits.fold(0, (p, c) => p + c);
@@ -770,18 +644,18 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
         final lastNum = int.tryParse(parts.last);
         if (lastNum != null) {
           final type = lastNum % 3;
-          if (type == 0) return _createDoctor(id);
-          if (type == 1) return _createSpaTherapist(id);
-          if (type == 2) return _createMassageTherapist(id);
+          if (type == 0) return createMockDoctor(id);
+          if (type == 1) return createMockSpaTherapist(id);
+          if (type == 2) return createMockMassageTherapist(id);
         }
       }
     } on FormatException {
       // Ignore parsing errors, use fallback
     }
 
-    if (type == 0) return _createDoctor(id);
-    if (type == 1) return _createSpaTherapist(id);
-    return _createMassageTherapist(id);
+    if (type == 0) return createMockDoctor(id);
+    if (type == 1) return createMockSpaTherapist(id);
+    return createMockMassageTherapist(id);
   }
 
   @override
@@ -810,7 +684,8 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       state: '',
       country: '',
       jobTitle: request.jobTitle,
-      medicalLicense: request.medicalLicense,
+      medicalTitles: request.medicalTitles,
+      medicalLicenses: request.medicalLicenses,
       experienceYears: request.experienceYears,
       consultationFee: request.consultationFee,
       specializations: request.specializations,
@@ -941,14 +816,14 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
     if (role.toUpperCase() == 'DOCTOR') {
       return List.generate(
         count,
-        (index) => _createDoctor(EmployeeId('mock-doc-$index')),
+        (index) => createMockDoctor(EmployeeId('mock-doc-$index')),
       );
     } else {
       return List.generate(count, (index) {
         if (index % 2 == 0) {
-          return _createSpaTherapist(EmployeeId('mock-spa-$index'));
+          return createMockSpaTherapist(EmployeeId('mock-spa-$index'));
         } else {
-          return _createMassageTherapist(EmployeeId('mock-massage-$index'));
+          return createMockMassageTherapist(EmployeeId('mock-massage-$index'));
         }
       });
     }

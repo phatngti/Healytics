@@ -28,6 +28,18 @@ void main() {
       // TODO
     });
 
+    // First name
+    // String firstName
+    test('to test the property `firstName`', () async {
+      // TODO
+    });
+
+    // Last name
+    // String lastName
+    test('to test the property `lastName`', () async {
+      // TODO
+    });
+
     // Full name of the employee
     // String fullName
     test('to test the property `fullName`', () async {
@@ -91,6 +103,60 @@ void main() {
     // Partner ID the employee belongs to
     // String partnerId
     test('to test the property `partnerId`', () async {
+      // TODO
+    });
+
+    // Job title
+    // String jobTitle
+    test('to test the property `jobTitle`', () async {
+      // TODO
+    });
+
+    // Start date
+    // String startDate
+    test('to test the property `startDate`', () async {
+      // TODO
+    });
+
+    // Employment type
+    // String employmentType
+    test('to test the property `employmentType`', () async {
+      // TODO
+    });
+
+    // Emergency contact name
+    // String emergencyContactName
+    test('to test the property `emergencyContactName`', () async {
+      // TODO
+    });
+
+    // Emergency contact phone
+    // String emergencyContactPhone
+    test('to test the property `emergencyContactPhone`', () async {
+      // TODO
+    });
+
+    // ID card URL
+    // String idCardUrl
+    test('to test the property `idCardUrl`', () async {
+      // TODO
+    });
+
+    // Bio / description
+    // String description
+    test('to test the property `description`', () async {
+      // TODO
+    });
+
+    // Account password
+    // String password
+    test('to test the property `password`', () async {
+      // TODO
+    });
+
+    // Weekly work schedule
+    // List<WorkScheduleEntryDto> schedule (default value: const [])
+    test('to test the property `schedule`', () async {
       // TODO
     });
 

@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/providers/api.provider.dart';
+import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/home/domain/entities/service_details.entity.dart';
 import 'package:user_openapi/api.dart';
 
@@ -35,21 +36,20 @@ abstract class ServiceDetailsRemoteDatasource {
 // Real implementation
 // ─────────────────────────────────────────────────────
 
-/// Calls the backend [ProductsApi] and maps DTOs
-/// to domain entities.
+/// Calls the backend [HealthServicesApi] and maps
+/// DTOs to domain entities.
 class ServiceDetailsRemoteDatasourceImpl
     implements ServiceDetailsRemoteDatasource {
-  const ServiceDetailsRemoteDatasourceImpl(this._productsApi);
+  const ServiceDetailsRemoteDatasourceImpl(this._apiService);
 
-  final ProductsApi _productsApi;
+  final ApiService _apiService;
 
   // ── Service Info ──────────────────────────────────
 
   @override
   Future<ServiceDetailsEntity> getServiceDetails(String serviceId) async {
-    final response = await _productsApi.productsControllerGetProductInfo(
-      serviceId,
-    );
+    final response = await _apiService.healthServicesApi
+        .healthServiceControllerGetProductInfo(serviceId);
     if (response == null) {
       throw Exception('Product info not found: $serviceId');
     }
@@ -57,7 +57,9 @@ class ServiceDetailsRemoteDatasourceImpl
     return _mapInfoToEntity(response);
   }
 
-  ServiceDetailsEntity _mapInfoToEntity(PublicProductInfoResponseDto dto) {
+  ServiceDetailsEntity _mapInfoToEntity(
+    PublicHealthServiceInfoResponseDto dto,
+  ) {
     return ServiceDetailsEntity(
       id: dto.id,
       title: dto.title,
@@ -84,9 +86,10 @@ class ServiceDetailsRemoteDatasourceImpl
   Future<List<SpecialistEntity>> getServiceEmployees(String serviceId) async {
     try {
       log('1. Calling API...');
-      final response = await _productsApi.productsControllerGetProductEmployees(
-        serviceId,
-      );
+      final response = await _apiService.healthServicesApi
+          .healthServiceControllerGetProductEmployees(
+            serviceId,
+          );
 
       log('2. API Returned. Is null? ${response == null}');
       if (response == null) return [];
@@ -100,7 +103,9 @@ class ServiceDetailsRemoteDatasourceImpl
     }
   }
 
-  SpecialistEntity _mapEmployeeToEntity(PublicProductEmployeeResponseDto dto) {
+  SpecialistEntity _mapEmployeeToEntity(
+    PublicHealthServiceEmployeeResponseDto dto,
+  ) {
     return SpecialistEntity(
       id: dto.id,
       name: dto.name,
@@ -117,7 +122,9 @@ class ServiceDetailsRemoteDatasourceImpl
     );
   }
 
-  DayScheduleEntity _mapDaySchedule(PublicProductEmployeeDayScheduleDto dto) {
+  DayScheduleEntity _mapDaySchedule(
+    PublicHealthServiceEmployeeDayScheduleDto dto,
+  ) {
     return DayScheduleEntity(
       date: DateTime.tryParse(dto.date) ?? DateTime.now(),
       isAvailable: dto.isAvailable,
@@ -133,14 +140,17 @@ class ServiceDetailsRemoteDatasourceImpl
 
   @override
   Future<List<ReviewEntity>> getServiceReviews(String serviceId) async {
-    final dtos = await _productsApi.productsControllerGetProductReviews(
-      serviceId,
-    );
+    final dtos = await _apiService.healthServicesApi
+        .healthServiceControllerGetProductReviews(
+          serviceId,
+        );
     if (dtos == null) return [];
     return dtos.map(_mapReviewToEntity).toList();
   }
 
-  ReviewEntity _mapReviewToEntity(PublicProductReviewResponseDto dto) {
+  ReviewEntity _mapReviewToEntity(
+    PublicHealthServiceReviewResponseDto dto,
+  ) {
     return ReviewEntity(
       reviewerName: dto.reviewerName,
       avatarUrl: dto.avatarUrl?.toString() ?? '',
@@ -158,15 +168,16 @@ class ServiceDetailsRemoteDatasourceImpl
   Future<List<RecommendedServiceEntity>> getRecommendedServices(
     String serviceId,
   ) async {
-    final dtos = await _productsApi.productsControllerGetRecommendedProducts(
-      serviceId,
-    );
+    final dtos = await _apiService.healthServicesApi
+        .healthServiceControllerGetRecommendedProducts(
+          serviceId,
+        );
     if (dtos == null) return [];
     return dtos.map(_mapRecommendedToEntity).toList();
   }
 
   RecommendedServiceEntity _mapRecommendedToEntity(
-    PublicProductRecommendedResponseDto dto,
+    PublicHealthServiceRecommendedResponseDto dto,
   ) {
     return RecommendedServiceEntity(
       id: dto.id,
@@ -229,7 +240,5 @@ final serviceDetailsRemoteDatasourceProvider =
       }
 
       final apiService = ref.read(apiServiceProvider);
-      return ServiceDetailsRemoteDatasourceImpl(
-        ProductsApi(apiService.apiClient),
-      );
+      return ServiceDetailsRemoteDatasourceImpl(apiService);
     });

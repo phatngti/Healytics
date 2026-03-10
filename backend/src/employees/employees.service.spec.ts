@@ -129,10 +129,10 @@ describe('EmployeesService', () => {
     it('should delegate to CreateDoctorHandler', async () => {
       // Arrange
       const inputDto = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@example.com',
-        profile: { specialization: 'Cardiology' },
+        firstName: 'Nguyen',
+        lastName: 'Van A',
+        email: 'doctor@example.com',
+        employeeId: 'DOC-001',
       };
       const expectedEmployee = { id: 'uuid-1', ...inputDto, role: EmployeeRole.DOCTOR };
       mockCreateDoctorHandler.execute.mockResolvedValue(expectedEmployee);
@@ -147,7 +147,7 @@ describe('EmployeesService', () => {
 
     it('should assign partnerId when provided', async () => {
       // Arrange
-      const inputDto = { email: 'john@example.com' } as any;
+      const inputDto = { email: 'doctor@example.com', firstName: 'Nguyen', lastName: 'Van A', employeeId: 'DOC-001' } as any;
       const partnerId = 'partner-uuid';
       mockCreateDoctorHandler.execute.mockResolvedValue({ id: 'uuid-1' });
 
@@ -155,41 +155,83 @@ describe('EmployeesService', () => {
       await service.createDoctor(inputDto, partnerId);
 
       // Assert
-      expect(inputDto.partnerId).toBe(partnerId);
+      expect(mockCreateDoctorHandler.execute).toHaveBeenCalledWith(
+        expect.objectContaining({ email: 'doctor@example.com', partnerId }),
+      );
     });
   });
 
-  describe('createTherapist', () => {
-    it('should delegate to CreateTherapistHandler', async () => {
+  describe('createSpaTherapist', () => {
+    it('should delegate to CreateTherapistHandler with SPA type', async () => {
       // Arrange
       const inputDto = {
-        firstName: 'Jane',
-        lastName: 'Smith',
-        email: 'jane@example.com',
-        profile: { certifications: ['Massage'] },
+        firstName: 'Le',
+        lastName: 'Thi C',
+        email: 'spa@example.com',
+        employeeId: 'SPA-001',
       };
       const expectedEmployee = { id: 'uuid-2', ...inputDto, role: EmployeeRole.THERAPIST };
       mockCreateTherapistHandler.execute.mockResolvedValue(expectedEmployee);
 
       // Act
-      const result = await service.createTherapist(inputDto as any);
+      const result = await service.createSpaTherapist(inputDto as any);
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(inputDto);
+      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(inputDto, 'SPA');
     });
 
     it('should assign partnerId when provided', async () => {
       // Arrange
-      const inputDto = { email: 'jane@example.com' } as any;
+      const inputDto = { email: 'spa@example.com', firstName: 'Le', lastName: 'Thi C', employeeId: 'SPA-001' } as any;
       const partnerId = 'partner-uuid';
       mockCreateTherapistHandler.execute.mockResolvedValue({ id: 'uuid-2' });
 
       // Act
-      await service.createTherapist(inputDto, partnerId);
+      await service.createSpaTherapist(inputDto, partnerId);
 
       // Assert
-      expect(inputDto.partnerId).toBe(partnerId);
+      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(
+        expect.objectContaining({ email: 'spa@example.com', partnerId }),
+        'SPA',
+      );
+    });
+  });
+
+  describe('createMassageTherapist', () => {
+    it('should delegate to CreateTherapistHandler with MASSAGE type', async () => {
+      // Arrange
+      const inputDto = {
+        firstName: 'Hoang',
+        lastName: 'Van E',
+        email: 'massage@example.com',
+        employeeId: 'MSG-001',
+      };
+      const expectedEmployee = { id: 'uuid-3', ...inputDto, role: EmployeeRole.THERAPIST };
+      mockCreateTherapistHandler.execute.mockResolvedValue(expectedEmployee);
+
+      // Act
+      const result = await service.createMassageTherapist(inputDto as any);
+
+      // Assert
+      expect(result).toEqual(expectedEmployee);
+      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(inputDto, 'MASSAGE');
+    });
+
+    it('should assign partnerId when provided', async () => {
+      // Arrange
+      const inputDto = { email: 'massage@example.com', firstName: 'Hoang', lastName: 'Van E', employeeId: 'MSG-001' } as any;
+      const partnerId = 'partner-uuid';
+      mockCreateTherapistHandler.execute.mockResolvedValue({ id: 'uuid-3' });
+
+      // Act
+      await service.createMassageTherapist(inputDto, partnerId);
+
+      // Assert
+      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(
+        expect.objectContaining({ email: 'massage@example.com', partnerId }),
+        'MASSAGE',
+      );
     });
   });
 

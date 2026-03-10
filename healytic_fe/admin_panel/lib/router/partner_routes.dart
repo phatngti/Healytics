@@ -1,8 +1,8 @@
 import 'package:admin_panel/features/partner/dashboard/presentation/dashboard.dart';
-import 'package:admin_panel/features/partner/employee/presentation/employee_add.screen.dart';
-import 'package:admin_panel/features/partner/employee/presentation/employee_edit.screen.dart';
-import 'package:admin_panel/features/partner/employee/presentation/employee_details.screen.dart';
-import 'package:admin_panel/features/partner/employee/presentation/employee_home.screen.dart';
+import 'package:admin_panel/features/partner/employee/presentation/screens/employee_add.screen.dart';
+import 'package:admin_panel/features/partner/employee/presentation/screens/employee_edit.screen.dart';
+import 'package:admin_panel/features/partner/employee/presentation/screens/employee_details.screen.dart';
+import 'package:admin_panel/features/partner/employee/presentation/screens/employee_home.screen.dart';
 import 'package:admin_panel/features/partner/products/presentation/product_add.screen.dart';
 import 'package:admin_panel/features/partner/products/presentation/product_details.screen.dart';
 import 'package:admin_panel/features/partner/products/presentation/product_edit.screen.dart';

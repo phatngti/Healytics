@@ -1,0 +1,38 @@
+_format_version: "3.0"
+_transform: true
+_workspace: default   # <--- ADD THIS
+
+services:
+  - name: backend-service
+    url: http://host.docker.internal:8080 # Global prefix baked into service URL
+    routes:
+      - name: my-backend-route
+        paths:
+          - /backend
+        strip_path: true # Strips /api prefix, remainder is appended to service URL
+  - name: ai-service
+    url: http://192.168.60.213:9000
+    connect_timeout: 600000
+    write_timeout: 600000
+    read_timeout: 600000
+    routes:
+      - name: ai-route
+        paths:
+          - /ai
+        strip_path: true
+    # plugins:
+      # If using Kong Enterprise (OIDC Plugin)
+      # - name: openid-connect
+      #   config:
+      #     issuer: "http://keycloak:8080/realms/myrealm"
+      #     client_id: ["kong-client"]
+      #     client_secret: ["secret-xxx"]
+      #     redirect_uri: ["http://localhost:8000/api/v1"]
+      #     scopes: ["openid", "profile", "email"]
+          
+      # OR If using Kong Community (JWT Plugin)
+      # - name: jwt
+      #   config:
+      #     key_claim_name: kid
+      #     claims_to_verify:
+      #       - exp

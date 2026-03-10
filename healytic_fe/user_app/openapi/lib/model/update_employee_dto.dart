@@ -15,6 +15,8 @@ class UpdateEmployeeDto {
   UpdateEmployeeDto({
     this.authId,
     this.employeeCode,
+    this.firstName,
+    this.lastName,
     this.fullName,
     this.displayName,
     this.email,
@@ -26,6 +28,15 @@ class UpdateEmployeeDto {
     this.status,
     this.branchId,
     this.partnerId,
+    this.jobTitle,
+    this.startDate,
+    this.employmentType,
+    this.emergencyContactName,
+    this.emergencyContactPhone,
+    this.idCardUrl,
+    this.description,
+    this.password,
+    this.schedule = const [],
     this.doctorProfile,
     this.therapistProfile,
   });
@@ -47,6 +58,24 @@ class UpdateEmployeeDto {
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
   String? employeeCode;
+
+  /// First name
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? firstName;
+
+  /// Last name
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? lastName;
 
   /// Full name of the employee
   ///
@@ -129,6 +158,81 @@ class UpdateEmployeeDto {
   ///
   String? partnerId;
 
+  /// Job title
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? jobTitle;
+
+  /// Start date
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? startDate;
+
+  /// Employment type
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? employmentType;
+
+  /// Emergency contact name
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? emergencyContactName;
+
+  /// Emergency contact phone
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? emergencyContactPhone;
+
+  /// ID card URL
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? idCardUrl;
+
+  /// Bio / description
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? description;
+
+  /// Account password
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? password;
+
+  /// Weekly work schedule
+  List<WorkScheduleEntryDto> schedule;
+
   /// Doctor profile data if role is DOCTOR
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -151,6 +255,8 @@ class UpdateEmployeeDto {
   bool operator ==(Object other) => identical(this, other) || other is UpdateEmployeeDto &&
     other.authId == authId &&
     other.employeeCode == employeeCode &&
+    other.firstName == firstName &&
+    other.lastName == lastName &&
     other.fullName == fullName &&
     other.displayName == displayName &&
     other.email == email &&
@@ -162,6 +268,15 @@ class UpdateEmployeeDto {
     other.status == status &&
     other.branchId == branchId &&
     other.partnerId == partnerId &&
+    other.jobTitle == jobTitle &&
+    other.startDate == startDate &&
+    other.employmentType == employmentType &&
+    other.emergencyContactName == emergencyContactName &&
+    other.emergencyContactPhone == emergencyContactPhone &&
+    other.idCardUrl == idCardUrl &&
+    other.description == description &&
+    other.password == password &&
+    _deepEquality.equals(other.schedule, schedule) &&
     other.doctorProfile == doctorProfile &&
     other.therapistProfile == therapistProfile;
 
@@ -170,6 +285,8 @@ class UpdateEmployeeDto {
     // ignore: unnecessary_parenthesis
     (authId == null ? 0 : authId!.hashCode) +
     (employeeCode == null ? 0 : employeeCode!.hashCode) +
+    (firstName == null ? 0 : firstName!.hashCode) +
+    (lastName == null ? 0 : lastName!.hashCode) +
     (fullName == null ? 0 : fullName!.hashCode) +
     (displayName == null ? 0 : displayName!.hashCode) +
     (email == null ? 0 : email!.hashCode) +
@@ -181,11 +298,20 @@ class UpdateEmployeeDto {
     (status == null ? 0 : status!.hashCode) +
     (branchId == null ? 0 : branchId!.hashCode) +
     (partnerId == null ? 0 : partnerId!.hashCode) +
+    (jobTitle == null ? 0 : jobTitle!.hashCode) +
+    (startDate == null ? 0 : startDate!.hashCode) +
+    (employmentType == null ? 0 : employmentType!.hashCode) +
+    (emergencyContactName == null ? 0 : emergencyContactName!.hashCode) +
+    (emergencyContactPhone == null ? 0 : emergencyContactPhone!.hashCode) +
+    (idCardUrl == null ? 0 : idCardUrl!.hashCode) +
+    (description == null ? 0 : description!.hashCode) +
+    (password == null ? 0 : password!.hashCode) +
+    (schedule.hashCode) +
     (doctorProfile == null ? 0 : doctorProfile!.hashCode) +
     (therapistProfile == null ? 0 : therapistProfile!.hashCode);
 
   @override
-  String toString() => 'UpdateEmployeeDto[authId=$authId, employeeCode=$employeeCode, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, role=$role, status=$status, branchId=$branchId, partnerId=$partnerId, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
+  String toString() => 'UpdateEmployeeDto[authId=$authId, employeeCode=$employeeCode, firstName=$firstName, lastName=$lastName, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, role=$role, status=$status, branchId=$branchId, partnerId=$partnerId, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, idCardUrl=$idCardUrl, description=$description, password=$password, schedule=$schedule, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -198,6 +324,16 @@ class UpdateEmployeeDto {
       json[r'employeeCode'] = this.employeeCode;
     } else {
       json[r'employeeCode'] = null;
+    }
+    if (this.firstName != null) {
+      json[r'firstName'] = this.firstName;
+    } else {
+      json[r'firstName'] = null;
+    }
+    if (this.lastName != null) {
+      json[r'lastName'] = this.lastName;
+    } else {
+      json[r'lastName'] = null;
     }
     if (this.fullName != null) {
       json[r'fullName'] = this.fullName;
@@ -254,6 +390,47 @@ class UpdateEmployeeDto {
     } else {
       json[r'partnerId'] = null;
     }
+    if (this.jobTitle != null) {
+      json[r'jobTitle'] = this.jobTitle;
+    } else {
+      json[r'jobTitle'] = null;
+    }
+    if (this.startDate != null) {
+      json[r'startDate'] = this.startDate;
+    } else {
+      json[r'startDate'] = null;
+    }
+    if (this.employmentType != null) {
+      json[r'employmentType'] = this.employmentType;
+    } else {
+      json[r'employmentType'] = null;
+    }
+    if (this.emergencyContactName != null) {
+      json[r'emergencyContactName'] = this.emergencyContactName;
+    } else {
+      json[r'emergencyContactName'] = null;
+    }
+    if (this.emergencyContactPhone != null) {
+      json[r'emergencyContactPhone'] = this.emergencyContactPhone;
+    } else {
+      json[r'emergencyContactPhone'] = null;
+    }
+    if (this.idCardUrl != null) {
+      json[r'idCardUrl'] = this.idCardUrl;
+    } else {
+      json[r'idCardUrl'] = null;
+    }
+    if (this.description != null) {
+      json[r'description'] = this.description;
+    } else {
+      json[r'description'] = null;
+    }
+    if (this.password != null) {
+      json[r'password'] = this.password;
+    } else {
+      json[r'password'] = null;
+    }
+      json[r'schedule'] = this.schedule;
     if (this.doctorProfile != null) {
       json[r'doctorProfile'] = this.doctorProfile;
     } else {
@@ -288,6 +465,8 @@ class UpdateEmployeeDto {
       return UpdateEmployeeDto(
         authId: mapValueOfType<String>(json, r'authId'),
         employeeCode: mapValueOfType<String>(json, r'employeeCode'),
+        firstName: mapValueOfType<String>(json, r'firstName'),
+        lastName: mapValueOfType<String>(json, r'lastName'),
         fullName: mapValueOfType<String>(json, r'fullName'),
         displayName: mapValueOfType<String>(json, r'displayName'),
         email: mapValueOfType<String>(json, r'email'),
@@ -299,6 +478,15 @@ class UpdateEmployeeDto {
         status: UpdateEmployeeDtoStatusEnum.fromJson(json[r'status']),
         branchId: mapValueOfType<String>(json, r'branchId'),
         partnerId: mapValueOfType<String>(json, r'partnerId'),
+        jobTitle: mapValueOfType<String>(json, r'jobTitle'),
+        startDate: mapValueOfType<String>(json, r'startDate'),
+        employmentType: mapValueOfType<String>(json, r'employmentType'),
+        emergencyContactName: mapValueOfType<String>(json, r'emergencyContactName'),
+        emergencyContactPhone: mapValueOfType<String>(json, r'emergencyContactPhone'),
+        idCardUrl: mapValueOfType<String>(json, r'idCardUrl'),
+        description: mapValueOfType<String>(json, r'description'),
+        password: mapValueOfType<String>(json, r'password'),
+        schedule: WorkScheduleEntryDto.listFromJson(json[r'schedule']),
         doctorProfile: CreateDoctorProfileDto.fromJson(json[r'doctorProfile']),
         therapistProfile: CreateTherapistProfileDto.fromJson(json[r'therapistProfile']),
       );
