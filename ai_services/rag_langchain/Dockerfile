@@ -11,12 +11,13 @@
 # newgrp docker
 # docker build -t giahung21112004/healytics_chatbot_rag:latest . (Build docker image)
 # docker run --gpus all -it healytics_chatbot_rag bash
-# docker run --name healytics_chatbot_3 --gpus all -it -p 5000:5000 -v /home/giahung21112004/Projects/Healytics/ai_services/rag_langchain:/app -v torch_cache:/root/.cache/torch -v hf_cache:/root/.cache/huggingface -w /app healytics_chatbot_rag bash (lệnh thay thế để mount code khỏi build)
+# docker run --name healytics_chatbot_3 --gpus all -it -p 5000:5000 -v /home/giahung21112004/Projects/Healytics/ai_services/rag_langchain:/app -v torch_cache:/root/.cache/torch -v hf_cache:/root/.cache/huggingface -w /app healytics_chatbot_rag (lệnh thay thế để mount code khỏi build)
 # docker start -ai healytics_chatbot_3
+# uvicorn src.app:app --host 0.0.0.0 --port 5000 --timeout-keep-alive 300
 # docker login
-# docker tag healytics_chatbot_rag:latest giahung21112004/healytics_chatbot_rag:latest
+# docker tag healytics_chatbot_rag:latest giahung2111/healytics_chatbot_rag:latest
 # docker images
-# docker push giahung21112004/healytics_chatbot_rag:latest
+# docker push giahung2111/healytics_chatbot_rag:latest
 
 
 FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04

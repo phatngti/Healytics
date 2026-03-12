@@ -1,9 +1,12 @@
 FROM python:3.11-slim
 
 # docker build -t healytics_gateway .
-# docker run -p 9000:9000 healytics_gateway
+# docker run --name healytics_gateway -p 9000:9000 --env-file .env healytics_gateway
 # uvicorn app.main:app --host 0.0.0.0 --port 9000
 # docker start -ai healytics_gateway
+# docker tag healytics_gateway giahung2111/healytics_gateway:latest 
+# docker push giahung2111/healytics_gateway:latest
+
 
 # 1. Workdir
 WORKDIR /app
@@ -27,7 +30,11 @@ RUN pip install --no-cache-dir \
     sqlalchemy \
     asyncpg \
     python-dotenv \
-    pydantic_settings
+    pydantic_settings \
+    sentence-transformers \
+    scikit-learn \
+    joblib \
+    pandas
 
 # 5. Copy source code
 COPY . /app
