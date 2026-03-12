@@ -8,6 +8,7 @@ from app.clients.chatbot_client import ChatbotClient
 from app.clients.recommender_client import RecommenderClient
 from app.core.sse import SSEEvent
 from app.core.enums import SSEEventType
+from app.intent_classification.main import load_model, predict_intent
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +56,10 @@ class ChatbotOrchestrator:
 
         # 4. Call Recommender (optional)
         recommendation = None
-        if request.enable_recommendation:
+        model, clf = load_model()
+        need_recommend = predict_intent(request.message, model, clf)
+        
+        if need_recommend:
             recommendation = await self._call_recommender_safe(request)
 
         # 5. Build enriched prompt — dùng thông tin chi tiết
@@ -81,7 +85,7 @@ class ChatbotOrchestrator:
 
         # 7. Emit recommendation AFTER chatbot finished
         # SSE trả về thông tin chi tiết để UI hiển thị cards
-        if recommendation:
+        if need_recommend and recommendation:
             yield SSEEvent(
                 SSEEventType.RECOMMENDATION,
                 {
