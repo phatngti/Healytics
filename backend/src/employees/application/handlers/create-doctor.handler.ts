@@ -11,7 +11,7 @@ import { EmployeeRole } from '../../enum/employee-role.enum';
 
 /**
  * Handler for creating doctor employees with transactional boundaries.
- * Follows the domain handler pattern with single responsibility.
+ * Maps flat DTO fields into Employee + DoctorProfile entities.
  */
 @Injectable()
 export class CreateDoctorHandler {
@@ -21,7 +21,7 @@ export class CreateDoctorHandler {
 
   /**
    * Executes the create doctor command within a transaction.
-   * @param command - The doctor creation data
+   * @param command - Flat doctor creation data
    * @returns The created employee with doctor profile
    */
   async execute(command: CreateDoctorDto): Promise<Employee> {
@@ -31,19 +31,42 @@ export class CreateDoctorHandler {
     await queryRunner.startTransaction();
 
     try {
-      const { profile, ...employeeData } = command;
-
-      // 1. Domain Action: Create Employee entity
+      // 1. Map flat DTO → Employee entity fields
       const employee = queryRunner.manager.create(Employee, {
-        ...employeeData,
+        firstName: command.firstName,
+        lastName: command.lastName,
+        email: command.email,
+        phone: command.phone,
+        dob: command.dateOfBirth ? new Date(command.dateOfBirth) : undefined,
+        gender: command.gender,
+        emergencyContactName: command.emergencyContactName,
+        emergencyContactPhone: command.emergencyContactPhone,
+        employeeCode: command.employeeId,
+        employmentType: command.employmentType,
+        startDate: command.startDate ? new Date(command.startDate) : undefined,
+        schedule: command.schedule,
+        avatarUrl: command.avatar,
+        idCardUrl: command.idCardUrl,
+        status: command.status,
+        branchId: command.branch || undefined,
+        password: command.password,
+        description: command.description,
+        jobTitle: command.jobTitle,
+        partnerId: command.partnerId,
         role: EmployeeRole.DOCTOR,
       });
       const savedEmployee = await queryRunner.manager.save(Employee, employee);
 
-      // 2. Domain Action: Create DoctorProfile entity
+      // 2. Map flat DTO → DoctorProfile entity fields
       const doctorProfile = queryRunner.manager.create(DoctorProfile, {
-        ...profile,
         employeeId: savedEmployee.id,
+        medicalTitles: command.medicalTitles,
+        medicalLicenses: command.medicalLicenses,
+        experienceYears: command.experienceYears,
+        consultationFee: command.consultationFee,
+        specializations: command.specializations,
+        education: command.education,
+        certifications: command.certifications,
       });
       await queryRunner.manager.save(DoctorProfile, doctorProfile);
 

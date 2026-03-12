@@ -7,8 +7,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'location.provider.g.dart';
 
-/// Maps a [LocationDto] from the API to a [LocationEntity] domain model.
-LocationEntity _mapLocationDto(LocationDto dto) {
+/// Maps a [LocationResponseDto] from the API
+/// to a [LocationEntity] domain model.
+LocationEntity _mapLocationDto(LocationResponseDto dto) {
   return LocationEntity(
     id: dto.id,
     name: dto.name,

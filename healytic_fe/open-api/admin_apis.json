@@ -4,6 +4,7 @@
     "/auth/user/register": {
       "post": {
         "operationId": "AuthController_registerUser",
+        "summary": "Register a new user",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -17,7 +18,7 @@
         },
         "responses": {
           "201": {
-            "description": "Registration returns access and refresh tokens",
+            "description": "Registration returns access and refresh tokens.",
             "content": {
               "application/json": {
                 "schema": {
@@ -25,6 +26,9 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "Email already in use."
           }
         },
         "tags": [
@@ -35,6 +39,7 @@
     "/auth/user/login": {
       "post": {
         "operationId": "AuthController_loginUser",
+        "summary": "Login as a user",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -48,7 +53,7 @@
         },
         "responses": {
           "200": {
-            "description": "User login returns access and refresh tokens",
+            "description": "User login returns access and refresh tokens.",
             "content": {
               "application/json": {
                 "schema": {
@@ -58,10 +63,10 @@
             }
           },
           "401": {
-            "description": "Invalid credentials"
+            "description": "Invalid credentials."
           },
           "403": {
-            "description": "Account is not authorized for user login"
+            "description": "Account not authorized for user login."
           }
         },
         "tags": [
@@ -73,7 +78,7 @@
       "post": {
         "operationId": "AuthController_registerPartner",
         "summary": "Register a new business partner",
-        "description": "Creates business entity, legal representative, and returns auth tokens immediately",
+        "description": "Creates business entity, legal representative, and returns auth tokens immediately.",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -87,7 +92,7 @@
         },
         "responses": {
           "201": {
-            "description": "Partner registration successful - returns tokens and business data",
+            "description": "Partner registration successful.",
             "content": {
               "application/json": {
                 "schema": {
@@ -97,10 +102,10 @@
             }
           },
           "400": {
-            "description": "Invalid input data or address hierarchy"
+            "description": "Invalid input data or address hierarchy."
           },
           "409": {
-            "description": "Email or tax code already exists"
+            "description": "Email or tax code already exists."
           }
         },
         "tags": [
@@ -111,6 +116,7 @@
     "/auth/partner/login": {
       "post": {
         "operationId": "AuthController_loginPartner",
+        "summary": "Login as a partner",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -124,7 +130,7 @@
         },
         "responses": {
           "200": {
-            "description": "Partner login returns access and refresh tokens",
+            "description": "Partner login returns access and refresh tokens.",
             "content": {
               "application/json": {
                 "schema": {
@@ -134,10 +140,45 @@
             }
           },
           "401": {
-            "description": "Invalid credentials"
+            "description": "Invalid credentials."
           },
           "403": {
-            "description": "Account is not authorized for partner login"
+            "description": "Account not authorized for partner login."
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/partner/refresh": {
+      "post": {
+        "operationId": "AuthController_refreshPartner",
+        "summary": "Refresh partner tokens with verification info",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "New pair of tokens with partner verification info.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token."
           }
         },
         "tags": [
@@ -148,6 +189,7 @@
     "/auth/admin/login": {
       "post": {
         "operationId": "AuthController_loginAdmin",
+        "summary": "Login as admin",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -161,7 +203,7 @@
         },
         "responses": {
           "200": {
-            "description": "Admin/Partner login returns access and refresh tokens",
+            "description": "Admin login returns access and refresh tokens.",
             "content": {
               "application/json": {
                 "schema": {
@@ -171,10 +213,10 @@
             }
           },
           "401": {
-            "description": "Invalid credentials"
+            "description": "Invalid credentials."
           },
           "403": {
-            "description": "Account is not authorized for admin login"
+            "description": "Account not authorized for admin login."
           }
         },
         "tags": [
@@ -185,10 +227,11 @@
     "/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
+        "summary": "Logout current user",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Logout confirmation",
+            "description": "Logout confirmation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -206,6 +249,7 @@
     "/auth/refresh": {
       "post": {
         "operationId": "AuthController_refresh",
+        "summary": "Refresh authentication tokens",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -219,7 +263,7 @@
         },
         "responses": {
           "200": {
-            "description": "Refresh returns new pair of tokens",
+            "description": "New pair of tokens.",
             "content": {
               "application/json": {
                 "schema": {
@@ -227,6 +271,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token."
           }
         },
         "tags": [
@@ -241,7 +288,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "User survey",
+            "description": "User survey data.",
             "content": {
               "application/json": {
                 "schema": {
@@ -276,7 +323,7 @@
         },
         "responses": {
           "201": {
-            "description": "Survey created",
+            "description": "Survey created.",
             "content": {
               "application/json": {
                 "schema": {
@@ -286,7 +333,7 @@
             }
           },
           "409": {
-            "description": "Survey already exists"
+            "description": "Survey already exists."
           }
         },
         "tags": [
@@ -318,13 +365,13 @@
           }
         },
         "tags": [
-          "partners"
+          "Partners"
         ]
       }
     },
-    "/partners/me": {
+    "/partner/partners/me": {
       "get": {
-        "operationId": "PartnersController_getMyProfile",
+        "operationId": "PartnerSelfController_getMyProfile",
         "summary": "Get own business profile",
         "description": "Partner gets their own business entity information",
         "parameters": [],
@@ -338,10 +385,13 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Partner not found."
           }
         },
         "tags": [
-          "partners"
+          "Partner Partners"
         ],
         "security": [
           {
@@ -350,7 +400,7 @@
         ]
       },
       "put": {
-        "operationId": "PartnersController_updateMyProfile",
+        "operationId": "PartnerSelfController_updateMyProfile",
         "summary": "Update own business profile",
         "description": "Partner updates their business information (limited fields)",
         "parameters": [],
@@ -374,10 +424,13 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Partner not found."
           }
         },
         "tags": [
-          "partners"
+          "Partner Partners"
         ],
         "security": [
           {
@@ -397,14 +450,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetProvincesResponseDto"
+                  "$ref": "#/components/schemas/LocationListResponseDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "locations"
+          "Locations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -418,7 +476,6 @@
             "required": true,
             "in": "path",
             "schema": {
-              "example": "uuid",
               "type": "string"
             }
           }
@@ -429,7 +486,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetDistrictsResponseDto"
+                  "$ref": "#/components/schemas/LocationListResponseDto"
                 }
               }
             }
@@ -439,7 +496,12 @@
           }
         },
         "tags": [
-          "locations"
+          "Locations"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -453,7 +515,6 @@
             "required": true,
             "in": "path",
             "schema": {
-              "example": "uuid",
               "type": "string"
             }
           }
@@ -464,7 +525,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetWardsResponseDto"
+                  "$ref": "#/components/schemas/LocationListResponseDto"
                 }
               }
             }
@@ -474,22 +535,12 @@
           }
         },
         "tags": [
-          "locations"
-        ]
-      }
-    },
-    "/locations/seed": {
-      "post": {
-        "operationId": "LocationsController_seedData",
-        "summary": "Seed Vietnam administrative divisions data",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Seeding completed successfully"
+          "Locations"
+        ],
+        "security": [
+          {
+            "bearer": []
           }
-        },
-        "tags": [
-          "locations"
         ]
       }
     },
@@ -624,24 +675,61 @@
         ]
       }
     },
-    "/partner/employees/therapists": {
+    "/partner/employees/spa-therapists": {
       "post": {
-        "operationId": "PartnerEmployeesController_createTherapist",
-        "summary": "Create a new therapist",
+        "operationId": "PartnerEmployeesController_createSpaTherapist",
+        "summary": "Create a new spa therapist",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateTherapistDto"
+                "$ref": "#/components/schemas/CreateSpaTherapistDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "The therapist has been successfully created.",
+            "description": "The spa therapist has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/employees/massage-therapists": {
+      "post": {
+        "operationId": "PartnerEmployeesController_createMassageTherapist",
+        "summary": "Create a new massage therapist",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMassageTherapistDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The massage therapist has been successfully created.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1137,9 +1225,9 @@
         ]
       }
     },
-    "/products/premium-treatments": {
+    "/health-services/premium-treatments": {
       "get": {
-        "operationId": "ProductsController_getPremiumTreatments",
+        "operationId": "HealthServiceController_getPremiumTreatments",
         "summary": "Get premium treatments",
         "parameters": [],
         "responses": {
@@ -1150,7 +1238,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PublicProductCardResponseDto"
+                    "$ref": "#/components/schemas/PublicHealthServiceCardResponseDto"
                   }
                 }
               }
@@ -1158,24 +1246,24 @@
           }
         },
         "tags": [
-          "Products"
+          "Health Services"
         ]
       }
     },
-    "/products/home-recommend": {
+    "/health-services/home-recommend": {
       "get": {
-        "operationId": "ProductsController_getHomeRecommend",
+        "operationId": "HealthServiceController_getHomeRecommend",
         "summary": "Get home recommendations",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Return list of home recommended products.",
+            "description": "Return list of home recommended services.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PublicProductCardResponseDto"
+                    "$ref": "#/components/schemas/PublicHealthServiceCardResponseDto"
                   }
                 }
               }
@@ -1183,14 +1271,14 @@
           }
         },
         "tags": [
-          "Products"
+          "Health Services"
         ]
       }
     },
-    "/products/{id}/info": {
+    "/health-services/{id}/info": {
       "get": {
-        "operationId": "ProductsController_getProductInfo",
-        "summary": "Get product info by ID",
+        "operationId": "HealthServiceController_getProductInfo",
+        "summary": "Get service info by ID",
         "parameters": [
           {
             "name": "id",
@@ -1203,28 +1291,28 @@
         ],
         "responses": {
           "200": {
-            "description": "Return product info for the detail screen.",
+            "description": "Return service info for the detail screen.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PublicProductInfoResponseDto"
+                  "$ref": "#/components/schemas/PublicHealthServiceInfoResponseDto"
                 }
               }
             }
           },
           "404": {
-            "description": "Product not found."
+            "description": "Service not found."
           }
         },
         "tags": [
-          "Products"
+          "Health Services"
         ]
       }
     },
-    "/products/{id}/employees": {
+    "/health-services/{id}/employees": {
       "get": {
-        "operationId": "ProductsController_getProductEmployees",
-        "summary": "Get employees for a product",
+        "operationId": "HealthServiceController_getProductEmployees",
+        "summary": "Get employees for a service",
         "parameters": [
           {
             "name": "id",
@@ -1243,25 +1331,25 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PublicProductEmployeeResponseDto"
+                    "$ref": "#/components/schemas/PublicHealthServiceEmployeeResponseDto"
                   }
                 }
               }
             }
           },
           "404": {
-            "description": "Product not found."
+            "description": "Service not found."
           }
         },
         "tags": [
-          "Products"
+          "Health Services"
         ]
       }
     },
-    "/products/{id}/reviews": {
+    "/health-services/{id}/reviews": {
       "get": {
-        "operationId": "ProductsController_getProductReviews",
-        "summary": "Get reviews for a product",
+        "operationId": "HealthServiceController_getProductReviews",
+        "summary": "Get reviews for a service",
         "parameters": [
           {
             "name": "id",
@@ -1280,25 +1368,25 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PublicProductReviewResponseDto"
+                    "$ref": "#/components/schemas/PublicHealthServiceReviewResponseDto"
                   }
                 }
               }
             }
           },
           "404": {
-            "description": "Product not found."
+            "description": "Service not found."
           }
         },
         "tags": [
-          "Products"
+          "Health Services"
         ]
       }
     },
-    "/products/{id}/recommended": {
+    "/health-services/{id}/recommended": {
       "get": {
-        "operationId": "ProductsController_getRecommendedProducts",
-        "summary": "Get recommended products",
+        "operationId": "HealthServiceController_getRecommendedProducts",
+        "summary": "Get recommended services",
         "parameters": [
           {
             "name": "id",
@@ -1311,31 +1399,31 @@
         ],
         "responses": {
           "200": {
-            "description": "Return list of recommended products.",
+            "description": "Return list of recommended services.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PublicProductRecommendedResponseDto"
+                    "$ref": "#/components/schemas/PublicHealthServiceRecommendedResponseDto"
                   }
                 }
               }
             }
           },
           "404": {
-            "description": "Product not found."
+            "description": "Service not found."
           }
         },
         "tags": [
-          "Products"
+          "Health Services"
         ]
       }
     },
-    "/products/{id}": {
+    "/health-services/{id}": {
       "get": {
-        "operationId": "ProductsController_findOne",
-        "summary": "Get a product by id",
+        "operationId": "HealthServiceController_findOne",
+        "summary": "Get a service by id",
         "parameters": [
           {
             "name": "id",
@@ -1348,38 +1436,38 @@
         ],
         "responses": {
           "200": {
-            "description": "Return the product.",
+            "description": "Return the service.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PublicProductResponseDto"
+                  "$ref": "#/components/schemas/PublicHealthServiceResponseDto"
                 }
               }
             }
           },
           "404": {
-            "description": "Product not found."
+            "description": "Service not found."
           }
         },
         "tags": [
-          "Products"
+          "Health Services"
         ]
       }
     },
-    "/partner/products": {
+    "/partner/health-services": {
       "get": {
-        "operationId": "PartnerProductsController_findAll",
-        "summary": "Get all products",
+        "operationId": "PartnerHealthServiceController_findAll",
+        "summary": "Get all health services",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Return all products.",
+            "description": "Return all health services.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PartnerProductResponseDto"
+                    "$ref": "#/components/schemas/PartnerHealthServiceResponseDto"
                   }
                 }
               }
@@ -1387,7 +1475,7 @@
           }
         },
         "tags": [
-          "Partner Products"
+          "Partner Health-services"
         ],
         "security": [
           {
@@ -1396,33 +1484,33 @@
         ]
       },
       "post": {
-        "operationId": "PartnerProductsController_create",
-        "summary": "Create a new product",
+        "operationId": "PartnerHealthServiceController_create",
+        "summary": "Create a new health service",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreatePartnerProductDto"
+                "$ref": "#/components/schemas/CreatePartnerHealthServiceDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "The product has been successfully created.",
+            "description": "The health service has been successfully created.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PartnerProductResponseDto"
+                  "$ref": "#/components/schemas/PartnerHealthServiceResponseDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "Partner Products"
+          "Partner Health-services"
         ],
         "security": [
           {
@@ -1431,10 +1519,10 @@
         ]
       }
     },
-    "/partner/products/slug/{slug}/details": {
+    "/partner/health-services/slug/{slug}/details": {
       "get": {
-        "operationId": "PartnerProductsController_getDetails",
-        "summary": "Get full product details by slug",
+        "operationId": "PartnerHealthServiceController_getDetails",
+        "summary": "Get full health service details by slug",
         "parameters": [
           {
             "name": "slug",
@@ -1447,21 +1535,21 @@
         ],
         "responses": {
           "200": {
-            "description": "Return enriched product details.",
+            "description": "Return enriched health service details.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PartnerProductDetailResponseDto"
+                  "$ref": "#/components/schemas/PartnerHealthServiceDetailResponseDto"
                 }
               }
             }
           },
           "404": {
-            "description": "Product not found."
+            "description": "Health service not found."
           }
         },
         "tags": [
-          "Partner Products"
+          "Partner Health-services"
         ],
         "security": [
           {
@@ -1470,10 +1558,10 @@
         ]
       }
     },
-    "/partner/products/slug/{slug}": {
+    "/partner/health-services/slug/{slug}": {
       "get": {
-        "operationId": "PartnerProductsController_findBySlug",
-        "summary": "Get a product by slug",
+        "operationId": "PartnerHealthServiceController_findBySlug",
+        "summary": "Get a health service by slug",
         "parameters": [
           {
             "name": "slug",
@@ -1486,21 +1574,21 @@
         ],
         "responses": {
           "200": {
-            "description": "Return the product.",
+            "description": "Return the health service.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PartnerProductResponseDto"
+                  "$ref": "#/components/schemas/PartnerHealthServiceResponseDto"
                 }
               }
             }
           },
           "404": {
-            "description": "Product not found."
+            "description": "Health service not found."
           }
         },
         "tags": [
-          "Partner Products"
+          "Partner Health-services"
         ],
         "security": [
           {
@@ -1509,10 +1597,10 @@
         ]
       }
     },
-    "/partner/products/{id}": {
+    "/partner/health-services/{id}": {
       "patch": {
-        "operationId": "PartnerProductsController_update",
-        "summary": "Update a product",
+        "operationId": "PartnerHealthServiceController_update",
+        "summary": "Update a health service",
         "parameters": [
           {
             "name": "id",
@@ -1528,28 +1616,28 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdatePartnerProductDto"
+                "$ref": "#/components/schemas/UpdatePartnerHealthServiceDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "The product has been successfully updated.",
+            "description": "The health service has been successfully updated.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PartnerProductResponseDto"
+                  "$ref": "#/components/schemas/PartnerHealthServiceResponseDto"
                 }
               }
             }
           },
           "404": {
-            "description": "Product not found."
+            "description": "Health service not found."
           }
         },
         "tags": [
-          "Partner Products"
+          "Partner Health-services"
         ],
         "security": [
           {
@@ -1558,8 +1646,8 @@
         ]
       },
       "delete": {
-        "operationId": "PartnerProductsController_remove",
-        "summary": "Delete a product",
+        "operationId": "PartnerHealthServiceController_remove",
+        "summary": "Delete a health service",
         "parameters": [
           {
             "name": "id",
@@ -1572,14 +1660,14 @@
         ],
         "responses": {
           "204": {
-            "description": "The product has been successfully deleted."
+            "description": "The health service has been successfully deleted."
           },
           "404": {
-            "description": "Product not found."
+            "description": "Health service not found."
           }
         },
         "tags": [
-          "Partner Products"
+          "Partner Health-services"
         ],
         "security": [
           {
@@ -1588,7 +1676,7 @@
         ]
       }
     },
-    "/service-tags": {
+    "/partner/service-tags": {
       "post": {
         "operationId": "ServiceTagsController_create",
         "summary": "Create a new service tag",
@@ -1616,7 +1704,7 @@
           }
         },
         "tags": [
-          "service-tags"
+          "Partner Service-tags"
         ],
         "security": [
           {
@@ -1644,7 +1732,7 @@
           }
         },
         "tags": [
-          "service-tags"
+          "Partner Service-tags"
         ],
         "security": [
           {
@@ -1653,7 +1741,7 @@
         ]
       }
     },
-    "/service-tags/active": {
+    "/partner/service-tags/active": {
       "get": {
         "operationId": "ServiceTagsController_findActive",
         "summary": "Get active service tags for current user",
@@ -1674,7 +1762,7 @@
           }
         },
         "tags": [
-          "service-tags"
+          "Partner Service-tags"
         ],
         "security": [
           {
@@ -1683,7 +1771,7 @@
         ]
       }
     },
-    "/service-tags/{id}": {
+    "/partner/service-tags/{id}": {
       "get": {
         "operationId": "ServiceTagsController_findOne",
         "summary": "Get a service tag by ID",
@@ -1713,7 +1801,7 @@
           }
         },
         "tags": [
-          "service-tags"
+          "Partner Service-tags"
         ],
         "security": [
           {
@@ -1763,7 +1851,7 @@
           }
         },
         "tags": [
-          "service-tags"
+          "Partner Service-tags"
         ],
         "security": [
           {
@@ -1796,7 +1884,7 @@
           }
         },
         "tags": [
-          "service-tags"
+          "Partner Service-tags"
         ],
         "security": [
           {
@@ -1805,7 +1893,7 @@
         ]
       }
     },
-    "/service-tags/{id}/products/{productId}": {
+    "/partner/service-tags/{id}/products/{productId}": {
       "post": {
         "operationId": "ServiceTagsController_attachToProduct",
         "summary": "Attach a tag to a product",
@@ -1849,7 +1937,7 @@
           }
         },
         "tags": [
-          "service-tags"
+          "Partner Service-tags"
         ],
         "security": [
           {
@@ -1890,7 +1978,7 @@
           }
         },
         "tags": [
-          "service-tags"
+          "Partner Service-tags"
         ],
         "security": [
           {
@@ -1899,7 +1987,7 @@
         ]
       }
     },
-    "/service-tags/products/{productId}": {
+    "/partner/service-tags/products/{productId}": {
       "get": {
         "operationId": "ServiceTagsController_getTagsForProduct",
         "summary": "Get all tags attached to a product",
@@ -1929,7 +2017,7 @@
           }
         },
         "tags": [
-          "service-tags"
+          "Partner Service-tags"
         ],
         "security": [
           {
@@ -1995,7 +2083,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "List of partners.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2022,7 +2110,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Total partner count.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2059,7 +2147,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Partner detail with verification data.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2067,6 +2155,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Partner not found."
           }
         },
         "tags": [
@@ -2106,7 +2197,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
+            "description": "Review submitted.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2114,6 +2205,12 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Partner is not in PENDING state."
+          },
+          "404": {
+            "description": "Partner not found."
           }
         },
         "tags": [
@@ -2126,10 +2223,10 @@
         ]
       }
     },
-    "/audit-logs": {
+    "/admin/audit-logs": {
       "get": {
         "operationId": "AuditController_getAuditLogs",
-        "summary": "Get audit logs",
+        "summary": "Get audit logs with optional filters",
         "parameters": [
           {
             "name": "targetId",
@@ -2155,13 +2252,14 @@
             "in": "query",
             "description": "Filter by Action type",
             "schema": {
+              "example": "PARTNER_REVIEW",
               "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of audit logs",
+            "description": "List of audit logs.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2175,7 +2273,7 @@
           }
         },
         "tags": [
-          "Audit Logs"
+          "Admin Audit-logs"
         ],
         "security": [
           {
@@ -2225,75 +2323,6 @@
                 }
               }
             }
-          }
-        },
-        "tags": [
-          "chatbot"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/chatbot/send": {
-      "post": {
-        "operationId": "ChatbotController_sendMessage",
-        "summary": "Send a message to the chatbot",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendMessageDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Message accepted. Use the streamUrl to connect to the SSE response stream.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SendMessageResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "chatbot"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/chatbot/stream/{conversationId}": {
-      "get": {
-        "operationId": "ChatbotController_streamChat",
-        "summary": "Stream chatbot response via SSE",
-        "parameters": [
-          {
-            "name": "conversationId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "SSE stream of chatbot events"
-          },
-          "404": {
-            "description": "Conversation not found or already consumed"
           }
         },
         "tags": [
@@ -2737,6 +2766,19 @@
           "password"
         ]
       },
+      "RefreshTokenRequestDto": {
+        "type": "object",
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "description": "Refresh token obtained from login or previous refresh",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...refresh"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ]
+      },
       "AdminLoginDto": {
         "type": "object",
         "properties": {
@@ -2768,19 +2810,6 @@
         },
         "required": [
           "message"
-        ]
-      },
-      "RefreshTokenRequestDto": {
-        "type": "object",
-        "properties": {
-          "refresh_token": {
-            "type": "string",
-            "description": "Refresh token obtained from login or previous refresh",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...refresh"
-          }
-        },
-        "required": [
-          "refresh_token"
         ]
       },
       "SurveyResponseDto": {
@@ -2862,7 +2891,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-03-02T16:18:54.410Z"
+              "submittedAt": "2026-03-09T17:00:07.562Z"
             }
           }
         },
@@ -3386,36 +3415,43 @@
           }
         }
       },
-      "LocationDto": {
+      "LocationResponseDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "example": "uuid-string"
+            "example": "uuid-string",
+            "description": "Location UUID"
           },
           "code": {
             "type": "string",
-            "example": "01"
+            "example": "01",
+            "description": "Official administrative code"
           },
           "name": {
             "type": "string",
-            "example": "Hà Nội"
+            "example": "Hà Nội",
+            "description": "Location name"
           },
           "nameEn": {
             "type": "string",
-            "example": "Ha Noi"
+            "example": "Ha Noi",
+            "description": "English name"
           },
           "fullName": {
             "type": "string",
-            "example": "Thành phố Hà Nội"
+            "example": "Thành phố Hà Nội",
+            "description": "Full name with prefix"
           },
           "fullNameEn": {
             "type": "string",
-            "example": "Hanoi City"
+            "example": "Hanoi City",
+            "description": "Full English name"
           },
           "level": {
             "type": "string",
-            "example": "PROVINCE"
+            "example": "PROVINCE",
+            "description": "Administrative level"
           }
         },
         "required": [
@@ -3426,56 +3462,20 @@
           "level"
         ]
       },
-      "GetProvincesResponseDto": {
+      "LocationListResponseDto": {
         "type": "object",
         "properties": {
           "data": {
+            "description": "List of locations",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/LocationDto"
+              "$ref": "#/components/schemas/LocationResponseDto"
             }
           },
           "total": {
             "type": "number",
-            "example": 63
-          }
-        },
-        "required": [
-          "data",
-          "total"
-        ]
-      },
-      "GetDistrictsResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LocationDto"
-            }
-          },
-          "total": {
-            "type": "number",
-            "example": 12
-          }
-        },
-        "required": [
-          "data",
-          "total"
-        ]
-      },
-      "GetWardsResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LocationDto"
-            }
-          },
-          "total": {
-            "type": "number",
-            "example": 14
+            "example": 63,
+            "description": "Total number of locations"
           }
         },
         "required": [
@@ -3547,32 +3547,200 @@
           "message"
         ]
       },
-      "DoctorProfileDto": {
+      "WorkScheduleEntryDto": {
         "type": "object",
         "properties": {
-          "title": {
+          "day": {
             "type": "string",
-            "example": "Dr.",
-            "description": "Title of the doctor"
+            "example": "Monday",
+            "description": "Day of the week",
+            "enum": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ]
           },
-          "medicalLicense": {
+          "start": {
             "type": "string",
-            "example": "MED123456",
-            "description": "Medical license number"
+            "example": "09:00",
+            "description": "Work start time in HH:mm format. Empty string if not working."
+          },
+          "end": {
+            "type": "string",
+            "example": "17:00",
+            "description": "Work end time in HH:mm format. Empty string if not working."
+          },
+          "isWorking": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the employee is working on this day."
+          }
+        },
+        "required": [
+          "day",
+          "isWorking"
+        ]
+      },
+      "CreateDoctorDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "Nguyen",
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Van A",
+            "description": "Last name"
+          },
+          "email": {
+            "type": "string",
+            "example": "doctor.a@healytics.com",
+            "description": "Email address"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0901234567",
+            "description": "Phone number"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "example": "1985-06-15",
+            "description": "Date of birth"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ],
+            "example": "MALE",
+            "description": "Gender"
+          },
+          "emergencyContactName": {
+            "type": "string",
+            "example": "Tran Thi B",
+            "description": "Emergency contact name"
+          },
+          "emergencyContactPhone": {
+            "type": "string",
+            "example": "0912345678",
+            "description": "Emergency contact phone"
+          },
+          "employeeId": {
+            "type": "string",
+            "example": "DOC-001",
+            "description": "Unique employee identifier code"
+          },
+          "employmentType": {
+            "type": "string",
+            "example": "Full-Time",
+            "description": "Employment type"
+          },
+          "startDate": {
+            "type": "string",
+            "example": "2026-03-08",
+            "description": "Start date"
+          },
+          "schedule": {
+            "description": "Weekly work schedule",
+            "example": [
+              {
+                "day": "Monday",
+                "start": "09:00",
+                "end": "17:00",
+                "isWorking": true
+              },
+              {
+                "day": "Sunday",
+                "start": "",
+                "end": "",
+                "isWorking": false
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
+          },
+          "avatar": {
+            "type": "string",
+            "example": "https://i.pravatar.cc/150?u=doctor.a@healytics.com",
+            "description": "Avatar URL"
+          },
+          "idCardUrl": {
+            "type": "string",
+            "description": "ID card URL"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "ON_LEAVE"
+            ],
+            "example": "ACTIVE",
+            "description": "Employee status"
+          },
+          "branch": {
+            "type": "string",
+            "example": "",
+            "description": "Branch ID or name"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "Account password"
+          },
+          "description": {
+            "type": "string",
+            "description": "Bio / description"
+          },
+          "jobTitle": {
+            "type": "string",
+            "example": "Dermatologist",
+            "description": "Job title"
+          },
+          "medicalTitles": {
+            "example": [
+              "MD",
+              "PhD"
+            ],
+            "description": "Medical titles",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "medicalLicenses": {
+            "example": [
+              "LIC-2024-001"
+            ],
+            "description": "Medical license numbers",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "experienceYears": {
             "type": "number",
-            "example": 5,
+            "example": 10,
             "description": "Years of experience"
           },
           "consultationFee": {
             "type": "number",
-            "example": 100,
+            "example": 500000,
             "description": "Consultation fee"
           },
           "specializations": {
             "example": [
-              "Cardiology"
+              "Dermatology"
             ],
             "description": "Specializations",
             "type": "array",
@@ -3593,102 +3761,76 @@
             "items": {
               "type": "string"
             }
-          }
-        },
-        "required": [
-          "medicalLicense"
-        ]
-      },
-      "CreateDoctorDto": {
-        "type": "object",
-        "properties": {
-          "authId": {
-            "type": "string",
-            "example": "auth0|123456",
-            "description": "Authentication ID from external provider"
-          },
-          "employeeCode": {
-            "type": "string",
-            "example": "DOC001",
-            "description": "Unique employee code"
-          },
-          "fullName": {
-            "type": "string",
-            "example": "Dr. John Doe",
-            "description": "Full name of the doctor"
-          },
-          "displayName": {
-            "type": "string",
-            "example": "Dr. John",
-            "description": "Display name"
-          },
-          "email": {
-            "type": "string",
-            "example": "john.doe@example.com",
-            "description": "Email address"
-          },
-          "phone": {
-            "type": "string",
-            "example": "+1234567890",
-            "description": "Phone number"
-          },
-          "avatarUrl": {
-            "type": "string",
-            "example": "https://example.com/avatar.jpg",
-            "description": "Avatar URL"
-          },
-          "dob": {
-            "type": "string",
-            "example": "1990-01-01",
-            "description": "Date of birth"
-          },
-          "gender": {
-            "type": "string",
-            "enum": [
-              "MALE",
-              "FEMALE",
-              "OTHER"
-            ],
-            "example": "MALE",
-            "description": "Gender"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE",
-              "ON_LEAVE"
-            ],
-            "example": "ACTIVE",
-            "description": "Status of the employee"
-          },
-          "branchId": {
-            "type": "string",
-            "example": "uuid-branch-id",
-            "description": "Branch ID the employee belongs to"
           },
           "partnerId": {
             "type": "string",
-            "example": "uuid-partner-id",
-            "description": "Partner ID the employee belongs to"
-          },
-          "profile": {
-            "description": "Doctor profile information",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DoctorProfileDto"
-              }
-            ]
+            "description": "Partner ID (auto-injected)"
           }
         },
         "required": [
-          "employeeCode",
-          "fullName",
+          "firstName",
+          "lastName",
           "email",
-          "profile"
+          "employeeId"
         ]
       },
-      "TherapistProfileDto": {
+      "DoctorProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "description": "Employee ID (primary key)"
+          },
+          "title": {
+            "type": "string",
+            "description": "Doctor title"
+          },
+          "medicalTitles": {
+            "description": "Medical titles",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "medicalLicenses": {
+            "description": "Medical license numbers",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "experienceYears": {
+            "type": "number",
+            "description": "Years of experience"
+          },
+          "consultationFee": {
+            "type": "number",
+            "description": "Consultation fee"
+          },
+          "specializations": {
+            "description": "List of specializations",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "education": {
+            "description": "Education history",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "certifications": {
+            "description": "Certifications",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TherapistProfileResponseDto": {
         "type": "object",
         "properties": {
           "employeeId": {
@@ -3747,6 +3889,14 @@
             "type": "string",
             "description": "Employee code"
           },
+          "firstName": {
+            "type": "object",
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "object",
+            "description": "Last name"
+          },
           "fullName": {
             "type": "string",
             "description": "Full name"
@@ -3782,6 +3932,25 @@
           "description": {
             "type": "object",
             "description": "Description/bio"
+          },
+          "emergencyContactName": {
+            "type": "object",
+            "description": "Emergency contact name"
+          },
+          "emergencyContactPhone": {
+            "type": "object",
+            "description": "Emergency contact phone"
+          },
+          "idCardUrl": {
+            "type": "object",
+            "description": "ID card URL"
+          },
+          "schedule": {
+            "description": "Work schedule",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
           },
           "dob": {
             "type": "object",
@@ -3841,7 +4010,7 @@
             "description": "Doctor profile",
             "allOf": [
               {
-                "$ref": "#/components/schemas/DoctorProfileDto"
+                "$ref": "#/components/schemas/DoctorProfileResponseDto"
               }
             ]
           },
@@ -3849,7 +4018,7 @@
             "description": "Therapist profile",
             "allOf": [
               {
-                "$ref": "#/components/schemas/TherapistProfileDto"
+                "$ref": "#/components/schemas/TherapistProfileResponseDto"
               }
             ]
           }
@@ -3867,47 +4036,32 @@
           "updatedAt"
         ]
       },
-      "CreateTherapistDto": {
+      "CreateSpaTherapistDto": {
         "type": "object",
         "properties": {
-          "authId": {
+          "firstName": {
             "type": "string",
-            "example": "auth0|123456",
-            "description": "Authentication ID from external provider"
+            "example": "Le",
+            "description": "First name"
           },
-          "employeeCode": {
+          "lastName": {
             "type": "string",
-            "example": "THP001",
-            "description": "Unique employee code"
-          },
-          "fullName": {
-            "type": "string",
-            "example": "Jane Smith",
-            "description": "Full name of the therapist"
-          },
-          "displayName": {
-            "type": "string",
-            "example": "Jane",
-            "description": "Display name"
+            "example": "Thi C",
+            "description": "Last name"
           },
           "email": {
             "type": "string",
-            "example": "jane.smith@example.com",
+            "example": "spa.therapist.c@healytics.com",
             "description": "Email address"
           },
           "phone": {
             "type": "string",
-            "example": "+1234567890",
+            "example": "0923456789",
             "description": "Phone number"
           },
-          "avatarUrl": {
+          "dateOfBirth": {
             "type": "string",
-            "example": "https://example.com/avatar.jpg",
-            "description": "Avatar URL"
-          },
-          "dob": {
-            "type": "string",
-            "example": "1995-05-15",
+            "example": "1992-09-20",
             "description": "Date of birth"
           },
           "gender": {
@@ -3920,6 +4074,61 @@
             "example": "FEMALE",
             "description": "Gender"
           },
+          "emergencyContactName": {
+            "type": "string",
+            "example": "Pham Van D",
+            "description": "Emergency contact name"
+          },
+          "emergencyContactPhone": {
+            "type": "string",
+            "example": "0934567890",
+            "description": "Emergency contact phone"
+          },
+          "employeeId": {
+            "type": "string",
+            "example": "SPA-001",
+            "description": "Unique employee identifier code"
+          },
+          "employmentType": {
+            "type": "string",
+            "example": "Full-Time",
+            "description": "Employment type"
+          },
+          "startDate": {
+            "type": "string",
+            "example": "2026-03-08",
+            "description": "Start date"
+          },
+          "schedule": {
+            "description": "Weekly work schedule",
+            "example": [
+              {
+                "day": "Monday",
+                "start": "09:00",
+                "end": "17:00",
+                "isWorking": true
+              },
+              {
+                "day": "Sunday",
+                "start": "",
+                "end": "",
+                "isWorking": false
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
+          },
+          "avatar": {
+            "type": "string",
+            "example": "https://i.pravatar.cc/150?u=spa@healytics.com",
+            "description": "Avatar URL"
+          },
+          "idCardUrl": {
+            "type": "string",
+            "description": "ID card URL"
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -3928,32 +4137,264 @@
               "ON_LEAVE"
             ],
             "example": "ACTIVE",
-            "description": "Status of the employee"
+            "description": "Employee status"
           },
-          "branchId": {
+          "branch": {
             "type": "string",
-            "example": "uuid-branch-id",
-            "description": "Branch ID the employee belongs to"
+            "example": "",
+            "description": "Branch ID or name"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "Account password"
+          },
+          "description": {
+            "type": "string",
+            "description": "Bio / description"
+          },
+          "jobTitle": {
+            "type": "string",
+            "example": "Senior Spa Therapist",
+            "description": "Job title"
+          },
+          "therapistLevel": {
+            "type": "string",
+            "enum": [
+              "JUNIOR",
+              "SENIOR",
+              "MASTER"
+            ],
+            "example": "SENIOR",
+            "description": "Therapist level"
+          },
+          "commissionRate": {
+            "type": "number",
+            "example": 15,
+            "description": "Commission rate percentage"
+          },
+          "healthCheckDate": {
+            "type": "string",
+            "example": "2026-01-15",
+            "description": "Last health check date"
+          },
+          "skills": {
+            "example": [
+              "Facial Treatment",
+              "Body Scrub"
+            ],
+            "description": "Skills",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deviceProficiency": {
+            "example": [
+              "LED Light Therapy",
+              "Microdermabrasion"
+            ],
+            "description": "Device proficiency",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "licenseUrl": {
+            "type": "string",
+            "example": "https://example.com/license/spa-001.pdf",
+            "description": "License URL"
           },
           "partnerId": {
             "type": "string",
-            "example": "uuid-partner-id",
-            "description": "Partner ID the employee belongs to"
-          },
-          "profile": {
-            "description": "Therapist profile information",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TherapistProfileDto"
-              }
-            ]
+            "description": "Partner ID (auto-injected)"
           }
         },
         "required": [
-          "employeeCode",
-          "fullName",
+          "firstName",
+          "lastName",
           "email",
-          "profile"
+          "employeeId"
+        ]
+      },
+      "CreateMassageTherapistDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "Hoang",
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Van E",
+            "description": "Last name"
+          },
+          "email": {
+            "type": "string",
+            "example": "massage.therapist.e@healytics.com",
+            "description": "Email address"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0945678901",
+            "description": "Phone number"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "example": "1990-03-10",
+            "description": "Date of birth"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ],
+            "example": "MALE",
+            "description": "Gender"
+          },
+          "emergencyContactName": {
+            "type": "string",
+            "example": "Nguyen Thi F",
+            "description": "Emergency contact name"
+          },
+          "emergencyContactPhone": {
+            "type": "string",
+            "example": "0956789012",
+            "description": "Emergency contact phone"
+          },
+          "employeeId": {
+            "type": "string",
+            "example": "MSG-001",
+            "description": "Unique employee identifier code"
+          },
+          "employmentType": {
+            "type": "string",
+            "example": "Part-Time",
+            "description": "Employment type"
+          },
+          "startDate": {
+            "type": "string",
+            "example": "2026-03-08",
+            "description": "Start date"
+          },
+          "schedule": {
+            "description": "Weekly work schedule",
+            "example": [
+              {
+                "day": "Monday",
+                "start": "09:00",
+                "end": "17:00",
+                "isWorking": true
+              },
+              {
+                "day": "Sunday",
+                "start": "",
+                "end": "",
+                "isWorking": false
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
+          },
+          "avatar": {
+            "type": "string",
+            "example": "https://i.pravatar.cc/150?u=massage@healytics.com",
+            "description": "Avatar URL"
+          },
+          "idCardUrl": {
+            "type": "string",
+            "description": "ID card URL"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "ON_LEAVE"
+            ],
+            "example": "ACTIVE",
+            "description": "Employee status"
+          },
+          "branch": {
+            "type": "string",
+            "example": "",
+            "description": "Branch ID or name"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "Account password"
+          },
+          "description": {
+            "type": "string",
+            "description": "Bio / description"
+          },
+          "jobTitle": {
+            "type": "string",
+            "example": "Master Massage Therapist",
+            "description": "Job title"
+          },
+          "therapistLevel": {
+            "type": "string",
+            "enum": [
+              "JUNIOR",
+              "SENIOR",
+              "MASTER"
+            ],
+            "example": "MASTER",
+            "description": "Therapist level"
+          },
+          "strengthLevel": {
+            "type": "string",
+            "enum": [
+              "SOFT",
+              "MEDIUM",
+              "STRONG"
+            ],
+            "example": "STRONG",
+            "description": "Strength level"
+          },
+          "commissionRate": {
+            "type": "number",
+            "example": 20,
+            "description": "Commission rate percentage"
+          },
+          "healthCheckDate": {
+            "type": "string",
+            "example": "2026-02-01",
+            "description": "Last health check date"
+          },
+          "skills": {
+            "example": [
+              "Deep Tissue",
+              "Swedish Massage"
+            ],
+            "description": "Skills",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "licenseUrl": {
+            "type": "string",
+            "example": "https://example.com/license/msg-001.pdf",
+            "description": "License URL"
+          },
+          "partnerId": {
+            "type": "string",
+            "description": "Partner ID (auto-injected)"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "employeeId"
         ]
       },
       "CreateDoctorProfileDto": {
@@ -3964,10 +4405,26 @@
             "example": "Dr.",
             "description": "Title of the doctor"
           },
-          "medicalLicense": {
-            "type": "string",
-            "example": "MED123456",
-            "description": "Medical license number"
+          "medicalTitles": {
+            "example": [
+              "MD",
+              "PhD"
+            ],
+            "description": "Medical titles",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "medicalLicenses": {
+            "example": [
+              "LIC-2024-001"
+            ],
+            "description": "Medical license numbers",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "experienceYears": {
             "type": "number",
@@ -4003,10 +4460,7 @@
               "type": "string"
             }
           }
-        },
-        "required": [
-          "medicalLicense"
-        ]
+        }
       },
       "CreateTherapistProfileDto": {
         "type": "object",
@@ -4056,6 +4510,17 @@
             "items": {
               "type": "string"
             }
+          },
+          "deviceProficiency": {
+            "description": "Device proficiency list",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "licenseUrl": {
+            "type": "string",
+            "description": "License URL"
           }
         }
       },
@@ -4071,6 +4536,16 @@
             "type": "string",
             "example": "EMP001",
             "description": "Unique employee code"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Nguyen",
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Van A",
+            "description": "Last name"
           },
           "fullName": {
             "type": "string",
@@ -4142,6 +4617,59 @@
             "type": "string",
             "example": "uuid-partner-id",
             "description": "Partner ID the employee belongs to"
+          },
+          "jobTitle": {
+            "type": "string",
+            "description": "Job title"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Start date"
+          },
+          "employmentType": {
+            "type": "string",
+            "description": "Employment type"
+          },
+          "emergencyContactName": {
+            "type": "string",
+            "description": "Emergency contact name"
+          },
+          "emergencyContactPhone": {
+            "type": "string",
+            "description": "Emergency contact phone"
+          },
+          "idCardUrl": {
+            "type": "string",
+            "description": "ID card URL"
+          },
+          "description": {
+            "type": "string",
+            "description": "Bio / description"
+          },
+          "password": {
+            "type": "string",
+            "description": "Account password"
+          },
+          "schedule": {
+            "description": "Weekly work schedule",
+            "example": [
+              {
+                "day": "Monday",
+                "start": "09:00",
+                "end": "17:00",
+                "isWorking": true
+              },
+              {
+                "day": "Sunday",
+                "start": "",
+                "end": "",
+                "isWorking": false
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
           },
           "doctorProfile": {
             "description": "Doctor profile data if role is DOCTOR",
@@ -4316,7 +4844,7 @@
           }
         }
       },
-      "PublicProductCardResponseDto": {
+      "PublicHealthServiceCardResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4490,7 +5018,7 @@
           "colorValue"
         ]
       },
-      "PublicProductInfoResponseDto": {
+      "PublicHealthServiceInfoResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4581,7 +5109,7 @@
           "isAvailable"
         ]
       },
-      "PublicProductEmployeeDayScheduleDto": {
+      "PublicHealthServiceEmployeeDayScheduleDto": {
         "type": "object",
         "properties": {
           "date": {
@@ -4605,7 +5133,7 @@
           "timeSlots"
         ]
       },
-      "PublicProductEmployeeResponseDto": {
+      "PublicHealthServiceEmployeeResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4649,7 +5177,7 @@
           "daySchedules": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PublicProductEmployeeDayScheduleDto"
+              "$ref": "#/components/schemas/PublicHealthServiceEmployeeDayScheduleDto"
             }
           }
         },
@@ -4661,7 +5189,7 @@
           "daySchedules"
         ]
       },
-      "PublicProductReviewResponseDto": {
+      "PublicHealthServiceReviewResponseDto": {
         "type": "object",
         "properties": {
           "reviewerName": {
@@ -4701,7 +5229,7 @@
           "imageUrls"
         ]
       },
-      "PublicProductRecommendedResponseDto": {
+      "PublicHealthServiceRecommendedResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4758,7 +5286,7 @@
           "slug"
         ]
       },
-      "PublicProductMediaDto": {
+      "PublicHealthServiceMediaDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4788,7 +5316,7 @@
           "sortOrder"
         ]
       },
-      "PublicProductDefinitionDto": {
+      "PublicHealthServiceDefinitionDto": {
         "type": "object",
         "properties": {
           "productId": {
@@ -4821,7 +5349,7 @@
           "durationMinutes"
         ]
       },
-      "PublicProductEmployeeEligibilityDto": {
+      "PublicHealthServiceEmployeeEligibilityDto": {
         "type": "object",
         "properties": {
           "productId": {
@@ -4843,16 +5371,16 @@
           "isPrimary"
         ]
       },
-      "PublicProductResponseDto": {
+      "PublicHealthServiceResponseDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "description": "Unique product identifier"
+            "description": "Unique identifier"
           },
           "name": {
             "type": "string",
-            "description": "Product name"
+            "description": "Name"
           },
           "slug": {
             "type": "string",
@@ -4860,7 +5388,7 @@
           },
           "description": {
             "type": "object",
-            "description": "Product description"
+            "description": "Description"
           },
           "type": {
             "type": "string",
@@ -4868,7 +5396,7 @@
               "physical",
               "service"
             ],
-            "description": "Product type"
+            "description": "Type"
           },
           "basePrice": {
             "type": "number",
@@ -4889,11 +5417,11 @@
               "active",
               "archived"
             ],
-            "description": "Product status"
+            "description": "Status"
           },
           "isVisibleOnline": {
             "type": "boolean",
-            "description": "Whether product is visible online"
+            "description": "Whether visible online"
           },
           "vendorName": {
             "type": "object",
@@ -4910,7 +5438,7 @@
             "description": "Last update timestamp"
           },
           "category": {
-            "description": "Product category",
+            "description": "Category",
             "allOf": [
               {
                 "$ref": "#/components/schemas/PublicCategorySummaryDto"
@@ -4918,17 +5446,17 @@
             ]
           },
           "media": {
-            "description": "Product media assets",
+            "description": "Media assets",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PublicProductMediaDto"
+              "$ref": "#/components/schemas/PublicHealthServiceMediaDto"
             }
           },
           "productDefinition": {
-            "description": "Product definition for service products",
+            "description": "Definition for service type",
             "allOf": [
               {
-                "$ref": "#/components/schemas/PublicProductDefinitionDto"
+                "$ref": "#/components/schemas/PublicHealthServiceDefinitionDto"
               }
             ]
           },
@@ -4936,7 +5464,7 @@
             "description": "Eligible employees for service",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PublicProductEmployeeEligibilityDto"
+              "$ref": "#/components/schemas/PublicHealthServiceEmployeeEligibilityDto"
             }
           }
         },
@@ -4972,7 +5500,7 @@
           "slug"
         ]
       },
-      "PartnerProductMediaDto": {
+      "PartnerHealthServiceMediaDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -5002,7 +5530,7 @@
           "sortOrder"
         ]
       },
-      "PartnerProductDefinitionDto": {
+      "PartnerHealthServiceDefinitionDto": {
         "type": "object",
         "properties": {
           "productId": {
@@ -5035,7 +5563,7 @@
           "durationMinutes"
         ]
       },
-      "PartnerProductEmployeeEligibilityDto": {
+      "PartnerHealthServiceEmployeeEligibilityDto": {
         "type": "object",
         "properties": {
           "productId": {
@@ -5057,16 +5585,16 @@
           "isPrimary"
         ]
       },
-      "PartnerProductResponseDto": {
+      "PartnerHealthServiceResponseDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "description": "Unique product identifier"
+            "description": "Unique identifier"
           },
           "name": {
             "type": "string",
-            "description": "Product name"
+            "description": "Name"
           },
           "slug": {
             "type": "string",
@@ -5074,7 +5602,7 @@
           },
           "description": {
             "type": "object",
-            "description": "Product description"
+            "description": "Description"
           },
           "type": {
             "type": "string",
@@ -5082,7 +5610,7 @@
               "physical",
               "service"
             ],
-            "description": "Product type"
+            "description": "Type"
           },
           "basePrice": {
             "type": "number",
@@ -5103,11 +5631,11 @@
               "active",
               "archived"
             ],
-            "description": "Product status"
+            "description": "Status"
           },
           "isVisibleOnline": {
             "type": "boolean",
-            "description": "Whether product is visible online"
+            "description": "Whether visible online"
           },
           "vendorName": {
             "type": "object",
@@ -5124,7 +5652,7 @@
             "description": "Last update timestamp"
           },
           "category": {
-            "description": "Product category",
+            "description": "Category",
             "allOf": [
               {
                 "$ref": "#/components/schemas/PartnerCategorySummaryDto"
@@ -5132,17 +5660,17 @@
             ]
           },
           "media": {
-            "description": "Product media assets",
+            "description": "Media assets",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PartnerProductMediaDto"
+              "$ref": "#/components/schemas/PartnerHealthServiceMediaDto"
             }
           },
           "productDefinition": {
-            "description": "Product definition for service products",
+            "description": "Definition for service type",
             "allOf": [
               {
-                "$ref": "#/components/schemas/PartnerProductDefinitionDto"
+                "$ref": "#/components/schemas/PartnerHealthServiceDefinitionDto"
               }
             ]
           },
@@ -5150,7 +5678,7 @@
             "description": "Eligible employees for service",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PartnerProductEmployeeEligibilityDto"
+              "$ref": "#/components/schemas/PartnerHealthServiceEmployeeEligibilityDto"
             }
           }
         },
@@ -5377,7 +5905,7 @@
           "price"
         ]
       },
-      "PartnerProductDetailResponseDto": {
+      "PartnerHealthServiceDetailResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -5472,7 +6000,7 @@
           "recommendedServices"
         ]
       },
-      "CreatePartnerProductMediaDto": {
+      "CreatePartnerHealthServiceMediaDto": {
         "type": "object",
         "properties": {
           "url": {
@@ -5500,7 +6028,7 @@
           "url"
         ]
       },
-      "CreatePartnerProductDefinitionDto": {
+      "CreatePartnerHealthServiceDefinitionDto": {
         "type": "object",
         "properties": {
           "durationMinutes": {
@@ -5533,7 +6061,7 @@
           "durationMinutes"
         ]
       },
-      "CreatePartnerProductFacilityImageDto": {
+      "CreatePartnerHealthServiceFacilityImageDto": {
         "type": "object",
         "properties": {
           "imageUrl": {
@@ -5554,7 +6082,7 @@
           "label"
         ]
       },
-      "CreatePartnerProductReviewDto": {
+      "CreatePartnerHealthServiceReviewDto": {
         "type": "object",
         "properties": {
           "reviewerName": {
@@ -5599,7 +6127,7 @@
           "text"
         ]
       },
-      "CreatePartnerProductDto": {
+      "CreatePartnerHealthServiceDto": {
         "type": "object",
         "properties": {
           "categoryId": {
@@ -5665,14 +6193,14 @@
             "description": "Product media (images/videos)",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreatePartnerProductMediaDto"
+              "$ref": "#/components/schemas/CreatePartnerHealthServiceMediaDto"
             }
           },
           "productDefinition": {
             "description": "Product definition (required if type is service)",
             "allOf": [
               {
-                "$ref": "#/components/schemas/CreatePartnerProductDefinitionDto"
+                "$ref": "#/components/schemas/CreatePartnerHealthServiceDefinitionDto"
               }
             ]
           },
@@ -5680,14 +6208,14 @@
             "description": "Facility/clinic images",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreatePartnerProductFacilityImageDto"
+              "$ref": "#/components/schemas/CreatePartnerHealthServiceFacilityImageDto"
             }
           },
           "reviews": {
             "description": "Product reviews",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreatePartnerProductReviewDto"
+              "$ref": "#/components/schemas/CreatePartnerHealthServiceReviewDto"
             }
           }
         },
@@ -5697,7 +6225,7 @@
           "type"
         ]
       },
-      "UpdatePartnerProductDto": {
+      "UpdatePartnerHealthServiceDto": {
         "type": "object",
         "properties": {
           "categoryId": {
@@ -5763,14 +6291,14 @@
             "description": "Product media (images/videos)",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreatePartnerProductMediaDto"
+              "$ref": "#/components/schemas/CreatePartnerHealthServiceMediaDto"
             }
           },
           "productDefinition": {
             "description": "Product definition (required if type is service)",
             "allOf": [
               {
-                "$ref": "#/components/schemas/CreatePartnerProductDefinitionDto"
+                "$ref": "#/components/schemas/CreatePartnerHealthServiceDefinitionDto"
               }
             ]
           },
@@ -5778,14 +6306,14 @@
             "description": "Facility/clinic images",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreatePartnerProductFacilityImageDto"
+              "$ref": "#/components/schemas/CreatePartnerHealthServiceFacilityImageDto"
             }
           },
           "reviews": {
             "description": "Product reviews",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CreatePartnerProductReviewDto"
+              "$ref": "#/components/schemas/CreatePartnerHealthServiceReviewDto"
             }
           }
         }
@@ -6234,43 +6762,6 @@
         "required": [
           "conversations",
           "meta"
-        ]
-      },
-      "SendMessageDto": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "The message content to send to the chatbot",
-            "example": "What are the benefits of regular health checkups?"
-          },
-          "conversationId": {
-            "type": "string",
-            "description": "Existing conversation ID to continue a conversation",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          }
-        },
-        "required": [
-          "message"
-        ]
-      },
-      "SendMessageResponseDto": {
-        "type": "object",
-        "properties": {
-          "conversationId": {
-            "type": "string",
-            "description": "The conversation ID to use for the SSE stream",
-            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          },
-          "streamUrl": {
-            "type": "string",
-            "description": "SSE stream URL to connect to",
-            "example": "/v1/chatbot/stream/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          }
-        },
-        "required": [
-          "conversationId",
-          "streamUrl"
         ]
       }
     }

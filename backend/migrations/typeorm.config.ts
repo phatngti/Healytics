@@ -16,4 +16,7 @@ export default new DataSource({
     __dirname + '/master-data/*{.ts,.js}',
   ],
   synchronize: false,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });

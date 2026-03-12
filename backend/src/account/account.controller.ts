@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  ConflictException,
   UseGuards,
   UseInterceptors,
   ClassSerializerInterceptor,
@@ -16,26 +15,29 @@ import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/auth/roles.decorator';
 import { ALL_ROLES } from '@/auth/constants/role-groups';
 import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
+import { Throttle } from '@nestjs/throttler';
 import {
   ApiTags,
   ApiBearerAuth,
-  ApiBody,
-  ApiResponse,
   ApiOkResponse,
+  ApiCreatedResponse,
   ApiConflictResponse,
   ApiOperation,
 } from '@nestjs/swagger';
 
 /**
  * Controller for account management endpoints.
- * API Version 1.
+ * Uses ALL_ROLES — all authenticated users can access these endpoints.
+ *
+ * Security: JwtAuthGuard → RolesGuard → ALL_ROLES
+ * Route prefix: /v1/account
  */
 @ApiTags('Account')
 @ApiBearerAuth()
 @Controller({ path: 'account', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
-@UseInterceptors(ClassSerializerInterceptor)
 @Roles(...ALL_ROLES)
+@UseInterceptors(ClassSerializerInterceptor)
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
@@ -44,32 +46,24 @@ export class AccountController {
    */
   @Get('survey')
   @ApiOperation({ summary: 'Get current user survey' })
-  @ApiOkResponse({ description: 'User survey', type: SurveyResponseDto })
+  @ApiOkResponse({ description: 'User survey data.', type: SurveyResponseDto })
   async getSurvey(@CurrentUser('id') userId: string): Promise<SurveyResponseDto> {
-    const survey = await this.accountService.getSurvey(userId);
-    if (survey === null) return { survey: null } as SurveyResponseDto;
-    return { survey };
+    return this.accountService.getSurveyResponse(userId);
   }
 
   /**
    * Creates a one-shot survey for the current user.
+   * Throws ConflictException if survey already exists (handled by service).
    */
   @Post('survey')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Create one-shot survey for current user' })
-  @ApiBody({ type: SurveyDto })
-  @ApiResponse({
-    status: 201,
-    description: 'Survey created',
-    type: SurveyResponseDto,
-  })
-  @ApiConflictResponse({ description: 'Survey already exists' })
+  @ApiCreatedResponse({ description: 'Survey created.', type: SurveyResponseDto })
+  @ApiConflictResponse({ description: 'Survey already exists.' })
   async postSurvey(
     @CurrentUser('id') userId: string,
     @Body() dto: SurveyDto,
   ): Promise<SurveyResponseDto> {
-    const existing = await this.accountService.getSurvey(userId);
-    if (existing !== null) throw new ConflictException('Survey already exists');
-    const created = await this.accountService.setSurvey(userId, dto.survey);
-    return { survey: created['survey'] };
+    return this.accountService.createSurvey(userId, dto.survey);
   }
 }

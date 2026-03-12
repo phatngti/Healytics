@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { AccountService } from '@/account/account.service';
 import { PartnersService } from '@/partners/partners.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
@@ -10,20 +9,14 @@ import { MockType } from '../../test/mocks/mock-types';
 describe('AuthController', () => {
   let controller: AuthController;
   let authService: MockType<AuthService>;
-  let accountService: MockType<AccountService>;
 
   beforeEach(async () => {
-    // Arrange - Create typed mocks
     const mockAuthService: MockType<AuthService> = {
       register: jest.fn(),
-
       loginUser: jest.fn(),
       loginAdmin: jest.fn(),
       refresh: jest.fn(),
-    };
-
-    const mockAccountService: MockType<AccountService> = {
-      removeRefreshToken: jest.fn(),
+      logout: jest.fn(),
     };
 
     const mockPartnersService: MockType<PartnersService> = {
@@ -33,24 +26,13 @@ describe('AuthController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
-        {
-          provide: AuthService,
-          useValue: mockAuthService,
-        },
-        {
-          provide: AccountService,
-          useValue: mockAccountService,
-        },
-        {
-          provide: PartnersService,
-          useValue: mockPartnersService,
-        },
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: PartnersService, useValue: mockPartnersService },
       ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
     authService = module.get(AuthService);
-    accountService = module.get(AccountService);
   });
 
   afterEach(() => {
@@ -117,44 +99,33 @@ describe('AuthController', () => {
     });
   });
 
-
-
   describe('logout', () => {
-    it('should remove refresh token and return success message', async () => {
+    it('should delegate to authService.logout and return success', async () => {
       // Arrange
       const mockReq = { user: { id: 'uuid-1' } };
-      accountService.removeRefreshToken!.mockResolvedValue(undefined);
+      const expectedResponse = { message: 'Logged out successfully' };
+      authService.logout!.mockResolvedValue(expectedResponse);
 
       // Act
       const result = await controller.logout(mockReq);
 
       // Assert
-      expect(result).toEqual({ message: 'Logged out successfully' });
-      expect(accountService.removeRefreshToken).toHaveBeenCalledWith('uuid-1');
+      expect(result).toEqual(expectedResponse);
+      expect(authService.logout).toHaveBeenCalledWith('uuid-1');
     });
 
-    it('should return success message even if removeRefreshToken fails', async () => {
-      // Arrange
-      const mockReq = { user: { id: 'uuid-1' } };
-      accountService.removeRefreshToken!.mockRejectedValue(new Error('DB error'));
-
-      // Act
-      const result = await controller.logout(mockReq);
-
-      // Assert
-      expect(result).toEqual({ message: 'Logged out successfully' });
-    });
-
-    it('should return success message when user is undefined', async () => {
+    it('should handle undefined user gracefully', async () => {
       // Arrange
       const mockReq = { user: undefined };
+      const expectedResponse = { message: 'Logged out successfully' };
+      authService.logout!.mockResolvedValue(expectedResponse);
 
       // Act
       const result = await controller.logout(mockReq);
 
       // Assert
-      expect(result).toEqual({ message: 'Logged out successfully' });
-      expect(accountService.removeRefreshToken).not.toHaveBeenCalled();
+      expect(result).toEqual(expectedResponse);
+      expect(authService.logout).toHaveBeenCalledWith(undefined);
     });
   });
 

@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:user_app/features/home/domain/entities/service_details.entity.dart';
 
-/// Individual review card with avatar, metadata, text, and
-/// optional image attachments.
+/// Flat review card matching Airbnb-style design.
 ///
-/// Shared between [ReviewsSection] (preview) and the full
+/// Shows avatar + name/location, star/date/service
+/// metadata, review text, and optional images.
+///
+/// Shared between [ReviewsSection] and the full
 /// reviews page.
 class ReviewCard extends StatelessWidget {
   const ReviewCard({super.key, required this.review});
@@ -15,69 +17,49 @@ class ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
-    final isDark = theme.brightness == Brightness.dark;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppDimens.spaceLg),
-      decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.surfaceContainerHighest
-            : colorScheme.surface,
-        borderRadius: AppDimens.radiusMedium,
-        border: Border.all(
-          color: isDark
-              ? colorScheme.outlineVariant
-              : colorScheme.outlineVariant.withValues(alpha: 0.3),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ── Avatar + name + location ──
+        _ReviewerInfo(
+          review: review,
+          textTheme: textTheme,
+          colorScheme: colorScheme,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Top row: avatar + name + date ──
-          _ReviewHeader(
-            review: review,
-            textTheme: textTheme,
-            colorScheme: colorScheme,
-          ),
+        AppDimens.verticalMediumSmall,
+
+        // ── Stars + date + service ──
+        _MetadataRow(
+          review: review,
+          textTheme: textTheme,
+          colorScheme: colorScheme,
+        ),
+        AppDimens.verticalSmall,
+
+        // ── Review text ──
+        Text(
+          review.text,
+          style: textTheme.bodyMedium?.copyWith(height: 1.6),
+          maxLines: 5,
+          overflow: TextOverflow.ellipsis,
+        ),
+
+        // ── Optional images ──
+        if (review.imageUrls.isNotEmpty) ...[
           AppDimens.verticalMediumSmall,
-
-          // ── Review text ──
-          Text(
-            'Review: Good, ${review.text}',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              height: 1.6,
-            ),
-            maxLines: 4,
-            overflow: TextOverflow.ellipsis,
-          ),
-
-          // ── Attached images ──
-          if (review.imageUrls.isNotEmpty) ...[
-            AppDimens.verticalMediumSmall,
-            _ReviewImages(imageUrls: review.imageUrls),
-          ],
+          _ReviewImages(imageUrls: review.imageUrls),
         ],
-      ),
+      ],
     );
   }
 }
 
-/// Avatar + reviewer name/status/stars on the left, date on
-/// the right.
-class _ReviewHeader extends StatelessWidget {
-  const _ReviewHeader({
+/// Avatar circle + reviewer name + location.
+class _ReviewerInfo extends StatelessWidget {
+  const _ReviewerInfo({
     required this.review,
     required this.textTheme,
     required this.colorScheme,
@@ -90,13 +72,12 @@ class _ReviewHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Avatar
         ClipOval(
           child: SizedBox(
-            width: AppDimens.ctaButtonMd,
-            height: AppDimens.ctaButtonMd,
+            width: AppDimens.avatarMd,
+            height: AppDimens.avatarMd,
             child: Image.network(
               review.avatarUrl,
               fit: BoxFit.cover,
@@ -109,7 +90,7 @@ class _ReviewHeader extends StatelessWidget {
         ),
         AppDimens.horizontalMediumSmall,
 
-        // Name + status + stars
+        // Name + location
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,86 +103,89 @@ class _ReviewHeader extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              AppDimens.verticalExtraSmall,
-              Row(
-                children: [
-                  _StatusBadge(
-                    status: review.status,
-                    colorScheme: colorScheme,
-                    textTheme: textTheme,
+              if (review.location.isNotEmpty) ...[
+                AppDimens.verticalExtraSmall,
+                Text(
+                  review.location,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
-                  AppDimens.horizontalSmall,
-                  _StarRow(rating: review.rating),
-                ],
-              ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ],
-          ),
-        ),
-
-        // Date
-        Text(
-          _formatDate(review.date),
-          style: textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontSize: 10,
           ),
         ),
       ],
     );
   }
-
-  String _formatDate(DateTime date) {
-    return DateFormat('hh:mm a MM/dd/yyyy').format(date);
-  }
 }
 
-/// Small green badge showing the review status.
-class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({
-    required this.status,
-    required this.colorScheme,
+/// Stars + dot + date + dot + service name.
+class _MetadataRow extends StatelessWidget {
+  const _MetadataRow({
+    required this.review,
     required this.textTheme,
+    required this.colorScheme,
   });
 
-  final String status;
-  final ColorScheme colorScheme;
+  final ReviewEntity review;
   final TextTheme textTheme;
-
-  /// Light-theme background for the badge.
-  static const _bgColor = Color(0xFFDCFCE7);
-
-  /// Foreground green for light theme text.
-  static const _fgColor = Color(0xFF15803D);
-
-  /// Dark-theme text color.
-  static const _fgColorDark = Color(0xFF4ADE80);
+  final ColorScheme colorScheme;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Row(
+      children: [
+        // Stars
+        _StarRow(rating: review.rating),
 
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimens.spaceXs + 2,
-        vertical: AppDimens.spaceXxs,
-      ),
-      decoration: BoxDecoration(
-        color: isDark ? _fgColor.withValues(alpha: 0.15) : _bgColor,
-        borderRadius: AppDimens.radiusExtraSmall,
-      ),
+        // Dot separator
+        _dot(),
+
+        // Date
+        Text(
+          _formatDate(review.date),
+          style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w500),
+        ),
+
+        // Service name
+        if (review.serviceName.isNotEmpty) ...[
+          _dot(),
+          Flexible(
+            child: Text(
+              review.serviceName,
+              style: textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _dot() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
       child: Text(
-        status,
+        '•',
         style: textTheme.labelSmall?.copyWith(
-          color: isDark ? _fgColorDark : _fgColor,
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
+          color: colorScheme.outlineVariant,
         ),
       ),
     );
   }
+
+  String _formatDate(DateTime date) {
+    return DateFormat('MMMM d, yyyy').format(date);
+  }
 }
 
-/// Horizontal row of filled star icons capped at 5.
+/// Horizontal row of filled star icons (1–5).
 class _StarRow extends StatelessWidget {
   const _StarRow({required this.rating});
 
@@ -209,17 +193,19 @@ class _StarRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.onSurface;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(
         rating.clamp(0, 5),
-        (_) => const Icon(Icons.star, color: Color(0xFFFBBF24), size: 12),
+        (_) => Icon(Icons.star, color: color, size: AppDimens.iconXs),
       ),
     );
   }
 }
 
-/// Horizontal scrollable row of attached review images.
+/// Horizontal scrollable row of attached images.
 class _ReviewImages extends StatelessWidget {
   const _ReviewImages({required this.imageUrls});
 

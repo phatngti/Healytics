@@ -36,6 +36,16 @@ class _VerificationStatusScreenState
     extends ConsumerState<VerificationStatusScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
 
+  @override
+  void initState() {
+    super.initState();
+    // Force re-fetch on every page visit so a browser
+    // refresh always hits the API with a fresh token.
+    Future.microtask(() {
+      ref.invalidate(verificationStatusProvider);
+    });
+  }
+
   /// Gets admin feedback from entity fields that have feedback.
   String? _getAdminFeedback(ProviderVerificationStatusEntity status) {
     // Collect all feedback from fields
@@ -150,6 +160,17 @@ class _VerificationStatusScreenState
     final statusAsync = ref.watch(verificationStatusProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    // Redirect to dashboard when status becomes approved.
+    ref.listen(verificationStatusProvider, (previous, next) {
+      final status = next.value;
+      if (status != null &&
+          status.verificationStatus == VerificationRevisionStatus.approved) {
+        if (context.mounted) {
+          context.go('/provider/dashboard');
+        }
+      }
+    });
 
     return statusAsync.when(
       data: (status) {

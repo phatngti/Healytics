@@ -3,6 +3,7 @@ import { ConflictException } from '@nestjs/common';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 import { SurveyDto } from './dto/request/survey.dto';
+import { SurveyResponseDto } from './dto/response/survey-response.dto';
 import { MockType } from '../../test/mocks/mock-types';
 
 describe('AccountController', () => {
@@ -10,10 +11,9 @@ describe('AccountController', () => {
   let accountService: MockType<AccountService>;
 
   beforeEach(async () => {
-    // Arrange - Create typed mock for AccountService
     const mockAccountService: MockType<AccountService> = {
-      getSurvey: jest.fn(),
-      setSurvey: jest.fn(),
+      getSurveyResponse: jest.fn(),
+      createSurvey: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -38,59 +38,61 @@ describe('AccountController', () => {
     it('should return survey data when survey exists', async () => {
       // Arrange
       const userId = 'uuid-1';
-      const surveyData = { question1: 'answer1', question2: 'answer2' };
-      accountService.getSurvey!.mockResolvedValue(surveyData);
+      const response: SurveyResponseDto = {
+        survey: { question1: 'answer1', question2: 'answer2' },
+      };
+      accountService.getSurveyResponse!.mockResolvedValue(response);
 
       // Act
       const result = await controller.getSurvey(userId);
 
       // Assert
-      expect(result).toEqual({ survey: surveyData });
-      expect(accountService.getSurvey).toHaveBeenCalledWith(userId);
+      expect(result).toEqual(response);
+      expect(accountService.getSurveyResponse).toHaveBeenCalledWith(userId);
     });
 
     it('should return null survey when no survey exists', async () => {
       // Arrange
       const userId = 'uuid-1';
-      accountService.getSurvey!.mockResolvedValue(null);
+      const response: SurveyResponseDto = { survey: null };
+      accountService.getSurveyResponse!.mockResolvedValue(response);
 
       // Act
       const result = await controller.getSurvey(userId);
 
       // Assert
       expect(result).toEqual({ survey: null });
-      expect(accountService.getSurvey).toHaveBeenCalledWith(userId);
+      expect(accountService.getSurveyResponse).toHaveBeenCalledWith(userId);
     });
   });
 
   describe('postSurvey', () => {
-    it('should create survey and return survey response', async () => {
+    it('should delegate survey creation to service and return response', async () => {
       // Arrange
       const userId = 'uuid-1';
       const dto: SurveyDto = { survey: { question1: 'answer1' } } as SurveyDto;
-      const createdSurvey = { survey: { question1: 'answer1' } };
-      accountService.getSurvey!.mockResolvedValue(null);
-      accountService.setSurvey!.mockResolvedValue(createdSurvey);
+      const response: SurveyResponseDto = { survey: { question1: 'answer1' } };
+      accountService.createSurvey!.mockResolvedValue(response);
 
       // Act
       const result = await controller.postSurvey(userId, dto);
 
       // Assert
-      expect(result).toEqual({ survey: createdSurvey.survey });
-      expect(accountService.getSurvey).toHaveBeenCalledWith(userId);
-      expect(accountService.setSurvey).toHaveBeenCalledWith(userId, dto.survey);
+      expect(result).toEqual(response);
+      expect(accountService.createSurvey).toHaveBeenCalledWith(userId, dto.survey);
     });
 
-    it('should throw ConflictException when survey already exists', async () => {
+    it('should propagate ConflictException from service when survey already exists', async () => {
       // Arrange
       const userId = 'uuid-1';
       const dto: SurveyDto = { survey: { question1: 'answer1' } } as SurveyDto;
-      accountService.getSurvey!.mockResolvedValue({ question1: 'existing' });
+      accountService.createSurvey!.mockRejectedValue(
+        new ConflictException('Survey already exists'),
+      );
 
       // Act & Assert
       await expect(controller.postSurvey(userId, dto)).rejects.toThrow(ConflictException);
       await expect(controller.postSurvey(userId, dto)).rejects.toThrow('Survey already exists');
-      expect(accountService.setSurvey).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,17 +1,24 @@
 import {
-    Controller,
-    Get,
-    Put,
-    Body,
-    Param,
-    UseGuards,
-    HttpCode,
-    HttpStatus,
-    Query,
-    Req,
-    UseInterceptors
+  Get,
+  Put,
+  Body,
+  Param,
+  HttpCode,
+  HttpStatus,
+  Query,
+  Req,
+  UseInterceptors,
+  ParseUUIDPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiParam,
+  ApiNotFoundResponse,
+  ApiBadRequestResponse,
+} from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import { AdminApi } from '@/common/decorators/api/admin-api.decorator';
 import { AdminPartnersService } from '../services/admin-partners.service';
 import { GetPartnersQueryDto } from '@/partners/dto/request/get-partners-query.dto';
 import { AuditInterceptor } from '@/audit/interceptors/audit.interceptor';
@@ -20,74 +27,61 @@ import { ReviewPartnerProfileDto } from '../dto/review-partner-profile.dto';
 import { ReviewPartnerResponseDto } from '../dto/review-partner-response.dto';
 import { PartnersResponseDto } from '@/partners/dto/response/partners-response.dto';
 import { TotalPartnersResponseDto } from '../dto/total-partners-response.dto';
-
-import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
-import { RolesGuard } from '@/auth/guards/roles.guard';
-import { Roles } from '@/common/decorators/auth/roles.decorator';
-import { Role } from '@/account/enum/role.enum';
 import { Audit } from '@/audit/decorators/audit.decorator';
 
-@ApiTags('Admin Partners')
-@Controller('admin/partners')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
-@ApiBearerAuth()
+/**
+ * Admin controller for partner management.
+ * Uses @AdminApi() composite decorator → ADMIN_ROLES, /v1/admin/partners.
+ *
+ * Security: JwtAuthGuard → RolesGuard → ADMIN_ROLES
+ * Audit: AuditInterceptor on all endpoints
+ */
+@AdminApi('partners')
 @UseInterceptors(AuditInterceptor)
 export class AdminPartnersController {
-    constructor(
-        private readonly adminPartnersService: AdminPartnersService,
-    ) { }
+  constructor(
+    private readonly adminPartnersService: AdminPartnersService,
+  ) {}
 
-    @Get()
-    @ApiOperation({ summary: 'List all partners' })
-    @ApiResponse({ status: 200, type: PartnersResponseDto })
-    async getPartners(@Query() query: GetPartnersQueryDto): Promise<PartnersResponseDto> {
-        return this.adminPartnersService.getPartners(query);
-    }
+  @Get()
+  @ApiOperation({ summary: 'List all partners' })
+  @ApiOkResponse({ description: 'List of partners.', type: PartnersResponseDto })
+  async getPartners(@Query() query: GetPartnersQueryDto): Promise<PartnersResponseDto> {
+    return this.adminPartnersService.getPartners(query);
+  }
 
-    @Get('total')
-    @ApiOperation({ summary: 'Get total number of partners' })
-    @ApiResponse({ status: 200, type: TotalPartnersResponseDto })
-    async getTotalPartners(): Promise<TotalPartnersResponseDto> {
-        return this.adminPartnersService.getTotalPartners();
-    }
+  @Get('total')
+  @ApiOperation({ summary: 'Get total number of partners' })
+  @ApiOkResponse({ description: 'Total partner count.', type: TotalPartnersResponseDto })
+  async getTotalPartners(): Promise<TotalPartnersResponseDto> {
+    return this.adminPartnersService.getTotalPartners();
+  }
 
-    @Get(':id')
-    @ApiOperation({ summary: 'Get partner details including documents' })
-    @ApiParam({ name: 'id', description: 'Partner ID' })
-    @ApiResponse({ status: 200, type: AdminPartnerDetailResponseDto })
-    async getPartnerDetail(@Param('id') id: string): Promise<AdminPartnerDetailResponseDto> {
-        return this.adminPartnersService.getPartnerDetail(id);
-    }
+  @Get(':id')
+  @ApiOperation({ summary: 'Get partner details including documents' })
+  @ApiParam({ name: 'id', description: 'Partner ID' })
+  @ApiOkResponse({ description: 'Partner detail with verification data.', type: AdminPartnerDetailResponseDto })
+  @ApiNotFoundResponse({ description: 'Partner not found.' })
+  async getPartnerDetail(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<AdminPartnerDetailResponseDto> {
+    return this.adminPartnersService.getPartnerDetail(id);
+  }
 
-    @Put(':id/review')
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Review partner profile' })
-    @ApiParam({ name: 'id', description: 'Partner ID' })
-    @ApiResponse({ status: 200, type: ReviewPartnerResponseDto })
-    @Audit('PARTNER_REVIEW', 'Partner')
-    async reviewPartner(
-        @Param('id') id: string,
-        @Body() dto: ReviewPartnerProfileDto,
-        @Req() req
-    ): Promise<ReviewPartnerResponseDto> {
-        await this.adminPartnersService.reviewPartner(id, dto, req.user.id);
-        return { message: 'Review submitted successfully' };
-    }
-
-    // // ============== DOCUMENT ADMIN ENDPOINTS ==============
-
-    // @Get(':partnerId/documents')
-    // @ApiOperation({ summary: 'Get document status for a partner' })
-    // @ApiParam({ name: 'partnerId', description: 'Partner ID' })
-    // @ApiResponse({ status: 200, type: DocumentStatusResponseDto })
-    // async getPartnerDocumentStatus(
-    //     @Param('partnerId') partnerId: string
-    // ): Promise<DocumentStatusResponseDto> {
-    //     return this.documentsService.getPartnerDocumentStatusByPartnerId(partnerId);
-    // }
-
-
-
-
+  @Put(':id/review')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  @Audit('PARTNER_REVIEW', 'Partner')
+  @ApiOperation({ summary: 'Review partner profile' })
+  @ApiParam({ name: 'id', description: 'Partner ID' })
+  @ApiOkResponse({ description: 'Review submitted.', type: ReviewPartnerResponseDto })
+  @ApiNotFoundResponse({ description: 'Partner not found.' })
+  @ApiBadRequestResponse({ description: 'Partner is not in PENDING state.' })
+  async reviewPartner(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: ReviewPartnerProfileDto,
+    @Req() req,
+  ): Promise<ReviewPartnerResponseDto> {
+    return this.adminPartnersService.reviewPartner(id, dto, req.user.id);
+  }
 }

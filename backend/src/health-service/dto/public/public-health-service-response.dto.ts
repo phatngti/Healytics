@@ -1,0 +1,173 @@
+import { Expose, Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { HealthServiceType } from '../../enums/health-service-type.enum';
+import { HealthServiceStatus } from '../../enums/health-service-status.enum';
+
+/**
+ * Response DTO for category data within health service.
+ */
+class PublicCategorySummaryDto {
+  @Expose()
+  @ApiProperty()
+  id: string;
+
+  @Expose()
+  @ApiProperty()
+  name: string;
+
+  @Expose()
+  @ApiProperty()
+  slug: string;
+}
+
+/**
+ * Response DTO for health service media.
+ * Matches ProductMedia entity structure.
+ */
+class PublicHealthServiceMediaDto {
+  @Expose()
+  @ApiProperty({ description: 'Unique media identifier' })
+  id: string;
+
+  @Expose()
+  @ApiProperty({ description: 'Media URL' })
+  url: string;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Media type (image, video, etc.)' })
+  mediaType?: string;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Whether this is the thumbnail' })
+  isThumbnail?: boolean;
+
+  @Expose()
+  @ApiProperty({ description: 'Sort order for display' })
+  sortOrder: number;
+}
+
+/**
+ * Response DTO for health service definition.
+ * Matches ProductDefinition entity structure.
+ */
+class PublicHealthServiceDefinitionDto {
+  @Expose()
+  @ApiProperty({ description: 'Product ID (primary key)' })
+  productId: string;
+
+  @Expose()
+  @ApiProperty({ description: 'Service duration in minutes' })
+  durationMinutes: number;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Buffer time between appointments' })
+  bufferMinutes?: number;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Maximum capacity per slot' })
+  maxCapacity?: number;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Minimum lead time for booking (hours)' })
+  minLeadTimeHours?: number;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Staff assignment type' })
+  staffAssignmentType?: string;
+}
+
+/**
+ * Response DTO for employee eligibility within health service.
+ * Matches ProductEmployeeEligibility entity structure.
+ */
+class PublicHealthServiceEmployeeEligibilityDto {
+  @Expose()
+  @ApiProperty({ description: 'Product ID' })
+  productId: string;
+
+  @Expose()
+  @ApiProperty({ description: 'Employee ID' })
+  employeeId: string;
+
+  @Expose()
+  @ApiProperty({ description: 'Whether this is the primary employee' })
+  isPrimary: boolean;
+}
+
+/**
+ * Health service response DTO for API responses.
+ * Never expose raw entity data directly.
+ */
+export class PublicHealthServiceResponseDto {
+  @Expose()
+  @ApiProperty({ description: 'Unique identifier' })
+  id: string;
+
+  @Expose()
+  @ApiProperty({ description: 'Name' })
+  name: string;
+
+  @Expose()
+  @ApiProperty({ description: 'URL-friendly slug' })
+  slug: string;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Description' })
+  description: string | null;
+
+  @Expose()
+  @ApiProperty({ enum: HealthServiceType, description: 'Type' })
+  type: HealthServiceType;
+
+  @Expose()
+  @ApiProperty({ description: 'Base price in specified currency' })
+  basePrice: number;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Sale price if on discount' })
+  salePrice: number | null;
+
+  @Expose()
+  @ApiProperty({ description: 'Currency code (ISO 4217)' })
+  currency: string;
+
+  @Expose()
+  @ApiProperty({ enum: HealthServiceStatus, description: 'Status' })
+  status: HealthServiceStatus;
+
+  @Expose()
+  @ApiProperty({ description: 'Whether visible online' })
+  isVisibleOnline: boolean;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Vendor name' })
+  vendorName: string | null;
+
+  @Expose()
+  @ApiProperty({ description: 'Creation timestamp' })
+  createdAt: Date;
+
+  @Expose()
+  @ApiProperty({ description: 'Last update timestamp' })
+  updatedAt: Date;
+
+  @Expose()
+  @Type(() => PublicCategorySummaryDto)
+  @ApiPropertyOptional({ type: PublicCategorySummaryDto, description: 'Category' })
+  category: PublicCategorySummaryDto | null;
+
+  @Expose()
+  @Type(() => PublicHealthServiceMediaDto)
+  @ApiPropertyOptional({ type: [PublicHealthServiceMediaDto], description: 'Media assets' })
+  media: PublicHealthServiceMediaDto[];
+
+  @Expose()
+  @Type(() => PublicHealthServiceDefinitionDto)
+  @ApiPropertyOptional({ type: PublicHealthServiceDefinitionDto, description: 'Definition for service type' })
+  productDefinition: PublicHealthServiceDefinitionDto | null;
+
+  @Expose()
+  @Type(() => PublicHealthServiceEmployeeEligibilityDto)
+  @ApiPropertyOptional({ type: [PublicHealthServiceEmployeeEligibilityDto], description: 'Eligible employees for service' })
+  productEmployeeEligibilities: PublicHealthServiceEmployeeEligibilityDto[];
+}

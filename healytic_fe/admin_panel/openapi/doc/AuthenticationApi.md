@@ -9,19 +9,20 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**authControllerLoginAdmin**](AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | 
-[**authControllerLoginPartner**](AuthenticationApi.md#authcontrollerloginpartner) | **POST** /auth/partner/login | 
-[**authControllerLoginUser**](AuthenticationApi.md#authcontrollerloginuser) | **POST** /auth/user/login | 
-[**authControllerLogout**](AuthenticationApi.md#authcontrollerlogout) | **POST** /auth/logout | 
-[**authControllerRefresh**](AuthenticationApi.md#authcontrollerrefresh) | **POST** /auth/refresh | 
+[**authControllerLoginAdmin**](AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | Login as admin
+[**authControllerLoginPartner**](AuthenticationApi.md#authcontrollerloginpartner) | **POST** /auth/partner/login | Login as a partner
+[**authControllerLoginUser**](AuthenticationApi.md#authcontrollerloginuser) | **POST** /auth/user/login | Login as a user
+[**authControllerLogout**](AuthenticationApi.md#authcontrollerlogout) | **POST** /auth/logout | Logout current user
+[**authControllerRefresh**](AuthenticationApi.md#authcontrollerrefresh) | **POST** /auth/refresh | Refresh authentication tokens
+[**authControllerRefreshPartner**](AuthenticationApi.md#authcontrollerrefreshpartner) | **POST** /auth/partner/refresh | Refresh partner tokens with verification info
 [**authControllerRegisterPartner**](AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
-[**authControllerRegisterUser**](AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | 
+[**authControllerRegisterUser**](AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | Register a new user
 
 
 # **authControllerLoginAdmin**
 > AuthTokensDto authControllerLoginAdmin(adminLoginDto)
 
-
+Login as admin
 
 ### Example
 ```dart
@@ -62,7 +63,7 @@ No authorization required
 # **authControllerLoginPartner**
 > AuthTokensDto authControllerLoginPartner(partnerLoginDto)
 
-
+Login as a partner
 
 ### Example
 ```dart
@@ -103,7 +104,7 @@ No authorization required
 # **authControllerLoginUser**
 > AuthTokensDto authControllerLoginUser(loginDto)
 
-
+Login as a user
 
 ### Example
 ```dart
@@ -144,7 +145,7 @@ No authorization required
 # **authControllerLogout**
 > LogoutResponseDto authControllerLogout()
 
-
+Logout current user
 
 ### Example
 ```dart
@@ -181,7 +182,7 @@ No authorization required
 # **authControllerRefresh**
 > AuthTokensDto authControllerRefresh(refreshTokenRequestDto)
 
-
+Refresh authentication tokens
 
 ### Example
 ```dart
@@ -219,12 +220,53 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **authControllerRefreshPartner**
+> AuthTokensDto authControllerRefreshPartner(refreshTokenRequestDto)
+
+Refresh partner tokens with verification info
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+final refreshTokenRequestDto = RefreshTokenRequestDto(); // RefreshTokenRequestDto | 
+
+try {
+    final result = api_instance.authControllerRefreshPartner(refreshTokenRequestDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerRefreshPartner: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **refreshTokenRequestDto** | [**RefreshTokenRequestDto**](RefreshTokenRequestDto.md)|  | 
+
+### Return type
+
+[**AuthTokensDto**](AuthTokensDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **authControllerRegisterPartner**
 > RegisterPartnerResponseDto authControllerRegisterPartner(registerPartnerDto)
 
 Register a new business partner
 
-Creates business entity, legal representative, and returns auth tokens immediately
+Creates business entity, legal representative, and returns auth tokens immediately.
 
 ### Example
 ```dart
@@ -265,7 +307,7 @@ No authorization required
 # **authControllerRegisterUser**
 > AuthTokensDto authControllerRegisterUser(registerDto)
 
-
+Register a new user
 
 ### Example
 ```dart

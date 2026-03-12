@@ -15,10 +15,10 @@ import { ProductReview } from '@/common/entities/product-review.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 import { Account } from '@/common/entities/account.entity';
 import { Role } from '@/account/enum/role.enum';
-import { ProductType } from '@/products/enums/product-type.enum';
-import { ProductStatus } from '@/products/enums/product-status.enum';
-import { StaffAssignmentType } from '@/products/enums/staff-assignment-type.enum';
-import { MediaType } from '@/products/enums/media-type.enum';
+import { HealthServiceType } from '@/health-service/enums/health-service-type.enum';
+import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
+import { StaffAssignmentType } from '@/health-service/enums/staff-assignment-type.enum';
+import { MediaType } from '@/health-service/enums/media-type.enum';
 import { ISeeder } from '../seeder.interface';
 
 /**
@@ -33,7 +33,7 @@ const SEED_PRODUCTS = [
     slug: 'full-body-massage-60-min',
     description:
       'Indulge in our signature full body relaxation massage. This 60-minute session combines Swedish and deep tissue techniques to relieve tension, improve circulation, and restore balance. Our certified therapists use premium aromatherapy oils tailored to your needs. Perfect for stress relief and muscle recovery.',
-    type: ProductType.SERVICE,
+    type: HealthServiceType.SERVICE,
     basePrice: 350000,
     salePrice: 299000,
     categorySlug: 'relaxation-massage',
@@ -118,7 +118,7 @@ const SEED_PRODUCTS = [
     slug: 'neck-shoulder-therapy',
     description:
       'Targeted therapeutic treatment designed specifically for chronic neck and shoulder pain. Our experienced therapists use a combination of trigger point therapy, myofascial release, and stretching techniques to address muscle tension, improve range of motion, and provide lasting relief. Ideal for office workers and people with postural imbalances.',
-    type: ProductType.SERVICE,
+    type: HealthServiceType.SERVICE,
     basePrice: 400000,
     categorySlug: 'rehabilitation-massage',
     media: [
@@ -181,7 +181,7 @@ const SEED_PRODUCTS = [
     slug: 'basic-facial-care-package',
     description:
       'Transform your skin with our essential facial care package. This 90-minute treatment includes deep cleansing, gentle exfoliation, hydrating mask application, and soothing facial massage. Using premium Korean skincare products, our estheticians customize each session to address your specific skin concerns — whether acne, dryness, or uneven tone.',
-    type: ProductType.SERVICE,
+    type: HealthServiceType.SERVICE,
     basePrice: 500000,
     salePrice: 450000,
     categorySlug: 'spa-beauty',
@@ -245,7 +245,7 @@ const SEED_PRODUCTS = [
     slug: 'professional-teeth-whitening',
     description:
       'Achieve a brighter, more confident smile with our professional in-office teeth whitening. Using advanced LED light-activated whitening technology, this 2-hour session can lighten your teeth by up to 8 shades. Our dental professionals ensure a safe, comfortable experience with minimal sensitivity. Results are immediate and long-lasting.',
-    type: ProductType.SERVICE,
+    type: HealthServiceType.SERVICE,
     basePrice: 1500000,
     salePrice: 1200000,
     categorySlug: 'dental',
@@ -300,7 +300,7 @@ const SEED_PRODUCTS = [
     slug: 'sunscreen-spf50-broad-spectrum',
     description:
       'Advanced broad spectrum SPF50 PA+++ sunscreen with lightweight, non-greasy formula. Provides superior UVA/UVB protection while hydrating and nourishing your skin. Water-resistant for up to 80 minutes. Suitable for all skin types including sensitive skin. Dermatologically tested.',
-    type: ProductType.PHYSICAL,
+    type: HealthServiceType.PHYSICAL,
     basePrice: 280000,
     categorySlug: 'dermatology',
     media: [
@@ -415,7 +415,7 @@ export class ProductSeeder implements ISeeder {
         basePrice: prodData.basePrice,
         salePrice: (prodData as any).salePrice ?? null,
         currency: 'VND',
-        status: ProductStatus.ACTIVE,
+        status: HealthServiceStatus.ACTIVE,
         isVisibleOnline: true,
         categoryId,
       });
@@ -477,7 +477,7 @@ export class ProductSeeder implements ISeeder {
       }
 
       // Only seed service-specific details for SERVICE-type products
-      if (prodData.type !== ProductType.SERVICE) continue;
+      if (prodData.type !== HealthServiceType.SERVICE) continue;
 
       // 4. Service Definition (1:1)
       if ((prodData as any).serviceDefinition) {

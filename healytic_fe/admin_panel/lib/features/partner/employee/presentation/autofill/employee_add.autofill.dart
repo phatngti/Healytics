@@ -22,7 +22,9 @@ abstract final class EmployeeAddAutofill {
   /// Returns the autofill map for the given [role].
   ///
   /// Supported roles: `THERAPIST` (default), `DOCTOR`.
-  static Map<String, dynamic> forRole([String role = 'THERAPIST']) {
+  static Map<String, dynamic> forRole([
+    String role = 'THERAPIST',
+  ]) {
     return switch (role.toUpperCase()) {
       'DOCTOR' => _doctorValues(),
       _ => _therapistValues(),
@@ -42,13 +44,15 @@ abstract final class EmployeeAddAutofill {
     'email_address': 'lan.therapist@healytics.dev',
     'phone_number': '0901234567',
     'date_of_birth': DateTime(1995, 6, 15),
-    'gender': EmployeeGender.female.displayName,
+    'gender':
+        EmployeeGender.female.displayName,
     'avatar_url': avatarUrl,
     // Emergency Contact
     'emergency_contact_name': 'Nguyen Van An',
     'emergency_contact_phone': '0912345678',
     // Professional
-    'employment_type': EmploymentType.fullTime.displayName,
+    'employment_type':
+        EmploymentType.fullTime.displayName,
     'start_date': DateTime(2024),
     'job_title': 'Senior Spa Therapist',
     'description':
@@ -62,10 +66,12 @@ abstract final class EmployeeAddAutofill {
         ',{"insert":"Hot Stone Massage"},{"insert":"\\n","attributes":{"list":"bullet"}}'
         ',{"insert":"Deep Tissue Massage"},{"insert":"\\n","attributes":{"list":"bullet"}}]',
     // Therapist-specific
-    'therapist_level': TherapistLevel.senior.displayName,
+    'therapist_level':
+        TherapistLevel.senior.displayName,
     'commission_rate': '15',
     'health_check_date': DateTime(2025, 1, 10),
-    'spa_skills': 'Aromatherapy, Hot Stone, Deep Tissue',
+    'spa_skills':
+        'Aromatherapy, Hot Stone, Deep Tissue',
   };
 
   // ──────────────────────────────────────────────
@@ -86,7 +92,8 @@ abstract final class EmployeeAddAutofill {
     'emergency_contact_name': 'Tran Thi Hoa',
     'emergency_contact_phone': '0934567890',
     // Professional
-    'employment_type': EmploymentType.fullTime.displayName,
+    'employment_type':
+        EmploymentType.fullTime.displayName,
     'start_date': DateTime(2023, 6, 1),
     'job_title': 'Dermatologist',
     'description':
@@ -99,12 +106,17 @@ abstract final class EmployeeAddAutofill {
         ',{"insert":"Cosmetic Dermatology"},{"insert":"\\n","attributes":{"list":"bullet"}}'
         ',{"insert":"Skin Health Consultations"},{"insert":"\\n","attributes":{"list":"bullet"}}'
         ',{"insert":"Anti-Aging Treatments"},{"insert":"\\n","attributes":{"list":"bullet"}}]',
-    // Doctor-specific
-    'medical_title': 'BS CKI',
-    'medical_license': 'CCHN-00456',
+    // Doctor-specific (indexed credentials)
+    'medical_title_0': 'BS CKI',
+    'medical_license_0': 'CCHN-00456',
+    'medical_title_1': 'Thạc sĩ Y khoa',
+    'medical_license_1': 'CCHN-00789',
     'experience_years': '10',
     'consultation_fee': '20',
     'specializations': ['dermatology'],
-    'education': MedicalEducation.doctorOfMedicine.displayName,
+    'education': [
+      MedicalEducation.doctorOfMedicine.displayName,
+    ],
+    'certifications': ['BLS'],
   };
 }
