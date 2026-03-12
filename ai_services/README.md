@@ -1,3 +1,42 @@
+# 1. Tạo network chung
+docker network create healytics_net
+
+# 2. Chạy Recommender
+docker run --name healytics_recommender \
+  --network healytics_net \
+  -it -p 8000:8000 \
+  --env-file .env \
+  -v /home/giahung21112004/Projects/Healytics/ai_services/recommender2:/app \
+  -v hf_cache:/root/.cache/huggingface \
+  -v torch_cache:/root/.cache/torch \
+  -w /app healytics_recommender
+
+docker start -ai healytics_recommender
+
+# 3. Chạy Chatbot
+docker run --name healytics_chatbot \
+  --network healytics_net \
+  --gpus all \
+  -it -p 5000:5000 \
+  -v /home/giahung21112004/Projects/Healytics/ai_services/rag_langchain:/app \
+  -v torch_cache:/root/.cache/torch \
+  -v hf_cache:/root/.cache/huggingface \
+  -w /app healytics_chatbot_rag
+
+docker start -ai healytics_chatbot
+
+# 4. Chạy Gateway
+docker run --name healytics_gateway \
+  --network healytics_net \
+  -p 9000:9000 \
+  --env-file .env \
+  healytics_gateway
+
+docker start -ai healytics_gateway
+
+
+
+
 1. Luồng tổng thể
 
 Browser

@@ -3,9 +3,11 @@ FROM python:3.11-slim
 # docker build -t healytics_recommender .
 # docker run -it healytics_recommender
 # docker run -it -v ~/Projects/Healytics/ai_services/recommender2:/app -w /app healytics_recommender bash
-# docker run --name healytics_recommender -it -p 8000:8000 --env-file .env -v /home/giahung21112004/Projects/Healytics/ai_services/recommender2:/app -v hf_cache:/root/.cache/huggingface -v torch_cache:/root/.cache/torch -w /app healytics_recommender bash
+# docker run --name healytics_recommender -it -p 8000:8000 --env-file .env -v /home/giahung21112004/Projects/Healytics/ai_services/recommender2:/app -v hf_cache:/root/.cache/huggingface -v torch_cache:/root/.cache/torch -w /app healytics_recommender 
 # uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 # docker start -ai healytics_recommender
+# docker tag healytics_recommender:latest giahung2111/healytics_recommender:latest
+# docker push giahung2111/healytics_recommender:latest
 
 # 1. Workdir
 WORKDIR /app
@@ -39,5 +41,5 @@ COPY . /app
 EXPOSE 8000
 
 # 7. Command 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
 
