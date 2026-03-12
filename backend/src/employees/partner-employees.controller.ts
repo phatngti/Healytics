@@ -11,6 +11,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import {
   ApiOperation,
   ApiCreatedResponse,
@@ -20,7 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { EmployeesService } from './employees.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
-import { CreateTherapistDto } from './dto/create-therapist.dto';
+import { CreateSpaTherapistDto, CreateMassageTherapistDto } from './dto/create-therapist.dto';
 import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { EmployeeResponseDto } from './dto/employee-response.dto';
@@ -40,6 +41,7 @@ export class PartnerEmployeesController {
    * Creates a new doctor employee for the authenticated partner.
    */
   @Post('doctors')
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Create a new doctor' })
   @ApiCreatedResponse({
     description: 'The doctor has been successfully created.',
@@ -56,22 +58,43 @@ export class PartnerEmployeesController {
   }
 
   /**
-   * Creates a new therapist employee for the authenticated partner.
+   * Creates a new spa therapist employee for the authenticated partner.
    */
-  @Post('therapists')
-  @ApiOperation({ summary: 'Create a new therapist' })
+  @Post('spa-therapists')
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  @ApiOperation({ summary: 'Create a new spa therapist' })
   @ApiCreatedResponse({
-    description: 'The therapist has been successfully created.',
+    description: 'The spa therapist has been successfully created.',
     type: EmployeeResponseDto,
   })
-  async createTherapist(
+  async createSpaTherapist(
     @Req() req,
-    @Body() createTherapistDto: CreateTherapistDto,
+    @Body() dto: CreateSpaTherapistDto,
   ): Promise<EmployeeResponseDto> {
     const partnerId = await this.employeesService.getPartnerIdByAccountId(
       req.user.id,
     );
-    return this.employeesService.createTherapist(createTherapistDto, partnerId);
+    return this.employeesService.createSpaTherapist(dto, partnerId);
+  }
+
+  /**
+   * Creates a new massage therapist employee for the authenticated partner.
+   */
+  @Post('massage-therapists')
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  @ApiOperation({ summary: 'Create a new massage therapist' })
+  @ApiCreatedResponse({
+    description: 'The massage therapist has been successfully created.',
+    type: EmployeeResponseDto,
+  })
+  async createMassageTherapist(
+    @Req() req,
+    @Body() dto: CreateMassageTherapistDto,
+  ): Promise<EmployeeResponseDto> {
+    const partnerId = await this.employeesService.getPartnerIdByAccountId(
+      req.user.id,
+    );
+    return this.employeesService.createMassageTherapist(dto, partnerId);
   }
 
   /**
@@ -117,6 +140,7 @@ export class PartnerEmployeesController {
    * Updates an employee (must belong to the authenticated partner).
    */
   @Patch(':id')
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Update an employee' })
   @ApiOkResponse({
     description: 'The employee has been successfully updated.',
@@ -143,6 +167,7 @@ export class PartnerEmployeesController {
    */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Delete an employee' })
   @ApiNoContentResponse({
     description: 'The employee has been successfully deleted.',

@@ -26,23 +26,5 @@ void main() {
       // TODO
     });
 
-    // Get own business profile
-    //
-    // Partner gets their own business entity information
-    //
-    //Future<MyProfileResponseDto> partnersControllerGetMyProfile() async
-    test('test partnersControllerGetMyProfile', () async {
-      // TODO
-    });
-
-    // Update own business profile
-    //
-    // Partner updates their business information (limited fields)
-    //
-    //Future<MyProfileResponseDto> partnersControllerUpdateMyProfile(UpdatePartnerDto updatePartnerDto) async
-    test('test partnersControllerUpdateMyProfile', () async {
-      // TODO
-    });
-
   });
 }

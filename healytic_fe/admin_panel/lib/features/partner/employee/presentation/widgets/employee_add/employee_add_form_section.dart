@@ -1,5 +1,6 @@
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/doctor_fields_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/doctor_experience_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_documents_certifications_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_professional_role_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_work_schedule_card.dart';
@@ -30,10 +31,20 @@ class EmployeeAddFormSection extends StatelessWidget {
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           child: selectedRole == EmployeeRole.therapist
-              ? const TherapistFieldsCard(key: ValueKey('therapist'))
-              : const DoctorFieldsCard(
-                  key: ValueKey('doctor'),
-                  isEditing: true,
+              ? const TherapistFieldsCard(
+                  key: ValueKey('therapist'),
+                )
+              : Column(
+                  key: const ValueKey('doctor'),
+                  children: const [
+                    DoctorFieldsCard(
+                      isEditing: true,
+                    ),
+                    AppDimens.verticalMedium,
+                    DoctorExperienceCard(
+                      isEditing: true,
+                    ),
+                  ],
                 ),
         ),
         AppDimens.verticalMedium,

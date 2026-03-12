@@ -3,7 +3,6 @@ import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/facility_image.entity.dart';
-import 'package:admin_panel/features/partner/products/domain/review.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/layouts/product_add_desktop.dart';
 import 'package:admin_panel/features/partner/products/presentation/autofill/product_add.autofill.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';

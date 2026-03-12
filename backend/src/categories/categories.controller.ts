@@ -14,6 +14,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import {
   ApiTags,
   ApiOperation,
@@ -51,6 +52,7 @@ export class CategoriesController {
    */
   @Post()
   @Roles(...ADMIN_ROLES)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({ summary: 'Create a new category' })
   @ApiCreatedResponse({
     description: 'The category has been successfully created.',
@@ -109,6 +111,7 @@ export class CategoriesController {
    */
   @Patch(':id')
   @Roles(...ADMIN_ROLES)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({ summary: 'Update a category' })
   @ApiOkResponse({
     description: 'The category has been successfully updated.',
@@ -127,6 +130,7 @@ export class CategoriesController {
    */
   @Delete(':id')
   @Roles(...ADMIN_ROLES)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a category' })
   @ApiNoContentResponse({

@@ -67,10 +67,13 @@ abstract class CreateDoctorRequest with _$CreateDoctorRequest {
     // Doctor-specific fields
 
     /// Job title (e.g., 'Dermatologist', 'General Practitioner').
-    required String jobTitle,
+    @Default('Doctor') String jobTitle,
 
-    /// Medical license number.
-    required String medicalLicense,
+    /// List of medical titles.
+    @Default([]) List<String> medicalTitles,
+
+    /// List of medical license numbers.
+    @Default([]) List<String> medicalLicenses,
 
     /// Years of professional experience.
     int? experienceYears,

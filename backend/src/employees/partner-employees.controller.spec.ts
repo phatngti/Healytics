@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PartnerEmployeesController } from './partner-employees.controller';
 import { EmployeesService } from './employees.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
-import { CreateTherapistDto } from './dto/create-therapist.dto';
+import { CreateSpaTherapistDto, CreateMassageTherapistDto } from './dto/create-therapist.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { MockType } from '../../test/mocks/mock-types';
@@ -20,7 +20,8 @@ describe('PartnerEmployeesController', () => {
     const mockEmployeesService: MockType<EmployeesService> = {
       getPartnerIdByAccountId: jest.fn().mockResolvedValue(mockPartnerId),
       createDoctor: jest.fn(),
-      createTherapist: jest.fn(),
+      createSpaTherapist: jest.fn(),
+      createMassageTherapist: jest.fn(),
       findAll: jest.fn(),
       findOneForPartner: jest.fn(),
       updateForPartner: jest.fn(),
@@ -49,8 +50,10 @@ describe('PartnerEmployeesController', () => {
     it('should resolve partnerId and call service.createDoctor', async () => {
       // Arrange
       const dto: CreateDoctorDto = {
-        fullName: 'Dr. John Doe',
-        email: 'john@example.com',
+        firstName: 'Nguyen',
+        lastName: 'Van A',
+        email: 'doctor.a@healytics.com',
+        employeeId: 'DOC-001',
       } as CreateDoctorDto;
       const expectedEmployee = { id: 'uuid-1', ...dto, role: EmployeeRole.DOCTOR };
       employeesService.createDoctor!.mockResolvedValue(expectedEmployee);
@@ -65,23 +68,47 @@ describe('PartnerEmployeesController', () => {
     });
   });
 
-  describe('createTherapist', () => {
-    it('should resolve partnerId and call service.createTherapist', async () => {
+  describe('createSpaTherapist', () => {
+    it('should resolve partnerId and call service.createSpaTherapist', async () => {
       // Arrange
-      const dto: CreateTherapistDto = {
-        fullName: 'Jane Smith',
-        email: 'jane@example.com',
-      } as CreateTherapistDto;
+      const dto: CreateSpaTherapistDto = {
+        firstName: 'Le',
+        lastName: 'Thi C',
+        email: 'spa@healytics.com',
+        employeeId: 'SPA-001',
+      } as CreateSpaTherapistDto;
       const expectedEmployee = { id: 'uuid-2', ...dto, role: EmployeeRole.THERAPIST };
-      employeesService.createTherapist!.mockResolvedValue(expectedEmployee);
+      employeesService.createSpaTherapist!.mockResolvedValue(expectedEmployee);
 
       // Act
-      const result = await controller.createTherapist(mockReq, dto);
+      const result = await controller.createSpaTherapist(mockReq, dto);
 
       // Assert
       expect(result).toEqual(expectedEmployee);
       expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(mockAccountId);
-      expect(employeesService.createTherapist).toHaveBeenCalledWith(dto, mockPartnerId);
+      expect(employeesService.createSpaTherapist).toHaveBeenCalledWith(dto, mockPartnerId);
+    });
+  });
+
+  describe('createMassageTherapist', () => {
+    it('should resolve partnerId and call service.createMassageTherapist', async () => {
+      // Arrange
+      const dto: CreateMassageTherapistDto = {
+        firstName: 'Hoang',
+        lastName: 'Van E',
+        email: 'massage@healytics.com',
+        employeeId: 'MSG-001',
+      } as CreateMassageTherapistDto;
+      const expectedEmployee = { id: 'uuid-3', ...dto, role: EmployeeRole.THERAPIST };
+      employeesService.createMassageTherapist!.mockResolvedValue(expectedEmployee);
+
+      // Act
+      const result = await controller.createMassageTherapist(mockReq, dto);
+
+      // Assert
+      expect(result).toEqual(expectedEmployee);
+      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(mockAccountId);
+      expect(employeesService.createMassageTherapist).toHaveBeenCalledWith(dto, mockPartnerId);
     });
   });
 

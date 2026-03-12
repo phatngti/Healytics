@@ -32,11 +32,11 @@ class DriftStoreRepository extends DriftDatabaseRepository {
   }
 
   Future<void> delete<T>(StoreKey<T> key) async {
-    return await transaction(
-      () async => _db.delete(_db.storeValue)
-        ..where((e) => e.id.equals(key.id))
-        ..go(),
-    );
+    return await transaction(() async {
+      final stmt = _db.delete(_db.storeValue)
+        ..where((e) => e.id.equals(key.id));
+      await stmt.go();
+    });
   }
 
   Future<bool> insert<T>(StoreKey<T> key, T value) async {

@@ -52,6 +52,18 @@ void main() {
       // TODO
     });
 
+    // Device proficiency list
+    // List<String> deviceProficiency (default value: const [])
+    test('to test the property `deviceProficiency`', () async {
+      // TODO
+    });
+
+    // License URL
+    // String licenseUrl
+    test('to test the property `licenseUrl`', () async {
+      // TODO
+    });
+
 
   });
 

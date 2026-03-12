@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logging/logging.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/providers/api.provider.dart';
+import 'package:user_app/core/services/api.service.dart';
 import 'package:user_openapi/api.dart';
 
 import 'package:user_app/features/bot_chat/domain/entities/chat_conversation.entity.dart';
@@ -16,7 +18,8 @@ import 'chat_sse_service.dart';
 
 /// Contract for fetching chat data from a remote source.
 abstract class ChatRemoteDatasource {
-  /// Fetches all conversation sessions for the current user.
+  /// Fetches all conversation sessions for the current
+  /// user.
   Future<List<ChatConversation>> getConversations();
 
   /// Fetches messages for a given [conversationId].
@@ -25,26 +28,30 @@ abstract class ChatRemoteDatasource {
   /// Sends a [text] message and returns an SSE stream
   /// of chatbot response events.
   ///
-  /// [conversationId] may be null for a new conversation.
+  /// [conversationId] may be null for a new
+  /// conversation.
   Stream<ChatSseEvent> sendMessageAndStream(
     String? conversationId,
     String text,
   );
 }
 
-/// Real implementation backed by [ChatbotApi] and
-/// [ChatSseService] for SSE streaming.
+/// Real implementation backed by [ChatbotApi]
+/// (via [ApiService]) and [ChatSseService] for
+/// POST-based SSE streaming via
+/// `POST /generative_ai/stream`.
 class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
   static final _log = Logger('ChatRemoteDatasourceImpl');
 
-  final ChatbotApi _chatbotApi;
+  final ApiService _apiService;
   final ChatSseService _sseService;
 
-  const ChatRemoteDatasourceImpl(this._chatbotApi, this._sseService);
+  const ChatRemoteDatasourceImpl(this._apiService, this._sseService);
 
   @override
   Future<List<ChatConversation>> getConversations() async {
-    final response = await _chatbotApi.chatbotControllerListConversations();
+    final response = await _apiService.chatbotApi
+        .chatbotControllerListConversations();
     if (response == null) return [];
     return response.conversations.map(_mapItemToEntity).toList();
   }
@@ -70,27 +77,31 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     String? conversationId,
     String text,
   ) async* {
-    // 1. POST /chatbot/send → get stream URL.
-    final dto = SendMessageDto(message: text, conversationId: conversationId);
+    // final userId = _extractUserId();
 
-    final response = await _chatbotApi.chatbotControllerSendMessage(dto);
+    final body = ChatbotRequest(
+      conversationId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      userId: "1fddc673-84d8-47c8-9ad1-d0db0d35b172",
+      message: text,
+      enableNer: false,
+    ).toJson();
 
-    if (response == null) {
-      throw Exception('Send message returned null');
-    }
-
-    // 2. Open SSE stream.
-    _log.info('Opening SSE stream: ${response.streamUrl}');
+    _log.info(
+      'POST /generative_ai/stream '
+      '(convId=$conversationId)',
+    );
 
     var isFirstEvent = true;
 
+    print("body:  $body");
+
     yield* _sseService
-        .connect(response.streamUrl)
+        .postAndStream('/generative_ai/stream', body)
         .map((event) {
           if (isFirstEvent) {
             _log.info(
-              'SSE connected successfully, '
-              'first event type: ${event.type}',
+              'SSE connected, first event '
+              'type: ${event.type}',
             );
             isFirstEvent = false;
           }
@@ -103,6 +114,32 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
           // ignore: only_throw_errors
           throw error;
         });
+  }
+
+  /// Extracts the user ID from the JWT `sub` claim
+  /// stored in [StoreKey.accessToken].
+  String _extractUserId() {
+    final token = Store.tryGet(StoreKey.accessToken);
+    if (token == null || token.isEmpty) {
+      throw Exception('Cannot send message: no access token');
+    }
+
+    try {
+      final claims = JwtDecoder.decode(token);
+      final sub = claims['sub'] as String?;
+      if (sub == null || sub.isEmpty) {
+        throw Exception(
+          'Cannot send message: '
+          'JWT missing "sub" claim',
+        );
+      }
+      return sub;
+    } catch (e) {
+      throw Exception(
+        'Cannot send message: '
+        'failed to decode JWT — $e',
+      );
+    }
   }
 }
 
@@ -190,17 +227,13 @@ class ChatRemoteDatasourceMock implements ChatRemoteDatasource {
   }
 }
 
-/// Provides a [ChatbotApi] instance using the core
-/// [ApiService] client.
-final chatbotApiProvider = Provider<ChatbotApi>((ref) {
-  final apiClient = ref.read(apiServiceProvider).apiClient;
-  return ChatbotApi(apiClient);
-});
-
-/// Provides a [ChatSseService] using the same base path
-/// as the [ApiService].
+/// Provides a [ChatSseService] using the AI-service
+/// base path from [ApiService].
 final chatSseServiceProvider = Provider<ChatSseService>((ref) {
-  final basePath = ref.read(apiServiceProvider).apiClient.basePath;
+  final basePath = ref
+      .read(apiServiceProvider)
+      .clientFor(ServicePrefix.ai)
+      .basePath;
   return ChatSseService(basePath: basePath);
 });
 
@@ -214,7 +247,7 @@ final chatRemoteDatasourceProvider = Provider<ChatRemoteDatasource>((ref) {
   }
 
   return ChatRemoteDatasourceImpl(
-    ref.read(chatbotApiProvider),
+    ref.read(apiServiceProvider),
     ref.read(chatSseServiceProvider),
   );
 });

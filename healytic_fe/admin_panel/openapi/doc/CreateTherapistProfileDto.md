@@ -14,6 +14,8 @@ Name | Type | Description | Notes
 **commissionRate** | **num** | Commission rate percentage | [optional] 
 **healthCheckDate** | **String** | Last health check date | [optional] 
 **skills** | **List<String>** | Therapist skills | [optional] [default to const []]
+**deviceProficiency** | **List<String>** | Device proficiency list | [optional] [default to const []]
+**licenseUrl** | **String** | License URL | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

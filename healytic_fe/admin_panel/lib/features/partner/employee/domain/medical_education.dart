@@ -19,10 +19,35 @@ enum MedicalEducation {
 
   /// Returns the user-friendly display name.
   String get displayName => switch (this) {
-    MedicalEducation.doctorOfMedicine => 'Doctor of Medicine',
-    MedicalEducation.masterOfMedicine => 'Master of Medicine',
-    MedicalEducation.bachelorOfMedicine => 'Bachelor of Medicine',
-    MedicalEducation.associateDegree => 'Associate Degree',
+    MedicalEducation.doctorOfMedicine =>
+      'Doctor of Medicine',
+    MedicalEducation.masterOfMedicine =>
+      'Master of Medicine',
+    MedicalEducation.bachelorOfMedicine =>
+      'Bachelor of Medicine',
+    MedicalEducation.associateDegree =>
+      'Associate Degree',
     MedicalEducation.other => 'Other',
+  };
+
+  /// Returns the API value for backend communication.
+  String get apiValue => switch (this) {
+    MedicalEducation.doctorOfMedicine =>
+      'Doctor of Medicine',
+    MedicalEducation.masterOfMedicine =>
+      'Master of Medicine',
+    MedicalEducation.bachelorOfMedicine =>
+      'Bachelor of Medicine',
+    MedicalEducation.associateDegree =>
+      'Associate Degree',
+    MedicalEducation.other => 'Other',
+  };
+
+  /// Returns a map of all education levels keyed by
+  /// [apiValue] with [displayName] as the value.
+  ///
+  /// Useful for multi-select chip fields.
+  static Map<String, String> get optionsMap => {
+    for (final e in values) e.apiValue: e.displayName,
   };
 }

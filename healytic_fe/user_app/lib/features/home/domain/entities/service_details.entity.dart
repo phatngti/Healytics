@@ -214,6 +214,8 @@ class ReviewEntity {
     required this.date,
     required this.text,
     this.status = 'Completed',
+    this.location = '',
+    this.serviceName = '',
     this.imageUrls = const [],
   });
 
@@ -228,6 +230,13 @@ class ReviewEntity {
 
   /// Completion status label, e.g. "Completed".
   final String status;
+
+  /// Reviewer's location, e.g. "District 1, HCM".
+  final String location;
+
+  /// Name of the service reviewed,
+  /// e.g. "Swedish Relax".
+  final String serviceName;
 
   /// When the review was submitted.
   final DateTime date;

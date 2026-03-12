@@ -9,7 +9,8 @@ import 'package:admin_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **title** | **String** | Title of the doctor | [optional] 
-**medicalLicense** | **String** | Medical license number | 
+**medicalTitles** | **List<String>** | Medical titles | [optional] [default to const []]
+**medicalLicenses** | **List<String>** | Medical license numbers | [optional] [default to const []]
 **experienceYears** | **num** | Years of experience | [optional] 
 **consultationFee** | **num** | Consultation fee | [optional] 
 **specializations** | **List<String>** | Specializations | [optional] [default to const []]
