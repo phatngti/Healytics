@@ -9,6 +9,7 @@ from app.clients.recommender_client import RecommenderClient
 from app.core.sse import SSEEvent
 from app.core.enums import SSEEventType
 from app.intent_classification.main import load_model, predict_intent
+from uuid import uuid4
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,9 @@ class ChatbotOrchestrator:
         request: Any,
         session: Any,
     ) -> AsyncGenerator[SSEEvent, None]:
+        
+        if request.conversation_id is None:
+            request.conversation_id = uuid4()
 
         # 1. Get or create conversation
         conversation = await conversation_repo.get_or_create_conversation(
