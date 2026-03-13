@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 
 # Virtual env
+runpod_scripts/.env
 .venv/
 env/
 healytics_env/
