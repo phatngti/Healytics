@@ -1,5 +1,5 @@
 # ai_services/gateway-service/app/schemas/chatbot_schema.py
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from pydantic import BaseModel, Field
 from datetime import datetime
@@ -12,7 +12,7 @@ class ChatbotRequest(BaseModel):
     POST /generative_ai/stream
     """
 
-    conversation_id: UUID
+    conversation_id: Optional[UUID] = None
     user_id: str
 
     message: str = Field(..., min_length=1)

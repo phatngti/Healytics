@@ -12,7 +12,10 @@ MODEL_DIR = os.path.join(BASE_DIR, "models")
 def load_model():
     global _model, _clf
     if _model is None:
-        _model = SentenceTransformer(os.path.join(MODEL_DIR, "intent_encoder"))
+        _model = SentenceTransformer(
+            os.path.join(MODEL_DIR, "intent_encoder"),
+            device="cpu"  
+        )
     if _clf is None:
         _clf = joblib.load(os.path.join(MODEL_DIR, "intent_classifier.pkl"))
     return _model, _clf
