@@ -2,6 +2,8 @@
 
 **Named Entity Recognition microservice** cho Healytics — trích xuất và chuẩn hóa entities từ câu truy vấn tiếng Việt để phục vụ bộ lọc (pre-filtering) trước khi đưa vào recommendation engine.
 
+> **Note:** Service này chạy nội bộ, được gọi bởi **gateway-service** (qua `NERClient`) trong pipeline `POST /prefilter/search`. Endpoint `/ner/extract` trên gateway chỉ là proxy debug, tạm giữ. User cuối không gọi trực tiếp NER service.
+
 ## Tech Stack
 
 | Công nghệ | Vai trò |
