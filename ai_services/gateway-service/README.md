@@ -1,5 +1,6 @@
 ## 📁 Cấu trúc thư mục
 
+```
 gateway-service/
 │
 ├── app/
@@ -9,36 +10,39 @@ gateway-service/
 │   ├── 5th - api/                         # Layer 1 - HTTP Controllers
 │   │   ├── chatbot_routes.py        # POST /chat/stream  (SSE endpoint)
 │   │   ├── recommender_routes.py    # POST /recommender/home + /recommender/chatbot
-│   │   ├── ner_routes.py            # POST /ner/extract  (nếu expose riêng)
+│   │   ├── ner_routes.py            # POST /ner/extract  (proxy NER service — debug only, tạm giữ)
+│   │   ├── prefilter_routes.py      # POST /prefilter/search ⭐ NEW
 │   │   └── health_routes.py         # GET /health
 │   │
 │   ├── 4th - orchestrators/               # Layer 2 - Business Flow
 │   │   ├── chatbot_orchestrator.py  # Điều phối LLM + NER + Recommender + DB + SSE
-│   │   └── recommendation_orchestrator.py # Logic orchestration cho recommend APIs
+│   │   ├── recommendation_orchestrator.py # Logic orchestration + MOCK_SERVICES data
+│   │   └── prefilter_orchestrator.py # ⭐ NEW: NER → Query Build → Filter services
 │   │
 │   ├── 3rd - clients/                     # Layer 3 - HTTP client gọi microservices
 │   │   ├── chatbot_client.py        # Gọi chatbot-service
 │   │   ├── recommender_client.py    # Gọi recommender-service
-│   │   └── ner_client.py            # Gọi ner-service (future-proof)
+│   │   └── ner_client.py            # Gọi ner-service
 │   │
 │   ├── repositories/                # Layer 4 - DB access
-│   │   ├── conversation_repo.py     # CRUD conversation    
+│   │   ├── conversation_repo.py     # CRUD conversation
 │   │   ├── message_repo.py          # CRUD message
 │   │   └── service_repo.py          # Cache service metadata (optional)
 │   │
 │   ├── 2nd - schemas/                     # Pydantic models (Request/Response/Event)
 │   │   ├── chatbot_schema.py        # ChatRequest + SSE event schemas
 │   │   ├── recommender_schema.py    # Home + Chatbot recommender request/response
-│   │   ├── ner_schema.py            # Entity model
+│   │   ├── ner_schema.py            # NerEntity (+ normalized fields) + PreFilterRequest/Response
 │   │   └── common_schema.py         # shared models (User, Price, Rating...)
 │   │
 │   ├── 1st - core/                        # System-level utilities
 │   │   ├── config.py                # ENV config (URLs of services, timeout)
 │   │   ├── sse.py                   # format_sse(event, data)
 │   │   ├── enums.py                 # Error codes, message status
-│   │   └── middleware.py            # Xử lý trước sau mỗi request (gán request_id, log request, auth,...) --> Hiện ch cần làm 
+│   │   └── middleware.py            # Xử lý trước sau mỗi request → Hiện chưa cần làm
 │   │
 │   └── utils/
+│       ├── query_builder.py         # ⭐ NEW: NER entities → query params + mock filter
 │       ├── logger.py                # structured logging
 │       └── exceptions.py            # custom exception classes
 │
@@ -47,6 +51,71 @@ gateway-service/
 ├── Dockerfile                       # Build gateway image
 ├── requirements.txt
 └── docker-compose.yml               # Orchestrate 3 services
+```
+
+---
+
+## ⭐ Pre-Filter Service (NEW)
+
+Pipeline: **text → NER extract → build query → filter services → return candidates**
+
+NER service chạy nội bộ — không expose NER response ra ngoài.
+Endpoint `/ner/extract` trên gateway chỉ là proxy debug, tạm giữ.
+
+### `POST /prefilter/search`
+
+**Request:**
+```json
+{"text": "Tìm spa ở Hà Nội giá dưới 500k trên 4 sao", "limit": 50}
+```
+
+**Response:**
+```json
+{
+  "text": "Tìm spa ở Hà Nội giá dưới 500k trên 4 sao",
+  "entities": [
+    {"type": "BUSINESS_TYPE", "value": "spa", "business_type": "SPA_BEAUTY", "confidence": 0.9},
+    {"type": "LOCATION", "value": "Hà Nội", "location_code": "01", "location_level": "PROVINCE", "confidence": 0.85},
+    {"type": "PRICE", "value": "dưới 500k", "operator": "lte", "amount": 500000.0, "confidence": 1.0},
+    {"type": "RATING", "value": "trên 4 sao", "operator": "gte", "amount": 4.0, "confidence": 1.0}
+  ],
+  "query_params": {
+    "businessType": "SPA_BEAUTY",
+    "locationCode": "01",
+    "locationLevel": "PROVINCE",
+    "maxPrice": 500000.0,
+    "minRating": 4.0,
+    "limit": 50
+  },
+  "candidates": [ ... ],
+  "total": 5
+}
+```
+
+### Pipeline chi tiết
+
+```
+User text
+  │
+  ▼
+NER Service (internal call via NERClient)
+  → entities: BUSINESS_TYPE, LOCATION, PRICE, RATING, CATEGORY
+  │
+  ▼
+query_builder.build_backend_query(entities)
+  → {businessType, locationCode, maxPrice, minRating, limit}
+  │
+  ▼
+query_builder.filter_mock_services(query, MOCK_SERVICES)
+  → filtered list of services
+  │
+  ▼
+PreFilterResponse (entities + query_params + candidates)
+```
+
+> **TODO:** Khi backend có `GET /v1/health-services/search`, thay `filter_mock_services()` bằng backend API call trong `prefilter_orchestrator.py`.
+
+---
 
 
 ## Bàn giao công việc cho NGUYÊN
