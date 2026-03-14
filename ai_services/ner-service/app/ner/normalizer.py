@@ -1,0 +1,233 @@
+"""
+ai_services/ner-service/app/ner/normalizer.py
+
+Entity Linking: chuyển raw entities từ extractor → normalized NerEntity.
+
+Strategy:
+  - LOC → O(1) lookup trong location RAM cache (province + district/ward)
+  - ORG/MISC/BUSINESS_TYPE → exact alias match + RapidFuzz fuzzy match
+  - PRICE/RATING → đã parse sẵn operator+amount từ extractor
+  - Không map được → normalized_id=None, log warning (không crash)
+"""
+
+import logging
+from typing import Optional
+
+from rapidfuzz import fuzz, process
+
+from app.ner import cache
+from app.ner.extractor import BUSINESS_TYPE_ALIASES
+from app.schemas.ner_schema import NerEntity
+
+logger = logging.getLogger(__name__)
+
+
+# Fuzzy matching threshold (0–100). Dưới ngưỡng → không map.
+FUZZY_THRESHOLD = 75
+
+
+# ============================================================================
+# PUBLIC API
+# ============================================================================
+
+def normalize_entities(raw_entities: list[dict]) -> list[NerEntity]:
+    """
+    Chuyển raw entities từ extractor → normalized NerEntity.
+    Mỗi entity được enrich với các trường normalized phù hợp.
+    Entity không map được → trường tương ứng = None (graceful degradation).
+    """
+    results: list[NerEntity] = []
+
+    for raw in raw_entities:
+        entity_type = raw.get("type", "")
+        value = raw.get("value", "")
+        confidence = raw.get("confidence", 0.0)
+
+        if entity_type == "LOC":
+            entity = _normalize_location(value, confidence)
+
+        elif entity_type == "BUSINESS_TYPE":
+            entity = _normalize_business_type(value, confidence, raw)
+
+        elif entity_type in ("ORG", "MISC"):
+            entity = _normalize_org_misc(value, confidence)
+
+        elif entity_type == "PRICE":
+            entity = _normalize_price(value, confidence, raw)
+
+        elif entity_type == "RATING":
+            entity = _normalize_rating(value, confidence, raw)
+
+        else:
+            # PER hoặc tag không xác định → skip
+            logger.debug(f"[Normalizer] Skipping entity type={entity_type!r}")
+            continue
+
+        results.append(entity)
+
+    return results
+
+
+# ============================================================================
+# PRIVATE — Location
+# ============================================================================
+
+def _normalize_location(value: str, confidence: float) -> NerEntity:
+    """Tra location cache O(1). Province hardcoded, district/ward từ backend."""
+    loc_info = cache.find_location(value)
+
+    if loc_info:
+        return NerEntity(
+            type="LOCATION",
+            value=value,
+            confidence=confidence,
+            location_code=loc_info["code"],
+            location_level=loc_info["level"],
+        )
+
+    # Không tìm thấy → graceful degradation
+    logger.warning(f"[Normalizer] Unknown location: {value!r}")
+    return NerEntity(
+        type="LOCATION",
+        value=value,
+        confidence=max(confidence * 0.5, 0.1),   # Giảm confidence
+    )
+
+
+# ============================================================================
+# PRIVATE — BusinessType (from keyword scan → đã có business_type sẵn)
+# ============================================================================
+
+def _normalize_business_type(
+    value: str, confidence: float, raw: dict
+) -> NerEntity:
+    """Entity từ keyword scan đã có business_type sẵn."""
+    return NerEntity(
+        type="BUSINESS_TYPE",
+        value=value,
+        confidence=confidence,
+        business_type=raw.get("business_type"),
+    )
+
+
+# ============================================================================
+# PRIVATE — ORG/MISC → thử BusinessType alias + Category fuzzy
+# ============================================================================
+
+def _normalize_org_misc(value: str, confidence: float) -> NerEntity:
+    """
+    ORG/MISC từ underthesea → thử:
+    1. Exact match trong BUSINESS_TYPE_ALIASES
+    2. Fuzzy match trong BUSINESS_TYPE_ALIASES
+    3. Fuzzy match trong category cache
+    4. Không map → trả về type CATEGORY với slug=None
+    """
+    value_lower = value.lower().strip()
+
+    # 1. Exact match → BusinessType
+    if value_lower in BUSINESS_TYPE_ALIASES:
+        return NerEntity(
+            type="BUSINESS_TYPE",
+            value=value,
+            confidence=confidence,
+            business_type=BUSINESS_TYPE_ALIASES[value_lower],
+        )
+
+    # 2. Fuzzy match → BusinessType
+    bt_match = _fuzzy_match_business_type(value_lower)
+    if bt_match:
+        return NerEntity(
+            type="BUSINESS_TYPE",
+            value=value,
+            confidence=confidence * 0.9,   # Fuzzy → giảm confidence nhẹ
+            business_type=bt_match,
+        )
+
+    # 3. Fuzzy match → Category
+    cat_slug = _fuzzy_match_category(value_lower)
+    if cat_slug:
+        return NerEntity(
+            type="CATEGORY",
+            value=value,
+            confidence=confidence * 0.85,
+            category_slug=cat_slug,
+        )
+
+    # 4. Không map được
+    logger.warning(f"[Normalizer] Cannot map ORG/MISC: {value!r}")
+    return NerEntity(
+        type="CATEGORY",
+        value=value,
+        confidence=max(confidence * 0.4, 0.1),
+    )
+
+
+# ============================================================================
+# PRIVATE — Price
+# ============================================================================
+
+def _normalize_price(value: str, confidence: float, raw: dict) -> NerEntity:
+    """PRICE đã được extractor Parse sẵn operator + amount."""
+    return NerEntity(
+        type="PRICE",
+        value=value,
+        confidence=confidence,
+        operator=raw.get("operator"),
+        amount=raw.get("amount"),
+        amount_max=raw.get("amount_max"),
+    )
+
+
+# ============================================================================
+# PRIVATE — Rating
+# ============================================================================
+
+def _normalize_rating(value: str, confidence: float, raw: dict) -> NerEntity:
+    """RATING đã được extractor parse sẵn operator + score."""
+    return NerEntity(
+        type="RATING",
+        value=value,
+        confidence=confidence,
+        operator=raw.get("operator"),
+        amount=raw.get("amount"),
+    )
+
+
+# ============================================================================
+# PRIVATE — Fuzzy Matching Helpers
+# ============================================================================
+
+def _fuzzy_match_business_type(text: str) -> Optional[str]:
+    """RapidFuzz match text against BUSINESS_TYPE_ALIASES keys."""
+    choices = list(BUSINESS_TYPE_ALIASES.keys())
+    if not choices:
+        return None
+
+    result = process.extractOne(
+        text, choices, scorer=fuzz.token_set_ratio
+    )
+    if result and result[1] >= FUZZY_THRESHOLD:
+        matched_key = result[0]
+        return BUSINESS_TYPE_ALIASES[matched_key]
+    return None
+
+
+def _fuzzy_match_category(text: str) -> Optional[str]:
+    """RapidFuzz match text against category cache names."""
+    categories = cache.get_category_list()
+    if not categories:
+        return None
+
+    cat_names = [c["name"] for c in categories]
+
+    result = process.extractOne(
+        text, cat_names, scorer=fuzz.token_set_ratio
+    )
+    if result and result[1] >= FUZZY_THRESHOLD:
+        matched_name = result[0]
+        # Tìm slug tương ứng
+        for c in categories:
+            if c["name"] == matched_name:
+                return c["slug"]
+
+    return None
