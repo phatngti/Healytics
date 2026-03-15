@@ -20,7 +20,6 @@ class ChatbotRequest(BaseModel):
     top_k: int = Field(default=3, ge=1, le=20)
 
     enable_recommendation: bool = True
-    enable_ner: bool = True
 
 
 
@@ -29,21 +28,6 @@ class TokenEvent(BaseModel):
 
     conversation_id: UUID
     text: str
-    timestamp: datetime
-
-
-
-class NerEntity(BaseModel):
-    type: str
-    value: str
-    confidence: float = Field(..., ge=0.0, le=1.0)
-
-
-class NerEvent(BaseModel):
-    event: SSEEventType = SSEEventType.NER
-
-    conversation_id: UUID
-    entities: List[NerEntity]
     timestamp: datetime
 
 

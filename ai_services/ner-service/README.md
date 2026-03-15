@@ -105,7 +105,6 @@ Trích xuất + chuẩn hóa entities từ text.
 **Request:**
 ```json
 {
-  "conversation_id": "123e4567-e89b-12d3-a456-426614174000",
   "text": "Tìm spa ở Hà Nội giá dưới 500k"
 }
 ```
@@ -113,7 +112,6 @@ Trích xuất + chuẩn hóa entities từ text.
 **Response:**
 ```json
 {
-  "conversation_id": "123e4567-e89b-12d3-a456-426614174000",
   "entities": [
     {
       "type": "BUSINESS_TYPE",
