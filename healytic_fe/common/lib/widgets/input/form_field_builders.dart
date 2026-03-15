@@ -60,8 +60,10 @@ class FormFieldBuilders {
     bool uppercaseLabel = true,
     String? initialValue,
     String? Function(dynamic)? validator,
+    Key? widgetKey,
   }) {
     return _AppAutoGenerateTextField(
+      key: widgetKey,
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
       onGenerate: onGenerate,
@@ -124,6 +126,7 @@ class FormFieldBuilders {
     bool uppercaseLabel = true,
     double? width,
     double? height,
+    Key? widgetKey,
   }) {
     // Handle empty label for fieldKey generation
     final generatedFieldKey =
@@ -133,6 +136,7 @@ class FormFieldBuilders {
             : 'field_${(hintText ?? '').toLowerCase().replaceAll(' ', '_')}');
 
     return _AppTextField(
+      key: widgetKey,
       fieldKey: generatedFieldKey,
       label: label,
       labelStyle:
@@ -189,8 +193,10 @@ class FormFieldBuilders {
     String? hintText,
     String? fieldKey,
     bool enabled = true,
+    Key? widgetKey,
   }) {
     return _AppDatePickField(
+      key: widgetKey,
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
       enabled: enabled,
@@ -235,8 +241,10 @@ class FormFieldBuilders {
     Widget? icon,
     bool isRequired = false,
     bool uppercaseLabel = true,
+    Key? widgetKey,
   }) {
     return _AppSelectionField<String>(
+      key: widgetKey,
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
       labelStyle:
@@ -310,8 +318,10 @@ class FormFieldBuilders {
     Widget? icon,
     bool isRequired = false,
     bool uppercaseLabel = true,
+    Key? widgetKey,
   }) {
     return _AppSelectionField<T>(
+      key: widgetKey,
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
       labelStyle:
@@ -371,8 +381,10 @@ class FormFieldBuilders {
     bool isRequired = false,
     TextStyle? labelStyle,
     bool enabled = true,
+    Key? widgetKey,
   }) {
     return _AppMultiSelectChipField<String>(
+      key: widgetKey,
       fieldKey: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label,
       labelStyle:
@@ -422,10 +434,11 @@ class FormFieldBuilders {
     TextStyle? labelStyle,
     bool isRequired = false,
     bool uppercaseLabel = true,
+    Key? widgetKey,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Column(
+    final child = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label.isNotEmpty)
@@ -505,6 +518,14 @@ class FormFieldBuilders {
         ),
       ],
     );
+
+    if (widgetKey != null) {
+      return KeyedSubtree(
+        key: widgetKey,
+        child: child,
+      );
+    }
+    return child;
   }
 
   /// Builds a multi-select popover field.
@@ -530,8 +551,10 @@ class FormFieldBuilders {
     double? width,
     double? height,
     bool enabled = true,
+    Key? widgetKey,
   }) {
     return MultiSelectPickerField<T>(
+      key: widgetKey,
       label: label,
       items: items,
       initialValue: initialValue,
@@ -565,8 +588,9 @@ class FormFieldBuilders {
     double height = 250,
     TextStyle? labelStyle,
     bool enabled = true,
+    Key? widgetKey,
   }) {
-    return _AppQuillEditorField(
+    final widget = _AppQuillEditorField(
       name: fieldKey ?? label.toLowerCase().replaceAll(' ', '_'),
       label: label.toUpperCase(),
       initialValue: initialValue,
@@ -575,5 +599,13 @@ class FormFieldBuilders {
       labelStyle: labelStyle,
       enabled: enabled,
     );
+
+    if (widgetKey != null) {
+      return KeyedSubtree(
+        key: widgetKey,
+        child: widget,
+      );
+    }
+    return widget;
   }
 }

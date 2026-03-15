@@ -303,6 +303,7 @@ const SEED_PRODUCTS = [
     type: HealthServiceType.PHYSICAL,
     basePrice: 280000,
     categorySlug: 'dermatology',
+    vendorName: 'Healytics Pharmacy',
     media: [
       { url: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=800', isThumbnail: true, sortOrder: 0 },
       { url: 'https://images.unsplash.com/photo-1532009877282-3340270e0529?w=800', isThumbnail: false, sortOrder: 1 },
@@ -414,6 +415,7 @@ export class ProductSeeder implements ISeeder {
         type: prodData.type,
         basePrice: prodData.basePrice,
         salePrice: (prodData as any).salePrice ?? null,
+        vendorName: (prodData as any).vendorName ?? null,
         currency: 'VND',
         status: HealthServiceStatus.ACTIVE,
         isVisibleOnline: true,

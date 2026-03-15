@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/widgets/button/button.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/utils/device.dart';
 
 class OnboardScreen extends HookConsumerWidget {
@@ -41,6 +42,7 @@ class OnboardScreen extends HookConsumerWidget {
             child: Column(
               children: [
                 AppButton(
+                  key: keys.onboardPage.signInButton,
                   onPressed: () {
                     // Navigate to the next screen or perform any action
                     context.pushReplacementNamed(SignInRoute.name);
@@ -61,6 +63,7 @@ class OnboardScreen extends HookConsumerWidget {
                 ),
                 (hScreen * 0.02).verticalSpace,
                 AppButton(
+                  key: keys.onboardPage.createAccountButton,
                   onPressed: () {
                     // Navigate to the next screen or perform any action
                     EmailFormRoute().push(context);

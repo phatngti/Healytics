@@ -5,12 +5,22 @@ import 'package:flutter/material.dart';
 
 /// Legal representative information section
 class LegalRepresentativeSection extends StatelessWidget {
-  const LegalRepresentativeSection({this.representative, super.key});
+  const LegalRepresentativeSection({
+    this.representative,
+    this.readOnly = false,
+    super.key,
+  });
 
   final LegalRepresentative? representative;
 
+  /// When true, hides field-level feedback controls
+  final bool readOnly;
+
   @override
   Widget build(BuildContext context) {
+    if (representative == null) {
+      return const SizedBox.shrink();
+    }
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Container(
@@ -38,12 +48,13 @@ class LegalRepresentativeSection extends StatelessWidget {
             padding: AppDimens.paddingAllLarge,
             child: Column(
               children: [
-                // Row 1: Full Name & Position
+                // Row 1: Full Name & Position & ID Type
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: ReviewableField(
+                        readOnly: readOnly,
                         title: 'Full Name',
                         fieldId: representative!.fullName.fieldKey,
                         compactMode: true,
@@ -53,11 +64,12 @@ class LegalRepresentativeSection extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     Expanded(
                       child: ReviewableField(
+                        readOnly: readOnly,
                         title: 'Position',
-                        fieldId: representative!.position!.fieldKey,
+                        fieldId:
+                            representative!.position?.fieldKey ?? 'position',
                         compactMode: true,
                         child: _buildInfoItem(
                           context,
@@ -67,44 +79,50 @@ class LegalRepresentativeSection extends StatelessWidget {
                     ),
                     Expanded(
                       child: ReviewableField(
+                        readOnly: readOnly,
                         title: 'ID Type',
-                        fieldId: representative!.idType!.fieldKey,
+                        fieldId: representative!.idType?.fieldKey ?? 'idType',
                         compactMode: true,
                         child: _buildInfoItem(
                           context,
-                          representative!.idType!.value,
+                          representative?.idType?.value,
                         ),
                       ),
                     ),
                   ],
                 ),
                 AppDimens.verticalMedium,
-                // Row 2: ID Type, ID Number, ID Issue Date
+                // Row 2: ID Number & ID Issue Date
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: ReviewableField(
+                        readOnly: readOnly,
                         title: 'ID Number',
-                        fieldId: representative!.idNumber!.fieldKey,
+                        fieldId:
+                            representative!.idNumber?.fieldKey ?? 'idNumber',
                         compactMode: true,
                         child: _buildInfoItem(
                           context,
-                          representative!.idNumber!.value,
+                          representative?.idNumber?.value,
                           isMono: true,
                         ),
                       ),
                     ),
-                    Spacer(flex: 1),
+                    const Spacer(),
                     Expanded(
                       child: ReviewableField(
+                        readOnly: readOnly,
                         title: 'ID Issue Date',
-                        fieldId: representative!.idIssueDate!.fieldKey,
+                        fieldId:
+                            representative!.idIssueDate?.fieldKey ??
+                            'idIssueDate',
                         compactMode: true,
                         child: _buildInfoItem(
                           context,
-                          representative!.idIssueDate!.value,
+                          representative?.idIssueDate?.value,
                         ),
                       ),
                     ),

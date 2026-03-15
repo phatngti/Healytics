@@ -20,8 +20,11 @@ class DriftStoreRepository extends DriftDatabaseRepository {
         .select(_db.storeValue)
         .watch()
         .asyncExpand(
-          (entities) =>
-              Stream.fromFutures(entities.map((e) async => _toUpdateEvent(e))),
+          (entities) => Stream.fromFutures(
+            entities
+                .where((e) => validStoreKeys.contains(e.id))
+                .map((e) async => _toUpdateEvent(e)),
+          ),
         );
   }
 
@@ -112,6 +115,11 @@ class DriftStoreRepository extends DriftDatabaseRepository {
 
   Future<List<StoreModel<Object>>> getAll() async {
     final entities = await _db.select(_db.storeValue).get();
-    return Future.wait(entities.map((e) => _toUpdateEvent(e)).toList());
+    return Future.wait(
+      entities
+          .where((e) => validStoreKeys.contains(e.id))
+          .map((e) => _toUpdateEvent(e))
+          .toList(),
+    );
   }
 }

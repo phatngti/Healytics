@@ -9,9 +9,16 @@ import 'package:intl/intl.dart';
 
 /// KYC Documents section showing uploaded verification documents
 class KycDocumentsSection extends HookConsumerWidget {
-  const KycDocumentsSection({this.documents, super.key});
+  const KycDocumentsSection({
+    this.documents,
+    this.readOnly = false,
+    super.key,
+  });
 
   final List<KycDocument>? documents;
+
+  /// When true, hides field-level feedback controls
+  final bool readOnly;
 
   /// Document keys for ID card images
   static const _idCardDocumentKeys = {'identity_front', 'identity_back'};
@@ -84,6 +91,7 @@ class KycDocumentsSection extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ReviewableField(
+                            readOnly: readOnly,
                             title: _getDocumentLabel(doc.documentKey),
                             fieldId: doc.documentKey,
                             child: _buildDocumentItem(context, doc),
@@ -112,6 +120,7 @@ class KycDocumentsSection extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ReviewableField(
+                            readOnly: readOnly,
                             title: _getDocumentLabel(doc.documentKey),
                             fieldId: doc.documentKey,
                             child: _buildDocumentItem(context, doc),
@@ -149,6 +158,7 @@ class KycDocumentsSection extends HookConsumerWidget {
               left: doc.documentKey == 'identity_back' ? 6 : 0,
             ),
             child: ReviewableField(
+              readOnly: readOnly,
               title:
                   DocumentTypes.findByKey(doc.documentKey)?.label ??
                   doc.documentKey,

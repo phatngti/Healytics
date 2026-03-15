@@ -259,12 +259,15 @@ class _CertificationList extends StatelessWidget {
                       color: colorScheme.tertiary,
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      cert,
-                      style:
-                          textTheme.labelMedium?.copyWith(
-                        color: colorScheme.tertiary,
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        cert,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            textTheme.labelMedium?.copyWith(
+                          color: colorScheme.tertiary,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],

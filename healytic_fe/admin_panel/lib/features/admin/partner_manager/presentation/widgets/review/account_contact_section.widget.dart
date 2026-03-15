@@ -11,6 +11,7 @@ class AccountContactSection extends StatelessWidget {
     this.email,
     this.isEmailVerified = false,
     this.phoneNumber,
+    this.readOnly = false,
     super.key,
   });
 
@@ -18,6 +19,9 @@ class AccountContactSection extends StatelessWidget {
   final VerifiedFieldEntity<String?>? email;
   final bool isEmailVerified;
   final VerifiedFieldEntity<String?>? phoneNumber;
+
+  /// When true, hides field-level feedback controls
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +56,7 @@ class AccountContactSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: ReviewableField(
+                    readOnly: readOnly,
                     title: 'Username',
                     fieldId: username?.fieldKey ?? 'username',
                     compactMode: true,
@@ -60,6 +65,7 @@ class AccountContactSection extends StatelessWidget {
                 ),
                 Expanded(
                   child: ReviewableField(
+                    readOnly: readOnly,
                     title: 'Email',
                     fieldId: email?.fieldKey ?? 'email',
                     compactMode: true,
@@ -68,6 +74,7 @@ class AccountContactSection extends StatelessWidget {
                 ),
                 Expanded(
                   child: ReviewableField(
+                    readOnly: readOnly,
                     title: 'Phone Number',
                     fieldId: phoneNumber?.fieldKey ?? 'phoneNumber',
                     compactMode: true,

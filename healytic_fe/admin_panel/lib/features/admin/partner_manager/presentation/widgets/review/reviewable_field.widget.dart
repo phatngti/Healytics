@@ -17,6 +17,7 @@ class ReviewableField extends ConsumerStatefulWidget {
     required this.title,
     this.titleStyle,
     this.compactMode = false,
+    this.readOnly = false,
     super.key,
   });
 
@@ -34,6 +35,9 @@ class ReviewableField extends ConsumerStatefulWidget {
 
   /// Use smaller buttons for compact layouts
   final bool compactMode;
+
+  /// When true, hides feedback controls (view-only mode)
+  final bool readOnly;
 
   @override
   ConsumerState<ReviewableField> createState() => _ReviewableFieldState();
@@ -84,6 +88,32 @@ class _ReviewableFieldState extends ConsumerState<ReviewableField> {
     final status = feedback?.status ?? FieldFeedbackStatus.pending;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
+
+    // In readOnly mode, skip feedback controls entirely
+    if (widget.readOnly) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Tooltip(
+            message: widget.title,
+            child: Text(
+              widget.title,
+              style:
+                  widget.titleStyle ??
+                  textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          AppDimens.verticalExtraSmall,
+          widget.child,
+        ],
+      );
+    }
 
     // Build feedback controls widget
     Widget feedbackControls = OverlayPortal(
