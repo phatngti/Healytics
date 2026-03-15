@@ -17,13 +17,6 @@ void main() {
   // final instance = ChatbotApi();
 
   group('tests for ChatbotApi', () {
-    // Get paginated list of conversations
-    //
-    //Future<ConversationListResponseDto> chatbotControllerListConversations({ num page, num limit }) async
-    test('test chatbotControllerListConversations', () async {
-      // TODO
-    });
-
     // Generative Ai Stream
     //
     //Future<Object> generativeAiStreamGenerativeAiStreamPost(ChatbotRequest chatbotRequest) async

@@ -10,6 +10,7 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
+import { Product } from './product.entity';
 
 @Entity('categories')
 export class Category {
@@ -36,6 +37,15 @@ export class Category {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
+  @Column({ name: 'icon_name', type: 'varchar', length: 100, nullable: true })
+  iconName: string | null;
+
+  @Column({ name: 'color_value', type: 'varchar', length: 9, nullable: true })
+  colorValue: string | null;
+
+  @Column({ name: 'sort_order', type: 'int', default: 0 })
+  sortOrder: number;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
@@ -54,4 +64,9 @@ export class Category {
 
   @OneToMany(() => Category, (category) => category.parent)
   children: Category[];
+
+  // Products relation (for serviceCount computation)
+  @OneToMany(() => Product, (product) => product.category)
+  products: Product[];
 }
+

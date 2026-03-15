@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:user_app/core/entities/store.entity.dart';
-import 'package:user_app/core/models/store.model.dart';
+import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 import 'checkout_mock_data.dart';
 
@@ -31,12 +30,12 @@ class CheckoutRemoteDatasourceMock implements CheckoutRemoteDatasource {
   }
 }
 
-/// Switches between real and mock implementations using
-/// [StoreKey.mockFlag].
+/// Switches between real and mock implementations
+/// using [AppEnvironment.useMock].
 final checkoutRemoteDatasourceProvider = Provider<CheckoutRemoteDatasource>((
   ref,
 ) {
-  final useMock = Store.tryGet(StoreKey.mockFlag) == 'true';
+  final useMock = AppEnvironment.current.useMock;
 
   if (useMock) {
     return CheckoutRemoteDatasourceMock();

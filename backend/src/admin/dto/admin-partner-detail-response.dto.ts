@@ -212,8 +212,8 @@ export class AddressInfoDto {
         }
 
         dto.country = 'Vietnam';
-        dto.latitude = null;
-        dto.longitude = null;
+        dto.latitude = partner.latitude;
+        dto.longitude = partner.longitude;
 
         return dto;
     }

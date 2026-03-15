@@ -52,6 +52,24 @@ void main() {
       // TODO
     });
 
+    // Icon identifier for frontend rendering
+    // String iconName
+    test('to test the property `iconName`', () async {
+      // TODO
+    });
+
+    // Hex color value (e.g. #FF6B6B or #FF6B6BCC)
+    // String colorValue
+    test('to test the property `colorValue`', () async {
+      // TODO
+    });
+
+    // Sort order for display (lower = first)
+    // num sortOrder
+    test('to test the property `sortOrder`', () async {
+      // TODO
+    });
+
 
   });
 

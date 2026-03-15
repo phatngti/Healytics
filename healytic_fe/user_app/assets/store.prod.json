@@ -1,0 +1,7 @@
+{
+    "serverEndpoint": "https://healytics.me",
+    "customHeaders": {
+        "deviceModel": "iPhone 13",
+        "deviceType": "iOS"
+    }
+}

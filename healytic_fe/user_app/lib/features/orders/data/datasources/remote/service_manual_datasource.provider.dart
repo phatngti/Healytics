@@ -1,13 +1,12 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:user_app/core/entities/store.entity.dart';
-import 'package:user_app/core/models/store.model.dart';
+import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/features/orders/data/datasources/remote/service_manual_remote_datasource.dart';
 
-/// Uses [StoreKey.mockFlag] to switch between real
-/// and mock implementations at runtime.
+/// Uses [AppEnvironment.useMock] to switch between
+/// real and mock implementations at runtime.
 final serviceManualRemoteDatasourceProvider =
     Provider<ServiceManualRemoteDataSource>((ref) {
-      final useMock = Store.tryGet(StoreKey.mockFlag) == 'true';
+      final useMock = AppEnvironment.current.useMock;
 
       if (useMock) {
         return ServiceManualRemoteDataSourceMock();
@@ -15,3 +14,4 @@ final serviceManualRemoteDatasourceProvider =
 
       return ServiceManualRemoteDataSourceImpl();
     });
+

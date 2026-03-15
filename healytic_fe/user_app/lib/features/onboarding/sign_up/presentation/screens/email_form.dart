@@ -10,6 +10,7 @@ import 'package:common/widgets/toast.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/router/routes.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/utils/device.dart';
 
 class EmailFormScreen extends HookConsumerWidget {
@@ -135,6 +136,7 @@ class EmailFormScreen extends HookConsumerWidget {
                           uppercaseLabel: false,
                           suffixIcon: Icon(Icons.email),
                           controller: emailController,
+                          widgetKey: keys.emailFormPage.emailTextField,
                         ),
                         AppDimens.verticalSmall,
                         Text.rich(
@@ -189,6 +191,7 @@ class EmailFormScreen extends HookConsumerWidget {
                   SizedBox(
                     width: double.infinity,
                     child: AppButton(
+                      key: keys.emailFormPage.continueButton,
                       // 3. Disable nút khi: Email rỗng HOẶC đang Loading
                       onPressed:
                           (emailController.text.isEmpty ||

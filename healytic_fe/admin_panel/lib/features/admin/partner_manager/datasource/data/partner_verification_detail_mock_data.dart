@@ -75,6 +75,8 @@ partnerVerificationDetailMockData = {
       district: _vfLocation('district', 'd001', 'Hoàn Kiếm', isVerified: true),
       city: _vfLocation('city', 'c001', 'Hà Nội', isVerified: true),
       country: 'Vietnam',
+      latitude: 21.0285,
+      longitude: 105.8522,
     ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',
@@ -162,6 +164,8 @@ partnerVerificationDetailMockData = {
       district: _vfLocation('district', 'd001', 'Hoàn Kiếm', isVerified: true),
       city: _vfLocation('city', 'c001', 'Hà Nội', isVerified: true),
       country: 'Vietnam',
+      latitude: 21.0228,
+      longitude: 105.8500,
     ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',
@@ -238,6 +242,8 @@ partnerVerificationDetailMockData = {
       district: _vfLocation('district', 'd001', 'Hoàn Kiếm', isVerified: true),
       city: _vfLocation('city', 'c001', 'Hà Nội', isVerified: true),
       country: 'Vietnam',
+      latitude: 21.0273,
+      longitude: 105.8460,
     ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',
@@ -310,6 +316,8 @@ partnerVerificationDetailMockData = {
       district: _vfLocation('district', 'd001', 'Hoàn Kiếm', isVerified: true),
       city: _vfLocation('city', 'c001', 'Hà Nội', isVerified: true),
       country: 'Vietnam',
+      latitude: 21.0245,
+      longitude: 105.8487,
     ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',
@@ -400,6 +408,8 @@ partnerVerificationDetailMockData = {
       ),
       city: _vfLocation('city', 'c001', 'Hà Nội', isVerified: true),
       country: 'Vietnam',
+      latitude: 21.0193,
+      longitude: 105.8533,
     ),
     email: const VerifiedFieldEntity(
       fieldKey: 'email',

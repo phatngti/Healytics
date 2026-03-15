@@ -12,6 +12,7 @@ import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
 import { S3Module } from '@/s3/s3.module';
 import { AuthModule } from '@/auth/auth.module';
 import { AccountModule } from '@/account/account.module';
+import { MapboxModule } from '@/mapbox/mapbox.module';
 import { RegisterPartnerHandler } from './application/handlers/register-partner.handler';
 import { UpdatePartnerProfileHandler } from './application/handlers/update-partner-profile.handler';
 
@@ -27,6 +28,7 @@ import { UpdatePartnerProfileHandler } from './application/handlers/update-partn
     ]),
     LocationsModule,
     S3Module,
+    MapboxModule,
     forwardRef(() => AuthModule),
   ],
   controllers: [PartnersController, PartnerSelfController],

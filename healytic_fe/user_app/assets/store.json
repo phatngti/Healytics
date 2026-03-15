@@ -1,8 +1,0 @@
-{
-    "serverEndpoint": "http://localhost:8000",
-    "customHeaders": {
-        "deviceModel": "iPhone 13",
-        "deviceType": "iOS"
-    },
-    "mockFlag": "true"
-}
