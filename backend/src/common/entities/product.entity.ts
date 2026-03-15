@@ -41,7 +41,7 @@ export class Product {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   type: HealthServiceType;
 
   // Pricing
@@ -55,7 +55,7 @@ export class Product {
   currency: string;
 
   // Status & Visibility
-  @Column({ length: 20, default: HealthServiceStatus.DRAFT })
+  @Column({ type: 'varchar', length: 20, default: HealthServiceStatus.DRAFT })
   status: HealthServiceStatus;
 
   @Column({ name: 'is_visible_online', default: false })

@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
 
 class AuthSessionStore {
-  bool get isMockMode => Store.tryGet(StoreKey.mockFlag) == 'true';
+  bool get isMockMode => AppEnvironment.current.useMock;
 
   /// Returns true if the user is logged in (has a valid,
   /// non-expired access token or is in mock mode).

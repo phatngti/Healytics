@@ -19,6 +19,9 @@ class CreateCategoryDto {
     this.description,
     this.imageUrl,
     this.isActive,
+    this.iconName,
+    this.colorValue,
+    this.sortOrder,
   });
 
   /// Parent category ID for hierarchical structure
@@ -63,6 +66,33 @@ class CreateCategoryDto {
   ///
   bool? isActive;
 
+  /// Icon identifier for frontend rendering
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? iconName;
+
+  /// Hex color value (e.g. #FF6B6B or #FF6B6BCC)
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? colorValue;
+
+  /// Sort order for display (lower = first)
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  num? sortOrder;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is CreateCategoryDto &&
     other.parentId == parentId &&
@@ -70,7 +100,10 @@ class CreateCategoryDto {
     other.slug == slug &&
     other.description == description &&
     other.imageUrl == imageUrl &&
-    other.isActive == isActive;
+    other.isActive == isActive &&
+    other.iconName == iconName &&
+    other.colorValue == colorValue &&
+    other.sortOrder == sortOrder;
 
   @override
   int get hashCode =>
@@ -80,10 +113,13 @@ class CreateCategoryDto {
     (slug.hashCode) +
     (description == null ? 0 : description!.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
-    (isActive == null ? 0 : isActive!.hashCode);
+    (isActive == null ? 0 : isActive!.hashCode) +
+    (iconName == null ? 0 : iconName!.hashCode) +
+    (colorValue == null ? 0 : colorValue!.hashCode) +
+    (sortOrder == null ? 0 : sortOrder!.hashCode);
 
   @override
-  String toString() => 'CreateCategoryDto[parentId=$parentId, name=$name, slug=$slug, description=$description, imageUrl=$imageUrl, isActive=$isActive]';
+  String toString() => 'CreateCategoryDto[parentId=$parentId, name=$name, slug=$slug, description=$description, imageUrl=$imageUrl, isActive=$isActive, iconName=$iconName, colorValue=$colorValue, sortOrder=$sortOrder]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -108,6 +144,21 @@ class CreateCategoryDto {
       json[r'isActive'] = this.isActive;
     } else {
       json[r'isActive'] = null;
+    }
+    if (this.iconName != null) {
+      json[r'iconName'] = this.iconName;
+    } else {
+      json[r'iconName'] = null;
+    }
+    if (this.colorValue != null) {
+      json[r'colorValue'] = this.colorValue;
+    } else {
+      json[r'colorValue'] = null;
+    }
+    if (this.sortOrder != null) {
+      json[r'sortOrder'] = this.sortOrder;
+    } else {
+      json[r'sortOrder'] = null;
     }
     return json;
   }
@@ -137,6 +188,9 @@ class CreateCategoryDto {
         description: mapValueOfType<String>(json, r'description'),
         imageUrl: mapValueOfType<String>(json, r'imageUrl'),
         isActive: mapValueOfType<bool>(json, r'isActive'),
+        iconName: mapValueOfType<String>(json, r'iconName'),
+        colorValue: mapValueOfType<String>(json, r'colorValue'),
+        sortOrder: num.parse('${json[r'sortOrder']}'),
       );
     }
     return null;

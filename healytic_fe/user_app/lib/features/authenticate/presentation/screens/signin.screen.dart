@@ -6,6 +6,7 @@ import 'package:common/widgets/button/button.dart';
 import 'package:user_app/features/authenticate/presentation/widgets/login_form.widget.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/utils/device.dart';
 
 class SingInScreen extends HookConsumerWidget {
@@ -75,6 +76,7 @@ class SingInScreen extends HookConsumerWidget {
                     FractionallySizedBox(
                       widthFactor: 0.8,
                       child: AppButton(
+                        key: keys.signInPage.googleButton,
                         onPressed: () {
                           // Handle Google sign-in
                         },
@@ -104,6 +106,7 @@ class SingInScreen extends HookConsumerWidget {
                     FractionallySizedBox(
                       widthFactor: 0.8,
                       child: AppButton(
+                        key: keys.signInPage.facebookButton,
                         onPressed: () {
                           // Handle Google sign-in
                         },

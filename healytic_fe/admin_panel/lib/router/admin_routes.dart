@@ -9,6 +9,7 @@ import 'package:admin_panel/features/authenticate/presentation/sign_up/sign_up_f
 import 'package:admin_panel/features/authenticate/presentation/sign_up/sucess_registration.screen.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/partner_manager_screen.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/review_application.screen.dart';
+import 'package:admin_panel/features/admin/partner_manager/presentation/view_partner_detail.screen.dart';
 import 'package:admin_panel/router/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -68,14 +69,20 @@ class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
   ],
 )
 class SignUpRoute extends GoRouteData with $SignUpRoute {
-  const SignUpRoute();
+  const SignUpRoute({this.autofill});
   static const name = "sign-up";
+
+  /// Dev flag: `?autofill=true` pre-fills all
+  /// registration fields.
+  final bool? autofill;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const SignUpFormScreen(),
+      child: SignUpFormScreen(
+        autofill: autofill ?? false,
+      ),
     );
   }
 }
@@ -123,6 +130,10 @@ class SuccessRegistrationRoute extends GoRouteData
     TypedGoRoute<ReviewApplicationRoute>(
       path: '/admin/partner-manager/review/:partnerId',
       name: ReviewApplicationRoute.name,
+    ),
+    TypedGoRoute<ViewPartnerDetailRoute>(
+      path: '/admin/partner-manager/detail/:partnerId',
+      name: ViewPartnerDetailRoute.name,
     ),
     TypedGoRoute<CategoryHomeRoute>(
       path: '/admin/category',
@@ -182,6 +193,30 @@ class ReviewApplicationRoute extends GoRouteData with $ReviewApplicationRoute {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ReviewApplicationScreen(partnerId: partnerId),
+    );
+  }
+}
+
+/// Route for viewing partner details (read-only)
+class ViewPartnerDetailRoute extends GoRouteData
+    with $ViewPartnerDetailRoute {
+  const ViewPartnerDetailRoute({required this.partnerId});
+
+  /// The partner ID to view
+  final String partnerId;
+
+  static const name = 'view-partner-detail';
+
+  @override
+  Page<void> buildPage(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ViewPartnerDetailScreen(
+        partnerId: partnerId,
+      ),
     );
   }
 }

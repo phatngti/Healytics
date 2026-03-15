@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/database/repositories/drift.repository.dart';
 import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/repositories/store.repository.dart';
@@ -17,9 +18,10 @@ abstract final class Bootstrap {
   }) async {
     try {
       final storeRepository = DriftStoreRepository(db);
-      // 1. Dùng rootBundle để load string thay vì File()
-      // Hàm này trả về Future nên cần await
-      final jsonString = await rootBundle.loadString('assets/store.json');
+      final env = AppEnvironment.fromDartDefine();
+      AppEnvironment.setCurrent(env);
+      final jsonString =
+          await rootBundle.loadString(env.assetPath);
 
       final Map<String, dynamic> jsonData = jsonDecode(jsonString);
 

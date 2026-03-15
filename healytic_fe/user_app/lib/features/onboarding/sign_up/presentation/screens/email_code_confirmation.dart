@@ -8,6 +8,7 @@ import 'package:common/widgets/button/button.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/router/router.dart'; // Đảm bảo import đúng Router
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/utils/device.dart';
 
 class EmailCodeConfirmationScreen extends HookConsumerWidget {
@@ -97,6 +98,7 @@ class EmailCodeConfirmationScreen extends HookConsumerWidget {
 
                       // --- PINPUT ---
                       Pinput(
+                        key: keys.codeConfirmationPage.pinput,
                         controller: codeController,
                         length: 5,
                         pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
@@ -160,6 +162,7 @@ class EmailCodeConfirmationScreen extends HookConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: AppButton(
+                    key: keys.codeConfirmationPage.submitButton,
                     buttonType: ButtonType.elevated,
                     // Logic Disable: Chưa nhập đủ 5 số HOẶC đang loading
                     onPressed:

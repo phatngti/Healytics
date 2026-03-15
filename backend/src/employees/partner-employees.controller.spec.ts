@@ -14,7 +14,6 @@ describe('PartnerEmployeesController', () => {
 
   const mockAccountId = 'account-uuid';
   const mockPartnerId = 'partner-uuid';
-  const mockReq = { user: { id: mockAccountId } };
 
   beforeEach(async () => {
     const mockEmployeesService: MockType<EmployeesService> = {
@@ -59,7 +58,7 @@ describe('PartnerEmployeesController', () => {
       employeesService.createDoctor!.mockResolvedValue(expectedEmployee);
 
       // Act
-      const result = await controller.createDoctor(mockReq, dto);
+      const result = await controller.createDoctor(mockAccountId, dto);
 
       // Assert
       expect(result).toEqual(expectedEmployee);
@@ -81,7 +80,7 @@ describe('PartnerEmployeesController', () => {
       employeesService.createSpaTherapist!.mockResolvedValue(expectedEmployee);
 
       // Act
-      const result = await controller.createSpaTherapist(mockReq, dto);
+      const result = await controller.createSpaTherapist(mockAccountId, dto);
 
       // Assert
       expect(result).toEqual(expectedEmployee);
@@ -103,7 +102,7 @@ describe('PartnerEmployeesController', () => {
       employeesService.createMassageTherapist!.mockResolvedValue(expectedEmployee);
 
       // Act
-      const result = await controller.createMassageTherapist(mockReq, dto);
+      const result = await controller.createMassageTherapist(mockAccountId, dto);
 
       // Assert
       expect(result).toEqual(expectedEmployee);
@@ -120,7 +119,7 @@ describe('PartnerEmployeesController', () => {
       employeesService.findAll!.mockResolvedValue(expectedEmployees);
 
       // Act
-      const result = await controller.findAll(mockReq, query);
+      const result = await controller.findAll(mockAccountId, query);
 
       // Assert
       expect(result).toEqual(expectedEmployees);
@@ -135,7 +134,7 @@ describe('PartnerEmployeesController', () => {
       employeesService.findAll!.mockResolvedValue(expectedEmployees);
 
       // Act
-      const result = await controller.findAll(mockReq, query);
+      const result = await controller.findAll(mockAccountId, query);
 
       // Assert
       expect(result).toEqual(expectedEmployees);
@@ -151,7 +150,7 @@ describe('PartnerEmployeesController', () => {
       employeesService.findOneForPartner!.mockResolvedValue(expectedEmployee);
 
       // Act
-      const result = await controller.findOne(mockReq, id);
+      const result = await controller.findOne(mockAccountId, id);
 
       // Assert
       expect(result).toEqual(expectedEmployee);
@@ -169,7 +168,7 @@ describe('PartnerEmployeesController', () => {
       employeesService.updateForPartner!.mockResolvedValue(expectedEmployee);
 
       // Act
-      const result = await controller.update(mockReq, id, dto);
+      const result = await controller.update(mockAccountId, id, dto);
 
       // Assert
       expect(result).toEqual(expectedEmployee);
@@ -185,7 +184,7 @@ describe('PartnerEmployeesController', () => {
       employeesService.removeForPartner!.mockResolvedValue(undefined);
 
       // Act
-      await controller.remove(mockReq, id);
+      await controller.remove(mockAccountId, id);
 
       // Assert
       expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(mockAccountId);

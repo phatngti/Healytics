@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account } from '@/common/entities/account.entity';
+import { UserProfile } from '@/common/entities/user-profile.entity';
 import { Category } from '@/common/entities/category.entity';
 import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
 import { ProductTag } from '@/common/entities/product-tag.entity';
@@ -13,6 +14,8 @@ import { ProductResourceRequirement } from '@/common/entities/product-resource-r
 import { ResourceType } from '@/common/entities/resource-type.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Partner } from '@/common/entities/partner.entity';
+import { LegalRepresentative } from '@/common/entities/legal-representative.entity';
+import { PartnerDocument } from '@/common/entities/partner-document.entity';
 import { ProductReview } from '@/common/entities/product-review.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 import { ProductMedia } from '@/common/entities/product-media.entity';
@@ -28,6 +31,7 @@ import { SeederService } from './seeder.service';
   imports: [
     TypeOrmModule.forFeature([
       Account,
+      UserProfile,
       Category,
       ProductFeatureTag,
       ProductTag,
@@ -40,6 +44,8 @@ import { SeederService } from './seeder.service';
       ResourceType,
       ProductEmployeeEligibility,
       Partner,
+      LegalRepresentative,
+      PartnerDocument,
       ProductReview,
       ProductFacilityImage,
       ProductMedia,

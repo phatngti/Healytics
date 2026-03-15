@@ -1,6 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:user_app/core/entities/store.entity.dart';
-import 'package:user_app/core/models/store.model.dart';
+import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/features/orders/domain/entities/appointment.entity.dart';
 
 import 'appointment_mock_data.dart';
@@ -71,11 +70,11 @@ class AppointmentRemoteDatasourceMock implements AppointmentRemoteDatasource {
   }
 }
 
-/// Uses [StoreKey.mockFlag] to switch between real and
-/// mock implementations at runtime.
+/// Uses [AppEnvironment.useMock] to switch between
+/// real and mock implementations at runtime.
 final appointmentRemoteDatasourceProvider =
     Provider<AppointmentRemoteDatasource>((ref) {
-      final useMock = Store.tryGet(StoreKey.mockFlag) == 'true';
+      final useMock = AppEnvironment.current.useMock;
 
       if (useMock) {
         return AppointmentRemoteDatasourceMock();

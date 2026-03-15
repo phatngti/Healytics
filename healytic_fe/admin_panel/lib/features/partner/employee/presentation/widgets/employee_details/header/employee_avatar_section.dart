@@ -36,7 +36,9 @@ class EmployeeAvatarSection extends StatelessWidget {
               backgroundImage: avatar.isNotEmpty
                   ? CachedNetworkImageProvider(avatar)
                   : null,
-              onBackgroundImageError: (_, __) {},
+              onBackgroundImageError: avatar.isNotEmpty
+                  ? (_, __) {}
+                  : null,
               child: avatar.isEmpty
                   ? Text(
                       _getInitials(fullName),
