@@ -9,7 +9,7 @@ import { ISeeder } from '../seeder.interface';
 const SEED_FEATURE_TAGS = [
   { name: 'Pain Relief', description: 'Pain management and relief services', colorValue: "#FF4CAF50" },
   { name: 'Relaxation', description: 'Relaxation and stress relief services', colorValue: "#FF2196F3" },
-  { name: 'Rehabilitation', description: 'Functional rehabilitation services', colorValue: "#xFFFF9800" },
+  { name: 'Rehabilitation', description: 'Functional rehabilitation services', colorValue: "#FFFF9800" },
   { name: 'Beauty', description: 'Beauty and aesthetic services', colorValue: "#FFE91E63" },
   { name: 'Skincare', description: 'Skincare and dermatology services', colorValue: "#FF9C27B0" },
 ];

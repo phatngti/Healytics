@@ -10,6 +10,7 @@ import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:common/widgets/toast.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 
 class LoginForm extends HookConsumerWidget {
   const LoginForm({super.key});
@@ -76,6 +77,7 @@ class LoginForm extends HookConsumerWidget {
               controller: emailController,
               suffixIcon: Icon(Icons.email),
               uppercaseLabel: false,
+              widgetKey: keys.signInPage.emailTextField,
               validator: (value) {
                 if (value == null || value.toString().isEmpty) {
                   return 'Please enter your email address';
@@ -95,6 +97,7 @@ class LoginForm extends HookConsumerWidget {
               controller: passwordController,
               obscureText: !isPasswordVisible.value,
               uppercaseLabel: false,
+              widgetKey: keys.signInPage.passwordTextField,
               suffixIcon: IconButton(
                 onPressed: () {
                   isPasswordVisible.value = !isPasswordVisible.value;
@@ -116,6 +119,7 @@ class LoginForm extends HookConsumerWidget {
             // AppDimens.verticalSmall,
             SizedBox(
               child: AppButton(
+                key: keys.signInPage.forgotPasswordButton,
                 buttonType: ButtonType.text,
                 onPressed: () {
                   // Handle forgot password action
@@ -134,6 +138,7 @@ class LoginForm extends HookConsumerWidget {
               child: FractionallySizedBox(
                 widthFactor: 0.8,
                 child: AppButton(
+                  key: keys.signInPage.signInButton,
                   onPressed: isLoading.value ? null : signIn,
                   buttonType: ButtonType.elevated,
                   customStyle: ElevatedButton.styleFrom(

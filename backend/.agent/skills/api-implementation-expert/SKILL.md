@@ -55,6 +55,7 @@ These bundle auth guards, roles, Swagger config, route prefix, and serialization
 
 | Decorator | Role | Route Prefix | Import |
 |-----------|------|-------------|--------|
+| `@PublicApi('resource')` | None (public) | `/v1/{resource}` | `@/common/decorators/api/public-api.decorator` |
 | `@PartnerApi('resource')` | `HEALTH_PARTNER` | `/v1/partner/{resource}` | `@/common/decorators/api/partner-api.decorator` |
 | `@AdminApi('resource')` | `ADMIN_ROLES` | `/v1/admin/{resource}` | `@/common/decorators/api/admin-api.decorator` |
 | `@UserApi('resource')` | `USER` | `/v1/user/{resource}` | `@/common/decorators/api/user-api.decorator` |
@@ -599,6 +600,7 @@ import { Role } from '@/account/enum/role.enum';
 import { ADMIN_ROLES, ALL_ROLES, USER_ROLES } from '@/auth/constants/role-groups';
 
 // === COMPOSITE API DECORATORS ===
+import { PublicApi } from '@/common/decorators/api/public-api.decorator';
 import { PartnerApi } from '@/common/decorators/api/partner-api.decorator';
 import { AdminApi } from '@/common/decorators/api/admin-api.decorator';
 import { UserApi } from '@/common/decorators/api/user-api.decorator';

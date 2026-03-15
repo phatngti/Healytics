@@ -8,7 +8,7 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**conversationId** | **String** |  | 
+**conversationId** | **String** |  | [optional] 
 **userId** | **String** |  | 
 **message** | **String** |  | 
 **topK** | **int** |  | [optional] [default to 3]

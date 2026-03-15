@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  OnModuleInit,
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +9,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from '@/common/entities/category.entity';
 import { CategoryResponseDto } from './dto/category-response.dto';
+import { AdminCategoryResponseDto } from './dto/admin-category-response.dto';
 import { CreateCategoryHandler } from './application/handlers/create-category.handler';
 import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
 import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';
@@ -20,7 +20,7 @@ import { RemoveCategoryHandler } from './application/handlers/remove-category.ha
  * Supports hierarchical categories with parent-child relationships.
  */
 @Injectable()
-export class CategoriesService implements OnModuleInit {
+export class CategoriesService {
   private readonly logger = new Logger(CategoriesService.name);
 
   constructor(
@@ -30,44 +30,6 @@ export class CategoriesService implements OnModuleInit {
     private readonly updateCategoryHandler: UpdateCategoryHandler,
     private readonly removeCategoryHandler: RemoveCategoryHandler,
   ) {}
-
-  /**
-   * Seeds default categories on module initialization.
-   */
-  async onModuleInit(): Promise<void> {
-    await this.seedCategories();
-  }
-
-  /**
-   * Seeds default categories if none exist.
-   */
-  private async seedCategories(): Promise<void> {
-    const count = await this.categoryRepository.count();
-    if (count > 0) {
-      this.logger.log('Categories already seeded, skipping...');
-      return;
-    }
-    const categories = [
-      { slug: 'skincare', name: 'Skincare' },
-      { slug: 'massage', name: 'Massage' },
-      { slug: 'facial-therapy', name: 'Facial Therapy' },
-      { slug: 'hair-care', name: 'Hair Care' },
-      { slug: 'supplements', name: 'Supplements' },
-      { slug: 'body-treatment', name: 'Body Treatment' },
-      { slug: 'wellness', name: 'Wellness' },
-    ];
-    this.logger.log('Seeding categories...');
-    for (const cat of categories) {
-      await this.categoryRepository.save(
-        this.categoryRepository.create({
-          slug: cat.slug,
-          name: cat.name,
-          isActive: true,
-        }),
-      );
-    }
-    this.logger.log('Categories seeded successfully.');
-  }
 
   /**
    * Facade: Delegates to CreateCategoryHandler.
@@ -165,4 +127,67 @@ export class CategoriesService implements OnModuleInit {
   async remove(id: string): Promise<void> {
     return this.removeCategoryHandler.execute(id);
   }
+
+  /**
+   * Retrieves all categories for admin, including iconName, colorValue, sortOrder,
+   * and a computed serviceCount (number of products using this category).
+   */
+  async findAllForAdmin(): Promise<AdminCategoryResponseDto[]> {
+    const categories = await this.categoryRepository
+      .createQueryBuilder('cat')
+      .leftJoinAndSelect('cat.parent', 'parent')
+      .leftJoinAndSelect('cat.children', 'children')
+      .loadRelationCountAndMap('cat.serviceCount', 'cat.products')
+      .orderBy('cat.sortOrder', 'ASC')
+      .addOrderBy('cat.name', 'ASC')
+      .withDeleted()
+      .where('cat.deletedAt IS NULL')
+      .getMany();
+
+    return AdminCategoryResponseDto.fromEntities(
+      categories as (Category & { serviceCount: number })[],
+    );
+  }
+
+  /**
+   * Retrieves a single category for admin by ID, including computed serviceCount.
+   */
+  async findOneForAdmin(id: string): Promise<AdminCategoryResponseDto> {
+    const category = await this.categoryRepository
+      .createQueryBuilder('cat')
+      .leftJoinAndSelect('cat.parent', 'parent')
+      .leftJoinAndSelect('cat.children', 'children')
+      .loadRelationCountAndMap('cat.serviceCount', 'cat.products')
+      .where('cat.id = :id', { id })
+      .getOne();
+
+    if (!category) {
+      this.logger.warn(`Category not found: ${id}`);
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+
+    return AdminCategoryResponseDto.fromEntity(
+      category as Category & { serviceCount: number },
+    );
+  }
+
+  /**
+   * Facade for admin create: delegates to handler then returns admin DTO with serviceCount.
+   */
+  async createForAdmin(createCategoryDto: CreateCategoryDto): Promise<AdminCategoryResponseDto> {
+    const entity = await this.createCategoryHandler.execute(createCategoryDto);
+    return this.findOneForAdmin(entity.id);
+  }
+
+  /**
+   * Facade for admin update: delegates to handler then returns admin DTO with serviceCount.
+   */
+  async updateForAdmin(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<AdminCategoryResponseDto> {
+    await this.updateCategoryHandler.execute(id, updateCategoryDto);
+    return this.findOneForAdmin(id);
+  }
 }
+

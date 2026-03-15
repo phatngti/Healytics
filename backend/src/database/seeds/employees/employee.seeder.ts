@@ -15,43 +15,59 @@ import { ISeeder } from '../seeder.interface';
 const SEED_EMPLOYEES = [
   {
     employeeCode: 'EMP-001',
-    fullName: 'Dr. James Anderson',
+    firstName: 'James',
+    lastName: 'Anderson',
     displayName: 'Dr. Anderson',
     email: 'doctor.anderson@healytics.vn',
     phone: '0901000001',
     jobTitle: 'General Practitioner',
     role: EmployeeRole.DOCTOR,
     gender: Gender.MALE,
+    dob: new Date('1985-03-15'),
+    startDate: new Date('2020-06-01'),
+    employmentType: 'Full-time',
   },
   {
     employeeCode: 'EMP-002',
-    fullName: 'Sarah Mitchell',
+    firstName: 'Sarah',
+    lastName: 'Mitchell',
     displayName: 'Sarah M.',
     email: 'therapist.mitchell@healytics.vn',
     phone: '0901000002',
     jobTitle: 'Physical Therapy Technician',
     role: EmployeeRole.THERAPIST,
     gender: Gender.FEMALE,
+    dob: new Date('1990-07-22'),
+    startDate: new Date('2021-02-15'),
+    employmentType: 'Full-time',
   },
   {
     employeeCode: 'EMP-003',
-    fullName: 'David Nguyen',
+    firstName: 'David',
+    lastName: 'Nguyen',
     displayName: 'David N.',
     email: 'reception.nguyen@healytics.vn',
     phone: '0901000003',
     jobTitle: 'Receptionist',
     role: EmployeeRole.RECEPTIONIST,
     gender: Gender.MALE,
+    dob: new Date('1995-11-08'),
+    startDate: new Date('2023-01-10'),
+    employmentType: 'Full-time',
   },
   {
     employeeCode: 'EMP-004',
-    fullName: 'Emily Parker',
+    firstName: 'Emily',
+    lastName: 'Parker',
     displayName: 'Emily P.',
     email: 'manager.parker@healytics.vn',
     phone: '0901000004',
     jobTitle: 'Branch Manager',
     role: EmployeeRole.MANAGER,
     gender: Gender.FEMALE,
+    dob: new Date('1988-05-30'),
+    startDate: new Date('2019-09-01'),
+    employmentType: 'Full-time',
   },
 ];
 
@@ -136,7 +152,7 @@ export class EmployeeSeeder implements ISeeder {
       });
 
       await this.employeeRepo.save(employee);
-      this.logger.log(`  ✅ Created employee "${empData.fullName}" (${empData.role}) → partner: ${partner?.brandName ?? 'none'}`);
+      this.logger.log(`  ✅ Created employee "${employee.fullName}" (${empData.role}) → partner: ${partner?.brandName ?? 'none'}`);
 
       await this.seedProfiles(employee);
     }

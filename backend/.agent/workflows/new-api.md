@@ -441,3 +441,9 @@ import { Throttle } from '@nestjs/throttler';
 import { Audit } from '@/audit/decorators/audit.decorator';
 import { AuditInterceptor } from '@/audit/interceptors/audit.interceptor';
 ```
+
+---
+
+## 13. Update Module Todos
+
+After verifying, run the `/update-todos` workflow to document this implementation in `todos/<module-name>/`.

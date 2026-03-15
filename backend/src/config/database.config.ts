@@ -11,4 +11,7 @@ export default registerAs('database', () => ({
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/../../migrations/scripts/*{.ts,.js}'],
   // migrationsRun: false,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 }));

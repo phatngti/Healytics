@@ -13,7 +13,7 @@ part of openapi.api;
 class ChatbotRequest {
   /// Returns a new [ChatbotRequest] instance.
   ChatbotRequest({
-    required this.conversationId,
+    this.conversationId,
     required this.userId,
     required this.message,
     this.topK = 3,
@@ -21,7 +21,7 @@ class ChatbotRequest {
     this.enableNer = true,
   });
 
-  String conversationId;
+  String? conversationId;
 
   String userId;
 
@@ -47,7 +47,7 @@ class ChatbotRequest {
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (conversationId.hashCode) +
+    (conversationId == null ? 0 : conversationId!.hashCode) +
     (userId.hashCode) +
     (message.hashCode) +
     (topK.hashCode) +
@@ -59,7 +59,11 @@ class ChatbotRequest {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+    if (this.conversationId != null) {
       json[r'conversation_id'] = this.conversationId;
+    } else {
+      json[r'conversation_id'] = null;
+    }
       json[r'user_id'] = this.userId;
       json[r'message'] = this.message;
       json[r'top_k'] = this.topK;
@@ -87,7 +91,7 @@ class ChatbotRequest {
       }());
 
       return ChatbotRequest(
-        conversationId: mapValueOfType<String>(json, r'conversation_id')!,
+        conversationId: mapValueOfType<String>(json, r'conversation_id'),
         userId: mapValueOfType<String>(json, r'user_id')!,
         message: mapValueOfType<String>(json, r'message')!,
         topK: mapValueOfType<int>(json, r'top_k') ?? 3,
@@ -140,7 +144,6 @@ class ChatbotRequest {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'conversation_id',
     'user_id',
     'message',
   };
