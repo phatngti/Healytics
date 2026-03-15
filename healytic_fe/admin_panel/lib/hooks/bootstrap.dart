@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:admin_panel/core/config/app_environment.dart';
 import 'package:admin_panel/core/database/repositories/drift.repository.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/repositories/store.repository.dart';
@@ -17,11 +18,12 @@ abstract final class Bootstrap {
   }) async {
     try {
       final storeRepository = DriftStoreRepository(db);
-      // 1. Dùng rootBundle để load string thay vì File()
-      // Hàm này trả về Future nên cần await
-      final jsonString = await rootBundle.loadString('assets/store.json');
+      final env = AppEnvironment.fromDartDefine();
+      final jsonString = await rootBundle.loadString(env.assetPath);
 
       final Map<String, dynamic> jsonData = jsonDecode(jsonString);
+
+      print("jsonData $jsonData");
 
       for (var key in jsonData.keys) {
         final storeKey = StoreKey.values.firstWhere(
@@ -39,7 +41,7 @@ abstract final class Bootstrap {
           _ => null,
         };
 
-        if (value != null) {
+        if (value != null && value != '') {
           await storeRepository.insert(storeKey, value);
         }
       }

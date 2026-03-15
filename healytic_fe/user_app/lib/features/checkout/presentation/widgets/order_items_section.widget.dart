@@ -202,7 +202,7 @@ class _OrderItemCard extends StatelessWidget {
       RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
       (m) => '${m[1]},',
     );
-    return '${formatted}đ';
+    return '$formattedđ';
   }
 }
 

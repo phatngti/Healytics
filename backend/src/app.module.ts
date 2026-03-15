@@ -14,7 +14,14 @@ import { LocationsModule } from './locations/locations.module';
 import { PartnersModule } from './partners/partners.module';
 import { AdminModule } from './admin/admin.module';
 import { ChatbotModule } from './chatbot/chatbot.module';
+import { RedisModule } from './redis/redis.module';
+import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
+import { BookingModule } from './booking/booking.module';
+import { MapboxModule } from './mapbox/mapbox.module';
 import databaseConfig from './config/database.config';
+import redisConfig from './config/redis.config';
+import rabbitmqConfig from './config/rabbitmq.config';
+import mapboxConfig from './config/mapbox.config';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
@@ -25,7 +32,7 @@ import { PublicThrottlerGuard } from './common/guards';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-      load: [databaseConfig],
+      load: [databaseConfig, redisConfig, rabbitmqConfig, mapboxConfig],
     }),
     // Rate limiting: 100 requests per 60 seconds for public routes
     ThrottlerModule.forRoot([{
@@ -46,9 +53,12 @@ import { PublicThrottlerGuard } from './common/guards';
           database: db.database,
           entities: db.entities,
           synchronize: db.synchronize || process.env.NODE_ENV === 'development',
+          ssl: db.ssl,
         } as const;
       },
     }),
+    RedisModule,
+    RabbitMQModule,
     AuthModule,
     AccountModule,
     EmployeesModule,
@@ -60,6 +70,8 @@ import { PublicThrottlerGuard } from './common/guards';
     PartnersModule,
     AdminModule,
     ChatbotModule,
+    BookingModule,
+    MapboxModule,
   ],
   providers: [
     {

@@ -1,21 +1,17 @@
 import {
-  Controller,
   Post,
   Get,
   Param,
   Delete,
   Body,
-  UseInterceptors,
-  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
-  ApiTags,
   ApiOperation,
   ApiParam,
   ApiCreatedResponse,
   ApiOkResponse,
 } from '@nestjs/swagger';
-
+import { PublicApi } from '@/common/decorators/api/public-api.decorator';
 import { S3Service } from './s3.service';
 import {
   PresignRequestDto,
@@ -23,23 +19,20 @@ import {
   FileUrlResponseDto,
   DeleteFileResponseDto,
 } from './dto';
-import { Public } from '@/common/decorators/auth/public.decorator';
-import { Throttle } from '@/common/decorators/auth/throttle.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 /**
- * Controller for S3-compatible storage operations.
+ * Public controller for S3-compatible storage operations.
  * Handles file uploads, downloads, and deletions via presigned URLs.
+ * Route prefix: /v1/s3
  */
-@ApiTags('S3')
-@Controller('s3')
-@UseInterceptors(ClassSerializerInterceptor)
+@PublicApi('s3')
 export class S3Controller {
   constructor(private readonly s3Service: S3Service) {}
 
   /**
    * Generates a presigned URL for uploading a file.
    */
-  @Public()
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('presign')
   @ApiOperation({ summary: 'Get presigned upload URL' })
@@ -54,7 +47,6 @@ export class S3Controller {
   /**
    * Gets the public or signed URL for a file.
    */
-  @Public()
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   @Get(':key')
   @ApiOperation({ summary: 'Get file URL' })

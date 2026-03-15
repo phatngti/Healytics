@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_detail.entity.dart';
+import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/map_preview.widget.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/reviewable_field.widget.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:common/utils/demensions.dart';
@@ -12,6 +13,7 @@ class BusinessOverviewSection extends StatelessWidget {
     this.isTaxCodeValid = false,
     required this.businessTypes,
     this.address,
+    this.readOnly = false,
     super.key,
   });
 
@@ -20,6 +22,9 @@ class BusinessOverviewSection extends StatelessWidget {
   final bool isTaxCodeValid;
   final VerifiedFieldEntity<List<String>> businessTypes;
   final AddressInfo? address;
+
+  /// When true, hides field-level feedback controls
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +64,7 @@ class BusinessOverviewSection extends StatelessWidget {
                   children: [
                     Expanded(
                       child: ReviewableField(
+                        readOnly: readOnly,
                         title: 'Brand Name',
                         fieldId: brandName.fieldKey,
                         child: _buildLabelValue(
@@ -71,6 +77,7 @@ class BusinessOverviewSection extends StatelessWidget {
                     Spacer(flex: 1),
                     Expanded(
                       child: ReviewableField(
+                        readOnly: readOnly,
                         title: 'Tax Code',
                         fieldId: taxRegistrationCode!.fieldKey,
                         child: _buildTaxCode(context, semantics),
@@ -82,6 +89,7 @@ class BusinessOverviewSection extends StatelessWidget {
 
                 // Business Types
                 ReviewableField(
+                  readOnly: readOnly,
                   title: 'Business Types',
                   fieldId: businessTypes.fieldKey,
                   child: Column(
@@ -142,39 +150,58 @@ class BusinessOverviewSection extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: ReviewableField(
-                                title: 'Province/City',
-                                fieldId: address!.city!.fieldKey,
-                                compactMode: true,
-                                child: _buildAddressField(
-                                  context,
-                                  address!.city!.value.name,
-                                ),
-                              ),
+                              child: address!.city != null
+                                  ? ReviewableField(
+                                      readOnly: readOnly,
+                                      title: 'Province/City',
+                                      fieldId: address!.city!.fieldKey,
+                                      compactMode: true,
+                                      child: _buildAddressField(
+                                        context,
+                                        address!.city!.value.name,
+                                      ),
+                                    )
+                                  : _buildAddressFieldPlaceholder(
+                                      context,
+                                      'Province/City',
+                                    ),
                             ),
                             AppDimens.horizontalMedium,
                             Expanded(
-                              child: ReviewableField(
-                                title: 'District',
-                                fieldId: address!.district!.fieldKey,
-                                compactMode: true,
-                                child: _buildAddressField(
-                                  context,
-                                  address!.district!.value.name,
-                                ),
-                              ),
+                              child: address!.district != null
+                                  ? ReviewableField(
+                                      readOnly: readOnly,
+                                      title: 'District',
+                                      fieldId:
+                                          address!.district!.fieldKey,
+                                      compactMode: true,
+                                      child: _buildAddressField(
+                                        context,
+                                        address!.district!.value.name,
+                                      ),
+                                    )
+                                  : _buildAddressFieldPlaceholder(
+                                      context,
+                                      'District',
+                                    ),
                             ),
                             AppDimens.horizontalMedium,
                             Expanded(
-                              child: ReviewableField(
-                                title: 'Ward',
-                                fieldId: address!.ward!.fieldKey,
-                                compactMode: true,
-                                child: _buildAddressField(
-                                  context,
-                                  address!.ward!.value.name,
-                                ),
-                              ),
+                              child: address!.ward != null
+                                  ? ReviewableField(
+                                      readOnly: readOnly,
+                                      title: 'Ward',
+                                      fieldId: address!.ward!.fieldKey,
+                                      compactMode: true,
+                                      child: _buildAddressField(
+                                        context,
+                                        address!.ward!.value.name,
+                                      ),
+                                    )
+                                  : _buildAddressFieldPlaceholder(
+                                      context,
+                                      'Ward',
+                                    ),
                             ),
                           ],
                         ),
@@ -186,21 +213,32 @@ class BusinessOverviewSection extends StatelessWidget {
                             // Street Address
                             Expanded(
                               flex: 3,
-                              child: ReviewableField(
-                                title: 'Street Address',
-                                fieldId: address!.streetAddress!.fieldKey,
-                                compactMode: true,
-                                child: _buildAddressField(
-                                  context,
-                                  address!.streetAddress?.value,
-                                ),
-                              ),
+                              child: address!.streetAddress != null
+                                  ? ReviewableField(
+                                      readOnly: readOnly,
+                                      title: 'Street Address',
+                                      fieldId: address!
+                                          .streetAddress!
+                                          .fieldKey,
+                                      compactMode: true,
+                                      child: _buildAddressField(
+                                        context,
+                                        address!.streetAddress?.value,
+                                      ),
+                                    )
+                                  : _buildAddressFieldPlaceholder(
+                                      context,
+                                      'Street Address',
+                                    ),
                             ),
                             AppDimens.horizontalMedium,
-                            // Map Placeholder
+                            // Map Preview
                             Expanded(
                               flex: 2,
-                              child: _buildMapPlaceholder(context),
+                              child: MapPreviewWidget(
+                                latitude: address!.latitude,
+                                longitude: address!.longitude,
+                              ),
                             ),
                           ],
                         ),
@@ -286,40 +324,27 @@ class BusinessOverviewSection extends StatelessWidget {
     );
   }
 
-  Widget _buildMapPlaceholder(BuildContext context) {
+  /// Placeholder for address fields that are null
+  Widget _buildAddressFieldPlaceholder(
+    BuildContext context,
+    String label,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Container(
-      height: 96,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: AppDimens.radiusSmall,
-      ),
-      child: Stack(
-        children: [
-          // Grid pattern
-          Positioned.fill(
-            child: CustomPaint(painter: _GridPatternPainter(colorScheme)),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
           ),
-          // Map icon
-          Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.map, size: 18, color: colorScheme.onSurfaceVariant),
-                AppDimens.horizontalExtraSmall,
-                Text(
-                  'Map Preview',
-                  style: textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+        AppDimens.verticalSmall,
+        _buildAddressField(context, 'N/A'),
+      ],
     );
   }
 
@@ -347,35 +372,12 @@ class BusinessOverviewSection extends StatelessWidget {
         Text(
           value,
           style: isLarge
-              ? textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
+              ? textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                )
               : textTheme.bodyMedium,
         ),
       ],
     );
   }
-}
-
-/// Custom painter for grid pattern in map placeholder
-class _GridPatternPainter extends CustomPainter {
-  _GridPatternPainter(this.colorScheme);
-
-  final ColorScheme colorScheme;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = colorScheme.onSurfaceVariant.withValues(alpha: 0.1)
-      ..strokeWidth = 1;
-
-    const spacing = 10.0;
-
-    for (var x = 0.0; x < size.width; x += spacing) {
-      for (var y = 0.0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), 1, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

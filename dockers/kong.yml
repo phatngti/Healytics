@@ -11,7 +11,7 @@ services:
           - /backend
         strip_path: true # Strips /api prefix, remainder is appended to service URL
   - name: ai-service
-    url: http://192.168.60.213:9000
+    url: https://u3gextiarhvqdt-9000.proxy.runpod.net
     connect_timeout: 600000
     write_timeout: 600000
     read_timeout: 600000

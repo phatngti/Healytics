@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:common/widgets/adaptive_root_scaffold/adaptive_root_scraffold.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/bot_chat/presentation/screens/chat_page.dart';
 import 'package:user_app/features/bot_chat/presentation/screens/conversation_history_page.dart';
 import 'package:user_app/features/home/presentation/screens/home_page.screen.dart';
@@ -95,7 +96,16 @@ class MobileWrapperRoutes extends StatefulShellRouteData {
     GoRouterState state,
     StatefulNavigationShell navigationShell,
   ) {
-    return AdaptiveRootScraffold(navigationShell: navigationShell);
+    return AdaptiveRootScraffold(
+      navigationShell: navigationShell,
+      destinationKeys: [
+        keys.bottomNav.homeTab,
+        keys.bottomNav.ordersTab,
+        keys.bottomNav.chatTab,
+        keys.bottomNav.notificationsTab,
+        keys.bottomNav.profileTab,
+      ],
+    );
   }
 }
 

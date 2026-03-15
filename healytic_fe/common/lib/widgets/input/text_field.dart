@@ -140,7 +140,6 @@ class _AppTextField extends StatelessWidget {
       width: width,
       height: height,
       child: FormBuilderField(
-        key: key,
         validator: validator,
         name: fieldKey,
         initialValue: controller != null ? controller!.text : initialValue,
@@ -179,6 +178,7 @@ class _AppTextField extends StatelessWidget {
                   ),
                 ),
               TextFormField(
+                key: key,
                 initialValue: controller != null
                     ? null
                     : field.value?.toString(),

@@ -78,6 +78,32 @@ export class Partner {
     @Column({ name: 'street_address', length: 300 })
     streetAddress: string;
 
+    @Column({ name: 'coordinates', type: 'text', nullable: true })
+    coordinates: string | null;
+
+    @Column({
+        name: 'location',
+        type: 'geography',
+        spatialFeatureType: 'Point',
+        srid: 4326,
+        nullable: true,
+    })
+    location: object | null;
+
+    /** Parse latitude from comma-separated coordinates string */
+    get latitude(): number | null {
+        if (!this.coordinates) return null;
+        const lat = parseFloat(this.coordinates.split(',')[0]);
+        return isNaN(lat) ? null : lat;
+    }
+
+    /** Parse longitude from comma-separated coordinates string */
+    get longitude(): number | null {
+        if (!this.coordinates) return null;
+        const lng = parseFloat(this.coordinates.split(',')[1]);
+        return isNaN(lng) ? null : lng;
+    }
+
     @Column({ name: 'phone_number', type: 'varchar', length: 20, nullable: true })
     phoneNumber: string | null;
 

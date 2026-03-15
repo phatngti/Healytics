@@ -190,14 +190,22 @@ class ApiClient {
           return AddressDto.fromJson(value);
         case 'AddressInfoDto':
           return AddressInfoDto.fromJson(value);
+        case 'AdminCategoryResponseDto':
+          return AdminCategoryResponseDto.fromJson(value);
         case 'AdminLoginDto':
           return AdminLoginDto.fromJson(value);
         case 'AdminPartnerDetailResponseDto':
           return AdminPartnerDetailResponseDto.fromJson(value);
+        case 'AsyncCheckoutDto':
+          return AsyncCheckoutDto.fromJson(value);
+        case 'AsyncCheckoutResponseDto':
+          return AsyncCheckoutResponseDto.fromJson(value);
         case 'AttachTagResponseDto':
           return AttachTagResponseDto.fromJson(value);
         case 'AuthTokensDto':
           return AuthTokensDto.fromJson(value);
+        case 'BookingResponseDto':
+          return BookingResponseDto.fromJson(value);
         case 'BusinessInfo':
           return BusinessInfo.fromJson(value);
         case 'BusinessInfoDto':
@@ -212,12 +220,10 @@ class ApiClient {
           return CategoryResponseDto.fromJson(value);
         case 'CategorySummaryDto':
           return CategorySummaryDto.fromJson(value);
-        case 'ConversationListItemDto':
-          return ConversationListItemDto.fromJson(value);
-        case 'ConversationListMetaDto':
-          return ConversationListMetaDto.fromJson(value);
-        case 'ConversationListResponseDto':
-          return ConversationListResponseDto.fromJson(value);
+        case 'CheckoutTicketResponseDto':
+          return CheckoutTicketResponseDto.fromJson(value);
+        case 'ClientKeyResponseDto':
+          return ClientKeyResponseDto.fromJson(value);
         case 'CreateCategoryDto':
           return CreateCategoryDto.fromJson(value);
         case 'CreateDoctorDto':
@@ -244,12 +250,22 @@ class ApiClient {
           return CreateTherapistProfileDto.fromJson(value);
         case 'DeleteFileResponseDto':
           return DeleteFileResponseDto.fromJson(value);
+        case 'DistanceMatrixElementDto':
+          return DistanceMatrixElementDto.fromJson(value);
+        case 'DistanceMatrixResponseDto':
+          return DistanceMatrixResponseDto.fromJson(value);
+        case 'DistanceMatrixRowDto':
+          return DistanceMatrixRowDto.fromJson(value);
         case 'DoctorProfileResponseDto':
           return DoctorProfileResponseDto.fromJson(value);
         case 'EmployeeResponseDto':
           return EmployeeResponseDto.fromJson(value);
         case 'FileUrlResponseDto':
           return FileUrlResponseDto.fromJson(value);
+        case 'GeocodeResponseDto':
+          return GeocodeResponseDto.fromJson(value);
+        case 'GeocodeResultDto':
+          return GeocodeResultDto.fromJson(value);
         case 'KycDocumentDto':
           return KycDocumentDto.fromJson(value);
         case 'LegalRepresentativeDto':
@@ -264,6 +280,10 @@ class ApiClient {
           return LoginDto.fromJson(value);
         case 'LogoutResponseDto':
           return LogoutResponseDto.fromJson(value);
+        case 'MicroLockDto':
+          return MicroLockDto.fromJson(value);
+        case 'MicroLockResponseDto':
+          return MicroLockResponseDto.fromJson(value);
         case 'MyProfileResponseDto':
           return MyProfileResponseDto.fromJson(value);
         case 'PartnerCategorySummaryDto':

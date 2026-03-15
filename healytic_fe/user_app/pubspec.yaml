@@ -95,6 +95,7 @@ dev_dependencies:
   go_router_builder: ^4.1.0
   json_serializable: ^6.11.1
   drift_dev: ^2.28.0
+  patrol: 4.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -109,11 +110,14 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/store.json
+    - assets/store.dev.json
+    - assets/store.uat.json
+    - assets/store.prod.json
     - assets/icons/
     - assets/images/
     - assets/translations/
     - assets/animations/
+    - patrol_test/fixtures/
     
   #   - images/a_dot_ham.jpeg
 
@@ -142,3 +146,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+patrol:
+  app_name: GoHealth
+  test_directory: patrol_test
+  android:
+    package_name: com.example.user_app
+  ios:
+    bundle_id: com.example.userApp

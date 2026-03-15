@@ -84,6 +84,8 @@ export interface MockQueryRunner {
     findOne: jest.Mock;
     save: jest.Mock;
     create: jest.Mock;
+    update: jest.Mock;
+    delete: jest.Mock;
     remove: jest.Mock;
     increment: jest.Mock;
     decrement: jest.Mock;
@@ -103,6 +105,8 @@ export const createMockQueryRunner = (): MockQueryRunner => ({
     findOne: jest.fn(),
     save: jest.fn(),
     create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
     remove: jest.fn(),
     increment: jest.fn(),
     decrement: jest.fn(),

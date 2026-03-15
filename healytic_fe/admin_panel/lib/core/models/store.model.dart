@@ -8,7 +8,8 @@ enum StoreKey<T> {
   mockRole<String>._(6),
   autoFill<bool>._(7),
   partnerVerified<bool>._(8),
-  r2PublicBaseUrl<String>._(9);
+  r2PublicBaseUrl<String>._(9),
+  mapboxAccessToken<String>._(10);
 
   const StoreKey._(this.id);
   final int id;

@@ -41,3 +41,8 @@ export { ProductResourceRequirement } from './product-resource-requirement.entit
 // Product Tags
 export { ProductFeatureTag } from './product-feature-tag.entity';
 export { ProductTag } from './product-tag.entity';
+
+// Booking & Checkout
+export { Booking } from './booking.entity';
+export { CheckoutTicket } from './checkout-ticket.entity';
+export { BookingStatusLog } from './booking-status-log.entity';
