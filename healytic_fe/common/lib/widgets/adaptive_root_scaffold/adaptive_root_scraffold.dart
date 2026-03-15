@@ -24,27 +24,51 @@ class AdaptiveRootScraffold extends HookConsumerWidget {
   /// Creates an [AdaptiveRootScraffold].
   ///
   /// - [navigationShell] — The GoRouter shell that manages branch navigation.
-  const AdaptiveRootScraffold({super.key, required this.navigationShell});
+  /// - [destinationKeys] — Optional keys for each destination (for integration tests).
+  const AdaptiveRootScraffold({
+    super.key,
+    required this.navigationShell,
+    this.destinationKeys,
+  });
 
   /// The stateful navigation shell managing tab-based branch routing.
   final StatefulNavigationShell navigationShell;
+
+  /// Optional keys for each [NavigationDestination].
+  ///
+  /// Must match the number of destinations if provided.
+  final List<Key>? destinationKeys;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = navigationShell.currentIndex;
 
     final destinations = [
-      NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-      NavigationDestination(icon: Icon(Symbols.order_approve), label: 'Orders'),
       NavigationDestination(
+        key: destinationKeys?.elementAtOrNull(0),
+        icon: Icon(Icons.home),
+        label: 'Home',
+      ),
+      NavigationDestination(
+        key: destinationKeys?.elementAtOrNull(1),
+        icon: Icon(Symbols.order_approve),
+        label: 'Orders',
+      ),
+      NavigationDestination(
+        key: destinationKeys?.elementAtOrNull(2),
         icon: Icon(Symbols.support_agent_rounded),
         label: 'Chat',
       ),
       NavigationDestination(
+        key: destinationKeys?.elementAtOrNull(3),
         icon: Icon(Icons.notifications),
         label: 'Notifications',
       ),
-      NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+      NavigationDestination(
+        key: destinationKeys?.elementAtOrNull(4),
+        icon: Icon(Icons.person),
+        label: 'Profile',
+      ),
     ];
 
     return _CustomAdaptiveScaffold(

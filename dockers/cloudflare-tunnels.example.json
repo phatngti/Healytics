@@ -1,0 +1,13 @@
+{
+  "tunnels": [
+    {
+      "name": "my-tunnel",
+      "routes": [
+        {
+          "hostname": "api.example.com",
+          "origin": "http://kong-cp:8000"
+        }
+      ]
+    }
+  ]
+}

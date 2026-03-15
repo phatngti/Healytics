@@ -32,12 +32,14 @@ class EmployeeHeaderCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          EmployeeAvatarSection(
-            avatar: employee.avatar,
-            fullName: employee.fullName,
-            displayName: employee.displayName,
-            employeeId: employee.id,
-            isEditing: isEditing,
+          Flexible(
+            child: EmployeeAvatarSection(
+              avatar: employee.avatar,
+              fullName: employee.fullName,
+              displayName: employee.displayName,
+              employeeId: employee.id,
+              isEditing: isEditing,
+            ),
           ),
           AppDimens.horizontalLarge,
           Expanded(
@@ -47,13 +49,15 @@ class EmployeeHeaderCard extends StatelessWidget {
               isEditing: isEditing,
             ),
           ),
-          EmployeeStatsActionsSection(
-            rating: employee.rating,
-            reviewCount: employee.reviewCount,
-            gender: employee.gender,
-            dateOfBirth: employee.dateOfBirth,
-            isEditing: isEditing,
-            onEdit: onEdit,
+          Flexible(
+            child: EmployeeStatsActionsSection(
+              rating: employee.rating,
+              reviewCount: employee.reviewCount,
+              gender: employee.gender,
+              dateOfBirth: employee.dateOfBirth,
+              isEditing: isEditing,
+              onEdit: onEdit,
+            ),
           ),
         ],
       ),

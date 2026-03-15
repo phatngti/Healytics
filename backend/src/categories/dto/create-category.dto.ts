@@ -4,7 +4,10 @@ import {
   IsBoolean,
   IsNotEmpty,
   IsUUID,
+  IsInt,
+  Min,
   MaxLength,
+  Matches,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -41,4 +44,22 @@ export class CreateCategoryDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @ApiPropertyOptional({ example: 'spa', description: 'Icon identifier for frontend rendering' })
+  @IsString()
+  @IsOptional()
+  @MaxLength(100)
+  iconName?: string;
+
+  @ApiPropertyOptional({ example: '#FF6B6B', description: 'Hex color value (e.g. #FF6B6B or #FF6B6BCC)' })
+  @IsString()
+  @IsOptional()
+  @Matches(/^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/, { message: 'colorValue must be a valid hex color (#RRGGBB or #RRGGBBAA)' })
+  colorValue?: string;
+
+  @ApiPropertyOptional({ example: 0, description: 'Sort order for display (lower = first)' })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  sortOrder?: number;
 }

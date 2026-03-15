@@ -145,7 +145,7 @@ class _VoucherRow extends StatelessWidget {
       RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
       (m) => '${m[1]},',
     );
-    return '${formatted}đ';
+    return '$formattedđ';
   }
 }
 
@@ -191,7 +191,7 @@ class _CoinRow extends StatelessWidget {
                 ),
                 Text(
                   'Balance: $coinBalance coins '
-                  '(-${formatted}đ)',
+                  '(-$formattedđ)',
                   style: textTheme.labelSmall?.copyWith(
                     fontSize: 10,
                     color: colorScheme.onSurfaceVariant,

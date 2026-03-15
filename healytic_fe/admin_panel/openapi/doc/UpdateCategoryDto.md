@@ -14,6 +14,9 @@ Name | Type | Description | Notes
 **description** | **String** | Category description | [optional] 
 **imageUrl** | **String** | Category image URL | [optional] 
 **isActive** | **bool** | Whether the category is active | [optional] 
+**iconName** | **String** | Icon identifier for frontend rendering | [optional] 
+**colorValue** | **String** | Hex color value (e.g. #FF6B6B or #FF6B6BCC) | [optional] 
+**sortOrder** | **num** | Sort order for display (lower = first) | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

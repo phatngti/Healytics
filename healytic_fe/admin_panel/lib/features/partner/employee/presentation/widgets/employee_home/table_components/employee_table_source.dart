@@ -39,18 +39,22 @@ class EmployeeTableSource {
             ),
           ),
           DataCell(
-            ClipOval(
-              child: employee.avatar.isNotEmpty
-                  ? Image.network(
-                      employee.avatar,
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const CircleAvatar(child: Icon(Icons.person));
-                      },
+            CircleAvatar(
+              radius: 20,
+              backgroundImage: employee.avatar.isNotEmpty
+                  ? NetworkImage(employee.avatar)
+                  : null,
+              onBackgroundImageError: employee.avatar.isNotEmpty
+                  ? (_, __) {}
+                  : null,
+              child: employee.avatar.isEmpty
+                  ? Text(
+                      _getInitials(employee.fullName),
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelMedium,
                     )
-                  : const CircleAvatar(child: Icon(Icons.person)),
+                  : null,
             ),
           ),
           DataCell(
@@ -119,5 +123,15 @@ class EmployeeTableSource {
       }
     }
     return rows;
+  }
+
+  static String _getInitials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.isEmpty) return '?';
+    if (parts.length == 1) {
+      return parts[0][0].toUpperCase();
+    }
+    return '${parts[0][0]}${parts[parts.length - 1][0]}'
+        .toUpperCase();
   }
 }

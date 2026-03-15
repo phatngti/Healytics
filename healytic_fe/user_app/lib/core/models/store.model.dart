@@ -2,8 +2,7 @@ enum StoreKey<T> {
   serverUrl<String>._(0),
   serverEndpoint<String>._(1),
   accessToken<String>._(2),
-  customHeaders<String>._(3),
-  mockFlag<String>._(4);
+  customHeaders<String>._(3);
 
   const StoreKey._(this.id);
   final int id;

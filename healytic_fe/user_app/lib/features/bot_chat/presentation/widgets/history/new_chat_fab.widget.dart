@@ -19,7 +19,12 @@ class NewChatFab extends StatefulWidget {
   /// still animates but does nothing on press.
   final VoidCallback? onPressed;
 
-  const NewChatFab({super.key, this.onPressed});
+  /// Optional key applied to the inner tappable
+  /// area so integration tests can hit-test it
+  /// through the animation wrappers.
+  final Key? tapKey;
+
+  const NewChatFab({super.key, this.onPressed, this.tapKey});
 
   @override
   State<NewChatFab> createState() => _NewChatFabState();
@@ -124,6 +129,7 @@ class _NewChatFabState extends State<NewChatFab> with TickerProviderStateMixin {
                       fabColor: fabColor,
                       onFabColor: onFabColor,
                       onPressed: widget.onPressed,
+                      tapKey: widget.tapKey,
                     ),
                   ],
                 ),
@@ -145,12 +151,14 @@ class _ChatBotButton extends StatelessWidget {
   final Color fabColor;
   final Color onFabColor;
   final VoidCallback? onPressed;
+  final Key? tapKey;
 
   const _ChatBotButton({
     required this.size,
     required this.fabColor,
     required this.onFabColor,
     this.onPressed,
+    this.tapKey,
   });
 
   @override
@@ -158,6 +166,7 @@ class _ChatBotButton extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
+        key: tapKey,
         onTap: onPressed,
         customBorder: const CircleBorder(),
         child: Ink(
