@@ -9,8 +9,13 @@ import 'package:universal_io/io.dart';
 
 class EmployeeProfileImageCard extends ConsumerStatefulWidget {
   final String? avatarUrl;
+  final String? fullName;
 
-  const EmployeeProfileImageCard({super.key, this.avatarUrl});
+  const EmployeeProfileImageCard({
+    super.key,
+    this.avatarUrl,
+    this.fullName,
+  });
 
   @override
   ConsumerState<EmployeeProfileImageCard> createState() =>
@@ -147,6 +152,7 @@ class _EmployeeProfileImageCardState
                             Container(
                               width: 144,
                               height: 144,
+                              alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: colorScheme.surfaceContainerHighest
                                     .withAlpha(50),
@@ -164,15 +170,23 @@ class _EmployeeProfileImageCardState
                                       )
                                     : null,
                               ),
-                              child:
-                                  _selectedImage == null &&
-                                      field.value == null &&
-                                      field.widget.enabled
-                                  ? Icon(
-                                      Icons.add_a_photo_outlined,
-                                      size: 40,
-                                      color: colorScheme.onSurfaceVariant,
-                                    )
+                              child: imageProvider == null
+                                  ? (widget.fullName != null &&
+                                          widget.fullName!.isNotEmpty
+                                      ? Text(
+                                          _getInitials(
+                                            widget.fullName!,
+                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineLarge,
+                                        )
+                                      : Icon(
+                                          Icons.add_a_photo_outlined,
+                                          size: 40,
+                                          color: colorScheme
+                                              .onSurfaceVariant,
+                                        ))
                                   : null,
                             ),
                             if (_isUploading)
@@ -240,5 +254,15 @@ class _EmployeeProfileImageCardState
         );
       },
     );
+  }
+
+  String _getInitials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.isEmpty) return '?';
+    if (parts.length == 1) {
+      return parts[0][0].toUpperCase();
+    }
+    return '${parts[0][0]}${parts[parts.length - 1][0]}'
+        .toUpperCase();
   }
 }

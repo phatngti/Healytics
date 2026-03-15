@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
@@ -34,18 +35,27 @@ class LottieSplashScreen extends HookConsumerWidget {
 
     return Scaffold(
       body: Center(
-        child: Lottie.asset(
-          'assets/animations/splash_animate.json', // Đường dẫn tới file Lottie
-          controller: controller, // Dùng controller từ hook
-          onLoaded: (composition) {
-            controller
-              ..duration = composition.duration
-              ..forward().whenComplete(() {
-                // Tự động điều hướng khi animation chạy xong
-                navigateToHome(); // Gọi hàm điều hướng
-              });
-          },
-        ),
+        child: Platform.environment.containsKey('FLUTTER_TEST') ||
+                const bool.fromEnvironment('patrol')
+            ? Builder(
+                builder: (context) {
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    if (context.mounted) navigateToHome();
+                  });
+                  return const SizedBox();
+                },
+              )
+            : Lottie.asset(
+                'assets/animations/splash_animate.json',
+                controller: controller,
+                onLoaded: (composition) {
+                  controller
+                    ..duration = composition.duration
+                    ..forward().whenComplete(() {
+                      navigateToHome();
+                    });
+                },
+              ),
       ),
     );
   }

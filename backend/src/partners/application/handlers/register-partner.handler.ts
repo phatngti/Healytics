@@ -16,12 +16,14 @@ import {
   PartnerDocument,
   PartnerDocumentStatuses,
 } from '@/common/entities/partner-document.entity';
+import { Location } from '@/common/entities/location.entity';
 import { RegisterPartnerDto } from '../../dto/request/register-partner.dto';
 import { RegisterPartnerResponseDto } from '../../dto/response/register-partner-response.dto';
 import { Role } from '@/account/enum/role.enum';
 import { BusinessType } from '../../enum/business-type.enum';
 import { LocationsService } from '@/locations/locations.service';
 import { AuthService } from '@/auth/auth.service';
+import { MapboxService } from '@/mapbox/mapbox.service';
 
 /**
  * Handler for partner registration.
@@ -29,9 +31,10 @@ import { AuthService } from '@/auth/auth.service';
  *
  * Flow:
  * 1. Invariant checks (duplicate email, tax code, address validation)
- * 2. Create Account, Partner, LegalRepresentative, PartnerDocuments
- * 3. Commit transaction
- * 4. Post-commit: generate auth tokens
+ * 2. Geocode facility address via Mapbox API (non-blocking)
+ * 3. Create Account, Partner, LegalRepresentative, PartnerDocuments
+ * 4. Commit transaction
+ * 5. Post-commit: generate auth tokens
  */
 @Injectable()
 export class RegisterPartnerHandler {
@@ -40,6 +43,7 @@ export class RegisterPartnerHandler {
   constructor(
     private readonly dataSource: DataSource,
     private readonly locationsService: LocationsService,
+    private readonly mapboxService: MapboxService,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
   ) {}
@@ -83,7 +87,33 @@ export class RegisterPartnerHandler {
       );
     }
 
-    // 2. Transaction: create all entities
+    // 2. Geocode facility address (non-blocking — failure does NOT stop registration)
+    let coordinates: string | null = null;
+    let locationSql: string | null = null;
+
+    try {
+      const fullAddress = await this.buildFullAddress(dto);
+      this.logger.log(`Geocoding partner address: ${fullAddress}`);
+
+      const geoResult = await this.mapboxService.geocode(fullAddress);
+
+      if (geoResult.results.length > 0) {
+        const lat = geoResult.results[0].lat;
+        const lng = geoResult.results[0].lng;
+        coordinates = `${lat},${lng}`;
+        locationSql = `ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography`;
+        this.logger.log(`Geocoded: ${coordinates}`);
+      } else {
+        this.logger.warn(`Geocoding returned no results for: ${fullAddress}`);
+      }
+    } catch (error) {
+      this.logger.warn(
+        `Geocoding failed (non-blocking): ${error.message}`,
+      );
+      // Continue registration without geo — coordinates will be null
+    }
+
+    // 3. Transaction: create all entities
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -99,7 +129,7 @@ export class RegisterPartnerHandler {
       });
       const savedAccount = await queryRunner.manager.save(account);
 
-      // Create Partner
+      // Create Partner (with geocoded coordinates)
       const partner = queryRunner.manager.create(Partner, {
         taxCode: dto.partner.taxCode,
         legalName: dto.partner.legalName,
@@ -109,10 +139,19 @@ export class RegisterPartnerHandler {
         districtId: dto.partner.districtId,
         wardId: dto.partner.wardId,
         streetAddress: dto.partner.streetAddress,
+        coordinates,
         phoneNumber: dto.partner.phoneNumber || null,
         accountId: savedAccount.id,
       });
       const savedPartner = await queryRunner.manager.save(partner);
+
+      // Set PostGIS location column via raw SQL (TypeORM doesn't support geography writes natively)
+      if (locationSql) {
+        await queryRunner.query(
+          `UPDATE health_partner_profile SET location = ${locationSql} WHERE id = $1`,
+          [savedPartner.id],
+        );
+      }
 
       // Create Legal Representative
       const legalRep = queryRunner.manager.create(LegalRepresentative, {
@@ -147,11 +186,11 @@ export class RegisterPartnerHandler {
         await queryRunner.manager.save(documents);
       }
 
-      // 3. Commit
+      // 4. Commit
       await queryRunner.commitTransaction();
       this.logger.log(`Partner registered successfully: ${savedPartner.id}`);
 
-      // 4. Post-commit: generate auth tokens
+      // 5. Post-commit: generate auth tokens
       const tokens = await this.authService.createTokensForUser(
         savedAccount.id,
         savedAccount.email,
@@ -184,5 +223,29 @@ export class RegisterPartnerHandler {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  /**
+   * Compose full address from location tree + street address for geocoding.
+   * Format: "{streetAddress}, {ward.fullName}, {district.fullName}, {province.fullName}, Vietnam"
+   */
+  private async buildFullAddress(dto: RegisterPartnerDto): Promise<string> {
+    const locationRepo = this.dataSource.getRepository(Location);
+
+    const [ward, district, province] = await Promise.all([
+      locationRepo.findOne({ where: { id: dto.partner.wardId } }),
+      locationRepo.findOne({ where: { id: dto.partner.districtId } }),
+      locationRepo.findOne({ where: { id: dto.partner.provinceId } }),
+    ]);
+
+    const parts = [
+      dto.partner.streetAddress,
+      ward?.fullName,
+      district?.fullName,
+      province?.fullName,
+      'Vietnam',
+    ].filter(Boolean);
+
+    return parts.join(', ');
   }
 }

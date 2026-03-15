@@ -258,6 +258,127 @@ export function createSurveyDto(overrides: Partial<Record<string, any>> = {}): S
 }
 
 // ============================================================================
+// Booking Factories
+// ============================================================================
+
+export interface BookingEntityData {
+  id: string;
+  userId: string;
+  staffId: string;
+  productId: string | null;
+  startTime: Date;
+  endTime: Date | null;
+  status: string;
+  paymentUrl: string | null;
+  paymentExpiresAt: Date | null;
+  notes: string | null;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+/**
+ * Creates a mock Booking entity
+ */
+export function createBookingEntity(overrides: Partial<BookingEntityData> = {}): BookingEntityData {
+  const now = new Date();
+  return {
+    id: `bk-${Date.now()}`,
+    userId: FAKE_UUID,
+    staffId: 'a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c4d5',
+    productId: null,
+    startTime: new Date('2025-10-25T14:00:00Z'),
+    endTime: null,
+    status: 'PENDING_PAYMENT',
+    paymentUrl: null,
+    paymentExpiresAt: null,
+    notes: null,
+    version: 1,
+    createdAt: now,
+    updatedAt: now,
+    deletedAt: null,
+    ...overrides,
+  };
+}
+
+export interface CheckoutTicketEntityData {
+  id: string;
+  userId: string;
+  staffId: string;
+  productId: string | null;
+  startTime: Date;
+  idempotencyKey: string;
+  status: string;
+  webhookUrl: string | null;
+  bookingId: string | null;
+  errorMessage: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Creates a mock CheckoutTicket entity
+ */
+export function createCheckoutTicketEntity(overrides: Partial<CheckoutTicketEntityData> = {}): CheckoutTicketEntityData {
+  const now = new Date();
+  return {
+    id: `tk-${Date.now()}`,
+    userId: FAKE_UUID,
+    staffId: 'a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c4d5',
+    productId: null,
+    startTime: new Date('2025-10-25T14:00:00Z'),
+    idempotencyKey: `idem-${Date.now()}`,
+    status: 'QUEUED',
+    webhookUrl: null,
+    bookingId: null,
+    errorMessage: null,
+    createdAt: now,
+    updatedAt: now,
+    ...overrides,
+  };
+}
+
+export interface AsyncCheckoutTestData {
+  userId: string;
+  staffId: string;
+  startTime: string;
+  productId?: string;
+  idempotencyKey: string;
+  webhookUrl?: string;
+}
+
+/**
+ * Creates async checkout DTO test data
+ */
+export function createAsyncCheckoutDto(overrides: Partial<AsyncCheckoutTestData> = {}): AsyncCheckoutTestData {
+  return {
+    userId: FAKE_UUID,
+    staffId: 'a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c4d5',
+    startTime: '2025-10-25T14:00:00Z',
+    idempotencyKey: `idem-${Date.now()}`,
+    ...overrides,
+  };
+}
+
+export interface MicroLockTestData {
+  staffId: string;
+  startTime: string;
+  productId?: string;
+}
+
+/**
+ * Creates micro lock DTO test data
+ */
+export function createMicroLockDto(overrides: Partial<MicroLockTestData> = {}): MicroLockTestData {
+  return {
+    staffId: 'a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c4d5',
+    startTime: '2025-10-25T14:00:00Z',
+    ...overrides,
+  };
+}
+
+// ============================================================================
 // Utility Constants
 // ============================================================================
 

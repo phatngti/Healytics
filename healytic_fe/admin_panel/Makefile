@@ -8,11 +8,17 @@ translate:
 	dart run slang
 
 
-run:
-	flutter run -d chrome --wasm --release
+run-dev:
+	flutter run -d chrome --dart-define=ENV=dev
 
-run-default:
-	flutter run -d chrome
+run-uat:
+	flutter run -d chrome --dart-define=ENV=uat
+
+run-prod:
+	flutter run -d chrome --dart-define=ENV=prod --release
+
+run:
+	flutter run -d chrome --dart-define=ENV=dev --wasm --release
 
 # Start chromedriver on port 4444 for integration tests
 start-chromedriver:

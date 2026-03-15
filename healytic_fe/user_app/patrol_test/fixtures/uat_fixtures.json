@@ -1,0 +1,9 @@
+{
+  "auth": {
+    "email": "<UAT_TEST_EMAIL>",
+    "password": "<UAT_TEST_PASSWORD>"
+  },
+  "orders": [],
+  "conversations": [],
+  "services": []
+}

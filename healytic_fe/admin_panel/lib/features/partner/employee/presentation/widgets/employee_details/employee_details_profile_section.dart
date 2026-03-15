@@ -5,14 +5,22 @@ import 'package:flutter/material.dart';
 
 class EmployeeDetailsProfileSection extends StatelessWidget {
   final String? avatarUrl;
+  final String? fullName;
 
-  const EmployeeDetailsProfileSection({super.key, this.avatarUrl});
+  const EmployeeDetailsProfileSection({
+    super.key,
+    this.avatarUrl,
+    this.fullName,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        EmployeeProfileImageCard(avatarUrl: avatarUrl),
+        EmployeeProfileImageCard(
+          avatarUrl: avatarUrl,
+          fullName: fullName,
+        ),
         AppDimens.verticalLarge,
         const EmployeeContactInfoCard(),
       ],

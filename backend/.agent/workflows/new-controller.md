@@ -14,13 +14,14 @@ Use this workflow when creating a **new controller** for an existing module, e.g
 
 ```
 Does this controller need authentication?
-├── NO → Plain @Controller() + @Public() per route
-│         Example: HealthServiceController (public browsing)
+├── NO → @PublicApi('resource')
+│         Route: /v1/{resource}
+│         Example: CategoriesController, LocationsController
 │
 └── YES → Which role?
     ├── USER (mobile app) → @UserApi('resource')
     │     Route: /v1/user/{resource}
-    │     Example: UserEmployeesController
+    │     Example: UserEmployeesController, BookingController
     │
     ├── HEALTH_PARTNER (clinic dashboard) → @PartnerApi('resource')
     │     Route: /v1/partner/{resource}
@@ -28,7 +29,7 @@ Does this controller need authentication?
     │
     ├── ADMIN (admin panel) → @AdminApi('resource')
     │     Route: /v1/admin/{resource}
-    │     Example: AdminPartnersController
+    │     Example: AdminPartnersController, AdminCategoriesController
     │
     └── MIXED (multiple roles per route) → Manual setup
           Use @UseGuards() + @Roles() per method
@@ -82,24 +83,21 @@ export class Partner<Module>Controller {
 }
 ```
 
-### Option B: Public Controller
+### Option B: Public Controller (Recommended: `@PublicApi`)
 
 For controllers where **all endpoints are publicly accessible:**
 
 ```typescript
 // src/<module>/<module>.controller.ts
-import { Controller, Get, Param, UseInterceptors, ClassSerializerInterceptor, ParseUUIDPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
-import { Public } from '@/common/decorators/auth/public.decorator';
+import { Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import { ApiOperation, ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import { PublicApi } from '@/common/decorators/api/public-api.decorator';
 
-@ApiTags('<Resource>')
-@Controller({ path: '<resource>', version: '1' })
-@UseInterceptors(ClassSerializerInterceptor)
+@PublicApi('<resource>')
 export class <Module>Controller {
   constructor(private readonly service: <Module>Service) {}
 
   @Get()
-  @Public()
   @ApiOperation({ summary: 'List <resources>' })
   @ApiOkResponse({ type: [ResponseDto] })
   findAll(): Promise<ResponseDto[]> {
@@ -107,7 +105,6 @@ export class <Module>Controller {
   }
 
   @Get(':id')
-  @Public()
   @ApiOperation({ summary: 'Get <resource> by ID' })
   @ApiOkResponse({ type: ResponseDto })
   @ApiNotFoundResponse({ description: '<Resource> not found.' })

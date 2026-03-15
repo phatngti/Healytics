@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 
 import '../providers/conversation_history.provider.dart';
@@ -63,6 +64,7 @@ class _ConversationHistoryPageState
         child: _buildBody(context, historyState, grouped, colorScheme),
       ),
       floatingActionButton: NewChatFab(
+        tapKey: keys.chatPage.newChatButton,
         onPressed: () {
           const ChatRoute().go(context);
         },

@@ -1,5 +1,5 @@
 {
-    "openapi": "3.0.0",
+    "openapi": "3.1.0",
     "info": {
         "title": "Gateway Service",
         "description": "Gateway điều phối: Chatbot streaming (SSE), NER extraction, Home & Chatbot Recommender.",
@@ -211,8 +211,15 @@
             "ChatbotRequest": {
                 "properties": {
                     "conversation_id": {
-                        "type": "string",
-                        "format": "uuid",
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
                         "title": "Conversation Id"
                     },
                     "user_id": {
@@ -244,7 +251,6 @@
                 },
                 "type": "object",
                 "required": [
-                    "conversation_id",
                     "user_id",
                     "message"
                 ],
