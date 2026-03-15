@@ -25,20 +25,16 @@ async def extract_entities(request: NerRequest):
       1. extractor.extract_entities(text) → raw entities (underthesea + regex + keyword scan)
       2. normalizer.normalize_entities(raw) → normalized NerEntity list
       3. Return NerResponse
+
+    Note: spatial context resolution happens downstream in /prefilter/search.
     """
     logger.info(f"[NER] Processing: {request.text[:100]}...")
 
-    # 1. Extract raw entities
     raw_entities = extractor.extract_entities(request.text)
-
-    # 2. Normalize (Entity Linking)
     entities = normalizer.normalize_entities(raw_entities)
 
     logger.info(f"[NER] Found {len(entities)} entities")
-    return NerResponse(
-        conversation_id=request.conversation_id,
-        entities=entities,
-    )
+    return NerResponse(entities=entities)
 
 
 @router.post("/internal/clear-cache")
@@ -53,7 +49,7 @@ async def clear_cache():
     extractor.clear_query_cache()
 
     # Reload location + category caches
-    result = cache.force_refresh()
+    result = await cache.force_refresh()
 
     return {
         "status": "ok",

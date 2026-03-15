@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from app.api import chatbot_routes, ner_routes, prefilter_routes, recommender_routes, health_routes
+from app.api import chatbot_routes, recommender_routes, health_routes
 from app.core.database import engine, Base
 import logging
 import time
@@ -24,7 +24,7 @@ app = FastAPI(
     title="Gateway Service",
     description=(
         "Gateway điều phối: Chatbot streaming (SSE), "
-        "NER extraction, Home & Chatbot Recommender."
+        "Home & Chatbot Recommender."
     ),
     version="1.0.0",
     lifespan=lifespan,
@@ -56,6 +56,4 @@ app.add_middleware(
 
 app.include_router(health_routes.router, tags=["Health"])
 app.include_router(chatbot_routes.router, tags=["Chatbot"])
-app.include_router(ner_routes.router, tags=["NER"])
-app.include_router(prefilter_routes.router, tags=["Pre-Filter"])
 app.include_router(recommender_routes.router, tags=["Recommender"])

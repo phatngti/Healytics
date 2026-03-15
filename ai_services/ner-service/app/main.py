@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import ner_routes
+from app.api import ner_routes, prefilter_routes
 from app.ner import cache
 
 logging.basicConfig(level=logging.INFO)
@@ -60,3 +60,4 @@ app.add_middleware(
 )
 
 app.include_router(ner_routes.router, tags=["NER"])
+app.include_router(prefilter_routes.router, tags=["PreFilter"])

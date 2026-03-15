@@ -17,6 +17,7 @@ from rapidfuzz import fuzz, process
 
 from app.ner import cache
 from app.ner.extractor import BUSINESS_TYPE_ALIASES
+from app.ner.semantic_matcher import get_matcher
 from app.schemas.ner_schema import NerEntity
 
 logger = logging.getLogger(__name__)
@@ -58,6 +59,9 @@ def normalize_entities(raw_entities: list[dict]) -> list[NerEntity]:
         elif entity_type == "RATING":
             entity = _normalize_rating(value, confidence, raw)
 
+        elif entity_type == "DISTANCE":
+            entity = _normalize_distance(value, confidence, raw)
+
         else:
             # PER hoặc tag không xác định → skip
             logger.debug(f"[Normalizer] Skipping entity type={entity_type!r}")
@@ -65,7 +69,58 @@ def normalize_entities(raw_entities: list[dict]) -> list[NerEntity]:
 
         results.append(entity)
 
+    # Combine hierarchical locations (xã+huyện+tỉnh → chỉ giữ cụ thể nhất)
+    results = _combine_location_entities(results)
+
     return results
+
+
+# ============================================================================
+# PRIVATE — Location combine (xã → huyện → tỉnh)
+# ============================================================================
+
+_LEVEL_PRIORITY: dict[str, int] = {"WARD": 3, "DISTRICT": 2, "PROVINCE": 1}
+
+
+def _combine_location_entities(entities: list[NerEntity]) -> list[NerEntity]:
+    """
+    Nếu nhiều LOCATION entity thuộc cùng cụm địa lý (xã+huyện+tỉnh),
+    chỉ giữ level cụ thể nhất (WARD > DISTRICT > PROVINCE).
+
+    Nếu có nhiều entity ở cùng level (2 quận khác nhau) → giữ nguyên hết.
+    Nếu chỉ có 1 level → không combine (không đủ cơ sở foldable).
+    """
+    non_loc = [e for e in entities if e.type != "LOCATION"]
+    loc_entities = [e for e in entities if e.type == "LOCATION"]
+
+    if len(loc_entities) <= 1:
+        return entities
+
+    mapped = [e for e in loc_entities if e.location_code]
+    unmapped = [e for e in loc_entities if not e.location_code]
+
+    if len(mapped) <= 1:
+        return entities
+
+    # Nhóm theo level
+    by_level: dict[str, list[NerEntity]] = {}
+    for e in mapped:
+        lv = e.location_level or "PROVINCE"
+        by_level.setdefault(lv, []).append(e)
+
+    # Chỉ 1 level → 2 địa điểm khác nhau, giữ tất cả
+    if len(by_level) == 1:
+        return entities
+
+    # Nhiều level → cụm địa lý → giữ level chi tiết nhất
+    best_level = max(by_level.keys(), key=lambda lv: _LEVEL_PRIORITY.get(lv, 0))
+    kept = by_level[best_level]
+    dropped = sum(len(v) for lv, v in by_level.items() if lv != best_level)
+    logger.info(
+        f"[Normalizer] Location combine: kept {len(kept)}×{best_level}, "
+        f"dropped {dropped} coarser level(s)"
+    )
+    return non_loc + kept + unmapped
 
 
 # ============================================================================
@@ -101,12 +156,19 @@ def _normalize_location(value: str, confidence: float) -> NerEntity:
 def _normalize_business_type(
     value: str, confidence: float, raw: dict
 ) -> NerEntity:
-    """Entity từ keyword scan đã có business_type sẵn."""
+    """Entity từ keyword scan đã có business_type sẵn, nhưng có thể tinh chỉnh bằng Semantic matching."""
+    bt = raw.get("business_type")
+    
+    # Nếu chưa có bt hoặc muốn kiểm chứng lại bằng model
+    if not bt:
+        matcher = get_matcher()
+        bt = matcher.match_business_type(value)
+
     return NerEntity(
         type="BUSINESS_TYPE",
         value=value,
         confidence=confidence,
-        business_type=raw.get("business_type"),
+        business_type=bt,
     )
 
 
@@ -133,13 +195,14 @@ def _normalize_org_misc(value: str, confidence: float) -> NerEntity:
             business_type=BUSINESS_TYPE_ALIASES[value_lower],
         )
 
-    # 2. Fuzzy match → BusinessType
-    bt_match = _fuzzy_match_business_type(value_lower)
+    # 2. Semantic match (Model-based) → BusinessType
+    matcher = get_matcher()
+    bt_match = matcher.match_business_type(value_lower)
     if bt_match:
         return NerEntity(
             type="BUSINESS_TYPE",
             value=value,
-            confidence=confidence * 0.9,   # Fuzzy → giảm confidence nhẹ
+            confidence=confidence * 0.95,   # Model confidence cao
             business_type=bt_match,
         )
 
@@ -190,6 +253,22 @@ def _normalize_rating(value: str, confidence: float, raw: dict) -> NerEntity:
         confidence=confidence,
         operator=raw.get("operator"),
         amount=raw.get("amount"),
+    )
+
+
+# ============================================================================
+# PRIVATE — Distance
+# ============================================================================
+
+def _normalize_distance(value: str, confidence: float, raw: dict) -> NerEntity:
+    """Distance đã được distance_extractor parse sẵn radius_meters + unit."""
+    return NerEntity(
+        type="DISTANCE",
+        value=value,
+        confidence=confidence,
+        radius_meters=raw.get("radius_meters"),
+        distance_unit=raw.get("distance_unit"),
+        proximity_intent=raw.get("proximity_intent"),
     )
 
 
