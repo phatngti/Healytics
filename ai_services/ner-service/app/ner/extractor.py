@@ -6,6 +6,9 @@ Trích xuất entity thô từ text tiếng Việt.
 Pipeline:
   1a. underthesea.ner() → LOC, ORG, PER, MISC spans
   1b. Keyword scan (song song) → bắt domain wellness terms mà underthesea miss
+  1c. Location fallback scan → N-gram lookup trên DB cache
+  1d. Distance & Proximity extraction
+  1e. Semantic Fallback → feed cả câu vào SemanticMatcher nếu chưa có BUSINESS_TYPE
   2.  Price/Rating regex → PRICE, RATING
   3.  LRU query cache → tránh xử lý lại câu truy vấn giống nhau
 
@@ -20,11 +23,14 @@ Kết quả trả về: list[dict] dạng:
 
 import logging
 import re
+import time
 from typing import Optional
 
 from cachetools import LRUCache
 
 from app.core.config import settings
+from app.ner.distance_extractor import extract_distance_entities
+from app.ner.semantic_matcher import get_matcher
 
 logger = logging.getLogger(__name__)
 
@@ -40,55 +46,30 @@ _query_cache: LRUCache = LRUCache(maxsize=settings.QUERY_CACHE_MAXSIZE)
 # Map nhiều alias tiếng Việt → enum value backend
 # ============================================================================
 BUSINESS_TYPE_ALIASES: dict[str, str] = {
-    # SPA_BEAUTY
     "spa": "SPA_BEAUTY",
     "làm đẹp": "SPA_BEAUTY",
     "chăm sóc da": "SPA_BEAUTY",
-    # FITNESS
     "gym": "FITNESS",
+    "phòng tập": "FITNESS",
     "yoga": "FITNESS",
-    "thể hình": "FITNESS",
     "pilates": "FITNESS",
-    "fitness": "FITNESS",
-    "tập gym": "FITNESS",
-    # DENTAL
     "nha khoa": "DENTAL",
-    "răng": "DENTAL",
-    "niềng răng": "DENTAL",
-    # MASSAGE_THERAPY
+    "nha sĩ": "DENTAL",
+    "phòng khám nha sĩ": "DENTAL",
+    "massage trị liệu": "MASSAGE_REHABILITATION",
     "massage": "MASSAGE_THERAPY",
     "mát xa": "MASSAGE_THERAPY",
-    "massage thư giãn": "MASSAGE_THERAPY",
-    # MASSAGE_REHABILITATION
-    "massage trị liệu": "MASSAGE_REHABILITATION",
-    "phục hồi chức năng": "MASSAGE_REHABILITATION",
-    "vật lý trị liệu": "MASSAGE_REHABILITATION",
     "nắn xương khớp": "MASSAGE_REHABILITATION",
-    # PSYCHOLOGY
+    "bấm huyệt": "MASSAGE_REHABILITATION",
+    "vật lý trị liệu": "MASSAGE_REHABILITATION",
+    "phục hồi chức năng": "MASSAGE_REHABILITATION",
     "tâm lý": "PSYCHOLOGY",
-    "tâm lý trị liệu": "PSYCHOLOGY",
-    "tư vấn tâm lý": "PSYCHOLOGY",
-    # PSYCHIATRY
     "tâm thần": "PSYCHIATRY",
-    "tâm thần học": "PSYCHIATRY",
-    # DERMATOLOGY
     "da liễu": "DERMATOLOGY",
-    "thẩm mỹ": "DERMATOLOGY",
-    "trị mụn": "DERMATOLOGY",
-    "chăm sóc da mặt": "DERMATOLOGY",
-    # NUTRITION
     "dinh dưỡng": "NUTRITION",
-    "ăn kiêng": "NUTRITION",
-    "giảm cân": "NUTRITION",
-    # TRADITIONAL_MEDICINE
     "đông y": "TRADITIONAL_MEDICINE",
-    "y học cổ truyền": "TRADITIONAL_MEDICINE",
-    "châm cứu": "TRADITIONAL_MEDICINE",
-    "bấm huyệt": "TRADITIONAL_MEDICINE",
-    # PHARMACY
-    "dược phẩm": "PHARMACY",
-    "thuốc": "PHARMACY",
     "nhà thuốc": "PHARMACY",
+    "hiệu thuốc": "PHARMACY",
 }
 
 # Sắp xếp by length desc → ưu tiên match cụm dài trước (VD: "massage trị liệu" > "massage")
@@ -98,7 +79,9 @@ _SORTED_BT_KEYWORDS = sorted(BUSINESS_TYPE_ALIASES.keys(), key=len, reverse=True
 _EXTRA_DOMAIN_KEYWORDS: set[str] = {
     "trị mụn", "giảm cân", "nắn xương khớp", "chăm sóc da mặt",
     "vật lý trị liệu", "phục hồi chức năng", "bấm huyệt", "châm cứu",
-    "niềng răng", "tập gym", "pilates", "massage trị liệu",
+    "khám", "nha khoa", "nha sĩ", "phòng khám nha sĩ", "niềng răng",
+    "tâm lý", "đông y", "hiệu thuốc", "nhà thuốc", "phòng tập", "yoga", "pilates",
+    "spa", "làm đẹp", "massage", "mát xa"
 }
 
 
@@ -106,17 +89,29 @@ _EXTRA_DOMAIN_KEYWORDS: set[str] = {
 # Price Regex — tách riêng để dễ mở rộng slang VN
 # ============================================================================
 # Bắt: "dưới 500k", "trên 300k", "từ 200k đến 1 triệu", "tối đa 1tr"
+# Negative lookahead (?!\s*(sao|điểm|★|\*|km)) để KHÔNG bắt Rating, Distance
 _PRICE_SINGLE_PATTERN = re.compile(
-    r"(dưới|trên|tối đa|tối thiểu|khoảng|<=?|>=?)\s*"
+    r"(dưới|trên|tối đa|tối thiểu|khoảng|cỡ|tầm|<=?|>=?)\s*"
     r"([\d.,]+)\s*"
-    r"(k|nghìn|ngàn|triệu|tr|đồng|đ|vnđ)?",
+    r"(k|nghìn|ngàn|triệu|tr|đồng|đ|vnđ)?\b"
+    r"(?!\s*(?:sao|điểm|★|\*|km\b|m\b|cây\s*số|dặm))",
+    re.IGNORECASE,
+)
+
+# Bắt: "giá 500k", "chi phí 400k", "phí 300k" — không có modifier nhưng có context từ giá
+# Dùng khi user không dùng "dưới/trên/khoảng"
+_PRICE_NO_MODIFIER_PATTERN = re.compile(
+    r"(?:giá(?:\s+tiền)?|chi\s*phí|học\s*phí|phí)\s+"
+    r"([\d.,]+)\s*"
+    r"(k|nghìn|ngàn|triệu|tr|đồng|đ|vnđ)\b",
     re.IGNORECASE,
 )
 
 _PRICE_RANGE_PATTERN = re.compile(
     r"từ\s*([\d.,]+)\s*(k|nghìn|ngàn|triệu|tr|đồng|đ|vnđ)?\s*"
     r"(?:đến|tới|->?|-)\s*"
-    r"([\d.,]+)\s*(k|nghìn|ngàn|triệu|tr|đồng|đ|vnđ)?",
+    r"([\d.,]+)\s*(k|nghìn|ngàn|triệu|tr|đồng|đ|vnđ)?\b"
+    r"(?!\s*(?:sao|điểm|★|\*))",
     re.IGNORECASE,
 )
 
@@ -126,7 +121,8 @@ _PRICE_RANGE_PATTERN = re.compile(
 _RATING_PATTERN = re.compile(
     r"(trên|từ|dưới|tối thiểu|ít nhất|>=?|<=?)\s*"
     r"([\d.]+)\s*"
-    r"(sao|điểm|★|\*)?",
+    r"(sao|điểm|★|\*)"  # unit is REQUIRED to avoid false match on "trên 3km", "dưới 5km"
+    ,
     re.IGNORECASE,
 )
 
@@ -140,6 +136,13 @@ def extract_entities(text: str) -> list[dict]:
     Trích xuất entity thô từ text. Có LRU caching.
     Returns list[dict] — mỗi dict có ít nhất {type, value, confidence}.
     """
+    if not text or not text.strip():
+        return []
+        
+    # Giới hạn text quá dài để tránh treo CPU (DDoS bảo vệ)
+    if len(text) > 2000:
+        text = text[:2000]
+        
     cache_key = text.strip().lower()
     if cache_key in _query_cache:
         logger.debug(f"[Extractor] Cache HIT: {cache_key[:50]}...")
@@ -148,25 +151,73 @@ def extract_entities(text: str) -> list[dict]:
     entities: list[dict] = []
 
     # 1a. underthesea NER
+    t0 = time.perf_counter()
     ner_entities = _extract_with_underthesea(text)
     entities.extend(ner_entities)
+    t1 = time.perf_counter()
+    logger.info(f"[Perf] Underthesea NER: {(t1-t0)*1000:.2f}ms")
 
     # 1b. Keyword scan (song song — bắt domain wellness terms)
-    keyword_entities = _keyword_scan(text)
+    keyword_entities, keyword_ranges = _keyword_scan(text)
     entities.extend(keyword_entities)
+    t2 = time.perf_counter()
+    logger.info(f"[Perf] Keyword Scan: {(t2-t1)*1000:.2f}ms")
+
+    # 1c. Location fallback scan — skip char ranges already matched by keyword scan
+    location_entities = _location_fallback_scan(text, excluded_ranges=keyword_ranges)
+    entities.extend(location_entities)
+    t3 = time.perf_counter()
+    logger.info(f"[Perf] Location Scan: {(t3-t2)*1000:.2f}ms")
+
+    # 1d. Distance & Proximity extraction
+    distance_entities = extract_distance_entities(text)
+    entities.extend(distance_entities)
+    t3_dist = time.perf_counter()
+    logger.info(f"[Perf] Distance Extraction: {(t3_dist-t3)*1000:.2f}ms")
+
+    # 1e. Semantic Fallback — chỉ chạy khi keyword scan + underthesea KHÔNG tìm ra BUSINESS_TYPE
+    # Feed toàn bộ câu cho AI để hiểu ý định ngầm ("nhổ răng", "đau lưng", "mất ngủ", ...)
+    has_business_type = any(e["type"] == "BUSINESS_TYPE" for e in entities)
+    if not has_business_type:
+        matcher = get_matcher()
+        matched_bt = matcher.match_business_type(text, threshold=0.35)
+        if matched_bt:
+            entities.append({
+                "type": "BUSINESS_TYPE",
+                "value": text.strip(),
+                "confidence": 0.75,
+                "business_type": matched_bt,
+            })
+            logger.info(f"[Extractor] Semantic Fallback: '{text[:60]}' -> {matched_bt}")
+    t3_sem = time.perf_counter()
+    logger.info(f"[Perf] Semantic Fallback: {(t3_sem-t3_dist)*1000:.2f}ms")
 
     # 2. Price + Rating regex
     price_entities = _parse_price(text)
     entities.extend(price_entities)
-
     rating_entities = _parse_rating(text)
     entities.extend(rating_entities)
+    t4 = time.perf_counter()
+    logger.info(f"[Perf] Regex (Price/Rating): {(t4-t3_dist)*1000:.2f}ms")
 
-    # Deduplicate: nếu cùng value + type thì giữ entity có confidence cao hơn
+    # deduplicate
     entities = _deduplicate(entities)
 
-    _query_cache[cache_key] = entities
-    return entities
+    # 3. Post-Filter LOC: Chỉ giữ lại các địa điểm có thật trong DB (cần code để build query)
+    from app.ner.cache import find_location
+    valid_entities = []
+    for e in entities:
+        if e["type"] == "LOC":
+            loc_info = find_location(e["value"])
+            if loc_info:
+                valid_entities.append(e)
+            else:
+                logger.debug(f"[Extractor] Discarding non-DB location: {e['value']}")
+        else:
+            valid_entities.append(e)
+
+    _query_cache[cache_key] = valid_entities
+    return valid_entities
 
 
 def clear_query_cache():
@@ -180,10 +231,7 @@ def clear_query_cache():
 # ============================================================================
 
 def _extract_with_underthesea(text: str) -> list[dict]:
-    """
-    Gọi underthesea.ner(text) → merge B-/I- tags thành spans.
-    Returns dạng: [{"type": "LOC", "value": "Hà Nội", "confidence": 0.95}]
-    """
+# ... (rest of _extract_with_underthesea remains unchanged) ...
     try:
         from underthesea import ner
         tagged = ner(text)
@@ -198,11 +246,7 @@ def _extract_with_underthesea(text: str) -> list[dict]:
 
 
 def _merge_ner_tags(tagged: list) -> list[dict]:
-    """
-    Gộp B-LOC/I-LOC, B-ORG/I-ORG thành spans liền mạch.
-    underthesea trả về: [(word, pos, chunk, ner_tag), ...]
-    ner_tag format: "O", "B-LOC", "I-LOC", "B-ORG", "I-ORG", "B-PER", "I-PER", etc.
-    """
+# ... (rest of _merge_ner_tags unchanged) ...
     entities: list[dict] = []
     current_type: Optional[str] = None
     current_tokens: list[str] = []
@@ -212,21 +256,19 @@ def _merge_ner_tags(tagged: list) -> list[dict]:
         ner_tag = item[3] if len(item) > 3 else "O"
 
         if ner_tag.startswith("B-"):
-            # Flush previous entity
             if current_type and current_tokens:
                 entities.append({
                     "type": _map_ner_tag(current_type),
                     "value": " ".join(current_tokens),
                     "confidence": 0.85,
                 })
-            current_type = ner_tag[2:]   # "B-LOC" → "LOC"
+            current_type = ner_tag[2:]
             current_tokens = [word]
 
         elif ner_tag.startswith("I-") and current_type == ner_tag[2:]:
             current_tokens.append(word)
 
         else:
-            # O tag — flush
             if current_type and current_tokens:
                 entities.append({
                     "type": _map_ner_tag(current_type),
@@ -236,7 +278,6 @@ def _merge_ner_tags(tagged: list) -> list[dict]:
             current_type = None
             current_tokens = []
 
-    # Flush last entity
     if current_type and current_tokens:
         entities.append({
             "type": _map_ner_tag(current_type),
@@ -248,7 +289,6 @@ def _merge_ner_tags(tagged: list) -> list[dict]:
 
 
 def _map_ner_tag(tag: str) -> str:
-    """Map underthesea NER tag → our entity types."""
     mapping = {
         "LOC": "LOC",
         "ORG": "ORG",
@@ -260,14 +300,10 @@ def _map_ner_tag(tag: str) -> str:
 
 # ============================================================================
 # PRIVATE — Keyword Scan (song song với underthesea)
-# Bắt domain-specific wellness terms mà underthesea hay miss
 # ============================================================================
 
-def _keyword_scan(text: str) -> list[dict]:
-    """
-    Quét text tìm BUSINESS_TYPE_ALIASES keys.
-    Ưu tiên match cụm dài trước (VD: "massage trị liệu" > "massage").
-    """
+def _keyword_scan(text: str) -> tuple[list[dict], list[tuple[int, int]]]:
+    """Returns (entities, matched_char_ranges) to allow downstream steps to skip matched spans."""
     found: list[dict] = []
     text_lower = text.lower()
     already_matched_ranges: list[tuple[int, int]] = []
@@ -278,8 +314,6 @@ def _keyword_scan(text: str) -> list[dict]:
             continue
 
         end = start + len(keyword)
-
-        # Kiểm tra overlap với entity đã match
         overlap = any(
             not (end <= ms or start >= me)
             for ms, me in already_matched_ranges
@@ -295,6 +329,69 @@ def _keyword_scan(text: str) -> list[dict]:
             "business_type": BUSINESS_TYPE_ALIASES[keyword],
         })
 
+    return found, already_matched_ranges
+
+
+def _location_fallback_scan(text: str, excluded_ranges: list[tuple[int, int]] | None = None) -> list[dict]:
+    """
+    Quét dictionary O(1) qua N-grams để bắt location.
+    Cực nhanh (vài mili-giây) do không loop qua 37,000 DB records.
+
+    excluded_ranges: char ranges already matched by keyword scan — skip to avoid
+    matching sub-words like "hiệu" (from "hiệu thuốc") as ward names.
+    """
+    found: list[dict] = []
+    text_lower = text.lower()
+
+    # Early out nếu text quá ngắn
+    if len(text_lower.replace(" ", "")) < 3:
+        return found
+
+    from app.ner.cache import _location_cache, to_canonical, PROVINCE_MAP, _DISTRICT_FALLBACK
+
+    already_matched_ranges: list[tuple[int, int]] = []
+
+    # Tách từ để tạo N-grams (max 5 từ cho 1 location: vd "thành phố hồ chí minh")
+    tokens = [(m.group(0), m.start(), m.end()) for m in re.finditer(r'\w+', text_lower)]
+
+    # Duyệt N-grams từ n=5 xuống 1 để ưu tiên match cụm dài trước
+    for n in range(5, 0, -1):
+        for i in range(len(tokens) - n + 1):
+            start_idx = tokens[i][1]
+            end_idx = tokens[i + n - 1][2]
+
+            # Bỏ qua nếu n-gram nằm trong vùng đã match bởi keyword scan
+            if excluded_ranges and any(
+                not (end_idx <= ms or start_idx >= me)
+                for ms, me in excluded_ranges
+            ):
+                continue
+
+            # Kiểm tra xem khoảng này đã bị match bởi N-gram dài hơn chưa
+            overlap = any(not (end_idx <= ms or start_idx >= me) for ms, me in already_matched_ranges)
+            if overlap:
+                continue
+
+            # Lấy chuỗi substring thật từ text lower
+            ngram_text = text_lower[start_idx:end_idx]
+
+            # 1. Canonical lookup → DB cache (works for most locations)
+            can_ngram = to_canonical(ngram_text)
+            matched = can_ngram in _location_cache
+
+            # 2. Direct lowercase lookup → PROVINCE_MAP and _DISTRICT_FALLBACK
+            # Needed for "quận 1", "quận 2"... where to_canonical strips the number leaving "1"
+            if not matched:
+                matched = ngram_text in PROVINCE_MAP or ngram_text in _DISTRICT_FALLBACK
+
+            if matched:
+                already_matched_ranges.append((start_idx, end_idx))
+                found.append({
+                    "type": "LOC",
+                    "value": text[start_idx:end_idx], # Giữ đúng case gốc
+                    "confidence": 0.85,
+                })
+
     return found
 
 
@@ -303,8 +400,17 @@ def _keyword_scan(text: str) -> list[dict]:
 # ============================================================================
 
 def _normalize_amount(raw: str, unit: Optional[str]) -> float:
-    """Chuyển text số + đơn vị → số thực."""
-    raw = raw.replace(",", "").replace(".", "")
+    """Chuyển text số + đơn vị → số thực.
+
+    Handles:
+      - "500"      → 500
+      - "1.5"      → 1.5  (decimal dot)
+      - "1,5"      → 1.5  (decimal comma — Vietnamese style)
+    """
+    # Normalize comma decimal separator to dot ("1,5" → "1.5")
+    # Do NOT strip dots — they are decimal points, not thousand separators
+    # (prices like "1.000" are uncommon in user queries; "1.5 triệu" is normal)
+    raw = raw.replace(",", ".")
     try:
         value = float(raw)
     except ValueError:
@@ -316,6 +422,9 @@ def _normalize_amount(raw: str, unit: Optional[str]) -> float:
             value *= 1_000
         elif unit_lower in ("triệu", "tr"):
             value *= 1_000_000
+    else:
+        # User requested: nếu không có đơn vị thì đơn vị là ĐỒNG (1:1)
+        pass
 
     return value
 
@@ -323,7 +432,7 @@ def _normalize_amount(raw: str, unit: Optional[str]) -> float:
 def _parse_price(text: str) -> list[dict]:
     """
     Trích xuất PRICE entities từ text bằng regex.
-    Tách riêng hàm để dễ thêm Vietnamese slang patterns sau.
+    Xử lý: dưới, trên, khoảng, cỡ, tầm,...
     """
     results: list[dict] = []
 
@@ -342,7 +451,7 @@ def _parse_price(text: str) -> list[dict]:
         })
         return results
 
-    # 2. Single bound: "dưới X", "trên X"
+    # 2. Single bound
     for match in _PRICE_SINGLE_PATTERN.finditer(text):
         modifier = match.group(1).lower()
         amount = _normalize_amount(match.group(2), match.group(3))
@@ -351,20 +460,40 @@ def _parse_price(text: str) -> list[dict]:
 
         if modifier in ("dưới", "tối đa", "<", "<="):
             operator = "lte"
+            res_entry = {"type": "PRICE", "value": match.group(0).strip(), "confidence": 1.0, "operator": operator, "amount": amount}
         elif modifier in ("trên", "tối thiểu", ">", ">="):
             operator = "gte"
-        elif modifier == "khoảng":
-            operator = "gte"     # "khoảng 500k" → treat as minimum hint
+            res_entry = {"type": "PRICE", "value": match.group(0).strip(), "confidence": 1.0, "operator": operator, "amount": amount}
+        elif modifier in ("khoảng", "cỡ", "tầm"):
+            # "Khoảng 300k" -> Search từ 255k đến 345k (85% - 115%)
+            res_entry = {
+                "type": "PRICE",
+                "value": match.group(0).strip(),
+                "confidence": 1.0,
+                "operator": "between",
+                "amount": amount * 0.85,
+                "amount_max": amount * 1.15,
+            }
         else:
             operator = "lte"
+            res_entry = {"type": "PRICE", "value": match.group(0).strip(), "confidence": 1.0, "operator": operator, "amount": amount}
 
-        results.append({
-            "type": "PRICE",
-            "value": match.group(0).strip(),
-            "confidence": 1.0,
-            "operator": operator,
-            "amount": amount,
-        })
+        results.append(res_entry)
+
+    # 3. No-modifier price: "giá 500k", "chi phí 400k" → around ±15%
+    if not results:
+        for match in _PRICE_NO_MODIFIER_PATTERN.finditer(text):
+            amount = _normalize_amount(match.group(1), match.group(2))
+            if amount <= 0:
+                continue
+            results.append({
+                "type": "PRICE",
+                "value": match.group(0).strip(),
+                "confidence": 0.9,
+                "operator": "between",
+                "amount": amount * 0.85,
+                "amount_max": amount * 1.15,
+            })
 
     return results
 
