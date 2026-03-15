@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoriesController } from './categories.controller';
 import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
 import { FindCategoriesQueryDto } from './dto/find-categories-query.dto';
 import { MockType } from '../../test/mocks/mock-types';
 
@@ -13,12 +11,9 @@ describe('CategoriesController', () => {
   beforeEach(async () => {
     // Arrange - Create typed mock for CategoriesService
     const mockCategoriesService: MockType<CategoriesService> = {
-      create: jest.fn(),
       findAll: jest.fn(),
       findOne: jest.fn(),
       findBySlug: jest.fn(),
-      update: jest.fn(),
-      remove: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -37,23 +32,6 @@ describe('CategoriesController', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-  });
-
-  describe('create', () => {
-    it('should call service.create with DTO and return created category', async () => {
-      // Arrange
-      const dto: CreateCategoryDto = { name: 'Test Category', slug: 'test-category' } as CreateCategoryDto;
-      const expectedCategory = { id: 'uuid-1', name: 'Test Category', slug: 'test-category' };
-      categoriesService.create!.mockResolvedValue(expectedCategory);
-
-      // Act
-      const result = await controller.create(dto);
-
-      // Assert
-      expect(result).toEqual(expectedCategory);
-      expect(categoriesService.create).toHaveBeenCalledWith(dto);
-      expect(categoriesService.create).toHaveBeenCalledTimes(1);
-    });
   });
 
   describe('findAll', () => {
@@ -115,38 +93,6 @@ describe('CategoriesController', () => {
       // Assert
       expect(result).toEqual(expectedCategory);
       expect(categoriesService.findBySlug).toHaveBeenCalledWith(slug);
-    });
-  });
-
-  describe('update', () => {
-    it('should call service.update with ID and DTO and return updated category', async () => {
-      // Arrange
-      const id = 'uuid-1';
-      const dto: UpdateCategoryDto = { name: 'Updated' } as UpdateCategoryDto;
-      const expectedCategory = { id, name: 'Updated' };
-      categoriesService.update!.mockResolvedValue(expectedCategory);
-
-      // Act
-      const result = await controller.update(id, dto);
-
-      // Assert
-      expect(result).toEqual(expectedCategory);
-      expect(categoriesService.update).toHaveBeenCalledWith(id, dto);
-    });
-  });
-
-  describe('remove', () => {
-    it('should call service.remove with ID', async () => {
-      // Arrange
-      const id = 'uuid-1';
-      categoriesService.remove!.mockResolvedValue(undefined);
-
-      // Act
-      await controller.remove(id);
-
-      // Assert
-      expect(categoriesService.remove).toHaveBeenCalledWith(id);
-      expect(categoriesService.remove).toHaveBeenCalledTimes(1);
     });
   });
 });

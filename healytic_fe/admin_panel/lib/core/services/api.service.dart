@@ -49,6 +49,7 @@ class ApiService implements Authentication {
   // ── Health Services & Categories ──────────────────
   late HealthServicesApi healthServicesApi;
   late CategoriesApi categoriesApi;
+  late AdminCategoriesApi adminCategoriesApi;
   late PartnerServiceTagsApi serviceTagsApi;
 
   // ── Locations ─────────────────────────────────────
@@ -116,6 +117,7 @@ class ApiService implements Authentication {
     partnerHealthServicesApi = PartnerHealthServicesApi(backend);
     healthServicesApi = HealthServicesApi(backend);
     categoriesApi = CategoriesApi(backend);
+    adminCategoriesApi = AdminCategoriesApi(backend);
     serviceTagsApi = PartnerServiceTagsApi(backend);
     locationsApi = LocationsApi(backend);
   }

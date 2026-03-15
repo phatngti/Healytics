@@ -32,6 +32,7 @@ import { SeederService } from './seeder.service';
           database: db.database,
           entities: db.entities,
           synchronize: false,
+          ssl: db.ssl,
         } as const;
       },
     }),

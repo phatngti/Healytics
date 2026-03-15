@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Account } from '@/common/entities/account.entity';
+import { UserProfile } from '@/common/entities/user-profile.entity';
 import { Role } from '@/account/enum/role.enum';
 import { ISeeder } from '../seeder.interface';
 
@@ -25,6 +26,36 @@ const SEED_USERS = [
     password: 'Partner@123',
     role: Role.HEALTH_PARTNER,
   },
+  {
+    email: 'partner2@healytics.vn',
+    username: 'partner_dental',
+    password: 'Partner@123',
+    role: Role.HEALTH_PARTNER,
+  },
+  {
+    email: 'partner3@healytics.vn',
+    username: 'partner_fitness',
+    password: 'Partner@123',
+    role: Role.HEALTH_PARTNER,
+  },
+  {
+    email: 'partner4@healytics.vn',
+    username: 'partner_pharmacy',
+    password: 'Partner@123',
+    role: Role.HEALTH_PARTNER,
+  },
+  {
+    email: 'partner5@healytics.vn',
+    username: 'partner_traditional',
+    password: 'Partner@123',
+    role: Role.HEALTH_PARTNER,
+  },
+  {
+    email: 'partner6@healytics.vn',
+    username: 'partner_psychology',
+    password: 'Partner@123',
+    role: Role.HEALTH_PARTNER,
+  },
 ];
 
 @Injectable()
@@ -34,6 +65,8 @@ export class UserSeeder implements ISeeder {
   constructor(
     @InjectRepository(Account)
     private readonly accountRepo: Repository<Account>,
+    @InjectRepository(UserProfile)
+    private readonly userProfileRepo: Repository<UserProfile>,
   ) {}
 
   async seed(): Promise<void> {
@@ -61,6 +94,18 @@ export class UserSeeder implements ISeeder {
 
       await this.accountRepo.save(account);
       this.logger.log(`  ✅ Created user "${userData.email}" (${userData.role})`);
+
+      // Create UserProfile for USER-role accounts
+      if (userData.role === Role.USER) {
+        const profile = this.userProfileRepo.create({
+          firstName: 'Test',
+          lastName: 'User',
+          phone: '0900000001',
+          accountId: account.id,
+        });
+        await this.userProfileRepo.save(profile);
+        this.logger.log(`    👤 Created user profile for "${userData.email}"`);
+      }
     }
 
     this.logger.log('Users seeding completed');

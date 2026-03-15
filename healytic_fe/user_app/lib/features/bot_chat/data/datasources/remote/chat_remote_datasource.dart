@@ -4,6 +4,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logging/logging.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/providers/api.provider.dart';
@@ -50,20 +51,10 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
 
   @override
   Future<List<ChatConversation>> getConversations() async {
-    final response = await _apiService.chatbotApi
-        .chatbotControllerListConversations();
-    if (response == null) return [];
-    return response.conversations.map(_mapItemToEntity).toList();
-  }
-
-  /// Maps [ConversationListItemDto] → [ChatConversation].
-  ChatConversation _mapItemToEntity(ConversationListItemDto dto) {
-    return ChatConversation(
-      id: dto.id,
-      title: dto.title,
-      lastMessage: dto.lastMessage,
-      timestamp: DateTime.parse(dto.timestamp),
-    );
+    // TODO: wire to API when the conversations
+    // listing endpoint is added to the spec.
+    _log.info('getConversations not yet wired to API');
+    return [];
   }
 
   @override
@@ -77,11 +68,11 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     String? conversationId,
     String text,
   ) async* {
-    // final userId = _extractUserId();
+    final userId = _extractUserId();
 
     final body = ChatbotRequest(
-      conversationId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-      userId: "1fddc673-84d8-47c8-9ad1-d0db0d35b172",
+      conversationId: "c7fd439d-6899-4164-8dda-cc7d29d14b04",
+      userId: userId,
       message: text,
       enableNer: false,
     ).toJson();
@@ -93,7 +84,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
 
     var isFirstEvent = true;
 
-    print("body:  $body");
+    _log.fine('body:  $body');
 
     yield* _sseService
         .postAndStream('/generative_ai/stream', body)
@@ -237,10 +228,10 @@ final chatSseServiceProvider = Provider<ChatSseService>((ref) {
   return ChatSseService(basePath: basePath);
 });
 
-/// Uses [StoreKey.mockFlag] to switch between real and
-/// mock implementations at runtime.
+/// Uses [AppEnvironment.useMock] to switch between
+/// real and mock implementations at runtime.
 final chatRemoteDatasourceProvider = Provider<ChatRemoteDatasource>((ref) {
-  final useMock = Store.tryGet(StoreKey.mockFlag) == 'true';
+  final useMock = AppEnvironment.current.useMock;
 
   if (useMock) {
     return ChatRemoteDatasourceMock();

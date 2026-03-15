@@ -5,6 +5,7 @@ import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/admin/category/domain/category.entity.dart';
 import 'package:admin_panel/features/admin/category/domain/create_category.request.dart';
 import 'package:admin_panel/features/admin/category/datasource/data/category_mock_data.dart';
+import 'package:admin_openapi/api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -49,10 +50,16 @@ abstract class CategoryRemoteDataSource {
 // ============================================================================
 
 /// Real implementation using API service
-class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
+class CategoryRemoteDataSourceImpl
+    implements CategoryRemoteDataSource {
   final ApiService apiService;
 
-  CategoryRemoteDataSourceImpl({required this.apiService});
+  CategoryRemoteDataSourceImpl({
+    required this.apiService,
+  });
+
+  AdminCategoriesApi get _api =>
+      apiService.adminCategoriesApi;
 
   @override
   Future<List<CategoryEntity>> getCategories({
@@ -61,33 +68,61 @@ class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   }) async {
-    // TODO: Implement real API call when endpoint is available
-    // final response = await apiService.categoriesApi.findAll();
-    debugPrint(
-      'CategoryRemoteDataSourceImpl.getCategories called - API not implemented yet',
+    final dtos =
+        await _api.adminCategoriesControllerFindAll();
+    if (dtos == null) return [];
+
+    final all = dtos.map(_mapDtoToEntity).toList();
+
+    final end = (startingAt + count).clamp(
+      0,
+      all.length,
     );
-    return [];
+    return all.sublist(
+      startingAt.clamp(0, all.length),
+      end,
+    );
   }
 
   @override
   Future<int> getTotalRows() async {
-    // TODO: Implement real API call
-    debugPrint(
-      'CategoryRemoteDataSourceImpl.getTotalRows called - API not implemented yet',
+    final dtos =
+        await _api.adminCategoriesControllerFindAll();
+    return dtos?.length ?? 0;
+  }
+
+  @override
+  Future<CategoryEntity> getCategoryById(
+    CategoryId id,
+  ) async {
+    final dto =
+        await _api.adminCategoriesControllerFindOne(id);
+    if (dto == null) {
+      throw Exception('Category not found: $id');
+    }
+    return _mapDtoToEntity(dto);
+  }
+
+  @override
+  Future<CategoryEntity> createCategory(
+    CreateCategoryRequest request,
+  ) async {
+    final dto =
+        await _api.adminCategoriesControllerCreate(
+      CreateCategoryDto(
+        name: request.name,
+        slug: _slugify(request.name),
+        description: request.description,
+        isActive: request.isVisible,
+        iconName: request.iconName,
+        colorValue: '#${request.colorValue.toRadixString(16).padLeft(8, '0')}',
+        sortOrder: request.sortOrder,
+      ),
     );
-    return 0;
-  }
-
-  @override
-  Future<CategoryEntity> getCategoryById(CategoryId id) async {
-    // TODO: Implement real API call
-    throw UnimplementedError('Category API not implemented yet');
-  }
-
-  @override
-  Future<CategoryEntity> createCategory(CreateCategoryRequest request) async {
-    // TODO: Implement real API call
-    throw UnimplementedError('Category API not implemented yet');
+    if (dto == null) {
+      throw Exception('Failed to create category');
+    }
+    return _mapDtoToEntity(dto);
   }
 
   @override
@@ -100,21 +135,75 @@ class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
     bool? isVisible,
     int? sortOrder,
   }) async {
-    // TODO: Implement real API call
-    throw UnimplementedError('Category API not implemented yet');
+    await _api.adminCategoriesControllerUpdate(
+      id,
+      UpdateCategoryDto(
+        name: name,
+        slug: name != null ? _slugify(name) : null,
+        description: description,
+        isActive: isVisible,
+        iconName: iconName,
+        colorValue: colorValue != null
+            ? '#${colorValue.toRadixString(16).padLeft(8, '0')}'
+            : null,
+        sortOrder: sortOrder,
+      ),
+    );
   }
 
   @override
   Future<void> deleteCategory(CategoryId id) async {
-    // TODO: Implement real API call
-    throw UnimplementedError('Category API not implemented yet');
+    await _api.adminCategoriesControllerRemove(id);
   }
 
   @override
   Future<List<CategoryEntity>> getVisibleCategories() async {
-    final all = await getCategories(startingAt: 0, count: 1000);
-    return all.where((c) => c.isVisible).toList();
+    final dtos =
+        await _api.adminCategoriesControllerFindAll();
+    if (dtos == null) return [];
+
+    return dtos
+        .where((dto) => dto.isActive)
+        .map(_mapDtoToEntity)
+        .toList();
   }
+}
+
+// ── Mapping helpers ─────────────────────────────────
+
+/// Maps [AdminCategoryResponseDto] → [CategoryEntity]
+CategoryEntity _mapDtoToEntity(
+  AdminCategoryResponseDto dto,
+) {
+  return CategoryEntity(
+    id: CategoryId(dto.id),
+    name: dto.name,
+    description: dto.description?.toString() ?? '',
+    iconName: dto.iconName?.toString() ?? 'category',
+    colorValue: _parseColorValue(dto.colorValue),
+    serviceCount: dto.serviceCount.toInt(),
+    isVisible: dto.isActive,
+    sortOrder: dto.sortOrder.toInt(),
+    createdAt: dto.createdAt.toIso8601String(),
+    updatedAt: dto.updatedAt.toIso8601String(),
+  );
+}
+
+/// Parses a hex color string like `#FF6366F1` to int.
+/// Falls back to default indigo if parsing fails.
+int _parseColorValue(Object? value) {
+  if (value == null) return 0xFF6366F1;
+  final str = value.toString().replaceFirst('#', '');
+  return int.tryParse(str, radix: 16) ?? 0xFF6366F1;
+}
+
+/// Generates a URL-friendly slug from [name].
+String _slugify(String name) {
+  return name
+      .toLowerCase()
+      .trim()
+      .replaceAll(RegExp(r'[^\w\s-]'), '')
+      .replaceAll(RegExp(r'\s+'), '-');
 }
 
 // ============================================================================

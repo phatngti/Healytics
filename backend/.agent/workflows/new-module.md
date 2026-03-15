@@ -163,26 +163,104 @@ export class ModuleService {
 
 ---
 
-## 6. Create Controller
+## 6. Create Controller(s)
+
+Choose the correct pattern based on the audience. If the module serves **multiple audiences**, create **one controller per role tier**.
+
+### Option A: Admin Controller — `@AdminApi('resource')`
 
 ```typescript
-// <module-name>.controller.ts
-@ApiTags('<module-name>')
-@ApiBearerAuth()
-@Controller({ path: '<module-name>', version: '1' })
-@UseGuards(JwtAuthGuard, RolesGuard)
-@UseInterceptors(ClassSerializerInterceptor)
-export class ModuleController {
+// admin-<module-name>.controller.ts → /v1/admin/<resource>
+import { AdminApi } from '@/common/decorators/api/admin-api.decorator';
+
+@AdminApi('<resource>')
+export class AdminModuleController {
   constructor(private readonly service: ModuleService) {}
 
   @Post()
-  @Roles('admin')
   @ApiOperation({ summary: 'Create new entity' })
   @ApiCreatedResponse({ type: EntityResponseDto })
   create(@Body() dto: CreateEntityDto): Promise<EntityResponseDto> {
     return this.service.create(dto);
   }
 }
+```
+
+### Option B: Partner Controller — `@PartnerApi('resource')`
+
+```typescript
+// partner-<module-name>.controller.ts → /v1/partner/<resource>
+import { PartnerApi } from '@/common/decorators/api/partner-api.decorator';
+import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
+
+@PartnerApi('<resource>')
+export class PartnerModuleController {
+  constructor(private readonly service: ModuleService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'List my entities' })
+  @ApiOkResponse({ type: [EntityResponseDto] })
+  findAll(@CurrentUser('id') userId: string): Promise<EntityResponseDto[]> {
+    return this.service.findAllByUser(userId);
+  }
+}
+```
+
+### Option C: User Controller — `@UserApi('resource')`
+
+```typescript
+// user-<module-name>.controller.ts → /v1/user/<resource>
+import { UserApi } from '@/common/decorators/api/user-api.decorator';
+
+@UserApi('<resource>')
+export class UserModuleController {
+  constructor(private readonly service: ModuleService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'List entities' })
+  @ApiOkResponse({ type: [EntityResponseDto] })
+  findAll(): Promise<EntityResponseDto[]> {
+    return this.service.findAll();
+  }
+}
+```
+
+### Option D: Public Controller — `@PublicApi('resource')`
+
+```typescript
+// <module-name>.controller.ts → /v1/<resource>
+import { PublicApi } from '@/common/decorators/api/public-api.decorator';
+
+@PublicApi('<resource>')
+export class ModuleController {
+  constructor(private readonly service: ModuleService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'List all entities' })
+  @ApiOkResponse({ type: [EntityResponseDto] })
+  findAll(): Promise<EntityResponseDto[]> {
+    return this.service.findAll();
+  }
+}
+```
+
+### Multi-Audience Modules
+
+If the module serves multiple audiences, create **one controller per tier**:
+
+```
+src/<module-name>/
+├── <module-name>.controller.ts          # Public (read-only)
+├── admin-<module-name>.controller.ts    # Admin (mutations)
+├── partner-<module-name>.controller.ts  # Partner
+├── user-<module-name>.controller.ts     # User
+```
+
+Register all controllers in the module:
+
+```typescript
+controllers: [ModuleController, AdminModuleController, PartnerModuleController],
+```
 ```
 
 ---
@@ -193,7 +271,10 @@ export class ModuleController {
 // <module-name>.module.ts
 @Module({
   imports: [TypeOrmModule.forFeature([YourEntity])],
-  controllers: [ModuleController],
+  controllers: [
+    ModuleController,          // Public read-only
+    AdminModuleController,     // Admin mutations (if applicable)
+  ],
   providers: [ModuleService, CreateEntityHandler],
   exports: [ModuleService],
 })
@@ -242,3 +323,10 @@ npm run migration:run
 npm run build
 npm run test
 ```
+
+---
+
+## 12. Update Module Todos
+
+After verifying, run the `/update-todos` workflow to document this implementation in `todos/<module-name>/`.
+

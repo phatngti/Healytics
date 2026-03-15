@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 
 /// Telegram-style input bar: clean, minimal, with an
 /// attachment button, expandable text field, and a send
@@ -83,6 +84,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                 child: Container(
                   constraints: const BoxConstraints(minHeight: 40),
                   child: TextField(
+                    key: keys.chatPage.messageInput,
                     controller: _controller,
                     maxLines: 5,
                     minLines: 1,
@@ -119,7 +121,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                     ScaleTransition(scale: anim, child: child),
                 child: _hasText
                     ? _CircleIconButton(
-                        key: const ValueKey('send'),
+                        key: keys.chatPage.sendButton,
                         icon: Icons.send_rounded,
                         color: colorScheme.onPrimary,
                         backgroundColor: colorScheme.primary,

@@ -1,0 +1,483 @@
+{
+  "auth": {
+    "email": "test@healytics.dev",
+    "password": "Test1234!"
+  },
+  "home": {
+    "categories": [
+      {
+        "id": "cat-1",
+        "name": "Spa",
+        "slug": "spa-treatments",
+        "categoryType": "primary"
+      },
+      {
+        "id": "cat-2",
+        "name": "Wellness",
+        "slug": "wellness-programs",
+        "categoryType": "secondary"
+      },
+      {
+        "id": "cat-3",
+        "name": "Fitness",
+        "slug": "fitness-training",
+        "categoryType": "tertiary"
+      },
+      {
+        "id": "cat-4",
+        "name": "Mental Health",
+        "slug": "mental-health",
+        "categoryType": "error"
+      },
+      {
+        "id": "cat-5",
+        "name": "Therapy",
+        "slug": "physical-therapy",
+        "categoryType": "tertiary"
+      },
+      {
+        "id": "cat-6",
+        "name": "Medical",
+        "slug": "medical-services",
+        "categoryType": "primary"
+      }
+    ],
+    "serviceTags": [
+      {
+        "id": "tag-1",
+        "name": "Deep Tissue Massage",
+        "description": "Therapeutic massage for muscle tension",
+        "usage": 24,
+        "sortOrder": 1
+      },
+      {
+        "id": "tag-2",
+        "name": "Swedish Massage",
+        "description": "Relaxing full-body massage",
+        "usage": 18,
+        "sortOrder": 2
+      },
+      {
+        "id": "tag-3",
+        "name": "Hot Stone Therapy",
+        "description": "Heated stone relaxation therapy",
+        "usage": 12,
+        "sortOrder": 3
+      },
+      {
+        "id": "tag-4",
+        "name": "Aromatherapy",
+        "description": "Essential oil treatments",
+        "usage": 15,
+        "sortOrder": 4
+      },
+      {
+        "id": "tag-5",
+        "name": "Sports Massage",
+        "description": "Athletic recovery massage",
+        "usage": 9,
+        "sortOrder": 5
+      },
+      {
+        "id": "tag-6",
+        "name": "Facial Treatment",
+        "description": "Skincare and facial therapy",
+        "usage": 21,
+        "sortOrder": 6
+      }
+    ],
+    "products": [
+      {
+        "id": "prod-1",
+        "name": "Deep Tissue Massage",
+        "slug": "deep-tissue-massage",
+        "category": "Spa",
+        "duration": "60 min",
+        "price": "850000 VND",
+        "rating": "4.9",
+        "vendorName": "Spa Harmony",
+        "location": "District 1, Ho Chi Minh City",
+        "type": "service"
+      },
+      {
+        "id": "prod-2",
+        "name": "Yoga & Meditation",
+        "slug": "yoga-meditation",
+        "category": "Wellness",
+        "duration": "45 min",
+        "price": "450000 VND",
+        "rating": "4.8",
+        "vendorName": "Zen Studio",
+        "location": "Thao Dien, Thu Duc City",
+        "type": "service"
+      },
+      {
+        "id": "prod-3",
+        "name": "Personal Training",
+        "slug": "personal-training",
+        "category": "Fitness",
+        "duration": "50 min",
+        "price": "600000 VND",
+        "rating": "4.7",
+        "vendorName": "FitLife Center",
+        "location": "District 7, Ho Chi Minh City",
+        "type": "service"
+      },
+      {
+        "id": "prod-4",
+        "name": "Aromatherapy Oil Set",
+        "slug": "aromatherapy-oil-set",
+        "category": "Wellness",
+        "price": "350000 VND",
+        "rating": "4.6",
+        "vendorName": "Nature Bliss",
+        "location": "Binh Thanh District",
+        "type": "physical"
+      },
+      {
+        "id": "prod-5",
+        "name": "Hot Stone Therapy",
+        "slug": "hot-stone-therapy",
+        "category": "Spa",
+        "duration": "90 min",
+        "price": "1200000 VND",
+        "rating": "5.0",
+        "vendorName": "Royal Spa",
+        "location": "District 3, Ho Chi Minh City",
+        "type": "service"
+      },
+      {
+        "id": "prod-6",
+        "name": "Herbal Wellness Tea",
+        "slug": "herbal-wellness-tea",
+        "category": "Wellness",
+        "price": "180000 VND",
+        "rating": "4.5",
+        "vendorName": "Tea Garden",
+        "location": "Phu Nhuan District",
+        "type": "physical"
+      }
+    ]
+  },
+  "serviceDetails": {
+    "service-laser-co2": {
+      "title": "Laser CO2 Skin Therapy",
+      "categoryLabel": "Clinical Dermatology",
+      "rating": 4.9,
+      "reviewCount": 124,
+      "price": "$350.00",
+      "isVerified": true,
+      "clinic": {
+        "name": "Elite Dermatology",
+        "address": "42 West St, NY"
+      }
+    },
+    "prod-1": {
+      "title": "Deep Tissue Massage",
+      "categoryLabel": "Spa",
+      "rating": 4.9,
+      "reviewCount": 87,
+      "price": "850,000 VND",
+      "isVerified": true,
+      "clinic": {
+        "name": "Spa Harmony",
+        "address": "District 1, Ho Chi Minh City"
+      }
+    },
+    "prod-2": {
+      "title": "Yoga & Meditation",
+      "categoryLabel": "Wellness",
+      "rating": 4.8,
+      "reviewCount": 62,
+      "price": "450,000 VND",
+      "isVerified": true,
+      "clinic": {
+        "name": "Zen Studio",
+        "address": "Thao Dien, Thu Duc City"
+      }
+    },
+    "prod-3": {
+      "title": "Personal Training",
+      "categoryLabel": "Fitness",
+      "rating": 4.7,
+      "reviewCount": 45,
+      "price": "600,000 VND",
+      "isVerified": true,
+      "clinic": {
+        "name": "FitLife Center",
+        "address": "District 7, Ho Chi Minh City"
+      }
+    },
+    "prod-5": {
+      "title": "Hot Stone Therapy",
+      "categoryLabel": "Spa",
+      "rating": 5.0,
+      "reviewCount": 31,
+      "price": "1,200,000 VND",
+      "isVerified": true,
+      "clinic": {
+        "name": "Royal Spa",
+        "address": "District 3, Ho Chi Minh City"
+      }
+    }
+  },
+  "conversations": [
+    {
+      "id": "1",
+      "title": "Mild headache and dizziness",
+      "lastMessage": "Recommended hydration and rest...",
+      "timestamp": "2026-02-10T14:00:00"
+    },
+    {
+      "id": "2",
+      "title": "Blood test results interpretation",
+      "lastMessage": "Analyzing lipid profile markers...",
+      "timestamp": "2026-02-10T11:30:00"
+    },
+    {
+      "id": "3",
+      "title": "Sore throat remedies",
+      "lastMessage": "Discussed tea with honey and...",
+      "timestamp": "2026-02-09T16:45:00"
+    },
+    {
+      "id": "4",
+      "title": "Weekly workout plan",
+      "lastMessage": "Generated low impact cardio routine...",
+      "timestamp": "2026-02-09T09:15:00"
+    },
+    {
+      "id": "5",
+      "title": "Medication reminder setup",
+      "lastMessage": "Configured daily alerts for vitamins...",
+      "timestamp": "2026-02-03T10:00:00"
+    }
+  ],
+  "chatMessages": {
+    "1": [
+      {
+        "id": "1",
+        "text": "Hello! 👋 I'm your personal health assistant. I can help verify symptoms or guide you to the right specialist. How are you feeling today?",
+        "timestamp": "2026-02-10T09:41:00",
+        "isUser": false
+      },
+      {
+        "id": "2",
+        "text": "Hi Dr. AI. I've had a mild headache since this morning and I'm feeling a bit dizzy.",
+        "timestamp": "2026-02-10T09:42:00",
+        "isUser": true
+      },
+      {
+        "id": "3",
+        "text": "I'm sorry to hear that. To help me understand better, on a scale of 1 to 10, how severe would you say the pain is right now?",
+        "timestamp": "2026-02-10T09:42:30",
+        "isUser": false
+      }
+    ]
+  },
+  "orders": {
+    "appointments": [
+      {
+        "id": "apt-1",
+        "serviceName": "Swedish Relax",
+        "vendorName": "Glow Saigon Spa Retreat",
+        "status": "upcoming",
+        "category": "spa",
+        "providerName": "Dr Alexander Linda",
+        "address": "311 Vo Van Tan, Ward 14, District 1, HCM City, VN",
+        "date": "2026-03-09T00:00:00",
+        "checkInTime": "7:00 AM",
+        "checkOutTime": "7:30 AM",
+        "duration": "About 1 hour"
+      },
+      {
+        "id": "apt-2",
+        "serviceName": "Swedish Relax",
+        "vendorName": "Glow Saigon Spa Retreat",
+        "status": "upcoming",
+        "category": "spa",
+        "providerName": "Dr Alexander Linda",
+        "address": "311 Vo Van Tan, Ward 14, District 1, HCM City, VN",
+        "date": "2026-03-09T00:00:00",
+        "checkInTime": "7:00 AM",
+        "checkOutTime": "7:30 AM",
+        "duration": "About 1 hour"
+      },
+      {
+        "id": "apt-3",
+        "serviceName": "Deep Tissue Recovery",
+        "vendorName": "Zen Wellness Center",
+        "status": "completed",
+        "category": "wellness",
+        "providerName": "Dr Maria Chen",
+        "address": "45 Nguyen Hue, Ben Nghe, District 1, HCM City, VN",
+        "date": "2026-02-20T00:00:00",
+        "checkInTime": "10:00 AM",
+        "checkOutTime": "11:30 AM",
+        "duration": "About 1.5 hours"
+      },
+      {
+        "id": "apt-4",
+        "serviceName": "Facial Rejuvenation",
+        "vendorName": "Beauty Lab Saigon",
+        "status": "canceled",
+        "category": "beauty",
+        "providerName": "Dr Sofia Tran",
+        "address": "88 Le Thanh Ton, Ben Nghe, District 1, HCM City, VN",
+        "date": "2026-02-15T00:00:00",
+        "checkInTime": "2:00 PM",
+        "checkOutTime": "2:45 PM",
+        "duration": "About 45 min"
+      }
+    ],
+    "categories": [
+      {
+        "id": "cat-all",
+        "name": "All",
+        "iconSlug": "check_circle_outline"
+      },
+      {
+        "id": "cat-spa",
+        "name": "Spa",
+        "iconSlug": "spa"
+      },
+      {
+        "id": "cat-wellness",
+        "name": "Wellness",
+        "iconSlug": "self_improvement"
+      },
+      {
+        "id": "cat-beauty",
+        "name": "Beauty",
+        "iconSlug": "face"
+      }
+    ],
+    "recommendedServices": [
+      {
+        "id": "rec-1",
+        "name": "Relaxation Massage",
+        "description": "Based on your stress levels and preference",
+        "price": "$89",
+        "duration": "60 min"
+      },
+      {
+        "id": "rec-2",
+        "name": "Aroma Therapy",
+        "description": "Essential oils to boost your mood",
+        "price": "$65",
+        "duration": "45 min"
+      }
+    ]
+  },
+  "checkout": {
+    "customer": {
+      "name": "Nguyen Tien Phat",
+      "phone": "0912 345 678",
+      "address": "12 Street 12, Ward 2, District 3, HCMC"
+    },
+    "items": [
+      {
+        "id": "1",
+        "name": "Elite Dermatology Laser CO2",
+        "vendorName": "Elite Dermatology Clinic",
+        "duration": "60 min",
+        "specialistName": "Dr. Sarah Lin",
+        "originalPrice": 5000000,
+        "discountedPrice": 3500000
+      },
+      {
+        "id": "2",
+        "name": "Swedish Relax Massage",
+        "vendorName": "Serenity Wellness Spa",
+        "duration": "90 min",
+        "specialistName": "Therapist Anna",
+        "originalPrice": 1200000,
+        "discountedPrice": 850000
+      }
+    ],
+    "vouchers": {
+      "shop": {
+        "label": "Shop Voucher",
+        "discountAmount": 0,
+        "isApplied": false
+      },
+      "platform": {
+        "label": "Platform Voucher",
+        "discountAmount": 150000,
+        "isApplied": true
+      }
+    },
+    "paymentMethods": [
+      {
+        "type": "card",
+        "label": "Credit/Debit Card",
+        "subLabel": "*3434"
+      },
+      {
+        "type": "eWallet",
+        "label": "E-Wallet (Momo/ZaloPay)"
+      },
+      {
+        "type": "payLater",
+        "label": "Pay Later"
+      }
+    ],
+    "summary": {
+      "subtotal": 10150000,
+      "shopDiscount": 1232000,
+      "platformVoucher": 150000,
+      "coinsUsed": 25000,
+      "coinBalance": 2500,
+      "coinValue": 25000
+    }
+  },
+  "serviceManual": {
+    "serviceName": "Swedish Relax",
+    "vendorName": "Glow Saigon",
+    "preServiceGuidelines": [
+      "Vui lòng đến trước 15 phút để hoàn tất thủ tục check-in và thay trang phục.",
+      "Uống đủ nước trước khi bắt đầu liệu trình để hỗ trợ quá trình thải độc.",
+      "Thông báo tình trạng sức khỏe đặc biệt cho trị liệu viên."
+    ],
+    "serviceRules": [
+      {
+        "iconSlug": "volume_off",
+        "title": "Yên lặng",
+        "description": "Vui lòng tắt chuông điện thoại để duy trì không gian thư giãn."
+      },
+      {
+        "iconSlug": "event_busy",
+        "title": "Hủy lịch",
+        "description": "Hủy trước 4 giờ để không mất phí đặt cọc."
+      }
+    ],
+    "procedureSteps": [
+      {
+        "step": 1,
+        "title": "Consultation",
+        "description": "Tư vấn chọn tinh dầu và kiểm tra da."
+      },
+      {
+        "step": 2,
+        "title": "Preparation",
+        "description": "Thay trang phục, ngâm chân thảo dược."
+      },
+      {
+        "step": 3,
+        "title": "Massage",
+        "description": "60 phút trị liệu Thụy Điển chuyên sâu.",
+        "isActive": true
+      },
+      {
+        "step": 4,
+        "title": "Relaxation",
+        "description": "Thư giãn với khăn nóng và đắp mắt."
+      },
+      {
+        "step": 5,
+        "title": "Aftercare",
+        "description": "Thưởng thức trà thảo mộc và bánh ngọt."
+      }
+    ]
+  }
+}

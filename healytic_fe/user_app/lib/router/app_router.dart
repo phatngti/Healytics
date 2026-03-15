@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
@@ -60,11 +61,13 @@ class RouterListenable extends _$RouterListenable implements Listenable {
             path == HealthSafetyStepRoute.pathPattern);
 
     if (isLoggedIn) {
+      developer.log('[ROUTER] Logged In Route requested: $path', name: 'AppRouter');
       // Logged-in user hitting a public route → send to home
       if (isPublicRoute) {
         return '/home';
       }
     } else {
+      developer.log('[ROUTER] Public Route requested: $path', name: 'AppRouter');
       // Not logged in and trying to access a protected route
       if (!isPublicRoute) {
         return '/signin';

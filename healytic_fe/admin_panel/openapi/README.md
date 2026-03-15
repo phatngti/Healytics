@@ -67,6 +67,11 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**accountControllerGetSurvey**](doc//AccountApi.md#accountcontrollergetsurvey) | **GET** /account/survey | Get current user survey
 *AccountApi* | [**accountControllerPostSurvey**](doc//AccountApi.md#accountcontrollerpostsurvey) | **POST** /account/survey | Create one-shot survey for current user
 *AdminAuditLogsApi* | [**auditControllerGetAuditLogs**](doc//AdminAuditLogsApi.md#auditcontrollergetauditlogs) | **GET** /admin/audit-logs | Get audit logs with optional filters
+*AdminCategoriesApi* | [**adminCategoriesControllerCreate**](doc//AdminCategoriesApi.md#admincategoriescontrollercreate) | **POST** /admin/categories | Create a new category
+*AdminCategoriesApi* | [**adminCategoriesControllerFindAll**](doc//AdminCategoriesApi.md#admincategoriescontrollerfindall) | **GET** /admin/categories | List all categories (admin view)
+*AdminCategoriesApi* | [**adminCategoriesControllerFindOne**](doc//AdminCategoriesApi.md#admincategoriescontrollerfindone) | **GET** /admin/categories/{id} | Get a category by id (admin view)
+*AdminCategoriesApi* | [**adminCategoriesControllerRemove**](doc//AdminCategoriesApi.md#admincategoriescontrollerremove) | **DELETE** /admin/categories/{id} | Delete a category
+*AdminCategoriesApi* | [**adminCategoriesControllerUpdate**](doc//AdminCategoriesApi.md#admincategoriescontrollerupdate) | **PATCH** /admin/categories/{id} | Update a category
 *AdminPartnersApi* | [**adminPartnersControllerGetPartnerDetail**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartnerdetail) | **GET** /admin/partners/{id} | Get partner details including documents
 *AdminPartnersApi* | [**adminPartnersControllerGetPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartners) | **GET** /admin/partners | List all partners
 *AdminPartnersApi* | [**adminPartnersControllerGetTotalPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergettotalpartners) | **GET** /admin/partners/total | Get total number of partners
@@ -79,13 +84,9 @@ Class | Method | HTTP request | Description
 *AuthenticationApi* | [**authControllerRefreshPartner**](doc//AuthenticationApi.md#authcontrollerrefreshpartner) | **POST** /auth/partner/refresh | Refresh partner tokens with verification info
 *AuthenticationApi* | [**authControllerRegisterPartner**](doc//AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
 *AuthenticationApi* | [**authControllerRegisterUser**](doc//AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | Register a new user
-*CategoriesApi* | [**categoriesControllerCreate**](doc//CategoriesApi.md#categoriescontrollercreate) | **POST** /categories | Create a new category
 *CategoriesApi* | [**categoriesControllerFindAll**](doc//CategoriesApi.md#categoriescontrollerfindall) | **GET** /categories | Get all categories
 *CategoriesApi* | [**categoriesControllerFindBySlug**](doc//CategoriesApi.md#categoriescontrollerfindbyslug) | **GET** /categories/slug/{slug} | Get a category by slug
 *CategoriesApi* | [**categoriesControllerFindOne**](doc//CategoriesApi.md#categoriescontrollerfindone) | **GET** /categories/{id} | Get a category by id
-*CategoriesApi* | [**categoriesControllerRemove**](doc//CategoriesApi.md#categoriescontrollerremove) | **DELETE** /categories/{id} | Delete a category
-*CategoriesApi* | [**categoriesControllerUpdate**](doc//CategoriesApi.md#categoriescontrollerupdate) | **PATCH** /categories/{id} | Update a category
-*ChatbotApi* | [**chatbotControllerListConversations**](doc//ChatbotApi.md#chatbotcontrollerlistconversations) | **GET** /chatbot/conversations | Get paginated list of conversations
 *HealthServicesApi* | [**healthServiceControllerFindOne**](doc//HealthServicesApi.md#healthservicecontrollerfindone) | **GET** /health-services/{id} | Get a service by id
 *HealthServicesApi* | [**healthServiceControllerGetHomeRecommend**](doc//HealthServicesApi.md#healthservicecontrollergethomerecommend) | **GET** /health-services/home-recommend | Get home recommendations
 *HealthServicesApi* | [**healthServiceControllerGetPremiumTreatments**](doc//HealthServicesApi.md#healthservicecontrollergetpremiumtreatments) | **GET** /health-services/premium-treatments | Get premium treatments
@@ -96,6 +97,10 @@ Class | Method | HTTP request | Description
 *LocationsApi* | [**locationsControllerGetDistricts**](doc//LocationsApi.md#locationscontrollergetdistricts) | **GET** /locations/provinces/{provinceId}/districts | Get all districts in a province
 *LocationsApi* | [**locationsControllerGetProvinces**](doc//LocationsApi.md#locationscontrollergetprovinces) | **GET** /locations/provinces | Get all provinces in Vietnam
 *LocationsApi* | [**locationsControllerGetWards**](doc//LocationsApi.md#locationscontrollergetwards) | **GET** /locations/districts/{districtId}/wards | Get all wards in a district
+*MapboxApi* | [**mapboxControllerDistanceMatrix**](doc//MapboxApi.md#mapboxcontrollerdistancematrix) | **GET** /mapbox/distance-matrix | Get travel distance and duration
+*MapboxApi* | [**mapboxControllerGeocode**](doc//MapboxApi.md#mapboxcontrollergeocode) | **GET** /mapbox/geocode | Geocode an address to lat/lng
+*MapboxApi* | [**mapboxControllerGetClientKey**](doc//MapboxApi.md#mapboxcontrollergetclientkey) | **GET** /mapbox/client-key | Get public access token for frontend/mobile SDKs
+*MapboxApi* | [**mapboxControllerReverseGeocode**](doc//MapboxApi.md#mapboxcontrollerreversegeocode) | **GET** /mapbox/reverse-geocode | Reverse geocode lat/lng to address
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateDoctor**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatedoctor) | **POST** /partner/employees/doctors | Create a new doctor
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateMassageTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatemassagetherapist) | **POST** /partner/employees/massage-therapists | Create a new massage therapist
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateSpaTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
@@ -124,8 +129,13 @@ Class | Method | HTTP request | Description
 *S3Api* | [**s3ControllerDeleteFile**](doc//S3Api.md#s3controllerdeletefile) | **DELETE** /s3/{key} | Delete file
 *S3Api* | [**s3ControllerGetFileUrl**](doc//S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file URL
 *S3Api* | [**s3ControllerPreSign**](doc//S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload URL
+*UserBookingsApi* | [**bookingControllerAsyncCheckout**](doc//UserBookingsApi.md#bookingcontrollerasynccheckout) | **POST** /user/bookings/async-checkout | Start async checkout (returns 202 with ticket ID)
+*UserBookingsApi* | [**bookingControllerGetBooking**](doc//UserBookingsApi.md#bookingcontrollergetbooking) | **GET** /user/bookings/{id} | Get booking by ID
+*UserBookingsApi* | [**bookingControllerGetTicketStatus**](doc//UserBookingsApi.md#bookingcontrollergetticketstatus) | **GET** /user/bookings/tickets/{id} | Get checkout ticket status
+*UserBookingsApi* | [**bookingControllerListMyBookings**](doc//UserBookingsApi.md#bookingcontrollerlistmybookings) | **GET** /user/bookings | List my bookings
 *UserEmployeesApi* | [**userEmployeesControllerFindAll**](doc//UserEmployeesApi.md#useremployeescontrollerfindall) | **GET** /user/employees | Get all employees
 *UserEmployeesApi* | [**userEmployeesControllerFindOne**](doc//UserEmployeesApi.md#useremployeescontrollerfindone) | **GET** /user/employees/{id} | Get an employee by id
+*UserSlotsApi* | [**slotsControllerMicroLock**](doc//UserSlotsApi.md#slotscontrollermicrolock) | **POST** /user/slots/micro-lock | Acquire a micro-lock on a time slot (120s TTL)
 
 
 ## Documentation For Models
@@ -133,10 +143,14 @@ Class | Method | HTTP request | Description
  - [AccountRequestDto](doc//AccountRequestDto.md)
  - [AddressDto](doc//AddressDto.md)
  - [AddressInfoDto](doc//AddressInfoDto.md)
+ - [AdminCategoryResponseDto](doc//AdminCategoryResponseDto.md)
  - [AdminLoginDto](doc//AdminLoginDto.md)
  - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
+ - [AsyncCheckoutDto](doc//AsyncCheckoutDto.md)
+ - [AsyncCheckoutResponseDto](doc//AsyncCheckoutResponseDto.md)
  - [AttachTagResponseDto](doc//AttachTagResponseDto.md)
  - [AuthTokensDto](doc//AuthTokensDto.md)
+ - [BookingResponseDto](doc//BookingResponseDto.md)
  - [BusinessInfo](doc//BusinessInfo.md)
  - [BusinessInfoDto](doc//BusinessInfoDto.md)
  - [BusinessServiceDto](doc//BusinessServiceDto.md)
@@ -144,9 +158,8 @@ Class | Method | HTTP request | Description
  - [BusinessType](doc//BusinessType.md)
  - [CategoryResponseDto](doc//CategoryResponseDto.md)
  - [CategorySummaryDto](doc//CategorySummaryDto.md)
- - [ConversationListItemDto](doc//ConversationListItemDto.md)
- - [ConversationListMetaDto](doc//ConversationListMetaDto.md)
- - [ConversationListResponseDto](doc//ConversationListResponseDto.md)
+ - [CheckoutTicketResponseDto](doc//CheckoutTicketResponseDto.md)
+ - [ClientKeyResponseDto](doc//ClientKeyResponseDto.md)
  - [CreateCategoryDto](doc//CreateCategoryDto.md)
  - [CreateDoctorDto](doc//CreateDoctorDto.md)
  - [CreateDoctorProfileDto](doc//CreateDoctorProfileDto.md)
@@ -160,9 +173,14 @@ Class | Method | HTTP request | Description
  - [CreateSpaTherapistDto](doc//CreateSpaTherapistDto.md)
  - [CreateTherapistProfileDto](doc//CreateTherapistProfileDto.md)
  - [DeleteFileResponseDto](doc//DeleteFileResponseDto.md)
+ - [DistanceMatrixElementDto](doc//DistanceMatrixElementDto.md)
+ - [DistanceMatrixResponseDto](doc//DistanceMatrixResponseDto.md)
+ - [DistanceMatrixRowDto](doc//DistanceMatrixRowDto.md)
  - [DoctorProfileResponseDto](doc//DoctorProfileResponseDto.md)
  - [EmployeeResponseDto](doc//EmployeeResponseDto.md)
  - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
+ - [GeocodeResponseDto](doc//GeocodeResponseDto.md)
+ - [GeocodeResultDto](doc//GeocodeResultDto.md)
  - [KycDocumentDto](doc//KycDocumentDto.md)
  - [LegalRepresentativeDto](doc//LegalRepresentativeDto.md)
  - [LegalRepresentativeRequestDto](doc//LegalRepresentativeRequestDto.md)
@@ -170,6 +188,8 @@ Class | Method | HTTP request | Description
  - [LocationResponseDto](doc//LocationResponseDto.md)
  - [LoginDto](doc//LoginDto.md)
  - [LogoutResponseDto](doc//LogoutResponseDto.md)
+ - [MicroLockDto](doc//MicroLockDto.md)
+ - [MicroLockResponseDto](doc//MicroLockResponseDto.md)
  - [MyProfileResponseDto](doc//MyProfileResponseDto.md)
  - [PartnerCategorySummaryDto](doc//PartnerCategorySummaryDto.md)
  - [PartnerClinicDto](doc//PartnerClinicDto.md)

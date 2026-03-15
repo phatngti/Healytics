@@ -1,0 +1,13 @@
+{
+    "serverEndpoint": "",
+    "customHeaders": {
+        "deviceModel": "iPhone 13",
+        "deviceType": "iOS"
+    },
+    "r2PublicBaseUrl": "https://pub-58a545087a6b4221b1b0dab10d8d3517.r2.dev",
+    "mockFlag": "true",
+    "mockRole": "admin",
+    "autoFill": "true",
+    "partnerVerified": "true",
+    "mapboxAccessToken": "pk.eyJ1IjoicGhhdG50Z2l0aHViIiwiYSI6ImNtbW9mYWRubTBkeDgycnBzNXM3ZjFhdnYifQ.khGgUZkf8agneDlgCQV0Xg"
+}
