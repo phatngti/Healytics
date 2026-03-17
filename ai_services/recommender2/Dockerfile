@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# docker build -t healytics_recommender .
+# docker build -t giahung2111/healytics_recommender:latest .
 # docker run -it healytics_recommender
 # docker run -it -v ~/Projects/Healytics/ai_services/recommender2:/app -w /app healytics_recommender bash
 # docker run --name healytics_recommender -it -p 8000:8000 --env-file .env -v /home/giahung21112004/Projects/Healytics/ai_services/recommender2:/app -v hf_cache:/root/.cache/huggingface -v torch_cache:/root/.cache/torch -w /app healytics_recommender 
