@@ -1,11 +1,14 @@
 from fastapi import APIRouter
+import json
 import logging
+from datetime import datetime, timezone
+from pathlib import Path
+
+from app.core.config import settings
 from app.schemas.ner_schema import PreFilterRequest, PreFilterResponse, NerEntity
 from app.ner import extractor, normalizer
 from app.ner.cache import get_feature_tags, get_category_list
-from app.ner.intent_logging import log_location_intent_samples
-from app.ner.semantic_adjudicator import SemanticAdjudicator
-from app.ner.semantic_matcher import get_matcher, group_tag_filters
+from app.ner.semantic_matcher import get_matcher, group_tag_filters, SemanticAdjudicator
 from app.ner.spatial_context import resolve_spatial_context
 from app.utils import db_fetcher
 from app.utils.query_builder import build_backend_query
@@ -13,6 +16,41 @@ from app.utils.query_builder import build_backend_query
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+def _log_location_intent_samples(text: str, entities: list[NerEntity], query_params: dict) -> None:
+    if not settings.LOCATION_INTENT_LOG_ENABLED:
+        return
+
+    location_entities = [e for e in entities if e.type == "LOCATION" and e.location_code]
+    if not location_entities:
+        return
+
+    applied_code = query_params.get("locationCode")
+
+    log_path = Path(settings.LOCATION_INTENT_LOG_PATH)
+    if not log_path.is_absolute():
+        log_path = Path.cwd() / log_path
+
+    try:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with log_path.open("a", encoding="utf-8") as f:
+            for e in location_entities:
+                record = {
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "text": text,
+                    "location_value": e.value,
+                    "location_code": e.location_code,
+                    "location_level": e.location_level,
+                    "intent_score": e.location_intent_score,
+                    "intent_decision": e.location_intent,
+                    "applied_filter": bool(applied_code and applied_code == e.location_code),
+                    "label": None,
+                }
+                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception as exc:
+        logger.warning("[IntentLogging] Failed to write location-intent sample: %s", exc)
 
 @router.post("/prefilter/search", response_model=PreFilterResponse)
 async def prefilter_search(request: PreFilterRequest):
@@ -155,7 +193,7 @@ async def prefilter_search(request: PreFilterRequest):
     # 5. Fetch services
     use_postgis = bool(spatial_context)
 
-    log_location_intent_samples(text, entities, query_params)
+    _log_location_intent_samples(text, entities, query_params)
 
     candidates = await db_fetcher.fetch_candidates_from_db(query_params, use_postgis=use_postgis)
 
