@@ -137,6 +137,8 @@ async def fetch_candidates_from_db(
         params["loc_code"] = loc_code
 
     # ── Category ──────────────────────────────────────────────────────────────
+    # Hard AND — category PHẢI match (dù detect bởi NER hay semantic fallback).
+    # Logic: businessType=X AND c.slug=Y AND (tag_A OR tag_B)
     cat_slug = query_params.get("categorySlug")
     if cat_slug:
         conditions.append("c.slug = :cat_slug")
@@ -159,6 +161,35 @@ async def fetch_candidates_from_db(
             "(SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id) >= :min_r"
         )
         params["min_r"] = min_r
+
+    # ── Feature Tag Filters ────────────────────────────────────────────────────
+    # tagFilters: [{ids:[...], op:"OR"}, {ids:[...], op:"AND"}, ...]
+    #   OR group  → EXISTS (...tag_id IN (:t0, :t1))  — product cần ít nhất 1 tag trong list
+    #   AND group → EXISTS (...tag_id = :t) per tag   — product phải có TẤT CẢ tags
+    # Tất cả groups được AND nhau trong WHERE:
+    #   WHERE ... AND c.slug=:cat AND (EXISTS tag_A OR EXISTS tag_B) AND EXISTS tag_C
+    tag_filters = query_params.get("tagFilters", [])
+    for i, tf in enumerate(tag_filters):
+        op   = tf.get("op", "OR")
+        tids = tf.get("ids", [])
+        if not tids:
+            continue
+        if op == "OR":
+            placeholders = ", ".join(f":tf_{i}_{j}" for j in range(len(tids)))
+            conditions.append(
+                f"EXISTS (SELECT 1 FROM product_tags pt "
+                f"WHERE pt.product_id = p.id AND pt.tag_id::text IN ({placeholders}))"
+            )
+            for j, tid in enumerate(tids):
+                params[f"tf_{i}_{j}"] = tid
+        else:  # AND — một EXISTS cho mỗi tag
+            for j, tid in enumerate(tids):
+                pkey = f"tf_{i}_{j}"
+                conditions.append(
+                    f"EXISTS (SELECT 1 FROM product_tags pt "
+                    f"WHERE pt.product_id = p.id AND pt.tag_id::text = :{pkey})"
+                )
+                params[pkey] = tid
 
     if conditions:
         sql += " AND " + " AND ".join(conditions)

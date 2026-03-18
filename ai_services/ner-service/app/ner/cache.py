@@ -173,8 +173,10 @@ _location_keywords_sorted: tuple[str, ...] = ()
 _unaccented_keywords_sorted: tuple[str, ...] = ()
 
 _category_cache: list[dict] = []            # list of {"slug": "...", "name": "..."}
+_feature_tags_cache: list[dict] = []        # list of {"id": "...", "name": "...", "description": "..."}
 _location_loaded_at: float = 0.0
 _category_loaded_at: float = 0.0
+_feature_tags_loaded_at: float = 0.0
 
 # ── Single-char prefix support ────────────────────────────────────────────────
 # Prefix 1 ký tự (q/p/h/x): KHÔNG strip trong to_canonical + expand exact (100%, không fuzzy)
@@ -298,9 +300,14 @@ def get_category_list() -> list[dict]:
     _maybe_refresh_categories()
     return _category_cache
 
+def get_feature_tags() -> list[dict]:
+    _maybe_refresh_feature_tags()
+    return _feature_tags_cache
+
 async def force_refresh() -> dict:
     d_count = 0
     c_count = 0
+    t_count = 0
     try:
         d_count = await _do_load_location_from_db()
     except Exception as e:
@@ -309,10 +316,14 @@ async def force_refresh() -> dict:
         c_count = await _do_load_categories_from_db()
     except Exception as e:
         logger.warning(f"[Cache] Force refresh categories failed: {e}")
-    return {"location_entries": d_count, "category_entries": c_count}
+    try:
+        t_count = await _do_load_feature_tags_from_db()
+    except Exception as e:
+        logger.warning(f"[Cache] Force refresh feature_tags failed: {e}")
+    return {"location_entries": d_count, "category_entries": c_count, "feature_tag_entries": t_count}
 
 async def startup_load():
-    logger.info("[Cache] Loading location + category caches at startup...")
+    logger.info("[Cache] Loading location + category + feature_tags caches at startup...")
     try:
         await _do_load_location_from_db()
     except Exception as e:
@@ -321,7 +332,15 @@ async def startup_load():
         await _do_load_categories_from_db()
     except Exception as e:
         logger.warning(f"[Cache] Failed to load category cache: {e}")
-    logger.info(f"[Cache] Loaded {len(_location_cache)} location entries, {len(_category_cache)} categories")
+    try:
+        await _do_load_feature_tags_from_db()
+    except Exception as e:
+        logger.warning(f"[Cache] Failed to load feature_tags cache: {e}")
+    logger.info(
+        f"[Cache] Loaded {len(_location_cache)} locations, "
+        f"{len(_category_cache)} categories, "
+        f"{len(_feature_tags_cache)} feature_tags"
+    )
 
 def _maybe_refresh_location():
     global _location_loaded_at
@@ -330,6 +349,23 @@ def _maybe_refresh_location():
             _load_location_sync_wrapper()
         except Exception as e:
             logger.warning(f"[Cache] Location refresh failed, keeping stale: {e}")
+
+def _maybe_refresh_feature_tags():
+    global _feature_tags_loaded_at
+    if time.time() - _feature_tags_loaded_at > settings.CATEGORY_CACHE_TTL:
+        try:
+            _load_feature_tags_sync_wrapper()
+        except Exception as e:
+            logger.warning(f"[Cache] Feature tags refresh failed, keeping stale: {e}")
+
+def _load_feature_tags_sync_wrapper() -> int:
+    try:
+        loop = asyncio.get_running_loop()
+        loop.create_task(_do_load_feature_tags_from_db())
+        return 0
+    except RuntimeError:
+        return asyncio.run(_do_load_feature_tags_from_db())
+
 
 def _maybe_refresh_categories():
     global _category_loaded_at
@@ -450,3 +486,28 @@ def _load_categories_sync_wrapper() -> int:
         return 0
     except RuntimeError:
         return asyncio.run(_do_load_categories_from_db())
+
+
+async def _do_load_feature_tags_from_db() -> int:
+    global _feature_tags_cache, _feature_tags_loaded_at
+    try:
+        async with async_session() as session:
+            result = await session.execute(
+                text(
+                    "SELECT id, name, description FROM product_feature_tags "
+                    "WHERE is_active = true AND deleted_at IS NULL"
+                )
+            )
+            rows = result.fetchall()
+    except Exception as e:
+        _feature_tags_loaded_at = time.time()
+        logger.warning(f"[Cache] Direct DB fetch failed for feature_tags: {e}")
+        raise
+
+    _feature_tags_cache = [
+        {"id": str(row[0]), "name": row[1], "description": row[2] or ""}
+        for row in rows
+        if row[0] and row[1]
+    ]
+    _feature_tags_loaded_at = time.time()
+    return len(_feature_tags_cache)

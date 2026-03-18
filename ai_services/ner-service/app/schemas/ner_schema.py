@@ -18,7 +18,7 @@ class NerRequest(BaseModel):
 
 
 class NerEntity(BaseModel):
-    type: str                                       # BUSINESS_TYPE / LOCATION / PRICE / RATING / CATEGORY
+    type: str                                       # BUSINESS_TYPE / LOCATION / PRICE / RATING / CATEGORY / FEATURE_TAG
     value: str                                      # raw text từ query
     confidence: float = Field(..., ge=0.0, le=1.0)
 
@@ -36,6 +36,11 @@ class NerEntity(BaseModel):
     distance_unit: Optional[str] = None             # Original unit ("km", "m", "cây số")
     proximity_intent: Optional[bool] = None         # True if implicit ("gần đây"), False if explicit
     fallback_to_registered_address: Optional[bool] = None  # True if using address fallback
+
+    # Feature Tag fields (type == "FEATURE_TAG")
+    tag_id:   Optional[str] = None   # UUID của product_feature_tags row
+    tag_name: Optional[str] = None   # Tên tag, VD: "Đá nóng"
+    tag_op:   Optional[str] = None   # "AND" | "OR" — group operator trong tagFilters
 
 
 class NerResponse(BaseModel):
