@@ -57,6 +57,16 @@ IDS = {
     "pro_3": "f0000001-0000-0000-0000-000000000003",  # Châm cứu bấm huyệt
     "pro_4": "f0000001-0000-0000-0000-000000000004",  # Tư vấn tâm lý
     "pro_5": "f0000001-0000-0000-0000-000000000005",  # Làm sạch răng
+
+    # Feature Tags
+    "tag_co_vai_gay": "aa000001-0000-0000-0000-000000000001",  # Đau cổ vai gáy
+    "tag_thoat_vi":   "aa000001-0000-0000-0000-000000000002",  # Thoát vị đĩa đệm
+    "tag_thu_gian":   "aa000001-0000-0000-0000-000000000003",  # Thư giãn sâu
+    "tag_da_nong":    "aa000001-0000-0000-0000-000000000004",  # Đá nóng
+    "tag_bam_huyet":  "aa000001-0000-0000-0000-000000000005",  # Bấm huyệt
+    "tag_rang_su":    "aa000001-0000-0000-0000-000000000006",  # Răng sứ thẩm mỹ
+    "tag_stress":     "aa000001-0000-0000-0000-000000000007",  # Căng thẳng lo âu
+    "tag_tim_mach":   "aa000001-0000-0000-0000-000000000008",  # Bệnh tim mạch
 }
 
 NOW = datetime.now(timezone.utc)
@@ -67,12 +77,22 @@ NOW = datetime.now(timezone.utc)
 async def clean(conn: asyncpg.Connection):
     print("🗑  Cleaning seed data...")
     ids = list(IDS.values())
+    # product_tags has composite PK — delete by product_id separately
+    product_ids = [
+        IDS[k] for k in ("pro_1", "pro_2", "pro_3", "pro_4", "pro_5")
+    ]
+    await conn.execute(
+        "DELETE FROM product_tags WHERE product_id = ANY($1::uuid[])", product_ids
+    )
+    await conn.execute(
+        "DELETE FROM product_employee_eligibility WHERE product_id = ANY($1::uuid[])", product_ids
+    )
     tables = [
         "product_reviews",
-        "product_employee_eligibility",
         "product_media",
         "product_definitions",
         "products",
+        "product_feature_tags",
         "employees",
         "health_partner_profile",
         "categories",
@@ -400,6 +420,60 @@ async def seed_reviews(conn: asyncpg.Connection):
     print(f"   {len(reviews)} reviews.\n")
 
 
+async def seed_feature_tags(conn: asyncpg.Connection):
+    print("🏷  Seeding product_feature_tags...")
+    # (id_key, name, description)
+    tags = [
+        ("tag_co_vai_gay", "Đau cổ vai gáy",      "Trị liệu cổ, vai, gáy; giải phóng cơ bắp căng cứng vùng vai gáy"),
+        ("tag_thoat_vi",   "Thoát vị đĩa đệm",    "Phục hồi chức năng cho bệnh nhân thoát vị đĩa đệm cột sống"),
+        ("tag_thu_gian",   "Thư giãn sâu",         "Liệu pháp thư giãn toàn thân, giảm stress và căng cơ"),
+        ("tag_da_nong",    "Đá nóng",              "Sử dụng đá nóng nhiệt để thư giãn cơ và tăng tuần hoàn máu"),
+        ("tag_bam_huyet",  "Bấm huyệt",            "Kỹ thuật bấm huyệt đạo theo y học cổ truyền"),
+        ("tag_rang_su",    "Răng sứ thẩm mỹ",      "Bọc răng sứ, làm trắng răng, phục hình thẩm mỹ"),
+        ("tag_stress",     "Căng thẳng lo âu",     "Tư vấn và trị liệu cho người bị stress, lo âu, trầm cảm"),
+        ("tag_tim_mach",   "Bệnh tim mạch",         "Tư vấn và xét nghiệm bệnh lý về tim, huyết áp, mạch máu"),
+    ]
+    for key, name, desc in tags:
+        await conn.execute("""
+            INSERT INTO product_feature_tags (
+                id, user_id, name, description, is_active,
+                usage, sort_order, created_at, updated_at
+            )
+            VALUES ($1, $2, $3, $4, true, 0, 0, $5, $5)
+            ON CONFLICT (id) DO NOTHING
+        """, IDS[key], IDS["acc_1"], name, desc, NOW)
+    print(f"   {len(tags)} feature tags.\n")
+
+
+async def seed_product_tags(conn: asyncpg.Connection):
+    print("🔗 Seeding product_tags (product ↔ feature tag)...")
+    # (product_key, tag_key)
+    rows = [
+        # pro_1 — Tư vấn tim mạch
+        ("pro_1", "tag_tim_mach"),
+        # pro_2 — Vật lý trị liệu thoát vị đĩa đệm
+        ("pro_2", "tag_co_vai_gay"),
+        ("pro_2", "tag_thoat_vi"),
+        ("pro_2", "tag_thu_gian"),
+        # pro_3 — Châm cứu bấm huyệt
+        ("pro_3", "tag_bam_huyet"),
+        ("pro_3", "tag_da_nong"),
+        ("pro_3", "tag_co_vai_gay"),
+        # pro_4 — Tư vấn tâm lý
+        ("pro_4", "tag_stress"),
+        ("pro_4", "tag_thu_gian"),
+        # pro_5 — Làm sạch răng
+        ("pro_5", "tag_rang_su"),
+    ]
+    for prod_key, tag_key in rows:
+        await conn.execute("""
+            INSERT INTO product_tags (product_id, tag_id, created_at)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (product_id, tag_id) DO NOTHING
+        """, IDS[prod_key], IDS[tag_key], NOW)
+    print(f"   {len(rows)} product_tags.\n")
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 async def main(do_clean: bool):
@@ -426,12 +500,14 @@ async def main(do_clean: bool):
         await seed_product_media(conn)
         await seed_eligibility(conn)
         await seed_reviews(conn)
+        await seed_feature_tags(conn)
+        await seed_product_tags(conn)
 
         print("🎉 Seed complete! Test với:")
         print('   POST http://localhost:8001/prefilter/search')
-        print('   {"text": "massage gần tôi ở quận 1 hcm", "current_lat": 10.7769, "current_lng": 106.7009}')
-        print('   {"text": "châm cứu hà nội dưới 600k"}')
-        print('   {"text": "vật lý trị liệu hcm rating cao"}')
+        print('   {"text": "vật lý trị liệu đau cổ vai gáy"}')
+        print('   {"text": "châm cứu đá nóng hoặc bấm huyệt"}')
+        print('   {"text": "trị liệu đá nóng và thư giãn"}')
 
     except Exception as e:
         print(f"❌ Seed error: {e}")

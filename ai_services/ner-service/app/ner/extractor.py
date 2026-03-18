@@ -210,6 +210,7 @@ def extract_entities(text: str) -> list[dict]:
         if e["type"] == "LOC":
             loc_info = find_location(e["value"])
             if loc_info:
+                e["source_query"] = text
                 valid_entities.append(e)
             else:
                 logger.debug(f"[Extractor] Discarding non-DB location: {e['value']}")
