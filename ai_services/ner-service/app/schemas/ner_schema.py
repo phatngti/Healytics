@@ -7,7 +7,7 @@ Extended with normalized fields for downstream pre-filtering.
 
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class NerRequest(BaseModel):
@@ -26,6 +26,8 @@ class NerEntity(BaseModel):
     business_type: Optional[str] = None             # VD: "SPA_BEAUTY" — khớp backend enum
     location_code: Optional[str] = None             # VD: "01" (Hà Nội), "760" (Quận 1)
     location_level: Optional[str] = None            # PROVINCE / DISTRICT / WARD
+    location_intent: Optional[bool] = None          # True nếu location là ràng buộc tìm kiếm
+    location_intent_score: Optional[float] = None   # Score semantic cho decision location_intent
     category_slug: Optional[str] = None             # VD: "yoga-therapy"
     operator: Optional[str] = None                  # lte / gte / between
     amount: Optional[float] = None                  # giá trị số sau normalize
@@ -86,6 +88,48 @@ class ServiceCandidate(BaseModel):
     location: Optional[LocationInfo] = None
     slots: Optional[List[str]] = None
     distance_meters: Optional[float] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_legacy_shape(cls, data):
+        """
+        Backward compatibility for legacy test/fixture payloads that still use
+        old keys: id, imageUrl, vendorName, and string price/rating/location.
+        """
+        if not isinstance(data, dict):
+            return data
+
+        payload = dict(data)
+
+        if "service_id" not in payload and "id" in payload:
+            payload["service_id"] = payload.get("id")
+        if "image_url" not in payload and "imageUrl" in payload:
+            payload["image_url"] = payload.get("imageUrl")
+        if "staff_name" not in payload and "vendorName" in payload:
+            payload["staff_name"] = payload.get("vendorName")
+
+        if isinstance(payload.get("price"), str):
+            digits = "".join(ch for ch in payload["price"] if ch.isdigit())
+            amount = int(digits) if digits else 0
+            payload["price"] = {"amount": amount, "currency": "VND"}
+
+        if isinstance(payload.get("rating"), str):
+            numeric = payload["rating"].replace(",", ".")
+            extracted = "".join(ch for ch in numeric if ch.isdigit() or ch == ".")
+            avg = float(extracted) if extracted else 0.0
+            payload["rating"] = {"average": avg, "total_reviews": 0}
+
+        if isinstance(payload.get("location"), str):
+            parts = [p.strip() for p in payload["location"].split(",")]
+            district = parts[0] if parts else ""
+            city = parts[-1] if len(parts) > 1 else ""
+            payload["location"] = {
+                "address": payload["location"],
+                "district": district,
+                "city": city,
+            }
+
+        return payload
 
 
 class PreFilterResponse(BaseModel):

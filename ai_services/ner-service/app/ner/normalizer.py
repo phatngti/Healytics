@@ -15,6 +15,7 @@ from typing import Optional
 
 from rapidfuzz import fuzz, process
 
+from app.core.config import settings
 from app.ner import cache
 from app.ner.extractor import BUSINESS_TYPE_ALIASES
 from app.ner.semantic_matcher import get_matcher
@@ -45,7 +46,7 @@ def normalize_entities(raw_entities: list[dict]) -> list[NerEntity]:
         confidence = raw.get("confidence", 0.0)
 
         if entity_type == "LOC":
-            entity = _normalize_location(value, confidence)
+            entity = _normalize_location(value, confidence, raw)
 
         elif entity_type == "BUSINESS_TYPE":
             entity = _normalize_business_type(value, confidence, raw)
@@ -127,9 +128,22 @@ def _combine_location_entities(entities: list[NerEntity]) -> list[NerEntity]:
 # PRIVATE — Location
 # ============================================================================
 
-def _normalize_location(value: str, confidence: float) -> NerEntity:
+def _normalize_location(value: str, confidence: float, raw: dict) -> NerEntity:
     """Tra location cache O(1). Province hardcoded, district/ward từ backend."""
     loc_info = cache.find_location(value)
+
+    location_intent = None
+    location_intent_score = None
+
+    source_query = raw.get("source_query")
+    if source_query:
+        intent_result = get_matcher().score_location_filter_intent(
+            source_query,
+            value,
+            threshold=settings.LOCATION_INTENT_THRESHOLD,
+        )
+        location_intent = intent_result["intent"]
+        location_intent_score = intent_result["score"]
 
     if loc_info:
         return NerEntity(
@@ -138,6 +152,8 @@ def _normalize_location(value: str, confidence: float) -> NerEntity:
             confidence=confidence,
             location_code=loc_info["code"],
             location_level=loc_info["level"],
+            location_intent=location_intent,
+            location_intent_score=location_intent_score,
         )
 
     # Không tìm thấy → graceful degradation
@@ -146,6 +162,8 @@ def _normalize_location(value: str, confidence: float) -> NerEntity:
         type="LOCATION",
         value=value,
         confidence=max(confidence * 0.5, 0.1),   # Giảm confidence
+        location_intent=location_intent,
+        location_intent_score=location_intent_score,
     )
 
 
@@ -253,6 +271,7 @@ def _normalize_rating(value: str, confidence: float, raw: dict) -> NerEntity:
         confidence=confidence,
         operator=raw.get("operator"),
         amount=raw.get("amount"),
+        amount_max=raw.get("amount_max"),
     )
 
 
@@ -270,25 +289,6 @@ def _normalize_distance(value: str, confidence: float, raw: dict) -> NerEntity:
         distance_unit=raw.get("distance_unit"),
         proximity_intent=raw.get("proximity_intent"),
     )
-
-
-# ============================================================================
-# PRIVATE — Fuzzy Matching Helpers
-# ============================================================================
-
-def _fuzzy_match_business_type(text: str) -> Optional[str]:
-    """RapidFuzz match text against BUSINESS_TYPE_ALIASES keys."""
-    choices = list(BUSINESS_TYPE_ALIASES.keys())
-    if not choices:
-        return None
-
-    result = process.extractOne(
-        text, choices, scorer=fuzz.token_set_ratio
-    )
-    if result and result[1] >= FUZZY_THRESHOLD:
-        matched_key = result[0]
-        return BUSINESS_TYPE_ALIASES[matched_key]
-    return None
 
 
 def _fuzzy_match_category(text: str) -> Optional[str]:

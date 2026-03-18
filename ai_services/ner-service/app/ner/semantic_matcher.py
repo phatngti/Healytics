@@ -1,8 +1,9 @@
 import logging
 import re
-import torch
-import numpy as np
 from typing import Any, Optional
+
+import numpy as np
+import torch
 from sentence_transformers import SentenceTransformer, util
 
 logger = logging.getLogger(__name__)
@@ -102,12 +103,25 @@ class SemanticMatcher:
         self._tag_emb_cache: dict[str, tuple[str, Any]] = {}
         # Category embedding cache: {slug: (content_hash, tensor)}
         self._cat_emb_cache: dict[str, tuple[str, Any]] = {}
+        # Location-intent embedding cache: {location_name: {"pos": tensor, "neg": tensor}}
+        self._loc_intent_cache: dict[str, dict[str, Any]] = {}
 
         total_phrases = sum(len(v) for v in BUSINESS_TYPE_PHRASES.values())
         logger.info(
             f"[SemanticMatcher] Loaded {len(self.bt_keys)} business types, "
             f"{total_phrases} prototype phrases."
         )
+
+    def extract_semantic_context(self, text: str) -> dict:
+        """Extract query-level semantic representation once for downstream slot matching."""
+        if not text:
+            return {"query_emb": None}
+        return {"query_emb": self.model.encode(text, convert_to_tensor=True)}
+
+    def _resolve_query_embedding(self, text: str, query_emb: Any | None = None) -> Any:
+        if query_emb is not None:
+            return query_emb
+        return self.model.encode(text, convert_to_tensor=True)
 
     def match_business_type(self, text: str, threshold: float = 0.45) -> Optional[str]:
         """
@@ -117,20 +131,12 @@ class SemanticMatcher:
         Chính xác hơn vì query khớp trực tiếp với phrase gần nhất,
         không bị pha loãng bởi embedding trung bình của cả description dài.
         """
-        if not text:
+        scored = self.score_business_type_candidates(text, self.bt_keys)
+        if not scored:
             return None
 
-        query_emb = self.model.encode(text, convert_to_tensor=True)
-
-        best_bt: Optional[str] = None
-        best_score = -1.0
-
-        for bt_key, phrase_embs in self.bt_phrase_embeddings.items():
-            scores = util.cos_sim(query_emb, phrase_embs)[0]
-            max_score = float(scores.max())
-            if max_score > best_score:
-                best_score = max_score
-                best_bt = bt_key
+        best_bt = scored[0]["business_type"]
+        best_score = float(scored[0]["score"])
 
         logger.debug(
             f"[SemanticMatcher] '{text[:60]}' -> {best_bt} "
@@ -141,12 +147,30 @@ class SemanticMatcher:
             return best_bt
         return None
 
+    def score_business_type_candidates(self, text: str, candidates: list[str], query_emb: Any | None = None) -> list[dict]:
+        """Score business type candidates and return sorted list by score desc."""
+        if not text or not candidates:
+            return []
+
+        query_emb = self._resolve_query_embedding(text, query_emb=query_emb)
+        results: list[dict] = []
+        for bt_key in candidates:
+            phrase_embs = self.bt_phrase_embeddings.get(bt_key)
+            if phrase_embs is None:
+                continue
+            score = float(util.cos_sim(query_emb, phrase_embs)[0].max())
+            results.append({"business_type": bt_key, "score": round(score, 4)})
+
+        results.sort(key=lambda x: x["score"], reverse=True)
+        return results
+
     def match_feature_tags(
         self,
         text: str,
         tags: list[dict],
         threshold: float = 0.35,
         top_k: int = 5,
+        query_emb: Any | None = None,
     ) -> list[dict]:
         """
         Match query text against feature tags từ DB.
@@ -160,7 +184,7 @@ class SemanticMatcher:
         if not text or not tags:
             return []
 
-        query_emb = self.model.encode(text, convert_to_tensor=True)
+        query_emb = self._resolve_query_embedding(text, query_emb=query_emb)
 
         # Tìm tags cần encode mới (chưa có trong cache hoặc content thay đổi)
         new_tags_idx: list[int] = []
@@ -224,12 +248,33 @@ class SemanticMatcher:
 
         Returns: {slug, name, score} hoặc None nếu không có category nào vượt threshold.
         """
-        if not text or not categories:
+        scored = self.score_categories(text, categories)
+        if not scored:
             return None
 
-        query_emb = self.model.encode(text, convert_to_tensor=True)
+        best = scored[0]
+        best_score = float(best["score"])
 
-        # Encode các category chưa có trong cache (keyed by slug)
+        logger.debug(
+            f"[SemanticMatcher] match_category '{text[:50]}' -> "
+            f"{best['slug']} (score={best_score:.4f})"
+        )
+
+        if best_score >= threshold:
+            return {
+                "slug":  best["slug"],
+                "name":  best["name"],
+                "score": round(best_score, 4),
+            }
+        return None
+
+    def score_categories(self, text: str, categories: list[dict], query_emb: Any | None = None) -> list[dict]:
+        """Score all category candidates and return sorted list by score desc."""
+        if not text or not categories:
+            return []
+
+        query_emb = self._resolve_query_embedding(text, query_emb=query_emb)
+
         new_cats: list[dict] = []
         new_texts: list[str] = []
         for cat in categories:
@@ -245,25 +290,100 @@ class SemanticMatcher:
                 content_hash = f"cat|{cat['slug']}|{cat['name']}"
                 self._cat_emb_cache[cat["slug"]] = (content_hash, emb)
 
-        # Stack embeddings theo thứ tự categories
         cat_embs = torch.stack([self._cat_emb_cache[cat["slug"]][1] for cat in categories])
         scores = util.cos_sim(query_emb, cat_embs)[0]
 
-        best_idx = int(scores.argmax())
-        best_score = float(scores[best_idx])
+        results = [
+            {
+                "slug": cat["slug"],
+                "name": cat["name"],
+                "score": round(float(scores[i]), 4),
+            }
+            for i, cat in enumerate(categories)
+        ]
+        results.sort(key=lambda x: x["score"], reverse=True)
+        return results
+
+    def score_location_filter_intent(
+        self,
+        text: str,
+        location_name: str,
+        threshold: float = 0.58,
+    ) -> dict:
+        """
+        Score whether user intends to FILTER by location, not just mention it.
+
+        Uses semantic margin between:
+          - Positive hypotheses: "search constrained to <location>"
+          - Negative hypotheses: "location only as context, no filtering"
+
+        Returns dict with score in [0,1], boolean intent, and diagnostics.
+        """
+        if not text or not location_name:
+            return {
+                "score": 0.0,
+                "intent": False,
+                "pos_score": 0.0,
+                "neg_score": 0.0,
+                "margin": -1.0,
+            }
+
+        query_emb = self.model.encode(text, convert_to_tensor=True)
+        hyp_embs = self._get_location_intent_hypothesis_embeddings(location_name)
+
+        pos_scores = util.cos_sim(query_emb, hyp_embs["pos"])[0]
+        neg_scores = util.cos_sim(query_emb, hyp_embs["neg"])[0]
+
+        pos = float(pos_scores.max())
+        neg = float(neg_scores.max())
+        margin = pos - neg
+
+        # Convert semantic margin to probability-like score.
+        score = float(1.0 / (1.0 + np.exp(-6.0 * margin)))
+        intent = score >= threshold
 
         logger.debug(
-            f"[SemanticMatcher] match_category '{text[:50]}' -> "
-            f"{categories[best_idx]['slug']} (score={best_score:.4f})"
+            "[SemanticMatcher] location_intent '%s' @ '%s' -> score=%.4f pos=%.4f neg=%.4f margin=%.4f",
+            text[:60],
+            location_name,
+            score,
+            pos,
+            neg,
+            margin,
         )
 
-        if best_score >= threshold:
-            return {
-                "slug":  categories[best_idx]["slug"],
-                "name":  categories[best_idx]["name"],
-                "score": round(best_score, 4),
-            }
-        return None
+        return {
+            "score": round(score, 4),
+            "intent": intent,
+            "pos_score": round(pos, 4),
+            "neg_score": round(neg, 4),
+            "margin": round(margin, 4),
+        }
+
+    def _get_location_intent_hypothesis_embeddings(self, location_name: str) -> dict[str, Any]:
+        cached = self._loc_intent_cache.get(location_name)
+        if cached is not None:
+            return cached
+
+        pos_hypotheses = [
+            f"Người dùng muốn tìm dịch vụ ở {location_name}.",
+            f"Địa điểm {location_name} là điều kiện lọc bắt buộc của truy vấn.",
+            f"Kết quả cần giới hạn trong khu vực {location_name}.",
+            f"Người dùng đang yêu cầu tìm theo vị trí tại {location_name}.",
+        ]
+        neg_hypotheses = [
+            f"Người dùng chỉ nhắc đến {location_name} như thông tin nền, không phải bộ lọc.",
+            f"Đề bài không yêu cầu giới hạn kết quả theo {location_name}.",
+            f"{location_name} chỉ là ngữ cảnh cá nhân, tìm kiếm không ràng buộc vị trí.",
+            f"Người dùng nói về {location_name} nhưng vẫn muốn tìm dịch vụ chung.",
+        ]
+
+        cached = {
+            "pos": self.model.encode(pos_hypotheses, convert_to_tensor=True),
+            "neg": self.model.encode(neg_hypotheses, convert_to_tensor=True),
+        }
+        self._loc_intent_cache[location_name] = cached
+        return cached
 
 
 # Singleton

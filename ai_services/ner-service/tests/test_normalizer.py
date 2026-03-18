@@ -67,6 +67,38 @@ class TestNormalizeLocation:
         assert result[0].location_code is None
         assert result[0].confidence < 0.85   # Confidence giảm
 
+    @patch("app.ner.normalizer.get_matcher")
+    def test_location_intent_semantic_true(self, mock_get_matcher):
+        mock_get_matcher.return_value.score_location_filter_intent.return_value = {
+            "intent": True,
+            "score": 0.83,
+        }
+        raw = [{
+            "type": "LOC",
+            "value": "Hà Nội",
+            "confidence": 0.85,
+            "source_query": "tìm spa ở Hà Nội",
+        }]
+        result = normalize_entities(raw)
+        assert result[0].location_intent is True
+        assert result[0].location_intent_score == 0.83
+
+    @patch("app.ner.normalizer.get_matcher")
+    def test_location_intent_semantic_false(self, mock_get_matcher):
+        mock_get_matcher.return_value.score_location_filter_intent.return_value = {
+            "intent": False,
+            "score": 0.21,
+        }
+        raw = [{
+            "type": "LOC",
+            "value": "Hà Nội",
+            "confidence": 0.85,
+            "source_query": "mình ở Hà Nội, muốn massage trị liệu",
+        }]
+        result = normalize_entities(raw)
+        assert result[0].location_intent is False
+        assert result[0].location_intent_score == 0.21
+
 
 # ============================================================================
 # BusinessType (from keyword scan — already has business_type field)

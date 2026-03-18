@@ -34,4 +34,21 @@ class Settings(BaseSettings):
     MAX_PROXIMITY_RADIUS_M: int = 50000                # Max allowed radius for DDoS protection
     POSTGIS_FALLBACK_TO_TEXT: bool = True              # Fallback to text-only query if PostGIS fails
 
+    # ------------------------------------------------------------------
+    # Semantic intent gating (location filter)
+    # ------------------------------------------------------------------
+    LOCATION_INTENT_THRESHOLD: float = 0.58
+    LOCATION_INTENT_LOG_ENABLED: bool = True
+    LOCATION_INTENT_LOG_PATH: str = "data/intent_logs/location_intent.jsonl"
+
+    # ------------------------------------------------------------------
+    # Unified semantic decision policy thresholds
+    # ------------------------------------------------------------------
+    SEMANTIC_BT_HIGH_THRESHOLD: float = 0.45
+    SEMANTIC_BT_MEDIUM_THRESHOLD: float = 0.35
+    SEMANTIC_CATEGORY_HIGH_THRESHOLD: float = 0.45
+    SEMANTIC_CATEGORY_MEDIUM_THRESHOLD: float = 0.35
+    SEMANTIC_TAG_HIGH_THRESHOLD: float = 0.50
+    SEMANTIC_TAG_MEDIUM_THRESHOLD: float = 0.40
+
 settings = Settings()
