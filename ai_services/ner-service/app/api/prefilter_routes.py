@@ -122,8 +122,8 @@ async def prefilter_search(request: PreFilterRequest):
         tag_matches = matcher.match_feature_tags(
             text,
             feature_tags,
-            threshold=0.35,
-            top_k=8,
+            threshold=settings.SEMANTIC_TAG_MEDIUM_THRESHOLD,
+            top_k=5,
             query_emb=semantic_ctx.get("query_emb"),
         )
         if tag_matches:
