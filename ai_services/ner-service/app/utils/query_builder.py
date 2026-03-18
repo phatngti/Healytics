@@ -101,8 +101,8 @@ def build_backend_query(entities: List[NerEntity], limit: int = 50, spatial_cont
             # Backend Partner.businessType là enum (SPA_BEAUTY, FITNESS, ...)
             query["businessType"] = e.business_type
 
-        elif e_type == "LOCATION" and e.location_code:
-            # Backend Location.code
+        elif e_type == "LOCATION" and e.location_code and e.location_intent is True:
+            # Backend Location.code — chỉ apply khi semantic adjudication xác nhận
             query["locationCode"] = e.location_code
 
         elif e_type == "CATEGORY" and e.category_slug:
@@ -152,6 +152,8 @@ def filter_mock_services(
     """
     results: List[Dict] = []
     limit = query.get("limit", 50)
+    if limit is None or limit <= 0:
+        return []
 
     for sid, svc in services.items():
         internal = svc.get("_internal", {})
@@ -193,7 +195,17 @@ def filter_mock_services(
             if avg_rating < min_rating:
                 continue
 
-        results.append(svc)
+        normalized = dict(svc)
+        internal = normalized.get("_internal", {})
+        # Backward-compatible aliases used by legacy tests/consumers.
+        normalized.setdefault("id", normalized.get("service_id"))
+        normalized.setdefault("base_price", internal.get("basePrice"))
+        normalized.setdefault("sale_price", None)
+        normalized.setdefault("business_types", internal.get("businessType", []))
+        if normalized.get("business_types"):
+            normalized.setdefault("type", normalized["business_types"][0])
+
+        results.append(normalized)
         if len(results) >= limit:
             break
 

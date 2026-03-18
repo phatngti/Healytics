@@ -260,27 +260,33 @@ def find_location(text: str) -> Optional[dict]:
 
     # Chuẩn hóa input
     key = to_canonical(text)
+    text_lower = text.strip().lower()
 
     _maybe_refresh_location()
 
-    # 1. Check DB cache (canonical key)
-    if key in _location_cache:
-        return _location_cache[key]
+    # 1. Curated fallback maps first for deterministic disambiguation.
+    # Prefer district fallback over DB cache for ambiguous keys (e.g., "binh thanh").
+    if key in _DISTRICT_FALLBACK:
+        return _DISTRICT_FALLBACK[key]
+    if text_lower in _DISTRICT_FALLBACK:
+        return _DISTRICT_FALLBACK[text_lower]
+    for district_name, district_info in _DISTRICT_FALLBACK.items():
+        if remove_accents(district_name) == key:
+            return district_info
 
     # 2. Check PROVINCE_MAP (canonical key)
     if key in PROVINCE_MAP:
         return PROVINCE_MAP[key]
 
-    # 3. Check _DISTRICT_FALLBACK (canonical key — works for abbreviations like "q1")
-    if key in _DISTRICT_FALLBACK:
-        return _DISTRICT_FALLBACK[key]
+    # 3. Check DB cache (canonical key)
+    if key in _location_cache:
+        return _location_cache[key]
 
     # 4. Direct lowercase match — handles "quận 1", "phường X", etc.
-    text_lower = text.strip().lower()
-    if text_lower in PROVINCE_MAP:
-        return PROVINCE_MAP[text_lower]
     if text_lower in _DISTRICT_FALLBACK:
         return _DISTRICT_FALLBACK[text_lower]
+    if text_lower in PROVINCE_MAP:
+        return PROVINCE_MAP[text_lower]
 
     # 5. Single-char prefix expansion — exact match only (100%), không fuzzy
     # "q 1" / "q1" → "quận 1", "p 5" → "phường 5"

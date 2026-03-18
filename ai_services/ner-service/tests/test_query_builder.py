@@ -23,7 +23,15 @@ def _spa_bt():
     return NerEntity(type="BUSINESS_TYPE", value="spa", confidence=0.9, business_type="SPA_BEAUTY")
 
 def _hcm_loc():
-    return NerEntity(type="LOCATION", value="HCM", confidence=0.9, location_code="79", location_level="PROVINCE")
+    return NerEntity(
+        type="LOCATION",
+        value="HCM",
+        confidence=0.9,
+        location_code="79",
+        location_level="PROVINCE",
+        location_intent=True,
+        location_intent_score=0.9,
+    )
 
 def _price_lte(amount=500000):
     return NerEntity(type="PRICE", value="dưới 500k", confidence=1.0, operator="lte", amount=amount)
@@ -101,6 +109,20 @@ class TestBuildBackendQuery:
     def test_location_without_code_skipped(self):
         """LOCATION entity without location_code → no locationCode in query."""
         e = NerEntity(type="LOCATION", value="Somewhere Unknown", confidence=0.5)
+        q = build_backend_query([e])
+        assert "locationCode" not in q
+
+    def test_location_with_false_intent_skipped(self):
+        """LOCATION with code but non-intent must not become hard filter."""
+        e = NerEntity(
+            type="LOCATION",
+            value="HCM",
+            confidence=0.9,
+            location_code="79",
+            location_level="PROVINCE",
+            location_intent=False,
+            location_intent_score=0.2,
+        )
         q = build_backend_query([e])
         assert "locationCode" not in q
 
@@ -311,7 +333,7 @@ class TestBuildBackendQueryCombined:
         from app.schemas.ner_schema import NerEntity
         entities = [
             NerEntity(type="BUSINESS_TYPE", value="spa", confidence=0.9, business_type="SPA_BEAUTY"),
-            NerEntity(type="LOCATION", value="HCM", confidence=0.9, location_code="79", location_level="PROVINCE"),
+            NerEntity(type="LOCATION", value="HCM", confidence=0.9, location_code="79", location_level="PROVINCE", location_intent=True),
             NerEntity(type="PRICE", value="dưới 500k", confidence=1.0, operator="lte", amount=500000.0),
             NerEntity(type="RATING", value="trên 4 sao", confidence=1.0, operator="gte", amount=4.0),
         ]
