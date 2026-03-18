@@ -1,10 +1,13 @@
 import logging
 import re
+from dataclasses import dataclass
 from typing import Any, Optional
 
 import numpy as np
 import torch
 from sentence_transformers import SentenceTransformer, util
+
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -122,6 +125,25 @@ class SemanticMatcher:
         if query_emb is not None:
             return query_emb
         return self.model.encode(text, convert_to_tensor=True)
+
+    def _get_category_embeddings(self, categories: list[dict]) -> Any:
+        """Return stacked category embeddings in the same order as input categories."""
+        new_cats: list[dict] = []
+        new_texts: list[str] = []
+        for cat in categories:
+            content_hash = f"cat|{cat['slug']}|{cat['name']}"
+            cached = self._cat_emb_cache.get(cat["slug"])
+            if cached is None or cached[0] != content_hash:
+                new_cats.append(cat)
+                new_texts.append(cat["name"])
+
+        if new_texts:
+            new_embs = self.model.encode(new_texts, convert_to_tensor=True)
+            for cat, emb in zip(new_cats, new_embs):
+                content_hash = f"cat|{cat['slug']}|{cat['name']}"
+                self._cat_emb_cache[cat["slug"]] = (content_hash, emb)
+
+        return torch.stack([self._cat_emb_cache[cat["slug"]][1] for cat in categories])
 
     def match_business_type(self, text: str, threshold: float = 0.45) -> Optional[str]:
         """
@@ -275,22 +297,7 @@ class SemanticMatcher:
 
         query_emb = self._resolve_query_embedding(text, query_emb=query_emb)
 
-        new_cats: list[dict] = []
-        new_texts: list[str] = []
-        for cat in categories:
-            content_hash = f"cat|{cat['slug']}|{cat['name']}"
-            cached = self._cat_emb_cache.get(cat["slug"])
-            if cached is None or cached[0] != content_hash:
-                new_cats.append(cat)
-                new_texts.append(cat["name"])
-
-        if new_texts:
-            new_embs = self.model.encode(new_texts, convert_to_tensor=True)
-            for cat, emb in zip(new_cats, new_embs):
-                content_hash = f"cat|{cat['slug']}|{cat['name']}"
-                self._cat_emb_cache[cat["slug"]] = (content_hash, emb)
-
-        cat_embs = torch.stack([self._cat_emb_cache[cat["slug"]][1] for cat in categories])
+        cat_embs = self._get_category_embeddings(categories)
         scores = util.cos_sim(query_emb, cat_embs)[0]
 
         results = [
@@ -395,6 +402,110 @@ def get_matcher() -> SemanticMatcher:
     if _instance is None:
         _instance = SemanticMatcher()
     return _instance
+
+
+@dataclass
+class SemanticDecision:
+    slot: str
+    value: str
+    score: float
+    uncertainty: float
+    policy: str  # hard | soft | skip
+    rationale: str
+    payload: Optional[dict] = None
+
+
+class SemanticAdjudicator:
+    """
+    Unified semantic decision layer.
+
+    Candidate generation can differ per slot, but final decision policy and
+    output format are standardized here.
+    """
+
+    def __init__(self):
+        self.bt_high = settings.SEMANTIC_BT_HIGH_THRESHOLD
+        self.bt_medium = settings.SEMANTIC_BT_MEDIUM_THRESHOLD
+        self.cat_high = settings.SEMANTIC_CATEGORY_HIGH_THRESHOLD
+        self.cat_medium = settings.SEMANTIC_CATEGORY_MEDIUM_THRESHOLD
+        self.tag_high = settings.SEMANTIC_TAG_HIGH_THRESHOLD
+        self.tag_medium = settings.SEMANTIC_TAG_MEDIUM_THRESHOLD
+
+    @staticmethod
+    def _policy(score: float, high: float, medium: float) -> str:
+        if score >= high:
+            return "hard"
+        if score >= medium:
+            return "soft"
+        return "skip"
+
+    def adjudicate_business_type(
+        self,
+        text: str,
+        matcher: SemanticMatcher,
+        candidate_keys: list[str],
+        semantic_ctx: Optional[dict] = None,
+    ) -> Optional[SemanticDecision]:
+        query_emb = (semantic_ctx or {}).get("query_emb")
+        scored = matcher.score_business_type_candidates(text, candidate_keys, query_emb=query_emb)
+        if not scored:
+            return None
+
+        best = scored[0]
+        score = float(best["score"])
+        policy = self._policy(score, self.bt_high, self.bt_medium)
+        return SemanticDecision(
+            slot="BUSINESS_TYPE",
+            value=best["business_type"],
+            score=score,
+            uncertainty=round(1.0 - score, 4),
+            policy=policy,
+            rationale=f"Top semantic BT={best['business_type']} with score={score:.4f}",
+            payload=best,
+        )
+
+    def adjudicate_category(
+        self,
+        text: str,
+        matcher: SemanticMatcher,
+        categories: list[dict],
+        semantic_ctx: Optional[dict] = None,
+    ) -> Optional[SemanticDecision]:
+        query_emb = (semantic_ctx or {}).get("query_emb")
+        scored = matcher.score_categories(text, categories, query_emb=query_emb)
+        if not scored:
+            return None
+
+        best = scored[0]
+        score = float(best["score"])
+        policy = self._policy(score, self.cat_high, self.cat_medium)
+        return SemanticDecision(
+            slot="CATEGORY",
+            value=best["slug"],
+            score=score,
+            uncertainty=round(1.0 - score, 4),
+            policy=policy,
+            rationale=f"Top semantic category={best['slug']} with score={score:.4f}",
+            payload=best,
+        )
+
+    def adjudicate_tags(self, tag_matches: list[dict]) -> list[SemanticDecision]:
+        decisions: list[SemanticDecision] = []
+        for m in tag_matches:
+            score = float(m["score"])
+            policy = self._policy(score, self.tag_high, self.tag_medium)
+            decisions.append(
+                SemanticDecision(
+                    slot="FEATURE_TAG",
+                    value=m["tag_id"],
+                    score=score,
+                    uncertainty=round(1.0 - score, 4),
+                    policy=policy,
+                    rationale=f"Semantic tag={m['tag_name']} score={score:.4f}",
+                    payload=m,
+                )
+            )
+        return decisions
 
 
 # ── AND/OR group builder ──────────────────────────────────────────────────────
