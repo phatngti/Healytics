@@ -24,6 +24,7 @@ IDS = {
     "acc_1": "a1000001-0000-0000-0000-000000000001",
     "acc_2": "a1000001-0000-0000-0000-000000000002",
     "acc_3": "a1000001-0000-0000-0000-000000000003",
+    "acc_4": "a1000001-0000-0000-0000-000000000004",
 
     # Locations — Province
     "loc_hcm":  "b0000001-0000-0000-0000-000000000001",
@@ -33,6 +34,8 @@ IDS = {
     "loc_q1":   "b0000002-0000-0000-0000-000000000001",  # Quận 1, HCM
     "loc_q3":   "b0000002-0000-0000-0000-000000000002",  # Quận 3, HCM
     "loc_hk":   "b0000002-0000-0000-0000-000000000003",  # Hoàn Kiếm, HN
+    "loc_q5":   "b0000002-0000-0000-0000-000000000004",  # Quận 5, HCM
+    "loc_q10":  "b0000002-0000-0000-0000-000000000005",  # Quận 10, HCM
 
     # Categories
     "cat_tim_mach":   "c0000001-0000-0000-0000-000000000001",
@@ -40,16 +43,20 @@ IDS = {
     "cat_dong_y":     "c0000001-0000-0000-0000-000000000003",
     "cat_tam_ly":     "c0000001-0000-0000-0000-000000000004",
     "cat_nha_khoa":   "c0000001-0000-0000-0000-000000000005",
+    "cat_massage":    "c0000001-0000-0000-0000-000000000006",
+    "cat_spa":        "c0000001-0000-0000-0000-000000000007",
 
     # Partners (health_partner_profile)
     "hpp_1": "d0000001-0000-0000-0000-000000000001",  # Phòng khám Q1 HCM
     "hpp_2": "d0000001-0000-0000-0000-000000000002",  # Trung tâm VLTL Q3 HCM
     "hpp_3": "d0000001-0000-0000-0000-000000000003",  # Đông y Hà Nội
+    "hpp_4": "d0000001-0000-0000-0000-000000000004",  # Massage/Spa Q10 HCM
 
     # Employees
     "emp_1": "e0000001-0000-0000-0000-000000000001",
     "emp_2": "e0000001-0000-0000-0000-000000000002",
     "emp_3": "e0000001-0000-0000-0000-000000000003",
+    "emp_4": "e0000001-0000-0000-0000-000000000004",
 
     # Products
     "pro_1": "f0000001-0000-0000-0000-000000000001",  # Tư vấn tim mạch
@@ -57,6 +64,9 @@ IDS = {
     "pro_3": "f0000001-0000-0000-0000-000000000003",  # Châm cứu bấm huyệt
     "pro_4": "f0000001-0000-0000-0000-000000000004",  # Tư vấn tâm lý
     "pro_5": "f0000001-0000-0000-0000-000000000005",  # Làm sạch răng
+    "pro_6": "f0000001-0000-0000-0000-000000000006",  # Massage cổ vai gáy 45p
+    "pro_7": "f0000001-0000-0000-0000-000000000007",  # Massage đá nóng 60p
+    "pro_8": "f0000001-0000-0000-0000-000000000008",  # Gội đầu dưỡng sinh 60p
 
     # Feature Tags
     "tag_co_vai_gay": "aa000001-0000-0000-0000-000000000001",  # Đau cổ vai gáy
@@ -77,7 +87,7 @@ NOW = datetime.now(timezone.utc)
 async def clean(conn: asyncpg.Connection):
     print("🗑  Cleaning seed data...")
     product_ids = [
-        IDS[k] for k in ("pro_1", "pro_2", "pro_3", "pro_4", "pro_5")
+        IDS[k] for k in ("pro_1", "pro_2", "pro_3", "pro_4", "pro_5", "pro_6", "pro_7", "pro_8")
     ]
     tag_ids = [
         IDS[k] for k in (
@@ -85,13 +95,14 @@ async def clean(conn: asyncpg.Connection):
             "tag_bam_huyet", "tag_rang_su", "tag_stress", "tag_tim_mach",
         )
     ]
-    partner_tax_codes = ["TAX001SEED", "TAX002SEED", "TAX003SEED"]
-    employee_codes = ["EMP001SEED", "EMP002SEED", "EMP003SEED"]
-    category_slugs = ["tim-mach", "vat-ly-tri-lieu", "dong-y", "tam-ly", "nha-khoa"]
+    partner_tax_codes = ["TAX001SEED", "TAX002SEED", "TAX003SEED", "TAX004SEED"]
+    employee_codes = ["EMP001SEED", "EMP002SEED", "EMP003SEED", "EMP004SEED"]
+    category_slugs = ["tim-mach", "vat-ly-tri-lieu", "dong-y", "tam-ly", "nha-khoa", "massage", "spa-beauty"]
     account_emails = [
         "partner1@healytics.test",
         "partner2@healytics.test",
         "partner3@healytics.test",
+        "partner4@healytics.test",
     ]
 
     # Junction and dependent tables keyed by product_id.
@@ -139,6 +150,7 @@ async def seed_accounts(conn: asyncpg.Connection):
         (IDS["acc_1"], "partner1@healytics.test", "partner1", "health_partner"),
         (IDS["acc_2"], "partner2@healytics.test", "partner2", "health_partner"),
         (IDS["acc_3"], "partner3@healytics.test", "partner3", "health_partner"),
+        (IDS["acc_4"], "partner4@healytics.test", "partner4", "health_partner"),
     ]
     for id_, email, username, role in rows:
         await conn.execute("""
@@ -163,6 +175,8 @@ async def seed_locations(conn: asyncpg.Connection):
         ("loc_q1", "760", "Quận 1",      "Quận 1",           "DISTRICT", "loc_hcm"),
         ("loc_q3", "770", "Quận 3",      "Quận 3",           "DISTRICT", "loc_hcm"),
         ("loc_hk", "001", "Hoàn Kiếm",   "Quận Hoàn Kiếm",  "DISTRICT", "loc_hn"),
+        ("loc_q5", "774", "Quận 5",      "Quận 5",           "DISTRICT", "loc_hcm"),
+        ("loc_q10", "771", "Quận 10",    "Quận 10",          "DISTRICT", "loc_hcm"),
     ]
 
     for key, code, name, full_name, level in provinces:
@@ -195,6 +209,8 @@ async def seed_categories(conn: asyncpg.Connection):
         (IDS["cat_dong_y"],    "Đông y",             "dong-y"),
         (IDS["cat_tam_ly"],    "Tâm lý",             "tam-ly"),
         (IDS["cat_nha_khoa"],  "Nha khoa",           "nha-khoa"),
+        (IDS["cat_massage"],   "Massage trị liệu",   "massage"),
+        (IDS["cat_spa"],       "Spa làm đẹp",        "spa-beauty"),
     ]
     for id_, name, slug in rows:
         await conn.execute("""
@@ -245,6 +261,17 @@ async def seed_partners(conn: asyncpg.Connection):
             IDS["acc_3"],
             21.0315, 105.8487,
         ),
+        (
+            IDS["hpp_4"],
+            "TAX004SEED",
+            "Công ty TNHH Wellness Sài Gòn",
+            "Wellness Sài Gòn",
+            "MASSAGE_THERAPY,SPA_BEAUTY",
+            IDS["loc_hcm"], IDS["loc_q10"],
+            "212 Sư Vạn Hạnh",
+            IDS["acc_4"],
+            10.7735, 106.6672,
+        ),
     ]
 
     for (
@@ -294,6 +321,10 @@ async def seed_employees(conn: asyncpg.Connection):
             IDS["emp_3"], "EMP003SEED", "Lê Văn Cường",
             "emp3seed@healytics.test", "DOCTOR", "ACTIVE", IDS["hpp_3"],
         ),
+        (
+            IDS["emp_4"], "EMP004SEED", "Phạm Thị Duyên",
+            "emp4seed@healytics.test", "THERAPIST", "ACTIVE", IDS["hpp_4"],
+        ),
     ]
     for id_, code, full_name, email, role, status, partner_id in rows:
         await conn.execute("""
@@ -336,6 +367,21 @@ async def seed_products(conn: asyncpg.Connection):
             "Làm sạch răng chuyên sâu", "lam-sach-rang-chuyen-sau",
             "physical", 300000, None, "Vệ sinh răng miệng chuyên sâu, loại bỏ cao răng và làm trắng nhẹ.",
         ),
+        (
+            IDS["pro_6"], IDS["cat_massage"],
+            "Massage cổ vai gáy 45 phút", "massage-co-vai-gay-45-phut",
+            "service", 180000, 169000, "Liệu trình massage cổ vai gáy giảm căng cứng, phù hợp dân văn phòng.",
+        ),
+        (
+            IDS["pro_7"], IDS["cat_massage"],
+            "Massage đá nóng thư giãn 60 phút", "massage-da-nong-thu-gian-60-phut",
+            "service", 320000, 289000, "Massage toàn thân kết hợp đá nóng giúp thư giãn sâu và ngủ ngon.",
+        ),
+        (
+            IDS["pro_8"], IDS["cat_spa"],
+            "Gội đầu dưỡng sinh 60 phút", "goi-dau-duong-sinh-60-phut",
+            "service", 250000, 219000, "Gội đầu dưỡng sinh kết hợp bấm huyệt đầu vai gáy.",
+        ),
     ]
 
     for id_, cat_id, name, slug, ptype, base_price, sale_price, desc in products:
@@ -362,6 +408,9 @@ async def seed_product_definitions(conn: asyncpg.Connection):
         (IDS["pro_3"], 90),
         (IDS["pro_4"], 50),
         (IDS["pro_5"], 30),
+        (IDS["pro_6"], 45),
+        (IDS["pro_7"], 60),
+        (IDS["pro_8"], 60),
     ]
     for product_id, duration in rows:
         await conn.execute("""
@@ -380,6 +429,9 @@ async def seed_product_media(conn: asyncpg.Connection):
         (IDS["pro_3"], "https://images.unsplash.com/photo-1512290923902-8a9f81dc2069?w=400&h=300&fit=crop"),
         (IDS["pro_4"], "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=300&fit=crop"),
         (IDS["pro_5"], "https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=400&h=300&fit=crop"),
+        (IDS["pro_6"], "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=300&fit=crop"),
+        (IDS["pro_7"], "https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=400&h=300&fit=crop"),
+        (IDS["pro_8"], "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400&h=300&fit=crop"),
     ]
     for product_id, url in images:
         await conn.execute("""
@@ -404,6 +456,9 @@ async def seed_eligibility(conn: asyncpg.Connection):
         (IDS["pro_3"], IDS["emp_3"], True),
         (IDS["pro_4"], IDS["emp_2"], True),
         (IDS["pro_5"], IDS["emp_1"], True),
+        (IDS["pro_6"], IDS["emp_4"], True),
+        (IDS["pro_7"], IDS["emp_4"], True),
+        (IDS["pro_8"], IDS["emp_4"], True),
     ]
     for prod_id, emp_id, is_primary in rows:
         await conn.execute("""
@@ -434,6 +489,15 @@ async def seed_reviews(conn: asyncpg.Connection):
         # pro_5 — nha khoa
         (IDS["pro_5"], "Cao Thị Thúy",       5, "Sạch bóng, không đau, nhân viên thân thiện."),
         (IDS["pro_5"], "Lý Văn Phú",         4, "Nhanh và sạch, sẽ quay lại."),
+        # pro_6 — massage co vai gay
+        (IDS["pro_6"], "Ngô Văn Tín",        5, "Giá tốt, làm xong nhẹ cổ vai gáy ngay."),
+        (IDS["pro_6"], "Trịnh Hồng Nhung",   4, "Phù hợp dân văn phòng, nhân viên dễ thương."),
+        # pro_7 — massage da nong
+        (IDS["pro_7"], "Phạm Gia Hân",       5, "Đá nóng rất thư giãn, ngủ ngon hơn hẳn."),
+        (IDS["pro_7"], "Lâm Quốc Bảo",       4, "Không gian sạch, kỹ thuật ổn."),
+        # pro_8 — goi dau duong sinh
+        (IDS["pro_8"], "Đỗ Thu Phương",      5, "Gội đầu xong thấy nhẹ đầu, đỡ stress."),
+        (IDS["pro_8"], "Nguyễn Quốc Thắng",  4, "Combo bấm huyệt đầu vai gáy khá ổn."),
     ]
     import uuid
     for prod_id, reviewer, rating, text in reviews:
@@ -491,6 +555,15 @@ async def seed_product_tags(conn: asyncpg.Connection):
         ("pro_4", "tag_thu_gian"),
         # pro_5 — Làm sạch răng
         ("pro_5", "tag_rang_su"),
+        # pro_6 — massage co vai gay
+        ("pro_6", "tag_co_vai_gay"),
+        ("pro_6", "tag_thu_gian"),
+        # pro_7 — massage da nong
+        ("pro_7", "tag_da_nong"),
+        ("pro_7", "tag_thu_gian"),
+        # pro_8 — goi dau duong sinh
+        ("pro_8", "tag_bam_huyet"),
+        ("pro_8", "tag_thu_gian"),
     ]
     for prod_key, tag_key in rows:
         await conn.execute("""
@@ -530,11 +603,72 @@ async def main(do_clean: bool):
         await seed_feature_tags(conn)
         await seed_product_tags(conn)
 
-        print("🎉 Seed complete! Test với:")
-        print('   POST http://localhost:8001/prefilter/search')
-        print('   {"text": "vật lý trị liệu đau cổ vai gáy"}')
-        print('   {"text": "châm cứu đá nóng hoặc bấm huyệt"}')
-        print('   {"text": "trị liệu đá nóng và thư giãn"}')
+        print("🎉 Seed complete!")
+        print("\n=== Test list cho EXTRACT (POST /ner/extract) ===")
+        extract_tests = [
+            "Mình đang cần tìm một chỗ nhổ răng khôn uy tín ở khu quận 3 TP.HCM, ưu tiên phòng khám có đánh giá tốt và đặt lịch nhanh.",
+            "Dạo này ngồi máy tính nhiều bị đau cổ vai gáy, bạn gợi ý giúp mình dịch vụ massage trị liệu ở TP.HCM với mức giá dưới 200k nhé.",
+            "Mình muốn tìm spa thư giãn ở quận 10, ngân sách khoảng 250k, ưu tiên nơi sạch sẽ và có liệu trình thư giãn sâu.",
+            "Ở Hà Nội có chỗ châm cứu bấm huyệt nào phù hợp cho người đau lưng lâu ngày không, mình muốn dịch vụ làm tại cơ sở uy tín.",
+            "Mình muốn đặt tư vấn tâm lý cho tình trạng stress và lo âu kéo dài, ưu tiên khu vực quận 3 để tiện di chuyển.",
+            "Cho mình tìm dịch vụ gội đầu dưỡng sinh gần đây, khoảng cách tầm 3-5km từ chỗ hiện tại là tốt nhất.",
+            "Mình cần dịch vụ massage đá nóng 60 phút để thư giãn sau giờ làm, ngân sách linh hoạt dưới 350k.",
+            "Tìm giúp mình dịch vụ nha khoa răng sứ thẩm mỹ ở quận 1, ưu tiên nơi có review tốt và có bác sĩ nhiều kinh nghiệm.",
+        ]
+        for i, q in enumerate(extract_tests, 1):
+            print(f"  {i}. {q}")
+
+        print("\n=== Test list cho PREFILTER text-only (POST /prefilter/search) ===")
+        prefilter_tests = [
+            "Mình bị đau cổ vai gáy mấy tuần nay, cần tìm vật lý trị liệu phù hợp để phục hồi vận động.",
+            "Châm cứu đá nóng hoặc bấm huyệt cho người đau lưng mãn tính, ưu tiên cơ sở có kinh nghiệm.",
+            "Mình muốn liệu trình thư giãn sâu bằng massage đá nóng sau giờ làm, không cần quá xa trung tâm.",
+            "Tìm chỗ massage cổ vai gáy giá dưới 200k ở TP.HCM, ưu tiên khu gần quận 10.",
+            "Tìm nha khoa có dịch vụ răng sứ thẩm mỹ khu quận 1, chi phí hợp lý và có lịch hẹn buổi tối.",
+            "Mình cần dịch vụ tâm lý trị liệu ở quận 3 để xử lý stress và mất ngủ kéo dài.",
+            "Tìm gói gội đầu dưỡng sinh có bấm huyệt và thư giãn, ưu tiên giá khoảng 200-250k.",
+            "Tìm dịch vụ massage trị liệu ở quận 10, có thể đi trong bán kính 5km từ vị trí hiện tại.",
+        ]
+        print("  URL: http://localhost:8002/prefilter/search")
+        for i, q in enumerate(prefilter_tests, 1):
+            print(f"  {i}. {{\"text\": \"{q}\", \"limit\": 20}}")
+
+        print("\n=== Test list cho PREFILTER + PostGIS (có tọa độ) ===")
+        postgis_tests = [
+            {
+                "text": "Mình muốn tìm dịch vụ massage cổ vai gáy gần đây trong khoảng 5km từ vị trí hiện tại.",
+                "limit": 20,
+                "current_lat": 10.7735,
+                "current_lng": 106.6672,
+            },
+            {
+                "text": "Tìm gội đầu dưỡng sinh gần chỗ mình, bán kính khoảng 3km thôi để tiện đi lại.",
+                "limit": 20,
+                "current_lat": 10.7760,
+                "current_lng": 106.6916,
+            },
+            {
+                "text": "Mình cần nha khoa răng sứ ở gần quận 1, ưu tiên nơi có thể đi trong vòng 20 phút.",
+                "limit": 20,
+                "current_lat": 10.7769,
+                "current_lng": 106.7009,
+            },
+            {
+                "text": "Tìm châm cứu bấm huyệt gần khu Hoàn Kiếm Hà Nội, ưu tiên nơi có review tốt.",
+                "limit": 20,
+                "current_lat": 21.0315,
+                "current_lng": 105.8487,
+            },
+            {
+                "text": "Mình muốn tìm massage đá nóng trong vòng 7km, nếu không có thì fallback theo địa chỉ đăng ký giúp mình.",
+                "limit": 20,
+                "current_lat": 10.7752,
+                "current_lng": 106.6863,
+                "user_registered_address": "45 Võ Thị Sáu, Quận 3, TP.HCM",
+            },
+        ]
+        for i, payload in enumerate(postgis_tests, 1):
+            print(f"  {i}. {payload}")
 
     except Exception as e:
         print(f"❌ Seed error: {e}")
