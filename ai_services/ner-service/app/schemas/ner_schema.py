@@ -47,6 +47,7 @@ class NerEntity(BaseModel):
 
 class NerResponse(BaseModel):
     entities: List[NerEntity]
+    extraction_source: Optional[str] = None
 
 
 # --- Pre-filter schemas ---

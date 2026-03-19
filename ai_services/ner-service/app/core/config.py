@@ -44,11 +44,23 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     # Unified semantic decision policy thresholds
     # ------------------------------------------------------------------
-    SEMANTIC_BT_HIGH_THRESHOLD: float = 0.45
-    SEMANTIC_BT_MEDIUM_THRESHOLD: float = 0.35
-    SEMANTIC_CATEGORY_HIGH_THRESHOLD: float = 0.45
-    SEMANTIC_CATEGORY_MEDIUM_THRESHOLD: float = 0.35
-    SEMANTIC_TAG_HIGH_THRESHOLD: float = 0.68
-    SEMANTIC_TAG_MEDIUM_THRESHOLD: float = 0.60
+    SEMANTIC_BT_HIGH_THRESHOLD: float = 0.60
+    SEMANTIC_BT_MEDIUM_THRESHOLD: float = 0.50
+    SEMANTIC_CATEGORY_HIGH_THRESHOLD: float = 0.60
+    SEMANTIC_CATEGORY_MEDIUM_THRESHOLD: float = 0.50
+    SEMANTIC_TAG_HIGH_THRESHOLD: float = 0.80
+    SEMANTIC_TAG_MEDIUM_THRESHOLD: float = 0.72
+
+    # ------------------------------------------------------------------
+    # LLM-based NER extraction (Gemini)
+    # ------------------------------------------------------------------
+    LLM_NER_ENABLED: bool = True
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+    GEMINI_API_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta"
+    GEMINI_TIMEOUT_MS: int = 1500
+    GEMINI_MAX_RETRIES: int = 1
+    GEMINI_RETRY_BACKOFF_MS: int = 400
+    GEMINI_COOLDOWN_SECONDS: int = 30
 
 settings = Settings()
