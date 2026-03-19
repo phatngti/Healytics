@@ -9,7 +9,8 @@
 | Công nghệ | Vai trò |
 |---|---|
 | **FastAPI** | Web framework (async, tự sinh OpenAPI docs) |
-| **underthesea** | NLP tiếng Việt — chạy local, không cần API key, latency ~10-50ms |
+| **Gemini API (optional)** | LLM-based NER (primary mode when enabled) |
+| **underthesea** | NLP tiếng Việt — local fallback khi LLM không khả dụng |
 | **RapidFuzz** | Fuzzy string matching (Levenshtein) — map text thô → backend IDs |
 | **cachetools** | LRU cache cho query dedup |
 | **httpx** | HTTP client để load data từ backend API |
@@ -35,7 +36,8 @@ ner-service/
 │   │
 │   ├── ner/                  # ★ NER Pipeline (core logic)
 │   │   ├── cache.py          # RAM cache: 63 tỉnh hardcode + district/ward/category từ backend
-│   │   ├── extractor.py      # underthesea + keyword scan + price/rating regex + LRU
+│   │   ├── extractor.py      # Gemini-first NER + local fallback + price/rating regex + LRU
+│   │   ├── gemini_ner.py     # Gemini client + JSON parsing/sanitization
 │   │   └── normalizer.py     # Entity Linking: cache lookup + RapidFuzz fuzzy match
 │   │
 │   └── api/
@@ -59,8 +61,8 @@ User Query: "Tìm spa ở Quận 1 giá dưới 500k trên 4 sao"
               │ cache miss
               ▼
 ┌─────────────────────────────┐
-│  1a. underthesea.ner(text)  │ → LOC("Quận 1"), ORG("spa")
-│  1b. Keyword Scan (song song)│ → BUSINESS_TYPE("spa" → SPA_BEAUTY)
+│  1a. Gemini NER (nếu bật)   │ → LOC("Quận 1"), BUSINESS_TYPE("SPA_BEAUTY")
+│  1b. Local fallback         │ underthesea + keyword scan nếu Gemini unavailable
 │  2.  Regex Price/Rating     │ → PRICE("dưới 500k"), RATING("trên 4 sao")
 └─────────────┬───────────────┘
               │ raw entities
@@ -173,10 +175,15 @@ Force refresh tất cả caches (gọi khi admin thêm category mới).
 
 | Variable | Default | Mô tả |
 |---|---|---|
-| `BACKEND_API_URL` | `http://localhost:3000` | URL backend để load cache |
-| `LOCATION_CACHE_TTL` | `86400` (24h) | TTL cache district/ward |
-| `CATEGORY_CACHE_TTL` | `300` (5 phút) | TTL cache categories |
-| `QUERY_CACHE_MAXSIZE` | `512` | Max entries LRU query cache |
+| `BACKEND_API_URL` | `http://localhost:3000/api` | URL backend để load cache |
+| `LOCATION_CACHE_TTL` | `3600` | TTL cache district/ward |
+| `CATEGORY_CACHE_TTL` | `3600` | TTL cache categories |
+| `QUERY_CACHE_MAXSIZE` | `1000` | Max entries LRU query cache |
+| `LLM_NER_ENABLED` | `false` | Bật Gemini làm primary NER extractor |
+| `GEMINI_API_KEY` | `""` | API key Gemini |
+| `GEMINI_MODEL` | `gemini-2.0-flash` | Model Gemini để extract NER |
+| `GEMINI_API_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta` | Base URL Gemini API |
+| `GEMINI_TIMEOUT_MS` | `1500` | Timeout gọi Gemini (ms) |
 | `PORT` | `8002` | Port chạy service |
 
 ## Thiết kế chống lỗi

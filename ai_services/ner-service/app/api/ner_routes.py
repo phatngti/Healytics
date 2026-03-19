@@ -22,7 +22,7 @@ router = APIRouter()
 async def extract_entities(request: NerRequest):
     """
     Pipeline:
-      1. extractor.extract_entities(text) → raw entities (underthesea + regex + keyword scan)
+      1. extractor.extract_entities(text) → raw entities (Gemini-first, fallback local extractor)
       2. normalizer.normalize_entities(raw) → normalized NerEntity list
       3. Return NerResponse
 
@@ -30,11 +30,11 @@ async def extract_entities(request: NerRequest):
     """
     logger.info(f"[NER] Processing: {request.text[:100]}...")
 
-    raw_entities = extractor.extract_entities(request.text)
+    raw_entities, extraction_source = extractor.extract_entities_with_source(request.text)
     entities = normalizer.normalize_entities(raw_entities)
 
-    logger.info(f"[NER] Found {len(entities)} entities")
-    return NerResponse(entities=entities)
+    logger.info(f"[NER] Found {len(entities)} entities | source={extraction_source}")
+    return NerResponse(entities=entities, extraction_source=extraction_source)
 
 
 @router.post("/internal/clear-cache")
