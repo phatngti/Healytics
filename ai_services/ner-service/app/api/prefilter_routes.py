@@ -1,11 +1,12 @@
 from fastapi import APIRouter
 import json
 import logging
+from typing import List
 from datetime import datetime, timezone
 from pathlib import Path
 
 from app.core.config import settings
-from app.schemas.ner_schema import PreFilterRequest, PreFilterResponse, NerEntity
+from app.schemas.ner_schema import PreFilterRequest, NerEntity, ServiceCandidate
 from app.ner import extractor, normalizer
 from app.ner.cache import get_feature_tags, get_category_list
 from app.ner.semantic_matcher import get_matcher, group_tag_filters, SemanticAdjudicator
@@ -52,7 +53,7 @@ def _log_location_intent_samples(text: str, entities: list[NerEntity], query_par
     except Exception as exc:
         logger.warning("[IntentLogging] Failed to write location-intent sample: %s", exc)
 
-@router.post("/prefilter/search", response_model=PreFilterResponse)
+@router.post("/prefilter/search", response_model=List[ServiceCandidate])
 async def prefilter_search(request: PreFilterRequest):
     """
     Full pipeline natively within NER service:
@@ -205,10 +206,4 @@ async def prefilter_search(request: PreFilterRequest):
         f"[PreFilter] entities={len(entities)} | candidates={len(candidates)} | spatial={use_postgis}"
     )
 
-    return PreFilterResponse(
-        text=text,
-        entities=entities,
-        query_params=query_params,
-        candidates=candidates,
-        total=len(candidates),
-    )
+    return candidates
