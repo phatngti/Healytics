@@ -30,7 +30,7 @@ from cachetools import LRUCache
 
 from app.core.config import settings
 from app.ner.distance_extractor import extract_distance_entities
-from app.ner.semantic_matcher import get_matcher
+from app.ner.gemini_ner import extract_entities_with_gemini
 
 logger = logging.getLogger(__name__)
 
@@ -132,12 +132,17 @@ _RATING_PATTERN = re.compile(
 # ============================================================================
 
 def extract_entities(text: str) -> list[dict]:
+    entities, _ = extract_entities_with_source(text)
+    return entities
+
+
+def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
     """
     Trích xuất entity thô từ text. Có LRU caching.
     Returns list[dict] — mỗi dict có ít nhất {type, value, confidence}.
     """
     if not text or not text.strip():
-        return []
+        return [], "none"
         
     # Giới hạn text quá dài để tránh treo CPU (DDoS bảo vệ)
     if len(text) > 2000:
@@ -146,59 +151,82 @@ def extract_entities(text: str) -> list[dict]:
     cache_key = text.strip().lower()
     if cache_key in _query_cache:
         logger.debug(f"[Extractor] Cache HIT: {cache_key[:50]}...")
-        return _query_cache[cache_key]
+        cached = _query_cache[cache_key]
+        if isinstance(cached, tuple) and len(cached) == 2:
+            return cached
+        return cached, "cache"
 
     entities: list[dict] = []
-
-    # 1a. underthesea NER
     t0 = time.perf_counter()
-    ner_entities = _extract_with_underthesea(text)
-    entities.extend(ner_entities)
-    t1 = time.perf_counter()
-    logger.info(f"[Perf] Underthesea NER: {(t1-t0)*1000:.2f}ms")
+    extraction_source = "local"
 
-    # 1b. Keyword scan (song song — bắt domain wellness terms)
-    keyword_entities, keyword_ranges = _keyword_scan(text)
-    entities.extend(keyword_entities)
-    t2 = time.perf_counter()
-    logger.info(f"[Perf] Keyword Scan: {(t2-t1)*1000:.2f}ms")
+    # LLM-first mode: replace legacy NER extraction when enabled.
+    llm_entities = extract_entities_with_gemini(text)
+    if llm_entities:
+        entities.extend(llm_entities)
+        extraction_source = "gemini"
+        t1 = time.perf_counter()
+        logger.info(f"[Perf] Gemini NER: {(t1-t0)*1000:.2f}ms | entities={len(llm_entities)}")
+    else:
+        extraction_source = "fallback_local" if settings.LLM_NER_ENABLED else "local"
+        if llm_entities == []:
+            logger.warning("[Extractor] Gemini returned empty entities, fallback to local extractor")
+        # 1a. underthesea NER
+        ner_entities = _extract_with_underthesea(text)
+        entities.extend(ner_entities)
+        t1 = time.perf_counter()
+        logger.info(f"[Perf] Underthesea NER: {(t1-t0)*1000:.2f}ms")
 
-    # 1c. Location fallback scan — skip char ranges already matched by keyword scan
-    location_entities = _location_fallback_scan(text, excluded_ranges=keyword_ranges)
-    entities.extend(location_entities)
-    t3 = time.perf_counter()
-    logger.info(f"[Perf] Location Scan: {(t3-t2)*1000:.2f}ms")
+        # 1b. Keyword scan (song song — bắt domain wellness terms)
+        keyword_entities, keyword_ranges = _keyword_scan(text)
+        entities.extend(keyword_entities)
+        t2 = time.perf_counter()
+        logger.info(f"[Perf] Keyword Scan: {(t2-t1)*1000:.2f}ms")
 
-    # 1d. Distance & Proximity extraction
-    distance_entities = extract_distance_entities(text)
-    entities.extend(distance_entities)
-    t3_dist = time.perf_counter()
-    logger.info(f"[Perf] Distance Extraction: {(t3_dist-t3)*1000:.2f}ms")
+        # 1c. Location fallback scan — skip char ranges already matched by keyword scan
+        location_entities = _location_fallback_scan(text, excluded_ranges=keyword_ranges)
+        entities.extend(location_entities)
+        t3 = time.perf_counter()
+        logger.info(f"[Perf] Location Scan: {(t3-t2)*1000:.2f}ms")
 
-    # 1e. Semantic Fallback — chỉ chạy khi keyword scan + underthesea KHÔNG tìm ra BUSINESS_TYPE
-    # Feed toàn bộ câu cho AI để hiểu ý định ngầm ("nhổ răng", "đau lưng", "mất ngủ", ...)
-    has_business_type = any(e["type"] == "BUSINESS_TYPE" for e in entities)
-    if not has_business_type:
-        matcher = get_matcher()
-        matched_bt = matcher.match_business_type(text, threshold=0.35)
-        if matched_bt:
-            entities.append({
-                "type": "BUSINESS_TYPE",
-                "value": text.strip(),
-                "confidence": 0.75,
-                "business_type": matched_bt,
-            })
-            logger.info(f"[Extractor] Semantic Fallback: '{text[:60]}' -> {matched_bt}")
-    t3_sem = time.perf_counter()
-    logger.info(f"[Perf] Semantic Fallback: {(t3_sem-t3_dist)*1000:.2f}ms")
+        # 1d. Distance & Proximity extraction
+        distance_entities = extract_distance_entities(text)
+        entities.extend(distance_entities)
+        t3_dist = time.perf_counter()
+        logger.info(f"[Perf] Distance Extraction: {(t3_dist-t3)*1000:.2f}ms")
 
-    # 2. Price + Rating regex
-    price_entities = _parse_price(text)
-    entities.extend(price_entities)
-    rating_entities = _parse_rating(text)
-    entities.extend(rating_entities)
+        # 1e. Semantic Fallback — chỉ chạy khi keyword scan + underthesea KHÔNG tìm ra BUSINESS_TYPE
+        # Feed toàn bộ câu cho AI để hiểu ý định ngầm ("nhổ răng", "đau lưng", "mất ngủ", ...)
+        has_business_type = any(e["type"] == "BUSINESS_TYPE" for e in entities)
+        if not has_business_type:
+            try:
+                from app.ner.semantic_matcher import get_matcher
+
+                matcher = get_matcher()
+                matched_bt = matcher.match_business_type(text, threshold=0.35)
+                if matched_bt:
+                    entities.append({
+                        "type": "BUSINESS_TYPE",
+                        "value": text.strip(),
+                        "confidence": 0.75,
+                        "business_type": matched_bt,
+                    })
+                    logger.info(f"[Extractor] Semantic Fallback: '{text[:60]}' -> {matched_bt}")
+            except Exception as exc:
+                logger.warning("[Extractor] Semantic fallback unavailable: %s", exc)
+
+    # Deterministic numeric extraction remains as safety net.
+    if not any(e.get("type") == "DISTANCE" for e in entities):
+        entities.extend(extract_distance_entities(text))
+
+    if not any(e.get("type") == "PRICE" for e in entities):
+        entities.extend(_parse_price(text))
+
+    if not any(e.get("type") == "RATING" for e in entities):
+        entities.extend(_parse_rating(text))
+
     t4 = time.perf_counter()
-    logger.info(f"[Perf] Regex (Price/Rating): {(t4-t3_dist)*1000:.2f}ms")
+    logger.info(f"[Perf] Post-process (Distance/Price/Rating): {(t4-t0)*1000:.2f}ms")
 
     # deduplicate
     entities = _deduplicate(entities)
@@ -217,8 +245,8 @@ def extract_entities(text: str) -> list[dict]:
         else:
             valid_entities.append(e)
 
-    _query_cache[cache_key] = valid_entities
-    return valid_entities
+    _query_cache[cache_key] = (valid_entities, extraction_source)
+    return valid_entities, extraction_source
 
 
 def clear_query_cache():

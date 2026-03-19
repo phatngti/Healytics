@@ -43,6 +43,7 @@ _SELECT_BASE = """
         p.sale_price,
         p.type,
         p.vendor_name,
+        p.created_at,
         c.name AS category_name,
         pd.duration_minutes,
         pm.url AS image_url,
@@ -209,17 +210,106 @@ async def fetch_candidates_from_db(
     candidates: List[ServiceCandidate] = []
     db_error: Optional[Exception] = None
 
-    try:
+    async def _execute_query(sql_text: str, sql_params: Dict[str, Any]) -> List[ServiceCandidate]:
+        rows_out = []
         async with async_session() as session:
-            result = await session.execute(text(sql), params)
+            result = await session.execute(text(sql_text), sql_params)
             rows = result.fetchall()
-
             for row in rows:
-                candidates.append(_row_to_candidate(row, has_distance_col))
+                rows_out.append(_row_to_candidate(row, has_distance_col))
+        return rows_out
+
+    try:
+        candidates = await _execute_query(sql, params)
 
     except Exception as e:
         db_error = e
         logger.error(f"[DBFetcher] Query failed (case={spatial_case}): {e}")
+
+    # ── Progressive relaxation for sparse data (non-spatial only) ───────────
+    # Keep businessType as strongest signal; relax category/location gradually.
+    if not candidates and db_error is None and spatial_case is None:
+        bt = query_params.get("businessType")
+        cat_slug = query_params.get("categorySlug")
+        loc_code = query_params.get("locationCode")
+        tag_filters = query_params.get("tagFilters")
+
+        relax_plans: list[tuple[str, Dict[str, Any]]] = []
+        if bt and cat_slug:
+            relax_plans.append(("drop_category", {**query_params, "categorySlug": None}))
+        if bt and loc_code:
+            relax_plans.append(("drop_location", {**query_params, "locationCode": None}))
+        if bt and (cat_slug or loc_code or tag_filters):
+            relax_plans.append((
+                "bt_only",
+                {
+                    **query_params,
+                    "categorySlug": None,
+                    "locationCode": None,
+                    "tagFilters": [],
+                },
+            ))
+
+        for plan_name, relaxed_params in relax_plans:
+            try:
+                relaxed_conditions: list[str] = []
+                relaxed_bind: Dict[str, Any] = {"limit": limit}
+
+                relaxed_sql = _SELECT_BASE + _FROM_JOINS
+
+                relaxed_bt = relaxed_params.get("businessType")
+                if relaxed_bt:
+                    relaxed_conditions.append(":bt = ANY(string_to_array(hpp.business_type, ','))")
+                    relaxed_bind["bt"] = relaxed_bt
+
+                relaxed_loc = relaxed_params.get("locationCode")
+                if relaxed_loc:
+                    relaxed_conditions.append("(loc_d.code = :loc_code OR loc_p.code = :loc_code)")
+                    relaxed_bind["loc_code"] = relaxed_loc
+
+                relaxed_cat = relaxed_params.get("categorySlug")
+                if relaxed_cat:
+                    relaxed_conditions.append("c.slug = :cat_slug")
+                    relaxed_bind["cat_slug"] = relaxed_cat
+
+                for i, tf in enumerate(relaxed_params.get("tagFilters", [])):
+                    op = tf.get("op", "OR")
+                    tids = tf.get("ids", [])
+                    if not tids:
+                        continue
+                    if op == "OR":
+                        placeholders = ", ".join(f":tf_{i}_{j}" for j in range(len(tids)))
+                        relaxed_conditions.append(
+                            f"EXISTS (SELECT 1 FROM product_tags pt "
+                            f"WHERE pt.product_id = p.id AND pt.tag_id::text IN ({placeholders}))"
+                        )
+                        for j, tid in enumerate(tids):
+                            relaxed_bind[f"tf_{i}_{j}"] = tid
+                    else:
+                        for j, tid in enumerate(tids):
+                            pkey = f"tf_{i}_{j}"
+                            relaxed_conditions.append(
+                                f"EXISTS (SELECT 1 FROM product_tags pt "
+                                f"WHERE pt.product_id = p.id AND pt.tag_id::text = :{pkey})"
+                            )
+                            relaxed_bind[pkey] = tid
+
+                if relaxed_conditions:
+                    relaxed_sql += " AND " + " AND ".join(relaxed_conditions)
+                relaxed_sql += " ORDER BY p.created_at DESC LIMIT :limit"
+
+                relaxed_candidates = await _execute_query(relaxed_sql, relaxed_bind)
+                if relaxed_candidates:
+                    logger.info(
+                        "[DBFetcher] Relaxation hit (%s): %s candidates",
+                        plan_name,
+                        len(relaxed_candidates),
+                    )
+                    candidates = relaxed_candidates
+                    break
+                logger.info("[DBFetcher] Relaxation miss (%s)", plan_name)
+            except Exception as relax_exc:
+                logger.warning("[DBFetcher] Relaxation failed (%s): %s", plan_name, relax_exc)
 
     # ── Mock fallback khi DB lỗi hoặc chưa có data ────────────────────────────
     if not candidates:
@@ -290,13 +380,13 @@ def _row_to_candidate(row, has_distance_col: bool) -> ServiceCandidate:
     if has_distance_col:
         (
             pid, name, slug, base_price, sale_price, ptype, vendor,
-            cat_name, duration, image_url, partner_brand,
+            created_at, cat_name, duration, image_url, partner_brand,
             dist_name, prov_name, rating, distance_m
         ) = row
     else:
         (
             pid, name, slug, base_price, sale_price, ptype, vendor,
-            cat_name, duration, image_url, partner_brand,
+            created_at, cat_name, duration, image_url, partner_brand,
             dist_name, prov_name, rating
         ) = row
         distance_m = None

@@ -128,8 +128,8 @@ async def prefilter_search(request: PreFilterRequest):
         )
         if tag_matches:
             tag_decisions = adjudicator.adjudicate_tags(tag_matches)
-            hard_or_soft = [d for d in tag_decisions if d.policy in ("hard", "soft")]
-            selected_matches = [d.payload for d in hard_or_soft if d.payload]
+            hard_only = [d for d in tag_decisions if d.policy == "hard"]
+            selected_matches = [d.payload for d in hard_only if d.payload]
 
             tag_filters = group_tag_filters(text, selected_matches)
             if tag_filters:
@@ -156,6 +156,10 @@ async def prefilter_search(request: PreFilterRequest):
                     f"[PreFilter] tagFilters={tag_filters} "
                     f"(from {[m['tag_name'] for m in selected_matches]})"
                 )
+
+            soft_tag_names = [d.payload["tag_name"] for d in tag_decisions if d.policy == "soft" and d.payload]
+            if soft_tag_names:
+                logger.info("[PreFilter] Soft tag signals only (not hard filters): %s", soft_tag_names)
 
             # Keep soft signals for future reranking layer.
             soft_signals = [
