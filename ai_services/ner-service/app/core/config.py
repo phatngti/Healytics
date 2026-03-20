@@ -9,9 +9,8 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # Database
-    DATABASE_URL: str = "postgresql+asyncpg://admin:admin%40123@localhost:5432/mydb"
-
+    # Database (required from .env / environment)
+    DATABASE_URL: str
     # Backend/API base URL
     BACKEND_API_URL: str = "http://localhost:3000/api"
 
@@ -19,6 +18,11 @@ class Settings(BaseSettings):
     LOCATION_CACHE_TTL: int = 3600
     CATEGORY_CACHE_TTL: int = 3600
     QUERY_CACHE_MAXSIZE: int = 1000
+    LOCATION_MATCHER_USE_AHO: bool = True
+    SEMANTIC_OFFLOAD_TO_THREAD: bool = True
+    SEMANTIC_QUERY_CACHE_MAXSIZE: int = 1000
+    SEMANTIC_MODEL_NAME: str = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+    SEMANTIC_USE_RETRIEVAL_PREFIX: bool = False
 
     # Spatial/PostGIS
     ENABLE_SPATIAL_QUERIES: bool = True

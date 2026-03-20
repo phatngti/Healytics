@@ -40,6 +40,11 @@ try:
 except ImportError:
     underthesea_ner = None
 
+try:
+    import ahocorasick  # type: ignore
+except ImportError:
+    ahocorasick = None
+
 
 # ============================================================================
 # LRU Query Cache
@@ -80,6 +85,10 @@ BUSINESS_TYPE_ALIASES: dict[str, str] = {
 
 # Sắp xếp by length desc → ưu tiên match cụm dài trước (VD: "massage trị liệu" > "massage")
 _SORTED_BT_KEYWORDS = sorted(BUSINESS_TYPE_ALIASES.keys(), key=len, reverse=True)
+_BT_KEYWORD_PATTERNS = {
+    keyword: re.compile(rf"(?<!\\w){re.escape(keyword)}(?!\\w)", re.IGNORECASE)
+    for keyword in _SORTED_BT_KEYWORDS
+}
 
 # Thêm domain-specific wellness keywords mà underthesea hay miss
 _EXTRA_DOMAIN_KEYWORDS: set[str] = {
@@ -89,6 +98,11 @@ _EXTRA_DOMAIN_KEYWORDS: set[str] = {
     "tâm lý", "đông y", "hiệu thuốc", "nhà thuốc", "phòng tập", "yoga", "pilates",
     "spa", "làm đẹp", "massage", "mát xa"
 }
+
+
+# Optional Aho-Corasick location index (lazy-built on first use)
+_location_automaton = None
+_location_automaton_fingerprint: tuple[int, int, int] | None = None
 
 
 # ============================================================================
@@ -138,6 +152,16 @@ _RATING_PATTERN = re.compile(
 # ============================================================================
 
 def extract_entities(text: str) -> list[dict]:
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        pass
+    else:
+        raise RuntimeError(
+            "extract_entities() cannot run inside an active event loop. "
+            "Use 'await extract_entities_with_source(text)' in async contexts."
+        )
+
     entities, _ = asyncio.run(extract_entities_with_source(text))
     return entities
 
@@ -149,11 +173,10 @@ async def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
     """
     if not text or not text.strip():
         return [], "none"
-        
-    # Giới hạn text quá dài để tránh treo CPU (DDoS bảo vệ)
+
     if len(text) > 2000:
         text = text[:2000]
-        
+
     cache_key = text.strip().lower()
     if cache_key in _query_cache:
         logger.debug(f"[Extractor] Cache HIT: {cache_key[:50]}...")
@@ -166,79 +189,78 @@ async def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
     t0 = time.perf_counter()
     extraction_source = "local"
 
-    # LLM-first mode: replace legacy NER extraction when enabled.
     llm_entities = await extract_entities_with_gemini(text)
     if llm_entities:
         entities.extend(llm_entities)
         extraction_source = "gemini"
-        t1 = time.perf_counter()
-        logger.info(f"[Perf] Gemini NER: {(t1-t0)*1000:.2f}ms | entities={len(llm_entities)}")
+        t_llm = time.perf_counter()
+        logger.info(f"[Perf] Gemini NER: {(t_llm-t0)*1000:.2f}ms | entities={len(llm_entities)}")
+    elif llm_entities == []:
+        extraction_source = "fallback_local" if settings.LLM_NER_ENABLED else "local"
+        logger.warning("[Extractor] Gemini returned empty entities, fallback to local extractor")
     else:
         extraction_source = "fallback_local" if settings.LLM_NER_ENABLED else "local"
-        if llm_entities == []:
-            logger.warning("[Extractor] Gemini returned empty entities, fallback to local extractor")
-        # 1a. underthesea NER
-        ner_entities = _extract_with_underthesea(text)
-        entities.extend(ner_entities)
-        t1 = time.perf_counter()
-        logger.info(f"[Perf] Underthesea NER: {(t1-t0)*1000:.2f}ms")
 
-        # 1b. Keyword scan (song song — bắt domain wellness terms)
-        keyword_entities, keyword_ranges = _keyword_scan(text)
-        entities.extend(keyword_entities)
-        t2 = time.perf_counter()
-        logger.info(f"[Perf] Keyword Scan: {(t2-t1)*1000:.2f}ms")
+    ner_entities = await asyncio.to_thread(_extract_with_underthesea, text)
+    entities.extend(ner_entities)
+    t1 = time.perf_counter()
+    logger.info(f"[Perf] Underthesea NER: {(t1-t0)*1000:.2f}ms")
 
-        # 1c. Location fallback scan — skip char ranges already matched by keyword scan
-        location_entities = _location_fallback_scan(text, excluded_ranges=keyword_ranges)
-        entities.extend(location_entities)
-        t3 = time.perf_counter()
-        logger.info(f"[Perf] Location Scan: {(t3-t2)*1000:.2f}ms")
+    keyword_entities, keyword_ranges = _keyword_scan(text)
+    entities.extend(keyword_entities)
+    t2 = time.perf_counter()
+    logger.info(f"[Perf] Keyword Scan: {(t2-t1)*1000:.2f}ms")
 
-        # 1d. Distance & Proximity extraction
-        distance_entities = extract_distance_entities(text)
-        entities.extend(distance_entities)
-        t3_dist = time.perf_counter()
-        logger.info(f"[Perf] Distance Extraction: {(t3_dist-t3)*1000:.2f}ms")
+    location_entities = await asyncio.to_thread(
+        _location_fallback_scan,
+        text,
+        excluded_ranges=keyword_ranges,
+    )
+    entities.extend(location_entities)
+    t3 = time.perf_counter()
+    logger.info(f"[Perf] Location Scan: {(t3-t2)*1000:.2f}ms")
 
-        # 1e. Semantic Fallback — chỉ chạy khi keyword scan + underthesea KHÔNG tìm ra BUSINESS_TYPE
-        # Feed toàn bộ câu cho AI để hiểu ý định ngầm ("nhổ răng", "đau lưng", "mất ngủ", ...)
-        has_business_type = any(e["type"] == "BUSINESS_TYPE" for e in entities)
-        if not has_business_type:
-            try:
-                from app.ner.semantic_matcher import get_matcher
+    distance_entities = extract_distance_entities(text)
+    entities.extend(distance_entities)
+    t3_dist = time.perf_counter()
+    logger.info(f"[Perf] Distance Extraction: {(t3_dist-t3)*1000:.2f}ms")
 
-                matcher = get_matcher()
-                matched_bt = matcher.match_business_type(text, threshold=0.35)
-                if matched_bt:
-                    entities.append({
+    has_business_type = any(e["type"] == "BUSINESS_TYPE" for e in entities)
+    if not has_business_type:
+        try:
+            from app.ner.semantic_matcher import get_matcher
+
+            matcher = get_matcher()
+            matched_bt = await asyncio.to_thread(matcher.match_business_type, text, 0.35)
+            if matched_bt:
+                entities.append(
+                    {
                         "type": "BUSINESS_TYPE",
                         "value": text.strip(),
                         "confidence": 0.75,
                         "business_type": matched_bt,
-                    })
-                    logger.info(f"[Extractor] Semantic Fallback: '{text[:60]}' -> {matched_bt}")
-            except Exception as exc:
-                logger.warning("[Extractor] Semantic fallback unavailable: %s", exc)
+                    }
+                )
+                logger.info(f"[Extractor] Semantic Fallback: '{text[:60]}' -> {matched_bt}")
+        except Exception as exc:
+            logger.warning("[Extractor] Semantic fallback unavailable: %s", exc)
 
-    # Deterministic numeric extraction remains as safety net.
-    if not any(e.get("type") == "DISTANCE" for e in entities):
-        entities.extend(extract_distance_entities(text))
+    # Deterministic numeric extraction is strictly superior for VN queries.
+    # We strip LLM's naive attempts at PRICE/RATING/DISTANCE to let local regex handle rules & overlaps properly.
+    entities = [e for e in entities if e.get("type") not in {"PRICE", "RATING", "DISTANCE"}]
 
-    if not any(e.get("type") == "PRICE" for e in entities):
-        entities.extend(_parse_price(text))
-
-    if not any(e.get("type") == "RATING" for e in entities):
-        entities.extend(_parse_rating(text))
+    entities.extend(extract_distance_entities(text))
+    entities.extend(_parse_price(text))
+    entities.extend(_parse_rating(text))
 
     t4 = time.perf_counter()
     logger.info(f"[Perf] Post-process (Distance/Price/Rating): {(t4-t0)*1000:.2f}ms")
 
-    # deduplicate
     entities = _deduplicate(entities)
+    entities = _resolve_distance_priority(entities)
 
-    # 3. Post-Filter LOC: Chỉ giữ lại các địa điểm có thật trong DB (cần code để build query)
     from app.ner.cache import find_location
+
     valid_entities = []
     for e in entities:
         if e["type"] == "LOC":
@@ -341,29 +363,26 @@ def _map_ner_tag(tag: str) -> str:
 def _keyword_scan(text: str) -> tuple[list[dict], list[tuple[int, int]]]:
     """Returns (entities, matched_char_ranges) to allow downstream steps to skip matched spans."""
     found: list[dict] = []
-    text_lower = text.lower()
     already_matched_ranges: list[tuple[int, int]] = []
 
     for keyword in _SORTED_BT_KEYWORDS:
-        start = text_lower.find(keyword)
-        if start == -1:
-            continue
+        pattern = _BT_KEYWORD_PATTERNS[keyword]
+        for m in pattern.finditer(text):
+            start, end = m.start(), m.end()
+            overlap = any(
+                not (end <= ms or start >= me)
+                for ms, me in already_matched_ranges
+            )
+            if overlap:
+                continue
 
-        end = start + len(keyword)
-        overlap = any(
-            not (end <= ms or start >= me)
-            for ms, me in already_matched_ranges
-        )
-        if overlap:
-            continue
-
-        already_matched_ranges.append((start, end))
-        found.append({
-            "type": "BUSINESS_TYPE",
-            "value": keyword,
-            "confidence": 0.90,
-            "business_type": BUSINESS_TYPE_ALIASES[keyword],
-        })
+            already_matched_ranges.append((start, end))
+            found.append({
+                "type": "BUSINESS_TYPE",
+                "value": text[start:end],
+                "confidence": 0.90,
+                "business_type": BUSINESS_TYPE_ALIASES[keyword],
+            })
 
     return found, already_matched_ranges
 
@@ -376,47 +395,126 @@ def _location_fallback_scan(text: str, excluded_ranges: list[tuple[int, int]] | 
     excluded_ranges: char ranges already matched by keyword scan — skip to avoid
     matching sub-words like "hiệu" (from "hiệu thuốc") as ward names.
     """
+    if not settings.LOCATION_MATCHER_USE_AHO or ahocorasick is None:
+        return _location_fallback_scan_ngram(text, excluded_ranges=excluded_ranges)
+
+    from app.ner.cache import _location_cache, to_canonical, PROVINCE_MAP, _DISTRICT_FALLBACK
+
+    token_spans = [(m.group(0), m.start(), m.end()) for m in re.finditer(r"\w+", text)]
+    if not token_spans:
+        return []
+
+    # Build canonical token stream and index map: canonical char range -> original token span.
+    canonical_tokens: list[str] = []
+    canonical_to_token_idx: list[int] = []
+    for idx, (tok, _, _) in enumerate(token_spans):
+        can_tok = to_canonical(tok)
+        if not can_tok:
+            continue
+        canonical_tokens.append(can_tok)
+        canonical_to_token_idx.append(idx)
+
+    if not canonical_tokens:
+        return []
+
+    canonical_text = " ".join(canonical_tokens)
+    if len(canonical_text.replace(" ", "")) < 3:
+        return []
+
+    auto = _get_location_automaton(_location_cache, PROVINCE_MAP, _DISTRICT_FALLBACK)
+    if auto is None:
+        return _location_fallback_scan_ngram(text, excluded_ranges=excluded_ranges)
+
+    # Precompute canonical token character offsets
+    canonical_token_starts: list[int] = []
+    pos = 0
+    for tok in canonical_tokens:
+        canonical_token_starts.append(pos)
+        pos += len(tok) + 1
+
+    matches: list[tuple[int, int]] = []
+    for end_idx, matched_phrase in auto.iter(canonical_text):
+        start_idx = end_idx - len(matched_phrase) + 1
+
+        # Require token boundaries in canonical stream
+        left_ok = start_idx == 0 or canonical_text[start_idx - 1] == " "
+        right_ok = end_idx == len(canonical_text) - 1 or canonical_text[end_idx + 1] == " "
+        if not (left_ok and right_ok):
+            continue
+
+        # Map canonical char range -> token range
+        start_tok = None
+        end_tok = None
+        for i, c_start in enumerate(canonical_token_starts):
+            c_end = c_start + len(canonical_tokens[i])
+            if start_tok is None and c_start == start_idx:
+                start_tok = i
+            if c_end - 1 == end_idx:
+                end_tok = i
+                break
+
+        if start_tok is None or end_tok is None:
+            continue
+
+        orig_start = token_spans[canonical_to_token_idx[start_tok]][1]
+        orig_end = token_spans[canonical_to_token_idx[end_tok]][2]
+        matches.append((orig_start, orig_end))
+
+    if not matches:
+        return []
+
+    # Longest-first overlap resolution to keep most specific span.
+    matches.sort(key=lambda s: (-(s[1] - s[0]), s[0]))
+    found: list[dict] = []
+    already_matched_ranges: list[tuple[int, int]] = []
+    for start_idx, end_idx in matches:
+        if excluded_ranges and any(not (end_idx <= ms or start_idx >= me) for ms, me in excluded_ranges):
+            continue
+        overlap = any(not (end_idx <= ms or start_idx >= me) for ms, me in already_matched_ranges)
+        if overlap:
+            continue
+        already_matched_ranges.append((start_idx, end_idx))
+        found.append({
+            "type": "LOC",
+            "value": text[start_idx:end_idx],
+            "confidence": 0.85,
+        })
+
+    return found
+
+
+def _location_fallback_scan_ngram(text: str, excluded_ranges: list[tuple[int, int]] | None = None) -> list[dict]:
+    """Compatibility fallback when Aho-Corasick library is unavailable."""
     found: list[dict] = []
     text_lower = text.lower()
 
-    # Early out nếu text quá ngắn
     if len(text_lower.replace(" ", "")) < 3:
         return found
 
     from app.ner.cache import _location_cache, to_canonical, PROVINCE_MAP, _DISTRICT_FALLBACK
 
     already_matched_ranges: list[tuple[int, int]] = []
-
-    # Tách từ để tạo N-grams (max 5 từ cho 1 location: vd "thành phố hồ chí minh")
     tokens = [(m.group(0), m.start(), m.end()) for m in re.finditer(r'\w+', text_lower)]
 
-    # Duyệt N-grams từ n=5 xuống 1 để ưu tiên match cụm dài trước
     for n in range(5, 0, -1):
         for i in range(len(tokens) - n + 1):
             start_idx = tokens[i][1]
             end_idx = tokens[i + n - 1][2]
 
-            # Bỏ qua nếu n-gram nằm trong vùng đã match bởi keyword scan
             if excluded_ranges and any(
                 not (end_idx <= ms or start_idx >= me)
                 for ms, me in excluded_ranges
             ):
                 continue
 
-            # Kiểm tra xem khoảng này đã bị match bởi N-gram dài hơn chưa
             overlap = any(not (end_idx <= ms or start_idx >= me) for ms, me in already_matched_ranges)
             if overlap:
                 continue
 
-            # Lấy chuỗi substring thật từ text lower
             ngram_text = text_lower[start_idx:end_idx]
-
-            # 1. Canonical lookup → DB cache (works for most locations)
             can_ngram = to_canonical(ngram_text)
             matched = can_ngram in _location_cache
 
-            # 2. Direct lowercase lookup → PROVINCE_MAP and _DISTRICT_FALLBACK
-            # Needed for "quận 1", "quận 2"... where to_canonical strips the number leaving "1"
             if not matched:
                 matched = ngram_text in PROVINCE_MAP or ngram_text in _DISTRICT_FALLBACK
 
@@ -424,11 +522,41 @@ def _location_fallback_scan(text: str, excluded_ranges: list[tuple[int, int]] | 
                 already_matched_ranges.append((start_idx, end_idx))
                 found.append({
                     "type": "LOC",
-                    "value": text[start_idx:end_idx], # Giữ đúng case gốc
+                    "value": text[start_idx:end_idx],
                     "confidence": 0.85,
                 })
 
     return found
+
+
+def _get_location_automaton(_location_cache: dict, province_map: dict, district_fallback: dict):
+    """Build or reuse a location phrase automaton keyed by canonical phrases."""
+    global _location_automaton, _location_automaton_fingerprint
+
+    if ahocorasick is None:
+        return None
+
+    fingerprint = (len(_location_cache), len(province_map), len(district_fallback))
+    if _location_automaton is not None and _location_automaton_fingerprint == fingerprint:
+        return _location_automaton
+
+    from app.ner.cache import to_canonical
+
+    keys: set[str] = set(_location_cache.keys())
+    keys.update(to_canonical(k) for k in province_map.keys())
+    keys.update(to_canonical(k) for k in district_fallback.keys())
+
+    auto = ahocorasick.Automaton()
+    for key in keys:
+        if not key:
+            continue
+        auto.add_word(key, key)
+
+    auto.make_automaton()
+    _location_automaton = auto
+    _location_automaton_fingerprint = fingerprint
+    logger.info("[Extractor] Built Aho-Corasick location index: %d phrases", len(keys))
+    return _location_automaton
 
 
 # ============================================================================
@@ -581,9 +709,83 @@ def _deduplicate(entities: list[dict]) -> list[dict]:
     """
     seen: dict[str, dict] = {}
 
+    def _merge_entity(primary: dict, secondary: dict) -> dict:
+        merged = dict(primary)
+
+        # Fill missing normalized fields from the secondary candidate.
+        for fld in (
+            "business_type",
+            "operator",
+            "amount",
+            "amount_max",
+            "radius_meters",
+            "distance_unit",
+            "proximity_intent",
+            "source_query",
+        ):
+            if merged.get(fld) is None and secondary.get(fld) is not None:
+                merged[fld] = secondary.get(fld)
+
+        # Distance-specific precedence: explicit extraction must override implicit intent.
+        if merged.get("type") == "DISTANCE":
+            if secondary.get("radius_meters") is not None and merged.get("radius_meters") is None:
+                merged["radius_meters"] = secondary.get("radius_meters")
+
+            # If either candidate says explicit distance, keep proximity_intent=False.
+            if secondary.get("proximity_intent") is False:
+                merged["proximity_intent"] = False
+
+            # Prefer non-implicit unit when available.
+            unit = merged.get("distance_unit")
+            secondary_unit = secondary.get("distance_unit")
+            if (not unit or unit == "implicit") and secondary_unit and secondary_unit != "implicit":
+                merged["distance_unit"] = secondary_unit
+
+        return merged
+
     for e in entities:
         key = f"{e['type']}::{e['value'].lower()}"
-        if key not in seen or e.get("confidence", 0) > seen[key].get("confidence", 0):
-            seen[key] = e
+        if key not in seen:
+            seen[key] = dict(e)
+            continue
+
+        current = seen[key]
+        if e.get("confidence", 0) > current.get("confidence", 0):
+            seen[key] = _merge_entity(dict(e), current)
+        else:
+            seen[key] = _merge_entity(current, e)
 
     return list(seen.values())
+
+
+def _resolve_distance_priority(entities: list[dict]) -> list[dict]:
+    """
+    Keep at most one DISTANCE entity, prioritizing explicit distance over implicit proximity.
+    """
+    distances = [e for e in entities if e.get("type") == "DISTANCE"]
+    if len(distances) <= 1:
+        return entities
+
+    explicit = [
+        e for e in distances
+        if e.get("radius_meters") is not None and e.get("proximity_intent") is False
+    ]
+    if explicit:
+        chosen = max(explicit, key=lambda x: float(x.get("confidence", 0)))
+    else:
+        # Fall back to any distance with meters, then highest confidence.
+        with_radius = [e for e in distances if e.get("radius_meters") is not None]
+        pool = with_radius if with_radius else distances
+        chosen = max(pool, key=lambda x: float(x.get("confidence", 0)))
+
+    kept: list[dict] = []
+    used_distance = False
+    for e in entities:
+        if e.get("type") != "DISTANCE":
+            kept.append(e)
+            continue
+        if not used_distance:
+            kept.append(chosen)
+            used_distance = True
+
+    return kept

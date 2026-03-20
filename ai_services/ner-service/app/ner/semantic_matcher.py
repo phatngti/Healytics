@@ -1,17 +1,19 @@
 import logging
 import re
+import threading
 from dataclasses import dataclass
 from typing import Any, Optional
 
 import numpy as np
 import torch
+from cachetools import LRUCache
 from sentence_transformers import SentenceTransformer, util
 
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-MODEL_NAME = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+DEFAULT_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 
 # Multi-prototype descriptors.
 # Mỗi BT có nhiều phrase ngắn → encode riêng → score = max(similarity(query, phrase_i))
@@ -91,40 +93,72 @@ BUSINESS_TYPE_PHRASES: dict[str, list[str]] = {
 
 class SemanticMatcher:
     def __init__(self):
-        logger.info(f"[SemanticMatcher] Loading model {MODEL_NAME}...")
-        self.model = SentenceTransformer(MODEL_NAME)
+        self.model_name = settings.SEMANTIC_MODEL_NAME.strip() or DEFAULT_MODEL_NAME
+        self.use_retrieval_prefix = settings.SEMANTIC_USE_RETRIEVAL_PREFIX or ("e5" in self.model_name.lower())
+
+        logger.info(f"[SemanticMatcher] Loading model {self.model_name}...")
+        self.model = SentenceTransformer(self.model_name)
         self.bt_keys = list(BUSINESS_TYPE_PHRASES.keys())
+        self._cache_lock = threading.RLock()
 
         # Encode từng phrase riêng lẻ: {bt_key: tensor[n_phrases, dim]}
         self.bt_phrase_embeddings: dict = {}
         for bt_key, phrases in BUSINESS_TYPE_PHRASES.items():
-            self.bt_phrase_embeddings[bt_key] = self.model.encode(
-                phrases, convert_to_tensor=True
-            )
+            self.bt_phrase_embeddings[bt_key] = self._encode_passages(phrases)
 
-        # Tag embedding cache: {tag_id: (content_hash, tensor)} — tránh re-encode
+        # Tag embedding cache: {tag_id: (content_hash, tensor[n_prototypes, dim])}
         self._tag_emb_cache: dict[str, tuple[str, Any]] = {}
         # Category embedding cache: {slug: (content_hash, tensor)}
         self._cat_emb_cache: dict[str, tuple[str, Any]] = {}
         # Location-intent embedding cache: {location_name: {"pos": tensor, "neg": tensor}}
         self._loc_intent_cache: dict[str, dict[str, Any]] = {}
+        # Query embedding cache to reduce repeated encode calls for hot queries.
+        self._query_emb_cache: LRUCache = LRUCache(maxsize=settings.SEMANTIC_QUERY_CACHE_MAXSIZE)
 
         total_phrases = sum(len(v) for v in BUSINESS_TYPE_PHRASES.values())
         logger.info(
             f"[SemanticMatcher] Loaded {len(self.bt_keys)} business types, "
-            f"{total_phrases} prototype phrases."
+            f"{total_phrases} prototype phrases. retrieval_prefix={self.use_retrieval_prefix}"
         )
+
+    def _with_prefix(self, text: str, is_query: bool) -> str:
+        if not self.use_retrieval_prefix:
+            return text
+        prefix = "query: " if is_query else "passage: "
+        lowered = text.lower().lstrip()
+        if lowered.startswith("query:") or lowered.startswith("passage:"):
+            return text
+        return f"{prefix}{text}"
+
+    def _encode_query(self, text: str) -> Any:
+        return self.model.encode(self._with_prefix(text, is_query=True), convert_to_tensor=True)
+
+    def _encode_passages(self, texts: list[str]) -> Any:
+        prepared = [self._with_prefix(t, is_query=False) for t in texts]
+        return self.model.encode(prepared, convert_to_tensor=True)
 
     def extract_semantic_context(self, text: str) -> dict:
         """Extract query-level semantic representation once for downstream slot matching."""
         if not text:
             return {"query_emb": None}
-        return {"query_emb": self.model.encode(text, convert_to_tensor=True)}
+        return {"query_emb": self._resolve_query_embedding(text)}
 
     def _resolve_query_embedding(self, text: str, query_emb: Any | None = None) -> Any:
         if query_emb is not None:
             return query_emb
-        return self.model.encode(text, convert_to_tensor=True)
+        key = " ".join(text.lower().split())
+        if not key:
+            return self._encode_query(text)
+
+        with self._cache_lock:
+            cached = self._query_emb_cache.get(key)
+        if cached is not None:
+            return cached
+
+        emb = self._encode_query(text)
+        with self._cache_lock:
+            self._query_emb_cache[key] = emb
+        return emb
 
     def _get_category_embeddings(self, categories: list[dict]) -> Any:
         """Return stacked category embeddings in the same order as input categories."""
@@ -132,18 +166,21 @@ class SemanticMatcher:
         new_texts: list[str] = []
         for cat in categories:
             content_hash = f"cat|{cat['slug']}|{cat['name']}"
-            cached = self._cat_emb_cache.get(cat["slug"])
+            with self._cache_lock:
+                cached = self._cat_emb_cache.get(cat["slug"])
             if cached is None or cached[0] != content_hash:
                 new_cats.append(cat)
                 new_texts.append(cat["name"])
 
         if new_texts:
-            new_embs = self.model.encode(new_texts, convert_to_tensor=True)
+            new_embs = self._encode_passages(new_texts)
             for cat, emb in zip(new_cats, new_embs):
                 content_hash = f"cat|{cat['slug']}|{cat['name']}"
-                self._cat_emb_cache[cat["slug"]] = (content_hash, emb)
+                with self._cache_lock:
+                    self._cat_emb_cache[cat["slug"]] = (content_hash, emb)
 
-        return torch.stack([self._cat_emb_cache[cat["slug"]][1] for cat in categories])
+        with self._cache_lock:
+            return torch.stack([self._cat_emb_cache[cat["slug"]][1] for cat in categories])
 
     def match_business_type(self, text: str, threshold: float = 0.45) -> Optional[str]:
         """
@@ -190,16 +227,16 @@ class SemanticMatcher:
         self,
         text: str,
         tags: list[dict],
-        threshold: float = 0.35,
+        threshold: float = 0.40,
         top_k: int = 5,
         query_emb: Any | None = None,
     ) -> list[dict]:
         """
         Match query text against feature tags từ DB.
 
-        Mỗi tag được encode dưới dạng "name. description" (nếu có description)
-        hoặc chỉ "name". Embeddings được cache theo content để tránh re-encode
-        cho các tag không thay đổi.
+        Mỗi tag được encode theo multi-prototype (name + các cụm mô tả ngắn),
+        score(tag) = max(cos_sim(query, prototype_i)).
+        Embeddings được cache theo content để tránh re-encode cho tag không đổi.
 
         Returns: list[{tag_id, tag_name, score}] sorted by score desc, >= threshold.
         """
@@ -208,42 +245,27 @@ class SemanticMatcher:
 
         query_emb = self._resolve_query_embedding(text, query_emb=query_emb)
 
-        # Tìm tags cần encode mới (chưa có trong cache hoặc content thay đổi)
-        new_tags_idx: list[int] = []
-        new_tags_text: list[str] = []
-        for idx, t in enumerate(tags):
-            tag_text = (
-                f"{t['name']}. {t['description']}".strip()
-                if t.get("description") else t["name"]
-            )
-            content_hash = f"{t['id']}|{tag_text}"
-            cached = self._tag_emb_cache.get(t["id"])
-            if cached is None or cached[0] != content_hash:
-                new_tags_idx.append(idx)
-                new_tags_text.append(tag_text)
-
-        # Batch encode tags mới
-        if new_tags_text:
-            new_embs = self.model.encode(new_tags_text, convert_to_tensor=True)
-            for pos, idx in enumerate(new_tags_idx):
-                t = tags[idx]
-                tag_text = new_tags_text[pos]
-                content_hash = f"{t['id']}|{tag_text}"
-                self._tag_emb_cache[t["id"]] = (content_hash, new_embs[pos])
-
-        # Build tensor của tất cả tag embeddings (theo thứ tự tags)
-        tag_emb_list = [self._tag_emb_cache[t["id"]][1] for t in tags]
-        tag_embs = torch.stack(tag_emb_list)
-
-        scores = util.cos_sim(query_emb, tag_embs)[0]
-
         results = []
-        for i, score in enumerate(scores):
-            s = float(score)
-            if s >= threshold:
+        for t in tags:
+            prototypes = self._resolve_tag_prototypes(t)
+            content_hash = f"{t['id']}|{'|'.join(prototypes)}"
+
+            with self._cache_lock:
+                cached = self._tag_emb_cache.get(t["id"])
+
+            if cached is None or cached[0] != content_hash:
+                proto_embs = self._encode_passages(prototypes)
+                with self._cache_lock:
+                    self._tag_emb_cache[t["id"]] = (content_hash, proto_embs)
+            else:
+                proto_embs = cached[1]
+
+            s = float(util.cos_sim(query_emb, proto_embs)[0].max())
+            effective_threshold = self._effective_tag_threshold(t, threshold)
+            if s >= effective_threshold:
                 results.append({
-                    "tag_id": tags[i]["id"],
-                    "tag_name": tags[i]["name"],
+                    "tag_id": t["id"],
+                    "tag_name": t["name"],
                     "score": round(s, 4),
                 })
 
@@ -255,6 +277,121 @@ class SemanticMatcher:
             f"{[m['tag_name'] for m in matched]}"
         )
         return matched
+
+    def prewarm_tags(self, tags: list[dict]) -> None:
+        """
+        Precompute tag prototype embeddings outside request path, then hot-swap cache atomically.
+        Intended to be called from background refresh tasks.
+        """
+        if not tags:
+            return
+
+        with self._cache_lock:
+            old_cache = dict(self._tag_emb_cache)
+
+        new_cache: dict[str, tuple[str, Any]] = {}
+        reused = 0
+        encoded = 0
+
+        for t in tags:
+            tag_id = str(t.get("id") or "")
+            if not tag_id:
+                continue
+
+            prototypes = self._resolve_tag_prototypes(t)
+            content_hash = f"{tag_id}|{'|'.join(prototypes)}"
+
+            old_entry = old_cache.get(tag_id)
+            if old_entry and old_entry[0] == content_hash:
+                new_cache[tag_id] = old_entry
+                reused += 1
+                continue
+
+            proto_embs = self._encode_passages(prototypes)
+            new_cache[tag_id] = (content_hash, proto_embs)
+            encoded += 1
+
+        with self._cache_lock:
+            self._tag_emb_cache = new_cache
+
+        logger.info(
+            "[SemanticMatcher] Hot-swapped tag embeddings: total=%s reused=%s encoded=%s",
+            len(new_cache),
+            reused,
+            encoded,
+        )
+
+    @staticmethod
+    def _effective_tag_threshold(tag: dict, base_threshold: float) -> float:
+        """
+        Dynamic threshold:
+          - If metadata exists (idf_score / match_weight), use it directly.
+          - Otherwise use a lexical-specificity heuristic to tighten generic tags.
+        """
+        idf_score = tag.get("idf_score")
+        if isinstance(idf_score, (int, float)):
+            return max(0.2, min(0.9, base_threshold + (0.5 - float(idf_score)) * 0.2))
+
+        match_weight = tag.get("match_weight")
+        if isinstance(match_weight, (int, float)):
+            return max(0.2, min(0.9, base_threshold + (0.5 - float(match_weight)) * 0.2))
+
+        name = str(tag.get("name") or "").strip().lower()
+        token_count = len(re.findall(r"\w+", name))
+        generic_terms = {
+            "thu gian", "thư giãn", "lam sach", "làm sạch", "cham soc", "chăm sóc",
+            "co ban", "cơ bản", "dich vu", "dịch vụ",
+        }
+        is_generic = name in generic_terms
+
+        delta = 0.0
+        if is_generic:
+            delta += 0.10
+        if token_count <= 2:
+            delta += 0.05
+        if token_count >= 4:
+            delta -= 0.03
+
+        return max(0.25, min(0.85, base_threshold + delta))
+
+    @staticmethod
+    def _build_tag_prototypes(tag: dict) -> list[str]:
+        """Build compact prototype phrases from tag name/description."""
+        name = str(tag.get("name") or "").strip()
+        description = str(tag.get("description") or "").strip()
+
+        prototypes: list[str] = []
+        if name:
+            prototypes.append(name)
+
+        if description:
+            for part in re.split(r"[\.;\n,]+", description):
+                p = " ".join(part.strip().split())
+                if len(p) >= 3:
+                    prototypes.append(p)
+                if len(prototypes) >= 3:
+                    break
+
+        # Keep deterministic order while removing duplicates.
+        deduped: list[str] = []
+        seen: set[str] = set()
+        for p in prototypes:
+            k = p.lower()
+            if k in seen:
+                continue
+            seen.add(k)
+            deduped.append(p)
+
+        return deduped or [name or "unknown"]
+
+    @classmethod
+    def _resolve_tag_prototypes(cls, tag: dict) -> list[str]:
+        raw = tag.get("search_prototypes")
+        if isinstance(raw, list):
+            protos = [str(p).strip() for p in raw if str(p).strip()]
+            if protos:
+                return protos
+        return cls._build_tag_prototypes(tag)
 
     def match_category(
         self,
@@ -335,7 +472,7 @@ class SemanticMatcher:
                 "margin": -1.0,
             }
 
-        query_emb = self.model.encode(text, convert_to_tensor=True)
+        query_emb = self._resolve_query_embedding(text)
         hyp_embs = self._get_location_intent_hypothesis_embeddings(location_name)
 
         pos_scores = util.cos_sim(query_emb, hyp_embs["pos"])[0]
@@ -368,7 +505,8 @@ class SemanticMatcher:
         }
 
     def _get_location_intent_hypothesis_embeddings(self, location_name: str) -> dict[str, Any]:
-        cached = self._loc_intent_cache.get(location_name)
+        with self._cache_lock:
+            cached = self._loc_intent_cache.get(location_name)
         if cached is not None:
             return cached
 
@@ -386,10 +524,11 @@ class SemanticMatcher:
         ]
 
         cached = {
-            "pos": self.model.encode(pos_hypotheses, convert_to_tensor=True),
-            "neg": self.model.encode(neg_hypotheses, convert_to_tensor=True),
+            "pos": self._encode_passages(pos_hypotheses),
+            "neg": self._encode_passages(neg_hypotheses),
         }
-        self._loc_intent_cache[location_name] = cached
+        with self._cache_lock:
+            self._loc_intent_cache[location_name] = cached
         return cached
 
 
@@ -510,12 +649,21 @@ class SemanticAdjudicator:
 
 # ── AND/OR group builder ──────────────────────────────────────────────────────
 
-_OR_PATTERN = re.compile(r'\bhoặc\b|\bor\b', re.IGNORECASE)
-_AND_PATTERN = re.compile(r'\b(?:và|kết hợp|cùng)\b', re.IGNORECASE)
-_AND_SPLIT   = re.compile(r'\s+(?:và|kết hợp|cùng)\s+', re.IGNORECASE)
+_OR_PATTERN = re.compile(r'\b(?:hoặc|or|hay)\b', re.IGNORECASE)
+_AND_PATTERN = re.compile(r'\b(?:và|kết hợp|cùng|với)\b|,', re.IGNORECASE)
+_AND_SPLIT = re.compile(r'\s*(?:,|\b(?:và|kết hợp|cùng|với)\b)\s*', re.IGNORECASE)
+_NEGATION_PATTERN = re.compile(
+    r'\b(?:không|ko|chua|chưa|tru|trừ|ngoại\s+trừ|không\s+cần|không\s+muốn)\b',
+    re.IGNORECASE,
+)
 
 
 def group_tag_filters(text: str, matches: list[dict]) -> list[dict]:
+    groups, _ = group_tag_filters_with_meta(text, matches)
+    return groups
+
+
+def group_tag_filters_with_meta(text: str, matches: list[dict]) -> tuple[list[dict], dict]:
     """
     Nhóm matched tags thành các AND/OR filter groups dựa trên từ kết nối trong query.
 
@@ -531,49 +679,91 @@ def group_tag_filters(text: str, matches: list[dict]) -> list[dict]:
         - Không có connector → 1 OR group (mặc định, kết quả rộng hơn)
     """
     if not matches:
-        return []
+        return [], {"implicit_and": False, "has_negation": False}
 
-    ids = [m["tag_id"] for m in matches]
+    positive_matches: list[dict] = []
+    negated_matches: list[dict] = []
+    for m in matches:
+        if _is_negated_tag(text, m.get("tag_name", "")):
+            negated_matches.append(m)
+        else:
+            positive_matches.append(m)
+
+    ids = [m["tag_id"] for m in positive_matches]
     has_or  = bool(_OR_PATTERN.search(text))
     has_and = bool(_AND_PATTERN.search(text))
-
-    if not has_and and not has_or:
-        # Không có connector rõ ràng → OR (broad search)
-        return [{"ids": ids, "op": "OR"}]
-
-    if has_or and not has_and:
-        return [{"ids": ids, "op": "OR"}]
-
-    if has_and and not has_or:
-        return [{"ids": [id_], "op": "AND"} for id_ in ids]
-
-    # Có cả AND và OR: split by AND connector, kiểm tra OR trong từng segment
-    # Assign each matched tag to the segment whose text it appears in
-    segments = _AND_SPLIT.split(text)
+    implicit_and = False
     groups: list[dict] = []
-    assigned: set[str] = set()
 
-    for seg in segments:
-        seg_lower = seg.lower()
-        seg_ids = [
-            m["tag_id"] for m in matches
-            if m["tag_id"] not in assigned and m["tag_name"].lower() in seg_lower
-        ]
-        for id_ in seg_ids:
-            assigned.add(id_)
+    if ids:
+        if not has_and and not has_or:
+            if len(ids) > 1:
+                # Multiple disjoint intents without explicit connector are usually conjunctive.
+                groups.extend({"ids": [id_], "op": "AND"} for id_ in ids)
+                implicit_and = True
+            else:
+                groups.append({"ids": ids, "op": "OR"})
 
-        if not seg_ids:
-            continue
+        elif has_or and not has_and:
+            groups.append({"ids": ids, "op": "OR"})
 
-        if _OR_PATTERN.search(seg):
-            groups.append({"ids": seg_ids, "op": "OR"})
+        elif has_and and not has_or:
+            groups.extend({"ids": [id_], "op": "AND"} for id_ in ids)
+
         else:
-            for id_ in seg_ids:
-                groups.append({"ids": [id_], "op": "AND"})
+            # Có cả AND và OR: split by AND connector, kiểm tra OR trong từng segment
+            segments = _AND_SPLIT.split(text)
+            assigned: set[str] = set()
 
-    # Fallback: tags không khớp với bất kỳ segment nào → OR group
-    remaining = [m["tag_id"] for m in matches if m["tag_id"] not in assigned]
-    if remaining:
-        groups.append({"ids": remaining, "op": "OR"})
+            for seg in segments:
+                seg_lower = seg.lower()
+                seg_ids = [
+                    m["tag_id"] for m in positive_matches
+                    if m["tag_id"] not in assigned and m["tag_name"].lower() in seg_lower
+                ]
+                for id_ in seg_ids:
+                    assigned.add(id_)
 
-    return groups if groups else [{"ids": ids, "op": "OR"}]
+                if not seg_ids:
+                    continue
+
+                if _OR_PATTERN.search(seg):
+                    groups.append({"ids": seg_ids, "op": "OR"})
+                else:
+                    groups.extend({"ids": [id_], "op": "AND"} for id_ in seg_ids)
+
+            remaining = [m["tag_id"] for m in positive_matches if m["tag_id"] not in assigned]
+            if remaining:
+                groups.append({"ids": remaining, "op": "OR"})
+
+    # Apply negated tags as exclusion filters.
+    if negated_matches:
+        groups.append({"ids": [m["tag_id"] for m in negated_matches], "op": "NOT"})
+
+    if not groups and not ids and negated_matches:
+        # Query with only negative constraints.
+        groups = [{"ids": [m["tag_id"] for m in negated_matches], "op": "NOT"}]
+
+    if not groups and ids:
+        groups = [{"ids": ids, "op": "OR"}]
+
+    return groups, {"implicit_and": implicit_and, "has_negation": bool(negated_matches)}
+
+
+def _is_negated_tag(text: str, tag_name: str) -> bool:
+    if not text or not tag_name:
+        return False
+
+    norm_text = " ".join(text.lower().split())
+    tag_pattern = re.escape(" ".join(tag_name.lower().split())).replace(r"\ ", r"\s+")
+
+    before_pat = re.compile(
+        rf"{_NEGATION_PATTERN.pattern}(?:\W+\w+){{0,4}}\W+{tag_pattern}",
+        re.IGNORECASE,
+    )
+    after_pat = re.compile(
+        rf"{tag_pattern}(?:\W+\w+){{0,3}}\W+{_NEGATION_PATTERN.pattern}",
+        re.IGNORECASE,
+    )
+
+    return bool(before_pat.search(norm_text) or after_pat.search(norm_text))

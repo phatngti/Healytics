@@ -346,7 +346,7 @@ class TestPrefilterEndpoint:
         assert response.status_code == 422
 
     async def test_prefilter_with_valid_spatial_fields_calls_db(self, client):
-        """Valid spatial query reaches DB (mocked) and returns expected schema."""
+        """Valid spatial query reaches DB (mocked) and returns list of service IDs."""
         from app.schemas.ner_schema import ServiceCandidate
         mock_candidates = [
             ServiceCandidate(
@@ -379,10 +379,8 @@ class TestPrefilterEndpoint:
             )
         assert response.status_code == 200
         data = response.json()
-        assert "entities" in data
-        assert "candidates" in data
-        assert "query_params" in data
-        assert data["total"] == 1
+        assert isinstance(data, list)
+        assert data == ["test-id"]
 
     async def test_prefilter_th1_gps_no_distance_in_text_no_postgis(self, client):
         """Text-only query (no DISTANCE entity) → use_postgis=False, no spatial_params."""
