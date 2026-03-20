@@ -24,6 +24,7 @@ Kết quả trả về: list[dict] dạng:
 import logging
 import re
 import time
+import asyncio
 from typing import Optional
 
 from cachetools import LRUCache
@@ -33,6 +34,11 @@ from app.ner.distance_extractor import extract_distance_entities
 from app.ner.gemini_ner import extract_entities_with_gemini
 
 logger = logging.getLogger(__name__)
+
+try:
+    from underthesea import ner as underthesea_ner
+except ImportError:
+    underthesea_ner = None
 
 
 # ============================================================================
@@ -132,11 +138,11 @@ _RATING_PATTERN = re.compile(
 # ============================================================================
 
 def extract_entities(text: str) -> list[dict]:
-    entities, _ = extract_entities_with_source(text)
+    entities, _ = asyncio.run(extract_entities_with_source(text))
     return entities
 
 
-def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
+async def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
     """
     Trích xuất entity thô từ text. Có LRU caching.
     Returns list[dict] — mỗi dict có ít nhất {type, value, confidence}.
@@ -161,7 +167,7 @@ def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
     extraction_source = "local"
 
     # LLM-first mode: replace legacy NER extraction when enabled.
-    llm_entities = extract_entities_with_gemini(text)
+    llm_entities = await extract_entities_with_gemini(text)
     if llm_entities:
         entities.extend(llm_entities)
         extraction_source = "gemini"
@@ -262,8 +268,9 @@ def clear_query_cache():
 def _extract_with_underthesea(text: str) -> list[dict]:
 # ... (rest of _extract_with_underthesea remains unchanged) ...
     try:
-        from underthesea import ner
-        tagged = ner(text)
+        if underthesea_ner is None:
+            raise ImportError("underthesea is not installed")
+        tagged = underthesea_ner(text)
     except ImportError:
         logger.warning("[Extractor] underthesea not installed, skipping NER")
         return []
