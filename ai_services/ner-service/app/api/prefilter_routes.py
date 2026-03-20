@@ -72,7 +72,7 @@ async def prefilter_search(request: PreFilterRequest):
     logger.info(f"[PreFilter] Processing: {text[:60]}...")
 
     # 1. & 2.
-    raw_entities = extractor.extract_entities(text)
+    raw_entities, _ = await extractor.extract_entities_with_source(text)
     entities = normalizer.normalize_entities(raw_entities)
 
     # 3. Resolve spatial context

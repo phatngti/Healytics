@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+import asyncio
 import time
 from typing import Any
 
@@ -10,6 +11,8 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+# In-memory cooldown is process-local. In multi-worker deployments,
+# use a shared store (e.g. Redis) for cross-worker rate-limit coordination.
 _cooldown_until_ts: float = 0.0
 
 _ALLOWED_TYPES = {
@@ -207,7 +210,7 @@ def _sanitize_entity(entity: dict[str, Any], text: str) -> dict[str, Any] | None
     return cleaned
 
 
-def extract_entities_with_gemini(text: str) -> list[dict] | None:
+async def extract_entities_with_gemini(text: str) -> list[dict] | None:
     """
     Returns:
       - list[dict]: parsed entities from Gemini (possibly empty)
@@ -270,8 +273,8 @@ def extract_entities_with_gemini(text: str) -> list[dict] | None:
     payload = None
     for attempt in range(max_retries + 1):
         try:
-            with httpx.Client(timeout=timeout_sec) as client:
-                response = client.post(url, params={"key": api_key}, json=body)
+            async with httpx.AsyncClient(timeout=timeout_sec) as client:
+                response = await client.post(url, params={"key": api_key}, json=body)
                 response.raise_for_status()
                 payload = response.json()
                 break
@@ -286,7 +289,7 @@ def extract_entities_with_gemini(text: str) -> list[dict] | None:
 
             if 500 <= status_code < 600 and attempt < max_retries:
                 sleep_sec = (backoff_ms * (2 ** attempt)) / 1000.0
-                time.sleep(sleep_sec)
+                await asyncio.sleep(sleep_sec)
                 continue
 
             logger.warning("[GeminiNER] API call failed with HTTP %s", status_code)
@@ -301,7 +304,7 @@ def extract_entities_with_gemini(text: str) -> list[dict] | None:
                     exc,
                     sleep_sec,
                 )
-                time.sleep(sleep_sec)
+                await asyncio.sleep(sleep_sec)
                 continue
             logger.warning("[GeminiNER] API call failed after retries: %s", exc)
             return None
