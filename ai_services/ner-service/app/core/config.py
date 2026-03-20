@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
     # Spatial/PostGIS
     ENABLE_SPATIAL_QUERIES: bool = True
-    DEFAULT_PROXIMITY_RADIUS_M: int = 5000
+    DEFAULT_PROXIMITY_RADIUS_M: int = 10000
     MAX_PROXIMITY_RADIUS_M: int = 50000
     POSTGIS_FALLBACK_TO_TEXT: bool = True
 

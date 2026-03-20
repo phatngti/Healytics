@@ -209,7 +209,7 @@ def _sanitize_entity(entity: dict[str, Any], text: str) -> dict[str, Any] | None
             cleaned["proximity_intent"] = True
 
         if cleaned.get("proximity_intent") is True and "radius_meters" not in cleaned:
-            cleaned["radius_meters"] = 5000
+            cleaned["radius_meters"] = settings.DEFAULT_PROXIMITY_RADIUS_M
             cleaned.setdefault("distance_unit", "implicit")
 
     # Carry source query for downstream location-intent scoring.

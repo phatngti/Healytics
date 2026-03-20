@@ -74,6 +74,10 @@ def normalize_entities(raw_entities: list[dict]) -> list[NerEntity]:
     # Combine hierarchical locations (xã+huyện+tỉnh → chỉ giữ cụ thể nhất)
     results = _combine_location_entities(results)
 
+    # Final canonical dedup after normalization.
+    # Example: "massage" and "MASSAGE_THERAPY" can both normalize to the same business_type.
+    results = _deduplicate_normalized_entities(results)
+
     return results
 
 
@@ -343,6 +347,32 @@ def _fuzzy_match_category(text: str) -> Optional[str]:
         return best_slug
 
     return None
+
+
+def _deduplicate_normalized_entities(entities: list[NerEntity]) -> list[NerEntity]:
+    """Deduplicate entities by normalized semantic keys instead of raw value."""
+    seen: dict[str, NerEntity] = {}
+
+    for e in entities:
+        key = _canonical_entity_key(e)
+        current = seen.get(key)
+        if current is None or e.confidence > current.confidence:
+            seen[key] = e
+
+    return list(seen.values())
+
+
+def _canonical_entity_key(e: NerEntity) -> str:
+    if e.type == "BUSINESS_TYPE" and e.business_type:
+        return f"BUSINESS_TYPE::{e.business_type}"
+    if e.type == "CATEGORY" and e.category_slug:
+        return f"CATEGORY::{e.category_slug}"
+    if e.type == "LOCATION" and e.location_code:
+        return f"LOCATION::{e.location_code}"
+    if e.type == "FEATURE_TAG" and e.tag_id:
+        return f"FEATURE_TAG::{e.tag_id}"
+
+    return f"{e.type}::{e.value.lower()}"
 
 
 def _phonetic_normalize_vi(text: str) -> str:
