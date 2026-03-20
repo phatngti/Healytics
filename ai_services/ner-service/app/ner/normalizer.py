@@ -11,9 +11,10 @@ Strategy:
 """
 
 import logging
+import re
 from typing import Optional
 
-from rapidfuzz import fuzz, process
+from rapidfuzz import fuzz
 
 from app.core.config import settings
 from app.ner import cache
@@ -199,8 +200,9 @@ def _normalize_org_misc(value: str, confidence: float) -> NerEntity:
     ORG/MISC từ underthesea → thử:
     1. Exact match trong BUSINESS_TYPE_ALIASES
     2. Fuzzy match trong BUSINESS_TYPE_ALIASES
-    3. Fuzzy match trong category cache
-    4. Không map → trả về type CATEGORY với slug=None
+    3. Semantic category match
+    4. Fuzzy match trong category cache
+    5. Không map → trả về type CATEGORY với slug=None
     """
     value_lower = value.lower().strip()
 
@@ -224,7 +226,23 @@ def _normalize_org_misc(value: str, confidence: float) -> NerEntity:
             business_type=bt_match,
         )
 
-    # 3. Fuzzy match → Category
+    # 3. Semantic category match → Category
+    categories = cache.get_category_list()
+    if categories:
+        cat_match = matcher.match_category(
+            value_lower,
+            categories,
+            threshold=settings.SEMANTIC_CATEGORY_MEDIUM_THRESHOLD,
+        )
+        if cat_match:
+            return NerEntity(
+                type="CATEGORY",
+                value=value,
+                confidence=confidence * 0.9,
+                category_slug=cat_match["slug"],
+            )
+
+    # 4. Fuzzy match → Category
     cat_slug = _fuzzy_match_category(value_lower)
     if cat_slug:
         return NerEntity(
@@ -234,7 +252,7 @@ def _normalize_org_misc(value: str, confidence: float) -> NerEntity:
             category_slug=cat_slug,
         )
 
-    # 4. Không map được
+    # 5. Không map được
     logger.warning(f"[Normalizer] Cannot map ORG/MISC: {value!r}")
     return NerEntity(
         type="CATEGORY",
@@ -297,16 +315,57 @@ def _fuzzy_match_category(text: str) -> Optional[str]:
     if not categories:
         return None
 
-    cat_names = [c["name"] for c in categories]
+    best_slug: Optional[str] = None
+    best_score = 0.0
+    text_len = max(len(text.strip()), 1)
+    text_phonetic = _phonetic_normalize_vi(text)
 
-    result = process.extractOne(
-        text, cat_names, scorer=fuzz.token_set_ratio
-    )
-    if result and result[1] >= FUZZY_THRESHOLD:
-        matched_name = result[0]
-        # Tìm slug tương ứng
-        for c in categories:
-            if c["name"] == matched_name:
-                return c["slug"]
+    for c in categories:
+        name = c["name"]
+        name_phonetic = _phonetic_normalize_vi(name)
+
+        base_score = float(fuzz.token_sort_ratio(text, name))
+        phonetic_score = float(fuzz.token_sort_ratio(text_phonetic, name_phonetic))
+        raw_score = max(base_score, phonetic_score - 2.0)
+
+        name_len = max(len(name.strip()), 1)
+        len_ratio = min(text_len, name_len) / max(text_len, name_len)
+
+        # Penalize extreme length mismatch to avoid snapping short generic queries.
+        if len_ratio < 0.5:
+            raw_score -= (0.5 - len_ratio) * 30.0
+
+        if raw_score > best_score:
+            best_score = raw_score
+            best_slug = c["slug"]
+
+    if best_slug and best_score >= FUZZY_THRESHOLD:
+        return best_slug
 
     return None
+
+
+def _phonetic_normalize_vi(text: str) -> str:
+    """Normalize common Vietnamese spelling confusions for fuzzy comparison only."""
+    if not text:
+        return ""
+
+    s = cache.remove_accents(text.lower())
+    # Longer patterns first to avoid partial rewrite artifacts.
+    replacements = (
+        ("ngh", "ng"),
+        ("gh", "g"),
+        ("kh", "k"),
+        ("ph", "f"),
+        ("th", "t"),
+        ("tr", "ch"),
+        ("gi", "d"),
+        ("qu", "q"),
+    )
+    for old, new in replacements:
+        s = s.replace(old, new)
+
+    # Single-char confusions.
+    s = s.replace("x", "s").replace("r", "d")
+    s = re.sub(r"\s+", " ", s).strip()
+    return s

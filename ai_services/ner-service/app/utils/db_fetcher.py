@@ -164,9 +164,10 @@ async def fetch_candidates_from_db(
         params["min_r"] = min_r
 
     # ── Feature Tag Filters ────────────────────────────────────────────────────
-    # tagFilters: [{ids:[...], op:"OR"}, {ids:[...], op:"AND"}, ...]
+    # tagFilters: [{ids:[...], op:"OR"}, {ids:[...], op:"AND"}, {ids:[...], op:"NOT"}, ...]
     #   OR group  → EXISTS (...tag_id IN (:t0, :t1))  — product cần ít nhất 1 tag trong list
     #   AND group → EXISTS (...tag_id = :t) per tag   — product phải có TẤT CẢ tags
+    #   NOT group → NOT EXISTS (...tag_id IN (...))   — product KHÔNG được chứa các tags này
     # Tất cả groups được AND nhau trong WHERE:
     #   WHERE ... AND c.slug=:cat AND (EXISTS tag_A OR EXISTS tag_B) AND EXISTS tag_C
     tag_filters = query_params.get("tagFilters", [])
@@ -179,6 +180,14 @@ async def fetch_candidates_from_db(
             placeholders = ", ".join(f":tf_{i}_{j}" for j in range(len(tids)))
             conditions.append(
                 f"EXISTS (SELECT 1 FROM product_tags pt "
+                f"WHERE pt.product_id = p.id AND pt.tag_id::text IN ({placeholders}))"
+            )
+            for j, tid in enumerate(tids):
+                params[f"tf_{i}_{j}"] = tid
+        elif op == "NOT":
+            placeholders = ", ".join(f":tf_{i}_{j}" for j in range(len(tids)))
+            conditions.append(
+                f"NOT EXISTS (SELECT 1 FROM product_tags pt "
                 f"WHERE pt.product_id = p.id AND pt.tag_id::text IN ({placeholders}))"
             )
             for j, tid in enumerate(tids):

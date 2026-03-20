@@ -104,9 +104,9 @@ def _canonicalize_raw_entity(entity: dict[str, Any]) -> dict[str, Any]:
     entity_type = str(normalized.get("type", "")).upper().strip()
 
     if entity_type == "BUSINESS_TYPE":
-        # Some model variants send enum in entity_value instead of business_type.
+        # Some model variants send enum in entity_value or value instead of business_type.
         if "business_type" not in normalized:
-            bt = normalized.get("entity_value")
+            bt = normalized.get("entity_value") or normalized.get("value")
             if isinstance(bt, str) and bt.strip():
                 normalized["business_type"] = bt.strip().upper()
 
@@ -166,12 +166,18 @@ def _sanitize_entity(entity: dict[str, Any], text: str) -> dict[str, Any] | None
             cleaned["operator"] = operator
 
         amount = entity.get("amount")
-        if isinstance(amount, (int, float)):
-            cleaned["amount"] = float(amount)
+        if amount is not None:
+            try:
+                cleaned["amount"] = float(amount)
+            except (ValueError, TypeError):
+                pass
 
         amount_max = entity.get("amount_max")
-        if isinstance(amount_max, (int, float)):
-            cleaned["amount_max"] = float(amount_max)
+        if amount_max is not None:
+            try:
+                cleaned["amount_max"] = float(amount_max)
+            except (ValueError, TypeError):
+                pass
 
     if entity_type == "DISTANCE":
         if isinstance(raw_value, dict):
@@ -186,8 +192,11 @@ def _sanitize_entity(entity: dict[str, Any], text: str) -> dict[str, Any] | None
             cleaned["value"] = value
 
         radius = entity.get("radius_meters")
-        if isinstance(radius, (int, float)):
-            cleaned["radius_meters"] = int(max(1, min(50000, int(radius))))
+        if radius is not None:
+            try:
+                cleaned["radius_meters"] = int(max(1, min(50000, float(radius))))
+            except (ValueError, TypeError):
+                pass
 
         unit = entity.get("distance_unit")
         if isinstance(unit, str) and unit.strip():
@@ -264,6 +273,7 @@ async def extract_entities_with_gemini(text: str) -> list[dict] | None:
         ],
         "generationConfig": {
             "temperature": 0.0,
+            "response_mime_type": "application/json",
         },
     }
 

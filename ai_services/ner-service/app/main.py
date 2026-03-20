@@ -7,6 +7,7 @@ Loads location + category caches at startup via lifespan.
 
 import logging
 import time
+import asyncio
 
 from contextlib import asynccontextmanager
 
@@ -15,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import ner_routes, prefilter_routes
 from app.ner import cache
+from app.ner.semantic_matcher import get_matcher
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,6 +26,11 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Load RAM caches at startup."""
     await cache.startup_load()
+    try:
+        await asyncio.to_thread(get_matcher)
+        logger.info("[Startup] SemanticMatcher preloaded")
+    except Exception as exc:
+        logger.warning("[Startup] SemanticMatcher preload failed: %s", exc)
     yield
 
 

@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+import asyncio
 import json
 import logging
 from typing import List
@@ -6,10 +7,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app.core.config import settings
-from app.schemas.ner_schema import PreFilterRequest, NerEntity, ServiceCandidate
+from app.schemas.ner_schema import PreFilterRequest, NerEntity
 from app.ner import extractor, normalizer
 from app.ner.cache import get_feature_tags, get_category_list
-from app.ner.semantic_matcher import get_matcher, group_tag_filters, SemanticAdjudicator
+from app.ner.semantic_matcher import (
+    get_matcher,
+    group_tag_filters,
+    group_tag_filters_with_meta,
+    SemanticAdjudicator,
+)
 from app.ner.spatial_context import resolve_spatial_context
 from app.utils import db_fetcher
 from app.utils.query_builder import build_backend_query
@@ -53,7 +59,7 @@ def _log_location_intent_samples(text: str, entities: list[NerEntity], query_par
     except Exception as exc:
         logger.warning("[IntentLogging] Failed to write location-intent sample: %s", exc)
 
-@router.post("/prefilter/search", response_model=List[ServiceCandidate])
+@router.post("/prefilter/search", response_model=List[str])
 async def prefilter_search(request: PreFilterRequest):
     """
     Full pipeline natively within NER service:
@@ -97,13 +103,31 @@ async def prefilter_search(request: PreFilterRequest):
 
     matcher = get_matcher()
     adjudicator = SemanticAdjudicator()
-    semantic_ctx = matcher.extract_semantic_context(text)
+    tag_filters_or_fallback = None
+    if settings.SEMANTIC_OFFLOAD_TO_THREAD:
+        semantic_ctx = await asyncio.to_thread(matcher.extract_semantic_context, text)
+    else:
+        semantic_ctx = matcher.extract_semantic_context(text)
 
     # 4a. Unified semantic adjudication — BUSINESS_TYPE
     bt_candidates = list({e.business_type for e in entities if e.type == "BUSINESS_TYPE" and e.business_type})
     if not bt_candidates:
         bt_candidates = matcher.bt_keys
-    bt_decision = adjudicator.adjudicate_business_type(text, matcher, bt_candidates, semantic_ctx=semantic_ctx)
+    if settings.SEMANTIC_OFFLOAD_TO_THREAD:
+        bt_decision = await asyncio.to_thread(
+            adjudicator.adjudicate_business_type,
+            text,
+            matcher,
+            bt_candidates,
+            semantic_ctx,
+        )
+    else:
+        bt_decision = adjudicator.adjudicate_business_type(
+            text,
+            matcher,
+            bt_candidates,
+            semantic_ctx=semantic_ctx,
+        )
     if bt_decision and bt_decision.policy in ("hard", "soft"):
         query_params["businessType"] = bt_decision.value
         entities.append(NerEntity(
@@ -120,21 +144,36 @@ async def prefilter_search(request: PreFilterRequest):
     # 4b. Unified semantic adjudication — FEATURE_TAG
     feature_tags = get_feature_tags()
     if feature_tags:
-        tag_matches = matcher.match_feature_tags(
-            text,
-            feature_tags,
-            threshold=settings.SEMANTIC_TAG_MEDIUM_THRESHOLD,
-            top_k=5,
-            query_emb=semantic_ctx.get("query_emb"),
-        )
+        if settings.SEMANTIC_OFFLOAD_TO_THREAD:
+            tag_matches = await asyncio.to_thread(
+                matcher.match_feature_tags,
+                text,
+                feature_tags,
+                settings.SEMANTIC_TAG_MEDIUM_THRESHOLD,
+                5,
+                semantic_ctx.get("query_emb"),
+            )
+        else:
+            tag_matches = matcher.match_feature_tags(
+                text,
+                feature_tags,
+                threshold=settings.SEMANTIC_TAG_MEDIUM_THRESHOLD,
+                top_k=5,
+                query_emb=semantic_ctx.get("query_emb"),
+            )
         if tag_matches:
             tag_decisions = adjudicator.adjudicate_tags(tag_matches)
             hard_only = [d for d in tag_decisions if d.policy == "hard"]
             selected_matches = [d.payload for d in hard_only if d.payload]
+            tag_filter_meta = {"implicit_and": False, "has_negation": False}
 
-            tag_filters = group_tag_filters(text, selected_matches)
+            tag_filters, tag_filter_meta = group_tag_filters_with_meta(text, selected_matches)
             if tag_filters:
                 query_params["tagFilters"] = tag_filters
+
+                if tag_filter_meta.get("implicit_and"):
+                    # Retry strategy: if strict implicit-AND returns empty, fallback to broad OR.
+                    tag_filters_or_fallback = group_tag_filters(text, selected_matches)
 
                 # tag_id → op map để gán tag_op vào entity
                 tag_id_to_op = {
@@ -180,7 +219,21 @@ async def prefilter_search(request: PreFilterRequest):
     if not query_params.get("categorySlug"):
         categories = get_category_list()
         if categories:
-            cat_decision = adjudicator.adjudicate_category(text, matcher, categories, semantic_ctx=semantic_ctx)
+            if settings.SEMANTIC_OFFLOAD_TO_THREAD:
+                cat_decision = await asyncio.to_thread(
+                    adjudicator.adjudicate_category,
+                    text,
+                    matcher,
+                    categories,
+                    semantic_ctx,
+                )
+            else:
+                cat_decision = adjudicator.adjudicate_category(
+                    text,
+                    matcher,
+                    categories,
+                    semantic_ctx=semantic_ctx,
+                )
             if cat_decision and cat_decision.policy in ("hard", "soft"):
                 cat_payload = cat_decision.payload or {}
                 query_params["categorySlug"] = cat_decision.value
@@ -201,9 +254,25 @@ async def prefilter_search(request: PreFilterRequest):
     _log_location_intent_samples(text, entities, query_params)
 
     candidates = await db_fetcher.fetch_candidates_from_db(query_params, use_postgis=use_postgis)
+    if not candidates:
+
+        if tag_filters_or_fallback:
+            fallback_query_params = dict(query_params)
+            fallback_query_params["tagFilters"] = tag_filters_or_fallback
+            candidates = await db_fetcher.fetch_candidates_from_db(
+                fallback_query_params,
+                use_postgis=use_postgis,
+            )
+            logger.info("[PreFilter] No candidates with implicit-AND tags, retried with OR fallback")
+
+    candidate_ids = [
+        c.get("service_id") if isinstance(c, dict) else getattr(c, "service_id", None)
+        for c in candidates
+    ]
+    candidate_ids = [service_id for service_id in candidate_ids if service_id]
 
     logger.info(
         f"[PreFilter] entities={len(entities)} | candidates={len(candidates)} | spatial={use_postgis}"
     )
 
-    return candidates
+    return candidate_ids

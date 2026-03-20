@@ -9,7 +9,7 @@
 | Công nghệ | Vai trò |
 |---|---|
 | **FastAPI** | Web framework (async, tự sinh OpenAPI docs) |
-| **Gemini API (optional)** | LLM-based NER (primary mode when enabled) |
+| **Gemini API (optional)** | LLM-based NER (semantic entities) + structured JSON outputs |
 | **underthesea** | NLP tiếng Việt — local fallback khi LLM không khả dụng |
 | **RapidFuzz** | Fuzzy string matching (Levenshtein) — map text thô → backend IDs |
 | **sentence-transformers** | Semantic matching cho business type/category/feature tags |
@@ -29,6 +29,8 @@ ner-service/
 ├── .env.example              # Template env vars
 ├── seed_local.py             # Seed local DB (accounts/locations/categories/products/tags)
 ├── run_prefilter_cases.py    # Batch test runner cho extract + prefilter + postgis
+├── scripts/
+│   └── generate_prototypes.py # Offline Gemini job: sinh search_prototypes cho feature tags
 │
 ├── app/
 │   ├── main.py               # FastAPI app, lifespan (load cache lúc startup)
@@ -42,10 +44,10 @@ ner-service/
 │   │
 │   ├── ner/                  # ★ NER Pipeline (core logic)
 │   │   ├── cache.py          # RAM cache: 63 tỉnh hardcode + district/ward/category từ backend
-│   │   ├── extractor.py      # Gemini-first NER + local fallback + price/rating regex + LRU
-│   │   ├── gemini_ner.py     # Gemini client + JSON parsing/sanitization
+│   │   ├── extractor.py      # Hybrid NER + deterministic numeric parser (PRICE/RATING/DISTANCE)
+│   │   ├── gemini_ner.py     # Gemini client + JSON mode + robust sanitization
 │   │   ├── normalizer.py     # Entity Linking: cache lookup + RapidFuzz fuzzy match
-│   │   ├── semantic_matcher.py
+│   │   ├── semantic_matcher.py # semantic scoring + negation-aware tag grouping + prewarm API
 │   │   ├── distance_extractor.py
 │   │   └── spatial_context.py
 │   │
@@ -77,9 +79,9 @@ User Query: "Tìm massage cổ vai gáy gần đây dưới 200k ở quận 10"
 ┌─────────────────────────────┐
 │  1) Extractor               │
 │  Gemini NER (nếu bật)       │
-│  + Local fallback           │
-│  + Regex Price/Rating       │
-│  + Distance extractor       │
+│  + Underthesea/keyword scan │
+│  + Deterministic numeric    │
+│    (PRICE/RATING/DISTANCE)  │
 └─────────────┬───────────────┘
     │ raw entities
               ▼
@@ -137,6 +139,20 @@ pytest tests/ -v
 # 6. Chạy batch functional cases (extract + prefilter + postgis)
 python run_prefilter_cases.py --timeout 180
 ```
+
+### Offline Prototype Generation (không nằm trong request path)
+
+Sinh `search_prototypes` cho feature tags bằng Gemini để cải thiện semantic matching:
+
+```bash
+cd ai_services/ner-service
+python scripts/generate_prototypes.py --limit 200 --sleep-ms 150
+```
+
+Ghi chú:
+- Script sẽ chỉ xử lý các tag chưa có `search_prototypes`.
+- Cần `GEMINI_API_KEY` hợp lệ trong `.env`.
+- Nếu DB chưa có cột `search_prototypes`, script sẽ báo lỗi rõ ràng.
 
 ## API Endpoints
 
@@ -213,17 +229,19 @@ Prefilter end-to-end: extract + normalize + semantic + spatial + DB fetch.
 **Response:**
 ```json
 [
-  {
-    "service_id": "...",
-    "name": "Massage cổ vai gáy 45 phút",
-    "price": {"amount": 169000, "currency": "VND"},
-    "rating": {"average": 4.5, "total_reviews": 0},
-    "distance_meters": 1200.0
-  }
+  "service-id-1",
+  "service-id-2",
+  "service-id-3"
 ]
 ```
 
-> Lưu ý: Endpoint này hiện trả về **list-only** (không bọc `text`, `entities`, `query_params`, `total`).
+> Lưu ý: Endpoint này hiện trả về **list-only service IDs** (không bọc `text`, `entities`, `query_params`, `total`).
+
+## Numeric Parsing Policy
+
+- Các entity định lượng `PRICE`, `RATING`, `DISTANCE` được xử lý **100% bởi parser local** (`regex + rule-based`).
+- Dữ liệu số học do LLM trả về sẽ bị loại bỏ trước bước parse local để tránh nhiễu (`amount=None`, xung đột explicit/implicit distance, v.v.).
+- Điều này giúp đảm bảo hành vi ổn định cho tiếng Việt và giữ test deterministic.
 
 ## Entity Types
 
@@ -252,14 +270,25 @@ Prefilter end-to-end: extract + normalize + semantic + spatial + DB fetch.
 | `LOCATION_CACHE_TTL` | `3600` | TTL cache district/ward |
 | `CATEGORY_CACHE_TTL` | `3600` | TTL cache categories |
 | `QUERY_CACHE_MAXSIZE` | `1000` | Max entries LRU query cache |
+| `LOCATION_MATCHER_USE_AHO` | `true` | Bật scan location bằng Aho-Corasick (fallback về N-gram nếu thiếu lib) |
+| `SEMANTIC_OFFLOAD_TO_THREAD` | `true` | Offload semantic inference sang thread để giảm block event loop |
+| `SEMANTIC_QUERY_CACHE_MAXSIZE` | `1000` | Kích thước cache query embeddings cho semantic matcher |
+| `SEMANTIC_MODEL_NAME` | `sentence-transformers/paraphrase-multilingual-mpnet-base-v2` | Model semantic matcher |
+| `SEMANTIC_USE_RETRIEVAL_PREFIX` | `false` | Prefix `query:/passage:` cho retrieval models (e5/bge) |
 | `LLM_NER_ENABLED` | `true` | Bật Gemini làm primary NER extractor |
 | `GEMINI_API_KEY` | `""` | API key Gemini |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | Model Gemini để extract NER |
 | `GEMINI_API_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta` | Base URL Gemini API |
 | `GEMINI_TIMEOUT_MS` | `1500` | Timeout gọi Gemini (ms) |
+| `GEMINI_MAX_RETRIES` | `1` | Số lần retry cho lỗi tạm thời khi gọi Gemini |
+| `GEMINI_RETRY_BACKOFF_MS` | `400` | Backoff base (ms) cho retry Gemini |
+| `GEMINI_COOLDOWN_SECONDS` | `30` | Cooldown tạm ngưng gọi Gemini khi bị rate-limit 429 |
 | `SEMANTIC_BT_HIGH_THRESHOLD` | `0.60` | Ngưỡng hard cho business type semantic |
+| `SEMANTIC_BT_MEDIUM_THRESHOLD` | `0.50` | Ngưỡng soft cho business type semantic |
 | `SEMANTIC_CATEGORY_HIGH_THRESHOLD` | `0.60` | Ngưỡng hard cho category semantic |
+| `SEMANTIC_CATEGORY_MEDIUM_THRESHOLD` | `0.50` | Ngưỡng soft cho category semantic |
 | `SEMANTIC_TAG_HIGH_THRESHOLD` | `0.80` | Ngưỡng hard cho feature tag semantic |
+| `SEMANTIC_TAG_MEDIUM_THRESHOLD` | `0.72` | Ngưỡng soft cho feature tag semantic |
 | `PORT` | `8002` | Port chạy service |
 
 ## Thiết kế chống lỗi
@@ -268,3 +297,4 @@ Prefilter end-to-end: extract + normalize + semantic + spatial + DB fetch.
 - **underthesea miss entity?** → Keyword scan chạy song song bắt bổ sung.
 - **Entity không map được?** → Trả `normalized_id=None` + giảm confidence. Không crash.
 - **Cache hết hạn nhưng backend lỗi?** → Giữ cache cũ (stale-while-revalidate).
+- **Feature tags refresh** → prewarm embeddings ở background + hot-swap cache atomically để giữ latency ổn định.

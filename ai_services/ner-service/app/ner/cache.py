@@ -8,6 +8,7 @@ Supports force_refresh() via /internal/clear-cache endpoint.
 
 import logging
 import time
+import json
 from typing import Optional
 
 from app.core.config import settings
@@ -177,6 +178,7 @@ _feature_tags_cache: list[dict] = []        # list of {"id": "...", "name": "...
 _location_loaded_at: float = 0.0
 _category_loaded_at: float = 0.0
 _feature_tags_loaded_at: float = 0.0
+_feature_tag_prewarm_task = None
 
 # ── Single-char prefix support ────────────────────────────────────────────────
 # Prefix 1 ký tự (q/p/h/x): KHÔNG strip trong to_canonical + expand exact (100%, không fuzzy)
@@ -498,22 +500,92 @@ async def _do_load_feature_tags_from_db() -> int:
     global _feature_tags_cache, _feature_tags_loaded_at
     try:
         async with async_session() as session:
-            result = await session.execute(
-                text(
-                    "SELECT id, name, description FROM product_feature_tags "
-                    "WHERE is_active = true AND deleted_at IS NULL"
+            rows = []
+            has_extended_cols = False
+            try:
+                result = await session.execute(
+                    text(
+                        "SELECT id, name, description, search_prototypes, idf_score, match_weight "
+                        "FROM product_feature_tags "
+                        "WHERE is_active = true AND deleted_at IS NULL"
+                    )
                 )
-            )
-            rows = result.fetchall()
+                rows = result.fetchall()
+                has_extended_cols = True
+            except Exception as ext_exc:
+                logger.info(
+                    "[Cache] feature_tags table has no prototype/weight columns yet, fallback query used: %s",
+                    ext_exc,
+                )
+                result = await session.execute(
+                    text(
+                        "SELECT id, name, description FROM product_feature_tags "
+                        "WHERE is_active = true AND deleted_at IS NULL"
+                    )
+                )
+                rows = result.fetchall()
     except Exception as e:
         _feature_tags_loaded_at = time.time()
         logger.warning(f"[Cache] Direct DB fetch failed for feature_tags: {e}")
         raise
 
-    _feature_tags_cache = [
-        {"id": str(row[0]), "name": row[1], "description": row[2] or ""}
-        for row in rows
-        if row[0] and row[1]
-    ]
+    parsed_tags: list[dict] = []
+    for row in rows:
+        if not row[0] or not row[1]:
+            continue
+
+        item = {
+            "id": str(row[0]),
+            "name": row[1],
+            "description": row[2] or "",
+        }
+
+        if has_extended_cols:
+            raw_prototypes = row[3]
+            if isinstance(raw_prototypes, str):
+                try:
+                    raw_prototypes = json.loads(raw_prototypes)
+                except Exception:
+                    raw_prototypes = None
+            if isinstance(raw_prototypes, list):
+                item["search_prototypes"] = [str(x).strip() for x in raw_prototypes if str(x).strip()]
+
+            if isinstance(row[4], (int, float)):
+                item["idf_score"] = float(row[4])
+            if isinstance(row[5], (int, float)):
+                item["match_weight"] = float(row[5])
+
+        parsed_tags.append(item)
+
+    _feature_tags_cache = parsed_tags
     _feature_tags_loaded_at = time.time()
+    _schedule_feature_tag_prewarm(_feature_tags_cache)
     return len(_feature_tags_cache)
+
+
+def _schedule_feature_tag_prewarm(tags: list[dict]) -> None:
+    global _feature_tag_prewarm_task
+
+    if not tags:
+        return
+
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        return
+
+    if _feature_tag_prewarm_task and not _feature_tag_prewarm_task.done():
+        return
+
+    tags_snapshot = [dict(t) for t in tags]
+
+    async def _runner() -> None:
+        try:
+            from app.ner.semantic_matcher import get_matcher
+
+            matcher = get_matcher()
+            await asyncio.to_thread(matcher.prewarm_tags, tags_snapshot)
+        except Exception as exc:
+            logger.warning("[Cache] Feature-tag prewarm failed: %s", exc)
+
+    _feature_tag_prewarm_task = loop.create_task(_runner())
