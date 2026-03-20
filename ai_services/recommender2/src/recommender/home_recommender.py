@@ -32,6 +32,7 @@ class Home_Recommender:
         results = self.vector_database.search_similarity_services(user_profile_embedding, n_results = top_k_home_results)
         return results
 
+# For testing
 if __name__ == "__main__":
     health_conditions = ["tim mạch", "huyết áp cao"]
     interests = ["yoga", "thiền", "chạy bộ"]
