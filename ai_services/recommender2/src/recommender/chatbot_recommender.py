@@ -11,11 +11,12 @@ class Chatbot_Recommender:
         self.vector_database = Vector_Database(db_name = database_name)
         self.embedding_model = Embedding_Model()
 
-    def recommend(self, query, top_k):
+    def recommend(self, query, top_k, filtered_ids=None):
         query_embedding = self.embedding_model.encode(query)
-        results = self.vector_database.search_similarity_services(query_embedding, n_results = top_k)
+        results = self.vector_database.search_with_filter(query_embedding, n_results = top_k, filtered_ids=filtered_ids)
         return results
 
+# For testing
 if __name__ == "__main__":
     chatbot = Chatbot_Recommender("healytics_collection")
     results = chatbot.recommend(

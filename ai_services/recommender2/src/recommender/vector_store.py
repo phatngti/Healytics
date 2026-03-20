@@ -23,7 +23,7 @@ class Vector_Database:
             ids=[service["id"]],
             embeddings=[embedding],
             documents=[service["name"] + service["description"]],
-            metadatas=[{"category": service["category"], "type": service["type"]}],
+            metadatas=[{"service_id": service["id"], "category": service["category"]}],
         )
     
     def search_similarity_services(self, embedding_query, n_results):
@@ -33,11 +33,26 @@ class Vector_Database:
         )
 
         return similarity_services
+    
+    def search_with_filter(self, embedding_query, n_results, filtered_ids=None):
+        """
+            filtered_ids: list service_id từ PostgreSQL sau khi NER filter
+        """
+        where = None
+        if filtered_ids:
+            where = {"service_id": {"$in": filtered_ids}}
+
+        return self.collection.query(
+            query_embeddings=[embedding_query],
+            n_results=n_results,
+            where=where,  # None = không filter, tìm toàn bộ
+        )
 
     def get_service_information(self, search_ids):
         service = self.collection.get(ids=[search_ids])
         return service
 
+# For testing
 if __name__ == "__main__":
     vector_database = Vector_Database(db_name = "healytics_collection")
     service_loader = Service_Loader()
@@ -51,7 +66,7 @@ if __name__ == "__main__":
 
     query = "Có dịch vụ nào giúp tôi giảm cân không?"
     query_embedding = embedding_model.encode(query)
-    results = vector_database.search_similarity_services(query_embedding)
+    results = vector_database.search_similarity_services(query_embedding, n_results=3)
 
     print(results)
 

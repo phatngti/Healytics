@@ -65,7 +65,7 @@ async def recommend_home(request: recommender.HomeRecommenderRequest, session: A
 
 @app.post("/recommender/chatbot", response_model=recommender.ChatbotRecommendationResponse)
 async def recommend_chatbot(request: recommender.ChatbotRecommenderRequest):
-    raw = chatbot.recommend(request.query, request.top_k)
+    raw = chatbot.recommend(request.query, request.top_k, request.filtered_ids)
     
     # Convert từ ChromaDB format → schema format
     service_ids = raw["ids"][0] if raw["ids"] else []
