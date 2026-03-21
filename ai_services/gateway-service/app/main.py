@@ -24,7 +24,7 @@ app = FastAPI(
     title="Gateway Service",
     description=(
         "Gateway điều phối: Chatbot streaming (SSE), "
-        "NER extraction, Home & Chatbot Recommender."
+        "Home & Chatbot Recommender."
     ),
     version="1.0.0",
     lifespan=lifespan,

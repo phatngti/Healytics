@@ -15,3 +15,4 @@ vectordb/
 
 # Data generated
 data/processed/
+ai_services/ner-service/.env
