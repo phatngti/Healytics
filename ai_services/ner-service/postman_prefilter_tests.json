@@ -1,0 +1,217 @@
+{
+  "info": {
+    "name": "Prefilter API — Seed Data Tests",
+    "description": "Test cases generated from seed_local.py data.\nBase URL: http://localhost:8002\nEndpoint: POST /prefilter/search\n\nSeed summary:\n  hpp_1 — Phòng khám Đa khoa Q1 HCM  (10.7769, 106.7009) | TRADITIONAL_MEDICINE, SPA_BEAUTY\n    └─ pro_1: Tư vấn tim mạch 350k\n    └─ pro_5: Làm sạch răng 300k\n  hpp_2 — Vật lý trị liệu Bình Minh Q3 HCM (10.7760, 106.6916) | MASSAGE_REHABILITATION, MASSAGE_THERAPY\n    └─ pro_2: Vật lý trị liệu thoát vị 800k (sale 720k)\n    └─ pro_4: Tư vấn tâm lý 400k (sale 350k)\n  hpp_3 — Đông y Gia truyền Hoàn Kiếm HN  (21.0315, 105.8487) | TRADITIONAL_MEDICINE\n    └─ pro_3: Châm cứu bấm huyệt 500k",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 — GPS + massage (expect: pro_2, pro_4)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"massage gần tôi ở quận 3 hcm\",\n  \"current_lat\": 10.7760,\n  \"current_lng\": 106.6916\n}"
+        }
+      },
+      "_expect": "MASSAGE_THERAPY → hpp_2, radius 5km, distance sort. Candidates: pro_2, pro_4"
+    },
+    {
+      "name": "02 — GPS + nha khoa Q1 (expect: pro_5)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"nha khoa gần tôi quận 1\",\n  \"current_lat\": 10.7769,\n  \"current_lng\": 106.7009\n}"
+        }
+      },
+      "_expect": "DENTAL → hpp_1 (DENTAL,TRADITIONAL_MEDICINE), radius 5km. Candidates: pro_5"
+    },
+    {
+      "name": "02b — GPS + tâm lý Q3 (expect: pro_4)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"tư vấn tâm lý gần tôi quận 3\",\n  \"current_lat\": 10.7760,\n  \"current_lng\": 106.6916\n}"
+        }
+      },
+      "_expect": "PSYCHOLOGY → hpp_2 (MASSAGE_REHABILITATION,PSYCHOLOGY), radius 5km. Candidates: pro_4"
+    },
+    {
+      "name": "03 — Location Hà Nội không có GPS (expect: pro_3)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"đông y châm cứu hà nội\"\n}"
+        }
+      },
+      "_expect": "TRADITIONAL_MEDICINE + LOC Hà Nội. Fallback TH2 province filter. Candidates: pro_3"
+    },
+    {
+      "name": "04 — Location quận Hoàn Kiếm (expect: pro_3)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"bấm huyệt hoàn kiếm\"\n}"
+        }
+      },
+      "_expect": "TRADITIONAL_MEDICINE + LOC Hoàn Kiếm (DISTRICT). Candidates: pro_3"
+    },
+    {
+      "name": "05 — Price filter dưới 400k (expect: pro_1 350k, pro_4 350k sale, pro_5 300k)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"dịch vụ sức khỏe dưới 400k\"\n}"
+        }
+      },
+      "_expect": "maxPrice=400000. Candidates: pro_1 (350k), pro_4 (sale 350k), pro_5 (300k)"
+    },
+    {
+      "name": "06 — Price + GPS (expect: pro_5 300k gần Q1)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"nha khoa dưới 400k gần đây\",\n  \"current_lat\": 10.7769,\n  \"current_lng\": 106.7009\n}"
+        }
+      },
+      "_expect": "DENTAL + maxPrice=400000 + GPS radius. Candidates: pro_5 (300k)"
+    },
+    {
+      "name": "07 — Semantic: đau răng (no keyword, expect DENTAL → pro_5)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"mình bị đau răng quá, quanh đây có chỗ nào khám không\",\n  \"current_lat\": 10.7769,\n  \"current_lng\": 106.7009\n}"
+        }
+      },
+      "_expect": "Semantic fallback → DENTAL. Candidates: pro_5"
+    },
+    {
+      "name": "08 — Semantic: đau lưng (expect MASSAGE_REHABILITATION → pro_2)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"lưng đau quá chịu không nổi, cần trị liệu gấp\",\n  \"current_lat\": 10.7760,\n  \"current_lng\": 106.6916\n}"
+        }
+      },
+      "_expect": "Semantic fallback → MASSAGE_REHABILITATION. Candidates: pro_2"
+    },
+    {
+      "name": "09 — Semantic: mất ngủ stress (expect PSYCHOLOGY → pro_4)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"dạo này mất ngủ nhiều, stress công việc\",\n  \"current_lat\": 10.7760,\n  \"current_lng\": 106.6916\n}"
+        }
+      },
+      "_expect": "Semantic fallback → PSYCHOLOGY. Candidates: pro_4"
+    },
+    {
+      "name": "10 — Rating cao HCM (expect: products avg_rating DESC)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"vật lý trị liệu hcm rating cao trên 4 sao\"\n}"
+        }
+      },
+      "_expect": "MASSAGE_REHABILITATION + LOC HCM + minRating=4.0. Candidates: pro_2"
+    },
+    {
+      "name": "11 — Price range 300k-500k (expect: pro_1 350k, pro_3 500k, pro_4 350k, pro_5 300k)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"dịch vụ từ 300k đến 500k\"\n}"
+        }
+      },
+      "_expect": "minPrice=300000 maxPrice=500000. Candidates: pro_1, pro_3, pro_4, pro_5"
+    },
+    {
+      "name": "12 — GPS + all (no filter, distance sort)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"dịch vụ sức khỏe gần tôi\",\n  \"current_lat\": 10.7765,\n  \"current_lng\": 106.6960\n}"
+        }
+      },
+      "_expect": "TH1, no BT filter, all HCM partners within 5km sorted by distance. Candidates: pro_1..5 (exclude pro_3 HN)"
+    },
+    {
+      "name": "13 — Combine GPS + category + price",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"massage trị liệu quận 3 giá dưới 800k\",\n  \"current_lat\": 10.7760,\n  \"current_lng\": 106.6916\n}"
+        }
+      },
+      "_expect": "MASSAGE_REHABILITATION + GPS + maxPrice=800000. Candidates: pro_2 (720k sale)"
+    },
+    {
+      "name": "14 — No GPS, no location → text-only (expect: ORDER BY created_at)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"châm cứu bấm huyệt\"\n}"
+        }
+      },
+      "_expect": "TRADITIONAL_MEDICINE keyword, no spatial. TH=None, ORDER BY created_at. Candidates: pro_3"
+    },
+    {
+      "name": "15 — Empty text (expect: 200 OK, empty candidates)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "http://localhost:8002/prefilter/search",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"\"\n}"
+        }
+      },
+      "_expect": "No entities extracted, fallback or empty list"
+    }
+  ]
+}
