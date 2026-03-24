@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from app.repositories import conversation_repo, message_repo
 from app.clients.chatbot_client import ChatbotClient
 from app.clients.recommender_client import RecommenderClient
+from app.clients.ner_client import NERClient
 from app.core.sse import SSEEvent
 from app.core.enums import SSEEventType
 from app.intent_classification.main import load_model, predict_intent
@@ -19,6 +20,7 @@ class ChatbotOrchestrator:
     def __init__(self):
         self.chatbot_client = ChatbotClient()
         self.recommender_client = RecommenderClient()
+        self.ner_client = NERClient()
 
         # Import ở đây để tránh circular import
         from app.orchestrators.recommendation_orchestrator import RecommendationOrchestrator
@@ -125,12 +127,17 @@ class ChatbotOrchestrator:
 
     async def _call_recommender_safe(self, request: Any) -> Optional[Dict[str, Any]]:
         try:
-            payload = {
+            ner_payload = {
+                "text": request.message
+            }
+            filtered_ids = await self.ner_client.get_service_ids(payload=ner_payload)
+            recommender_payload = {
                 "conversation_id": str(request.conversation_id),
                 "query": request.message,
                 "top_k": request.top_k,
+                "filtered_ids": filtered_ids,
             }
-            result = await self.recommender_client.recommend_chatbot(payload=payload)
+            result = await self.recommender_client.recommend_chatbot(payload=recommender_payload)
 
             # Lấy service_ids từ kết quả thô
             service_ids = (

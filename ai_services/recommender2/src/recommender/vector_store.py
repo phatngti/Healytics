@@ -45,7 +45,7 @@ class Vector_Database:
         return self.collection.query(
             query_embeddings=[embedding_query],
             n_results=n_results,
-            where=where,  # None = không filter, tìm toàn bộ
+            where=where,  
         )
 
     def get_service_information(self, search_ids):
