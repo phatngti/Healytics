@@ -26,8 +26,9 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------------
     # Downstream microservice base URLs
     # ------------------------------------------------------------------
-    CHATBOT_SERVICE_URL: str = "http://chatbot-service:8001"
-    RECOMMENDER_SERVICE_URL: str = "http://recommender-service:8003"
+    CHATBOT_SERVICE_URL: str = "http://chatbot-service:5000"
+    RECOMMENDER_SERVICE_URL: str = "http://recommender-service:8000"
+    NER_SERVICE_URL: str = "http://ner-service:7000"
 
     # ------------------------------------------------------------------
     # HTTP client timeouts (seconds)
