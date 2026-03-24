@@ -1,6 +1,6 @@
 # recommender2/src/schemas/recommender.py
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 
 
 # ==============================
@@ -35,6 +35,7 @@ class ChatbotRecommenderRequest(BaseModel):
         ge=1,
         le=20
     )
+    filtered_ids: Optional[List[str]] = None
 
 
 # ==============================
