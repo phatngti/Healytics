@@ -41,5 +41,6 @@ DATABASE_NAME = "healytics_collection"
 # Relational DB — async DSN for asyncpg driver
 # ------------------------------------------------------------------
 DATABASE_URL: str = os.environ["DATABASE_URL"]
+REDIS_URL: str = os.environ.get("REDIS_URL", "")
 
 
