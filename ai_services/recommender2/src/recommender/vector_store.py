@@ -50,7 +50,21 @@ class Vector_Database:
 
     def get_service_information(self, search_ids):
         service = self.collection.get(ids=[search_ids])
-        return service
+        return 
+    
+    def upsert_service(self, service_id: str, name: str, 
+                   description: str, category: str, embedding):
+        """Thêm mới hoặc update nếu đã tồn tại"""
+        self.collection.upsert(
+            ids=[service_id],
+            embeddings=[embedding],
+            documents=[name + " " + description],
+            metadatas=[{"service_id": service_id, "category": category}],
+        )
+
+    def delete_service(self, service_id: str):
+        """Xóa service khỏi vector store"""
+        self.collection.delete(ids=[service_id])
 
 # For testing
 if __name__ == "__main__":
