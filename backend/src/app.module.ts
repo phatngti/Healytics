@@ -1,18 +1,44 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
+import { EmployeesModule } from './employees/employees.module';
+import { CategoriesModule } from './categories/categories.module';
+import { HealthServiceModule } from './health-service/health-service.module';
+import { ServiceTagsModule } from './service-tags/service-tags.module';
+import { S3Module } from './s3/s3.module';
+import { LocationsModule } from './locations/locations.module';
+import { PartnersModule } from './partners/partners.module';
+import { AdminModule } from './admin/admin.module';
+import { ChatbotModule } from './chatbot/chatbot.module';
+import { RedisModule } from './redis/redis.module';
+import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
+import { BookingModule } from './booking/booking.module';
+import { MapboxModule } from './mapbox/mapbox.module';
 import databaseConfig from './config/database.config';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import redisConfig from './config/redis.config';
+import rabbitmqConfig from './config/rabbitmq.config';
+import mapboxConfig from './config/mapbox.config';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { LoggingMiddleware } from './common/middleware/logging.middleware';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { PublicThrottlerGuard } from './common/guards';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-      load: [databaseConfig],
+      load: [databaseConfig, redisConfig, rabbitmqConfig, mapboxConfig],
     }),
+    // Rate limiting: 100 requests per 60 seconds for public routes
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100,
+    }]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -26,18 +52,45 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
           password: db.password,
           database: db.database,
           entities: db.entities,
-          synchronize: db.synchronize,
+          synchronize: db.synchronize || process.env.NODE_ENV === 'development',
+          ssl: db.ssl,
         } as const;
       },
     }),
+    RedisModule,
+    RabbitMQModule,
     AuthModule,
     AccountModule,
+    EmployeesModule,
+    CategoriesModule,
+    HealthServiceModule,
+    ServiceTagsModule,
+    S3Module,
+    LocationsModule,
+    PartnersModule,
+    AdminModule,
+    ChatbotModule,
+    BookingModule,
+    MapboxModule,
   ],
   providers: [
-  {
-    provide: 'APP_GUARD',
-    useClass: JwtAuthGuard,
-  },
-],
+    {
+      provide: 'APP_GUARD',
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: 'APP_GUARD',
+      useClass: PublicThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // Apply logging middleware to all routes
+    consumer.apply(LoggingMiddleware).forRoutes('*');
+  }
+}

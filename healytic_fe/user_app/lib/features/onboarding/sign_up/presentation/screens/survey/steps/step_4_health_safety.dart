@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:user_app/features/common/button/button.dart';
-import 'package:user_app/features/common/indicator/linear_indicator.dart';
-import 'package:user_app/features/common/toast.dart';
+import 'package:common/widgets/button/button.dart';
+import 'package:common/widgets/linear_indicator.dart';
+import 'package:common/widgets/toast.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/survey_entity.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/widgets/survey_field.dart';
 import 'package:user_app/router/routes.dart';
-import 'package:user_app/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:user_app/utils/device.dart';
 
 class HealthSafetyStep extends HookConsumerWidget {
@@ -68,10 +69,10 @@ class HealthSafetyStep extends HookConsumerWidget {
       if (next.value?.isSurveyCompleted == true &&
           next.hasValue &&
           !next.isLoading) {
-        if (context.mounted) {
-          // Navigate to the next screen or show success message
-          SignInRoute().push(context);
-        }
+        // if (context.mounted) {
+        //   // Navigate to the next screen or show success message
+        //   SignInRoute().push(context);
+        // }
       }
       isLoading.value = false;
     });
@@ -92,6 +93,10 @@ class HealthSafetyStep extends HookConsumerWidget {
               }).toList(),
             );
         await ref.read(registerFlowProvider.notifier).completeSurvey();
+
+        if (context.mounted) {
+          context.goNamed(SignInRoute.name);
+        }
       }
     }
 

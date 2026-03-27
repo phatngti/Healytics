@@ -1,4 +1,4 @@
-#file_loader.py
+# file_loader.py
 from typing import Union, List, Literal
 import glob
 from tqdm import tqdm
@@ -6,7 +6,7 @@ import multiprocessing
 
 # Các module trong LangChain dùng để đọc và xử lý tài liệu
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 def remove_non_utf8_characters(text: str) -> str:
     """Xóa các ký tự không nằm trong bảng mã UTF-8 (thường là lỗi khi đọc PDF)."""
@@ -14,7 +14,7 @@ def remove_non_utf8_characters(text: str) -> str:
 
 def load_pdf(pdf_file: str):
     """Đọc một file PDF và trả về nội dung đã được làm sạch."""
-    docs = PyPDFLoader(pdf_file, extract_images=True).load()
+    docs = PyPDFLoader(pdf_file, extract_images=False).load()
     for doc in docs:
         doc.page_content = remove_non_utf8_characters(doc.page_content)
     return docs

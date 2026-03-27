@@ -1,0 +1,657 @@
+text,label
+Can you recommend a doctor for back pain,1
+Which department should I visit for chest pain,1
+I have stomach pain which doctor should I see,1
+Suggest a medical service for my headache,1
+Where should I go if I feel dizzy,1
+Can you suggest a clinic for diabetes checkup,1
+Which medical service is suitable for high blood pressure,1
+What doctor should I see for knee pain,1
+Recommend a health service for my symptoms,1
+Where should I go for heart problems,1
+Which doctor treats migraines,1
+Suggest a service for my cough,1
+What department handles skin allergies,1
+Who should I consult for anxiety,1
+Which clinic is good for eye problems,1
+I have breathing problems what service should I use,1
+Can you suggest treatment options for back pain,1
+Which doctor can help with insomnia,1
+Where can I get treatment for stomach ulcers,1
+Recommend a specialist for joint pain,1
+What is hypertension,0
+Explain diabetes to me,0
+What causes headaches,0
+Tell me about heart disease,0
+What are the symptoms of flu,0
+Explain high blood pressure,0
+What is anxiety disorder,0
+Tell me how diabetes affects the body,0
+How does hypertension develop,0
+What is a healthy diet,0
+How can I improve my sleep,0
+What are common symptoms of depression,0
+Explain how exercise benefits health,0
+What causes chest pain,0
+What is cholesterol,0
+How does the immune system work,0
+What is mental health,0
+How can I reduce stress,0
+What are the symptoms of dehydration,0
+Explain the benefits of walking daily,0
+Hello,0
+Hi there,0
+Good morning,0
+How are you today,0
+Nice to meet you,0
+What can you do,0
+Can you help me,0
+Thanks for your help,0
+Thank you,0
+That's helpful,0
+Tôi bị đau lưng nên khám khoa nào,1
+Tôi nên gặp bác sĩ nào khi bị đau đầu,1
+Bạn có thể gợi ý dịch vụ y tế cho tôi không,1
+Tôi bị đau dạ dày thì nên đi khám ở đâu,1
+Khoa nào điều trị bệnh tim,1
+Tôi nên khám bác sĩ nào khi bị khó thở,1
+Gợi ý cho tôi dịch vụ khám bệnh phù hợp,1
+Tôi bị chóng mặt thì nên đi khám ở đâu,1
+Bác sĩ nào chữa bệnh mất ngủ,1
+Tôi nên khám khoa nào khi bị dị ứng da,1
+Bạn có thể đề xuất bác sĩ cho tôi không,1
+Tôi cần khám sức khỏe tổng quát nên đi đâu,1
+Tôi bị đau khớp thì nên gặp bác sĩ nào,1
+Khám bệnh tiểu đường ở đâu,1
+Tôi nên khám gì khi bị đau ngực,1
+Bệnh đau đầu nên khám khoa nào,1
+Tôi nên khám gì khi bị ho lâu ngày,1
+Khó thở thì nên đi khám ở đâu,1
+Đau bụng nên đi khám khoa nào,1
+Bạn gợi ý giúp tôi dịch vụ y tế phù hợp,1
+Bệnh tiểu đường là gì,0
+Tăng huyết áp là gì,0
+Nguyên nhân gây đau đầu là gì,0
+Các triệu chứng của cúm là gì,0
+Cholesterol là gì,0
+Hệ miễn dịch hoạt động như thế nào,0
+Thế nào là sức khỏe tâm thần,0
+Tại sao cần tập thể dục,0
+Chế độ ăn uống lành mạnh là gì,0
+Ngủ bao nhiêu là đủ,0
+Làm sao để giảm stress,0
+Tại sao nên uống nhiều nước,0
+Bệnh tim là gì,0
+Nguyên nhân gây đau ngực là gì,0
+Làm sao để cải thiện giấc ngủ,0
+Các triệu chứng của mất nước là gì,0
+Tại sao cần vận động mỗi ngày,0
+Xin chào,0
+Chào bạn,0
+Bạn khỏe không,0
+Chào buổi sáng,0
+Cảm ơn bạn,0
+Bạn có thể giúp tôi không,0
+Bạn làm được những gì,0
+Cảm ơn rất nhiều,0
+Rất hữu ích,0
+I have severe chest pain which doctor should I see,1
+My knee hurts badly what specialist should I visit,1
+Who should I consult for persistent headaches,1
+Which hospital department treats stomach ulcers,1
+Can you recommend a doctor for chronic back pain,1
+Where should I go for treatment of heart problems,1
+Suggest a specialist for anxiety problems,1
+What medical service is suitable for high blood pressure,1
+Which clinic should I visit for diabetes management,1
+Who can help me with sleep disorders,1
+Which doctor handles skin rashes,1
+I feel dizzy frequently what department should I go to,1
+Where can I get treatment for breathing issues,1
+Can you suggest a healthcare service for my symptoms,1
+Which doctor treats migraines,1
+I have joint pain which specialist should I see,1
+Recommend a medical service for stomach pain,1
+What department treats digestive issues,1
+Where should I go if I have chest tightness,1
+Suggest a doctor for allergy treatment,1
+Which doctor should I see for vision problems,1
+Where can I get a health checkup,1
+Recommend a clinic for general health screening,1
+I need medical advice which specialist should I see,1
+What doctor handles hormonal problems,1
+Which department treats liver disease,1
+Where should I go for mental health support,1
+Who treats depression and anxiety,1
+What service should I use for chronic fatigue,1
+Where can I get help for persistent cough,1
+What is diabetes,0
+Explain hypertension,0
+What causes chest pain,0
+What are symptoms of flu,0
+Tell me about heart disease,0
+How does diabetes affect the body,0
+Explain the immune system,0
+What is cholesterol,0
+What causes insomnia,0
+Explain anxiety disorder,0
+How can I stay healthy,0
+What foods are good for heart health,0
+How does exercise benefit the body,0
+What causes headaches,0
+Explain the benefits of meditation,0
+How can I reduce stress,0
+What are signs of dehydration,0
+What does high blood pressure mean,0
+Tell me about mental health,0
+How can I improve sleep quality,0
+Hello,0
+Hi there,0
+Good afternoon,0
+Nice to meet you,0
+Thank you very much,0
+Can you help me with something,0
+Thanks for your assistance,0
+That's very helpful,0
+Appreciate your help,0
+Goodbye,0
+Tôi bị đau ngực nên khám bác sĩ nào,1
+Đau đầu nhiều ngày thì nên đi khám ở đâu,1
+Tôi nên khám khoa nào khi bị đau dạ dày,1
+Bạn có thể gợi ý bác sĩ cho tôi không,1
+Tôi nên gặp bác sĩ nào khi bị mất ngủ,1
+Khó thở thì nên khám ở đâu,1
+Tôi bị dị ứng da nên khám khoa nào,1
+Bạn gợi ý giúp tôi dịch vụ khám bệnh phù hợp,1
+Đau khớp gối nên gặp bác sĩ nào,1
+Tôi nên khám gì khi bị đau lưng,1
+Tôi muốn kiểm tra sức khỏe tổng quát thì đi đâu,1
+Bệnh tim nên khám khoa nào,1
+Tôi bị chóng mặt nên khám ở đâu,1
+Ho lâu ngày nên đi khám bác sĩ nào,1
+Tôi nên khám khoa nào khi bị đau bụng,1
+Bạn có thể gợi ý dịch vụ y tế cho tôi không,1
+Tôi cần khám bệnh tiểu đường thì nên đi đâu,1
+Nên khám bác sĩ nào khi bị đau vai,1
+Đau mắt nên khám ở đâu,1
+Tôi cần tư vấn bác sĩ cho bệnh huyết áp cao,1
+Tôi nên khám gì khi bị đau ngực,1
+Tôi muốn tìm bác sĩ điều trị mất ngủ,1
+Nên khám khoa nào khi bị stress nhiều,1
+Tôi nên đi khám ở đâu khi bị đau tim,1
+Gợi ý cho tôi dịch vụ khám bệnh phù hợp với triệu chứng,1
+Bệnh tiểu đường là gì,0
+Tăng huyết áp là gì,0
+Nguyên nhân gây đau đầu là gì,0
+Triệu chứng của cúm là gì,0
+Cholesterol là gì,0
+Hệ miễn dịch hoạt động thế nào,0
+Thế nào là sức khỏe tâm thần,0
+Tại sao nên tập thể dục,0
+Chế độ ăn uống lành mạnh là gì,0
+Ngủ bao nhiêu là đủ,0
+Làm sao để giảm stress,0
+Vì sao cần uống đủ nước,0
+Bệnh tim là gì,0
+Nguyên nhân gây đau ngực là gì,0
+Làm sao cải thiện giấc ngủ,0
+Triệu chứng của mất nước là gì,0
+Vì sao nên vận động mỗi ngày,0
+Xin chào,0
+Chào bạn,0
+Bạn khỏe không,0
+Chào buổi sáng,0
+Cảm ơn bạn rất nhiều,0
+Bạn có thể giúp tôi không,0
+Bạn làm được những gì,0
+Rất hữu ích,0
+Cảm ơn vì đã hỗ trợ,0
+Tạm biệt,0
+I have had a strong headache for two days which doctor should I see,1
+My stomach hurts a lot lately where should I get it checked,1
+Which hospital department treats heart problems,1
+Can you recommend a clinic for knee pain,1
+Where should I go if I keep feeling dizzy,1
+Which specialist handles chronic back pain,1
+Is there a hospital that checks diabetes,1
+I think I need to check my blood pressure where should I go,1
+Which doctor should I visit for skin allergy,1
+Can you suggest a clinic for eye irritation,1
+My chest hurts sometimes which department should I visit,1
+Where can I check if I have stomach ulcers,1
+What specialist should I see for breathing problems,1
+Is there a clinic that treats insomnia,1
+Which hospital should I go to for migraine problems,1
+Recommend a doctor for joint pain,1
+Which clinic treats ear infections,1
+Where can I check persistent cough,1
+Which doctor treats thyroid problems,1
+Can you recommend a hospital for heart checkup,1
+Đau đầu nhiều ngày rồi tôi nên khám ở đâu,1
+Tôi bị đau dạ dày nên đi bệnh viện nào,1
+Đau lưng thì nên khám bác sĩ nào,1
+Bạn có thể gợi ý phòng khám cho đau đầu gối không,1
+Tôi nên đi đâu để kiểm tra huyết áp,1
+Tôi bị ho lâu ngày nên gặp bác sĩ nào,1
+Nên khám khoa nào khi bị đau ngực,1
+Tôi muốn kiểm tra tiểu đường thì đi đâu,1
+Phòng khám nào điều trị dị ứng da,1
+Tôi nên khám ở đâu khi bị chóng mặt,1
+Bị mất ngủ thì nên gặp bác sĩ nào,1
+Tôi nên đi bệnh viện nào để kiểm tra tim,1
+Đau răng thì nên khám bác sĩ nào,1
+Có bệnh viện nào khám tai mũi họng tốt không,1
+Đau khớp thì nên đi khám ở đâu,1
+Khó thở thì nên khám khoa nào,1
+Tôi nên khám ở đâu khi đau bụng dữ dội,1
+Có phòng khám nào kiểm tra mắt không,1
+Tôi bị đau nửa đầu nên khám ở đâu,1
+Nên đi đâu để kiểm tra cholesterol,1
+What causes headaches frequently,0
+Why do I sometimes feel dizzy,0
+How can I reduce back pain at home,0
+Is chest pain always dangerous,0
+What are symptoms of diabetes,0
+How can I improve sleep quality,0
+What medicine helps sore throat,0
+Why do people get migraines,0
+How long does cough usually last,0
+What should I do if I feel tired all the time,0
+Can stress cause stomach pain,0
+Is dizziness normal after standing up,0
+What are symptoms of high blood pressure,0
+How can I treat mild fever at home,0
+What food should I avoid with stomach pain,0
+Why do my joints hurt sometimes,0
+Is headache a sign of dehydration,0
+How can I reduce eye strain,0
+What causes insomnia,0
+How can I reduce anxiety naturally,0
+Đau đầu là do nguyên nhân gì,0
+Tại sao tôi hay bị chóng mặt,0
+Làm sao giảm đau lưng tại nhà,0
+Đau ngực có nguy hiểm không,0
+Triệu chứng của tiểu đường là gì,0
+Làm sao ngủ ngon hơn vào ban đêm,0
+Nên làm gì khi bị sốt nhẹ,0
+Ho kéo dài có phải dấu hiệu bệnh nặng không,0
+Đau dạ dày nên ăn gì,0
+Tại sao tôi hay cảm thấy mệt mỏi,0
+Chóng mặt khi đứng lên có bình thường không,0
+Nguyên nhân gây mất ngủ là gì,0
+Đau khớp có phải do tuổi tác không,0
+Triệu chứng cao huyết áp gồm những gì,0
+Làm sao giảm căng thẳng hiệu quả,0
+Đau họng thì nên làm gì,0
+Tại sao mắt tôi hay bị khô,0
+Ho ban đêm là do đâu,0
+Đau đầu buổi sáng có nguy hiểm không,0
+Làm sao cải thiện sức khỏe tim mạch,0
+My knee hurts badly where can I get it checked,1
+Which doctor handles stomach problems,1
+Where should I go for severe headache,1
+Can you suggest a hospital for heart screening,1
+Which clinic should I visit for skin rash,1
+Is there a specialist for sleep disorders,1
+Where can I check breathing problems,1
+Recommend a clinic for allergy tests,1
+Which hospital treats chronic cough,1
+Where should I go for ear pain,1
+Đau tai thì nên khám ở đâu,1
+Tôi bị dị ứng nên gặp bác sĩ nào,1
+Tôi muốn kiểm tra dạ dày thì đi đâu,1
+Đau đầu gối thì nên khám khoa nào,1
+Ho nhiều ngày rồi nên đi bệnh viện nào,1
+Khám tim thì nên đến bệnh viện nào,1
+Có phòng khám nào điều trị mất ngủ không,1
+Tôi nên khám ở đâu khi bị đau ngực nhẹ,1
+Tôi muốn kiểm tra sức khỏe tổng quát thì đi đâu,1
+Đau mắt thì nên gặp bác sĩ nào,1
+Why do I feel tired every afternoon,0
+What causes stomach bloating,0
+Is mild fever dangerous,0
+How can I sleep better naturally,0
+What are early signs of flu,0
+Why does my throat feel dry,0
+How long does muscle pain last,0
+Can anxiety cause headache,0
+Why do I sometimes feel weak,0
+What causes dry eyes,0
+Tại sao tôi hay đau đầu vào buổi tối,0
+Nguyên nhân gây đau dạ dày là gì,0
+Mất ngủ kéo dài có sao không,0
+Ho khan là dấu hiệu bệnh gì,0
+Làm sao giảm đau đầu nhanh,0
+Đau họng có cần uống thuốc không,0
+Tại sao tôi hay bị mệt,0
+Triệu chứng cảm cúm gồm những gì,0
+Làm sao giảm đau cơ sau khi tập thể dục,0
+Đau mắt có thể do nguyên nhân nào,0
+I have been having chest pain recently which doctor should I see,1
+My back hurts a lot lately where should I get it checked,1
+Which hospital department treats severe migraines,1
+Can you recommend a clinic for stomach pain,1
+Where should I go if my knee keeps hurting,1
+Is there a hospital that can check my blood pressure,1
+What specialist should I see for persistent cough,1
+My eyes feel irritated which doctor should I visit,1
+Can you suggest a hospital for diabetes screening,1
+Where can I get treatment for skin allergies,1
+I think I need to check my heart where should I go,1
+Which clinic handles ear infections,1
+Recommend a doctor for joint pain,1
+Which department should I visit for breathing problems,1
+Where can I check if I have high cholesterol,1
+Is there a clinic for insomnia treatment,1
+My stomach hurts badly which doctor should I see,1
+Where should I go to treat severe headaches,1
+Which hospital treats chronic back pain,1
+Can you recommend a specialist for anxiety problems,1
+Đau bụng nhiều ngày rồi tôi nên khám ở đâu,1
+Tôi bị đau đầu liên tục nên gặp bác sĩ nào,1
+Nên đi bệnh viện nào để kiểm tra tim,1
+Đau lưng thì nên khám khoa nào,1
+Bạn có thể gợi ý phòng khám cho đau đầu gối không,1
+Tôi nên đi đâu để khám tiểu đường,1
+Ho lâu ngày thì nên gặp bác sĩ nào,1
+Tôi muốn kiểm tra huyết áp thì đi đâu,1
+Có bệnh viện nào khám dị ứng da không,1
+Tôi bị chóng mặt nên khám ở khoa nào,1
+Đau ngực thì nên đi khám ở đâu,1
+Có phòng khám nào kiểm tra mắt không,1
+Tôi nên gặp bác sĩ nào khi bị đau răng,1
+Bị mất ngủ thì nên khám bác sĩ nào,1
+Nên đi đâu để kiểm tra cholesterol,1
+Đau khớp nên khám chuyên khoa nào,1
+Tôi bị khó thở nên đi khám ở đâu,1
+Phòng khám nào điều trị đau nửa đầu,1
+Có bệnh viện nào khám tai mũi họng tốt không,1
+Tôi nên khám ở đâu khi bị đau dạ dày,1
+What causes frequent headaches,0
+Why do I keep feeling dizzy sometimes,0
+How can I reduce back pain at home,0
+Is chest pain always a serious problem,0
+What are common symptoms of diabetes,0
+How can I improve my sleep quality,0
+What medicine helps with sore throat,0
+Why do people get migraines,0
+How long does a cough usually last,0
+What should I do if I feel tired all the time,0
+Can stress cause stomach pain,0
+Is it normal to feel dizzy after standing up,0
+What are the symptoms of high blood pressure,0
+How can I treat a mild fever at home,0
+What food should I avoid if I have stomach pain,0
+Why do my joints hurt when it rains,0
+Is headache a symptom of dehydration,0
+How can I relieve eye strain,0
+What causes insomnia,0
+How can I reduce anxiety naturally,0
+Đau đầu là do nguyên nhân gì,0
+Tại sao tôi hay bị chóng mặt,0
+Làm sao giảm đau lưng tại nhà,0
+Đau ngực có nguy hiểm không,0
+Triệu chứng của tiểu đường là gì,0
+Làm sao ngủ ngon hơn vào ban đêm,0
+Nên làm gì khi bị sốt nhẹ,0
+Ho kéo dài có phải dấu hiệu bệnh nặng không,0
+Đau dạ dày nên ăn gì,0
+Tại sao tôi hay cảm thấy mệt mỏi,0
+Chóng mặt khi đứng lên có bình thường không,0
+Nguyên nhân gây mất ngủ là gì,0
+Đau khớp có phải do tuổi tác không,0
+Triệu chứng cao huyết áp gồm những gì,0
+Làm sao giảm căng thẳng hiệu quả,0
+Đau họng thì nên làm gì,0
+Tại sao mắt tôi hay bị khô,0
+Ho ban đêm là do đâu,0
+Đau đầu buổi sáng có nguy hiểm không,0
+Làm sao cải thiện sức khỏe tim mạch,0
+I think I should get my stomach checked somewhere,1
+Maybe I should see a doctor about this headache,1
+Không biết đau ngực như vậy có nên đi bệnh viện không,1
+Should I take medicine for my headache,0
+I have chest pain is it dangerous,0
+Tôi bị ho có cần uống thuốc không,0
+hey my knee hurts a lot lately where do people usually go check this,1
+ugh this headache again what could be causing it,0
+hey my chest kinda hurts lately where do people usually go check that,1
+my knee has been bothering me for weeks should i see someone,1
+not sure if this headache is serious maybe i should get it checked somewhere,1
+i think i should get my stomach checked any clinic for that,1
+been coughing for a long time what doctor usually handles this,1
+my back pain keeps coming back where should i go for this,1
+do hospitals usually have a department for sleep problems,1
+i probably need to check my blood pressure somewhere,1
+my eye feels weird these days where can i get it checked,1
+been dizzy lately maybe i should see a doctor somewhere,1
+i guess i should go to a hospital for this chest pain right,1
+any clinic that usually deals with allergies,1
+who do people see when they have migraine problems,1
+i might need a doctor for my stomach issues,1
+where do people go when their joints hurt a lot,1
+is there a place to check if i have diabetes,1
+thinking about getting my heart checked any suggestion,1
+where would you go if your throat hurts a lot,1
+which clinic usually checks ear problems,1
+where can i check breathing problems,1
+tôi bị đau đầu mấy ngày rồi chắc nên đi khám ở đâu nhỉ,1
+đau bụng như này chắc phải đi bệnh viện đúng không,1
+không biết ho lâu ngày thì nên khám chỗ nào,1
+tôi nên kiểm tra huyết áp ở đâu nhỉ,1
+đau ngực nhẹ vậy có nên đi khám tim không,1
+tôi bị dị ứng da chắc phải đi khám ở đâu đó,1
+đau lưng nhiều quá chắc nên gặp bác sĩ nào đó,1
+không biết chóng mặt vậy thì nên đi khám khoa nào,1
+chắc tôi nên đi kiểm tra dạ dày ở đâu nhỉ,1
+mất ngủ lâu ngày chắc phải gặp bác sĩ đúng không,1
+đau khớp vậy thì nên khám ở đâu ta,1
+tôi muốn kiểm tra sức khỏe tim thì nên đi bệnh viện nào,1
+có chỗ nào khám đau đầu gối không,1
+chắc tôi cần kiểm tra mắt ở đâu đó,1
+tôi bị đau tai không biết nên đi khám ở đâu,1
+đau răng vậy chắc phải đi nha khoa đúng không,1
+tôi nên đi đâu để kiểm tra cholesterol,1
+không biết khó thở vậy nên đi khám khoa nào,1
+tôi nên đi khám dạ dày ở đâu,1
+có phòng khám nào kiểm tra tiểu đường không,1
+ugh this headache again why does this keep happening,0
+i feel tired all the time lately what's going on,0
+is chest pain always serious or not really,0
+why do i feel dizzy when i stand up fast,0
+my throat hurts a bit should i just drink water,0
+been coughing for days is that normal,0
+what causes stomach pain usually,0
+how do people deal with insomnia naturally,0
+is it bad if my joints hurt when it rains,0
+what does migraine actually feel like,0
+is it normal to feel weak after not sleeping well,0
+why do my eyes feel dry at night,0
+how long does flu usually last,0
+what should i do if i feel stressed all the time,0
+can anxiety cause chest tightness,0
+does drinking coffee cause headaches,0
+why does my stomach feel bloated sometimes,0
+how do you reduce back pain at home,0
+is it normal to feel sleepy all day,0
+why do i keep sneezing lately,0
+tại sao tôi hay bị đau đầu vậy,0
+sao dạo này tôi hay mệt quá,0
+đau bụng nhẹ vậy có sao không,0
+tại sao đứng lên nhanh lại bị chóng mặt,0
+ho mấy ngày vậy có bình thường không,0
+tại sao tôi khó ngủ vào ban đêm,0
+đau họng vậy có cần uống thuốc không,0
+tại sao mắt tôi hay bị khô,0
+đau khớp khi trời lạnh là do gì,0
+tôi hay bị stress thì phải làm sao,0
+đau đầu buổi sáng có nguy hiểm không,0
+tại sao tôi hay buồn ngủ ban ngày,0
+tôi bị ho khan là dấu hiệu bệnh gì,0
+tại sao tôi hay cảm thấy yếu người,0
+mất ngủ kéo dài có sao không,0
+đau dạ dày thì nên ăn gì,0
+sao tôi hay bị chóng mặt gần đây,0
+tại sao tôi khó thở khi chạy nhanh,0
+đau mắt có thể do nguyên nhân gì,0
+tại sao tôi hay bị dị ứng da,0
+hey quick question if someone has chest pain where do they normally go check,1
+my friend said i should check my blood pressure somewhere any idea where,1
+this cough isn't going away maybe i should see someone,1
+thinking i might need a doctor for this stomach thing,1
+do clinics handle migraine checks,1
+is there a hospital that checks heart stuff,1
+who should i see if my knee keeps hurting,1
+maybe i should get my lungs checked somewhere,1
+where do people go for allergy tests usually,1
+i might need to check my eyes any clinic suggestion,1
+tôi nghĩ mình nên kiểm tra tim ở đâu đó,1
+chắc tôi cần gặp bác sĩ vì đau lưng quá,1
+không biết khám đau đầu gối thì đi đâu,1
+tôi muốn kiểm tra huyết áp thì đi đâu nhỉ,1
+tôi bị ho chắc nên đi khám rồi,1
+đau dạ dày vậy chắc phải đi bệnh viện,1
+tôi nên gặp bác sĩ nào khi bị chóng mặt,1
+có chỗ nào kiểm tra mắt không nhỉ,1
+đau tai vậy chắc nên đi khám đúng không,1
+tôi muốn kiểm tra sức khỏe tổng quát ở đâu,1
+hmm why do i feel dizzy after working out,0
+why do i wake up with headaches sometimes,0
+what causes random stomach cramps,0
+is sore throat common when weather changes,0
+why do i feel sleepy even after sleeping enough,0
+does stress cause stomach issues,0
+why does my back hurt when sitting long,0
+can dehydration cause headache,0
+why do my eyes hurt after using computer,0
+what are early signs of flu,0
+tại sao tôi bị đau đầu sau khi làm việc lâu,0
+tại sao ngồi lâu lại bị đau lưng,0
+tại sao tôi hay bị buồn ngủ,0
+đau dạ dày có phải do ăn uống không,0
+tại sao tôi hay bị dị ứng khi trời lạnh,0
+đau họng khi thay đổi thời tiết có bình thường không,0
+tại sao tôi hay bị đau cổ,0
+tại sao tôi cảm thấy mệt sau khi tập thể dục,0
+đau mắt khi nhìn màn hình lâu có sao không,0
+tại sao tôi hay bị ho vào ban đêm,0
+so i've been having chest pain should i just rest or take medicine,0
+my stomach hurts do you think it's something serious,0
+i keep coughing at night is that normal,0
+is it bad if my knee hurts after running,0
+my back hurts should i stretch more or rest,0
+i have headaches almost every day is that dangerous,0
+my throat feels weird should i drink warm water,0
+i feel dizzy sometimes is that a big problem,0
+my chest feels tight sometimes is that anxiety,0
+i can't sleep well these days what should i do,0
+i've had stomach pain since yesterday should i take medicine,0
+my knee hurts when i walk should i stop exercising,0
+i get headaches when using my laptop too long is that normal,0
+my eyes feel dry should i use eye drops,0
+my back pain comes and goes is that normal,0
+i sometimes feel my heart beating fast is that okay,0
+my stomach feels bloated after eating is that normal,0
+i wake up with headaches sometimes why,0
+my throat hurts when i swallow should i worry,0
+my joints hurt when it's cold outside why,0
+tôi bị đau đầu vậy có cần uống thuốc không,0
+tôi bị đau bụng vậy có nguy hiểm không,0
+tôi bị chóng mặt vậy có sao không,0
+tôi ho nhiều vậy có bình thường không,0
+đau lưng vậy thì nên nghỉ ngơi hay tập thể dục,0
+đau họng vậy nên uống nước ấm đúng không,0
+tôi bị mất ngủ vậy phải làm sao,0
+đau khớp khi trời lạnh là bình thường à,0
+tôi bị đau đầu sau khi làm việc nhiều là do gì,0
+tôi bị đau bụng sau khi ăn là bình thường không,0
+khó thở nhẹ khi chạy nhanh có sao không,0
+tôi hay bị chóng mặt khi đứng lên nhanh là sao,0
+tôi hay buồn ngủ vào ban ngày là do gì,0
+tôi bị đau cổ sau khi ngủ dậy là bình thường không,0
+tôi bị đau mắt khi nhìn màn hình lâu là sao,0
+tôi bị đau đầu mỗi sáng có nguy hiểm không,0
+tôi bị ho khan lâu ngày có đáng lo không,0
+tôi bị mệt mỏi suốt ngày là do gì,0
+đau dạ dày thì nên ăn gì cho đỡ,0
+tôi bị đau đầu khi thiếu ngủ là bình thường không,0
+hmm this headache has been going on for days maybe i should get it checked somewhere,1
+my stomach pain isn't going away i think i need to see someone,1
+i've been coughing for weeks maybe i should go get checked,1
+my chest pain worries me maybe i should visit a hospital,1
+this knee pain is getting worse i probably need a doctor,1
+my back pain keeps coming back i should probably see a specialist,1
+i feel dizzy a lot lately maybe i should get it checked,1
+i think i should check my blood pressure somewhere,1
+my eyes have been hurting maybe i should see someone about it,1
+i've had insomnia for weeks i guess i should see a doctor,1
+this stomach issue is bothering me maybe time to visit a clinic,1
+my heart feels weird sometimes maybe i should get a checkup,1
+this allergy keeps coming back maybe i should go to a clinic,1
+i think i need to check my lungs somewhere,1
+my throat hurts a lot lately maybe a doctor should look at it,1
+đau đầu mấy ngày rồi chắc tôi nên đi khám ở đâu đó,1
+đau bụng vậy chắc phải đi kiểm tra dạ dày rồi,1
+tôi ho lâu quá chắc nên đi khám rồi,1
+tôi hay bị chóng mặt chắc nên kiểm tra sức khỏe,1
+đau ngực vậy chắc nên đi bệnh viện xem sao,1
+đau lưng kiểu này chắc phải gặp bác sĩ rồi,1
+mất ngủ lâu ngày chắc nên đi khám,1
+tôi bị dị ứng da hoài chắc phải đi kiểm tra,1
+tôi nghĩ mình nên kiểm tra tim ở đâu đó,1
+không biết đau đầu gối vậy có nên đi khám không,1
+tôi chắc cần kiểm tra mắt rồi,1
+tôi nên đi khám tai vì đau tai mấy ngày rồi,1
+chắc phải đi kiểm tra huyết áp thôi,1
+tôi bị đau dạ dày vậy chắc nên đi bệnh viện,1
+tôi nghĩ mình nên kiểm tra sức khỏe tổng quát,1
+Gợi ý dịch vụ cho người bị stress,1
+Gợi ý dịch vụ chăm sóc sức khỏe cho người bị stress,1
+Gợi ý dịch vụ hỗ trợ người bị stress kéo dài,1
+Gợi ý dịch vụ điều trị stress hiệu quả,1
+Gợi ý dịch vụ giúp giảm stress,1
+Gợi ý dịch vụ chăm sóc tinh thần cho người stress,1
+Gợi ý dịch vụ trị stress ở đâu tốt,1
+Gợi ý dịch vụ hỗ trợ tâm lý cho người bị stress,1
+Gợi ý dịch vụ thư giãn cho người bị stress nhiều,1
+Gợi ý dịch vụ điều trị căng thẳng thần kinh,1
+Gợi ý dịch vụ giúp cải thiện stress,1
+Gợi ý dịch vụ y tế cho người bị stress,1
+Gợi ý dịch vụ chăm sóc tâm lý cho stress,1
+Gợi ý dịch vụ hỗ trợ giảm stress nhanh,1
+Gợi ý dịch vụ điều trị stress ở bệnh viện,1
+Gợi ý dịch vụ khám cho người bị stress,1
+Gợi ý dịch vụ kiểm tra sức khỏe tinh thần,1
+Gợi ý dịch vụ cho người hay bị stress,1
+Gợi ý dịch vụ chăm sóc sức khỏe tâm thần,1
+Gợi ý dịch vụ giảm stress tại phòng khám,1
+Gợi ý dịch vụ cho người bị căng thẳng nhiều,1
+Gợi ý dịch vụ trị stress lâu ngày,1
+Gợi ý dịch vụ khám stress ở đâu,1
+Gợi ý dịch vụ hỗ trợ tâm lý khi bị stress,1
+Gợi ý dịch vụ trị stress hiệu quả ở đâu,1
+Gợi ý dịch vụ chăm sóc sức khỏe khi bị stress,1
+Gợi ý dịch vụ điều trị stress mãn tính,1
+Gợi ý dịch vụ cho người bị stress,1
+Gợi ý dịch vụ cho người bị mất ngủ,1
+Gợi ý dịch vụ cho người bị đau đầu,1
+Gợi ý dịch vụ cho người bị đau lưng,1
+Gợi ý dịch vụ cho người bị đau dạ dày,1
+Gợi ý dịch vụ cho người bị cao huyết áp,1
+Gợi ý dịch vụ cho người bị tiểu đường,1
+Gợi ý dịch vụ cho người bị đau khớp,1
+Gợi ý dịch vụ cho người bị đau vai gáy,1
+Gợi ý dịch vụ cho người bị đau đầu gối,1
+Gợi ý dịch vụ cho người bị chóng mặt,1
+Gợi ý dịch vụ cho người bị dị ứng da,1
+Gợi ý dịch vụ cho người bị viêm họng,1
+Gợi ý dịch vụ cho người bị ho kéo dài,1
+Gợi ý dịch vụ cho người bị đau ngực,1
+Gợi ý dịch vụ cho người bị khó thở,1
+Gợi ý dịch vụ cho người bị đau tai,1
+Gợi ý dịch vụ cho người bị đau răng,1
+Gợi ý dịch vụ cho người bị đau mắt,1
+Gợi ý dịch vụ cho người bị khô mắt,1
+Gợi ý dịch vụ cho người bị đau cổ,1
+Gợi ý dịch vụ cho người bị viêm xoang,1
+Gợi ý dịch vụ cho người bị đau bụng,1

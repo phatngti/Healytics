@@ -1,0 +1,15 @@
+{
+    "general": {
+        "appTitle": "GoHealh"
+    },
+    "settings": {
+        "general": {
+            "themeModes": {
+                "system": "System",
+                "light": "Light",
+                "dark": "Dark",
+                "black": "Black"
+            }
+        }
+    }
+}

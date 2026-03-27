@@ -1,0 +1,113 @@
+\chapter{Kết quả thử nghiệm}
+
+\section{Kết quả thử nghiệm \& đánh giá}
+
+\subsection{Kiểm thử chức năng (Functional Testing)}
+
+Phần này trình bày kết quả kiểm thử chức năng của hệ thống, bao gồm kiểm thử đơn vị và kiểm thử tích hợp.
+
+\subsubsection{Kiểm thử đơn vị (Unit Tests)}
+
+Kiểm thử đơn vị nhằm đảm bảo từng thành phần nhỏ (Controller, Service) hoạt động đúng khi được tách riêng khỏi phần còn lại của hệ thống. Hệ thống sử dụng \textbf{Jest} làm công cụ kiểm thử chính, với tổng cộng \textbf{23 tệp kiểm thử} bao phủ toàn bộ các module:
+
+\begin{itemize}
+    \item \texttt{auth}: Kiểm tra đăng ký, đăng nhập, làm mới token và xác thực JWT.
+    \item \texttt{partners}: Kiểm tra đăng ký đối tác, cập nhật hồ sơ, chuyển đổi trạng thái xác minh.
+    \item \texttt{admin}: Kiểm tra quy trình xét duyệt, xác định kết quả duyệt, ghi nhận lịch sử.
+    \item \texttt{audit}: Kiểm tra ghi nhật ký kiểm toán tự động.
+    \item \texttt{employees}, \texttt{products}, \texttt{categories}, \texttt{locations}, \texttt{service-tags}, \texttt{s3}: Kiểm tra các thao tác thêm/sửa/xóa và logic nghiệp vụ.
+\end{itemize}
+
+Để cô lập từng thành phần, các bài kiểm thử sử dụng đối tượng giả lập (mock) thay thế cho cơ sở dữ liệu thực. Mỗi bài kiểm thử tuân theo mô hình 3 bước: \textbf{Chuẩn bị} dữ liệu đầu vào, \textbf{Thực thi} hàm cần kiểm tra, và \textbf{Xác nhận} kết quả đầu ra.
+
+\subsubsection{Kiểm thử tích hợp (End-to-End Tests)}
+
+Kiểm thử tích hợp mô phỏng hành vi thực tế của người dùng bằng cách gửi các yêu cầu HTTP đến hệ thống đang chạy đầy đủ. Các bài kiểm thử được tổ chức trong thư mục \texttt{test/e2e/}, sử dụng thư viện \texttt{Supertest}:
+
+\begin{itemize}
+    \item \texttt{auth/}: Kiểm tra luồng hoàn chỉnh từ đăng ký $\rightarrow$ đăng nhập $\rightarrow$ làm mới token.
+    \item \texttt{account/}: Kiểm tra cập nhật hồ sơ cá nhân.
+    \item \texttt{categories/}, \texttt{employees/}, \texttt{products/}: Kiểm tra các API thêm/sửa/xóa từ đầu đến cuối.
+\end{itemize}
+
+Để hỗ trợ việc viết kiểm thử nhanh và nhất quán, hệ thống cung cấp các thư mục tiện ích:
+
+\begin{itemize}
+    \item \texttt{test/factories/}: Tạo dữ liệu mẫu tự động cho các bài kiểm thử.
+    \item \texttt{test/fixtures/}: Dữ liệu cố định dùng chung.
+    \item \texttt{test/mocks/}: Các đối tượng giả lập dùng chung giữa nhiều bài kiểm thử.
+    \item \texttt{test/helpers/}: Các hàm tiện ích hỗ trợ khởi tạo và dọn dẹp môi trường kiểm thử.
+\end{itemize}
+
+\subsubsection{Công cụ và lệnh kiểm thử}
+
+\begin{itemize}
+    \item \textbf{Chạy kiểm thử đơn vị:} \texttt{npm test}
+    \item \textbf{Chạy kiểm thử tích hợp:} \texttt{npm run test:e2e}
+    \item \textbf{Xem độ bao phủ mã nguồn:} \texttt{npm run test:cov}
+    \item \textbf{Kiểm tra chất lượng mã:} \texttt{npx eslint src/}
+    \item \textbf{Định dạng mã nguồn:} \texttt{npx prettier --write src/}
+\end{itemize}
+
+\subsection{Kiểm thử phi chức năng (Performance, Load, Security)}
+
+Ngoài kiểm thử chức năng, hệ thống còn được đánh giá theo các yêu cầu phi chức năng đã đề ra trong Chương Yêu cầu hệ thống. Bảng dưới đây tổng hợp các tiêu chí và kết quả kiểm thử tương ứng.
+
+\subsubsection{Hiệu suất (Performance)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Tiêu chí} & \textbf{Yêu cầu} & \textbf{Kết quả} & \textbf{Đạt/Không} \\
+\hline
+Thời gian phản hồi API & $<$ 200ms & \textit{(chưa đo)} & -- \\
+\hline
+Tải trang ứng dụng & $<$ 2 giây & \textit{(chưa đo)} & -- \\
+\hline
+Số người dùng đồng thời & $\geq$ 1.000 & \textit{(chưa đo)} & -- \\
+\hline
+\end{tabular}
+\caption{Kết quả kiểm thử hiệu suất}
+\end{table}
+
+\subsubsection{Bảo mật (Security)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Tiêu chí} & \textbf{Hiện thực} & \textbf{Đạt/Không} \\
+\hline
+Mã hóa truyền tải (SSL/TLS) & \textit{(chưa kiểm tra)} & -- \\
+\hline
+Xác thực JWT \& phân quyền RBAC & \textit{(chưa kiểm tra)} & -- \\
+\hline
+Bảo vệ HTTP headers (Helmet) & \textit{(chưa kiểm tra)} & -- \\
+\hline
+Kiểm tra OWASP Top 10 & \textit{(chưa kiểm tra)} & -- \\
+\hline
+\end{tabular}
+\caption{Kết quả kiểm thử bảo mật}
+\end{table}
+
+\subsubsection{Khả năng mở rộng \& Độ sẵn sàng}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Tiêu chí} & \textbf{Kết quả} & \textbf{Đạt/Không} \\
+\hline
+Hỗ trợ mở rộng ngang (horizontal scaling) & \textit{(chưa kiểm tra)} & -- \\
+\hline
+Uptime $\geq$ 99.9\% & \textit{(chưa đo)} & -- \\
+\hline
+Sao lưu \& phục hồi dữ liệu & \textit{(chưa kiểm tra)} & -- \\
+\hline
+\end{tabular}
+\caption{Kết quả kiểm thử khả năng mở rộng và độ sẵn sàng}
+\end{table}
+
+\subsection{Đánh giá hiệu quả AI trong gợi ý dịch vụ}
+\subsection{Phản hồi từ người dùng thử nghiệm}

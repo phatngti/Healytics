@@ -20,8 +20,11 @@ class DriftStoreRepository extends DriftDatabaseRepository {
         .select(_db.storeValue)
         .watch()
         .asyncExpand(
-          (entities) =>
-              Stream.fromFutures(entities.map((e) async => _toUpdateEvent(e))),
+          (entities) => Stream.fromFutures(
+            entities
+                .where((e) => validStoreKeys.contains(e.id))
+                .map((e) async => _toUpdateEvent(e)),
+          ),
         );
   }
 
@@ -32,11 +35,11 @@ class DriftStoreRepository extends DriftDatabaseRepository {
   }
 
   Future<void> delete<T>(StoreKey<T> key) async {
-    return await transaction(
-      () async => _db.delete(_db.storeValue)
-        ..where((e) => e.id.equals(key.id))
-        ..go(),
-    );
+    return await transaction(() async {
+      final stmt = _db.delete(_db.storeValue)
+        ..where((e) => e.id.equals(key.id));
+      await stmt.go();
+    });
   }
 
   Future<bool> insert<T>(StoreKey<T> key, T value) async {
@@ -112,6 +115,11 @@ class DriftStoreRepository extends DriftDatabaseRepository {
 
   Future<List<StoreModel<Object>>> getAll() async {
     final entities = await _db.select(_db.storeValue).get();
-    return Future.wait(entities.map((e) => _toUpdateEvent(e)).toList());
+    return Future.wait(
+      entities
+          .where((e) => validStoreKeys.contains(e.id))
+          .map((e) => _toUpdateEvent(e))
+          .toList(),
+    );
   }
 }

@@ -1,7 +1,0 @@
-{
-    "serverEndpoint": "http://localhost:8080",
-    "customHeaders": {
-        "deviceModel": "iPhone 13",
-        "deviceType": "iOS"
-    }
-}

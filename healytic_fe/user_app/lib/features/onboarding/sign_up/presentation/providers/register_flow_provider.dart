@@ -4,10 +4,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/survey_entity.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/user_entity.dart';
-import 'package:user_app/features/onboarding/sign_up/domain/usecases/completed_resgistration.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/usecases/otp.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/usecases/persistence.dart';
-import 'package:user_app/features/onboarding/sign_up/domain/usecases/surver.dart';
+import 'package:user_app/features/onboarding/sign_up/domain/usecases/survey.dart';
+import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_usecases.provider.dart';
 
 part 'register_flow_provider.freezed.dart';
 part 'register_flow_provider.g.dart';
@@ -122,7 +122,7 @@ class RegisterFlowNotifier extends _$RegisterFlowNotifier {
       final email = state.value?.user?.email;
       if (email == null) throw Exception("Email cannot be null");
       final authenTokens = await ref
-          .read(completedResgistrationUsecaseProvider)
+          .read(completedRegistrationUseCaseProvider)
           .call(user: updatedUser.copyWith(email: email));
 
       debugPrint('completeRegistration: got tokens');
@@ -142,26 +142,41 @@ class RegisterFlowNotifier extends _$RegisterFlowNotifier {
     }
   }
 
-  Future<void> updateSurvey(String step, List<SurveyEntity> surveys) async {
-    final currentSurveys = state.value?.surveys ?? {};
-    final updatedSurveys = {...currentSurveys, step: surveys};
+  Future<void> updateSurvey(String stepKey, List<SurveyEntity> surveys) async {
+    if (state.value?.isRegistrationCompleted ?? false) {
+      return;
+    }
 
+    final currentSurveys = state.value?.surveys ?? {};
+    final updatedSurveys = {...currentSurveys, stepKey: surveys};
+
+    final currentStepIndex = state.value?.stepIndex == 4
+        ? 4
+        : (state.value?.stepIndex ?? 0) + 1;
     _updateState(
       (current) => current.copyWith(
         surveys: updatedSurveys,
-        stepIndex: current.stepIndex == 3 ? 4 : current.stepIndex + 1,
+        stepIndex: currentStepIndex,
+        isRegistrationCompleted: currentStepIndex == 4,
       ),
     );
     await saveProgress();
   }
 
   Future<void> completeSurvey() async {
-    if (state.value?.stepIndex == 4) {
-      final surveys = state.value?.surveys ?? <String, List<SurveyEntity>>{};
-      await ref.read(surveyUseCaseProvider).completeSurvey(surveys: surveys);
-      await saveProgress();
-      _updateState((current) => current.copyWith(isSurveyCompleted: true));
-      ref.invalidateSelf();
+    try {
+      debugPrint(
+        'isRegistrationCompleted ${state.value?.isRegistrationCompleted}',
+      );
+      if (state.value?.isRegistrationCompleted ?? false) {
+        final surveys = state.value?.surveys ?? <String, List<SurveyEntity>>{};
+        await ref.read(surveyUseCaseProvider).completeSurvey(surveys: surveys);
+        await saveProgress();
+        ref.invalidateSelf();
+      }
+    } catch (e, stack) {
+      state = AsyncError<RegisterStateData>(e, stack);
+      rethrow;
     }
   }
 

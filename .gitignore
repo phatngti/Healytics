@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+runpod_scripts/.env
+.venv/
+env/
+healytics_env/
+
+# Vector DB / Chroma
+*.sqlite3
+chroma/
+vectordb/
+
+# Data generated
+data/processed/
+ai_services/ner-service/.env
