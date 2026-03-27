@@ -1,6 +1,7 @@
 # app/schemas/recommender_schema.py
 from pydantic import BaseModel, Field
 from typing import List, Optional, Any, Dict
+from uuid import UUID
 
 
 # ==============================
@@ -8,7 +9,7 @@ from typing import List, Optional, Any, Dict
 # ==============================
 
 class HomeRecommenderRequest(BaseModel):
-    user_id: str = Field(..., min_length=1)
+    user_id: UUID
     top_k: int = Field(default=5, ge=1, le=20)
 
 
