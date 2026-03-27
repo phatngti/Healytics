@@ -14,7 +14,6 @@
 \AtEveryBibitem{%
   \clearfield{issn} % Remove issn
   \clearfield{doi} % Remove doi
-
   \ifentrytype{online}{}{% Remove url except for @online
     \clearfield{url}
   }
