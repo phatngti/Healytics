@@ -1,0 +1,47 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsUUID,
+  IsDateString,
+  IsString,
+  IsOptional,
+  IsUrl,
+  MaxLength,
+} from 'class-validator';
+
+export class AsyncCheckoutDto {
+  @ApiProperty({ description: 'User account UUID' })
+  @IsUUID()
+  userId: string;
+
+  @ApiProperty({ description: 'Staff/employee UUID' })
+  @IsUUID()
+  staffId: string;
+
+  @ApiProperty({
+    description: 'Desired slot start time (ISO 8601)',
+    example: '2023-10-25T14:00:00Z',
+  })
+  @IsDateString()
+  startTime: string;
+
+  @ApiPropertyOptional({ description: 'Product/service UUID' })
+  @IsUUID()
+  @IsOptional()
+  productId?: string;
+
+  @ApiProperty({
+    description: 'Idempotency key to prevent duplicate requests from AI retry',
+    example: 'ai_chat_session_888_msg_12',
+  })
+  @IsString()
+  @MaxLength(255)
+  idempotencyKey: string;
+
+  @ApiPropertyOptional({
+    description: 'Webhook URL to receive checkout result',
+    example: 'https://ai-service.com/webhook/booking-result',
+  })
+  @IsUrl()
+  @IsOptional()
+  webhookUrl?: string;
+}

@@ -4,14 +4,13 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:user_app/features/common/button/button.dart';
-import 'package:user_app/features/common/field/date_pick_field.dart';
-import 'package:user_app/features/common/field/text_field.dart';
-import 'package:user_app/features/common/toast.dart';
+import 'package:common/widgets/button/button.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:common/widgets/toast.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/user_entity.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/router/routes.dart';
-import 'package:user_app/utils/demensions.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:user_app/utils/device.dart';
 
 class FinishSignUpScreen extends HookConsumerWidget {
@@ -166,9 +165,19 @@ class FinishSignUpScreen extends HookConsumerWidget {
                             ),
                       ),
                       AppDimens.verticalSmall,
-                      AppTextField(fieldKey: 'first_name', label: 'First name'),
+                      FormFieldBuilders.buildTextField(
+                        context,
+                        fieldKey: 'first_name',
+                        label: 'First name',
+                        uppercaseLabel: false,
+                      ),
                       AppDimens.verticalSmall,
-                      AppTextField(fieldKey: 'last_name', label: 'Last name'),
+                      FormFieldBuilders.buildTextField(
+                        context,
+                        fieldKey: 'last_name',
+                        label: 'Last name',
+                        uppercaseLabel: false,
+                      ),
                       AppDimens.verticalSmall,
                       Text(
                         'Make sure the matches the name on your government ID. This is required for identity verification.',
@@ -197,7 +206,8 @@ class FinishSignUpScreen extends HookConsumerWidget {
                             ),
                       ),
                       AppDimens.verticalSmall,
-                      AppDatePickField(
+                      FormFieldBuilders.buildDateField(
+                        context,
                         fieldKey: 'date_of_birth',
                         label: 'Select your birthday',
                       ),
@@ -229,15 +239,19 @@ class FinishSignUpScreen extends HookConsumerWidget {
                             ),
                       ),
                       AppDimens.verticalSmall,
-                      AppTextField(
+                      FormFieldBuilders.buildTextField(
+                        context,
                         fieldKey: 'password',
                         label: 'Password',
+                        uppercaseLabel: false,
                         obscureText: true,
                       ),
                       AppDimens.verticalSmall,
-                      AppTextField(
+                      FormFieldBuilders.buildTextField(
+                        context,
                         fieldKey: 'confirm_password',
                         label: 'Confirm Password',
+                        uppercaseLabel: false,
                         obscureText: true,
                       ),
                       AppDimens.verticalSmall,
@@ -270,17 +284,19 @@ class FinishSignUpScreen extends HookConsumerWidget {
                               ),
                         ),
                         AppDimens.verticalSmall,
-                        AppTextField(
+                        FormFieldBuilders.buildTextField(
+                          context,
                           fieldKey: 'street_address',
                           label: 'Street Address',
-                          obscureText: false,
+                          uppercaseLabel: false,
                         ),
 
                         AppDimens.verticalSmall,
-                        AppTextField(
+                        FormFieldBuilders.buildTextField(
+                          context,
                           fieldKey: 'ward',
                           label: 'Ward',
-                          obscureText: false,
+                          uppercaseLabel: false,
                         ),
                         AppDimens.verticalSmall,
 
@@ -288,27 +304,30 @@ class FinishSignUpScreen extends HookConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: AppTextField(
+                              child: FormFieldBuilders.buildTextField(
+                                context,
                                 fieldKey: 'district',
                                 label: 'District',
-                                obscureText: false,
+                                uppercaseLabel: false,
                               ),
                             ),
                             AppDimens.horizontalSmall,
                             Expanded(
-                              child: AppTextField(
+                              child: FormFieldBuilders.buildTextField(
+                                context,
                                 fieldKey: 'city_or_province',
                                 label: 'City or Province',
-                                obscureText: false,
+                                uppercaseLabel: false,
                               ),
                             ),
                           ],
                         ),
                         AppDimens.verticalSmall,
-                        AppTextField(
+                        FormFieldBuilders.buildTextField(
+                          context,
                           fieldKey: 'country',
                           label: 'Country',
-                          obscureText: false,
+                          uppercaseLabel: false,
                           enabled: false,
                           initialValue: 'Vietnam',
                         ),

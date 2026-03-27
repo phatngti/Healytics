@@ -1,0 +1,25 @@
+targets:
+  $default:
+    builders:
+      slang_build_runner:
+        options:
+          base_locale: en
+          fallback_strategy: base_locale
+          input_directory: assets/translations
+          input_file_pattern: .i18n.json
+          output_directory: lib/gen
+          output_file_fomat: single_file
+          output_file_name: translations.g.dart
+          translation_class_visibility: public
+          locale_handling: false
+      json_serializable:
+        options:
+          # Tự động gọi .toJson() cho các object lồng nhau
+          explicit_to_json: true
+          
+          # (Tuỳ chọn) Tự động đổi tên biến từ camelCase (Dart) sang snake_case (JSON)
+          # Ví dụ: firstName -> first_name
+          # field_rename: snake
+          
+          # (Tuỳ chọn) Kiểm tra null chặt chẽ hơn khi parse JSON
+          # check_for_null: true

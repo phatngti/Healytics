@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: healytics_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: GH21112004@lngh
+      POSTGRES_DB: healytics
+    ports:
+      - "5433:5432"
+    volumes:
+      - healytics_pgdata:/var/lib/postgresql/data
+
+volumes:
+  healytics_pgdata:

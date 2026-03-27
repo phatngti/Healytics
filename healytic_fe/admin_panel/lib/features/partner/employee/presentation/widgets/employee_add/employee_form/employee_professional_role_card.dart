@@ -1,0 +1,293 @@
+import 'package:admin_panel/features/partner/employee/domain/employment_type.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:admin_panel/theme/app_theme.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/role_toggle_selector.dart';
+import 'package:common/utils/demensions.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:uuid/uuid.dart';
+
+class EmployeeProfessionalRoleCard extends StatefulWidget {
+  final ValueChanged<EmployeeRole>? onRoleChanged;
+  final EmployeeRole initialRole;
+  final bool readOnly;
+  final EmployeeEntity? employee;
+
+  const EmployeeProfessionalRoleCard({
+    super.key,
+    this.onRoleChanged,
+    this.initialRole = EmployeeRole.therapist,
+    this.readOnly = false,
+    this.employee,
+  });
+
+  @override
+  State<EmployeeProfessionalRoleCard> createState() =>
+      _EmployeeProfessionalRoleCardState();
+}
+
+class _EmployeeProfessionalRoleCardState
+    extends State<EmployeeProfessionalRoleCard> {
+  late final TextEditingController _employeeIdController;
+
+  bool _isExpanded = true;
+  late EmployeeRole _selectedRole;
+
+  @override
+  void initState() {
+    super.initState();
+    _employeeIdController = TextEditingController(
+      text: const Uuid().v4().substring(0, 8).toUpperCase(),
+    );
+
+    _selectedRole = widget.initialRole;
+  }
+
+  @override
+  void didUpdateWidget(EmployeeProfessionalRoleCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialRole != oldWidget.initialRole) {
+      if (_selectedRole != widget.initialRole) {
+        setState(() {
+          _selectedRole = widget.initialRole;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _employeeIdController.dispose();
+    super.dispose();
+  }
+
+  void _handleRoleChanged(EmployeeRole role) {
+    setState(() {
+      _selectedRole = role;
+    });
+    widget.onRoleChanged?.call(role);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final formEnabled = FormBuilder.of(context)?.enabled ?? true;
+    final isReadOnly = widget.readOnly || !formEnabled;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outlineVariant),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withAlpha(4),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          // Header
+          InkWell(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).extension<SemanticColors>()!.info!.withAlpha(25),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).extension<SemanticColors>()!.info!.withAlpha(50),
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.badge_outlined,
+                      size: 18,
+                      color: Theme.of(
+                        context,
+                      ).extension<SemanticColors>()!.info,
+                    ),
+                  ),
+                  AppDimens.horizontalMediumSmall,
+                  Text(
+                    'Professional Role',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  AnimatedRotation(
+                    turns: _isExpanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      Icons.expand_more,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Content
+          AnimatedCrossFade(
+            firstChild: _buildContent(context, isReadOnly),
+            secondChild: const SizedBox.shrink(),
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(milliseconds: 200),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, bool isReadOnly) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Role Toggle Selector
+          Text(
+            'Select Role Type',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          IgnorePointer(
+            ignoring: isReadOnly,
+            child: RoleToggleSelector(
+              selectedRole: _selectedRole,
+              onRoleChanged: _handleRoleChanged,
+            ),
+          ),
+          // Hidden field to store role in form
+          FormBuilderField<String>(
+            name: 'employee_role',
+            initialValue: _selectedRole.apiValue,
+            builder: (field) {
+              // Update field when selection changes
+              if (field.value != _selectedRole.apiValue) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  field.didChange(_selectedRole.apiValue);
+                });
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+          const SizedBox(height: 24),
+          const Divider(),
+          const SizedBox(height: 24),
+          // Common fields
+          Row(
+            children: [
+              Expanded(
+                child: _buildTextField(
+                  context,
+                  label: 'Job Title',
+                  placeholder: _selectedRole == EmployeeRole.doctor
+                      ? 'e.g. Senior Dermatologist'
+                      : 'e.g. Senior Massage Therapist',
+                  isRequired: true,
+                ),
+              ),
+              AppDimens.horizontalLarge,
+              Expanded(
+                child: FormFieldBuilders.buildAutoGenerateTextField(
+                  context,
+                  label: 'Employee ID',
+                  controller: _employeeIdController,
+                  onGenerate: () {
+                    // Prevent generation in read only mode
+                    if (isReadOnly) return;
+                    setState(() {
+                      _employeeIdController.text = const Uuid()
+                          .v4()
+                          .substring(0, 8)
+                          .toUpperCase();
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+          AppDimens.verticalLarge,
+          Row(
+            children: [
+              Expanded(
+                child: FormFieldBuilders.buildDropdownField(
+                  context,
+                  label: 'Employment Type',
+                  items: EmploymentType.values
+                      .map((e) => e.displayName)
+                      .toList(),
+                  initialValue: EmploymentType.fullTime.displayName,
+                ),
+              ),
+              AppDimens.horizontalLarge,
+              Expanded(
+                child: FormFieldBuilders.buildDateField(
+                  context,
+                  fieldKey: 'start_date',
+                  label: 'Start Date',
+                  hintText: 'Select Start Date',
+                ),
+              ),
+            ],
+          ),
+          AppDimens.verticalLarge,
+          // Description (Quill Editor)
+          FormFieldBuilders.buildQuillEditor(
+            context,
+            label: 'Description'.toUpperCase(),
+            fieldKey: 'description',
+            readOnly: isReadOnly,
+            initialValue: widget.employee?.description,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+    BuildContext context, {
+    required String label,
+    required String placeholder,
+    bool isRequired = false,
+    TextEditingController? controller,
+  }) {
+    final fieldKey = label.toLowerCase().replaceAll(' ', '_');
+    return FormFieldBuilders.buildTextField(
+      context,
+      fieldKey: fieldKey,
+      label: label,
+      hintText: placeholder,
+      isRequired: isRequired,
+      controller: controller,
+    );
+  }
+}

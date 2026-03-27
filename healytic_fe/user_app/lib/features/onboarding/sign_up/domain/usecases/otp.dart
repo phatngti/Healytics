@@ -1,5 +1,5 @@
 import 'package:user_app/features/onboarding/sign_up/data/repositories/register_repository_impl.dart';
-import 'package:user_app/features/onboarding/sign_up/domain/repositories/register_repo.dart';
+import 'package:user_app/features/onboarding/sign_up/domain/repositories/register_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'otp.g.dart';
@@ -13,7 +13,7 @@ class OtpUseCase {
   // Sends a verification code to the provided email address.
   Future<void> sendOTP({required String email}) async {
     if (email.isEmpty || !email.contains('@')) {
-      throw Exception("Email cannot be empty");
+      throw Exception("Invalid email address");
     }
     return await _repository.sendVerificationCode(email: email);
   }

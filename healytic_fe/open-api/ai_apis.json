@@ -1,0 +1,527 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Gateway Service",
+        "description": "Gateway điều phối: Chatbot streaming (SSE), NER extraction, Home & Chatbot Recommender.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Health",
+                "operationId": "health_health_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/generative_ai/stream": {
+            "post": {
+                "tags": [
+                    "Chatbot"
+                ],
+                "summary": "Generative Ai Stream",
+                "operationId": "generative_ai_stream_generative_ai_stream_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChatbotRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/recommender/home": {
+            "post": {
+                "tags": [
+                    "Recommender"
+                ],
+                "summary": "Recommend Home",
+                "description": "Home recommender (non-stream).",
+                "operationId": "recommend_home_recommender_home_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HomeRecommenderRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RecommendationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/recommender/chatbot": {
+            "post": {
+                "tags": [
+                    "Recommender"
+                ],
+                "summary": "Recommend Chatbot",
+                "description": "Chatbot recommender (non-stream).",
+                "operationId": "recommend_chatbot_recommender_chatbot_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChatbotRecommenderRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChatbotRecommendationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ChatbotRecommendationResponse": {
+                "properties": {
+                    "conversation_id": {
+                        "type": "string",
+                        "title": "Conversation Id"
+                    },
+                    "recommendations": {
+                        "items": {
+                            "$ref": "#/components/schemas/ServiceDetail"
+                        },
+                        "type": "array",
+                        "title": "Recommendations"
+                    },
+                    "total": {
+                        "type": "integer",
+                        "title": "Total"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "conversation_id",
+                    "recommendations",
+                    "total",
+                    "timestamp"
+                ],
+                "title": "ChatbotRecommendationResponse"
+            },
+            "ChatbotRecommenderRequest": {
+                "properties": {
+                    "conversation_id": {
+                        "type": "string",
+                        "title": "Conversation Id"
+                    },
+                    "query": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Query"
+                    },
+                    "top_k": {
+                        "type": "integer",
+                        "maximum": 20.0,
+                        "minimum": 1.0,
+                        "title": "Top K",
+                        "default": 3
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "conversation_id",
+                    "query"
+                ],
+                "title": "ChatbotRecommenderRequest"
+            },
+            "ChatbotRequest": {
+                "properties": {
+                    "conversation_id": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Conversation Id"
+                    },
+                    "user_id": {
+                        "type": "string",
+                        "title": "User Id"
+                    },
+                    "message": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Message"
+                    },
+                    "top_k": {
+                        "type": "integer",
+                        "maximum": 20.0,
+                        "minimum": 1.0,
+                        "title": "Top K",
+                        "default": 3
+                    },
+                    "enable_recommendation": {
+                        "type": "boolean",
+                        "title": "Enable Recommendation",
+                        "default": true
+                    },
+                    "enable_ner": {
+                        "type": "boolean",
+                        "title": "Enable Ner",
+                        "default": true
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "user_id",
+                    "message"
+                ],
+                "title": "ChatbotRequest",
+                "description": "POST /generative_ai/stream"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "HomeRecommenderRequest": {
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "User Id"
+                    },
+                    "top_k": {
+                        "type": "integer",
+                        "maximum": 20.0,
+                        "minimum": 1.0,
+                        "title": "Top K",
+                        "default": 5
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "user_id"
+                ],
+                "title": "HomeRecommenderRequest"
+            },
+            "LocationInfo": {
+                "properties": {
+                    "address": {
+                        "type": "string",
+                        "title": "Address"
+                    },
+                    "district": {
+                        "type": "string",
+                        "title": "District"
+                    },
+                    "city": {
+                        "type": "string",
+                        "title": "City"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "address",
+                    "district",
+                    "city"
+                ],
+                "title": "LocationInfo"
+            },
+            "PriceInfo": {
+                "properties": {
+                    "amount": {
+                        "type": "integer",
+                        "title": "Amount"
+                    },
+                    "currency": {
+                        "type": "string",
+                        "title": "Currency",
+                        "default": "VND"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "amount"
+                ],
+                "title": "PriceInfo"
+            },
+            "RatingInfo": {
+                "properties": {
+                    "average": {
+                        "type": "number",
+                        "title": "Average"
+                    },
+                    "total_reviews": {
+                        "type": "integer",
+                        "title": "Total Reviews"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "average",
+                    "total_reviews"
+                ],
+                "title": "RatingInfo"
+            },
+            "RecommendationResponse": {
+                "properties": {
+                    "recommendations": {
+                        "items": {
+                            "$ref": "#/components/schemas/ServiceDetail"
+                        },
+                        "type": "array",
+                        "title": "Recommendations"
+                    },
+                    "total": {
+                        "type": "integer",
+                        "title": "Total"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "recommendations",
+                    "total",
+                    "timestamp"
+                ],
+                "title": "RecommendationResponse"
+            },
+            "ServiceDetail": {
+                "properties": {
+                    "service_id": {
+                        "type": "string",
+                        "title": "Service Id"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "image_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image Url"
+                    },
+                    "badge": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Badge"
+                    },
+                    "booked_count": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Booked Count"
+                    },
+                    "price": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/PriceInfo"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "staff_name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Staff Name"
+                    },
+                    "rating": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/RatingInfo"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "location": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/LocationInfo"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "slots": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Slots"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "service_id",
+                    "name"
+                ],
+                "title": "ServiceDetail"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    },
+                    "input": {
+                        "title": "Input"
+                    },
+                    "ctx": {
+                        "type": "object",
+                        "title": "Context"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}
