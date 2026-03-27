@@ -24,13 +24,21 @@ class ChatbotClient(BaseClient):
             từng chunk text từ downstream service
         """
 
-        # async with = dùng xong tự đóng
-        async with self._client() as client:
-            async with client.stream("POST", "/chat/stream", json=payload,) as response:
+        try:
+            # async with = dùng xong tự đóng
+            async with self._client() as client:
+                async with client.stream("POST", "/chat/stream", json=payload) as response:
+                    # nếu status != 200 thì crash ngay
+                    response.raise_for_status()
 
-                # nếu status != 200 thì crash ngay
-                response.raise_for_status()
-
-                async for chunk in response.aiter_text():
-                    if chunk:
-                        yield chunk # Gửi lên oschestrator
+                    async for chunk in response.aiter_text():
+                        if chunk:
+                            yield chunk  # Gửi lên orchestrator
+        except httpx.TimeoutException as e:
+            raise RuntimeError(
+                f"Chatbot service timeout at {self.base_url}/chat/stream"
+            ) from e
+        except httpx.HTTPError as e:
+            raise RuntimeError(
+                f"Chatbot service HTTP error at {self.base_url}/chat/stream: {e!r}"
+            ) from e

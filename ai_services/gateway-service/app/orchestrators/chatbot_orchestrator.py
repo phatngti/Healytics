@@ -77,17 +77,37 @@ class ChatbotOrchestrator:
 
         # 6. Stream LLM tokens
         full_response = ""
-        async for chunk in self.chatbot_client.stream_chat(enriched_payload):
-            if chunk:
-                full_response += chunk
-                yield SSEEvent(
-                    SSEEventType.TOKEN,
-                    {
-                        "conversation_id": str(request.conversation_id),
-                        "text": chunk,
-                        "timestamp": datetime.now(timezone.utc).isoformat(),
-                    },
-                )
+        try:
+            async for chunk in self.chatbot_client.stream_chat(enriched_payload):
+                if chunk:
+                    full_response += chunk
+                    yield SSEEvent(
+                        SSEEventType.TOKEN,
+                        {
+                            "conversation_id": str(request.conversation_id),
+                            "text": chunk,
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
+                        },
+                    )
+        except Exception as e:
+            logger.exception("Chatbot stream failed: %s", e)
+            yield SSEEvent(
+                SSEEventType.ERROR,
+                {
+                    "conversation_id": str(request.conversation_id),
+                    "message": str(e),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                },
+            )
+            yield SSEEvent(
+                SSEEventType.DONE,
+                {
+                    "conversation_id": str(request.conversation_id),
+                    "status": "failed",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                },
+            )
+            return
 
         # 7. Emit recommendation AFTER chatbot finished
         # SSE trả về thông tin chi tiết để UI hiển thị cards
@@ -146,8 +166,8 @@ class ChatbotOrchestrator:
             )
 
             # Enrich thành thông tin chi tiết
-            services = self.recommendation_orchestrator.get_enriched_services(service_ids)
-            services_text = self.recommendation_orchestrator.get_enriched_services_for_prompt(service_ids)
+            services = await self.recommendation_orchestrator.get_enriched_services(service_ids)
+            services_text = await self.recommendation_orchestrator.get_enriched_services_for_prompt(service_ids)
 
             return {
                 "services": services,        # list dict chi tiết → dùng cho SSE
@@ -155,7 +175,13 @@ class ChatbotOrchestrator:
             }
 
         except Exception as e:
-            logger.warning(f"Recommender call failed: {e}")
+            logger.warning(
+                "Recommender call failed: %r | ner_url=%s | recommender_url=%s",
+                e,
+                self.ner_client.base_url,
+                self.recommender_client.base_url,
+                exc_info=True,
+            )
             return None
 
     def _build_chatbot_payload(
