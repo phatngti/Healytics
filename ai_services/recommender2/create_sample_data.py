@@ -1,0 +1,504 @@
+
+import json
+import os
+from config import settings
+
+
+# Các dịch vụ mẫu về sức khỏe
+sample_services = [
+    # Y TẾ - TƯ VẤN & KHÁM BỆNH
+    {
+        "id": "SV001",
+        "name": "Tư vấn tim mạch trực tuyến",
+        "description": "Dịch vụ tư vấn sức khỏe tim mạch với bác sĩ chuyên khoa. Bao gồm đánh giá nguy cơ bệnh tim mạch, tư vấn chế độ dinh dưỡng phòng ngừa, hướng dẫn tập luyện an toàn cho người có vấn đề về tim. Tư vấn trực tuyến tiện lợi, tiết kiệm thời gian.",
+        "category": "y_te",
+        "tags": ["tim mạch", "tư vấn online", "phòng ngừa", "bác sĩ chuyên khoa"],
+        "type": "consultation"
+    },
+    {
+        "id": "SV002",
+        "name": "Khám sức khỏe tổng quát",
+        "description": "Gói khám sức khỏe định kỳ toàn diện bao gồm xét nghiệm máu, siêu âm, đo điện tim, chụp X-quang ngực. Phát hiện sớm các bệnh lý tim mạch, đái tháo đường, ung thư. Kết quả trong 24h với bác sĩ tư vấn trực tiếp.",
+        "category": "y_te",
+        "tags": ["khám tổng quát", "xét nghiệm", "phòng ngừa", "sức khỏe", "định kỳ"],
+        "type": "checkup"
+    },
+    {
+        "id": "SV003",
+        "name": "Tư vấn đái tháo đường",
+        "description": "Chương trình quản lý đái tháo đường toàn diện với bác sĩ nội tiết. Bao gồm hướng dẫn theo dõi đường huyết, kế hoạch ăn uống cho người tiểu đường, tư vấn sử dụng thuốc và insulin, phòng ngừa biến chứng.",
+        "category": "y_te",
+        "tags": ["đái tháo đường", "nội tiết", "đường huyết", "biến chứng", "quản lý bệnh"],
+        "type": "disease_management"
+    },
+    {
+        "id": "SV004",
+        "name": "Tư vấn huyết áp cao",
+        "description": "Chương trình quản lý và điều trị huyết áp cao với bác sĩ tim mạch. Theo dõi huyết áp hàng ngày qua app, tư vấn thuốc, chế độ ăn ít muối, quản lý stress. Giúp kiểm soát huyết áp ổn định, phòng ngừa đột quỵ và suy tim.",
+        "category": "y_te",
+        "tags": ["huyết áp cao", "tim mạch", "quản lý bệnh", "phòng ngừa đột quỵ"],
+        "type": "disease_management"
+    },
+    {
+        "id": "SV005",
+        "name": "Khám phụ khoa định kỳ",
+        "description": "Gói khám phụ khoa toàn diện cho phụ nữ bao gồm siêu âm vú, siêu âm buồng trứng, xét nghiệm PAP, khám lâm sàng. Phát hiện sớm các bệnh lý phụ khoa, u nang, ung thư cổ tử cung. Bác sĩ nữ giàu kinh nghiệm, thân thiện.",
+        "category": "y_te",
+        "tags": ["phụ khoa", "khám phụ nữ", "siêu âm", "phòng ngừa ung thư"],
+        "type": "checkup"
+    },
+    {
+        "id": "SV006",
+        "name": "Tư vấn sức khỏe trẻ em",
+        "description": "Dịch vụ tư vấn sức khỏe và phát triển cho trẻ em từ 0-12 tuổi. Bao gồm tư vấn dinh dưỡng, tiêm chủng, theo dõi phát triển, xử lý các bệnh thường gặp. Bác sĩ nhi khoa giàu kinh nghiệm, tư vấn online hoặc tại nhà.",
+        "category": "y_te",
+        "tags": ["nhi khoa", "trẻ em", "phát triển", "tiêm chủng", "dinh dưỡng trẻ"],
+        "type": "consultation"
+    },
+    {
+        "id": "SV007",
+        "name": "Khám da liễu chuyên sâu",
+        "description": "Khám và điều trị các bệnh da liễu như mụn trứng cá, viêm da, nấm da, vảy nến, zona. Sử dụng công nghệ soi da hiện đại, phân tích tình trạng da chi tiết. Tư vấn liệu trình điều trị phù hợp, hướng dẫn chăm sóc da đúng cách.",
+        "category": "y_te",
+        "tags": ["da liễu", "mụn", "viêm da", "điều trị da", "chăm sóc da"],
+        "type": "consultation"
+    },
+    {
+        "id": "SV008",
+        "name": "Tư vấn tiêu hóa",
+        "description": "Tư vấn và điều trị các bệnh lý đường tiêu hóa như viêm dạ dày, trào ngược, hội chứng ruột kích thích, táo bón mãn tính. Bác sĩ tiêu hóa giàu kinh nghiệm tư vấn chế độ ăn, thuốc điều trị, thay đổi lối sống để cải thiện sức khỏe tiêu hóa.",
+        "category": "y_te",
+        "tags": ["tiêu hóa", "dạ dày", "ruột", "trào ngược", "hội chứng ruột kích thích"],
+        "type": "consultation"
+    },
+    {
+        "id": "SV009",
+        "name": "Khám mắt và đo thị lực",
+        "description": "Khám mắt tổng quát bao gồm đo thị lực, đo nhãn áp, khám đáy mắt, phát hiện các bệnh lý về mắt như cận thị, viễn thị, loạn thị, đục thủy tinh thể, glaucoma. Tư vấn đeo kính hoặc phẫu thuật mắt phù hợp.",
+        "category": "y_te",
+        "tags": ["nhãn khoa", "mắt", "thị lực", "cận thị", "glaucoma"],
+        "type": "checkup"
+    },
+    {
+        "id": "SV010",
+        "name": "Tư vấn cai thuốc lá",
+        "description": "Chương trình cai thuốc lá chuyên nghiệp với sự hỗ trợ của bác sĩ và nhà tâm lý. Bao gồm đánh giá mức độ nghiện, kế hoạch cai từng bước, thuốc hỗ trợ cai nghiện, tư vấn tâm lý vượt qua cơn thèm. Tỷ lệ thành công cao.",
+        "category": "y_te",
+        "tags": ["cai thuốc lá", "nghiện thuốc", "phòng ngừa ung thư", "sức khỏe phổi"],
+        "type": "consultation"
+    },
+    {
+        "id": "SV011",
+        "name": "Khám răng định kỳ",
+        "description": "Khám răng miệng tổng quát bao gồm cạo vôi răng, đánh bóng, kiểm tra sâu răng, viêm nướu. Phát hiện sớm các vấn đề về răng miệng, tư vấn điều trị và cách chăm sóc răng đúng cách. Nha sĩ tay nghề cao, trang thiết bị hiện đại.",
+        "category": "y_te",
+        "tags": ["nha khoa", "răng", "cạo vôi răng", "sâu răng", "vệ sinh răng miệng"],
+        "type": "checkup"
+    },
+    {
+        "id": "SV012",
+        "name": "Tư vấn xương khớp",
+        "description": "Tư vấn và điều trị các bệnh lý xương khớp như viêm khớp, thoái hóa khớp, gout, loãng xương. Bác sĩ chuyên khoa cơ xương khớp đánh giá tình trạng, tư vấn thuốc, vật lý trị liệu, chế độ ăn và vận động phù hợp.",
+        "category": "y_te",
+        "tags": ["xương khớp", "viêm khớp", "thoái hóa", "gout", "loãng xương"],
+        "type": "consultation"
+    },
+    {
+        "id": "SV013",
+        "name": "Khám tai mũi họng",
+        "description": "Khám và điều trị các bệnh lý tai mũi họng như viêm xoang, viêm amidan, polyp mũi, viêm tai giữa, ngạt mũi. Sử dụng nội soi hiện đại, điều trị không đau. Tư vấn phòng ngừa và chăm sóc sức khỏe tai mũi họng.",
+        "category": "y_te",
+        "tags": ["tai mũi họng", "viêm xoang", "viêm amidan", "nội soi", "điều trị tai"],
+        "type": "consultation"
+    },
+    {
+        "id": "SV014",
+        "name": "Tư vấn gan mật",
+        "description": "Tư vấn về sức khỏe gan mật, điều trị các bệnh như gan nhiễm mỡ, viêm gan, xơ gan, sỏi mật. Bao gồm xét nghiệm chức năng gan, siêu âm gan, tư vấn chế độ ăn kiêng, thuốc bảo vệ gan, thay đổi lối sống lành mạnh.",
+        "category": "y_te",
+        "tags": ["gan", "gan nhiễm mỡ", "viêm gan", "xơ gan", "bảo vệ gan"],
+        "type": "consultation"
+    },
+    {
+        "id": "SV015",
+        "name": "Khám tiết niệu",
+        "description": "Khám và điều trị các bệnh lý tiết niệu như viêm bàng quang, sỏi thận, nhiễm trùng tiết niệu, phì đại tuyến tiền liệt. Bác sĩ tiết niệu giàu kinh nghiệm, tư vấn điều trị nội khoa hoặc phẫu thuật phù hợp.",
+        "category": "y_te",
+        "tags": ["tiết niệu", "thận", "bàng quang", "sỏi thận", "tuyến tiền liệt"],
+        "type": "consultation"
+    },
+
+    # TÂM LÝ & SỨC KHỎE TINH THẦN (15 services)
+    {
+        "id": "SV016",
+        "name": "Tâm lý trị liệu căng thẳng",
+        "description": "Liệu trình tâm lý điều trị căng thẳng, lo âu và trầm cảm nhẹ. Sử dụng phương pháp CBT (Cognitive Behavioral Therapy) kết hợp mindfulness. Buổi tư vấn 1-1 với nhà tâm lý lâm sàng có kinh nghiệm, bảo mật tuyệt đối.",
+        "category": "tam_ly",
+        "tags": ["tâm lý", "căng thẳng", "lo âu", "trầm cảm", "CBT", "mindfulness"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV017",
+        "name": "Lớp học thiền định mindfulness",
+        "description": "Khóa học 8 tuần về thiền định chánh niệm (mindfulness) giúp giảm stress, cải thiện tập trung và nâng cao chất lượng giấc ngủ. Hướng dẫn bởi giáo viên có chứng chỉ MBSR. Bài tập thực hành hàng ngày và nhóm hỗ trợ online.",
+        "category": "tam_ly",
+        "tags": ["thiền", "mindfulness", "giảm stress", "tập trung", "giấc ngủ"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV018",
+        "name": "Tư vấn tâm lý gia đình",
+        "description": "Tư vấn tâm lý cho các vấn đề gia đình như mâu thuẫn vợ chồng, xung đột cha mẹ con cái, khủng hoảng hôn nhân. Nhà tâm lý gia đình giúp cải thiện giao tiếp, giải quyết xung đột, xây dựng mối quan hệ gia đình hạnh phúc.",
+        "category": "tam_ly",
+        "tags": ["tâm lý gia đình", "vợ chồng", "nuôi dạy con", "xung đột gia đình"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV019",
+        "name": "Tư vấn tâm lý trẻ em",
+        "description": "Tư vấn tâm lý cho trẻ em và thanh thiếu niên gặp vấn đề về học tập, hành vi, cảm xúc. Xử lý các vấn đề như tự ti, tự kỷ, chậm phát triển, bạo lực học đường. Chuyên gia tâm lý trẻ em giàu kinh nghiệm, phương pháp vui chơi trị liệu.",
+        "category": "tam_ly",
+        "tags": ["tâm lý trẻ em", "vấn đề hành vi", "học tập", "tự kỷ", "chậm phát triển"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV020",
+        "name": "Trị liệu lo âu xã hội",
+        "description": "Chương trình điều trị lo âu xã hội, sợ giao tiếp, sợ nói trước đám đông. Sử dụng kỹ thuật CBT, exposure therapy, kỹ năng giao tiếp. Giúp tăng tự tin, cải thiện kỹ năng xã hội, vượt qua nỗi sợ giao tiếp.",
+        "category": "tam_ly",
+        "tags": ["lo âu xã hội", "sợ giao tiếp", "tự tin", "kỹ năng xã hội", "CBT"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV021",
+        "name": "Tư vấn trầm cảm",
+        "description": "Tư vấn và điều trị trầm cảm với nhà tâm lý lâm sàng. Đánh giá mức độ trầm cảm, tư vấn liệu trình điều trị phù hợp kết hợp thuốc và tâm lý trị liệu. Theo dõi tiến độ hàng tuần, hỗ trợ 24/7 khi cần thiết.",
+        "category": "tam_ly",
+        "tags": ["trầm cảm", "suy nhược tinh thần", "điều trị tâm lý", "hỗ trợ cảm xúc"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV022",
+        "name": "Quản lý cơn giận",
+        "description": "Chương trình quản lý cơn giận và cảm xúc tiêu cực. Học cách nhận biết trigger, kỹ thuật kiểm soát cảm xúc, giao tiếp hiệu quả khi tức giận. Phù hợp cho người hay nổi giận, bạo lực gia đình, vấn đề kiểm soát cảm xúc.",
+        "category": "tam_ly",
+        "tags": ["quản lý giận dữ", "kiểm soát cảm xúc", "bạo lực", "giao tiếp"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV023",
+        "name": "Tư vấn nghiện game và mạng xã hội",
+        "description": "Tư vấn và điều trị nghiện game, nghiện internet, nghiện mạng xã hội. Đánh giá mức độ nghiện, kế hoạch cai nghiện từng bước, hỗ trợ tâm lý vượt qua thời kỳ khó khăn. Giúp cân bằng lại cuộc sống, tập trung vào học tập và công việc.",
+        "category": "tam_ly",
+        "tags": ["nghiện game", "nghiện internet", "mạng xã hội", "cai nghiện", "quản lý thời gian"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV024",
+        "name": "Tư vấn hôn nhân trước kết hôn",
+        "description": "Tư vấn cho các cặp đôi chuẩn bị kết hôn về kỹ năng giao tiếp, quản lý tài chính gia đình, xử lý xung đột, kế hoạch sinh con. Giúp xây dựng nền tảng vững chắc cho hôn nhân hạnh phúc, giảm nguy cơ ly hôn.",
+        "category": "tam_ly",
+        "tags": ["tư vấn hôn nhân", "chuẩn bị kết hôn", "kỹ năng vợ chồng", "gia đình"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV025",
+        "name": "Trị liệu chấn thương tâm lý",
+        "description": "Điều trị chấn thương tâm lý (trauma) sau tai nạn, bạo lực, lạm dụng, mất mát người thân. Sử dụng EMDR (Eye Movement Desensitization and Reprocessing), trauma-focused CBT. Giúp hồi phục tâm lý, vượt qua nỗi đau.",
+        "category": "tam_ly",
+        "tags": ["chấn thương tâm lý", "trauma", "EMDR", "PTSD", "hồi phục tinh thần"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV026",
+        "name": "Tư vấn rối loạn ăn uống",
+        "description": "Tư vấn và điều trị các rối loạn ăn uống như anorexia, bulimia, binge eating. Kết hợp tâm lý trị liệu và tư vấn dinh dưỡng. Giúp xây dựng lại mối quan hệ lành mạnh với thức ăn, hình ảnh cơ thể tích cực.",
+        "category": "tam_ly",
+        "tags": ["rối loạn ăn uống", "anorexia", "bulimia", "hình ảnh cơ thể", "tâm lý"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV027",
+        "name": "Nhóm hỗ trợ tâm lý",
+        "description": "Các nhóm hỗ trợ tâm lý cho người gặp vấn đề tương tự như trầm cảm, lo âu, mất mát, nghiện ngập. Chia sẻ kinh nghiệm, học hỏi lẫn nhau, tạo mạng lưới hỗ trợ. Điều hành bởi nhà tâm lý chuyên nghiệp.",
+        "category": "tam_ly",
+        "tags": ["nhóm hỗ trợ", "chia sẻ", "cộng đồng", "hỗ trợ lẫn nhau", "tâm lý"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV028",
+        "name": "Coaching phát triển bản thân",
+        "description": "Coaching cá nhân giúp phát triển bản thân, đạt mục tiêu nghề nghiệp và cuộc sống. Xây dựng kế hoạch hành động, vượt qua rào cản, phát triển kỹ năng lãnh đạo. Coach chuyên nghiệp, phương pháp khoa học.",
+        "category": "tam_ly",
+        "tags": ["coaching", "phát triển bản thân", "mục tiêu", "lãnh đạo", "thành công"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV029",
+        "name": "Tư vấn nghề nghiệp",
+        "description": "Tư vấn định hướng nghề nghiệp, chuyển đổi nghề nghiệp, phát triển sự nghiệp. Đánh giá năng lực, sở thích, phân tích thị trường lao động, xây dựng kế hoạch phát triển nghề nghiệp dài hạn.",
+        "category": "tam_ly",
+        "tags": ["nghề nghiệp", "định hướng", "chuyển đổi nghề", "phát triển sự nghiệp"],
+        "type": "mental_health"
+    },
+    {
+        "id": "SV030",
+        "name": "Tư vấn cân bằng công việc cuộc sống",
+        "description": "Tư vấn giúp cân bằng giữa công việc và cuộc sống cá nhân, phòng ngừa burnout. Học cách quản lý thời gian, ưu tiên công việc, thiết lập ranh giới, chăm sóc bản thân. Phù hợp cho người làm việc nhiều, stress cao.",
+        "category": "tam_ly",
+        "tags": ["work-life balance", "burnout", "quản lý thời gian", "stress công việc"],
+        "type": "mental_health"
+    },
+
+    # THỂ THAO & VẬN ĐỘNG (20 services)
+    {
+        "id": "SV031",
+        "name": "Chương trình Yoga trị liệu",
+        "description": "Khóa học Yoga chuyên biệt dành cho người có vấn đề về cột sống, đau lưng mãn tính. Bài tập được thiết kế bởi chuyên gia vật lý trị liệu kết hợp giáo viên Yoga có chứng chỉ quốc tế. Giúp giảm đau, tăng cường sức mạnh cơ bắp và cải thiện tư thế.",
+        "category": "the_thao",
+        "tags": ["yoga", "phục hồi chức năng", "đau lưng", "cột sống", "trị liệu"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV032",
+        "name": "Chương trình gym cá nhân hóa",
+        "description": "Lịch tập gym được thiết kế riêng theo mục tiêu (tăng cơ, giảm mỡ, tăng sức bền). Bao gồm buổi đánh giá thể lực ban đầu, lịch tập chi tiết 12 tuần, video hướng dẫn động tác, theo dõi tiến độ với huấn luyện viên cá nhân.",
+        "category": "the_thao",
+        "tags": ["gym", "tăng cơ", "giảm mỡ", "huấn luyện viên", "cá nhân hóa"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV033",
+        "name": "Lớp Pilates cải thiện tư thế",
+        "description": "Khóa học Pilates tập trung vào core, cải thiện tư thế, tăng sự linh hoạt. Phù hợp cho người làm văn phòng, tư thế xấu, đau cổ vai gáy. Giáo viên Pilates chứng chỉ quốc tế, lớp học nhỏ, chú ý từng học viên.",
+        "category": "the_thao",
+        "tags": ["pilates", "tư thế", "core", "linh hoạt", "văn phòng"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV034",
+        "name": "Chạy bộ cùng huấn luyện viên",
+        "description": "Chương trình chạy bộ từ cơ bản đến nâng cao với huấn luyện viên chạy bộ chuyên nghiệp. Lịch tập phù hợp với mọi trình độ, kỹ thuật chạy đúng cách, phòng tránh chấn thương. Chuẩn bị cho các giải chạy marathon.",
+        "category": "the_thao",
+        "tags": ["chạy bộ", "marathon", "cardio", "huấn luyện viên", "sức bền"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV035",
+        "name": "Bơi lội trị liệu",
+        "description": "Khóa học bơi lội trị liệu dành cho người chấn thương, phục hồi sau phẫu thuật, người cao tuổi. Bơi lội nhẹ nhàng, không tác động mạnh lên khớp. Giúp tăng sức mạnh cơ, cải thiện hô hấp, giảm đau khớp.",
+        "category": "the_thao",
+        "tags": ["bơi lội", "trị liệu", "phục hồi", "khớp", "người cao tuổi"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV036",
+        "name": "Kickboxing giảm stress",
+        "description": "Lớp kickboxing kết hợp cardio và giải tỏa stress. Đốt cháy calo hiệu quả, tăng sức mạnh, sự linh hoạt và phản xạ. Phù hợp cho người muốn giảm cân, tăng cường thể lực và giải tỏa căng thẳng sau giờ làm việc.",
+        "category": "the_thao",
+        "tags": ["kickboxing", "cardio", "giảm stress", "giảm cân", "tự vệ"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV037",
+        "name": "Yoga buổi sáng online",
+        "description": "Lớp yoga online mỗi sáng giúp bắt đầu ngày tràn đầy năng lượng. Các bài tập kéo giãn, thở, hạ huyết áp. Phù hợp cho người bận rộn, tập tại nhà. Giáo viên yoga trực tiếp hướng dẫn qua zoom.",
+        "category": "the_thao",
+        "tags": ["yoga", "buổi sáng", "online", "năng lượng", "kéo giãn"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV038",
+        "name": "CrossFit cho người mới bắt đầu",
+        "description": "Chương trình CrossFit dành cho người mới, tập trung vào functional fitness. Kết hợp cardio, sức mạnh, sự linh hoạt. Lớp học nhỏ, coach chú ý từng người, điều chỉnh bài tập phù hợp. Tăng thể lực toàn diện.",
+        "category": "the_thao",
+        "tags": ["crossfit", "functional fitness", "sức mạnh", "cardio", "người mới"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV039",
+        "name": "Đạp xe ngoài trời",
+        "description": "Nhóm đạp xe ngoài trời cuối tuần, khám phá các cung đường đẹp. Phù hợp cho mọi trình độ từ cơ bản đến nâng cao. Cải thiện sức khỏe tim mạch, đốt cháy calo, kết nối với thiên nhiên và cộng đồng yêu xe đạp.",
+        "category": "the_thao",
+        "tags": ["đạp xe", "ngoài trời", "cardio", "cộng đồng", "thiên nhiên"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV040",
+        "name": "Yoga cho bà bầu",
+        "description": "Lớp yoga dành riêng cho phụ nữ mang thai, giúp giảm đau lưng, chuẩn bị cho sinh nở. Các bài tập an toàn cho mẹ và bé, cải thiện hô hấp, giảm căng thẳng. Giáo viên được đào tạo chuyên sâu về yoga tiền sản.",
+        "category": "the_thao",
+        "tags": ["yoga", "bà bầu", "mang thai", "sinh nở", "tiền sản"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV041",
+        "name": "Aerobic giảm cân",
+        "description": "Lớp aerobic vui nhộn, âm nhạc sôi động giúp giảm cân hiệu quả. Đốt cháy 500-700 calo mỗi buổi, cải thiện sức khỏe tim mạch, tăng sự dẻo dai. Phù hợp cho mọi lứa tuổi, không cần kinh nghiệm.",
+        "category": "the_thao",
+        "tags": ["aerobic", "giảm cân", "cardio", "đốt calo", "vui nhộn"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV042",
+        "name": "Bơi lội cơ bản cho người lớn",
+        "description": "Khóa học bơi lội dành cho người lớn chưa biết bơi. Từ làm quen với nước đến bơi thành thạo 4 kiểu. Huấn luyện viên kiên nhẫn, lớp nhỏ, hồ bơi riêng. Vượt qua nỗi sợ nước, học kỹ năng sinh tồn quan trọng.",
+        "category": "the_thao",
+        "tags": ["bơi lội", "người lớn", "cơ bản", "học bơi", "kỹ năng sinh tồn"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV043",
+        "name": "Thể dục dụng cụ cho trẻ",
+        "description": "Lớp thể dục dụng cụ cho trẻ 4-12 tuổi, phát triển thể chất toàn diện. Tăng sự linh hoạt, sức mạnh, sự cân bằng. Giúp trẻ tự tin, kỷ luật, làm việc nhóm. Huấn luyện viên giàu kinh nghiệm, môi trường an toàn.",
+        "category": "the_thao",
+        "tags": ["thể dục dụng cụ", "trẻ em", "phát triển thể chất", "linh hoạt"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV044",
+        "name": "Zumba dance fitness",
+        "description": "Lớp Zumba kết hợp nhảy và fitness, âm nhạc Latin sôi động. Đốt cháy calo cao, cải thiện điệu nhịp, giảm stress. Không cần biết nhảy, dễ theo, vui vẻ. Phù hợp cho người muốn giảm cân theo cách thú vị.",
+        "category": "the_thao",
+        "tags": ["zumba", "nhảy", "giảm cân", "vui vẻ", "fitness"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV045",
+        "name": "Leo núi cuối tuần",
+        "description": "Nhóm leo núi cuối tuần, chinh phục các đỉnh núi đẹp. Tăng sức bền, sức mạnh chân, thưởng thức thiên nhiên. Hướng dẫn viên giàu kinh nghiệm, thiết bị an toàn đầy đủ. Phù hợp cho người yêu thiên nhiên và thử thách.",
+        "category": "the_thao",
+        "tags": ["leo núi", "trekking", "ngoài trời", "thiên nhiên", "sức bền"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV046",
+        "name": "Võ thuật tự vệ cho phụ nữ",
+        "description": "Khóa học võ thuật tự vệ dành riêng cho phụ nữ. Học các kỹ thuật tự vệ đơn giản nhưng hiệu quả, tăng tự tin, nhận thức về an toàn. Huấn luyện viên nữ giàu kinh nghiệm, môi trường thân thiện.",
+        "category": "the_thao",
+        "tags": ["võ thuật", "tự vệ", "phụ nữ", "an toàn", "tự tin"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV047",
+        "name": "Stretching & flexibility",
+        "description": "Lớp kéo giãn và tăng sự linh hoạt, giảm đau cơ, phòng ngừa chấn thương. Phù hợp sau tập luyện, cho người ngồi nhiều, hoặc muốn cải thiện phạm vi chuyển động. Bài tập nhẹ nhàng, thư giãn.",
+        "category": "the_thao",
+        "tags": ["stretching", "kéo giãn", "linh hoạt", "giảm đau", "thư giãn"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV048",
+        "name": "TRX suspension training",
+        "description": "Lớp TRX sử dụng dây đeo tập luyện toàn thân. Tăng sức mạnh cơ, core, sự cân bằng. Điều chỉnh độ khó phù hợp mọi trình độ. Hiệu quả cao, ít tác động lên khớp, phù hợp cho không gian nhỏ.",
+        "category": "the_thao",
+        "tags": ["TRX", "suspension training", "sức mạnh", "core", "cân bằng"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV049",
+        "name": "Thể dục người cao tuổi",
+        "description": "Chương trình thể dục nhẹ nhàng dành cho người cao tuổi, tập trung vào sự linh hoạt, cân bằng, phòng ngừa té ngã. Cải thiện sức khỏe tim mạch, xương khớp, duy trì độc lập. Huấn luyện viên hiểu sinh lý người cao tuổi.",
+        "category": "the_thao",
+        "tags": ["người cao tuổi", "thể dục nhẹ", "cân bằng", "phòng ngừa té ngã"],
+        "type": "exercise"
+    },
+    {
+        "id": "SV050",
+        "name": "HIIT training giảm mỡ",
+        "description": "High Intensity Interval Training đốt cháy mỡ nhanh chóng. Tập ngắn (30-45 phút) nhưng hiệu quả cao. Tăng trao đổi chất, giữ cơ bắp, giảm mỡ. Phù hợp cho người bận rộn muốn giảm cân hiệu quả.",
+        "category": "the_thao",
+        "tags": ["HIIT", "giảm mỡ", "tăng trao đổi chất", "hiệu quả cao", "tiết kiệm thời gian"],
+        "type": "exercise"
+    },
+
+    # DINH DƯỠNG (15 services)
+    {
+        "id": "SV051",
+        "name": "Tư vấn dinh dưỡng cá nhân hóa",
+        "description": "Chương trình tư vấn dinh dưỡng riêng biệt dựa trên tình trạng sức khỏe, mục tiêu cá nhân và phong cách sống. Bao gồm phân tích thành phần cơ thể, lập kế hoạch ăn uống chi tiết, theo dõi tiến độ hàng tuần với chuyên gia dinh dưỡng.",
+        "category": "dinh_duong",
+        "tags": ["dinh dưỡng", "giảm cân", "tăng cân", "cá nhân hóa", "chuyên gia"],
+        "type": "nutrition"
+    },
+    {
+        "id": "SV052",
+        "name": "Kế hoạch ăn kiêng Keto",
+        "description": "Chương trình ăn kiêng Keto (low-carb, high-fat) được cá nhân hóa để giảm cân và cải thiện sức khỏe chuyển hóa. Bao gồm thực đơn 30 ngày, công thức nấu ăn, danh sách mua sắm, và hướng dẫn chuyển đổi an toàn vào chế độ Keto.",
+        "category": "dinh_duong",
+        "tags": ["keto", "low-carb", "giảm cân", "chuyển hóa", "thực đơn"],
+        "type": "nutrition"
+    },
+    {
+        "id": "SV053",
+        "name": "Thực đơn ăn chay khoa học",
+        "description": "Kế hoạch ăn chay/thuần chay cân bằng dinh dưỡng, đủ protein, vitamin B12, sắt, canxi. Thực đơn đa dạng, ngon miệng, dễ thực hiện. Phù hợp cho người ăn chay, muốn chuyển sang ăn chay, hoặc giảm tiêu thụ thịt.",
+        "category": "dinh_duong",
+        "tags": ["ăn chay", "thuần chay", "vegan", "protein thực vật", "cân bằng dinh dưỡng"],
+        "type": "nutrition"
+    },
+    {
+        "id": "SV054",
+        "name": "Dinh dưỡng tăng cơ",
+        "description": "Kế hoạch dinh dưỡng cho người tập gym muốn tăng cơ. Tính toán lượng protein, carb, fat phù hợp, thực đơn meal prep, thời điểm ăn tối ưu. Kết hợp với lịch tập để tối đa hóa tăng cơ, giảm mỡ.",
+        "category": "dinh_duong",
+        "tags": ["tăng cơ", "gym", "protein", "meal prep", "thực đơn tăng cơ"],
+        "type": "nutrition"
+    },
+    {
+        "id": "SV055",
+        "name": "Thực đơn cho người tiểu đường",
+        "description": "Kế hoạch ăn uống khoa học cho người đái tháo đường type 1 và 2. Kiểm soát đường huyết, chỉ số GI thấp, cân bằng dinh dưỡng. Thực đơn ngon miệng, dễ làm, phòng ngừa biến chứng. Tư vấn bởi chuyên gia dinh dưỡng.",
+        "category": "dinh_duong",
+        "tags": ["tiểu đường", "đái tháo đường", "đường huyết", "GI thấp", "biến chứng"],
+        "type": "nutrition"
+    },
+    {
+        "id": "SV056",
+        "name": "Dinh dưỡng cho bà bầu",
+        "description": "Kế hoạch dinh dưỡng toàn diện cho phụ nữ mang thai. Đủ chất dinh dưỡng cho mẹ và bé, kiểm soát cân nặng hợp lý, phòng ngừa thiếu máu, táo bón. Thực đơn theo từng giai đoạn thai kỳ.",
+        "category": "dinh_duong",
+        "tags": ["bà bầu", "mang thai", "dinh dưỡng thai kỳ", "mẹ và bé", "tiền sản"],
+        "type": "nutrition"
+    },
+    {
+        "id": "SV057",
+        "name": "Thực đơn giảm cholesterol",
+        "description": "Kế hoạch ăn uống giúp giảm cholesterol xấu (LDL), tăng cholesterol tốt (HDL). Tập trung vào chất xơ, omega-3, hạn chế chất béo bão hòa. Phòng ngừa bệnh tim mạch, xơ vữa động mạch.",
+        "category": "dinh_duong",
+        "tags": ["cholesterol", "tim mạch", "omega-3", "chất xơ", "phòng ngừa"],
+        "type": "nutrition"
+    },
+    {
+        "id": "SV058",
+        "name": "Intermittent fasting coaching",
+        "description": "Hướng dẫn nhịn ăn gián đoạn (IF) an toàn và hiệu quả. Các phương pháp 16/8, 5:2, eat-stop-eat. Tư vấn thời gian ăn, thực đơn, xử lý cơn đói. Giảm cân, cải thiện trao đổi chất, tăng tuổi thọ.",
+        "category": "dinh_duong",
+        "tags": ["intermittent fasting", "nhịn ăn gián đoạn", "giảm cân", "trao đổi chất"],
+        "type": "nutrition"
+    },
+    {
+        "id": "SV059",
+        "name": "Dinh dưỡng cho vận động viên",
+        "description": "Kế hoạch dinh dưỡng chuyên nghiệp cho vận động viên và người tập luyện cường độ cao. Tối ưu hóa hiệu suất, phục hồi nhanh, phòng ngừa chấn thương. Thực đơn trước/trong/sau thi đấu.",
+        "category": "dinh_duong",
+        "tags": ["vận động viên", "hiệu suất", "phục hồi", "sports nutrition"],
+        "type": "nutrition"
+    },
+    {
+        "id": "SV060",
+        "name": "Thực đơn Mediterranean diet",
+        "description": "Chế độ ăn Địa Trung Hải - một trong những chế độ ăn lành mạnh nhất thế giới. Nhiều rau củ, cá, dầu ô liu, ngũ cốc nguyên hạt. Giảm nguy cơ tim mạch, tiểu đường, tăng tuổi thọ. Thực đơn ngon, dễ làm.",
+        "category": "dinh_duong",
+        "tags": ["Mediterranean diet", "ăn uống lành mạnh", "tim mạch", "tuổi thọ"],
+        "type": "nutrition"
+    }
+]
+
+with open(os.path.join(settings.RAW_DATA_DIR, "services.json"), "w", encoding='utf8') as file:
+	json.dump(sample_services, file, ensure_ascii=False, indent=4)
+   
+print("Created sample services at", os.path.join(settings.RAW_DATA_DIR, "services.json"))
+
+# for sample_service in sample_services:
+#     print(sample_service["id"])

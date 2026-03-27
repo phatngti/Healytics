@@ -1,0 +1,13 @@
+export 'header/employee_avatar_section.dart';
+export 'employee_badges_strength.dart';
+export 'contact/employee_contact_card.dart';
+export 'contact/employee_contact_item.dart';
+export 'header/employee_header_card.dart';
+export 'contact/employee_notes_card.dart';
+export 'details_infonmation/employee_operational_card.dart';
+export 'header/employee_role_branch_section.dart';
+export 'employee_schedule_section.dart';
+export 'employee_services_section.dart';
+export 'employee_skill_cloud.dart';
+export 'details_infonmation/employee_skills_card.dart';
+export 'header/employee_stats_actions_section.dart';

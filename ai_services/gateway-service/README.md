@@ -1,0 +1,375 @@
+## 📁 Cấu trúc thư mục
+
+```
+gateway-service/
+│
+├── app/
+│   │
+│   ├── 6th - main.py                      # FastAPI app entrypoint, include routers, middleware
+│   │
+│   ├── 5th - api/                         # Layer 1 - HTTP Controllers
+│   │   ├── chatbot_routes.py        # POST /chat/stream  (SSE endpoint)
+│   │   ├── recommender_routes.py    # POST /recommender/home + /recommender/chatbot
+│   │   ├── ner_routes.py            # POST /ner/extract  (proxy NER service — debug only, tạm giữ)
+│   │   ├── prefilter_routes.py      # POST /prefilter/search ⭐ NEW
+│   │   └── health_routes.py         # GET /health
+│   │
+│   ├── 4th - orchestrators/               # Layer 2 - Business Flow
+│   │   ├── chatbot_orchestrator.py  # Điều phối LLM + NER + Recommender + DB + SSE
+│   │   ├── recommendation_orchestrator.py # Logic orchestration + MOCK_SERVICES data
+│   │   └── prefilter_orchestrator.py # ⭐ NEW: NER → Query Build → Filter services
+│   │
+│   ├── 3rd - clients/                     # Layer 3 - HTTP client gọi microservices
+│   │   ├── chatbot_client.py        # Gọi chatbot-service
+│   │   ├── recommender_client.py    # Gọi recommender-service
+│   │   └── ner_client.py            # Gọi ner-service
+│   │
+│   ├── repositories/                # Layer 4 - DB access
+│   │   ├── conversation_repo.py     # CRUD conversation
+│   │   ├── message_repo.py          # CRUD message
+│   │   └── service_repo.py          # Cache service metadata (optional)
+│   │
+│   ├── 2nd - schemas/                     # Pydantic models (Request/Response/Event)
+│   │   ├── chatbot_schema.py        # ChatRequest + SSE event schemas
+│   │   ├── recommender_schema.py    # Home + Chatbot recommender request/response
+│   │   ├── ner_schema.py            # NerEntity (+ normalized fields) + PreFilterRequest/Response
+│   │   └── common_schema.py         # shared models (User, Price, Rating...)
+│   │
+│   ├── 1st - core/                        # System-level utilities
+│   │   ├── config.py                # ENV config (URLs of services, timeout)
+│   │   ├── sse.py                   # format_sse(event, data)
+│   │   ├── enums.py                 # Error codes, message status
+│   │   └── middleware.py            # Xử lý trước sau mỗi request → Hiện chưa cần làm
+│   │
+│   └── utils/
+│       ├── query_builder.py         # ⭐ NEW: NER entities → query params + mock filter
+│       ├── logger.py                # structured logging
+│       └── exceptions.py            # custom exception classes
+│
+├── tests/                           # Unit + integration test
+│
+├── Dockerfile                       # Build gateway image
+├── requirements.txt
+└── docker-compose.yml               # Orchestrate 3 services
+```
+
+---
+
+## ⭐ Pre-Filter Service (NEW)
+
+Pipeline: **text → NER extract → build query → filter services → return candidates**
+
+NER service chạy nội bộ — không expose NER response ra ngoài.
+Endpoint `/ner/extract` trên gateway chỉ là proxy debug, tạm giữ.
+
+### `POST /prefilter/search`
+
+**Request:**
+```json
+{"text": "Tìm spa ở Hà Nội giá dưới 500k trên 4 sao", "limit": 50}
+```
+
+**Response:**
+```json
+{
+  "text": "Tìm spa ở Hà Nội giá dưới 500k trên 4 sao",
+  "entities": [
+    {"type": "BUSINESS_TYPE", "value": "spa", "business_type": "SPA_BEAUTY", "confidence": 0.9},
+    {"type": "LOCATION", "value": "Hà Nội", "location_code": "01", "location_level": "PROVINCE", "confidence": 0.85},
+    {"type": "PRICE", "value": "dưới 500k", "operator": "lte", "amount": 500000.0, "confidence": 1.0},
+    {"type": "RATING", "value": "trên 4 sao", "operator": "gte", "amount": 4.0, "confidence": 1.0}
+  ],
+  "query_params": {
+    "businessType": "SPA_BEAUTY",
+    "locationCode": "01",
+    "locationLevel": "PROVINCE",
+    "maxPrice": 500000.0,
+    "minRating": 4.0,
+    "limit": 50
+  },
+  "candidates": [ ... ],
+  "total": 5
+}
+```
+
+### Pipeline chi tiết
+
+```
+User text
+  │
+  ▼
+NER Service (internal call via NERClient)
+  → entities: BUSINESS_TYPE, LOCATION, PRICE, RATING, CATEGORY
+  │
+  ▼
+query_builder.build_backend_query(entities)
+  → {businessType, locationCode, maxPrice, minRating, limit}
+  │
+  ▼
+query_builder.filter_mock_services(query, MOCK_SERVICES)
+  → filtered list of services
+  │
+  ▼
+PreFilterResponse (entities + query_params + candidates)
+```
+
+> **TODO:** Khi backend có `GET /v1/health-services/search`, thay `filter_mock_services()` bằng backend API call trong `prefilter_orchestrator.py`.
+
+---
+
+
+## Bàn giao công việc cho NGUYÊN
+# Công việc 1:
+===============================
+REPOSITORIES LAYER SPECIFICATION
+Gateway Service - DB Access Layer
+===============================
+
+MỤC TIÊU
+--------
+
+Repositories layer chịu trách nhiệm:
+- Tất cả thao tác với database
+- Không chứa business logic
+- Không chứa HTTP logic
+- Không chứa orchestration logic
+
+Chỉ làm nhiệm vụ CRUD cho:
+- Conversation
+- Message
+
+Orchestrator sẽ gọi các hàm trong repositories.
+Repositories không được gọi ngược lên orchestrator.
+
+
+========================================
+I. DATABASE MODELING (MINIMAL VERSION)
+========================================
+
+1) conversation table
+
+Fields:
+- id (string / uuid) PRIMARY KEY
+- user_id (string) NULLABLE
+- created_at (timestamp)
+- updated_at (timestamp)
+
+Relationship:
+1 conversation -> many messages
+
+
+2) message table
+
+Fields:
+- id (string / uuid) PRIMARY KEY
+- conversation_id (string) FOREIGN KEY -> conversation.id
+- role (string)  # "user" | "assistant"
+- content (text)
+- created_at (timestamp)
+
+
+
+========================================
+II. FOLDER STRUCTURE
+========================================
+
+repositories/
+    conversation_repo.py
+    message_repo.py
+
+
+========================================
+III. REQUIRED FUNCTIONS
+========================================
+
+
+----------------------------------------
+1) conversation_repo.py
+----------------------------------------
+
+Purpose:
+Manage conversation entity.
+
+
+Functions to implement:
+
+
+async def get_conversation_by_id(session, conversation_id: str):
+    """
+    Return conversation object or None
+    """
+
+
+async def create_conversation(session, conversation_id: str, user_id: str | None):
+    """
+    Create new conversation
+    Return created object
+    """
+
+
+async def get_or_create_conversation(session, conversation_id: str, user_id: str | None):
+    """
+    If exists -> return
+    Else -> create and return
+    """
+
+
+----------------------------------------
+2) message_repo.py
+----------------------------------------
+
+Purpose:
+Manage message entity.
+
+
+async def create_message(
+    session,
+    conversation_id: str,
+    role: str,
+    content: str
+):
+    """
+    Insert new message.
+    Return created message object.
+    """
+
+
+async def get_messages_by_conversation(
+    session,
+    conversation_id: str,
+    limit: int | None = None
+):
+    """
+    Return list of messages ordered by created_at ASC
+    """
+
+
+
+========================================
+IV. HOW ORCHESTRATOR WILL USE THIS
+========================================
+
+Example Flow:
+
+1) User sends message
+2) Orchestrator:
+
+    conversation = await conversation_repo.get_or_create_conversation(...)
+
+    user_msg = await message_repo.create_message(
+        session,
+        conversation_id=conversation.id,
+        role="user",
+        content=request.message
+    )
+
+3) LLM streaming finishes
+
+    assistant_msg = await message_repo.create_message(
+        session,
+        conversation_id=conversation.id,
+        role="assistant",
+        content=full_llm_response
+    )
+
+
+
+========================================
+VI. IMPORTANT DESIGN RULES
+========================================
+
+1) No business logic in repository
+2) No HTTP logicNguyên nhớ 
+3) No try/except swallowing errors silently
+4) Keep functions small and atomic
+5) Repository returns DB model
+
+
+========================================
+VII. MINIMAL SUCCESS CRITERIA
+========================================
+
+✔ Can create conversation
+✔ Can create user message
+✔ Can create assistant message
+✔ Can query conversation history
+
+That is enough for Phase 1 implementation.
+
+
+END OF SPEC
+
+
+========================================
+VIII. DATABASE SESSION — HOW IT WORKS
+========================================
+
+Common question: Is the session passed automatically?
+
+NO. FastAPI injects the session automatically into the endpoint function,
+but from there you must pass it down manually through each layer.
+
+
+Flow:
+
+    FastAPI request
+        │
+        ▼
+    Endpoint function
+        db: AsyncSession = Depends(get_db)
+        │   ↑ FastAPI creates and injects this automatically.
+        │     get_db commits on success, rolls back on error.
+        ▼
+    Orchestrator(session=db, ...)
+        │   ↑ You pass the session manually to the orchestrator.
+        │
+        ├── conversation_repo.get_or_create_conversation(db, ...)
+        ├── message_repo.create_message(db, ...)
+        └── message_repo.create_message(db, ...)
+            ↑ Repos receive session as a plain argument.
+
+
+Example endpoint:
+
+    @router.post("/chat/stream")
+    async def chat_stream(
+        request: ChatRequest,
+        db: AsyncSession = Depends(get_db),  # ← injected automatically by FastAPI
+    ):
+        return await chatbot_orchestrator.run(db, request)  # ← passed manually
+
+
+Example orchestrator:
+
+    async def run(session: AsyncSession, request: ChatRequest):
+        conv = await conversation_repo.get_or_create_conversation(
+            session, request.conversation_id, request.user_id
+        )
+        user_msg = await message_repo.create_message(
+            session,
+            conversation_id=conv.id,
+            role="user",
+            content=request.message,
+        )
+        # ... call LLM, stream response ...
+        await message_repo.create_message(
+            session,
+            conversation_id=conv.id,
+            role="assistant",
+            content=full_response,
+        )
+
+
+Why pass it manually?
+
+    All repo calls within one request share the same session
+    = the same transaction. If any step fails, get_db rolls
+    back everything — no partial writes are left committed.
+
+Important rules:
+
+    - Repos only call session.flush()  → writes to DB inside the transaction,
+      does NOT commit.
+    - The commit() is handled by get_db after the endpoint returns successfully.
+    - Never call session.commit() inside a repo.
+

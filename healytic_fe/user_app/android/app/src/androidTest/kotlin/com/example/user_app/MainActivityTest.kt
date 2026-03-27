@@ -1,0 +1,31 @@
+package com.example.user_app
+
+import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.junit.runners.Parameterized.Parameters
+import pl.leancode.patrol.PatrolJUnitRunner
+
+@RunWith(Parameterized::class)
+class MainActivityTest(private val dartTestName: String) {
+
+    companion object {
+        @JvmStatic
+        @Parameters(name = "{0}")
+        fun testCases(): Array<Any> {
+            val instrumentation = InstrumentationRegistry.getInstrumentation()
+            val runner = instrumentation as PatrolJUnitRunner
+            runner.setUp(MainActivity::class.java)
+            runner.waitForPatrolAppService()
+            return runner.listDartTests()
+        }
+    }
+
+    @Test
+    fun runDartTest() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val runner = instrumentation as PatrolJUnitRunner
+        runner.runDartTest(dartTestName)
+    }
+}

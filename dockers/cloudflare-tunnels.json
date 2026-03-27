@@ -1,0 +1,21 @@
+{
+  "tunnels": [
+    {
+      "name": "healytics-tunnel",
+      "token": "",
+      "routes": [
+        {
+          "hostname": "healytics.me",
+          "origin": "http://kong-cp:8000"
+        },
+        {
+          "hostname": "database.healytics.me",
+          "origin": "tcp://host.docker.internal:5432",
+          "originRequest": {
+            "noTLSVerify": true
+          }
+        }
+      ]
+    }
+  ]
+}

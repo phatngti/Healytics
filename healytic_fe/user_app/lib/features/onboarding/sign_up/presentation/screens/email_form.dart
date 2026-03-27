@@ -4,12 +4,13 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:user_app/features/common/button/button.dart';
-import 'package:user_app/features/common/field/text_field.dart';
-import 'package:user_app/features/common/toast.dart';
+import 'package:common/widgets/button/button.dart';
+import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:common/widgets/toast.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/router/routes.dart';
-import 'package:user_app/utils/demensions.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/utils/device.dart';
 
 class EmailFormScreen extends HookConsumerWidget {
@@ -48,18 +49,20 @@ class EmailFormScreen extends HookConsumerWidget {
     useListenable(emailController);
 
     // 2. QUAN TRỌNG: Logic sync dữ liệu từ Provider vào Controller (giữ nguyên của bạn)
-    useEffect(() {
-      final newValue =
-          (asyncState.hasValue ? asyncState.requireValue.user?.email : null) ??
-          '';
-      if (emailController.text != newValue) {
-        emailController.value = emailController.value.copyWith(
-          text: newValue,
-          selection: TextSelection.collapsed(offset: newValue.length),
-        );
-      }
-      return null;
-    }, [asyncState.hasValue ? asyncState.requireValue.user?.email : null]);
+    // 2. LOGIC SYNC: Removed to prevent resetting value while typing.
+    // Initial value is handled by useTextEditingController.
+    // useEffect(() {
+    //   final newValue =
+    //       (asyncState.hasValue ? asyncState.requireValue.user?.email : null) ??
+    //       '';
+    //   if (emailController.text != newValue) {
+    //     emailController.value = emailController.value.copyWith(
+    //       text: newValue,
+    //       selection: TextSelection.collapsed(offset: newValue.length),
+    //     );
+    //   }
+    //   return null;
+    // }, [asyncState.hasValue ? asyncState.requireValue.user?.email : null]);
 
     Future<void> submit() async {
       if (formKey.currentState?.saveAndValidate() ?? false) {
@@ -126,11 +129,14 @@ class EmailFormScreen extends HookConsumerWidget {
                               ),
                         ),
                         AppDimens.verticalSmall,
-                        AppTextField(
-                          fieldKey: "email",
-                          label: "Email",
+                        FormFieldBuilders.buildTextField(
+                          context,
+                          fieldKey: 'email',
+                          label: 'Email',
+                          uppercaseLabel: false,
                           suffixIcon: Icon(Icons.email),
                           controller: emailController,
+                          widgetKey: keys.emailFormPage.emailTextField,
                         ),
                         AppDimens.verticalSmall,
                         Text.rich(
@@ -185,6 +191,7 @@ class EmailFormScreen extends HookConsumerWidget {
                   SizedBox(
                     width: double.infinity,
                     child: AppButton(
+                      key: keys.emailFormPage.continueButton,
                       // 3. Disable nút khi: Email rỗng HOẶC đang Loading
                       onPressed:
                           (emailController.text.isEmpty ||

@@ -8,7 +8,7 @@
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: lines_longer_than_80_chars
 
-import 'package:openapi/api.dart';
+import 'package:user_openapi/api.dart';
 import 'package:test/test.dart';
 
 
@@ -17,23 +17,61 @@ void main() {
   // final instance = AuthenticationApi();
 
   group('tests for AuthenticationApi', () {
-    //Future<AuthTokensDto> authControllerLogin(LoginDto loginDto) async
-    test('test authControllerLogin', () async {
+    // Login as admin
+    //
+    //Future<AuthTokensDto> authControllerLoginAdmin(AdminLoginDto adminLoginDto) async
+    test('test authControllerLoginAdmin', () async {
       // TODO
     });
 
+    // Login as a partner
+    //
+    //Future<AuthTokensDto> authControllerLoginPartner(PartnerLoginDto partnerLoginDto) async
+    test('test authControllerLoginPartner', () async {
+      // TODO
+    });
+
+    // Login as a user
+    //
+    //Future<AuthTokensDto> authControllerLoginUser(LoginDto loginDto) async
+    test('test authControllerLoginUser', () async {
+      // TODO
+    });
+
+    // Logout current user
+    //
     //Future<LogoutResponseDto> authControllerLogout() async
     test('test authControllerLogout', () async {
       // TODO
     });
 
-    //Future<AuthTokensDto> authControllerRefresh() async
+    // Refresh authentication tokens
+    //
+    //Future<AuthTokensDto> authControllerRefresh(RefreshTokenRequestDto refreshTokenRequestDto) async
     test('test authControllerRefresh', () async {
       // TODO
     });
 
-    //Future<AuthTokensDto> authControllerRegister(RegisterDto registerDto) async
-    test('test authControllerRegister', () async {
+    // Refresh partner tokens with verification info
+    //
+    //Future<AuthTokensDto> authControllerRefreshPartner(RefreshTokenRequestDto refreshTokenRequestDto) async
+    test('test authControllerRefreshPartner', () async {
+      // TODO
+    });
+
+    // Register a new business partner
+    //
+    // Creates business entity, legal representative, and returns auth tokens immediately.
+    //
+    //Future<RegisterPartnerResponseDto> authControllerRegisterPartner(RegisterPartnerDto registerPartnerDto) async
+    test('test authControllerRegisterPartner', () async {
+      // TODO
+    });
+
+    // Register a new user
+    //
+    //Future<AuthTokensDto> authControllerRegisterUser(RegisterDto registerDto) async
+    test('test authControllerRegisterUser', () async {
       // TODO
     });
 
