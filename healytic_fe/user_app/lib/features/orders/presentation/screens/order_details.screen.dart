@@ -1,3 +1,4 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -42,28 +43,35 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hPad = AppDimens.horizontalPadding(context);
+
     return CustomScrollView(
       slivers: [
-        _SliverBackButton(),
+        const _SliverBackButton(),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: hPad),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 8),
+                AppDimens.verticalSmall,
                 HeroImage(imageUrl: appointment.imageUrl),
-                const SizedBox(height: 24),
+                AppDimens.verticalLarge,
                 ServiceHeader(appointment: appointment),
-                const SizedBox(height: 24),
+                AppDimens.verticalLarge,
                 CheckInOutCard(appointment: appointment),
-                const SizedBox(height: 32),
+                AppDimens.verticalExtraLarge,
                 DetailRow(
                   icon: Symbols.local_hospital,
                   title: 'Doctor or Therapist',
                   subtitle: appointment.providerName,
+                  onTap: appointment.providerId != null
+                      ? () => EmployeeDetailRoute(
+                          employeeId: appointment.providerId!,
+                        ).push(context)
+                      : null,
                 ),
-                const SizedBox(height: 28),
+                SizedBox(height: AppDimens.spaceXxl + AppDimens.spaceXs),
                 DetailRow(
                   icon: Symbols.storefront,
                   title: 'Service manual',
@@ -74,13 +82,13 @@ class _Content extends StatelessWidget {
                     appointmentId: appointment.id,
                   ).push(context),
                 ),
-                const SizedBox(height: 28),
+                SizedBox(height: AppDimens.spaceXxl + AppDimens.spaceXs),
                 DetailRow(
                   icon: Symbols.chat_bubble,
                   title: 'Message your services',
                   subtitle: appointment.vendorName,
                 ),
-                const SizedBox(height: 32),
+                AppDimens.verticalExtraLarge,
               ],
             ),
           ),
@@ -93,17 +101,23 @@ class _Content extends StatelessWidget {
 // ─── Sliver back button ────────────────────────────
 
 class _SliverBackButton extends StatelessWidget {
+  const _SliverBackButton();
+
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.only(left: 8, top: 4),
+          padding: EdgeInsets.only(
+            left: AppDimens.spaceSm,
+            top: AppDimens.spaceXs,
+          ),
           child: Align(
             alignment: Alignment.centerLeft,
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, size: 24),
+              tooltip: 'Go back',
+              icon: Icon(Icons.arrow_back, size: AppDimens.iconLg),
               onPressed: () => Navigator.of(context).maybePop(),
             ),
           ),

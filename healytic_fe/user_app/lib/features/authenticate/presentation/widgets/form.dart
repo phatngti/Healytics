@@ -1,4 +1,4 @@
-import 'dart:developer' as developer;
+import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -11,6 +11,8 @@ import 'package:common/widgets/toast.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
+
+final _log = Logger('AuthForm');
 
 class LoginForm extends HookConsumerWidget {
   const LoginForm({super.key});
@@ -25,7 +27,7 @@ class LoginForm extends HookConsumerWidget {
     final passwordController = useTextEditingController();
 
     ref.listen(authenticateProvider, (previous, next) {
-      developer.log('Auth state: $next');
+      _log.fine('Auth state: $next');
       if (next.hasError && !next.isLoading) {
         if (context.mounted) {
           ToastContext.showToast(

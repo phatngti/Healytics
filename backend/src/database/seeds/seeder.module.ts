@@ -16,7 +16,12 @@ import { ProductEmployeeEligibility } from '@/common/entities/product-employee-e
 import { Partner } from '@/common/entities/partner.entity';
 import { LegalRepresentative } from '@/common/entities/legal-representative.entity';
 import { PartnerDocument } from '@/common/entities/partner-document.entity';
-import { ProductReview } from '@/common/entities/product-review.entity';
+import { Location } from '@/common/entities/location.entity';
+import { TreatmentReview } from '@/common/entities/treatment-review.entity';
+import { SpecialistReview } from '@/common/entities/specialist-review.entity';
+import { Booking } from '@/common/entities/booking.entity';
+import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
+import { Payment } from '@/common/entities/payment.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 import { ProductMedia } from '@/common/entities/product-media.entity';
 import { UserSeeder } from './users/user.seeder';
@@ -25,6 +30,7 @@ import { EmployeeSeeder } from './employees/employee.seeder';
 import { ProductSeeder } from './products/product.seeder';
 import { PartnerSeeder } from './partners/partner.seeder';
 import { CategorySeeder } from './categories/category.seeder';
+import { AppointmentSeeder } from './appointments/appointment.seeder';
 import { SeederService } from './seeder.service';
 
 @Module({
@@ -46,7 +52,12 @@ import { SeederService } from './seeder.service';
       Partner,
       LegalRepresentative,
       PartnerDocument,
-      ProductReview,
+      Location,
+      TreatmentReview,
+      SpecialistReview,
+      Booking,
+      BookingStatusLog,
+      Payment,
       ProductFacilityImage,
       ProductMedia,
     ]),
@@ -58,6 +69,7 @@ import { SeederService } from './seeder.service';
     ProductSeeder,
     PartnerSeeder,
     CategorySeeder,
+    AppointmentSeeder,
     SeederService,
   ],
   exports: [SeederService],

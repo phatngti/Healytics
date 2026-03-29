@@ -14,21 +14,19 @@ Name | Type | Description | Notes
 **phone** | **String** | Phone number | [optional] 
 **dateOfBirth** | **String** | Date of birth | [optional] 
 **gender** | **String** | Gender | [optional] 
-**emergencyContactName** | **String** | Emergency contact name | [optional] 
-**emergencyContactPhone** | **String** | Emergency contact phone | [optional] 
+**emergencyContactName** | **String** | Emergency contact name | 
+**emergencyContactPhone** | **String** | Emergency contact phone | 
 **employeeId** | **String** | Unique employee identifier code | 
 **employmentType** | **String** | Employment type | [optional] 
-**startDate** | **String** | Start date | [optional] 
-**schedule** | [**List<WorkScheduleEntryDto>**](WorkScheduleEntryDto.md) | Weekly work schedule | [optional] [default to const []]
+**startDate** | **String** | Start date | 
+**schedule** | [**List<WorkScheduleEntryDto>**](WorkScheduleEntryDto.md) | Weekly work schedule | [default to const []]
+**workHistory** | [**List<WorkHistoryEntryDto>**](WorkHistoryEntryDto.md) | Work history entries | [optional] [default to const []]
 **avatar** | **String** | Avatar URL | [optional] 
-**idCardUrl** | **String** | ID card URL | [optional] 
+**verificationDocuments** | [**List<VerificationDocumentEntryDto>**](VerificationDocumentEntryDto.md) | Verification documents (ID card, licenses, etc.) | [optional] [default to const []]
 **status** | **String** | Employee status | [optional] 
-**branch** | **String** | Branch ID or name | [optional] 
-**password** | **String** | Account password | [optional] 
-**description** | **String** | Bio / description | [optional] 
+**description** | **String** | Bio / description | 
 **jobTitle** | **String** | Job title | [optional] 
-**medicalTitles** | **List<String>** | Medical titles | [optional] [default to const []]
-**medicalLicenses** | **List<String>** | Medical license numbers | [optional] [default to const []]
+**medicalCredentials** | **List<String>** | Medical credentials (titles + licenses) | [optional] [default to const []]
 **experienceYears** | **num** | Years of experience | [optional] 
 **consultationFee** | **num** | Consultation fee | [optional] 
 **specializations** | **List<String>** | Specializations | [optional] [default to const []]

@@ -1,5 +1,9 @@
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:user_app/features/home/domain/entities/'
+    'ai_recommendation.entity.dart';
 import 'package:user_app/features/home/domain/entities/home.entity.dart';
+import 'package:user_app/features/orders/domain/entities/'
+    'appointment.entity.dart';
 
 /// Mock categories for development and testing.
 final List<HomeCategory> kMockCategories = [
@@ -210,3 +214,164 @@ final List<HomeProduct> kMockRecommendedProducts = kMockProducts
 final List<HomeProduct> kMockPremiumTreatments = kMockProducts
     .where((p) => p.type == 'service')
     .toList();
+
+/// Mock featured specialists for the home page.
+final List<HomeSpecialist> kMockFeaturedSpecialists =
+    const [
+  HomeSpecialist(
+    id: 'spec-1',
+    name: 'Dr. Anna Nguyen',
+    specialty: 'Spa Therapist',
+    avatarUrl:
+        'https://api.dicebear.com/9.x/avataaars/svg'
+        '?seed=Anna',
+    rating: 4.9,
+    soldCount: 124,
+    clinicName: 'Healytics Spa & Wellness',
+  ),
+  HomeSpecialist(
+    id: 'spec-4',
+    name: 'Dr. Hoa Le',
+    specialty: 'Wellness Coach',
+    avatarUrl:
+        'https://api.dicebear.com/9.x/avataaars/svg'
+        '?seed=Hoa',
+    rating: 4.8,
+    soldCount: 98,
+    clinicName: 'Harmony Wellness Hub',
+  ),
+  HomeSpecialist(
+    id: 'spec-6',
+    name: 'Coach Duc Vo',
+    specialty: 'Personal Trainer',
+    avatarUrl:
+        'https://api.dicebear.com/9.x/avataaars/svg'
+        '?seed=Duc',
+    rating: 4.7,
+    soldCount: 76,
+    clinicName: 'FitZone Gym',
+  ),
+  HomeSpecialist(
+    id: 'spec-8',
+    name: 'Dr. Tuan Phan',
+    specialty: 'Psychologist',
+    avatarUrl:
+        'https://api.dicebear.com/9.x/avataaars/svg'
+        '?seed=Tuan',
+    rating: 5.0,
+    soldCount: 203,
+    clinicName: 'MindCare Clinic',
+  ),
+  HomeSpecialist(
+    id: 'spec-9',
+    name: 'Dr. Lan Bui',
+    specialty: 'Physical Therapist',
+    avatarUrl:
+        'https://api.dicebear.com/9.x/avataaars/svg'
+        '?seed=Lan',
+    rating: 4.6,
+    soldCount: 57,
+    clinicName: 'PhysioPlus Rehab',
+  ),
+  HomeSpecialist(
+    id: 'spec-11',
+    name: 'Dr. Bao Hoang',
+    specialty: 'General Physician',
+    avatarUrl:
+        'https://api.dicebear.com/9.x/avataaars/svg'
+        '?seed=Bao',
+    rating: 4.8,
+    soldCount: 165,
+    clinicName: 'Healytics Medical',
+  ),
+];
+
+/// Mock AI-recommended services for development.
+final List<AiRecommendation> kMockAiRecommendations =
+    const [
+  AiRecommendation(
+    serviceId: 'prod-1',
+    name: 'Deep Tissue Massage',
+    imageUrl:
+        'https://images.unsplash.com/photo-1544161515-4ab6ce6db874'
+        '?w=400&h=300&fit=crop',
+    badge: 'Popular',
+    bookedCount: 124,
+    price: '850,000 VND',
+    priceAmount: 850000,
+    currency: 'VND',
+    rating: 4.9,
+    totalReviews: 87,
+    location: 'District 1, Ho Chi Minh City',
+    staffName: 'Dr. Anna Nguyen',
+    slots: ['09:00', '10:30', '14:00'],
+  ),
+  AiRecommendation(
+    serviceId: 'prod-5',
+    name: 'Hot Stone Therapy',
+    imageUrl:
+        'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2'
+        '?w=400&h=300&fit=crop',
+    badge: 'Top Rated',
+    bookedCount: 98,
+    price: '1,200,000 VND',
+    priceAmount: 1200000,
+    currency: 'VND',
+    rating: 5.0,
+    totalReviews: 63,
+    location: 'District 3, Ho Chi Minh City',
+    staffName: 'Dr. Hoa Le',
+    slots: ['08:00', '11:00', '15:30'],
+  ),
+  AiRecommendation(
+    serviceId: 'prod-2',
+    name: 'Yoga & Meditation',
+    imageUrl:
+        'https://images.unsplash.com/photo-1506126613408-eca07ce68773'
+        '?w=400&h=300&fit=crop',
+    bookedCount: 76,
+    price: '450,000 VND',
+    priceAmount: 450000,
+    currency: 'VND',
+    rating: 4.8,
+    totalReviews: 42,
+    location: 'Thao Dien, Thu Duc City',
+    slots: ['07:00', '16:00'],
+  ),
+];
+
+/// Mock recent activities for the home dashboard.
+final List<AppointmentEntity> kMockRecentActivities = [
+  AppointmentEntity(
+    id: 'appt-1',
+    serviceName: 'Aromatherapy',
+    vendorName: 'Spa Harmony',
+    imageUrl: '',
+    status: 'completed',
+    category: 'Spa',
+    providerName: 'Dr. Anna Nguyen',
+    address: 'District 1, HCMC',
+    date: DateTime.now().subtract(
+      const Duration(days: 1),
+    ),
+    checkInTime: '15:00',
+    checkOutTime: '16:00',
+    duration: '60 min',
+  ),
+  AppointmentEntity(
+    id: 'appt-2',
+    serviceName: 'Wellness Consult',
+    vendorName: 'Harmony Wellness Hub',
+    imageUrl: '',
+    status: 'upcoming',
+    category: 'Wellness',
+    providerName: 'Dr. Hoa Le',
+    address: 'Thao Dien, Thu Duc',
+    date: DateTime.now().add(
+      const Duration(days: 1),
+    ),
+    checkInTime: '10:00',
+    checkOutTime: '11:00',
+    duration: '60 min',
+  ),
+];

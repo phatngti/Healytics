@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
 import 'package:timezone/data/latest_all.dart';
+import 'package:user_app/core/providers/error_observer.dart';
 import 'package:user_app/features/app/app.dart';
 import 'package:user_app/hooks/bootstrap.dart';
 
@@ -16,7 +17,12 @@ void main() async {
   await Bootstrap.initDomain(db);
   await initApp();
 
-  runApp(const ProviderScope(child: App()));
+  runApp(
+    ProviderScope(
+      observers: [ErrorObserver()],
+      child: const App(),
+    ),
+  );
 }
 
 Future<void> initApp() async {

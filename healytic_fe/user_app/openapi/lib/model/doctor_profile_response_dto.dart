@@ -15,13 +15,11 @@ class DoctorProfileResponseDto {
   DoctorProfileResponseDto({
     this.employeeId,
     this.title,
-    this.medicalTitles = const [],
-    this.medicalLicenses = const [],
+    this.medicalCredentials = const [],
     this.experienceYears,
     this.consultationFee,
     this.specializations = const [],
     this.education = const [],
-    this.certifications = const [],
   });
 
   /// Employee ID (primary key)
@@ -42,11 +40,8 @@ class DoctorProfileResponseDto {
   ///
   String? title;
 
-  /// Medical titles
-  List<String> medicalTitles;
-
-  /// Medical license numbers
-  List<String> medicalLicenses;
+  /// Medical credentials (titles + licenses)
+  List<MedicalCredentialResponseDto> medicalCredentials;
 
   /// Years of experience
   ///
@@ -72,36 +67,29 @@ class DoctorProfileResponseDto {
   /// Education history
   List<String> education;
 
-  /// Certifications
-  List<String> certifications;
-
   @override
   bool operator ==(Object other) => identical(this, other) || other is DoctorProfileResponseDto &&
     other.employeeId == employeeId &&
     other.title == title &&
-    _deepEquality.equals(other.medicalTitles, medicalTitles) &&
-    _deepEquality.equals(other.medicalLicenses, medicalLicenses) &&
+    _deepEquality.equals(other.medicalCredentials, medicalCredentials) &&
     other.experienceYears == experienceYears &&
     other.consultationFee == consultationFee &&
     _deepEquality.equals(other.specializations, specializations) &&
-    _deepEquality.equals(other.education, education) &&
-    _deepEquality.equals(other.certifications, certifications);
+    _deepEquality.equals(other.education, education);
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (employeeId == null ? 0 : employeeId!.hashCode) +
     (title == null ? 0 : title!.hashCode) +
-    (medicalTitles.hashCode) +
-    (medicalLicenses.hashCode) +
+    (medicalCredentials.hashCode) +
     (experienceYears == null ? 0 : experienceYears!.hashCode) +
     (consultationFee == null ? 0 : consultationFee!.hashCode) +
     (specializations.hashCode) +
-    (education.hashCode) +
-    (certifications.hashCode);
+    (education.hashCode);
 
   @override
-  String toString() => 'DoctorProfileResponseDto[employeeId=$employeeId, title=$title, medicalTitles=$medicalTitles, medicalLicenses=$medicalLicenses, experienceYears=$experienceYears, consultationFee=$consultationFee, specializations=$specializations, education=$education, certifications=$certifications]';
+  String toString() => 'DoctorProfileResponseDto[employeeId=$employeeId, title=$title, medicalCredentials=$medicalCredentials, experienceYears=$experienceYears, consultationFee=$consultationFee, specializations=$specializations, education=$education]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -115,8 +103,7 @@ class DoctorProfileResponseDto {
     } else {
       json[r'title'] = null;
     }
-      json[r'medicalTitles'] = this.medicalTitles;
-      json[r'medicalLicenses'] = this.medicalLicenses;
+      json[r'medicalCredentials'] = this.medicalCredentials;
     if (this.experienceYears != null) {
       json[r'experienceYears'] = this.experienceYears;
     } else {
@@ -129,7 +116,6 @@ class DoctorProfileResponseDto {
     }
       json[r'specializations'] = this.specializations;
       json[r'education'] = this.education;
-      json[r'certifications'] = this.certifications;
     return json;
   }
 
@@ -154,12 +140,7 @@ class DoctorProfileResponseDto {
       return DoctorProfileResponseDto(
         employeeId: mapValueOfType<String>(json, r'employeeId'),
         title: mapValueOfType<String>(json, r'title'),
-        medicalTitles: json[r'medicalTitles'] is Iterable
-            ? (json[r'medicalTitles'] as Iterable).cast<String>().toList(growable: false)
-            : const [],
-        medicalLicenses: json[r'medicalLicenses'] is Iterable
-            ? (json[r'medicalLicenses'] as Iterable).cast<String>().toList(growable: false)
-            : const [],
+        medicalCredentials: MedicalCredentialResponseDto.listFromJson(json[r'medicalCredentials']),
         experienceYears: num.parse('${json[r'experienceYears']}'),
         consultationFee: num.parse('${json[r'consultationFee']}'),
         specializations: json[r'specializations'] is Iterable
@@ -167,9 +148,6 @@ class DoctorProfileResponseDto {
             : const [],
         education: json[r'education'] is Iterable
             ? (json[r'education'] as Iterable).cast<String>().toList(growable: false)
-            : const [],
-        certifications: json[r'certifications'] is Iterable
-            ? (json[r'certifications'] as Iterable).cast<String>().toList(growable: false)
             : const [],
       );
     }

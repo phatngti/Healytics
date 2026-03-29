@@ -184,6 +184,8 @@ class ApiClient {
           return value is DateTime ? value : DateTime.tryParse(value);
         case 'Object':
           return value;
+        case 'AccountMeResponseDto':
+          return AccountMeResponseDto.fromJson(value);
         case 'AccountRequestDto':
           return AccountRequestDto.fromJson(value);
         case 'AddressDto':
@@ -196,6 +198,22 @@ class ApiClient {
           return AdminLoginDto.fromJson(value);
         case 'AdminPartnerDetailResponseDto':
           return AdminPartnerDetailResponseDto.fromJson(value);
+        case 'AiLocationDto':
+          return AiLocationDto.fromJson(value);
+        case 'AiPriceDto':
+          return AiPriceDto.fromJson(value);
+        case 'AiRatingDto':
+          return AiRatingDto.fromJson(value);
+        case 'AiRecommendationItemDto':
+          return AiRecommendationItemDto.fromJson(value);
+        case 'AiRecommendationsRequestDto':
+          return AiRecommendationsRequestDto.fromJson(value);
+        case 'AiRecommendationsResponseDto':
+          return AiRecommendationsResponseDto.fromJson(value);
+        case 'AppointmentCategoryResponseDto':
+          return AppointmentCategoryResponseDto.fromJson(value);
+        case 'AppointmentResponseDto':
+          return AppointmentResponseDto.fromJson(value);
         case 'AsyncCheckoutDto':
           return AsyncCheckoutDto.fromJson(value);
         case 'AsyncCheckoutResponseDto':
@@ -206,6 +224,12 @@ class ApiClient {
           return AuthTokensDto.fromJson(value);
         case 'BookingResponseDto':
           return BookingResponseDto.fromJson(value);
+        case 'BookingScheduleDto':
+          return BookingScheduleDto.fromJson(value);
+        case 'BookingServiceResponseDto':
+          return BookingServiceResponseDto.fromJson(value);
+        case 'BookingSpecialistResponseDto':
+          return BookingSpecialistResponseDto.fromJson(value);
         case 'BusinessInfo':
           return BusinessInfo.fromJson(value);
         case 'BusinessInfoDto':
@@ -216,6 +240,8 @@ class ApiClient {
           return BusinessServicesResponseDto.fromJson(value);
         case 'BusinessType':
           return BusinessTypeTypeTransformer().decode(value);
+        case 'CategoryInfoDto':
+          return CategoryInfoDto.fromJson(value);
         case 'CategoryResponseDto':
           return CategoryResponseDto.fromJson(value);
         case 'CategorySummaryDto':
@@ -238,6 +264,10 @@ class ApiClient {
           return CreateDoctorProfileDto.fromJson(value);
         case 'CreateMassageTherapistDto':
           return CreateMassageTherapistDto.fromJson(value);
+        case 'CreateMoMoPaymentDto':
+          return CreateMoMoPaymentDto.fromJson(value);
+        case 'CreateMoMoRefundDto':
+          return CreateMoMoRefundDto.fromJson(value);
         case 'CreatePartnerHealthServiceDefinitionDto':
           return CreatePartnerHealthServiceDefinitionDto.fromJson(value);
         case 'CreatePartnerHealthServiceDto':
@@ -252,8 +282,14 @@ class ApiClient {
           return CreateServiceTagDto.fromJson(value);
         case 'CreateSpaTherapistDto':
           return CreateSpaTherapistDto.fromJson(value);
+        case 'CreateSpecialistReviewDto':
+          return CreateSpecialistReviewDto.fromJson(value);
         case 'CreateTherapistProfileDto':
           return CreateTherapistProfileDto.fromJson(value);
+        case 'CreateTreatmentReviewDto':
+          return CreateTreatmentReviewDto.fromJson(value);
+        case 'DayScheduleDto':
+          return DayScheduleDto.fromJson(value);
         case 'DeleteFileResponseDto':
           return DeleteFileResponseDto.fromJson(value);
         case 'DistanceMatrixElementDto':
@@ -264,8 +300,16 @@ class ApiClient {
           return DistanceMatrixRowDto.fromJson(value);
         case 'DoctorProfileResponseDto':
           return DoctorProfileResponseDto.fromJson(value);
+        case 'DocumentEntryDto':
+          return DocumentEntryDto.fromJson(value);
         case 'EmployeeResponseDto':
           return EmployeeResponseDto.fromJson(value);
+        case 'EmployeeTimeSlotsResponseDto':
+          return EmployeeTimeSlotsResponseDto.fromJson(value);
+        case 'FacilityDto':
+          return FacilityDto.fromJson(value);
+        case 'FeaturedSpecialistResponseDto':
+          return FeaturedSpecialistResponseDto.fromJson(value);
         case 'FileUrlResponseDto':
           return FileUrlResponseDto.fromJson(value);
         case 'GeocodeResponseDto':
@@ -282,6 +326,8 @@ class ApiClient {
           return LegalRepresentativeRequestDto.fromJson(value);
         case 'LocationInfo':
           return LocationInfo.fromJson(value);
+        case 'LocationInfoDto':
+          return LocationInfoDto.fromJson(value);
         case 'LocationListResponseDto':
           return LocationListResponseDto.fromJson(value);
         case 'LocationResponseDto':
@@ -290,6 +336,8 @@ class ApiClient {
           return LoginDto.fromJson(value);
         case 'LogoutResponseDto':
           return LogoutResponseDto.fromJson(value);
+        case 'MedicalCredentialResponseDto':
+          return MedicalCredentialResponseDto.fromJson(value);
         case 'MicroLockDto':
           return MicroLockDto.fromJson(value);
         case 'MicroLockResponseDto':
@@ -302,6 +350,12 @@ class ApiClient {
           return PartnerClinicDto.fromJson(value);
         case 'PartnerDayScheduleDto':
           return PartnerDayScheduleDto.fromJson(value);
+        case 'PartnerDetailProcedureStepDto':
+          return PartnerDetailProcedureStepDto.fromJson(value);
+        case 'PartnerDetailServiceManualDto':
+          return PartnerDetailServiceManualDto.fromJson(value);
+        case 'PartnerDetailServiceRuleDto':
+          return PartnerDetailServiceRuleDto.fromJson(value);
         case 'PartnerDocumentVerificationDto':
           return PartnerDocumentVerificationDto.fromJson(value);
         case 'PartnerFacilityImageDto':
@@ -322,12 +376,18 @@ class ApiClient {
           return PartnerItemDto.fromJson(value);
         case 'PartnerLoginDto':
           return PartnerLoginDto.fromJson(value);
+        case 'PartnerProcedureStepDto':
+          return PartnerProcedureStepDto.fromJson(value);
         case 'PartnerRecommendedServiceDto':
           return PartnerRecommendedServiceDto.fromJson(value);
         case 'PartnerRequestDto':
           return PartnerRequestDto.fromJson(value);
         case 'PartnerReviewDto':
           return PartnerReviewDto.fromJson(value);
+        case 'PartnerServiceManualDto':
+          return PartnerServiceManualDto.fromJson(value);
+        case 'PartnerServiceRuleDto':
+          return PartnerServiceRuleDto.fromJson(value);
         case 'PartnerSpecialistDto':
           return PartnerSpecialistDto.fromJson(value);
         case 'PartnerTimeSlotDto':
@@ -340,8 +400,14 @@ class ApiClient {
           return PresignRequestDto.fromJson(value);
         case 'PresignResponseDto':
           return PresignResponseDto.fromJson(value);
+        case 'PriceBreakdownDto':
+          return PriceBreakdownDto.fromJson(value);
         case 'PriceInfo':
           return PriceInfo.fromJson(value);
+        case 'ProcedureStepDto':
+          return ProcedureStepDto.fromJson(value);
+        case 'ProcedureStepInputDto':
+          return ProcedureStepInputDto.fromJson(value);
         case 'PublicCategoryDto':
           return PublicCategoryDto.fromJson(value);
         case 'PublicCategorySummaryDto':
@@ -380,6 +446,8 @@ class ApiClient {
           return RatingInfo.fromJson(value);
         case 'RecommendationResponse':
           return RecommendationResponse.fromJson(value);
+        case 'RecommendedServiceResponseDto':
+          return RecommendedServiceResponseDto.fromJson(value);
         case 'RefreshTokenRequestDto':
           return RefreshTokenRequestDto.fromJson(value);
         case 'RegisterDto':
@@ -396,18 +464,38 @@ class ApiClient {
           return ReviewPartnerProfileDto.fromJson(value);
         case 'ReviewPartnerResponseDto':
           return ReviewPartnerResponseDto.fromJson(value);
+        case 'ReviewSummaryDto':
+          return ReviewSummaryDto.fromJson(value);
         case 'ServiceDetail':
           return ServiceDetail.fromJson(value);
+        case 'ServiceInfoDto':
+          return ServiceInfoDto.fromJson(value);
+        case 'ServiceManualInputDto':
+          return ServiceManualInputDto.fromJson(value);
+        case 'ServiceManualResponseDto':
+          return ServiceManualResponseDto.fromJson(value);
+        case 'ServiceRuleDto':
+          return ServiceRuleDto.fromJson(value);
+        case 'ServiceRuleInputDto':
+          return ServiceRuleInputDto.fromJson(value);
         case 'ServiceTagResponseDto':
           return ServiceTagResponseDto.fromJson(value);
+        case 'SpecialistInfoDto':
+          return SpecialistInfoDto.fromJson(value);
+        case 'SpecialistReviewResponseDto':
+          return SpecialistReviewResponseDto.fromJson(value);
         case 'SurveyDto':
           return SurveyDto.fromJson(value);
         case 'SurveyResponseDto':
           return SurveyResponseDto.fromJson(value);
         case 'TherapistProfileResponseDto':
           return TherapistProfileResponseDto.fromJson(value);
+        case 'TimeSlotDto':
+          return TimeSlotDto.fromJson(value);
         case 'TotalPartnersResponseDto':
           return TotalPartnersResponseDto.fromJson(value);
+        case 'TreatmentReviewResponseDto':
+          return TreatmentReviewResponseDto.fromJson(value);
         case 'UpdateCategoryDto':
           return UpdateCategoryDto.fromJson(value);
         case 'UpdateEmployeeDto':
@@ -418,8 +506,16 @@ class ApiClient {
           return UpdatePartnerHealthServiceDto.fromJson(value);
         case 'UpdateServiceTagDto':
           return UpdateServiceTagDto.fromJson(value);
+        case 'UserEligibilityDetailResponseDto':
+          return UserEligibilityDetailResponseDto.fromJson(value);
+        case 'UserProfileDto':
+          return UserProfileDto.fromJson(value);
+        case 'VerificationDocumentEntryDto':
+          return VerificationDocumentEntryDto.fromJson(value);
         case 'VerifiedField':
           return VerifiedField.fromJson(value);
+        case 'WorkHistoryEntryDto':
+          return WorkHistoryEntryDto.fromJson(value);
         case 'WorkScheduleEntryDto':
           return WorkScheduleEntryDto.fromJson(value);
         default:

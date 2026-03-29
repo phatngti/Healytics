@@ -31,5 +31,26 @@ void main() {
       // TODO
     });
 
+    // Get services for a specialist
+    //
+    //Future<List<BookingServiceResponseDto>> userEmployeesControllerFindServices(String id) async
+    test('test userEmployeesControllerFindServices', () async {
+      // TODO
+    });
+
+    // Get featured specialists for home page
+    //
+    //Future<List<FeaturedSpecialistResponseDto>> userEmployeesControllerGetFeaturedSpecialists({ num limit }) async
+    test('test userEmployeesControllerGetFeaturedSpecialists', () async {
+      // TODO
+    });
+
+    // Get time slots with availability for an employee
+    //
+    //Future<EmployeeTimeSlotsResponseDto> userEmployeesControllerGetTimeSlots(String id, { String date, num days }) async
+    test('test userEmployeesControllerGetTimeSlots', () async {
+      // TODO
+    });
+
   });
 }

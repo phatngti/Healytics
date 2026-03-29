@@ -52,6 +52,12 @@ void main() {
       // TODO
     });
 
+    // Category type for UI grouping
+    // String categoryType (default value: 'primary')
+    test('to test the property `categoryType`', () async {
+      // TODO
+    });
+
     // Creation timestamp
     // DateTime createdAt
     test('to test the property `createdAt`', () async {

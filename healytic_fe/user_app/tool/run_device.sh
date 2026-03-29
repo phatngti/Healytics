@@ -8,7 +8,13 @@ if [ -z "$PLATFORM" ] || [ -z "$ENV" ]; then
   exit 1
 fi
 
-DEVICE_ID=$(flutter devices | awk -F'•' -v plat="$PLATFORM" 'tolower($0) ~ plat && !found {gsub(/ /, "", $2); print $2; found=1}')
+DEVICE_LINE=$(flutter devices | awk -v plat="$PLATFORM" '
+  tolower($0) ~ plat && !found {print; found=1}
+')
+
+DEVICE_ID=$(printf '%s\n' "$DEVICE_LINE" | awk -F'•' '
+  {gsub(/ /, "", $2); print $2}
+')
 
 if [ -z "$DEVICE_ID" ]; then
   echo "No $PLATFORM device found."

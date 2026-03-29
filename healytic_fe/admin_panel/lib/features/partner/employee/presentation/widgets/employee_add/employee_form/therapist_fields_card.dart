@@ -11,10 +11,16 @@ class TherapistFieldsCard extends StatefulWidget {
   final TherapistType? initialTherapistType;
   final String? initialStrengthLevel;
 
+  /// Called when the therapist type toggle
+  /// changes between Spa and Massage.
+  final ValueChanged<TherapistType>?
+      onTherapistTypeChanged;
+
   const TherapistFieldsCard({
     super.key,
     this.initialTherapistType,
     this.initialStrengthLevel,
+    this.onTherapistTypeChanged,
   });
 
   @override
@@ -145,8 +151,11 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
                   onTap: () {
                     if (formEnabled) {
                       setState(() {
-                        _selectedTherapistType = TherapistType.spa;
+                        _selectedTherapistType =
+                            TherapistType.spa;
                       });
+                      widget.onTherapistTypeChanged
+                          ?.call(TherapistType.spa);
                     }
                   },
                 ),
@@ -162,8 +171,11 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
                   onTap: () {
                     if (formEnabled) {
                       setState(() {
-                        _selectedTherapistType = TherapistType.massage;
+                        _selectedTherapistType =
+                            TherapistType.massage;
                       });
+                      widget.onTherapistTypeChanged
+                          ?.call(TherapistType.massage);
                     }
                   },
                 ),

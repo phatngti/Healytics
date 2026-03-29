@@ -16,8 +16,15 @@ void main() {
   // final instance = PublicHealthServiceEmployeeResponseDto();
 
   group('test PublicHealthServiceEmployeeResponseDto', () {
+    // Employee (specialist) ID
     // String id
     test('to test the property `id`', () async {
+      // TODO
+    });
+
+    // product_employee_eligibility surrogate PK for this employee–service pair
+    // String eligibilityId
+    test('to test the property `eligibilityId`', () async {
       // TODO
     });
 

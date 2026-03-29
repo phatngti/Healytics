@@ -7,6 +7,8 @@ import { CreateAccountHandler } from './application/handlers/create-account.hand
 import { SetSurveyHandler } from './application/handlers/set-survey.handler';
 import { SetRefreshTokenHandler } from './application/handlers/set-refresh-token.handler';
 import { SurveyResponseDto } from './dto/response/survey-response.dto';
+import { AccountMeResponseDto } from './dto/response/account-me-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 /**
  * Service facade for managing user accounts.
@@ -24,6 +26,26 @@ export class AccountService {
     private readonly setSurveyHandler: SetSurveyHandler,
     private readonly setRefreshTokenHandler: SetRefreshTokenHandler,
   ) {}
+
+  /**
+   * Retrieves the current account with role and user profile.
+   * @param accountId - The account ID from the JWT
+   * @returns AccountMeResponseDto with full account data
+   */
+  async getMe(accountId: string): Promise<AccountMeResponseDto> {
+    const account = await this.accountRepo.findOne({
+      where: { id: accountId },
+      relations: ['userProfile'],
+    });
+
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
+
+    return plainToInstance(AccountMeResponseDto, account, {
+      excludeExtraneousValues: true,
+    });
+  }
 
   /**
    * Facade: Delegates to CreateAccountHandler.

@@ -1,3 +1,4 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 
@@ -6,7 +7,10 @@ import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart'
 class OrderItemsSection extends StatelessWidget {
   final List<CheckoutItem> items;
 
-  const OrderItemsSection({super.key, required this.items});
+  const OrderItemsSection({
+    super.key,
+    required this.items,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +21,9 @@ class OrderItemsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.spaceXs,
+          ),
           child: Text(
             'Order Items (${items.length})',
             style: textTheme.titleSmall?.copyWith(
@@ -26,10 +32,12 @@ class OrderItemsSection extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        AppDimens.verticalMedium,
         ...items.map(
           (item) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(
+              bottom: AppDimens.spaceMd,
+            ),
             child: _OrderItemCard(item: item),
           ),
         ),
@@ -38,6 +46,8 @@ class OrderItemsSection extends StatelessWidget {
   }
 }
 
+/// Card displaying a single order item with clinic
+/// header, image, details, and pricing.
 class _OrderItemCard extends StatelessWidget {
   final CheckoutItem item;
 
@@ -46,40 +56,57 @@ class _OrderItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final radius = AppDimens.cardRadius(context);
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(radius),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+          color: colorScheme.outlineVariant
+              .withValues(alpha: 0.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow
+                .withValues(alpha: 0.08),
+            blurRadius: AppDimens.spaceMd,
+            offset: const Offset(
+              0,
+              AppDimens.spaceXxs,
+            ),
           ),
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 6),
+            color: colorScheme.shadow
+                .withValues(alpha: 0.04),
+            blurRadius: AppDimens.spaceXxl,
+            offset: const Offset(
+              0,
+              AppDimens.spaceXs + 2,
+            ),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ClinicHeader(item: item),
+          _ClinicHeader(
+            item: item,
+            topRadius: radius,
+          ),
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(
+              AppDimens.contentPadding(context),
+            ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
-                _buildImage(colorScheme),
-                const SizedBox(width: 16),
-                Expanded(child: _buildDetails(colorScheme, textTheme)),
+                _ItemImage(imageUrl: item.imageUrl),
+                AppDimens.horizontalMedium,
+                Expanded(
+                  child: _ItemDetails(item: item),
+                ),
               ],
             ),
           ),
@@ -87,16 +114,36 @@ class _OrderItemCard extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildImage(ColorScheme colorScheme) {
+/// Item thumbnail image with rounded corners.
+class _ItemImage extends StatelessWidget {
+  final String imageUrl;
+
+  const _ItemImage({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppDimens.radiusMediumSmall,
       child: Container(
-        width: 80,
-        height: 80,
+        width: AppDimens.adaptive(
+          context,
+          small: 72,
+          medium: 80,
+          large: 88,
+        ),
+        height: AppDimens.adaptive(
+          context,
+          small: 72,
+          medium: 80,
+          large: 88,
+        ),
         color: colorScheme.surfaceContainerHighest,
         child: Image.network(
-          item.imageUrl,
+          imageUrl,
           fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => Icon(
             Icons.image_not_supported_outlined,
@@ -106,8 +153,19 @@ class _OrderItemCard extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildDetails(ColorScheme colorScheme, TextTheme textTheme) {
+/// Name, tags, and pricing details for an item.
+class _ItemDetails extends StatelessWidget {
+  final CheckoutItem item;
+
+  const _ItemDetails({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -121,37 +179,50 @@ class _OrderItemCard extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 4),
-        _buildTags(colorScheme, textTheme),
-        const SizedBox(height: 8),
-        _buildPriceRow(colorScheme, textTheme),
+        AppDimens.verticalExtraSmall,
+        _ItemTags(item: item),
+        AppDimens.verticalSmall,
+        _PriceRow(item: item),
       ],
     );
   }
+}
 
-  Widget _buildTags(ColorScheme colorScheme, TextTheme textTheme) {
+/// Duration and specialist name tags.
+class _ItemTags extends StatelessWidget {
+  final CheckoutItem item;
+
+  const _ItemTags({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.spaceXs + 2,
+            vertical: AppDimens.spaceXxs,
+          ),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(4),
+            color:
+                colorScheme.surfaceContainerHighest,
+            borderRadius: AppDimens.radiusExtraSmall,
           ),
           child: Text(
             item.duration,
             style: textTheme.labelSmall?.copyWith(
-              fontSize: 10,
               color: colorScheme.onSurfaceVariant,
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        AppDimens.horizontalSmall,
         Expanded(
           child: Text(
             item.specialistName,
             style: textTheme.labelSmall?.copyWith(
-              fontSize: 10,
               color: colorScheme.onSurfaceVariant,
             ),
             maxLines: 1,
@@ -161,21 +232,34 @@ class _OrderItemCard extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildPriceRow(ColorScheme colorScheme, TextTheme textTheme) {
+/// Original and discounted price with quantity.
+class _PriceRow extends StatelessWidget {
+  final CheckoutItem item;
+
+  const _PriceRow({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment:
+          MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
           children: [
             Text(
               _formatCurrency(item.originalPrice),
               style: textTheme.labelSmall?.copyWith(
-                fontSize: 10,
                 color: colorScheme.onSurfaceVariant,
-                decoration: TextDecoration.lineThrough,
+                decoration:
+                    TextDecoration.lineThrough,
               ),
             ),
             Text(
@@ -198,7 +282,8 @@ class _OrderItemCard extends StatelessWidget {
   }
 
   String _formatCurrency(int amount) {
-    final formatted = amount.toString().replaceAllMapped(
+    final formatted =
+        amount.toString().replaceAllMapped(
       RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
       (m) => '${m[1]},',
     );
@@ -206,35 +291,51 @@ class _OrderItemCard extends StatelessWidget {
   }
 }
 
-/// Header showing clinic/spa icon, name, and address
-/// at the top of the order item card.
+/// Header showing clinic icon, name, and address.
 class _ClinicHeader extends StatelessWidget {
   final CheckoutItem item;
+  final double topRadius;
 
-  const _ClinicHeader({required this.item});
+  const _ClinicHeader({
+    required this.item,
+    required this.topRadius,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final pad = AppDimens.contentPadding(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: pad + 2,
+        vertical: pad - 2,
+      ),
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withValues(alpha: 0.35),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        color: colorScheme.primaryContainer
+            .withValues(alpha: 0.35),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(topRadius),
+        ),
       ),
       child: Row(
         children: [
-          Icon(_vendorIconData, size: 16, color: colorScheme.primary),
-          const SizedBox(width: 8),
+          Icon(
+            _vendorIconData,
+            size: AppDimens.iconSm,
+            color: colorScheme.primary,
+          ),
+          AppDimens.horizontalSmall,
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   item.vendorName,
-                  style: textTheme.labelMedium?.copyWith(
+                  style:
+                      textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface,
                   ),
@@ -244,8 +345,10 @@ class _ClinicHeader extends StatelessWidget {
                 if (item.vendorAddress.isNotEmpty)
                   Text(
                     item.vendorAddress,
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                    style: textTheme.labelSmall
+                        ?.copyWith(
+                      color: colorScheme
+                          .onSurfaceVariant,
                       height: 1.3,
                     ),
                     maxLines: 1,
@@ -260,13 +363,10 @@ class _ClinicHeader extends StatelessWidget {
   }
 
   IconData get _vendorIconData {
-    switch (item.vendorIcon) {
-      case 'local_hospital':
-        return Icons.local_hospital;
-      case 'spa':
-        return Icons.spa;
-      default:
-        return Icons.storefront;
-    }
+    return switch (item.vendorIcon) {
+      'local_hospital' => Icons.local_hospital,
+      'spa' => Icons.spa,
+      _ => Icons.storefront,
+    };
   }
 }

@@ -46,12 +46,6 @@ void main() {
       // TODO
     });
 
-    // Display name
-    // Object displayName
-    test('to test the property `displayName`', () async {
-      // TODO
-    });
-
     // Email address
     // String email
     test('to test the property `email`', () async {
@@ -106,15 +100,21 @@ void main() {
       // TODO
     });
 
-    // ID card URL
-    // Object idCardUrl
-    test('to test the property `idCardUrl`', () async {
+    // Verification documents
+    // List<VerificationDocumentEntryDto> verificationDocuments (default value: const [])
+    test('to test the property `verificationDocuments`', () async {
       // TODO
     });
 
     // Work schedule
     // List<WorkScheduleEntryDto> schedule (default value: const [])
     test('to test the property `schedule`', () async {
+      // TODO
+    });
+
+    // Work history
+    // List<WorkHistoryEntryDto> workHistory (default value: const [])
+    test('to test the property `workHistory`', () async {
       // TODO
     });
 

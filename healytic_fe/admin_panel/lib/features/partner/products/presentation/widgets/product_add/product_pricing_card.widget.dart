@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -52,14 +53,14 @@ class ProductPricingCard extends StatelessWidget {
                     Expanded(
                       child: _PriceField(
                         label: 'Base Price',
-                        fieldKey: 'base_price',
+                        fieldKey: ProductFormField.basePrice.key,
                       ),
                     ),
                     AppDimens.horizontalLarge,
                     Expanded(
                       child: _PriceField(
                         label: 'Sale Price',
-                        fieldKey: 'sale_price',
+                        fieldKey: ProductFormField.salePrice.key,
                       ),
                     ),
                   ],

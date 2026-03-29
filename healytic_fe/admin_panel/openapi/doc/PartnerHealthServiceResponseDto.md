@@ -25,6 +25,7 @@ Name | Type | Description | Notes
 **media** | [**List<PartnerHealthServiceMediaDto>**](PartnerHealthServiceMediaDto.md) | Media assets | [optional] [default to const []]
 **productDefinition** | [**PartnerHealthServiceDefinitionDto**](PartnerHealthServiceDefinitionDto.md) | Definition for service type | [optional] 
 **productEmployeeEligibilities** | [**List<PartnerHealthServiceEmployeeEligibilityDto>**](PartnerHealthServiceEmployeeEligibilityDto.md) | Eligible employees for service | [optional] [default to const []]
+**serviceManual** | [**PartnerServiceManualDto**](PartnerServiceManualDto.md) | Service manual (guidelines, rules, procedure steps) | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

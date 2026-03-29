@@ -5,6 +5,8 @@ import 'package:admin_panel/features/partner/employee/presentation/widgets/emplo
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_education_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_operational_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_skills_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_verification_documents_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_work_history_details_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/header/employee_header_card.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:common/utils/demensions.dart';
@@ -54,10 +56,19 @@ class EmployeeDetailsDesktop extends StatelessWidget {
                         EmployeeContactCard(
                           email: employee.email,
                           phone: employee.phone,
+                          emergencyContactName:
+                              employee.emergencyContactName,
+                          emergencyContactPhone:
+                              employee.emergencyContactPhone,
                         ),
                         AppDimens.verticalMedium,
                         EmployeeNotesCard(
                           description: employee.description,
+                        ),
+                        AppDimens.verticalMedium,
+                        EmployeeVerificationDocumentsCard(
+                          documents: employee
+                              .verificationDocuments,
                         ),
                       ],
                     ),
@@ -70,6 +81,11 @@ class EmployeeDetailsDesktop extends StatelessWidget {
                       children: [
                         EmployeeSkillsCard(
                           employee: employee,
+                        ),
+                        AppDimens.verticalMedium,
+                        EmployeeWorkHistoryDetailsCard(
+                          workHistory:
+                              employee.workHistory,
                         ),
                         AppDimens.verticalMedium,
                         if (employee case DoctorEntity doctor)

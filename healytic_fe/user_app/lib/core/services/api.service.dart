@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -12,6 +11,8 @@ import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/utils/url_helper.dart';
 import 'package:user_app/core/utils/user_agent.dart';
 import 'package:user_openapi/api.dart';
+
+import 'auth_http_client.dart';
 
 /// Prefixes for different backend services behind
 /// the API gateway (Kong).
@@ -33,6 +34,7 @@ enum ServicePrefix {
 
 class ApiService implements Authentication {
   final _clients = <ServicePrefix, ApiClient>{};
+  AuthHttpClient? _authHttpClient;
 
   // ── Authentication & Account ──────────────────────
   late AuthenticationApi authenticateApi;
@@ -41,12 +43,34 @@ class ApiService implements Authentication {
   // ── Home / Products ───────────────────────────────
   late CategoriesApi categoriesApi;
   late PartnerServiceTagsApi partnerServiceTagsApi;
-  late HealthServicesApi healthServicesApi;
+  late UserHealthServicesApi userHealthServicesApi;
+
+  // ── Booking / Slots ───────────────────────────────
+  late UserBookingsApi userBookingsApi;
+  late UserSlotsApi userSlotsApi;
+
+  // ── Appointments ──────────────────────────────────
+  late UserAppointmentsApi userAppointmentsApi;
+
+  // ── Reviews ───────────────────────────────────────
+  late UserReviewsApi userReviewsApi;
 
   // ── Chatbot (AI service) ──────────────────────────
   late ChatbotApi chatbotApi;
 
-  ApiService() {
+  // ── AI Recommendations ────────────────────────────
+  late AIRecommendationsApi aiRecommendationsApi;
+
+  // ── Employees ─────────────────────────────────────
+  late UserEmployeesApi userEmployeesApi;
+
+  // ── User Categories ───────────────────────────────
+  late UserCategoriesApi userCategoriesApi;
+
+  // ── Payments ──────────────────────────────────────
+  late UserPaymentsApi userPaymentsApi;
+
+  ApiService({AuthHttpClient? httpClient}) : _authHttpClient = httpClient {
     // Eagerly initialise so late fields are never
     // accessed before the endpoint is resolved.
     setEndpoint('');
@@ -84,11 +108,18 @@ class ApiService implements Authentication {
   dynamic setEndpoint(String endPoint) {
     // Create one ApiClient per service prefix.
     for (final prefix in ServicePrefix.values) {
-      _clients[prefix] = ApiClient(
+      final client = ApiClient(
         basePath: '$endPoint${prefix.path}',
         authentication: this,
       );
+      if (_authHttpClient != null) {
+        client.client = _authHttpClient!;
+      }
+      _clients[prefix] = client;
     }
+
+    // Update backend base path for refresh calls.
+    _authHttpClient?.backendBasePath = '$endPoint${ServicePrefix.backend.path}';
 
     _setUserAgentHeaders();
 
@@ -104,10 +135,18 @@ class ApiService implements Authentication {
     accountApi = AccountApi(backend);
     categoriesApi = CategoriesApi(backend);
     partnerServiceTagsApi = PartnerServiceTagsApi(backend);
-    healthServicesApi = HealthServicesApi(backend);
+    userBookingsApi = UserBookingsApi(backend);
+    userSlotsApi = UserSlotsApi(backend);
+    userAppointmentsApi = UserAppointmentsApi(backend);
+    userEmployeesApi = UserEmployeesApi(backend);
+    userCategoriesApi = UserCategoriesApi(backend);
+    userPaymentsApi = UserPaymentsApi(backend);
+    userHealthServicesApi = UserHealthServicesApi(backend);
+    userReviewsApi = UserReviewsApi(backend);
 
     // ── AI APIs ─────────────────────────────────────
     chatbotApi = ChatbotApi(ai);
+    aiRecommendationsApi = AIRecommendationsApi(ai);
   }
 
   /// Applies the User-Agent header to every client.
@@ -201,7 +240,7 @@ class ApiService implements Authentication {
   Future<void> setAccessToken(String accessToken) async {
     _accessToken = accessToken;
     await Store.put(StoreKey.accessToken, accessToken);
-    log('Access token updated', name: 'ApiService');
+    _log.info('Access token updated');
   }
 
   Future<void> setDeviceInfoHeader() async {

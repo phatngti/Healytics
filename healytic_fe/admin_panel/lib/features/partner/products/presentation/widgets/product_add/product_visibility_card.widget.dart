@@ -1,3 +1,5 @@
+import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
+import 'package:admin_panel/features/partner/products/domain/product_status.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -67,14 +69,17 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
             children: [
               FormFieldBuilders.buildCustomDropdownField<String>(
                 context,
-                fieldKey: 'status',
+                fieldKey: ProductFormField.visibilityStatus.key,
                 label: 'Status',
                 initialValue: _status,
-                items: const [
-                  DropdownMenuItem(value: 'draft', child: Text('Draft')),
-                  DropdownMenuItem(value: 'active', child: Text('Active')),
-                  DropdownMenuItem(value: 'archived', child: Text('Archived')),
-                ],
+                items: ProductStatus.values
+                    .map(
+                      (s) => DropdownMenuItem(
+                        value: s.apiValue,
+                        child: Text(s.displayName),
+                      ),
+                    )
+                    .toList(),
                 onChanged: (value) {
                   if (value != null) {
                     setState(() {

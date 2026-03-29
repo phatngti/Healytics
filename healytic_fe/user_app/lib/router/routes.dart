@@ -22,8 +22,23 @@ import 'package:user_app/features/orders/presentation/screens/order_details.scre
 import 'package:user_app/features/orders/presentation/screens/orders.screen.dart';
 import 'package:user_app/features/orders/presentation/screens/service_manual.screen.dart';
 import 'package:user_app/features/profile/presentation/screens/profile.screen.dart';
+import 'package:user_app/features/profile/presentation/screens/edit_profile.screen.dart';
 import 'package:user_app/features/checkout/presentation/screens/checkout.screen.dart';
 import 'package:user_app/features/authenticate/presentation/screens/signin.screen.dart';
+import 'package:user_app/features/employee/domain/entities/certificate.entity.dart';
+import 'package:user_app/features/employee/presentation/screens/certificate_viewer.screen.dart';
+import 'package:user_app/features/employee/presentation/screens/certificates_list.screen.dart';
+import 'package:user_app/features/employee/presentation/screens/employee_detail.screen.dart';
+import 'package:user_app/features/home/presentation/screens/book_appointment.screen.dart';
+import 'package:user_app/features/home/presentation/screens/select_specialist.screen.dart';
+import 'package:user_app/features/home/presentation/screens/service_specialist.screen.dart';
+import 'package:user_app/features/home/presentation/screens/booking_summary.screen.dart';
+import 'package:user_app/features/home/presentation/screens/ai_health_assistant.screen.dart';
+import 'package:user_app/features/employee/presentation/screens/employee_booking.screen.dart';
+import 'package:user_app/features/employee/presentation/screens/employee_booking_summary.screen.dart';
+import 'package:user_app/features/review/presentation/screens/review_treatment.screen.dart';
+import 'package:user_app/features/review/presentation/screens/review_specialist.screen.dart';
+import 'package:user_app/features/review/presentation/screens/review_submitted.screen.dart';
 
 part 'routes.g.dart';
 
@@ -248,6 +263,150 @@ class CheckoutRoute extends GoRouteData with $CheckoutRoute {
   }
 }
 
+// --- BOOK APPOINTMENT ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<BookAppointmentRoute>(
+  path: '/book_appointment',
+  name: BookAppointmentRoute.name,
+)
+class BookAppointmentRoute extends GoRouteData with $BookAppointmentRoute {
+  const BookAppointmentRoute();
+  static const name = 'book_appointment';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const BookAppointmentScreen(),
+    );
+  }
+}
+
+// --- SELECT SPECIALIST ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<SelectSpecialistRoute>(
+  path: '/select_specialist',
+  name: SelectSpecialistRoute.name,
+)
+class SelectSpecialistRoute extends GoRouteData with $SelectSpecialistRoute {
+  final String categoryId;
+  const SelectSpecialistRoute({required this.categoryId});
+  static const name = 'select_specialist';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: SelectSpecialistScreen(categoryId: categoryId),
+    );
+  }
+}
+
+// --- SERVICE SPECIALIST ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ServiceSpecialistRoute>(
+  path: '/service_specialist',
+  name: ServiceSpecialistRoute.name,
+)
+class ServiceSpecialistRoute extends GoRouteData with $ServiceSpecialistRoute {
+  final String serviceId;
+  const ServiceSpecialistRoute({required this.serviceId});
+  static const name = 'service_specialist';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ServiceSpecialistScreen(serviceId: serviceId),
+    );
+  }
+}
+
+// --- EMPLOYEE BOOKING ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<EmployeeBookingRoute>(
+  path: '/employee_booking',
+  name: EmployeeBookingRoute.name,
+)
+class EmployeeBookingRoute extends GoRouteData with $EmployeeBookingRoute {
+  final String employeeId;
+  final String serviceId;
+  const EmployeeBookingRoute({
+    required this.employeeId,
+    required this.serviceId,
+  });
+  static const name = 'employee_booking';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: EmployeeBookingScreen(
+        employeeId: employeeId,
+        serviceId: serviceId,
+      ),
+    );
+  }
+}
+
+// --- EMPLOYEE BOOKING SUMMARY ROUTE (No Nav Bar) ---
+
+@TypedGoRoute<EmployeeBookingSummaryRoute>(
+  path: '/employee_booking_summary',
+  name: EmployeeBookingSummaryRoute.name,
+)
+class EmployeeBookingSummaryRoute extends GoRouteData
+    with $EmployeeBookingSummaryRoute {
+  const EmployeeBookingSummaryRoute();
+  static const name = 'employee_booking_summary';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const EmployeeBookingSummaryScreen(),
+    );
+  }
+}
+
+// --- BOOKING SUMMARY ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<BookingSummaryRoute>(
+  path: '/booking_summary',
+  name: BookingSummaryRoute.name,
+)
+class BookingSummaryRoute extends GoRouteData with $BookingSummaryRoute {
+  const BookingSummaryRoute();
+  static const name = 'booking_summary';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const BookingSummaryScreen(),
+    );
+  }
+}
+
+// --- AI HEALTH ASSISTANT ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<AiHealthAssistantRoute>(
+  path: '/ai_health_assistant',
+  name: AiHealthAssistantRoute.name,
+)
+class AiHealthAssistantRoute extends GoRouteData with $AiHealthAssistantRoute {
+  const AiHealthAssistantRoute();
+  static const name = 'ai_health_assistant';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const AiHealthAssistantScreen(),
+    );
+  }
+}
+
 // --- ORDER DETAILS ROUTE (No Navigation Bar) ---
 
 @TypedGoRoute<OrderDetailsRoute>(
@@ -284,6 +443,84 @@ class ServiceManualRoute extends GoRouteData with $ServiceManualRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ServiceManualScreen(appointmentId: appointmentId),
+    );
+  }
+}
+
+// --- EMPLOYEE DETAIL ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<EmployeeDetailRoute>(
+  path: '/employee_detail',
+  name: EmployeeDetailRoute.name,
+)
+class EmployeeDetailRoute extends GoRouteData with $EmployeeDetailRoute {
+  final String employeeId;
+  const EmployeeDetailRoute({required this.employeeId});
+  static const name = 'employee_detail';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: EmployeeDetailScreen(employeeId: employeeId),
+    );
+  }
+}
+
+// --- CERTIFICATES ROUTES (No Navigation Bar) ---
+
+@TypedGoRoute<CertificatesListRoute>(
+  path: '/certificates_list',
+  name: CertificatesListRoute.name,
+)
+class CertificatesListRoute extends GoRouteData with $CertificatesListRoute {
+  final String employeeName;
+  final String employeeId;
+  const CertificatesListRoute({
+    required this.employeeName,
+    required this.employeeId,
+  });
+  static const name = 'certificates_list';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: CertificatesListScreen(
+        employeeId: employeeId,
+        employeeName: employeeName,
+      ),
+    );
+  }
+}
+
+@TypedGoRoute<CertificateViewerRoute>(
+  path: '/certificate_viewer',
+  name: CertificateViewerRoute.routeName,
+)
+class CertificateViewerRoute extends GoRouteData with $CertificateViewerRoute {
+  final String certificateName;
+  final String url;
+  final String type;
+  const CertificateViewerRoute({
+    required this.certificateName,
+    required this.url,
+    required this.type,
+  });
+  static const routeName = 'certificate_viewer';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: CertificateViewerScreen(
+        name: certificateName,
+        url: url,
+        type: CertificateType.values.firstWhere(
+          (e) => e.name == type,
+          orElse: () => CertificateType.unknown,
+        ),
+      ),
     );
   }
 }
@@ -496,6 +733,141 @@ class HealthSafetyStepRoute extends GoRouteData with $HealthSafetyStepRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const HealthSafetyStep(),
+    );
+  }
+}
+
+// --- EDIT PROFILE ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<EditProfileRoute>(
+  path: '/edit_profile',
+  name: EditProfileRoute.name,
+)
+class EditProfileRoute extends GoRouteData with $EditProfileRoute {
+  const EditProfileRoute();
+  static const name = 'edit_profile';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const EditProfileScreen(),
+    );
+  }
+}
+
+// --- REVIEW TREATMENT ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ReviewTreatmentRoute>(
+  path: '/review_treatment',
+  name: ReviewTreatmentRoute.name,
+)
+class ReviewTreatmentRoute extends GoRouteData
+    with $ReviewTreatmentRoute {
+  final String appointmentId;
+  final String serviceName;
+  final String vendorName;
+
+  const ReviewTreatmentRoute({
+    required this.appointmentId,
+    required this.serviceName,
+    required this.vendorName,
+  });
+
+  static const name = 'review_treatment';
+
+  @override
+  Page<void> buildPage(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ReviewTreatmentScreen(
+        appointmentId: appointmentId,
+        serviceName: serviceName,
+        vendorName: vendorName,
+      ),
+    );
+  }
+}
+
+// --- REVIEW SPECIALIST ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ReviewSpecialistRoute>(
+  path: '/review_specialist',
+  name: ReviewSpecialistRoute.name,
+)
+class ReviewSpecialistRoute extends GoRouteData
+    with $ReviewSpecialistRoute {
+  final String appointmentId;
+  final String specialistId;
+  final String specialistName;
+  final String specialistRole;
+  final String? specialistAvatarUrl;
+
+  const ReviewSpecialistRoute({
+    required this.appointmentId,
+    required this.specialistId,
+    required this.specialistName,
+    required this.specialistRole,
+    this.specialistAvatarUrl,
+  });
+
+  static const name = 'review_specialist';
+
+  @override
+  Page<void> buildPage(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ReviewSpecialistScreen(
+        appointmentId: appointmentId,
+        specialistId: specialistId,
+        specialistName: specialistName,
+        specialistRole: specialistRole,
+        specialistAvatarUrl:
+            specialistAvatarUrl,
+      ),
+    );
+  }
+}
+
+// --- REVIEW SUBMITTED ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ReviewSubmittedRoute>(
+  path: '/review_submitted',
+  name: ReviewSubmittedRoute.name,
+)
+class ReviewSubmittedRoute extends GoRouteData
+    with $ReviewSubmittedRoute {
+  final String specialistName;
+  final String? specialistAvatarUrl;
+  final int rating;
+
+  const ReviewSubmittedRoute({
+    required this.specialistName,
+    this.specialistAvatarUrl,
+    required this.rating,
+  });
+
+  static const name = 'review_submitted';
+
+  @override
+  Page<void> buildPage(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ReviewSubmittedScreen(
+        specialistName: specialistName,
+        specialistAvatarUrl:
+            specialistAvatarUrl,
+        rating: rating,
+      ),
     );
   }
 }

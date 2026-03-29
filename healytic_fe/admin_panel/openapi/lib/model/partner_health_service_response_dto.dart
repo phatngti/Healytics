@@ -30,6 +30,7 @@ class PartnerHealthServiceResponseDto {
     this.media = const [],
     this.productDefinition,
     this.productEmployeeEligibilities = const [],
+    this.serviceManual,
   });
 
   /// Unique identifier
@@ -113,6 +114,15 @@ class PartnerHealthServiceResponseDto {
   /// Eligible employees for service
   List<PartnerHealthServiceEmployeeEligibilityDto> productEmployeeEligibilities;
 
+  /// Service manual (guidelines, rules, procedure steps)
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  PartnerServiceManualDto? serviceManual;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is PartnerHealthServiceResponseDto &&
     other.id == id &&
@@ -131,7 +141,8 @@ class PartnerHealthServiceResponseDto {
     other.category == category &&
     _deepEquality.equals(other.media, media) &&
     other.productDefinition == productDefinition &&
-    _deepEquality.equals(other.productEmployeeEligibilities, productEmployeeEligibilities);
+    _deepEquality.equals(other.productEmployeeEligibilities, productEmployeeEligibilities) &&
+    other.serviceManual == serviceManual;
 
   @override
   int get hashCode =>
@@ -152,10 +163,11 @@ class PartnerHealthServiceResponseDto {
     (category == null ? 0 : category!.hashCode) +
     (media.hashCode) +
     (productDefinition == null ? 0 : productDefinition!.hashCode) +
-    (productEmployeeEligibilities.hashCode);
+    (productEmployeeEligibilities.hashCode) +
+    (serviceManual == null ? 0 : serviceManual!.hashCode);
 
   @override
-  String toString() => 'PartnerHealthServiceResponseDto[id=$id, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, vendorName=$vendorName, createdAt=$createdAt, updatedAt=$updatedAt, category=$category, media=$media, productDefinition=$productDefinition, productEmployeeEligibilities=$productEmployeeEligibilities]';
+  String toString() => 'PartnerHealthServiceResponseDto[id=$id, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, vendorName=$vendorName, createdAt=$createdAt, updatedAt=$updatedAt, category=$category, media=$media, productDefinition=$productDefinition, productEmployeeEligibilities=$productEmployeeEligibilities, serviceManual=$serviceManual]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -196,6 +208,11 @@ class PartnerHealthServiceResponseDto {
       json[r'productDefinition'] = null;
     }
       json[r'productEmployeeEligibilities'] = this.productEmployeeEligibilities;
+    if (this.serviceManual != null) {
+      json[r'serviceManual'] = this.serviceManual;
+    } else {
+      json[r'serviceManual'] = null;
+    }
     return json;
   }
 
@@ -235,6 +252,7 @@ class PartnerHealthServiceResponseDto {
         media: PartnerHealthServiceMediaDto.listFromJson(json[r'media']),
         productDefinition: PartnerHealthServiceDefinitionDto.fromJson(json[r'productDefinition']),
         productEmployeeEligibilities: PartnerHealthServiceEmployeeEligibilityDto.listFromJson(json[r'productEmployeeEligibilities']),
+        serviceManual: PartnerServiceManualDto.fromJson(json[r'serviceManual']),
       );
     }
     return null;
@@ -308,12 +326,10 @@ class PartnerHealthServiceResponseDtoTypeEnum {
 
   String toJson() => value;
 
-  static const physical = PartnerHealthServiceResponseDtoTypeEnum._(r'physical');
   static const service = PartnerHealthServiceResponseDtoTypeEnum._(r'service');
 
   /// List of all possible values in this [enum][PartnerHealthServiceResponseDtoTypeEnum].
   static const values = <PartnerHealthServiceResponseDtoTypeEnum>[
-    physical,
     service,
   ];
 
@@ -353,7 +369,6 @@ class PartnerHealthServiceResponseDtoTypeEnumTypeTransformer {
   PartnerHealthServiceResponseDtoTypeEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'physical': return PartnerHealthServiceResponseDtoTypeEnum.physical;
         case r'service': return PartnerHealthServiceResponseDtoTypeEnum.service;
         default:
           if (!allowNull) {

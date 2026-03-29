@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
 
 import 'package:common/utils/demensions.dart';
@@ -73,7 +74,7 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
                 // Product Name
                 FormFieldBuilders.buildTextField(
                   context,
-                  fieldKey: 'product_name',
+                  fieldKey: ProductFormField.productName.key,
                   label: 'Product Name',
                   hintText: 'e.g. Rejuvenating Night Cream',
                   isRequired: true,

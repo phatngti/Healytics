@@ -8,7 +8,8 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **String** |  | 
+**id** | **String** | Employee (specialist) ID | 
+**eligibilityId** | **String** | product_employee_eligibility surrogate PK for this employee–service pair | 
 **name** | **String** |  | 
 **role** | **String** |  | 
 **imageUrl** | [**Object**](.md) |  | [optional] 

@@ -58,12 +58,6 @@ void main() {
       // TODO
     });
 
-    // License URL
-    // String licenseUrl
-    test('to test the property `licenseUrl`', () async {
-      // TODO
-    });
-
 
   });
 

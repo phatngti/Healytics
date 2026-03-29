@@ -9,7 +9,9 @@ import fs from 'fs';
 import path from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+  });
 
   // app.use(
   //   session({
@@ -33,6 +35,10 @@ async function bootstrap() {
       .setDescription('This a the project document')
       .setVersion('0.0.1')
       .addBearerAuth()
+      .addApiKey(
+        { type: 'apiKey', name: 'X-AI-API-Key', in: 'header', description: 'AI Service API Token' },
+        'X-AI-API-Key',
+      )
       .build();
     const document = SwaggerModule.createDocument(app, options);
     const openapiPath = __dirname + '/../../openapi/';

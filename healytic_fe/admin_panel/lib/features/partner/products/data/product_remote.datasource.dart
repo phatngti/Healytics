@@ -5,6 +5,7 @@ import 'package:admin_panel/features/partner/products/domain/create_product.requ
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/service_manual.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:admin_openapi/api.dart';
@@ -46,10 +47,8 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   PartnerHealthServicesApi get _partnerHealthServicesApi =>
       apiService.partnerHealthServicesApi;
-  CategoriesApi get _categoriesApi =>
-      apiService.categoriesApi;
-  PartnerServiceTagsApi get _serviceTagsApi =>
-      apiService.serviceTagsApi;
+  CategoriesApi get _categoriesApi => apiService.categoriesApi;
+  PartnerServiceTagsApi get _serviceTagsApi => apiService.serviceTagsApi;
 
   @override
   Future<List<CategoryEntity>> getCategories() async {
@@ -124,9 +123,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
         bufferMinutes: request.buffer,
         maxCapacity: request.capacity,
         minLeadTimeHours: request.leadTime,
-        staffAssignmentType: _mapStaffAssignment(
-          request.staffAllocation,
-        ),
+        staffAssignmentType: _mapStaffAssignment(request.staffAllocation),
       );
     }
 
@@ -134,10 +131,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       name: request.name,
       description: request.description,
       categoryId: request.category,
-      slug: request.name.toLowerCase().replaceAll(
-        RegExp(r'\s+'),
-        '-',
-      ),
+      slug: request.name.toLowerCase().replaceAll(RegExp(r'\s+'), '-'),
       type: typeEnum,
       basePrice: request.basePrice,
       salePrice: request.salePrice,
@@ -151,9 +145,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           .map(
             (entry) => CreatePartnerHealthServiceMediaDto(
               url: entry.value,
-              mediaType:
-                  CreatePartnerHealthServiceMediaDtoMediaTypeEnum
-                      .image,
+              mediaType: CreatePartnerHealthServiceMediaDtoMediaTypeEnum.image,
               isThumbnail: entry.key == 0,
               sortOrder: entry.key,
             ),
@@ -183,14 +175,11 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
             ),
           )
           .toList(),
+      serviceManual: _mapServiceManual(request.serviceManual),
     );
 
-    final response =
-        await _partnerHealthServicesApi
-            .partnerHealthServiceControllerCreate(
-              dto,
-            
-    );
+    final response = await _partnerHealthServicesApi
+        .partnerHealthServiceControllerCreate(dto);
 
     if (response == null) {
       throw Exception('Failed to create product');
@@ -211,36 +200,31 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           request.images?.asMap().entries.map((entry) {
             return CreatePartnerHealthServiceMediaDto(
               url: entry.value,
-              mediaType:
-                  CreatePartnerHealthServiceMediaDtoMediaTypeEnum
-                      .image,
+              mediaType: CreatePartnerHealthServiceMediaDtoMediaTypeEnum.image,
               isThumbnail: entry.key == 0,
               sortOrder: entry.key,
             );
           }).toList() ??
           [],
+      serviceManual: _mapServiceManual(request.serviceManual),
     );
 
-    await _partnerHealthServicesApi
-        .partnerHealthServiceControllerUpdate(
-          request.id.value.toString(),
-          dto,
-        );
+    await _partnerHealthServicesApi.partnerHealthServiceControllerUpdate(
+      request.id.value.toString(),
+      dto,
+    );
   }
 
   @override
   Future<void> deleteProduct(ProductId id) async {
-    await _partnerHealthServicesApi
-        .partnerHealthServiceControllerRemove(
-          id.value.toString(),
-        );
+    await _partnerHealthServicesApi.partnerHealthServiceControllerRemove(
+      id.value.toString(),
+    );
   }
 
   /// Maps a [PartnerProductResponseDto] to the
   /// domain [Product] entity.
-  Product _mapToProduct(
-    PartnerHealthServiceResponseDto dto,
-  ) {
+  Product _mapToProduct(PartnerHealthServiceResponseDto dto) {
     final service = dto.productDefinition;
     final category = dto.category;
 
@@ -266,45 +250,35 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       capacity: service?.maxCapacity?.toInt(),
       leadTime: service?.minLeadTimeHours?.toInt(),
       staffAllocation: service?.staffAssignmentType?.toLowerCase() ?? 'any',
+
+      // Service Manual
+      serviceManual: _mapServiceManualFromDto(dto.serviceManual),
     );
   }
 
-  CreatePartnerHealthServiceDtoTypeEnum _mapProductType(
-    String type,
-  ) {
+  CreatePartnerHealthServiceDtoTypeEnum _mapProductType(String type) {
     switch (type.toLowerCase()) {
-      case 'physical':
-        return CreatePartnerHealthServiceDtoTypeEnum
-            .physical;
       case 'service':
       default:
-        return CreatePartnerHealthServiceDtoTypeEnum
-            .service;
+        return CreatePartnerHealthServiceDtoTypeEnum.service;
     }
   }
 
-  CreatePartnerHealthServiceDtoStatusEnum _mapStatus(
-    String status,
-  ) {
+  CreatePartnerHealthServiceDtoStatusEnum _mapStatus(String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return CreatePartnerHealthServiceDtoStatusEnum
-            .active;
+        return CreatePartnerHealthServiceDtoStatusEnum.active;
       case 'archived':
-        return CreatePartnerHealthServiceDtoStatusEnum
-            .archived;
+        return CreatePartnerHealthServiceDtoStatusEnum.archived;
       case 'draft':
       default:
-        return CreatePartnerHealthServiceDtoStatusEnum
-            .draft;
+        return CreatePartnerHealthServiceDtoStatusEnum.draft;
     }
   }
 
   // ignore: lines_longer_than_80_chars
   CreatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum?
-      _mapStaffAssignment(
-    String assignment,
-  ) {
+  _mapStaffAssignment(String assignment) {
     switch (assignment.toLowerCase()) {
       case 'specific':
         return CreatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum
@@ -316,10 +290,65 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     }
   }
 
+  /// Maps a domain [ServiceManualEntity] to the
+  /// OpenAPI [ServiceManualInputDto].
+  ServiceManualInputDto? _mapServiceManual(ServiceManualEntity? manual) {
+    if (manual == null) return null;
+    return ServiceManualInputDto(
+      preServiceGuidelines: manual.preServiceGuidelines,
+      serviceRules: manual.serviceRules
+          .map(
+            (r) => ServiceRuleInputDto(
+              iconSlug: r.iconSlug,
+              title: r.title,
+              description: r.description,
+            ),
+          )
+          .toList(),
+      procedureSteps: manual.procedureSteps
+          .asMap()
+          .entries
+          .map(
+            (e) => ProcedureStepInputDto(
+              stepNumber: e.key + 1,
+              title: e.value.title,
+              description: e.value.description,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  /// Maps a [PartnerServiceManualDto] from the API
+  /// response to the domain [ServiceManualEntity].
+  ServiceManualEntity? _mapServiceManualFromDto(PartnerServiceManualDto? dto) {
+    if (dto == null) return null;
+    return ServiceManualEntity(
+      preServiceGuidelines: dto.preServiceGuidelines,
+      serviceRules: dto.serviceRules
+          .map(
+            (r) => ServiceRuleEntity(
+              iconSlug: r.iconSlug,
+              title: r.title,
+              description: r.description,
+            ),
+          )
+          .toList(),
+      procedureSteps: dto.procedureSteps
+          .map(
+            (s) => ProcedureStepEntity(
+              stepNumber: s.stepNumber.toInt(),
+              title: s.title,
+              description: s.description,
+            ),
+          )
+          .toList(),
+    );
+  }
+
   @override
   Future<List<ServiceTagResponseDto>> getServiceTags() async {
-    final response = await _serviceTagsApi
-        .serviceTagsControllerFindActive();
+    final response = await _serviceTagsApi.serviceTagsControllerFindActive();
     return response ?? [];
   }
 }

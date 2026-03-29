@@ -19,6 +19,8 @@ final List<AppointmentEntity> kMockAppointments = [
     checkInTime: '7:00 AM',
     checkOutTime: '7:30 AM',
     duration: 'About 1 hour',
+    distanceKm: 2.5,
+    providerId: 'emp-doctor-1',
   ),
   AppointmentEntity(
     id: 'apt-2',
@@ -37,6 +39,8 @@ final List<AppointmentEntity> kMockAppointments = [
     checkInTime: '7:00 AM',
     checkOutTime: '7:30 AM',
     duration: 'About 1 hour',
+    distanceKm: 3.1,
+    providerId: 'emp-doctor-1',
   ),
   AppointmentEntity(
     id: 'apt-3',
@@ -55,6 +59,9 @@ final List<AppointmentEntity> kMockAppointments = [
     checkInTime: '10:00 AM',
     checkOutTime: '11:30 AM',
     duration: 'About 1.5 hours',
+    distanceKm: 1.8,
+    providerId: 'emp-therapist-1',
+    isReviewed: true,
   ),
   AppointmentEntity(
     id: 'apt-4',
@@ -73,6 +80,49 @@ final List<AppointmentEntity> kMockAppointments = [
     checkInTime: '2:00 PM',
     checkOutTime: '2:45 PM',
     duration: 'About 45 min',
+    distanceKm: 4.2,
+    providerId: 'emp-doctor-1',
+  ),
+  AppointmentEntity(
+    id: 'apt-5',
+    serviceName: 'Sports Recovery Therapy',
+    vendorName: 'Zen Wellness Center',
+    imageUrl:
+        'https://images.unsplash.com/photo-1519824145371-296894a0daa9'
+        '?w=800&h=400&fit=crop',
+    status: 'upcoming',
+    category: 'wellness',
+    providerName: 'Therapist Nguyen Linh',
+    address:
+        '45 Nguyen Hue, Ben Nghe\n'
+        'District 1, HCM City, VN',
+    date: DateTime(2026, 3, 22),
+    checkInTime: '9:00 AM',
+    checkOutTime: '10:00 AM',
+    duration: 'About 1 hour',
+    distanceKm: 2.1,
+    providerId: 'emp-therapist-1',
+  ),
+  AppointmentEntity(
+    id: 'apt-6',
+    serviceName: 'Posture Correction',
+    vendorName: 'Zen Wellness Center',
+    imageUrl:
+        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b'
+        '?w=800&h=400&fit=crop',
+    status: 'completed',
+    category: 'wellness',
+    providerName: 'Therapist Nguyen Linh',
+    address:
+        '45 Nguyen Hue, Ben Nghe\n'
+        'District 1, HCM City, VN',
+    date: DateTime(2026, 3, 10),
+    checkInTime: '3:00 PM',
+    checkOutTime: '4:00 PM',
+    duration: 'About 1 hour',
+    distanceKm: 2.1,
+    providerId: 'emp-therapist-1',
+    isReviewed: false,
   ),
 ];
 

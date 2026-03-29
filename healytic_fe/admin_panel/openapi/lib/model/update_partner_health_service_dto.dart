@@ -28,6 +28,7 @@ class UpdatePartnerHealthServiceDto {
     this.productDefinition,
     this.facilityImages = const [],
     this.reviews = const [],
+    this.serviceManual,
   });
 
   ///
@@ -118,6 +119,15 @@ class UpdatePartnerHealthServiceDto {
   /// Product reviews
   List<CreatePartnerHealthServiceReviewDto> reviews;
 
+  /// Service manual (guidelines, rules, procedure steps)
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  ServiceManualInputDto? serviceManual;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is UpdatePartnerHealthServiceDto &&
     other.categoryId == categoryId &&
@@ -134,7 +144,8 @@ class UpdatePartnerHealthServiceDto {
     _deepEquality.equals(other.media, media) &&
     other.productDefinition == productDefinition &&
     _deepEquality.equals(other.facilityImages, facilityImages) &&
-    _deepEquality.equals(other.reviews, reviews);
+    _deepEquality.equals(other.reviews, reviews) &&
+    other.serviceManual == serviceManual;
 
   @override
   int get hashCode =>
@@ -153,10 +164,11 @@ class UpdatePartnerHealthServiceDto {
     (media.hashCode) +
     (productDefinition == null ? 0 : productDefinition!.hashCode) +
     (facilityImages.hashCode) +
-    (reviews.hashCode);
+    (reviews.hashCode) +
+    (serviceManual == null ? 0 : serviceManual!.hashCode);
 
   @override
-  String toString() => 'UpdatePartnerHealthServiceDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, reviews=$reviews]';
+  String toString() => 'UpdatePartnerHealthServiceDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, reviews=$reviews, serviceManual=$serviceManual]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -219,6 +231,11 @@ class UpdatePartnerHealthServiceDto {
     }
       json[r'facilityImages'] = this.facilityImages;
       json[r'reviews'] = this.reviews;
+    if (this.serviceManual != null) {
+      json[r'serviceManual'] = this.serviceManual;
+    } else {
+      json[r'serviceManual'] = null;
+    }
     return json;
   }
 
@@ -258,6 +275,7 @@ class UpdatePartnerHealthServiceDto {
         productDefinition: CreatePartnerHealthServiceDefinitionDto.fromJson(json[r'productDefinition']),
         facilityImages: CreatePartnerHealthServiceFacilityImageDto.listFromJson(json[r'facilityImages']),
         reviews: CreatePartnerHealthServiceReviewDto.listFromJson(json[r'reviews']),
+        serviceManual: ServiceManualInputDto.fromJson(json[r'serviceManual']),
       );
     }
     return null;
@@ -321,12 +339,10 @@ class UpdatePartnerHealthServiceDtoTypeEnum {
 
   String toJson() => value;
 
-  static const physical = UpdatePartnerHealthServiceDtoTypeEnum._(r'physical');
   static const service = UpdatePartnerHealthServiceDtoTypeEnum._(r'service');
 
   /// List of all possible values in this [enum][UpdatePartnerHealthServiceDtoTypeEnum].
   static const values = <UpdatePartnerHealthServiceDtoTypeEnum>[
-    physical,
     service,
   ];
 
@@ -366,7 +382,6 @@ class UpdatePartnerHealthServiceDtoTypeEnumTypeTransformer {
   UpdatePartnerHealthServiceDtoTypeEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'physical': return UpdatePartnerHealthServiceDtoTypeEnum.physical;
         case r'service': return UpdatePartnerHealthServiceDtoTypeEnum.service;
         default:
           if (!allowNull) {
