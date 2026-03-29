@@ -10,8 +10,6 @@ Unit tests cho normalizer module:
 - Hallucination-safe: unknown entities → None
 """
 
-from unittest.mock import patch
-
 from app.ner.normalizer import normalize_entities
 
 
@@ -67,12 +65,7 @@ class TestNormalizeLocation:
         assert result[0].location_code is None
         assert result[0].confidence < 0.85   # Confidence giảm
 
-    @patch("app.ner.normalizer.get_matcher")
-    def test_location_intent_semantic_true(self, mock_get_matcher):
-        mock_get_matcher.return_value.score_location_filter_intent.return_value = {
-            "intent": True,
-            "score": 0.83,
-        }
+    def test_location_intent_not_scored_in_normalizer(self):
         raw = [{
             "type": "LOC",
             "value": "Hà Nội",
@@ -80,24 +73,7 @@ class TestNormalizeLocation:
             "source_query": "tìm spa ở Hà Nội",
         }]
         result = normalize_entities(raw)
-        assert result[0].location_intent is True
-        assert result[0].location_intent_score == 0.83
-
-    @patch("app.ner.normalizer.get_matcher")
-    def test_location_intent_semantic_false(self, mock_get_matcher):
-        mock_get_matcher.return_value.score_location_filter_intent.return_value = {
-            "intent": False,
-            "score": 0.21,
-        }
-        raw = [{
-            "type": "LOC",
-            "value": "Hà Nội",
-            "confidence": 0.85,
-            "source_query": "mình ở Hà Nội, muốn massage trị liệu",
-        }]
-        result = normalize_entities(raw)
-        assert result[0].location_intent is False
-        assert result[0].location_intent_score == 0.21
+        assert result[0].location_intent is None
 
 
 # ============================================================================
@@ -131,7 +107,7 @@ class TestNormalizeBusinessType:
 
 
 # ============================================================================
-# ORG/MISC → BusinessType alias → Category fuzzy
+# ORG/MISC → BusinessType alias + semantic business type
 # ============================================================================
 
 class TestNormalizeOrgMisc:
@@ -149,16 +125,14 @@ class TestNormalizeOrgMisc:
         raw = [{"type": "ORG", "value": "thẩm mỹ viện", "confidence": 0.85}]
         result = normalize_entities(raw)
         assert len(result) == 1
-        # Semantic match should map beauty clinic to SPA_BEAUTY
-        assert result[0].type in ("BUSINESS_TYPE", "CATEGORY")  # semantic match found something
+        assert result[0].type == "BUSINESS_TYPE"
 
     def test_org_unknown_returns_none(self):
-        """ORG unrecognizable → category_slug=None (hallucination-safe)."""
+        """ORG unrecognizable → no mapped business type (hallucination-safe)."""
         raw = [{"type": "ORG", "value": "xyzabc123", "confidence": 0.85}]
         result = normalize_entities(raw)
         assert len(result) == 1
         assert result[0].business_type is None
-        assert result[0].category_slug is None
 
 
 # ============================================================================
@@ -418,6 +392,40 @@ class TestNormalizeDistance:
         }]
         result = normalize_entities(raw)
         assert result[0].radius_meters == 2000
+
+    def test_distance_between_passthrough(self):
+        raw = [{
+            "type": "DISTANCE",
+            "value": "từ 2km đến 5km",
+            "confidence": 1.0,
+            "operator": "between",
+            "amount": 2000.0,
+            "amount_max": 5000.0,
+            "radius_meters": 5000,
+            "distance_unit": "km",
+            "proximity_intent": False,
+        }]
+        result = normalize_entities(raw)
+        assert result[0].operator == "between"
+        assert result[0].amount == 2000.0
+        assert result[0].amount_max == 5000.0
+
+    def test_distance_gte_passthrough(self):
+        raw = [{
+            "type": "DISTANCE",
+            "value": "trên 3km",
+            "confidence": 1.0,
+            "operator": "gte",
+            "amount": 3000.0,
+            "amount_max": 50000.0,
+            "radius_meters": 3000,
+            "distance_unit": "km",
+            "proximity_intent": False,
+        }]
+        result = normalize_entities(raw)
+        assert result[0].operator == "gte"
+        assert result[0].amount == 3000.0
+        assert result[0].amount_max == 50000.0
 
 
 # ============================================================================

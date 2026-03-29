@@ -13,7 +13,7 @@ Changes from previous version:
 
 import pytest
 import pytest_asyncio
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import patch, AsyncMock
 from httpx import ASGITransport, AsyncClient
 
 from app.main import app
@@ -199,6 +199,40 @@ class TestNerExtractNewFeatures:
         assert len(dist_entities) == 1
         assert dist_entities[0]["radius_meters"] == 2000, \
             f"Expected 2000m for '2 cây số', got {dist_entities[0]['radius_meters']}"
+
+    async def test_distance_between_range_operator(self, client):
+        """'từ 2km đến 5km' -> DISTANCE operator=between (min=2000, max=5000)."""
+        response = await client.post(
+            "/ner/extract",
+            json={"text": "Tìm spa từ 2km đến 5km"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        dist_entities = [e for e in data["entities"] if e["type"] == "DISTANCE"]
+        assert len(dist_entities) == 1
+        d = dist_entities[0]
+        assert d["operator"] == "between"
+        assert d["amount"] == 2000.0
+        assert d["amount_max"] == 5000.0
+
+    async def test_distance_between_khoang_toi_no_price_false_positive(self, client):
+        """'khoảng 2 tới 5km' should be DISTANCE between and must not create PRICE entity."""
+        response = await client.post(
+            "/ner/extract",
+            json={"text": "gợi ý các dịch vụ spa và nha sĩ cách đây khoảng 2 tới 5km"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        dist_entities = [e for e in data["entities"] if e["type"] == "DISTANCE"]
+        price_entities = [e for e in data["entities"] if e["type"] == "PRICE"]
+
+        assert len(dist_entities) == 1
+        d = dist_entities[0]
+        assert d["operator"] == "between"
+        assert d["amount"] == 2000.0
+        assert d["amount_max"] == 5000.0
+        assert price_entities == []
 
 
 # ============================================================================
@@ -471,21 +505,9 @@ class TestPrefilterDebugEndpoint:
             "app.api.prefilter_routes.normalizer.normalize_entities",
             return_value=mocked_entities,
         ), patch(
-            "app.api.prefilter_routes.get_feature_tags",
-            return_value=[{"id": "t1", "name": "foo"}],
-        ), patch(
-            "app.api.prefilter_routes.get_category_list",
-            return_value=[{"slug": "dong-y", "name": "Đông y"}],
-        ), patch(
             "app.api.prefilter_routes.db_fetcher.fetch_candidates_from_db",
             new=AsyncMock(return_value=[]),
-        ) as mock_fetch, patch(
-            "app.api.prefilter_routes.SemanticAdjudicator.adjudicate_category",
-            side_effect=AssertionError("adjudicate_category should not be called without BUSINESS_TYPE"),
-        ), patch(
-            "app.api.prefilter_routes.SemanticAdjudicator.adjudicate_tags",
-            side_effect=AssertionError("adjudicate_tags should not be called without BUSINESS_TYPE"),
-        ):
+        ) as mock_fetch:
             response = await client.post(
                 "/prefilter/search/debug",
                 json={"text": "dịch vụ ở hồ chí minh", "limit": 20},
@@ -497,20 +519,21 @@ class TestPrefilterDebugEndpoint:
         assert "categorySlug" not in data["query_params"]
         assert mock_fetch.await_count >= 1
 
-    async def test_prefilter_debug_uses_business_evidence_in_semantic_matching(self, client):
+    async def test_prefilter_debug_keeps_multiple_business_types(self, client):
         mocked_entities = [
             {
                 "type": "BUSINESS_TYPE",
-                "value": "dịch vụ cho đau lưng",
+                "value": "dịch vụ gym",
                 "confidence": 0.9,
                 "business_type": "FITNESS",
-                "business_evidence": "pilates trị liệu cho đau lưng mãn tính",
-            }
+            },
+            {
+                "type": "BUSINESS_TYPE",
+                "value": "dịch vụ spa",
+                "confidence": 0.85,
+                "business_type": "SPA_BEAUTY",
+            },
         ]
-
-        mock_matcher = MagicMock()
-        mock_matcher.extract_semantic_context.return_value = {"query_emb": None}
-        mock_matcher.match_feature_tags.return_value = []
 
         with patch(
             "app.api.prefilter_routes.extractor.extract_entities_with_source",
@@ -519,36 +542,17 @@ class TestPrefilterDebugEndpoint:
             "app.api.prefilter_routes.normalizer.normalize_entities",
             return_value=mocked_entities,
         ), patch(
-            "app.api.prefilter_routes.get_matcher",
-            return_value=mock_matcher,
-        ), patch(
-            "app.api.prefilter_routes.get_feature_tags",
-            return_value=[{"id": "t1", "name": "Giảm đau lưng"}],
-        ), patch(
-            "app.api.prefilter_routes.get_category_list",
-            return_value=[{"slug": "pilates", "name": "Pilates"}],
-        ), patch(
             "app.api.prefilter_routes.db_fetcher.fetch_candidates_from_db",
             new=AsyncMock(return_value=[]),
-        ), patch(
-            "app.api.prefilter_routes.SemanticAdjudicator.adjudicate_business_type",
-            return_value=None,
-        ), patch(
-            "app.api.prefilter_routes.SemanticAdjudicator.adjudicate_category",
-            return_value=None,
-        ) as mock_cat:
+        ):
             response = await client.post(
                 "/prefilter/search/debug",
-                json={"text": "dịch vụ cho người đau lưng", "limit": 20},
+                json={"text": "dịch vụ gym hoặc spa", "limit": 20},
             )
 
         assert response.status_code == 200
-
-        tag_text_arg = mock_matcher.match_feature_tags.call_args.args[0]
-        assert "pilates trị liệu cho đau lưng mãn tính" in tag_text_arg
-
-        category_text_arg = mock_cat.call_args.args[0]
-        assert "pilates trị liệu cho đau lưng mãn tính" in category_text_arg
+        data = response.json()
+        assert data["query_params"].get("businessTypes") == ["FITNESS", "SPA_BEAUTY"]
 
     async def test_prefilter_debug_keeps_only_selected_location_from_gemini(self, client):
         mocked_entities = [
@@ -569,17 +573,12 @@ class TestPrefilterDebugEndpoint:
                 "location_intent": False,
             },
         ]
-        mock_matcher = MagicMock()
-
         with patch(
             "app.api.prefilter_routes.extractor.extract_entities_with_source",
             new=AsyncMock(return_value=(mocked_entities, "gemini")),
         ), patch(
             "app.api.prefilter_routes.normalizer.normalize_entities",
             return_value=mocked_entities,
-        ), patch(
-            "app.api.prefilter_routes.get_matcher",
-            return_value=mock_matcher,
         ), patch(
             "app.api.prefilter_routes.select_requested_location_with_gemini",
             new=AsyncMock(return_value={
@@ -615,17 +614,12 @@ class TestPrefilterDebugEndpoint:
                 "location_intent": True,
             }
         ]
-        mock_matcher = MagicMock()
-
         with patch(
             "app.api.prefilter_routes.extractor.extract_entities_with_source",
             new=AsyncMock(return_value=(mocked_entities, "gemini")),
         ), patch(
             "app.api.prefilter_routes.normalizer.normalize_entities",
             return_value=mocked_entities,
-        ), patch(
-            "app.api.prefilter_routes.get_matcher",
-            return_value=mock_matcher,
         ), patch(
             "app.api.prefilter_routes.select_requested_location_with_gemini",
             new=AsyncMock(return_value={

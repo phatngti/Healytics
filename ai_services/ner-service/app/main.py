@@ -2,7 +2,7 @@
 ai_services/ner-service/app/main.py
 
 FastAPI application entry point.
-Loads location + category caches at startup via lifespan.
+Loads location cache at startup via lifespan.
 """
 
 import logging

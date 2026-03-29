@@ -4,7 +4,6 @@ import threading
 from dataclasses import dataclass
 from typing import Any, Optional
 
-import numpy as np
 import torch
 from cachetools import LRUCache
 from sentence_transformers import SentenceTransformer, util
@@ -110,8 +109,6 @@ class SemanticMatcher:
         self._tag_emb_cache: dict[str, tuple[str, Any]] = {}
         # Category embedding cache: {slug: (content_hash, tensor)}
         self._cat_emb_cache: dict[str, tuple[str, Any]] = {}
-        # Location-intent embedding cache: {location_name: {"pos": tensor, "neg": tensor}}
-        self._loc_intent_cache: dict[str, dict[str, Any]] = {}
         # Query embedding cache to reduce repeated encode calls for hot queries.
         self._query_emb_cache: LRUCache = LRUCache(maxsize=settings.SEMANTIC_QUERY_CACHE_MAXSIZE)
 
@@ -447,90 +444,6 @@ class SemanticMatcher:
         ]
         results.sort(key=lambda x: x["score"], reverse=True)
         return results
-
-    def score_location_filter_intent(
-        self,
-        text: str,
-        location_name: str,
-        threshold: float = 0.58,
-    ) -> dict:
-        """
-        Score whether user intends to FILTER by location, not just mention it.
-
-        Uses semantic margin between:
-          - Positive hypotheses: "search constrained to <location>"
-          - Negative hypotheses: "location only as context, no filtering"
-
-        Returns dict with score in [0,1], boolean intent, and diagnostics.
-        """
-        if not text or not location_name:
-            return {
-                "score": 0.0,
-                "intent": False,
-                "pos_score": 0.0,
-                "neg_score": 0.0,
-                "margin": -1.0,
-            }
-
-        query_emb = self._resolve_query_embedding(text)
-        hyp_embs = self._get_location_intent_hypothesis_embeddings(location_name)
-
-        pos_scores = util.cos_sim(query_emb, hyp_embs["pos"])[0]
-        neg_scores = util.cos_sim(query_emb, hyp_embs["neg"])[0]
-
-        pos = float(pos_scores.max())
-        neg = float(neg_scores.max())
-        margin = pos - neg
-
-        # Convert semantic margin to probability-like score.
-        score = float(1.0 / (1.0 + np.exp(-6.0 * margin)))
-        intent = score >= threshold
-
-        logger.debug(
-            "[SemanticMatcher] location_intent '%s' @ '%s' -> score=%.4f pos=%.4f neg=%.4f margin=%.4f",
-            text[:60],
-            location_name,
-            score,
-            pos,
-            neg,
-            margin,
-        )
-
-        return {
-            "score": round(score, 4),
-            "intent": intent,
-            "pos_score": round(pos, 4),
-            "neg_score": round(neg, 4),
-            "margin": round(margin, 4),
-        }
-
-    def _get_location_intent_hypothesis_embeddings(self, location_name: str) -> dict[str, Any]:
-        with self._cache_lock:
-            cached = self._loc_intent_cache.get(location_name)
-        if cached is not None:
-            return cached
-
-        pos_hypotheses = [
-            f"Người dùng muốn tìm dịch vụ ở {location_name}.",
-            f"Địa điểm {location_name} là điều kiện lọc bắt buộc của truy vấn.",
-            f"Kết quả cần giới hạn trong khu vực {location_name}.",
-            f"Người dùng đang yêu cầu tìm theo vị trí tại {location_name}.",
-        ]
-        neg_hypotheses = [
-            f"Người dùng chỉ nhắc đến {location_name} như thông tin nền, không phải bộ lọc.",
-            f"Đề bài không yêu cầu giới hạn kết quả theo {location_name}.",
-            f"{location_name} chỉ là ngữ cảnh cá nhân, tìm kiếm không ràng buộc vị trí.",
-            f"Người dùng nói về {location_name} nhưng vẫn muốn tìm dịch vụ chung.",
-        ]
-
-        cached = {
-            "pos": self._encode_passages(pos_hypotheses),
-            "neg": self._encode_passages(neg_hypotheses),
-        }
-        with self._cache_lock:
-            self._loc_intent_cache[location_name] = cached
-        return cached
-
 
 # Singleton
 _instance: Optional[SemanticMatcher] = None

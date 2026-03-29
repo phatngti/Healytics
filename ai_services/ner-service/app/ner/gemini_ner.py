@@ -65,6 +65,41 @@ def _strip_code_fence(text: str) -> str:
     return text
 
 
+def _extract_outermost_json_block(text: str) -> str:
+    """
+    Extract the outermost JSON object/array from a possibly padded LLM response.
+
+    This intentionally avoids regex-based extraction to prevent greedy/ambiguous
+    captures when the model includes conversational text before/after JSON.
+    """
+    if not text:
+        return text
+
+    first_brace, last_brace = text.find("{"), text.rfind("}")
+    first_bracket, last_bracket = text.find("["), text.rfind("]")
+
+    candidates: list[tuple[int, int]] = []
+    if first_brace != -1 and last_brace > first_brace:
+        candidates.append((first_brace, last_brace + 1))
+    if first_bracket != -1 and last_bracket > first_bracket:
+        candidates.append((first_bracket, last_bracket + 1))
+
+    if not candidates:
+        return text
+
+    for start, end in sorted(candidates, key=lambda item: item[0]):
+        candidate = text[start:end]
+        try:
+            json.loads(candidate)
+            return candidate
+        except Exception:
+            continue
+
+    # Fallback to the earliest bounds if both parse checks fail.
+    start, end = min(candidates, key=lambda item: item[0])
+    return text[start:end]
+
+
 def _guess_business_type_from_value(value: str) -> str | None:
     value_lower = value.lower().strip()
     for keyword, bt in _BT_FALLBACK_KEYWORDS.items():
@@ -112,6 +147,10 @@ def _canonicalize_raw_entity(entity: dict[str, Any]) -> dict[str, Any]:
             bt = normalized.get("entity_value") or normalized.get("value")
             if isinstance(bt, str) and bt.strip():
                 normalized["business_type"] = bt.strip().upper()
+            elif isinstance(bt, list):
+                bt_list = [str(item).strip().upper() for item in bt if str(item).strip()]
+                if bt_list:
+                    normalized["business_type"] = bt_list
 
         # Keep optional evidence text for downstream semantic disambiguation.
         if "business_evidence" not in normalized:
@@ -141,7 +180,7 @@ def _canonicalize_raw_entity(entity: dict[str, Any]) -> dict[str, Any]:
     return normalized
 
 
-def _sanitize_entity(entity: dict[str, Any], text: str) -> dict[str, Any] | None:
+def _sanitize_entities(entity: dict[str, Any], text: str) -> list[dict[str, Any]]:
     entity_type = str(entity.get("type", "")).upper().strip()
 
     # Keep LOCATION compatible with current normalizer pipeline.
@@ -149,12 +188,12 @@ def _sanitize_entity(entity: dict[str, Any], text: str) -> dict[str, Any] | None
         entity_type = "LOC"
 
     if entity_type not in _ALLOWED_TYPES:
-        return None
+        return []
 
     raw_value = entity.get("value", "")
     value = str(raw_value).strip()
     if not value:
-        return None
+        return []
 
     try:
         confidence = float(entity.get("confidence", 0.8))
@@ -169,13 +208,29 @@ def _sanitize_entity(entity: dict[str, Any], text: str) -> dict[str, Any] | None
     }
 
     if entity_type == "BUSINESS_TYPE":
-        bt = str(entity.get("business_type", "")).strip().upper()
-        if bt not in _ALLOWED_BUSINESS_TYPES:
-            bt = _guess_business_type_from_value(value) or ""
-        if bt in _ALLOWED_BUSINESS_TYPES:
-            cleaned["business_type"] = bt
-        else:
-            return None
+        raw_bt = entity.get("business_type")
+        bt_candidates: list[str] = []
+        if isinstance(raw_bt, str):
+            bt = raw_bt.strip().upper()
+            if bt:
+                bt_candidates.append(bt)
+        elif isinstance(raw_bt, list):
+            for item in raw_bt:
+                bt = str(item).strip().upper()
+                if bt:
+                    bt_candidates.append(bt)
+
+        # Preserve order while deduplicating.
+        bt_candidates = list(dict.fromkeys(bt_candidates))
+        valid_bts = [bt for bt in bt_candidates if bt in _ALLOWED_BUSINESS_TYPES]
+
+        if not valid_bts:
+            guessed = _guess_business_type_from_value(value)
+            if guessed:
+                valid_bts = [guessed]
+
+        if not valid_bts:
+            return []
 
         evidence = str(entity.get("business_evidence") or entity.get("business_phrase") or "").strip()
         if evidence:
@@ -184,6 +239,13 @@ def _sanitize_entity(entity: dict[str, Any], text: str) -> dict[str, Any] | None
         else:
             cleaned["business_evidence"] = value
             cleaned["business_phrase"] = value
+
+        exploded: list[dict[str, Any]] = []
+        for bt in valid_bts:
+            item = dict(cleaned)
+            item["business_type"] = bt
+            exploded.append(item)
+        return exploded
 
     if entity_type in {"PRICE", "RATING"}:
         operator = entity.get("operator")
@@ -223,6 +285,26 @@ def _sanitize_entity(entity: dict[str, Any], text: str) -> dict[str, Any] | None
             except (ValueError, TypeError):
                 pass
 
+        operator = entity.get("operator")
+        if isinstance(operator, str):
+            operator = operator.strip().lower()
+            if operator in {"lte", "gte", "between"}:
+                cleaned["operator"] = operator
+
+        amount = entity.get("amount")
+        if amount is not None:
+            try:
+                cleaned["amount"] = float(amount)
+            except (ValueError, TypeError):
+                pass
+
+        amount_max = entity.get("amount_max")
+        if amount_max is not None:
+            try:
+                cleaned["amount_max"] = float(amount_max)
+            except (ValueError, TypeError):
+                pass
+
         unit = entity.get("distance_unit")
         if isinstance(unit, str) and unit.strip():
             cleaned["distance_unit"] = unit.strip()
@@ -235,13 +317,15 @@ def _sanitize_entity(entity: dict[str, Any], text: str) -> dict[str, Any] | None
 
         if cleaned.get("proximity_intent") is True and "radius_meters" not in cleaned:
             cleaned["radius_meters"] = settings.DEFAULT_PROXIMITY_RADIUS_M
+            cleaned.setdefault("operator", "lte")
+            cleaned.setdefault("amount", float(settings.DEFAULT_PROXIMITY_RADIUS_M))
             cleaned.setdefault("distance_unit", "implicit")
 
     # Carry source query for downstream location-intent scoring.
     if entity_type == "LOC":
         cleaned["source_query"] = text
 
-    return cleaned
+    return [cleaned]
 
 
 async def _request_gemini_json(prompt: str) -> Any | None:
@@ -323,6 +407,7 @@ async def _request_gemini_json(prompt: str) -> Any | None:
     try:
         raw_text = payload["candidates"][0]["content"]["parts"][0]["text"]
         raw_text = _strip_code_fence(raw_text)
+        raw_text = _extract_outermost_json_block(raw_text)
         return json.loads(raw_text)
     except Exception as exc:
         logger.warning(
@@ -462,6 +547,8 @@ async def extract_entities_with_gemini(text: str) -> list[dict] | None:
         "(3) Không suy diễn quá mức từ từ chung chung. "
         "(4) Với mỗi BUSINESS_TYPE, phải thêm key 'business_evidence' chứa chuỗi bằng chứng trích từ query; "
         "chuỗi này có thể là cụm ngắn hoặc cả một đoạn substring dài hơn."
+        " (5) Nếu query thể hiện rõ NHIỀU loại hình, cho phép trả 'business_type' dưới dạng array enum, "
+        "ví dụ ['SPA_BEAUTY','FITNESS']; nếu chỉ 1 loại thì dùng string như bình thường."
         "\n"
         "Quy tắc LOC: nếu query có địa danh rõ ràng (tỉnh/thành/quận/huyện/phường), luôn trả LOC với value là cụm địa danh gốc trong query."
         "\n"
@@ -469,10 +556,10 @@ async def extract_entities_with_gemini(text: str) -> list[dict] | None:
         "\n"
         "PRICE/RATING có thể gồm operator (lte|gte|between), amount, amount_max."
         "\n"
-        "DISTANCE có thể gồm radius_meters, distance_unit, proximity_intent."
+        "DISTANCE có thể gồm operator (lte|gte|between), amount, amount_max, radius_meters, distance_unit, proximity_intent."
         "\n\n"
-        "Ví dụ 1: query='gợi ý các dịch vụ khám sức khỏe hồ chí minh' => "
-        "[{\"type\":\"BUSINESS_TYPE\",\"value\":\"khám sức khỏe\",\"confidence\":0.82,\"business_type\":\"TRADITIONAL_MEDICINE\",\"business_evidence\":\"khám sức khỏe\"},"
+        "Ví dụ 1: query='tìm spa và phòng gym ở hồ chí minh' => "
+        "[{\"type\":\"BUSINESS_TYPE\",\"value\":\"spa và phòng gym\",\"confidence\":0.9,\"business_type\":[\"SPA_BEAUTY\",\"FITNESS\"],\"business_evidence\":\"spa và phòng gym\"},"
         "{\"type\":\"LOC\",\"value\":\"hồ chí minh\",\"confidence\":0.9}]"
         "\n"
         "Ví dụ 2: query='dịch vụ chăm sóc toàn diện cho người cao tuổi' (không rõ 11 loại) => "
@@ -499,9 +586,9 @@ async def extract_entities_with_gemini(text: str) -> list[dict] | None:
         if not isinstance(item, dict):
             dropped += 1
             continue
-        cleaned = _sanitize_entity(_canonicalize_raw_entity(item), text)
-        if cleaned is not None:
-            entities.append(cleaned)
+        cleaned_list = _sanitize_entities(_canonicalize_raw_entity(item), text)
+        if cleaned_list:
+            entities.extend(cleaned_list)
         else:
             dropped += 1
 
