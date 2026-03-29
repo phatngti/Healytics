@@ -46,11 +46,16 @@ abstract class CreateDoctorRequest with _$CreateDoctorRequest {
     /// Weekly work schedule configuration.
     @Default([]) List<Map<String, dynamic>> schedule,
 
+    /// Work history entries.
+    @Default([])
+    List<Map<String, dynamic>> workHistory,
+
     /// URL to avatar image.
     String? avatar,
 
-    /// URL to ID card document.
-    String? idCardUrl,
+    /// Verification documents (ID card, licenses, etc.).
+    @Default([])
+    List<Map<String, dynamic>> verificationDocuments,
 
     /// Employment status (defaults to 'Active').
     @Default('Active') String status,
@@ -139,11 +144,16 @@ abstract class CreateSpaTherapistRequest with _$CreateSpaTherapistRequest {
     /// Weekly work schedule configuration.
     @Default([]) List<Map<String, dynamic>> schedule,
 
+    /// Work history entries.
+    @Default([])
+    List<Map<String, dynamic>> workHistory,
+
     /// URL to avatar image.
     String? avatar,
 
-    /// URL to ID card document.
-    String? idCardUrl,
+    /// Verification documents (ID card, licenses, etc.).
+    @Default([])
+    List<Map<String, dynamic>> verificationDocuments,
 
     /// Employment status (defaults to 'Active').
     @Default('Active') String status,
@@ -176,9 +186,6 @@ abstract class CreateSpaTherapistRequest with _$CreateSpaTherapistRequest {
 
     /// List of device/equipment proficiencies.
     @Default([]) List<String> deviceProficiency,
-
-    /// URL to professional license document.
-    String? licenseUrl,
   }) = _CreateSpaTherapistRequest;
 
   /// Creates a [CreateSpaTherapistRequest] from JSON data.
@@ -231,11 +238,16 @@ abstract class CreateMassageTherapistRequest
     /// Weekly work schedule configuration.
     @Default([]) List<Map<String, dynamic>> schedule,
 
+    /// Work history entries.
+    @Default([])
+    List<Map<String, dynamic>> workHistory,
+
     /// URL to avatar image.
     String? avatar,
 
-    /// URL to ID card document.
-    String? idCardUrl,
+    /// Verification documents (ID card, licenses, etc.).
+    @Default([])
+    List<Map<String, dynamic>> verificationDocuments,
 
     /// Employment status (defaults to 'Active').
     @Default('Active') String status,
@@ -268,9 +280,6 @@ abstract class CreateMassageTherapistRequest
 
     /// List of massage technique skills.
     @Default([]) List<String> skills,
-
-    /// URL to professional license document.
-    String? licenseUrl,
   }) = _CreateMassageTherapistRequest;
 
   /// Creates a [CreateMassageTherapistRequest] from JSON data.

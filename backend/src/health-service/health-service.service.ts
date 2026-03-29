@@ -1,29 +1,50 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Not, Repository, In } from 'typeorm';
 import { CreatePartnerHealthServiceDto } from './dto/partner/create-partner-health-service.dto';
 import { UpdatePartnerHealthServiceDto } from './dto/partner/update-partner-health-service.dto';
 import { Product } from '@/common/entities/product.entity';
+import { Booking } from '@/common/entities/booking.entity';
+import { TreatmentReview } from '@/common/entities/treatment-review.entity';
+import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { CreateHealthServiceHandler } from './application/handlers/create-health-service.handler';
 import { UpdateHealthServiceHandler } from './application/handlers/update-health-service.handler';
 import { RemoveHealthServiceHandler } from './application/handlers/remove-health-service.handler';
 import { PartnerHealthServiceDetailResponseDto } from './dto/partner/partner-health-service-detail-response.dto';
 import { PublicHealthServiceInfoResponseDto } from './dto/public/public-health-service-info-response.dto';
-import { PublicHealthServiceEmployeeResponseDto } from './dto/public/public-health-service-employee-response.dto';
+import {
+  PublicHealthServiceEmployeeResponseDto,
+  PublicHealthServiceEmployeeDayScheduleDto,
+  PublicEmployeeTimeSlotDto,
+} from './dto/public/public-health-service-employee-response.dto';
 import { PublicHealthServiceReviewResponseDto } from './dto/public/public-health-service-review-response.dto';
 import { PublicHealthServiceRecommendedResponseDto } from './dto/public/public-health-service-recommended-response.dto';
 import { PublicHealthServiceCardResponseDto } from './dto/public/public-health-service-card-response.dto';
+import { UserEligibilityDetailResponseDto } from './dto/public/user-eligibility-detail-response.dto';
 import { PartnersService } from '@/partners/partners.service';
 import { HealthServiceStatus } from './enums/health-service-status.enum';
+import { HealthServiceType } from './enums/health-service-type.enum';
+import { BookingStatus } from '@/booking/enums/booking-status.enum';
 
 
 @Injectable()
 export class HealthServiceService {
   private readonly logger = new Logger(HealthServiceService.name);
 
+  /** Slot duration in minutes. */
+  private readonly SLOT_DURATION_MINUTES = 30;
+  /** Number of days ahead to generate schedules for. */
+  private readonly SCHEDULE_DAYS_AHEAD = 30;
+
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(Booking)
+    private readonly bookingRepository: Repository<Booking>,
+    @InjectRepository(TreatmentReview)
+    private readonly treatmentReviewRepository: Repository<TreatmentReview>,
+    @InjectRepository(ProductEmployeeEligibility)
+    private readonly eligibilityRepository: Repository<ProductEmployeeEligibility>,
     private readonly createHealthServiceHandler: CreateHealthServiceHandler,
     private readonly updateHealthServiceHandler: UpdateHealthServiceHandler,
     private readonly removeHealthServiceHandler: RemoveHealthServiceHandler,
@@ -39,6 +60,9 @@ export class HealthServiceService {
 
   async findAll(): Promise<Product[]> {
     return this.productRepository.find({
+      where: {
+        type: HealthServiceType.SERVICE
+      },
       relations: [
         'category',
         'media',
@@ -133,7 +157,54 @@ export class HealthServiceService {
     return PartnerHealthServiceDetailResponseDto.fromEntity(product, recommended);
   }
 
-  // ─── User-facing Detail Endpoints ───────────────────
+  // ─── Rating Helpers ──────────────────────────────────────────
+
+  /**
+   * Returns { rating, count } for a single product, computed by joining
+   * product_treatment_reviews → bookings on productId.
+   */
+  async getProductRatingData(productId: string): Promise<{ rating: number; count: number }> {
+    const result = await this.treatmentReviewRepository
+      .createQueryBuilder('tr')
+      .innerJoin('tr.booking', 'b')
+      .where('b.product_id = :productId', { productId })
+      .select('AVG(tr.rating)', 'avg')
+      .addSelect('COUNT(tr.id)', 'count')
+      .getRawOne<{ avg: string | null; count: string }>();
+
+    const count = parseInt(result?.count ?? '0', 10);
+    const rating = count > 0 ? Math.round((parseFloat(result?.avg ?? '0')) * 10) / 10 : 0;
+    return { rating, count };
+  }
+
+  /**
+   * Bulk version — returns a Map<productId, { rating, count }> for a set of products.
+   * Used by listing endpoints to avoid N+1 queries.
+   */
+  private async buildRatingsMap(
+    productIds: string[],
+  ): Promise<Map<string, { rating: number; count: number }>> {
+    if (!productIds.length) return new Map();
+
+    const rows = await this.treatmentReviewRepository
+      .createQueryBuilder('tr')
+      .innerJoin('tr.booking', 'b')
+      .where('b.product_id IN (:...productIds)', { productIds })
+      .select('b.product_id', 'productId')
+      .addSelect('AVG(tr.rating)', 'avg')
+      .addSelect('COUNT(tr.id)', 'count')
+      .groupBy('b.product_id')
+      .getRawMany<{ productId: string; avg: string; count: string }>();
+
+    const map = new Map<string, { rating: number; count: number }>();
+    for (const row of rows) {
+      const count = parseInt(row.count, 10);
+      const rating = count > 0 ? Math.round((parseFloat(row.avg)) * 10) / 10 : 0;
+      map.set(row.productId, { rating, count });
+    }
+    return map;
+  }
+
 
   /**
    * Returns info (service info) for the user detail screen.
@@ -147,7 +218,6 @@ export class HealthServiceService {
         'media',
         'productTags',
         'productTags.tag',
-        'reviews',
         'facilityImages',
       ],
     });
@@ -157,14 +227,18 @@ export class HealthServiceService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    // Load health partner's profile for clinic info
-    const partner = await this.partnersService.getFirstHealthPartner();
+    const [partner, ratingData] = await Promise.all([
+      this.partnersService.getFirstHealthPartner(),
+      this.getProductRatingData(id),
+    ]);
 
-    return PublicHealthServiceInfoResponseDto.fromEntity(product, partner);
+    return PublicHealthServiceInfoResponseDto.fromEntity(product, partner, ratingData);
   }
 
   /**
-   * Returns the list of eligible employees for a service.
+   * Returns the list of eligible employees for a service, with real
+   * day-by-day booking schedules derived from the employee's work schedule
+   * and existing bookings.
    */
   async getProductEmployees(id: string): Promise<PublicHealthServiceEmployeeResponseDto[]> {
     const product = await this.productRepository.findOne({
@@ -182,28 +256,75 @@ export class HealthServiceService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    const employees = (product.productEmployeeEligibilities ?? [])
-      .map((elig) => elig.employee)
-      .filter(Boolean);
+    const eligibilities = product.productEmployeeEligibilities ?? [];
 
-    return PublicHealthServiceEmployeeResponseDto.fromEntities(employees);
+    if (eligibilities.length === 0) {
+      return [];
+    }
+
+    // Determine which employee is "selected" (primary or first)
+    const primaryEligibility = eligibilities.find((e) => e.isPrimary);
+    const selectedEmployeeId = primaryEligibility?.employeeId ?? eligibilities[0]?.employeeId;
+
+    // Date range: today → +30 days
+    const now = new Date();
+    const rangeStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const rangeEnd = new Date(rangeStart);
+    rangeEnd.setDate(rangeEnd.getDate() + this.SCHEDULE_DAYS_AHEAD);
+
+    // Fetch non-cancelled bookings for all employees in the date range
+    const employeeIds = eligibilities.map((e) => e.employeeId);
+    const bookings = await this.bookingRepository.find({
+      where: {
+        staffId: In(employeeIds),
+        status: Not(BookingStatus.CANCELLED),
+      },
+    });
+
+    // Index bookings by staffId → Set<ISO-date-time-key>
+    const bookedSlotsByEmployee = this.indexBookedSlots(bookings, rangeStart, rangeEnd);
+
+    // Build response — filter out any eligibilities whose employee relation is missing
+    return eligibilities
+      .filter((elig) => elig.employee != null)
+      .map((elig) => {
+        const employee = elig.employee;
+        const daySchedules = this.buildDaySchedules(
+          employee.schedule ?? [],
+          bookedSlotsByEmployee.get(employee.id) ?? new Set(),
+          rangeStart,
+        );
+
+        return PublicHealthServiceEmployeeResponseDto.fromEntity(employee, {
+          eligibilityId: elig.id,
+          isSelected: employee.id === selectedEmployeeId,
+          daySchedules,
+        });
+      });
   }
 
   /**
-   * Returns the list of reviews.
+   * Returns the list of treatment reviews for a service.
+   * Queries product_treatment_reviews via bookings.product_id.
+   * Loads user → userProfile for reviewer name.
    */
   async getProductReviews(id: string): Promise<PublicHealthServiceReviewResponseDto[]> {
-    const product = await this.productRepository.findOne({
-      where: { id },
-      relations: ['reviews'],
-    });
-
-    if (!product) {
+    // Verify the product exists first
+    const productExists = await this.productRepository.count({ where: { id } });
+    if (!productExists) {
       this.logger.warn(`Product not found for reviews: ${id}`);
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    return PublicHealthServiceReviewResponseDto.fromEntities(product.reviews ?? []);
+    const reviews = await this.treatmentReviewRepository
+      .createQueryBuilder('tr')
+      .innerJoin('tr.booking', 'b')
+      .innerJoinAndSelect('tr.user', 'account')
+      .where('b.product_id = :id', { id })
+      .orderBy('tr.createdAt', 'DESC')
+      .getMany();
+
+    return PublicHealthServiceReviewResponseDto.fromEntities(reviews);
   }
 
   /**
@@ -229,12 +350,42 @@ export class HealthServiceService {
         categoryId: product.categoryId,
         id: Not(product.id),
       },
-      relations: ['media', 'reviews'],
+      relations: ['media'],
       take: 5,
       order: { createdAt: 'DESC' },
     });
 
-    return PublicHealthServiceRecommendedResponseDto.fromEntities(recommended);
+    const ratingsMap = await this.buildRatingsMap(recommended.map((p) => p.id));
+    return PublicHealthServiceRecommendedResponseDto.fromEntities(recommended, ratingsMap);
+  }
+
+  // ─── User-authenticated Eligibility Endpoint ────────────────
+
+  /**
+   * Returns enriched eligibility detail — category, product, and employee info —
+   * looked up by the surrogate PK on product_employee_eligibility.
+   */
+  async getEligibilityDetail(eligibilityId: string): Promise<UserEligibilityDetailResponseDto> {
+    const eligibility = await this.eligibilityRepository.findOne({
+      where: { id: eligibilityId },
+      relations: [
+        'product',
+        'product.category',
+        'product.media',
+        'product.productDefinition',
+        'employee',
+        'employee.doctorProfile',
+      ],
+    });
+
+    if (!eligibility) {
+      this.logger.warn(`Eligibility not found: ${eligibilityId}`);
+      throw new NotFoundException(`Eligibility with ID ${eligibilityId} not found`);
+    }
+
+    const partner = await this.partnersService.getFirstHealthPartner();
+
+    return UserEligibilityDetailResponseDto.fromEntity(eligibility, partner);
   }
 
   // ─── Public Listing Endpoints ───────────────────────────────
@@ -246,7 +397,6 @@ export class HealthServiceService {
     'productDefinition',
     'productEmployeeEligibilities',
     'productEmployeeEligibilities.employee',
-    'reviews',
   ];
 
   /**
@@ -263,8 +413,11 @@ export class HealthServiceService {
       order: { createdAt: 'DESC' },
     });
 
-    const partner = await this.partnersService.getFirstHealthPartner();
-    return PublicHealthServiceCardResponseDto.fromEntities(products, partner);
+    const [partner, ratingsMap] = await Promise.all([
+      this.partnersService.getFirstHealthPartner(),
+      this.buildRatingsMap(products.map((p) => p.id)),
+    ]);
+    return PublicHealthServiceCardResponseDto.fromEntities(products, partner, ratingsMap);
   }
 
   /**
@@ -281,8 +434,11 @@ export class HealthServiceService {
       order: { createdAt: 'DESC' },
     });
 
-    const partner = await this.partnersService.getFirstHealthPartner();
-    return PublicHealthServiceCardResponseDto.fromEntities(products, partner);
+    const [partner, ratingsMap] = await Promise.all([
+      this.partnersService.getFirstHealthPartner(),
+      this.buildRatingsMap(products.map((p) => p.id)),
+    ]);
+    return PublicHealthServiceCardResponseDto.fromEntities(products, partner, ratingsMap);
   }
 
   /**
@@ -300,5 +456,133 @@ export class HealthServiceService {
    */
   async remove(id: string): Promise<void> {
     return this.removeHealthServiceHandler.execute(id);
+  }
+
+  // ─── Private Schedule Helpers ──────────────────────────────
+
+  /** Day-of-week names matching the employee schedule JSONB keys. */
+  private static readonly DAY_NAMES = [
+    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+  ];
+
+  /**
+   * Indexes bookings into a Map<employeeId, Set<slotKey>>.
+   * Each slotKey is `YYYY-MM-DD|HH:mm` for fast lookup.
+   */
+  private indexBookedSlots(
+    bookings: Booking[],
+    rangeStart: Date,
+    rangeEnd: Date,
+  ): Map<string, Set<string>> {
+    const map = new Map<string, Set<string>>();
+
+    for (const booking of bookings) {
+      const startTime = new Date(booking.startTime);
+      if (startTime < rangeStart || startTime >= rangeEnd) continue;
+
+      if (!map.has(booking.staffId)) {
+        map.set(booking.staffId, new Set());
+      }
+
+      const dateStr = this.formatDate(startTime);
+      const timeStr = this.formatTime24(startTime);
+      map.get(booking.staffId)!.add(`${dateStr}|${timeStr}`);
+    }
+
+    return map;
+  }
+
+  /**
+   * Builds 30-day schedules for an employee from their weekly schedule
+   * and a set of already-booked slot keys.
+   */
+  private buildDaySchedules(
+    weeklySchedule: { day: string; start: string; end: string; isWorking: boolean }[],
+    bookedSlots: Set<string>,
+    rangeStart: Date,
+  ): PublicHealthServiceEmployeeDayScheduleDto[] {
+    // Index weekly schedule by day name for O(1) lookup
+    const scheduleByDay = new Map<string, { start: string; end: string; isWorking: boolean }>();
+    for (const entry of weeklySchedule) {
+      scheduleByDay.set(entry.day, entry);
+    }
+
+    const days: PublicHealthServiceEmployeeDayScheduleDto[] = [];
+
+    for (let i = 0; i < this.SCHEDULE_DAYS_AHEAD; i++) {
+      const date = new Date(rangeStart);
+      date.setDate(date.getDate() + i);
+
+      const dayName = HealthServiceService.DAY_NAMES[date.getDay()];
+      const dateStr = this.formatDate(date);
+      const entry = scheduleByDay.get(dayName);
+
+      if (!entry || !entry.isWorking || !entry.start || !entry.end) {
+        days.push({ date: dateStr, isAvailable: false, timeSlots: [] });
+        continue;
+      }
+
+      const timeSlots = this.generateTimeSlots(entry.start, entry.end, dateStr, bookedSlots);
+      const isAvailable = timeSlots.some((s) => s.isAvailable);
+
+      days.push({ date: dateStr, isAvailable, timeSlots });
+    }
+
+    return days;
+  }
+
+  /**
+   * Generates 30-minute time slots between startTime and endTime (24h format "HH:mm"),
+   * marking each as available/booked based on the bookedSlots set.
+   */
+  private generateTimeSlots(
+    startTime: string,
+    endTime: string,
+    dateStr: string,
+    bookedSlots: Set<string>,
+  ): PublicEmployeeTimeSlotDto[] {
+    const [startH, startM] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+
+    const startMinutes = startH * 60 + startM;
+    const endMinutes = endH * 60 + endM;
+
+    const slots: PublicEmployeeTimeSlotDto[] = [];
+
+    for (let m = startMinutes; m < endMinutes; m += this.SLOT_DURATION_MINUTES) {
+      const h = Math.floor(m / 60);
+      const min = m % 60;
+
+      const time24 = `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+      const label = this.formatTime12(h, min);
+      const slotKey = `${dateStr}|${time24}`;
+
+      slots.push({
+        label,
+        isAvailable: !bookedSlots.has(slotKey),
+      });
+    }
+
+    return slots;
+  }
+
+  /** Formats a Date to YYYY-MM-DD. */
+  private formatDate(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  /** Formats a Date's time to HH:mm (24h). */
+  private formatTime24(date: Date): string {
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  }
+
+  /** Converts 24h hour/minute to 12h format label (e.g. "09:00 AM"). */
+  private formatTime12(hour: number, minute: number): string {
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    return `${String(h12).padStart(2, '0')}:${String(minute).padStart(2, '0')} ${period}`;
   }
 }

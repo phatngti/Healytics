@@ -1,8 +1,10 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/features/orders/domain/entities/appointment.entity.dart';
 
-/// Displays the service name and vendor name
-/// as the primary heading on the details page.
+/// Displays the service name, vendor name, and
+/// distance as the primary heading on the details
+/// page.
 class ServiceHeader extends StatelessWidget {
   const ServiceHeader({super.key, required this.appointment});
 
@@ -12,6 +14,7 @@ class ServiceHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,12 +25,51 @@ class ServiceHeader extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 4),
+        AppDimens.verticalExtraSmall,
         Text(
           appointment.vendorName,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+            color: colors.onSurfaceVariant,
             fontWeight: FontWeight.w500,
+          ),
+        ),
+        if (appointment.distanceKm! > 0) ...[
+          AppDimens.verticalSmall,
+          _DistanceInfo(
+            distanceKm: appointment.distanceKm!,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Inline distance indicator with a location icon.
+class _DistanceInfo extends StatelessWidget {
+  const _DistanceInfo({required this.distanceKm});
+  final double distanceKm;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final label = distanceKm < 10
+        ? '${distanceKm.toStringAsFixed(1)} km'
+        : '${distanceKm.round()} km';
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.location_on_outlined,
+          size: AppDimens.iconSm,
+          color: colors.onSurfaceVariant,
+        ),
+        AppDimens.horizontalExtraSmall,
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colors.onSurfaceVariant,
           ),
         ),
       ],

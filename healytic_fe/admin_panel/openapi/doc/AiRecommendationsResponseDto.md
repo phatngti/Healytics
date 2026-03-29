@@ -1,0 +1,16 @@
+# admin_openapi.model.AiRecommendationsResponseDto
+
+## Load the model package
+```dart
+import 'package:admin_openapi/api.dart';
+```
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**total** | **num** |  | 
+**recommendations** | [**List<AiRecommendationItemDto>**](AiRecommendationItemDto.md) |  | [default to const []]
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

@@ -6,5 +6,5 @@
 /// Only active when [kDebugMode] is `true`.
 abstract final class SignInAutofill {
   static const email = 'partner@healytics.vn';
-  static const password = 'Partner@123';
+  static const password = 'partner@123';
 }

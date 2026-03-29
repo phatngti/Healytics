@@ -1,10 +1,14 @@
+import 'package:admin_panel/features/partner/products/domain/facility_image_key.dart';
+
 /// Dev-only autofill defaults for the Product Add form.
 ///
 /// Used when navigating to the Add Product screen with
-/// `?autofill=true` (e.g. `/provider/products/add?autofill=true`).
+/// `?autofill=true`
+/// (e.g. `/provider/products/add?autofill=true`).
 ///
-/// Only active when [kDebugMode] is `true` — the guard lives
-/// in [ProductAddScreen], not here, so this class stays pure.
+/// Only active when [kDebugMode] is `true` — the
+/// guard lives in [ProductAddScreen], not here,
+/// so this class stays pure.
 abstract final class ProductAddAutofill {
   static const name = 'Signature Rejuvenating Facial';
 
@@ -53,28 +57,30 @@ abstract final class ProductAddAutofill {
         'istockphoto-1460619599-1024x1024.jpg',
   ];
 
-  /// Facility image entries (URL + label) for autofill.
-  static const facilityImages = <Map<String, String>>[
+  /// Facility image entries (URL + label)
+  /// for autofill.
+  static const facilityImages =
+      <Map<String, String>>[
     {
-      'imageUrl':
+      FacilityImageKey.imageUrl:
           'https://pub-58a545087a6b4221b1b0dab10d8d3517'
           '.r2.dev/1770315713692-Gemini_Generated_Image'
           '_86fd6v86fd6v86fd-Photoroom.png',
-      'label': 'Reception Area',
+      FacilityImageKey.label: 'Reception Area',
     },
     {
-      'imageUrl':
+      FacilityImageKey.imageUrl:
           'https://pub-58a545087a6b4221b1b0dab10d8d3517'
           '.r2.dev/1770315725051-Gemini_Generated_Image'
           '_eq0jpneq0jpneq0j-Photoroom.png',
-      'label': 'Treatment Room',
+      FacilityImageKey.label: 'Treatment Room',
     },
     {
-      'imageUrl':
+      FacilityImageKey.imageUrl:
           'https://pub-58a545087a6b4221b1b0dab10d8d3517'
           '.r2.dev/1770316458784-Gemini_Generated_Image'
           '_86fd6v86fd6v86fd-Photoroom.png',
-      'label': 'Relaxation Lounge',
+      FacilityImageKey.label: 'Relaxation Lounge',
     },
   ];
 }

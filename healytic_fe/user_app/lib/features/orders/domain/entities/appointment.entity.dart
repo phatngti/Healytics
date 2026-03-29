@@ -17,6 +17,18 @@ class AppointmentEntity {
   final String checkOutTime;
   final String duration;
 
+  /// Distance from user to the clinic in km.
+  /// Null when coordinates are unavailable.
+  final double? distanceKm;
+
+  /// The employee ID of the assigned provider.
+  /// Used for navigating to the employee detail.
+  final String? providerId;
+
+  /// Whether the user has already submitted
+  /// a review for this appointment.
+  final bool isReviewed;
+
   const AppointmentEntity({
     required this.id,
     required this.serviceName,
@@ -30,7 +42,49 @@ class AppointmentEntity {
     required this.checkInTime,
     required this.checkOutTime,
     required this.duration,
+    this.distanceKm,
+    this.providerId,
+    this.isReviewed = false,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AppointmentEntity &&
+          id == other.id &&
+          serviceName == other.serviceName &&
+          vendorName == other.vendorName &&
+          imageUrl == other.imageUrl &&
+          status == other.status &&
+          category == other.category &&
+          providerName == other.providerName &&
+          address == other.address &&
+          date == other.date &&
+          checkInTime == other.checkInTime &&
+          checkOutTime == other.checkOutTime &&
+          duration == other.duration &&
+          distanceKm == other.distanceKm &&
+          providerId == other.providerId &&
+          isReviewed == other.isReviewed;
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        serviceName,
+        vendorName,
+        imageUrl,
+        status,
+        category,
+        providerName,
+        address,
+        date,
+        checkInTime,
+        checkOutTime,
+        duration,
+        distanceKm,
+        providerId,
+        isReviewed,
+      );
 }
 
 /// Category filter for appointments.
@@ -44,6 +98,17 @@ class AppointmentCategory {
     required this.name,
     required this.iconSlug,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AppointmentCategory &&
+          id == other.id &&
+          name == other.name &&
+          iconSlug == other.iconSlug;
+
+  @override
+  int get hashCode => Object.hash(id, name, iconSlug);
 }
 
 /// A service recommendation shown below appointments.
@@ -63,4 +128,25 @@ class RecommendedServiceEntity {
     required this.price,
     required this.duration,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RecommendedServiceEntity &&
+          id == other.id &&
+          name == other.name &&
+          description == other.description &&
+          imageUrl == other.imageUrl &&
+          price == other.price &&
+          duration == other.duration;
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        name,
+        description,
+        imageUrl,
+        price,
+        duration,
+      );
 }

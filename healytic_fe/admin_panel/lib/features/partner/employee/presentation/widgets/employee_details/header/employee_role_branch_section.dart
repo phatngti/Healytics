@@ -17,8 +17,6 @@ class EmployeeRoleBranchSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -28,17 +26,6 @@ class EmployeeRoleBranchSection extends StatelessWidget {
           children: [
             _RoleBadge(role: role),
             _StatusBadge(status: status),
-          ],
-        ),
-        AppDimens.verticalMediumSmall,
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.storefront,
-              size: 20,
-              color: colorScheme.onSurfaceVariant,
-            ),
           ],
         ),
       ],

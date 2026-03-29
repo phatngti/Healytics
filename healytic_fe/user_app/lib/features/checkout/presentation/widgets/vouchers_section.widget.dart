@@ -1,3 +1,4 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 
@@ -24,24 +25,34 @@ class VouchersSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final radius = AppDimens.cardRadius(context);
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(radius),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+          color: colorScheme.outlineVariant
+              .withValues(alpha: 0.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow
+                .withValues(alpha: 0.08),
+            blurRadius: AppDimens.spaceMd,
+            offset: const Offset(
+              0,
+              AppDimens.spaceXxs,
+            ),
           ),
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 6),
+            color: colorScheme.shadow
+                .withValues(alpha: 0.04),
+            blurRadius: AppDimens.spaceXxl,
+            offset: const Offset(
+              0,
+              AppDimens.spaceXs + 2,
+            ),
           ),
         ],
       ),
@@ -54,15 +65,22 @@ class VouchersSection extends StatelessWidget {
               discount: shopVoucher!.discountAmount,
               isApplied: shopVoucher!.isApplied,
             ),
-          Divider(height: 1, color: colorScheme.outlineVariant),
+          Divider(
+            height: 1,
+            color: colorScheme.outlineVariant,
+          ),
           if (platformVoucher != null)
             _VoucherRow(
               icon: Icons.confirmation_number,
               label: platformVoucher!.label,
-              discount: platformVoucher!.discountAmount,
+              discount:
+                  platformVoucher!.discountAmount,
               isApplied: platformVoucher!.isApplied,
             ),
-          Divider(height: 1, color: colorScheme.outlineVariant),
+          Divider(
+            height: 1,
+            color: colorScheme.outlineVariant,
+          ),
           _CoinRow(
             coinBalance: coinBalance,
             coinValue: coinValue,
@@ -75,6 +93,8 @@ class VouchersSection extends StatelessWidget {
   }
 }
 
+/// A single voucher row with icon, label, discount,
+/// and a chevron for selection.
 class _VoucherRow extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -92,22 +112,30 @@ class _VoucherRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final pad = AppDimens.cardPadding(context);
 
     return InkWell(
       onTap: () {
         // TODO: open voucher selection
       },
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(
+        AppDimens.cardRadius(context),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(pad),
         child: Row(
           children: [
-            Icon(icon, color: colorScheme.primary, size: 20),
-            const SizedBox(width: 12),
+            Icon(
+              icon,
+              color: colorScheme.primary,
+              size: AppDimens.iconMd,
+            ),
+            AppDimens.horizontalMediumSmall,
             Expanded(
               child: Text(
                 label,
-                style: textTheme.bodyMedium?.copyWith(
+                style:
+                    textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: colorScheme.onSurface,
                 ),
@@ -116,7 +144,8 @@ class _VoucherRow extends StatelessWidget {
             if (isApplied && discount > 0)
               Text(
                 '-${_formatCurrency(discount)}',
-                style: textTheme.bodySmall?.copyWith(
+                style:
+                    textTheme.bodySmall?.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
@@ -124,14 +153,16 @@ class _VoucherRow extends StatelessWidget {
             else
               Text(
                 'Select voucher',
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+                style:
+                    textTheme.bodySmall?.copyWith(
+                  color:
+                      colorScheme.onSurfaceVariant,
                 ),
               ),
-            const SizedBox(width: 8),
+            AppDimens.horizontalSmall,
             Icon(
               Icons.chevron_right,
-              size: 16,
+              size: AppDimens.iconSm,
               color: colorScheme.onSurfaceVariant,
             ),
           ],
@@ -141,7 +172,8 @@ class _VoucherRow extends StatelessWidget {
   }
 
   String _formatCurrency(int amount) {
-    final formatted = amount.toString().replaceAllMapped(
+    final formatted =
+        amount.toString().replaceAllMapped(
       RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
       (m) => '${m[1]},',
     );
@@ -149,6 +181,8 @@ class _VoucherRow extends StatelessWidget {
   }
 }
 
+/// Coin redemption row with balance display and
+/// toggle switch.
 class _CoinRow extends StatelessWidget {
   final int coinBalance;
   final int coinValue;
@@ -166,25 +200,33 @@ class _CoinRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final pad = AppDimens.cardPadding(context);
 
-    final formatted = coinValue.toString().replaceAllMapped(
+    final formatted =
+        coinValue.toString().replaceAllMapped(
       RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
       (m) => '${m[1]},',
     );
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(pad),
       child: Row(
         children: [
-          Icon(Icons.monetization_on, color: Colors.amber.shade400, size: 20),
-          const SizedBox(width: 12),
+          Icon(
+            Icons.monetization_on,
+            color: Colors.amber.shade400,
+            size: AppDimens.iconMd,
+          ),
+          AppDimens.horizontalMediumSmall,
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   'Redeem Coins',
-                  style: textTheme.bodyMedium?.copyWith(
+                  style:
+                      textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                     color: colorScheme.onSurface,
                   ),
@@ -192,9 +234,10 @@ class _CoinRow extends StatelessWidget {
                 Text(
                   'Balance: $coinBalance coins '
                   '(-$formattedđ)',
-                  style: textTheme.labelSmall?.copyWith(
-                    fontSize: 10,
-                    color: colorScheme.onSurfaceVariant,
+                  style:
+                      textTheme.labelSmall?.copyWith(
+                    color:
+                        colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

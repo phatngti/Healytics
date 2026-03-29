@@ -20,4 +20,16 @@ enum TherapistType {
     TherapistType.spa => 'SPA',
     TherapistType.massage => 'MASSAGE',
   };
+
+  /// Returns the [TherapistType] for the given API [value].
+  ///
+  /// Returns `null` if no matching type is found.
+  static TherapistType? fromApiValue(String? value) {
+    if (value == null) return null;
+    return switch (value.toUpperCase()) {
+      'SPA' => TherapistType.spa,
+      'MASSAGE' => TherapistType.massage,
+      _ => null,
+    };
+  }
 }

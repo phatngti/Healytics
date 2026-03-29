@@ -18,6 +18,10 @@ import { RedisModule } from './redis/redis.module';
 import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 import { BookingModule } from './booking/booking.module';
 import { MapboxModule } from './mapbox/mapbox.module';
+import { AppointmentModule } from './appointment/appointment.module';
+import { AiServiceModule } from './ai-service/ai-service.module';
+import { ReviewModule } from './review/review.module';
+import { PaymentGatewayModule } from './payment-gateway/payment-gateway.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 import rabbitmqConfig from './config/rabbitmq.config';
@@ -72,6 +76,10 @@ import { PublicThrottlerGuard } from './common/guards';
     ChatbotModule,
     BookingModule,
     MapboxModule,
+    AppointmentModule,
+    AiServiceModule,
+    ReviewModule,
+    PaymentGatewayModule,
   ],
   providers: [
     {

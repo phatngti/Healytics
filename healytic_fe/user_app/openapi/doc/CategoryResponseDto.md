@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **description** | [**Object**](.md) | Category description | [optional] 
 **imageUrl** | [**Object**](.md) | Category image URL | [optional] 
 **isActive** | **bool** | Whether category is active | 
+**categoryType** | **String** | Category type for UI grouping | [optional] [default to 'primary']
 **createdAt** | [**DateTime**](DateTime.md) | Creation timestamp | 
 **updatedAt** | [**DateTime**](DateTime.md) | Last update timestamp | 
 **parent** | [**CategorySummaryDto**](CategorySummaryDto.md) | Parent category | [optional] 

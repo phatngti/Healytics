@@ -77,6 +77,20 @@ export class RedisService implements OnModuleDestroy {
     return this.redis.del(key);
   }
 
+  // ── Pub/Sub helpers ─────────────────────────────────────────
+
+  /**
+   * Publish a message to a Redis channel (Pub/Sub).
+   * Returns the number of subscribers that received the message.
+   */
+  async publish(channel: string, message: string): Promise<number> {
+    const receivers = await this.redis.publish(channel, message);
+    this.logger.debug(
+      `Published to "${channel}" (${receivers} receiver(s)): ${message}`,
+    );
+    return receivers;
+  }
+
   async onModuleDestroy() {
     this.logger.log('Closing Redis connection...');
     await this.redis.quit();

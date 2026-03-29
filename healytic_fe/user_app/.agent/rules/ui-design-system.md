@@ -93,7 +93,34 @@ double getHorizontalPadding(BuildContext context) {
 
 ## Images and Assets
 - Declare in `pubspec.yaml` under `assets:`.
-- Use `Image.asset` for local, `Image.network` with `errorBuilder` and `loadingBuilder`.
+- Use `Image.asset` for local assets.
+- **For all network images**, use `NetworkImageAuto` from `package:common`:
+
+```dart
+import 'package:common/widgets/images/network_image_auto.dart';
+
+// Handles SVG and raster (PNG/JPEG/WebP) automatically
+NetworkImageAuto(
+  imageUrl: url,
+  fit: BoxFit.cover,
+  placeholder: (_) => placeholder,
+  errorWidget: (_) => fallback,
+)
+```
+
+- For **circular avatars**, use `AvatarImage` from `package:common`:
+
+```dart
+import 'package:common/widgets/images/avatar.dart';
+
+AvatarImage(
+  name: 'John Doe',
+  imageUrl: avatarUrl,
+  radius: 24,
+)
+```
+
+- **Never** use `Image.network`, `NetworkImage`, or `CachedNetworkImage` directly — backend URLs may return SVG (e.g. DiceBear avatars).
 - Use `BoxFit.cover` for hero/banner images.
 - Set container heights proportionally (`screenWidth * factor`).
 

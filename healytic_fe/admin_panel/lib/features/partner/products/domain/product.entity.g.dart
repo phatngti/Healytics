@@ -34,6 +34,11 @@ _Product _$ProductFromJson(Map<String, dynamic> json) => _Product(
   images:
       (json['images'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
+  serviceManual: json['serviceManual'] == null
+      ? null
+      : ServiceManualEntity.fromJson(
+          json['serviceManual'] as Map<String, dynamic>,
+        ),
 );
 
 Map<String, dynamic> _$ProductToJson(_Product instance) => <String, dynamic>{
@@ -58,4 +63,5 @@ Map<String, dynamic> _$ProductToJson(_Product instance) => <String, dynamic>{
   'staffAllocation': instance.staffAllocation,
   'staffIds': instance.staffIds,
   'images': instance.images,
+  'serviceManual': instance.serviceManual?.toJson(),
 };

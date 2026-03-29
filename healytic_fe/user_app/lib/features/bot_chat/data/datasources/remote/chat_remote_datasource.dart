@@ -71,7 +71,7 @@ class ChatRemoteDatasourceImpl implements ChatRemoteDatasource {
     final userId = _extractUserId();
 
     final body = ChatbotRequest(
-      conversationId: "c7fd439d-6899-4164-8dda-cc7d29d14b04",
+      conversationId: conversationId,
       userId: userId,
       message: text,
       enableNer: false,

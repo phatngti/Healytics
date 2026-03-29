@@ -24,8 +24,7 @@ export class Employee {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'auth_id', nullable: true, unique: true, length: 255 })
-  authId: string;
+
 
   @Index()
   @Column({ name: 'employee_code', unique: true, length: 50 })
@@ -40,8 +39,7 @@ export class Employee {
   @Column({ name: 'full_name', length: 100 })
   fullName: string;
 
-  @Column({ name: 'display_name', length: 50, nullable: true })
-  displayName: string;
+
 
   @Index()
   @Column({ unique: true, length: 100 })
@@ -69,17 +67,25 @@ export class Employee {
   @Column({ name: 'emergency_contact_phone', length: 20, nullable: true })
   emergencyContactPhone: string;
 
-  @Column({ name: 'id_card_url', type: 'text', nullable: true })
-  idCardUrl: string;
+  @Column({ name: 'verification_documents', type: 'jsonb', nullable: true })
+  verificationDocuments: {
+    fieldKey: string;
+    name?: string;
+    url?: string;
+    updatedTime?: string;
+    documents?: { name: string; url: string; updatedTime?: string }[];
+  }[];
 
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ length: 255, nullable: true })
-  password: string;
+
 
   @Column({ type: 'jsonb', nullable: true })
   schedule: { day: string; start: string; end: string; isWorking: boolean }[];
+
+  @Column({ name: 'work_history', type: 'jsonb', nullable: true })
+  workHistory: { facility: string; position: string; period: string; isCurrent: boolean }[];
 
   @Column({ type: 'date', nullable: true })
   dob: Date;
@@ -103,9 +109,7 @@ export class Employee {
   @Column({ name: 'review_count', type: 'int', default: 0 })
   reviewCount: number;
 
-  @Index()
-  @Column({ name: 'branch_id', type: 'uuid', nullable: true })
-  branchId: string;
+
 
   @Index()
   @Column({ name: 'partner_id', type: 'uuid', nullable: true })

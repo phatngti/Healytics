@@ -79,6 +79,24 @@ class PartnerRecommendedServiceDto {
   @ApiProperty() price: string;
 }
 
+class PartnerDetailServiceRuleDto {
+  @ApiProperty({ example: 'no-eating' }) iconSlug: string;
+  @ApiProperty({ example: 'No Eating Before' }) title: string;
+  @ApiProperty({ example: 'Avoid eating 2 hours before the service' }) description: string;
+}
+
+class PartnerDetailProcedureStepDto {
+  @ApiProperty({ example: 1 }) stepNumber: number;
+  @ApiProperty({ example: 'Check-in & Registration' }) title: string;
+  @ApiProperty({ example: 'Arrive at the reception and complete registration' }) description: string;
+}
+
+class PartnerDetailServiceManualDto {
+  @ApiPropertyOptional({ type: [String] }) preServiceGuidelines?: string[];
+  @ApiPropertyOptional({ type: [PartnerDetailServiceRuleDto] }) serviceRules?: PartnerDetailServiceRuleDto[];
+  @ApiPropertyOptional({ type: [PartnerDetailProcedureStepDto] }) procedureSteps?: PartnerDetailProcedureStepDto[];
+}
+
 // ─── Main DTO ────────────────────────────────────────────────
 
 export class PartnerHealthServiceDetailResponseDto {
@@ -99,6 +117,7 @@ export class PartnerHealthServiceDetailResponseDto {
   @ApiProperty({ type: [PartnerFacilityImageDto] }) facilityImages: PartnerFacilityImageDto[];
   @ApiProperty({ type: [PartnerReviewDto] }) reviews: PartnerReviewDto[];
   @ApiProperty({ type: [PartnerRecommendedServiceDto] }) recommendedServices: PartnerRecommendedServiceDto[];
+  @ApiPropertyOptional({ type: PartnerDetailServiceManualDto }) serviceManual: PartnerDetailServiceManualDto | null;
 
   /**
    * Maps a Product entity + recommended products into the detail response DTO.
@@ -115,12 +134,9 @@ export class PartnerHealthServiceDetailResponseDto {
     dto.description = product.description;
     dto.duration = product.productDefinition?.durationMinutes ?? 0;
 
-    // Reviews & rating
-    const reviews = product.reviews ?? [];
-    dto.reviewCount = reviews.length;
-    dto.rating = reviews.length
-      ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10
-      : 0;
+    // Reviews & rating — product_reviews table dropped; fetched separately from product_treatment_reviews
+    dto.reviewCount = 0;
+    dto.rating = 0;
 
     // Price formatting
     const price = product.salePrice ?? product.basePrice;
@@ -171,17 +187,8 @@ export class PartnerHealthServiceDetailResponseDto {
         label: fi.label,
       }));
 
-    // Reviews mapping
-    dto.reviews = reviews.map((r) => ({
-      id: r.id,
-      reviewerName: r.reviewerName,
-      avatarUrl: r.avatarUrl,
-      rating: r.rating,
-      status: r.status,
-      date: r.date instanceof Date ? r.date.toISOString().split('T')[0] : String(r.date),
-      text: r.text,
-      imageUrls: r.imageUrls ?? [],
-    }));
+    // Reviews — empty; use GET /reviews endpoint to fetch real TreatmentReview data
+    dto.reviews = [];
 
     // Recommended services
     dto.recommendedServices = recommended.map((p) => {
@@ -195,6 +202,9 @@ export class PartnerHealthServiceDetailResponseDto {
         price: new Intl.NumberFormat('vi-VN').format(Number(rPrice)) + '₫',
       };
     });
+
+    // Service manual
+    dto.serviceManual = product.serviceManual ?? null;
 
     return dto;
   }

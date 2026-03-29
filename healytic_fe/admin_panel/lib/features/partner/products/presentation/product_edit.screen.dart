@@ -1,7 +1,9 @@
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/service_manual.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
 import 'package:admin_panel/features/partner/products/presentation/layouts/product_edit_desktop.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_service_manual_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product_details.provider.dart';
 import 'package:admin_panel/router/partner_routes.dart';
@@ -65,6 +67,9 @@ class _ProductEditContent extends HookConsumerWidget {
     final formKey = useMemoized(
       () => GlobalKey<FormBuilderState>(),
     );
+    final serviceManualKey = useMemoized(
+      () => GlobalKey<ProductServiceManualCardState>(),
+    );
     final isSubmitting = useState(false);
 
     /// Build initial values from the loaded product.
@@ -93,9 +98,13 @@ class _ProductEditContent extends HookConsumerWidget {
           images: (data['product_images'] as List?)
               ?.map((e) => e.toString())
               .toList(),
-          staffIds: (data['selected_staff_ids'] as List?)
-              ?.map((e) => e.toString())
-              .toList(),
+          staffIds:
+              (data['selected_staff_ids'] as List?)
+                  ?.map((e) => e.toString())
+                  .toList(),
+          serviceManual: _extractServiceManual(
+            serviceManualKey,
+          ),
         );
 
         await ref
@@ -139,9 +148,79 @@ class _ProductEditContent extends HookConsumerWidget {
       initialValue: initialValues,
       child: ProductEditDesktop(
         product: product,
-        onSave: isSubmitting.value ? null : handleSave,
+        onSave:
+            isSubmitting.value ? null : handleSave,
         onCancel: handleCancel,
+        serviceManualKey: serviceManualKey,
+        initialGuidelines: product.serviceManual
+                ?.preServiceGuidelines ??
+            [],
+        initialRules: product.serviceManual
+                ?.serviceRules
+                .map(
+                  (r) => {
+                    'iconSlug': r.iconSlug,
+                    'title': r.title,
+                    'description': r.description,
+                  },
+                )
+                .toList() ??
+            [],
+        initialSteps: product.serviceManual
+                ?.procedureSteps
+                .map(
+                  (s) => {
+                    'title': s.title,
+                    'description': s.description,
+                  },
+                )
+                .toList() ??
+            [],
       ),
+    );
+  }
+
+  /// Extracts [ServiceManualEntity] from the card.
+  static ServiceManualEntity? _extractServiceManual(
+    GlobalKey<ProductServiceManualCardState> key,
+  ) {
+    final data = key.currentState?.extractFormData();
+    if (data == null) return null;
+
+    final guidelines =
+        (data['guidelines'] as List<String>?) ?? [];
+    final rules =
+        (data['rules'] as List<Map<String, String>>?)
+                ?.map(
+                  (r) => ServiceRuleEntity(
+                    iconSlug: r['iconSlug'] ?? '',
+                    title: r['title'] ?? '',
+                    description:
+                        r['description'] ?? '',
+                  ),
+                )
+                .toList() ??
+            [];
+    final steps =
+        (data['steps'] as List<Map<String, String>>?)
+                ?.asMap()
+                .entries
+                .map(
+                  (e) => ProcedureStepEntity(
+                    stepNumber: e.key + 1,
+                    title:
+                        e.value['title'] ?? '',
+                    description:
+                        e.value['description'] ?? '',
+                  ),
+                )
+                .toList() ??
+            [];
+
+    return ServiceManualEntity(
+      preServiceGuidelines: guidelines,
+      serviceRules: rules,
+      procedureSteps: steps,
     );
   }
 

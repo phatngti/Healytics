@@ -1,3 +1,4 @@
+import 'package:user_app/features/checkout/domain/entities/booking.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 
 /// Mock data constants for the checkout feature,
@@ -91,4 +92,54 @@ const kMockCheckoutData = CheckoutData(
   coinValue: 25000,
   paymentMethods: kMockPaymentMethods,
   summary: kMockCheckoutSummary,
+);
+
+// ── Booking API Mock Data ────────────────────────────
+
+const kMockAsyncCheckoutResult = AsyncCheckoutResult(
+  ticketId: 'TICKET_MOCK_001',
+  status: 'QUEUED',
+  message: 'Your booking request is being processed.',
+);
+
+final kMockTicketProcessing = CheckoutTicketEntity(
+  id: 'TICKET_MOCK_001',
+  userId: 'mock-user-id',
+  staffId: 'mock-staff-id',
+  startTime: DateTime(2026, 3, 20, 14),
+  status: CheckoutTicketStatus.processing,
+  idempotencyKey: 'checkout_mock_key',
+  createdAt: DateTime(2026, 3, 16),
+  updatedAt: DateTime(2026, 3, 16),
+);
+
+final kMockTicketSuccess = CheckoutTicketEntity(
+  id: 'TICKET_MOCK_001',
+  userId: 'mock-user-id',
+  staffId: 'mock-staff-id',
+  startTime: DateTime(2026, 3, 20, 14),
+  status: CheckoutTicketStatus.success,
+  idempotencyKey: 'checkout_mock_key',
+  bookingId: 'BK_MOCK_001',
+  createdAt: DateTime(2026, 3, 16),
+  updatedAt: DateTime(2026, 3, 16),
+);
+
+final kMockBooking = BookingEntity(
+  id: 'BK_MOCK_001',
+  userId: 'mock-user-id',
+  staffId: 'mock-staff-id',
+  productId: 'mock-product-id',
+  startTime: DateTime(2026, 3, 20, 14),
+  endTime: DateTime(2026, 3, 20, 15),
+  status: BookingStatus.pendingPayment,
+  paymentUrl: 'https://payment.example.com/BK_MOCK_001',
+  paymentExpiresAt: DateTime(2026, 3, 20, 14, 10),
+  createdAt: DateTime(2026, 3, 16),
+  updatedAt: DateTime(2026, 3, 16),
+);
+
+const kMockMicroLockResult = MicroLockResult(
+  locked: true,
+  expiresIn: 120,
 );

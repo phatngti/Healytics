@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { Partner } from '@/common/entities/partner.entity';
 import { Account } from '@/common/entities/account.entity';
+import { Location } from '@/common/entities/location.entity';
 import { LegalRepresentative } from '@/common/entities/legal-representative.entity';
 import {
   PartnerDocument,
@@ -40,6 +41,12 @@ interface SeedDocument {
   status: PartnerDocumentStatus;
 }
 
+interface SeedAddress {
+  provinceCode: string; // Official VN administrative code (e.g. "79" for HCMC)
+  districtCode: string; // e.g. "760" for District 1
+  wardCode: string;     // e.g. "26734" for Bến Nghé ward
+}
+
 interface SeedPartner {
   accountEmail: string;
   taxCode: string;
@@ -50,6 +57,7 @@ interface SeedPartner {
   phoneNumber: string;
   verificationStatus: PartnerVerificationStatus;
   coordinates: string | null;
+  address: SeedAddress;
   legalRepresentative: SeedLegalRepresentative;
   documents: SeedDocument[];
 }
@@ -60,8 +68,9 @@ interface SeedPartner {
 
 /**
  * Seed partner profiles with related LegalRepresentative and PartnerDocument data.
- * FK dependency: `accountId` → Account (requires UserSeeder to create HEALTH_PARTNER accounts first).
- * Location FKs (provinceId, districtId, wardId) are all nullable — left null for seed data.
+ * FK dependency:
+ *   - `accountId` → Account (requires UserSeeder to create HEALTH_PARTNER accounts first).
+ *   - `provinceId`, `districtId`, `wardId` → Location (requires location seed data to be loaded).
  */
 const SEED_PARTNERS: SeedPartner[] = [
   // ── 1. APPROVED — Spa & Wellness ──
@@ -71,10 +80,11 @@ const SEED_PARTNERS: SeedPartner[] = [
     legalName: 'Healytics Spa & Wellness LLC',
     brandName: 'Healytics Spa & Wellness',
     businessType: [BusinessType.SPA_BEAUTY, BusinessType.MASSAGE_THERAPY],
-    streetAddress: '123 Nguyen Hue Street, District 1',
+    streetAddress: '123 Nguyen Hue Street',
     phoneNumber: '0281234567',
     verificationStatus: PartnerVerificationStatus.APPROVED,
     coordinates: '10.7769,106.7009',
+    address: { provinceCode: '79', districtCode: '760', wardCode: '26740' }, // HCMC > Quận 1 > Bến Nghé
     legalRepresentative: {
       fullName: 'Nguyen Van An',
       position: 'Director',
@@ -115,10 +125,11 @@ const SEED_PARTNERS: SeedPartner[] = [
     legalName: 'Healytics Dental Clinic Ltd',
     brandName: 'Healytics Dental',
     businessType: [BusinessType.DENTAL],
-    streetAddress: '456 Le Loi Street, District 3',
+    streetAddress: '456 Le Loi Street',
     phoneNumber: '0289876543',
     verificationStatus: PartnerVerificationStatus.PENDING,
     coordinates: '10.7831,106.6916',
+    address: { provinceCode: '79', districtCode: '770', wardCode: '27139' }, // HCMC > Quận 3 > Phường Võ Thị Sáu
     legalRepresentative: {
       fullName: 'Tran Thi Bich',
       position: 'Chief Dentist',
@@ -159,10 +170,11 @@ const SEED_PARTNERS: SeedPartner[] = [
     legalName: 'FitLife Vietnam JSC',
     brandName: 'FitLife Gym & Yoga',
     businessType: [BusinessType.FITNESS, BusinessType.MASSAGE_REHABILITATION],
-    streetAddress: '789 Vo Van Tan, District 3',
+    streetAddress: '789 Vo Van Tan',
     phoneNumber: '0283456789',
     verificationStatus: PartnerVerificationStatus.REJECTED,
     coordinates: '10.7756,106.6893',
+    address: { provinceCode: '79', districtCode: '770', wardCode: '27142' }, // HCMC > Quận 3 > Phường 9
     legalRepresentative: {
       fullName: 'Le Minh Duc',
       position: 'CEO',
@@ -196,10 +208,11 @@ const SEED_PARTNERS: SeedPartner[] = [
     legalName: 'Saigon Pharma Co., Ltd',
     brandName: 'Saigon Pharma',
     businessType: [BusinessType.PHARMACY, BusinessType.NUTRITION],
-    streetAddress: '12 Hai Ba Trung, District 1',
+    streetAddress: '12 Hai Ba Trung',
     phoneNumber: '0284567890',
     verificationStatus: PartnerVerificationStatus.REQUIRED_RESUBMIT,
     coordinates: '10.7741,106.7030',
+    address: { provinceCode: '79', districtCode: '760', wardCode: '26743' }, // HCMC > Quận 1 > Bến Thành
     legalRepresentative: {
       fullName: 'Pham Hoang Long',
       position: 'Pharmacist Manager',
@@ -247,10 +260,11 @@ const SEED_PARTNERS: SeedPartner[] = [
     legalName: 'Dong Y Viet Nam Heritage',
     brandName: 'Heritage Traditional Medicine',
     businessType: [BusinessType.TRADITIONAL_MEDICINE],
-    streetAddress: '88 Tran Quoc Toan, District 3',
+    streetAddress: '88 Tran Quoc Toan',
     phoneNumber: '0285678901',
     verificationStatus: PartnerVerificationStatus.ONBOARDING,
     coordinates: '10.7800,106.6870',
+    address: { provinceCode: '79', districtCode: '770', wardCode: '27130' }, // HCMC > Quận 3 > Phường 12
     legalRepresentative: {
       fullName: 'Vo Thi Lan',
       position: 'Owner',
@@ -283,10 +297,11 @@ const SEED_PARTNERS: SeedPartner[] = [
     legalName: 'MindSkin Wellness Center',
     brandName: 'MindSkin Clinic',
     businessType: [BusinessType.DERMATOLOGY, BusinessType.PSYCHOLOGY, BusinessType.PSYCHIATRY],
-    streetAddress: '55 Nguyen Dinh Chieu, District 3',
+    streetAddress: '55 Nguyen Dinh Chieu',
     phoneNumber: '0286789012',
     verificationStatus: PartnerVerificationStatus.APPROVED,
     coordinates: '10.7810,106.6940',
+    address: { provinceCode: '79', districtCode: '770', wardCode: '27151' }, // HCMC > Quận 3 > Phường 5
     legalRepresentative: {
       fullName: 'Hoang Quoc Viet',
       position: 'Medical Director',
@@ -356,8 +371,24 @@ export class PartnerSeeder implements ISeeder {
     @InjectRepository(PartnerDocument)
     private readonly partnerDocRepo: Repository<PartnerDocument>,
 
+    @InjectRepository(Location)
+    private readonly locationRepo: Repository<Location>,
+
     private readonly dataSource: DataSource,
   ) {}
+
+  /**
+   * Resolve a Location record by its official administrative code.
+   * Returns null (with a warning) if the code is not found.
+   */
+  private async resolveLocationByCode(code: string, label: string): Promise<string | null> {
+    const location = await this.locationRepo.findOne({ where: { code } });
+    if (!location) {
+      this.logger.warn(`  ⚠ Location ${label} with code "${code}" not found — setting to null. Ensure location seed data is loaded.`);
+      return null;
+    }
+    return location.id;
+  }
 
   async seed(): Promise<void> {
     this.logger.log('Seeding partners...');
@@ -396,6 +427,14 @@ export class PartnerSeeder implements ISeeder {
         continue;
       }
 
+      // ── Resolve Location FKs ──
+      const { address } = partnerData;
+      const [provinceId, districtId, wardId] = await Promise.all([
+        this.resolveLocationByCode(address.provinceCode, 'province'),
+        this.resolveLocationByCode(address.districtCode, 'district'),
+        this.resolveLocationByCode(address.wardCode, 'ward'),
+      ]);
+
       // ── Create Partner ──
       const partner = this.partnerRepo.create({
         taxCode: partnerData.taxCode,
@@ -411,9 +450,9 @@ export class PartnerSeeder implements ISeeder {
             : null,
         accountId: account.id,
         coordinates: partnerData.coordinates ?? null,
-        provinceId: null,
-        districtId: null,
-        wardId: null,
+        provinceId,
+        districtId,
+        wardId,
       });
 
       const savedPartner = await this.partnerRepo.save(partner);

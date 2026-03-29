@@ -1,0 +1,137 @@
+---
+description: Expert knowledge for creating Freezed immutable data classes, sealed unions, and JSON-serializable models. Use when defining entities, state classes, DTOs, or any data model that needs immutability and code generation.
+globs: "**/*.entity.dart"
+alwaysApply: false
+---
+
+# Freezed Models
+
+## Basic Entity
+
+```dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'user.entity.freezed.dart';
+part 'user.entity.g.dart'; // Only if using JSON
+
+@freezed
+class UserEntity with _$UserEntity {
+  const factory UserEntity({
+    required String id,
+    required String email,
+    required String fullName,
+    String? avatarUrl,
+    @Default(false) bool isVerified,
+    @Default([]) List<String> roles,
+  }) = _UserEntity;
+
+  factory UserEntity.fromJson(Map<String, dynamic> json) =>
+      _$UserEntityFromJson(json);
+}
+```
+
+### What You Get
+- Immutable class with `const` constructor
+- `copyWith()` for creating modified copies
+- Value equality (`==` and `hashCode`)
+- Readable `toString()`
+- JSON serialization (if `fromJson` included)
+
+## Sealed Union Types (State Modeling)
+
+```dart
+@freezed
+sealed class AuthState with _$AuthState {
+  const factory AuthState.initial() = AuthInitial;
+  const factory AuthState.loading() = AuthLoading;
+  const factory AuthState.authenticated(UserEntity user) =
+      AuthAuthenticated;
+  const factory AuthState.unauthenticated() = AuthUnauthenticated;
+  const factory AuthState.error(String message) = AuthError;
+}
+```
+
+### Consuming with Pattern Matching
+```dart
+Widget build(BuildContext context, WidgetRef ref) {
+  final authState = ref.watch(authNotifierProvider);
+  return switch (authState) {
+    AuthInitial() => const SplashScreen(),
+    AuthLoading() => const LoadingIndicator(),
+    AuthAuthenticated(:final user) => HomeScreen(user: user),
+    AuthUnauthenticated() => const SignInScreen(),
+    AuthError(:final message) => ErrorScreen(message: message),
+  };
+}
+```
+
+## JSON Serialization with snake_case
+
+```dart
+@freezed
+class ProductDto with _$ProductDto {
+  @JsonSerializable(fieldRename: FieldRename.snake)
+  const factory ProductDto({
+    required String id,
+    required String productName,   // maps to product_name
+    required double unitPrice,     // maps to unit_price
+    @JsonKey(name: 'img_url')
+    String? imageUrl,              // custom mapping
+  }) = _ProductDto;
+
+  factory ProductDto.fromJson(Map<String, dynamic> json) =>
+      _$ProductDtoFromJson(json);
+}
+```
+
+## Adding Custom Methods
+
+```dart
+@freezed
+class CartEntity with _$CartEntity {
+  const CartEntity._(); // Required for custom methods
+
+  const factory CartEntity({
+    @Default([]) List<CartItemEntity> items,
+  }) = _CartEntity;
+
+  double get totalPrice =>
+      items.fold(0, (sum, item) => sum + item.total);
+  bool get isEmpty => items.isEmpty;
+}
+```
+
+## Code Generation
+
+After creating or modifying any `@freezed` class:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+### Part Directives Required
+```dart
+part '<filename>.freezed.dart';     // Always required
+part '<filename>.g.dart';           // Only if using fromJson/toJson
+```
+
+## Common Issues
+
+| Issue | Fix |
+|-------|-----|
+| Missing `.freezed.dart` | Run build_runner |
+| `part` directive error | Ensure filename matches exactly |
+| Custom methods not working | Add `const ClassName._();` private constructor |
+| JSON not generating | Add `part '*.g.dart'` and `fromJson` factory |
+| Default value not const | Use `@Default()` with const-compatible values |
+
+## Checklist
+
+- `@freezed` annotation on class
+- `with _$ClassName` mixin
+- `const factory` constructor
+- Correct `part` directives
+- `fromJson` factory if JSON needed
+- `@JsonSerializable(fieldRename: FieldRename.snake)` for API models
+- Private constructor `const ClassName._()` if custom methods
+- Entity in domain layer is pure Dart (no Flutter imports)

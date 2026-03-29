@@ -30,4 +30,18 @@ enum EmployeeRole {
     EmployeeRole.receptionist => 'RECEPTIONIST',
     EmployeeRole.manager => 'MANAGER',
   };
+
+  /// Returns the [EmployeeRole] for the given API [value].
+  ///
+  /// Returns `null` if no matching role is found.
+  static EmployeeRole? fromApiValue(String? value) {
+    if (value == null) return null;
+    return switch (value.toUpperCase()) {
+      'THERAPIST' => EmployeeRole.therapist,
+      'DOCTOR' => EmployeeRole.doctor,
+      'RECEPTIONIST' => EmployeeRole.receptionist,
+      'MANAGER' => EmployeeRole.manager,
+      _ => null,
+    };
+  }
 }

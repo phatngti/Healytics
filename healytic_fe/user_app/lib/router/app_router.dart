@@ -1,4 +1,4 @@
-import 'dart:developer' as developer;
+import 'package:logging/logging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
@@ -7,12 +7,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
 
-final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> rootNavigatorKey =
+    GlobalKey<NavigatorState>();
+final _log = Logger('AppRouter');
 
 @riverpod
 GoRouter router(Ref ref) {
-  final notifier = ref.watch(routerListenableProvider.notifier);
-  String initialLocation = '/'; // Rõ ràng và an toàn hơn
+  final notifier =
+      ref.watch(routerListenableProvider.notifier);
+  String initialLocation = '/';
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -25,50 +28,77 @@ GoRouter router(Ref ref) {
 }
 
 @riverpod
-class RouterListenable extends _$RouterListenable implements Listenable {
+class RouterListenable extends _$RouterListenable
+    implements Listenable {
   final List<VoidCallback> _listeners = [];
 
   @override
   FutureOr<void> build() {
-    final authSessionStore = ref.watch(authSessionStoreProvider);
-    final subscription = authSessionStore.watchAccessToken().listen((_) {
+    final authSessionStore =
+        ref.watch(authSessionStoreProvider);
+    final subscription = authSessionStore
+        .watchAccessToken()
+        .listen((_) {
       _notifyListeners();
     });
     ref.onDispose(subscription.cancel);
   }
 
-  String? redirect(BuildContext context, GoRouterState state) {
-    final authSessionStore = ref.watch(authSessionStoreProvider);
+  String? redirect(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    final authSessionStore =
+        ref.watch(authSessionStoreProvider);
     final isLoggedIn = authSessionStore.isLoggedIn;
     final path = state.uri.path;
 
-    final isPublicRoute =
-        (LottieSplashRoute.isPublic && path == LottieSplashRoute.pathPattern) ||
-        (OnboardingRoute.isPublic && path == OnboardingRoute.pathPattern) ||
-        (SignInRoute.isPublic && path == SignInRoute.pathPattern) ||
-        (EmailFormRoute.isPublic && path == EmailFormRoute.pathPattern) ||
+    final isPublicRoute = (LottieSplashRoute
+                .isPublic &&
+            path ==
+                LottieSplashRoute.pathPattern) ||
+        (OnboardingRoute.isPublic &&
+            path == OnboardingRoute.pathPattern) ||
+        (SignInRoute.isPublic &&
+            path == SignInRoute.pathPattern) ||
+        (EmailFormRoute.isPublic &&
+            path == EmailFormRoute.pathPattern) ||
         (EmailCodeConfirmationRoute.isPublic &&
-            path == EmailCodeConfirmationRoute.pathPattern) ||
-        (FinishSignUpRoute.isPublic && path == FinishSignUpRoute.pathPattern) ||
-        (SurveyScreenRoute.isPublic && path == SurveyScreenRoute.pathPattern) ||
+            path ==
+                EmailCodeConfirmationRoute
+                    .pathPattern) ||
+        (FinishSignUpRoute.isPublic &&
+            path ==
+                FinishSignUpRoute.pathPattern) ||
+        (SurveyScreenRoute.isPublic &&
+            path ==
+                SurveyScreenRoute.pathPattern) ||
         (GeneralGoalsStepRoute.isPublic &&
-            path == GeneralGoalsStepRoute.pathPattern) ||
+            path ==
+                GeneralGoalsStepRoute
+                    .pathPattern) ||
         (LifestyleActivityStepRoute.isPublic &&
-            path == LifestyleActivityStepRoute.pathPattern) ||
+            path ==
+                LifestyleActivityStepRoute
+                    .pathPattern) ||
         (BodyEnergyStepRoute.isPublic &&
-            path == BodyEnergyStepRoute.pathPattern) ||
+            path ==
+                BodyEnergyStepRoute.pathPattern) ||
         (HealthSafetyStepRoute.isPublic &&
-            path == HealthSafetyStepRoute.pathPattern);
+            path ==
+                HealthSafetyStepRoute.pathPattern);
 
     if (isLoggedIn) {
-      developer.log('[ROUTER] Logged In Route requested: $path', name: 'AppRouter');
-      // Logged-in user hitting a public route → send to home
+      _log.info(
+        'Logged In Route requested: $path',
+      );
       if (isPublicRoute) {
         return '/home';
       }
     } else {
-      developer.log('[ROUTER] Public Route requested: $path', name: 'AppRouter');
-      // Not logged in and trying to access a protected route
+      _log.info(
+        'Public Route requested: $path',
+      );
       if (!isPublicRoute) {
         return '/signin';
       }

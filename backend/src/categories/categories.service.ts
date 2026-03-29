@@ -8,8 +8,15 @@ import { Repository, IsNull } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from '@/common/entities/category.entity';
+import { Product } from '@/common/entities/product.entity';
+import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { CategoryResponseDto } from './dto/category-response.dto';
 import { AdminCategoryResponseDto } from './dto/admin-category-response.dto';
+import { BookingSpecialistResponseDto } from './dto/booking-specialist-response.dto';
+import { BookingServiceResponseDto } from '@/employees/dto/booking-service-response.dto';
+import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
+import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
+import { PartnersService } from '@/partners/partners.service';
 import { CreateCategoryHandler } from './application/handlers/create-category.handler';
 import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
 import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';
@@ -26,6 +33,11 @@ export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+    @InjectRepository(ProductEmployeeEligibility)
+    private readonly eligibilityRepository: Repository<ProductEmployeeEligibility>,
+    private readonly partnersService: PartnersService,
     private readonly createCategoryHandler: CreateCategoryHandler,
     private readonly updateCategoryHandler: UpdateCategoryHandler,
     private readonly removeCategoryHandler: RemoveCategoryHandler,
@@ -124,6 +136,85 @@ export class CategoriesService {
    * Facade: Delegates to RemoveCategoryHandler.
    * @param id - The category ID
    */
+  /**
+   * Returns specialists (employees) who serve the given category.
+   * Query path: Category → Products → ProductEmployeeEligibility → Employee.
+   * Deduplicates employees (one employee may offer multiple services in the same category).
+   */
+  async findSpecialistsByCategory(
+    categoryId: string,
+  ): Promise<BookingSpecialistResponseDto[]> {
+    // Verify category exists
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
+    if (!category) {
+      this.logger.warn(`Category not found: ${categoryId}`);
+      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+    }
+
+    // Query eligible employees via the join chain, retaining the eligibility record
+    const eligibilities = await this.eligibilityRepository
+      .createQueryBuilder('elig')
+      .innerJoinAndSelect('elig.employee', 'emp')
+      .innerJoin('elig.product', 'prod')
+      .where('prod.category_id = :categoryId', { categoryId })
+      .andWhere('prod.status = :activeStatus', {
+        activeStatus: HealthServiceStatus.ACTIVE,
+      })
+      .andWhere('emp.status = :empStatus', {
+        empStatus: EmployeeStatus.ACTIVE,
+      })
+      .getMany();
+
+    // Deduplicate by employee ID, keeping the first eligibility record per employee
+    const seen = new Set<string>();
+    const uniqueEligibilities = eligibilities.filter((elig) => {
+      if (!elig.employee || seen.has(elig.employee.id)) return false;
+      seen.add(elig.employee.id);
+      return true;
+    });
+
+    return uniqueEligibilities.map((elig) =>
+      BookingSpecialistResponseDto.fromEntity(elig.employee, elig.id),
+    );
+  }
+
+  /**
+   * Returns all active services (products) in the given category.
+   * Used by the Book Appointment flow Step 1 (Category → Services).
+   * Includes clinic info from the health partner and optional distance calculation.
+   */
+  async findServicesByCategory(
+    categoryId: string,
+    userLat?: number,
+    userLng?: number,
+  ): Promise<BookingServiceResponseDto[]> {
+    // Verify category exists
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
+    if (!category) {
+      this.logger.warn(`Category not found: ${categoryId}`);
+      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+    }
+
+    // Query active products in this category with media + definition
+    const products = await this.productRepository.find({
+      where: {
+        categoryId,
+        status: HealthServiceStatus.ACTIVE,
+      },
+      relations: ['media', 'productDefinition'],
+      order: { createdAt: 'DESC' },
+    });
+
+    // Load partner for clinic info
+    const partner = await this.partnersService.getFirstHealthPartner();
+
+    return BookingServiceResponseDto.fromEntities(products, partner, userLat, userLng);
+  }
+
   async remove(id: string): Promise<void> {
     return this.removeCategoryHandler.execute(id);
   }

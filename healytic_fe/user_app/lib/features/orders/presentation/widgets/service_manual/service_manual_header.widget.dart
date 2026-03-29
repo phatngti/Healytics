@@ -2,10 +2,13 @@ import 'dart:ui';
 
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
-/// Sticky glassmorphism app bar for the service manual
-/// screen, showing the service name and vendor.
+/// Pinned header for the service manual screen.
+///
+/// Shows a centred title ("Service Manual") with a
+/// subtitle combining [serviceName] and [vendorName].
+/// Uses a glassmorphism backdrop blur and a thin
+/// bottom border.
 class ServiceManualHeader extends StatelessWidget {
   const ServiceManualHeader({
     super.key,
@@ -13,10 +16,10 @@ class ServiceManualHeader extends StatelessWidget {
     required this.vendorName,
   });
 
-  /// Name of the service being displayed.
+  /// Display name of the booked service.
   final String serviceName;
 
-  /// Name of the vendor providing the service.
+  /// Display name of the vendor / spa.
   final String vendorName;
 
   @override
@@ -27,20 +30,17 @@ class ServiceManualHeader extends StatelessWidget {
     return SliverAppBar(
       pinned: true,
       centerTitle: true,
-      backgroundColor: colors.surface.withValues(alpha: 0.7),
-      surfaceTintColor: colors.surface.withValues(alpha: 0),
-      leading: IconButton(
-        tooltip: 'Back',
-        icon: const Icon(Symbols.arrow_back, size: AppDimens.iconLg),
-        onPressed: () => Navigator.of(context).maybePop(),
+      backgroundColor: colors.surface.withValues(
+        alpha: 0.8,
       ),
-      flexibleSpace: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(color: Colors.transparent),
-        ),
+      surfaceTintColor: Colors.transparent,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: 'Back',
+        onPressed: () => Navigator.of(context).pop(),
       ),
       title: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             'Service Manual',
@@ -60,6 +60,27 @@ class ServiceManualHeader extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ],
+      ),
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: 12,
+            sigmaY: 12,
+          ),
+          child: const SizedBox.expand(),
+        ),
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(
+          AppDimens.borderWidth,
+        ),
+        child: Divider(
+          height: AppDimens.borderWidth,
+          thickness: AppDimens.borderWidth,
+          color: colors.outlineVariant.withValues(
+            alpha: 0.5,
+          ),
+        ),
       ),
     );
   }
