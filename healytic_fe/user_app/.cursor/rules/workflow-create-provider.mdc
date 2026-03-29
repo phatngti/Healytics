@@ -1,0 +1,85 @@
+---
+description: Workflow for creating a new Riverpod 3.0 provider using code generation, for either data or presentation layer.
+globs: "**/*.provider.dart"
+alwaysApply: false
+---
+
+# Create Provider Workflow
+
+## Input Required
+- `<provider_name>`: Provider name (PascalCase, e.g., `ProductList`)
+- `<layer>`: Either `data` or `presentation`
+- `<feature_name>`: The feature this provider belongs to
+- `<provider_type>`: `function` (read-only) or `notifier` (mutable state)
+
+## For Data Layer Provider (Repository wiring)
+
+Create `lib/features/<feature_name>/data/provider/<name>.provider.dart`:
+```dart
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part '<name>.provider.g.dart';
+
+@riverpod
+<RepositoryType> <repositoryName>(Ref ref) {
+  final useMock = ref.read(useMockProvider);
+  final dataSource = useMock
+      ? <DataSourceMock>()
+      : <DataSourceImpl>(ref.read(apiServiceProvider));
+  return <RepositoryImpl>(dataSource);
+}
+```
+
+## For Presentation Layer Provider (UI State)
+
+### Read-only providers (fetching/computed data):
+```dart
+@riverpod
+Future<List<ItemEntity>> <providerName>(Ref ref) async {
+  final repo = ref.read(<repository>Provider);
+  return repo.getItems();
+}
+```
+
+### Notifier providers (mutable state):
+```dart
+@riverpod
+class <NotifierName> extends _$<NotifierName> {
+  @override
+  <StateType> build() => <StateType>.initial();
+
+  Future<void> loadData() async {
+    state = <StateType>.loading();
+    try {
+      final repo = ref.read(<repository>Provider);
+      final data = await repo.getData();
+      if (!ref.mounted) return;
+      state = <StateType>.loaded(data);
+    } catch (e) {
+      if (!ref.mounted) return;
+      state = <StateType>.error(e.toString());
+    }
+  }
+}
+```
+
+### keepAlive providers (persist across screens):
+```dart
+@Riverpod(keepAlive: true)
+class <NotifierName> extends _$<NotifierName> { ... }
+```
+
+## After Creation
+```bash
+dart run build_runner build --delete-conflicting-outputs
+dart analyze
+```
+
+## Rules
+- Always use `@riverpod` annotations — never write providers manually.
+- Always use unified `Ref ref` — never typed refs.
+- Always check `ref.mounted` after `await` in notifier methods.
+- Data providers inject data sources into repositories.
+- Presentation providers call repositories, never data sources directly.
+- Use `ref.watch` in `build()`, `ref.read` in callbacks.
+- Use Freezed sealed classes for complex state types.

@@ -121,7 +121,7 @@ final class CheckoutNotifierProvider
   CheckoutNotifier create() => CheckoutNotifier();
 }
 
-String _$checkoutNotifierHash() => r'60294d5f1787617796f8bab57bf22f874e3e606c';
+String _$checkoutNotifierHash() => r'e0adda92c49650b9ddd7848ae96d739bfd92dc9f';
 
 /// Notifier managing checkout screen interactions.
 ///

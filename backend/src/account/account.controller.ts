@@ -10,6 +10,7 @@ import {
 import { AccountService } from './account.service';
 import { SurveyDto } from './dto/request/survey.dto';
 import { SurveyResponseDto } from './dto/response/survey-response.dto';
+import { AccountMeResponseDto } from './dto/response/account-me-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/auth/roles.decorator';
@@ -40,6 +41,16 @@ import {
 @UseInterceptors(ClassSerializerInterceptor)
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
+
+  /**
+   * Returns the current authenticated user's full account data including role.
+   */
+  @Get('me')
+  @ApiOperation({ summary: 'Get current user account details' })
+  @ApiOkResponse({ description: 'Current user account data with role.', type: AccountMeResponseDto })
+  async getMe(@CurrentUser('id') userId: string): Promise<AccountMeResponseDto> {
+    return this.accountService.getMe(userId);
+  }
 
   /**
    * Gets the current user's survey data.

@@ -18,6 +18,7 @@ describe('UserEmployeesController', () => {
       findOne: jest.fn(),
       update: jest.fn(),
       remove: jest.fn(),
+      getFeaturedSpecialists: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -36,6 +37,21 @@ describe('UserEmployeesController', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('getFeaturedSpecialists', () => {
+    it('should delegate to service.getFeaturedSpecialists with limit', async () => {
+      // Arrange
+      const expected = [{ id: 'uuid-1', name: 'Dr. Anna', soldCount: 10 }];
+      employeesService.getFeaturedSpecialists!.mockResolvedValue(expected);
+
+      // Act
+      const result = await controller.getFeaturedSpecialists(5);
+
+      // Assert
+      expect(result).toEqual(expected);
+      expect(employeesService.getFeaturedSpecialists).toHaveBeenCalledWith(5);
+    });
   });
 
   describe('findAll', () => {

@@ -12,7 +12,14 @@ abstract class ServiceDetailsRepository {
   Future<List<SpecialistEntity>> getServiceEmployees(String serviceId);
 
   /// User reviews for this service.
-  Future<List<ReviewEntity>> getServiceReviews(String serviceId);
+  Future<List<ReviewEntity>> getServiceReviews(
+    String serviceId,
+  );
+
+  /// Reviews for a specific employee/specialist.
+  Future<List<ReviewEntity>> getEmployeeReviews(
+    String employeeId,
+  );
 
   /// Related service recommendations.
   Future<List<RecommendedServiceEntity>> getRecommendedServices(

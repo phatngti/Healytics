@@ -8,25 +8,23 @@ part of 'appointment.provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Fetches all appointments from the repository.
+/// Fetches all appointments from the repository
+/// and exposes a [silentRefresh] for background
+/// reload without redundant re-renders.
 
-@ProviderFor(appointments)
-const appointmentsProvider = AppointmentsProvider._();
+@ProviderFor(AppointmentsNotifier)
+const appointmentsProvider = AppointmentsNotifierProvider._();
 
-/// Fetches all appointments from the repository.
-
-final class AppointmentsProvider
+/// Fetches all appointments from the repository
+/// and exposes a [silentRefresh] for background
+/// reload without redundant re-renders.
+final class AppointmentsNotifierProvider
     extends
-        $FunctionalProvider<
-          AsyncValue<List<AppointmentEntity>>,
-          List<AppointmentEntity>,
-          FutureOr<List<AppointmentEntity>>
-        >
-    with
-        $FutureModifier<List<AppointmentEntity>>,
-        $FutureProvider<List<AppointmentEntity>> {
-  /// Fetches all appointments from the repository.
-  const AppointmentsProvider._()
+        $AsyncNotifierProvider<AppointmentsNotifier, List<AppointmentEntity>> {
+  /// Fetches all appointments from the repository
+  /// and exposes a [silentRefresh] for background
+  /// reload without redundant re-renders.
+  const AppointmentsNotifierProvider._()
     : super(
         from: null,
         argument: null,
@@ -38,21 +36,47 @@ final class AppointmentsProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$appointmentsHash();
+  String debugGetCreateSourceHash() => _$appointmentsNotifierHash();
 
   @$internal
   @override
-  $FutureProviderElement<List<AppointmentEntity>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<AppointmentEntity>> create(Ref ref) {
-    return appointments(ref);
-  }
+  AppointmentsNotifier create() => AppointmentsNotifier();
 }
 
-String _$appointmentsHash() => r'0b8ce0e4372e9bfc369d17d816d0c205747fd521';
+String _$appointmentsNotifierHash() =>
+    r'197e52b2054177a5f06938b8504630cb0695c51a';
+
+/// Fetches all appointments from the repository
+/// and exposes a [silentRefresh] for background
+/// reload without redundant re-renders.
+
+abstract class _$AppointmentsNotifier
+    extends $AsyncNotifier<List<AppointmentEntity>> {
+  FutureOr<List<AppointmentEntity>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<List<AppointmentEntity>>,
+              List<AppointmentEntity>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<AppointmentEntity>>,
+                List<AppointmentEntity>
+              >,
+              AsyncValue<List<AppointmentEntity>>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
 
 /// Fetches appointment category filters.
 
@@ -99,7 +123,7 @@ final class AppointmentCategoriesProvider
 }
 
 String _$appointmentCategoriesHash() =>
-    r'9fd36a8b04929801e6969fe6246e578b692b8084';
+    r'c8cca837a03c63c21d59bb63555a72143906101f';
 
 /// Fetches recommended services.
 
@@ -147,7 +171,7 @@ final class AppointmentRecommendationsProvider
 }
 
 String _$appointmentRecommendationsHash() =>
-    r'ff5a4f8c9cc865a38e9af39442fef3eee16a4530';
+    r'c2c9839b2f7c9fa0552a87489de60697064b0767';
 
 /// Holds the currently selected tab index.
 
@@ -317,7 +341,7 @@ final class FilteredAppointmentsProvider
 }
 
 String _$filteredAppointmentsHash() =>
-    r'e37e0ced52d98c7109652ad3e902028aafdf8eec';
+    r'625f7effdd7146d1b2157c360d4274ec17a03dea';
 
 /// Fetches a single appointment by its [id].
 

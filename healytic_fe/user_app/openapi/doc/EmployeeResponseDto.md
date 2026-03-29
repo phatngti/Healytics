@@ -13,7 +13,6 @@ Name | Type | Description | Notes
 **firstName** | [**Object**](.md) | First name | [optional] 
 **lastName** | [**Object**](.md) | Last name | [optional] 
 **fullName** | **String** | Full name | 
-**displayName** | [**Object**](.md) | Display name | [optional] 
 **email** | **String** | Email address | 
 **phone** | [**Object**](.md) | Phone number | [optional] 
 **avatarUrl** | [**Object**](.md) | Avatar URL | [optional] 
@@ -23,8 +22,9 @@ Name | Type | Description | Notes
 **description** | [**Object**](.md) | Description/bio | [optional] 
 **emergencyContactName** | [**Object**](.md) | Emergency contact name | [optional] 
 **emergencyContactPhone** | [**Object**](.md) | Emergency contact phone | [optional] 
-**idCardUrl** | [**Object**](.md) | ID card URL | [optional] 
+**verificationDocuments** | [**List<VerificationDocumentEntryDto>**](VerificationDocumentEntryDto.md) | Verification documents | [optional] [default to const []]
 **schedule** | [**List<WorkScheduleEntryDto>**](WorkScheduleEntryDto.md) | Work schedule | [optional] [default to const []]
+**workHistory** | [**List<WorkHistoryEntryDto>**](WorkHistoryEntryDto.md) | Work history | [optional] [default to const []]
 **dob** | [**Object**](.md) | Date of birth | [optional] 
 **gender** | **String** | Gender | [optional] 
 **role** | **String** | Employee role | 

@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/employee/domain/verification_document_entry.entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'employee.entity.freezed.dart';
@@ -35,6 +36,9 @@ extension type const EmployeeId(String value) implements String {
 sealed class EmployeeEntity {
   /// The unique identifier for the employee.
   EmployeeId get id;
+
+  /// The employee code (e.g. 'EMP-001').
+  String get employeeCode;
 
   /// The employee's full legal name.
   String get fullName;
@@ -78,20 +82,17 @@ sealed class EmployeeEntity {
   /// Country name.
   String get country;
 
-  /// URL to the employee's professional license document.
-  String? get licenseUrl;
-
-  /// URL to the employee's ID card document.
-  String? get idCardUrl;
-
   /// Optional description or bio.
   String? get description;
 
-  /// List of document URLs associated with the employee.
-  List<String> get documents;
+  /// Verification documents (ID card, licenses, etc.).
+  List<VerificationDocumentEntry> get verificationDocuments;
 
   /// Weekly work schedule.
   List<EmployeeSchedule> get workSchedule;
+
+  /// Work history entries for the employee.
+  List<WorkHistoryEntry> get workHistory;
 
   /// Date of birth in ISO 8601 format.
   String? get dateOfBirth;
@@ -141,6 +142,7 @@ abstract class DoctorEntity with _$DoctorEntity implements EmployeeEntity {
   /// Creates a new [DoctorEntity].
   const factory DoctorEntity({
     required EmployeeId id,
+    @Default('') String employeeCode,
     required String fullName,
     required String displayName,
     required String avatar,
@@ -163,11 +165,11 @@ abstract class DoctorEntity with _$DoctorEntity implements EmployeeEntity {
     @Default([]) List<String> certifications,
     int? experienceYears,
     double? consultationFee,
-    String? licenseUrl,
-    String? idCardUrl,
     String? description,
-    @Default([]) List<String> documents,
+    @Default([])
+    List<VerificationDocumentEntry> verificationDocuments,
     @Default([]) List<EmployeeSchedule> workSchedule,
+    @Default([]) List<WorkHistoryEntry> workHistory,
     String? dateOfBirth,
     String? gender,
     String? employmentType,
@@ -192,6 +194,7 @@ abstract class SpaTherapistEntity
   /// Creates a new [SpaTherapistEntity].
   const factory SpaTherapistEntity({
     required EmployeeId id,
+    @Default('') String employeeCode,
     required String fullName,
     required String displayName,
     required String avatar,
@@ -212,11 +215,11 @@ abstract class SpaTherapistEntity
     @Default([]) List<String> deviceProficiency,
     String? therapistLevel,
     String? healthCheckDate,
-    String? licenseUrl,
-    String? idCardUrl,
     String? description,
-    @Default([]) List<String> documents,
+    @Default([])
+    List<VerificationDocumentEntry> verificationDocuments,
     @Default([]) List<EmployeeSchedule> workSchedule,
+    @Default([]) List<WorkHistoryEntry> workHistory,
     String? dateOfBirth,
     String? gender,
     String? employmentType,
@@ -241,6 +244,7 @@ abstract class MassageTherapistEntity
   /// Creates a new [MassageTherapistEntity].
   const factory MassageTherapistEntity({
     required EmployeeId id,
+    @Default('') String employeeCode,
     required String fullName,
     required String displayName,
     required String avatar,
@@ -261,11 +265,11 @@ abstract class MassageTherapistEntity
     String? strengthLevel,
     String? therapistLevel,
     String? healthCheckDate,
-    String? licenseUrl,
-    String? idCardUrl,
     String? description,
-    @Default([]) List<String> documents,
+    @Default([])
+    List<VerificationDocumentEntry> verificationDocuments,
     @Default([]) List<EmployeeSchedule> workSchedule,
+    @Default([]) List<WorkHistoryEntry> workHistory,
     String? dateOfBirth,
     String? gender,
     String? employmentType,
@@ -290,6 +294,7 @@ abstract class BasicEmployeeEntity
   /// Creates a new [BasicEmployeeEntity].
   const factory BasicEmployeeEntity({
     required EmployeeId id,
+    @Default('') String employeeCode,
     required String fullName,
     required String displayName,
     required String avatar,
@@ -304,11 +309,11 @@ abstract class BasicEmployeeEntity
     required String city,
     required String state,
     required String country,
-    String? licenseUrl,
-    String? idCardUrl,
     String? description,
-    @Default([]) List<String> documents,
+    @Default([])
+    List<VerificationDocumentEntry> verificationDocuments,
     @Default([]) List<EmployeeSchedule> workSchedule,
+    @Default([]) List<WorkHistoryEntry> workHistory,
     String? dateOfBirth,
     String? gender,
     String? employmentType,
@@ -341,4 +346,27 @@ abstract class EmployeeSchedule with _$EmployeeSchedule {
   /// Creates an [EmployeeSchedule] from JSON data.
   factory EmployeeSchedule.fromJson(Map<String, dynamic> json) =>
       _$EmployeeScheduleFromJson(json);
+}
+
+/// Represents a single work history entry for an employee.
+///
+/// Tracks the facility, position, employment period, and
+/// whether this is the employee's current position.
+@Freezed(toJson: true)
+abstract class WorkHistoryEntry with _$WorkHistoryEntry {
+  /// Creates a new [WorkHistoryEntry].
+  ///
+  /// - [facility]: Name of the workplace or facility.
+  /// - [position]: Job title or position held.
+  /// - [period]: Employment period (e.g., '2022–Present').
+  const factory WorkHistoryEntry({
+    required String facility,
+    required String position,
+    required String period,
+    @Default(false) bool isCurrent,
+  }) = _WorkHistoryEntry;
+
+  /// Creates a [WorkHistoryEntry] from JSON data.
+  factory WorkHistoryEntry.fromJson(Map<String, dynamic> json) =>
+      _$WorkHistoryEntryFromJson(json);
 }

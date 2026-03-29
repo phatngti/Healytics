@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/service_manual.entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'update_product.request.freezed.dart';
@@ -17,6 +18,7 @@ abstract class UpdateProductRequest with _$UpdateProductRequest {
     List<String>? images,
     String? category,
     List<String>? staffIds,
+    ServiceManualEntity? serviceManual,
   }) = _UpdateProductRequest;
 
   factory UpdateProductRequest.fromJson(Map<String, dynamic> json) =>

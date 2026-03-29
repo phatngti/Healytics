@@ -4,12 +4,25 @@ import { EmployeeRole } from '../enum/employee-role.enum';
 import { EmployeeStatus } from '../enum/employee-status.enum';
 import { Gender } from '../enum/gender.enum';
 import { WorkScheduleEntryDto } from './work-schedule-entry.dto';
+import { WorkHistoryEntryDto } from './work-history-entry.dto';
+import { VerificationDocumentEntryDto } from './verification-document-entry.dto';
 
 /**
  * Doctor profile response DTO.
  * Matches DoctorProfile entity structure.
  */
-class DoctorProfileResponseDto {
+
+export class MedicalCredentialResponseDto {
+  @Expose()
+  @ApiPropertyOptional({ description: 'Title' })
+  title?: string;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'License' })
+  license?: string;
+}
+
+export class DoctorProfileResponseDto {
   @Expose()
   @ApiPropertyOptional({ description: 'Employee ID (primary key)' })
   employeeId?: string;
@@ -19,12 +32,9 @@ class DoctorProfileResponseDto {
   title?: string;
 
   @Expose()
-  @ApiPropertyOptional({ type: [String], description: 'Medical titles' })
-  medicalTitles?: string[];
-
-  @Expose()
-  @ApiPropertyOptional({ type: [String], description: 'Medical license numbers' })
-  medicalLicenses?: string[];
+  @ApiPropertyOptional({ type: [MedicalCredentialResponseDto], description: 'Medical credentials (titles + licenses)' })
+  @Type(() => MedicalCredentialResponseDto)
+  medicalCredentials?: Array<MedicalCredentialResponseDto>;
 
   @Expose()
   @ApiPropertyOptional({ description: 'Years of experience' })
@@ -41,17 +51,13 @@ class DoctorProfileResponseDto {
   @Expose()
   @ApiPropertyOptional({ type: [String], description: 'Education history' })
   education?: string[];
-
-  @Expose()
-  @ApiPropertyOptional({ type: [String], description: 'Certifications' })
-  certifications?: string[];
 }
 
 /**
  * Therapist profile response DTO.
  * Matches TherapistProfile entity structure.
  */
-class TherapistProfileResponseDto {
+export class TherapistProfileResponseDto {
   @Expose()
   @ApiPropertyOptional({ description: 'Employee ID (primary key)' })
   employeeId?: string;
@@ -83,10 +89,6 @@ class TherapistProfileResponseDto {
   @Expose()
   @ApiPropertyOptional({ type: [String], description: 'Device proficiency list' })
   deviceProficiency?: string[];
-
-  @Expose()
-  @ApiPropertyOptional({ description: 'License URL' })
-  licenseUrl?: string;
 }
 
 /**
@@ -114,9 +116,7 @@ export class EmployeeResponseDto {
   @ApiProperty({ description: 'Full name' })
   fullName: string;
 
-  @Expose()
-  @ApiPropertyOptional({ description: 'Display name' })
-  displayName: string | null;
+
 
   @Expose()
   @ApiProperty({ description: 'Email address' })
@@ -155,13 +155,19 @@ export class EmployeeResponseDto {
   emergencyContactPhone: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'ID card URL' })
-  idCardUrl: string | null;
+  @ApiPropertyOptional({ type: [VerificationDocumentEntryDto], description: 'Verification documents' })
+  @Type(() => VerificationDocumentEntryDto)
+  verificationDocuments: VerificationDocumentEntryDto[] | null;
 
   @Expose()
   @ApiPropertyOptional({ type: [WorkScheduleEntryDto], description: 'Work schedule' })
   @Type(() => WorkScheduleEntryDto)
   schedule: WorkScheduleEntryDto[] | null;
+
+  @Expose()
+  @ApiPropertyOptional({ type: [WorkHistoryEntryDto], description: 'Work history' })
+  @Type(() => WorkHistoryEntryDto)
+  workHistory: WorkHistoryEntryDto[] | null;
 
   @Expose()
   @ApiPropertyOptional({ description: 'Date of birth' })

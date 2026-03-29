@@ -34,8 +34,22 @@ Future<List<ReviewEntity>> serviceReviews(
   Ref ref, {
   required String serviceId,
 }) async {
-  final repo = ref.read(serviceDetailsRepositoryProvider);
+  final repo = ref.read(
+    serviceDetailsRepositoryProvider,
+  );
   return repo.getServiceReviews(serviceId);
+}
+
+/// Fetches reviews for a specific employee.
+@riverpod
+Future<List<ReviewEntity>> employeeReviews(
+  Ref ref, {
+  required String employeeId,
+}) async {
+  final repo = ref.read(
+    serviceDetailsRepositoryProvider,
+  );
+  return repo.getEmployeeReviews(employeeId);
 }
 
 /// Fetches recommended services for a given

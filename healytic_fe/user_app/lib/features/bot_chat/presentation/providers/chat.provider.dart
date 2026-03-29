@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
+
+import 'package:logging/logging.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/features/bot_chat/domain/repositories/chat.repository.dart';
@@ -61,6 +62,7 @@ final _sentenceEndRegex = RegExp(r'[.!?](?:\s|$)');
 ///   segment begins
 @riverpod
 class Chat extends _$Chat {
+  static final _log = Logger('Chat');
   late final ChatRepository _repository;
   StreamSubscription<ChatSseEvent>? _sseSubscription;
 
@@ -102,12 +104,7 @@ class Chat extends _$Chat {
       final messages = await _repository.getMessages(conversationId);
       state = state.copyWith(isLoading: false, messages: messages);
     } catch (e, st) {
-      log(
-        'Error loading chat messages',
-        name: 'Chat',
-        error: e,
-        stackTrace: st,
-      );
+      _log.severe('Error loading chat messages', e, st);
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to load messages.',
@@ -156,7 +153,7 @@ class Chat extends _$Chat {
       _sseSubscription = stream.listen(
         _handleSseEvent,
         onError: (Object error) {
-          log('SSE stream error', name: 'Chat', error: error);
+          _log.severe('SSE stream error', error);
           state = state.copyWith(
             isLoading: false,
             error: 'Connection lost. Please retry.',
@@ -172,7 +169,7 @@ class Chat extends _$Chat {
         },
       );
     } catch (e, st) {
-      log('Error sending message', name: 'Chat', error: e, stackTrace: st);
+      _log.severe('Error sending message', e, st);
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to send message.',

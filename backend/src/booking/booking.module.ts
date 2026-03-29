@@ -21,7 +21,7 @@ import { WebhookService } from './services/webhook.service';
     TypeOrmModule.forFeature([Booking, CheckoutTicket, BookingStatusLog]),
     HttpModule.register({ timeout: 5000 }),
   ],
-  controllers: [BookingController, SlotsController],
+  controllers: [BookingController, SlotsController, ProcessCheckoutHandler],
   providers: [
     BookingService,
     AcquireMicroLockHandler,

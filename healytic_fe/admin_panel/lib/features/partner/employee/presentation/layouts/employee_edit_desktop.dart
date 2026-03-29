@@ -7,6 +7,7 @@ import 'package:admin_panel/features/partner/employee/presentation/widgets/emplo
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/doctor_experience_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_professional_role_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_work_schedule_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_work_history_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/therapist_fields_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/employee_details_profile_section.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_details_documents_card.dart';
@@ -224,6 +225,10 @@ class _RightColumn extends StatelessWidget {
             ),
             _ => const SizedBox.shrink(),
           },
+        ),
+        AppDimens.verticalMedium,
+        EmployeeWorkHistoryCard(
+          initialEntries: employee.workHistory,
         ),
         AppDimens.verticalMedium,
         EmployeeDetailsDocumentsCard(isEditing: isEditing),

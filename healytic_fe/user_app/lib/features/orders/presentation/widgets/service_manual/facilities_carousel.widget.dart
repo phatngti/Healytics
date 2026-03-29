@@ -1,13 +1,15 @@
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:user_app/features/orders/domain/entities/service_manual.entity.dart';
 import 'package:user_app/features/orders/presentation/widgets/service_manual/manual_section_card.widget.dart';
 
-/// Displays the "Cơ sở vật chất" section with a
+/// Displays the "Facilities" section with a
 /// horizontally scrollable image carousel.
 class FacilitiesCarousel extends StatelessWidget {
-  const FacilitiesCarousel({super.key, required this.facilities});
+  const FacilitiesCarousel({
+    super.key,
+    required this.facilities,
+  });
 
   /// List of facility items.
   final List<FacilityEntity> facilities;
@@ -15,21 +17,21 @@ class FacilitiesCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ManualSectionCard(
-      icon: Symbols.pool,
-      title: 'Cơ sở vật chất',
+      title: 'Facilities',
       padding: const EdgeInsets.only(
-        top: AppDimens.spaceXl,
-        bottom: AppDimens.spaceXl,
+        top: AppDimens.spaceLg,
       ),
       child: SizedBox(
         height: 156,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
-          padding: AppDimens.paddingHorizontalMediumLarge,
           itemCount: facilities.length,
-          separatorBuilder: (_, __) => AppDimens.horizontalMediumSmall,
+          separatorBuilder: (_, __) =>
+              AppDimens.horizontalMediumSmall,
           itemBuilder: (context, index) =>
-              _FacilityItem(facility: facilities[index]),
+              _FacilityItem(
+            facility: facilities[index],
+          ),
         ),
       ),
     );
@@ -60,7 +62,8 @@ class _FacilityItem extends StatelessWidget {
                 facility.imageUrl,
                 fit: BoxFit.cover,
                 semanticLabel: facility.name,
-                errorBuilder: (_, __, ___) => Container(
+                errorBuilder: (_, __, ___) =>
+                    Container(
                   color: colors.surfaceContainerHighest,
                   child: Center(
                     child: Icon(

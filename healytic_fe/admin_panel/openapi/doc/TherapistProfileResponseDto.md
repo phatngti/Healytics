@@ -16,7 +16,6 @@ Name | Type | Description | Notes
 **healthCheckDate** | [**DateTime**](DateTime.md) | Health check date | [optional] 
 **skills** | **List<String>** | List of skills | [optional] [default to const []]
 **deviceProficiency** | **List<String>** | Device proficiency list | [optional] [default to const []]
-**licenseUrl** | **String** | License URL | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

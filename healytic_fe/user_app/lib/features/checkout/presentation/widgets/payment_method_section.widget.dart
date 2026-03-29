@@ -1,3 +1,4 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 
@@ -18,25 +19,36 @@ class PaymentMethodSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final pad = AppDimens.cardPadding(context);
+    final radius = AppDimens.cardRadius(context);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(pad),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(radius),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+          color: colorScheme.outlineVariant
+              .withValues(alpha: 0.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow
+                .withValues(alpha: 0.08),
+            blurRadius: AppDimens.spaceMd,
+            offset: const Offset(
+              0,
+              AppDimens.spaceXxs,
+            ),
           ),
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 6),
+            color: colorScheme.shadow
+                .withValues(alpha: 0.04),
+            blurRadius: AppDimens.spaceXxl,
+            offset: const Offset(
+              0,
+              AppDimens.spaceXs + 2,
+            ),
           ),
         ],
       ),
@@ -50,13 +62,16 @@ class PaymentMethodSection extends StatelessWidget {
               color: colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 16),
+          AppDimens.verticalMedium,
           ...methods.map(
             (method) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(
+                bottom: AppDimens.spaceMd,
+              ),
               child: _PaymentOptionTile(
                 method: method,
-                isSelected: method.type == selectedType,
+                isSelected:
+                    method.type == selectedType,
                 onTap: () => onSelected(method.type),
               ),
             ),
@@ -67,6 +82,8 @@ class PaymentMethodSection extends StatelessWidget {
   }
 }
 
+/// A single payment option with icon, label, and
+/// radio indicator.
 class _PaymentOptionTile extends StatelessWidget {
   final PaymentMethodOption method;
   final bool isSelected;
@@ -81,65 +98,111 @@ class _PaymentOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final pad = AppDimens.contentPadding(context);
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppDimens.radiusMediumSmall,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(pad),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppDimens.radiusMediumSmall,
           border: Border.all(
             color: isSelected
                 ? colorScheme.primary
                 : colorScheme.outlineVariant,
           ),
           color: isSelected
-              ? colorScheme.primary.withValues(alpha: 0.05)
+              ? colorScheme.primary
+                  .withValues(alpha: 0.05)
               : Colors.transparent,
         ),
         child: Row(
           children: [
-            _buildLeadingIcon(colorScheme),
-            const SizedBox(width: 12),
-            Expanded(child: _buildLabel(colorScheme, textTheme)),
-            _buildRadio(colorScheme),
+            _PaymentIcon(
+              type: method.type,
+              isSelected: isSelected,
+            ),
+            AppDimens.horizontalMediumSmall,
+            Expanded(
+              child: _PaymentLabel(
+                method: method,
+                isSelected: isSelected,
+              ),
+            ),
+            _RadioIndicator(
+              isSelected: isSelected,
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildLeadingIcon(ColorScheme colorScheme) {
-    switch (method.type) {
-      case PaymentMethodType.card:
-        return Container(
-          width: 32,
-          height: 20,
+/// Icon for the payment method type.
+class _PaymentIcon extends StatelessWidget {
+  final PaymentMethodType type;
+  final bool isSelected;
+
+  const _PaymentIcon({
+    required this.type,
+    required this.isSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return switch (type) {
+      PaymentMethodType.card => Container(
+          width: AppDimens.avatarSm,
+          height: AppDimens.iconMd,
           decoration: BoxDecoration(
             color: colorScheme.onSurface,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: AppDimens.radiusExtraSmall,
           ),
           alignment: Alignment.center,
           child: Text(
             'VISA',
             style: TextStyle(
-              fontSize: 6,
+              fontSize: AppDimens.spaceXs + 2,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,
               color: colorScheme.surface,
             ),
           ),
-        );
-      case PaymentMethodType.eWallet:
-        return Icon(Icons.account_balance_wallet, color: Colors.blue, size: 20);
-      case PaymentMethodType.payLater:
-        return Icon(Icons.schedule, color: Colors.purple, size: 20);
-    }
+        ),
+      PaymentMethodType.eWallet => Icon(
+          Icons.account_balance_wallet,
+          color: colorScheme.tertiary,
+          size: AppDimens.iconMd,
+        ),
+      PaymentMethodType.payLater => Icon(
+          Icons.schedule,
+          color: colorScheme.secondary,
+          size: AppDimens.iconMd,
+        ),
+    };
   }
+}
 
-  Widget _buildLabel(ColorScheme colorScheme, TextTheme textTheme) {
+/// Label text (and optional sub-label) for a payment
+/// option.
+class _PaymentLabel extends StatelessWidget {
+  final PaymentMethodOption method;
+  final bool isSelected;
+
+  const _PaymentLabel({
+    required this.method,
+    required this.isSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return RichText(
       text: TextSpan(
         text: method.label,
@@ -161,23 +224,35 @@ class _PaymentOptionTile extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildRadio(ColorScheme colorScheme) {
+/// Custom radio circle indicator.
+class _RadioIndicator extends StatelessWidget {
+  final bool isSelected;
+
+  const _RadioIndicator({required this.isSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
-      width: 20,
-      height: 20,
+      width: AppDimens.iconMd,
+      height: AppDimens.iconMd,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: isSelected ? colorScheme.primary : colorScheme.outline,
-          width: 2,
+          color: isSelected
+              ? colorScheme.primary
+              : colorScheme.outline,
+          width: AppDimens.borderWidthThick,
         ),
       ),
       child: isSelected
           ? Center(
               child: Container(
-                width: 10,
-                height: 10,
+                width: AppDimens.spaceSmMd,
+                height: AppDimens.spaceSmMd,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: colorScheme.primary,

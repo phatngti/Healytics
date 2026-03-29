@@ -5,6 +5,7 @@ import 'package:admin_panel/features/partner/products/presentation/widgets/produ
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_organization.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_performance.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_pricing.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_service_manual.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_details/product_details_status.widget.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +77,8 @@ class ProductDetailsDesktop extends StatelessWidget {
                         ProductDetailsMediaGalleryCard(product: product),
                         AppDimens.verticalLarge,
                         ProductDetailsAboutCard(product: product),
+                        AppDimens.verticalLarge,
+                        ProductDetailsServiceManualCard(product: product),
                         AppDimens.verticalLarge,
                         ProductDetailsPricingCard(product: product),
                         AppDimens.verticalLarge,

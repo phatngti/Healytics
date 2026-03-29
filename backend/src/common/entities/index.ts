@@ -31,7 +31,6 @@ export { DocumentRequirement } from './document-requirement.entity';
 // Products
 export { Product } from './product.entity';
 export { ProductMedia } from './product-media.entity';
-export { ProductReview } from './product-review.entity';
 export { ProductFacilityImage } from './product-facility-image.entity';
 export { ResourceType } from './resource-type.entity';
 export { ProductDefinition } from './product-definition.entity';
@@ -46,3 +45,11 @@ export { ProductTag } from './product-tag.entity';
 export { Booking } from './booking.entity';
 export { CheckoutTicket } from './checkout-ticket.entity';
 export { BookingStatusLog } from './booking-status-log.entity';
+
+// Payment Gateway
+export { Payment } from './payment.entity';
+export { PaymentTransactionLog } from './payment-transaction-log.entity';
+
+// Reviews
+export { TreatmentReview } from './treatment-review.entity';
+export { SpecialistReview } from './specialist-review.entity';

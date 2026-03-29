@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { HealthServiceService } from './health-service.service';
 import { Product } from '@/common/entities/product.entity';
+import { Booking } from '@/common/entities/booking.entity';
 import { CreatePartnerHealthServiceDto } from './dto/partner/create-partner-health-service.dto';
 import { UpdatePartnerHealthServiceDto } from './dto/partner/update-partner-health-service.dto';
 import { CreateHealthServiceHandler } from './application/handlers/create-health-service.handler';
@@ -19,6 +20,7 @@ import {
 describe('HealthServiceService', () => {
   let service: HealthServiceService;
   let productRepository: MockRepository<Product>;
+  let bookingRepository: MockRepository<Booking>;
   let createHandler: MockHandler;
   let updateHandler: MockHandler;
   let removeHandler: MockHandler;
@@ -26,6 +28,7 @@ describe('HealthServiceService', () => {
   beforeEach(async () => {
     // Arrange - Create fresh mocks for each test
     productRepository = createMockRepository<Product>();
+    bookingRepository = createMockRepository<Booking>();
     createHandler = createMockHandler();
     updateHandler = createMockHandler();
     removeHandler = createMockHandler();
@@ -36,6 +39,10 @@ describe('HealthServiceService', () => {
         {
           provide: getRepositoryToken(Product),
           useValue: productRepository,
+        },
+        {
+          provide: getRepositoryToken(Booking),
+          useValue: bookingRepository,
         },
         {
           provide: CreateHealthServiceHandler,
@@ -200,6 +207,162 @@ describe('HealthServiceService', () => {
       // Act & Assert
       await expect(service.findBySlug(slug)).rejects.toThrow(NotFoundException);
       await expect(service.findBySlug(slug)).rejects.toThrow(`Product with slug "${slug}" not found`);
+    });
+  });
+
+  describe('getProductEmployees', () => {
+    it('should throw NotFoundException when product not found', async () => {
+      // Arrange
+      productRepository.findOne.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.getProductEmployees('missing-id')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should return empty array when product has no employees', async () => {
+      // Arrange
+      productRepository.findOne.mockResolvedValue({
+        id: 'prod-1',
+        productEmployeeEligibilities: [],
+      });
+
+      // Act
+      const result = await service.getProductEmployees('prod-1');
+
+      // Assert
+      expect(result).toEqual([]);
+    });
+
+    it('should return employees with day schedules generated from work schedule', async () => {
+      // Arrange
+      const employee = {
+        id: 'emp-1',
+        fullName: 'Dr. Test',
+        jobTitle: 'Doctor',
+        role: 'doctor',
+        avatarUrl: null,
+        description: null,
+        doctorProfile: null,
+        therapistProfile: null,
+        schedule: [
+          { day: 'Monday', start: '09:00', end: '10:00', isWorking: true },
+          { day: 'Tuesday', start: '', end: '', isWorking: false },
+        ],
+      };
+
+      productRepository.findOne.mockResolvedValue({
+        id: 'prod-1',
+        productEmployeeEligibilities: [
+          { id: 'elig-1', employeeId: 'emp-1', isPrimary: false, employee },
+        ],
+      });
+      bookingRepository.find.mockResolvedValue([]);
+
+      // Act
+      const result = await service.getProductEmployees('prod-1');
+
+      // Assert
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('emp-1');
+      expect(result[0].eligibilityId).toBe('elig-1');
+      expect(result[0].name).toBe('Dr. Test');
+      expect(result[0].isSelected).toBe(true); // first employee is selected
+      expect(result[0].daySchedules).toHaveLength(30);
+
+      // Find a Monday in the schedules
+      const mondaySchedule = result[0].daySchedules.find((d) => {
+        const date = new Date(d.date + 'T00:00:00');
+        return date.getDay() === 1; // Monday
+      });
+      expect(mondaySchedule).toBeDefined();
+      expect(mondaySchedule!.isAvailable).toBe(true);
+      expect(mondaySchedule!.timeSlots.length).toBe(2); // 09:00, 09:30
+
+      // Find a Tuesday
+      const tuesdaySchedule = result[0].daySchedules.find((d) => {
+        const date = new Date(d.date + 'T00:00:00');
+        return date.getDay() === 2; // Tuesday
+      });
+      expect(tuesdaySchedule).toBeDefined();
+      expect(tuesdaySchedule!.isAvailable).toBe(false);
+      expect(tuesdaySchedule!.timeSlots).toEqual([]);
+    });
+
+    it('should mark booked slots as unavailable', async () => {
+      // Arrange — find next Monday from today
+      const today = new Date();
+      const todayDay = today.getDay();
+      const daysUntilMonday = todayDay === 1 ? 0 : todayDay === 0 ? 1 : 8 - todayDay;
+      const nextMonday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + daysUntilMonday);
+
+      const employee = {
+        id: 'emp-1',
+        fullName: 'Dr. Test',
+        jobTitle: 'Doctor',
+        role: 'doctor',
+        avatarUrl: null,
+        description: null,
+        doctorProfile: null,
+        therapistProfile: null,
+        schedule: [
+          { day: 'Monday', start: '09:00', end: '10:00', isWorking: true },
+        ],
+      };
+
+      productRepository.findOne.mockResolvedValue({
+        id: 'prod-1',
+        productEmployeeEligibilities: [
+          { id: 'elig-1', employeeId: 'emp-1', isPrimary: false, employee },
+        ],
+      });
+
+      // Create a booking at 09:00 on next Monday
+      const bookingTime = new Date(nextMonday);
+      bookingTime.setHours(9, 0, 0, 0);
+      bookingRepository.find.mockResolvedValue([
+        { staffId: 'emp-1', startTime: bookingTime, status: 'CONFIRMED' },
+      ]);
+
+      // Act
+      const result = await service.getProductEmployees('prod-1');
+
+      // Assert
+      const mondayDate = `${nextMonday.getFullYear()}-${String(nextMonday.getMonth() + 1).padStart(2, '0')}-${String(nextMonday.getDate()).padStart(2, '0')}`;
+      const mondaySchedule = result[0].daySchedules.find((d) => d.date === mondayDate);
+      expect(mondaySchedule).toBeDefined();
+
+      const slot9am = mondaySchedule!.timeSlots.find((s) => s.label === '09:00 AM');
+      const slot930am = mondaySchedule!.timeSlots.find((s) => s.label === '09:30 AM');
+      expect(slot9am!.isAvailable).toBe(false); // booked
+      expect(slot930am!.isAvailable).toBe(true); // not booked
+    });
+
+    it('should set isSelected on the primary employee', async () => {
+      // Arrange
+      const emp1 = {
+        id: 'emp-1', fullName: 'Doctor A', jobTitle: 'Doctor', role: 'doctor',
+        avatarUrl: null, description: null, doctorProfile: null, therapistProfile: null, schedule: [],
+      };
+      const emp2 = {
+        id: 'emp-2', fullName: 'Doctor B', jobTitle: 'Doctor', role: 'doctor',
+        avatarUrl: null, description: null, doctorProfile: null, therapistProfile: null, schedule: [],
+      };
+
+      productRepository.findOne.mockResolvedValue({
+        id: 'prod-1',
+        productEmployeeEligibilities: [
+          { id: 'elig-1', employeeId: 'emp-1', isPrimary: false, employee: emp1 },
+          { id: 'elig-2', employeeId: 'emp-2', isPrimary: true, employee: emp2 },
+        ],
+      });
+      bookingRepository.find.mockResolvedValue([]);
+
+      // Act
+      const result = await service.getProductEmployees('prod-1');
+
+      // Assert
+      expect(result[0].isSelected).toBe(false); // emp-1
+      expect(result[1].isSelected).toBe(true);  // emp-2 is primary
     });
   });
 

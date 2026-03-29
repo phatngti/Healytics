@@ -308,12 +308,10 @@ class PublicHealthServiceResponseDtoTypeEnum {
 
   String toJson() => value;
 
-  static const physical = PublicHealthServiceResponseDtoTypeEnum._(r'physical');
   static const service = PublicHealthServiceResponseDtoTypeEnum._(r'service');
 
   /// List of all possible values in this [enum][PublicHealthServiceResponseDtoTypeEnum].
   static const values = <PublicHealthServiceResponseDtoTypeEnum>[
-    physical,
     service,
   ];
 
@@ -353,7 +351,6 @@ class PublicHealthServiceResponseDtoTypeEnumTypeTransformer {
   PublicHealthServiceResponseDtoTypeEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'physical': return PublicHealthServiceResponseDtoTypeEnum.physical;
         case r'service': return PublicHealthServiceResponseDtoTypeEnum.service;
         default:
           if (!allowNull) {

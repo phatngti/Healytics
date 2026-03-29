@@ -1,18 +1,20 @@
 import 'package:common/widgets/button/back_button.dart';
 
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_add_form_section.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form_actions.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form_profile_section.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:common/utils/demensions.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';
 
-/// Callback that returns autofill values for the given role.
-typedef AutofillBuilder = Map<String, dynamic> Function(String role);
+/// Callback that returns autofill values
+/// for the given role and optional therapist type.
+typedef AutofillBuilder =
+    Map<String, dynamic> Function(String role, [String? therapistType]);
 
 class EmployeeAddDesktop extends StatefulWidget {
   final VoidCallback? onCancel;
@@ -41,8 +43,19 @@ class EmployeeAddDesktop extends StatefulWidget {
 }
 
 class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
-  final _formKey = GlobalKey<FormBuilderState>();
+  var _formKey = GlobalKey<FormBuilderState>();
   EmployeeRole _selectedRole = EmployeeRole.therapist;
+  TherapistType _selectedTherapistType = TherapistType.massage;
+
+  /// Tracks the current form initial values.
+  /// Updated when role changes during autofill.
+  late Map<String, dynamic> _formInitialValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _formInitialValue = widget.initialValue;
+  }
 
   void _handleSubmit() {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
@@ -51,22 +64,38 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
   }
 
   void _handleRoleChanged(EmployeeRole role) {
-    // Reset all form fields when switching role
-    _formKey.currentState?.reset();
     setState(() {
       _selectedRole = role;
-    });
+      // Reset therapist type to default
+      // when switching roles.
+      _selectedTherapistType = TherapistType.massage;
 
-    // Re-patch form with role-specific autofill data
-    // in debug / staging builds.
-    if (widget.shouldAutofill) {
-      final values = widget.onBuildAutofillValues?.call(role.apiValue);
-      if (values != null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _formKey.currentState?.patchValue(values);
-        });
+      // Rebuild FormBuilder with role-specific
+      // autofill data in debug / staging builds.
+      if (widget.shouldAutofill) {
+        final values = widget.onBuildAutofillValues?.call(role.apiValue);
+        if (values != null) {
+          _formInitialValue = values;
+          _formKey = GlobalKey<FormBuilderState>();
+        }
       }
-    }
+    });
+  }
+
+  void _handleTherapistTypeChanged(TherapistType type) {
+    _selectedTherapistType = type;
+    if (!widget.shouldAutofill) return;
+
+    setState(() {
+      final values = widget.onBuildAutofillValues?.call(
+        _selectedRole.apiValue,
+        type.apiValue,
+      );
+      if (values != null) {
+        _formInitialValue = values;
+        _formKey = GlobalKey<FormBuilderState>();
+      }
+    });
   }
 
   @override
@@ -75,7 +104,7 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
 
     return FormBuilder(
       key: _formKey,
-      initialValue: widget.initialValue,
+      initialValue: _formInitialValue,
       child: Stack(
         children: [
           // Scrollable content
@@ -102,7 +131,9 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
                     Expanded(
                       child: EmployeeAddFormSection(
                         selectedRole: _selectedRole,
+                        selectedTherapistType: _selectedTherapistType,
                         onRoleChanged: _handleRoleChanged,
+                        onTherapistTypeChanged: _handleTherapistTypeChanged,
                       ),
                     ),
                   ],

@@ -48,6 +48,7 @@ List<DayScheduleEntity> _buildMonthSchedule({
 final kMockServiceInfo = ServiceDetailsEntity(
   id: 'service-laser-co2',
   title: 'Laser CO2 Skin\nTherapy',
+  categoryId: 'cat-dermatology',
   categoryLabel: 'Clinical Dermatology',
   images: const [
     'https://lh3.googleusercontent.com/aida-public/AB6AXuAWK5FyO-mTU6MTCyXD3ltC8CbqBqSmBUxjXMTidRKJwW6ECbzeR2-7D6s0NAUjTTysGCqoX_MePcTv0K_X3QIIVdiJ4KpgwJ8wOW0L65fQjM7kK8HND5qfYd5OsPHco99npiBVsrOX-iOnWn1wHjiSRpWdyJSZjwxanKpFvYXwkLHD9aS-3D-XtilUmdILsYVPg9qmAV_xCShqCs-iDYiFtEi4R_Dyhdm236EEG6yEfxHFRFotrFm9V2TNcU2kzrouGZI_APyC4IPt',
@@ -115,6 +116,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
   'prod-1': ServiceDetailsEntity(
     id: 'prod-1',
     title: 'Deep Tissue\nMassage',
+    categoryId: 'cat-spa',
     categoryLabel: 'Spa',
     images: const [
       'https://images.unsplash.com/photo-1544161515-4ab6ce6db874'
@@ -165,6 +167,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
   'prod-2': ServiceDetailsEntity(
     id: 'prod-2',
     title: 'Yoga &\nMeditation',
+    categoryId: 'cat-wellness',
     categoryLabel: 'Wellness',
     images: const [
       'https://images.unsplash.com/photo-1506126613408-eca07ce68773'
@@ -205,6 +208,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
   'prod-3': ServiceDetailsEntity(
     id: 'prod-3',
     title: 'Personal\nTraining',
+    categoryId: 'cat-fitness',
     categoryLabel: 'Fitness',
     images: const [
       'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b'
@@ -245,6 +249,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
   'prod-5': ServiceDetailsEntity(
     id: 'prod-5',
     title: 'Hot Stone\nTherapy',
+    categoryId: 'cat-spa',
     categoryLabel: 'Spa',
     images: const [
       'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2'
@@ -729,6 +734,110 @@ const Map<String, List<RecommendedServiceEntity>> kMockRecommendedMap = {
       reviewLabel: '(62 Reviews)',
       bookedLabel: '300+ Booked',
       price: '450,000 VND',
+    ),
+  ],
+};
+
+// ─── Employee → Review mappings ──────────────────
+
+/// Mock reviews grouped by employee/specialist ID.
+///
+/// Used when showing reviews based on the selected
+/// specialist.
+final Map<String, List<ReviewEntity>>
+    kMockEmployeeReviewsMap = {
+  'spec-1': [
+    ReviewEntity(
+      reviewerName: 'Tran Van Nam',
+      avatarUrl:
+          'https://images.unsplash.com/'
+          'photo-1507003211169-0a1dd7228f2d'
+          '?w=100&h=100&fit=crop',
+      rating: 5,
+      date: DateTime(2025, 4, 20),
+      location: 'District 1, HCM',
+      serviceName: 'Deep Tissue Massage',
+      text:
+          'Dr. Anna is incredible! Best deep tissue '
+          'massage I have ever had.',
+    ),
+    ReviewEntity(
+      reviewerName: 'Le Thi Mai',
+      avatarUrl:
+          'https://images.unsplash.com/'
+          'photo-1494790108377-be9c29b29330'
+          '?w=100&h=100&fit=crop',
+      rating: 4,
+      date: DateTime(2025, 3, 15),
+      location: 'Thu Duc City',
+      serviceName: 'Deep Tissue Massage',
+      text:
+          'Very professional and attentive. '
+          'Will come back.',
+    ),
+  ],
+  'spec-2': [
+    ReviewEntity(
+      reviewerName: 'Nguyen Hoang',
+      avatarUrl:
+          'https://images.unsplash.com/'
+          'photo-1472099645785-5658abf4ff4e'
+          '?w=100&h=100&fit=crop',
+      rating: 5,
+      date: DateTime(2025, 5, 2),
+      location: 'District 3, HCM',
+      serviceName: 'Swedish Massage',
+      text:
+          'Dr. Minh has magic hands! '
+          'Highly recommended.',
+    ),
+  ],
+  'spec-3': [
+    ReviewEntity(
+      reviewerName: 'Pham Thanh',
+      avatarUrl:
+          'https://images.unsplash.com/'
+          'photo-1500648767791-00dcc994a43e'
+          '?w=100&h=100&fit=crop',
+      rating: 5,
+      date: DateTime(2025, 4, 10),
+      location: 'Binh Thanh',
+      serviceName: 'Aromatherapy',
+      text:
+          'Linh is very skilled. The aromatherapy '
+          'session was deeply relaxing.',
+    ),
+  ],
+  'spec-4': [
+    ReviewEntity(
+      reviewerName: 'Vo Minh Duc',
+      avatarUrl:
+          'https://images.unsplash.com/'
+          'photo-1519085360753-af0119f7cbe7'
+          '?w=100&h=100&fit=crop',
+      rating: 4,
+      date: DateTime(2025, 3, 28),
+      location: 'District 7, HCM',
+      serviceName: 'Wellness Consultation',
+      text:
+          'Dr. Hoa gave great wellness advice. '
+          'Very knowledgeable.',
+    ),
+  ],
+  'spec-6': [
+    ReviewEntity(
+      reviewerName: 'Ly Hoang Anh',
+      avatarUrl:
+          'https://images.unsplash.com/'
+          'photo-1534528741775-53994a69daeb'
+          '?w=100&h=100&fit=crop',
+      rating: 5,
+      date: DateTime(2025, 5, 8),
+      location: 'District 2, HCM',
+      serviceName: 'Personal Training',
+      text:
+          'Coach Duc pushed me to my limits! '
+          'Great trainer.',
     ),
   ],
 };

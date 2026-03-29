@@ -78,13 +78,24 @@ class LogService {
     await file.writeAsString(line, mode: FileMode.append);
   }
 
+  /// Returns an ANSI escape code for [level].
+  static String _levelColor(Level level) {
+    if (level >= Level.SEVERE) return '\x1B[31m'; // red
+    if (level >= Level.WARNING) return '\x1B[33m'; // yellow
+    if (level >= Level.INFO) return '\x1B[34m'; // blue
+    if (level >= Level.CONFIG) return '\x1B[32m'; // green
+    return '\x1B[90m'; // gray
+  }
+
   void _handleLogRecord(LogRecord r) {
     if (kDebugMode) {
+      final color = _levelColor(r.level);
+      const reset = '\x1B[0m';
       debugPrint(
-        '[${r.level.name}] [${r.time}] '
+        '$color[${r.level.name}]$reset '
         '[${r.loggerName}] ${r.message}'
-        '${r.error == null ? '' : '\nError: ${r.error}'}'
-        '${r.stackTrace == null ? '' : '\nStack: ${r.stackTrace}'}',
+        '${r.error == null ? '' : '\n${color}Error: ${r.error}$reset'}'
+        '${r.stackTrace == null ? '' : '\n${color}Stack: ${r.stackTrace}$reset'}',
       );
     }
 

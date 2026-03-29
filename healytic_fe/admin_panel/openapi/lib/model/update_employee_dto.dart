@@ -13,12 +13,10 @@ part of openapi.api;
 class UpdateEmployeeDto {
   /// Returns a new [UpdateEmployeeDto] instance.
   UpdateEmployeeDto({
-    this.authId,
     this.employeeCode,
     this.firstName,
     this.lastName,
     this.fullName,
-    this.displayName,
     this.email,
     this.phone,
     this.avatarUrl,
@@ -26,29 +24,19 @@ class UpdateEmployeeDto {
     this.gender,
     this.role,
     this.status,
-    this.branchId,
     this.partnerId,
     this.jobTitle,
     this.startDate,
     this.employmentType,
     this.emergencyContactName,
     this.emergencyContactPhone,
-    this.idCardUrl,
+    this.verificationDocuments = const [],
     this.description,
-    this.password,
     this.schedule = const [],
+    this.workHistory = const [],
     this.doctorProfile,
     this.therapistProfile,
   });
-
-  /// Authentication ID from external provider
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? authId;
 
   /// Unique employee code
   ///
@@ -85,15 +73,6 @@ class UpdateEmployeeDto {
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
   String? fullName;
-
-  /// Display name
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? displayName;
 
   /// Email address
   ///
@@ -139,15 +118,6 @@ class UpdateEmployeeDto {
 
   /// Status of the employee
   UpdateEmployeeDtoStatusEnum? status;
-
-  /// Branch ID the employee belongs to
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? branchId;
 
   /// Partner ID the employee belongs to
   ///
@@ -203,14 +173,8 @@ class UpdateEmployeeDto {
   ///
   String? emergencyContactPhone;
 
-  /// ID card URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? idCardUrl;
+  /// Verification documents (ID card, licenses, etc.)
+  List<VerificationDocumentEntryDto> verificationDocuments;
 
   /// Bio / description
   ///
@@ -221,17 +185,11 @@ class UpdateEmployeeDto {
   ///
   String? description;
 
-  /// Account password
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? password;
-
   /// Weekly work schedule
   List<WorkScheduleEntryDto> schedule;
+
+  /// Work history entries
+  List<WorkHistoryEntryDto> workHistory;
 
   /// Doctor profile data if role is DOCTOR
   ///
@@ -253,12 +211,10 @@ class UpdateEmployeeDto {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is UpdateEmployeeDto &&
-    other.authId == authId &&
     other.employeeCode == employeeCode &&
     other.firstName == firstName &&
     other.lastName == lastName &&
     other.fullName == fullName &&
-    other.displayName == displayName &&
     other.email == email &&
     other.phone == phone &&
     other.avatarUrl == avatarUrl &&
@@ -266,29 +222,26 @@ class UpdateEmployeeDto {
     other.gender == gender &&
     other.role == role &&
     other.status == status &&
-    other.branchId == branchId &&
     other.partnerId == partnerId &&
     other.jobTitle == jobTitle &&
     other.startDate == startDate &&
     other.employmentType == employmentType &&
     other.emergencyContactName == emergencyContactName &&
     other.emergencyContactPhone == emergencyContactPhone &&
-    other.idCardUrl == idCardUrl &&
+    _deepEquality.equals(other.verificationDocuments, verificationDocuments) &&
     other.description == description &&
-    other.password == password &&
     _deepEquality.equals(other.schedule, schedule) &&
+    _deepEquality.equals(other.workHistory, workHistory) &&
     other.doctorProfile == doctorProfile &&
     other.therapistProfile == therapistProfile;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (authId == null ? 0 : authId!.hashCode) +
     (employeeCode == null ? 0 : employeeCode!.hashCode) +
     (firstName == null ? 0 : firstName!.hashCode) +
     (lastName == null ? 0 : lastName!.hashCode) +
     (fullName == null ? 0 : fullName!.hashCode) +
-    (displayName == null ? 0 : displayName!.hashCode) +
     (email == null ? 0 : email!.hashCode) +
     (phone == null ? 0 : phone!.hashCode) +
     (avatarUrl == null ? 0 : avatarUrl!.hashCode) +
@@ -296,30 +249,24 @@ class UpdateEmployeeDto {
     (gender == null ? 0 : gender!.hashCode) +
     (role == null ? 0 : role!.hashCode) +
     (status == null ? 0 : status!.hashCode) +
-    (branchId == null ? 0 : branchId!.hashCode) +
     (partnerId == null ? 0 : partnerId!.hashCode) +
     (jobTitle == null ? 0 : jobTitle!.hashCode) +
     (startDate == null ? 0 : startDate!.hashCode) +
     (employmentType == null ? 0 : employmentType!.hashCode) +
     (emergencyContactName == null ? 0 : emergencyContactName!.hashCode) +
     (emergencyContactPhone == null ? 0 : emergencyContactPhone!.hashCode) +
-    (idCardUrl == null ? 0 : idCardUrl!.hashCode) +
+    (verificationDocuments.hashCode) +
     (description == null ? 0 : description!.hashCode) +
-    (password == null ? 0 : password!.hashCode) +
     (schedule.hashCode) +
+    (workHistory.hashCode) +
     (doctorProfile == null ? 0 : doctorProfile!.hashCode) +
     (therapistProfile == null ? 0 : therapistProfile!.hashCode);
 
   @override
-  String toString() => 'UpdateEmployeeDto[authId=$authId, employeeCode=$employeeCode, firstName=$firstName, lastName=$lastName, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, role=$role, status=$status, branchId=$branchId, partnerId=$partnerId, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, idCardUrl=$idCardUrl, description=$description, password=$password, schedule=$schedule, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
+  String toString() => 'UpdateEmployeeDto[employeeCode=$employeeCode, firstName=$firstName, lastName=$lastName, fullName=$fullName, email=$email, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, role=$role, status=$status, partnerId=$partnerId, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, verificationDocuments=$verificationDocuments, description=$description, schedule=$schedule, workHistory=$workHistory, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.authId != null) {
-      json[r'authId'] = this.authId;
-    } else {
-      json[r'authId'] = null;
-    }
     if (this.employeeCode != null) {
       json[r'employeeCode'] = this.employeeCode;
     } else {
@@ -339,11 +286,6 @@ class UpdateEmployeeDto {
       json[r'fullName'] = this.fullName;
     } else {
       json[r'fullName'] = null;
-    }
-    if (this.displayName != null) {
-      json[r'displayName'] = this.displayName;
-    } else {
-      json[r'displayName'] = null;
     }
     if (this.email != null) {
       json[r'email'] = this.email;
@@ -380,11 +322,6 @@ class UpdateEmployeeDto {
     } else {
       json[r'status'] = null;
     }
-    if (this.branchId != null) {
-      json[r'branchId'] = this.branchId;
-    } else {
-      json[r'branchId'] = null;
-    }
     if (this.partnerId != null) {
       json[r'partnerId'] = this.partnerId;
     } else {
@@ -415,22 +352,14 @@ class UpdateEmployeeDto {
     } else {
       json[r'emergencyContactPhone'] = null;
     }
-    if (this.idCardUrl != null) {
-      json[r'idCardUrl'] = this.idCardUrl;
-    } else {
-      json[r'idCardUrl'] = null;
-    }
+      json[r'verificationDocuments'] = this.verificationDocuments;
     if (this.description != null) {
       json[r'description'] = this.description;
     } else {
       json[r'description'] = null;
     }
-    if (this.password != null) {
-      json[r'password'] = this.password;
-    } else {
-      json[r'password'] = null;
-    }
       json[r'schedule'] = this.schedule;
+      json[r'workHistory'] = this.workHistory;
     if (this.doctorProfile != null) {
       json[r'doctorProfile'] = this.doctorProfile;
     } else {
@@ -463,12 +392,10 @@ class UpdateEmployeeDto {
       }());
 
       return UpdateEmployeeDto(
-        authId: mapValueOfType<String>(json, r'authId'),
         employeeCode: mapValueOfType<String>(json, r'employeeCode'),
         firstName: mapValueOfType<String>(json, r'firstName'),
         lastName: mapValueOfType<String>(json, r'lastName'),
         fullName: mapValueOfType<String>(json, r'fullName'),
-        displayName: mapValueOfType<String>(json, r'displayName'),
         email: mapValueOfType<String>(json, r'email'),
         phone: mapValueOfType<String>(json, r'phone'),
         avatarUrl: mapValueOfType<String>(json, r'avatarUrl'),
@@ -476,17 +403,16 @@ class UpdateEmployeeDto {
         gender: UpdateEmployeeDtoGenderEnum.fromJson(json[r'gender']),
         role: UpdateEmployeeDtoRoleEnum.fromJson(json[r'role']),
         status: UpdateEmployeeDtoStatusEnum.fromJson(json[r'status']),
-        branchId: mapValueOfType<String>(json, r'branchId'),
         partnerId: mapValueOfType<String>(json, r'partnerId'),
         jobTitle: mapValueOfType<String>(json, r'jobTitle'),
         startDate: mapValueOfType<String>(json, r'startDate'),
         employmentType: mapValueOfType<String>(json, r'employmentType'),
         emergencyContactName: mapValueOfType<String>(json, r'emergencyContactName'),
         emergencyContactPhone: mapValueOfType<String>(json, r'emergencyContactPhone'),
-        idCardUrl: mapValueOfType<String>(json, r'idCardUrl'),
+        verificationDocuments: VerificationDocumentEntryDto.listFromJson(json[r'verificationDocuments']),
         description: mapValueOfType<String>(json, r'description'),
-        password: mapValueOfType<String>(json, r'password'),
         schedule: WorkScheduleEntryDto.listFromJson(json[r'schedule']),
+        workHistory: WorkHistoryEntryDto.listFromJson(json[r'workHistory']),
         doctorProfile: CreateDoctorProfileDto.fromJson(json[r'doctorProfile']),
         therapistProfile: CreateTherapistProfileDto.fromJson(json[r'therapistProfile']),
       );
