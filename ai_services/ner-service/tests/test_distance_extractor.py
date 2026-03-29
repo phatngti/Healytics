@@ -242,6 +242,14 @@ class TestExtractDistanceEntities:
         assert results[0]["amount_max"] == 5000.0
         assert results[0]["radius_meters"] == 5000
 
+    def test_distance_range_khoang_toi(self):
+        results = extract_distance_entities("gợi ý spa cách đây khoảng 2 tới 5km")
+        assert len(results) == 1
+        assert results[0]["operator"] == "between"
+        assert results[0]["amount"] == 2000.0
+        assert results[0]["amount_max"] == 5000.0
+        assert results[0]["radius_meters"] == 5000
+
     def test_returns_list_always(self):
         """Always returns a list, even for empty input."""
         assert extract_distance_entities("") == []

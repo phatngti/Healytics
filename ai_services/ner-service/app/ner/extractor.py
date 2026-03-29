@@ -114,7 +114,10 @@ _PRICE_SINGLE_PATTERN = re.compile(
     r"(dưới|trên|tối đa|tối thiểu|khoảng|cỡ|tầm|<=?|>=?)\s*"
     r"([\d.,]+)\s*"
     r"(k|nghìn|ngàn|triệu|tr|đồng|đ|vnđ)?\b"
-    r"(?!\s*(?:sao|điểm|★|\*|km\b|m\b|cây\s*số|dặm))",
+    r"(?!\s*(?:"
+    r"sao|điểm|★|\*|km\b|m\b|cây\s*số|dặm"
+    r"|(?:đến|tới|-|–|—)\s*[\d.,]+\s*(?:km\b|m\b|cây\s*số|dặm)"
+    r"))",
     re.IGNORECASE,
 )
 
