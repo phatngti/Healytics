@@ -93,16 +93,20 @@ def build_backend_query(entities: List[NerEntity], limit: int = 50, spatial_cont
     Optional spatial_context: SpatialContext object for spatial queries.
     """
     query: Dict[str, Any] = {}
+    business_types: list[str] = []
+    seen_business_types: set[str] = set()
 
     for e in entities:
         e_type = e.type
 
         if e_type == "BUSINESS_TYPE" and e.business_type:
             # Backend Partner.businessType là enum (SPA_BEAUTY, FITNESS, ...)
-            query["businessType"] = e.business_type
+            if e.business_type not in seen_business_types:
+                seen_business_types.add(e.business_type)
+                business_types.append(e.business_type)
 
-        elif e_type == "LOCATION" and e.location_code and e.location_intent is True:
-            # Backend Location.code — chỉ apply khi semantic adjudication xác nhận
+        elif e_type == "LOCATION" and e.location_code:
+            # LOCATION pruning/disambiguation happens upstream; apply resolved location directly.
             query["locationCode"] = e.location_code
 
         elif e_type == "CATEGORY" and e.category_slug:
@@ -124,6 +128,12 @@ def build_backend_query(entities: List[NerEntity], limit: int = 50, spatial_cont
             op = e.operator
             if op in ("gte", "between"):
                 query["minRating"] = e.amount
+
+    if business_types:
+        query["businessTypes"] = business_types
+        # Keep backward compatibility for downstream consumers expecting singular key.
+        if len(business_types) == 1:
+            query["businessType"] = business_types[0]
 
     # Add spatial parameters if spatial context provided
     if spatial_context:
@@ -158,11 +168,16 @@ def filter_mock_services(
     for sid, svc in services.items():
         internal = svc.get("_internal", {})
 
-        # Business type filter - exact match if present
-        target_bt = query.get("businessType")
-        if target_bt:
+        # Business type filter - OR semantics for list input
+        target_bts = query.get("businessTypes")
+        if not target_bts:
+            target_bt = query.get("businessType")
+            if target_bt:
+                target_bts = [target_bt]
+
+        if target_bts:
             svc_bts = internal.get("businessType", [])
-            if target_bt not in svc_bts:
+            if not any(bt in svc_bts for bt in target_bts):
                 continue
 
         # Location filter - match code
