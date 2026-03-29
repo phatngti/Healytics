@@ -215,6 +215,25 @@ class TestNerExtractNewFeatures:
         assert d["amount"] == 2000.0
         assert d["amount_max"] == 5000.0
 
+    async def test_distance_between_khoang_toi_no_price_false_positive(self, client):
+        """'khoảng 2 tới 5km' should be DISTANCE between and must not create PRICE entity."""
+        response = await client.post(
+            "/ner/extract",
+            json={"text": "gợi ý các dịch vụ spa và nha sĩ cách đây khoảng 2 tới 5km"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        dist_entities = [e for e in data["entities"] if e["type"] == "DISTANCE"]
+        price_entities = [e for e in data["entities"] if e["type"] == "PRICE"]
+
+        assert len(dist_entities) == 1
+        d = dist_entities[0]
+        assert d["operator"] == "between"
+        assert d["amount"] == 2000.0
+        assert d["amount_max"] == 5000.0
+        assert price_entities == []
+
 
 # ============================================================================
 # POST /ner/extract — location bug fixes

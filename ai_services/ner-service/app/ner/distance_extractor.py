@@ -33,9 +33,9 @@ _UNIT_PATTERN = r"(?:km|m|cây\s*số|dặm)"
 EXPLICIT_DISTANCE_PATTERN = rf"({_NUM_PATTERN})\s*({_UNIT_PATTERN})"
 _EXPLICIT_SINGLE_RE = re.compile(EXPLICIT_DISTANCE_PATTERN, re.IGNORECASE)
 
-# Range: "từ 2km đến 5km", "từ 2 đến 5km", "trong khoảng 1.5km - 3km"
+# Range: "từ 2km đến 5km", "khoảng 2 tới 5km", "tầm 1.5km - 3km"
 _DISTANCE_RANGE_RE = re.compile(
-    rf"(?:từ|trong\s+khoảng)\s*({_NUM_PATTERN})\s*({_UNIT_PATTERN})?\s*(?:đến|tới|-|–|—)\s*({_NUM_PATTERN})\s*({_UNIT_PATTERN})?",
+    rf"(?:từ|trong\s+khoảng|khoảng|tầm|cỡ)\s*({_NUM_PATTERN})\s*({_UNIT_PATTERN})?\s*(?:đến|tới|-|–|—)\s*({_NUM_PATTERN})\s*({_UNIT_PATTERN})?",
     re.IGNORECASE,
 )
 
