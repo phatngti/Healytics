@@ -34,11 +34,19 @@ export class UpdateHealthServiceHandler {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
 
-      const { media, productDefinition, ...updateData } = command;
+      const { media, productDefinition, serviceManual, ...updateData } = command;
 
-      // 2. Domain Action (Mutate)
       if (Object.keys(updateData).length > 0) {
         Object.assign(existingProduct, updateData);
+      }
+
+      // Update service manual (full replacement)
+      if (serviceManual !== undefined) {
+        existingProduct.serviceManual = serviceManual;
+      }
+
+      // Save product if any fields changed
+      if (Object.keys(updateData).length > 0 || serviceManual !== undefined) {
         await queryRunner.manager.save(Product, existingProduct);
       }
 

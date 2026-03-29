@@ -1,50 +1,79 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 
 /// Displays customer name, phone, and address with
-/// a green person icon and an "Edit" button.
+/// a person icon and an "Edit" button.
 class CustomerDetailsSection extends StatelessWidget {
   final CustomerDetails customer;
 
-  const CustomerDetailsSection({super.key, required this.customer});
+  const CustomerDetailsSection({
+    super.key,
+    required this.customer,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final pad = AppDimens.cardPadding(context);
+    final radius = AppDimens.cardRadius(context);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(pad),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(radius),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
+            color: colorScheme.shadow
+                .withValues(alpha: 0.05),
+            blurRadius: AppDimens.spaceXl,
+            offset: const Offset(
+              0,
+              AppDimens.spaceXs,
+            ),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(colorScheme, textTheme),
-          const SizedBox(height: 12),
-          _buildContent(colorScheme, textTheme),
+          _Header(colorScheme: colorScheme),
+          AppDimens.verticalMediumSmall,
+          _Content(
+            customer: customer,
+            colorScheme: colorScheme,
+            textTheme: textTheme,
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildHeader(ColorScheme colorScheme, TextTheme textTheme) {
+/// Section header with icon, title, and edit button.
+class _Header extends StatelessWidget {
+  final ColorScheme colorScheme;
+
+  const _Header({required this.colorScheme});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment:
+          MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
-            Icon(Icons.person, color: colorScheme.primary, size: 16),
-            const SizedBox(width: 8),
+            Icon(
+              Icons.person,
+              color: colorScheme.primary,
+              size: AppDimens.iconSm,
+            ),
+            AppDimens.horizontalSmall,
             Text(
               'Customer Details',
               style: textTheme.titleSmall?.copyWith(
@@ -60,8 +89,12 @@ class CustomerDetailsSection extends StatelessWidget {
           },
           style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
-            minimumSize: const Size(48, 32),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            minimumSize: const Size(
+              AppDimens.touchTarget,
+              AppDimens.avatarSm,
+            ),
+            tapTargetSize:
+                MaterialTapTargetSize.shrinkWrap,
           ),
           child: Text(
             'Edit',
@@ -74,14 +107,35 @@ class CustomerDetailsSection extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildContent(ColorScheme colorScheme, TextTheme textTheme) {
+/// Customer contact details with a left border accent.
+class _Content extends StatelessWidget {
+  final CustomerDetails customer;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+
+  const _Content({
+    required this.customer,
+    required this.colorScheme,
+    required this.textTheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 8),
-      padding: const EdgeInsets.only(left: 16),
+      margin: const EdgeInsets.only(
+        left: AppDimens.spaceSm,
+      ),
+      padding: const EdgeInsets.only(
+        left: AppDimens.spaceLg,
+      ),
       decoration: BoxDecoration(
         border: Border(
-          left: BorderSide(color: colorScheme.outlineVariant, width: 2),
+          left: BorderSide(
+            color: colorScheme.outlineVariant,
+            width: AppDimens.borderWidthThick,
+          ),
         ),
       ),
       child: Column(
@@ -94,14 +148,16 @@ class CustomerDetailsSection extends StatelessWidget {
               color: colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 4),
+          AppDimens.verticalExtraSmall,
           Text(
             customer.phone,
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(
+            height: AppDimens.spaceXxs,
+          ),
           Text(
             customer.address,
             style: textTheme.bodySmall?.copyWith(

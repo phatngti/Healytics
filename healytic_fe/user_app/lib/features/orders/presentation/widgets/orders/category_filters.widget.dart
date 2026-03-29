@@ -1,3 +1,4 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -11,27 +12,38 @@ class CategoryFilters extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncCategories = ref.watch(appointmentCategoriesProvider);
-    final selectedId = ref.watch(selectedCategoryProvider);
+    final asyncCategories =
+        ref.watch(appointmentCategoriesProvider);
+    final selectedId =
+        ref.watch(selectedCategoryProvider);
 
     return switch (asyncCategories) {
       AsyncData(:final value) => Padding(
-        padding: const EdgeInsets.only(left: 16, top: 16),
+        padding: EdgeInsets.only(
+          left: AppDimens.spaceLg,
+          top: AppDimens.spaceLg,
+        ),
         child: SizedBox(
-          height: 40,
+          height: AppDimens.ctaButtonMd,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: value.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            padding: const EdgeInsets.only(right: 16),
+            separatorBuilder: (_, __) =>
+                AppDimens.horizontalMediumSmall,
+            padding: EdgeInsets.only(
+              right: AppDimens.spaceLg,
+            ),
             itemBuilder: (context, index) {
               final cat = value[index];
               final isActive = cat.id == selectedId;
               return _CategoryChip(
                 category: cat,
                 isActive: isActive,
-                onTap: () =>
-                    ref.read(selectedCategoryProvider.notifier).select(cat.id),
+                onTap: () => ref
+                    .read(
+                      selectedCategoryProvider.notifier,
+                    )
+                    .select(cat.id),
               );
             },
           ),
@@ -39,8 +51,12 @@ class CategoryFilters extends HookConsumerWidget {
       ),
       AsyncError() => const SizedBox.shrink(),
       _ => const Padding(
-        padding: EdgeInsets.all(16),
-        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+        padding: AppDimens.paddingAllMedium,
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+          ),
+        ),
       ),
     };
   }
@@ -69,16 +85,22 @@ class _CategoryChip extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppDimens.radiusMediumLarge,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppDimens.spaceXl,
+            vertical: AppDimens.spaceSm,
+          ),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppDimens.radiusMediumLarge,
             border: Border.all(
-              color: isActive ? colors.primary : colors.outlineVariant,
+              color: isActive
+                  ? colors.primary
+                  : colors.outlineVariant,
             ),
             color: isActive
-                ? colors.primary.withValues(alpha: 0.1)
+                ? colors.primary
+                    .withValues(alpha: 0.1)
                 : Colors.transparent,
           ),
           child: Row(
@@ -86,14 +108,20 @@ class _CategoryChip extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                size: 16,
-                color: isActive ? colors.primary : colors.onSurfaceVariant,
+                size: AppDimens.iconSm,
+                color: isActive
+                    ? colors.primary
+                    : colors.onSurfaceVariant,
               ),
+              // 6dp contextual chip spacing
               const SizedBox(width: 6),
               Text(
                 category.name,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: isActive ? colors.primary : colors.onSurfaceVariant,
+                style:
+                    theme.textTheme.labelLarge?.copyWith(
+                  color: isActive
+                      ? colors.primary
+                      : colors.onSurfaceVariant,
                 ),
               ),
             ],
@@ -105,7 +133,8 @@ class _CategoryChip extends StatelessWidget {
 
   IconData _resolveIcon(String slug) {
     return switch (slug) {
-      'check_circle_outline' => Icons.check_circle_outline,
+      'check_circle_outline' =>
+        Icons.check_circle_outline,
       'spa' => Symbols.spa,
       'self_improvement' => Symbols.self_improvement,
       'face' => Symbols.face,

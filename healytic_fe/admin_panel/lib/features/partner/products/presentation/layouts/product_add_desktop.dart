@@ -6,6 +6,7 @@ import 'package:admin_panel/features/partner/products/presentation/widgets/produ
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_organization_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_pricing_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_facility_images_card.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_service_manual_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_visibility_card.widget.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class ProductAddDesktop extends ConsumerStatefulWidget {
     this.initialStatus = 'draft',
     this.initialOnlineStore = false,
     this.initialDescription,
+    this.serviceManualKey,
   });
 
   final VoidCallback? onSubmit;
@@ -28,6 +30,10 @@ class ProductAddDesktop extends ConsumerStatefulWidget {
 
   /// Initial Quill Delta JSON for the description editor.
   final String? initialDescription;
+
+  /// Key to access the service manual card for data extraction.
+  final GlobalKey<ProductServiceManualCardState>?
+      serviceManualKey;
 
   @override
   ConsumerState<ProductAddDesktop> createState() => _ProductAddDesktopState();
@@ -75,7 +81,9 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                             initialDescription: widget.initialDescription,
                           ),
                           AppDimens.verticalMedium,
-                          const ProductOperationsCard(),
+                          ProductServiceManualCard(
+                            key: widget.serviceManualKey,
+                          ),
                           AppDimens.verticalMedium,
                           const ProductPricingCard(),
                           AppDimens.verticalMedium,
@@ -114,6 +122,8 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                               });
                             },
                           ),
+                          AppDimens.verticalMedium,
+                          const ProductOperationsCard(),
                         ],
                       ),
                     ),

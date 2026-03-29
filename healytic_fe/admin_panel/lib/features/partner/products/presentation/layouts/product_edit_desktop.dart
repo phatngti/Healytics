@@ -6,6 +6,7 @@ import 'package:admin_panel/features/partner/products/presentation/widgets/produ
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_operations_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_organization_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_pricing_card.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_service_manual_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_visibility_card.widget.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -24,11 +25,24 @@ class ProductEditDesktop extends StatelessWidget {
   /// Called when the user presses Cancel / Back.
   final VoidCallback onCancel;
 
+  /// Key to access the service manual card data.
+  final GlobalKey<ProductServiceManualCardState>?
+      serviceManualKey;
+
+  /// Pre-populated service manual data.
+  final List<String> initialGuidelines;
+  final List<Map<String, String>> initialRules;
+  final List<Map<String, String>> initialSteps;
+
   const ProductEditDesktop({
     super.key,
     required this.product,
     required this.onSave,
     required this.onCancel,
+    this.serviceManualKey,
+    this.initialGuidelines = const [],
+    this.initialRules = const [],
+    this.initialSteps = const [],
   });
 
   @override
@@ -66,6 +80,14 @@ class ProductEditDesktop extends StatelessWidget {
                           const ProductPricingCard(),
                           AppDimens.verticalMedium,
                           const ProductMediaCard(),
+                          AppDimens.verticalMedium,
+                          ProductServiceManualCard(
+                            key: serviceManualKey,
+                            initialGuidelines:
+                                initialGuidelines,
+                            initialRules: initialRules,
+                            initialSteps: initialSteps,
+                          ),
                         ],
                       ),
                     ),

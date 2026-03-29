@@ -3,6 +3,52 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { HealthServiceType } from '../../enums/health-service-type.enum';
 import { HealthServiceStatus } from '../../enums/health-service-status.enum';
 
+// ─── Service Manual Sub-DTOs ─────────────────────────────────
+
+class PartnerServiceRuleDto {
+  @Expose()
+  @ApiProperty({ example: 'no-eating' })
+  iconSlug: string;
+
+  @Expose()
+  @ApiProperty({ example: 'No Eating Before' })
+  title: string;
+
+  @Expose()
+  @ApiProperty({ example: 'Avoid eating 2 hours before the service' })
+  description: string;
+}
+
+class PartnerProcedureStepDto {
+  @Expose()
+  @ApiProperty({ example: 1 })
+  stepNumber: number;
+
+  @Expose()
+  @ApiProperty({ example: 'Check-in & Registration' })
+  title: string;
+
+  @Expose()
+  @ApiProperty({ example: 'Arrive at the reception and complete registration' })
+  description: string;
+}
+
+class PartnerServiceManualDto {
+  @Expose()
+  @ApiPropertyOptional({ type: [String], example: ['Avoid heavy meals', 'Wear comfortable clothing'] })
+  preServiceGuidelines?: string[];
+
+  @Expose()
+  @Type(() => PartnerServiceRuleDto)
+  @ApiPropertyOptional({ type: [PartnerServiceRuleDto] })
+  serviceRules?: PartnerServiceRuleDto[];
+
+  @Expose()
+  @Type(() => PartnerProcedureStepDto)
+  @ApiPropertyOptional({ type: [PartnerProcedureStepDto] })
+  procedureSteps?: PartnerProcedureStepDto[];
+}
+
 /**
  * Response DTO for category data within health service.
  */
@@ -170,4 +216,9 @@ export class PartnerHealthServiceResponseDto {
   @Type(() => PartnerHealthServiceEmployeeEligibilityDto)
   @ApiPropertyOptional({ type: [PartnerHealthServiceEmployeeEligibilityDto], description: 'Eligible employees for service' })
   productEmployeeEligibilities: PartnerHealthServiceEmployeeEligibilityDto[];
+
+  @Expose()
+  @Type(() => PartnerServiceManualDto)
+  @ApiPropertyOptional({ type: PartnerServiceManualDto, description: 'Service manual (guidelines, rules, procedure steps)' })
+  serviceManual: PartnerServiceManualDto | null;
 }

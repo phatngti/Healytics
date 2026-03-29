@@ -14,7 +14,9 @@ export 'widgets/button/selector_switch.dart';
 export 'widgets/card/statistic_card.dart';
 
 // Widgets - Images
+export 'widgets/images/avatar.dart';
 export 'widgets/images/circular.dart';
+export 'widgets/images/network_image_auto.dart';
 
 // Widgets - Input
 export 'widgets/input/form_field_builders.dart';

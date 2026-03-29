@@ -11,7 +11,8 @@ import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity'
 import { ProductTag } from '@/common/entities/product-tag.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { ProductMedia } from '@/common/entities/product-media.entity';
-import { ProductReview } from '@/common/entities/product-review.entity';
+import { TreatmentReview } from '@/common/entities/treatment-review.entity';
+import { Booking } from '@/common/entities/booking.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 import { Account } from '@/common/entities/account.entity';
 import { Role } from '@/account/enum/role.enum';
@@ -24,8 +25,8 @@ import { ISeeder } from '../seeder.interface';
 /**
  * Seed data for products with full service details.
  * Every SERVICE product includes: media, serviceDefinition, resourceRequirements,
- * tagNames, eligibleEmployees, facilityImages, and reviews — ensuring all
- * user-facing detail endpoints return rich data.
+ * tagNames, eligibleEmployees, and facilityImages.
+ * Treatment reviews are seeded separately by finding completed bookings.
  */
 const SEED_PRODUCTS = [
   {
@@ -54,6 +55,25 @@ const SEED_PRODUCTS = [
       { resourceTypeName: 'Massage Room', quantityRequired: 1 },
       { resourceTypeName: 'Massage Oil Set', quantityRequired: 1 },
     ],
+    serviceManual: {
+      preServiceGuidelines: [
+        'Avoid heavy meals 2 hours before your session',
+        'Wear comfortable, loose-fitting clothing',
+        'Stay hydrated before and after the massage',
+        'Inform the therapist of any injuries or pain areas',
+      ],
+      serviceRules: [
+        { iconSlug: 'no-eating', title: 'No Heavy Meals', description: 'Avoid eating large meals 2 hours before your massage' },
+        { iconSlug: 'hydrate', title: 'Stay Hydrated', description: 'Drink plenty of water before and after the treatment' },
+        { iconSlug: 'arrive-early', title: 'Arrive 15 Minutes Early', description: 'Allow time for check-in and changing' },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: 'Check-in & Consultation', description: 'Arrive at reception, complete health form, and discuss your preferences' },
+        { stepNumber: 2, title: 'Preparation', description: 'Change into comfortable attire and relax in the pre-treatment lounge' },
+        { stepNumber: 3, title: 'Massage Session', description: 'Enjoy your 60-minute full body massage with aromatherapy oils' },
+        { stepNumber: 4, title: 'Post-Session Relaxation', description: 'Rest in the relaxation lounge and enjoy complimentary herbal tea' },
+      ],
+    },
     tagNames: ['Relaxation'],
     eligibleEmployees: [
       { code: 'EMP-002', isPrimary: true },
@@ -64,53 +84,6 @@ const SEED_PRODUCTS = [
       { imageUrl: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=600', label: 'Treatment Suite A', sortOrder: 1 },
       { imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600', label: 'Relaxation Lounge', sortOrder: 2 },
       { imageUrl: 'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=600', label: 'Aromatherapy Room', sortOrder: 3 },
-    ],
-    reviews: [
-      {
-        reviewerName: 'Nguyen Van A',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
-        rating: 5,
-        status: 'Completed',
-        date: '2025-05-11',
-        text: 'Excellent full body massage! The therapist was very skilled and the ambiance was perfect. I felt completely relaxed after the session. Highly recommend!',
-        imageUrls: ['https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400'],
-      },
-      {
-        reviewerName: 'Tran Thi B',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
-        rating: 4,
-        status: 'Completed',
-        date: '2025-05-08',
-        text: 'Great experience overall. The room was clean and the massage technique was professional. Would have liked a bit more pressure on the shoulders.',
-        imageUrls: [],
-      },
-      {
-        reviewerName: 'Le Van C',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/67.jpg',
-        rating: 5,
-        status: 'Completed',
-        date: '2025-04-22',
-        text: 'Best massage in the city! Will definitely come back again. The aromatherapy oils they used were amazing.',
-        imageUrls: [],
-      },
-      {
-        reviewerName: 'Phan Minh D',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/28.jpg',
-        rating: 5,
-        status: 'Completed',
-        date: '2025-04-15',
-        text: 'Wonderful atmosphere and extremely professional staff. The 60-minute session flew by, and my back pain was significantly reduced.',
-        imageUrls: ['https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=400'],
-      },
-      {
-        reviewerName: 'Hoang Anh E',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/45.jpg',
-        rating: 4,
-        status: 'Completed',
-        date: '2025-03-30',
-        text: 'Good experience. The therapist listened to my preferences and adjusted the technique accordingly. Booking was easy and the facilities are top-notch.',
-        imageUrls: [],
-      },
     ],
   },
   {
@@ -136,6 +109,25 @@ const SEED_PRODUCTS = [
     resourceRequirements: [
       { resourceTypeName: 'Therapy Room', quantityRequired: 1 },
     ],
+    serviceManual: {
+      preServiceGuidelines: [
+        'Wear clothing that allows access to your neck and shoulders',
+        'Note any recent injuries or areas of acute pain',
+        'Avoid applying heat packs before the session',
+        'Be prepared to discuss your pain history and daily activities',
+      ],
+      serviceRules: [
+        { iconSlug: 'no-heat', title: 'No Heat Packs', description: 'Avoid applying heat to the treatment area before your session' },
+        { iconSlug: 'communicate', title: 'Communicate Pain Levels', description: 'Always let the therapist know if pressure is too intense' },
+        { iconSlug: 'follow-up', title: 'Follow Post-Care Instructions', description: 'Gentle stretches may be prescribed for home care' },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: 'Assessment', description: 'Therapist evaluates your posture, range of motion, and pain points' },
+        { stepNumber: 2, title: 'Targeted Therapy', description: '30-minute trigger point and myofascial release treatment' },
+        { stepNumber: 3, title: 'Stretching & Cool Down', description: '15-minute guided stretching and mobility exercises' },
+        { stepNumber: 4, title: 'Home Care Briefing', description: 'Therapist provides personalized exercises and aftercare advice' },
+      ],
+    },
     tagNames: ['Pain Relief', 'Rehabilitation'],
     eligibleEmployees: [
       { code: 'EMP-001', isPrimary: true },
@@ -145,35 +137,6 @@ const SEED_PRODUCTS = [
       { imageUrl: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600', label: 'Therapy Room', sortOrder: 0 },
       { imageUrl: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600', label: 'Equipment Area', sortOrder: 1 },
       { imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600', label: 'Recovery Zone', sortOrder: 2 },
-    ],
-    reviews: [
-      {
-        reviewerName: 'Pham Duc D',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/22.jpg',
-        rating: 5,
-        status: 'Completed',
-        date: '2025-05-10',
-        text: 'My neck pain has significantly improved after just one session. The therapist was extremely knowledgeable and explained every step of the treatment.',
-        imageUrls: [],
-      },
-      {
-        reviewerName: 'Vo Thi F',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/55.jpg',
-        rating: 5,
-        status: 'Completed',
-        date: '2025-04-28',
-        text: 'I have been coming here for 3 months and the improvement in my shoulder mobility is remarkable. Best rehabilitation therapy I have tried.',
-        imageUrls: ['https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=400'],
-      },
-      {
-        reviewerName: 'Dang Quoc G',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/38.jpg',
-        rating: 4,
-        status: 'Completed',
-        date: '2025-04-05',
-        text: 'Professional service and the therapist really understood my pain points. The therapy room is well-equipped and private.',
-        imageUrls: [],
-      },
     ],
   },
   {
@@ -201,6 +164,26 @@ const SEED_PRODUCTS = [
       { resourceTypeName: 'Facial Treatment Room', quantityRequired: 1 },
       { resourceTypeName: 'Skincare Product Kit', quantityRequired: 1 },
     ],
+    serviceManual: {
+      preServiceGuidelines: [
+        'Remove all makeup before arrival or let our staff assist',
+        'Avoid using retinol products 48 hours prior',
+        'Inform the esthetician of any skin allergies or sensitivities',
+        'Stay out of direct sun exposure for 24 hours after treatment',
+      ],
+      serviceRules: [
+        { iconSlug: 'no-retinol', title: 'No Retinol 48h Before', description: 'Discontinue retinol products 48 hours before your facial' },
+        { iconSlug: 'no-sun', title: 'Avoid Sun After', description: 'Stay out of direct sunlight for 24 hours post-treatment' },
+        { iconSlug: 'clean-face', title: 'Clean Face', description: 'Arrive with a clean, makeup-free face for best results' },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: 'Skin Analysis', description: 'Esthetician examines your skin type and discusses concerns' },
+        { stepNumber: 2, title: 'Deep Cleansing & Exfoliation', description: '20-minute cleansing and gentle exfoliation' },
+        { stepNumber: 3, title: 'Mask Application', description: 'Customized hydrating mask tailored to your skin needs' },
+        { stepNumber: 4, title: 'Facial Massage & Moisturizing', description: 'Relaxing facial massage with premium Korean skincare products' },
+        { stepNumber: 5, title: 'Post-Treatment Care', description: 'Application of SPF protection and aftercare guidance' },
+      ],
+    },
     tagNames: ['Beauty', 'Skincare'],
     eligibleEmployees: [
       { code: 'EMP-002', isPrimary: true },
@@ -209,35 +192,6 @@ const SEED_PRODUCTS = [
       { imageUrl: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600', label: 'Facial Treatment Room', sortOrder: 0 },
       { imageUrl: 'https://images.unsplash.com/photo-1552693673-1bf958298935?w=600', label: 'Product Display', sortOrder: 1 },
       { imageUrl: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600', label: 'Relaxation Area', sortOrder: 2 },
-    ],
-    reviews: [
-      {
-        reviewerName: 'Mai Thu H',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/33.jpg',
-        rating: 5,
-        status: 'Completed',
-        date: '2025-05-09',
-        text: 'My skin has never looked this good! The Korean products they use are amazing and the esthetician was very gentle and thorough.',
-        imageUrls: ['https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'],
-      },
-      {
-        reviewerName: 'Nguyen Thanh I',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/62.jpg',
-        rating: 4,
-        status: 'Completed',
-        date: '2025-04-20',
-        text: 'Very relaxing facial treatment. The mask they applied was so soothing. My skin felt refreshed and hydrated for days.',
-        imageUrls: [],
-      },
-      {
-        reviewerName: 'Le Phuong K',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/18.jpg',
-        rating: 5,
-        status: 'Completed',
-        date: '2025-04-01',
-        text: 'Best facial care package I have tried in HCMC. The facilities are spotless and the staff is incredibly professional.',
-        imageUrls: [],
-      },
     ],
   },
   {
@@ -265,6 +219,26 @@ const SEED_PRODUCTS = [
       { resourceTypeName: 'Dental Chair', quantityRequired: 1 },
       { resourceTypeName: 'Whitening Kit', quantityRequired: 1 },
     ],
+    serviceManual: {
+      preServiceGuidelines: [
+        'Brush and floss your teeth before the appointment',
+        'Avoid consuming coffee, tea, or red wine 24 hours before',
+        'Inform the dentist of any tooth sensitivity issues',
+        'Avoid smoking for 48 hours after the procedure',
+      ],
+      serviceRules: [
+        { iconSlug: 'no-staining', title: 'No Staining Foods 24h Before', description: 'Avoid coffee, tea, red wine, and dark-colored foods' },
+        { iconSlug: 'no-smoking', title: 'No Smoking 48h After', description: 'Avoid smoking or tobacco products for 48 hours post-treatment' },
+        { iconSlug: 'sensitivity', title: 'Expect Mild Sensitivity', description: 'Temporary tooth sensitivity is normal and subsides within 24-48 hours' },
+      ],
+      procedureSteps: [
+        { stepNumber: 1, title: 'Dental Examination', description: 'Dr. examines your teeth and discusses expected results' },
+        { stepNumber: 2, title: 'Teeth Cleaning', description: 'Professional cleaning to remove plaque and prepare surfaces' },
+        { stepNumber: 3, title: 'Whitening Gel Application', description: 'Protective gum shield applied, followed by whitening gel' },
+        { stepNumber: 4, title: 'LED Light Activation', description: '3 cycles of 15-minute LED light treatment for maximum whitening' },
+        { stepNumber: 5, title: 'Final Rinse & Review', description: 'Gel removed, shade comparison, and aftercare instructions provided' },
+      ],
+    },
     tagNames: ['Beauty'],
     eligibleEmployees: [
       { code: 'EMP-001', isPrimary: true },
@@ -273,63 +247,6 @@ const SEED_PRODUCTS = [
       { imageUrl: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600', label: 'Dental Office', sortOrder: 0 },
       { imageUrl: 'https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=600', label: 'Treatment Chair', sortOrder: 1 },
       { imageUrl: 'https://images.unsplash.com/photo-1629909615957-be38d48fbbe4?w=600', label: 'Equipment Station', sortOrder: 2 },
-    ],
-    reviews: [
-      {
-        reviewerName: 'Bui Quang L',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/52.jpg',
-        rating: 5,
-        status: 'Completed',
-        date: '2025-05-05',
-        text: 'Incredible results! My teeth are noticeably whiter after just one session. Dr. Anderson was very professional and made me feel comfortable throughout.',
-        imageUrls: [],
-      },
-      {
-        reviewerName: 'Tran Ngoc M',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/41.jpg',
-        rating: 4,
-        status: 'Completed',
-        date: '2025-04-18',
-        text: 'Good service and visible results. There was slight sensitivity during the procedure but it subsided quickly. Worth the price.',
-        imageUrls: ['https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=400'],
-      },
-    ],
-  },
-  {
-    name: 'Sunscreen SPF50 Broad Spectrum',
-    slug: 'sunscreen-spf50-broad-spectrum',
-    description:
-      'Advanced broad spectrum SPF50 PA+++ sunscreen with lightweight, non-greasy formula. Provides superior UVA/UVB protection while hydrating and nourishing your skin. Water-resistant for up to 80 minutes. Suitable for all skin types including sensitive skin. Dermatologically tested.',
-    type: HealthServiceType.PHYSICAL,
-    basePrice: 280000,
-    categorySlug: 'dermatology',
-    vendorName: 'Healytics Pharmacy',
-    media: [
-      { url: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=800', isThumbnail: true, sortOrder: 0 },
-      { url: 'https://images.unsplash.com/photo-1532009877282-3340270e0529?w=800', isThumbnail: false, sortOrder: 1 },
-    ],
-    eligibleEmployees: [
-      { code: 'EMP-002', isPrimary: true },
-    ],
-    reviews: [
-      {
-        reviewerName: 'Lam Thu N',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/36.jpg',
-        rating: 5,
-        status: 'Completed',
-        date: '2025-05-12',
-        text: 'Love this sunscreen! Non-greasy and absorbs quickly. Perfect for daily use under makeup. Great UV protection.',
-        imageUrls: [],
-      },
-      {
-        reviewerName: 'Do Minh O',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/29.jpg',
-        rating: 4,
-        status: 'Completed',
-        date: '2025-04-25',
-        text: 'Lightweight formula that does not leave a white cast. Very impressed with the quality for the price.',
-        imageUrls: [],
-      },
     ],
   },
 ];
@@ -369,8 +286,11 @@ export class ProductSeeder implements ISeeder {
     @InjectRepository(ProductMedia)
     private readonly mediaRepo: Repository<ProductMedia>,
 
-    @InjectRepository(ProductReview)
-    private readonly reviewRepo: Repository<ProductReview>,
+    @InjectRepository(TreatmentReview)
+    private readonly treatmentReviewRepo: Repository<TreatmentReview>,
+
+    @InjectRepository(Booking)
+    private readonly bookingRepo: Repository<Booking>,
 
     @InjectRepository(ProductFacilityImage)
     private readonly facilityImageRepo: Repository<ProductFacilityImage>,
@@ -416,6 +336,7 @@ export class ProductSeeder implements ISeeder {
         basePrice: prodData.basePrice,
         salePrice: (prodData as any).salePrice ?? null,
         vendorName: (prodData as any).vendorName ?? null,
+        serviceManual: (prodData as any).serviceManual ?? null,
         currency: 'VND',
         status: HealthServiceStatus.ACTIVE,
         isVisibleOnline: true,
@@ -440,23 +361,8 @@ export class ProductSeeder implements ISeeder {
         this.logger.log(`    📷 Added ${prodData.media.length} media image(s)`);
       }
 
-      // 3. Reviews (for all product types)
-      if (prodData.reviews?.length) {
-        for (const rev of prodData.reviews) {
-          const review = this.reviewRepo.create({
-            productId: product.id,
-            reviewerName: rev.reviewerName,
-            avatarUrl: rev.avatarUrl,
-            rating: rev.rating,
-            status: rev.status ?? 'Completed',
-            date: new Date(rev.date),
-            text: rev.text,
-            imageUrls: rev.imageUrls ?? [],
-          });
-          await this.reviewRepo.save(review);
-        }
-        this.logger.log(`    ⭐ Added ${prodData.reviews.length} review(s)`);
-      }
+      // 3. TreatmentReviews — seed from completed bookings for this product
+      await this.seedTreatmentReviews(product.id);
 
       // 4. Employee Eligibility (for all product types)
       if ((prodData as any).eligibleEmployees?.length) {
@@ -560,6 +466,62 @@ export class ProductSeeder implements ISeeder {
     }
 
     this.logger.log('Products seeding completed');
+  }
+
+  /**
+   * Seeds sample TreatmentReview records for a given product by finding
+   * its COMPLETED bookings. This ensures review data in product_treatment_reviews
+   * is always backed by real appointment + user records.
+   */
+  private async seedTreatmentReviews(productId: string): Promise<void> {
+    const { BookingStatus } = await import('@/booking/enums/booking-status.enum');
+
+    // Find up to 5 completed bookings for this product
+    const completedBookings = await this.bookingRepo.find({
+      where: { productId, status: BookingStatus.COMPLETED },
+      relations: ['user'],
+      take: 5,
+    });
+
+    if (!completedBookings.length) {
+      this.logger.log(`    ℹ️  No completed bookings for product ${productId} — skipping treatment reviews`);
+      return;
+    }
+
+    const SAMPLE_REVIEWS = [
+      { rating: 5, comment: 'Excellent service! The therapist was very professional and the results were amazing.', tags: ['Professional', 'Relaxing', 'Clean'] },
+      { rating: 5, comment: 'Best experience I have had. Will definitely come back!', tags: ['On-time', 'Friendly', 'Clean'] },
+      { rating: 4, comment: 'Great service overall. Highly recommend to anyone looking for quality care.', tags: ['Relaxing', 'Professional'] },
+      { rating: 4, comment: 'Very pleasant experience. The facility is spotless and the staff is knowledgeable.', tags: ['Clean', 'Friendly'] },
+      { rating: 5, comment: 'Amazing atmosphere and incredibly skilled practitioners. Worth every penny!', tags: ['Professional', 'On-time', 'Relaxing'] },
+    ];
+
+    let seededCount = 0;
+    for (let i = 0; i < completedBookings.length; i++) {
+      const booking = completedBookings[i];
+
+      // Skip if a review already exists for this booking
+      const existing = await this.treatmentReviewRepo.findOne({
+        where: { appointmentId: booking.id },
+      });
+      if (existing) continue;
+
+      const sample = SAMPLE_REVIEWS[i % SAMPLE_REVIEWS.length];
+      const review = this.treatmentReviewRepo.create({
+        appointmentId: booking.id,
+        userId: booking.userId,
+        rating: sample.rating,
+        comment: sample.comment,
+        tags: sample.tags,
+        photoUrls: [],
+      });
+      await this.treatmentReviewRepo.save(review);
+      seededCount++;
+    }
+
+    if (seededCount > 0) {
+      this.logger.log(`    ⭐ Seeded ${seededCount} treatment review(s) for product ${productId}`);
+    }
   }
 
   async clear(): Promise<void> {

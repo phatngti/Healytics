@@ -6,38 +6,50 @@ import 'package:user_app/features/orders/presentation/widgets/service_manual/fac
 import 'package:user_app/features/orders/presentation/widgets/service_manual/pre_service_guide.widget.dart';
 import 'package:user_app/features/orders/presentation/widgets/service_manual/procedure_timeline.widget.dart';
 import 'package:user_app/features/orders/presentation/widgets/service_manual/review_card.widget.dart';
+import 'package:user_app/features/orders/presentation/widgets/service_manual/service_hero_image.widget.dart';
 import 'package:user_app/features/orders/presentation/widgets/service_manual/service_manual_header.widget.dart';
-import 'package:user_app/features/orders/presentation/widgets/service_manual/service_manual_hero_image.widget.dart';
 import 'package:user_app/features/orders/presentation/widgets/service_manual/service_rules.widget.dart';
 
 /// Service manual detail screen showing pre-service
 /// guidelines, rules, procedure timeline, facilities,
 /// and review.
 class ServiceManualScreen extends HookConsumerWidget {
-  const ServiceManualScreen({super.key, required this.appointmentId});
+  const ServiceManualScreen({
+    super.key,
+    required this.appointmentId,
+  });
 
   /// The appointment whose manual is displayed.
   final String appointmentId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncManual = ref.watch(serviceManualProvider(appointmentId));
+    final asyncManual = ref.watch(
+      serviceManualProvider(appointmentId),
+    );
 
     return Scaffold(
       body: switch (asyncManual) {
-        AsyncData(:final value) when value != null => _Content(
-          serviceName: value.serviceName,
-          vendorName: value.vendorName,
-          imageUrl: value.imageUrl,
-          guidelines: value.preServiceGuidelines,
-          rules: value.serviceRules,
-          steps: value.procedureSteps,
-          facilities: value.facilities,
-          review: value.review,
-        ),
-        AsyncData() => const Center(child: Text('Manual not found')),
-        AsyncError(:final error) => Center(child: Text('Error: $error')),
-        _ => const Center(child: CircularProgressIndicator()),
+        AsyncData(:final value) when value != null =>
+          _Content(
+            serviceName: value.serviceName,
+            vendorName: value.vendorName,
+            imageUrl: value.imageUrl,
+            guidelines: value.preServiceGuidelines,
+            rules: value.serviceRules,
+            steps: value.procedureSteps,
+            facilities: value.facilities,
+            review: value.review,
+          ),
+        AsyncData() => const Center(
+            child: Text('Manual not found'),
+          ),
+        AsyncError(:final error) => Center(
+            child: Text('Error: $error'),
+          ),
+        _ => const Center(
+            child: CircularProgressIndicator(),
+          ),
       },
     );
   }
@@ -69,12 +81,15 @@ class _Content extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hPad = AppDimens.horizontalPadding(context);
-    final section = AppDimens.sectionSpacing(context);
     final bottom = AppDimens.bottomScrollPadding(context);
+    final colors = Theme.of(context).colorScheme;
 
     return CustomScrollView(
       slivers: [
-        ServiceManualHeader(serviceName: serviceName, vendorName: vendorName),
+        ServiceManualHeader(
+          serviceName: serviceName,
+          vendorName: vendorName,
+        ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
             hPad,
@@ -84,22 +99,40 @@ class _Content extends StatelessWidget {
           ),
           sliver: SliverList.list(
             children: [
-              ServiceManualHeroImage(imageUrl: imageUrl),
-              SizedBox(height: section),
+              ServiceHeroImage(imageUrl: imageUrl),
+              SizedBox(
+                height: AppDimens.sectionSpacing(
+                  context,
+                ),
+              ),
               PreServiceGuide(guidelines: guidelines),
-              SizedBox(height: section),
+              _sectionDivider(colors),
               ServiceRules(rules: rules.cast()),
-              SizedBox(height: section),
+              _sectionDivider(colors),
               ProcedureTimeline(steps: steps.cast()),
-              SizedBox(height: section),
-              FacilitiesCarousel(facilities: facilities.cast()),
-              SizedBox(height: section),
+              _sectionDivider(colors),
+              FacilitiesCarousel(
+                facilities: facilities.cast(),
+              ),
+              _sectionDivider(colors),
               ManualReviewCard(review: review),
-              SizedBox(height: section),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  /// Thin divider to separate major sections.
+  Widget _sectionDivider(ColorScheme colors) {
+    return Padding(
+      padding: AppDimens.paddingVerticalMedium,
+      child: Divider(
+        height: AppDimens.borderWidth,
+        color: colors.outlineVariant.withValues(
+          alpha: 0.3,
+        ),
+      ),
     );
   }
 }

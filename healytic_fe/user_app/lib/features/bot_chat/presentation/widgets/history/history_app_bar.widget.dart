@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/button/button.dart';
+import 'package:user_app/router/routes.dart';
 
 /// Custom app bar for the conversation history page.
 ///
@@ -76,7 +77,7 @@ class _HistoryAppBarState extends State<HistoryAppBar> {
             // ── Back button ──
             AppButton(
               buttonType: ButtonType.text,
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => const HomeRoute().go(context),
               primaryColor: colorScheme.onSurface,
               customStyle: TextButton.styleFrom(
                 padding: EdgeInsets.all(AppDimens.spaceSm),

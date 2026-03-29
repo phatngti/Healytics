@@ -267,13 +267,20 @@ services:
       - ./rabbitmq/cluster-entrypoint.sh:/usr/local/bin/cluster-entrypoint.sh
       - rabbitmq1-data:/var/lib/rabbitmq/
       - rabbitmq1-logs:/var/log/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   rabbitmq2:
     <<: *rabbitmq-common
     hostname: rabbitmq2
     container_name: rabbitmq2
     depends_on:
-      - rabbitmq1
+      rabbitmq1:
+        condition: service_healthy
     environment:
       - JOIN_CLUSTER_HOST=rabbitmq1
     volumes:
@@ -283,13 +290,20 @@ services:
       - ./rabbitmq/cluster-entrypoint.sh:/usr/local/bin/cluster-entrypoint.sh
       - rabbitmq2-data:/var/lib/rabbitmq/
       - rabbitmq2-logs:/var/log/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   rabbitmq3:
     <<: *rabbitmq-common
     hostname: rabbitmq3
     container_name: rabbitmq3
     depends_on:
-      - rabbitmq1
+      rabbitmq1:
+        condition: service_healthy
     environment:
       - JOIN_CLUSTER_HOST=rabbitmq1
     volumes:
@@ -299,6 +313,12 @@ services:
       - ./rabbitmq/cluster-entrypoint.sh:/usr/local/bin/cluster-entrypoint.sh
       - rabbitmq3-data:/var/lib/rabbitmq/
       - rabbitmq3-logs:/var/log/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   rabbitmq-haproxy:
     image: haproxy:2.4
@@ -308,9 +328,12 @@ services:
       - ./rabbitmq/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
       - ./rabbitmq/certs:/certs:ro
     depends_on:
-      - rabbitmq1
-      - rabbitmq2
-      - rabbitmq3
+      rabbitmq1:
+        condition: service_healthy
+      rabbitmq2:
+        condition: service_healthy
+      rabbitmq3:
+        condition: service_healthy
     ports:
       - 15671:15671
       - 5671:5671
@@ -325,9 +348,12 @@ services:
     networks:
       - services
     depends_on:
-      - rabbitmq1
-      - rabbitmq2
-      - rabbitmq3
+      rabbitmq1:
+        condition: service_healthy
+      rabbitmq2:
+        condition: service_healthy
+      rabbitmq3:
+        condition: service_healthy
     volumes:
       - ./rabbitmq/init-rabbitmq.sh:/init-rabbitmq.sh:ro
       - ./rabbitmq/certs:/certs:ro

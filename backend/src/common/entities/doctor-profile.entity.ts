@@ -9,11 +9,8 @@ export class DoctorProfile {
   @Column({ length: 100, nullable: true })
   title: string;
 
-  @Column({ name: 'medical_titles', type: 'jsonb', nullable: true })
-  medicalTitles: string[];
-
-  @Column({ name: 'medical_licenses', type: 'jsonb', nullable: true })
-  medicalLicenses: string[];
+  @Column({ name: 'medical_credentials', type: 'jsonb', nullable: true })
+  medicalCredentials: { title: string; license: string }[];
 
   @Column({ name: 'experience_years', type: 'int', default: 0 })
   experienceYears: number;

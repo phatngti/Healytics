@@ -281,6 +281,33 @@
         ]
       }
     },
+    "/account/me": {
+      "get": {
+        "operationId": "AccountController_getMe",
+        "summary": "Get current user account details",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current user account data with role.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountMeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/account/survey": {
       "get": {
         "operationId": "AccountController_getSurvey",
@@ -1036,6 +1063,46 @@
         ]
       }
     },
+    "/user/employees/featured-specialists": {
+      "get": {
+        "operationId": "UserEmployeesController_getFeaturedSpecialists",
+        "summary": "Get featured specialists for home page",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Max specialists to return (default 10)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of featured specialists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FeaturedSpecialistResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/user/employees": {
       "get": {
         "operationId": "UserEmployeesController_findAll",
@@ -1108,6 +1175,107 @@
           },
           "404": {
             "description": "Employee not found."
+          }
+        },
+        "tags": [
+          "User Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/employees/{id}/time-slots": {
+      "get": {
+        "operationId": "UserEmployeesController_getTimeSlots",
+        "summary": "Get time slots with availability for an employee",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Start date for the schedule range (YYYY-MM-DD). Defaults to today.",
+            "schema": {
+              "example": "2026-03-26",
+              "type": "string"
+            }
+          },
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Number of days to return from the start date. Default 7, max 30.",
+            "schema": {
+              "example": 7,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return all time slots from the employee schedule, each marked free or busy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeTimeSlotsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found."
+          }
+        },
+        "tags": [
+          "User Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/employees/{id}/services": {
+      "get": {
+        "operationId": "UserEmployeesController_findServices",
+        "summary": "Get services for a specialist",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of services for the given specialist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingServiceResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Specialist not found."
           }
         },
         "tags": [
@@ -1221,6 +1389,108 @@
         },
         "tags": [
           "Categories"
+        ]
+      }
+    },
+    "/user/categories/{categoryId}/services": {
+      "get": {
+        "operationId": "UserCategoriesController_findServicesByCategory",
+        "summary": "Get services for a category",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lat",
+            "required": false,
+            "in": "query",
+            "description": "User latitude for distance calc",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": false,
+            "in": "query",
+            "description": "User longitude for distance calc",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of services for the given category.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingServiceResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found."
+          }
+        },
+        "tags": [
+          "User Categories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/categories/{categoryId}/specialists": {
+      "get": {
+        "operationId": "UserCategoriesController_findSpecialistsByCategory",
+        "summary": "Get specialists for a category",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of specialists for the given category.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingSpecialistResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found."
+          }
+        },
+        "tags": [
+          "User Categories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -1402,235 +1672,6 @@
           {
             "bearer": []
           }
-        ]
-      }
-    },
-    "/health-services/premium-treatments": {
-      "get": {
-        "operationId": "HealthServiceController_getPremiumTreatments",
-        "summary": "Get premium treatments",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Return list of premium treatments.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PublicHealthServiceCardResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Health Services"
-        ]
-      }
-    },
-    "/health-services/home-recommend": {
-      "get": {
-        "operationId": "HealthServiceController_getHomeRecommend",
-        "summary": "Get home recommendations",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Return list of home recommended services.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PublicHealthServiceCardResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Health Services"
-        ]
-      }
-    },
-    "/health-services/{id}/info": {
-      "get": {
-        "operationId": "HealthServiceController_getProductInfo",
-        "summary": "Get service info by ID",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return service info for the detail screen.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PublicHealthServiceInfoResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Service not found."
-          }
-        },
-        "tags": [
-          "Health Services"
-        ]
-      }
-    },
-    "/health-services/{id}/employees": {
-      "get": {
-        "operationId": "HealthServiceController_getProductEmployees",
-        "summary": "Get employees for a service",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return list of eligible employees.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PublicHealthServiceEmployeeResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Service not found."
-          }
-        },
-        "tags": [
-          "Health Services"
-        ]
-      }
-    },
-    "/health-services/{id}/reviews": {
-      "get": {
-        "operationId": "HealthServiceController_getProductReviews",
-        "summary": "Get reviews for a service",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return list of reviews.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PublicHealthServiceReviewResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Service not found."
-          }
-        },
-        "tags": [
-          "Health Services"
-        ]
-      }
-    },
-    "/health-services/{id}/recommended": {
-      "get": {
-        "operationId": "HealthServiceController_getRecommendedProducts",
-        "summary": "Get recommended services",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return list of recommended services.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PublicHealthServiceRecommendedResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Service not found."
-          }
-        },
-        "tags": [
-          "Health Services"
-        ]
-      }
-    },
-    "/health-services/{id}": {
-      "get": {
-        "operationId": "HealthServiceController_findOne",
-        "summary": "Get a service by id",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return the service.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PublicHealthServiceResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Service not found."
-          }
-        },
-        "tags": [
-          "Health Services"
         ]
       }
     },
@@ -1848,6 +1889,310 @@
         },
         "tags": [
           "Partner Health-services"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/health-services/premium-treatments": {
+      "get": {
+        "operationId": "UserHealthServiceController_getPremiumTreatments",
+        "summary": "Get premium treatments",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return list of premium treatments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicHealthServiceCardResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Health-services"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/health-services/home-recommend": {
+      "get": {
+        "operationId": "UserHealthServiceController_getHomeRecommend",
+        "summary": "Get home recommendations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return list of home recommended services.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicHealthServiceCardResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Health-services"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/health-services/eligibilities/{id}": {
+      "get": {
+        "operationId": "UserHealthServiceController_getEligibilityDetail",
+        "summary": "Get eligibility detail by ID",
+        "description": "Returns the full eligibility record enriched with category, service, and employee information, looked up by the surrogate primary key on the product_employee_eligibility table.",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns eligibility detail with category, product, and employee info.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserEligibilityDetailResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Eligibility not found."
+          }
+        },
+        "tags": [
+          "User Health-services"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/health-services/{id}/info": {
+      "get": {
+        "operationId": "UserHealthServiceController_getProductInfo",
+        "summary": "Get service info by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return service info for the detail screen.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicHealthServiceInfoResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found."
+          }
+        },
+        "tags": [
+          "User Health-services"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/health-services/{id}/employees": {
+      "get": {
+        "operationId": "UserHealthServiceController_getProductEmployees",
+        "summary": "Get employees for a service",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of eligible employees.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicHealthServiceEmployeeResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found."
+          }
+        },
+        "tags": [
+          "User Health-services"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/health-services/{id}/reviews": {
+      "get": {
+        "operationId": "UserHealthServiceController_getProductReviews",
+        "summary": "Get reviews for a service",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of reviews.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicHealthServiceReviewResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found."
+          }
+        },
+        "tags": [
+          "User Health-services"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/health-services/{id}/recommended": {
+      "get": {
+        "operationId": "UserHealthServiceController_getRecommendedProducts",
+        "summary": "Get recommended services",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of recommended services.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicHealthServiceRecommendedResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found."
+          }
+        },
+        "tags": [
+          "User Health-services"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/health-services/{id}": {
+      "get": {
+        "operationId": "UserHealthServiceController_findOne",
+        "summary": "Get a service by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return the service.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicHealthServiceResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found."
+          }
+        },
+        "tags": [
+          "User Health-services"
         ],
         "security": [
           {
@@ -2644,6 +2989,496 @@
         ]
       }
     },
+    "/user/appointments": {
+      "get": {
+        "operationId": "UserAppointmentController_listAppointments",
+        "summary": "List all user appointments with optional distance calculation",
+        "parameters": [
+          {
+            "name": "latitude",
+            "required": false,
+            "in": "query",
+            "description": "User latitude (-90 to 90)",
+            "schema": {
+              "example": 10.7769,
+              "type": "number"
+            }
+          },
+          {
+            "name": "longitude",
+            "required": false,
+            "in": "query",
+            "description": "User longitude (-180 to 180)",
+            "schema": {
+              "example": 106.7009,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/appointments/categories": {
+      "get": {
+        "operationId": "UserAppointmentController_listCategories",
+        "summary": "Get appointment categories for filter chips",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentCategoryResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/appointments/recommendations": {
+      "get": {
+        "operationId": "UserAppointmentController_listRecommendedServices",
+        "summary": "Get recommended services",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecommendedServiceResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/appointments/recent-activity": {
+      "get": {
+        "operationId": "UserAppointmentController_listRecentActivity",
+        "summary": "Get recent appointment activity for home dashboard",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximum number of items to return (1–20)",
+            "schema": {
+              "default": 5,
+              "example": 5,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "Number of items to skip",
+            "schema": {
+              "default": 0,
+              "example": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of recent activities with meta"
+          }
+        },
+        "tags": [
+          "User Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/appointments/{id}": {
+      "get": {
+        "operationId": "UserAppointmentController_getAppointment",
+        "summary": "Get appointment details by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found"
+          }
+        },
+        "tags": [
+          "User Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/appointments/{appointmentId}/manual": {
+      "get": {
+        "operationId": "UserAppointmentController_getServiceManual",
+        "summary": "Get service manual for an appointment",
+        "parameters": [
+          {
+            "name": "appointmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceManualResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found"
+          }
+        },
+        "tags": [
+          "User Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/ai/recommendations": {
+      "post": {
+        "operationId": "AiServiceController_getRecommendations",
+        "summary": "Get service recommendations by IDs",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiRecommendationsRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns enriched recommendation data for the requested services.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiRecommendationsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "AI Recommendations"
+        ],
+        "security": [
+          {
+            "X-AI-API-Key": []
+          }
+        ]
+      }
+    },
+    "/user/reviews/treatment": {
+      "post": {
+        "operationId": "UserReviewController_submitTreatmentReview",
+        "summary": "Submit a treatment review for a completed appointment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTreatmentReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Treatment review submitted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreatmentReviewResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or appointment not completed"
+          },
+          "404": {
+            "description": "Appointment not found"
+          },
+          "409": {
+            "description": "Treatment review already submitted"
+          }
+        },
+        "tags": [
+          "User Reviews"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/reviews/specialist": {
+      "post": {
+        "operationId": "UserReviewController_submitSpecialistReview",
+        "summary": "Submit a specialist review for a completed appointment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSpecialistReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Specialist review submitted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialistReviewResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or appointment not completed"
+          },
+          "404": {
+            "description": "Appointment not found"
+          },
+          "409": {
+            "description": "Specialist review already submitted"
+          }
+        },
+        "tags": [
+          "User Reviews"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/momo/ipn": {
+      "post": {
+        "operationId": "MoMoController_handleMoMoIPN",
+        "summary": "MoMo IPN callback (server-to-server)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoMoIPNDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "IPN acknowledged"
+          }
+        },
+        "tags": [
+          "Momo"
+        ]
+      }
+    },
+    "/user/payments/momo/{bookingId}": {
+      "post": {
+        "operationId": "UserPaymentController_createMoMoPayment",
+        "summary": "Create MoMo payment for booking",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMoMoPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MoMoPaymentResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Booking not in PENDING_PAYMENT status or invalid amount"
+          },
+          "404": {
+            "description": "Booking not found"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/momo/{bookingId}/refund": {
+      "post": {
+        "operationId": "UserPaymentController_refundMoMoPayment",
+        "summary": "Request MoMo refund for booking",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMoMoRefundDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MoMoRefundResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid transId"
+          },
+          "404": {
+            "description": "Booking not found"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "tags": [
@@ -2771,6 +3606,12 @@
         "scheme": "bearer",
         "bearerFormat": "JWT",
         "type": "http"
+      },
+      "X-AI-API-Key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-AI-API-Key",
+        "description": "AI Service API Token"
       }
     },
     "schemas": {
@@ -3233,6 +4074,102 @@
           "message"
         ]
       },
+      "UserProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Profile ID"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Last name"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Phone number"
+          },
+          "bio": {
+            "type": "object",
+            "description": "Bio"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Date of birth",
+            "example": "1990-01-15"
+          },
+          "profileCompleted": {
+            "type": "boolean",
+            "description": "Whether the profile is completed"
+          }
+        },
+        "required": [
+          "id",
+          "profileCompleted"
+        ]
+      },
+      "AccountMeResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Account ID"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username"
+          },
+          "role": {
+            "type": "string",
+            "description": "Account role",
+            "enum": [
+              "user",
+              "employee",
+              "health_partner",
+              "admin"
+            ],
+            "example": "user"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether the account is active"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Account creation date"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update date"
+          },
+          "userProfile": {
+            "description": "User profile data",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserProfileDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "role",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "SurveyResponseDto": {
         "type": "object",
         "properties": {
@@ -3312,7 +4249,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-03-14T10:29:13.279Z"
+              "submittedAt": "2026-03-29T15:48:42.117Z"
             }
           }
         },
@@ -4139,6 +5076,88 @@
           "isWorking"
         ]
       },
+      "WorkHistoryEntryDto": {
+        "type": "object",
+        "properties": {
+          "facility": {
+            "type": "string",
+            "example": "Glow Saigon Spa Retreat",
+            "description": "Facility or organization name"
+          },
+          "position": {
+            "type": "string",
+            "example": "Head of Dermatology",
+            "description": "Position or role held"
+          },
+          "period": {
+            "type": "string",
+            "example": "2022–Present",
+            "description": "Employment period"
+          },
+          "isCurrent": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether this is the current position"
+          }
+        },
+        "required": [
+          "facility",
+          "position",
+          "period",
+          "isCurrent"
+        ]
+      },
+      "DocumentEntryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Health Certificate",
+            "description": "Display name of the document"
+          },
+          "url": {
+            "type": "string",
+            "example": "https://storage.example.com/docs/health-cert.pdf",
+            "description": "URL of the uploaded document"
+          },
+          "updatedTime": {
+            "type": "string",
+            "example": "2026-03-21T14:00:00.000Z",
+            "description": "ISO timestamp of the last update"
+          }
+        },
+        "required": [
+          "name",
+          "url"
+        ]
+      },
+      "VerificationDocumentEntryDto": {
+        "type": "object",
+        "properties": {
+          "fieldKey": {
+            "type": "string",
+            "example": "id_card",
+            "description": "Unique key identifying the document field (e.g. \"id_card\", \"other_documents\")"
+          },
+          "documents": {
+            "description": "Array of document entries for this field",
+            "example": [
+              {
+                "name": "ID Card",
+                "url": "https://storage.example.com/id-card.jpg",
+                "updatedTime": "2026-03-21T14:00:00.000Z"
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentEntryDto"
+            }
+          }
+        },
+        "required": [
+          "fieldKey"
+        ]
+      },
       "CreateDoctorDto": {
         "type": "object",
         "properties": {
@@ -4223,14 +5242,54 @@
               "$ref": "#/components/schemas/WorkScheduleEntryDto"
             }
           },
+          "workHistory": {
+            "description": "Work history entries",
+            "example": [
+              {
+                "facility": "Glow Saigon Spa Retreat",
+                "position": "Head of Dermatology",
+                "period": "2022–Present",
+                "isCurrent": true
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkHistoryEntryDto"
+            }
+          },
           "avatar": {
             "type": "string",
             "example": "https://i.pravatar.cc/150?u=doctor.a@healytics.com",
             "description": "Avatar URL"
           },
-          "idCardUrl": {
-            "type": "string",
-            "description": "ID card URL"
+          "verificationDocuments": {
+            "description": "Verification documents (ID card, licenses, etc.)",
+            "example": [
+              {
+                "fieldKey": "id_card",
+                "documents": [
+                  {
+                    "name": "ID Card",
+                    "url": "https://storage.example.com/id-card.jpg",
+                    "updatedTime": "2026-03-21T14:00:00.000Z"
+                  }
+                ]
+              },
+              {
+                "fieldKey": "other_documents",
+                "documents": [
+                  {
+                    "name": "Health Certificate",
+                    "url": "https://storage.example.com/health-cert.pdf",
+                    "updatedTime": "2026-03-21T14:00:00.000Z"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationDocumentEntryDto"
+            }
           },
           "status": {
             "type": "string",
@@ -4242,16 +5301,6 @@
             "example": "ACTIVE",
             "description": "Employee status"
           },
-          "branch": {
-            "type": "string",
-            "example": "",
-            "description": "Branch ID or name"
-          },
-          "password": {
-            "type": "string",
-            "example": "password123",
-            "description": "Account password"
-          },
           "description": {
             "type": "string",
             "description": "Bio / description"
@@ -4261,22 +5310,14 @@
             "example": "Dermatologist",
             "description": "Job title"
           },
-          "medicalTitles": {
+          "medicalCredentials": {
+            "description": "Medical credentials (titles + licenses)",
             "example": [
-              "MD",
-              "PhD"
+              {
+                "title": "MD",
+                "license": "LIC-2024-001"
+              }
             ],
-            "description": "Medical titles",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "medicalLicenses": {
-            "example": [
-              "LIC-2024-001"
-            ],
-            "description": "Medical license numbers",
             "type": "array",
             "items": {
               "type": "string"
@@ -4325,8 +5366,26 @@
           "firstName",
           "lastName",
           "email",
-          "employeeId"
+          "emergencyContactName",
+          "emergencyContactPhone",
+          "employeeId",
+          "startDate",
+          "schedule",
+          "description"
         ]
+      },
+      "MedicalCredentialResponseDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title"
+          },
+          "license": {
+            "type": "string",
+            "description": "License"
+          }
+        }
       },
       "DoctorProfileResponseDto": {
         "type": "object",
@@ -4339,18 +5398,11 @@
             "type": "string",
             "description": "Doctor title"
           },
-          "medicalTitles": {
-            "description": "Medical titles",
+          "medicalCredentials": {
+            "description": "Medical credentials (titles + licenses)",
             "type": "array",
             "items": {
-              "type": "string"
-            }
-          },
-          "medicalLicenses": {
-            "description": "Medical license numbers",
-            "type": "array",
-            "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/MedicalCredentialResponseDto"
             }
           },
           "experienceYears": {
@@ -4370,13 +5422,6 @@
           },
           "education": {
             "description": "Education history",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "certifications": {
-            "description": "Certifications",
             "type": "array",
             "items": {
               "type": "string"
@@ -4425,10 +5470,6 @@
             "items": {
               "type": "string"
             }
-          },
-          "licenseUrl": {
-            "type": "string",
-            "description": "License URL"
           }
         }
       },
@@ -4454,10 +5495,6 @@
           "fullName": {
             "type": "string",
             "description": "Full name"
-          },
-          "displayName": {
-            "type": "object",
-            "description": "Display name"
           },
           "email": {
             "type": "string",
@@ -4495,15 +5532,25 @@
             "type": "object",
             "description": "Emergency contact phone"
           },
-          "idCardUrl": {
-            "type": "object",
-            "description": "ID card URL"
+          "verificationDocuments": {
+            "description": "Verification documents",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationDocumentEntryDto"
+            }
           },
           "schedule": {
             "description": "Work schedule",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
+          },
+          "workHistory": {
+            "description": "Work history",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkHistoryEntryDto"
             }
           },
           "dob": {
@@ -4674,14 +5721,54 @@
               "$ref": "#/components/schemas/WorkScheduleEntryDto"
             }
           },
+          "workHistory": {
+            "description": "Work history entries",
+            "example": [
+              {
+                "facility": "Glow Saigon Spa Retreat",
+                "position": "Senior Spa Therapist",
+                "period": "2021–Present",
+                "isCurrent": true
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkHistoryEntryDto"
+            }
+          },
           "avatar": {
             "type": "string",
             "example": "https://i.pravatar.cc/150?u=spa@healytics.com",
             "description": "Avatar URL"
           },
-          "idCardUrl": {
-            "type": "string",
-            "description": "ID card URL"
+          "verificationDocuments": {
+            "description": "Verification documents (ID card, licenses, etc.)",
+            "example": [
+              {
+                "fieldKey": "id_card",
+                "documents": [
+                  {
+                    "name": "ID Card",
+                    "url": "https://storage.example.com/id-card.jpg",
+                    "updatedTime": "2026-03-21T14:00:00.000Z"
+                  }
+                ]
+              },
+              {
+                "fieldKey": "other_documents",
+                "documents": [
+                  {
+                    "name": "Health Certificate",
+                    "url": "https://storage.example.com/health-cert.pdf",
+                    "updatedTime": "2026-03-21T14:00:00.000Z"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationDocumentEntryDto"
+            }
           },
           "status": {
             "type": "string",
@@ -4692,16 +5779,6 @@
             ],
             "example": "ACTIVE",
             "description": "Employee status"
-          },
-          "branch": {
-            "type": "string",
-            "example": "",
-            "description": "Branch ID or name"
-          },
-          "password": {
-            "type": "string",
-            "example": "password123",
-            "description": "Account password"
           },
           "description": {
             "type": "string",
@@ -4754,11 +5831,6 @@
               "type": "string"
             }
           },
-          "licenseUrl": {
-            "type": "string",
-            "example": "https://example.com/license/spa-001.pdf",
-            "description": "License URL"
-          },
           "partnerId": {
             "type": "string",
             "description": "Partner ID (auto-injected)"
@@ -4768,7 +5840,12 @@
           "firstName",
           "lastName",
           "email",
-          "employeeId"
+          "emergencyContactName",
+          "emergencyContactPhone",
+          "employeeId",
+          "startDate",
+          "schedule",
+          "description"
         ]
       },
       "CreateMassageTherapistDto": {
@@ -4855,14 +5932,54 @@
               "$ref": "#/components/schemas/WorkScheduleEntryDto"
             }
           },
+          "workHistory": {
+            "description": "Work history entries",
+            "example": [
+              {
+                "facility": "Healing Hands Massage Center",
+                "position": "Lead Massage Therapist",
+                "period": "2020–Present",
+                "isCurrent": true
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkHistoryEntryDto"
+            }
+          },
           "avatar": {
             "type": "string",
             "example": "https://i.pravatar.cc/150?u=massage@healytics.com",
             "description": "Avatar URL"
           },
-          "idCardUrl": {
-            "type": "string",
-            "description": "ID card URL"
+          "verificationDocuments": {
+            "description": "Verification documents (ID card, licenses, etc.)",
+            "example": [
+              {
+                "fieldKey": "id_card",
+                "documents": [
+                  {
+                    "name": "ID Card",
+                    "url": "https://storage.example.com/id-card.jpg",
+                    "updatedTime": "2026-03-21T14:00:00.000Z"
+                  }
+                ]
+              },
+              {
+                "fieldKey": "other_documents",
+                "documents": [
+                  {
+                    "name": "Health Certificate",
+                    "url": "https://storage.example.com/health-cert.pdf",
+                    "updatedTime": "2026-03-21T14:00:00.000Z"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationDocumentEntryDto"
+            }
           },
           "status": {
             "type": "string",
@@ -4873,16 +5990,6 @@
             ],
             "example": "ACTIVE",
             "description": "Employee status"
-          },
-          "branch": {
-            "type": "string",
-            "example": "",
-            "description": "Branch ID or name"
-          },
-          "password": {
-            "type": "string",
-            "example": "password123",
-            "description": "Account password"
           },
           "description": {
             "type": "string",
@@ -4934,11 +6041,6 @@
               "type": "string"
             }
           },
-          "licenseUrl": {
-            "type": "string",
-            "example": "https://example.com/license/msg-001.pdf",
-            "description": "License URL"
-          },
           "partnerId": {
             "type": "string",
             "description": "Partner ID (auto-injected)"
@@ -4948,7 +6050,12 @@
           "firstName",
           "lastName",
           "email",
-          "employeeId"
+          "emergencyContactName",
+          "emergencyContactPhone",
+          "employeeId",
+          "startDate",
+          "schedule",
+          "description"
         ]
       },
       "CreateDoctorProfileDto": {
@@ -4959,25 +6066,17 @@
             "example": "Dr.",
             "description": "Title of the doctor"
           },
-          "medicalTitles": {
+          "medicalCredentials": {
+            "description": "Medical credentials (titles + licenses)",
             "example": [
-              "MD",
-              "PhD"
+              {
+                "title": "MD",
+                "license": "LIC-2024-001"
+              }
             ],
-            "description": "Medical titles",
             "type": "array",
             "items": {
-              "type": "string"
-            }
-          },
-          "medicalLicenses": {
-            "example": [
-              "LIC-2024-001"
-            ],
-            "description": "Medical license numbers",
-            "type": "array",
-            "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/MedicalCredentialResponseDto"
             }
           },
           "experienceYears": {
@@ -5071,21 +6170,12 @@
             "items": {
               "type": "string"
             }
-          },
-          "licenseUrl": {
-            "type": "string",
-            "description": "License URL"
           }
         }
       },
       "UpdateEmployeeDto": {
         "type": "object",
         "properties": {
-          "authId": {
-            "type": "string",
-            "example": "auth0|123456",
-            "description": "Authentication ID from external provider"
-          },
           "employeeCode": {
             "type": "string",
             "example": "EMP001",
@@ -5105,11 +6195,6 @@
             "type": "string",
             "example": "John Doe",
             "description": "Full name of the employee"
-          },
-          "displayName": {
-            "type": "string",
-            "example": "Johnny",
-            "description": "Display name"
           },
           "email": {
             "type": "string",
@@ -5162,11 +6247,6 @@
             "example": "ACTIVE",
             "description": "Status of the employee"
           },
-          "branchId": {
-            "type": "string",
-            "example": "uuid-branch-id",
-            "description": "Branch ID the employee belongs to"
-          },
           "partnerId": {
             "type": "string",
             "example": "uuid-partner-id",
@@ -5192,17 +6272,38 @@
             "type": "string",
             "description": "Emergency contact phone"
           },
-          "idCardUrl": {
-            "type": "string",
-            "description": "ID card URL"
+          "verificationDocuments": {
+            "description": "Verification documents (ID card, licenses, etc.)",
+            "example": [
+              {
+                "fieldKey": "id_card",
+                "documents": [
+                  {
+                    "name": "ID Card",
+                    "url": "https://storage.example.com/id-card.jpg",
+                    "updatedTime": "2026-03-21T14:00:00.000Z"
+                  }
+                ]
+              },
+              {
+                "fieldKey": "other_documents",
+                "documents": [
+                  {
+                    "name": "Health Certificate",
+                    "url": "https://storage.example.com/health-cert.pdf",
+                    "updatedTime": "2026-03-21T14:00:00.000Z"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationDocumentEntryDto"
+            }
           },
           "description": {
             "type": "string",
             "description": "Bio / description"
-          },
-          "password": {
-            "type": "string",
-            "description": "Account password"
           },
           "schedule": {
             "description": "Weekly work schedule",
@@ -5225,6 +6326,21 @@
               "$ref": "#/components/schemas/WorkScheduleEntryDto"
             }
           },
+          "workHistory": {
+            "description": "Work history entries",
+            "example": [
+              {
+                "facility": "Glow Saigon Spa Retreat",
+                "position": "Head of Dermatology",
+                "period": "2022–Present",
+                "isCurrent": true
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkHistoryEntryDto"
+            }
+          },
           "doctorProfile": {
             "description": "Doctor profile data if role is DOCTOR",
             "allOf": [
@@ -5242,6 +6358,221 @@
             ]
           }
         }
+      },
+      "FeaturedSpecialistResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the specialist",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name",
+            "example": "Dr. Anna Nguyen"
+          },
+          "specialty": {
+            "type": "string",
+            "description": "Short specialty label",
+            "example": "Spa Therapist"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "description": "Profile image URL (nullable)",
+            "nullable": true
+          },
+          "rating": {
+            "type": "number",
+            "description": "Average rating 0.0–5.0",
+            "example": 4.9
+          },
+          "soldCount": {
+            "type": "number",
+            "description": "Total completed appointments",
+            "example": 124
+          },
+          "clinicName": {
+            "type": "string",
+            "description": "Associated clinic name",
+            "example": "Healytics Spa & Wellness"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "specialty",
+          "rating",
+          "soldCount",
+          "clinicName"
+        ]
+      },
+      "TimeSlotDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "09:00 AM",
+            "description": "Human-readable label in 12h format"
+          },
+          "time": {
+            "type": "string",
+            "example": "09:00",
+            "description": "Slot start time in HH:mm (24h) format"
+          },
+          "isBusy": {
+            "type": "string",
+            "enum": [
+              "free",
+              "busy"
+            ],
+            "example": "free",
+            "description": "Whether the slot is free or busy"
+          }
+        },
+        "required": [
+          "label",
+          "time",
+          "isBusy"
+        ]
+      },
+      "DayScheduleDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-03-26",
+            "description": "Date in YYYY-MM-DD format"
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "example": "Wednesday",
+            "description": "Day of the week"
+          },
+          "isWorkingDay": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the employee works on this day"
+          },
+          "slots": {
+            "description": "Time slots for this day (empty if not working)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimeSlotDto"
+            }
+          }
+        },
+        "required": [
+          "date",
+          "dayOfWeek",
+          "isWorkingDay",
+          "slots"
+        ]
+      },
+      "EmployeeTimeSlotsResponseDto": {
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Employee ID"
+          },
+          "employeeName": {
+            "type": "string",
+            "example": "Dr. Anna Nguyen",
+            "description": "Employee full name"
+          },
+          "slotDurationMinutes": {
+            "type": "number",
+            "example": 30,
+            "description": "Slot duration in minutes"
+          },
+          "schedule": {
+            "description": "Day-by-day schedule with time slots",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DayScheduleDto"
+            }
+          },
+          "rangeStart": {
+            "type": "string",
+            "example": "2026-03-26",
+            "description": "Start of the schedule range"
+          },
+          "rangeEnd": {
+            "type": "string",
+            "example": "2026-04-25",
+            "description": "End of the schedule range"
+          }
+        },
+        "required": [
+          "employeeId",
+          "employeeName",
+          "slotDurationMinutes",
+          "schedule",
+          "rangeStart",
+          "rangeEnd"
+        ]
+      },
+      "BookingServiceResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Service/Product UUID"
+          },
+          "imageUrl": {
+            "type": "object",
+            "description": "Service image URL",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "description": "Service name",
+            "example": "Deep Tissue Massage"
+          },
+          "duration": {
+            "type": "string",
+            "description": "Formatted duration",
+            "example": "60 min"
+          },
+          "price": {
+            "type": "string",
+            "description": "Formatted price",
+            "example": "850,000 VND"
+          },
+          "clinicName": {
+            "type": "object",
+            "description": "Clinic or facility name",
+            "nullable": true
+          },
+          "clinicAddress": {
+            "type": "object",
+            "description": "Clinic street address",
+            "nullable": true
+          },
+          "distance": {
+            "type": "object",
+            "description": "Distance from user (e.g. \"1.2 km\")",
+            "nullable": true
+          },
+          "durationMinutes": {
+            "type": "object",
+            "description": "Duration in minutes",
+            "example": 60
+          },
+          "priceVnd": {
+            "type": "object",
+            "description": "Raw price in VND",
+            "example": 850000
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "duration",
+          "price"
+        ]
       },
       "CategorySummaryDto": {
         "type": "object",
@@ -5289,6 +6620,11 @@
             "type": "boolean",
             "description": "Whether category is active"
           },
+          "categoryType": {
+            "type": "string",
+            "description": "Category type for UI grouping",
+            "default": "primary"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
@@ -5322,6 +6658,40 @@
           "isActive",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "BookingSpecialistResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique specialist/employee ID"
+          },
+          "eligibilityId": {
+            "type": "string",
+            "description": "product_employee_eligibility surrogate PK"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full display name",
+            "example": "Dr. Anna Nguyen"
+          },
+          "specialty": {
+            "type": "string",
+            "description": "Short specialty label",
+            "example": "Spa Therapist"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "description": "URL to avatar image",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "eligibilityId",
+          "name",
+          "specialty"
         ]
       },
       "AdminCategoryResponseDto": {
@@ -5508,643 +6878,6 @@
           }
         }
       },
-      "PublicHealthServiceCardResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "a1b2c3d4-..."
-          },
-          "name": {
-            "type": "string",
-            "example": "Deep Tissue Massage"
-          },
-          "slug": {
-            "type": "string",
-            "example": "deep-tissue-massage"
-          },
-          "imageUrl": {
-            "type": "object",
-            "example": "https://example.com/image.jpg"
-          },
-          "category": {
-            "type": "string",
-            "example": "Massage"
-          },
-          "duration": {
-            "type": "string",
-            "example": "60 min"
-          },
-          "price": {
-            "type": "string",
-            "example": "₫500,000"
-          },
-          "rating": {
-            "type": "string",
-            "example": "4.9"
-          },
-          "vendorName": {
-            "type": "string",
-            "example": "Healytics Spa"
-          },
-          "location": {
-            "type": "string",
-            "example": "District 1, HCMC"
-          },
-          "staffAvatars": {
-            "example": [
-              "https://example.com/avatar1.jpg"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "type": {
-            "type": "string",
-            "example": "service"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "slug",
-          "category",
-          "duration",
-          "price",
-          "rating",
-          "vendorName",
-          "location",
-          "staffAvatars",
-          "type"
-        ]
-      },
-      "PublicCategoryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "a1b2c3d4-..."
-          },
-          "name": {
-            "type": "string",
-            "example": "Spa & Massage"
-          },
-          "slug": {
-            "type": "string",
-            "example": "spa-massage"
-          },
-          "imageUrl": {
-            "type": "object",
-            "example": "https://example.com/category.jpg"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "slug"
-        ]
-      },
-      "PublicFeatureTagDto": {
-        "type": "object",
-        "properties": {
-          "iconName": {
-            "type": "string",
-            "example": "schedule"
-          },
-          "label": {
-            "type": "string",
-            "example": "Pain Relief"
-          }
-        },
-        "required": [
-          "iconName",
-          "label"
-        ]
-      },
-      "PublicClinicDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "Healytics Wellness Center"
-          },
-          "address": {
-            "type": "string",
-            "example": "123 Health Street, District 1, HCMC"
-          }
-        },
-        "required": [
-          "name",
-          "address"
-        ]
-      },
-      "PublicFacilityImageDto": {
-        "type": "object",
-        "properties": {
-          "imageUrl": {
-            "type": "string",
-            "example": "https://example.com/facility.jpg"
-          },
-          "label": {
-            "type": "string",
-            "example": "Treatment Room"
-          }
-        },
-        "required": [
-          "imageUrl",
-          "label"
-        ]
-      },
-      "PublicServiceTagDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "a1b2c3d4-..."
-          },
-          "name": {
-            "type": "string",
-            "example": "Pain Relief"
-          },
-          "colorValue": {
-            "type": "string",
-            "example": "#FF4CAF50"
-          },
-          "description": {
-            "type": "object",
-            "example": "Pain management and relief services"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "colorValue"
-        ]
-      },
-      "PublicHealthServiceInfoResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "category": {
-            "$ref": "#/components/schemas/PublicCategoryDto"
-          },
-          "images": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "rating": {
-            "type": "number",
-            "example": 4.9
-          },
-          "reviewCount": {
-            "type": "number",
-            "example": 124
-          },
-          "price": {
-            "type": "string",
-            "example": "$350.00"
-          },
-          "isVerified": {
-            "type": "boolean",
-            "example": true
-          },
-          "description": {
-            "type": "object"
-          },
-          "featureTags": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PublicFeatureTagDto"
-            }
-          },
-          "clinic": {
-            "$ref": "#/components/schemas/PublicClinicDto"
-          },
-          "facilityImages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PublicFacilityImageDto"
-            }
-          },
-          "serviceTags": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PublicServiceTagDto"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "category",
-          "images",
-          "rating",
-          "reviewCount",
-          "price",
-          "isVerified",
-          "featureTags",
-          "clinic",
-          "facilityImages",
-          "serviceTags"
-        ]
-      },
-      "PublicEmployeeTimeSlotDto": {
-        "type": "object",
-        "properties": {
-          "label": {
-            "type": "string",
-            "example": "7:00 AM"
-          },
-          "isAvailable": {
-            "type": "boolean",
-            "example": true
-          }
-        },
-        "required": [
-          "label",
-          "isAvailable"
-        ]
-      },
-      "PublicHealthServiceEmployeeDayScheduleDto": {
-        "type": "object",
-        "properties": {
-          "date": {
-            "type": "string",
-            "example": "2026-02-25T00:00:00.000Z"
-          },
-          "isAvailable": {
-            "type": "boolean",
-            "example": true
-          },
-          "timeSlots": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PublicEmployeeTimeSlotDto"
-            }
-          }
-        },
-        "required": [
-          "date",
-          "isAvailable",
-          "timeSlots"
-        ]
-      },
-      "PublicHealthServiceEmployeeResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          },
-          "imageUrl": {
-            "type": "object"
-          },
-          "isSelected": {
-            "type": "boolean",
-            "example": false
-          },
-          "quote": {
-            "type": "object"
-          },
-          "degrees": {
-            "type": "object"
-          },
-          "languages": {
-            "type": "object"
-          },
-          "experience": {
-            "type": "object",
-            "example": "12 years"
-          },
-          "specializations": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "bio": {
-            "type": "object"
-          },
-          "daySchedules": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PublicHealthServiceEmployeeDayScheduleDto"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "role",
-          "isSelected",
-          "daySchedules"
-        ]
-      },
-      "PublicHealthServiceReviewResponseDto": {
-        "type": "object",
-        "properties": {
-          "reviewerName": {
-            "type": "string"
-          },
-          "avatarUrl": {
-            "type": "object"
-          },
-          "rating": {
-            "type": "number",
-            "example": 5
-          },
-          "status": {
-            "type": "string",
-            "example": "Completed"
-          },
-          "date": {
-            "type": "string",
-            "example": "2025-05-11T00:00:00.000Z"
-          },
-          "text": {
-            "type": "string"
-          },
-          "imageUrls": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "reviewerName",
-          "rating",
-          "status",
-          "date",
-          "text",
-          "imageUrls"
-        ]
-      },
-      "PublicHealthServiceRecommendedResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "imageUrl": {
-            "type": "object"
-          },
-          "rating": {
-            "type": "number",
-            "example": 4.9
-          },
-          "reviewLabel": {
-            "type": "string",
-            "example": "(500+ Reviews)"
-          },
-          "bookedLabel": {
-            "type": "string",
-            "example": "1.2k+ Booked"
-          },
-          "price": {
-            "type": "string",
-            "example": "350.000₫"
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "rating",
-          "reviewLabel",
-          "bookedLabel",
-          "price"
-        ]
-      },
-      "PublicCategorySummaryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "slug"
-        ]
-      },
-      "PublicHealthServiceMediaDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique media identifier"
-          },
-          "url": {
-            "type": "string",
-            "description": "Media URL"
-          },
-          "mediaType": {
-            "type": "string",
-            "description": "Media type (image, video, etc.)"
-          },
-          "isThumbnail": {
-            "type": "boolean",
-            "description": "Whether this is the thumbnail"
-          },
-          "sortOrder": {
-            "type": "number",
-            "description": "Sort order for display"
-          }
-        },
-        "required": [
-          "id",
-          "url",
-          "sortOrder"
-        ]
-      },
-      "PublicHealthServiceDefinitionDto": {
-        "type": "object",
-        "properties": {
-          "productId": {
-            "type": "string",
-            "description": "Product ID (primary key)"
-          },
-          "durationMinutes": {
-            "type": "number",
-            "description": "Service duration in minutes"
-          },
-          "bufferMinutes": {
-            "type": "number",
-            "description": "Buffer time between appointments"
-          },
-          "maxCapacity": {
-            "type": "number",
-            "description": "Maximum capacity per slot"
-          },
-          "minLeadTimeHours": {
-            "type": "number",
-            "description": "Minimum lead time for booking (hours)"
-          },
-          "staffAssignmentType": {
-            "type": "string",
-            "description": "Staff assignment type"
-          }
-        },
-        "required": [
-          "productId",
-          "durationMinutes"
-        ]
-      },
-      "PublicHealthServiceEmployeeEligibilityDto": {
-        "type": "object",
-        "properties": {
-          "productId": {
-            "type": "string",
-            "description": "Product ID"
-          },
-          "employeeId": {
-            "type": "string",
-            "description": "Employee ID"
-          },
-          "isPrimary": {
-            "type": "boolean",
-            "description": "Whether this is the primary employee"
-          }
-        },
-        "required": [
-          "productId",
-          "employeeId",
-          "isPrimary"
-        ]
-      },
-      "PublicHealthServiceResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique identifier"
-          },
-          "name": {
-            "type": "string",
-            "description": "Name"
-          },
-          "slug": {
-            "type": "string",
-            "description": "URL-friendly slug"
-          },
-          "description": {
-            "type": "object",
-            "description": "Description"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "physical",
-              "service"
-            ],
-            "description": "Type"
-          },
-          "basePrice": {
-            "type": "number",
-            "description": "Base price in specified currency"
-          },
-          "salePrice": {
-            "type": "object",
-            "description": "Sale price if on discount"
-          },
-          "currency": {
-            "type": "string",
-            "description": "Currency code (ISO 4217)"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "active",
-              "archived"
-            ],
-            "description": "Status"
-          },
-          "isVisibleOnline": {
-            "type": "boolean",
-            "description": "Whether visible online"
-          },
-          "vendorName": {
-            "type": "object",
-            "description": "Vendor name"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Creation timestamp"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Last update timestamp"
-          },
-          "category": {
-            "description": "Category",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PublicCategorySummaryDto"
-              }
-            ]
-          },
-          "media": {
-            "description": "Media assets",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PublicHealthServiceMediaDto"
-            }
-          },
-          "productDefinition": {
-            "description": "Definition for service type",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PublicHealthServiceDefinitionDto"
-              }
-            ]
-          },
-          "productEmployeeEligibilities": {
-            "description": "Eligible employees for service",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PublicHealthServiceEmployeeEligibilityDto"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "slug",
-          "type",
-          "basePrice",
-          "currency",
-          "status",
-          "isVisibleOnline",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
       "PartnerCategorySummaryDto": {
         "type": "object",
         "properties": {
@@ -6249,6 +6982,77 @@
           "isPrimary"
         ]
       },
+      "PartnerServiceRuleDto": {
+        "type": "object",
+        "properties": {
+          "iconSlug": {
+            "type": "string",
+            "example": "no-eating"
+          },
+          "title": {
+            "type": "string",
+            "example": "No Eating Before"
+          },
+          "description": {
+            "type": "string",
+            "example": "Avoid eating 2 hours before the service"
+          }
+        },
+        "required": [
+          "iconSlug",
+          "title",
+          "description"
+        ]
+      },
+      "PartnerProcedureStepDto": {
+        "type": "object",
+        "properties": {
+          "stepNumber": {
+            "type": "number",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Check-in & Registration"
+          },
+          "description": {
+            "type": "string",
+            "example": "Arrive at the reception and complete registration"
+          }
+        },
+        "required": [
+          "stepNumber",
+          "title",
+          "description"
+        ]
+      },
+      "PartnerServiceManualDto": {
+        "type": "object",
+        "properties": {
+          "preServiceGuidelines": {
+            "example": [
+              "Avoid heavy meals",
+              "Wear comfortable clothing"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "serviceRules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerServiceRuleDto"
+            }
+          },
+          "procedureSteps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerProcedureStepDto"
+            }
+          }
+        }
+      },
       "PartnerHealthServiceResponseDto": {
         "type": "object",
         "properties": {
@@ -6271,7 +7075,6 @@
           "type": {
             "type": "string",
             "enum": [
-              "physical",
               "service"
             ],
             "description": "Type"
@@ -6344,6 +7147,14 @@
             "items": {
               "$ref": "#/components/schemas/PartnerHealthServiceEmployeeEligibilityDto"
             }
+          },
+          "serviceManual": {
+            "description": "Service manual (guidelines, rules, procedure steps)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerServiceManualDto"
+              }
+            ]
           }
         },
         "required": [
@@ -6569,6 +7380,73 @@
           "price"
         ]
       },
+      "PartnerDetailServiceRuleDto": {
+        "type": "object",
+        "properties": {
+          "iconSlug": {
+            "type": "string",
+            "example": "no-eating"
+          },
+          "title": {
+            "type": "string",
+            "example": "No Eating Before"
+          },
+          "description": {
+            "type": "string",
+            "example": "Avoid eating 2 hours before the service"
+          }
+        },
+        "required": [
+          "iconSlug",
+          "title",
+          "description"
+        ]
+      },
+      "PartnerDetailProcedureStepDto": {
+        "type": "object",
+        "properties": {
+          "stepNumber": {
+            "type": "number",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Check-in & Registration"
+          },
+          "description": {
+            "type": "string",
+            "example": "Arrive at the reception and complete registration"
+          }
+        },
+        "required": [
+          "stepNumber",
+          "title",
+          "description"
+        ]
+      },
+      "PartnerDetailServiceManualDto": {
+        "type": "object",
+        "properties": {
+          "preServiceGuidelines": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "serviceRules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerDetailServiceRuleDto"
+            }
+          },
+          "procedureSteps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerDetailProcedureStepDto"
+            }
+          }
+        }
+      },
       "PartnerHealthServiceDetailResponseDto": {
         "type": "object",
         "properties": {
@@ -6643,6 +7521,9 @@
             "items": {
               "$ref": "#/components/schemas/PartnerRecommendedServiceDto"
             }
+          },
+          "serviceManual": {
+            "$ref": "#/components/schemas/PartnerDetailServiceManualDto"
           }
         },
         "required": [
@@ -6791,6 +7672,77 @@
           "text"
         ]
       },
+      "ServiceRuleInputDto": {
+        "type": "object",
+        "properties": {
+          "iconSlug": {
+            "type": "string",
+            "example": "no-eating"
+          },
+          "title": {
+            "type": "string",
+            "example": "No Eating Before"
+          },
+          "description": {
+            "type": "string",
+            "example": "Avoid eating 2 hours before the service"
+          }
+        },
+        "required": [
+          "iconSlug",
+          "title",
+          "description"
+        ]
+      },
+      "ProcedureStepInputDto": {
+        "type": "object",
+        "properties": {
+          "stepNumber": {
+            "type": "number",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Check-in & Registration"
+          },
+          "description": {
+            "type": "string",
+            "example": "Arrive at the reception and complete registration"
+          }
+        },
+        "required": [
+          "stepNumber",
+          "title",
+          "description"
+        ]
+      },
+      "ServiceManualInputDto": {
+        "type": "object",
+        "properties": {
+          "preServiceGuidelines": {
+            "example": [
+              "Avoid heavy meals",
+              "Wear comfortable clothing"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "serviceRules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRuleInputDto"
+            }
+          },
+          "procedureSteps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProcedureStepInputDto"
+            }
+          }
+        }
+      },
       "CreatePartnerHealthServiceDto": {
         "type": "object",
         "properties": {
@@ -6813,7 +7765,6 @@
           "type": {
             "type": "string",
             "enum": [
-              "physical",
               "service"
             ],
             "example": "service"
@@ -6881,6 +7832,14 @@
             "items": {
               "$ref": "#/components/schemas/CreatePartnerHealthServiceReviewDto"
             }
+          },
+          "serviceManual": {
+            "description": "Service manual (guidelines, rules, procedure steps)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServiceManualInputDto"
+              }
+            ]
           }
         },
         "required": [
@@ -6911,7 +7870,6 @@
           "type": {
             "type": "string",
             "enum": [
-              "physical",
               "service"
             ],
             "example": "service"
@@ -6979,8 +7937,826 @@
             "items": {
               "$ref": "#/components/schemas/CreatePartnerHealthServiceReviewDto"
             }
+          },
+          "serviceManual": {
+            "description": "Service manual (guidelines, rules, procedure steps)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServiceManualInputDto"
+              }
+            ]
           }
         }
+      },
+      "PublicHealthServiceCardResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "name": {
+            "type": "string",
+            "example": "Deep Tissue Massage"
+          },
+          "slug": {
+            "type": "string",
+            "example": "deep-tissue-massage"
+          },
+          "imageUrl": {
+            "type": "object",
+            "example": "https://example.com/image.jpg"
+          },
+          "category": {
+            "type": "string",
+            "example": "Massage"
+          },
+          "duration": {
+            "type": "string",
+            "example": "60 min"
+          },
+          "price": {
+            "type": "string",
+            "example": "₫500,000"
+          },
+          "rating": {
+            "type": "string",
+            "example": "4.9"
+          },
+          "vendorName": {
+            "type": "string",
+            "example": "Healytics Spa"
+          },
+          "location": {
+            "type": "string",
+            "example": "District 1, HCMC"
+          },
+          "staffAvatars": {
+            "example": [
+              "https://example.com/avatar1.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "type": {
+            "type": "string",
+            "example": "service"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "category",
+          "duration",
+          "price",
+          "rating",
+          "vendorName",
+          "location",
+          "staffAvatars",
+          "type"
+        ]
+      },
+      "BookingScheduleDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "object",
+            "example": "2024-05-20T00:00:00.000Z"
+          },
+          "timeSlotLabel": {
+            "type": "object",
+            "example": "09:00 AM - 10:00 AM"
+          }
+        }
+      },
+      "SpecialistInfoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "spec-12345"
+          },
+          "name": {
+            "type": "string",
+            "example": "Dr. Sarah Jenkins"
+          },
+          "specialty": {
+            "type": "object",
+            "example": "Dermatologist"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "example": "https://example.com/avatars/sarah.jpg"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ServiceInfoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "srv-98765"
+          },
+          "title": {
+            "type": "string",
+            "example": "Comprehensive Skin Assessment"
+          },
+          "subtitle": {
+            "type": "object",
+            "example": "Full body mole mapping and skin health check"
+          },
+          "duration": {
+            "type": "string",
+            "example": "45 min"
+          },
+          "imageUrl": {
+            "type": "object",
+            "example": "https://example.com/services/skin-assessment.jpg"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "duration"
+        ]
+      },
+      "CategoryInfoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "cat-555"
+          },
+          "name": {
+            "type": "string",
+            "example": "Dermatology"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "LocationInfoDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Healytics Main Center"
+          },
+          "address": {
+            "type": "string",
+            "example": "123 Wellness Avenue, Ho Chi Minh City"
+          },
+          "mapUrl": {
+            "type": "object",
+            "example": "https://maps.example.com/..."
+          }
+        },
+        "required": [
+          "name",
+          "address"
+        ]
+      },
+      "PriceBreakdownDto": {
+        "type": "object",
+        "properties": {
+          "subTotal": {
+            "type": "number",
+            "example": 500000
+          },
+          "discount": {
+            "type": "number",
+            "example": 50000
+          },
+          "totalAmount": {
+            "type": "number",
+            "example": 450000
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          }
+        },
+        "required": [
+          "subTotal",
+          "discount",
+          "totalAmount",
+          "currency"
+        ]
+      },
+      "UserEligibilityDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "isCompletedStep": {
+            "type": "boolean",
+            "example": true
+          },
+          "bookingSchedule": {
+            "$ref": "#/components/schemas/BookingScheduleDto"
+          },
+          "specialist": {
+            "$ref": "#/components/schemas/SpecialistInfoDto"
+          },
+          "service": {
+            "$ref": "#/components/schemas/ServiceInfoDto"
+          },
+          "category": {
+            "$ref": "#/components/schemas/CategoryInfoDto"
+          },
+          "location": {
+            "$ref": "#/components/schemas/LocationInfoDto"
+          },
+          "priceBreakdown": {
+            "$ref": "#/components/schemas/PriceBreakdownDto"
+          }
+        },
+        "required": [
+          "isCompletedStep",
+          "specialist",
+          "service",
+          "category",
+          "location",
+          "priceBreakdown"
+        ]
+      },
+      "PublicCategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "name": {
+            "type": "string",
+            "example": "Spa & Massage"
+          },
+          "slug": {
+            "type": "string",
+            "example": "spa-massage"
+          },
+          "imageUrl": {
+            "type": "object",
+            "example": "https://example.com/category.jpg"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ]
+      },
+      "PublicFeatureTagDto": {
+        "type": "object",
+        "properties": {
+          "iconName": {
+            "type": "string",
+            "example": "schedule"
+          },
+          "label": {
+            "type": "string",
+            "example": "Pain Relief"
+          }
+        },
+        "required": [
+          "iconName",
+          "label"
+        ]
+      },
+      "PublicClinicDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Healytics Wellness Center"
+          },
+          "address": {
+            "type": "string",
+            "example": "123 Health Street, District 1, HCMC"
+          }
+        },
+        "required": [
+          "name",
+          "address"
+        ]
+      },
+      "PublicFacilityImageDto": {
+        "type": "object",
+        "properties": {
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/facility.jpg"
+          },
+          "label": {
+            "type": "string",
+            "example": "Treatment Room"
+          }
+        },
+        "required": [
+          "imageUrl",
+          "label"
+        ]
+      },
+      "PublicServiceTagDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "name": {
+            "type": "string",
+            "example": "Pain Relief"
+          },
+          "colorValue": {
+            "type": "string",
+            "example": "#FF4CAF50"
+          },
+          "description": {
+            "type": "object",
+            "example": "Pain management and relief services"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "colorValue"
+        ]
+      },
+      "PublicHealthServiceInfoResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/PublicCategoryDto"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.9
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 124
+          },
+          "price": {
+            "type": "string",
+            "example": "$350.00"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "example": true
+          },
+          "description": {
+            "type": "object"
+          },
+          "featureTags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicFeatureTagDto"
+            }
+          },
+          "clinic": {
+            "$ref": "#/components/schemas/PublicClinicDto"
+          },
+          "facilityImages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicFacilityImageDto"
+            }
+          },
+          "serviceTags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicServiceTagDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "category",
+          "images",
+          "rating",
+          "reviewCount",
+          "price",
+          "isVerified",
+          "featureTags",
+          "clinic",
+          "facilityImages",
+          "serviceTags"
+        ]
+      },
+      "PublicEmployeeTimeSlotDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "09:00 AM"
+          },
+          "isAvailable": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "label",
+          "isAvailable"
+        ]
+      },
+      "PublicHealthServiceEmployeeDayScheduleDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-03-25"
+          },
+          "isAvailable": {
+            "type": "boolean",
+            "example": true
+          },
+          "timeSlots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicEmployeeTimeSlotDto"
+            }
+          }
+        },
+        "required": [
+          "date",
+          "isAvailable",
+          "timeSlots"
+        ]
+      },
+      "PublicHealthServiceEmployeeResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Employee (specialist) ID"
+          },
+          "eligibilityId": {
+            "type": "string",
+            "description": "product_employee_eligibility surrogate PK for this employee–service pair"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "object"
+          },
+          "isSelected": {
+            "type": "boolean",
+            "example": false
+          },
+          "quote": {
+            "type": "object"
+          },
+          "degrees": {
+            "type": "object"
+          },
+          "languages": {
+            "type": "object"
+          },
+          "experience": {
+            "type": "object",
+            "example": "12 years"
+          },
+          "specializations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bio": {
+            "type": "object"
+          },
+          "daySchedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicHealthServiceEmployeeDayScheduleDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "eligibilityId",
+          "name",
+          "role",
+          "isSelected",
+          "daySchedules"
+        ]
+      },
+      "PublicHealthServiceReviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "reviewerName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5
+          },
+          "status": {
+            "type": "string",
+            "example": "Completed"
+          },
+          "date": {
+            "type": "string",
+            "example": "2025-05-11T00:00:00.000Z"
+          },
+          "text": {
+            "type": "string"
+          },
+          "imageUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "reviewerName",
+          "rating",
+          "status",
+          "date",
+          "text",
+          "imageUrls"
+        ]
+      },
+      "PublicHealthServiceRecommendedResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "object"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.9
+          },
+          "reviewLabel": {
+            "type": "string",
+            "example": "(500+ Reviews)"
+          },
+          "bookedLabel": {
+            "type": "string",
+            "example": "1.2k+ Booked"
+          },
+          "price": {
+            "type": "string",
+            "example": "350.000₫"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "rating",
+          "reviewLabel",
+          "bookedLabel",
+          "price"
+        ]
+      },
+      "PublicCategorySummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ]
+      },
+      "PublicHealthServiceMediaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique media identifier"
+          },
+          "url": {
+            "type": "string",
+            "description": "Media URL"
+          },
+          "mediaType": {
+            "type": "string",
+            "description": "Media type (image, video, etc.)"
+          },
+          "isThumbnail": {
+            "type": "boolean",
+            "description": "Whether this is the thumbnail"
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "Sort order for display"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "sortOrder"
+        ]
+      },
+      "PublicHealthServiceDefinitionDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "Product ID (primary key)"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "description": "Service duration in minutes"
+          },
+          "bufferMinutes": {
+            "type": "number",
+            "description": "Buffer time between appointments"
+          },
+          "maxCapacity": {
+            "type": "number",
+            "description": "Maximum capacity per slot"
+          },
+          "minLeadTimeHours": {
+            "type": "number",
+            "description": "Minimum lead time for booking (hours)"
+          },
+          "staffAssignmentType": {
+            "type": "string",
+            "description": "Staff assignment type"
+          }
+        },
+        "required": [
+          "productId",
+          "durationMinutes"
+        ]
+      },
+      "PublicHealthServiceEmployeeEligibilityDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "Product ID"
+          },
+          "employeeId": {
+            "type": "string",
+            "description": "Employee ID"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary employee"
+          }
+        },
+        "required": [
+          "productId",
+          "employeeId",
+          "isPrimary"
+        ]
+      },
+      "PublicHealthServiceResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name"
+          },
+          "slug": {
+            "type": "string",
+            "description": "URL-friendly slug"
+          },
+          "description": {
+            "type": "object",
+            "description": "Description"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "service"
+            ],
+            "description": "Type"
+          },
+          "basePrice": {
+            "type": "number",
+            "description": "Base price in specified currency"
+          },
+          "salePrice": {
+            "type": "object",
+            "description": "Sale price if on discount"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code (ISO 4217)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "active",
+              "archived"
+            ],
+            "description": "Status"
+          },
+          "isVisibleOnline": {
+            "type": "boolean",
+            "description": "Whether visible online"
+          },
+          "vendorName": {
+            "type": "object",
+            "description": "Vendor name"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update timestamp"
+          },
+          "category": {
+            "description": "Category",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicCategorySummaryDto"
+              }
+            ]
+          },
+          "media": {
+            "description": "Media assets",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicHealthServiceMediaDto"
+            }
+          },
+          "productDefinition": {
+            "description": "Definition for service type",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicHealthServiceDefinitionDto"
+              }
+            ]
+          },
+          "productEmployeeEligibilities": {
+            "description": "Eligible employees for service",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicHealthServiceEmployeeEligibilityDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "type",
+          "basePrice",
+          "currency",
+          "status",
+          "isVisibleOnline",
+          "createdAt",
+          "updatedAt"
+        ]
       },
       "CreateServiceTagDto": {
         "type": "object",
@@ -7579,6 +9355,690 @@
           "locked",
           "expiresIn"
         ]
+      },
+      "AppointmentResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "serviceName": {
+            "type": "string",
+            "example": "Thai Massage"
+          },
+          "vendorName": {
+            "type": "string",
+            "example": "Healytics Spa Center"
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "upcoming",
+              "completed",
+              "canceled"
+            ],
+            "example": "upcoming"
+          },
+          "category": {
+            "type": "string",
+            "example": "Spa & Wellness"
+          },
+          "providerName": {
+            "type": "string",
+            "example": "Dr. Jane Smith"
+          },
+          "providerId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "address": {
+            "type": "string",
+            "example": "123 Main Street, District 1"
+          },
+          "date": {
+            "type": "string",
+            "example": "2025-10-25T00:00:00.000Z"
+          },
+          "checkInTime": {
+            "type": "string",
+            "example": "09:00 AM"
+          },
+          "checkOutTime": {
+            "type": "string",
+            "example": "10:30 AM"
+          },
+          "duration": {
+            "type": "string",
+            "example": "90 min"
+          },
+          "isReviewed": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether the user has reviewed this appointment"
+          },
+          "distanceKm": {
+            "type": "number",
+            "example": 2.5,
+            "nullable": true,
+            "description": "Distance from user to clinic in kilometers (null if coordinates not provided)"
+          }
+        },
+        "required": [
+          "id",
+          "serviceName",
+          "vendorName",
+          "imageUrl",
+          "status",
+          "category",
+          "providerName",
+          "providerId",
+          "address",
+          "date",
+          "checkInTime",
+          "checkOutTime",
+          "duration",
+          "isReviewed",
+          "distanceKm"
+        ]
+      },
+      "AppointmentCategoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "name": {
+            "type": "string",
+            "example": "Spa & Wellness"
+          },
+          "iconSlug": {
+            "type": "string",
+            "example": "spa-wellness"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "iconSlug"
+        ]
+      },
+      "RecommendedServiceResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "name": {
+            "type": "string",
+            "example": "Deep Tissue Massage"
+          },
+          "description": {
+            "type": "string",
+            "example": "Full body deep tissue massage for relief"
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "price": {
+            "type": "string",
+            "example": "$120.00"
+          },
+          "duration": {
+            "type": "string",
+            "example": "60 min"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "imageUrl",
+          "price",
+          "duration"
+        ]
+      },
+      "ServiceRuleDto": {
+        "type": "object",
+        "properties": {
+          "iconSlug": {
+            "type": "string",
+            "example": "no-eating"
+          },
+          "title": {
+            "type": "string",
+            "example": "No Eating Before"
+          },
+          "description": {
+            "type": "string",
+            "example": "Avoid eating 2 hours before the service"
+          }
+        },
+        "required": [
+          "iconSlug",
+          "title",
+          "description"
+        ]
+      },
+      "ProcedureStepDto": {
+        "type": "object",
+        "properties": {
+          "stepNumber": {
+            "type": "number",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Check-in & Registration"
+          },
+          "description": {
+            "type": "string",
+            "example": "Arrive at the reception and complete registration"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "stepNumber",
+          "title",
+          "description",
+          "isActive"
+        ]
+      },
+      "FacilityDto": {
+        "type": "object",
+        "properties": {
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/facility.jpg"
+          },
+          "name": {
+            "type": "string",
+            "example": "Sauna Room"
+          }
+        },
+        "required": [
+          "imageUrl",
+          "name"
+        ]
+      },
+      "ReviewSummaryDto": {
+        "type": "object",
+        "properties": {
+          "averageRating": {
+            "type": "number",
+            "example": 4.8
+          },
+          "reviewerName": {
+            "type": "string",
+            "example": "Jane Doe"
+          },
+          "reviewText": {
+            "type": "string",
+            "example": "Excellent service! Very relaxing."
+          },
+          "starCount": {
+            "type": "number",
+            "example": 5
+          }
+        },
+        "required": [
+          "averageRating",
+          "reviewerName",
+          "reviewText",
+          "starCount"
+        ]
+      },
+      "ServiceManualResponseDto": {
+        "type": "object",
+        "properties": {
+          "serviceName": {
+            "type": "string",
+            "example": "Thai Massage"
+          },
+          "vendorName": {
+            "type": "string",
+            "example": "Healytics Spa Center"
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/image.jpg"
+          },
+          "preServiceGuidelines": {
+            "example": [
+              "Avoid heavy meals",
+              "Wear comfortable clothing"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "serviceRules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRuleDto"
+            }
+          },
+          "procedureSteps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProcedureStepDto"
+            }
+          },
+          "facilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FacilityDto"
+            }
+          },
+          "review": {
+            "$ref": "#/components/schemas/ReviewSummaryDto"
+          }
+        },
+        "required": [
+          "serviceName",
+          "vendorName",
+          "imageUrl",
+          "preServiceGuidelines",
+          "serviceRules",
+          "procedureSteps",
+          "facilities"
+        ]
+      },
+      "AiRecommendationsRequestDto": {
+        "type": "object",
+        "properties": {
+          "serviceIds": {
+            "description": "List of service IDs to retrieve recommendations for",
+            "example": [
+              "SV002",
+              "SV005"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "serviceIds"
+        ]
+      },
+      "AiPriceDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 800000
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          }
+        },
+        "required": [
+          "amount",
+          "currency"
+        ]
+      },
+      "AiRatingDto": {
+        "type": "object",
+        "properties": {
+          "average": {
+            "type": "number",
+            "example": 4.8
+          },
+          "total_reviews": {
+            "type": "number",
+            "example": 124
+          }
+        },
+        "required": [
+          "average",
+          "total_reviews"
+        ]
+      },
+      "AiLocationDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "example": "123 Nguyễn Huệ"
+          },
+          "district": {
+            "type": "string",
+            "example": "Quận 1"
+          },
+          "city": {
+            "type": "string",
+            "example": "Hồ Chí Minh"
+          }
+        },
+        "required": [
+          "address",
+          "district",
+          "city"
+        ]
+      },
+      "AiRecommendationItemDto": {
+        "type": "object",
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "example": "SV002"
+          },
+          "name": {
+            "type": "string",
+            "example": "Phục hồi cột sống chuyên sâu"
+          },
+          "image_url": {
+            "type": "object",
+            "example": "https://images.unsplash.com/photo-..."
+          },
+          "badge": {
+            "type": "object",
+            "example": "Premium"
+          },
+          "booked_count": {
+            "type": "number",
+            "example": 1200
+          },
+          "price": {
+            "$ref": "#/components/schemas/AiPriceDto"
+          },
+          "staff_name": {
+            "type": "object",
+            "example": "BS Nguyễn Văn A"
+          },
+          "rating": {
+            "$ref": "#/components/schemas/AiRatingDto"
+          },
+          "location": {
+            "$ref": "#/components/schemas/AiLocationDto"
+          },
+          "slots": {
+            "example": [
+              "2026-02-21T09:00:00"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "service_id",
+          "name",
+          "booked_count",
+          "price",
+          "rating",
+          "location",
+          "slots"
+        ]
+      },
+      "AiRecommendationsResponseDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number",
+            "example": 2
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiRecommendationItemDto"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "recommendations"
+        ]
+      },
+      "CreateTreatmentReviewDto": {
+        "type": "object",
+        "properties": {
+          "appointmentId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "description": "ID of the completed appointment to review"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4,
+            "description": "Rating from 1 to 5"
+          },
+          "comment": {
+            "type": "string",
+            "example": "Great session, very relaxing atmosphere.",
+            "description": "Free-text comment (max 2000 chars)"
+          },
+          "tags": {
+            "example": [
+              "On-time",
+              "Relaxing",
+              "Clean"
+            ],
+            "description": "Feedback tags (max 10)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "photoKeys": {
+            "example": [
+              "review-photos/1234-photo1.jpg"
+            ],
+            "description": "S3 keys of uploaded photos (max 5). Upload via POST /v1/s3/presign first.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "appointmentId",
+          "rating"
+        ]
+      },
+      "TreatmentReviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "appointmentId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4
+          },
+          "comment": {
+            "type": "object",
+            "example": "Great session, very relaxing atmosphere."
+          },
+          "tags": {
+            "example": [
+              "On-time",
+              "Relaxing",
+              "Clean"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "photoUrls": {
+            "example": [
+              "https://cdn.healytics.com/reviews/photo1.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-03-29T13:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "appointmentId",
+          "rating",
+          "tags",
+          "photoUrls",
+          "createdAt"
+        ]
+      },
+      "CreateSpecialistReviewDto": {
+        "type": "object",
+        "properties": {
+          "appointmentId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "description": "ID of the completed appointment"
+          },
+          "specialistId": {
+            "type": "string",
+            "example": "660e8400-e29b-41d4-a716-556655440000",
+            "description": "ID of the specialist/employee who performed the service"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5,
+            "description": "Rating from 1 to 5"
+          },
+          "comment": {
+            "type": "string",
+            "example": "Very attentive and professional throughout.",
+            "description": "Free-text comment (max 2000 chars)"
+          },
+          "tags": {
+            "example": [
+              "Professional",
+              "Attentive"
+            ],
+            "description": "Feedback tags (max 10)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "wouldRecommend": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the user would recommend this specialist"
+          }
+        },
+        "required": [
+          "appointmentId",
+          "specialistId",
+          "rating",
+          "wouldRecommend"
+        ]
+      },
+      "SpecialistReviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "appointmentId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "specialistId": {
+            "type": "string",
+            "example": "660e8400-e29b-41d4-a716-556655440000"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5
+          },
+          "comment": {
+            "type": "object",
+            "example": "Very attentive and professional throughout."
+          },
+          "tags": {
+            "example": [
+              "Professional",
+              "Attentive"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "wouldRecommend": {
+            "type": "boolean",
+            "example": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-03-29T13:01:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "appointmentId",
+          "specialistId",
+          "rating",
+          "tags",
+          "wouldRecommend",
+          "createdAt"
+        ]
+      },
+      "MoMoIPNDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateMoMoPaymentDto": {
+        "type": "object",
+        "properties": {
+          "requestType": {
+            "type": "string",
+            "example": "captureWallet",
+            "description": "MoMo request type: captureWallet | payWithATM | payWithCC"
+          }
+        }
+      },
+      "MoMoPaymentResponseDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateMoMoRefundDto": {
+        "type": "object",
+        "properties": {
+          "transId": {
+            "type": "number",
+            "example": 987654321,
+            "description": "MoMo transaction ID from the original payment (required for refund)"
+          }
+        },
+        "required": [
+          "transId"
+        ]
+      },
+      "MoMoRefundResponseDto": {
+        "type": "object",
+        "properties": {}
       },
       "ChatbotRecommendationResponse": {
         "properties": {

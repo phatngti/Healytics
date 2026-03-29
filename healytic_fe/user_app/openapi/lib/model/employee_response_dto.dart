@@ -18,7 +18,6 @@ class EmployeeResponseDto {
     this.firstName,
     this.lastName,
     required this.fullName,
-    this.displayName,
     required this.email,
     this.phone,
     this.avatarUrl,
@@ -28,8 +27,9 @@ class EmployeeResponseDto {
     this.description,
     this.emergencyContactName,
     this.emergencyContactPhone,
-    this.idCardUrl,
+    this.verificationDocuments = const [],
     this.schedule = const [],
+    this.workHistory = const [],
     this.dob,
     this.gender,
     required this.role,
@@ -69,15 +69,6 @@ class EmployeeResponseDto {
 
   /// Full name
   String fullName;
-
-  /// Display name
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? displayName;
 
   /// Email address
   String email;
@@ -154,17 +145,14 @@ class EmployeeResponseDto {
   ///
   Object? emergencyContactPhone;
 
-  /// ID card URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? idCardUrl;
+  /// Verification documents
+  List<VerificationDocumentEntryDto> verificationDocuments;
 
   /// Work schedule
   List<WorkScheduleEntryDto> schedule;
+
+  /// Work history
+  List<WorkHistoryEntryDto> workHistory;
 
   /// Date of birth
   ///
@@ -230,7 +218,6 @@ class EmployeeResponseDto {
     other.firstName == firstName &&
     other.lastName == lastName &&
     other.fullName == fullName &&
-    other.displayName == displayName &&
     other.email == email &&
     other.phone == phone &&
     other.avatarUrl == avatarUrl &&
@@ -240,8 +227,9 @@ class EmployeeResponseDto {
     other.description == description &&
     other.emergencyContactName == emergencyContactName &&
     other.emergencyContactPhone == emergencyContactPhone &&
-    other.idCardUrl == idCardUrl &&
+    _deepEquality.equals(other.verificationDocuments, verificationDocuments) &&
     _deepEquality.equals(other.schedule, schedule) &&
+    _deepEquality.equals(other.workHistory, workHistory) &&
     other.dob == dob &&
     other.gender == gender &&
     other.role == role &&
@@ -262,7 +250,6 @@ class EmployeeResponseDto {
     (firstName == null ? 0 : firstName!.hashCode) +
     (lastName == null ? 0 : lastName!.hashCode) +
     (fullName.hashCode) +
-    (displayName == null ? 0 : displayName!.hashCode) +
     (email.hashCode) +
     (phone == null ? 0 : phone!.hashCode) +
     (avatarUrl == null ? 0 : avatarUrl!.hashCode) +
@@ -272,8 +259,9 @@ class EmployeeResponseDto {
     (description == null ? 0 : description!.hashCode) +
     (emergencyContactName == null ? 0 : emergencyContactName!.hashCode) +
     (emergencyContactPhone == null ? 0 : emergencyContactPhone!.hashCode) +
-    (idCardUrl == null ? 0 : idCardUrl!.hashCode) +
+    (verificationDocuments.hashCode) +
     (schedule.hashCode) +
+    (workHistory.hashCode) +
     (dob == null ? 0 : dob!.hashCode) +
     (gender == null ? 0 : gender!.hashCode) +
     (role.hashCode) +
@@ -287,7 +275,7 @@ class EmployeeResponseDto {
     (therapistProfile == null ? 0 : therapistProfile!.hashCode);
 
   @override
-  String toString() => 'EmployeeResponseDto[id=$id, employeeCode=$employeeCode, firstName=$firstName, lastName=$lastName, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, description=$description, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, idCardUrl=$idCardUrl, schedule=$schedule, dob=$dob, gender=$gender, role=$role, status=$status, rating=$rating, reviewCount=$reviewCount, partnerId=$partnerId, createdAt=$createdAt, updatedAt=$updatedAt, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
+  String toString() => 'EmployeeResponseDto[id=$id, employeeCode=$employeeCode, firstName=$firstName, lastName=$lastName, fullName=$fullName, email=$email, phone=$phone, avatarUrl=$avatarUrl, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, description=$description, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, verificationDocuments=$verificationDocuments, schedule=$schedule, workHistory=$workHistory, dob=$dob, gender=$gender, role=$role, status=$status, rating=$rating, reviewCount=$reviewCount, partnerId=$partnerId, createdAt=$createdAt, updatedAt=$updatedAt, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -304,11 +292,6 @@ class EmployeeResponseDto {
       json[r'lastName'] = null;
     }
       json[r'fullName'] = this.fullName;
-    if (this.displayName != null) {
-      json[r'displayName'] = this.displayName;
-    } else {
-      json[r'displayName'] = null;
-    }
       json[r'email'] = this.email;
     if (this.phone != null) {
       json[r'phone'] = this.phone;
@@ -350,12 +333,9 @@ class EmployeeResponseDto {
     } else {
       json[r'emergencyContactPhone'] = null;
     }
-    if (this.idCardUrl != null) {
-      json[r'idCardUrl'] = this.idCardUrl;
-    } else {
-      json[r'idCardUrl'] = null;
-    }
+      json[r'verificationDocuments'] = this.verificationDocuments;
       json[r'schedule'] = this.schedule;
+      json[r'workHistory'] = this.workHistory;
     if (this.dob != null) {
       json[r'dob'] = this.dob;
     } else {
@@ -414,7 +394,6 @@ class EmployeeResponseDto {
         firstName: mapValueOfType<Object>(json, r'firstName'),
         lastName: mapValueOfType<Object>(json, r'lastName'),
         fullName: mapValueOfType<String>(json, r'fullName')!,
-        displayName: mapValueOfType<Object>(json, r'displayName'),
         email: mapValueOfType<String>(json, r'email')!,
         phone: mapValueOfType<Object>(json, r'phone'),
         avatarUrl: mapValueOfType<Object>(json, r'avatarUrl'),
@@ -424,8 +403,9 @@ class EmployeeResponseDto {
         description: mapValueOfType<Object>(json, r'description'),
         emergencyContactName: mapValueOfType<Object>(json, r'emergencyContactName'),
         emergencyContactPhone: mapValueOfType<Object>(json, r'emergencyContactPhone'),
-        idCardUrl: mapValueOfType<Object>(json, r'idCardUrl'),
+        verificationDocuments: VerificationDocumentEntryDto.listFromJson(json[r'verificationDocuments']),
         schedule: WorkScheduleEntryDto.listFromJson(json[r'schedule']),
+        workHistory: WorkHistoryEntryDto.listFromJson(json[r'workHistory']),
         dob: mapValueOfType<Object>(json, r'dob'),
         gender: EmployeeResponseDtoGenderEnum.fromJson(json[r'gender']),
         role: EmployeeResponseDtoRoleEnum.fromJson(json[r'role'])!,

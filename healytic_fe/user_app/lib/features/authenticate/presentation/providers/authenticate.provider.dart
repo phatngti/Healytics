@@ -35,9 +35,18 @@ class AuthenticateNotifier extends _$AuthenticateNotifier {
 
       // Persist tokens so the router guard recognises
       // the session as authenticated.
-      await Store.put(StoreKey.accessToken, authenticate.accessToken);
+      await Store.put(
+        StoreKey.accessToken,
+        authenticate.accessToken,
+      );
+      await Store.put(
+        StoreKey.refreshToken,
+        authenticate.refreshToken,
+      );
 
-      state = AsyncData(AuthenticateStateData(authenticate: authenticate));
+      state = AsyncData(
+        AuthenticateStateData(authenticate: authenticate),
+      );
     } on ApiException catch (e) {
       state = AsyncError<AuthenticateStateData>(
         errorMessageCode(e.code),

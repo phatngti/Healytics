@@ -95,6 +95,12 @@ void main() {
       // TODO
     });
 
+    // Service manual (guidelines, rules, procedure steps)
+    // ServiceManualInputDto serviceManual
+    test('to test the property `serviceManual`', () async {
+      // TODO
+    });
+
 
   });
 

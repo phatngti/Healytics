@@ -1,0 +1,64 @@
+---
+description: Workflow for creating a new Freezed domain entity with proper immutability, JSON serialization, and code generation.
+globs: "**/domain/entities/**"
+alwaysApply: false
+---
+
+# Create Entity Workflow
+
+## Input Required
+- `<feature_name>`: The feature this entity belongs to
+- `<entity_name>`: Entity name (PascalCase, e.g., `Appointment`)
+- `<fields>`: List of fields with types and names
+- `<needs_json>`: Whether JSON serialization is needed (true/false)
+
+## Steps
+
+1. **Create entity file:** `lib/features/<feature_name>/domain/entities/<entity_name_snake>.entity.dart`:
+   ```dart
+   import 'package:freezed_annotation/freezed_annotation.dart';
+
+   part '<entity_name_snake>.entity.freezed.dart';
+   part '<entity_name_snake>.entity.g.dart'; // Only if needs_json
+
+   @freezed
+   class <EntityName> with _$<EntityName> {
+     const factory <EntityName>({
+       required String id,
+       required String name,
+       @Default(false) bool isActive,
+     }) = _<EntityName>;
+
+     factory <EntityName>.fromJson(Map<String, dynamic> json) =>
+         _$<EntityName>FromJson(json);
+   }
+   ```
+
+2. **For sealed union types** (state modeling):
+   ```dart
+   @freezed
+   sealed class <EntityName>State with _$<EntityName>State {
+     const factory <EntityName>State.initial() = _Initial;
+     const factory <EntityName>State.loading() = _Loading;
+     const factory <EntityName>State.loaded(<EntityName> data) = _Loaded;
+     const factory <EntityName>State.error(String message) = _Error;
+   }
+   ```
+
+3. **JSON considerations:**
+   - Use `@JsonSerializable(fieldRename: FieldRename.snake)` for API models.
+   - Use `@JsonKey(name: 'custom_name')` for non-standard field mappings.
+   - Use `@Default(value)` for optional fields with defaults.
+
+4. **Run code generation:**
+   ```bash
+   dart run build_runner build --delete-conflicting-outputs
+   ```
+
+5. **Verify:** Check `.freezed.dart` and `.g.dart` files. Run `dart analyze`.
+
+## Rules
+- Domain entities must be pure Dart — no Flutter imports.
+- Use `const factory` constructors.
+- Prefer `required` parameters over optional ones.
+- Document public fields with `///` comments.

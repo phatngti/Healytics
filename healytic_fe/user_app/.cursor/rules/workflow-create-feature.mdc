@@ -1,0 +1,62 @@
+---
+description: Workflow for scaffolding a complete new feature module following Clean Architecture with all layers, data sources, and providers.
+globs: "**/features/**"
+alwaysApply: false
+---
+
+# Create Feature Workflow
+
+## Input Required
+- `<feature_name>`: Feature name (snake_case, e.g., `appointments`)
+- `<entity_name>`: Primary entity name (PascalCase, e.g., `Appointment`)
+- `<entity_fields>`: Key fields for the entity
+
+## Steps
+
+1. **Create folder structure:**
+   ```
+   lib/features/<feature_name>/
+   ├── data/
+   │   ├── datasources/remote/
+   │   │   └── <feature_name>_remote_datasource.dart
+   │   ├── repositories/
+   │   │   └── <feature_name>_impl.repository.dart
+   │   └── provider/
+   │       └── <feature_name>.provider.dart
+   ├── domain/
+   │   ├── entities/
+   │   │   └── <feature_name>.entity.dart
+   │   └── repositories/
+   │       └── <feature_name>.repository.dart
+   └── presentation/
+       ├── providers/
+       │   └── <feature_name>.provider.dart
+       ├── screens/
+       │   └── <feature_name>.screen.dart
+       └── widgets/
+   ```
+
+2. **Create domain entity:** `@freezed` class, pure Dart, no Flutter imports.
+
+3. **Create repository interface:** Abstract class in `domain/repositories/`.
+
+4. **Create remote data source:** ONE file with 3 parts (interface, impl, mock).
+
+5. **Create mock data file:** If complex, separate `*_mock_data.dart`.
+
+6. **Create repository implementation:** Delegates to data source.
+
+7. **Create data provider:** `@riverpod` with `Ref ref`, mock/real switching.
+
+8. **Create presentation provider:** `@riverpod` notifier managing UI state via repository.
+
+9. **Create screen:** `ConsumerWidget` or `HookConsumerWidget` watching the provider.
+
+10. **Add route:** `TypedGoRoute` in `lib/router/routes.dart`.
+
+11. **Run code generation:**
+    ```bash
+    dart run build_runner build --delete-conflicting-outputs
+    ```
+
+12. **Verify:** `dart analyze` to check for errors.

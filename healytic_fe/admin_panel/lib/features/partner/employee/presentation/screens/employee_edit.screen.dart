@@ -49,9 +49,22 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
       'phone_number': employee.phone,
       'avatar_url': employee.avatar,
       'employee_role': _selectedRole,
-      'license_file': employee.licenseUrl,
-      'id_card_file': employee.idCardUrl,
-      'additional_documents': employee.documents,
+      'verification_documents': employee
+          .verificationDocuments
+          .map(
+            (d) => {
+              'fieldKey': d.fieldKey,
+              'documents': d.documents
+                  .map(
+                    (doc) => {
+                      'name': doc.name,
+                      'url': doc.url,
+                    },
+                  )
+                  .toList(),
+            },
+          )
+          .toList(),
       'date_of_birth': _parseDate(employee.dateOfBirth),
       'gender': _mapGender(employee.gender),
       'employment_type': employee.employmentType,
@@ -154,15 +167,8 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
           city: employee.city,
           state: employee.state,
           country: employee.country,
-          licenseUrl: values['license_file'] is String
-              ? values['license_file'] as String?
-              : employee.licenseUrl,
-          idCardUrl: values['id_card_file'] is String
-              ? values['id_card_file'] as String?
-              : employee.idCardUrl,
-          documents: values['additional_documents'] is List<String>
-              ? values['additional_documents'] as List<String>
-              : employee.documents,
+          verificationDocuments:
+              _collectVerificationDocs(values),
         );
 
         await ref.read(employeeProvider.notifier).updateEmployee(request);
@@ -197,6 +203,21 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
     setState(() {
       _selectedRole = role;
     });
+  }
+
+  /// Collects verification documents from
+  /// form values.
+  List<Map<String, dynamic>>
+      _collectVerificationDocs(
+    Map<String, dynamic> values,
+  ) {
+    final raw = values['verification_documents'];
+    if (raw is List) {
+      return raw
+          .whereType<Map<String, dynamic>>()
+          .toList();
+    }
+    return [];
   }
 
   @override

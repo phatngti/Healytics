@@ -1,0 +1,78 @@
+---
+description: Workflow for adding a new screen to an existing feature with routing, provider, and proper widget structure.
+globs: "**/screens/**"
+alwaysApply: false
+---
+
+# Create Screen Workflow
+
+## Input Required
+- `<feature_name>`: Existing feature (e.g., `home`)
+- `<screen_name>`: New screen name (snake_case, e.g., `product_details`)
+- `<route_path>`: URL path (e.g., `/product-details`)
+- `<route_params>`: Required route parameters (e.g., `productId: String`)
+
+## Steps
+
+1. **Create the screen file** at `lib/features/<feature_name>/presentation/screens/<screen_name>.screen.dart`:
+   - Use `ConsumerWidget` or `HookConsumerWidget`.
+   - Accept route parameters as constructor arguments.
+   - Watch relevant providers in `build()`.
+   - Use `Theme.of(context)` for all styling.
+   - Add `const` constructor.
+
+   ```dart
+   class ProductDetailsScreen extends ConsumerWidget {
+     const ProductDetailsScreen({
+       super.key,
+       required this.productId,
+     });
+     final String productId;
+
+     @override
+     Widget build(BuildContext context, WidgetRef ref) {
+       return Scaffold(
+         appBar: AppBar(
+           title: Text('Details', style: Theme.of(context).textTheme.titleLarge),
+         ),
+         body: const Center(child: Text('Content')),
+       );
+     }
+   }
+   ```
+
+2. **Create supporting widgets:** If >150 lines or 3+ sub-widgets, create `presentation/widgets/<screen_name>/` directory. See refactor-screen-widgets workflow.
+
+3. **Create presentation provider (if needed):** `@riverpod` notifier for screen-specific state.
+
+4. **Add route definition** in `lib/router/routes.dart`:
+   - Determine route type: main tab, auth flow, standalone, or nested.
+   - Create `GoRouteData` class with parameters.
+   - Add `TypedGoRoute` annotation.
+   - Use `_buildSlideTransitionPage` for transitions.
+
+   ```dart
+   class ProductDetailsRoute extends GoRouteData {
+     const ProductDetailsRoute({required this.productId});
+     final String productId;
+
+     @override
+     Page<void> buildPage(BuildContext context, GoRouterState state) =>
+         _buildSlideTransitionPage(
+           state: state,
+           child: ProductDetailsScreen(productId: productId),
+         );
+   }
+   ```
+
+5. **Run code generation:**
+   ```bash
+   dart run build_runner build --delete-conflicting-outputs
+   ```
+
+6. **Verify navigation:**
+   ```dart
+   const ProductDetailsRoute(productId: '123').push(context);
+   ```
+
+7. **Run analysis:** `dart analyze`

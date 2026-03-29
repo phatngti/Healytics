@@ -16,12 +16,6 @@ void main() {
   // final instance = UpdateEmployeeDto();
 
   group('test UpdateEmployeeDto', () {
-    // Authentication ID from external provider
-    // String authId
-    test('to test the property `authId`', () async {
-      // TODO
-    });
-
     // Unique employee code
     // String employeeCode
     test('to test the property `employeeCode`', () async {
@@ -43,12 +37,6 @@ void main() {
     // Full name of the employee
     // String fullName
     test('to test the property `fullName`', () async {
-      // TODO
-    });
-
-    // Display name
-    // String displayName
-    test('to test the property `displayName`', () async {
       // TODO
     });
 
@@ -94,12 +82,6 @@ void main() {
       // TODO
     });
 
-    // Branch ID the employee belongs to
-    // String branchId
-    test('to test the property `branchId`', () async {
-      // TODO
-    });
-
     // Partner ID the employee belongs to
     // String partnerId
     test('to test the property `partnerId`', () async {
@@ -136,9 +118,9 @@ void main() {
       // TODO
     });
 
-    // ID card URL
-    // String idCardUrl
-    test('to test the property `idCardUrl`', () async {
+    // Verification documents (ID card, licenses, etc.)
+    // List<VerificationDocumentEntryDto> verificationDocuments (default value: const [])
+    test('to test the property `verificationDocuments`', () async {
       // TODO
     });
 
@@ -148,15 +130,15 @@ void main() {
       // TODO
     });
 
-    // Account password
-    // String password
-    test('to test the property `password`', () async {
-      // TODO
-    });
-
     // Weekly work schedule
     // List<WorkScheduleEntryDto> schedule (default value: const [])
     test('to test the property `schedule`', () async {
+      // TODO
+    });
+
+    // Work history entries
+    // List<WorkHistoryEntryDto> workHistory (default value: const [])
+    test('to test the property `workHistory`', () async {
       // TODO
     });
 

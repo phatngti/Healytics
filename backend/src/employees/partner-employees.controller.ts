@@ -26,6 +26,7 @@ import { CreateSpaTherapistDto, CreateMassageTherapistDto } from './dto/create-t
 import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { EmployeeResponseDto } from './dto/employee-response.dto';
+import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 /**
  * Partner controller for employee management.

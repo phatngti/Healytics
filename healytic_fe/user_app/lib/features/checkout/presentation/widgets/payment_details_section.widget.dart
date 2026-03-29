@@ -1,3 +1,4 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 /// Payment details breakdown showing subtotal,
@@ -20,32 +21,46 @@ class PaymentDetailsSection extends StatelessWidget {
 
   int get _total {
     final coins = useCoins ? coinsUsed : 0;
-    return subtotal - shopDiscount - platformVoucher - coins;
+    return subtotal -
+        shopDiscount -
+        platformVoucher -
+        coins;
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final pad = AppDimens.cardPadding(context);
+    final radius = AppDimens.cardRadius(context);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(pad),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(radius),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+          color: colorScheme.outlineVariant
+              .withValues(alpha: 0.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow
+                .withValues(alpha: 0.08),
+            blurRadius: AppDimens.spaceMd,
+            offset: const Offset(
+              0,
+              AppDimens.spaceXxs,
+            ),
           ),
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 6),
+            color: colorScheme.shadow
+                .withValues(alpha: 0.04),
+            blurRadius: AppDimens.spaceXxl,
+            offset: const Offset(
+              0,
+              AppDimens.spaceXs + 2,
+            ),
           ),
         ],
       ),
@@ -59,61 +74,74 @@ class PaymentDetailsSection extends StatelessWidget {
               color: colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 16),
-          _buildRow(context, 'Subtotal', _formatCurrency(subtotal)),
-          const SizedBox(height: 12),
-          _buildRow(
-            context,
-            'Shop Discount',
-            '-${_formatCurrency(shopDiscount)}',
+          AppDimens.verticalMedium,
+          _DetailRow(
+            label: 'Subtotal',
+            value: _formatCurrency(subtotal),
+          ),
+          AppDimens.verticalMediumSmall,
+          _DetailRow(
+            label: 'Shop Discount',
+            value:
+                '-${_formatCurrency(shopDiscount)}',
             isDiscount: true,
           ),
-          const SizedBox(height: 12),
-          _buildRow(
-            context,
-            'Platform Voucher',
-            '-${_formatCurrency(platformVoucher)}',
+          AppDimens.verticalMediumSmall,
+          _DetailRow(
+            label: 'Platform Voucher',
+            value:
+                '-${_formatCurrency(platformVoucher)}',
             isDiscount: true,
           ),
           if (useCoins) ...[
-            const SizedBox(height: 12),
-            _buildRow(
-              context,
-              'Coins Used',
-              '-${_formatCurrency(coinsUsed)}',
+            AppDimens.verticalMediumSmall,
+            _DetailRow(
+              label: 'Coins Used',
+              value:
+                  '-${_formatCurrency(coinsUsed)}',
               isDiscount: true,
             ),
           ],
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1, color: colorScheme.outlineVariant),
+            padding: EdgeInsets.symmetric(
+              vertical: AppDimens.contentPadding(
+                context,
+              ),
+            ),
+            child: Divider(
+              height: 1,
+              color: colorScheme.outlineVariant,
+            ),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment:
+                MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Total Payment',
-                style: textTheme.titleSmall?.copyWith(
+                style:
+                    textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
                 ),
               ),
               Text(
                 _formatCurrency(_total),
-                style: textTheme.titleMedium?.copyWith(
+                style:
+                    textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.primary,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          AppDimens.verticalExtraSmall,
           Align(
             alignment: Alignment.centerRight,
             child: Text(
               '(VAT Included)',
-              style: textTheme.labelSmall?.copyWith(
-                fontSize: 10,
+              style:
+                  textTheme.labelSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
@@ -123,17 +151,37 @@ class PaymentDetailsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(
-    BuildContext context,
-    String label,
-    String value, {
-    bool isDiscount = false,
-  }) {
+  String _formatCurrency(int amount) {
+    final formatted =
+        amount.toString().replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]},',
+    );
+    return '$formattedđ';
+  }
+}
+
+/// A single row showing a label and value pair in
+/// the payment breakdown.
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool isDiscount;
+
+  const _DetailRow({
+    required this.label,
+    required this.value,
+    this.isDiscount = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment:
+          MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
@@ -145,18 +193,12 @@ class PaymentDetailsSection extends StatelessWidget {
           value,
           style: textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w500,
-            color: isDiscount ? colorScheme.error : colorScheme.onSurface,
+            color: isDiscount
+                ? colorScheme.error
+                : colorScheme.onSurface,
           ),
         ),
       ],
     );
-  }
-
-  String _formatCurrency(int amount) {
-    final formatted = amount.toString().replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]},',
-    );
-    return '$formattedđ';
   }
 }

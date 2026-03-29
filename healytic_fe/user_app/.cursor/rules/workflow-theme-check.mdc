@@ -1,0 +1,54 @@
+---
+description: Workflow for scanning the codebase for theme-related violations and providing auto-fix suggestions for hardcoded colors, text styles, and deprecated APIs.
+globs: "{**/*.screen.dart,**/*.widget.dart}"
+alwaysApply: false
+---
+
+# Theme Check Workflow
+
+## Steps
+
+1. **Scan for hardcoded colors** in `lib/` `.dart` files:
+   - `Colors.` (excluding theme files, comments)
+   - `Color(0x` — hex color literals
+   - `Color.fromRGBO(` — RGBO color literals
+
+   Mapping:
+   | Hardcoded | Replace With |
+   |-----------|-------------|
+   | `Colors.blue`, `Colors.deepPurple` | `colorScheme.primary` |
+   | `Colors.grey` | `colorScheme.outline` or `colorScheme.onSurface` |
+   | `Colors.white` | `colorScheme.surface` or `colorScheme.onPrimary` |
+   | `Colors.black` | `colorScheme.onSurface` |
+   | `Colors.red` | `colorScheme.error` |
+   | `Colors.green` | Use `ThemeExtension` for semantic `success` |
+
+2. **Scan for hardcoded text styles:**
+   | Hardcoded | Replace With |
+   |-----------|-------------|
+   | `TextStyle(fontSize: 24, fontWeight: FontWeight.bold)` | `textTheme.headlineMedium` |
+   | `TextStyle(fontSize: 16)` | `textTheme.bodyLarge` |
+   | `TextStyle(fontSize: 14)` | `textTheme.bodyMedium` |
+   | `TextStyle(fontSize: 12)` | `textTheme.bodySmall` |
+
+3. **Scan for deprecated APIs:**
+   `.withOpacity(` → `.withValues(alpha:)`.
+
+4. **Scan for magic numbers** in spacing:
+   - `EdgeInsets.*` with literal numbers
+   - `SizedBox(height:` / `SizedBox(width:` with literal numbers
+   - `BorderRadius.circular(` with literal numbers
+   Flag any not using `Demensions.*` constants.
+
+5. **Report violations** with file paths and line numbers.
+
+6. **Auto-fix (with user confirmation):**
+   - Replace `.withOpacity(N)` → `.withValues(alpha: N)`
+   - Replace common `Colors.*` → `Theme.of(context).colorScheme.*`
+
+7. **Exceptions (do NOT flag):**
+   - Theme definition files (`lib/theme/`)
+   - Color constants in design token files
+   - Comments and documentation
+   - Test files
+   - Generated files (`*.g.dart`, `*.freezed.dart`)

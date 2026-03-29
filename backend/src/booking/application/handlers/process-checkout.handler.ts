@@ -1,5 +1,5 @@
 import {
-  Injectable,
+  Controller,
   Logger,
 } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
@@ -26,7 +26,7 @@ interface CheckoutMessage {
   webhookUrl?: string;
 }
 
-@Injectable()
+@Controller()
 export class ProcessCheckoutHandler {
   private readonly logger = new Logger(ProcessCheckoutHandler.name);
 

@@ -46,7 +46,7 @@ export const RABBITMQ_CLIENT = 'RABBITMQ_CLIENT';
               queueOptions: {
                 durable: true, // survive broker restarts
               },
-              noAck: false, // require manual acknowledgment
+              noAck: true, // client-side must be true; RMQ direct reply-to doesn't support manual ack
               prefetchCount: 1, // process one message at a time (FIFO)
               socketOptions,
             },

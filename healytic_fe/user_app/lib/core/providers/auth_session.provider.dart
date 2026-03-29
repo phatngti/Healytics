@@ -39,6 +39,19 @@ class AuthSessionStore {
     return null;
   }
 
+  /// Returns the current user's UUID from the JWT
+  /// `sub` claim, or `null` if unavailable.
+  String? get currentUserId {
+    final token = Store.tryGet(StoreKey.accessToken);
+    if (token == null || token.isEmpty) return null;
+    try {
+      final claims = JwtDecoder.decode(token);
+      return claims['sub'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Validates the stored access token exists and has
   /// not expired.
   bool _isTokenValid() {
@@ -54,7 +67,12 @@ class AuthSessionStore {
 
   void _clearSession() {
     Store.delete(StoreKey.accessToken);
+    Store.delete(StoreKey.refreshToken);
   }
+
+  /// Clears all tokens and forces the user back to
+  /// the login screen via the router guard.
+  void forceLogout() => _clearSession();
 }
 
 final authSessionStoreProvider = Provider<AuthSessionStore>((ref) {
@@ -63,4 +81,10 @@ final authSessionStoreProvider = Provider<AuthSessionStore>((ref) {
 
 final currentUserDisplayNameProvider = Provider<String?>((ref) {
   return ref.watch(authSessionStoreProvider).currentUserDisplayName;
+});
+
+/// Provides the current user's UUID extracted from
+/// the JWT `sub` claim.
+final currentUserIdProvider = Provider<String?>((ref) {
+  return ref.watch(authSessionStoreProvider).currentUserId;
 });

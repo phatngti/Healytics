@@ -57,6 +57,10 @@ export class CategoryResponseDto {
   isActive: boolean;
 
   @Expose()
+  @ApiPropertyOptional({ description: 'Category type for UI grouping', default: 'primary' })
+  categoryType: string;
+
+  @Expose()
   @ApiProperty({ description: 'Creation timestamp' })
   createdAt: Date;
 
@@ -82,6 +86,7 @@ export class CategoryResponseDto {
     dto.description = entity.description;
     dto.imageUrl = entity.imageUrl;
     dto.isActive = entity.isActive;
+    dto.categoryType = 'primary';
     dto.createdAt = entity.createdAt;
     dto.updatedAt = entity.updatedAt;
     dto.parent = entity.parent

@@ -3,8 +3,10 @@ import { EmployeesService } from './employees.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
+import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { NotFoundException } from '@nestjs/common';
 import { EmployeeRole } from './enum/employee-role.enum';
+import { PartnersService } from '@/partners/partners.service';
 import { CreateDoctorHandler } from './application/handlers/create-doctor.handler';
 import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
 import { UpdateEmployeeHandler } from './application/handlers/update-employee.handler';
@@ -44,6 +46,14 @@ describe('EmployeesService', () => {
     execute: jest.fn(),
   };
 
+  const mockEligibilityRepository = {
+    find: jest.fn(),
+  };
+
+  const mockPartnersService = {
+    getFirstHealthPartner: jest.fn().mockResolvedValue(null),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -55,6 +65,14 @@ describe('EmployeesService', () => {
         {
           provide: getRepositoryToken(Partner),
           useValue: mockPartnerRepository,
+        },
+        {
+          provide: getRepositoryToken(ProductEmployeeEligibility),
+          useValue: mockEligibilityRepository,
+        },
+        {
+          provide: PartnersService,
+          useValue: mockPartnersService,
         },
         {
           provide: CreateDoctorHandler,
