@@ -114,7 +114,10 @@ _PRICE_SINGLE_PATTERN = re.compile(
     r"(dưới|trên|tối đa|tối thiểu|khoảng|cỡ|tầm|<=?|>=?)\s*"
     r"([\d.,]+)\s*"
     r"(k|nghìn|ngàn|triệu|tr|đồng|đ|vnđ)?\b"
-    r"(?!\s*(?:sao|điểm|★|\*|km\b|m\b|cây\s*số|dặm))",
+    r"(?!\s*(?:"
+    r"sao|điểm|★|\*|km\b|m\b|cây\s*số|dặm"
+    r"|(?:đến|tới|-|–|—)\s*[\d.,]+\s*(?:km\b|m\b|cây\s*số|dặm)"
+    r"))",
     re.IGNORECASE,
 )
 
@@ -250,7 +253,7 @@ async def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
     # We strip LLM's naive attempts at PRICE/RATING/DISTANCE to let local regex handle rules & overlaps properly.
     entities = [e for e in entities if e.get("type") not in {"PRICE", "RATING", "DISTANCE"}]
 
-    entities.extend(extract_distance_entities(text))
+    entities.extend(distance_entities)
     entities.extend(_parse_price(text))
     entities.extend(_parse_rating(text))
 
@@ -764,7 +767,10 @@ def _deduplicate(entities: list[dict]) -> list[dict]:
 
 def _resolve_distance_priority(entities: list[dict]) -> list[dict]:
     """
-    Keep at most one DISTANCE entity, prioritizing explicit distance over implicit proximity.
+    Keep at most one DISTANCE entity.
+
+    If multiple explicit DISTANCE constraints exist (e.g., "trên 2km" + "dưới 5km"),
+    merge them into a single range entity instead of dropping one side.
     """
     distances = [e for e in entities if e.get("type") == "DISTANCE"]
     if len(distances) <= 1:
@@ -775,7 +781,8 @@ def _resolve_distance_priority(entities: list[dict]) -> list[dict]:
         if e.get("radius_meters") is not None and e.get("proximity_intent") is False
     ]
     if explicit:
-        chosen = max(explicit, key=lambda x: float(x.get("confidence", 0)))
+        merged = _merge_distance_constraints(explicit)
+        chosen = merged if merged else max(explicit, key=lambda x: float(x.get("confidence", 0)))
     else:
         # Fall back to any distance with meters, then highest confidence.
         with_radius = [e for e in distances if e.get("radius_meters") is not None]
@@ -793,3 +800,94 @@ def _resolve_distance_priority(entities: list[dict]) -> list[dict]:
             used_distance = True
 
     return kept
+
+
+def _merge_distance_constraints(distances: list[dict]) -> Optional[dict]:
+    """Merge multiple DISTANCE entities into one coherent bound if possible."""
+    if not distances:
+        return None
+
+    lowers: list[float] = []
+    uppers: list[float] = []
+    has_explicit = False
+
+    for e in distances:
+        op = str(e.get("operator") or "").lower().strip()
+        amount = e.get("amount")
+        amount_max = e.get("amount_max")
+        radius = e.get("radius_meters")
+
+        try:
+            amount_f = float(amount) if amount is not None else None
+        except (TypeError, ValueError):
+            amount_f = None
+
+        try:
+            amount_max_f = float(amount_max) if amount_max is not None else None
+        except (TypeError, ValueError):
+            amount_max_f = None
+
+        try:
+            radius_f = float(radius) if radius is not None else None
+        except (TypeError, ValueError):
+            radius_f = None
+
+        if e.get("proximity_intent") is False:
+            has_explicit = True
+
+        if op == "between":
+            if amount_f is not None:
+                lowers.append(amount_f)
+            if amount_max_f is not None:
+                uppers.append(amount_max_f)
+            continue
+
+        if op == "gte":
+            if amount_f is not None:
+                lowers.append(amount_f)
+            if amount_max_f is not None:
+                uppers.append(amount_max_f)
+            continue
+
+        if op == "lte":
+            if amount_f is not None:
+                uppers.append(amount_f)
+            continue
+
+        # Legacy fallback without operator: treat radius as upper bound.
+        if radius_f is not None:
+            uppers.append(radius_f)
+
+    lower = max(lowers) if lowers else None
+    upper = min(uppers) if uppers else None
+
+    if lower is not None and upper is not None and lower > upper:
+        return None
+
+    chosen = dict(max(distances, key=lambda x: float(x.get("confidence", 0))))
+    chosen["type"] = "DISTANCE"
+    chosen["proximity_intent"] = False if has_explicit else chosen.get("proximity_intent")
+
+    if lower is not None and upper is not None:
+        chosen["operator"] = "between"
+        chosen["amount"] = float(lower)
+        chosen["amount_max"] = float(upper)
+        chosen["radius_meters"] = int(upper)
+        return chosen
+
+    if upper is not None:
+        chosen["operator"] = "lte"
+        chosen["amount"] = float(upper)
+        chosen["amount_max"] = None
+        chosen["radius_meters"] = int(upper)
+        return chosen
+
+    if lower is not None:
+        chosen["operator"] = "gte"
+        chosen["amount"] = float(lower)
+        chosen["amount_max"] = float(settings.MAX_PROXIMITY_RADIUS_M)
+        # Keep compatibility for callers still reading radius_meters.
+        chosen["radius_meters"] = int(lower)
+        return chosen
+
+    return chosen
