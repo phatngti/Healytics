@@ -239,6 +239,7 @@ async def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
                         "value": text.strip(),
                         "confidence": 0.75,
                         "business_type": matched_bt,
+                            "business_evidence": text.strip(),
                     }
                 )
                 logger.info(f"[Extractor] Semantic Fallback: '{text[:60]}' -> {matched_bt}")
@@ -382,6 +383,7 @@ def _keyword_scan(text: str) -> tuple[list[dict], list[tuple[int, int]]]:
                 "value": text[start:end],
                 "confidence": 0.90,
                 "business_type": BUSINESS_TYPE_ALIASES[keyword],
+                    "business_evidence": text[start:end],
             })
 
     return found, already_matched_ranges
@@ -715,6 +717,8 @@ def _deduplicate(entities: list[dict]) -> list[dict]:
         # Fill missing normalized fields from the secondary candidate.
         for fld in (
             "business_type",
+            "business_evidence",
+            "business_phrase",
             "operator",
             "amount",
             "amount_max",
