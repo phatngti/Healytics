@@ -138,7 +138,6 @@ def _normalize_location(value: str, confidence: float, raw: dict) -> NerEntity:
     loc_info = cache.find_location(value)
 
     location_intent = None
-    location_intent_score = None
 
     source_query = raw.get("source_query")
     if source_query:
@@ -148,7 +147,6 @@ def _normalize_location(value: str, confidence: float, raw: dict) -> NerEntity:
             threshold=settings.LOCATION_INTENT_THRESHOLD,
         )
         location_intent = intent_result["intent"]
-        location_intent_score = intent_result["score"]
 
     if loc_info:
         return NerEntity(
@@ -158,7 +156,6 @@ def _normalize_location(value: str, confidence: float, raw: dict) -> NerEntity:
             location_code=loc_info["code"],
             location_level=loc_info["level"],
             location_intent=location_intent,
-            location_intent_score=location_intent_score,
         )
 
     # Không tìm thấy → graceful degradation
@@ -168,7 +165,6 @@ def _normalize_location(value: str, confidence: float, raw: dict) -> NerEntity:
         value=value,
         confidence=max(confidence * 0.5, 0.1),   # Giảm confidence
         location_intent=location_intent,
-        location_intent_score=location_intent_score,
     )
 
 
@@ -181,17 +177,40 @@ def _normalize_business_type(
 ) -> NerEntity:
     """Entity từ keyword scan đã có business_type sẵn, nhưng có thể tinh chỉnh bằng Semantic matching."""
     bt = raw.get("business_type")
+
+    # Disambiguate common overlap: "massage trị liệu" should map to rehabilitation.
+    evidence_text = " ".join(
+        [
+            str(value or ""),
+            str(raw.get("business_evidence") or ""),
+            str(raw.get("business_phrase") or ""),
+        ]
+    ).lower()
+    rehab_cues = (
+        "massage trị liệu",
+        "trị liệu",
+        "vật lý trị liệu",
+        "phục hồi chức năng",
+        "nắn xương",
+        "bấm huyệt",
+    )
+    if any(cue in evidence_text for cue in rehab_cues):
+        bt = "MASSAGE_REHABILITATION"
     
     # Nếu chưa có bt hoặc muốn kiểm chứng lại bằng model
     if not bt:
         matcher = get_matcher()
         bt = matcher.match_business_type(value)
 
+    evidence = raw.get("business_evidence") or raw.get("business_phrase") or value
+
     return NerEntity(
         type="BUSINESS_TYPE",
         value=value,
         confidence=confidence,
         business_type=bt,
+        business_evidence=evidence,
+        business_phrase=evidence,
     )
 
 
@@ -217,6 +236,8 @@ def _normalize_org_misc(value: str, confidence: float) -> NerEntity:
             value=value,
             confidence=confidence,
             business_type=BUSINESS_TYPE_ALIASES[value_lower],
+            business_evidence=value,
+            business_phrase=value,
         )
 
     # 2. Semantic match (Model-based) → BusinessType
@@ -228,6 +249,8 @@ def _normalize_org_misc(value: str, confidence: float) -> NerEntity:
             value=value,
             confidence=confidence * 0.95,   # Model confidence cao
             business_type=bt_match,
+            business_evidence=value,
+            business_phrase=value,
         )
 
     # 3. Semantic category match → Category
