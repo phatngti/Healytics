@@ -1,3 +1,4 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 /// A horizontal row displaying an icon, title,
@@ -35,22 +36,25 @@ class DetailRow extends StatelessWidget {
     final content = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 28),
-        const SizedBox(width: 20),
+        Icon(icon, size: AppDimens.iconXl),
+        SizedBox(width: AppDimens.spaceXl),
         Expanded(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: theme.textTheme.titleSmall?.copyWith(
+                style: theme.textTheme.titleSmall
+                    ?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: AppDimens.spaceXxs),
               Text(
                 subtitle,
-                style: theme.textTheme.bodySmall?.copyWith(
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(
                   color: colors.onSurfaceVariant,
                 ),
               ),
@@ -58,7 +62,11 @@ class DetailRow extends StatelessWidget {
           ),
         ),
         if (onTap != null)
-          Icon(Icons.chevron_right, size: 20, color: colors.onSurfaceVariant),
+          Icon(
+            Icons.chevron_right,
+            size: AppDimens.iconMd,
+            color: colors.onSurfaceVariant,
+          ),
       ],
     );
 
@@ -66,7 +74,7 @@ class DetailRow extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: AppDimens.radiusSmall,
       child: content,
     );
   }

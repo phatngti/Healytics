@@ -1,0 +1,37 @@
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Booking } from '@/common/entities/booking.entity';
+import { AppointmentResponseDto } from '../../dto/appointment-response.dto';
+
+@Injectable()
+export class GetAppointmentHandler {
+  private readonly logger = new Logger(GetAppointmentHandler.name);
+
+  constructor(
+    @InjectRepository(Booking)
+    private readonly bookingRepository: Repository<Booking>,
+  ) {}
+
+  async execute(id: string): Promise<AppointmentResponseDto> {
+    this.logger.log(`Getting appointment: ${id}`);
+
+    const booking = await this.bookingRepository.findOne({
+      where: { id },
+      relations: [
+        'product',
+        'product.category',
+        'product.media',
+        'product.productDefinition',
+        'staff',
+      ],
+    });
+
+    if (!booking) {
+      this.logger.warn(`Appointment not found: ${id}`);
+      throw new NotFoundException(`Appointment with ID ${id} not found`);
+    }
+
+    return AppointmentResponseDto.fromEntity(booking);
+  }
+}

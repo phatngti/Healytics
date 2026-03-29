@@ -40,20 +40,19 @@ Please follow the [installation procedure](#installation--usage) and then run th
 ```dart
 import 'package:user_openapi/api.dart';
 
-// TODO Configure HTTP Bearer authorization: bearer
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+// TODO Configure API key authorization: X-AI-API-Key
+//defaultApiClient.getAuthentication<ApiKeyAuth>('X-AI-API-Key').apiKey = 'YOUR_API_KEY';
+// uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+//defaultApiClient.getAuthentication<ApiKeyAuth>('X-AI-API-Key').apiKeyPrefix = 'Bearer';
 
-final api_instance = AccountApi();
+final api_instance = AIRecommendationsApi();
+final aiRecommendationsRequestDto = AiRecommendationsRequestDto(); // AiRecommendationsRequestDto | 
 
 try {
-    final result = api_instance.accountControllerGetSurvey();
+    final result = api_instance.aiServiceControllerGetRecommendations(aiRecommendationsRequestDto);
     print(result);
 } catch (e) {
-    print('Exception when calling AccountApi->accountControllerGetSurvey: $e\n');
+    print('Exception when calling AIRecommendationsApi->aiServiceControllerGetRecommendations: $e\n');
 }
 
 ```
@@ -64,6 +63,8 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*AIRecommendationsApi* | [**aiServiceControllerGetRecommendations**](doc//AIRecommendationsApi.md#aiservicecontrollergetrecommendations) | **POST** /ai/recommendations | Get service recommendations by IDs
+*AccountApi* | [**accountControllerGetMe**](doc//AccountApi.md#accountcontrollergetme) | **GET** /account/me | Get current user account details
 *AccountApi* | [**accountControllerGetSurvey**](doc//AccountApi.md#accountcontrollergetsurvey) | **GET** /account/survey | Get current user survey
 *AccountApi* | [**accountControllerPostSurvey**](doc//AccountApi.md#accountcontrollerpostsurvey) | **POST** /account/survey | Create one-shot survey for current user
 *AdminAuditLogsApi* | [**auditControllerGetAuditLogs**](doc//AdminAuditLogsApi.md#auditcontrollergetauditlogs) | **GET** /admin/audit-logs | Get audit logs with optional filters
@@ -89,13 +90,6 @@ Class | Method | HTTP request | Description
 *CategoriesApi* | [**categoriesControllerFindOne**](doc//CategoriesApi.md#categoriescontrollerfindone) | **GET** /categories/{id} | Get a category by id
 *ChatbotApi* | [**generativeAiStreamGenerativeAiStreamPost**](doc//ChatbotApi.md#generativeaistreamgenerativeaistreampost) | **POST** /generative_ai/stream | Generative Ai Stream
 *HealthApi* | [**healthHealthGet**](doc//HealthApi.md#healthhealthget) | **GET** /health | Health
-*HealthServicesApi* | [**healthServiceControllerFindOne**](doc//HealthServicesApi.md#healthservicecontrollerfindone) | **GET** /health-services/{id} | Get a service by id
-*HealthServicesApi* | [**healthServiceControllerGetHomeRecommend**](doc//HealthServicesApi.md#healthservicecontrollergethomerecommend) | **GET** /health-services/home-recommend | Get home recommendations
-*HealthServicesApi* | [**healthServiceControllerGetPremiumTreatments**](doc//HealthServicesApi.md#healthservicecontrollergetpremiumtreatments) | **GET** /health-services/premium-treatments | Get premium treatments
-*HealthServicesApi* | [**healthServiceControllerGetProductEmployees**](doc//HealthServicesApi.md#healthservicecontrollergetproductemployees) | **GET** /health-services/{id}/employees | Get employees for a service
-*HealthServicesApi* | [**healthServiceControllerGetProductInfo**](doc//HealthServicesApi.md#healthservicecontrollergetproductinfo) | **GET** /health-services/{id}/info | Get service info by ID
-*HealthServicesApi* | [**healthServiceControllerGetProductReviews**](doc//HealthServicesApi.md#healthservicecontrollergetproductreviews) | **GET** /health-services/{id}/reviews | Get reviews for a service
-*HealthServicesApi* | [**healthServiceControllerGetRecommendedProducts**](doc//HealthServicesApi.md#healthservicecontrollergetrecommendedproducts) | **GET** /health-services/{id}/recommended | Get recommended services
 *LocationsApi* | [**locationsControllerGetDistricts**](doc//LocationsApi.md#locationscontrollergetdistricts) | **GET** /locations/provinces/{provinceId}/districts | Get all districts in a province
 *LocationsApi* | [**locationsControllerGetProvinces**](doc//LocationsApi.md#locationscontrollergetprovinces) | **GET** /locations/provinces | Get all provinces in Vietnam
 *LocationsApi* | [**locationsControllerGetWards**](doc//LocationsApi.md#locationscontrollergetwards) | **GET** /locations/districts/{districtId}/wards | Get all wards in a district
@@ -103,6 +97,7 @@ Class | Method | HTTP request | Description
 *MapboxApi* | [**mapboxControllerGeocode**](doc//MapboxApi.md#mapboxcontrollergeocode) | **GET** /mapbox/geocode | Geocode an address to lat/lng
 *MapboxApi* | [**mapboxControllerGetClientKey**](doc//MapboxApi.md#mapboxcontrollergetclientkey) | **GET** /mapbox/client-key | Get public access token for frontend/mobile SDKs
 *MapboxApi* | [**mapboxControllerReverseGeocode**](doc//MapboxApi.md#mapboxcontrollerreversegeocode) | **GET** /mapbox/reverse-geocode | Reverse geocode lat/lng to address
+*MomoApi* | [**moMoControllerHandleMoMoIPN**](doc//MomoApi.md#momocontrollerhandlemomoipn) | **POST** /momo/ipn | MoMo IPN callback (server-to-server)
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateDoctor**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatedoctor) | **POST** /partner/employees/doctors | Create a new doctor
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateMassageTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatemassagetherapist) | **POST** /partner/employees/massage-therapists | Create a new massage therapist
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateSpaTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
@@ -133,33 +128,69 @@ Class | Method | HTTP request | Description
 *S3Api* | [**s3ControllerDeleteFile**](doc//S3Api.md#s3controllerdeletefile) | **DELETE** /s3/{key} | Delete file
 *S3Api* | [**s3ControllerGetFileUrl**](doc//S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file URL
 *S3Api* | [**s3ControllerPreSign**](doc//S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload URL
+*UserAppointmentsApi* | [**userAppointmentControllerGetAppointment**](doc//UserAppointmentsApi.md#userappointmentcontrollergetappointment) | **GET** /user/appointments/{id} | Get appointment details by ID
+*UserAppointmentsApi* | [**userAppointmentControllerGetServiceManual**](doc//UserAppointmentsApi.md#userappointmentcontrollergetservicemanual) | **GET** /user/appointments/{appointmentId}/manual | Get service manual for an appointment
+*UserAppointmentsApi* | [**userAppointmentControllerListAppointments**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistappointments) | **GET** /user/appointments | List all user appointments with optional distance calculation
+*UserAppointmentsApi* | [**userAppointmentControllerListCategories**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistcategories) | **GET** /user/appointments/categories | Get appointment categories for filter chips
+*UserAppointmentsApi* | [**userAppointmentControllerListRecentActivity**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistrecentactivity) | **GET** /user/appointments/recent-activity | Get recent appointment activity for home dashboard
+*UserAppointmentsApi* | [**userAppointmentControllerListRecommendedServices**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistrecommendedservices) | **GET** /user/appointments/recommendations | Get recommended services
 *UserBookingsApi* | [**bookingControllerAsyncCheckout**](doc//UserBookingsApi.md#bookingcontrollerasynccheckout) | **POST** /user/bookings/async-checkout | Start async checkout (returns 202 with ticket ID)
 *UserBookingsApi* | [**bookingControllerGetBooking**](doc//UserBookingsApi.md#bookingcontrollergetbooking) | **GET** /user/bookings/{id} | Get booking by ID
 *UserBookingsApi* | [**bookingControllerGetTicketStatus**](doc//UserBookingsApi.md#bookingcontrollergetticketstatus) | **GET** /user/bookings/tickets/{id} | Get checkout ticket status
 *UserBookingsApi* | [**bookingControllerListMyBookings**](doc//UserBookingsApi.md#bookingcontrollerlistmybookings) | **GET** /user/bookings | List my bookings
+*UserCategoriesApi* | [**userCategoriesControllerFindServicesByCategory**](doc//UserCategoriesApi.md#usercategoriescontrollerfindservicesbycategory) | **GET** /user/categories/{categoryId}/services | Get services for a category
+*UserCategoriesApi* | [**userCategoriesControllerFindSpecialistsByCategory**](doc//UserCategoriesApi.md#usercategoriescontrollerfindspecialistsbycategory) | **GET** /user/categories/{categoryId}/specialists | Get specialists for a category
 *UserEmployeesApi* | [**userEmployeesControllerFindAll**](doc//UserEmployeesApi.md#useremployeescontrollerfindall) | **GET** /user/employees | Get all employees
 *UserEmployeesApi* | [**userEmployeesControllerFindOne**](doc//UserEmployeesApi.md#useremployeescontrollerfindone) | **GET** /user/employees/{id} | Get an employee by id
+*UserEmployeesApi* | [**userEmployeesControllerFindServices**](doc//UserEmployeesApi.md#useremployeescontrollerfindservices) | **GET** /user/employees/{id}/services | Get services for a specialist
+*UserEmployeesApi* | [**userEmployeesControllerGetFeaturedSpecialists**](doc//UserEmployeesApi.md#useremployeescontrollergetfeaturedspecialists) | **GET** /user/employees/featured-specialists | Get featured specialists for home page
+*UserEmployeesApi* | [**userEmployeesControllerGetTimeSlots**](doc//UserEmployeesApi.md#useremployeescontrollergettimeslots) | **GET** /user/employees/{id}/time-slots | Get time slots with availability for an employee
+*UserHealthServicesApi* | [**userHealthServiceControllerFindOne**](doc//UserHealthServicesApi.md#userhealthservicecontrollerfindone) | **GET** /user/health-services/{id} | Get a service by ID
+*UserHealthServicesApi* | [**userHealthServiceControllerGetEligibilityDetail**](doc//UserHealthServicesApi.md#userhealthservicecontrollergeteligibilitydetail) | **GET** /user/health-services/eligibilities/{id} | Get eligibility detail by ID
+*UserHealthServicesApi* | [**userHealthServiceControllerGetHomeRecommend**](doc//UserHealthServicesApi.md#userhealthservicecontrollergethomerecommend) | **GET** /user/health-services/home-recommend | Get home recommendations
+*UserHealthServicesApi* | [**userHealthServiceControllerGetPremiumTreatments**](doc//UserHealthServicesApi.md#userhealthservicecontrollergetpremiumtreatments) | **GET** /user/health-services/premium-treatments | Get premium treatments
+*UserHealthServicesApi* | [**userHealthServiceControllerGetProductEmployees**](doc//UserHealthServicesApi.md#userhealthservicecontrollergetproductemployees) | **GET** /user/health-services/{id}/employees | Get employees for a service
+*UserHealthServicesApi* | [**userHealthServiceControllerGetProductInfo**](doc//UserHealthServicesApi.md#userhealthservicecontrollergetproductinfo) | **GET** /user/health-services/{id}/info | Get service info by ID
+*UserHealthServicesApi* | [**userHealthServiceControllerGetProductReviews**](doc//UserHealthServicesApi.md#userhealthservicecontrollergetproductreviews) | **GET** /user/health-services/{id}/reviews | Get reviews for a service
+*UserHealthServicesApi* | [**userHealthServiceControllerGetRecommendedProducts**](doc//UserHealthServicesApi.md#userhealthservicecontrollergetrecommendedproducts) | **GET** /user/health-services/{id}/recommended | Get recommended services
+*UserPaymentsApi* | [**userPaymentControllerCreateMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollercreatemomopayment) | **POST** /user/payments/momo/{bookingId} | Create MoMo payment for booking
+*UserPaymentsApi* | [**userPaymentControllerRefundMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundmomopayment) | **POST** /user/payments/momo/{bookingId}/refund | Request MoMo refund for booking
+*UserReviewsApi* | [**userReviewControllerSubmitSpecialistReview**](doc//UserReviewsApi.md#userreviewcontrollersubmitspecialistreview) | **POST** /user/reviews/specialist | Submit a specialist review for a completed appointment
+*UserReviewsApi* | [**userReviewControllerSubmitTreatmentReview**](doc//UserReviewsApi.md#userreviewcontrollersubmittreatmentreview) | **POST** /user/reviews/treatment | Submit a treatment review for a completed appointment
 *UserSlotsApi* | [**slotsControllerMicroLock**](doc//UserSlotsApi.md#slotscontrollermicrolock) | **POST** /user/slots/micro-lock | Acquire a micro-lock on a time slot (120s TTL)
 
 
 ## Documentation For Models
 
+ - [AccountMeResponseDto](doc//AccountMeResponseDto.md)
  - [AccountRequestDto](doc//AccountRequestDto.md)
  - [AddressDto](doc//AddressDto.md)
  - [AddressInfoDto](doc//AddressInfoDto.md)
  - [AdminCategoryResponseDto](doc//AdminCategoryResponseDto.md)
  - [AdminLoginDto](doc//AdminLoginDto.md)
  - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
+ - [AiLocationDto](doc//AiLocationDto.md)
+ - [AiPriceDto](doc//AiPriceDto.md)
+ - [AiRatingDto](doc//AiRatingDto.md)
+ - [AiRecommendationItemDto](doc//AiRecommendationItemDto.md)
+ - [AiRecommendationsRequestDto](doc//AiRecommendationsRequestDto.md)
+ - [AiRecommendationsResponseDto](doc//AiRecommendationsResponseDto.md)
+ - [AppointmentCategoryResponseDto](doc//AppointmentCategoryResponseDto.md)
+ - [AppointmentResponseDto](doc//AppointmentResponseDto.md)
  - [AsyncCheckoutDto](doc//AsyncCheckoutDto.md)
  - [AsyncCheckoutResponseDto](doc//AsyncCheckoutResponseDto.md)
  - [AttachTagResponseDto](doc//AttachTagResponseDto.md)
  - [AuthTokensDto](doc//AuthTokensDto.md)
  - [BookingResponseDto](doc//BookingResponseDto.md)
+ - [BookingScheduleDto](doc//BookingScheduleDto.md)
+ - [BookingServiceResponseDto](doc//BookingServiceResponseDto.md)
+ - [BookingSpecialistResponseDto](doc//BookingSpecialistResponseDto.md)
  - [BusinessInfo](doc//BusinessInfo.md)
  - [BusinessInfoDto](doc//BusinessInfoDto.md)
  - [BusinessServiceDto](doc//BusinessServiceDto.md)
  - [BusinessServicesResponseDto](doc//BusinessServicesResponseDto.md)
  - [BusinessType](doc//BusinessType.md)
+ - [CategoryInfoDto](doc//CategoryInfoDto.md)
  - [CategoryResponseDto](doc//CategoryResponseDto.md)
  - [CategorySummaryDto](doc//CategorySummaryDto.md)
  - [ChatbotRecommendationResponse](doc//ChatbotRecommendationResponse.md)
@@ -171,6 +202,8 @@ Class | Method | HTTP request | Description
  - [CreateDoctorDto](doc//CreateDoctorDto.md)
  - [CreateDoctorProfileDto](doc//CreateDoctorProfileDto.md)
  - [CreateMassageTherapistDto](doc//CreateMassageTherapistDto.md)
+ - [CreateMoMoPaymentDto](doc//CreateMoMoPaymentDto.md)
+ - [CreateMoMoRefundDto](doc//CreateMoMoRefundDto.md)
  - [CreatePartnerHealthServiceDefinitionDto](doc//CreatePartnerHealthServiceDefinitionDto.md)
  - [CreatePartnerHealthServiceDto](doc//CreatePartnerHealthServiceDto.md)
  - [CreatePartnerHealthServiceFacilityImageDto](doc//CreatePartnerHealthServiceFacilityImageDto.md)
@@ -178,13 +211,20 @@ Class | Method | HTTP request | Description
  - [CreatePartnerHealthServiceReviewDto](doc//CreatePartnerHealthServiceReviewDto.md)
  - [CreateServiceTagDto](doc//CreateServiceTagDto.md)
  - [CreateSpaTherapistDto](doc//CreateSpaTherapistDto.md)
+ - [CreateSpecialistReviewDto](doc//CreateSpecialistReviewDto.md)
  - [CreateTherapistProfileDto](doc//CreateTherapistProfileDto.md)
+ - [CreateTreatmentReviewDto](doc//CreateTreatmentReviewDto.md)
+ - [DayScheduleDto](doc//DayScheduleDto.md)
  - [DeleteFileResponseDto](doc//DeleteFileResponseDto.md)
  - [DistanceMatrixElementDto](doc//DistanceMatrixElementDto.md)
  - [DistanceMatrixResponseDto](doc//DistanceMatrixResponseDto.md)
  - [DistanceMatrixRowDto](doc//DistanceMatrixRowDto.md)
  - [DoctorProfileResponseDto](doc//DoctorProfileResponseDto.md)
+ - [DocumentEntryDto](doc//DocumentEntryDto.md)
  - [EmployeeResponseDto](doc//EmployeeResponseDto.md)
+ - [EmployeeTimeSlotsResponseDto](doc//EmployeeTimeSlotsResponseDto.md)
+ - [FacilityDto](doc//FacilityDto.md)
+ - [FeaturedSpecialistResponseDto](doc//FeaturedSpecialistResponseDto.md)
  - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
  - [GeocodeResponseDto](doc//GeocodeResponseDto.md)
  - [GeocodeResultDto](doc//GeocodeResultDto.md)
@@ -193,16 +233,21 @@ Class | Method | HTTP request | Description
  - [LegalRepresentativeDto](doc//LegalRepresentativeDto.md)
  - [LegalRepresentativeRequestDto](doc//LegalRepresentativeRequestDto.md)
  - [LocationInfo](doc//LocationInfo.md)
+ - [LocationInfoDto](doc//LocationInfoDto.md)
  - [LocationListResponseDto](doc//LocationListResponseDto.md)
  - [LocationResponseDto](doc//LocationResponseDto.md)
  - [LoginDto](doc//LoginDto.md)
  - [LogoutResponseDto](doc//LogoutResponseDto.md)
+ - [MedicalCredentialResponseDto](doc//MedicalCredentialResponseDto.md)
  - [MicroLockDto](doc//MicroLockDto.md)
  - [MicroLockResponseDto](doc//MicroLockResponseDto.md)
  - [MyProfileResponseDto](doc//MyProfileResponseDto.md)
  - [PartnerCategorySummaryDto](doc//PartnerCategorySummaryDto.md)
  - [PartnerClinicDto](doc//PartnerClinicDto.md)
  - [PartnerDayScheduleDto](doc//PartnerDayScheduleDto.md)
+ - [PartnerDetailProcedureStepDto](doc//PartnerDetailProcedureStepDto.md)
+ - [PartnerDetailServiceManualDto](doc//PartnerDetailServiceManualDto.md)
+ - [PartnerDetailServiceRuleDto](doc//PartnerDetailServiceRuleDto.md)
  - [PartnerDocumentVerificationDto](doc//PartnerDocumentVerificationDto.md)
  - [PartnerFacilityImageDto](doc//PartnerFacilityImageDto.md)
  - [PartnerFeatureTagDto](doc//PartnerFeatureTagDto.md)
@@ -213,16 +258,22 @@ Class | Method | HTTP request | Description
  - [PartnerHealthServiceResponseDto](doc//PartnerHealthServiceResponseDto.md)
  - [PartnerItemDto](doc//PartnerItemDto.md)
  - [PartnerLoginDto](doc//PartnerLoginDto.md)
+ - [PartnerProcedureStepDto](doc//PartnerProcedureStepDto.md)
  - [PartnerRecommendedServiceDto](doc//PartnerRecommendedServiceDto.md)
  - [PartnerRequestDto](doc//PartnerRequestDto.md)
  - [PartnerReviewDto](doc//PartnerReviewDto.md)
+ - [PartnerServiceManualDto](doc//PartnerServiceManualDto.md)
+ - [PartnerServiceRuleDto](doc//PartnerServiceRuleDto.md)
  - [PartnerSpecialistDto](doc//PartnerSpecialistDto.md)
  - [PartnerTimeSlotDto](doc//PartnerTimeSlotDto.md)
  - [PartnerVerificationStatus](doc//PartnerVerificationStatus.md)
  - [PartnersResponseDto](doc//PartnersResponseDto.md)
  - [PresignRequestDto](doc//PresignRequestDto.md)
  - [PresignResponseDto](doc//PresignResponseDto.md)
+ - [PriceBreakdownDto](doc//PriceBreakdownDto.md)
  - [PriceInfo](doc//PriceInfo.md)
+ - [ProcedureStepDto](doc//ProcedureStepDto.md)
+ - [ProcedureStepInputDto](doc//ProcedureStepInputDto.md)
  - [PublicCategoryDto](doc//PublicCategoryDto.md)
  - [PublicCategorySummaryDto](doc//PublicCategorySummaryDto.md)
  - [PublicClinicDto](doc//PublicClinicDto.md)
@@ -242,6 +293,7 @@ Class | Method | HTTP request | Description
  - [PublicServiceTagDto](doc//PublicServiceTagDto.md)
  - [RatingInfo](doc//RatingInfo.md)
  - [RecommendationResponse](doc//RecommendationResponse.md)
+ - [RecommendedServiceResponseDto](doc//RecommendedServiceResponseDto.md)
  - [RefreshTokenRequestDto](doc//RefreshTokenRequestDto.md)
  - [RegisterDto](doc//RegisterDto.md)
  - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
@@ -250,18 +302,32 @@ Class | Method | HTTP request | Description
  - [ReviewItemDto](doc//ReviewItemDto.md)
  - [ReviewPartnerProfileDto](doc//ReviewPartnerProfileDto.md)
  - [ReviewPartnerResponseDto](doc//ReviewPartnerResponseDto.md)
+ - [ReviewSummaryDto](doc//ReviewSummaryDto.md)
  - [ServiceDetail](doc//ServiceDetail.md)
+ - [ServiceInfoDto](doc//ServiceInfoDto.md)
+ - [ServiceManualInputDto](doc//ServiceManualInputDto.md)
+ - [ServiceManualResponseDto](doc//ServiceManualResponseDto.md)
+ - [ServiceRuleDto](doc//ServiceRuleDto.md)
+ - [ServiceRuleInputDto](doc//ServiceRuleInputDto.md)
  - [ServiceTagResponseDto](doc//ServiceTagResponseDto.md)
+ - [SpecialistInfoDto](doc//SpecialistInfoDto.md)
+ - [SpecialistReviewResponseDto](doc//SpecialistReviewResponseDto.md)
  - [SurveyDto](doc//SurveyDto.md)
  - [SurveyResponseDto](doc//SurveyResponseDto.md)
  - [TherapistProfileResponseDto](doc//TherapistProfileResponseDto.md)
+ - [TimeSlotDto](doc//TimeSlotDto.md)
  - [TotalPartnersResponseDto](doc//TotalPartnersResponseDto.md)
+ - [TreatmentReviewResponseDto](doc//TreatmentReviewResponseDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)
  - [UpdateEmployeeDto](doc//UpdateEmployeeDto.md)
  - [UpdatePartnerDto](doc//UpdatePartnerDto.md)
  - [UpdatePartnerHealthServiceDto](doc//UpdatePartnerHealthServiceDto.md)
  - [UpdateServiceTagDto](doc//UpdateServiceTagDto.md)
+ - [UserEligibilityDetailResponseDto](doc//UserEligibilityDetailResponseDto.md)
+ - [UserProfileDto](doc//UserProfileDto.md)
+ - [VerificationDocumentEntryDto](doc//VerificationDocumentEntryDto.md)
  - [VerifiedField](doc//VerifiedField.md)
+ - [WorkHistoryEntryDto](doc//WorkHistoryEntryDto.md)
  - [WorkScheduleEntryDto](doc//WorkScheduleEntryDto.md)
 
 
@@ -272,6 +338,12 @@ Authentication schemes defined for the API:
 ### bearer
 
 - **Type**: HTTP Bearer authentication
+
+### X-AI-API-Key
+
+- **Type**: API key
+- **API key parameter name**: X-AI-API-Key
+- **Location**: HTTP header
 
 
 ## Author

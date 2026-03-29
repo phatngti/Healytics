@@ -89,3 +89,39 @@ class ServiceTag {
     return Symbols.category;
   }
 }
+
+/// Lightweight specialist entity for the home page
+/// featured-specialists section.
+class HomeSpecialist {
+  /// Unique identifier.
+  final String id;
+
+  /// Display name (e.g. "Dr. Anna Nguyen").
+  final String name;
+
+  /// Short specialty label (e.g. "Spa Therapist").
+  final String specialty;
+
+  /// Optional avatar URL.
+  final String? avatarUrl;
+
+  /// Average rating (0.0 – 5.0).
+  final double rating;
+
+  /// Number of appointments/services sold.
+  final int soldCount;
+
+  /// Associated clinic or facility name.
+  final String clinicName;
+
+  const HomeSpecialist({
+    required this.id,
+    required this.name,
+    required this.specialty,
+    this.avatarUrl,
+    this.rating = 0.0,
+    this.soldCount = 0,
+    this.clinicName = '',
+  });
+}
+

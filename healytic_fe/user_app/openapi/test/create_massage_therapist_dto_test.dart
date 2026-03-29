@@ -88,33 +88,27 @@ void main() {
       // TODO
     });
 
+    // Work history entries
+    // List<WorkHistoryEntryDto> workHistory (default value: const [])
+    test('to test the property `workHistory`', () async {
+      // TODO
+    });
+
     // Avatar URL
     // String avatar
     test('to test the property `avatar`', () async {
       // TODO
     });
 
-    // ID card URL
-    // String idCardUrl
-    test('to test the property `idCardUrl`', () async {
+    // Verification documents (ID card, licenses, etc.)
+    // List<VerificationDocumentEntryDto> verificationDocuments (default value: const [])
+    test('to test the property `verificationDocuments`', () async {
       // TODO
     });
 
     // Employee status
     // String status
     test('to test the property `status`', () async {
-      // TODO
-    });
-
-    // Branch ID or name
-    // String branch
-    test('to test the property `branch`', () async {
-      // TODO
-    });
-
-    // Account password
-    // String password
-    test('to test the property `password`', () async {
       // TODO
     });
 
@@ -157,12 +151,6 @@ void main() {
     // Skills
     // List<String> skills (default value: const [])
     test('to test the property `skills`', () async {
-      // TODO
-    });
-
-    // License URL
-    // String licenseUrl
-    test('to test the property `licenseUrl`', () async {
       // TODO
     });
 

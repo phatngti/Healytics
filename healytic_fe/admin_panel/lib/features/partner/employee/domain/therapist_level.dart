@@ -17,4 +17,24 @@ enum TherapistLevel {
     TherapistLevel.senior => 'Senior',
     TherapistLevel.master => 'Master',
   };
+
+  /// Returns the API value for backend communication.
+  String get apiValue => switch (this) {
+    TherapistLevel.junior => 'JUNIOR',
+    TherapistLevel.senior => 'SENIOR',
+    TherapistLevel.master => 'MASTER',
+  };
+
+  /// Returns the [TherapistLevel] for the given API [value].
+  ///
+  /// Returns `null` if no matching level is found.
+  static TherapistLevel? fromApiValue(String? value) {
+    if (value == null) return null;
+    return switch (value.toUpperCase()) {
+      'JUNIOR' => TherapistLevel.junior,
+      'SENIOR' => TherapistLevel.senior,
+      'MASTER' => TherapistLevel.master,
+      _ => null,
+    };
+  }
 }

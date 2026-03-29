@@ -46,6 +46,7 @@ export class PublicHealthServiceCardResponseDto {
   static fromEntity(
     product: Product,
     partner?: Partner | null,
+    ratingAvg?: number,
   ): PublicHealthServiceCardResponseDto {
     const dto = new PublicHealthServiceCardResponseDto();
 
@@ -70,11 +71,8 @@ export class PublicHealthServiceCardResponseDto {
     const price = product.salePrice ?? product.basePrice;
     dto.price = '₫' + new Intl.NumberFormat('vi-VN').format(Number(price));
 
-    // Average rating from reviews
-    const reviews = product.reviews ?? [];
-    const avg = reviews.length
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : 0;
+    // Average rating — pre-computed from TreatmentReview aggregate
+    const avg = ratingAvg ?? 0;
     dto.rating = (Math.round(avg * 10) / 10).toString();
 
     // Vendor name: prefer product-level, fall back to partner brand
@@ -104,7 +102,10 @@ export class PublicHealthServiceCardResponseDto {
   static fromEntities(
     products: Product[],
     partner?: Partner | null,
+    ratingsMap?: Map<string, { rating: number; count: number }>,
   ): PublicHealthServiceCardResponseDto[] {
-    return products.map((p) => PublicHealthServiceCardResponseDto.fromEntity(p, partner));
+    return products.map((p) =>
+      PublicHealthServiceCardResponseDto.fromEntity(p, partner, ratingsMap?.get(p.id)?.rating),
+    );
   }
 }

@@ -1,54 +1,232 @@
-import 'package:common/widgets/button/button.dart';
+import 'package:admin_panel/core/providers/s3.provider.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_form_field.dart';
+import 'package:admin_panel/features/partner/employee/domain/verification_document_entry.entity.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/button/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class EmployeeDocumentsCertificationsCard extends StatefulWidget {
+/// Keys identifying each verification document
+/// type. Must match the backend's
+/// `VerificationDocumentEntryDto.fieldKey`.
+abstract final class DocFieldKey {
+  static const license = 'license';
+  static const idCard = 'id_card';
+  static const others = 'other_documents';
+}
+
+/// Manages the verification documents section of
+/// the employee add form.
+///
+/// All documents are stored as a single
+/// `FormBuilderField` keyed by
+/// [EmployeeFormField.verificationDocuments].
+///
+/// Each entry is a `Map<String, dynamic>` with
+/// `fieldKey` and `documents` (a list of maps with
+/// `name` and `url`) matching the
+/// `VerificationDocumentEntryDto` structure.
+class EmployeeDocumentsCertificationsCard extends ConsumerStatefulWidget {
   const EmployeeDocumentsCertificationsCard({super.key});
 
   @override
-  State<EmployeeDocumentsCertificationsCard> createState() =>
-      _EmployeeDocumentsCertificationsCardState();
+  ConsumerState<EmployeeDocumentsCertificationsCard> createState() =>
+      _EmployeeDocsCertCardState();
 }
 
-class _EmployeeDocumentsCertificationsCardState
-    extends State<EmployeeDocumentsCertificationsCard> {
+class _EmployeeDocsCertCardState
+    extends ConsumerState<EmployeeDocumentsCertificationsCard> {
   bool _isExpanded = true;
+  bool _isUploading = false;
   final ImagePicker _picker = ImagePicker();
 
-  // We rely on FormBuilder to hold the state of files (XFile) or URLs (String)
-  // keys: 'license_file', 'id_card_file'
+  // ── Document list helpers ────────────────────
 
-  Future<void> _pickDocument(String fieldName) async {
-    try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: ImageSource.gallery,
+  /// Returns the current grouped doc list from the
+  /// form field or an empty list.
+  List<Map<String, dynamic>> _currentGroups(FormFieldState<dynamic> field) {
+    final raw = field.value;
+    if (raw is List) {
+      return raw.whereType<Map<String, dynamic>>().toList();
+    }
+    return [];
+  }
+
+  /// Finds a group entry by its [fieldKey].
+  Map<String, dynamic>? _findGroup(
+    List<Map<String, dynamic>> groups,
+    String fieldKey,
+  ) {
+    for (final g in groups) {
+      if (g['fieldKey'] == fieldKey) return g;
+    }
+    return null;
+  }
+
+  /// Returns the `documents` list from a group.
+  List<Map<String, dynamic>> _docsFromGroup(Map<String, dynamic>? group) {
+    final raw = group?['documents'];
+    if (raw is List) {
+      return raw.whereType<Map<String, dynamic>>().toList();
+    }
+    return [];
+  }
+
+  /// Upserts a single-document group (for
+  /// `license` and `id_card` which only hold one
+  /// document).
+  List<Map<String, dynamic>> _upsertSingleDoc(
+    List<Map<String, dynamic>> groups, {
+    required String fieldKey,
+    required String name,
+    required String url,
+  }) {
+    final updated = groups.where((g) => g['fieldKey'] != fieldKey).toList();
+    updated.add(
+      VerificationDocumentEntry(
+        fieldKey: fieldKey,
+        documents: [
+          DocumentEntry(
+            name: name,
+            url: url,
+            updatedTime: DateTime.now().toIso8601String(),
+          ),
+        ],
+      ).toJson(),
+    );
+    return updated;
+  }
+
+  /// Removes a group entry by [fieldKey].
+  List<Map<String, dynamic>> _removeGroup(
+    List<Map<String, dynamic>> groups,
+    String fieldKey,
+  ) => groups.where((g) => g['fieldKey'] != fieldKey).toList();
+
+  /// Adds a document to the `other_documents`
+  /// group, creating it if absent.
+  List<Map<String, dynamic>> _addToOtherDocs(
+    List<Map<String, dynamic>> groups, {
+    required String name,
+    required String url,
+  }) {
+    final existing = _findGroup(groups, DocFieldKey.others);
+    final docs = _docsFromGroup(existing);
+    docs.add(
+      DocumentEntry(
+        name: name,
+        url: url,
+        updatedTime: DateTime.now().toIso8601String(),
+      ).toJson(),
+    );
+
+    final updated = groups
+        .where((g) => g['fieldKey'] != DocFieldKey.others)
+        .toList();
+    updated.add(
+      VerificationDocumentEntry(
+        fieldKey: DocFieldKey.others,
+        documents: docs.map((d) => DocumentEntry.fromJson(d)).toList(),
+      ).toJson(),
+    );
+    return updated;
+  }
+
+  /// Removes a document at [index] from the
+  /// `other_documents` group.
+  List<Map<String, dynamic>> _removeFromOtherDocs(
+    List<Map<String, dynamic>> groups,
+    int index,
+  ) {
+    final existing = _findGroup(groups, DocFieldKey.others);
+    final docs = _docsFromGroup(existing);
+    if (index >= 0 && index < docs.length) {
+      docs.removeAt(index);
+    }
+
+    final updated = groups
+        .where((g) => g['fieldKey'] != DocFieldKey.others)
+        .toList();
+    if (docs.isNotEmpty) {
+      updated.add(
+        VerificationDocumentEntry(
+          fieldKey: DocFieldKey.others,
+          documents: docs.map((d) => DocumentEntry.fromJson(d)).toList(),
+        ).toJson(),
       );
+    }
+    return updated;
+  }
 
-      if (pickedFile != null) {
-        // Save XFile to form state
-        final formState = FormBuilder.of(context);
-        formState?.fields[fieldName]?.didChange(pickedFile);
+  /// Replaces a document at [index] in the
+  /// `other_documents` group.
+  List<Map<String, dynamic>> _replaceInOtherDocs(
+    List<Map<String, dynamic>> groups,
+    int index, {
+    required String name,
+    required String url,
+  }) {
+    final existing = _findGroup(groups, DocFieldKey.others);
+    final docs = _docsFromGroup(existing);
+    if (index >= 0 && index < docs.length) {
+      docs[index] = DocumentEntry(name: name, url: url).toJson();
+    }
+
+    final updated = groups
+        .where((g) => g['fieldKey'] != DocFieldKey.others)
+        .toList();
+    updated.add(
+      VerificationDocumentEntry(
+        fieldKey: DocFieldKey.others,
+        documents: docs.map((d) => DocumentEntry.fromJson(d)).toList(),
+      ).toJson(),
+    );
+    return updated;
+  }
+
+  // ── Upload / View ───────────────────────────
+
+  /// Picks and uploads a file, then calls
+  /// [onUploaded] with the resulting URL.
+  Future<void> _pickAndUpload(void Function(String url) onUploaded) async {
+    try {
+      final picked = await _picker.pickImage(source: ImageSource.gallery);
+      if (picked == null) return;
+
+      setState(() => _isUploading = true);
+
+      final s3 = ref.read(s3ServiceProvider);
+      final key = await s3.uploadFile(picked);
+      if (key != null) {
+        final url = await s3.getFileUrl(key);
+        if (mounted && url != null) {
+          onUploaded(url);
+        }
       }
     } catch (e) {
-      debugPrint('Error picking file: $e');
+      debugPrint('Upload error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error uploading file: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isUploading = false);
+      }
     }
   }
 
-  void _removeDocument(String fieldName) {
-    final formState = FormBuilder.of(context);
-    formState?.fields[fieldName]?.didChange(null);
-  }
-
+  /// Opens a URL in the external browser.
   Future<void> _viewDocument(String url) async {
     final uri = Uri.tryParse(url);
     if (uri != null && await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
-      debugPrint('Could not launch url: $url');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -56,6 +234,8 @@ class _EmployeeDocumentsCertificationsCardState
       }
     }
   }
+
+  // ── Build ────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -77,62 +257,9 @@ class _EmployeeDocumentsCertificationsCardState
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          // Header
-          InkWell(
-            onTap: () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).extension<SemanticColors>()!.info!.withAlpha(25),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Theme.of(
-                          context,
-                        ).extension<SemanticColors>()!.info!.withAlpha(50),
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.workspace_premium,
-                      size: 18,
-                      color: Theme.of(
-                        context,
-                      ).extension<SemanticColors>()!.info,
-                    ),
-                  ),
-                  AppDimens.horizontalMediumSmall,
-                  Text(
-                    'Documents & Certifications',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  AnimatedRotation(
-                    turns: _isExpanded ? 0.5 : 0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Icon(
-                      Icons.expand_more,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Content
+          _buildHeader(context, colorScheme),
           AnimatedCrossFade(
-            firstChild: _buildContent(context),
+            firstChild: _buildBody(context),
             secondChild: const SizedBox.shrink(),
             crossFadeState: _isExpanded
                 ? CrossFadeState.showFirst
@@ -144,7 +271,52 @@ class _EmployeeDocumentsCertificationsCardState
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildHeader(BuildContext context, ColorScheme colorScheme) {
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
+
+    return InkWell(
+      onTap: () => setState(() => _isExpanded = !_isExpanded),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: semanticColors.info!.withAlpha(25),
+                shape: BoxShape.circle,
+                border: Border.all(color: semanticColors.info!.withAlpha(50)),
+              ),
+              child: Icon(
+                Icons.workspace_premium,
+                size: 18,
+                color: semanticColors.info,
+              ),
+            ),
+            AppDimens.horizontalMediumSmall,
+            Text(
+              'Documents & Certifications',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const Spacer(),
+            AnimatedRotation(
+              turns: _isExpanded ? 0.5 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                Icons.expand_more,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -152,25 +324,41 @@ class _EmployeeDocumentsCertificationsCardState
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Upload verified certificates, professional licenses, and degrees applicable to this therapist or doctor.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          AppDimens.verticalLarge,
-          _buildRequiredDocuments(context),
-          AppDimens.verticalLarge,
-          _buildAdditionalDocuments(context),
-        ],
+      child: FormBuilderField<List<Map<String, dynamic>>>(
+        name: EmployeeFormField.verificationDocuments.key,
+        initialValue: const [],
+        builder: (field) {
+          final groups = _currentGroups(field);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Upload verified certificates, '
+                'professional licenses, and '
+                'degrees applicable to this '
+                'therapist or doctor.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              AppDimens.verticalLarge,
+              _buildRequiredSection(context, groups, field),
+              AppDimens.verticalLarge,
+              _buildOtherDocumentsSection(context, groups, field),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildRequiredDocuments(BuildContext context) {
+  // ── Required documents ──────────────────────
+
+  Widget _buildRequiredSection(
+    BuildContext context,
+    List<Map<String, dynamic>> groups,
+    FormFieldState<List<Map<String, dynamic>>> field,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -182,112 +370,281 @@ class _EmployeeDocumentsCertificationsCardState
           ),
         ),
         AppDimens.verticalMedium,
-        Column(
-          children: [
-            _buildManagedDocumentItem(
-              context: context,
-              fieldName: 'license_file',
-              uploadTitle: 'Professional License / Practice Permit',
-              uploadSubtitle: 'PDF or JPG • Max 10MB',
-              uploadIcon: Icons.badge,
-              uploadedTypeLabel: 'License / Permit',
-            ),
-            AppDimens.verticalMedium,
-            _buildManagedDocumentItem(
-              context: context,
-              fieldName: 'id_card_file',
-              uploadTitle: 'Identity Card / Passport',
-              uploadSubtitle: 'PDF, JPG, or PNG • Max 10MB',
-              uploadIcon: Icons.perm_identity,
-              uploadedTypeLabel: 'Identity Card',
-            ),
-          ],
+        _buildSingleDocRow(
+          context: context,
+          groups: groups,
+          field: field,
+          fieldKey: DocFieldKey.license,
+          uploadTitle:
+              'Professional License /'
+              ' Practice Permit',
+          uploadSubtitle: 'PDF or JPG • Max 10MB',
+          uploadIcon: Icons.badge,
+          typeLabel: 'License / Permit',
+        ),
+        AppDimens.verticalMedium,
+        _buildSingleDocRow(
+          context: context,
+          groups: groups,
+          field: field,
+          fieldKey: DocFieldKey.idCard,
+          uploadTitle: 'Identity Card / Passport',
+          uploadSubtitle: 'PDF, JPG, or PNG • Max 10MB',
+          uploadIcon: Icons.perm_identity,
+          typeLabel: 'Identity Card',
         ),
       ],
     );
   }
 
-  Widget _buildManagedDocumentItem({
+  /// Builds a row for a single-document group
+  /// (license or id_card).
+  Widget _buildSingleDocRow({
     required BuildContext context,
-    required String fieldName,
+    required List<Map<String, dynamic>> groups,
+    required FormFieldState<List<Map<String, dynamic>>> field,
+    required String fieldKey,
     required String uploadTitle,
     required String uploadSubtitle,
     required IconData uploadIcon,
-    required String uploadedTypeLabel,
+    required String typeLabel,
   }) {
-    // Determine current value from FormBuilder
-    return FormBuilderField(
-      name: fieldName,
-      builder: (FormFieldState<dynamic> field) {
-        final value = field.value;
+    final group = _findGroup(groups, fieldKey);
+    final docs = _docsFromGroup(group);
+    final firstDoc = docs.isNotEmpty ? docs.first : null;
 
-        // No value -> Show Upload
-        if (value == null || (value is String && value.isEmpty)) {
-          return _buildDocumentUploadItem(
-            context,
-            icon: uploadIcon,
-            title: uploadTitle,
-            subtitle: uploadSubtitle,
-            onUpload: () => _pickDocument(fieldName),
-          );
-        }
+    if (firstDoc == null) {
+      return _DocumentUploadTile(
+        icon: uploadIcon,
+        title: _isUploading ? 'Uploading...' : uploadTitle,
+        subtitle: uploadSubtitle,
+        onUpload: _isUploading
+            ? null
+            : () => _pickAndUpload((url) {
+                final updated = _upsertSingleDoc(
+                  _currentGroups(field),
+                  fieldKey: fieldKey,
+                  name: uploadTitle,
+                  url: url,
+                );
+                field.didChange(updated);
+              }),
+      );
+    }
 
-        // Value exists (String URL or XFile) -> Show Viewed Item
-        String fileName = 'Document';
-        String fileSize = ''; // Can't easily know size from URL
-        bool isUrl = false;
+    final url = firstDoc['url']?.toString() ?? '';
+    final name = firstDoc['name']?.toString() ?? fieldKey;
 
-        if (value is XFile) {
-          fileName = value.name;
-        } else if (value is String) {
-          isUrl = true;
-          fileName = value.split('/').last;
-          if (fileName.contains('?')) {
-            fileName = fileName.split('?').first;
-          }
-        }
-
-        return _buildUploadedDocumentItem(
-          context,
-          fileName: fileName,
-          fileSize: fileSize,
-          type: uploadedTypeLabel,
-          isUrl: isUrl,
-          onView: isUrl ? () => _viewDocument(value as String) : null,
-          onRemove: () => _removeDocument(fieldName),
-          onReplace: () => _pickDocument(fieldName),
+    return _UploadedDocumentTile(
+      fileName: _fileNameFromUrl(url, name),
+      typeLabel: typeLabel,
+      onView: url.isNotEmpty ? () => _viewDocument(url) : null,
+      onReplace: () => _pickAndUpload((newUrl) {
+        final updated = _upsertSingleDoc(
+          _currentGroups(field),
+          fieldKey: fieldKey,
+          name: name,
+          url: newUrl,
         );
+        field.didChange(updated);
+      }),
+      onRemove: () {
+        final updated = _removeGroup(_currentGroups(field), fieldKey);
+        field.didChange(updated);
       },
     );
   }
 
-  Widget _buildDocumentUploadItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onUpload,
-  }) {
+  // ── Other documents (subform) ───────────────
+
+  /// Builds the "Other Documents" section with a
+  /// subform for adding/removing documents within
+  /// the `other_documents` group.
+  Widget _buildOtherDocumentsSection(
+    BuildContext context,
+    List<Map<String, dynamic>> groups,
+    FormFieldState<List<Map<String, dynamic>>> field,
+  ) {
+    final otherGroup = _findGroup(groups, DocFieldKey.others);
+    final otherDocs = _docsFromGroup(otherGroup);
     final colorScheme = Theme.of(context).colorScheme;
 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'OTHER DOCUMENTS',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        AppDimens.verticalMediumSmall,
+
+        // Existing other documents list
+        ...List.generate(otherDocs.length, (index) {
+          final doc = otherDocs[index];
+          final url = doc['url']?.toString() ?? '';
+          final name = doc['name']?.toString() ?? '';
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _UploadedDocumentTile(
+              fileName: _fileNameFromUrl(url, name),
+              typeLabel: name,
+              onView: url.isNotEmpty ? () => _viewDocument(url) : null,
+              onReplace: () => _pickAndUpload((newUrl) {
+                final fileName = _fileNameFromUrl(newUrl, name);
+                final updated = _replaceInOtherDocs(
+                  _currentGroups(field),
+                  index,
+                  name: fileName,
+                  url: newUrl,
+                );
+                field.didChange(updated);
+              }),
+              onRemove: () {
+                final updated = _removeFromOtherDocs(
+                  _currentGroups(field),
+                  index,
+                );
+                field.didChange(updated);
+              },
+            ),
+          );
+        }),
+
+        // Upload zone
+        _buildUploadZone(context, colorScheme, field),
+      ],
+    );
+  }
+
+  /// Cloud-upload zone for adding new documents
+  /// to the `other_documents` group.
+  Widget _buildUploadZone(
+    BuildContext context,
+    ColorScheme colorScheme,
+    FormFieldState<List<Map<String, dynamic>>> field,
+  ) {
+    return InkWell(
+      onTap: _isUploading
+          ? null
+          : () => _pickAndUpload((url) {
+              final fileName = _fileNameFromUrl(url, 'Document');
+              final updated = _addToOtherDocs(
+                _currentGroups(field),
+                name: fileName,
+                url: url,
+              );
+              field.didChange(updated);
+            }),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: colorScheme.outlineVariant),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.shadow.withAlpha(10),
+                    blurRadius: 2,
+                  ),
+                ],
+                border: Border.all(color: colorScheme.outlineVariant),
+              ),
+              child: _isUploading
+                  ? const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Icon(
+                      Icons.cloud_upload,
+                      color: colorScheme.primary,
+                      size: 24,
+                    ),
+            ),
+            AppDimens.verticalMediumSmall,
+            Text(
+              _isUploading ? 'Uploading...' : 'Click to upload',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            AppDimens.verticalExtraSmall,
+            Text(
+              'Upload any relevant '
+              'certificates, records, '
+              'or files.\n'
+              'Supported: PDF, JPG, PNG'
+              ' • Max 10MB.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Helpers ──────────────────────────────────
+
+  /// Extracts a display-friendly file name
+  /// from a URL, falling back to [fallback].
+  String _fileNameFromUrl(String url, String fallback) {
+    if (url.isEmpty) return fallback;
+    var name = url.split('/').last;
+    if (name.contains('?')) {
+      name = name.split('?').first;
+    }
+    return name.isNotEmpty ? name : fallback;
+  }
+}
+
+// ══════════════════════════════════════════════
+// Private extracted widgets
+// ══════════════════════════════════════════════
+
+/// A row showing an "upload" placeholder for a
+/// document that hasn't been uploaded yet.
+class _DocumentUploadTile extends StatelessWidget {
+  const _DocumentUploadTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onUpload,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback? onUpload;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outlineVariant),
+        border: Border.all(color: cs.outlineVariant),
       ),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.outlineVariant),
-            ),
-            child: Icon(icon, color: colorScheme.onSurfaceVariant, size: 20),
-          ),
+          _iconBox(cs, icon),
           AppDimens.horizontalMedium,
           Expanded(
             child: Column(
@@ -301,9 +658,9 @@ class _EmployeeDocumentsCertificationsCardState
                 ),
                 Text(
                   subtitle,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                 ),
               ],
             ),
@@ -319,40 +676,37 @@ class _EmployeeDocumentsCertificationsCardState
       ),
     );
   }
+}
 
-  Widget _buildUploadedDocumentItem(
-    BuildContext context, {
-    required String fileName,
-    required String fileSize,
-    required String type,
-    required bool isUrl,
-    VoidCallback? onView,
-    required VoidCallback onRemove,
-    required VoidCallback onReplace,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
+/// A row showing an already-uploaded document
+/// with View / Replace / Remove actions.
+class _UploadedDocumentTile extends StatelessWidget {
+  const _UploadedDocumentTile({
+    required this.fileName,
+    required this.typeLabel,
+    this.onView,
+    required this.onReplace,
+    required this.onRemove,
+  });
+
+  final String fileName;
+  final String typeLabel;
+  final VoidCallback? onView;
+  final VoidCallback onReplace;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.primary),
+        border: Border.all(color: cs.primary),
       ),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.outlineVariant),
-            ),
-            child: Icon(
-              _getFileIcon(fileName),
-              color: colorScheme.onSurfaceVariant,
-              size: 20,
-            ),
-          ),
+          _iconBox(cs, _fileIcon(fileName)),
           AppDimens.horizontalMedium,
           Expanded(
             child: Column(
@@ -366,187 +720,107 @@ class _EmployeeDocumentsCertificationsCardState
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        type,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onPrimary,
-                        ),
-                      ),
-                    ),
-                    if (fileSize.isNotEmpty) ...[
-                      AppDimens.horizontalSmall,
-                      Text(
-                        fileSize,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+                _typeBadge(context, cs),
               ],
             ),
           ),
           AppDimens.horizontalMedium,
-          Row(
-            children: [
-              if (isUrl && onView != null) ...[
-                AppButton(
-                  onPressed: onView,
-                  buttonType: ButtonType.text,
-                  child: Text(
-                    'View',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primary,
-                    ),
-                  ),
-                ),
-                AppDimens.horizontalSmall,
-              ],
-              AppButton(
-                onPressed: onReplace,
-                buttonType: ButtonType.outline,
-                customStyle: OutlinedButton.styleFrom(
-                  foregroundColor: colorScheme.onSurfaceVariant,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  side: BorderSide(color: colorScheme.outlineVariant),
-                ),
-                child: Text(
-                  'Replace',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              AppDimens.horizontalMedium,
-              InkWell(
-                onTap: onRemove,
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.delete,
-                    size: 20,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          _actions(context, cs),
         ],
       ),
     );
   }
 
-  Widget _buildAdditionalDocuments(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'ADDITIONAL DOCUMENTS',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
+  Widget _typeBadge(BuildContext context, ColorScheme cs) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: cs.primary,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        typeLabel,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: cs.onPrimary,
         ),
-        AppDimens.verticalMediumSmall,
-        InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: colorScheme.outlineVariant,
-                style: BorderStyle
-                    .solid, // Dashed border not native, solid for now or custom painter if needed. HTML says dashed.
+      ),
+    );
+  }
+
+  Widget _actions(BuildContext context, ColorScheme cs) {
+    return Row(
+      children: [
+        if (onView != null) ...[
+          AppButton(
+            onPressed: onView,
+            buttonType: ButtonType.text,
+            child: Text(
+              'View',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: cs.primary,
               ),
             ),
-            child: Column(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.shadow.withAlpha(10),
-                        blurRadius: 2,
-                      ),
-                    ],
-                    border: Border.all(color: colorScheme.outlineVariant),
-                  ),
-                  child: Icon(
-                    Icons.cloud_upload,
-                    color: colorScheme.primary,
-                    size: 24,
-                  ),
-                ),
-                AppDimens.verticalMediumSmall,
-                Text(
-                  'Click to upload or drag and drop',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                AppDimens.verticalExtraSmall,
-                Text(
-                  'Upload any other relevant certificates, records, or files.\nSupported formats: PDF, JPG, PNG. Max file size: 10MB.',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+          ),
+          AppDimens.horizontalSmall,
+        ],
+        AppButton(
+          onPressed: onReplace,
+          buttonType: ButtonType.outline,
+          customStyle: OutlinedButton.styleFrom(
+            foregroundColor: cs.onSurfaceVariant,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            side: BorderSide(color: cs.outlineVariant),
+          ),
+          child: Text(
+            'Replace',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: cs.onSurfaceVariant,
             ),
+          ),
+        ),
+        AppDimens.horizontalMedium,
+        InkWell(
+          onTap: onRemove,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+            child: Icon(Icons.delete, size: 20, color: cs.onSurfaceVariant),
           ),
         ),
       ],
     );
   }
 
-  IconData _getFileIcon(String fileName) {
-    if (!fileName.contains('.')) return Icons.insert_drive_file;
-    final extension = fileName.split('.').last.toLowerCase();
-    switch (extension) {
-      case 'pdf':
-        return Icons.picture_as_pdf;
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-        return Icons.image;
-      case 'doc':
-      case 'docx':
-        return Icons.description;
-      default:
-        return Icons.insert_drive_file;
+  IconData _fileIcon(String name) {
+    if (!name.contains('.')) {
+      return Icons.insert_drive_file;
     }
+    final ext = name.split('.').last.toLowerCase();
+    return switch (ext) {
+      'pdf' => Icons.picture_as_pdf,
+      'jpg' || 'jpeg' || 'png' => Icons.image,
+      'doc' || 'docx' => Icons.description,
+      _ => Icons.insert_drive_file,
+    };
   }
+}
+
+// ── Shared icon box ────────────────────────────
+
+Widget _iconBox(ColorScheme cs, IconData icon) {
+  return Container(
+    width: 40,
+    height: 40,
+    decoration: BoxDecoration(
+      color: cs.surface,
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: cs.outlineVariant),
+    ),
+    child: Icon(icon, color: cs.onSurfaceVariant, size: 20),
+  );
 }

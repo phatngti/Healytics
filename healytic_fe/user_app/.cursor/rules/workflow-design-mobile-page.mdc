@@ -1,0 +1,80 @@
+---
+description: Workflow for creating a mobile page following the UI design system with proper theming, responsive layout, shared components, and compliance checklist.
+globs: "**/*.screen.dart"
+alwaysApply: false
+---
+
+# Design Mobile Page Workflow
+
+## Input Required
+- `<page_name>`: Page name (PascalCase, e.g., `BookingList`)
+- `<feature_name>`: Feature it belongs to
+
+## Steps
+
+1. **Create the screen file** at `lib/features/<feature>/presentation/screens/<page_name_snake>.screen.dart`:
+   ```dart
+   import 'package:flutter/material.dart';
+   import 'package:hooks_riverpod/hooks_riverpod.dart';
+   import 'package:common/utils/demensions.dart';
+
+   class <PageName>Screen extends ConsumerWidget {
+     const <PageName>Screen({super.key});
+
+     @override
+     Widget build(BuildContext context, WidgetRef ref) {
+       final colorScheme = Theme.of(context).colorScheme;
+       final textTheme = Theme.of(context).textTheme;
+
+       return Scaffold(
+         appBar: AppBar(
+           title: Text('Page Title', style: textTheme.titleLarge),
+           backgroundColor: colorScheme.surface,
+         ),
+         body: SafeArea(
+           child: SingleChildScrollView(
+             padding: EdgeInsets.all(Demensions.paddingMedium),
+             child: Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
+                 _Header(),
+                 SizedBox(height: Demensions.spacingMedium),
+                 _Content(),
+               ],
+             ),
+           ),
+         ),
+       );
+     }
+   }
+   ```
+
+2. **Extract sections into private widgets** — each major section as its own class.
+
+3. **For lists, use ListView.builder** with `shrinkWrap: true` and `NeverScrollableScrollPhysics()`.
+
+4. **For data-driven pages, handle loading/error states** with `AsyncValue` pattern matching.
+
+5. **Use shared components** from `package:common`.
+
+6. **Add the route** in `lib/router/routes.dart` with slide transition.
+
+7. **Run code generation:**
+   ```bash
+   dart run build_runner build --delete-conflicting-outputs
+   ```
+
+8. **Verify compliance checklist:**
+   - All colors from `Theme.of(context).colorScheme.*`
+   - All text styles from `Theme.of(context).textTheme.*`
+   - All spacing from `Demensions.*` constants
+   - Using `package:common` widgets where available
+   - Widget composition (no build method > 50 lines)
+   - `const` constructors where possible
+   - `ListView.builder` for dynamic lists
+   - `SafeArea` for proper display
+   - Loading/error state handling
+   - Semantic labels for accessibility
+   - No magic numbers
+   - `Color.withValues(alpha:)` not `.withOpacity()`
+   - Responsive sizing with `MediaQuery` or `LayoutBuilder`

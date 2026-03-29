@@ -1,0 +1,126 @@
+---
+description: Comprehensive testing patterns for Flutter apps using the project's mock data source pattern. Covers unit tests, widget tests, and Riverpod 3.0 provider testing.
+globs: "**/*_test.dart"
+alwaysApply: false
+---
+
+# Flutter Testing (Riverpod 3.0)
+
+## Test Organization
+
+```
+test/
+├── features/
+│   └── <feature_name>/
+│       ├── data/
+│       │   └── <feature>_repository_test.dart
+│       ├── domain/
+│       │   └── <feature>_entity_test.dart
+│       └── presentation/
+│           ├── <feature>_provider_test.dart
+│           └── <feature>_screen_test.dart
+└── core/
+    └── ...
+```
+
+## Unit Tests (Domain & Data)
+
+### Testing Entities
+```dart
+test('creates with required fields', () {
+  const product = ProductEntity(id: '1', name: 'Test', price: 9.99);
+  expect(product.id, '1');
+});
+
+test('copyWith creates new instance', () {
+  const original = ProductEntity(id: '1', name: 'Original', price: 9.99);
+  final updated = original.copyWith(name: 'Updated');
+  expect(updated.name, 'Updated');
+  expect(updated.id, '1');
+});
+```
+
+### Testing Repositories (using built-in mocks)
+```dart
+setUp(() {
+  mockDataSource = ProductRemoteDataSourceMock();
+  repository = ProductRepositoryImpl(mockDataSource);
+});
+
+test('getProducts returns non-empty list', () async {
+  final products = await repository.getProducts();
+  expect(products, isNotEmpty);
+  expect(products.first, isA<ProductEntity>());
+});
+```
+
+**Important:** Use the project's built-in mock data source classes. No need for mockito/mocktail.
+
+## Riverpod 3.0 Provider Tests
+
+### `ProviderContainer.test` (auto-dispose)
+```dart
+test('initial state loads products', () async {
+  final container = ProviderContainer.test(
+    overrides: [
+      productRepositoryProvider.overrideWithValue(
+        ProductRepositoryImpl(ProductRemoteDataSourceMock()),
+      ),
+    ],
+  );
+  final products = await container.read(productListNotifierProvider.future);
+  expect(products, isNotEmpty);
+});
+```
+
+### `overrideWithBuild` — Mock Only `build()`
+```dart
+test('notifier starts with custom state', () {
+  final container = ProviderContainer.test(
+    overrides: [
+      myNotifierProvider.overrideWithBuild((ref) => 42),
+    ],
+  );
+  expect(container.read(myNotifierProvider), 42);
+  container.read(myNotifierProvider.notifier).increment();
+  expect(container.read(myNotifierProvider), 43);
+});
+```
+
+## Widget Tests
+
+### Using `WidgetTester.container`
+```dart
+testWidgets('shows loading then products', (tester) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        productRepositoryProvider.overrideWithValue(
+          ProductRepositoryImpl(ProductRemoteDataSourceMock()),
+        ),
+      ],
+      child: const MaterialApp(home: ProductListScreen()),
+    ),
+  );
+  expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  await tester.pumpAndSettle();
+  expect(find.byType(ProductCard), findsWidgets);
+});
+```
+
+## Best Practices
+
+- **AAA Pattern:** Arrange (setUp), Act (call method), Assert (expect).
+- **Group related tests** with `group()`.
+- **Use `ProviderContainer.test`** — no manual `dispose()` / `tearDown`.
+- **Test error paths** — not just happy paths.
+- **Prefer built-in mocks** from data sources over mocking libraries.
+- **Widget tests:** Always wrap in `MaterialApp` and `ProviderScope`.
+
+## Running Tests
+
+```bash
+flutter test                                    # All tests
+flutter test test/features/home/                # Feature tests
+flutter test --coverage                         # With coverage
+```

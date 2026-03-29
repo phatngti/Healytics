@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
+import 'package:user_app/router/routes.dart';
+
 class QuickActionsSection extends StatelessWidget {
   const QuickActionsSection({super.key});
 
@@ -38,7 +40,10 @@ class QuickActionsSection extends StatelessWidget {
                 ),
                 title: 'Book Appointment',
                 subtitle: 'Quick booking with AI suggestions',
-                onTap: () {},
+                onTap: () {
+                  const BookAppointmentRoute()
+                      .push(context);
+                },
               ),
             ),
             SizedBox(width: cardGap),
@@ -51,7 +56,10 @@ class QuickActionsSection extends StatelessWidget {
                 ),
                 title: 'AI Health Assistant',
                 subtitle: 'Get instant health guidance',
-                onTap: () {},
+                onTap: () {
+                  const AiHealthAssistantRoute()
+                      .push(context);
+                },
               ),
             ),
           ],

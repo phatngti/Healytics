@@ -1,6 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/features/home/data/provider/home.provider.dart';
+import 'package:user_app/features/home/domain/entities/'
+    'ai_recommendation.entity.dart';
 import 'package:user_app/features/home/domain/entities/home.entity.dart';
+import 'package:user_app/features/orders/domain/entities/'
+    'appointment.entity.dart';
 
 part 'home.provider.g.dart';
 
@@ -30,4 +34,34 @@ Future<List<HomeProduct>> premiumTreatments(Ref ref) async {
 Future<List<ServiceTag>> serviceTags(Ref ref) async {
   final repository = ref.read(homeRepositoryProvider);
   return repository.getServiceTags();
+}
+
+/// Provider for fetching featured specialists.
+@riverpod
+Future<List<HomeSpecialist>> featuredSpecialists(
+  Ref ref,
+) async {
+  final repository = ref.read(homeRepositoryProvider);
+  return repository.getFeaturedSpecialists();
+}
+
+/// Provider for fetching AI-powered service
+/// recommendations based on a list of service IDs.
+@riverpod
+Future<List<AiRecommendation>> aiRecommendations(
+  Ref ref,
+  List<String> serviceIds,
+) async {
+  final repository = ref.read(homeRepositoryProvider);
+  return repository.getAiRecommendations(serviceIds);
+}
+
+/// Provider for fetching recent appointment activity
+/// shown on the home dashboard.
+@riverpod
+Future<List<AppointmentEntity>> recentActivity(
+  Ref ref,
+) async {
+  final repository = ref.read(homeRepositoryProvider);
+  return repository.getRecentActivity(limit: 5);
 }

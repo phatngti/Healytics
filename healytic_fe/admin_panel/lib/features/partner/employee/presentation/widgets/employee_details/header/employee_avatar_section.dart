@@ -11,6 +11,7 @@ class EmployeeAvatarSection extends StatelessWidget {
   final String fullName;
   final String displayName;
   final EmployeeId employeeId;
+  final String employeeCode;
   final bool isEditing;
 
   const EmployeeAvatarSection({
@@ -19,6 +20,7 @@ class EmployeeAvatarSection extends StatelessWidget {
     required this.fullName,
     required this.displayName,
     required this.employeeId,
+    required this.employeeCode,
     this.isEditing = false,
   });
 
@@ -67,39 +69,63 @@ class EmployeeAvatarSection extends StatelessWidget {
           ],
         ),
         AppDimens.horizontalLarge,
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              fullName,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurfaceVariant,
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                fullName,
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall
+                    ?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            Text(
-              'Display: "$displayName"',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+              Text(
+                'Display: "$displayName"',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            AppDimens.verticalExtraSmall,
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: colorScheme.outlineVariant),
-              ),
-              child: Text(
-                'EMP-${employeeId.value.substring(0, math.min(6, employeeId.value.length)).toUpperCase()}',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontFamily: 'monospace',
-                  color: colorScheme.onSurfaceVariant,
+              AppDimens.verticalExtraSmall,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                      colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant,
+                  ),
+                ),
+                child: Text(
+                  employeeCode.isNotEmpty
+                      ? employeeCode
+                      : 'EMP-${employeeId.value.substring(0, math.min(6, employeeId.value.length)).toUpperCase()}',
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelSmall
+                      ?.copyWith(
+                        fontFamily: 'monospace',
+                        color:
+                            colorScheme.onSurfaceVariant,
+                      ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );

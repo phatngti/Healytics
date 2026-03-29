@@ -12,8 +12,18 @@ List<RouteBase> get $appRoutes => [
   $serviceDetailsRoute,
   $reviewsRoute,
   $checkoutRoute,
+  $bookAppointmentRoute,
+  $selectSpecialistRoute,
+  $serviceSpecialistRoute,
+  $employeeBookingRoute,
+  $employeeBookingSummaryRoute,
+  $bookingSummaryRoute,
+  $aiHealthAssistantRoute,
   $orderDetailsRoute,
   $serviceManualRoute,
+  $employeeDetailRoute,
+  $certificatesListRoute,
+  $certificateViewerRoute,
   $lottieSplashRoute,
   $onboardingRoute,
   $signInRoute,
@@ -25,6 +35,10 @@ List<RouteBase> get $appRoutes => [
   $lifestyleActivityStepRoute,
   $bodyEnergyStepRoute,
   $healthSafetyStepRoute,
+  $editProfileRoute,
+  $reviewTreatmentRoute,
+  $reviewSpecialistRoute,
+  $reviewSubmittedRoute,
 ];
 
 RouteBase get $mobileWrapperRoutes => StatefulShellRouteData.$route(
@@ -310,6 +324,220 @@ mixin $CheckoutRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $bookAppointmentRoute => GoRouteData.$route(
+  path: '/book_appointment',
+  name: 'book_appointment',
+  factory: $BookAppointmentRoute._fromState,
+);
+
+mixin $BookAppointmentRoute on GoRouteData {
+  static BookAppointmentRoute _fromState(GoRouterState state) =>
+      const BookAppointmentRoute();
+
+  @override
+  String get location => GoRouteData.$location('/book_appointment');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $selectSpecialistRoute => GoRouteData.$route(
+  path: '/select_specialist',
+  name: 'select_specialist',
+  factory: $SelectSpecialistRoute._fromState,
+);
+
+mixin $SelectSpecialistRoute on GoRouteData {
+  static SelectSpecialistRoute _fromState(GoRouterState state) =>
+      SelectSpecialistRoute(
+        categoryId: state.uri.queryParameters['category-id']!,
+      );
+
+  SelectSpecialistRoute get _self => this as SelectSpecialistRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/select_specialist',
+    queryParams: {'category-id': _self.categoryId},
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $serviceSpecialistRoute => GoRouteData.$route(
+  path: '/service_specialist',
+  name: 'service_specialist',
+  factory: $ServiceSpecialistRoute._fromState,
+);
+
+mixin $ServiceSpecialistRoute on GoRouteData {
+  static ServiceSpecialistRoute _fromState(GoRouterState state) =>
+      ServiceSpecialistRoute(
+        serviceId: state.uri.queryParameters['service-id']!,
+      );
+
+  ServiceSpecialistRoute get _self => this as ServiceSpecialistRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/service_specialist',
+    queryParams: {'service-id': _self.serviceId},
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $employeeBookingRoute => GoRouteData.$route(
+  path: '/employee_booking',
+  name: 'employee_booking',
+  factory: $EmployeeBookingRoute._fromState,
+);
+
+mixin $EmployeeBookingRoute on GoRouteData {
+  static EmployeeBookingRoute _fromState(GoRouterState state) =>
+      EmployeeBookingRoute(
+        employeeId: state.uri.queryParameters['employee-id']!,
+        serviceId: state.uri.queryParameters['service-id']!,
+      );
+
+  EmployeeBookingRoute get _self => this as EmployeeBookingRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/employee_booking',
+    queryParams: {
+      'employee-id': _self.employeeId,
+      'service-id': _self.serviceId,
+    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $employeeBookingSummaryRoute => GoRouteData.$route(
+  path: '/employee_booking_summary',
+  name: 'employee_booking_summary',
+  factory: $EmployeeBookingSummaryRoute._fromState,
+);
+
+mixin $EmployeeBookingSummaryRoute on GoRouteData {
+  static EmployeeBookingSummaryRoute _fromState(GoRouterState state) =>
+      const EmployeeBookingSummaryRoute();
+
+  @override
+  String get location => GoRouteData.$location('/employee_booking_summary');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $bookingSummaryRoute => GoRouteData.$route(
+  path: '/booking_summary',
+  name: 'booking_summary',
+  factory: $BookingSummaryRoute._fromState,
+);
+
+mixin $BookingSummaryRoute on GoRouteData {
+  static BookingSummaryRoute _fromState(GoRouterState state) =>
+      const BookingSummaryRoute();
+
+  @override
+  String get location => GoRouteData.$location('/booking_summary');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $aiHealthAssistantRoute => GoRouteData.$route(
+  path: '/ai_health_assistant',
+  name: 'ai_health_assistant',
+  factory: $AiHealthAssistantRoute._fromState,
+);
+
+mixin $AiHealthAssistantRoute on GoRouteData {
+  static AiHealthAssistantRoute _fromState(GoRouterState state) =>
+      const AiHealthAssistantRoute();
+
+  @override
+  String get location => GoRouteData.$location('/ai_health_assistant');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $orderDetailsRoute => GoRouteData.$route(
   path: '/order_details',
   name: 'order_details',
@@ -361,6 +589,118 @@ mixin $ServiceManualRoute on GoRouteData {
   String get location => GoRouteData.$location(
     '/service_manual',
     queryParams: {'appointment-id': _self.appointmentId},
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $employeeDetailRoute => GoRouteData.$route(
+  path: '/employee_detail',
+  name: 'employee_detail',
+  factory: $EmployeeDetailRoute._fromState,
+);
+
+mixin $EmployeeDetailRoute on GoRouteData {
+  static EmployeeDetailRoute _fromState(GoRouterState state) =>
+      EmployeeDetailRoute(
+        employeeId: state.uri.queryParameters['employee-id']!,
+      );
+
+  EmployeeDetailRoute get _self => this as EmployeeDetailRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/employee_detail',
+    queryParams: {'employee-id': _self.employeeId},
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $certificatesListRoute => GoRouteData.$route(
+  path: '/certificates_list',
+  name: 'certificates_list',
+  factory: $CertificatesListRoute._fromState,
+);
+
+mixin $CertificatesListRoute on GoRouteData {
+  static CertificatesListRoute _fromState(GoRouterState state) =>
+      CertificatesListRoute(
+        employeeName: state.uri.queryParameters['employee-name']!,
+        employeeId: state.uri.queryParameters['employee-id']!,
+      );
+
+  CertificatesListRoute get _self => this as CertificatesListRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/certificates_list',
+    queryParams: {
+      'employee-name': _self.employeeName,
+      'employee-id': _self.employeeId,
+    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $certificateViewerRoute => GoRouteData.$route(
+  path: '/certificate_viewer',
+  name: 'certificate_viewer',
+  factory: $CertificateViewerRoute._fromState,
+);
+
+mixin $CertificateViewerRoute on GoRouteData {
+  static CertificateViewerRoute _fromState(GoRouterState state) =>
+      CertificateViewerRoute(
+        certificateName: state.uri.queryParameters['certificate-name']!,
+        url: state.uri.queryParameters['url']!,
+        type: state.uri.queryParameters['type']!,
+      );
+
+  CertificateViewerRoute get _self => this as CertificateViewerRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/certificate_viewer',
+    queryParams: {
+      'certificate-name': _self.certificateName,
+      'url': _self.url,
+      'type': _self.type,
+    },
   );
 
   @override
@@ -658,6 +998,159 @@ mixin $HealthSafetyStepRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/health_safety_step');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $editProfileRoute => GoRouteData.$route(
+  path: '/edit_profile',
+  name: 'edit_profile',
+  factory: $EditProfileRoute._fromState,
+);
+
+mixin $EditProfileRoute on GoRouteData {
+  static EditProfileRoute _fromState(GoRouterState state) =>
+      const EditProfileRoute();
+
+  @override
+  String get location => GoRouteData.$location('/edit_profile');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $reviewTreatmentRoute => GoRouteData.$route(
+  path: '/review_treatment',
+  name: 'review_treatment',
+  factory: $ReviewTreatmentRoute._fromState,
+);
+
+mixin $ReviewTreatmentRoute on GoRouteData {
+  static ReviewTreatmentRoute _fromState(GoRouterState state) =>
+      ReviewTreatmentRoute(
+        appointmentId: state.uri.queryParameters['appointment-id']!,
+        serviceName: state.uri.queryParameters['service-name']!,
+        vendorName: state.uri.queryParameters['vendor-name']!,
+      );
+
+  ReviewTreatmentRoute get _self => this as ReviewTreatmentRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/review_treatment',
+    queryParams: {
+      'appointment-id': _self.appointmentId,
+      'service-name': _self.serviceName,
+      'vendor-name': _self.vendorName,
+    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $reviewSpecialistRoute => GoRouteData.$route(
+  path: '/review_specialist',
+  name: 'review_specialist',
+  factory: $ReviewSpecialistRoute._fromState,
+);
+
+mixin $ReviewSpecialistRoute on GoRouteData {
+  static ReviewSpecialistRoute _fromState(GoRouterState state) =>
+      ReviewSpecialistRoute(
+        appointmentId: state.uri.queryParameters['appointment-id']!,
+        specialistId: state.uri.queryParameters['specialist-id']!,
+        specialistName: state.uri.queryParameters['specialist-name']!,
+        specialistRole: state.uri.queryParameters['specialist-role']!,
+        specialistAvatarUrl: state.uri.queryParameters['specialist-avatar-url'],
+      );
+
+  ReviewSpecialistRoute get _self => this as ReviewSpecialistRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/review_specialist',
+    queryParams: {
+      'appointment-id': _self.appointmentId,
+      'specialist-id': _self.specialistId,
+      'specialist-name': _self.specialistName,
+      'specialist-role': _self.specialistRole,
+      if (_self.specialistAvatarUrl != null)
+        'specialist-avatar-url': _self.specialistAvatarUrl,
+    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $reviewSubmittedRoute => GoRouteData.$route(
+  path: '/review_submitted',
+  name: 'review_submitted',
+  factory: $ReviewSubmittedRoute._fromState,
+);
+
+mixin $ReviewSubmittedRoute on GoRouteData {
+  static ReviewSubmittedRoute _fromState(GoRouterState state) =>
+      ReviewSubmittedRoute(
+        specialistName: state.uri.queryParameters['specialist-name']!,
+        specialistAvatarUrl: state.uri.queryParameters['specialist-avatar-url'],
+        rating: int.parse(state.uri.queryParameters['rating']!),
+      );
+
+  ReviewSubmittedRoute get _self => this as ReviewSubmittedRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/review_submitted',
+    queryParams: {
+      'specialist-name': _self.specialistName,
+      if (_self.specialistAvatarUrl != null)
+        'specialist-avatar-url': _self.specialistAvatarUrl,
+      'rating': _self.rating.toString(),
+    },
+  );
 
   @override
   void go(BuildContext context) => context.go(location);

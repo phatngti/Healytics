@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
@@ -98,7 +99,7 @@ class _ProductOrganizationCardState
 
         return FormFieldBuilders.buildCustomDropdownField<String>(
           context,
-          fieldKey: 'category',
+          fieldKey: ProductFormField.category.key,
           hintText: 'Select category...',
           initialValue: _category,
           label: 'Category',

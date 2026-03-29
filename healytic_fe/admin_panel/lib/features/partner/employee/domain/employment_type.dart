@@ -30,4 +30,18 @@ enum EmploymentType {
     EmploymentType.contractor => 'CONTRACTOR',
     EmploymentType.seasonal => 'SEASONAL',
   };
+
+  /// Returns the [EmploymentType] for the given API [value].
+  ///
+  /// Returns `null` if no matching type is found.
+  static EmploymentType? fromApiValue(String? value) {
+    if (value == null) return null;
+    return switch (value.toUpperCase()) {
+      'FULL_TIME' => EmploymentType.fullTime,
+      'PART_TIME' => EmploymentType.partTime,
+      'CONTRACTOR' => EmploymentType.contractor,
+      'SEASONAL' => EmploymentType.seasonal,
+      _ => null,
+    };
+  }
 }

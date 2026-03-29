@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'package:logging/logging.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/config/app_environment.dart';
@@ -24,6 +24,12 @@ abstract class ServiceDetailsRemoteDatasource {
   /// `GET /products/:id/reviews` — user reviews.
   Future<List<ReviewEntity>> getServiceReviews(String serviceId);
 
+  /// `GET /employees/:id/reviews` — reviews for a
+  /// specific employee.
+  Future<List<ReviewEntity>> getEmployeeReviews(
+    String employeeId,
+  );
+
   /// `GET /products/:id/recommended` — related
   /// service cards.
   Future<List<RecommendedServiceEntity>> getRecommendedServices(
@@ -39,6 +45,9 @@ abstract class ServiceDetailsRemoteDatasource {
 /// DTOs to domain entities.
 class ServiceDetailsRemoteDatasourceImpl
     implements ServiceDetailsRemoteDatasource {
+  static final _log =
+      Logger('ServiceDetailsDatasource');
+
   const ServiceDetailsRemoteDatasourceImpl(this._apiService);
 
   final ApiService _apiService;
@@ -47,8 +56,8 @@ class ServiceDetailsRemoteDatasourceImpl
 
   @override
   Future<ServiceDetailsEntity> getServiceDetails(String serviceId) async {
-    final response = await _apiService.healthServicesApi
-        .healthServiceControllerGetProductInfo(serviceId);
+    final response = await _apiService.userHealthServicesApi
+        .userHealthServiceControllerGetProductInfo(serviceId);
     if (response == null) {
       throw Exception('Product info not found: $serviceId');
     }
@@ -62,6 +71,7 @@ class ServiceDetailsRemoteDatasourceImpl
     return ServiceDetailsEntity(
       id: dto.id,
       title: dto.title,
+      categoryId: dto.category.id,
       categoryLabel: dto.category.name,
       images: dto.images,
       rating: dto.rating.toDouble(),
@@ -84,20 +94,19 @@ class ServiceDetailsRemoteDatasourceImpl
   @override
   Future<List<SpecialistEntity>> getServiceEmployees(String serviceId) async {
     try {
-      log('1. Calling API...');
-      final response = await _apiService.healthServicesApi
-          .healthServiceControllerGetProductEmployees(
+      _log.fine('Calling employees API...');
+      final response = await _apiService.userHealthServicesApi
+          .userHealthServiceControllerGetProductEmployees(
             serviceId,
           );
 
-      log('2. API Returned. Is null? ${response == null}');
+      _log.fine('API returned. Is null? ${response == null}');
       if (response == null) return [];
 
-      log('3. Response data: $response');
+      _log.fine('Response data: $response');
       return response.map(_mapEmployeeToEntity).toList();
     } catch (e, stackTrace) {
-      log('ERROR DURING API CALL OR PARSING: $e');
-      log('$stackTrace');
+      _log.severe('Error during API call or parsing', e, stackTrace);
       rethrow;
     }
   }
@@ -139,8 +148,8 @@ class ServiceDetailsRemoteDatasourceImpl
 
   @override
   Future<List<ReviewEntity>> getServiceReviews(String serviceId) async {
-    final dtos = await _apiService.healthServicesApi
-        .healthServiceControllerGetProductReviews(
+    final dtos = await _apiService.userHealthServicesApi
+        .userHealthServiceControllerGetProductReviews(
           serviceId,
         );
     if (dtos == null) return [];
@@ -161,14 +170,25 @@ class ServiceDetailsRemoteDatasourceImpl
     );
   }
 
+  // ── Employee Reviews ──────────────────────────────
+
+  @override
+  Future<List<ReviewEntity>> getEmployeeReviews(
+    String employeeId,
+  ) async {
+    // TODO: call actual backend endpoint once
+    //       available.
+    return [];
+  }
+
   // ── Recommended ───────────────────────────────────
 
   @override
   Future<List<RecommendedServiceEntity>> getRecommendedServices(
     String serviceId,
   ) async {
-    final dtos = await _apiService.healthServicesApi
-        .healthServiceControllerGetRecommendedProducts(
+    final dtos = await _apiService.userHealthServicesApi
+        .userHealthServiceControllerGetRecommendedProducts(
           serviceId,
         );
     if (dtos == null) return [];
@@ -210,9 +230,25 @@ class ServiceDetailsRemoteDatasourceMock
   }
 
   @override
-  Future<List<ReviewEntity>> getServiceReviews(String serviceId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
+  Future<List<ReviewEntity>> getServiceReviews(
+    String serviceId,
+  ) async {
+    await Future.delayed(
+      const Duration(milliseconds: 300),
+    );
     return kMockReviewsMap[serviceId] ?? [];
+  }
+
+  @override
+  Future<List<ReviewEntity>> getEmployeeReviews(
+    String employeeId,
+  ) async {
+    await Future.delayed(
+      const Duration(milliseconds: 300),
+    );
+    return kMockEmployeeReviewsMap[
+        employeeId] ??
+        [];
   }
 
   @override

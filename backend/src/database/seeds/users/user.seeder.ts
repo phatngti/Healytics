@@ -9,7 +9,7 @@ import { ISeeder } from '../seeder.interface';
 
 const SEED_USERS = [
   {
-    email: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.com',
+    email: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
     username: 'admin',
     password: process.env.DEFAULT_ADMIN_PASSWORD || 'admin@123',
     role: Role.ADMIN,
@@ -17,43 +17,43 @@ const SEED_USERS = [
   {
     email: 'user@healytics.vn',
     username: 'testuser',
-    password: 'User@123',
+    password: 'user@123',
     role: Role.USER,
   },
   {
     email: 'partner@healytics.vn',
     username: 'testpartner',
-    password: 'Partner@123',
+    password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
   {
     email: 'partner2@healytics.vn',
     username: 'partner_dental',
-    password: 'Partner@123',
+    password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
   {
     email: 'partner3@healytics.vn',
     username: 'partner_fitness',
-    password: 'Partner@123',
+    password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
   {
     email: 'partner4@healytics.vn',
     username: 'partner_pharmacy',
-    password: 'Partner@123',
+    password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
   {
     email: 'partner5@healytics.vn',
     username: 'partner_traditional',
-    password: 'Partner@123',
+    password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
   {
     email: 'partner6@healytics.vn',
     username: 'partner_psychology',
-    password: 'Partner@123',
+    password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
 ];

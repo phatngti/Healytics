@@ -1,4 +1,11 @@
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_gender.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_status.dart';
+import 'package:admin_panel/features/partner/employee/domain/employment_type.dart';
+import 'package:admin_panel/features/partner/employee/domain/massage_strength_level.dart';
+import 'package:admin_panel/features/partner/employee/domain/therapist_level.dart';
+import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 
 // ============================================================================
 // Static Mock Constants
@@ -35,6 +42,25 @@ const String employeeMockPdfUrl =
 
 /// Mock documents list for employee testing.
 const List<String> employeeMockDocuments = [employeeMockPdfUrl];
+
+/// Mock work history entries for employee testing.
+const List<WorkHistoryEntry> employeeMockWorkHistory = [
+  WorkHistoryEntry(
+    facility: 'Glow Saigon Spa Retreat',
+    position: 'Head of Dermatology',
+    period: '2022–Present',
+  ),
+  WorkHistoryEntry(
+    facility: 'Lotus Wellness Center',
+    position: 'Senior Therapist',
+    period: '2019–2022',
+  ),
+  WorkHistoryEntry(
+    facility: 'Harmony Health Clinic',
+    position: 'Junior Therapist',
+    period: '2016–2019',
+  ),
+];
 
 /// Mock description text for employee testing.
 const String employeeMockDescription = '''
@@ -99,23 +125,21 @@ Map<String, dynamic> getMockCommonFields(String idSuffix, String role) {
     'displayName': 'Mock $role $idSuffix',
     'avatar': avatarUrl,
     'role': role.toUpperCase(),
+    'employeeCode': 'EMP-${idSuffix.hashCode.abs() % 10000}',
     'position': role == 'Doctor' ? 'Specialist Doctor' : '$role Therapist',
     'rating': 4.5,
     'reviewCount': 100,
-    'status': 'ACTIVE',
+    'status': EmployeeStatus.active.apiValue,
     'email': 'mock.$role.$idSuffix@example.com',
     'phone': '0901234567',
     'address': '123 Mock Street, District 1',
     'city': 'Ho Chi Minh City',
     'state': 'Ho Chi Minh',
     'country': 'Vietnam',
-    'licenseUrl': employeeMockPdfUrl,
-    'idCardUrl': employeeMockPdfUrl,
-    'documents': employeeMockDocuments,
     'description': employeeMockDescription,
     'dateOfBirth': '1990-05-15',
-    'gender': 'FEMALE',
-    'employmentType': 'Full-Time',
+    'gender': EmployeeGender.female.apiValue,
+    'employmentType': EmploymentType.fullTime.displayName,
     'startDate': '2023-01-01',
     'emergencyContactName': 'Tran Thi B',
     'emergencyContactPhone': '0987654321',
@@ -127,10 +151,11 @@ DoctorEntity createMockDoctor(EmployeeId id) {
   final common = getMockCommonFields(id.value, 'Doctor');
   return DoctorEntity(
     id: id,
+    employeeCode: common['employeeCode'],
     fullName: common['fullName'],
     displayName: common['displayName'],
     avatar: common['avatar'],
-    role: 'DOCTOR',
+    role: EmployeeRole.doctor.apiValue,
     position: 'Senior Doctor',
     rating: common['rating'],
     reviewCount: common['reviewCount'],
@@ -141,10 +166,7 @@ DoctorEntity createMockDoctor(EmployeeId id) {
     city: common['city'],
     state: common['state'],
     country: common['country'],
-    licenseUrl: common['licenseUrl'],
-    idCardUrl: common['idCardUrl'],
     description: common['description'],
-    documents: common['documents'],
     dateOfBirth: common['dateOfBirth'],
     gender: common['gender'],
     employmentType: common['employmentType'],
@@ -166,6 +188,7 @@ DoctorEntity createMockDoctor(EmployeeId id) {
       'Advanced Laser Safety Officer',
     ],
     workSchedule: employeeMockWorkSchedule,
+    workHistory: employeeMockWorkHistory,
   );
 }
 
@@ -174,11 +197,12 @@ SpaTherapistEntity createMockSpaTherapist(EmployeeId id) {
   final common = getMockCommonFields(id.value, 'Spa');
   return SpaTherapistEntity(
     id: id,
+    employeeCode: common['employeeCode'],
     fullName: common['fullName'],
     displayName: common['displayName'],
     avatar: common['avatar'],
-    role: 'THERAPIST',
-    position: 'Spa Therapist',
+    role: EmployeeRole.therapist.apiValue,
+    position: TherapistType.spa.displayName,
     rating: common['rating'],
     reviewCount: common['reviewCount'],
     status: common['status'],
@@ -188,10 +212,7 @@ SpaTherapistEntity createMockSpaTherapist(EmployeeId id) {
     city: common['city'],
     state: common['state'],
     country: common['country'],
-    licenseUrl: common['licenseUrl'],
-    idCardUrl: common['idCardUrl'],
     description: common['description'],
-    documents: common['documents'],
     dateOfBirth: common['dateOfBirth'],
     gender: common['gender'],
     employmentType: common['employmentType'],
@@ -199,7 +220,7 @@ SpaTherapistEntity createMockSpaTherapist(EmployeeId id) {
     emergencyContactName: common['emergencyContactName'],
     emergencyContactPhone: common['emergencyContactPhone'],
     jobTitle: 'Senior Spa Therapist',
-    therapistLevel: 'SENIOR',
+    therapistLevel: TherapistLevel.senior.displayName,
     commissionRate: 15.0,
     healthCheckDate: DateTime.now()
         .subtract(const Duration(days: 30))
@@ -207,6 +228,7 @@ SpaTherapistEntity createMockSpaTherapist(EmployeeId id) {
     skills: ['Facial', 'Body Wrap', 'Aromatherapy', 'Skin Care'],
     deviceProficiency: ['Laser Machine', 'HIFU Device', 'Skin Analyzer'],
     workSchedule: employeeMockWorkSchedule,
+    workHistory: employeeMockWorkHistory,
   );
 }
 
@@ -215,11 +237,12 @@ MassageTherapistEntity createMockMassageTherapist(EmployeeId id) {
   final common = getMockCommonFields(id.value, 'Massage');
   return MassageTherapistEntity(
     id: id,
+    employeeCode: common['employeeCode'],
     fullName: common['fullName'],
     displayName: common['displayName'],
     avatar: common['avatar'],
-    role: 'THERAPIST',
-    position: 'Massage Therapist',
+    role: EmployeeRole.therapist.apiValue,
+    position: TherapistType.massage.displayName,
     rating: common['rating'],
     reviewCount: common['reviewCount'],
     status: common['status'],
@@ -229,10 +252,7 @@ MassageTherapistEntity createMockMassageTherapist(EmployeeId id) {
     city: common['city'],
     state: common['state'],
     country: common['country'],
-    licenseUrl: common['licenseUrl'],
-    idCardUrl: common['idCardUrl'],
     description: common['description'],
-    documents: common['documents'],
     dateOfBirth: common['dateOfBirth'],
     gender: common['gender'],
     employmentType: common['employmentType'],
@@ -240,13 +260,14 @@ MassageTherapistEntity createMockMassageTherapist(EmployeeId id) {
     emergencyContactName: common['emergencyContactName'],
     emergencyContactPhone: common['emergencyContactPhone'],
     jobTitle: 'Master Massage Therapist',
-    therapistLevel: 'MASTER',
-    strengthLevel: 'STRONG',
+    therapistLevel: TherapistLevel.master.displayName,
+    strengthLevel: MassageStrengthLevel.strong.displayName,
     commissionRate: 20.0,
     healthCheckDate: DateTime.now()
         .subtract(const Duration(days: 15))
         .toIso8601String(),
     skills: ['Thai Massage', 'Shiatsu', 'Deep Tissue', 'Reflexology'],
     workSchedule: employeeMockWorkSchedule,
+    workHistory: employeeMockWorkHistory,
   );
 }

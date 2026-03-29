@@ -1,3 +1,4 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/features/orders/domain/entities/appointment.entity.dart';
 
@@ -16,10 +17,13 @@ class CheckInOutCard extends StatelessWidget {
     final dateLabel = _formatDate(appointment.date);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.spaceLg,
+        vertical: AppDimens.spaceXl,
+      ),
       decoration: BoxDecoration(
         color: colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(color: colors.outlineVariant),
       ),
       child: Row(
@@ -86,14 +90,14 @@ class _TimeColumn extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: AppDimens.spaceXs + 2),
         Text(
           date,
           style: theme.textTheme.bodySmall?.copyWith(
             color: colors.onSurfaceVariant,
           ),
         ),
-        const SizedBox(height: 2),
+        SizedBox(height: AppDimens.spaceXxs),
         Text(
           time,
           style: theme.textTheme.bodySmall?.copyWith(

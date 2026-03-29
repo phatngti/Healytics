@@ -1,5 +1,8 @@
 import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
+import 'package:admin_panel/features/partner/products/domain/staff_allocation.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +18,8 @@ class ProductOperationsCard extends ConsumerStatefulWidget {
 }
 
 class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
-  String _staffAllocation = 'any';
-  String _staffRole = 'DOCTOR'; // Default role
+  String _staffAllocation = StaffAllocation.any.apiValue;
+  String _staffRole = EmployeeRole.doctor.apiValue;
   List<EmployeeEntity> _selectedStaff = [];
   List<EmployeeEntity> _allStaff = [];
   bool _isLoadingStaff = true;
@@ -53,9 +56,9 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
     if (formState != null) {
       // Store staff IDs as a list
       final staffIds = _selectedStaff.map((s) => s.id).toList();
-      formState.fields['selected_staff_ids']?.didChange(staffIds);
+      formState.fields[ProductFormField.selectedStaffIds.key]?.didChange(staffIds);
       // Also store staff allocation type
-      formState.fields['staff_allocation']?.didChange(_staffAllocation);
+      formState.fields[ProductFormField.staffAllocation.key]?.didChange(_staffAllocation);
     }
   }
 
@@ -68,12 +71,12 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
       children: [
         // Hidden FormBuilder fields to store staff data
         FormBuilderField<List<dynamic>>(
-          name: 'selected_staff_ids',
+          name: ProductFormField.selectedStaffIds.key,
           initialValue: _selectedStaff.map((s) => s.id).toList(),
           builder: (field) => const SizedBox.shrink(),
         ),
         FormBuilderField<String>(
-          name: 'staff_allocation',
+          name: ProductFormField.staffAllocation.key,
           initialValue: _staffAllocation,
           builder: (field) => const SizedBox.shrink(),
         ),
@@ -137,7 +140,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                     _buildStaffAllocationOptions(context),
                     AppDimens.verticalMedium,
                     // Only show staff selector if "Specific Staff" is selected
-                    if (_staffAllocation == 'specific') ...[
+                    if (_staffAllocation == StaffAllocation.specific.apiValue) ...[
                       _buildStaffRoleSelector(context),
                       AppDimens.verticalMedium,
                       _buildStaffSelector(context),
@@ -202,9 +205,9 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
         _StaffAllocationOption(
           title: 'Any Available Staff',
           subtitle: 'Auto-assign based on availability',
-          isSelected: _staffAllocation == 'any',
+          isSelected: _staffAllocation == StaffAllocation.any.apiValue,
           onTap: () {
-            setState(() => _staffAllocation = 'any');
+            setState(() => _staffAllocation = StaffAllocation.any.apiValue);
             _updateFormBuilderStaff();
           },
         ),
@@ -212,9 +215,9 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
         _StaffAllocationOption(
           title: 'Specific Staff',
           subtitle: 'Limit booking to selected employees',
-          isSelected: _staffAllocation == 'specific',
+          isSelected: _staffAllocation == StaffAllocation.specific.apiValue,
           onTap: () {
-            setState(() => _staffAllocation = 'specific');
+            setState(() => _staffAllocation = StaffAllocation.specific.apiValue);
             _updateFormBuilderStaff();
           },
         ),
@@ -235,9 +238,17 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
         AppDimens.verticalSmall,
         Row(
           children: [
-            _buildRoleChip(context, 'Doctor', 'DOCTOR'),
+            _buildRoleChip(
+              context,
+              EmployeeRole.doctor.displayName,
+              EmployeeRole.doctor.apiValue,
+            ),
             AppDimens.horizontalSmall,
-            _buildRoleChip(context, 'Therapist', 'THERAPIST'),
+            _buildRoleChip(
+              context,
+              EmployeeRole.therapist.displayName,
+              EmployeeRole.therapist.apiValue,
+            ),
           ],
         ),
       ],
@@ -335,7 +346,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                 icon: Icons.hourglass_empty,
                 label: 'Duration (min)',
                 hintText: '60',
-                fieldKey: 'duration',
+                fieldKey: ProductFormField.duration.key,
               ),
             ),
             AppDimens.horizontalMedium,
@@ -344,7 +355,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                 icon: Icons.more_time,
                 label: 'Buffer (min)',
                 hintText: '15',
-                fieldKey: 'buffer',
+                fieldKey: ProductFormField.buffer.key,
               ),
             ),
           ],
@@ -357,7 +368,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
               icon: Icons.group_add_outlined,
               label: 'Capacity (Parallel Bookings)',
               hintText: '1',
-              fieldKey: 'capacity',
+              fieldKey: ProductFormField.capacity.key,
             ),
             AppDimens.verticalExtraSmall,
             Text(
@@ -394,7 +405,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                 Expanded(
                   child: FormBuilderTextField(
                     key: const ValueKey('formfield_lead_time'),
-                    name: 'lead_time',
+                    name: ProductFormField.leadTime.key,
                     keyboardType: TextInputType.number,
                     initialValue: '2',
                     decoration: InputDecoration(

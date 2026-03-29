@@ -18,7 +18,7 @@ import { HealthServiceStatus } from '@/health-service/enums/health-service-statu
 import { ProductDefinition } from './product-definition.entity';
 import { ProductEmployeeEligibility } from './product-employee-eligibility.entity';
 import { ProductTag } from './product-tag.entity';
-import { ProductReview } from './product-review.entity';
+
 import { ProductFacilityImage } from './product-facility-image.entity';
 
 @Entity('products')
@@ -61,6 +61,13 @@ export class Product {
   @Column({ name: 'is_visible_online', default: false })
   isVisibleOnline: boolean;
 
+  @Column({ name: 'service_manual', type: 'jsonb', nullable: true })
+  serviceManual: {
+    preServiceGuidelines?: string[];
+    serviceRules?: { iconSlug: string; title: string; description: string }[];
+    procedureSteps?: { stepNumber: number; title: string; description: string }[];
+  } | null;
+
   @Column({ type: 'varchar', name: 'vendor_name', length: 100, nullable: true })
   vendorName: string | null;
 
@@ -99,8 +106,7 @@ export class Product {
   @OneToMany(() => ProductTag, (pt) => pt.product)
   productTags: ProductTag[];
 
-  @OneToMany(() => ProductReview, (review) => review.product, { cascade: true })
-  reviews: ProductReview[];
+
 
   @OneToMany(() => ProductFacilityImage, (fi) => fi.product, { cascade: true })
   facilityImages: ProductFacilityImage[];
