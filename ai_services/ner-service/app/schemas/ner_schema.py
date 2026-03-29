@@ -24,10 +24,11 @@ class NerEntity(BaseModel):
 
     # Normalized fields — None = không map được (graceful degradation)
     business_type: Optional[str] = None             # VD: "SPA_BEAUTY" — khớp backend enum
+    business_evidence: Optional[str] = None         # Chuỗi bằng chứng trích từ query để suy ra business_type
+    business_phrase: Optional[str] = None           # Legacy alias giữ tương thích ngược
     location_code: Optional[str] = None             # VD: "01" (Hà Nội), "760" (Quận 1)
     location_level: Optional[str] = None            # PROVINCE / DISTRICT / WARD
     location_intent: Optional[bool] = None          # True nếu location là ràng buộc tìm kiếm
-    location_intent_score: Optional[float] = None   # Score semantic cho decision location_intent
     category_slug: Optional[str] = None             # VD: "yoga-therapy"
     operator: Optional[str] = None                  # lte / gte / between
     amount: Optional[float] = None                  # giá trị số sau normalize

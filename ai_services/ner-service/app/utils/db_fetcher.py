@@ -83,6 +83,41 @@ _ST_DWITHIN = """ST_DWithin(
     )"""
 
 
+def _extract_business_types(query_params: Dict[str, Any]) -> list[str]:
+    business_types: list[str] = []
+    seen: set[str] = set()
+
+    raw_list = query_params.get("businessTypes")
+    if isinstance(raw_list, str):
+        raw_list = [raw_list]
+    if isinstance(raw_list, list):
+        for bt in raw_list:
+            bt_str = str(bt).strip() if bt is not None else ""
+            if bt_str and bt_str not in seen:
+                seen.add(bt_str)
+                business_types.append(bt_str)
+
+    legacy_bt = query_params.get("businessType")
+    legacy_bt_str = str(legacy_bt).strip() if legacy_bt is not None else ""
+    if legacy_bt_str and legacy_bt_str not in seen:
+        seen.add(legacy_bt_str)
+        business_types.append(legacy_bt_str)
+
+    return business_types
+
+
+def _build_business_type_or_clause(business_types: list[str], bind_prefix: str = "bt") -> tuple[str, Dict[str, Any]]:
+    params: Dict[str, Any] = {}
+    conditions: list[str] = []
+
+    for i, business_type in enumerate(business_types):
+        key = f"{bind_prefix}_{i}"
+        params[key] = business_type
+        conditions.append(f":{key} = ANY(string_to_array(hpp.business_type, ','))")
+
+    return "(" + " OR ".join(conditions) + ")", params
+
+
 # ─── Main function ────────────────────────────────────────────────────────────
 
 async def fetch_candidates_from_db(
@@ -120,10 +155,11 @@ async def fetch_candidates_from_db(
         conditions.append(_ST_DWITHIN.strip())
 
     # ── Business Type ─────────────────────────────────────────────────────────
-    bt = query_params.get("businessType")
-    if bt:
-        conditions.append(":bt = ANY(string_to_array(hpp.business_type, ','))")
-        params["bt"] = bt
+    business_types = _extract_business_types(query_params)
+    if business_types:
+        bt_clause, bt_params = _build_business_type_or_clause(business_types, bind_prefix="bt")
+        conditions.append(bt_clause)
+        params.update(bt_params)
 
     # ── Location Code ─────────────────────────────────────────────────────────
     # TH2 only: apply admin boundary as the primary filter.
@@ -236,19 +272,19 @@ async def fetch_candidates_from_db(
         logger.error(f"[DBFetcher] Query failed (case={spatial_case}): {e}")
 
     # ── Progressive relaxation for sparse data (non-spatial only) ───────────
-    # Keep businessType as strongest signal; relax category/location gradually.
+    # Keep businessTypes as strongest signal; relax category/location gradually.
     if not candidates and db_error is None and spatial_case is None:
-        bt = query_params.get("businessType")
+        bt_list = _extract_business_types(query_params)
         cat_slug = query_params.get("categorySlug")
         loc_code = query_params.get("locationCode")
         tag_filters = query_params.get("tagFilters")
 
         relax_plans: list[tuple[str, Dict[str, Any]]] = []
-        if bt and cat_slug:
+        if bt_list and cat_slug:
             relax_plans.append(("drop_category", {**query_params, "categorySlug": None}))
-        if bt and loc_code:
+        if bt_list and loc_code:
             relax_plans.append(("drop_location", {**query_params, "locationCode": None}))
-        if bt and (cat_slug or loc_code or tag_filters):
+        if bt_list and (cat_slug or loc_code or tag_filters):
             relax_plans.append((
                 "bt_only",
                 {
@@ -266,10 +302,11 @@ async def fetch_candidates_from_db(
 
                 relaxed_sql = _SELECT_BASE + _FROM_JOINS
 
-                relaxed_bt = relaxed_params.get("businessType")
-                if relaxed_bt:
-                    relaxed_conditions.append(":bt = ANY(string_to_array(hpp.business_type, ','))")
-                    relaxed_bind["bt"] = relaxed_bt
+                relaxed_bt_list = _extract_business_types(relaxed_params)
+                if relaxed_bt_list:
+                    bt_clause, bt_params = _build_business_type_or_clause(relaxed_bt_list, bind_prefix="rbt")
+                    relaxed_conditions.append(bt_clause)
+                    relaxed_bind.update(bt_params)
 
                 relaxed_loc = relaxed_params.get("locationCode")
                 if relaxed_loc:

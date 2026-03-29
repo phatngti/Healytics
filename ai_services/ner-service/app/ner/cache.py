@@ -369,7 +369,8 @@ def _maybe_refresh_feature_tags():
 def _load_feature_tags_sync_wrapper() -> int:
     try:
         loop = asyncio.get_running_loop()
-        loop.create_task(_do_load_feature_tags_from_db())
+        task = loop.create_task(_do_load_feature_tags_from_db())
+        _attach_background_task_logging(task, "refresh_feature_tags_cache")
         return 0
     except RuntimeError:
         return asyncio.run(_do_load_feature_tags_from_db())
@@ -386,6 +387,25 @@ def _maybe_refresh_categories():
 import asyncio
 from sqlalchemy import text
 from app.core.database import async_session
+
+
+def _attach_background_task_logging(task: asyncio.Task, task_name: str) -> None:
+    """Consume background task exceptions to avoid 'Task exception was never retrieved'."""
+
+    def _on_done(done_task: asyncio.Task) -> None:
+        try:
+            exc = done_task.exception()
+        except asyncio.CancelledError:
+            logger.info("[Cache] Background task cancelled: %s", task_name)
+            return
+        except Exception as callback_exc:
+            logger.warning("[Cache] Background task callback failed (%s): %s", task_name, callback_exc)
+            return
+
+        if exc:
+            logger.warning("[Cache] Background task failed (%s): %s", task_name, exc)
+
+    task.add_done_callback(_on_done)
 
 async def _do_load_location_from_db() -> int:
     global _location_cache, _location_loaded_at
@@ -461,6 +481,7 @@ def _load_location_sync_wrapper() -> int:
     try:
         loop = asyncio.get_running_loop()
         task = loop.create_task(_do_load_location_from_db())
+        _attach_background_task_logging(task, "refresh_location_cache")
         return 0 
     except RuntimeError:
         return asyncio.run(_do_load_location_from_db())
@@ -491,6 +512,7 @@ def _load_categories_sync_wrapper() -> int:
     try:
         loop = asyncio.get_running_loop()
         task = loop.create_task(_do_load_categories_from_db())
+        _attach_background_task_logging(task, "refresh_categories_cache")
         return 0
     except RuntimeError:
         return asyncio.run(_do_load_categories_from_db())
@@ -513,6 +535,8 @@ async def _do_load_feature_tags_from_db() -> int:
                 rows = result.fetchall()
                 has_extended_cols = True
             except Exception as ext_exc:
+                # Clear failed transaction state before running fallback query.
+                await session.rollback()
                 logger.info(
                     "[Cache] feature_tags table has no prototype/weight columns yet, fallback query used: %s",
                     ext_exc,
