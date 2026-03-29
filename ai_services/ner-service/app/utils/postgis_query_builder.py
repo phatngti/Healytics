@@ -160,8 +160,22 @@ def build_postgis_sql(query_dict: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
     ]
 
     # Add traditional filters if present
-    if "businessType" in query_dict:
-        sql_parts.append("AND :businessType = ANY(string_to_array(hpp.business_type, ','))")
+    business_types = query_dict.get("businessTypes")
+    if isinstance(business_types, str):
+        business_types = [business_types]
+    if not business_types and query_dict.get("businessType"):
+        business_types = [query_dict["businessType"]]
+
+    if business_types:
+        business_types = [str(bt).strip() for bt in business_types if bt is not None and str(bt).strip()]
+
+    if business_types:
+        bt_conditions = []
+        for i, bt in enumerate(business_types):
+            key = f"bt_{i}"
+            bt_conditions.append(f":{key} = ANY(string_to_array(hpp.business_type, ','))")
+            params[key] = bt
+        sql_parts.append("AND (" + " OR ".join(bt_conditions) + ")")
 
     if "categorySlug" in query_dict:
         sql_parts.append("AND c.slug = :categorySlug")
@@ -190,8 +204,6 @@ def build_postgis_sql(query_dict: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
     sql = " ".join(sql_parts)
 
     # Add traditional filter params
-    if "businessType" in query_dict:
-        params["businessType"] = f"%{query_dict['businessType']}%"
     if "categorySlug" in query_dict:
         params["categorySlug"] = query_dict["categorySlug"]
     if "minPrice" in query_dict:
