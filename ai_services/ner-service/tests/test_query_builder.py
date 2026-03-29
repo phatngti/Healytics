@@ -5,7 +5,7 @@ Unit tests cho query_builder và db_fetcher._resolve_spatial_case:
 - build_backend_query: field mapping từ NerEntity list
 - spatial_params: presence, fields, location_level pass-through
 - _resolve_spatial_case: all 4 cases (TH1 / TH2 / TH3 / None)
-- filter_mock_services: business_type, price, rating filters
+- filter_mock_services: business_type, price filters + confidence-first sorting
 """
 
 import pytest
@@ -30,7 +30,6 @@ def _hcm_loc():
         location_code="79",
         location_level="PROVINCE",
         location_intent=True,
-        location_intent_score=0.9,
     )
 
 def _price_lte(amount=500000):
@@ -49,6 +48,32 @@ def _distance_entity(radius=5000):
     return NerEntity(type="DISTANCE", value="5km", confidence=1.0, radius_meters=radius, proximity_intent=False)
 
 
+def _distance_between(lo=2000.0, hi=5000.0):
+    return NerEntity(
+        type="DISTANCE",
+        value="từ 2km đến 5km",
+        confidence=1.0,
+        operator="between",
+        amount=lo,
+        amount_max=hi,
+        radius_meters=int(hi),
+        proximity_intent=False,
+    )
+
+
+def _distance_gte(lo=3000.0, hi=50000.0):
+    return NerEntity(
+        type="DISTANCE",
+        value="trên 3km",
+        confidence=1.0,
+        operator="gte",
+        amount=lo,
+        amount_max=hi,
+        radius_meters=int(lo),
+        proximity_intent=False,
+    )
+
+
 # ============================================================================
 # build_backend_query — basic field mapping
 # ============================================================================
@@ -57,6 +82,7 @@ class TestBuildBackendQuery:
 
     def test_business_type_mapped(self):
         q = build_backend_query([_spa_bt()])
+        assert q["businessTypes"] == ["SPA_BEAUTY"]
         assert q["businessType"] == "SPA_BEAUTY"
 
     def test_location_code_mapped(self):
@@ -80,7 +106,7 @@ class TestBuildBackendQuery:
 
     def test_rating_mapped(self):
         q = build_backend_query([_rating_gte()])
-        assert q["minRating"] == 4.0
+        assert "minRating" not in q
 
     def test_default_limit_50(self):
         q = build_backend_query([])
@@ -102,9 +128,9 @@ class TestBuildBackendQuery:
         assert "DISTANCE" not in q
 
     def test_category_slug_mapped(self):
-        e = NerEntity(type="CATEGORY", value="da liễu", confidence=0.8, category_slug="da-lieu")
+        e = NerEntity(type="CATEGORY", value="da liễu", confidence=0.8)
         q = build_backend_query([e])
-        assert q["categorySlug"] == "da-lieu"
+        assert "categorySlug" not in q
 
     def test_location_without_code_skipped(self):
         """LOCATION entity without location_code → no locationCode in query."""
@@ -113,7 +139,7 @@ class TestBuildBackendQuery:
         assert "locationCode" not in q
 
     def test_location_with_false_intent_skipped(self):
-        """LOCATION with code but non-intent must not become hard filter."""
+        """LOCATION with code still maps; intent pruning is handled upstream."""
         e = NerEntity(
             type="LOCATION",
             value="HCM",
@@ -121,10 +147,22 @@ class TestBuildBackendQuery:
             location_code="79",
             location_level="PROVINCE",
             location_intent=False,
-            location_intent_score=0.2,
         )
         q = build_backend_query([e])
-        assert "locationCode" not in q
+        assert q["locationCode"] == "79"
+
+    def test_location_with_unknown_intent_applied(self):
+        """LOCATION with unknown intent (None) still applies as a filter."""
+        e = NerEntity(
+            type="LOCATION",
+            value="HCM",
+            confidence=0.9,
+            location_code="79",
+            location_level="PROVINCE",
+            location_intent=None,
+        )
+        q = build_backend_query([e])
+        assert q["locationCode"] == "79"
 
 
 # ============================================================================
@@ -199,6 +237,18 @@ class TestBuildBackendQuerySpatial:
     def test_spatial_params_location_level_district_th3(self):
         q = build_backend_query([], spatial_context=self._th3_ctx())
         assert q["spatial_params"]["location_level"] == "DISTRICT"
+
+    def test_spatial_params_distance_between_bounds(self):
+        q = build_backend_query([_distance_between()], spatial_context=self._th1_ctx())
+        sp = q["spatial_params"]
+        assert sp["distance_min_meters"] == 2000.0
+        assert sp["distance_max_meters"] == 5000.0
+
+    def test_spatial_params_distance_gte_bounds(self):
+        q = build_backend_query([_distance_gte()], spatial_context=self._th1_ctx())
+        sp = q["spatial_params"]
+        assert sp["distance_min_meters"] == 3000.0
+        assert sp["distance_max_meters"] == 50000.0
 
 
 # ============================================================================
@@ -277,6 +327,14 @@ class TestFilterMockServices:
         results = filter_mock_services(q)
         assert results == []
 
+    def test_multiple_business_types_or_filter(self):
+        q = {"businessTypes": ["MASSAGE_REHABILITATION", "TRADITIONAL_MEDICINE"], "limit": 50}
+        results = filter_mock_services(q)
+        ids = [r["id"] for r in results]
+        assert "SV001" in ids
+        assert "SV002" in ids
+        assert "SV003" in ids
+
     def test_max_price_filter(self):
         """maxPrice=600000 → SV001 (350k) and SV003 (500k) pass, SV002 (800k) filtered."""
         q = {"maxPrice": 600_000, "limit": 50}
@@ -294,14 +352,13 @@ class TestFilterMockServices:
         assert "SV002" in ids
         assert "SV001" not in ids
 
-    def test_min_rating_filter(self):
-        """minRating=4.8 → SV001 (4.8) and SV002 (4.9), SV003 (4.7) excluded."""
-        q = {"minRating": 4.8, "limit": 50}
+    def test_results_sorted_by_confidence_then_rating(self):
+        q = {"businessTypes": ["TRADITIONAL_MEDICINE", "MASSAGE_REHABILITATION"], "limit": 50}
         results = filter_mock_services(q)
         ids = [r["id"] for r in results]
-        assert "SV001" in ids
-        assert "SV002" in ids
-        assert "SV003" not in ids
+
+        # SV002 matches 1/2 but has higher rating than SV001/SV003 (also 1/2).
+        assert ids[0] == "SV002"
 
     def test_no_filter_returns_all(self):
         q = {"limit": 50}
@@ -338,10 +395,11 @@ class TestBuildBackendQueryCombined:
             NerEntity(type="RATING", value="trên 4 sao", confidence=1.0, operator="gte", amount=4.0),
         ]
         q = build_backend_query(entities)
+        assert q["businessTypes"] == ["SPA_BEAUTY"]
         assert q["businessType"] == "SPA_BEAUTY"
         assert q["locationCode"] == "79"
         assert q["maxPrice"] == 500000.0
-        assert q["minRating"] == 4.0
+        assert "minRating" not in q
 
     def test_distance_entity_not_in_query_keys(self):
         """DISTANCE entity → spatial_context handles it; no direct key in query."""
@@ -364,16 +422,16 @@ class TestBuildBackendQueryCombined:
         assert q["minPrice"] == 200000.0
         assert q["maxPrice"] == 1000000.0
 
-    def test_multiple_business_types_last_wins(self):
-        """If two BUSINESS_TYPE entities somehow present, last one wins."""
+    def test_multiple_business_types_kept_for_or_matching(self):
+        """If two BUSINESS_TYPE entities are present, keep both for OR filtering."""
         from app.schemas.ner_schema import NerEntity
         entities = [
             NerEntity(type="BUSINESS_TYPE", value="spa", confidence=0.9, business_type="SPA_BEAUTY"),
             NerEntity(type="BUSINESS_TYPE", value="gym", confidence=0.9, business_type="FITNESS"),
         ]
         q = build_backend_query(entities)
-        # One of them should be set
-        assert q.get("businessType") in ("SPA_BEAUTY", "FITNESS")
+        assert q.get("businessTypes") == ["SPA_BEAUTY", "FITNESS"]
+        assert "businessType" not in q
 
 
 # ============================================================================

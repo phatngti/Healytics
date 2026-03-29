@@ -3,7 +3,7 @@ ai_services/ner-service/app/api/ner_routes.py
 
 Endpoints:
   POST /ner/extract          — trích xuất + normalize entities từ text
-  POST /internal/clear-cache — force refresh location + category caches
+  POST /internal/clear-cache — force refresh location cache
 """
 
 import logging
@@ -40,19 +40,19 @@ async def extract_entities(request: NerRequest):
 @router.post("/internal/clear-cache")
 async def clear_cache():
     """
-    Force refresh all caches.
-    Gọi endpoint này khi admin thêm category mới hoặc location data thay đổi.
+    Force refresh location cache.
+    Gọi endpoint này khi location data thay đổi.
     """
-    logger.info("[NER] Force clearing all caches...")
+    logger.info("[NER] Force refreshing location cache...")
 
     # Clear query cache
     extractor.clear_query_cache()
 
-    # Reload location + category caches
+    # Reload location cache
     result = await cache.force_refresh()
 
     return {
         "status": "ok",
-        "message": "All caches cleared and reloaded",
+        "message": "Location cache refreshed",
         "details": result,
     }
