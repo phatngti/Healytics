@@ -19,6 +19,7 @@ from app.ner.spatial_context import (
     resolve_registered_address,
     resolve_location_code_to_coordinates,
 )
+from app.core.config import settings
 from app.schemas.ner_schema import NerEntity
 
 
@@ -44,6 +45,34 @@ def _location_entity(location_code="79", location_level="PROVINCE"):
         confidence=0.9,
         location_code=location_code,
         location_level=location_level,
+    )
+
+
+def _distance_between_entity(lo=2000.0, hi=5000.0):
+    return NerEntity(
+        type="DISTANCE",
+        value="từ 2km đến 5km",
+        confidence=1.0,
+        operator="between",
+        amount=lo,
+        amount_max=hi,
+        radius_meters=int(hi),
+        distance_unit="km",
+        proximity_intent=False,
+    )
+
+
+def _distance_gte_entity(lo=3000.0, hi=None):
+    return NerEntity(
+        type="DISTANCE",
+        value="trên 3km",
+        confidence=1.0,
+        operator="gte",
+        amount=lo,
+        amount_max=hi,
+        radius_meters=int(lo),
+        distance_unit="km",
+        proximity_intent=False,
     )
 
 
@@ -128,6 +157,27 @@ class TestPriority1GPS:
             entities, current_lat=10.0, current_lng=106.0, user_registered_address=None
         )
         assert ctx.radius_meters == 2000
+
+    def test_radius_from_between_amount_max(self):
+        entities = [_distance_between_entity(lo=2000.0, hi=5000.0)]
+        ctx = resolve_spatial_context(
+            entities, current_lat=10.0, current_lng=106.0, user_registered_address=None
+        )
+        assert ctx.radius_meters == 5000
+
+    def test_radius_from_gte_amount_max(self):
+        entities = [_distance_gte_entity(lo=3000.0, hi=40000.0)]
+        ctx = resolve_spatial_context(
+            entities, current_lat=10.0, current_lng=106.0, user_registered_address=None
+        )
+        assert ctx.radius_meters == 40000
+
+    def test_radius_from_gte_without_max_uses_cap(self):
+        entities = [_distance_gte_entity(lo=3000.0, hi=None)]
+        ctx = resolve_spatial_context(
+            entities, current_lat=10.0, current_lng=106.0, user_registered_address=None
+        )
+        assert ctx.radius_meters == settings.MAX_PROXIMITY_RADIUS_M
 
 
 # ============================================================================
@@ -227,6 +277,23 @@ class TestPriority3LocationEntity:
         assert ctx is not None
         assert ctx.location_level == "DISTRICT"
 
+    def test_district_code_fallback_to_province_center(self):
+        """District code like 760 should still resolve via owning province center."""
+        entities = [
+            _distance_entity(),
+            _location_entity(location_code="760", location_level="DISTRICT"),
+        ]
+        ctx = resolve_spatial_context(
+            entities,
+            current_lat=None,
+            current_lng=None,
+            user_registered_address=None,
+        )
+        assert ctx is not None
+        assert ctx.location_level == "DISTRICT"
+        assert ctx.center_lat == pytest.approx(10.7769, abs=0.01)
+        assert ctx.center_lng == pytest.approx(106.7009, abs=0.01)
+
     def test_no_location_code_returns_none(self):
         """LOCATION entity without location_code → can't resolve → None."""
         entities = [
@@ -290,6 +357,21 @@ class TestResolveRegisteredAddress:
     def test_empty_returns_none(self):
         result = resolve_registered_address("")
         assert result is None
+
+    def test_full_address_hcm_resolves(self):
+        """Full address containing province alias should resolve correctly."""
+        result = resolve_registered_address("123 Lê Lợi, Quận 1, TP HCM")
+        assert result is not None
+        lat, lng = result
+        assert lat == pytest.approx(10.7769, abs=0.01)
+        assert lng == pytest.approx(106.7009, abs=0.01)
+
+    def test_full_address_danang_resolves(self):
+        result = resolve_registered_address("Số 5 Trần Phú, Hải Châu, Đà Nẵng")
+        assert result is not None
+        lat, lng = result
+        assert lat == pytest.approx(16.0544, abs=0.01)
+        assert lng == pytest.approx(108.2022, abs=0.01)
 
 
 # ============================================================================

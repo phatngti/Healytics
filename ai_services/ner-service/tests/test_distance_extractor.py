@@ -11,6 +11,7 @@ Unit tests cho distance_extractor module:
 """
 
 import pytest
+from app.core.config import settings
 from app.ner.distance_extractor import (
     extract_distance_entities,
     _extract_explicit_distance,
@@ -123,15 +124,16 @@ class TestSanityBounds:
         assert result is None
 
     def test_too_large_200km_rejected(self):
-        """200km > 100km limit → None."""
-        result = _extract_explicit_distance("cách 200km")
+        """Any value above configured MAX_PROXIMITY_RADIUS_M is rejected."""
+        too_large = settings.MAX_PROXIMITY_RADIUS_M + 1
+        result = _extract_explicit_distance(f"cách {too_large}m")
         assert result is None
 
     def test_max_boundary_100km_accepted(self):
-        """100km = 100000m = exactly at upper bound → accepted."""
-        result = _extract_explicit_distance("trong vòng 100km")
+        """Configured MAX_PROXIMITY_RADIUS_M is accepted at boundary."""
+        result = _extract_explicit_distance(f"trong vòng {settings.MAX_PROXIMITY_RADIUS_M}m")
         assert result is not None
-        assert result["radius_meters"] == 100_000
+        assert result["radius_meters"] == settings.MAX_PROXIMITY_RADIUS_M
 
 
 # ============================================================================
@@ -220,7 +222,25 @@ class TestExtractDistanceEntities:
         """'trên 3km' — '3km' is extracted as explicit distance."""
         results = extract_distance_entities("Tìm spa trên 3km")
         assert len(results) == 1
+        assert results[0]["operator"] == "gte"
+        assert results[0]["amount"] == 3000.0
         assert results[0]["radius_meters"] == 3000
+
+    def test_distance_range_tu_den(self):
+        results = extract_distance_entities("Tìm spa từ 2km đến 5km")
+        assert len(results) == 1
+        assert results[0]["operator"] == "between"
+        assert results[0]["amount"] == 2000.0
+        assert results[0]["amount_max"] == 5000.0
+        assert results[0]["radius_meters"] == 5000
+
+    def test_distance_mixed_bounds_combined(self):
+        results = extract_distance_entities("Tìm spa trên 2km và dưới 5km")
+        assert len(results) == 1
+        assert results[0]["operator"] == "between"
+        assert results[0]["amount"] == 2000.0
+        assert results[0]["amount_max"] == 5000.0
+        assert results[0]["radius_meters"] == 5000
 
     def test_returns_list_always(self):
         """Always returns a list, even for empty input."""

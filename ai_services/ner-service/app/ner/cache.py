@@ -1,9 +1,8 @@
 """
 ai_services/ner-service/app/ner/cache.py
 
-In-memory cache with TTL for Location and Category lookups.
-Loads all data at startup; refreshes automatically when TTL expires.
-Supports force_refresh() via /internal/clear-cache endpoint.
+In-memory cache with TTL for Location lookups.
+Loads location data at startup and supports location-only force refresh.
 """
 
 import logging
@@ -305,50 +304,28 @@ def find_location(text: str) -> Optional[dict]:
     return None
 
 def get_category_list() -> list[dict]:
-    _maybe_refresh_categories()
-    return _category_cache
+    # Category matching was removed from the prefilter flow.
+    return []
 
 def get_feature_tags() -> list[dict]:
-    _maybe_refresh_feature_tags()
-    return _feature_tags_cache
+    # Feature-tag matching was removed from the prefilter flow.
+    return []
 
 async def force_refresh() -> dict:
     d_count = 0
-    c_count = 0
-    t_count = 0
     try:
         d_count = await _do_load_location_from_db()
     except Exception as e:
         logger.warning(f"[Cache] Force refresh location failed: {e}")
-    try:
-        c_count = await _do_load_categories_from_db()
-    except Exception as e:
-        logger.warning(f"[Cache] Force refresh categories failed: {e}")
-    try:
-        t_count = await _do_load_feature_tags_from_db()
-    except Exception as e:
-        logger.warning(f"[Cache] Force refresh feature_tags failed: {e}")
-    return {"location_entries": d_count, "category_entries": c_count, "feature_tag_entries": t_count}
+    return {"location_entries": d_count}
 
 async def startup_load():
-    logger.info("[Cache] Loading location + category + feature_tags caches at startup...")
+    logger.info("[Cache] Loading location cache at startup...")
     try:
         await _do_load_location_from_db()
     except Exception as e:
         logger.warning(f"[Cache] Failed to load location cache: {e}")
-    try:
-        await _do_load_categories_from_db()
-    except Exception as e:
-        logger.warning(f"[Cache] Failed to load category cache: {e}")
-    try:
-        await _do_load_feature_tags_from_db()
-    except Exception as e:
-        logger.warning(f"[Cache] Failed to load feature_tags cache: {e}")
-    logger.info(
-        f"[Cache] Loaded {len(_location_cache)} locations, "
-        f"{len(_category_cache)} categories, "
-        f"{len(_feature_tags_cache)} feature_tags"
-    )
+    logger.info(f"[Cache] Loaded {len(_location_cache)} locations")
 
 def _maybe_refresh_location():
     global _location_loaded_at
