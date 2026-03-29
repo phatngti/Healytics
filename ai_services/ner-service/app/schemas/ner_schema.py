@@ -18,7 +18,7 @@ class NerRequest(BaseModel):
 
 
 class NerEntity(BaseModel):
-    type: str                                       # BUSINESS_TYPE / LOCATION / PRICE / RATING / CATEGORY / FEATURE_TAG
+    type: str                                       # BUSINESS_TYPE / LOCATION / PRICE / RATING / CATEGORY
     value: str                                      # raw text từ query
     confidence: float = Field(..., ge=0.0, le=1.0)
 
@@ -29,8 +29,7 @@ class NerEntity(BaseModel):
     location_code: Optional[str] = None             # VD: "01" (Hà Nội), "760" (Quận 1)
     location_level: Optional[str] = None            # PROVINCE / DISTRICT / WARD
     location_intent: Optional[bool] = None          # True nếu location là ràng buộc tìm kiếm
-    category_slug: Optional[str] = None             # VD: "yoga-therapy"
-    operator: Optional[str] = None                  # lte / gte / between
+    operator: Optional[str] = None                  # lte / gte / between (PRICE/RATING/DISTANCE)
     amount: Optional[float] = None                  # giá trị số sau normalize
     amount_max: Optional[float] = None              # giới hạn trên nếu "từ X đến Y"
 
@@ -40,11 +39,6 @@ class NerEntity(BaseModel):
     proximity_intent: Optional[bool] = None         # True if implicit ("gần đây"), False if explicit
     fallback_to_registered_address: Optional[bool] = None  # True if using address fallback
 
-    # Feature Tag fields (type == "FEATURE_TAG")
-    tag_id:   Optional[str] = None   # UUID của product_feature_tags row
-    tag_name: Optional[str] = None   # Tên tag, VD: "Đá nóng"
-    tag_op:   Optional[str] = None   # "AND" | "OR" — group operator trong tagFilters
-
 
 class NerResponse(BaseModel):
     entities: List[NerEntity]
@@ -53,12 +47,8 @@ class NerResponse(BaseModel):
 
 # --- Pre-filter schemas ---
 
-class PreFilterRequest(BaseModel):
-    text: str = Field(..., min_length=1)
+class PreFilterRequest(NerRequest):
     limit: int = Field(default=50, ge=1, le=200)
-    current_lat: Optional[float] = Field(None, ge=-90, le=90, description="User's current latitude")
-    current_lng: Optional[float] = Field(None, ge=-180, le=180, description="User's current longitude")
-    user_registered_address: Optional[str] = Field(None, max_length=500, description="User's registered address for spatial fallback")
     sort_by_distance: bool = Field(True, description="Sort results by distance if spatial params provided")
 
 
@@ -81,6 +71,7 @@ class LocationInfo(BaseModel):
 class ServiceCandidate(BaseModel):
     service_id: str
     name: str
+    confidence: Optional[float] = None
     image_url: Optional[str] = None
     badge: Optional[str] = None
     booked_count: Optional[int] = None

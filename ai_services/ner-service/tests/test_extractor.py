@@ -394,6 +394,16 @@ class TestExtractEntities:
             assert dist[0]["radius_meters"] == 5000
             assert dist[0]["proximity_intent"] is False
 
+    def test_distance_between_kept_as_single_entity(self):
+        """'trên 2km và dưới 5km' should merge into one DISTANCE between entity."""
+        clear_query_cache()
+        entities = extract_entities("tìm spa trên 2km và dưới 5km")
+        dist = [e for e in entities if e["type"] == "DISTANCE"]
+        assert len(dist) == 1
+        assert dist[0].get("operator") == "between"
+        assert dist[0].get("amount") == 2000.0
+        assert dist[0].get("amount_max") == 5000.0
+
     def test_text_too_long_truncated(self):
         """Text > 2000 chars is truncated, not rejected."""
         long_text = "tìm spa " * 400  # ~3200 chars
