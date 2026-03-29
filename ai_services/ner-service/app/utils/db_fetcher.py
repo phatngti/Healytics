@@ -5,22 +5,22 @@ Fetch service candidates from PostgreSQL with 3-case spatial routing:
 
   TH1 — Có GPS thật (fallback_used=False):
     - ST_DWithin(user_coords, radius) — vẽ vòng tròn bất chấp ranh giới hành chính
-    - ORDER BY distance_meters ASC, avg_rating DESC
+        - ORDER BY match_confidence DESC, avg_rating DESC, distance_meters ASC
     - Không áp locationCode (GPS đã đủ chính xác)
 
   TH2 — Fallback Province (fallback_used=True, level=PROVINCE):
     - Không dùng ST_DWithin (quét domain quá lớn, tâm tỉnh không đại diện được)
     - Áp ranh giới hành chính: loc_p.code = :loc_code
-    - ORDER BY avg_rating DESC
+        - ORDER BY match_confidence DESC, avg_rating DESC
 
   TH3 — Fallback District/Ward (fallback_used=True, level=DISTRICT/WARD):
     - ST_DWithin(district_center, radius) — cho phép vượt ranh giới quận
     - Không áp loc_d.code (mở rộng sang quận giáp ranh)
-    - ORDER BY distance_meters ASC, avg_rating DESC
+        - ORDER BY match_confidence DESC, avg_rating DESC, distance_meters ASC
 
   Không có spatial:
     - Text-only query + optional filters
-    - ORDER BY p.created_at DESC
+        - ORDER BY match_confidence DESC, avg_rating DESC, p.created_at DESC
 """
 
 import logging
@@ -55,11 +55,13 @@ _SELECT_BASE = """
             0
         ) AS avg_rating"""
 
-_SELECT_DISTANCE = """,
-        ST_Distance(
+_ST_DISTANCE_EXPR = """ST_Distance(
             hpp.location,
             ST_SetSRID(ST_MakePoint(:center_lng, :center_lat), 4326)::geography
-        ) AS distance_meters"""
+        )"""
+
+_SELECT_DISTANCE = f""",
+        {_ST_DISTANCE_EXPR} AS distance_meters"""
 
 _FROM_JOINS = """
     FROM products p
@@ -81,6 +83,8 @@ _ST_DWITHIN = """ST_DWithin(
         ST_SetSRID(ST_MakePoint(:center_lng, :center_lat), 4326)::geography,
         :radius_m
     )"""
+
+_ST_DISTANCE_GTE = f"""{_ST_DISTANCE_EXPR} >= :distance_min_m"""
 
 
 def _extract_business_types(query_params: Dict[str, Any]) -> list[str]:
@@ -118,6 +122,94 @@ def _build_business_type_or_clause(business_types: list[str], bind_prefix: str =
     return "(" + " OR ".join(conditions) + ")", params
 
 
+def _build_distance_conditions(spatial_params: Dict[str, Any]) -> tuple[list[str], Dict[str, Any]]:
+    """
+    Build index-friendly distance conditions.
+
+    Strategy:
+      - Use ST_DWithin(max_distance) for GiST index pruning.
+      - Add ST_Distance >= min_distance when lower bound exists.
+    """
+    conditions: list[str] = []
+    params: Dict[str, Any] = {}
+
+    max_distance = spatial_params.get("distance_max_meters")
+    if max_distance is None:
+        max_distance = spatial_params.get("radius_meters")
+
+    min_distance = spatial_params.get("distance_min_meters")
+
+    if max_distance is not None:
+        try:
+            max_m = int(float(max_distance))
+        except (TypeError, ValueError):
+            max_m = 0
+        if max_m > 0:
+            params["radius_m"] = max_m
+            conditions.append(_ST_DWITHIN.strip())
+
+    if min_distance is not None:
+        try:
+            min_m = float(min_distance)
+        except (TypeError, ValueError):
+            min_m = 0.0
+        if min_m > 0:
+            params["distance_min_m"] = min_m
+            conditions.append(_ST_DISTANCE_GTE.strip())
+
+    return conditions, params
+
+
+def _build_match_confidence_expression(
+    business_types: list[str],
+    bind_prefix: str = "score_bt",
+) -> tuple[str, Dict[str, Any]]:
+    """Build SQL expression for confidence score in range [0, 1]."""
+    if not business_types:
+        return "0.0", {}
+
+    params: Dict[str, Any] = {}
+    score_terms: list[str] = []
+
+    for i, business_type in enumerate(business_types):
+        key = f"{bind_prefix}_{i}"
+        params[key] = business_type
+        score_terms.append(
+            f"CASE WHEN :{key} = ANY(string_to_array(COALESCE(hpp.business_type, ''), ',')) THEN 1 ELSE 0 END"
+        )
+
+    count_key = f"{bind_prefix}_count"
+    params[count_key] = len(business_types)
+    expression = "(" + " + ".join(score_terms) + f")::float / :{count_key}"
+    return expression, params
+
+
+def _compute_match_confidence(service_business_types: list[str], target_business_types: list[str]) -> float:
+    if not target_business_types:
+        return 0.0
+
+    target_set = {bt for bt in target_business_types if bt}
+    if not target_set:
+        return 0.0
+
+    service_set = {bt for bt in service_business_types if bt}
+    if not service_set:
+        return 0.0
+
+    overlap = len(target_set.intersection(service_set))
+    return round(overlap / len(target_set), 4)
+
+
+def _parse_service_business_types(raw_business_types: Any) -> list[str]:
+    if raw_business_types is None:
+        return []
+    if isinstance(raw_business_types, str):
+        return [part.strip() for part in raw_business_types.split(",") if part and part.strip()]
+    if isinstance(raw_business_types, list):
+        return [str(part).strip() for part in raw_business_types if part is not None and str(part).strip()]
+    return []
+
+
 # ─── Main function ────────────────────────────────────────────────────────────
 
 async def fetch_candidates_from_db(
@@ -135,27 +227,30 @@ async def fetch_candidates_from_db(
     logger.info(f"[DBFetcher] spatial_case={spatial_case}")
 
     # ── Build SQL ─────────────────────────────────────────────────────────────
+    business_types = _extract_business_types(query_params)
+    confidence_expr, confidence_params = _build_match_confidence_expression(business_types)
+
     has_distance_col = spatial_case in ("TH1", "TH3")
 
-    select_sql = _SELECT_BASE + (_SELECT_DISTANCE if has_distance_col else "")
+    select_sql = _SELECT_BASE + f",\n        {confidence_expr} AS match_confidence" + (_SELECT_DISTANCE if has_distance_col else "")
     sql = select_sql + _FROM_JOINS
 
     if spatial_case in ("TH1", "TH3"):
         sql += _WHERE_LOCATION_NOT_NULL
 
     conditions: list[str] = []
-    params: Dict[str, Any] = {}
+    params: Dict[str, Any] = dict(confidence_params)
 
     # ── Spatial WHERE conditions ───────────────────────────────────────────────
     if spatial_case in ("TH1", "TH3"):
         sp = query_params["spatial_params"]
         params["center_lat"] = sp["center_lat"]
         params["center_lng"] = sp["center_lng"]
-        params["radius_m"] = sp["radius_meters"]
-        conditions.append(_ST_DWITHIN.strip())
+        distance_conditions, distance_params = _build_distance_conditions(sp)
+        conditions.extend(distance_conditions)
+        params.update(distance_params)
 
     # ── Business Type ─────────────────────────────────────────────────────────
-    business_types = _extract_business_types(query_params)
     if business_types:
         bt_clause, bt_params = _build_business_type_or_clause(business_types, bind_prefix="bt")
         conditions.append(bt_clause)
@@ -173,14 +268,6 @@ async def fetch_candidates_from_db(
         conditions.append("(loc_d.code = :loc_code OR loc_p.code = :loc_code)")
         params["loc_code"] = loc_code
 
-    # ── Category ──────────────────────────────────────────────────────────────
-    # Hard AND — category PHẢI match (dù detect bởi NER hay semantic fallback).
-    # Logic: businessType=X AND c.slug=Y AND (tag_A OR tag_B)
-    cat_slug = query_params.get("categorySlug")
-    if cat_slug:
-        conditions.append("c.slug = :cat_slug")
-        params["cat_slug"] = cat_slug
-
     # ── Price ─────────────────────────────────────────────────────────────────
     min_p = query_params.get("minPrice")
     max_p = query_params.get("maxPrice")
@@ -191,62 +278,16 @@ async def fetch_candidates_from_db(
         conditions.append("COALESCE(p.sale_price, p.base_price) <= :max_p")
         params["max_p"] = max_p
 
-    # ── Rating ────────────────────────────────────────────────────────────────
-    min_r = query_params.get("minRating")
-    if min_r is not None:
-        conditions.append(
-            "(SELECT AVG(rating) FROM product_reviews WHERE product_id = p.id) >= :min_r"
-        )
-        params["min_r"] = min_r
-
-    # ── Feature Tag Filters ────────────────────────────────────────────────────
-    # tagFilters: [{ids:[...], op:"OR"}, {ids:[...], op:"AND"}, {ids:[...], op:"NOT"}, ...]
-    #   OR group  → EXISTS (...tag_id IN (:t0, :t1))  — product cần ít nhất 1 tag trong list
-    #   AND group → EXISTS (...tag_id = :t) per tag   — product phải có TẤT CẢ tags
-    #   NOT group → NOT EXISTS (...tag_id IN (...))   — product KHÔNG được chứa các tags này
-    # Tất cả groups được AND nhau trong WHERE:
-    #   WHERE ... AND c.slug=:cat AND (EXISTS tag_A OR EXISTS tag_B) AND EXISTS tag_C
-    tag_filters = query_params.get("tagFilters", [])
-    for i, tf in enumerate(tag_filters):
-        op   = tf.get("op", "OR")
-        tids = tf.get("ids", [])
-        if not tids:
-            continue
-        if op == "OR":
-            placeholders = ", ".join(f":tf_{i}_{j}" for j in range(len(tids)))
-            conditions.append(
-                f"EXISTS (SELECT 1 FROM product_tags pt "
-                f"WHERE pt.product_id = p.id AND pt.tag_id::text IN ({placeholders}))"
-            )
-            for j, tid in enumerate(tids):
-                params[f"tf_{i}_{j}"] = tid
-        elif op == "NOT":
-            placeholders = ", ".join(f":tf_{i}_{j}" for j in range(len(tids)))
-            conditions.append(
-                f"NOT EXISTS (SELECT 1 FROM product_tags pt "
-                f"WHERE pt.product_id = p.id AND pt.tag_id::text IN ({placeholders}))"
-            )
-            for j, tid in enumerate(tids):
-                params[f"tf_{i}_{j}"] = tid
-        else:  # AND — một EXISTS cho mỗi tag
-            for j, tid in enumerate(tids):
-                pkey = f"tf_{i}_{j}"
-                conditions.append(
-                    f"EXISTS (SELECT 1 FROM product_tags pt "
-                    f"WHERE pt.product_id = p.id AND pt.tag_id::text = :{pkey})"
-                )
-                params[pkey] = tid
-
     if conditions:
         sql += " AND " + " AND ".join(conditions)
 
     # ── ORDER BY ──────────────────────────────────────────────────────────────
     if spatial_case in ("TH1", "TH3"):
-        sql += " ORDER BY distance_meters ASC, avg_rating DESC"
+        sql += " ORDER BY match_confidence DESC, avg_rating DESC, distance_meters ASC"
     elif spatial_case == "TH2":
-        sql += " ORDER BY avg_rating DESC"
+        sql += " ORDER BY match_confidence DESC, avg_rating DESC"
     else:
-        sql += " ORDER BY p.created_at DESC"
+        sql += " ORDER BY match_confidence DESC, avg_rating DESC, p.created_at DESC"
 
     sql += " LIMIT :limit"
     params["limit"] = limit
@@ -272,37 +313,35 @@ async def fetch_candidates_from_db(
         logger.error(f"[DBFetcher] Query failed (case={spatial_case}): {e}")
 
     # ── Progressive relaxation for sparse data (non-spatial only) ───────────
-    # Keep businessTypes as strongest signal; relax category/location gradually.
+    # Keep businessTypes as strongest signal; relax location if needed.
     if not candidates and db_error is None and spatial_case is None:
         bt_list = _extract_business_types(query_params)
-        cat_slug = query_params.get("categorySlug")
         loc_code = query_params.get("locationCode")
-        tag_filters = query_params.get("tagFilters")
 
         relax_plans: list[tuple[str, Dict[str, Any]]] = []
-        if bt_list and cat_slug:
-            relax_plans.append(("drop_category", {**query_params, "categorySlug": None}))
         if bt_list and loc_code:
             relax_plans.append(("drop_location", {**query_params, "locationCode": None}))
-        if bt_list and (cat_slug or loc_code or tag_filters):
+        if bt_list and loc_code:
             relax_plans.append((
                 "bt_only",
                 {
                     **query_params,
-                    "categorySlug": None,
                     "locationCode": None,
-                    "tagFilters": [],
                 },
             ))
 
         for plan_name, relaxed_params in relax_plans:
             try:
                 relaxed_conditions: list[str] = []
-                relaxed_bind: Dict[str, Any] = {"limit": limit}
-
-                relaxed_sql = _SELECT_BASE + _FROM_JOINS
-
                 relaxed_bt_list = _extract_business_types(relaxed_params)
+                relaxed_conf_expr, relaxed_conf_bind = _build_match_confidence_expression(
+                    relaxed_bt_list,
+                    bind_prefix="rscore_bt",
+                )
+                relaxed_bind: Dict[str, Any] = {"limit": limit, **relaxed_conf_bind}
+
+                relaxed_sql = _SELECT_BASE + f",\n        {relaxed_conf_expr} AS match_confidence" + _FROM_JOINS
+
                 if relaxed_bt_list:
                     bt_clause, bt_params = _build_business_type_or_clause(relaxed_bt_list, bind_prefix="rbt")
                     relaxed_conditions.append(bt_clause)
@@ -313,36 +352,9 @@ async def fetch_candidates_from_db(
                     relaxed_conditions.append("(loc_d.code = :loc_code OR loc_p.code = :loc_code)")
                     relaxed_bind["loc_code"] = relaxed_loc
 
-                relaxed_cat = relaxed_params.get("categorySlug")
-                if relaxed_cat:
-                    relaxed_conditions.append("c.slug = :cat_slug")
-                    relaxed_bind["cat_slug"] = relaxed_cat
-
-                for i, tf in enumerate(relaxed_params.get("tagFilters", [])):
-                    op = tf.get("op", "OR")
-                    tids = tf.get("ids", [])
-                    if not tids:
-                        continue
-                    if op == "OR":
-                        placeholders = ", ".join(f":tf_{i}_{j}" for j in range(len(tids)))
-                        relaxed_conditions.append(
-                            f"EXISTS (SELECT 1 FROM product_tags pt "
-                            f"WHERE pt.product_id = p.id AND pt.tag_id::text IN ({placeholders}))"
-                        )
-                        for j, tid in enumerate(tids):
-                            relaxed_bind[f"tf_{i}_{j}"] = tid
-                    else:
-                        for j, tid in enumerate(tids):
-                            pkey = f"tf_{i}_{j}"
-                            relaxed_conditions.append(
-                                f"EXISTS (SELECT 1 FROM product_tags pt "
-                                f"WHERE pt.product_id = p.id AND pt.tag_id::text = :{pkey})"
-                            )
-                            relaxed_bind[pkey] = tid
-
                 if relaxed_conditions:
                     relaxed_sql += " AND " + " AND ".join(relaxed_conditions)
-                relaxed_sql += " ORDER BY p.created_at DESC LIMIT :limit"
+                relaxed_sql += " ORDER BY match_confidence DESC, avg_rating DESC, p.created_at DESC LIMIT :limit"
 
                 relaxed_candidates = await _execute_query(relaxed_sql, relaxed_bind)
                 if relaxed_candidates:
@@ -363,6 +375,7 @@ async def fetch_candidates_from_db(
         reason = f"DB error: {db_error}" if db_error else "DB returned empty — using mock"
         logger.warning(f"[DBFetcher] Falling back to mock services. Reason: {reason}")
 
+        target_bts = _extract_business_types(query_params)
         mock_results = filter_mock_services(query_params)
         for svc in mock_results:
             internal = svc.get("_internal", {})
@@ -370,6 +383,8 @@ async def fetch_candidates_from_db(
             rating_val = internal.get("ratingValue", 0.0)
             total_reviews = internal.get("totalReviews", 0)
             loc = svc.get("location", {})
+            service_bts = _parse_service_business_types(internal.get("businessType"))
+            confidence = _compute_match_confidence(service_bts, target_bts)
 
             candidates.append(ServiceCandidate(
                 service_id=svc["service_id"],
@@ -386,6 +401,7 @@ async def fetch_candidates_from_db(
                     city=loc.get("city", ""),
                 ),
                 slots=svc.get("slots", []),
+                confidence=confidence,
                 distance_meters=None,
             ))
 
@@ -427,13 +443,13 @@ def _row_to_candidate(row, has_distance_col: bool) -> ServiceCandidate:
         (
             pid, name, slug, base_price, sale_price, ptype, vendor,
             created_at, cat_name, duration, image_url, partner_brand,
-            dist_name, prov_name, rating, distance_m
+            dist_name, prov_name, rating, confidence, distance_m
         ) = row
     else:
         (
             pid, name, slug, base_price, sale_price, ptype, vendor,
             created_at, cat_name, duration, image_url, partner_brand,
-            dist_name, prov_name, rating
+            dist_name, prov_name, rating, confidence
         ) = row
         distance_m = None
 
@@ -454,5 +470,6 @@ def _row_to_candidate(row, has_distance_col: bool) -> ServiceCandidate:
             city=prov_name or "",
         ),
         slots=[],
+        confidence=round(float(confidence), 4) if confidence is not None else 0.0,
         distance_meters=float(distance_m) if distance_m is not None else None,
     )

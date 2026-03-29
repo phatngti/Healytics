@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "pytest-delta-check",
+			"type": "shell",
+			"command": "d:/GitHub/Healytics/.venv/Scripts/python.exe",
+			"args": [
+				"-m",
+				"pytest",
+				"tests/test_db_fetcher.py",
+				"tests/test_query_builder.py",
+				"tests/test_api.py",
+				"-k",
+				"prefilter_debug_skips_tag_category_without_business_type or prefilter_debug_uses_business_evidence_in_semantic_matching",
+				"-q"
+			],
+			"isBackground": false
+		}
+	]
+}
