@@ -38,6 +38,7 @@ class EmployeeHeaderCard extends StatelessWidget {
               fullName: employee.fullName,
               displayName: employee.displayName,
               employeeId: employee.id,
+              employeeCode: employee.employeeCode,
               isEditing: isEditing,
             ),
           ),

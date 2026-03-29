@@ -14,6 +14,7 @@ class PublicHealthServiceEmployeeResponseDto {
   /// Returns a new [PublicHealthServiceEmployeeResponseDto] instance.
   PublicHealthServiceEmployeeResponseDto({
     required this.id,
+    required this.eligibilityId,
     required this.name,
     required this.role,
     this.imageUrl,
@@ -27,7 +28,11 @@ class PublicHealthServiceEmployeeResponseDto {
     this.daySchedules = const [],
   });
 
+  /// Employee (specialist) ID
   String id;
+
+  /// product_employee_eligibility surrogate PK for this employee–service pair
+  String eligibilityId;
 
   String name;
 
@@ -90,6 +95,7 @@ class PublicHealthServiceEmployeeResponseDto {
   @override
   bool operator ==(Object other) => identical(this, other) || other is PublicHealthServiceEmployeeResponseDto &&
     other.id == id &&
+    other.eligibilityId == eligibilityId &&
     other.name == name &&
     other.role == role &&
     other.imageUrl == imageUrl &&
@@ -106,6 +112,7 @@ class PublicHealthServiceEmployeeResponseDto {
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
+    (eligibilityId.hashCode) +
     (name.hashCode) +
     (role.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
@@ -119,11 +126,12 @@ class PublicHealthServiceEmployeeResponseDto {
     (daySchedules.hashCode);
 
   @override
-  String toString() => 'PublicHealthServiceEmployeeResponseDto[id=$id, name=$name, role=$role, imageUrl=$imageUrl, isSelected=$isSelected, quote=$quote, degrees=$degrees, languages=$languages, experience=$experience, specializations=$specializations, bio=$bio, daySchedules=$daySchedules]';
+  String toString() => 'PublicHealthServiceEmployeeResponseDto[id=$id, eligibilityId=$eligibilityId, name=$name, role=$role, imageUrl=$imageUrl, isSelected=$isSelected, quote=$quote, degrees=$degrees, languages=$languages, experience=$experience, specializations=$specializations, bio=$bio, daySchedules=$daySchedules]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
+      json[r'eligibilityId'] = this.eligibilityId;
       json[r'name'] = this.name;
       json[r'role'] = this.role;
     if (this.imageUrl != null) {
@@ -182,6 +190,7 @@ class PublicHealthServiceEmployeeResponseDto {
 
       return PublicHealthServiceEmployeeResponseDto(
         id: mapValueOfType<String>(json, r'id')!,
+        eligibilityId: mapValueOfType<String>(json, r'eligibilityId')!,
         name: mapValueOfType<String>(json, r'name')!,
         role: mapValueOfType<String>(json, r'role')!,
         imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
@@ -243,6 +252,7 @@ class PublicHealthServiceEmployeeResponseDto {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'id',
+    'eligibilityId',
     'name',
     'role',
     'isSelected',

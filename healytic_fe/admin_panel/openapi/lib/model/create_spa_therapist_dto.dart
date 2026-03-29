@@ -19,25 +19,23 @@ class CreateSpaTherapistDto {
     this.phone,
     this.dateOfBirth,
     this.gender,
-    this.emergencyContactName,
-    this.emergencyContactPhone,
+    required this.emergencyContactName,
+    required this.emergencyContactPhone,
     required this.employeeId,
     this.employmentType,
-    this.startDate,
+    required this.startDate,
     this.schedule = const [],
+    this.workHistory = const [],
     this.avatar,
-    this.idCardUrl,
+    this.verificationDocuments = const [],
     this.status,
-    this.branch,
-    this.password,
-    this.description,
+    required this.description,
     this.jobTitle,
     this.therapistLevel,
     this.commissionRate,
     this.healthCheckDate,
     this.skills = const [],
     this.deviceProficiency = const [],
-    this.licenseUrl,
     this.partnerId,
   });
 
@@ -72,22 +70,10 @@ class CreateSpaTherapistDto {
   CreateSpaTherapistDtoGenderEnum? gender;
 
   /// Emergency contact name
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? emergencyContactName;
+  String emergencyContactName;
 
   /// Emergency contact phone
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? emergencyContactPhone;
+  String emergencyContactPhone;
 
   /// Unique employee identifier code
   String employeeId;
@@ -102,16 +88,13 @@ class CreateSpaTherapistDto {
   String? employmentType;
 
   /// Start date
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? startDate;
+  String startDate;
 
   /// Weekly work schedule
   List<WorkScheduleEntryDto> schedule;
+
+  /// Work history entries
+  List<WorkHistoryEntryDto> workHistory;
 
   /// Avatar URL
   ///
@@ -122,44 +105,14 @@ class CreateSpaTherapistDto {
   ///
   String? avatar;
 
-  /// ID card URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? idCardUrl;
+  /// Verification documents (ID card, licenses, etc.)
+  List<VerificationDocumentEntryDto> verificationDocuments;
 
   /// Employee status
   CreateSpaTherapistDtoStatusEnum? status;
 
-  /// Branch ID or name
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? branch;
-
-  /// Account password
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? password;
-
   /// Bio / description
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? description;
+  String description;
 
   /// Job title
   ///
@@ -197,15 +150,6 @@ class CreateSpaTherapistDto {
   /// Device proficiency
   List<String> deviceProficiency;
 
-  /// License URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? licenseUrl;
-
   /// Partner ID (auto-injected)
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -229,11 +173,10 @@ class CreateSpaTherapistDto {
     other.employmentType == employmentType &&
     other.startDate == startDate &&
     _deepEquality.equals(other.schedule, schedule) &&
+    _deepEquality.equals(other.workHistory, workHistory) &&
     other.avatar == avatar &&
-    other.idCardUrl == idCardUrl &&
+    _deepEquality.equals(other.verificationDocuments, verificationDocuments) &&
     other.status == status &&
-    other.branch == branch &&
-    other.password == password &&
     other.description == description &&
     other.jobTitle == jobTitle &&
     other.therapistLevel == therapistLevel &&
@@ -241,7 +184,6 @@ class CreateSpaTherapistDto {
     other.healthCheckDate == healthCheckDate &&
     _deepEquality.equals(other.skills, skills) &&
     _deepEquality.equals(other.deviceProficiency, deviceProficiency) &&
-    other.licenseUrl == licenseUrl &&
     other.partnerId == partnerId;
 
   @override
@@ -253,29 +195,27 @@ class CreateSpaTherapistDto {
     (phone == null ? 0 : phone!.hashCode) +
     (dateOfBirth == null ? 0 : dateOfBirth!.hashCode) +
     (gender == null ? 0 : gender!.hashCode) +
-    (emergencyContactName == null ? 0 : emergencyContactName!.hashCode) +
-    (emergencyContactPhone == null ? 0 : emergencyContactPhone!.hashCode) +
+    (emergencyContactName.hashCode) +
+    (emergencyContactPhone.hashCode) +
     (employeeId.hashCode) +
     (employmentType == null ? 0 : employmentType!.hashCode) +
-    (startDate == null ? 0 : startDate!.hashCode) +
+    (startDate.hashCode) +
     (schedule.hashCode) +
+    (workHistory.hashCode) +
     (avatar == null ? 0 : avatar!.hashCode) +
-    (idCardUrl == null ? 0 : idCardUrl!.hashCode) +
+    (verificationDocuments.hashCode) +
     (status == null ? 0 : status!.hashCode) +
-    (branch == null ? 0 : branch!.hashCode) +
-    (password == null ? 0 : password!.hashCode) +
-    (description == null ? 0 : description!.hashCode) +
+    (description.hashCode) +
     (jobTitle == null ? 0 : jobTitle!.hashCode) +
     (therapistLevel == null ? 0 : therapistLevel!.hashCode) +
     (commissionRate == null ? 0 : commissionRate!.hashCode) +
     (healthCheckDate == null ? 0 : healthCheckDate!.hashCode) +
     (skills.hashCode) +
     (deviceProficiency.hashCode) +
-    (licenseUrl == null ? 0 : licenseUrl!.hashCode) +
     (partnerId == null ? 0 : partnerId!.hashCode);
 
   @override
-  String toString() => 'CreateSpaTherapistDto[firstName=$firstName, lastName=$lastName, email=$email, phone=$phone, dateOfBirth=$dateOfBirth, gender=$gender, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, employeeId=$employeeId, employmentType=$employmentType, startDate=$startDate, schedule=$schedule, avatar=$avatar, idCardUrl=$idCardUrl, status=$status, branch=$branch, password=$password, description=$description, jobTitle=$jobTitle, therapistLevel=$therapistLevel, commissionRate=$commissionRate, healthCheckDate=$healthCheckDate, skills=$skills, deviceProficiency=$deviceProficiency, licenseUrl=$licenseUrl, partnerId=$partnerId]';
+  String toString() => 'CreateSpaTherapistDto[firstName=$firstName, lastName=$lastName, email=$email, phone=$phone, dateOfBirth=$dateOfBirth, gender=$gender, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, employeeId=$employeeId, employmentType=$employmentType, startDate=$startDate, schedule=$schedule, workHistory=$workHistory, avatar=$avatar, verificationDocuments=$verificationDocuments, status=$status, description=$description, jobTitle=$jobTitle, therapistLevel=$therapistLevel, commissionRate=$commissionRate, healthCheckDate=$healthCheckDate, skills=$skills, deviceProficiency=$deviceProficiency, partnerId=$partnerId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -297,58 +237,29 @@ class CreateSpaTherapistDto {
     } else {
       json[r'gender'] = null;
     }
-    if (this.emergencyContactName != null) {
       json[r'emergencyContactName'] = this.emergencyContactName;
-    } else {
-      json[r'emergencyContactName'] = null;
-    }
-    if (this.emergencyContactPhone != null) {
       json[r'emergencyContactPhone'] = this.emergencyContactPhone;
-    } else {
-      json[r'emergencyContactPhone'] = null;
-    }
       json[r'employeeId'] = this.employeeId;
     if (this.employmentType != null) {
       json[r'employmentType'] = this.employmentType;
     } else {
       json[r'employmentType'] = null;
     }
-    if (this.startDate != null) {
       json[r'startDate'] = this.startDate;
-    } else {
-      json[r'startDate'] = null;
-    }
       json[r'schedule'] = this.schedule;
+      json[r'workHistory'] = this.workHistory;
     if (this.avatar != null) {
       json[r'avatar'] = this.avatar;
     } else {
       json[r'avatar'] = null;
     }
-    if (this.idCardUrl != null) {
-      json[r'idCardUrl'] = this.idCardUrl;
-    } else {
-      json[r'idCardUrl'] = null;
-    }
+      json[r'verificationDocuments'] = this.verificationDocuments;
     if (this.status != null) {
       json[r'status'] = this.status;
     } else {
       json[r'status'] = null;
     }
-    if (this.branch != null) {
-      json[r'branch'] = this.branch;
-    } else {
-      json[r'branch'] = null;
-    }
-    if (this.password != null) {
-      json[r'password'] = this.password;
-    } else {
-      json[r'password'] = null;
-    }
-    if (this.description != null) {
       json[r'description'] = this.description;
-    } else {
-      json[r'description'] = null;
-    }
     if (this.jobTitle != null) {
       json[r'jobTitle'] = this.jobTitle;
     } else {
@@ -371,11 +282,6 @@ class CreateSpaTherapistDto {
     }
       json[r'skills'] = this.skills;
       json[r'deviceProficiency'] = this.deviceProficiency;
-    if (this.licenseUrl != null) {
-      json[r'licenseUrl'] = this.licenseUrl;
-    } else {
-      json[r'licenseUrl'] = null;
-    }
     if (this.partnerId != null) {
       json[r'partnerId'] = this.partnerId;
     } else {
@@ -409,18 +315,17 @@ class CreateSpaTherapistDto {
         phone: mapValueOfType<String>(json, r'phone'),
         dateOfBirth: mapValueOfType<String>(json, r'dateOfBirth'),
         gender: CreateSpaTherapistDtoGenderEnum.fromJson(json[r'gender']),
-        emergencyContactName: mapValueOfType<String>(json, r'emergencyContactName'),
-        emergencyContactPhone: mapValueOfType<String>(json, r'emergencyContactPhone'),
+        emergencyContactName: mapValueOfType<String>(json, r'emergencyContactName')!,
+        emergencyContactPhone: mapValueOfType<String>(json, r'emergencyContactPhone')!,
         employeeId: mapValueOfType<String>(json, r'employeeId')!,
         employmentType: mapValueOfType<String>(json, r'employmentType'),
-        startDate: mapValueOfType<String>(json, r'startDate'),
+        startDate: mapValueOfType<String>(json, r'startDate')!,
         schedule: WorkScheduleEntryDto.listFromJson(json[r'schedule']),
+        workHistory: WorkHistoryEntryDto.listFromJson(json[r'workHistory']),
         avatar: mapValueOfType<String>(json, r'avatar'),
-        idCardUrl: mapValueOfType<String>(json, r'idCardUrl'),
+        verificationDocuments: VerificationDocumentEntryDto.listFromJson(json[r'verificationDocuments']),
         status: CreateSpaTherapistDtoStatusEnum.fromJson(json[r'status']),
-        branch: mapValueOfType<String>(json, r'branch'),
-        password: mapValueOfType<String>(json, r'password'),
-        description: mapValueOfType<String>(json, r'description'),
+        description: mapValueOfType<String>(json, r'description')!,
         jobTitle: mapValueOfType<String>(json, r'jobTitle'),
         therapistLevel: CreateSpaTherapistDtoTherapistLevelEnum.fromJson(json[r'therapistLevel']),
         commissionRate: num.parse('${json[r'commissionRate']}'),
@@ -431,7 +336,6 @@ class CreateSpaTherapistDto {
         deviceProficiency: json[r'deviceProficiency'] is Iterable
             ? (json[r'deviceProficiency'] as Iterable).cast<String>().toList(growable: false)
             : const [],
-        licenseUrl: mapValueOfType<String>(json, r'licenseUrl'),
         partnerId: mapValueOfType<String>(json, r'partnerId'),
       );
     }
@@ -483,7 +387,12 @@ class CreateSpaTherapistDto {
     'firstName',
     'lastName',
     'email',
+    'emergencyContactName',
+    'emergencyContactPhone',
     'employeeId',
+    'startDate',
+    'schedule',
+    'description',
   };
 }
 

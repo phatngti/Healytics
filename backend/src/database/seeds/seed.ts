@@ -44,17 +44,21 @@ class SeedAppModule {}
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(SeedAppModule);
   const isClear = process.argv.includes('--clear');
+  const isClearAll = process.argv.includes('--clear-all');
 
   try {
     const seeder = app.get(SeederService);
 
-    if (isClear) {
+    if (isClearAll) {
+      await seeder.clearAll();
+    } else if (isClear) {
       await seeder.clear();
     } else {
       await seeder.seed();
     }
   } catch (error) {
-    console.error(isClear ? '❌ Clearing failed:' : '❌ Seeding failed:', error);
+    const label = isClearAll ? '❌ Clear-all failed:' : isClear ? '❌ Clearing failed:' : '❌ Seeding failed:';
+    console.error(label, error);
     process.exitCode = 1;
   } finally {
     await app.close();

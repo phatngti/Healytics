@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { RedisService } from '@/redis/redis.service';
 import { CreatePartnerHealthServiceDto } from '../../dto/partner/create-partner-health-service.dto';
 import { Product } from '@/common/entities/product.entity';
 import { HealthServiceType } from '../../enums/health-service-type.enum';
@@ -12,13 +13,15 @@ import { ProductMedia } from '@/common/entities/product-media.entity';
 import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
-import { ProductReview } from '@/common/entities/product-review.entity';
 
 @Injectable()
 export class CreateHealthServiceHandler {
   private readonly logger = new Logger(CreateHealthServiceHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly redisService: RedisService,
+  ) {}
 
   async execute(command: CreatePartnerHealthServiceDto): Promise<Product> {
     this.logger.log(`Executing CreateHealthServiceHandler with name: ${command.name}`);
@@ -27,7 +30,7 @@ export class CreateHealthServiceHandler {
     await queryRunner.startTransaction();
 
     try {
-      const { media, productDefinition, employeeIds, facilityImages, reviews, ...baseData } = command;
+      const { media, productDefinition, employeeIds, facilityImages, serviceManual, ...baseData } = command;
 
       // 1. Invariant Check (Validate)
       if (baseData.type === HealthServiceType.SERVICE && !productDefinition) {
@@ -39,6 +42,7 @@ export class CreateHealthServiceHandler {
       // 2. Domain Action (Prepare Entity)
       const product = queryRunner.manager.create(Product, {
         ...baseData,
+        serviceManual: serviceManual ?? null,
         currency: 'VND', // Hardcoded as per business rule defaults
       });
 
@@ -95,19 +99,20 @@ export class CreateHealthServiceHandler {
         await queryRunner.manager.save(ProductFacilityImage, facilityEntities);
       }
 
-      // Handle Reviews — Relation Management
-      if (reviews && reviews.length > 0) {
-        const reviewEntities = reviews.map((r) =>
-          queryRunner.manager.create(ProductReview, {
-            ...r,
-            productId: savedProduct.id,
-          }),
-        );
-        await queryRunner.manager.save(ProductReview, reviewEntities);
-      }
-
       await queryRunner.commitTransaction();
       this.logger.log(`Product created successfully: ${savedProduct.id}`);
+
+      // 4. Publish Redis event — notify subscribers of new service
+      try {
+        await this.redisService.publish(
+          'new_service_created',
+          savedProduct.id,
+        );
+      } catch (pubErr) {
+        this.logger.warn(
+          `Failed to publish new_service_created event for ${savedProduct.id}: ${pubErr.message}`,
+        );
+      }
 
       const completeProduct = await this.dataSource.manager.findOne(Product, {
         where: { id: savedProduct.id },
@@ -119,7 +124,6 @@ export class CreateHealthServiceHandler {
           'productEmployeeEligibilities.employee',
           'productTags',
           'productTags.tag',
-          'reviews',
           'facilityImages',
         ],
       });

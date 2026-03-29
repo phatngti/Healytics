@@ -73,7 +73,11 @@ export class PublicHealthServiceInfoResponseDto {
   @ApiProperty({ type: [PublicFacilityImageDto] }) facilityImages: PublicFacilityImageDto[];
   @ApiProperty({ type: [PublicServiceTagDto] }) serviceTags: PublicServiceTagDto[];
 
-  static fromEntity(product: Product, partner?: Partner | null): PublicHealthServiceInfoResponseDto {
+  static fromEntity(
+    product: Product,
+    partner?: Partner | null,
+    ratingData?: { rating: number; count: number },
+  ): PublicHealthServiceInfoResponseDto {
     const dto = new PublicHealthServiceInfoResponseDto();
 
     dto.id = product.id;
@@ -91,12 +95,9 @@ export class PublicHealthServiceInfoResponseDto {
       .map((m) => m.url);
     dto.description = product.description;
 
-    // Reviews & rating
-    const reviews = product.reviews ?? [];
-    dto.reviewCount = reviews.length;
-    dto.rating = reviews.length
-      ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10
-      : 0;
+    // Reviews & rating — pre-computed from TreatmentReview aggregate
+    dto.reviewCount = ratingData?.count ?? 0;
+    dto.rating = ratingData?.rating ?? 0;
 
     // Price formatting
     const price = product.salePrice ?? product.basePrice;

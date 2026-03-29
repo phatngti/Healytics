@@ -1,7 +1,9 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:user_app/features/orders/domain/entities/appointment.entity.dart';
 
-/// Compact horizontal card for service recommendations.
+/// Compact horizontal card for service
+/// recommendations.
 class RecommendationCard extends StatelessWidget {
   const RecommendationCard({
     super.key,
@@ -19,14 +21,17 @@ class RecommendationCard extends StatelessWidget {
 
     return Container(
       width: 288,
-      padding: const EdgeInsets.all(12),
+      padding: AppDimens.paddingAllMediumSmall,
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colors.outlineVariant),
+        borderRadius: AppDimens.radiusMediumSmall,
+        border: Border.all(
+          color: colors.outlineVariant,
+        ),
         boxShadow: [
           BoxShadow(
-            color: colors.shadow.withValues(alpha: 0.05),
+            color: colors.shadow
+                .withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -35,8 +40,10 @@ class RecommendationCard extends StatelessWidget {
       child: Row(
         children: [
           _Thumbnail(imageUrl: service.imageUrl),
-          const SizedBox(width: 12),
-          Expanded(child: _Details(service: service)),
+          AppDimens.horizontalMediumSmall,
+          Expanded(
+            child: _Details(service: service),
+          ),
         ],
       ),
     );
@@ -50,7 +57,7 @@ class _Thumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: AppDimens.radiusSmall,
       child: SizedBox(
         width: 96,
         height: 96,
@@ -58,8 +65,14 @@ class _Thumbnail extends StatelessWidget {
           imageUrl,
           fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => Container(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            child: const Center(child: Icon(Icons.image_not_supported)),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest,
+            child: const Center(
+              child: Icon(
+                Icons.image_not_supported,
+              ),
+            ),
           ),
         ),
       ),
@@ -76,45 +89,61 @@ class _Details extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment:
+          MainAxisAlignment.spaceBetween,
       children: [
         Text(
           service.name,
-          style: theme.textTheme.titleSmall?.copyWith(
+          style:
+              theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 4),
+        AppDimens.verticalExtraSmall,
         Text(
           service.description,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+          style:
+              theme.textTheme.bodySmall?.copyWith(
+            color:
+                theme.colorScheme.onSurfaceVariant,
           ),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 8),
+        AppDimens.verticalSmall,
         Row(
           children: [
-            Text(
-              service.price,
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+            Flexible(
+              child: Text(
+                service.price,
+                style: theme.textTheme.titleSmall
+                    ?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(width: 12),
+            AppDimens.horizontalMediumSmall,
             Icon(
               Icons.schedule,
-              size: 14,
-              color: theme.colorScheme.onSurfaceVariant,
+              size: AppDimens.iconXs,
+              color:
+                  theme.colorScheme.onSurfaceVariant,
             ),
-            const SizedBox(width: 2),
-            Text(
-              service.duration,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+            SizedBox(width: AppDimens.spaceXxs),
+            Flexible(
+              child: Text(
+                service.duration,
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(
+                  color: theme
+                      .colorScheme.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

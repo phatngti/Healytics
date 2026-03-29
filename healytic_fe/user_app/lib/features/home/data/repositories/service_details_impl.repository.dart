@@ -20,10 +20,22 @@ class ServiceDetailsImplRepository implements ServiceDetailsRepository {
   }
 
   @override
-  Future<List<ReviewEntity>> getServiceReviews(String serviceId) async {
-    return remoteDatasource.getServiceReviews(serviceId);
+  Future<List<ReviewEntity>> getServiceReviews(
+    String serviceId,
+  ) async {
+    return remoteDatasource.getServiceReviews(
+      serviceId,
+    );
   }
 
+  @override
+  Future<List<ReviewEntity>> getEmployeeReviews(
+    String employeeId,
+  ) async {
+    return remoteDatasource.getEmployeeReviews(
+      employeeId,
+    );
+  }
   @override
   Future<List<RecommendedServiceEntity>> getRecommendedServices(
     String serviceId,

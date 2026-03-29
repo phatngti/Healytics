@@ -13,6 +13,7 @@ class ServiceDetailsEntity {
   const ServiceDetailsEntity({
     required this.id,
     required this.title,
+    required this.categoryId,
     required this.categoryLabel,
     required this.images,
     required this.rating,
@@ -27,6 +28,10 @@ class ServiceDetailsEntity {
 
   final String id;
   final String title;
+
+  /// Category identifier for navigation to
+  /// specialist selection.
+  final String categoryId;
   final String categoryLabel;
   final List<String> images;
   final double rating;

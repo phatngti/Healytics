@@ -7,12 +7,21 @@ import 'employee_contact_item.dart';
 class EmployeeContactCard extends StatelessWidget {
   final String email;
   final String phone;
+
+  /// Emergency contact person's name.
+  final String? emergencyContactName;
+
+  /// Emergency contact person's phone number.
+  final String? emergencyContactPhone;
+
   final bool isEditing;
 
   const EmployeeContactCard({
     super.key,
     required this.email,
     required this.phone,
+    this.emergencyContactName,
+    this.emergencyContactPhone,
     this.isEditing = false,
   });
 
@@ -21,6 +30,10 @@ class EmployeeContactCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final semanticColors = Theme.of(context).extension<SemanticColors>()!;
+
+    final hasEmergency =
+        (emergencyContactName?.isNotEmpty ?? false) ||
+        (emergencyContactPhone?.isNotEmpty ?? false);
 
     return Container(
       decoration: BoxDecoration(
@@ -92,8 +105,12 @@ class EmployeeContactCard extends StatelessWidget {
                   iconColor: semanticColors.error,
                   iconBgColor: semanticColors.error?.withAlpha(25),
                   label: 'Emergency Contact',
-                  value: 'Not available',
-                  subtitle: 'No emergency contact on file',
+                  value: hasEmergency
+                      ? emergencyContactName ?? 'Unknown'
+                      : 'Not available',
+                  subtitle: hasEmergency
+                      ? emergencyContactPhone
+                      : 'No emergency contact on file',
                   isEditing: isEditing,
                 ),
               ],

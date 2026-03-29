@@ -4,11 +4,11 @@ import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:user_app/features/checkout/domain/entities/booking_params.entity.dart';
-import 'package:user_app/features/checkout/presentation/providers/checkout.provider.dart';
+
 import 'package:user_app/features/home/domain/entities/service_details.entity.dart';
 import 'package:user_app/features/home/presentation/providers/service_details.provider.dart';
 import 'package:user_app/router/routes.dart';
+
 
 import '../widgets/service_details/about_treatment.widget.dart';
 import '../widgets/service_details/clinic_card.widget.dart';
@@ -18,7 +18,7 @@ import '../widgets/service_details/hero_image_carousel.widget.dart';
 import '../widgets/service_details/rating_price_row.widget.dart';
 import '../widgets/service_details/recommended_services_section.widget.dart';
 import '../widgets/service_details/reviews_section.widget.dart';
-import '../widgets/service_details/specialist_section.widget.dart';
+
 
 /// Full-screen service detail view composed from smaller
 /// widgets matching the new HTML design spec.
@@ -42,8 +42,10 @@ class ServiceDetailsScreen extends ConsumerWidget {
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, _) =>
           Scaffold(body: Center(child: Text('Failed to load details: $error'))),
-      data: (details) =>
-          _ServiceDetailsBody(details: details, serviceId: serviceId),
+      data: (details) => _ServiceDetailsBody(
+        details: details,
+        serviceId: serviceId,
+      ),
     );
   }
 }
@@ -51,30 +53,27 @@ class ServiceDetailsScreen extends ConsumerWidget {
 /// The main scrollable body rendered once data is
 /// available. Uses [CustomScrollView] with slivers so
 /// that off-screen sections are built lazily.
-class _ServiceDetailsBody extends ConsumerStatefulWidget {
-  const _ServiceDetailsBody({required this.details, required this.serviceId});
+class _ServiceDetailsBody extends StatefulWidget {
+  const _ServiceDetailsBody({
+    required this.details,
+    required this.serviceId,
+  });
 
   final ServiceDetailsEntity details;
   final String serviceId;
 
   @override
-  ConsumerState<_ServiceDetailsBody> createState() =>
+  State<_ServiceDetailsBody> createState() =>
       _ServiceDetailsBodyState();
 }
 
-class _ServiceDetailsBodyState extends ConsumerState<_ServiceDetailsBody> {
+class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
   final _scrollController = ScrollController();
   final _showBlur = ValueNotifier<bool>(false);
 
   /// Cached scroll threshold – recomputed only when
   /// MediaQuery values change (orientation / resize).
   double _blurThreshold = 0;
-
-  // ── Selected specialist state ──
-  String? _selectedEmployeeId;
-  String? _selectedEmployeeName;
-  DateTime? _selectedDate;
-  String? _selectedSlotLabel;
 
   @override
   void initState() {
@@ -123,61 +122,7 @@ class _ServiceDetailsBodyState extends ConsumerState<_ServiceDetailsBody> {
     }
   }
 
-  void _onSpecialistChanged(String employeeId, String employeeName) {
-    _selectedEmployeeId = employeeId;
-    _selectedEmployeeName = employeeName;
-    // Reset slot when specialist changes.
-    _selectedDate = null;
-    _selectedSlotLabel = null;
-  }
 
-  void _onSlotSelected(DateTime date, String slotLabel) {
-    _selectedDate = date;
-    _selectedSlotLabel = slotLabel;
-  }
-
-  void _handleConfirmBooking() {
-    final details = widget.details;
-
-    // Validate that a specialist and time slot
-    // have been selected.
-    if (_selectedEmployeeId == null ||
-        _selectedSlotLabel == null ||
-        _selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Please select a specialist and '
-            'time slot before booking.',
-          ),
-        ),
-      );
-      return;
-    }
-
-    final params = BookingParams(
-      serviceId: details.id,
-      serviceName: details.title,
-      serviceImageUrl: details.images.isNotEmpty ? details.images.first : '',
-      price: details.price,
-      clinicName: details.clinic.name,
-      clinicAddress: details.clinic.address,
-      clinicImageUrl: details.clinic.imageUrl,
-      employeeId: _selectedEmployeeId!,
-      employeeName: _selectedEmployeeName!,
-      selectedDate: _selectedDate!,
-      selectedTimeSlot: _selectedSlotLabel!,
-    );
-
-    // Set booking params and navigate.
-    ref.read(bookingParamsProvider.notifier).set(params);
-
-    // Invalidate checkout so it rebuilds with
-    // the new booking params.
-    ref.invalidate(checkoutProvider);
-
-    const CheckoutRoute().push(context);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -258,14 +203,6 @@ class _ServiceDetailsBodyState extends ConsumerState<_ServiceDetailsBody> {
                             address: details.clinic.address,
                           ),
                         ],
-                        AppDimens.verticalLargeExtra,
-
-                        // Specialist section
-                        SpecialistSection(
-                          serviceId: widget.serviceId,
-                          onSpecialistChanged: _onSpecialistChanged,
-                          onSlotSelected: _onSlotSelected,
-                        ),
                       ],
                     ),
                   ),
@@ -314,15 +251,19 @@ class _ServiceDetailsBodyState extends ConsumerState<_ServiceDetailsBody> {
             ),
           ),
 
-          // ── Bottom booking bar ──
+          // ── Bottom action bar ──
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: RepaintBoundary(
-              child: _BottomBookingBar(
+              child: _BottomActionBar(
                 price: details.price,
-                onConfirm: _handleConfirmBooking,
+                onPressed: () {
+                  ServiceSpecialistRoute(
+                    serviceId: widget.serviceId,
+                  ).push(context);
+                },
               ),
             ),
           ),
@@ -423,13 +364,17 @@ class _GlassCircleButton extends StatelessWidget {
   }
 }
 
-/// Fixed bottom bar with total price and confirm booking
-/// button. Reads [Theme] once to avoid repeated lookups.
-class _BottomBookingBar extends StatelessWidget {
-  const _BottomBookingBar({required this.price, required this.onConfirm});
+
+/// Fixed bottom bar with price and "Select Specialist"
+/// CTA. Uses a blurred backdrop matching the header.
+class _BottomActionBar extends StatelessWidget {
+  const _BottomActionBar({
+    required this.price,
+    required this.onPressed,
+  });
 
   final String price;
-  final VoidCallback onConfirm;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -437,11 +382,15 @@ class _BottomBookingBar extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
-    final bottomPad = MediaQuery.paddingOf(context).bottom;
+    final bottomPad =
+        MediaQuery.paddingOf(context).bottom;
 
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        filter: ImageFilter.blur(
+          sigmaX: 16,
+          sigmaY: 16,
+        ),
         child: Container(
           padding: EdgeInsets.fromLTRB(
             AppDimens.spaceXxl,
@@ -451,65 +400,81 @@ class _BottomBookingBar extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: isDark
-                ? colorScheme.surface.withValues(alpha: 0.8)
-                : Colors.white.withValues(alpha: 0.8),
+                ? colorScheme.surface
+                    .withValues(alpha: 0.8)
+                : Colors.white
+                    .withValues(alpha: 0.8),
             border: Border(
               top: BorderSide(
                 color: isDark
                     ? colorScheme.outlineVariant
-                    : colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    : colorScheme.outlineVariant
+                        .withValues(alpha: 0.3),
               ),
             ),
           ),
           child: Row(
             children: [
-              // Price column
               Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Total Price',
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                    style:
+                        textTheme.labelSmall?.copyWith(
+                      color:
+                          colorScheme.onSurfaceVariant,
                     ),
                   ),
                   Text(
                     price,
-                    style: textTheme.titleLarge?.copyWith(
+                    style:
+                        textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
               AppDimens.horizontalMedium,
-              // Confirm button
               Expanded(
                 child: Material(
                   color: colorScheme.primary,
-                  borderRadius: AppDimens.radiusMediumSmall,
+                  borderRadius:
+                      AppDimens.radiusMediumSmall,
                   elevation: 4,
-                  shadowColor: colorScheme.primary.withValues(alpha: 0.3),
+                  shadowColor: colorScheme.primary
+                      .withValues(alpha: 0.3),
                   child: InkWell(
-                    onTap: onConfirm,
-                    borderRadius: AppDimens.radiusMediumSmall,
+                    onTap: onPressed,
+                    borderRadius:
+                        AppDimens.radiusMediumSmall,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding:
+                          const EdgeInsets.symmetric(
+                        vertical: 14,
+                      ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment:
+                            MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Confirm Booking',
-                            style: textTheme.labelLarge?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontWeight: FontWeight.w600,
+                            'Select Specialist',
+                            style: textTheme.labelLarge
+                                ?.copyWith(
+                              color: colorScheme
+                                  .onPrimary,
+                              fontWeight:
+                                  FontWeight.w600,
                             ),
                           ),
                           AppDimens.horizontalSmall,
                           Icon(
-                            Icons.check_circle,
+                            Icons.arrow_forward,
                             size: AppDimens.iconSm,
-                            color: colorScheme.onPrimary,
+                            color:
+                                colorScheme.onPrimary,
                           ),
                         ],
                       ),

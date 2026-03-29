@@ -1,4 +1,5 @@
 import 'package:admin_panel/core/providers/s3.provider.dart';
+import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
 import 'package:common/widgets/images/multi_picker.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return FormBuilderField<List<dynamic>>(
-      name: 'product_images',
+      name: ProductFormField.productImages.key,
       builder: (FormFieldState<List<dynamic>> field) {
         final currentImages = field.value ?? [];
 

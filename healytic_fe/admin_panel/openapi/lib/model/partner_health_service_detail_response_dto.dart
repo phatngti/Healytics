@@ -30,6 +30,7 @@ class PartnerHealthServiceDetailResponseDto {
     this.facilityImages = const [],
     this.reviews = const [],
     this.recommendedServices = const [],
+    this.serviceManual,
   });
 
   String id;
@@ -72,6 +73,14 @@ class PartnerHealthServiceDetailResponseDto {
 
   List<PartnerRecommendedServiceDto> recommendedServices;
 
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  PartnerDetailServiceManualDto? serviceManual;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is PartnerHealthServiceDetailResponseDto &&
     other.id == id &&
@@ -90,7 +99,8 @@ class PartnerHealthServiceDetailResponseDto {
     _deepEquality.equals(other.daySchedules, daySchedules) &&
     _deepEquality.equals(other.facilityImages, facilityImages) &&
     _deepEquality.equals(other.reviews, reviews) &&
-    _deepEquality.equals(other.recommendedServices, recommendedServices);
+    _deepEquality.equals(other.recommendedServices, recommendedServices) &&
+    other.serviceManual == serviceManual;
 
   @override
   int get hashCode =>
@@ -111,10 +121,11 @@ class PartnerHealthServiceDetailResponseDto {
     (daySchedules.hashCode) +
     (facilityImages.hashCode) +
     (reviews.hashCode) +
-    (recommendedServices.hashCode);
+    (recommendedServices.hashCode) +
+    (serviceManual == null ? 0 : serviceManual!.hashCode);
 
   @override
-  String toString() => 'PartnerHealthServiceDetailResponseDto[id=$id, title=$title, categoryLabel=$categoryLabel, images=$images, rating=$rating, reviewCount=$reviewCount, price=$price, isVerified=$isVerified, description=$description, duration=$duration, featureTags=$featureTags, clinic=$clinic, specialists=$specialists, daySchedules=$daySchedules, facilityImages=$facilityImages, reviews=$reviews, recommendedServices=$recommendedServices]';
+  String toString() => 'PartnerHealthServiceDetailResponseDto[id=$id, title=$title, categoryLabel=$categoryLabel, images=$images, rating=$rating, reviewCount=$reviewCount, price=$price, isVerified=$isVerified, description=$description, duration=$duration, featureTags=$featureTags, clinic=$clinic, specialists=$specialists, daySchedules=$daySchedules, facilityImages=$facilityImages, reviews=$reviews, recommendedServices=$recommendedServices, serviceManual=$serviceManual]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -139,6 +150,11 @@ class PartnerHealthServiceDetailResponseDto {
       json[r'facilityImages'] = this.facilityImages;
       json[r'reviews'] = this.reviews;
       json[r'recommendedServices'] = this.recommendedServices;
+    if (this.serviceManual != null) {
+      json[r'serviceManual'] = this.serviceManual;
+    } else {
+      json[r'serviceManual'] = null;
+    }
     return json;
   }
 
@@ -180,6 +196,7 @@ class PartnerHealthServiceDetailResponseDto {
         facilityImages: PartnerFacilityImageDto.listFromJson(json[r'facilityImages']),
         reviews: PartnerReviewDto.listFromJson(json[r'reviews']),
         recommendedServices: PartnerRecommendedServiceDto.listFromJson(json[r'recommendedServices']),
+        serviceManual: PartnerDetailServiceManualDto.fromJson(json[r'serviceManual']),
       );
     }
     return null;

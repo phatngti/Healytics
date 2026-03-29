@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
 import 'package:common/utils/demensions.dart';
 
-import '../widgets/explore_services_section.widget.dart';
+import '../widgets/specialists_section.widget.dart';
 import '../widgets/feature_banner.widget.dart';
 import '../widgets/home_header.widget.dart';
 import '../widgets/quick_actions_section.widget.dart';
@@ -54,7 +54,7 @@ class HomeUpdatePage extends HookConsumerWidget {
                       SizedBox(height: sectionGap),
                       const FeatureBanner(),
                       SizedBox(height: sectionGap),
-                      const ExploreServicesSection(),
+                      const SpecialistsSection(),
                       SizedBox(height: sectionGap),
                       const PremiumTreatmentsSection(),
                       SizedBox(height: sectionGap),

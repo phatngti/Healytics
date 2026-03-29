@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+import 'package:logging/logging.dart';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
@@ -15,6 +15,7 @@ import 'package:user_app/features/bot_chat/domain/entities/chat_sse_event.entity
 /// connections. The POST variant is used by the
 /// `/generative_ai/stream` endpoint.
 class ChatSseService {
+  static final _log = Logger('ChatSseService');
   final String _basePath;
 
   /// Creates a service pointing at [basePath]
@@ -118,7 +119,7 @@ class ChatSseService {
 
           if (line.startsWith('event:')) {
             eventType = line.substring(6).trim();
-            log('SSE event received: $eventType', name: 'ChatSseService');
+            _log.info('SSE event received: $eventType');
           } else if (line.startsWith('data:')) {
             dataBuffer.write(line.substring(5).trim());
           } else if (line.isEmpty && eventType.isNotEmpty) {
@@ -145,12 +146,7 @@ class ChatSseService {
     StackTrace st,
     StreamController<ChatSseEvent> controller,
   ) {
-    log(
-      'SSE stream error',
-      name: 'ChatSseService',
-      error: error,
-      stackTrace: st,
-    );
+    _log.severe('SSE stream error', error, st);
     if (!controller.isClosed) {
       controller.addError(error);
     }
@@ -176,7 +172,7 @@ class ChatSseService {
   ) {
     final type = ChatSseEvent.parseType(rawType);
     if (type == null) {
-      log('Unknown SSE event type: $rawType', name: 'ChatSseService');
+      _log.warning('Unknown SSE event type: $rawType');
       return;
     }
 
@@ -187,11 +183,7 @@ class ChatSseService {
 
       controller.add(ChatSseEvent(type: type, data: data));
     } catch (e) {
-      log(
-        'Failed to parse SSE data: $rawData',
-        name: 'ChatSseService',
-        error: e,
-      );
+      _log.severe('Failed to parse SSE data: $rawData', e);
     }
   }
 }

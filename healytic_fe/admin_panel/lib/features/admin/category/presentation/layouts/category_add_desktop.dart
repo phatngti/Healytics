@@ -1,6 +1,8 @@
 import 'package:common/widgets/button/back_button.dart';
 import 'package:common/widgets/button/button.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:admin_panel/features/admin/category/domain/category_form_field.dart';
+import 'package:admin_panel/features/admin/category/domain/category_status.dart';
 import 'package:admin_panel/router/admin_routes.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -116,8 +118,13 @@ class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
                         FormFieldBuilders.buildDropdownField(
                           context,
                           label: 'Status',
-                          items: const ['Active', 'Inactive'],
-                          initialValue: 'Active',
+                          items: CategoryStatus.values
+                              .map(
+                                (s) => s.displayName,
+                              )
+                              .toList(),
+                          initialValue:
+                              CategoryStatus.active.displayName,
                           hintText: 'Select status',
                         ),
                         AppDimens.verticalMedium,
@@ -153,7 +160,8 @@ class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
                         FormFieldBuilders.buildTextField(
                           context,
                           label: 'Color (Hex)',
-                          fieldKey: 'color_hex',
+                          fieldKey:
+                              CategoryFormField.colorHex.key,
                           hintText: 'Enter hex color (e.g., #1A7B99)',
                           prefixIcon: Icons.color_lens_outlined,
                           validator: (value) {

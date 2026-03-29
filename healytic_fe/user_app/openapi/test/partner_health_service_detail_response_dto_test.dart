@@ -101,6 +101,11 @@ void main() {
       // TODO
     });
 
+    // PartnerDetailServiceManualDto serviceManual
+    test('to test the property `serviceManual`', () async {
+      // TODO
+    });
+
 
   });
 

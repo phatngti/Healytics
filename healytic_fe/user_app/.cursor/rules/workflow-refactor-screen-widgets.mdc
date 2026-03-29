@@ -1,0 +1,89 @@
+---
+description: Workflow for extracting inline private widgets from screen files into dedicated widget files under a screen-context sub-folder.
+globs: "{**/*.screen.dart,**/*.widget.dart}"
+alwaysApply: false
+---
+
+# Refactor Screen Widgets Workflow
+
+Extract inline private widgets from a screen file into separate public widget files,
+grouped by screen context in `presentation/widgets/<screen_name>/`.
+
+## When to Apply
+
+- A screen file exceeds **~150 lines** due to inline widget classes.
+- A screen has **3+ private widget classes** alongside the main screen widget.
+- You want clearer separation of concerns for maintainability and testability.
+
+## Steps
+
+1. **Audit the screen file** — list all private widget classes (`_WidgetName`).
+
+2. **Decide what to extract.** Extract if it:
+   - Has `build()` longer than **15 lines**
+   - Is **logically separable** (e.g., a card, a section, a filter bar)
+   - Could be **reused** or tested independently
+
+   Keep inline if:
+   - Tiny layout adapter (< 10 lines)
+   - Tightly coupled to scroll/layout structure
+
+3. **Create the sub-folder:**
+   ```
+   lib/features/<feature_name>/presentation/widgets/<screen_name>/
+   ```
+
+4. **For each widget to extract:**
+   - Path: `widgets/<screen_name>/<widget_name>.widget.dart`
+   - Rename `_WidgetName` (private) → `WidgetName` (public)
+   - Add all necessary imports
+   - Include `///` doc comments
+   - Use `const` constructor when possible
+   - Keep closely-related private helpers in the same file
+
+5. **Update the screen file:**
+   - Remove extracted widget classes
+   - Add imports for new widget files
+   - Keep only the main screen class and thin composition shell
+   - Replace `_WidgetName(...)` → `WidgetName(...)`
+
+6. **Handle shared vs. screen-specific widgets:**
+   - Widgets used by **multiple screens** → flat `widgets/` root
+   - Widgets specific to **one screen** → sub-folder `widgets/<screen_name>/`
+
+7. **Verify:**
+   ```bash
+   dart analyze lib/features/<feature_name>/presentation/
+   ```
+
+## Example: Before vs After
+
+### Before
+```
+presentation/
+├── screens/
+│   └── orders.screen.dart        (332 lines, 8 widget classes)
+└── widgets/
+    └── appointment_card.widget.dart
+```
+
+### After
+```
+presentation/
+├── screens/
+│   └── orders.screen.dart        (~40 lines, 1 screen + 1 body shell)
+├── widgets/
+│   ├── appointment_card.widget.dart  (shared, unchanged)
+│   └── orders/
+│       ├── orders_tab_bar.widget.dart
+│       ├── category_filters.widget.dart
+│       └── appointment_list.widget.dart
+```
+
+## Naming Conventions
+
+| Original Private Class | File Name | Public Class |
+|------------------------|-----------|--------------|
+| `_TabBar` | `orders_tab_bar.widget.dart` | `OrdersTabBar` |
+| `_CategoryFilters` | `category_filters.widget.dart` | `CategoryFilters` |
+| `_HeroImage` | `hero_image.widget.dart` | `HeroImage` |

@@ -10,8 +10,6 @@ import {
   ValidateNested,
   MaxLength,
   Min,
-  Max,
-  IsDateString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -95,43 +93,59 @@ export class CreatePartnerHealthServiceFacilityImageDto {
   sortOrder?: number;
 }
 
-export class CreatePartnerHealthServiceReviewDto {
-  @ApiProperty({ example: 'John Smith' })
+export class ServiceRuleInputDto {
+  @ApiProperty({ example: 'no-eating' })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(100)
-  reviewerName: string;
+  iconSlug: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg' })
+  @ApiProperty({ example: 'No Eating Before' })
   @IsString()
-  @IsOptional()
-  avatarUrl?: string;
+  @IsNotEmpty()
+  title: string;
 
-  @ApiProperty({ example: 5, description: 'Rating from 1 to 5' })
+  @ApiProperty({ example: 'Avoid eating 2 hours before the service' })
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+}
+
+export class ProcedureStepInputDto {
+  @ApiProperty({ example: 1 })
   @IsNumber()
-  @Min(1)
-  @Max(5)
-  rating: number;
+  stepNumber: number;
 
-  @ApiPropertyOptional({ example: 'Completed' })
-  @IsString()
-  @IsOptional()
-  status?: string;
-
-  @ApiProperty({ example: '2025-05-11' })
-  @IsDateString()
-  date: string;
-
-  @ApiProperty({ example: 'Excellent service and amazing results!' })
+  @ApiProperty({ example: 'Check-in & Registration' })
   @IsString()
   @IsNotEmpty()
-  text: string;
+  title: string;
 
-  @ApiPropertyOptional({ type: [String], example: ['https://example.com/review-img.jpg'] })
+  @ApiProperty({ example: 'Arrive at the reception and complete registration' })
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+}
+
+export class ServiceManualInputDto {
+  @ApiPropertyOptional({ type: [String], example: ['Avoid heavy meals', 'Wear comfortable clothing'] })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  imageUrls?: string[];
+  preServiceGuidelines?: string[];
+
+  @ApiPropertyOptional({ type: [ServiceRuleInputDto] })
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ServiceRuleInputDto)
+  serviceRules?: ServiceRuleInputDto[];
+
+  @ApiPropertyOptional({ type: [ProcedureStepInputDto] })
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ProcedureStepInputDto)
+  procedureSteps?: ProcedureStepInputDto[];
 }
 
 // Main DTO
@@ -220,10 +234,9 @@ export class CreatePartnerHealthServiceDto {
   @Type(() => CreatePartnerHealthServiceFacilityImageDto)
   facilityImages?: CreatePartnerHealthServiceFacilityImageDto[];
 
-  @ApiPropertyOptional({ type: [CreatePartnerHealthServiceReviewDto], description: 'Product reviews' })
-  @IsArray()
+  @ApiPropertyOptional({ type: ServiceManualInputDto, description: 'Service manual (guidelines, rules, procedure steps)' })
   @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => CreatePartnerHealthServiceReviewDto)
-  reviews?: CreatePartnerHealthServiceReviewDto[];
+  @ValidateNested()
+  @Type(() => ServiceManualInputDto)
+  serviceManual?: ServiceManualInputDto;
 }

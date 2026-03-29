@@ -17,6 +17,13 @@ void main() {
   // final instance = AccountApi();
 
   group('tests for AccountApi', () {
+    // Get current user account details
+    //
+    //Future<AccountMeResponseDto> accountControllerGetMe() async
+    test('test accountControllerGetMe', () async {
+      // TODO
+    });
+
     // Get current user survey
     //
     //Future<SurveyResponseDto> accountControllerGetSurvey() async

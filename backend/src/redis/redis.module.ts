@@ -16,24 +16,31 @@ import { RedisService, REDIS_CLIENT } from './redis.service';
           host: string;
           port: number;
           password?: string;
+          username?: string;
         };
+
+        const isLocal =
+          cfg.host === 'localhost' || cfg.host === '127.0.0.1';
 
         const client = new Redis({
           host: cfg.host,
           port: cfg.port,
           password: cfg.password,
+          username: cfg.username,
+          ...(isLocal ? {} : { tls: {} }),
           retryStrategy: (times) => {
-            if (times > 10) {
+            if (times > 5) {
               logger.error(
-                'Redis: max retries reached, stopping reconnection',
+                'Redis: max retries reached, giving up. App will work without Redis.',
               );
               return null; // stop retrying
             }
-            const delay = Math.min(times * 200, 5000);
+            const delay = Math.min(times * 1000, 5000);
             logger.warn(`Redis: reconnecting in ${delay}ms (attempt ${times})`);
             return delay;
           },
-          maxRetriesPerRequest: 3,
+          maxRetriesPerRequest: 1,
+          enableOfflineQueue: false,
           lazyConnect: true,
         });
 

@@ -54,11 +54,10 @@ export class CreateTherapistHandler {
         employmentType: command.employmentType,
         startDate: command.startDate ? new Date(command.startDate) : undefined,
         schedule: command.schedule,
+        workHistory: command.workHistory,
         avatarUrl: command.avatar,
-        idCardUrl: command.idCardUrl,
+        verificationDocuments: command.verificationDocuments,
         status: command.status,
-        branchId: command.branch || undefined,
-        password: command.password,
         description: command.description,
         jobTitle: command.jobTitle,
         partnerId: command.partnerId,
@@ -76,7 +75,6 @@ export class CreateTherapistHandler {
           ? new Date(command.healthCheckDate)
           : undefined,
         skills: command.skills,
-        licenseUrl: command.licenseUrl,
       };
 
       // SPA-specific: deviceProficiency

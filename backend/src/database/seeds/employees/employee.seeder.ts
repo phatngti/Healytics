@@ -17,57 +17,113 @@ const SEED_EMPLOYEES = [
     employeeCode: 'EMP-001',
     firstName: 'James',
     lastName: 'Anderson',
-    displayName: 'Dr. Anderson',
+
     email: 'doctor.anderson@healytics.vn',
     phone: '0901000001',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=James',
     jobTitle: 'General Practitioner',
     role: EmployeeRole.DOCTOR,
     gender: Gender.MALE,
     dob: new Date('1985-03-15'),
     startDate: new Date('2020-06-01'),
     employmentType: 'Full-time',
+    description:
+      'Dr. James Anderson is a board-certified General Practitioner with over 12 years of clinical experience specializing in internal medicine and preventive care. He is passionate about providing comprehensive, patient-centered healthcare and chronic disease management.',
+    schedule: [
+      { day: 'Monday', start: '08:00', end: '17:00', isWorking: true },
+      { day: 'Tuesday', start: '08:00', end: '17:00', isWorking: true },
+      { day: 'Wednesday', start: '08:00', end: '12:00', isWorking: true },
+      { day: 'Thursday', start: '08:00', end: '17:00', isWorking: true },
+      { day: 'Friday', start: '08:00', end: '17:00', isWorking: true },
+      { day: 'Saturday', start: '09:00', end: '13:00', isWorking: true },
+      { day: 'Sunday', start: '00:00', end: '00:00', isWorking: false },
+    ],
+    workHistory: [
+      { facility: 'Healytics Medical Center', position: 'General Practitioner', period: '2020–Present', isCurrent: true },
+      { facility: 'Cho Ray Hospital', position: 'Resident – Internal Medicine', period: '2014–2020', isCurrent: false },
+    ],
   },
   {
     employeeCode: 'EMP-002',
     firstName: 'Sarah',
     lastName: 'Mitchell',
-    displayName: 'Sarah M.',
+
     email: 'therapist.mitchell@healytics.vn',
     phone: '0901000002',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Sarah',
     jobTitle: 'Physical Therapy Technician',
     role: EmployeeRole.THERAPIST,
     gender: Gender.FEMALE,
     dob: new Date('1990-07-22'),
     startDate: new Date('2021-02-15'),
     employmentType: 'Full-time',
+    description:
+      'Sarah Mitchell is a Senior Physical Therapist with expertise in deep tissue massage, sports rehabilitation, and myofascial release. She combines modern therapeutic techniques with advanced medical devices to deliver outstanding patient outcomes.',
+    schedule: [
+      { day: 'Monday', start: '09:00', end: '18:00', isWorking: true },
+      { day: 'Tuesday', start: '09:00', end: '18:00', isWorking: true },
+      { day: 'Wednesday', start: '09:00', end: '18:00', isWorking: true },
+      { day: 'Thursday', start: '09:00', end: '18:00', isWorking: true },
+      { day: 'Friday', start: '09:00', end: '18:00', isWorking: true },
+      { day: 'Saturday', start: '10:00', end: '15:00', isWorking: true },
+      { day: 'Sunday', start: '00:00', end: '00:00', isWorking: false },
+    ],
+    workHistory: [
+      { facility: 'Healytics Spa & Wellness', position: 'Senior Physical Therapist', period: '2021–Present', isCurrent: true },
+      { facility: 'Glow Saigon Spa Retreat', position: 'Physical Therapist', period: '2018–2021', isCurrent: false },
+    ],
   },
   {
     employeeCode: 'EMP-003',
     firstName: 'David',
     lastName: 'Nguyen',
-    displayName: 'David N.',
+
     email: 'reception.nguyen@healytics.vn',
     phone: '0901000003',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=David',
     jobTitle: 'Receptionist',
     role: EmployeeRole.RECEPTIONIST,
     gender: Gender.MALE,
     dob: new Date('1995-11-08'),
     startDate: new Date('2023-01-10'),
     employmentType: 'Full-time',
+    description:
+      'David Nguyen is a professional receptionist who ensures seamless front-desk operations, patient check-ins, and appointment scheduling. He is known for excellent communication skills and a welcoming attitude.',
+    schedule: [
+      { day: 'Monday', start: '07:30', end: '16:30', isWorking: true },
+      { day: 'Tuesday', start: '07:30', end: '16:30', isWorking: true },
+      { day: 'Wednesday', start: '07:30', end: '16:30', isWorking: true },
+      { day: 'Thursday', start: '07:30', end: '16:30', isWorking: true },
+      { day: 'Friday', start: '07:30', end: '16:30', isWorking: true },
+      { day: 'Saturday', start: '08:00', end: '12:00', isWorking: true },
+      { day: 'Sunday', start: '00:00', end: '00:00', isWorking: false },
+    ],
   },
   {
     employeeCode: 'EMP-004',
     firstName: 'Emily',
     lastName: 'Parker',
-    displayName: 'Emily P.',
+
     email: 'manager.parker@healytics.vn',
     phone: '0901000004',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Emily',
     jobTitle: 'Branch Manager',
     role: EmployeeRole.MANAGER,
     gender: Gender.FEMALE,
     dob: new Date('1988-05-30'),
     startDate: new Date('2019-09-01'),
     employmentType: 'Full-time',
+    description:
+      'Emily Parker is an experienced Branch Manager overseeing day-to-day clinic operations, staff coordination, and quality assurance. She brings strong leadership and organizational skills honed over 7 years in healthcare management.',
+    schedule: [
+      { day: 'Monday', start: '08:00', end: '17:00', isWorking: true },
+      { day: 'Tuesday', start: '08:00', end: '17:00', isWorking: true },
+      { day: 'Wednesday', start: '08:00', end: '17:00', isWorking: true },
+      { day: 'Thursday', start: '08:00', end: '17:00', isWorking: true },
+      { day: 'Friday', start: '08:00', end: '17:00', isWorking: true },
+      { day: 'Saturday', start: '00:00', end: '00:00', isWorking: false },
+      { day: 'Sunday', start: '00:00', end: '00:00', isWorking: false },
+    ],
   },
 ];
 
@@ -75,8 +131,7 @@ const SEED_EMPLOYEES = [
 const SEED_DOCTOR_PROFILES: Record<string, Partial<Omit<DoctorProfile, 'employeeId' | 'employee'>>> = {
   'EMP-001': {
     title: 'M.D.',
-    medicalTitles: ['M.D.'],
-    medicalLicenses: ['ML-2024-001'],
+    medicalCredentials: [{ title: 'M.D.', license: 'ML-2024-001' }],
     experienceYears: 12,
     consultationFee: 350000,
     specializations: ['Internal Medicine', 'Preventive Care', 'Chronic Disease Management'],
@@ -137,7 +192,18 @@ export class EmployeeSeeder implements ISeeder {
       });
 
       if (exists) {
-        this.logger.log(`  ⏭ Employee "${empData.employeeCode}" already exists, skipping`);
+        // Update fields that may have been added after initial seeding
+        const fieldsToUpdate: Partial<Employee> = {};
+        if (empData.avatarUrl && !exists.avatarUrl) fieldsToUpdate.avatarUrl = empData.avatarUrl;
+        if (empData.description && !exists.description) fieldsToUpdate.description = empData.description;
+        if (empData.schedule && !exists.schedule) fieldsToUpdate.schedule = empData.schedule;
+
+        if (Object.keys(fieldsToUpdate).length > 0) {
+          await this.employeeRepo.update(exists.id, fieldsToUpdate);
+          this.logger.log(`  🔄 Updated employee "${empData.employeeCode}" with: ${Object.keys(fieldsToUpdate).join(', ')}`);
+        } else {
+          this.logger.log(`  ⏭ Employee "${empData.employeeCode}" already exists, skipping`);
+        }
         await this.seedProfiles(exists);
         continue;
       }
@@ -148,7 +214,7 @@ export class EmployeeSeeder implements ISeeder {
         rating: 0,
         reviewCount: 0,
         partnerId: partner?.id ?? null,
-        // branchId is nullable — left null for seed data
+
       });
 
       await this.employeeRepo.save(employee);

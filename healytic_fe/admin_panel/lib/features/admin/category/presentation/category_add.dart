@@ -1,5 +1,6 @@
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/features/admin/category/domain/category_form_field.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/admin/category/presentation/autofill/category_add.autofill.dart';
 import 'package:admin_panel/features/admin/category/presentation/layouts/category_add_desktop.dart';
@@ -24,7 +25,9 @@ class _CategoryAddScreenState extends ConsumerState<CategoryAddScreen> {
   Future<void> _handleSubmit(Map<String, dynamic> values) async {
     try {
       // TODO: Implement actual category creation via provider
-      final categoryName = values['category_name']?.toString().trim() ?? '';
+      final categoryName = values[
+        CategoryFormField.categoryName.key
+      ]?.toString().trim() ?? '';
 
       // Simulate API call
       await Future.delayed(const Duration(milliseconds: 500));
@@ -86,11 +89,17 @@ class _CategoryAddScreenState extends ConsumerState<CategoryAddScreen> {
   }
 
   static Map<String, dynamic> _buildAutofillValues() => {
-    'category_name': CategoryAddAutofill.name,
-    'description': CategoryAddAutofill.description,
-    'status': CategoryAddAutofill.status,
-    'sort_order': CategoryAddAutofill.sortOrder,
-    'icon_name': CategoryAddAutofill.iconName,
-    'color_hex': CategoryAddAutofill.colorHex,
+    CategoryFormField.categoryName.key:
+        CategoryAddAutofill.name,
+    CategoryFormField.description.key:
+        CategoryAddAutofill.description,
+    CategoryFormField.status.key:
+        CategoryAddAutofill.status,
+    CategoryFormField.sortOrder.key:
+        CategoryAddAutofill.sortOrder,
+    CategoryFormField.iconName.key:
+        CategoryAddAutofill.iconName,
+    CategoryFormField.colorHex.key:
+        CategoryAddAutofill.colorHex,
   };
 }

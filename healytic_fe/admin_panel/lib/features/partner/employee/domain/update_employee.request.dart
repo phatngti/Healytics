@@ -54,17 +54,9 @@ abstract class UpdateEmployeeRequest with _$UpdateEmployeeRequest {
     /// Updated country.
     required String country,
 
-    /// Updated license document URL.
-    String? licenseUrl,
-
-    /// Updated ID card document URL.
-    String? idCardUrl,
-
-    /// Updated list of document URLs.
-    @Default([]) List<String> documents,
-
-    /// New password (only if password change is needed).
-    String? password,
+    /// Updated verification documents.
+    @Default([])
+    List<Map<String, dynamic>> verificationDocuments,
   }) = _UpdateEmployeeRequest;
 
   /// Creates an [UpdateEmployeeRequest] from JSON data.

@@ -1,0 +1,117 @@
+---
+description: Reviews Flutter pages and widgets for UI design system compliance. Use when reviewing UI code for theme usage, spacing, accessibility, responsive design, and performance.
+globs: "{**/*.screen.dart,**/*.widget.dart}"
+alwaysApply: false
+---
+
+# UI Design System Review
+
+## Review Checklist
+
+### 1. Theme Compliance (Critical)
+
+**Hardcoded colors:**
+```dart
+// VIOLATION
+Colors.blue, Colors.red, Color(0xFF123456), Color.fromRGBO(...)
+
+// CORRECT
+Theme.of(context).colorScheme.primary
+Theme.of(context).colorScheme.surface
+```
+
+**Hardcoded text styles:**
+```dart
+// VIOLATION
+TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+
+// CORRECT
+Theme.of(context).textTheme.bodyMedium
+Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
+```
+
+**Deprecated APIs:**
+```dart
+// VIOLATION
+color.withOpacity(0.5)
+
+// CORRECT
+color.withValues(alpha: 0.5)
+```
+
+### 2. Spacing and Dimensions
+
+**Magic numbers:**
+```dart
+// VIOLATION
+EdgeInsets.all(16.0)
+SizedBox(height: 8.0)
+
+// CORRECT
+EdgeInsets.all(Demensions.paddingMedium)
+SizedBox(height: Demensions.spacingSmall)
+```
+
+Verify `import 'package:common/utils/demensions.dart';` is present.
+
+### 3. Shared Components
+
+Check if custom implementations duplicate `package:common`:
+- Custom buttons → should use `package:common/widgets/button/button.dart`
+- Custom text fields → `package:common/widgets/input/simple_fields.dart`
+- Custom toasts → `package:common/widgets/toast.dart`
+
+### 4. Widget Composition
+
+- `build()` method > 50 lines → break into sub-widgets.
+- Repeated widget trees → extract to private widget classes.
+- Helper methods returning widgets → convert to private widget classes.
+- Missing `const` constructors where possible.
+
+### 5. Performance
+
+- `ListView(children: [...])` for dynamic data → use `ListView.builder`.
+- Expensive operations in `build()` → move to provider/notifier.
+- Missing `const` on static widgets.
+
+### 6. Responsive Design
+
+- Fixed widths like `Container(width: 300)` → use responsive sizing.
+- Missing `LayoutBuilder` or `MediaQuery` for adaptive layouts.
+
+### 7. Accessibility
+
+- `IconButton` without `tooltip` or `Semantics` label.
+- `GestureDetector` without semantic annotation.
+- Color contrast below WCAG: 4.5:1 normal text, 3:1 large text.
+- Touch targets below 48x48 dp.
+
+### 8. Error Handling
+
+- `Image.network` without `errorBuilder`.
+- `AsyncValue` without error state handling.
+- Missing loading indicators during data fetch.
+
+## Report Format
+
+```markdown
+# UI Design System Review: <filename>
+
+## Critical Issues (Must Fix)
+- Line XX: `Colors.blue` → `Theme.of(context).colorScheme.primary`
+
+## Warnings (Should Fix)
+- Line XX: Large build method (85 lines) → break into sub-widgets
+
+## Suggestions (Nice to Have)
+- Line XX: Add semantic label to IconButton
+
+## Score: XX/100
+```
+
+## Auto-Fix Capability
+
+Offer to automatically fix:
+- Hardcoded colors → theme colors
+- `.withOpacity()` → `.withValues(alpha:)`
+- Common magic numbers → `Demensions` constants

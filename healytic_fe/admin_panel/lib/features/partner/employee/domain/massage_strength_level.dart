@@ -25,4 +25,18 @@ enum MassageStrengthLevel {
     MassageStrengthLevel.medium => 'MEDIUM',
     MassageStrengthLevel.strong => 'STRONG',
   };
+
+  /// Returns the [MassageStrengthLevel] for the given
+  /// API [value].
+  ///
+  /// Returns `null` if no matching level is found.
+  static MassageStrengthLevel? fromApiValue(String? value) {
+    if (value == null) return null;
+    return switch (value.toUpperCase()) {
+      'SOFT' => MassageStrengthLevel.soft,
+      'MEDIUM' => MassageStrengthLevel.medium,
+      'STRONG' => MassageStrengthLevel.strong,
+      _ => null,
+    };
+  }
 }

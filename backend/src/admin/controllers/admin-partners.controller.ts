@@ -28,6 +28,7 @@ import { ReviewPartnerResponseDto } from '../dto/review-partner-response.dto';
 import { PartnersResponseDto } from '@/partners/dto/response/partners-response.dto';
 import { TotalPartnersResponseDto } from '../dto/total-partners-response.dto';
 import { Audit } from '@/audit/decorators/audit.decorator';
+import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 /**
  * Admin controller for partner management.
