@@ -62,9 +62,9 @@ class HomePageKeys {
   final searchField = const Key('homeSearchField');
 }
 
-// --- Bot Chat ---
+// --- AI Health Assistant Chat ---
 
-class ChatPageKeys {
+class ChatScreenKeys {
   final messageInput = const Key('chatMessageInput');
   final sendButton = const Key('chatSendButton');
   final newChatButton = const Key('chatNewButton');
@@ -116,7 +116,7 @@ class Keys {
   final emailFormPage = EmailFormPageKeys();
   final codeConfirmationPage = CodeConfirmationPageKeys();
   final homePage = HomePageKeys();
-  final chatPage = ChatPageKeys();
+  final chatScreen = ChatScreenKeys();
   final checkoutPage = CheckoutPageKeys();
   final profilePage = ProfilePageKeys();
   final notificationsPage = NotificationsPageKeys();

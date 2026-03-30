@@ -1,0 +1,449 @@
+import { Controller, Get } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiExtraModels, ApiBearerAuth } from '@nestjs/swagger';
+import { Public } from '@/common/decorators/auth/public.decorator';
+import {
+  WsConnectionInfoDto,
+  WsSendMessagePayloadDto,
+  WsTypingPayloadDto,
+  WsMarkReadPayloadDto,
+  WsJoinConversationPayloadDto,
+  WsNewMessageEventDto,
+  WsMessageSentAckDto,
+  WsMessagesReadEventDto,
+  WsTypingEventDto,
+  WsStopTypingEventDto,
+  WsErrorEventDto,
+} from './dto/ws-docs.dto';
+
+/**
+ * Documentation-only controller for the WebSocket Chat API.
+ *
+ * This controller does NOT handle any real HTTP traffic.
+ * It exists solely to render WebSocket connection details and event schemas
+ * inside Swagger UI, since NestJS Swagger cannot auto-document gateways.
+ *
+ * ───────────────────────────────────────────────────────────────
+ * The actual WebSocket communication happens via Socket.IO:
+ *   - User gateway:    ws://<host>/user-chat
+ *   - Partner gateway:  ws://<host>/partner-chat
+ * ───────────────────────────────────────────────────────────────
+ */
+@ApiTags('💬 WebSocket Chat — Connection Guide')
+@ApiExtraModels(
+  WsConnectionInfoDto,
+  WsSendMessagePayloadDto,
+  WsTypingPayloadDto,
+  WsMarkReadPayloadDto,
+  WsJoinConversationPayloadDto,
+  WsNewMessageEventDto,
+  WsMessageSentAckDto,
+  WsMessagesReadEventDto,
+  WsTypingEventDto,
+  WsStopTypingEventDto,
+  WsErrorEventDto,
+)
+@Controller({ path: 'chat/ws-docs', version: '1' })
+export class WsChatDocsController {
+  // ═══════════════════════════════════════════════════════════════
+  //  CONNECTION INFO
+  // ═══════════════════════════════════════════════════════════════
+
+  @Get('user-gateway')
+  @Public()
+  @ApiOperation({
+    summary: '🟢 User Chat Gateway — ws://<host>/user-chat',
+    description: `
+## WebSocket Connection (User / Patient side)
+
+**Namespace:** \`/user-chat\`
+**Allowed Roles:** \`user\`
+**Transport:** Socket.IO v4
+
+### How to Connect
+
+\`\`\`javascript
+import { io } from 'socket.io-client';
+
+const socket = io('ws://localhost:8080/user-chat', {
+  auth: { token: '<JWT_ACCESS_TOKEN>' },
+  transports: ['websocket'],
+});
+
+socket.on('connect', () => console.log('Connected!'));
+socket.on('connect_error', (err) => console.error(err.message));
+// Possible errors: AUTH_REQUIRED, INVALID_TOKEN, USER_NOT_FOUND, INSUFFICIENT_ROLE
+\`\`\`
+
+### Flutter (socket_io_client) Example
+
+\`\`\`dart
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
+final socket = IO.io('http://localhost:8080/user-chat', 
+  IO.OptionBuilder()
+    .setTransports(['websocket'])
+    .setAuth({'token': accessToken})
+    .build(),
+);
+
+socket.onConnect((_) => print('Connected to user-chat'));
+socket.on('new_message', (data) => print('Message: \$data'));
+\`\`\`
+
+### Connection Lifecycle
+
+1. Client connects with JWT in \`auth.token\`
+2. Server validates JWT → verifies role is \`user\`
+3. Server auto-joins the socket to all existing conversation rooms
+4. Client is ready to send/receive messages
+
+### Authentication Errors (on connect)
+
+| Error Code | Meaning |
+|------------|---------|
+| \`AUTH_REQUIRED\` | No token provided in \`auth.token\` or \`Authorization\` header |
+| \`INVALID_TOKEN\` | JWT is expired, malformed, or has wrong signature |
+| \`USER_NOT_FOUND\` | Token is valid but account no longer exists |
+| \`INSUFFICIENT_ROLE\` | Account role is not \`user\` (e.g. partner trying to connect here) |
+    `,
+  })
+  @ApiOkResponse({ description: 'This endpoint is documentation-only. Use Socket.IO to connect.', type: WsConnectionInfoDto })
+  getUserGatewayInfo(): WsConnectionInfoDto {
+    return {
+      url: 'ws://<host>/user-chat',
+      auth: '{ auth: { token: "<JWT_ACCESS_TOKEN>" } }',
+      allowedRoles: ['user'],
+    };
+  }
+
+  @Get('partner-gateway')
+  @Public()
+  @ApiOperation({
+    summary: '🟢 Partner Chat Gateway — ws://<host>/partner-chat',
+    description: `
+## WebSocket Connection (Health Partner side)
+
+**Namespace:** \`/partner-chat\`
+**Allowed Roles:** \`health_partner\`, \`employee\`
+**Transport:** Socket.IO v4
+
+### How to Connect
+
+\`\`\`javascript
+import { io } from 'socket.io-client';
+
+const socket = io('ws://localhost:8080/partner-chat', {
+  auth: { token: '<JWT_ACCESS_TOKEN>' },
+  transports: ['websocket'],
+});
+
+socket.on('connect', () => console.log('Connected!'));
+socket.on('connect_error', (err) => console.error(err.message));
+\`\`\`
+
+### Flutter (socket_io_client) Example
+
+\`\`\`dart
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
+final socket = IO.io('http://localhost:8080/partner-chat', 
+  IO.OptionBuilder()
+    .setTransports(['websocket'])
+    .setAuth({'token': accessToken})
+    .build(),
+);
+
+socket.onConnect((_) => print('Connected to partner-chat'));
+socket.on('new_message', (data) => print('Message: \$data'));
+\`\`\`
+
+### Connection Lifecycle
+
+1. Client connects with JWT in \`auth.token\`
+2. Server validates JWT → verifies role is \`health_partner\` or \`employee\`
+3. Server auto-joins the socket to all existing conversation rooms
+4. Client is ready to send/receive messages
+    `,
+  })
+  @ApiOkResponse({ description: 'This endpoint is documentation-only. Use Socket.IO to connect.', type: WsConnectionInfoDto })
+  getPartnerGatewayInfo(): WsConnectionInfoDto {
+    return {
+      url: 'ws://<host>/partner-chat',
+      auth: '{ auth: { token: "<JWT_ACCESS_TOKEN>" } }',
+      allowedRoles: ['health_partner', 'employee'],
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  CLIENT → SERVER EVENTS
+  // ═══════════════════════════════════════════════════════════════
+
+  @Get('events/send-message')
+  @Public()
+  @ApiOperation({
+    summary: '📤 send_message — Send a chat message',
+    description: `
+## Event: \`send_message\`
+**Direction:** Client → Server
+**Response:** Server returns \`{ event: "message_sent", data: { id, clientMessageId } }\`
+
+### Usage
+
+\`\`\`javascript
+socket.emit('send_message', {
+  conversationId: '550e8400-e29b-41d4-a716-446655440000',
+  content: 'Hello, I have a question!',
+  messageType: 'text',           // optional, default: 'text'
+  clientMessageId: 'client-123', // optional, for idempotent delivery
+}, (response) => {
+  // ACK callback
+  console.log('Sent:', response.data.id);
+});
+\`\`\`
+
+### Flutter Example
+
+\`\`\`dart
+socket.emitWithAck('send_message', {
+  'conversationId': conversationId,
+  'content': messageText,
+  'clientMessageId': uuid.v4(), // local UUID for dedup
+}).then((ack) {
+  print('Message ID: \${ack['data']['id']}');
+});
+\`\`\`
+
+### Side Effects
+- Message is persisted to database
+- Conversation \`lastMessageText\` and \`lastMessageAt\` are updated
+- Other participant's \`unreadCount\` is incremented
+- \`new_message\` event is broadcast to all sockets in the conversation room
+- If \`clientMessageId\` was already used, the existing message is returned (idempotent)
+
+### Errors
+- \`Conversation not found\` — invalid conversationId
+- \`You are not a participant of this conversation\` — access denied
+    `,
+  })
+  @ApiOkResponse({ type: WsSendMessagePayloadDto, description: 'Payload schema for send_message event' })
+  getSendMessageDocs(): WsSendMessagePayloadDto {
+    return { conversationId: '', content: '' };
+  }
+
+  @Get('events/typing')
+  @Public()
+  @ApiOperation({
+    summary: '📤 typing / stop_typing — Typing indicators',
+    description: `
+## Event: \`typing\` and \`stop_typing\`
+**Direction:** Client → Server → Other participants
+
+### Usage
+
+\`\`\`javascript
+// When user starts typing
+socket.emit('typing', { conversationId: '<uuid>' });
+
+// When user stops typing (after 3s of inactivity)
+socket.emit('stop_typing', { conversationId: '<uuid>' });
+\`\`\`
+
+### Received Event (other participant)
+
+\`\`\`javascript
+socket.on('typing', (data) => {
+  // data = { conversationId, userId, userName }
+  showTypingIndicator(data.userName);
+});
+
+socket.on('stop_typing', (data) => {
+  // data = { conversationId, userId }
+  hideTypingIndicator();
+});
+\`\`\`
+
+### Notes
+- Typing events are NOT persisted — they are fire-and-forget
+- Events are broadcast to the other participant on BOTH gateways
+- Client should debounce and auto-send \`stop_typing\` after ~3s of no keystrokes
+    `,
+  })
+  @ApiOkResponse({ type: WsTypingPayloadDto, description: 'Payload schema for typing events' })
+  getTypingDocs(): WsTypingPayloadDto {
+    return { conversationId: '' };
+  }
+
+  @Get('events/mark-read')
+  @Public()
+  @ApiOperation({
+    summary: '📤 mark_read — Mark messages as read',
+    description: `
+## Event: \`mark_read\`
+**Direction:** Client → Server → Other participant
+
+### Usage
+
+\`\`\`javascript
+socket.emit('mark_read', { conversationId: '<uuid>' });
+\`\`\`
+
+### Side Effects
+- Viewer's \`unreadCount\` is reset to 0 in the database
+- \`messages_read\` event is broadcast to the other participant
+
+### Received Event (other participant)
+
+\`\`\`javascript
+socket.on('messages_read', (data) => {
+  // data = { conversationId, readerId, readAt }
+  updateReadReceipts(data.conversationId);
+});
+\`\`\`
+    `,
+  })
+  @ApiOkResponse({ type: WsMarkReadPayloadDto, description: 'Payload schema for mark_read event' })
+  getMarkReadDocs(): WsMarkReadPayloadDto {
+    return { conversationId: '' };
+  }
+
+  @Get('events/join-conversation')
+  @Public()
+  @ApiOperation({
+    summary: '📤 join_conversation — Join a conversation room',
+    description: `
+## Event: \`join_conversation\`
+**Direction:** Client → Server
+
+### Usage
+
+\`\`\`javascript
+// Call this after creating a new conversation via REST API
+socket.emit('join_conversation', { conversationId: '<uuid>' });
+\`\`\`
+
+### Notes
+- On connect, the server auto-joins the socket to ALL existing conversation rooms
+- Use this event only for conversations created AFTER the socket connected
+- No server response — this is a fire-and-forget operation
+    `,
+  })
+  @ApiOkResponse({ type: WsJoinConversationPayloadDto, description: 'Payload schema for join_conversation event' })
+  getJoinConversationDocs(): WsJoinConversationPayloadDto {
+    return { conversationId: '' };
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  SERVER → CLIENT EVENTS
+  // ═══════════════════════════════════════════════════════════════
+
+  @Get('events/new-message')
+  @Public()
+  @ApiOperation({
+    summary: '📥 new_message — Receive a new message',
+    description: `
+## Event: \`new_message\`
+**Direction:** Server → Client
+**When:** Another participant sends a message in a conversation you're in
+
+### Payload
+
+\`\`\`javascript
+socket.on('new_message', (data) => {
+  // data = {
+  //   id: '660e8400-...',
+  //   conversationId: '550e8400-...',
+  //   senderId: '770e8400-...',
+  //   senderName: 'Dr. Nguyen Van A',
+  //   senderAvatar: 'https://s3.example.com/...',
+  //   content: 'Hello!',
+  //   messageType: 'text',
+  //   clientMessageId: 'client-123',
+  //   createdAt: '2026-03-31T00:00:00.000Z'
+  // }
+  appendMessage(data);
+});
+\`\`\`
+    `,
+  })
+  @ApiOkResponse({ type: WsNewMessageEventDto, description: 'Event payload for new_message' })
+  getNewMessageDocs(): WsNewMessageEventDto {
+    return {} as WsNewMessageEventDto;
+  }
+
+  @Get('events/message-sent')
+  @Public()
+  @ApiOperation({
+    summary: '📥 message_sent — ACK for your sent message',
+    description: `
+## Event: \`message_sent\`
+**Direction:** Server → Sender (ACK)
+**When:** Your \`send_message\` was processed successfully
+
+### Payload
+
+\`\`\`javascript
+// Returned as the ACK response from emit
+socket.emit('send_message', payload, (response) => {
+  // response = { event: 'message_sent', data: { id, clientMessageId } }
+  markMessageAsDelivered(response.data.clientMessageId, response.data.id);
+});
+\`\`\`
+
+### Notes
+- Use \`clientMessageId\` to match the ACK to your local pending message
+- Replace the local temp ID with the server-generated \`id\`
+    `,
+  })
+  @ApiOkResponse({ type: WsMessageSentAckDto, description: 'ACK payload for message_sent' })
+  getMessageSentDocs(): WsMessageSentAckDto {
+    return { id: '', clientMessageId: '' };
+  }
+
+  @Get('events/messages-read')
+  @Public()
+  @ApiOperation({
+    summary: '📥 messages_read — Read receipt from other participant',
+    description: `
+## Event: \`messages_read\`
+**Direction:** Server → Client
+**When:** The other participant calls \`mark_read\`
+
+### Payload
+
+\`\`\`javascript
+socket.on('messages_read', (data) => {
+  // data = { conversationId, readerId, readAt }
+  showReadTicks(data.conversationId, data.readAt);
+});
+\`\`\`
+    `,
+  })
+  @ApiOkResponse({ type: WsMessagesReadEventDto, description: 'Event payload for messages_read' })
+  getMessagesReadDocs(): WsMessagesReadEventDto {
+    return {} as WsMessagesReadEventDto;
+  }
+
+  @Get('events/error')
+  @Public()
+  @ApiOperation({
+    summary: '📥 error — Error notification',
+    description: `
+## Event: \`error\`
+**Direction:** Server → Client
+**When:** A \`send_message\` or other operation fails
+
+### Payload
+
+\`\`\`javascript
+socket.on('error', (data) => {
+  // data = { message: 'You are not a participant of this conversation' }
+  showError(data.message);
+});
+\`\`\`
+    `,
+  })
+  @ApiOkResponse({ type: WsErrorEventDto, description: 'Event payload for error' })
+  getErrorDocs(): WsErrorEventDto {
+    return { message: '' };
+  }
+}
