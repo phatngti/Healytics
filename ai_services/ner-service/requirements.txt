@@ -13,3 +13,4 @@ anyio>=4.4.0
 sentence-transformers>=3.0.0
 numpy
 pyahocorasick>=2.1.0
+sqlalchemy
