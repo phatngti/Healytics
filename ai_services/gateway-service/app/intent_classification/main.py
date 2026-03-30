@@ -1,3 +1,6 @@
+"""
+Script để test mô hình intent classification
+"""
 from sentence_transformers import SentenceTransformer
 from sklearn.linear_model import LogisticRegression
 import joblib
