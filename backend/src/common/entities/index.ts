@@ -53,3 +53,8 @@ export { PaymentTransactionLog } from './payment-transaction-log.entity';
 // Reviews
 export { TreatmentReview } from './treatment-review.entity';
 export { SpecialistReview } from './specialist-review.entity';
+
+// Chat
+export { Conversation } from './conversation.entity';
+export { ChatMessage } from './chat-message.entity';
+export { ChatAttachment } from './chat-attachment.entity';

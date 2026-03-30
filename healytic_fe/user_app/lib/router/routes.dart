@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:common/widgets/adaptive_root_scaffold/adaptive_root_scraffold.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
-import 'package:user_app/features/bot_chat/presentation/screens/chat_page.dart';
-import 'package:user_app/features/bot_chat/presentation/screens/conversation_history_page.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/chat.screen.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/conversation_history.screen.dart';
 import 'package:user_app/features/home/presentation/screens/home_page.screen.dart';
-import 'package:user_app/features/home/presentation/screens/service_details.screen.dart';
-import 'package:user_app/features/home/presentation/screens/reviews.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/service_details.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/reviews.screen.dart';
 import 'package:user_app/features/notifications/presentation/screens/notifications.screen.dart';
 import 'package:user_app/features/onboarding/presentation/screens/lottie_splash.screen.dart';
 import 'package:user_app/features/onboarding/presentation/screens/onboard.screen.dart';
@@ -29,11 +29,11 @@ import 'package:user_app/features/employee/domain/entities/certificate.entity.da
 import 'package:user_app/features/employee/presentation/screens/certificate_viewer.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/certificates_list.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/employee_detail.screen.dart';
-import 'package:user_app/features/home/presentation/screens/book_appointment.screen.dart';
-import 'package:user_app/features/home/presentation/screens/select_specialist.screen.dart';
-import 'package:user_app/features/home/presentation/screens/service_specialist.screen.dart';
-import 'package:user_app/features/home/presentation/screens/booking_summary.screen.dart';
-import 'package:user_app/features/home/presentation/screens/ai_health_assistant.screen.dart';
+import 'package:user_app/features/booking/presentation/screens/book_appointment.screen.dart';
+import 'package:user_app/features/booking/presentation/screens/select_specialist.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/service_specialist.screen.dart';
+import 'package:user_app/features/booking/presentation/screens/booking_summary.screen.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/ai_health_assistant.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/employee_booking.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/employee_booking_summary.screen.dart';
 import 'package:user_app/features/review/presentation/screens/review_treatment.screen.dart';
@@ -162,7 +162,7 @@ class ConversationHistoryRoute extends GoRouteData
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const ConversationHistoryPage(),
+      child: const ConversationHistoryScreen(),
     );
   }
 }
@@ -193,7 +193,7 @@ class ProfileRoute extends GoRouteData with $ProfileRoute {
   }
 }
 
-// --- BOT CHAT ROUTES ---
+// --- AI HEALTH ASSISTANT CHAT ROUTES ---
 
 @TypedGoRoute<ChatRoute>(path: '/chat', name: ChatRoute.name)
 class ChatRoute extends GoRouteData with $ChatRoute {
@@ -205,7 +205,7 @@ class ChatRoute extends GoRouteData with $ChatRoute {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: ChatPage(conversationId: conversationId),
+      child: ChatScreen(conversationId: conversationId),
     );
   }
 }

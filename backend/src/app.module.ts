@@ -22,6 +22,7 @@ import { AppointmentModule } from './appointment/appointment.module';
 import { AiServiceModule } from './ai-service/ai-service.module';
 import { ReviewModule } from './review/review.module';
 import { PaymentGatewayModule } from './payment-gateway/payment-gateway.module';
+import { ChatModule } from './chat/chat.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 import rabbitmqConfig from './config/rabbitmq.config';
@@ -80,6 +81,7 @@ import { PublicThrottlerGuard } from './common/guards';
     AiServiceModule,
     ReviewModule,
     PaymentGatewayModule,
+    ChatModule,
   ],
   providers: [
     {

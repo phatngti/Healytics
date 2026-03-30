@@ -9,24 +9,24 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:user_app/features/employee/'
     'presentation/providers/'
     'employee_services.provider.dart';
-import 'package:user_app/features/home/'
+import 'package:user_app/features/booking/'
     'domain/entities/booking.entity.dart';
-import 'package:user_app/features/home/'
+import 'package:user_app/features/booking/'
     'presentation/providers/'
     'booking.provider.dart';
-import 'package:user_app/features/home/'
+import 'package:user_app/features/booking/'
     'presentation/providers/'
     'booking_flow.provider.dart';
-import 'package:user_app/features/home/'
+import 'package:user_app/features/booking/'
     'presentation/widgets/book_appointment/'
     'date_picker_row.widget.dart';
-import 'package:user_app/features/home/'
+import 'package:user_app/features/booking/'
     'presentation/widgets/book_appointment/'
     'specialist_card_list.widget.dart';
-import 'package:user_app/features/home/'
+import 'package:user_app/features/booking/'
     'presentation/widgets/book_appointment/'
     'time_slot_section.widget.dart';
-import 'package:user_app/features/home/'
+import 'package:user_app/features/service_details/'
     'presentation/widgets/service_details/'
     'reviews_section_loader.widget.dart';
 import 'package:user_app/features/employee/'
