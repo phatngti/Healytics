@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol/patrol.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
-import 'package:user_app/features/bot_chat/presentation/screens/chat_page.dart';
-import 'package:user_app/features/bot_chat/presentation/screens/conversation_history_page.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/chat.screen.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/conversation_history.screen.dart';
 
 import 'common.dart';
 import 'helpers/auth_helper.dart';
@@ -17,7 +17,7 @@ void main() {
       await navigateToTab($, TabKeys.chat);
 
       expect(
-        $(ConversationHistoryPage),
+        $(ConversationHistoryScreen),
         findsOneWidget,
       );
     },
@@ -25,19 +25,19 @@ void main() {
 
   patrolTest(
     'starting a new conversation opens '
-    'chat page',
+    'chat screen',
     ($) async {
       await pumpApp($);
       await signIn($);
       await navigateToTab($, TabKeys.chat);
 
       // tapKey on the InkWell inside NewChatFab
-      await $(keys.chatPage.newChatButton)
+      await $(keys.chatScreen.newChatButton)
           .waitUntilVisible();
-      await $(keys.chatPage.newChatButton).tap();
+      await $(keys.chatScreen.newChatButton).tap();
       await $.pump(const Duration(seconds: 2));
 
-      expect($(ChatPage), findsOneWidget);
+      expect($(ChatScreen), findsOneWidget);
     },
   );
 
@@ -48,21 +48,21 @@ void main() {
       await signIn($);
       await navigateToTab($, TabKeys.chat);
 
-      await $(keys.chatPage.newChatButton)
+      await $(keys.chatScreen.newChatButton)
           .waitUntilVisible();
-      await $(keys.chatPage.newChatButton).tap();
+      await $(keys.chatScreen.newChatButton).tap();
       await $.pump(const Duration(seconds: 2));
 
-      await $(keys.chatPage.messageInput).enterText(
+      await $(keys.chatScreen.messageInput).enterText(
         'Hello doctor',
       );
-      await $(keys.chatPage.sendButton).tap();
+      await $(keys.chatScreen.sendButton).tap();
       await $.pump(const Duration(seconds: 3));
 
       // sendMessage adds user msg asynchronously
       // (after await in provider). Just verify
-      // ChatPage is still showing — no crash.
-      expect($(ChatPage), findsOneWidget);
+      // ChatScreen is still showing — no crash.
+      expect($(ChatScreen), findsOneWidget);
     },
   );
 
@@ -81,7 +81,7 @@ void main() {
           .tap();
       await $.pump(const Duration(seconds: 2));
 
-      expect($(ChatPage), findsOneWidget);
+      expect($(ChatScreen), findsOneWidget);
     },
   );
 }
