@@ -1,3 +1,6 @@
+"""
+Redis subscriber để listen các event từ Redis
+"""
 import asyncio
 import json
 import os
