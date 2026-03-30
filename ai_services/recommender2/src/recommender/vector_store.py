@@ -13,6 +13,7 @@ vectordb_path = os.path.join(settings.PROCESSED_DATA_DIR, "vectordb")
 class Vector_Database:
     def __init__(self, db_name):
         # Create chroma client
+        os.makedirs(vectordb_path, exist_ok=True)
         self.chroma_client = chromadb.PersistentClient(path=vectordb_path)
         self.collection = self.chroma_client.get_or_create_collection(
             name = db_name,
@@ -22,7 +23,7 @@ class Vector_Database:
         self.collection.add(
             ids=[service["id"]],
             embeddings=[embedding],
-            documents=[service["name"] + service["description"]],
+            documents=[service["name"] + " " + service["description"]],
             metadatas=[{"service_id": service["id"], "category": service["category"]}],
         )
     
@@ -45,12 +46,26 @@ class Vector_Database:
         return self.collection.query(
             query_embeddings=[embedding_query],
             n_results=n_results,
-            where=where,  # None = không filter, tìm toàn bộ
+            where=where,  
         )
 
     def get_service_information(self, search_ids):
         service = self.collection.get(ids=[search_ids])
         return service
+    
+    def upsert_service(self, service_id: str, name: str, 
+                   description: str, category: str, embedding):
+        """Thêm mới hoặc update nếu đã tồn tại"""
+        self.collection.upsert(
+            ids=[service_id],
+            embeddings=[embedding],
+            documents=[name + " " + description],
+            metadatas=[{"service_id": service_id, "category": category}],
+        )
+
+    def delete_service(self, service_id: str):
+        """Xóa service khỏi vector store"""
+        self.collection.delete(ids=[service_id])
 
 # For testing
 if __name__ == "__main__":

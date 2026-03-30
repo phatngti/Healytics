@@ -1,6 +1,7 @@
 # recommender2/src/schemas/recommender.py
 from pydantic import BaseModel, Field
 from typing import List, Optional
+from uuid import UUID
 
 
 # ==============================
@@ -13,7 +14,7 @@ class HomeRecommenderRequest(BaseModel):
     Service tự query DB/profile.
     """
 
-    user_id: str = Field(..., min_length=1)
+    user_id: UUID
 
     top_k: int = Field(
         default=5,

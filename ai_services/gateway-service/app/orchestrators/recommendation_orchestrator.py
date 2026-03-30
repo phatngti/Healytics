@@ -1,8 +1,14 @@
 # app/orchestrators/recommendation_orchestrator.py
 from datetime import datetime, timezone
 from typing import Any, Dict
+import logging
+import httpx
+from fastapi import HTTPException
 from app.clients.recommender_client import RecommenderClient
+from app.clients.backend_ai_client import BackendAIClient
+from app.core.config import settings
 
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Mock service data — thay bằng gọi API thật khi backend sẵn sàng
@@ -72,12 +78,36 @@ MOCK_SERVICES: Dict[str, Dict] = {
 }
 
 
-def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
-    """Tạm thời dùng mock. Sau này thay bằng gọi API backend."""
-    return [
-        MOCK_SERVICES.get(sid, {"service_id": sid, "name": "Unknown", "description": ""})
-        for sid in service_ids
-    ]
+async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
+    """Dùng API backend thật để lấy full thông tin service."""
+    if not service_ids:
+        return []
+
+    # Don't break current system if key missing.
+    if not settings.AI_API_KEY:
+        return [
+            MOCK_SERVICES.get(sid, {"service_id": sid, "name": "Unknown", "description": ""})
+            for sid in service_ids
+        ]
+
+    client = BackendAIClient()
+    try:
+        services = await client.get_service_details(service_ids)
+    except Exception as e:
+        # Do not break main recommendation flow if backend enrichment API is down.
+        logger.warning("Backend enrichment failed, fallback to basic payload. error=%r", e)
+        return [{"service_id": sid, "name": "Unknown", "description": ""} for sid in service_ids]
+    if not services:
+        return [{"service_id": sid, "name": "Unknown", "description": ""} for sid in service_ids]
+
+    # Preserve the ordering from recommender response
+    by_id: dict[str, dict] = {}
+    for s in services:
+        sid = s.get("service_id") or s.get("id")
+        if sid is not None:
+            by_id[str(sid)] = s
+
+    return [by_id.get(sid, {"service_id": sid, "name": "Unknown", "description": ""}) for sid in service_ids]
 
 
 def _format_services_for_prompt(services: list[dict]) -> str:
@@ -107,13 +137,21 @@ class RecommendationOrchestrator:
         self.recommender_client = RecommenderClient()
 
     async def recommend_home(self, request: Any) -> Dict:
-        payload = {"user_id": request.user_id, "top_k": request.top_k}
-        result = await self.recommender_client.recommend_home(payload)
+        payload = {"user_id": str(request.user_id), "top_k": request.top_k}
+        try:
+            result = await self.recommender_client.recommend_home(payload)
+        except httpx.HTTPStatusError as e:
+            detail = None
+            try:
+                detail = e.response.json()
+            except Exception:
+                detail = e.response.text or "Downstream recommender error"
+            raise HTTPException(status_code=e.response.status_code, detail=detail) from e
 
         service_ids = result["recommendations"][0]["service_ids"] if result.get("recommendations") else []
 
         # Enrich service_ids → ServiceDetail
-        services = _enrich_with_service_info(service_ids)
+        services = await _enrich_with_service_info(service_ids)
 
         return {
             "recommendations": services,   # ← list ServiceDetail, không phải list RecommendationItem
@@ -127,12 +165,20 @@ class RecommendationOrchestrator:
             "query": request.query,
             "top_k": request.top_k,
         }
-        result = await self.recommender_client.recommend_chatbot(payload)
+        try:
+            result = await self.recommender_client.recommend_chatbot(payload)
+        except httpx.HTTPStatusError as e:
+            detail = None
+            try:
+                detail = e.response.json()
+            except Exception:
+                detail = e.response.text or "Downstream recommender error"
+            raise HTTPException(status_code=e.response.status_code, detail=detail) from e
 
         service_ids = result["recommendations"][0]["service_ids"] if result.get("recommendations") else []
 
         # Enrich
-        services = _enrich_with_service_info(service_ids)
+        services = await _enrich_with_service_info(service_ids)
 
         return {
             "conversation_id": str(request.conversation_id),
@@ -141,14 +187,14 @@ class RecommendationOrchestrator:
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
-    def get_enriched_services_for_prompt(self, service_ids: list[str]) -> str:
+    async def get_enriched_services_for_prompt(self, service_ids: list[str]) -> str:
         """
         Dùng bởi ChatbotOrchestrator để enrich prompt.
         Trả về string mô tả dịch vụ để inject vào prompt LLM.
         """
-        services = _enrich_with_service_info(service_ids)
+        services = await _enrich_with_service_info(service_ids)
         return _format_services_for_prompt(services)
     
-    def get_enriched_services(self, service_ids: list[str]) -> list[dict]:
+    async def get_enriched_services(self, service_ids: list[str]) -> list[dict]:
         """Trả về list service detail — dùng cho SSE event."""
-        return _enrich_with_service_info(service_ids)
+        return await _enrich_with_service_info(service_ids)
