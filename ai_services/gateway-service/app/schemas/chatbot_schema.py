@@ -19,7 +19,6 @@ class ChatbotRequest(BaseModel):
 
     top_k: int = Field(default=3, ge=1, le=20)
 
-    enable_recommendation: bool = True
 
 
 
