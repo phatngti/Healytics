@@ -1,3 +1,6 @@
+"""
+Script để build vector database từ DB
+"""
 from src.recommender.vector_store import Vector_Database
 from src.recommender.embedding_model import Embedding_Model
 from config.settings import DATABASE_NAME

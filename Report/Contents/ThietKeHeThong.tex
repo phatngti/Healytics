@@ -524,363 +524,99 @@ Các phần tiếp theo trình bày chi tiết thiết kế giao diện cho các
     \item Dữ liệu đánh giá \& phản hồi
     \item Chuẩn hóa và lưu trữ dữ liệu
 \end{itemize}
+% ============================================================
+% THIẾT KẾ HỆ THỐNG
+% ============================================================
+
 \subsection{Thiết kế hệ thống RAG Chatbot}
 
-Hệ thống RAG (Retrieval-Augmented Generation) Chatbot được thiết kế nhằm xây dựng một trợ lý hội thoại thông minh có khả năng trả lời câu hỏi dựa trên kiến thức từ tài liệu chuyên môn. Khác với các chatbot truyền thống chỉ dựa vào kiến thức được huấn luyện sẵn, hệ thống RAG kết hợp việc truy xuất thông tin từ cơ sở tri thức với khả năng sinh ngôn ngữ tự nhiên của mô hình ngôn ngữ lớn.
+\subsubsection{Luồng tích hợp tổng thể}
 
-\subsubsection{Kiến trúc tổng thể}
+Trong kiến trúc microservices của hệ thống, dịch vụ chatbot không hoạt động độc lập mà được điều phối thông qua một \textbf{Gateway Service} trung tâm. Mỗi khi người dùng gửi tin nhắn, Gateway chịu trách nhiệm lưu trữ hội thoại vào PostgreSQL, nạp lại lịch sử hội thoại, phân tích ý định của người dùng thông qua mô hình \textit{Intent Classification}, và quyết định có cần kích hoạt hệ thống gợi ý dịch vụ hay không. Sau khi thu thập đầy đủ ngữ cảnh, Gateway tổng hợp payload và chuyển tiếp đến dịch vụ RAG để sinh câu trả lời. Phản hồi được trả về dưới dạng luồng SSE liên tục, cho phép giao diện người dùng hiển thị từng đoạn văn bản ngay khi được sinh ra.
 
-Hệ thống RAG Chatbot được xây dựng dựa trên kiến trúc pipeline gồm các thành phần chính:
+Thứ tự xử lý trong một phiên hội thoại diễn ra theo trình tự: phân loại ý định $\rightarrow$ (nếu cần) gọi dịch vụ NER để trích xuất địa điểm $\rightarrow$ gọi dịch vụ gợi ý $\rightarrow$ gọi dịch vụ RAG kèm ngữ cảnh đã làm giàu $\rightarrow$ phát các SSE event về client.
 
-\begin{itemize}
-    \item \textbf{Bộ tải tài liệu}: Thu thập và tải tài liệu từ nhiều nguồn (PDF, file văn bản)
-    \item \textbf{Xử lý văn bản}: Tiền xử lý và chia nhỏ tài liệu thành các đoạn
-    \item \textbf{Mô hình embedding}: Chuyển đổi văn bản thành biểu diễn vector
-    \item \textbf{Cơ sở dữ liệu vector}: Lưu trữ và tìm kiếm các đoạn tài liệu
-    \item \textbf{Bộ truy xuất}: Tìm kiếm ngữ cảnh liên quan từ cơ sở dữ liệu vector
-    \item \textbf{Mô hình ngôn ngữ}: Sinh câu trả lời dựa trên ngữ cảnh và câu hỏi
-    \item \textbf{Mẫu prompt}: Định dạng đầu vào cho mô hình ngôn ngữ
-    \item \textbf{Bộ xử lý đầu ra}: Xử lý và chuẩn hóa kết quả từ mô hình
-\end{itemize}
+\subsubsection{Pipeline RAG trong dịch vụ chatbot}
 
-\subsubsection{Phương pháp RAG}
-
-\paragraph{Nguyên lý hoạt động}  
-Phương pháp RAG giải quyết vấn đề giới hạn kiến thức của mô hình ngôn ngữ lớn bằng cách:
+Dịch vụ RAG nhận payload từ Gateway gồm ba thành phần: lịch sử hội thoại đã định dạng, mô tả các dịch vụ liên quan (có thể rỗng nếu ý định không yêu cầu gợi ý), và câu hỏi hiện tại của người dùng. Pipeline xử lý nội bộ bao gồm:
 
 \begin{enumerate}
-    \item \textbf{Giai đoạn truy xuất}: Khi nhận câu hỏi, hệ thống tìm kiếm các đoạn văn bản liên quan nhất từ cơ sở tri thức
-    \item \textbf{Giai đoạn bổ sung}: Kết hợp ngữ cảnh thu được với câu hỏi gốc thành một prompt đầy đủ
-    \item \textbf{Giai đoạn sinh}: Mô hình ngôn ngữ sinh câu trả lời dựa trên prompt đã được bổ sung
+    \item \textbf{Truy xuất ngữ cảnh:} Câu hỏi hiện tại được embedding thông qua lớp \texttt{HuggingFaceEmbeddings} của LangChain, ưu tiên thiết bị CUDA khi có. Hệ thống tìm kiếm trong vector store \textbf{ChromaDB} theo chế độ \textit{similarity} với $k = 10$ đoạn tài liệu liên quan nhất, sau đó ghép nội dung các đoạn thành một khối ngữ cảnh thống nhất.
+
+    \item \textbf{Xây dựng prompt:} Hệ thống sử dụng một mẫu prompt quy định rõ vai trò trợ lý sức khỏe, thứ tự ưu tiên nguồn thông tin (lịch sử hội thoại $\rightarrow$ knowledge base $\rightarrow$ dịch vụ gợi ý $\rightarrow$ kiến thức chung), và các ràng buộc an toàn y tế. Mô tả dịch vụ chỉ được đưa vào prompt khi danh sách gợi ý không rỗng.
+
+    \item \textbf{Sinh câu trả lời:} Mô hình ngôn ngữ \textbf{Llama-3.1-8B-Instruct} được tải với lượng tử hoá 4-bit (NF4, double quantization, compute dtype float16).
+
+    \item \textbf{Trả về luồng:} Sau khi có câu trả lời đầy đủ, dịch vụ chatbot chia nhỏ văn bản thành các cụm từ và trả về dưới dạng \texttt{StreamingResponse} (plain text). Gateway nhận từng chunk và bọc thành SSE event kiểu \texttt{TOKEN} trước khi đẩy về client.
 \end{enumerate}
 
-Phương pháp này mang lại các lợi ích:
-\begin{itemize}
-    \item Cập nhật kiến thức mà không cần huấn luyện lại mô hình
-    \item Trả lời dựa trên nguồn thông tin cụ thể, có thể truy xuất
-    \item Giảm thiểu hiện tượng ảo giác (sinh thông tin không chính xác)
-    \item Tùy chỉnh cơ sở tri thức theo lĩnh vực cụ thể
-\end{itemize}
+Kho tri thức được xây dựng từ các tài liệu PDF của Tổ chức Y tế Thế giới (WHO) bao gồm hướng dẫn về bệnh tim mạch, đái tháo đường, huyết áp, sức khoẻ tâm thần và hoạt động thể chất. Tài liệu được đọc song song bằng multiprocessing, làm sạch ký tự không thuộc ASCII, và chia đoạn bằng \textit{RecursiveCharacterTextSplitter} với độ dài 300 ký tự, không chồng lấp. Vector store được dựng lại mỗi khi dịch vụ khởi động.
 
-\subsubsection{Quy trình xử lý tài liệu}
+\subsubsection{Thiết kế SSE và phân tách trách nhiệm}
 
-\paragraph{Tải tài liệu}  
-Hệ thống hỗ trợ tải tài liệu từ nhiều định dạng:
-\begin{itemize}
-    \item \textbf{File PDF}: Bài báo khoa học, báo cáo, tài liệu hướng dẫn
-    \item \textbf{File văn bản}: Plain text, markdown
-    \item \textbf{Dữ liệu có cấu trúc}: JSON, CSV (nếu cần)
-\end{itemize}
+Hệ thống áp dụng kiến trúc phân tách rõ ràng giữa các tầng xử lý SSE. Tầng dữ liệu (\texttt{SSEEvent}) là một đối tượng thuần tuý chứa tên event và payload, hoàn toàn không phụ thuộc vào FastAPI hay HTTP. Tầng định dạng (\texttt{SSEFormatter}) chịu trách nhiệm encode theo chuẩn \texttt{text/event-stream}. Tầng adapter (\texttt{sse\_stream}) là cầu nối giữa async generator của orchestrator và \texttt{StreamingResponse} của FastAPI. Kiến trúc này đảm bảo orchestrator chỉ cần \texttt{yield SSEEvent} mà không cần biết bất kỳ chi tiết HTTP nào.
 
-Bộ tải tài liệu sử dụng xử lý song song để tăng tốc độ khi làm việc với nhiều file.
-
-\paragraph{Chia nhỏ văn bản}  
-Tài liệu được chia nhỏ thành các đoạn với các yêu cầu:
+Hệ thống định nghĩa bốn loại event trong một phiên hội thoại:
 
 \begin{itemize}
-    \item \textbf{Kích thước đoạn}: 200-500 token, đảm bảo mỗi đoạn chứa đủ ngữ cảnh
-    \item \textbf{Chồng lấp}: Các đoạn có phần chồng lấp để tránh mất thông tin ở ranh giới
-    \item \textbf{Chia theo ngữ nghĩa}: Ưu tiên chia theo đoạn văn, câu hoàn chỉnh
-    \item \textbf{Bảo toàn metadata}: Giữ lại thông tin nguồn (tên file, số trang)
+    \item \textbf{TOKEN}: Mỗi cụm từ được sinh ra, kèm \texttt{conversation\_id} và timestamp.
+    \item \textbf{RECOMMENDATION}: Danh sách chi tiết dịch vụ gợi ý, phát sau khi luồng LLM kết thúc.
+    \item \textbf{DONE}: Tín hiệu kết thúc phiên, kèm trạng thái \texttt{completed} hoặc \texttt{failed}.
+    \item \textbf{ERROR}: Thông báo lỗi có cấu trúc, được phát trước \texttt{DONE} khi xảy ra ngoại lệ.
 \end{itemize}
 
-Việc chia nhỏ văn bản là bước quan trọng vì:
-\begin{itemize}
-    \item Mô hình ngôn ngữ có giới hạn cửa sổ ngữ cảnh
-    \item Các đoạn nhỏ giúp truy xuất chính xác hơn
-    \item Tìm kiếm độ tương đồng vector hiệu quả hơn với các đơn vị ngữ nghĩa
-\end{itemize}
-
-\paragraph{Embedding và lưu trữ vector}  
-Mỗi đoạn văn bản được chuyển đổi thành vector sử dụng mô hình embedding:
-
-\begin{itemize}
-    \item \textbf{Mô hình embedding}: Sentence transformers từ HuggingFace
-    \item \textbf{Số chiều vector}: 384-768 chiều tùy mô hình
-    \item \textbf{Độ đo tương đồng}: Cosine similarity
-\end{itemize}
-
-Các vector được lưu trữ trong cơ sở dữ liệu vector hỗ trợ:
-\begin{itemize}
-    \item \textbf{Tìm kiếm nhanh}: Thuật toán láng giềng gần đúng
-    \item \textbf{Lọc theo metadata}: Lọc theo nguồn, ngày tháng, danh mục
-    \item \textbf{Lưu trữ lâu dài}: Không cần xây dựng lại mỗi lần chạy
-\end{itemize}
-
-\subsubsection{Chiến lược truy xuất}
-
-\paragraph{Xử lý câu hỏi}  
-Khi nhận câu hỏi từ người dùng:
-
-\begin{enumerate}
-    \item \textbf{Embedding câu hỏi}: Câu hỏi được chuyển thành vector trong cùng không gian với tài liệu
-    \item \textbf{Tìm kiếm tương đồng}: Tìm top-K đoạn có độ tương đồng cosine cao nhất
-    \item \textbf{Sắp xếp lại} (tùy chọn): Sắp xếp lại kết quả dựa trên điểm liên quan
-\end{enumerate}
-
-\paragraph{Tham số truy xuất}  
-
-\begin{itemize}
-    \item \textbf{k (số lượng đoạn)}: Thường là 5-10 đoạn
-    \item \textbf{Loại tìm kiếm}: 
-    \begin{itemize}
-        \item \textit{Tìm kiếm tương đồng}: Tìm các vector gần nhất
-        \item \textit{MMR}: Cân bằng giữa độ liên quan và tính đa dạng
-    \end{itemize}
-    \item \textbf{Ngưỡng điểm}: Lọc bỏ các đoạn có độ tương đồng quá thấp
-\end{itemize}
-
-Bộ truy xuất đảm bảo ngữ cảnh được cung cấp cho mô hình ngôn ngữ:
-\begin{itemize}
-    \item Liên quan nhất đến câu hỏi
-    \item Đa dạng để bao phủ nhiều khía cạnh
-    \item Đủ ngắn gọn để vừa với cửa sổ ngữ cảnh
-\end{itemize}
-
-\subsubsection{Mô hình ngôn ngữ và sinh văn bản}
-
-\paragraph{Lựa chọn mô hình}  
-Hệ thống sử dụng mô hình ngôn ngữ lớn với các đặc điểm:
-
-\begin{itemize}
-    \item \textbf{Kích thước mô hình}: 3B-7B tham số (cân bằng giữa chất lượng và tốc độ)
-    \item \textbf{Cửa sổ ngữ cảnh}: 4K-8K token
-    \item \textbf{Hỗ trợ đa ngôn ngữ}: Tiếng Việt và tiếng Anh
-    \item \textbf{Được tinh chỉnh theo hướng dẫn}: Được huấn luyện để tuân theo chỉ dẫn tốt
-\end{itemize}
-
-\paragraph{Lượng tử hóa}  
-Để giảm dung lượng bộ nhớ và tăng tốc độ suy luận:
-
-\begin{itemize}
-    \item \textbf{Lượng tử hóa 4-bit}: Giảm kích thước mô hình từ ~14GB xuống ~4GB
-    \item \textbf{NF4}: Định dạng lượng tử hóa tối ưu cho mạng nơ-ron
-    \item \textbf{Lượng tử hóa kép}: Giảm thêm overhead từ các hệ số lượng tử hóa
-    \item \textbf{Kiểu dữ liệu tính toán}: bfloat16 để cân bằng độ chính xác và tốc độ
-\end{itemize}
-
-Lượng tử hóa cho phép:
-\begin{itemize}
-    \item Triển khai trên phần cứng hạn chế (GPU tiêu dùng)
-    \item Suy luận nhanh hơn 2-3 lần
-    \item Chất lượng đầu ra gần như không bị ảnh hưởng
-\end{itemize}
-
-\subsubsection{Thiết kế prompt}
-
-\paragraph{Cấu trúc mẫu prompt}  
-Prompt được thiết kế với cấu trúc rõ ràng:
-
-\begin{enumerate}
-    \item \textbf{Thông điệp hệ thống}: Định nghĩa vai trò và hành vi của trợ lý
-    \item \textbf{Phần ngữ cảnh}: Chứa tài liệu được truy xuất từ RAG
-    \item \textbf{Câu hỏi người dùng}: Câu hỏi gốc từ người dùng
-    \item \textbf{Hướng dẫn}: Chỉ dẫn cách trả lời (dựa trên ngữ cảnh, ngắn gọn, v.v.)
-\end{enumerate}
-
-\paragraph{Nguyên tắc thiết kế prompt}  
-
-\begin{itemize}
-    \item \textbf{Hướng dẫn rõ ràng}: Yêu cầu mô hình trả lời dựa trên ngữ cảnh được cung cấp
-    \item \textbf{Định dạng cụ thể}: Chỉ định định dạng đầu ra mong muốn
-    \item \textbf{Đặt ràng buộc}: Không trả lời nếu không có thông tin trong ngữ cảnh
-    \item \textbf{Chỉ định ngôn ngữ}: Xác định ngôn ngữ đầu ra (tiếng Việt/tiếng Anh)
-\end{itemize}
-
-Mẫu prompt được thiết kế để:
-\begin{itemize}
-    \item Tối ưu hóa chất lượng câu trả lời
-    \item Giảm hiện tượng ảo giác
-    \item Đảm bảo trả lời dựa trên sự thật từ tài liệu
-\end{itemize}
-
-\subsubsection{Xử lý đầu ra}
-
-\paragraph{Phân tích phản hồi}  
-Đầu ra từ mô hình ngôn ngữ cần được xử lý:
-
-\begin{enumerate}
-    \item \textbf{Trích xuất văn bản}: Lấy phần văn bản chính từ đầu ra của mô hình
-    \item \textbf{Làm sạch định dạng}: Loại bỏ các token đặc biệt, lỗi định dạng
-    \item \textbf{Kiểm tra câu trả lời}: Kiểm tra đầu ra có định dạng mong muốn
-    \item \textbf{Hậu xử lý}: Chuẩn hóa dấu câu, khoảng trắng, xuống dòng
-\end{enumerate}
-
-\paragraph{Xử lý lỗi}  
-
-\begin{itemize}
-    \item \textbf{Phản hồi rỗng}: Xử lý khi mô hình không sinh đầu ra
-    \item \textbf{Phản hồi lạc đề}: Phát hiện khi mô hình không trả lời theo ngữ cảnh
-    \item \textbf{Sinh không hoàn chỉnh}: Xử lý khi đầu ra bị cắt cụt
-    \item \textbf{Cơ chế dự phòng}: Thử lại hoặc phản hồi mặc định khi có lỗi
-\end{itemize}
-
-\subsubsection{Tích hợp pipeline}
-
-Toàn bộ các thành phần được tích hợp thành một pipeline thống nhất:
-
-\begin{equation}
-\text{Câu trả lời} = \text{LLM}(\text{Prompt}(\text{Câu hỏi}, \text{Truy xuất}(\text{Câu hỏi}, \text{CSDL vector})))
-\end{equation}
-
-Pipeline đảm bảo:
-\begin{itemize}
-    \item \textbf{Tính mô-đun}: Mỗi thành phần có thể thay đổi độc lập
-    \item \textbf{Khả năng tái sử dụng}: Các thành phần có thể dùng cho các tác vụ khác
-    \item \textbf{Dễ bảo trì}: Dễ gỡ lỗi, kiểm thử từng thành phần riêng biệt
-    \item \textbf{Khả năng mở rộng}: Có thể mở rộng với nhiều tài liệu, người dùng
-\end{itemize}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ============================================================
 
 \subsection{Thiết kế hệ thống gợi ý dịch vụ cá nhân hóa}
 
-Hệ thống gợi ý dịch vụ cá nhân hóa được thiết kế nhằm cung cấp cho người dùng các đề xuất chính xác, phù hợp với nhu cầu sức khỏe và điều kiện cá nhân. Khác với các hệ thống gợi ý truyền thống sử dụng collaborative filtering hoặc content-based filtering đơn thuần, hệ thống này áp dụng phương pháp \textit{semantic search} dựa trên \textit{vector embeddings} để nắm bắt ngữ nghĩa sâu của nhu cầu người dùng và đặc điểm dịch vụ.
-
 \subsubsection{Kiến trúc tổng thể}
 
-Hệ thống được thiết kế với hai luồng gợi ý chính: (1) \textbf{Home Recommender} - gợi ý trên trang chủ dựa trên hồ sơ người dùng và lịch sử tương tác, và (2) \textbf{Chatbot Recommender} - gợi ý theo ngữ cảnh từ câu hỏi tự nhiên của người dùng trong hội thoại. Kiến trúc hệ thống bao gồm các thành phần chính:
+Hệ thống gợi ý được thiết kế theo phương pháp \textbf{tìm kiếm ngữ nghĩa} (\textit{semantic similarity search}) trên không gian vector, không sử dụng collaborative filtering hay rule-based ranking. Toàn bộ logic gợi ý dựa trên khoảng cách cosine giữa vector biểu diễn nhu cầu người dùng và vector biểu diễn từng dịch vụ trong cơ sở dữ liệu vector.
 
-    \begin{itemize}
-        \item \textbf{Services Database}: Lưu trữ thông tin chi tiết về các dịch vụ y tế
-        \item \textbf{Embedding Model}: Chuyển đổi text thành vector representations
-        \item \textbf{Vector Database}: Lưu trữ và tìm kiếm vectors hiệu quả
-        \item \textbf{Query Builder}: Xây dựng query từ user profile hoặc natural language
-        \item \textbf{Ranking Module}: Sắp xếp và lọc kết quả dựa trên relevance
-    \end{itemize}
-
-\subsubsection{Phương pháp biểu diễn đặc trưng}
-
-    \paragraph{Textual Features}  
-    Hệ thống tập trung vào việc sử dụng \textbf{textual features} và phương pháp embedding ngữ nghĩa để nắm bắt toàn bộ thông tin của dịch vụ. Quyết định này dựa trên khả năng mạnh mẽ của các mô hình embedding hiện đại trong việc nắm bắt ngữ nghĩa từ văn bản, bao gồm cả thông tin về category, tags và các thuộc tính mô tả.
-
-    Các trường dữ liệu textual được sử dụng:
-    \begin{itemize}
-        \item \textbf{Name}: tên dịch vụ, sản phẩm
-        \item \textbf{Description}: mô tả chi tiết lợi ích, hướng dẫn sử dụng, quy trình thăm khám
-        \item \textbf{Category}: phân loại dịch vụ (y tế, dinh dưỡng, thể thao, tâm lý)
-        \item \textbf{Tags}: từ khóa đặc trưng như ``tim mạch'', ``yoga'', ``tư vấn online'', ``phục hồi chức năng''
-    \end{itemize}
-
-Mỗi dịch vụ được biểu diễn dưới dạng một document có cấu trúc kết hợp tất cả các trường thông tin trên thành một văn bản thống nhất.
-
-    \paragraph{Embedding Model}  
-    Hệ thống sử dụng mô hình Sentence-BERT với các đặc điểm:
-
-    \begin{itemize}
-        \item \textbf{Multilingual support}: Hỗ trợ tốt tiếng Việt
-        \item \textbf{Semantic understanding}: Nắm bắt ý nghĩa ngữ nghĩa sâu, không chỉ matching từ khóa
-        \item \textbf{Efficient inference}: Tốc độ xử lý nhanh, phù hợp cho production
-        \item \textbf{Fixed-size output}: Vector đầu ra có kích thước cố định 768 chiều
-    \end{itemize}
-
-Mô hình embedding chuyển đổi document text thành vector representation trong không gian 768 chiều, nơi các documents có ngữ nghĩa tương tự sẽ gần nhau về mặt hình học.
-
-\subsubsection{Vector Database và Similarity Search}
-
-    \paragraph{Vector Indexing}  
-    Hệ thống sử dụng ChromaDB làm vector database với các tính năng:
-
-    \begin{itemize}
-        \item \textbf{Persistent storage}: Lưu trữ vector database trên disk
-        \item \textbf{HNSW index}: Hierarchical Navigable Small World index cho tìm kiếm nhanh
-        \item \textbf{Metadata support}: Lưu trữ metadata (service\_id, category, tags) cùng với vectors
-        \item \textbf{Cosine similarity}: Sử dụng cosine distance để đo độ tương đồng
-    \end{itemize}
-
-\paragraph{Similarity Measure}  
-Độ tương đồng giữa query và service được tính dựa trên cosine distance:
-
-\begin{equation}
-\text{distance}(u, v) = 1 - \frac{u \cdot v}{\|u\| \|v\|}
-\end{equation}
-
-Similarity score được chuyển đổi từ distance:
-
-\begin{equation}
-\text{similarity}(u, v) = 1 - \text{distance}(u, v)
-\end{equation}
-
-Với $\text{similarity} \in [0, 1]$, giá trị càng gần 1 nghĩa là hai vectors càng tương đồng về mặt ngữ nghĩa.
-
-\subsubsection{Query Construction}
-
-\paragraph{Home Recommender Query}  
-Đối với trang chủ, query được xây dựng từ nhiều nguồn thông tin về người dùng:
+Hệ thống phục vụ hai luồng gợi ý độc lập:
 
 \begin{itemize}
-    \item \textbf{Health Conditions}: Các tình trạng sức khỏe hiện tại của người dùng
-    \item \textbf{Interests}: Các lĩnh vực quan tâm (yoga, dinh dưỡng, thể thao)
-    \item \textbf{Goals}: Mục tiêu sức khỏe (giảm cân, tăng cơ, giảm stress)
-    \item \textbf{Service History}: Tags và category từ các dịch vụ đã sử dụng
+    \item \textbf{Home Recommender}: Gợi ý trên trang chủ, dựa trên hồ sơ sức khoẻ người dùng lấy từ cuộc khảo sát ban đầu khi đăng ký tài khoản.
+    \item \textbf{Chatbot Recommender}: Gợi ý theo ngữ cảnh hội thoại, dựa trên câu hỏi tự nhiên của người dùng, có thể kết hợp với danh sách dịch vụ ứng viên do NER Service cung cấp.
 \end{itemize}
 
-Các thông tin này được kết hợp thành một query string thống nhất, sau đó được embedding để tìm kiếm trong vector space.
+\subsubsection{Biểu diễn dịch vụ và xây dựng chỉ mục}
 
-\paragraph{Chatbot Recommender Query}  
-Đối với chatbot, người dùng nhập trực tiếp câu tự nhiên mô tả nhu cầu của mình. Hệ thống sử dụng semantic search trực tiếp mà không cần extract entities phức tạp. Query tự nhiên được embedding và tìm kiếm các services có ngữ nghĩa tương đồng nhất.
+Mỗi dịch vụ trong cơ sở dữ liệu được biểu diễn dưới dạng một chuỗi văn bản kết hợp tên và mô tả. Chuỗi này được embedding bằng mô hình \textbf{sentence-transformers/paraphrase-multilingual-mpnet-base-v2} tạo ra vector 768 chiều. Metadata đi kèm mỗi vector gồm \texttt{service\_id} và \texttt{category}, phục vụ cho các truy vấn có lọc điều kiện.
 
-\subsubsection{Ranking và Filtering}
+Vector store sử dụng \textbf{ChromaDB} ở chế độ persistent, lưu trữ cục bộ trên đĩa. Quá trình xây dựng chỉ mục được thực hiện offline theo hai phương thức: tải dữ liệu từ tệp JSON mẫu (môi trường phát triển) hoặc truy vấn trực tiếp bảng \texttt{products} trong PostgreSQL (môi trường production). Hệ thống hỗ trợ thao tác \textit{upsert} để cập nhật dịch vụ mà không cần rebuild toàn bộ chỉ mục.
 
-Hệ thống áp dụng các chiến lược ranking và filtering để đảm bảo chất lượng gợi ý:
+\subsubsection{Đồng bộ hoá dữ liệu thời gian thực}
 
-\paragraph{Similarity Threshold}  
-Chỉ các services có similarity score vượt ngưỡng $\theta$ mới được đề xuất:
+Để đảm bảo vector store luôn đồng bộ với cơ sở dữ liệu nghiệp vụ, hệ thống triển khai một cơ chế lắng nghe sự kiện qua \textbf{Redis Pub/Sub}. Khi backend tạo mới, cập nhật hoặc xoá một dịch vụ, một sự kiện tương ứng được publish lên Redis. Dịch vụ recommender lắng nghe các kênh này và phản ứng bằng cách upsert hoặc xoá bản ghi trong vector store, đảm bảo tính nhất quán giữa dữ liệu nghiệp vụ và chỉ mục vector mà không cần can thiệp thủ công.
 
-\begin{equation}
-\text{recommend}(s) = \begin{cases}
-s & \text{if } \text{similarity}(q, s) \geq \theta \\  
-\text{reject} & \text{otherwise}
-\end{cases}
-\end{equation}
+\subsubsection{Xây dựng truy vấn}
 
-\paragraph{History Filtering}  
-Đối với Home Recommender, các services mà người dùng đã sử dụng sẽ được loại bỏ khỏi danh sách gợi ý để tránh lặp lại.
+\paragraph{Home Recommender}
+Truy vấn được xây dựng bằng cách nối các danh sách từ hồ sơ người dùng: tình trạng sức khoẻ, sở thích, mục tiêu và văn bản mô tả của các dịch vụ người dùng đã sử dụng trước đây (lấy từ vector store theo ID). Chuỗi tổng hợp này sau đó được embedding để tìm kiếm các dịch vụ có ngữ nghĩa tương đồng nhất.
 
-\paragraph{Diversification}  
-Khi không có thông tin profile (người dùng mới), hệ thống áp dụng chiến lược diversification để đảm bảo các gợi ý đa dạng về category, tránh tập trung vào một nhóm dịch vụ duy nhất.
+\paragraph{Chatbot Recommender}
+Câu hỏi tự nhiên của người dùng được embedding trực tiếp mà không qua bước tiền xử lý phức tạp. Khi NER Service cung cấp danh sách \texttt{service\_id} ứng viên dựa trên địa điểm hoặc loại hình dịch vụ được trích xuất từ câu hỏi, hệ thống bổ sung điều kiện lọc metadata vào truy vấn ChromaDB, thu hẹp không gian tìm kiếm và tăng độ chính xác gợi ý.
 
-\paragraph{Explanation Generation}  
-Mỗi gợi ý được đi kèm với lý do giải thích dựa trên:
-\begin{itemize}
-    \item Tags matching giữa query và service
-    \item Similarity score cao
-    \item Matching với health conditions hoặc interests của người dùng
-\end{itemize}
+\subsubsection{Làm giàu kết quả và tích hợp với Gateway Service}
 
-\subsubsection{Pipeline tổng thể}
+Recommender Service trả về danh sách \texttt{service\_id} và điểm tương đồng. Gateway nhận kết quả này và thực hiện bước làm giàu thông tin: tra cứu chi tiết từng dịch vụ (tên, mô tả, giá, đánh giá, lịch trống, vị trí) để chuẩn bị cho hai mục đích song song — đưa mô tả dạng văn bản vào prompt LLM giúp chatbot phản hồi có ngữ cảnh, và đưa thông tin đầy đủ vào SSE event \texttt{RECOMMENDATION} để giao diện hiển thị thẻ dịch vụ.
 
-\paragraph{Offline Phase}  
+% ============================================================
+
+\subsection{Thiết kế hệ thống Intent Classification}
+
+\subsubsection{Mục tiêu và vị trí trong pipeline}
+
+Bài toán phân loại ý định được thiết kế là \textbf{phân loại nhị phân}: xác định liệu tin nhắn người dùng có yêu cầu gợi ý dịch vụ hay không. Kết quả phân loại quyết định luồng xử lý tiếp theo trong Gateway — nếu nhãn dương, Gateway tiến hành gọi NER Service và Recommender Service trước khi gọi RAG; nếu nhãn âm, Gateway bỏ qua các bước đó và gọi thẳng dịch vụ chatbot.
+
+\subsubsection{Kiến trúc mô hình}
+
+Mô hình sử dụng kiến trúc hai tầng:
+
 \begin{enumerate}
-    \item Load danh sách services từ database
-    \item Xây dựng document cho mỗi service (kết hợp name, description, category, tags)
-    \item Embedding tất cả documents thành vectors
-    \item Index vectors vào ChromaDB với metadata
-    \item Persist vector database
+    \item \textbf{Encoder:} SentenceTransformer mã hoá câu đầu vào thành vector biểu diễn ngữ nghĩa cố định chiều. Mô hình encoder được huấn luyện với \texttt{all-MiniLM-L6-v2} và lưu cục bộ cùng mã nguồn để đảm bảo hoạt động offline, chạy trên CPU khi suy luận.
+    \item \textbf{Bộ phân lớp:} Hồi quy logistic (scikit-learn) nhận vector từ encoder và dự đoán nhãn nhị phân (0: không cần gợi ý, 1: cần gợi ý). Trọng số được lưu dưới dạng tệp pickle và nạp theo cơ chế singleton để tránh tải lại nhiều lần trong vòng đời ứng dụng.
 \end{enumerate}
 
-\paragraph{Online Phase - Home Recommender}  
-\begin{enumerate}
-    \item Nhận user profile và service history
-    \item Xây dựng query string từ profile
-    \item Embedding query
-    \item Tìm kiếm top-K similar services
-    \item Lọc bỏ services đã sử dụng
-    \item Áp dụng similarity threshold
-    \item Generate explanations
-    \item Trả về ranked list
-\end{enumerate}
-
-\paragraph{Online Phase - Chatbot Recommender}  
-\begin{enumerate}
-    \item Nhận natural language query
-    \item Embedding query trực tiếp
-    \item Tìm kiếm top-K similar services
-    \item Áp dụng similarity threshold
-    \item Generate explanations
-    \item Trả về ranked list
-\end{enumerate}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Mô hình được huấn luyện trên tập dữ liệu 1000 samples, với các mẫu dương tính là các câu hỏi yêu cầu tìm kiếm, gợi ý dịch vụ hoặc mô tả triệu chứng, và các mẫu âm tính là các câu chào hỏi, hỏi thông tin y tế chung, hoặc yêu cầu quản lý lịch hẹn.
