@@ -10,7 +10,8 @@ from app.clients.ner_client import NERClient
 from app.core.sse import SSEEvent
 from app.core.enums import SSEEventType
 from app.intent_classification.main import load_model, predict_intent
-from uuid import uuid4
+from uuid import uuid4, UUID
+from app.utils import formatters
 
 logger = logging.getLogger(__name__)
 
@@ -140,6 +141,42 @@ class ChatbotOrchestrator:
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             },
         )
+
+    async def get_conversations(
+        self,
+        session: Any,
+        user_id: str,
+        page: int = 1,
+        limit: int = 10,
+    ) -> Dict[str, Any]:
+        """
+        Return a paginated list of conversations for a user.
+        """
+        conversations, total = await conversation_repo.get_conversations_page(
+            session=session,
+            user_id=user_id,
+            page=page,
+            limit=limit,
+        )
+        return formatters.format_conversations_page(conversations, total, page, limit)
+
+    async def get_messages(
+        self,
+        session: Any,
+        conversation_id: str | UUID,
+        page: int = 1,
+        limit: int = 20,
+    ) -> Dict[str, Any]:
+        """
+        Return a paginated list of messages for a conversation.
+        """
+        messages, total = await message_repo.get_messages_page(
+            session=session,
+            conversation_id=conversation_id,
+            page=page,
+            limit=limit,
+        )
+        return formatters.format_messages_page(messages, total, page, limit)
 
     # ============================================
     # PRIVATE HELPERS
