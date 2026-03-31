@@ -27,7 +27,10 @@ import { WsJwtAuthMiddleware, WsRoleMiddleware } from './ws-jwt-auth.middleware'
  * Mirrors UserChatGateway but with partner-specific role enforcement
  * and conversation resolution.
  */
-@WebSocketGateway({ namespace: 'partner-chat', cors: { origin: '*' } })
+@WebSocketGateway({
+  namespace: 'partner-chat',
+  cors: { origin: process.env.WS_CORS_ORIGIN || '*' },
+})
 @UsePipes(new ValidationPipe({ whitelist: true }))
 export class PartnerChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -56,7 +59,9 @@ export class PartnerChatGateway
 
   async handleConnection(client: Socket) {
     const user = client.data.user;
-    this.logger.log(`Partner connected: ${user.email} (${client.id})`);
+    this.logger.log(
+      `[WS Connected] partner=${user.email} userId=${user.id} role=${user.role} socketId=${client.id} transport=${client.conn?.transport?.name ?? 'unknown'}`,
+    );
 
     // Auto-join the partner to all their conversation rooms
     try {
@@ -64,15 +69,21 @@ export class PartnerChatGateway
       for (const convId of conversations) {
         client.join(convId);
       }
-      this.logger.log(`Partner ${user.email} joined ${conversations.length} conversation rooms`);
+      this.logger.log(
+        `[WS Auto-Join] partner=${user.email} rooms=${conversations.length} roomIds=[${conversations.join(', ')}]`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to join rooms for ${user.email}: ${(error as Error).message}`);
+      this.logger.error(
+        `[WS Auto-Join Failed] partner=${user.email} error=${(error as Error).message}`,
+      );
     }
   }
 
   handleDisconnect(client: Socket) {
     const user = client.data.user;
-    this.logger.log(`Partner disconnected: ${user?.email ?? 'unknown'} (${client.id})`);
+    this.logger.log(
+      `[WS Disconnected] partner=${user?.email ?? 'unknown'} userId=${user?.id ?? 'N/A'} socketId=${client.id}`,
+    );
   }
 
   // ── Event Handlers ───────────────────────────────────────────
@@ -83,6 +94,13 @@ export class PartnerChatGateway
     @MessageBody() payload: SendMessageDto,
   ) {
     const user = client.data.user;
+    this.logger.log(
+      `[WS Received] event=send_message partner=${user.email} conversationId=${payload.conversationId} clientMessageId=${payload.clientMessageId ?? 'none'}`,
+    );
+    this.logger.debug(
+      `[WS Received Payload] event=send_message content="${payload.content?.substring(0, 100)}" type=${payload.messageType ?? 'text'}`,
+    );
+
     try {
       const message = await this.chatService.send(payload, user.id);
 
@@ -92,10 +110,16 @@ export class PartnerChatGateway
       // Also emit to user gateway
       this.emitToUserGateway(payload.conversationId, ChatEvent.NEW_MESSAGE, message);
 
+      this.logger.log(
+        `[WS Sent] event=new_message messageId=${message.id} conversationId=${payload.conversationId} sender=${user.email}`,
+      );
+
       // Acknowledge to the sender
       return { event: ChatEvent.MESSAGE_SENT, data: { id: message.id, clientMessageId: payload.clientMessageId } };
     } catch (error) {
-      this.logger.error(`Send message failed: ${(error as Error).message}`);
+      this.logger.error(
+        `[WS Send Failed] event=send_message partner=${user.email} conversationId=${payload.conversationId} error=${(error as Error).message}`,
+      );
       return { event: ChatEvent.ERROR, data: { message: (error as Error).message } };
     }
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/images/avatar.dart';
 
 class HomeHeader extends StatelessWidget {
   final String userName;
@@ -30,8 +31,6 @@ class HomeHeader extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  height: AppDimens.avatarMd,
-                  width: AppDimens.avatarMd,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -39,16 +38,9 @@ class HomeHeader extends StatelessWidget {
                       width: AppDimens.borderWidthThick,
                     ),
                   ),
-                  child: ClipOval(
-                    child: Image.network(
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuAHFOX7h9F48tcGwMIcEIfkFIO_BCb-TwyhCGYTSYlivBYYPeitHy4W3oeX4l3dEEfJb_yZupssfa2sclSZPLyXfEG5q3pl2sx39c1coakQeOePB7aFA1dAPE3Ra0lpxaiQawpTpkWJktpcY7JCrjO_VPaGyAgzVQM37ZX_Y0pjSESxXa_IpilQ3wPqplOIkK3Rv_S_u-cz9aZh75qv45DoVVZ9RQ3Jl9ta2otLB3h_v3CdJg2ZGgoU5oVyRGojV_h0ciQfIgAJaK6I',
-                      fit: BoxFit.cover,
-                      semanticLabel: 'User avatar',
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.person,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
+                  child: AvatarImage(
+                    name: userName,
+                    radius: AppDimens.avatarMd / 2,
                   ),
                 ),
                 SizedBox(width: AppDimens.spaceMd),

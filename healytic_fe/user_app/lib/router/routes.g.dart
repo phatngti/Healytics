@@ -39,6 +39,7 @@ List<RouteBase> get $appRoutes => [
   $reviewTreatmentRoute,
   $reviewSpecialistRoute,
   $reviewSubmittedRoute,
+  $partnerChatRoute,
 ];
 
 RouteBase get $mobileWrapperRoutes => StatefulShellRouteData.$route(
@@ -1149,6 +1150,45 @@ mixin $ReviewSubmittedRoute on GoRouteData {
       if (_self.specialistAvatarUrl != null)
         'specialist-avatar-url': _self.specialistAvatarUrl,
       'rating': _self.rating.toString(),
+    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $partnerChatRoute => GoRouteData.$route(
+  path: '/partner_chat',
+  name: 'partner_chat',
+  factory: $PartnerChatRoute._fromState,
+);
+
+mixin $PartnerChatRoute on GoRouteData {
+  static PartnerChatRoute _fromState(GoRouterState state) => PartnerChatRoute(
+    partnerAccountId: state.uri.queryParameters['partner-account-id']!,
+    partnerName: state.uri.queryParameters['partner-name']!,
+    partnerAvatar: state.uri.queryParameters['partner-avatar'],
+  );
+
+  PartnerChatRoute get _self => this as PartnerChatRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/partner_chat',
+    queryParams: {
+      'partner-account-id': _self.partnerAccountId,
+      'partner-name': _self.partnerName,
+      if (_self.partnerAvatar != null) 'partner-avatar': _self.partnerAvatar,
     },
   );
 

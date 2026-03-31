@@ -87,6 +87,13 @@ class _Content extends StatelessWidget {
                   icon: Symbols.chat_bubble,
                   title: 'Message your services',
                   subtitle: appointment.vendorName,
+                  onTap: () => PartnerChatRoute(
+                    partnerAccountId:
+                        appointment.vendorAccountId ??
+                            '',
+                    partnerName:
+                        appointment.vendorName,
+                  ).push(context),
                 ),
                 AppDimens.verticalExtraLarge,
               ],

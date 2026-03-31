@@ -25,6 +25,10 @@ class AppointmentEntity {
   /// Used for navigating to the employee detail.
   final String? providerId;
 
+  /// The account UUID of the health partner (vendor).
+  /// Used for creating chat conversations.
+  final String? vendorAccountId;
+
   /// Whether the user has already submitted
   /// a review for this appointment.
   final bool isReviewed;
@@ -44,6 +48,7 @@ class AppointmentEntity {
     required this.duration,
     this.distanceKm,
     this.providerId,
+    this.vendorAccountId,
     this.isReviewed = false,
   });
 
@@ -65,6 +70,7 @@ class AppointmentEntity {
           duration == other.duration &&
           distanceKm == other.distanceKm &&
           providerId == other.providerId &&
+          vendorAccountId == other.vendorAccountId &&
           isReviewed == other.isReviewed;
 
   @override
@@ -83,6 +89,7 @@ class AppointmentEntity {
         duration,
         distanceKm,
         providerId,
+        vendorAccountId,
         isReviewed,
       );
 }
