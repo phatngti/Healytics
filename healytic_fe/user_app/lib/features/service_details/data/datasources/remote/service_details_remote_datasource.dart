@@ -163,10 +163,10 @@ class ServiceDetailsRemoteDatasourceImpl
       reviewerName: dto.reviewerName,
       avatarUrl: dto.avatarUrl?.toString() ?? '',
       rating: dto.rating.toInt(),
-      status: dto.status,
-      date: DateTime.tryParse(dto.date) ?? DateTime.now(),
-      text: dto.text,
-      imageUrls: dto.imageUrls,
+      date: DateTime.tryParse(dto.createdAt) ??
+          DateTime.now(),
+      text: dto.comment?.toString() ?? '',
+      imageUrls: dto.photoUrls,
     );
   }
 

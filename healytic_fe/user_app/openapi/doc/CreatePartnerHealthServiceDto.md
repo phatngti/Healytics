@@ -22,7 +22,6 @@ Name | Type | Description | Notes
 **media** | [**List<CreatePartnerHealthServiceMediaDto>**](CreatePartnerHealthServiceMediaDto.md) | Product media (images/videos) | [optional] [default to const []]
 **productDefinition** | [**CreatePartnerHealthServiceDefinitionDto**](CreatePartnerHealthServiceDefinitionDto.md) | Product definition (required if type is service) | [optional] 
 **facilityImages** | [**List<CreatePartnerHealthServiceFacilityImageDto>**](CreatePartnerHealthServiceFacilityImageDto.md) | Facility/clinic images | [optional] [default to const []]
-**reviews** | [**List<CreatePartnerHealthServiceReviewDto>**](CreatePartnerHealthServiceReviewDto.md) | Product reviews | [optional] [default to const []]
 **serviceManual** | [**ServiceManualInputDto**](ServiceManualInputDto.md) | Service manual (guidelines, rules, procedure steps) | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

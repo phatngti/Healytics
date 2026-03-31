@@ -256,8 +256,12 @@ class ApiClient {
           return CheckoutTicketResponseDto.fromJson(value);
         case 'ClientKeyResponseDto':
           return ClientKeyResponseDto.fromJson(value);
+        case 'ConversationResponseDto':
+          return ConversationResponseDto.fromJson(value);
         case 'CreateCategoryDto':
           return CreateCategoryDto.fromJson(value);
+        case 'CreateConversationDto':
+          return CreateConversationDto.fromJson(value);
         case 'CreateDoctorDto':
           return CreateDoctorDto.fromJson(value);
         case 'CreateDoctorProfileDto':
@@ -276,8 +280,6 @@ class ApiClient {
           return CreatePartnerHealthServiceFacilityImageDto.fromJson(value);
         case 'CreatePartnerHealthServiceMediaDto':
           return CreatePartnerHealthServiceMediaDto.fromJson(value);
-        case 'CreatePartnerHealthServiceReviewDto':
-          return CreatePartnerHealthServiceReviewDto.fromJson(value);
         case 'CreateServiceTagDto':
           return CreateServiceTagDto.fromJson(value);
         case 'CreateSpaTherapistDto':
@@ -320,6 +322,8 @@ class ApiClient {
           return HomeRecommenderRequest.fromJson(value);
         case 'KycDocumentDto':
           return KycDocumentDto.fromJson(value);
+        case 'LastMessageDto':
+          return LastMessageDto.fromJson(value);
         case 'LegalRepresentativeDto':
           return LegalRepresentativeDto.fromJson(value);
         case 'LegalRepresentativeRequestDto':
@@ -344,6 +348,8 @@ class ApiClient {
           return MicroLockResponseDto.fromJson(value);
         case 'MyProfileResponseDto':
           return MyProfileResponseDto.fromJson(value);
+        case 'ParticipantInfoDto':
+          return ParticipantInfoDto.fromJson(value);
         case 'PartnerCategorySummaryDto':
           return PartnerCategorySummaryDto.fromJson(value);
         case 'PartnerClinicDto':
@@ -518,6 +524,28 @@ class ApiClient {
           return WorkHistoryEntryDto.fromJson(value);
         case 'WorkScheduleEntryDto':
           return WorkScheduleEntryDto.fromJson(value);
+        case 'WsConnectionInfoDto':
+          return WsConnectionInfoDto.fromJson(value);
+        case 'WsErrorEventDto':
+          return WsErrorEventDto.fromJson(value);
+        case 'WsJoinConversationPayloadDto':
+          return WsJoinConversationPayloadDto.fromJson(value);
+        case 'WsMarkReadPayloadDto':
+          return WsMarkReadPayloadDto.fromJson(value);
+        case 'WsMessageSentAckDto':
+          return WsMessageSentAckDto.fromJson(value);
+        case 'WsMessagesReadEventDto':
+          return WsMessagesReadEventDto.fromJson(value);
+        case 'WsNewMessageEventDto':
+          return WsNewMessageEventDto.fromJson(value);
+        case 'WsSendMessagePayloadDto':
+          return WsSendMessagePayloadDto.fromJson(value);
+        case 'WsStopTypingEventDto':
+          return WsStopTypingEventDto.fromJson(value);
+        case 'WsTypingEventDto':
+          return WsTypingEventDto.fromJson(value);
+        case 'WsTypingPayloadDto':
+          return WsTypingPayloadDto.fromJson(value);
         default:
           dynamic match;
           if (value is List && (match = _regList.firstMatch(targetType)?.group(1)) != null) {

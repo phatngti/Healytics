@@ -34,6 +34,11 @@ final List<Map<String, dynamic>> providerSlideMenuItems = [
     "label": 'Service Tags',
     "route": partner.ServiceTagsHomeRoute().location,
   },
+  {
+    "icon": Icons.chat_bubble_outline_rounded,
+    "label": 'Messages',
+    "route": partner.PartnerChatInboxRoute().location,
+  },
 ];
 
 final List<Map<String, dynamic>> adminSlideMenuItems = [

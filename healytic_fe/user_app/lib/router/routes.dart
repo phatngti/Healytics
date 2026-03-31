@@ -39,6 +39,7 @@ import 'package:user_app/features/employee/presentation/screens/employee_booking
 import 'package:user_app/features/review/presentation/screens/review_treatment.screen.dart';
 import 'package:user_app/features/review/presentation/screens/review_specialist.screen.dart';
 import 'package:user_app/features/review/presentation/screens/review_submitted.screen.dart';
+import 'package:user_app/features/partner_chat/presentation/screens/partner_chat.screen.dart';
 
 part 'routes.g.dart';
 
@@ -867,6 +868,42 @@ class ReviewSubmittedRoute extends GoRouteData
         specialistAvatarUrl:
             specialistAvatarUrl,
         rating: rating,
+      ),
+    );
+  }
+}
+
+// --- PARTNER CHAT ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<PartnerChatRoute>(
+  path: '/partner_chat',
+  name: PartnerChatRoute.name,
+)
+class PartnerChatRoute extends GoRouteData
+    with $PartnerChatRoute {
+  final String partnerAccountId;
+  final String partnerName;
+  final String? partnerAvatar;
+
+  const PartnerChatRoute({
+    required this.partnerAccountId,
+    required this.partnerName,
+    this.partnerAvatar,
+  });
+
+  static const name = 'partner_chat';
+
+  @override
+  Page<void> buildPage(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: PartnerChatScreen(
+        partnerAccountId: partnerAccountId,
+        partnerName: partnerName,
+        partnerAvatar: partnerAvatar,
       ),
     );
   }
