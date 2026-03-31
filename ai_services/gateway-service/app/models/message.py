@@ -9,7 +9,7 @@ Table schema (from NestJS migration):
     conversation_id  UUID  FK -> conversations.id  ON DELETE CASCADE
     role             VARCHAR(20)   -- "user" | "assistant"
     content          TEXT
-    created_at       TIMESTAMP  DEFAULT now()
+    created_at       TIMESTAMPTZ  DEFAULT now()
 """
 
 import uuid
@@ -40,7 +40,7 @@ class Message(Base):
     role: Mapped[str] = mapped_column(String(20), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=False),
+        DateTime(timezone=True),
         server_default=text("now()"),
     )
 
