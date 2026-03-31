@@ -27,7 +27,6 @@ class UpdatePartnerHealthServiceDto {
     this.media = const [],
     this.productDefinition,
     this.facilityImages = const [],
-    this.reviews = const [],
     this.serviceManual,
   });
 
@@ -116,9 +115,6 @@ class UpdatePartnerHealthServiceDto {
   /// Facility/clinic images
   List<CreatePartnerHealthServiceFacilityImageDto> facilityImages;
 
-  /// Product reviews
-  List<CreatePartnerHealthServiceReviewDto> reviews;
-
   /// Service manual (guidelines, rules, procedure steps)
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -144,7 +140,6 @@ class UpdatePartnerHealthServiceDto {
     _deepEquality.equals(other.media, media) &&
     other.productDefinition == productDefinition &&
     _deepEquality.equals(other.facilityImages, facilityImages) &&
-    _deepEquality.equals(other.reviews, reviews) &&
     other.serviceManual == serviceManual;
 
   @override
@@ -164,11 +159,10 @@ class UpdatePartnerHealthServiceDto {
     (media.hashCode) +
     (productDefinition == null ? 0 : productDefinition!.hashCode) +
     (facilityImages.hashCode) +
-    (reviews.hashCode) +
     (serviceManual == null ? 0 : serviceManual!.hashCode);
 
   @override
-  String toString() => 'UpdatePartnerHealthServiceDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, reviews=$reviews, serviceManual=$serviceManual]';
+  String toString() => 'UpdatePartnerHealthServiceDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, serviceManual=$serviceManual]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -230,7 +224,6 @@ class UpdatePartnerHealthServiceDto {
       json[r'productDefinition'] = null;
     }
       json[r'facilityImages'] = this.facilityImages;
-      json[r'reviews'] = this.reviews;
     if (this.serviceManual != null) {
       json[r'serviceManual'] = this.serviceManual;
     } else {
@@ -274,7 +267,6 @@ class UpdatePartnerHealthServiceDto {
         media: CreatePartnerHealthServiceMediaDto.listFromJson(json[r'media']),
         productDefinition: CreatePartnerHealthServiceDefinitionDto.fromJson(json[r'productDefinition']),
         facilityImages: CreatePartnerHealthServiceFacilityImageDto.listFromJson(json[r'facilityImages']),
-        reviews: CreatePartnerHealthServiceReviewDto.listFromJson(json[r'reviews']),
         serviceManual: ServiceManualInputDto.fromJson(json[r'serviceManual']),
       );
     }

@@ -89,12 +89,6 @@ void main() {
       // TODO
     });
 
-    // Product reviews
-    // List<CreatePartnerHealthServiceReviewDto> reviews (default value: const [])
-    test('to test the property `reviews`', () async {
-      // TODO
-    });
-
     // Service manual (guidelines, rules, procedure steps)
     // ServiceManualInputDto serviceManual
     test('to test the property `serviceManual`', () async {

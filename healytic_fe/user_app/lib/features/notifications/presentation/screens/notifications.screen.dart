@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/widgets/main_screen_layout.widget.dart';
 import 'package:user_app/features/notifications/'
     'domain/repositories/notification.repository.dart';
 import 'package:user_app/features/notifications/'
@@ -14,6 +15,9 @@ import 'package:user_app/features/notifications/'
 /// Main notifications screen, rendered as a tab in
 /// the bottom navigation shell.
 ///
+/// Uses [MainScreenLayout] for consistent
+/// header/background across navigation tabs.
+///
 /// Layout reference: grouped date sections
 /// ("Today", "Yesterday") with notification cards.
 class NotificationsPage extends HookConsumerWidget {
@@ -21,49 +25,25 @@ class NotificationsPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncSections = ref.watch(
-      notificationsProvider,
-    );
-    final hPad =
-        AppDimens.horizontalPadding(context);
-    final bottomPad =
-        AppDimens.bottomScrollPadding(context);
+    final asyncSections = ref.watch(notificationsProvider);
+    final hPad = AppDimens.horizontalPadding(context);
+    final bottomPad = AppDimens.bottomScrollPadding(context);
 
-    return Scaffold(
-      backgroundColor:
-          Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Notifications'),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: MediaQuery.of(context)
-                .textScaler
-                .clamp(
-                  minScaleFactor: 0.8,
-                  maxScaleFactor: 1.3,
-                ),
-          ),
-          child: asyncSections.when(
-            loading: () => _LoadingState(
-              hPadding: hPad,
-            ),
-            error: (error, _) =>
-                const _ErrorState(),
-            data: (sections) {
-              if (sections.isEmpty) {
-                return const _EmptyState();
-              }
-              return _NotificationList(
-                sections: sections,
-                hPadding: hPad,
-                bottomPadding: bottomPad,
-              );
-            },
-          ),
-        ),
+    return MainScreenLayout(
+      title: 'Notifications',
+      body: asyncSections.when(
+        loading: () => _LoadingState(hPadding: hPad),
+        error: (error, _) => const _ErrorState(),
+        data: (sections) {
+          if (sections.isEmpty) {
+            return const _EmptyState();
+          }
+          return _NotificationList(
+            sections: sections,
+            hPadding: hPad,
+            bottomPadding: bottomPad,
+          );
+        },
       ),
     );
   }
@@ -103,8 +83,7 @@ class _NotificationList extends StatelessWidget {
     for (final section in sections) {
       // 1 for header, N for notifications,
       // 1 for bottom spacing
-      count +=
-          1 + section.notifications.length + 1;
+      count += 1 + section.notifications.length + 1;
     }
     return count;
   }
@@ -114,24 +93,18 @@ class _NotificationList extends StatelessWidget {
     for (final section in sections) {
       // Section header
       if (index == cursor) {
-        return NotificationSectionHeader(
-          label: section.label,
-        );
+        return NotificationSectionHeader(label: section.label);
       }
       cursor++;
 
       // Notification cards
-      final notifCount =
-          section.notifications.length;
+      final notifCount = section.notifications.length;
       if (index < cursor + notifCount) {
         final notifIndex = index - cursor;
         return Padding(
-          padding: EdgeInsets.only(
-            bottom: AppDimens.spaceLg,
-          ),
+          padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
           child: NotificationCard(
-            notification:
-                section.notifications[notifIndex],
+            notification: section.notifications[notifIndex],
           ),
         );
       }
@@ -139,9 +112,7 @@ class _NotificationList extends StatelessWidget {
 
       // Section bottom spacing
       if (index == cursor) {
-        return SizedBox(
-          height: AppDimens.spaceXl,
-        );
+        return SizedBox(height: AppDimens.spaceXl);
       }
       cursor++;
     }
@@ -172,99 +143,71 @@ class _LoadingState extends StatelessWidget {
         Container(
           width: 60,
           height: 12,
-          margin: EdgeInsets.only(
-            bottom: AppDimens.spaceLg,
-          ),
+          margin: EdgeInsets.only(bottom: AppDimens.spaceLg),
           decoration: BoxDecoration(
-            color: theme
-                .colorScheme.surfaceContainerHighest,
-            borderRadius:
-                AppDimens.radiusExtraSmall,
+            color: theme.colorScheme.surfaceContainerHighest,
+            borderRadius: AppDimens.radiusExtraSmall,
           ),
         ),
         // Shimmer cards
         ...List.generate(3, (i) {
           return Padding(
-            padding: EdgeInsets.only(
-              bottom: AppDimens.spaceLg,
-            ),
+            padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
             child: Container(
               padding: EdgeInsets.all(cardPad),
               decoration: BoxDecoration(
-                color: theme
-                    .colorScheme.surfaceContainerLow,
-                borderRadius:
-                    BorderRadius.circular(cardRad),
+                color: theme.colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(cardRad),
               ),
               child: Row(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     width: AppDimens.avatarLg,
                     height: AppDimens.avatarLg,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme
-                          .surfaceContainerHighest,
-                      borderRadius:
-                          AppDimens.radiusMedium,
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusMedium,
                     ),
                   ),
-                  SizedBox(
-                    width: AppDimens.spaceLg,
-                  ),
+                  SizedBox(width: AppDimens.spaceLg),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           height: 14,
                           width: 160,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme
-                                .surfaceContainerHighest,
-                            borderRadius: AppDimens
-                                .radiusExtraSmall,
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: AppDimens.radiusExtraSmall,
                           ),
                         ),
-                        SizedBox(
-                          height: AppDimens.spaceSm,
-                        ),
+                        SizedBox(height: AppDimens.spaceSm),
                         Container(
                           height: 12,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme
-                                .surfaceContainerHighest,
-                            borderRadius: AppDimens
-                                .radiusExtraSmall,
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: AppDimens.radiusExtraSmall,
                           ),
                         ),
-                        SizedBox(
-                          height: AppDimens.spaceXs,
-                        ),
+                        SizedBox(height: AppDimens.spaceXs),
                         Container(
                           height: 12,
                           width: 120,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme
-                                .surfaceContainerHighest,
-                            borderRadius: AppDimens
-                                .radiusExtraSmall,
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: AppDimens.radiusExtraSmall,
                           ),
                         ),
-                        SizedBox(
-                          height: AppDimens.spaceLg,
-                        ),
+                        SizedBox(height: AppDimens.spaceLg),
                         Container(
                           height: 32,
                           width: 100,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme
-                                .surfaceContainerHighest,
-                            borderRadius:
-                                AppDimens.radiusPill,
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: AppDimens.radiusPill,
                           ),
                         ),
                       ],
@@ -296,28 +239,21 @@ class _EmptyState extends StatelessWidget {
           Icon(
             Icons.notifications_none_rounded,
             size: 64,
-            color: theme
-                .colorScheme.onSurfaceVariant
-                .withValues(alpha: 0.4),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
           ),
           AppDimens.verticalMedium,
           Text(
             'No notifications yet',
-            style: theme.textTheme.titleMedium
-                ?.copyWith(
-              color: theme
-                  .colorScheme.onSurfaceVariant,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           AppDimens.verticalSmall,
           Text(
             "We'll notify you when something "
             'important happens',
-            style: theme.textTheme.bodySmall
-                ?.copyWith(
-              color: theme
-                  .colorScheme.onSurfaceVariant
-                  .withValues(alpha: 0.7),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -343,17 +279,13 @@ class _ErrorState extends StatelessWidget {
           Icon(
             Icons.error_outline_rounded,
             size: 64,
-            color: theme
-                .colorScheme.onSurfaceVariant
-                .withValues(alpha: 0.4),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
           ),
           AppDimens.verticalMedium,
           Text(
             'Could not load notifications',
-            style: theme.textTheme.titleMedium
-                ?.copyWith(
-              color: theme
-                  .colorScheme.onSurfaceVariant,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],

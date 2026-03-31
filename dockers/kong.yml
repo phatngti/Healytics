@@ -10,6 +10,26 @@ services:
         paths:
           - /backend
         strip_path: true # Strips /api prefix, remainder is appended to service URL
+  - name: chat-ws-service
+    url: http://host.docker.internal:8080
+    connect_timeout: 60000
+    write_timeout: 3600000   # 1 hour — keep WS connections alive
+    read_timeout: 3600000
+    routes:
+      - name: user-chat-ws-route
+        paths:
+          - /user-chat
+        strip_path: false
+        protocols:
+          - http
+          - https
+      - name: partner-chat-ws-route
+        paths:
+          - /partner-chat
+        strip_path: false
+        protocols:
+          - http
+          - https
   - name: ai-service
     url: https://6yb3yz5bcy5mrm-9000.proxy.runpod.net
     connect_timeout: 600000

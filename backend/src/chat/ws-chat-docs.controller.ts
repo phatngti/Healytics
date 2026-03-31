@@ -51,7 +51,7 @@ export class WsChatDocsController {
   @Get('user-gateway')
   @Public()
   @ApiOperation({
-    summary: '🟢 User Chat Gateway — ws://<host>/user-chat',
+    summary: `🟢 User Chat Gateway — ws://<host>:${process.env.PORT ?? 8080}/user-chat`,
     description: `
 ## WebSocket Connection (User / Patient side)
 
@@ -64,7 +64,7 @@ export class WsChatDocsController {
 \`\`\`javascript
 import { io } from 'socket.io-client';
 
-const socket = io('ws://localhost:8080/user-chat', {
+const socket = io('ws://localhost:${process.env.PORT ?? 8080}/user-chat', {
   auth: { token: '<JWT_ACCESS_TOKEN>' },
   transports: ['websocket'],
 });
@@ -79,7 +79,7 @@ socket.on('connect_error', (err) => console.error(err.message));
 \`\`\`dart
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-final socket = IO.io('http://localhost:8080/user-chat', 
+final socket = IO.io('http://localhost:${process.env.PORT ?? 8080}/user-chat', 
   IO.OptionBuilder()
     .setTransports(['websocket'])
     .setAuth({'token': accessToken})
@@ -119,7 +119,7 @@ socket.on('new_message', (data) => print('Message: \$data'));
   @Get('partner-gateway')
   @Public()
   @ApiOperation({
-    summary: '🟢 Partner Chat Gateway — ws://<host>/partner-chat',
+    summary: `🟢 Partner Chat Gateway — ws://<host>:${process.env.PORT ?? 8080}/partner-chat`,
     description: `
 ## WebSocket Connection (Health Partner side)
 
@@ -132,7 +132,7 @@ socket.on('new_message', (data) => print('Message: \$data'));
 \`\`\`javascript
 import { io } from 'socket.io-client';
 
-const socket = io('ws://localhost:8080/partner-chat', {
+const socket = io('ws://localhost:${process.env.PORT ?? 8080}/partner-chat', {
   auth: { token: '<JWT_ACCESS_TOKEN>' },
   transports: ['websocket'],
 });
@@ -146,7 +146,7 @@ socket.on('connect_error', (err) => console.error(err.message));
 \`\`\`dart
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-final socket = IO.io('http://localhost:8080/partner-chat', 
+final socket = IO.io('http://localhost:${process.env.PORT ?? 8080}/partner-chat', 
   IO.OptionBuilder()
     .setTransports(['websocket'])
     .setAuth({'token': accessToken})

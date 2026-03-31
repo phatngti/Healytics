@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/chat/presentation/screens/partner_chat_inbox.screen.dart';
 import 'package:admin_panel/features/partner/dashboard/presentation/dashboard.dart';
 import 'package:admin_panel/features/partner/employee/presentation/screens/employee_add.screen.dart';
 import 'package:admin_panel/features/partner/employee/presentation/screens/employee_edit.screen.dart';
@@ -60,6 +61,10 @@ part 'partner_routes.g.dart';
     TypedGoRoute<VerificationStatusRoute>(
       path: '/provider/verification-status',
       name: VerificationStatusRoute.name,
+    ),
+    TypedGoRoute<PartnerChatInboxRoute>(
+      path: '/provider/chat',
+      name: PartnerChatInboxRoute.name,
     ),
   ],
 )
@@ -223,6 +228,23 @@ class VerificationStatusRoute extends GoRouteData
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const VerificationStatusScreen(),
+    );
+  }
+}
+
+class PartnerChatInboxRoute extends GoRouteData
+    with $PartnerChatInboxRoute {
+  const PartnerChatInboxRoute();
+  static const name = 'provider-chat-inbox';
+
+  @override
+  Page<void> buildPage(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const PartnerChatInboxScreen(),
     );
   }
 }

@@ -3478,6 +3478,526 @@
           }
         ]
       }
+    },
+    "/user/chat/conversations": {
+      "get": {
+        "operationId": "UserChatController_getConversations",
+        "summary": "List all conversations for the current user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConversationResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "UserChatController_createConversation",
+        "summary": "Create a new conversation with a health partner",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConversationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/chat/conversations/{id}/messages": {
+      "get": {
+        "operationId": "UserChatController_getMessages",
+        "summary": "Get message history for a conversation (cursor-paginated)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "beforeId",
+            "required": false,
+            "in": "query",
+            "description": "Fetch messages older than this message ID (cursor)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of messages to return",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated message list with hasMore flag"
+          },
+          "404": {
+            "description": "Conversation not found or not a participant"
+          }
+        },
+        "tags": [
+          "User Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/chat/conversations/{id}/read": {
+      "post": {
+        "operationId": "UserChatController_markRead",
+        "summary": "Mark all messages in a conversation as read",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/chat/conversations": {
+      "get": {
+        "operationId": "PartnerChatController_getConversations",
+        "summary": "List all conversations for the current partner",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConversationResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "PartnerChatController_createConversation",
+        "summary": "Create a new conversation with a user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConversationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/chat/conversations/{id}/messages": {
+      "get": {
+        "operationId": "PartnerChatController_getMessages",
+        "summary": "Get message history for a conversation (cursor-paginated)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "beforeId",
+            "required": false,
+            "in": "query",
+            "description": "Fetch messages older than this message ID (cursor)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of messages to return",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated message list with hasMore flag"
+          },
+          "404": {
+            "description": "Conversation not found or not a participant"
+          }
+        },
+        "tags": [
+          "Partner Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/chat/conversations/{id}/read": {
+      "post": {
+        "operationId": "PartnerChatController_markRead",
+        "summary": "Mark all messages in a conversation as read",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partner Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/chat/ws-docs/user-gateway": {
+      "get": {
+        "operationId": "WsChatDocsController_getUserGatewayInfo",
+        "summary": "🟢 User Chat Gateway — ws://<host>:8080/user-chat",
+        "description": "\n## WebSocket Connection (User / Patient side)\n\n**Namespace:** `/user-chat`\n**Allowed Roles:** `user`\n**Transport:** Socket.IO v4\n\n### How to Connect\n\n```javascript\nimport { io } from 'socket.io-client';\n\nconst socket = io('ws://localhost:8080/user-chat', {\n  auth: { token: '<JWT_ACCESS_TOKEN>' },\n  transports: ['websocket'],\n});\n\nsocket.on('connect', () => console.log('Connected!'));\nsocket.on('connect_error', (err) => console.error(err.message));\n// Possible errors: AUTH_REQUIRED, INVALID_TOKEN, USER_NOT_FOUND, INSUFFICIENT_ROLE\n```\n\n### Flutter (socket_io_client) Example\n\n```dart\nimport 'package:socket_io_client/socket_io_client.dart' as IO;\n\nfinal socket = IO.io('http://localhost:8080/user-chat', \n  IO.OptionBuilder()\n    .setTransports(['websocket'])\n    .setAuth({'token': accessToken})\n    .build(),\n);\n\nsocket.onConnect((_) => print('Connected to user-chat'));\nsocket.on('new_message', (data) => print('Message: $data'));\n```\n\n### Connection Lifecycle\n\n1. Client connects with JWT in `auth.token`\n2. Server validates JWT → verifies role is `user`\n3. Server auto-joins the socket to all existing conversation rooms\n4. Client is ready to send/receive messages\n\n### Authentication Errors (on connect)\n\n| Error Code | Meaning |\n|------------|---------|\n| `AUTH_REQUIRED` | No token provided in `auth.token` or `Authorization` header |\n| `INVALID_TOKEN` | JWT is expired, malformed, or has wrong signature |\n| `USER_NOT_FOUND` | Token is valid but account no longer exists |\n| `INSUFFICIENT_ROLE` | Account role is not `user` (e.g. partner trying to connect here) |\n    ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "This endpoint is documentation-only. Use Socket.IO to connect.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WsConnectionInfoDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "💬 WebSocket Chat — Connection Guide"
+        ]
+      }
+    },
+    "/chat/ws-docs/partner-gateway": {
+      "get": {
+        "operationId": "WsChatDocsController_getPartnerGatewayInfo",
+        "summary": "🟢 Partner Chat Gateway — ws://<host>:8080/partner-chat",
+        "description": "\n## WebSocket Connection (Health Partner side)\n\n**Namespace:** `/partner-chat`\n**Allowed Roles:** `health_partner`, `employee`\n**Transport:** Socket.IO v4\n\n### How to Connect\n\n```javascript\nimport { io } from 'socket.io-client';\n\nconst socket = io('ws://localhost:8080/partner-chat', {\n  auth: { token: '<JWT_ACCESS_TOKEN>' },\n  transports: ['websocket'],\n});\n\nsocket.on('connect', () => console.log('Connected!'));\nsocket.on('connect_error', (err) => console.error(err.message));\n```\n\n### Flutter (socket_io_client) Example\n\n```dart\nimport 'package:socket_io_client/socket_io_client.dart' as IO;\n\nfinal socket = IO.io('http://localhost:8080/partner-chat', \n  IO.OptionBuilder()\n    .setTransports(['websocket'])\n    .setAuth({'token': accessToken})\n    .build(),\n);\n\nsocket.onConnect((_) => print('Connected to partner-chat'));\nsocket.on('new_message', (data) => print('Message: $data'));\n```\n\n### Connection Lifecycle\n\n1. Client connects with JWT in `auth.token`\n2. Server validates JWT → verifies role is `health_partner` or `employee`\n3. Server auto-joins the socket to all existing conversation rooms\n4. Client is ready to send/receive messages\n    ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "This endpoint is documentation-only. Use Socket.IO to connect.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WsConnectionInfoDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "💬 WebSocket Chat — Connection Guide"
+        ]
+      }
+    },
+    "/chat/ws-docs/events/send-message": {
+      "get": {
+        "operationId": "WsChatDocsController_getSendMessageDocs",
+        "summary": "📤 send_message — Send a chat message",
+        "description": "\n## Event: `send_message`\n**Direction:** Client → Server\n**Response:** Server returns `{ event: \"message_sent\", data: { id, clientMessageId } }`\n\n### Usage\n\n```javascript\nsocket.emit('send_message', {\n  conversationId: '550e8400-e29b-41d4-a716-446655440000',\n  content: 'Hello, I have a question!',\n  messageType: 'text',           // optional, default: 'text'\n  clientMessageId: 'client-123', // optional, for idempotent delivery\n}, (response) => {\n  // ACK callback\n  console.log('Sent:', response.data.id);\n});\n```\n\n### Flutter Example\n\n```dart\nsocket.emitWithAck('send_message', {\n  'conversationId': conversationId,\n  'content': messageText,\n  'clientMessageId': uuid.v4(), // local UUID for dedup\n}).then((ack) {\n  print('Message ID: ${ack['data']['id']}');\n});\n```\n\n### Side Effects\n- Message is persisted to database\n- Conversation `lastMessageText` and `lastMessageAt` are updated\n- Other participant's `unreadCount` is incremented\n- `new_message` event is broadcast to all sockets in the conversation room\n- If `clientMessageId` was already used, the existing message is returned (idempotent)\n\n### Errors\n- `Conversation not found` — invalid conversationId\n- `You are not a participant of this conversation` — access denied\n    ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Payload schema for send_message event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WsSendMessagePayloadDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "💬 WebSocket Chat — Connection Guide"
+        ]
+      }
+    },
+    "/chat/ws-docs/events/typing": {
+      "get": {
+        "operationId": "WsChatDocsController_getTypingDocs",
+        "summary": "📤 typing / stop_typing — Typing indicators",
+        "description": "\n## Event: `typing` and `stop_typing`\n**Direction:** Client → Server → Other participants\n\n### Usage\n\n```javascript\n// When user starts typing\nsocket.emit('typing', { conversationId: '<uuid>' });\n\n// When user stops typing (after 3s of inactivity)\nsocket.emit('stop_typing', { conversationId: '<uuid>' });\n```\n\n### Received Event (other participant)\n\n```javascript\nsocket.on('typing', (data) => {\n  // data = { conversationId, userId, userName }\n  showTypingIndicator(data.userName);\n});\n\nsocket.on('stop_typing', (data) => {\n  // data = { conversationId, userId }\n  hideTypingIndicator();\n});\n```\n\n### Notes\n- Typing events are NOT persisted — they are fire-and-forget\n- Events are broadcast to the other participant on BOTH gateways\n- Client should debounce and auto-send `stop_typing` after ~3s of no keystrokes\n    ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Payload schema for typing events",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WsTypingPayloadDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "💬 WebSocket Chat — Connection Guide"
+        ]
+      }
+    },
+    "/chat/ws-docs/events/mark-read": {
+      "get": {
+        "operationId": "WsChatDocsController_getMarkReadDocs",
+        "summary": "📤 mark_read — Mark messages as read",
+        "description": "\n## Event: `mark_read`\n**Direction:** Client → Server → Other participant\n\n### Usage\n\n```javascript\nsocket.emit('mark_read', { conversationId: '<uuid>' });\n```\n\n### Side Effects\n- Viewer's `unreadCount` is reset to 0 in the database\n- `messages_read` event is broadcast to the other participant\n\n### Received Event (other participant)\n\n```javascript\nsocket.on('messages_read', (data) => {\n  // data = { conversationId, readerId, readAt }\n  updateReadReceipts(data.conversationId);\n});\n```\n    ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Payload schema for mark_read event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WsMarkReadPayloadDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "💬 WebSocket Chat — Connection Guide"
+        ]
+      }
+    },
+    "/chat/ws-docs/events/join-conversation": {
+      "get": {
+        "operationId": "WsChatDocsController_getJoinConversationDocs",
+        "summary": "📤 join_conversation — Join a conversation room",
+        "description": "\n## Event: `join_conversation`\n**Direction:** Client → Server\n\n### Usage\n\n```javascript\n// Call this after creating a new conversation via REST API\nsocket.emit('join_conversation', { conversationId: '<uuid>' });\n```\n\n### Notes\n- On connect, the server auto-joins the socket to ALL existing conversation rooms\n- Use this event only for conversations created AFTER the socket connected\n- No server response — this is a fire-and-forget operation\n    ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Payload schema for join_conversation event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WsJoinConversationPayloadDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "💬 WebSocket Chat — Connection Guide"
+        ]
+      }
+    },
+    "/chat/ws-docs/events/new-message": {
+      "get": {
+        "operationId": "WsChatDocsController_getNewMessageDocs",
+        "summary": "📥 new_message — Receive a new message",
+        "description": "\n## Event: `new_message`\n**Direction:** Server → Client\n**When:** Another participant sends a message in a conversation you're in\n\n### Payload\n\n```javascript\nsocket.on('new_message', (data) => {\n  // data = {\n  //   id: '660e8400-...',\n  //   conversationId: '550e8400-...',\n  //   senderId: '770e8400-...',\n  //   senderName: 'Dr. Nguyen Van A',\n  //   senderAvatar: 'https://s3.example.com/...',\n  //   content: 'Hello!',\n  //   messageType: 'text',\n  //   clientMessageId: 'client-123',\n  //   createdAt: '2026-03-31T00:00:00.000Z'\n  // }\n  appendMessage(data);\n});\n```\n    ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Event payload for new_message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WsNewMessageEventDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "💬 WebSocket Chat — Connection Guide"
+        ]
+      }
+    },
+    "/chat/ws-docs/events/message-sent": {
+      "get": {
+        "operationId": "WsChatDocsController_getMessageSentDocs",
+        "summary": "📥 message_sent — ACK for your sent message",
+        "description": "\n## Event: `message_sent`\n**Direction:** Server → Sender (ACK)\n**When:** Your `send_message` was processed successfully\n\n### Payload\n\n```javascript\n// Returned as the ACK response from emit\nsocket.emit('send_message', payload, (response) => {\n  // response = { event: 'message_sent', data: { id, clientMessageId } }\n  markMessageAsDelivered(response.data.clientMessageId, response.data.id);\n});\n```\n\n### Notes\n- Use `clientMessageId` to match the ACK to your local pending message\n- Replace the local temp ID with the server-generated `id`\n    ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "ACK payload for message_sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WsMessageSentAckDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "💬 WebSocket Chat — Connection Guide"
+        ]
+      }
+    },
+    "/chat/ws-docs/events/messages-read": {
+      "get": {
+        "operationId": "WsChatDocsController_getMessagesReadDocs",
+        "summary": "📥 messages_read — Read receipt from other participant",
+        "description": "\n## Event: `messages_read`\n**Direction:** Server → Client\n**When:** The other participant calls `mark_read`\n\n### Payload\n\n```javascript\nsocket.on('messages_read', (data) => {\n  // data = { conversationId, readerId, readAt }\n  showReadTicks(data.conversationId, data.readAt);\n});\n```\n    ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Event payload for messages_read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WsMessagesReadEventDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "💬 WebSocket Chat — Connection Guide"
+        ]
+      }
+    },
+    "/chat/ws-docs/events/error": {
+      "get": {
+        "operationId": "WsChatDocsController_getErrorDocs",
+        "summary": "📥 error — Error notification",
+        "description": "\n## Event: `error`\n**Direction:** Server → Client\n**When:** A `send_message` or other operation fails\n\n### Payload\n\n```javascript\nsocket.on('error', (data) => {\n  // data = { message: 'You are not a participant of this conversation' }\n  showError(data.message);\n});\n```\n    ",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Event payload for error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WsErrorEventDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "💬 WebSocket Chat — Connection Guide"
+        ]
+      }
     }
   },
   "info": {
@@ -4137,7 +4657,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-03-29T15:48:42.117Z"
+              "submittedAt": "2026-03-30T19:37:54.949Z"
             }
           }
         },
@@ -7515,51 +8035,6 @@
           "label"
         ]
       },
-      "CreatePartnerHealthServiceReviewDto": {
-        "type": "object",
-        "properties": {
-          "reviewerName": {
-            "type": "string",
-            "example": "John Smith"
-          },
-          "avatarUrl": {
-            "type": "string",
-            "example": "https://example.com/avatar.jpg"
-          },
-          "rating": {
-            "type": "number",
-            "example": 5,
-            "description": "Rating from 1 to 5"
-          },
-          "status": {
-            "type": "string",
-            "example": "Completed"
-          },
-          "date": {
-            "type": "string",
-            "example": "2025-05-11"
-          },
-          "text": {
-            "type": "string",
-            "example": "Excellent service and amazing results!"
-          },
-          "imageUrls": {
-            "example": [
-              "https://example.com/review-img.jpg"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "reviewerName",
-          "rating",
-          "date",
-          "text"
-        ]
-      },
       "ServiceRuleInputDto": {
         "type": "object",
         "properties": {
@@ -7714,13 +8189,6 @@
               "$ref": "#/components/schemas/CreatePartnerHealthServiceFacilityImageDto"
             }
           },
-          "reviews": {
-            "description": "Product reviews",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreatePartnerHealthServiceReviewDto"
-            }
-          },
           "serviceManual": {
             "description": "Service manual (guidelines, rules, procedure steps)",
             "allOf": [
@@ -7817,13 +8285,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CreatePartnerHealthServiceFacilityImageDto"
-            }
-          },
-          "reviews": {
-            "description": "Product reviews",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreatePartnerHealthServiceReviewDto"
             }
           },
           "serviceManual": {
@@ -8358,41 +8819,58 @@
       "PublicHealthServiceReviewResponseDto": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
           "reviewerName": {
-            "type": "string"
+            "type": "string",
+            "example": "Nguyen Van A"
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "object",
+            "example": "https://example.com/avatar.jpg"
           },
           "rating": {
             "type": "number",
             "example": 5
           },
-          "status": {
-            "type": "string",
-            "example": "Completed"
+          "comment": {
+            "type": "object",
+            "example": "Great session, very relaxing atmosphere."
           },
-          "date": {
-            "type": "string",
-            "example": "2025-05-11T00:00:00.000Z"
-          },
-          "text": {
-            "type": "string"
-          },
-          "imageUrls": {
+          "tags": {
+            "example": [
+              "On-time",
+              "Relaxing",
+              "Clean"
+            ],
             "type": "array",
             "items": {
               "type": "string"
             }
+          },
+          "photoUrls": {
+            "example": [
+              "https://cdn.healytics.com/reviews/photo1.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-03-29T13:00:00.000Z"
           }
         },
         "required": [
+          "id",
           "reviewerName",
           "rating",
-          "status",
-          "date",
-          "text",
-          "imageUrls"
+          "tags",
+          "photoUrls",
+          "createdAt"
         ]
       },
       "PublicHealthServiceRecommendedResponseDto": {
@@ -9927,6 +10405,357 @@
       "MoMoRefundResponseDto": {
         "type": "object",
         "properties": {}
+      },
+      "ParticipantInfoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role"
+        ]
+      },
+      "LastMessageDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "senderId": {
+            "type": "string"
+          }
+        }
+      },
+      "ConversationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "archived",
+              "closed"
+            ]
+          },
+          "bookingId": {
+            "type": "string"
+          },
+          "otherParticipant": {
+            "$ref": "#/components/schemas/ParticipantInfoDto"
+          },
+          "lastMessage": {
+            "$ref": "#/components/schemas/LastMessageDto"
+          },
+          "unreadCount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "otherParticipant",
+          "lastMessage",
+          "unreadCount",
+          "createdAt"
+        ]
+      },
+      "CreateConversationDto": {
+        "type": "object",
+        "properties": {
+          "participantAccountId": {
+            "type": "string",
+            "description": "Account ID of the other party (partner or user)"
+          },
+          "bookingId": {
+            "type": "string",
+            "description": "Optional booking context for the conversation"
+          },
+          "initialMessage": {
+            "type": "string",
+            "description": "Optional first message to start the conversation"
+          }
+        },
+        "required": [
+          "participantAccountId"
+        ]
+      },
+      "WsConnectionInfoDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Socket.IO namespace URL for WebSocket connection",
+            "example": "ws://localhost:8080/user-chat"
+          },
+          "auth": {
+            "type": "string",
+            "description": "Authentication method — pass JWT token in the Socket.IO auth object",
+            "example": "{ auth: { token: \"eyJhbGciOiJIUzI1NiIs...\" } }"
+          },
+          "allowedRoles": {
+            "description": "Allowed roles for this gateway",
+            "example": [
+              "user"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "url",
+          "auth",
+          "allowedRoles"
+        ]
+      },
+      "WsSendMessagePayloadDto": {
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string",
+            "description": "Target conversation UUID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "content": {
+            "type": "string",
+            "description": "Message text content (max 5000 chars)",
+            "example": "Hello, I have a question about my appointment."
+          },
+          "messageType": {
+            "type": "string",
+            "description": "Message type",
+            "enum": [
+              "text",
+              "image",
+              "file",
+              "system"
+            ],
+            "default": "text"
+          },
+          "clientMessageId": {
+            "type": "string",
+            "description": "Client-generated UUID for idempotent delivery (prevents duplicates on retry)",
+            "example": "client-uuid-abc-123"
+          }
+        },
+        "required": [
+          "conversationId",
+          "content"
+        ]
+      },
+      "WsTypingPayloadDto": {
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string",
+            "description": "Conversation UUID where user is typing",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        },
+        "required": [
+          "conversationId"
+        ]
+      },
+      "WsMarkReadPayloadDto": {
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string",
+            "description": "Conversation UUID to mark as read",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        },
+        "required": [
+          "conversationId"
+        ]
+      },
+      "WsJoinConversationPayloadDto": {
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string",
+            "description": "Conversation UUID to join (auto-joined on connect, use this for new conversations)",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        },
+        "required": [
+          "conversationId"
+        ]
+      },
+      "WsNewMessageEventDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "660e8400-e29b-41d4-a716-446655440000"
+          },
+          "conversationId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "senderId": {
+            "type": "string",
+            "example": "770e8400-e29b-41d4-a716-446655440000"
+          },
+          "senderName": {
+            "type": "string",
+            "example": "Dr. Nguyen Van A"
+          },
+          "senderAvatar": {
+            "type": "string",
+            "example": "https://s3.example.com/avatars/doctor.jpg"
+          },
+          "content": {
+            "type": "string",
+            "example": "Hello, I have a question about my appointment."
+          },
+          "messageType": {
+            "type": "string",
+            "enum": [
+              "text",
+              "image",
+              "file",
+              "system"
+            ],
+            "example": "text"
+          },
+          "clientMessageId": {
+            "type": "string",
+            "example": "client-uuid-abc-123"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-03-31T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "conversationId",
+          "senderId",
+          "content",
+          "messageType",
+          "createdAt"
+        ]
+      },
+      "WsMessageSentAckDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Server-generated message UUID",
+            "example": "660e8400-e29b-41d4-a716-446655440000"
+          },
+          "clientMessageId": {
+            "type": "string",
+            "description": "Echoed client message ID for matching",
+            "example": "client-uuid-abc-123"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "WsMessagesReadEventDto": {
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "readerId": {
+            "type": "string",
+            "description": "Account ID of the reader",
+            "example": "770e8400-e29b-41d4-a716-446655440000"
+          },
+          "readAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-03-31T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "conversationId",
+          "readerId",
+          "readAt"
+        ]
+      },
+      "WsTypingEventDto": {
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "userId": {
+            "type": "string",
+            "example": "770e8400-e29b-41d4-a716-446655440000"
+          },
+          "userName": {
+            "type": "string",
+            "example": "Dr. Nguyen Van A"
+          }
+        },
+        "required": [
+          "conversationId",
+          "userId",
+          "userName"
+        ]
+      },
+      "WsStopTypingEventDto": {
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "userId": {
+            "type": "string",
+            "example": "770e8400-e29b-41d4-a716-446655440000"
+          }
+        },
+        "required": [
+          "conversationId",
+          "userId"
+        ]
+      },
+      "WsErrorEventDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message",
+            "example": "You are not a participant of this conversation"
+          }
+        },
+        "required": [
+          "message"
+        ]
       }
     }
   }

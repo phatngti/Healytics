@@ -259,15 +259,12 @@ class ChatRemoteDatasourceMock
   }
 }
 
-/// Provides a [ChatSseService] using the AI-service
-/// base path from [ApiService].
+/// Provides a [ChatSseService] backed by [ApiService]
+/// for centralized SSE stream management.
 final chatSseServiceProvider =
     Provider<ChatSseService>((ref) {
-      final basePath = ref
-          .read(apiServiceProvider)
-          .clientFor(ServicePrefix.ai)
-          .basePath;
-      return ChatSseService(basePath: basePath);
+      final apiService = ref.read(apiServiceProvider);
+      return ChatSseService(apiService);
     });
 
 /// Uses [AppEnvironment.useMock] to switch between

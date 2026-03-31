@@ -2,38 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
+import 'package:user_app/core/widgets/main_screen_layout.widget.dart';
 import 'package:user_app/router/routes.dart';
 
 import '../providers/conversation_history.provider.dart';
 import '../widgets/history/date_section.widget.dart';
-import '../widgets/history/history_app_bar.widget.dart';
 import '../widgets/history/history_empty_state.widget.dart';
 import '../widgets/history/new_chat_fab.widget.dart';
 
 /// Conversation history page listing past chatbot
 /// sessions grouped by date.
 ///
+/// Uses [MainScreenLayout] for consistent
+/// header/background across navigation tabs.
+///
 /// Composes:
-/// - [HistoryAppBar] — back button, centred title,
-///   search toggle.
+/// - Standardised [AppBar] with search toggle
+///   action.
 /// - Body: date-grouped [DateSection] list.
 /// - [NewChatFab] to start a new conversation.
 ///
 /// All dimensions use [AppDimens]; all colours from
 /// the active [ColorScheme].
-class ConversationHistoryScreen
-    extends ConsumerStatefulWidget {
+class ConversationHistoryScreen extends ConsumerStatefulWidget {
   const ConversationHistoryScreen({super.key});
 
   @override
-  ConsumerState<ConversationHistoryScreen>
-      createState() =>
-          _ConversationHistoryScreenState();
+  ConsumerState<ConversationHistoryScreen> createState() =>
+      _ConversationHistoryScreenState();
 }
 
 class _ConversationHistoryScreenState
     extends ConsumerState<ConversationHistoryScreen> {
   final _searchController = TextEditingController();
+  bool _isSearching = false;
 
   @override
   void dispose() {
@@ -41,46 +43,82 @@ class _ConversationHistoryScreenState
     super.dispose();
   }
 
+  void _toggleSearch() {
+    setState(() {
+      _isSearching = !_isSearching;
+      if (!_isSearching) {
+        _searchController.clear();
+        ref.read(conversationHistoryProvider.notifier).updateSearchQuery('');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final historyState = ref.watch(
-      conversationHistoryProvider,
-    );
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final historyState = ref.watch(conversationHistoryProvider);
     final filtered = historyState.filtered;
-    final grouped =
-        groupConversationsByDate(filtered);
+    final grouped = groupConversationsByDate(filtered);
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: HistoryAppBar(
-        onSearchChanged: (value) {
-          ref
-              .read(
-                conversationHistoryProvider
-                    .notifier,
+    return MainScreenLayout(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: (value) {
+                  ref
+                      .read(conversationHistoryProvider.notifier)
+                      .updateSearchQuery(value);
+                },
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search conversations...',
+                  hintStyle: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.4),
+                  ),
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: AppDimens.spaceSm,
+                  ),
+                ),
               )
-              .updateSearchQuery(value);
-        },
-        searchController: _searchController,
-      ),
-      body: MediaQuery(
-        data: MediaQuery.of(context).copyWith(
-          textScaler: MediaQuery.of(context)
-              .textScaler
-              .clamp(
-                minScaleFactor: 0.8,
-                maxScaleFactor: 1.3,
+            : Text(
+                'Chat History',
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: AppDimens.fontWeightSemiBold,
+                  color: colorScheme.onSurface,
+                ),
               ),
-        ),
-        child: _buildBody(
-          context,
-          historyState,
-          grouped,
-          colorScheme,
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isSearching ? Icons.close : Icons.search,
+              color: colorScheme.primary,
+            ),
+            tooltip: _isSearching ? 'Close search' : 'Search',
+            onPressed: _toggleSearch,
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(AppDimens.borderWidth),
+          child: Container(
+            height: AppDimens.borderWidth,
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+          ),
         ),
       ),
+      body: _buildBody(context, historyState, grouped, colorScheme),
       floatingActionButton: NewChatFab(
         tapKey: keys.chatScreen.newChatButton,
         onPressed: () {
@@ -96,28 +134,19 @@ class _ConversationHistoryScreenState
     List<DateGroup> grouped,
     ColorScheme colorScheme,
   ) {
-    if (historyState.isLoading &&
-        historyState.conversations.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+    if (historyState.isLoading && historyState.conversations.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
     }
 
-    if (historyState.error != null &&
-        historyState.conversations.isEmpty) {
+    if (historyState.error != null && historyState.conversations.isEmpty) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.all(
-            AppDimens.horizontalPadding(context),
-          ),
+          padding: EdgeInsets.all(AppDimens.horizontalPadding(context)),
           child: Text(
             historyState.error!,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(
-                  color: colorScheme.error,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: colorScheme.error),
             textAlign: TextAlign.center,
           ),
         ),
@@ -130,17 +159,11 @@ class _ConversationHistoryScreenState
 
     return ListView.builder(
       padding: EdgeInsets.only(
-        left:
-            AppDimens.horizontalPadding(context),
-        right:
-            AppDimens.horizontalPadding(context),
+        left: AppDimens.horizontalPadding(context),
+        right: AppDimens.horizontalPadding(context),
         top: AppDimens.spaceLg,
         // FAB clearance
-        bottom:
-            AppDimens.bottomScrollPadding(
-              context,
-            ) +
-            80,
+        bottom: AppDimens.bottomScrollPadding(context) + 80,
       ),
       itemCount: grouped.length,
       itemBuilder: (context, index) {

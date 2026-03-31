@@ -98,6 +98,10 @@ Class | Method | HTTP request | Description
 *MapboxApi* | [**mapboxControllerGetClientKey**](doc//MapboxApi.md#mapboxcontrollergetclientkey) | **GET** /mapbox/client-key | Get public access token for frontend/mobile SDKs
 *MapboxApi* | [**mapboxControllerReverseGeocode**](doc//MapboxApi.md#mapboxcontrollerreversegeocode) | **GET** /mapbox/reverse-geocode | Reverse geocode lat/lng to address
 *MomoApi* | [**moMoControllerHandleMoMoIPN**](doc//MomoApi.md#momocontrollerhandlemomoipn) | **POST** /momo/ipn | MoMo IPN callback (server-to-server)
+*PartnerChatApi* | [**partnerChatControllerCreateConversation**](doc//PartnerChatApi.md#partnerchatcontrollercreateconversation) | **POST** /partner/chat/conversations | Create a new conversation with a user
+*PartnerChatApi* | [**partnerChatControllerGetConversations**](doc//PartnerChatApi.md#partnerchatcontrollergetconversations) | **GET** /partner/chat/conversations | List all conversations for the current partner
+*PartnerChatApi* | [**partnerChatControllerGetMessages**](doc//PartnerChatApi.md#partnerchatcontrollergetmessages) | **GET** /partner/chat/conversations/{id}/messages | Get message history for a conversation (cursor-paginated)
+*PartnerChatApi* | [**partnerChatControllerMarkRead**](doc//PartnerChatApi.md#partnerchatcontrollermarkread) | **POST** /partner/chat/conversations/{id}/read | Mark all messages in a conversation as read
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateDoctor**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatedoctor) | **POST** /partner/employees/doctors | Create a new doctor
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateMassageTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatemassagetherapist) | **POST** /partner/employees/massage-therapists | Create a new massage therapist
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateSpaTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
@@ -140,6 +144,10 @@ Class | Method | HTTP request | Description
 *UserBookingsApi* | [**bookingControllerListMyBookings**](doc//UserBookingsApi.md#bookingcontrollerlistmybookings) | **GET** /user/bookings | List my bookings
 *UserCategoriesApi* | [**userCategoriesControllerFindServicesByCategory**](doc//UserCategoriesApi.md#usercategoriescontrollerfindservicesbycategory) | **GET** /user/categories/{categoryId}/services | Get services for a category
 *UserCategoriesApi* | [**userCategoriesControllerFindSpecialistsByCategory**](doc//UserCategoriesApi.md#usercategoriescontrollerfindspecialistsbycategory) | **GET** /user/categories/{categoryId}/specialists | Get specialists for a category
+*UserChatApi* | [**userChatControllerCreateConversation**](doc//UserChatApi.md#userchatcontrollercreateconversation) | **POST** /user/chat/conversations | Create a new conversation with a health partner
+*UserChatApi* | [**userChatControllerGetConversations**](doc//UserChatApi.md#userchatcontrollergetconversations) | **GET** /user/chat/conversations | List all conversations for the current user
+*UserChatApi* | [**userChatControllerGetMessages**](doc//UserChatApi.md#userchatcontrollergetmessages) | **GET** /user/chat/conversations/{id}/messages | Get message history for a conversation (cursor-paginated)
+*UserChatApi* | [**userChatControllerMarkRead**](doc//UserChatApi.md#userchatcontrollermarkread) | **POST** /user/chat/conversations/{id}/read | Mark all messages in a conversation as read
 *UserEmployeesApi* | [**userEmployeesControllerFindAll**](doc//UserEmployeesApi.md#useremployeescontrollerfindall) | **GET** /user/employees | Get all employees
 *UserEmployeesApi* | [**userEmployeesControllerFindOne**](doc//UserEmployeesApi.md#useremployeescontrollerfindone) | **GET** /user/employees/{id} | Get an employee by id
 *UserEmployeesApi* | [**userEmployeesControllerFindServices**](doc//UserEmployeesApi.md#useremployeescontrollerfindservices) | **GET** /user/employees/{id}/services | Get services for a specialist
@@ -158,6 +166,16 @@ Class | Method | HTTP request | Description
 *UserReviewsApi* | [**userReviewControllerSubmitSpecialistReview**](doc//UserReviewsApi.md#userreviewcontrollersubmitspecialistreview) | **POST** /user/reviews/specialist | Submit a specialist review for a completed appointment
 *UserReviewsApi* | [**userReviewControllerSubmitTreatmentReview**](doc//UserReviewsApi.md#userreviewcontrollersubmittreatmentreview) | **POST** /user/reviews/treatment | Submit a treatment review for a completed appointment
 *UserSlotsApi* | [**slotsControllerMicroLock**](doc//UserSlotsApi.md#slotscontrollermicrolock) | **POST** /user/slots/micro-lock | Acquire a micro-lock on a time slot (120s TTL)
+*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetErrorDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergeterrordocs) | **GET** /chat/ws-docs/events/error | 📥 error — Error notification
+*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetJoinConversationDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetjoinconversationdocs) | **GET** /chat/ws-docs/events/join-conversation | 📤 join_conversation — Join a conversation room
+*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetMarkReadDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetmarkreaddocs) | **GET** /chat/ws-docs/events/mark-read | 📤 mark_read — Mark messages as read
+*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetMessageSentDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetmessagesentdocs) | **GET** /chat/ws-docs/events/message-sent | 📥 message_sent — ACK for your sent message
+*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetMessagesReadDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetmessagesreaddocs) | **GET** /chat/ws-docs/events/messages-read | 📥 messages_read — Read receipt from other participant
+*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetNewMessageDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetnewmessagedocs) | **GET** /chat/ws-docs/events/new-message | 📥 new_message — Receive a new message
+*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetPartnerGatewayInfo**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetpartnergatewayinfo) | **GET** /chat/ws-docs/partner-gateway | 🟢 Partner Chat Gateway — ws://<host>:8080/partner-chat
+*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetSendMessageDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetsendmessagedocs) | **GET** /chat/ws-docs/events/send-message | 📤 send_message — Send a chat message
+*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetTypingDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergettypingdocs) | **GET** /chat/ws-docs/events/typing | 📤 typing / stop_typing — Typing indicators
+*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetUserGatewayInfo**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetusergatewayinfo) | **GET** /chat/ws-docs/user-gateway | 🟢 User Chat Gateway — ws://<host>:8080/user-chat
 
 
 ## Documentation For Models
@@ -198,7 +216,9 @@ Class | Method | HTTP request | Description
  - [ChatbotRequest](doc//ChatbotRequest.md)
  - [CheckoutTicketResponseDto](doc//CheckoutTicketResponseDto.md)
  - [ClientKeyResponseDto](doc//ClientKeyResponseDto.md)
+ - [ConversationResponseDto](doc//ConversationResponseDto.md)
  - [CreateCategoryDto](doc//CreateCategoryDto.md)
+ - [CreateConversationDto](doc//CreateConversationDto.md)
  - [CreateDoctorDto](doc//CreateDoctorDto.md)
  - [CreateDoctorProfileDto](doc//CreateDoctorProfileDto.md)
  - [CreateMassageTherapistDto](doc//CreateMassageTherapistDto.md)
@@ -208,7 +228,6 @@ Class | Method | HTTP request | Description
  - [CreatePartnerHealthServiceDto](doc//CreatePartnerHealthServiceDto.md)
  - [CreatePartnerHealthServiceFacilityImageDto](doc//CreatePartnerHealthServiceFacilityImageDto.md)
  - [CreatePartnerHealthServiceMediaDto](doc//CreatePartnerHealthServiceMediaDto.md)
- - [CreatePartnerHealthServiceReviewDto](doc//CreatePartnerHealthServiceReviewDto.md)
  - [CreateServiceTagDto](doc//CreateServiceTagDto.md)
  - [CreateSpaTherapistDto](doc//CreateSpaTherapistDto.md)
  - [CreateSpecialistReviewDto](doc//CreateSpecialistReviewDto.md)
@@ -230,6 +249,7 @@ Class | Method | HTTP request | Description
  - [GeocodeResultDto](doc//GeocodeResultDto.md)
  - [HomeRecommenderRequest](doc//HomeRecommenderRequest.md)
  - [KycDocumentDto](doc//KycDocumentDto.md)
+ - [LastMessageDto](doc//LastMessageDto.md)
  - [LegalRepresentativeDto](doc//LegalRepresentativeDto.md)
  - [LegalRepresentativeRequestDto](doc//LegalRepresentativeRequestDto.md)
  - [LocationInfo](doc//LocationInfo.md)
@@ -242,6 +262,7 @@ Class | Method | HTTP request | Description
  - [MicroLockDto](doc//MicroLockDto.md)
  - [MicroLockResponseDto](doc//MicroLockResponseDto.md)
  - [MyProfileResponseDto](doc//MyProfileResponseDto.md)
+ - [ParticipantInfoDto](doc//ParticipantInfoDto.md)
  - [PartnerCategorySummaryDto](doc//PartnerCategorySummaryDto.md)
  - [PartnerClinicDto](doc//PartnerClinicDto.md)
  - [PartnerDayScheduleDto](doc//PartnerDayScheduleDto.md)
@@ -329,6 +350,17 @@ Class | Method | HTTP request | Description
  - [VerifiedField](doc//VerifiedField.md)
  - [WorkHistoryEntryDto](doc//WorkHistoryEntryDto.md)
  - [WorkScheduleEntryDto](doc//WorkScheduleEntryDto.md)
+ - [WsConnectionInfoDto](doc//WsConnectionInfoDto.md)
+ - [WsErrorEventDto](doc//WsErrorEventDto.md)
+ - [WsJoinConversationPayloadDto](doc//WsJoinConversationPayloadDto.md)
+ - [WsMarkReadPayloadDto](doc//WsMarkReadPayloadDto.md)
+ - [WsMessageSentAckDto](doc//WsMessageSentAckDto.md)
+ - [WsMessagesReadEventDto](doc//WsMessagesReadEventDto.md)
+ - [WsNewMessageEventDto](doc//WsNewMessageEventDto.md)
+ - [WsSendMessagePayloadDto](doc//WsSendMessagePayloadDto.md)
+ - [WsStopTypingEventDto](doc//WsStopTypingEventDto.md)
+ - [WsTypingEventDto](doc//WsTypingEventDto.md)
+ - [WsTypingPayloadDto](doc//WsTypingPayloadDto.md)
 
 
 ## Documentation For Authorization
