@@ -13,12 +13,11 @@ Table schema (from NestJS migration):
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, String, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
-from datetime import datetime, timezone
 
 from app.core.database import Base
 
