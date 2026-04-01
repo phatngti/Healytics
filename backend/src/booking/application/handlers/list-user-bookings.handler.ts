@@ -18,7 +18,9 @@ export class ListUserBookingsHandler {
     page = 1,
     limit = 10,
   ): Promise<BookingResponseDto[]> {
-    this.logger.log(`Listing bookings: user=${userId}, page=${page}, limit=${limit}`);
+    this.logger.log(
+      `Listing bookings: user=${userId}, page=${page}, limit=${limit}`,
+    );
 
     const bookings = await this.bookingRepo.find({
       where: { userId },

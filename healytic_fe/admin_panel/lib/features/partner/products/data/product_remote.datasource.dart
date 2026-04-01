@@ -162,19 +162,6 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
             ),
           )
           .toList(),
-      reviews: request.reviews
-          .map(
-            (review) => CreatePartnerHealthServiceReviewDto(
-              reviewerName: review.reviewerName,
-              avatarUrl: review.avatarUrl,
-              rating: review.rating,
-              status: review.status,
-              date: review.date,
-              text: review.text,
-              imageUrls: review.imageUrls,
-            ),
-          )
-          .toList(),
       serviceManual: _mapServiceManual(request.serviceManual),
     );
 

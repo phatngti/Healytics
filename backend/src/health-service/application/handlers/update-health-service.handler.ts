@@ -17,7 +17,10 @@ export class UpdateHealthServiceHandler {
 
   constructor(private readonly dataSource: DataSource) {}
 
-  async execute(id: string, command: UpdatePartnerHealthServiceDto): Promise<Product> {
+  async execute(
+    id: string,
+    command: UpdatePartnerHealthServiceDto,
+  ): Promise<Product> {
     this.logger.log(`Executing UpdateHealthServiceHandler for ID: ${id}`);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -34,7 +37,8 @@ export class UpdateHealthServiceHandler {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
 
-      const { media, productDefinition, serviceManual, ...updateData } = command;
+      const { media, productDefinition, serviceManual, ...updateData } =
+        command;
 
       if (Object.keys(updateData).length > 0) {
         Object.assign(existingProduct, updateData);
@@ -51,10 +55,16 @@ export class UpdateHealthServiceHandler {
       }
 
       // 3. Update Product Definition
-      if (existingProduct.type === HealthServiceType.SERVICE && productDefinition) {
-        const existingDef = await queryRunner.manager.findOne(ProductDefinition, {
-          where: { productId: id },
-        });
+      if (
+        existingProduct.type === HealthServiceType.SERVICE &&
+        productDefinition
+      ) {
+        const existingDef = await queryRunner.manager.findOne(
+          ProductDefinition,
+          {
+            where: { productId: id },
+          },
+        );
 
         if (existingDef) {
           Object.assign(existingDef, productDefinition);

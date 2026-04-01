@@ -16,24 +16,60 @@ describe('LocationsController', () => {
   // Mock data (now using DTO shape)
   const mockProvinces = {
     data: [
-      { id: 'province-1', code: '01', name: 'Hà Nội', fullName: 'Thành phố Hà Nội', level: 'PROVINCE' },
-      { id: 'province-2', code: '79', name: 'Hồ Chí Minh', fullName: 'Thành phố Hồ Chí Minh', level: 'PROVINCE' },
+      {
+        id: 'province-1',
+        code: '01',
+        name: 'Hà Nội',
+        fullName: 'Thành phố Hà Nội',
+        level: 'PROVINCE',
+      },
+      {
+        id: 'province-2',
+        code: '79',
+        name: 'Hồ Chí Minh',
+        fullName: 'Thành phố Hồ Chí Minh',
+        level: 'PROVINCE',
+      },
     ],
     total: 2,
   };
 
   const mockDistricts = {
     data: [
-      { id: 'district-1', code: '001', name: 'Quận 1', fullName: 'Quận 1', level: 'DISTRICT' },
-      { id: 'district-2', code: '002', name: 'Quận 2', fullName: 'Quận 2', level: 'DISTRICT' },
+      {
+        id: 'district-1',
+        code: '001',
+        name: 'Quận 1',
+        fullName: 'Quận 1',
+        level: 'DISTRICT',
+      },
+      {
+        id: 'district-2',
+        code: '002',
+        name: 'Quận 2',
+        fullName: 'Quận 2',
+        level: 'DISTRICT',
+      },
     ],
     total: 2,
   };
 
   const mockWards = {
     data: [
-      { id: 'ward-1', code: '00001', name: 'Phường 1', fullName: 'Phường 1', level: 'WARD' },
-      { id: 'ward-2', code: '00002', name: 'Phường 2', fullName: 'Phường 2', level: 'WARD' },
+      {
+        id: 'ward-1',
+        code: '00001',
+        name: 'Phường 1',
+        fullName: 'Phường 1',
+        level: 'WARD',
+      },
+      {
+        id: 'ward-2',
+        code: '00002',
+        name: 'Phường 2',
+        fullName: 'Phường 2',
+        level: 'WARD',
+      },
     ],
     total: 2,
   };
@@ -77,14 +113,18 @@ describe('LocationsController', () => {
     it('should return districts for a province', async () => {
       // Arrange
       const provinceId = 'province-1';
-      mockLocationsService.getDistrictsByProvinceId.mockResolvedValue(mockDistricts);
+      mockLocationsService.getDistrictsByProvinceId.mockResolvedValue(
+        mockDistricts,
+      );
 
       // Act
       const result = await controller.getDistricts(provinceId);
 
       // Assert
       expect(result).toEqual(mockDistricts);
-      expect(mockLocationsService.getDistrictsByProvinceId).toHaveBeenCalledWith(provinceId);
+      expect(
+        mockLocationsService.getDistrictsByProvinceId,
+      ).toHaveBeenCalledWith(provinceId);
     });
 
     it('should propagate NotFoundException from service', async () => {
@@ -95,7 +135,9 @@ describe('LocationsController', () => {
       );
 
       // Act & Assert
-      await expect(controller.getDistricts(provinceId)).rejects.toThrow(NotFoundException);
+      await expect(controller.getDistricts(provinceId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -110,7 +152,9 @@ describe('LocationsController', () => {
 
       // Assert
       expect(result).toEqual(mockWards);
-      expect(mockLocationsService.getWardsByDistrictId).toHaveBeenCalledWith(districtId);
+      expect(mockLocationsService.getWardsByDistrictId).toHaveBeenCalledWith(
+        districtId,
+      );
     });
 
     it('should propagate NotFoundException from service', async () => {
@@ -121,7 +165,9 @@ describe('LocationsController', () => {
       );
 
       // Act & Assert
-      await expect(controller.getWards(districtId)).rejects.toThrow(NotFoundException);
+      await expect(controller.getWards(districtId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

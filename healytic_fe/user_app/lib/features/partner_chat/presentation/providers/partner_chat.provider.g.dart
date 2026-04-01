@@ -124,59 +124,6 @@ final class PartnerChatRepositoryProvider
 String _$partnerChatRepositoryHash() =>
     r'5ca2331a34909861c51baaa1369f8aaf507fee6d';
 
-/// Singleton socket service provider.
-
-@ProviderFor(partnerChatSocketService)
-const partnerChatSocketServiceProvider = PartnerChatSocketServiceProvider._();
-
-/// Singleton socket service provider.
-
-final class PartnerChatSocketServiceProvider
-    extends
-        $FunctionalProvider<
-          PartnerChatSocketService,
-          PartnerChatSocketService,
-          PartnerChatSocketService
-        >
-    with $Provider<PartnerChatSocketService> {
-  /// Singleton socket service provider.
-  const PartnerChatSocketServiceProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'partnerChatSocketServiceProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$partnerChatSocketServiceHash();
-
-  @$internal
-  @override
-  $ProviderElement<PartnerChatSocketService> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
-
-  @override
-  PartnerChatSocketService create(Ref ref) {
-    return partnerChatSocketService(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(PartnerChatSocketService value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<PartnerChatSocketService>(value),
-    );
-  }
-}
-
-String _$partnerChatSocketServiceHash() =>
-    r'675644a007fa4cecd3e9ae90a5e4e8e2f5c7fdc5';
-
 /// Main chat notifier — manages the full lifecycle of
 /// a partner chat conversation.
 ///
@@ -245,7 +192,7 @@ final class PartnerChatProvider
   }
 }
 
-String _$partnerChatHash() => r'764360e27d500c06ddcf187a0a7505f0e8a188d2';
+String _$partnerChatHash() => r'7228fa7a44b034d18e8ab82e97cafebf2dc0a42d';
 
 /// Main chat notifier — manages the full lifecycle of
 /// a partner chat conversation.

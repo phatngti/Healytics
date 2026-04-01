@@ -50,7 +50,8 @@ export class CreateTreatmentReviewDto {
 
   @ApiPropertyOptional({
     example: ['review-photos/1234-photo1.jpg'],
-    description: 'S3 keys of uploaded photos (max 5). Upload via POST /v1/s3/presign first.',
+    description:
+      'S3 keys of uploaded photos (max 5). Upload via POST /v1/s3/presign first.',
   })
   @IsOptional()
   @IsArray()

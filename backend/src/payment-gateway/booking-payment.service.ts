@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Booking } from '@/common/entities/booking.entity';
@@ -34,17 +30,12 @@ export class BookingPaymentService {
    *
    * Đảm bảo user chỉ truy cập booking của mình.
    */
-  async findByIdAndUser(
-    bookingId: string,
-    userId: string,
-  ): Promise<Booking> {
+  async findByIdAndUser(bookingId: string, userId: string): Promise<Booking> {
     const booking = await this.bookingRepo.findOne({
       where: { id: bookingId, userId },
     });
     if (!booking) {
-      throw new NotFoundException(
-        `Booking ${bookingId} not found`,
-      );
+      throw new NotFoundException(`Booking ${bookingId} not found`);
     }
     return booking;
   }
@@ -59,9 +50,7 @@ export class BookingPaymentService {
       where: { id: bookingId },
     });
     if (!booking) {
-      throw new NotFoundException(
-        `Booking ${bookingId} not found`,
-      );
+      throw new NotFoundException(`Booking ${bookingId} not found`);
     }
     return booking;
   }
@@ -81,9 +70,7 @@ export class BookingPaymentService {
       where: { id: booking.productId },
     });
     if (!product) {
-      throw new NotFoundException(
-        `Product ${booking.productId} not found`,
-      );
+      throw new NotFoundException(`Product ${booking.productId} not found`);
     }
 
     const rawAmount = product.salePrice ?? product.basePrice;
@@ -144,9 +131,7 @@ export class BookingPaymentService {
       }),
     );
 
-    this.logger.log(
-      `Booking ${booking.id}: status ${fromStatus} -> ${status}`,
-    );
+    this.logger.log(`Booking ${booking.id}: status ${fromStatus} -> ${status}`);
     return updated;
   }
 }

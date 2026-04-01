@@ -28,7 +28,10 @@ export class RecentActivityResponseDto {
   @Expose()
   scheduled_at: string;
 
-  @ApiProperty({ enum: RecentActivityStatus, example: RecentActivityStatus.COMPLETED })
+  @ApiProperty({
+    enum: RecentActivityStatus,
+    example: RecentActivityStatus.COMPLETED,
+  })
   @Expose()
   status: RecentActivityStatus;
 
@@ -74,7 +77,8 @@ export class RecentActivityResponseDto {
     dto.title = booking.product?.name ?? 'Unknown Service';
     dto.scheduled_at = booking.startTime?.toISOString() ?? '';
     dto.status = RecentActivityResponseDto.mapStatus(booking.status);
-    dto.service_type_code = RecentActivityResponseDto.deriveServiceTypeCode(booking);
+    dto.service_type_code =
+      RecentActivityResponseDto.deriveServiceTypeCode(booking);
     return dto;
   }
 

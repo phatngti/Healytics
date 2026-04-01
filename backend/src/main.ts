@@ -36,7 +36,12 @@ async function bootstrap() {
       .setVersion('0.0.1')
       .addBearerAuth()
       .addApiKey(
-        { type: 'apiKey', name: 'X-AI-API-Key', in: 'header', description: 'AI Service API Token' },
+        {
+          type: 'apiKey',
+          name: 'X-AI-API-Key',
+          in: 'header',
+          description: 'AI Service API Token',
+        },
         'X-AI-API-Key',
       )
       .build();
@@ -58,7 +63,9 @@ async function bootstrap() {
   }
 
   // ── RabbitMQ Microservice Consumer ───────────────────────
-  const rmqUrl = process.env.RABBITMQ_URL || 'amqps://backend:backend%40rmq123@localhost:5671/healytics';
+  const rmqUrl =
+    process.env.RABBITMQ_URL ||
+    'amqps://backend:backend%40rmq123@localhost:5671/healytics';
   const rmqQueue = process.env.RABBITMQ_QUEUE_CHECKOUT || 'checkout_queue';
 
   // Build TLS socket options if cert env vars are provided

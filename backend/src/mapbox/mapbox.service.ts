@@ -2,7 +2,10 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { GeocodeResultDto, GeocodeResponseDto } from './dto/geocode-response.dto';
+import {
+  GeocodeResultDto,
+  GeocodeResponseDto,
+} from './dto/geocode-response.dto';
 import {
   DistanceMatrixResponseDto,
   DistanceMatrixRowDto,
@@ -10,7 +13,8 @@ import {
 } from './dto/distance-matrix-response.dto';
 
 const GEOCODING_BASE = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
-const MATRIX_BASE = 'https://api.mapbox.com/directions-matrix/v1/mapbox/driving';
+const MATRIX_BASE =
+  'https://api.mapbox.com/directions-matrix/v1/mapbox/driving';
 
 @Injectable()
 export class MapboxService {
@@ -22,12 +26,17 @@ export class MapboxService {
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
   ) {
-    const cfg = this.configService.get<{ accessToken: string; publicToken: string }>('mapbox');
+    const cfg = this.configService.get<{
+      accessToken: string;
+      publicToken: string;
+    }>('mapbox');
     this.accessToken = cfg?.accessToken || '';
     this.publicToken = cfg?.publicToken || '';
 
     if (!this.accessToken) {
-      this.logger.warn('MAPBOX_ACCESS_TOKEN is not set — server-side geocoding/matrix will fail');
+      this.logger.warn(
+        'MAPBOX_ACCESS_TOKEN is not set — server-side geocoding/matrix will fail',
+      );
     }
   }
 
@@ -80,7 +89,9 @@ export class MapboxService {
 
     if (data.message) {
       this.logger.error(`Reverse geocoding failed: ${data.message}`);
-      throw new BadRequestException(`Reverse geocoding failed: ${data.message}`);
+      throw new BadRequestException(
+        `Reverse geocoding failed: ${data.message}`,
+      );
     }
 
     const results: GeocodeResultDto[] = (data.features || []).map((f: any) => ({
@@ -119,7 +130,9 @@ export class MapboxService {
 
     // Build source/destination indices
     const sourceIndices = originCoords.map((_, i) => i).join(';');
-    const destIndices = destCoords.map((_, i) => i + originCoords.length).join(';');
+    const destIndices = destCoords
+      .map((_, i) => i + originCoords.length)
+      .join(';');
 
     const url = `${MATRIX_BASE}/${coordString}`;
 
@@ -135,13 +148,17 @@ export class MapboxService {
     );
 
     if (data.code !== 'Ok') {
-      this.logger.error(`Distance matrix failed: ${data.code} — ${data.message || ''}`);
+      this.logger.error(
+        `Distance matrix failed: ${data.code} — ${data.message || ''}`,
+      );
       throw new BadRequestException(`Distance matrix failed: ${data.code}`);
     }
 
     // Map Mapbox response to our DTO shape
     const originAddresses = (data.sources || []).map((s: any) => s.name || '');
-    const destinationAddresses = (data.destinations || []).map((d: any) => d.name || '');
+    const destinationAddresses = (data.destinations || []).map(
+      (d: any) => d.name || '',
+    );
 
     const rows: DistanceMatrixRowDto[] = (data.durations || []).map(
       (durationRow: number[], rowIdx: number) => ({

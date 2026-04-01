@@ -58,13 +58,32 @@ class ChatRemoteDatasourceImpl
   );
 
   @override
-  Future<List<ChatConversation>> getConversations() async {
-    // TODO: wire to API when the conversations
-    // listing endpoint is added to the spec.
-    _log.info(
-      'getConversations not yet wired to API',
-    );
-    return [];
+  Future<List<ChatConversation>>
+      getConversations() async {
+    final userId = _extractUserId();
+    _log.info('GET /chatbot/conversations '
+        '(userId=$userId)');
+
+    try {
+      final response = await _apiService
+          .chatbotApi
+          .getConversationsChatbotConversationsGet(
+        userId,
+      );
+
+      if (response == null) return [];
+
+      return response.conversations
+          .map(_mapConversation)
+          .toList();
+    } catch (e, st) {
+      _log.severe(
+        'Error fetching conversations',
+        e,
+        st,
+      );
+      rethrow;
+    }
   }
 
   @override
@@ -72,9 +91,62 @@ class ChatRemoteDatasourceImpl
     String conversationId,
   ) async {
     _log.info(
-      'getMessages not yet wired to API',
+      'GET /chatbot/conversations/'
+      '$conversationId/messages',
     );
-    return [];
+
+    try {
+      final response = await _apiService.chatbotApi
+          .getMessagesChatbotConversationsConversationIdMessagesGet(
+        conversationId,
+      );
+
+      if (response == null) return [];
+
+      return response.messages
+          .map(_mapMessage)
+          .toList();
+    } catch (e, st) {
+      _log.severe(
+        'Error fetching messages for '
+        'conversation $conversationId',
+        e,
+        st,
+      );
+      rethrow;
+    }
+  }
+
+  /// Maps [ConversationResponse] DTO to
+  /// [ChatConversation] domain entity.
+  ///
+  /// Falls back to [title] for `lastMessage` since
+  /// the API does not provide a preview field.
+  ChatConversation _mapConversation(
+    ConversationResponse dto,
+  ) {
+    return ChatConversation(
+      id: dto.id,
+      title: dto.title,
+      lastMessage: dto.title,
+      timestamp: dto.updatedAt,
+      iconName: 'smart_toy',
+    );
+  }
+
+  /// Maps [MessageResponse] DTO to [ChatMessage]
+  /// domain entity.
+  ///
+  /// Uses `role == 'user'` to distinguish user
+  /// messages from bot messages.
+  ChatMessage _mapMessage(MessageResponse dto) {
+    return ChatMessage(
+      id: dto.id,
+      text: dto.content,
+      timestamp: dto.createdAt,
+      isUser: dto.role == 'user',
+      isRead: true,
+    );
   }
 
   @override

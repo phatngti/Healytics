@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PartnerChatMessage {
 
- String get id; String get conversationId; String get senderId; String? get senderName; String? get senderAvatar; String get content; PartnerMessageType get messageType; String? get clientMessageId; DateTime get createdAt; bool get isRead;
+ String get id; String get conversationId; String get senderId; String? get senderName; String? get senderAvatar; String get content; PartnerMessageType get messageType; String? get clientMessageId; DateTime get createdAt; bool get isRead; MessageStatus get status;
 /// Create a copy of PartnerChatMessage
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $PartnerChatMessageCopyWith<PartnerChatMessage> get copyWith => _$PartnerChatMes
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerChatMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.conversationId, conversationId) || other.conversationId == conversationId)&&(identical(other.senderId, senderId) || other.senderId == senderId)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.senderAvatar, senderAvatar) || other.senderAvatar == senderAvatar)&&(identical(other.content, content) || other.content == content)&&(identical(other.messageType, messageType) || other.messageType == messageType)&&(identical(other.clientMessageId, clientMessageId) || other.clientMessageId == clientMessageId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isRead, isRead) || other.isRead == isRead));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartnerChatMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.conversationId, conversationId) || other.conversationId == conversationId)&&(identical(other.senderId, senderId) || other.senderId == senderId)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.senderAvatar, senderAvatar) || other.senderAvatar == senderAvatar)&&(identical(other.content, content) || other.content == content)&&(identical(other.messageType, messageType) || other.messageType == messageType)&&(identical(other.clientMessageId, clientMessageId) || other.clientMessageId == clientMessageId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isRead, isRead) || other.isRead == isRead)&&(identical(other.status, status) || other.status == status));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,conversationId,senderId,senderName,senderAvatar,content,messageType,clientMessageId,createdAt,isRead);
+int get hashCode => Object.hash(runtimeType,id,conversationId,senderId,senderName,senderAvatar,content,messageType,clientMessageId,createdAt,isRead,status);
 
 @override
 String toString() {
-  return 'PartnerChatMessage(id: $id, conversationId: $conversationId, senderId: $senderId, senderName: $senderName, senderAvatar: $senderAvatar, content: $content, messageType: $messageType, clientMessageId: $clientMessageId, createdAt: $createdAt, isRead: $isRead)';
+  return 'PartnerChatMessage(id: $id, conversationId: $conversationId, senderId: $senderId, senderName: $senderName, senderAvatar: $senderAvatar, content: $content, messageType: $messageType, clientMessageId: $clientMessageId, createdAt: $createdAt, isRead: $isRead, status: $status)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $PartnerChatMessageCopyWith<$Res>  {
   factory $PartnerChatMessageCopyWith(PartnerChatMessage value, $Res Function(PartnerChatMessage) _then) = _$PartnerChatMessageCopyWithImpl;
 @useResult
 $Res call({
- String id, String conversationId, String senderId, String? senderName, String? senderAvatar, String content, PartnerMessageType messageType, String? clientMessageId, DateTime createdAt, bool isRead
+ String id, String conversationId, String senderId, String? senderName, String? senderAvatar, String content, PartnerMessageType messageType, String? clientMessageId, DateTime createdAt, bool isRead, MessageStatus status
 });
 
 
@@ -62,7 +62,7 @@ class _$PartnerChatMessageCopyWithImpl<$Res>
 
 /// Create a copy of PartnerChatMessage
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? conversationId = null,Object? senderId = null,Object? senderName = freezed,Object? senderAvatar = freezed,Object? content = null,Object? messageType = null,Object? clientMessageId = freezed,Object? createdAt = null,Object? isRead = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? conversationId = null,Object? senderId = null,Object? senderName = freezed,Object? senderAvatar = freezed,Object? content = null,Object? messageType = null,Object? clientMessageId = freezed,Object? createdAt = null,Object? isRead = null,Object? status = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,conversationId: null == conversationId ? _self.conversationId : conversationId // ignore: cast_nullable_to_non_nullable
@@ -74,7 +74,8 @@ as String,messageType: null == messageType ? _self.messageType : messageType // 
 as PartnerMessageType,clientMessageId: freezed == clientMessageId ? _self.clientMessageId : clientMessageId // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,isRead: null == isRead ? _self.isRead : isRead // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as MessageStatus,
   ));
 }
 
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String conversationId,  String senderId,  String? senderName,  String? senderAvatar,  String content,  PartnerMessageType messageType,  String? clientMessageId,  DateTime createdAt,  bool isRead)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String conversationId,  String senderId,  String? senderName,  String? senderAvatar,  String content,  PartnerMessageType messageType,  String? clientMessageId,  DateTime createdAt,  bool isRead,  MessageStatus status)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PartnerChatMessage() when $default != null:
-return $default(_that.id,_that.conversationId,_that.senderId,_that.senderName,_that.senderAvatar,_that.content,_that.messageType,_that.clientMessageId,_that.createdAt,_that.isRead);case _:
+return $default(_that.id,_that.conversationId,_that.senderId,_that.senderName,_that.senderAvatar,_that.content,_that.messageType,_that.clientMessageId,_that.createdAt,_that.isRead,_that.status);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.id,_that.conversationId,_that.senderId,_that.senderName,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String conversationId,  String senderId,  String? senderName,  String? senderAvatar,  String content,  PartnerMessageType messageType,  String? clientMessageId,  DateTime createdAt,  bool isRead)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String conversationId,  String senderId,  String? senderName,  String? senderAvatar,  String content,  PartnerMessageType messageType,  String? clientMessageId,  DateTime createdAt,  bool isRead,  MessageStatus status)  $default,) {final _that = this;
 switch (_that) {
 case _PartnerChatMessage():
-return $default(_that.id,_that.conversationId,_that.senderId,_that.senderName,_that.senderAvatar,_that.content,_that.messageType,_that.clientMessageId,_that.createdAt,_that.isRead);}
+return $default(_that.id,_that.conversationId,_that.senderId,_that.senderName,_that.senderAvatar,_that.content,_that.messageType,_that.clientMessageId,_that.createdAt,_that.isRead,_that.status);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -194,10 +195,10 @@ return $default(_that.id,_that.conversationId,_that.senderId,_that.senderName,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String conversationId,  String senderId,  String? senderName,  String? senderAvatar,  String content,  PartnerMessageType messageType,  String? clientMessageId,  DateTime createdAt,  bool isRead)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String conversationId,  String senderId,  String? senderName,  String? senderAvatar,  String content,  PartnerMessageType messageType,  String? clientMessageId,  DateTime createdAt,  bool isRead,  MessageStatus status)?  $default,) {final _that = this;
 switch (_that) {
 case _PartnerChatMessage() when $default != null:
-return $default(_that.id,_that.conversationId,_that.senderId,_that.senderName,_that.senderAvatar,_that.content,_that.messageType,_that.clientMessageId,_that.createdAt,_that.isRead);case _:
+return $default(_that.id,_that.conversationId,_that.senderId,_that.senderName,_that.senderAvatar,_that.content,_that.messageType,_that.clientMessageId,_that.createdAt,_that.isRead,_that.status);case _:
   return null;
 
 }
@@ -209,7 +210,7 @@ return $default(_that.id,_that.conversationId,_that.senderId,_that.senderName,_t
 
 
 class _PartnerChatMessage implements PartnerChatMessage {
-  const _PartnerChatMessage({required this.id, required this.conversationId, required this.senderId, this.senderName, this.senderAvatar, required this.content, this.messageType = PartnerMessageType.text, this.clientMessageId, required this.createdAt, this.isRead = false});
+  const _PartnerChatMessage({required this.id, required this.conversationId, required this.senderId, this.senderName, this.senderAvatar, required this.content, this.messageType = PartnerMessageType.text, this.clientMessageId, required this.createdAt, this.isRead = false, this.status = MessageStatus.sent});
   
 
 @override final  String id;
@@ -222,6 +223,7 @@ class _PartnerChatMessage implements PartnerChatMessage {
 @override final  String? clientMessageId;
 @override final  DateTime createdAt;
 @override@JsonKey() final  bool isRead;
+@override@JsonKey() final  MessageStatus status;
 
 /// Create a copy of PartnerChatMessage
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +235,16 @@ _$PartnerChatMessageCopyWith<_PartnerChatMessage> get copyWith => __$PartnerChat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerChatMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.conversationId, conversationId) || other.conversationId == conversationId)&&(identical(other.senderId, senderId) || other.senderId == senderId)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.senderAvatar, senderAvatar) || other.senderAvatar == senderAvatar)&&(identical(other.content, content) || other.content == content)&&(identical(other.messageType, messageType) || other.messageType == messageType)&&(identical(other.clientMessageId, clientMessageId) || other.clientMessageId == clientMessageId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isRead, isRead) || other.isRead == isRead));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartnerChatMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.conversationId, conversationId) || other.conversationId == conversationId)&&(identical(other.senderId, senderId) || other.senderId == senderId)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.senderAvatar, senderAvatar) || other.senderAvatar == senderAvatar)&&(identical(other.content, content) || other.content == content)&&(identical(other.messageType, messageType) || other.messageType == messageType)&&(identical(other.clientMessageId, clientMessageId) || other.clientMessageId == clientMessageId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isRead, isRead) || other.isRead == isRead)&&(identical(other.status, status) || other.status == status));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,conversationId,senderId,senderName,senderAvatar,content,messageType,clientMessageId,createdAt,isRead);
+int get hashCode => Object.hash(runtimeType,id,conversationId,senderId,senderName,senderAvatar,content,messageType,clientMessageId,createdAt,isRead,status);
 
 @override
 String toString() {
-  return 'PartnerChatMessage(id: $id, conversationId: $conversationId, senderId: $senderId, senderName: $senderName, senderAvatar: $senderAvatar, content: $content, messageType: $messageType, clientMessageId: $clientMessageId, createdAt: $createdAt, isRead: $isRead)';
+  return 'PartnerChatMessage(id: $id, conversationId: $conversationId, senderId: $senderId, senderName: $senderName, senderAvatar: $senderAvatar, content: $content, messageType: $messageType, clientMessageId: $clientMessageId, createdAt: $createdAt, isRead: $isRead, status: $status)';
 }
 
 
@@ -253,7 +255,7 @@ abstract mixin class _$PartnerChatMessageCopyWith<$Res> implements $PartnerChatM
   factory _$PartnerChatMessageCopyWith(_PartnerChatMessage value, $Res Function(_PartnerChatMessage) _then) = __$PartnerChatMessageCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String conversationId, String senderId, String? senderName, String? senderAvatar, String content, PartnerMessageType messageType, String? clientMessageId, DateTime createdAt, bool isRead
+ String id, String conversationId, String senderId, String? senderName, String? senderAvatar, String content, PartnerMessageType messageType, String? clientMessageId, DateTime createdAt, bool isRead, MessageStatus status
 });
 
 
@@ -270,7 +272,7 @@ class __$PartnerChatMessageCopyWithImpl<$Res>
 
 /// Create a copy of PartnerChatMessage
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? conversationId = null,Object? senderId = null,Object? senderName = freezed,Object? senderAvatar = freezed,Object? content = null,Object? messageType = null,Object? clientMessageId = freezed,Object? createdAt = null,Object? isRead = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? conversationId = null,Object? senderId = null,Object? senderName = freezed,Object? senderAvatar = freezed,Object? content = null,Object? messageType = null,Object? clientMessageId = freezed,Object? createdAt = null,Object? isRead = null,Object? status = null,}) {
   return _then(_PartnerChatMessage(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,conversationId: null == conversationId ? _self.conversationId : conversationId // ignore: cast_nullable_to_non_nullable
@@ -282,7 +284,8 @@ as String,messageType: null == messageType ? _self.messageType : messageType // 
 as PartnerMessageType,clientMessageId: freezed == clientMessageId ? _self.clientMessageId : clientMessageId // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,isRead: null == isRead ? _self.isRead : isRead // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as MessageStatus,
   ));
 }
 

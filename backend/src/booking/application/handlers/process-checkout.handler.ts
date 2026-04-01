@@ -1,7 +1,4 @@
-import {
-  Controller,
-  Logger,
-} from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { DataSource } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -176,7 +173,9 @@ export class ProcessCheckoutHandler {
       errorMessage,
     });
 
-    this.logger.warn(`Checkout failed: ticket=${data.ticketId}: ${errorMessage}`);
+    this.logger.warn(
+      `Checkout failed: ticket=${data.ticketId}: ${errorMessage}`,
+    );
 
     const webhookPayload: WebhookPayload = {
       ticket_id: data.ticketId,

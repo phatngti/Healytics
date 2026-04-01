@@ -44,14 +44,22 @@ export class UserChatController {
   }
 
   @Get('conversations/:id/messages')
-  @ApiOperation({ summary: 'Get message history for a conversation (cursor-paginated)' })
+  @ApiOperation({
+    summary: 'Get message history for a conversation (cursor-paginated)',
+  })
   @ApiOkResponse({ description: 'Paginated message list with hasMore flag' })
-  @ApiNotFoundResponse({ description: 'Conversation not found or not a participant' })
+  @ApiNotFoundResponse({
+    description: 'Conversation not found or not a participant',
+  })
   getMessages(
     @Param('id', ParseUUIDPipe) conversationId: string,
     @CurrentUser('id') userId: string,
     @Query() query: MessagesQueryDto,
-  ): Promise<{ messages: ChatMessageResponseDto[]; hasMore: boolean }> {
+  ): Promise<{
+    messages: ChatMessageResponseDto[];
+    hasMore: boolean;
+    nextCursor: string | null;
+  }> {
     return this.chatService.messagesFor(conversationId, userId, query);
   }
 

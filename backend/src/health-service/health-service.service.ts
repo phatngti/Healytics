@@ -26,7 +26,6 @@ import { HealthServiceStatus } from './enums/health-service-status.enum';
 import { HealthServiceType } from './enums/health-service-type.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 
-
 @Injectable()
 export class HealthServiceService {
   private readonly logger = new Logger(HealthServiceService.name);
@@ -61,7 +60,7 @@ export class HealthServiceService {
   async findAll(): Promise<Product[]> {
     return this.productRepository.find({
       where: {
-        type: HealthServiceType.SERVICE
+        type: HealthServiceType.SERVICE,
       },
       relations: [
         'category',
@@ -118,7 +117,9 @@ export class HealthServiceService {
    * Returns an enriched detail response by slug.
    * Loads all relations and queries recommended services from the same category.
    */
-  async getProductDetails(slug: string): Promise<PartnerHealthServiceDetailResponseDto> {
+  async getProductDetails(
+    slug: string,
+  ): Promise<PartnerHealthServiceDetailResponseDto> {
     const product = await this.productRepository.findOne({
       where: { slug },
       relations: [
@@ -154,7 +155,10 @@ export class HealthServiceService {
       });
     }
 
-    return PartnerHealthServiceDetailResponseDto.fromEntity(product, recommended);
+    return PartnerHealthServiceDetailResponseDto.fromEntity(
+      product,
+      recommended,
+    );
   }
 
   // ─── Rating Helpers ──────────────────────────────────────────
@@ -163,7 +167,9 @@ export class HealthServiceService {
    * Returns { rating, count } for a single product, computed by joining
    * product_treatment_reviews → bookings on productId.
    */
-  async getProductRatingData(productId: string): Promise<{ rating: number; count: number }> {
+  async getProductRatingData(
+    productId: string,
+  ): Promise<{ rating: number; count: number }> {
     const result = await this.treatmentReviewRepository
       .createQueryBuilder('tr')
       .innerJoin('tr.booking', 'b')
@@ -173,7 +179,8 @@ export class HealthServiceService {
       .getRawOne<{ avg: string | null; count: string }>();
 
     const count = parseInt(result?.count ?? '0', 10);
-    const rating = count > 0 ? Math.round((parseFloat(result?.avg ?? '0')) * 10) / 10 : 0;
+    const rating =
+      count > 0 ? Math.round(parseFloat(result?.avg ?? '0') * 10) / 10 : 0;
     return { rating, count };
   }
 
@@ -199,18 +206,19 @@ export class HealthServiceService {
     const map = new Map<string, { rating: number; count: number }>();
     for (const row of rows) {
       const count = parseInt(row.count, 10);
-      const rating = count > 0 ? Math.round((parseFloat(row.avg)) * 10) / 10 : 0;
+      const rating = count > 0 ? Math.round(parseFloat(row.avg) * 10) / 10 : 0;
       map.set(row.productId, { rating, count });
     }
     return map;
   }
 
-
   /**
    * Returns info (service info) for the user detail screen.
    * Loads the health_partner's profile to populate clinic info.
    */
-  async getProductInfo(id: string): Promise<PublicHealthServiceInfoResponseDto> {
+  async getProductInfo(
+    id: string,
+  ): Promise<PublicHealthServiceInfoResponseDto> {
     const product = await this.productRepository.findOne({
       where: { id },
       relations: [
@@ -232,7 +240,11 @@ export class HealthServiceService {
       this.getProductRatingData(id),
     ]);
 
-    return PublicHealthServiceInfoResponseDto.fromEntity(product, partner, ratingData);
+    return PublicHealthServiceInfoResponseDto.fromEntity(
+      product,
+      partner,
+      ratingData,
+    );
   }
 
   /**
@@ -240,7 +252,9 @@ export class HealthServiceService {
    * day-by-day booking schedules derived from the employee's work schedule
    * and existing bookings.
    */
-  async getProductEmployees(id: string): Promise<PublicHealthServiceEmployeeResponseDto[]> {
+  async getProductEmployees(
+    id: string,
+  ): Promise<PublicHealthServiceEmployeeResponseDto[]> {
     const product = await this.productRepository.findOne({
       where: { id },
       relations: [
@@ -264,11 +278,16 @@ export class HealthServiceService {
 
     // Determine which employee is "selected" (primary or first)
     const primaryEligibility = eligibilities.find((e) => e.isPrimary);
-    const selectedEmployeeId = primaryEligibility?.employeeId ?? eligibilities[0]?.employeeId;
+    const selectedEmployeeId =
+      primaryEligibility?.employeeId ?? eligibilities[0]?.employeeId;
 
     // Date range: today → +30 days
     const now = new Date();
-    const rangeStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const rangeStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
     const rangeEnd = new Date(rangeStart);
     rangeEnd.setDate(rangeEnd.getDate() + this.SCHEDULE_DAYS_AHEAD);
 
@@ -282,7 +301,11 @@ export class HealthServiceService {
     });
 
     // Index bookings by staffId → Set<ISO-date-time-key>
-    const bookedSlotsByEmployee = this.indexBookedSlots(bookings, rangeStart, rangeEnd);
+    const bookedSlotsByEmployee = this.indexBookedSlots(
+      bookings,
+      rangeStart,
+      rangeEnd,
+    );
 
     // Build response — filter out any eligibilities whose employee relation is missing
     return eligibilities
@@ -308,7 +331,9 @@ export class HealthServiceService {
    * Queries product_treatment_reviews via bookings.product_id.
    * Loads user → userProfile for reviewer name.
    */
-  async getProductReviews(id: string): Promise<PublicHealthServiceReviewResponseDto[]> {
+  async getProductReviews(
+    id: string,
+  ): Promise<PublicHealthServiceReviewResponseDto[]> {
     // Verify the product exists first
     const productExists = await this.productRepository.count({ where: { id } });
     if (!productExists) {
@@ -330,7 +355,9 @@ export class HealthServiceService {
   /**
    * Returns recommended services from the same category.
    */
-  async getRecommendedProducts(id: string): Promise<PublicHealthServiceRecommendedResponseDto[]> {
+  async getRecommendedProducts(
+    id: string,
+  ): Promise<PublicHealthServiceRecommendedResponseDto[]> {
     const product = await this.productRepository.findOne({
       where: { id },
       select: ['id', 'categoryId'],
@@ -356,7 +383,10 @@ export class HealthServiceService {
     });
 
     const ratingsMap = await this.buildRatingsMap(recommended.map((p) => p.id));
-    return PublicHealthServiceRecommendedResponseDto.fromEntities(recommended, ratingsMap);
+    return PublicHealthServiceRecommendedResponseDto.fromEntities(
+      recommended,
+      ratingsMap,
+    );
   }
 
   // ─── User-authenticated Eligibility Endpoint ────────────────
@@ -365,7 +395,9 @@ export class HealthServiceService {
    * Returns enriched eligibility detail — category, product, and employee info —
    * looked up by the surrogate PK on product_employee_eligibility.
    */
-  async getEligibilityDetail(eligibilityId: string): Promise<UserEligibilityDetailResponseDto> {
+  async getEligibilityDetail(
+    eligibilityId: string,
+  ): Promise<UserEligibilityDetailResponseDto> {
     const eligibility = await this.eligibilityRepository.findOne({
       where: { id: eligibilityId },
       relations: [
@@ -380,7 +412,9 @@ export class HealthServiceService {
 
     if (!eligibility) {
       this.logger.warn(`Eligibility not found: ${eligibilityId}`);
-      throw new NotFoundException(`Eligibility with ID ${eligibilityId} not found`);
+      throw new NotFoundException(
+        `Eligibility with ID ${eligibilityId} not found`,
+      );
     }
 
     const partner = await this.partnersService.getFirstHealthPartner();
@@ -417,7 +451,11 @@ export class HealthServiceService {
       this.partnersService.getFirstHealthPartner(),
       this.buildRatingsMap(products.map((p) => p.id)),
     ]);
-    return PublicHealthServiceCardResponseDto.fromEntities(products, partner, ratingsMap);
+    return PublicHealthServiceCardResponseDto.fromEntities(
+      products,
+      partner,
+      ratingsMap,
+    );
   }
 
   /**
@@ -438,7 +476,11 @@ export class HealthServiceService {
       this.partnersService.getFirstHealthPartner(),
       this.buildRatingsMap(products.map((p) => p.id)),
     ]);
-    return PublicHealthServiceCardResponseDto.fromEntities(products, partner, ratingsMap);
+    return PublicHealthServiceCardResponseDto.fromEntities(
+      products,
+      partner,
+      ratingsMap,
+    );
   }
 
   /**
@@ -462,7 +504,13 @@ export class HealthServiceService {
 
   /** Day-of-week names matching the employee schedule JSONB keys. */
   private static readonly DAY_NAMES = [
-    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
   ];
 
   /**
@@ -497,12 +545,20 @@ export class HealthServiceService {
    * and a set of already-booked slot keys.
    */
   private buildDaySchedules(
-    weeklySchedule: { day: string; start: string; end: string; isWorking: boolean }[],
+    weeklySchedule: {
+      day: string;
+      start: string;
+      end: string;
+      isWorking: boolean;
+    }[],
     bookedSlots: Set<string>,
     rangeStart: Date,
   ): PublicHealthServiceEmployeeDayScheduleDto[] {
     // Index weekly schedule by day name for O(1) lookup
-    const scheduleByDay = new Map<string, { start: string; end: string; isWorking: boolean }>();
+    const scheduleByDay = new Map<
+      string,
+      { start: string; end: string; isWorking: boolean }
+    >();
     for (const entry of weeklySchedule) {
       scheduleByDay.set(entry.day, entry);
     }
@@ -522,7 +578,12 @@ export class HealthServiceService {
         continue;
       }
 
-      const timeSlots = this.generateTimeSlots(entry.start, entry.end, dateStr, bookedSlots);
+      const timeSlots = this.generateTimeSlots(
+        entry.start,
+        entry.end,
+        dateStr,
+        bookedSlots,
+      );
       const isAvailable = timeSlots.some((s) => s.isAvailable);
 
       days.push({ date: dateStr, isAvailable, timeSlots });
@@ -549,7 +610,11 @@ export class HealthServiceService {
 
     const slots: PublicEmployeeTimeSlotDto[] = [];
 
-    for (let m = startMinutes; m < endMinutes; m += this.SLOT_DURATION_MINUTES) {
+    for (
+      let m = startMinutes;
+      m < endMinutes;
+      m += this.SLOT_DURATION_MINUTES
+    ) {
       const h = Math.floor(m / 60);
       const min = m % 60;
 

@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Namespace } from 'socket.io';
-import { Conversation } from '@/common/entities/conversation.entity';
+import { PartnerConversation } from '@/common/entities/partner-conversation.entity';
 import { SendMessageDto } from './dto/send-message.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { MessagesQueryDto } from './dto/messages-query.dto';
@@ -30,8 +30,8 @@ export class ChatService {
   private partnerServer: Namespace | null = null;
 
   constructor(
-    @InjectRepository(Conversation)
-    private readonly conversationRepo: Repository<Conversation>,
+    @InjectRepository(PartnerConversation)
+    private readonly conversationRepo: Repository<PartnerConversation>,
     private readonly sendMessageHandler: SendMessageHandler,
     private readonly createConversationHandler: CreateConversationHandler,
     private readonly getMessagesHandler: GetConversationMessagesHandler,
@@ -64,7 +64,10 @@ export class ChatService {
     return this.sendMessageHandler.execute(dto, senderId);
   }
 
-  create(dto: CreateConversationDto, initiatorAccountId: string): Promise<ConversationResponseDto> {
+  create(
+    dto: CreateConversationDto,
+    initiatorAccountId: string,
+  ): Promise<ConversationResponseDto> {
     return this.createConversationHandler.execute(dto, initiatorAccountId);
   }
 
@@ -78,7 +81,11 @@ export class ChatService {
     conversationId: string,
     requesterId: string,
     query: MessagesQueryDto,
-  ): Promise<{ messages: ChatMessageResponseDto[]; hasMore: boolean }> {
+  ): Promise<{
+    messages: ChatMessageResponseDto[];
+    hasMore: boolean;
+    nextCursor: string | null;
+  }> {
     return this.getMessagesHandler.execute(conversationId, requesterId, query);
   }
 
@@ -86,7 +93,9 @@ export class ChatService {
     return this.getUserConversationsHandler.execute(userId);
   }
 
-  partnerConversations(partnerAccountId: string): Promise<ConversationResponseDto[]> {
+  partnerConversations(
+    partnerAccountId: string,
+  ): Promise<ConversationResponseDto[]> {
     return this.getPartnerConversationsHandler.execute(partnerAccountId);
   }
 

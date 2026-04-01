@@ -16,13 +16,13 @@ export class ListAppointmentsHandler {
   ): Promise<AppointmentResponseDto[]> {
     this.logger.log(`Listing appointments for user: ${userId}`);
 
-    const hasCoordinates =
-      query?.latitude != null && query?.longitude != null;
+    const hasCoordinates = query?.latitude != null && query?.longitude != null;
 
     const qb = this.dataSource
       .getRepository(Booking)
       .createQueryBuilder('booking')
       .leftJoinAndSelect('booking.product', 'product')
+      .leftJoinAndSelect('product.partner', 'productPartner')
       .leftJoinAndSelect('product.category', 'category')
       .leftJoinAndSelect('product.media', 'media')
       .leftJoinAndSelect('product.productDefinition', 'productDefinition')

@@ -6,11 +6,12 @@
 class AppointmentEntity {
   final String id;
   final String serviceName;
-  final String vendorName;
+  final String healthPartnerName;
+  final String healthPartnerId;
   final String imageUrl;
   final String status;
   final String category;
-  final String providerName;
+  final String specialistName;
   final String address;
   final DateTime date;
   final String checkInTime;
@@ -23,11 +24,11 @@ class AppointmentEntity {
 
   /// The employee ID of the assigned provider.
   /// Used for navigating to the employee detail.
-  final String? providerId;
+  final String? specialistId;
 
-  /// The account UUID of the health partner (vendor).
-  /// Used for creating chat conversations.
-  final String? vendorAccountId;
+  /// The product/service ID.
+  /// Used for navigating to service details.
+  final String? serviceId;
 
   /// Whether the user has already submitted
   /// a review for this appointment.
@@ -36,19 +37,20 @@ class AppointmentEntity {
   const AppointmentEntity({
     required this.id,
     required this.serviceName,
-    required this.vendorName,
+    required this.healthPartnerName,
+    required this.healthPartnerId,
     required this.imageUrl,
     required this.status,
     required this.category,
-    required this.providerName,
+    required this.specialistName,
     required this.address,
     required this.date,
     required this.checkInTime,
     required this.checkOutTime,
     required this.duration,
     this.distanceKm,
-    this.providerId,
-    this.vendorAccountId,
+    this.specialistId,
+    this.serviceId,
     this.isReviewed = false,
   });
 
@@ -58,40 +60,42 @@ class AppointmentEntity {
       other is AppointmentEntity &&
           id == other.id &&
           serviceName == other.serviceName &&
-          vendorName == other.vendorName &&
+          healthPartnerName == other.healthPartnerName &&
+          healthPartnerId == other.healthPartnerId &&
           imageUrl == other.imageUrl &&
           status == other.status &&
           category == other.category &&
-          providerName == other.providerName &&
+          specialistName == other.specialistName &&
           address == other.address &&
           date == other.date &&
           checkInTime == other.checkInTime &&
           checkOutTime == other.checkOutTime &&
           duration == other.duration &&
           distanceKm == other.distanceKm &&
-          providerId == other.providerId &&
-          vendorAccountId == other.vendorAccountId &&
+          specialistId == other.specialistId &&
+          serviceId == other.serviceId &&
           isReviewed == other.isReviewed;
 
   @override
   int get hashCode => Object.hash(
-        id,
-        serviceName,
-        vendorName,
-        imageUrl,
-        status,
-        category,
-        providerName,
-        address,
-        date,
-        checkInTime,
-        checkOutTime,
-        duration,
-        distanceKm,
-        providerId,
-        vendorAccountId,
-        isReviewed,
-      );
+    id,
+    serviceName,
+    healthPartnerName,
+    healthPartnerId,
+    imageUrl,
+    status,
+    category,
+    specialistName,
+    address,
+    date,
+    checkInTime,
+    checkOutTime,
+    duration,
+    distanceKm,
+    specialistId,
+    serviceId,
+    isReviewed,
+  );
 }
 
 /// Category filter for appointments.
@@ -148,12 +152,6 @@ class RecommendedServiceEntity {
           duration == other.duration;
 
   @override
-  int get hashCode => Object.hash(
-        id,
-        name,
-        description,
-        imageUrl,
-        price,
-        duration,
-      );
+  int get hashCode =>
+      Object.hash(id, name, description, imageUrl, price, duration);
 }

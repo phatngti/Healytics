@@ -28,7 +28,9 @@ describe('PartnerHealthServiceController', () => {
       ],
     }).compile();
 
-    controller = module.get<PartnerHealthServiceController>(PartnerHealthServiceController);
+    controller = module.get<PartnerHealthServiceController>(
+      PartnerHealthServiceController,
+    );
     healthServiceService = module.get(HealthServiceService);
   });
 
@@ -61,7 +63,9 @@ describe('PartnerHealthServiceController', () => {
     it('should call service.update with ID and DTO and return the updated product', async () => {
       // Arrange
       const id = 'uuid-1';
-      const updateDto: UpdatePartnerHealthServiceDto = { name: 'Updated Massage' };
+      const updateDto: UpdatePartnerHealthServiceDto = {
+        name: 'Updated Massage',
+      };
       const expectedProduct = { id, name: 'Updated Massage' };
       healthServiceService.update!.mockResolvedValue(expectedProduct);
 

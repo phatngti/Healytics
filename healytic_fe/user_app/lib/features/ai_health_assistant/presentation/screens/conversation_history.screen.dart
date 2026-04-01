@@ -6,12 +6,14 @@ import 'package:user_app/core/widgets/main_screen_layout.widget.dart';
 import 'package:user_app/router/routes.dart';
 
 import '../providers/conversation_history.provider.dart';
+import '../widgets/history/chat_type_selector.widget.dart';
 import '../widgets/history/date_section.widget.dart';
 import '../widgets/history/history_empty_state.widget.dart';
 import '../widgets/history/new_chat_fab.widget.dart';
+import '../widgets/history/partner_date_section.widget.dart';
 
 /// Conversation history page listing past chatbot
-/// sessions grouped by date.
+/// and partner chat sessions grouped by date.
 ///
 /// Uses [MainScreenLayout] for consistent
 /// header/background across navigation tabs.
@@ -19,23 +21,32 @@ import '../widgets/history/new_chat_fab.widget.dart';
 /// Composes:
 /// - Standardised [AppBar] with search toggle
 ///   action.
-/// - Body: date-grouped [DateSection] list.
+/// - [ChatTypeSelector] segmented tab bar.
+/// - Body: date-grouped list of conversations,
+///   switching content based on the selected
+///   [ChatType].
 /// - [NewChatFab] to start a new conversation.
 ///
 /// All dimensions use [AppDimens]; all colours from
 /// the active [ColorScheme].
-class ConversationHistoryScreen extends ConsumerStatefulWidget {
+class ConversationHistoryScreen
+    extends ConsumerStatefulWidget {
   const ConversationHistoryScreen({super.key});
 
   @override
-  ConsumerState<ConversationHistoryScreen> createState() =>
-      _ConversationHistoryScreenState();
+  ConsumerState<ConversationHistoryScreen>
+      createState() =>
+          _ConversationHistoryScreenState();
 }
 
 class _ConversationHistoryScreenState
-    extends ConsumerState<ConversationHistoryScreen> {
-  final _searchController = TextEditingController();
+    extends
+        ConsumerState<ConversationHistoryScreen> {
+  final _searchController =
+      TextEditingController();
   bool _isSearching = false;
+  ChatType _selectedChatType =
+      ChatType.aiSession;
 
   @override
   void dispose() {
@@ -48,18 +59,25 @@ class _ConversationHistoryScreenState
       _isSearching = !_isSearching;
       if (!_isSearching) {
         _searchController.clear();
-        ref.read(conversationHistoryProvider.notifier).updateSearchQuery('');
+        ref
+            .read(
+              conversationHistoryProvider
+                  .notifier,
+            )
+            .updateSearchQuery('');
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final historyState = ref.watch(conversationHistoryProvider);
-    final filtered = historyState.filtered;
-    final grouped = groupConversationsByDate(filtered);
+    final colorScheme =
+        Theme.of(context).colorScheme;
+    final textTheme =
+        Theme.of(context).textTheme;
+    final historyState = ref.watch(
+      conversationHistoryProvider,
+    );
 
     return MainScreenLayout(
       appBar: AppBar(
@@ -70,55 +88,69 @@ class _ConversationHistoryScreenState
         backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         title: _isSearching
-            ? TextField(
+            ? _SearchField(
                 controller: _searchController,
-                autofocus: true,
+                textTheme: textTheme,
+                colorScheme: colorScheme,
                 onChanged: (value) {
                   ref
-                      .read(conversationHistoryProvider.notifier)
+                      .read(
+                        conversationHistoryProvider
+                            .notifier,
+                      )
                       .updateSearchQuery(value);
                 },
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Search conversations...',
-                  hintStyle: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.4),
-                  ),
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: AppDimens.spaceSm,
-                  ),
-                ),
               )
             : Text(
                 'Chat History',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: AppDimens.fontWeightSemiBold,
+                style: textTheme.titleMedium
+                    ?.copyWith(
+                  fontWeight: AppDimens
+                      .fontWeightSemiBold,
                   color: colorScheme.onSurface,
                 ),
               ),
         actions: [
           IconButton(
             icon: Icon(
-              _isSearching ? Icons.close : Icons.search,
+              _isSearching
+                  ? Icons.close
+                  : Icons.search,
               color: colorScheme.primary,
             ),
-            tooltip: _isSearching ? 'Close search' : 'Search',
+            tooltip: _isSearching
+                ? 'Close search'
+                : 'Search',
             onPressed: _toggleSearch,
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(AppDimens.borderWidth),
-          child: Container(
-            height: AppDimens.borderWidth,
-            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-          ),
-        ),
       ),
-      body: _buildBody(context, historyState, grouped, colorScheme),
+      body: Column(
+        children: [
+          ChatTypeSelector(
+            selected: _selectedChatType,
+            onChanged: (type) {
+              setState(() {
+                _selectedChatType = type;
+              });
+            },
+          ),
+          Expanded(
+            child: _selectedChatType ==
+                    ChatType.aiSession
+                ? _buildAiBody(
+                    context,
+                    historyState,
+                    colorScheme,
+                  )
+                : _buildPartnerBody(
+                    context,
+                    historyState,
+                    colorScheme,
+                  ),
+          ),
+        ],
+      ),
       floatingActionButton: NewChatFab(
         tapKey: keys.chatScreen.newChatButton,
         onPressed: () {
@@ -128,52 +160,194 @@ class _ConversationHistoryScreenState
     );
   }
 
-  Widget _buildBody(
+  // ── AI Session Tab ────────────────────────────
+
+  Widget _buildAiBody(
     BuildContext context,
     ConversationHistoryState historyState,
-    List<DateGroup> grouped,
     ColorScheme colorScheme,
   ) {
-    if (historyState.isLoading && historyState.conversations.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (historyState.error != null && historyState.conversations.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.all(AppDimens.horizontalPadding(context)),
-          child: Text(
-            historyState.error!,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: colorScheme.error),
-            textAlign: TextAlign.center,
-          ),
-        ),
+    if (historyState.isLoading &&
+        historyState.conversations.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(),
       );
     }
+
+    if (historyState.error != null &&
+        historyState.conversations.isEmpty) {
+      return _ErrorMessage(
+        message: historyState.error!,
+        colorScheme: colorScheme,
+      );
+    }
+
+    final filtered = historyState.filtered;
+    final grouped =
+        groupConversationsByDate(filtered);
 
     if (grouped.isEmpty) {
       return const HistoryEmptyState();
     }
 
     return ListView.builder(
-      padding: EdgeInsets.only(
-        left: AppDimens.horizontalPadding(context),
-        right: AppDimens.horizontalPadding(context),
-        top: AppDimens.spaceLg,
-        // FAB clearance
-        bottom: AppDimens.bottomScrollPadding(context) + 80,
-      ),
+      padding: _listPadding(context),
       itemCount: grouped.length,
       itemBuilder: (context, index) {
         final section = grouped[index];
         return DateSection(
           label: section.label,
-          conversations: section.conversations,
+          conversations:
+              section.conversations,
           isOlder: section.isOlder,
         );
       },
+    );
+  }
+
+  // ── Partner Chat Tab ──────────────────────────
+
+  Widget _buildPartnerBody(
+    BuildContext context,
+    ConversationHistoryState historyState,
+    ColorScheme colorScheme,
+  ) {
+    if (historyState.isLoadingPartner &&
+        historyState
+            .partnerConversations
+            .isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (historyState.partnerError != null &&
+        historyState
+            .partnerConversations
+            .isEmpty) {
+      return _ErrorMessage(
+        message: historyState.partnerError!,
+        colorScheme: colorScheme,
+      );
+    }
+
+    final filtered =
+        historyState.filteredPartner;
+    final grouped =
+        groupPartnerConversationsByDate(
+      filtered,
+    );
+
+    if (grouped.isEmpty) {
+      return const HistoryEmptyState();
+    }
+
+    return ListView.builder(
+      padding: _listPadding(context),
+      itemCount: grouped.length,
+      itemBuilder: (context, index) {
+        final section = grouped[index];
+        return PartnerDateSection(
+          label: section.label,
+          conversations:
+              section.conversations,
+          isOlder: section.isOlder,
+        );
+      },
+    );
+  }
+
+  // ── Shared helpers ────────────────────────────
+
+  EdgeInsets _listPadding(
+    BuildContext context,
+  ) {
+    return EdgeInsets.only(
+      left: AppDimens.horizontalPadding(context),
+      right:
+          AppDimens.horizontalPadding(context),
+      top: AppDimens.spaceLg,
+      // FAB clearance
+      bottom:
+          AppDimens.bottomScrollPadding(context) +
+          80,
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────
+// Private reusable sub-widgets
+// ─────────────────────────────────────────────────
+
+/// Inline search text field for the app bar.
+class _SearchField extends StatelessWidget {
+  final TextEditingController controller;
+  final TextTheme textTheme;
+  final ColorScheme colorScheme;
+  final ValueChanged<String> onChanged;
+
+  const _SearchField({
+    required this.controller,
+    required this.textTheme,
+    required this.colorScheme,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      autofocus: true,
+      onChanged: onChanged,
+      style: textTheme.bodyMedium?.copyWith(
+        color: colorScheme.onSurface,
+      ),
+      decoration: InputDecoration(
+        hintText: 'Search conversations...',
+        hintStyle:
+            textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurface
+              .withValues(alpha: 0.4),
+        ),
+        border: InputBorder.none,
+        isDense: true,
+        contentPadding: EdgeInsets.symmetric(
+          vertical: AppDimens.spaceSm,
+        ),
+      ),
+    );
+  }
+}
+
+/// Centred error message with the theme's error
+/// colour.
+class _ErrorMessage extends StatelessWidget {
+  final String message;
+  final ColorScheme colorScheme;
+
+  const _ErrorMessage({
+    required this.message,
+    required this.colorScheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(
+          AppDimens.horizontalPadding(context),
+        ),
+        child: Text(
+          message,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.copyWith(
+                color: colorScheme.error,
+              ),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }

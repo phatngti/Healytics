@@ -16,9 +16,9 @@ void main() {
   // final instance = CreateConversationDto();
 
   group('test CreateConversationDto', () {
-    // Account ID of the other party (partner or user)
-    // String participantAccountId
-    test('to test the property `participantAccountId`', () async {
+    // Account ID of the health partner
+    // String healthPartnerId
+    test('to test the property `healthPartnerId`', () async {
       // TODO
     });
 

@@ -36,12 +36,21 @@ describe('UserCategoriesController', () => {
       // Arrange
       const categoryId = 'cat-uuid-1';
       const expected = [
-        { id: 'svc-1', title: 'Deep Tissue', duration: '60 min', price: '850,000 VND' },
+        {
+          id: 'svc-1',
+          title: 'Deep Tissue',
+          duration: '60 min',
+          price: '850,000 VND',
+        },
       ];
       categoriesService.findServicesByCategory!.mockResolvedValue(expected);
 
       // Act
-      const result = await controller.findServicesByCategory(categoryId, '10.8', '106.7');
+      const result = await controller.findServicesByCategory(
+        categoryId,
+        '10.8',
+        '106.7',
+      );
 
       // Assert
       expect(result).toEqual(expected);
@@ -74,7 +83,12 @@ describe('UserCategoriesController', () => {
       // Arrange
       const categoryId = 'cat-uuid-1';
       const expected = [
-        { id: 'spec-1', name: 'Dr. Anna', specialty: 'Therapist', avatarUrl: null },
+        {
+          id: 'spec-1',
+          name: 'Dr. Anna',
+          specialty: 'Therapist',
+          avatarUrl: null,
+        },
       ];
       categoriesService.findSpecialistsByCategory!.mockResolvedValue(expected);
 
@@ -83,7 +97,9 @@ describe('UserCategoriesController', () => {
 
       // Assert
       expect(result).toEqual(expected);
-      expect(categoriesService.findSpecialistsByCategory).toHaveBeenCalledWith(categoryId);
+      expect(categoriesService.findSpecialistsByCategory).toHaveBeenCalledWith(
+        categoryId,
+      );
     });
 
     it('should return empty array when no specialists found', async () => {

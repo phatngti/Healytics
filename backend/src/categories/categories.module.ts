@@ -15,10 +15,19 @@ import { RemoveCategoryHandler } from './application/handlers/remove-category.ha
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Category, Product, ProductEmployeeEligibility, Employee]),
+    TypeOrmModule.forFeature([
+      Category,
+      Product,
+      ProductEmployeeEligibility,
+      Employee,
+    ]),
     PartnersModule,
   ],
-  controllers: [CategoriesController, UserCategoriesController, AdminCategoriesController],
+  controllers: [
+    CategoriesController,
+    UserCategoriesController,
+    AdminCategoriesController,
+  ],
   providers: [
     CategoriesService,
     CreateCategoryHandler,

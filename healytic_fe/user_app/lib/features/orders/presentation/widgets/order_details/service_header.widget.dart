@@ -27,7 +27,7 @@ class ServiceHeader extends StatelessWidget {
         ),
         AppDimens.verticalExtraSmall,
         Text(
-          appointment.vendorName,
+          appointment.healthPartnerName,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: colors.onSurfaceVariant,
             fontWeight: FontWeight.w500,
@@ -35,9 +35,7 @@ class ServiceHeader extends StatelessWidget {
         ),
         if (appointment.distanceKm! > 0) ...[
           AppDimens.verticalSmall,
-          _DistanceInfo(
-            distanceKm: appointment.distanceKm!,
-          ),
+          _DistanceInfo(distanceKm: appointment.distanceKm!),
         ],
       ],
     );

@@ -33,13 +33,17 @@ export class ServiceInfoDto {
   @ApiProperty({ example: 'Comprehensive Skin Assessment' })
   title: string;
 
-  @ApiPropertyOptional({ example: 'Full body mole mapping and skin health check' })
+  @ApiPropertyOptional({
+    example: 'Full body mole mapping and skin health check',
+  })
   subtitle: string | null;
 
   @ApiProperty({ example: '45 min' })
   duration: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/services/skin-assessment.jpg' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/services/skin-assessment.jpg',
+  })
   imageUrl: string | null;
 }
 
@@ -124,7 +128,9 @@ export class UserEligibilityDetailResponseDto {
     };
 
     // ── Service ──────────────────────────────────────────────
-    const sortedMedia = (product?.media ?? []).sort((a, b) => a.sortOrder - b.sortOrder);
+    const sortedMedia = (product?.media ?? []).sort(
+      (a, b) => a.sortOrder - b.sortOrder,
+    );
     const durationMins = product?.productDefinition?.durationMinutes ?? 0;
 
     dto.service = {
@@ -165,7 +171,8 @@ export class UserEligibilityDetailResponseDto {
 
     // ── Price Breakdown ──────────────────────────────────────
     const subTotal = Number(product?.basePrice ?? 0);
-    const salePrice = product?.salePrice != null ? Number(product.salePrice) : null;
+    const salePrice =
+      product?.salePrice != null ? Number(product.salePrice) : null;
     const totalAmount = salePrice ?? subTotal;
     const discount = subTotal - totalAmount;
 

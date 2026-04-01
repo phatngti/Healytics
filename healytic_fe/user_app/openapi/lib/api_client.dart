@@ -256,8 +256,12 @@ class ApiClient {
           return CheckoutTicketResponseDto.fromJson(value);
         case 'ClientKeyResponseDto':
           return ClientKeyResponseDto.fromJson(value);
+        case 'ConversationResponse':
+          return ConversationResponse.fromJson(value);
         case 'ConversationResponseDto':
           return ConversationResponseDto.fromJson(value);
+        case 'ConversationsPageResponse':
+          return ConversationsPageResponse.fromJson(value);
         case 'CreateCategoryDto':
           return CreateCategoryDto.fromJson(value);
         case 'CreateConversationDto':
@@ -342,12 +346,18 @@ class ApiClient {
           return LogoutResponseDto.fromJson(value);
         case 'MedicalCredentialResponseDto':
           return MedicalCredentialResponseDto.fromJson(value);
+        case 'MessageResponse':
+          return MessageResponse.fromJson(value);
+        case 'MessagesPageResponse':
+          return MessagesPageResponse.fromJson(value);
         case 'MicroLockDto':
           return MicroLockDto.fromJson(value);
         case 'MicroLockResponseDto':
           return MicroLockResponseDto.fromJson(value);
         case 'MyProfileResponseDto':
           return MyProfileResponseDto.fromJson(value);
+        case 'PaginationMeta':
+          return PaginationMeta.fromJson(value);
         case 'ParticipantInfoDto':
           return ParticipantInfoDto.fromJson(value);
         case 'PartnerCategorySummaryDto':
@@ -524,28 +534,6 @@ class ApiClient {
           return WorkHistoryEntryDto.fromJson(value);
         case 'WorkScheduleEntryDto':
           return WorkScheduleEntryDto.fromJson(value);
-        case 'WsConnectionInfoDto':
-          return WsConnectionInfoDto.fromJson(value);
-        case 'WsErrorEventDto':
-          return WsErrorEventDto.fromJson(value);
-        case 'WsJoinConversationPayloadDto':
-          return WsJoinConversationPayloadDto.fromJson(value);
-        case 'WsMarkReadPayloadDto':
-          return WsMarkReadPayloadDto.fromJson(value);
-        case 'WsMessageSentAckDto':
-          return WsMessageSentAckDto.fromJson(value);
-        case 'WsMessagesReadEventDto':
-          return WsMessagesReadEventDto.fromJson(value);
-        case 'WsNewMessageEventDto':
-          return WsNewMessageEventDto.fromJson(value);
-        case 'WsSendMessagePayloadDto':
-          return WsSendMessagePayloadDto.fromJson(value);
-        case 'WsStopTypingEventDto':
-          return WsStopTypingEventDto.fromJson(value);
-        case 'WsTypingEventDto':
-          return WsTypingEventDto.fromJson(value);
-        case 'WsTypingPayloadDto':
-          return WsTypingPayloadDto.fromJson(value);
         default:
           dynamic match;
           if (value is List && (match = _regList.firstMatch(targetType)?.group(1)) != null) {

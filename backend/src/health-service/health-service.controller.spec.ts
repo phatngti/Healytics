@@ -50,7 +50,9 @@ describe('HealthServiceController', () => {
 
       // Assert
       expect(result).toEqual(expected);
-      expect(healthServiceService.getPremiumTreatments!).toHaveBeenCalledTimes(1);
+      expect(healthServiceService.getPremiumTreatments!).toHaveBeenCalledTimes(
+        1,
+      );
     });
   });
 

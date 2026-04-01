@@ -39,8 +39,18 @@ const SEED_EMPLOYEES = [
       { day: 'Sunday', start: '00:00', end: '00:00', isWorking: false },
     ],
     workHistory: [
-      { facility: 'Healytics Medical Center', position: 'General Practitioner', period: '2020–Present', isCurrent: true },
-      { facility: 'Cho Ray Hospital', position: 'Resident – Internal Medicine', period: '2014–2020', isCurrent: false },
+      {
+        facility: 'Healytics Medical Center',
+        position: 'General Practitioner',
+        period: '2020–Present',
+        isCurrent: true,
+      },
+      {
+        facility: 'Cho Ray Hospital',
+        position: 'Resident – Internal Medicine',
+        period: '2014–2020',
+        isCurrent: false,
+      },
     ],
   },
   {
@@ -69,8 +79,18 @@ const SEED_EMPLOYEES = [
       { day: 'Sunday', start: '00:00', end: '00:00', isWorking: false },
     ],
     workHistory: [
-      { facility: 'Healytics Spa & Wellness', position: 'Senior Physical Therapist', period: '2021–Present', isCurrent: true },
-      { facility: 'Glow Saigon Spa Retreat', position: 'Physical Therapist', period: '2018–2021', isCurrent: false },
+      {
+        facility: 'Healytics Spa & Wellness',
+        position: 'Senior Physical Therapist',
+        period: '2021–Present',
+        isCurrent: true,
+      },
+      {
+        facility: 'Glow Saigon Spa Retreat',
+        position: 'Physical Therapist',
+        period: '2018–2021',
+        isCurrent: false,
+      },
     ],
   },
   {
@@ -128,13 +148,20 @@ const SEED_EMPLOYEES = [
 ];
 
 /** Doctor profile seed data keyed by employee code */
-const SEED_DOCTOR_PROFILES: Record<string, Partial<Omit<DoctorProfile, 'employeeId' | 'employee'>>> = {
+const SEED_DOCTOR_PROFILES: Record<
+  string,
+  Partial<Omit<DoctorProfile, 'employeeId' | 'employee'>>
+> = {
   'EMP-001': {
     title: 'M.D.',
     medicalCredentials: [{ title: 'M.D.', license: 'ML-2024-001' }],
     experienceYears: 12,
     consultationFee: 350000,
-    specializations: ['Internal Medicine', 'Preventive Care', 'Chronic Disease Management'],
+    specializations: [
+      'Internal Medicine',
+      'Preventive Care',
+      'Chronic Disease Management',
+    ],
     education: [
       'Doctor of Medicine - University of Medicine HCMC (2014)',
       'Residency – Internal Medicine - Cho Ray Hospital (2017)',
@@ -147,15 +174,27 @@ const SEED_DOCTOR_PROFILES: Record<string, Partial<Omit<DoctorProfile, 'employee
 };
 
 /** Therapist profile seed data keyed by employee code */
-const SEED_THERAPIST_PROFILES: Record<string, Partial<Omit<TherapistProfile, 'employeeId' | 'employee'>>> = {
+const SEED_THERAPIST_PROFILES: Record<
+  string,
+  Partial<Omit<TherapistProfile, 'employeeId' | 'employee'>>
+> = {
   'EMP-002': {
     level: TherapistLevel.SENIOR,
     type: 'Physical Therapy',
     strengthLevel: StrengthLevel.MEDIUM,
     commissionRate: 15.5,
     healthCheckDate: new Date('2025-12-15'),
-    skills: ['Deep Tissue Massage', 'Sports Rehabilitation', 'Trigger Point Therapy', 'Myofascial Release'],
-    deviceProficiency: ['Ultrasound Therapy', 'TENS Unit', 'Laser Therapy Device'],
+    skills: [
+      'Deep Tissue Massage',
+      'Sports Rehabilitation',
+      'Trigger Point Therapy',
+      'Myofascial Release',
+    ],
+    deviceProficiency: [
+      'Ultrasound Therapy',
+      'TENS Unit',
+      'Laser Therapy Device',
+    ],
   },
 };
 
@@ -183,7 +222,9 @@ export class EmployeeSeeder implements ISeeder {
     });
 
     if (!partner) {
-      this.logger.warn('  ⚠ No partner found with taxCode "0123456789" — employees will have no partner. Run PartnerSeeder first.');
+      this.logger.warn(
+        '  ⚠ No partner found with taxCode "0123456789" — employees will have no partner. Run PartnerSeeder first.',
+      );
     }
 
     for (const empData of SEED_EMPLOYEES) {
@@ -194,15 +235,22 @@ export class EmployeeSeeder implements ISeeder {
       if (exists) {
         // Update fields that may have been added after initial seeding
         const fieldsToUpdate: Partial<Employee> = {};
-        if (empData.avatarUrl && !exists.avatarUrl) fieldsToUpdate.avatarUrl = empData.avatarUrl;
-        if (empData.description && !exists.description) fieldsToUpdate.description = empData.description;
-        if (empData.schedule && !exists.schedule) fieldsToUpdate.schedule = empData.schedule;
+        if (empData.avatarUrl && !exists.avatarUrl)
+          fieldsToUpdate.avatarUrl = empData.avatarUrl;
+        if (empData.description && !exists.description)
+          fieldsToUpdate.description = empData.description;
+        if (empData.schedule && !exists.schedule)
+          fieldsToUpdate.schedule = empData.schedule;
 
         if (Object.keys(fieldsToUpdate).length > 0) {
           await this.employeeRepo.update(exists.id, fieldsToUpdate);
-          this.logger.log(`  🔄 Updated employee "${empData.employeeCode}" with: ${Object.keys(fieldsToUpdate).join(', ')}`);
+          this.logger.log(
+            `  🔄 Updated employee "${empData.employeeCode}" with: ${Object.keys(fieldsToUpdate).join(', ')}`,
+          );
         } else {
-          this.logger.log(`  ⏭ Employee "${empData.employeeCode}" already exists, skipping`);
+          this.logger.log(
+            `  ⏭ Employee "${empData.employeeCode}" already exists, skipping`,
+          );
         }
         await this.seedProfiles(exists);
         continue;
@@ -214,11 +262,12 @@ export class EmployeeSeeder implements ISeeder {
         rating: 0,
         reviewCount: 0,
         partnerId: partner?.id ?? null,
-
       });
 
       await this.employeeRepo.save(employee);
-      this.logger.log(`  ✅ Created employee "${employee.fullName}" (${empData.role}) → partner: ${partner?.brandName ?? 'none'}`);
+      this.logger.log(
+        `  ✅ Created employee "${employee.fullName}" (${empData.role}) → partner: ${partner?.brandName ?? 'none'}`,
+      );
 
       await this.seedProfiles(employee);
     }
@@ -239,9 +288,13 @@ export class EmployeeSeeder implements ISeeder {
           employeeId: employee.id,
         });
         await this.doctorProfileRepo.save(profile);
-        this.logger.log(`  ✅ Created doctor profile for "${employee.fullName}"`);
+        this.logger.log(
+          `  ✅ Created doctor profile for "${employee.fullName}"`,
+        );
       } else {
-        this.logger.log(`  ⏭ Doctor profile for "${employee.employeeCode}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ Doctor profile for "${employee.employeeCode}" already exists, skipping`,
+        );
       }
     }
 
@@ -256,9 +309,13 @@ export class EmployeeSeeder implements ISeeder {
           employeeId: employee.id,
         });
         await this.therapistProfileRepo.save(profile);
-        this.logger.log(`  ✅ Created therapist profile for "${employee.fullName}"`);
+        this.logger.log(
+          `  ✅ Created therapist profile for "${employee.fullName}"`,
+        );
       } else {
-        this.logger.log(`  ⏭ Therapist profile for "${employee.employeeCode}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ Therapist profile for "${employee.employeeCode}" already exists, skipping`,
+        );
       }
     }
   }
@@ -282,16 +339,21 @@ export class EmployeeSeeder implements ISeeder {
         this.logger.log(`🗑️ Deleted ${doctorDeleted} seed doctor profile(s)`);
       }
 
-      const { affected: therapistDeleted } = await this.therapistProfileRepo.delete({
-        employeeId: In(empIds),
-      });
+      const { affected: therapistDeleted } =
+        await this.therapistProfileRepo.delete({
+          employeeId: In(empIds),
+        });
       if (therapistDeleted) {
-        this.logger.log(`🗑️ Deleted ${therapistDeleted} seed therapist profile(s)`);
+        this.logger.log(
+          `🗑️ Deleted ${therapistDeleted} seed therapist profile(s)`,
+        );
       }
     }
 
     // Then delete employees
-    const { affected } = await this.employeeRepo.delete({ employeeCode: In(codes) });
+    const { affected } = await this.employeeRepo.delete({
+      employeeCode: In(codes),
+    });
     if (!affected) {
       this.logger.warn('⚠ No seed employees found to delete');
     } else {

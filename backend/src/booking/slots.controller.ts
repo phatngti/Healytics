@@ -1,11 +1,5 @@
-import {
-  Post,
-  Body,
-} from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiOkResponse,
-} from '@nestjs/swagger';
+import { Post, Body } from '@nestjs/common';
+import { ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { UserApi } from '@/common/decorators/api/user-api.decorator';
 import { BookingService } from './booking.service';
 import { MicroLockDto } from './dto/micro-lock.dto';

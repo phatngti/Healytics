@@ -57,7 +57,10 @@ export class BookingServiceResponseDto {
   price: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Clinic or facility name', nullable: true })
+  @ApiPropertyOptional({
+    description: 'Clinic or facility name',
+    nullable: true,
+  })
   clinicName: string | null;
 
   @Expose()
@@ -65,7 +68,10 @@ export class BookingServiceResponseDto {
   clinicAddress: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Distance from user (e.g. "1.2 km")', nullable: true })
+  @ApiPropertyOptional({
+    description: 'Distance from user (e.g. "1.2 km")',
+    nullable: true,
+  })
   distance: string | null;
 
   // --- Structured fields for frontend flexibility ---
@@ -124,7 +130,12 @@ export class BookingServiceResponseDto {
       partner?.latitude != null &&
       partner?.longitude != null
     ) {
-      const km = haversineKm(userLat, userLng, partner.latitude, partner.longitude);
+      const km = haversineKm(
+        userLat,
+        userLng,
+        partner.latitude,
+        partner.longitude,
+      );
       dto.distance = `${km.toFixed(1)} km`;
     }
 

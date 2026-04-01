@@ -12,7 +12,9 @@ jest.mock('@aws-sdk/client-s3', () => ({
 }));
 
 jest.mock('@aws-sdk/s3-request-presigner', () => ({
-  getSignedUrl: jest.fn().mockResolvedValue('https://presigned-url.example.com'),
+  getSignedUrl: jest
+    .fn()
+    .mockResolvedValue('https://presigned-url.example.com'),
 }));
 
 describe('S3Service', () => {
@@ -39,7 +41,10 @@ describe('S3Service', () => {
   describe('getPresignedUploadUrl', () => {
     it('should return presigned URL and key', async () => {
       // Act
-      const result = await service.getPresignedUploadUrl('test.jpg', 'image/jpeg');
+      const result = await service.getPresignedUploadUrl(
+        'test.jpg',
+        'image/jpeg',
+      );
 
       // Assert
       expect(result).toHaveProperty('uploadUrl');

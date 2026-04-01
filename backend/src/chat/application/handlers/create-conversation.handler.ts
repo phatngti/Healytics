@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { DataSource, QueryRunner } from 'typeorm';
 import { Account } from '@/common/entities/account.entity';
-import { Conversation } from '@/common/entities/conversation.entity';
-import { ChatMessage } from '@/common/entities/chat-message.entity';
+import { PartnerConversation } from '@/common/entities/partner-conversation.entity';
+import { PartnerChatMessage } from '@/common/entities/partner-chat-message.entity';
 import { ConversationStatus } from '@/chat/enums/conversation-status.enum';
 import { MessageType } from '@/chat/enums/message-type.enum';
 import { CreateConversationDto } from '@/chat/dto/create-conversation.dto';
@@ -37,7 +37,7 @@ export class CreateConversationHandler {
     initiatorAccountId: string,
   ): Promise<ConversationResponseDto> {
     this.logger.log(
-      `Creating conversation: initiator=${initiatorAccountId}, participant=${dto.participantAccountId}`,
+      `Creating conversation: initiator=${initiatorAccountId}, participant=${dto.healthPartnerId}`,
     );
 
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
@@ -51,22 +51,30 @@ export class CreateConversationHandler {
         relations: ['userProfile'],
       });
       const participant = await queryRunner.manager.findOne(Account, {
-        where: { id: dto.participantAccountId },
+        where: { id: dto.healthPartnerId },
         relations: ['userProfile'],
       });
 
-      if (!initiator) throw new NotFoundException('Initiator account not found');
-      if (!participant) throw new NotFoundException('Participant account not found');
+      if (!initiator)
+        throw new NotFoundException('Initiator account not found');
+      if (!participant)
+        throw new NotFoundException('Participant account not found');
 
       // 2. Determine user vs partner
       // The "user" in the conversation is always the one with Role.USER
       let userId: string;
       let partnerAccountId: string;
 
-      if (initiator.role === Role.USER && [Role.HEALTH_PARTNER, Role.EMPLOYEE].includes(participant.role)) {
+      if (
+        initiator.role === Role.USER &&
+        [Role.HEALTH_PARTNER, Role.EMPLOYEE].includes(participant.role)
+      ) {
         userId = initiator.id;
         partnerAccountId = participant.id;
-      } else if ([Role.HEALTH_PARTNER, Role.EMPLOYEE].includes(initiator.role) && participant.role === Role.USER) {
+      } else if (
+        [Role.HEALTH_PARTNER, Role.EMPLOYEE].includes(initiator.role) &&
+        participant.role === Role.USER
+      ) {
         userId = participant.id;
         partnerAccountId = initiator.id;
       } else {
@@ -76,43 +84,60 @@ export class CreateConversationHandler {
       }
 
       // 3. Check for existing active conversation
-      let conversation = await queryRunner.manager.findOne(Conversation, {
-        where: { userId, partnerAccountId },
-        relations: ['user', 'user.userProfile', 'partnerAccount', 'partnerAccount.userProfile'],
-      });
+      let conversation = await queryRunner.manager.findOne(
+        PartnerConversation,
+        {
+          where: { userId, partnerAccountId },
+          relations: [
+            'user',
+            'user.userProfile',
+            'partnerAccount',
+            'partnerAccount.userProfile',
+          ],
+        },
+      );
 
       if (conversation && conversation.status === ConversationStatus.ACTIVE) {
         this.logger.log(`Reusing existing conversation: ${conversation.id}`);
         await queryRunner.rollbackTransaction();
-        return ConversationResponseDto.fromEntity(conversation, initiatorAccountId);
+        return ConversationResponseDto.fromEntity(
+          conversation,
+          initiatorAccountId,
+        );
       }
 
       // If conversation exists but is closed/archived, reactivate it
       if (conversation) {
         conversation.status = ConversationStatus.ACTIVE;
-        await queryRunner.manager.save(Conversation, conversation);
+        await queryRunner.manager.save(PartnerConversation, conversation);
         this.logger.log(`Reactivated conversation: ${conversation.id}`);
       } else {
         // 4. Create new conversation
-        conversation = queryRunner.manager.create(Conversation, {
+        conversation = queryRunner.manager.create(PartnerConversation, {
           userId,
           partnerAccountId,
           bookingId: dto.bookingId ?? null,
           status: ConversationStatus.ACTIVE,
         });
-        conversation = await queryRunner.manager.save(Conversation, conversation);
+        conversation = await queryRunner.manager.save(
+          PartnerConversation,
+          conversation,
+        );
         this.logger.log(`Created new conversation: ${conversation.id}`);
       }
 
       // 5. Optionally send initial message
       if (dto.initialMessage) {
-        const message = queryRunner.manager.create(ChatMessage, {
+        const message = queryRunner.manager.create(PartnerChatMessage, {
           conversationId: conversation.id,
           senderId: initiatorAccountId,
           content: dto.initialMessage,
           messageType: MessageType.TEXT,
         });
-        const savedMsg = await queryRunner.manager.save(ChatMessage, message);
+        const savedMsg = await queryRunner.manager.save(
+          PartnerChatMessage,
+          message,
+        );
 
         conversation.lastMessageText = dto.initialMessage.substring(0, 200);
         conversation.lastMessageAt = savedMsg.createdAt;
@@ -124,22 +149,36 @@ export class CreateConversationHandler {
         } else {
           conversation.userUnreadCount = 1;
         }
-        await queryRunner.manager.save(Conversation, conversation);
+        await queryRunner.manager.save(PartnerConversation, conversation);
       }
 
       // 6. Commit
       await queryRunner.commitTransaction();
 
       // 7. Reload with relations
-      const fullConversation = await this.dataSource.manager.findOne(Conversation, {
-        where: { id: conversation.id },
-        relations: ['user', 'user.userProfile', 'partnerAccount', 'partnerAccount.userProfile'],
-      });
+      const fullConversation = await this.dataSource.manager.findOne(
+        PartnerConversation,
+        {
+          where: { id: conversation.id },
+          relations: [
+            'user',
+            'user.userProfile',
+            'partnerAccount',
+            'partnerAccount.userProfile',
+          ],
+        },
+      );
 
-      return ConversationResponseDto.fromEntity(fullConversation!, initiatorAccountId);
+      return ConversationResponseDto.fromEntity(
+        fullConversation!,
+        initiatorAccountId,
+      );
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      this.logger.error(`Create conversation failed: ${(error as Error).message}`, (error as Error).stack);
+      this.logger.error(
+        `Create conversation failed: ${(error as Error).message}`,
+        (error as Error).stack,
+      );
       throw error;
     } finally {
       await queryRunner.release();

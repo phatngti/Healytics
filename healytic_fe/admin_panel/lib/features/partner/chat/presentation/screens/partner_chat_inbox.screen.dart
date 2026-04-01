@@ -7,6 +7,8 @@ import 'package:admin_panel/features/partner/chat/domain/entities/partner_chat_m
 import 'package:admin_panel/features/partner/chat/domain/entities/partner_conversation.entity.dart';
 import 'package:admin_panel/features/partner/chat/presentation/providers/partner_inbox.provider.dart';
 
+enum _OutgoingMessageStatus { sending, sent }
+
 /// Desktop-first split-pane chat inbox for health
 /// partners.
 ///
@@ -598,6 +600,12 @@ class _ChatDetailPanel extends HookConsumerWidget {
                           (context, index) {
                         final msg = detailState
                             .messages[index];
+                        final outgoingStatus =
+                            _resolveOutgoingMessageStatus(
+                          msg,
+                          detailState
+                              .pendingClientMessageIds,
+                        );
                         return Padding(
                           padding:
                               const EdgeInsets.only(
@@ -607,10 +615,12 @@ class _ChatDetailPanel extends HookConsumerWidget {
                               _DesktopMessageBubble(
                             message: msg,
                             isPartner:
-                                msg.senderId ==
-                                    'current-partner' ||
-                                msg.senderId ==
-                                    'partner-001',
+                                _isCurrentPartnerMessage(
+                              msg,
+                              conversation,
+                            ),
+                            outgoingStatus:
+                                outgoingStatus,
                           ),
                         );
                       },
@@ -729,6 +739,44 @@ class _ChatDetailPanel extends HookConsumerWidget {
       ],
     );
   }
+
+  bool _isCurrentPartnerMessage(
+    PartnerChatMessage message,
+    PartnerConversation? conversation,
+  ) {
+    // Determine "my message" by comparing against the
+    // known counterpart in the active conversation.
+    final counterpartId =
+        conversation?.otherParticipant.id;
+    if (counterpartId != null &&
+        counterpartId.isNotEmpty) {
+      return message.senderId != counterpartId;
+    }
+
+    // Fallback for optimistic local messages while
+    // conversation data is still resolving.
+    return message.senderId == 'current-partner';
+  }
+
+  _OutgoingMessageStatus? _resolveOutgoingMessageStatus(
+    PartnerChatMessage message,
+    Set<String> pendingClientMessageIds,
+  ) {
+    if (!_isCurrentPartnerMessage(
+      message,
+      conversation,
+    )) {
+      return null;
+    }
+    final clientMessageId = message.clientMessageId;
+    if (clientMessageId == null) {
+      return _OutgoingMessageStatus.sent;
+    }
+    if (pendingClientMessageIds.contains(clientMessageId)) {
+      return _OutgoingMessageStatus.sending;
+    }
+    return _OutgoingMessageStatus.sent;
+  }
 }
 
 // ─── Desktop Message Bubble ─────────────────────────
@@ -736,10 +784,12 @@ class _ChatDetailPanel extends HookConsumerWidget {
 class _DesktopMessageBubble extends StatelessWidget {
   final PartnerChatMessage message;
   final bool isPartner;
+  final _OutgoingMessageStatus? outgoingStatus;
 
   const _DesktopMessageBubble({
     required this.message,
     required this.isPartner,
+    this.outgoingStatus,
   });
 
   @override
@@ -812,6 +862,34 @@ class _DesktopMessageBubble extends StatelessWidget {
                           .withValues(alpha: 0.5),
                     ),
                   ),
+                  if (isPartner &&
+                      outgoingStatus ==
+                          _OutgoingMessageStatus
+                              .sending) ...[
+                    const SizedBox(width: 6),
+                    Text(
+                      'Sending',
+                      style: textTheme.labelSmall
+                          ?.copyWith(
+                        color: colorScheme
+                            .onSurfaceVariant
+                            .withValues(alpha: 0.7),
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                  if (isPartner &&
+                      outgoingStatus ==
+                          _OutgoingMessageStatus.sent) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.check_rounded,
+                      size: 14,
+                      color: colorScheme
+                          .onSurfaceVariant
+                          .withValues(alpha: 0.7),
+                    ),
+                  ],
                   if (isPartner &&
                       message.isRead) ...[
                     const SizedBox(width: 4),
