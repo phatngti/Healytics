@@ -120,16 +120,27 @@ _DISTRICT_FALLBACK: dict[str, dict] = {
     "sóc sơn": {"code": "016", "level": "DISTRICT"},
     "quận 1": {"code": "760", "level": "DISTRICT"},
     "q1": {"code": "760", "level": "DISTRICT"},
+    "q.1": {"code": "760", "level": "DISTRICT"},
+    "quận một": {"code": "760", "level": "DISTRICT"},
     "quận 2": {"code": "769", "level": "DISTRICT"},
     "quận 3": {"code": "770", "level": "DISTRICT"},
     "q3": {"code": "770", "level": "DISTRICT"},
-    "quận 4": {"code": "771", "level": "DISTRICT"},
-    "quận 5": {"code": "772", "level": "DISTRICT"},
-    "quận 6": {"code": "773", "level": "DISTRICT"},
-    "quận 7": {"code": "774", "level": "DISTRICT"},
-    "quận 8": {"code": "775", "level": "DISTRICT"},
+    "q.3": {"code": "770", "level": "DISTRICT"},
+    "quận 4": {"code": "773", "level": "DISTRICT"},
+    "q4": {"code": "773", "level": "DISTRICT"},
+    "quận 5": {"code": "774", "level": "DISTRICT"},
+    "q5": {"code": "774", "level": "DISTRICT"},
+    "quận 6": {"code": "775", "level": "DISTRICT"},
+    "q6": {"code": "775", "level": "DISTRICT"},
+    "quận 7": {"code": "778", "level": "DISTRICT"},
+    "q7": {"code": "778", "level": "DISTRICT"},
+    "q.7": {"code": "778", "level": "DISTRICT"},
+    "quận 8": {"code": "776", "level": "DISTRICT"},
+    "q8": {"code": "776", "level": "DISTRICT"},
     "quận 9": {"code": "763", "level": "DISTRICT"},
-    "quận 10": {"code": "776", "level": "DISTRICT"},
+    "quận 10": {"code": "771", "level": "DISTRICT"},
+    "q10": {"code": "771", "level": "DISTRICT"},
+    "q.10": {"code": "771", "level": "DISTRICT"},
     "quận 11": {"code": "777", "level": "DISTRICT"},
     "quận 12": {"code": "761", "level": "DISTRICT"},
     "bình thạnh": {"code": "765", "level": "DISTRICT"},
@@ -235,20 +246,50 @@ def to_canonical(text: str) -> str:
     return s
 
 
+# Vietnamese number words to digits
+_VN_NUMBER_WORDS = {
+    "một": "1", "mot": "1",
+    "hai": "2",
+    "ba": "3",
+    "bốn": "4", "bon": "4",
+    "năm": "5", "nam": "5",
+    "sáu": "6", "sau": "6",
+    "bảy": "7", "bay": "7",
+    "tám": "8", "tam": "8",
+    "chín": "9", "chin": "9",
+    "mười": "10", "muoi": "10",
+    "mười một": "11", "muoi mot": "11",
+    "mười hai": "12", "muoi hai": "12",
+}
+
+
 def _expand_single_char_prefix(text_lower: str) -> Optional[str]:
     """
     Expand single-char admin prefix thành full prefix để tra exact.
-    "q 1" → "quận 1", "q1" → "quận 1", "p 5" → "phường 5"
-    Chỉ dành cho pattern: [q|p|h|x] + (space?) + (số hoặc tên).
+    "q 1" → "quận 1", "q1" → "quận 1", "q.1" → "quận 1", "p 5" → "phường 5"
+    Chỉ dành cho pattern: [q|p|h|x] + (space/dot?) + (số hoặc tên).
     Không fuzzy — chỉ dùng làm exact lookup key.
     """
-    m = re.match(r'^([qphx])\s*(\d+|\w.+)$', text_lower.strip())
+    # Match: q1, q 1, q.1, q. 1, etc.
+    m = re.match(r'^([qphx])[\s.]*(\d+|\w.+)$', text_lower.strip())
     if not m:
         return None
     full_prefix = _SINGLE_CHAR_PREFIX_EXPAND.get(m.group(1))
     if not full_prefix:
         return None
     return f"{full_prefix} {m.group(2).strip()}"
+
+
+def _normalize_vn_number_words(text: str) -> str:
+    """
+    Normalize Vietnamese number words to digits.
+    "quận một" → "quận 1", "quận mười hai" → "quận 12"
+    """
+    text_lower = text.lower().strip()
+    # Try multi-word numbers first (mười một, mười hai)
+    for word, digit in sorted(_VN_NUMBER_WORDS.items(), key=lambda x: -len(x[0])):
+        text_lower = text_lower.replace(word, digit)
+    return text_lower
 
 def find_location(text: str) -> Optional[dict]:
     """
@@ -262,6 +303,9 @@ def find_location(text: str) -> Optional[dict]:
     # Chuẩn hóa input
     key = to_canonical(text)
     text_lower = text.strip().lower()
+    
+    # Normalize Vietnamese number words: "quận một" → "quận 1"
+    text_normalized = _normalize_vn_number_words(text_lower)
 
     _maybe_refresh_location()
 
@@ -271,6 +315,8 @@ def find_location(text: str) -> Optional[dict]:
         return _DISTRICT_FALLBACK[key]
     if text_lower in _DISTRICT_FALLBACK:
         return _DISTRICT_FALLBACK[text_lower]
+    if text_normalized in _DISTRICT_FALLBACK:
+        return _DISTRICT_FALLBACK[text_normalized]
     for district_name, district_info in _DISTRICT_FALLBACK.items():
         if remove_accents(district_name) == key:
             return district_info
@@ -290,7 +336,7 @@ def find_location(text: str) -> Optional[dict]:
         return PROVINCE_MAP[text_lower]
 
     # 5. Single-char prefix expansion — exact match only (100%), không fuzzy
-    # "q 1" / "q1" → "quận 1", "p 5" → "phường 5"
+    # "q 1" / "q1" / "q.1" → "quận 1", "p 5" → "phường 5"
     text_no_accent = remove_accents(text_lower)
     expanded = _expand_single_char_prefix(text_no_accent)
     if expanded:
