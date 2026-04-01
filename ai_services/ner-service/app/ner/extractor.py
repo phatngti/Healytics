@@ -191,10 +191,14 @@ async def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
     entities: list[dict] = []
     t0 = time.perf_counter()
     extraction_source = "local"
+    gemini_returned_entities = False
+    gemini_has_business_type = False
 
     llm_entities = await extract_entities_with_gemini(text)
     if llm_entities:
         entities.extend(llm_entities)
+        gemini_returned_entities = True
+        gemini_has_business_type = any(e.get("type") == "BUSINESS_TYPE" for e in llm_entities)
         extraction_source = "gemini"
         t_llm = time.perf_counter()
         logger.info(f"[Perf] Gemini NER: {(t_llm-t0)*1000:.2f}ms | entities={len(llm_entities)}")
@@ -228,26 +232,41 @@ async def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
     t3_dist = time.perf_counter()
     logger.info(f"[Perf] Distance Extraction: {(t3_dist-t3)*1000:.2f}ms")
 
-    has_business_type = any(e["type"] == "BUSINESS_TYPE" for e in entities)
-    if not has_business_type:
-        try:
-            from app.ner.semantic_matcher import get_matcher
-
-            matcher = get_matcher()
-            matched_bt = await asyncio.to_thread(matcher.match_business_type, text, 0.35)
-            if matched_bt:
-                entities.append(
-                    {
-                        "type": "BUSINESS_TYPE",
-                        "value": text.strip(),
-                        "confidence": 0.75,
-                        "business_type": matched_bt,
-                            "business_evidence": text.strip(),
-                    }
-                )
-                logger.info(f"[Extractor] Semantic Fallback: '{text[:60]}' -> {matched_bt}")
-        except Exception as exc:
-            logger.warning("[Extractor] Semantic fallback unavailable: %s", exc)
+    # ============================================================================
+    # SEMANTIC FALLBACK - TEMPORARILY DISABLED
+    # ============================================================================
+    # Reason: Semantic fallback was bypassing confidence filter by adding
+    # entities with hardcoded confidence=0.75, causing 26+ false positives.
+    # 
+    # Gemini NER with confidence filter (threshold=0.8) is sufficient.
+    # If recall drops significantly, we can re-enable with stricter conditions:
+    #   - Higher semantic matching threshold (0.5+ instead of 0.35)
+    #   - Higher confidence score (0.85+ to pass filter)
+    #   - Mandatory business keyword validation
+    #
+    # Current strategy: Trust Gemini + confidence filter only.
+    #
+    # has_business_type = any(e["type"] == "BUSINESS_TYPE" for e in entities)
+    # if not has_business_type and settings.LLM_NER_ENABLED:
+    #     try:
+    #         from app.ner.semantic_matcher import get_matcher
+    #         matcher = get_matcher()
+    #         matched_bt = await asyncio.to_thread(matcher.match_business_type, text, 0.5)
+    #         if matched_bt:
+    #             business_keywords = ['spa', 'gym', 'massage', 'nha khoa', 'yoga', 'phòng khám', 
+    #                                 'fitness', 'tâm lý', 'dinh dưỡng', 'da liễu']
+    #             has_keyword = any(kw in text.lower() for kw in business_keywords)
+    #             if has_keyword:
+    #                 entities.append({
+    #                     "type": "BUSINESS_TYPE",
+    #                     "value": text.strip(),
+    #                     "confidence": 0.85,
+    #                     "business_type": matched_bt,
+    #                     "business_evidence": text.strip(),
+    #                 })
+    #                 logger.info(f"[Extractor] Semantic Fallback: '{text[:60]}' -> {matched_bt}")
+    #     except Exception as exc:
+    #         logger.warning("[Extractor] Semantic fallback unavailable: %s", exc)
 
     # Deterministic numeric extraction is strictly superior for VN queries.
     # We strip LLM's naive attempts at PRICE/RATING/DISTANCE to let local regex handle rules & overlaps properly.
@@ -262,6 +281,11 @@ async def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
 
     entities = _deduplicate(entities)
     entities = _resolve_distance_priority(entities)
+
+    # If Gemini already returned entities but none are BUSINESS_TYPE,
+    # do not allow local fallback paths to add BUSINESS_TYPE.
+    if gemini_returned_entities and not gemini_has_business_type:
+        entities = [e for e in entities if e.get("type") != "BUSINESS_TYPE"]
 
     from app.ner.cache import find_location
 

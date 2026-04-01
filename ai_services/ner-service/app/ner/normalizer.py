@@ -11,6 +11,7 @@ Strategy:
 """
 
 import logging
+import re
 
 from app.ner import cache
 from app.ner.extractor import BUSINESS_TYPE_ALIASES
@@ -18,6 +19,32 @@ from app.ner.semantic_matcher import get_matcher
 from app.schemas.ner_schema import NerEntity
 
 logger = logging.getLogger(__name__)
+
+_GENERIC_WARD_TERMS: set[str] = {
+    "trung tam",
+    "trung tâm",
+    "khu trung tam",
+    "khu trung tâm",
+    "tam",
+    "tâm",
+}
+
+
+def _has_ward_prefix(text: str) -> bool:
+    txt = (text or "").strip().lower()
+    if not txt:
+        return False
+
+    # Accept explicit Vietnamese admin prefixes and short forms like p.5 / x 2.
+    return bool(re.search(r"\b(phường|phuong|xã|xa|thị trấn|thi tran|p\.?\s*\d+|x\.?\s*\d+)\b", txt))
+
+
+def _is_generic_ward_term(text: str) -> bool:
+    txt = (text or "").strip().lower()
+    if not txt:
+        return False
+    txt_no_accent = cache.remove_accents(txt)
+    return txt in _GENERIC_WARD_TERMS or txt_no_accent in _GENERIC_WARD_TERMS
 
 
 # ============================================================================
@@ -76,7 +103,29 @@ def normalize_entities(raw_entities: list[dict]) -> list[NerEntity]:
 # PRIVATE — Location combine (xã → huyện → tỉnh)
 # ============================================================================
 
-_LEVEL_PRIORITY: dict[str, int] = {"WARD": 3, "DISTRICT": 2, "PROVINCE": 1}
+_LEVEL_PRIORITY: dict[str, int] = {"DISTRICT": 2, "WARD": 3, "PROVINCE": 1}
+
+
+def _score_location_candidate(entity: NerEntity) -> float:
+    """Lightweight ranking for competing location entities in a single query."""
+    score = float(entity.confidence or 0.0)
+    value = (entity.value or "").strip().lower()
+    no_accent = cache.remove_accents(value)
+    level = (entity.location_level or "").upper()
+
+    score += _LEVEL_PRIORITY.get(level, 0) * 0.3
+
+    # Explicit district cues should beat generic ward names in mixed-level collisions.
+    if re.search(r"\b(quận|quan|q\.?\s*\d+)\b", value):
+        score += 1.5
+    if re.search(r"\b(phường|phuong|xã|xa|p\.?\s*\d+|x\.?\s*\d+)\b", value):
+        score += 1.0
+
+    # Penalize known generic mentions when they are incorrectly treated as specific locations.
+    if no_accent in _GENERIC_WARD_TERMS:
+        score -= 1.5
+
+    return score
 
 
 def _combine_location_entities(entities: list[NerEntity]) -> list[NerEntity]:
@@ -109,10 +158,14 @@ def _combine_location_entities(entities: list[NerEntity]) -> list[NerEntity]:
     if len(by_level) == 1:
         return entities
 
-    # Nhiều level → cụm địa lý → giữ level chi tiết nhất
-    best_level = max(by_level.keys(), key=lambda lv: _LEVEL_PRIORITY.get(lv, 0))
-    kept = by_level[best_level]
-    dropped = sum(len(v) for lv, v in by_level.items() if lv != best_level)
+    # Nhiều level → chọn candidate mạnh nhất theo score (ưu tiên district explicit over noisy ward)
+    scored_pairs = [(e, _score_location_candidate(e)) for e in mapped]
+    scored_pairs.sort(key=lambda item: item[1], reverse=True)
+    best_score = scored_pairs[0][1]
+    kept = [e for e, score in scored_pairs if abs(score - best_score) < 1e-6]
+    kept_levels = {(e.location_level or "PROVINCE") for e in kept}
+    best_level = ",".join(sorted(kept_levels))
+    dropped = len(mapped) - len(kept)
     logger.info(
         f"[Normalizer] Location combine: kept {len(kept)}×{best_level}, "
         f"dropped {dropped} coarser level(s)"
@@ -129,13 +182,22 @@ def _normalize_location(value: str, confidence: float, _raw: dict) -> NerEntity:
     loc_info = cache.find_location(value)
 
     if loc_info:
-        return NerEntity(
-            type="LOCATION",
-            value=value,
-            confidence=confidence,
-            location_code=loc_info["code"],
-            location_level=loc_info["level"],
-        )
+        level = str(loc_info.get("level") or "").upper()
+        # Guard against generic false positives like "trung tâm" mapped to WARD.
+        if level == "WARD" and _is_generic_ward_term(value) and not _has_ward_prefix(value):
+            logger.info(
+                "[Normalizer] Rejected generic ward match without prefix: %r -> %s",
+                value,
+                loc_info.get("code"),
+            )
+        else:
+            return NerEntity(
+                type="LOCATION",
+                value=value,
+                confidence=confidence,
+                location_code=loc_info["code"],
+                location_level=loc_info["level"],
+            )
 
     # Không tìm thấy → graceful degradation
     logger.warning(f"[Normalizer] Unknown location: {value!r}")
