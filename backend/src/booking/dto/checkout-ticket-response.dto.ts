@@ -3,7 +3,10 @@ import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
 import { CheckoutTicketStatus } from '@/booking/enums/checkout-ticket-status.enum';
 
 export class CheckoutTicketResponseDto {
-  @ApiProperty({ description: 'Ticket ID (same as ticket_id in webhook)', example: 'TICKET_ABCD123' })
+  @ApiProperty({
+    description: 'Ticket ID (same as ticket_id in webhook)',
+    example: 'TICKET_ABCD123',
+  })
   id: string;
 
   @ApiProperty()
@@ -15,7 +18,10 @@ export class CheckoutTicketResponseDto {
   @ApiProperty({ example: '2023-10-25T14:00:00Z' })
   startTime: Date;
 
-  @ApiProperty({ enum: CheckoutTicketStatus, example: CheckoutTicketStatus.QUEUED })
+  @ApiProperty({
+    enum: CheckoutTicketStatus,
+    example: CheckoutTicketStatus.QUEUED,
+  })
   status: CheckoutTicketStatus;
 
   @ApiProperty({ example: 'ai_chat_session_888_msg_12' })

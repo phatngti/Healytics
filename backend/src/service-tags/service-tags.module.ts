@@ -24,4 +24,3 @@ import { DetachProductTagHandler } from './application/handlers/detach-product-t
   exports: [ServiceTagsService],
 })
 export class ServiceTagsModule {}
-

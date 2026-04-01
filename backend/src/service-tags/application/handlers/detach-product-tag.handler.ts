@@ -24,7 +24,11 @@ export class DetachProductTagHandler {
    * @param productId - The ID of the product
    * @param userId - The ID of the user (must own the tag)
    */
-  async execute(tagId: string, productId: string, userId: string): Promise<void> {
+  async execute(
+    tagId: string,
+    productId: string,
+    userId: string,
+  ): Promise<void> {
     this.logger.log(`Detaching tag ${tagId} from product ${productId}`);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -42,7 +46,9 @@ export class DetachProductTagHandler {
 
       // 2. Invariant Check - Ownership
       if (tag.userId !== userId) {
-        throw new ForbiddenException('You do not have permission to modify this tag');
+        throw new ForbiddenException(
+          'You do not have permission to modify this tag',
+        );
       }
 
       // 3. Find existing attachment
@@ -59,7 +65,12 @@ export class DetachProductTagHandler {
 
       // 5. Side Effect - Decrement usage counter
       if (tag.usage > 0) {
-        await queryRunner.manager.decrement(ProductFeatureTag, { id: tagId }, 'usage', 1);
+        await queryRunner.manager.decrement(
+          ProductFeatureTag,
+          { id: tagId },
+          'usage',
+          1,
+        );
       }
 
       await queryRunner.commitTransaction();

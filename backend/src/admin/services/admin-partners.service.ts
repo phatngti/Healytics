@@ -42,7 +42,14 @@ export class AdminPartnersService {
   async getPartnerDetail(id: string): Promise<AdminPartnerDetailResponseDto> {
     const partner = await this.partnerRepo.findOne({
       where: { id },
-      relations: ['account', 'province', 'district', 'ward', 'legalRepresentative', 'documents'],
+      relations: [
+        'account',
+        'province',
+        'district',
+        'ward',
+        'legalRepresentative',
+        'documents',
+      ],
     });
 
     if (!partner) {
@@ -59,7 +66,11 @@ export class AdminPartnersService {
     const fieldFeedbackMap = this.buildFieldFeedbackMap(latestReviewLog);
     const documentFeedbackMap = this.buildDocumentFeedbackMap(latestReviewLog);
 
-    return AdminPartnerDetailResponseDto.fromPartner(partner, fieldFeedbackMap, documentFeedbackMap);
+    return AdminPartnerDetailResponseDto.fromPartner(
+      partner,
+      fieldFeedbackMap,
+      documentFeedbackMap,
+    );
   }
 
   /**
@@ -150,7 +161,9 @@ export class AdminPartnersService {
   // Private Helper Methods
   // ============================================================================
 
-  private buildFieldFeedbackMap(reviewLog: PartnerReviewLog | null): FieldFeedbackMap {
+  private buildFieldFeedbackMap(
+    reviewLog: PartnerReviewLog | null,
+  ): FieldFeedbackMap {
     const feedbackMap: FieldFeedbackMap = {};
     if (!reviewLog?.fieldReviews) return feedbackMap;
 
@@ -163,7 +176,9 @@ export class AdminPartnersService {
     return feedbackMap;
   }
 
-  private buildDocumentFeedbackMap(reviewLog: PartnerReviewLog | null): FieldFeedbackMap {
+  private buildDocumentFeedbackMap(
+    reviewLog: PartnerReviewLog | null,
+  ): FieldFeedbackMap {
     const feedbackMap: FieldFeedbackMap = {};
     if (!reviewLog?.documentReviews) return feedbackMap;
 

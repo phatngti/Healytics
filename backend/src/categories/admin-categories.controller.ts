@@ -56,7 +56,9 @@ export class AdminCategoriesController {
     type: AdminCategoryResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Category not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<AdminCategoryResponseDto> {
+  findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<AdminCategoryResponseDto> {
     return this.categoriesService.findOneForAdmin(id);
   }
 
@@ -70,7 +72,9 @@ export class AdminCategoriesController {
     description: 'The category has been successfully created.',
     type: AdminCategoryResponseDto,
   })
-  create(@Body() createCategoryDto: CreateCategoryDto): Promise<AdminCategoryResponseDto> {
+  create(
+    @Body() createCategoryDto: CreateCategoryDto,
+  ): Promise<AdminCategoryResponseDto> {
     return this.categoriesService.createForAdmin(createCategoryDto);
   }
 

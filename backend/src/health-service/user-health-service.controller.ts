@@ -71,7 +71,8 @@ export class UserHealthServiceController {
       'looked up by the surrogate primary key on the product_employee_eligibility table.',
   })
   @ApiOkResponse({
-    description: 'Returns eligibility detail with category, product, and employee info.',
+    description:
+      'Returns eligibility detail with category, product, and employee info.',
     type: UserEligibilityDetailResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Eligibility not found.' })

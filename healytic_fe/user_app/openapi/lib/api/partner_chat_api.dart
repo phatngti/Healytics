@@ -127,7 +127,7 @@ class PartnerChatApi {
   ///   Fetch messages older than this message ID (cursor)
   ///
   /// * [num] limit:
-  ///   Number of messages to return
+  ///   Number of messages to return (max 50)
   Future<Response> partnerChatControllerGetMessagesWithHttpInfo(String id, { String? beforeId, num? limit, }) async {
     // ignore: prefer_const_declarations
     final path = r'/partner/chat/conversations/{id}/messages'
@@ -171,7 +171,7 @@ class PartnerChatApi {
   ///   Fetch messages older than this message ID (cursor)
   ///
   /// * [num] limit:
-  ///   Number of messages to return
+  ///   Number of messages to return (max 50)
   Future<void> partnerChatControllerGetMessages(String id, { String? beforeId, num? limit, }) async {
     final response = await partnerChatControllerGetMessagesWithHttpInfo(id,  beforeId: beforeId, limit: limit, );
     if (response.statusCode >= HttpStatus.badRequest) {

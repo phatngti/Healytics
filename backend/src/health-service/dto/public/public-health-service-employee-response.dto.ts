@@ -26,7 +26,11 @@ export class PublicHealthServiceEmployeeDayScheduleDto {
 
 export class PublicHealthServiceEmployeeResponseDto {
   @ApiProperty({ description: 'Employee (specialist) ID' }) id: string;
-  @ApiProperty({ description: 'product_employee_eligibility surrogate PK for this employee–service pair' }) eligibilityId: string;
+  @ApiProperty({
+    description:
+      'product_employee_eligibility surrogate PK for this employee–service pair',
+  })
+  eligibilityId: string;
   @ApiProperty() name: string;
   @ApiProperty() role: string;
   @ApiPropertyOptional() imageUrl: string | null;
@@ -37,7 +41,8 @@ export class PublicHealthServiceEmployeeResponseDto {
   @ApiPropertyOptional({ example: '12 years' }) experience: string | null;
   @ApiPropertyOptional({ type: [String] }) specializations: string[];
   @ApiPropertyOptional() bio: string | null;
-  @ApiProperty({ type: [PublicHealthServiceEmployeeDayScheduleDto] }) daySchedules: PublicHealthServiceEmployeeDayScheduleDto[];
+  @ApiProperty({ type: [PublicHealthServiceEmployeeDayScheduleDto] })
+  daySchedules: PublicHealthServiceEmployeeDayScheduleDto[];
 
   static fromEntity(
     employee: Employee,
@@ -59,7 +64,9 @@ export class PublicHealthServiceEmployeeResponseDto {
     dto.quote = employee.description ?? null;
     dto.degrees = doc?.education?.join(', ') ?? null;
     dto.languages = 'Vietnamese, English'; // Placeholder until entity supports it
-    dto.experience = doc?.experienceYears ? `${doc.experienceYears} years` : null;
+    dto.experience = doc?.experienceYears
+      ? `${doc.experienceYears} years`
+      : null;
     dto.specializations = doc?.specializations ?? [];
     dto.bio = employee.description ?? null;
     dto.daySchedules = options.daySchedules;

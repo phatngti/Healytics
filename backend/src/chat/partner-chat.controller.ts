@@ -23,6 +23,7 @@ import { CreateConversationDto } from './dto/create-conversation.dto';
 import { ConversationResponseDto } from './dto/conversation-response.dto';
 import { ChatMessageResponseDto } from './dto/chat-message-response.dto';
 import { MessagesQueryDto } from './dto/messages-query.dto';
+import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 /**
  * REST controller for health partner chat operations.
@@ -45,15 +46,27 @@ export class PartnerChatController {
   }
 
   @Get('conversations/:id/messages')
-  @ApiOperation({ summary: 'Get message history for a conversation (cursor-paginated)' })
+  @ApiOperation({
+    summary: 'Get message history for a conversation (cursor-paginated)',
+  })
   @ApiOkResponse({ description: 'Paginated message list with hasMore flag' })
-  @ApiNotFoundResponse({ description: 'Conversation not found or not a participant' })
+  @ApiNotFoundResponse({
+    description: 'Conversation not found or not a participant',
+  })
   getMessages(
     @Param('id', ParseUUIDPipe) conversationId: string,
     @CurrentUser('id') partnerAccountId: string,
     @Query() query: MessagesQueryDto,
-  ): Promise<{ messages: ChatMessageResponseDto[]; hasMore: boolean }> {
-    return this.chatService.messagesFor(conversationId, partnerAccountId, query);
+  ): Promise<{
+    messages: ChatMessageResponseDto[];
+    hasMore: boolean;
+    nextCursor: string | null;
+  }> {
+    return this.chatService.messagesFor(
+      conversationId,
+      partnerAccountId,
+      query,
+    );
   }
 
   @Post('conversations')

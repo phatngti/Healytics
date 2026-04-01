@@ -29,7 +29,9 @@ export class GetServiceManualHandler {
 
     if (!booking) {
       this.logger.warn(`Appointment not found: ${appointmentId}`);
-      throw new NotFoundException(`Appointment with ID ${appointmentId} not found`);
+      throw new NotFoundException(
+        `Appointment with ID ${appointmentId} not found`,
+      );
     }
 
     return ServiceManualResponseDto.fromBooking(booking);

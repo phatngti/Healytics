@@ -44,7 +44,9 @@ describe('ServiceTagsController', () => {
   describe('create', () => {
     it('should call service.create with DTO and userId', async () => {
       // Arrange
-      const dto: CreateServiceTagDto = { name: 'Test Tag' } as CreateServiceTagDto;
+      const dto: CreateServiceTagDto = {
+        name: 'Test Tag',
+      } as CreateServiceTagDto;
       const userId = 'user-uuid-1';
       const expectedTag = { id: 'tag-uuid-1', name: 'Test Tag', userId };
       serviceTagsService.create!.mockResolvedValue(expectedTag);
@@ -110,7 +112,9 @@ describe('ServiceTagsController', () => {
     it('should call service.update with ID, DTO, and userId', async () => {
       // Arrange
       const id = 'tag-uuid-1';
-      const dto: UpdateServiceTagDto = { name: 'Updated Tag' } as UpdateServiceTagDto;
+      const dto: UpdateServiceTagDto = {
+        name: 'Updated Tag',
+      } as UpdateServiceTagDto;
       const userId = 'user-uuid-1';
       const expectedTag = { id, name: 'Updated Tag' };
       serviceTagsService.update!.mockResolvedValue(expectedTag);
@@ -154,7 +158,11 @@ describe('ServiceTagsController', () => {
 
       // Assert
       expect(result).toEqual(expectedDto);
-      expect(serviceTagsService.attachToProduct).toHaveBeenCalledWith(tagId, productId, userId);
+      expect(serviceTagsService.attachToProduct).toHaveBeenCalledWith(
+        tagId,
+        productId,
+        userId,
+      );
     });
   });
 
@@ -170,7 +178,11 @@ describe('ServiceTagsController', () => {
       await controller.detachFromProduct(tagId, productId, userId);
 
       // Assert
-      expect(serviceTagsService.detachFromProduct).toHaveBeenCalledWith(tagId, productId, userId);
+      expect(serviceTagsService.detachFromProduct).toHaveBeenCalledWith(
+        tagId,
+        productId,
+        userId,
+      );
     });
   });
 
@@ -186,7 +198,9 @@ describe('ServiceTagsController', () => {
 
       // Assert
       expect(result).toEqual(expectedTags);
-      expect(serviceTagsService.getTagsForProduct).toHaveBeenCalledWith(productId);
+      expect(serviceTagsService.getTagsForProduct).toHaveBeenCalledWith(
+        productId,
+      );
     });
   });
 });

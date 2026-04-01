@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 import { randomUUID } from 'crypto';
 
@@ -46,9 +41,7 @@ export class RedisService implements OnModuleDestroy {
     `;
     const result = await this.redis.eval(script, 1, key, token);
     const released = result === 1;
-    this.logger.debug(
-      `Lock release ${released ? 'OK' : 'SKIPPED'}: ${key}`,
-    );
+    this.logger.debug(`Lock release ${released ? 'OK' : 'SKIPPED'}: ${key}`);
     return released;
   }
 

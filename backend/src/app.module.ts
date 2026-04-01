@@ -1,5 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_INTERCEPTOR, DiscoveryModule } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -13,7 +13,6 @@ import { S3Module } from './s3/s3.module';
 import { LocationsModule } from './locations/locations.module';
 import { PartnersModule } from './partners/partners.module';
 import { AdminModule } from './admin/admin.module';
-import { ChatbotModule } from './chatbot/chatbot.module';
 import { RedisModule } from './redis/redis.module';
 import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 import { BookingModule } from './booking/booking.module';
@@ -31,19 +30,23 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { PublicThrottlerGuard } from './common/guards';
+import { WsContractBootstrapService } from './common/services/ws-contract-bootstrap.service';
 
 @Module({
   imports: [
+    DiscoveryModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
       load: [databaseConfig, redisConfig, rabbitmqConfig, mapboxConfig],
     }),
     // Rate limiting: 100 requests per 60 seconds for public routes
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -74,7 +77,6 @@ import { PublicThrottlerGuard } from './common/guards';
     LocationsModule,
     PartnersModule,
     AdminModule,
-    ChatbotModule,
     BookingModule,
     MapboxModule,
     AppointmentModule,
@@ -96,6 +98,7 @@ import { PublicThrottlerGuard } from './common/guards';
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
     },
+    WsContractBootstrapService,
   ],
 })
 export class AppModule implements NestModule {

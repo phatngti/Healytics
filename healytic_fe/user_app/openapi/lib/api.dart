@@ -57,7 +57,6 @@ part 'api/user_health_services_api.dart';
 part 'api/user_payments_api.dart';
 part 'api/user_reviews_api.dart';
 part 'api/user_slots_api.dart';
-part 'api/web_socket_chat_connection_guide_api.dart';
 
 part 'model/account_me_response_dto.dart';
 part 'model/account_request_dto.dart';
@@ -95,7 +94,9 @@ part 'model/chatbot_recommender_request.dart';
 part 'model/chatbot_request.dart';
 part 'model/checkout_ticket_response_dto.dart';
 part 'model/client_key_response_dto.dart';
+part 'model/conversation_response.dart';
 part 'model/conversation_response_dto.dart';
+part 'model/conversations_page_response.dart';
 part 'model/create_category_dto.dart';
 part 'model/create_conversation_dto.dart';
 part 'model/create_doctor_dto.dart';
@@ -138,9 +139,12 @@ part 'model/location_response_dto.dart';
 part 'model/login_dto.dart';
 part 'model/logout_response_dto.dart';
 part 'model/medical_credential_response_dto.dart';
+part 'model/message_response.dart';
+part 'model/messages_page_response.dart';
 part 'model/micro_lock_dto.dart';
 part 'model/micro_lock_response_dto.dart';
 part 'model/my_profile_response_dto.dart';
+part 'model/pagination_meta.dart';
 part 'model/participant_info_dto.dart';
 part 'model/partner_category_summary_dto.dart';
 part 'model/partner_clinic_dto.dart';
@@ -229,17 +233,6 @@ part 'model/verification_document_entry_dto.dart';
 part 'model/verified_field.dart';
 part 'model/work_history_entry_dto.dart';
 part 'model/work_schedule_entry_dto.dart';
-part 'model/ws_connection_info_dto.dart';
-part 'model/ws_error_event_dto.dart';
-part 'model/ws_join_conversation_payload_dto.dart';
-part 'model/ws_mark_read_payload_dto.dart';
-part 'model/ws_message_sent_ack_dto.dart';
-part 'model/ws_messages_read_event_dto.dart';
-part 'model/ws_new_message_event_dto.dart';
-part 'model/ws_send_message_payload_dto.dart';
-part 'model/ws_stop_typing_event_dto.dart';
-part 'model/ws_typing_event_dto.dart';
-part 'model/ws_typing_payload_dto.dart';
 
 
 /// An [ApiClient] instance that uses the default values obtained from

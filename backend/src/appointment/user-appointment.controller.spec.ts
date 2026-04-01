@@ -23,7 +23,9 @@ describe('UserAppointmentController', () => {
       ],
     }).compile();
 
-    controller = module.get<UserAppointmentController>(UserAppointmentController);
+    controller = module.get<UserAppointmentController>(
+      UserAppointmentController,
+    );
   });
 
   afterEach(() => {
@@ -40,7 +42,10 @@ describe('UserAppointmentController', () => {
       const result = await controller.listAppointments(userId, query);
 
       expect(result).toEqual(expected);
-      expect(appointmentService.listAppointments).toHaveBeenCalledWith(userId, query);
+      expect(appointmentService.listAppointments).toHaveBeenCalledWith(
+        userId,
+        query,
+      );
     });
 
     it('should forward latitude and longitude from query', async () => {
@@ -48,13 +53,18 @@ describe('UserAppointmentController', () => {
       const query = new ListAppointmentsQueryDto();
       query.latitude = 10.7769;
       query.longitude = 106.7009;
-      const expected = [{ id: 'appt-1', serviceName: 'Massage', distanceKm: 2.5 }];
+      const expected = [
+        { id: 'appt-1', serviceName: 'Massage', distanceKm: 2.5 },
+      ];
       appointmentService.listAppointments.mockResolvedValue(expected);
 
       const result = await controller.listAppointments(userId, query);
 
       expect(result).toEqual(expected);
-      expect(appointmentService.listAppointments).toHaveBeenCalledWith(userId, query);
+      expect(appointmentService.listAppointments).toHaveBeenCalledWith(
+        userId,
+        query,
+      );
     });
   });
 
@@ -92,7 +102,9 @@ describe('UserAppointmentController', () => {
       const result = await controller.getAppointment(appointmentId);
 
       expect(result).toEqual(expected);
-      expect(appointmentService.getAppointment).toHaveBeenCalledWith(appointmentId);
+      expect(appointmentService.getAppointment).toHaveBeenCalledWith(
+        appointmentId,
+      );
     });
   });
 
@@ -105,7 +117,9 @@ describe('UserAppointmentController', () => {
       const result = await controller.getServiceManual(appointmentId);
 
       expect(result).toEqual(expected);
-      expect(appointmentService.getServiceManual).toHaveBeenCalledWith(appointmentId);
+      expect(appointmentService.getServiceManual).toHaveBeenCalledWith(
+        appointmentId,
+      );
     });
   });
 });

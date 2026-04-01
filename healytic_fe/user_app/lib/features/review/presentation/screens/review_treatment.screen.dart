@@ -48,43 +48,31 @@ class ReviewTreatmentScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(reviewTreatmentProvider);
-    final notifier = ref.read(
-      reviewTreatmentProvider.notifier,
-    );
+    final notifier = ref.read(reviewTreatmentProvider.notifier);
 
     // Navigate to specialist screen after successful
     // treatment review submission.
-    ref.listen(
-      reviewTreatmentProvider,
-      (prev, next) {
-        // Show error toast if submission fails.
-        if (next.errorMessage != null &&
-            prev?.errorMessage != next.errorMessage) {
-          ToastContext.showToast(
-            context,
-            ToastType.error,
-            next.errorMessage!,
-          );
-        }
+    ref.listen(reviewTreatmentProvider, (prev, next) {
+      // Show error toast if submission fails.
+      if (next.errorMessage != null &&
+          prev?.errorMessage != next.errorMessage) {
+        ToastContext.showToast(context, ToastType.error, next.errorMessage!);
+      }
 
-        // Navigate when newly submitted.
-        if (next.isSubmitted &&
-            !(prev?.isSubmitted ?? false)) {
-          final apt = next.appointment;
-          ReviewSpecialistRoute(
-            appointmentId: appointmentId,
-            specialistId: apt?.providerId ?? '',
-            specialistName:
-                apt?.providerName ?? 'Your Specialist',
-            specialistRole: 'Specialist',
-          ).push(context);
-        }
-      },
-    );
+      // Navigate when newly submitted.
+      if (next.isSubmitted && !(prev?.isSubmitted ?? false)) {
+        final apt = next.appointment;
+        ReviewSpecialistRoute(
+          appointmentId: appointmentId,
+          specialistId: apt?.specialistId ?? '',
+          specialistName: apt?.specialistName ?? 'Your Specialist',
+          specialistRole: 'Specialist',
+        ).push(context);
+      }
+    });
 
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(context),
       body: Stack(
@@ -97,46 +85,31 @@ class ReviewTreatmentScreen extends ConsumerWidget {
   }
 
   /// Glassmorphic app bar with blur.
-  PreferredSizeWidget _buildAppBar(
-    BuildContext context,
-  ) {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return PreferredSize(
-      preferredSize:
-          const Size.fromHeight(kToolbarHeight),
+      preferredSize: const Size.fromHeight(kToolbarHeight),
       child: ClipRRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 20,
-            sigmaY: 20,
-          ),
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: AppBar(
-            backgroundColor: Theme.of(context)
-                .colorScheme
-                .surface
-                .withValues(alpha: 0.7),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.surface.withValues(alpha: 0.7),
             elevation: 0,
             centerTitle: true,
             leading: IconButton(
-              onPressed: () =>
-                  Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(context).pop(),
               icon: Icon(
                 Icons.arrow_back,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             title: Text(
               'Review Treatment',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
         ),
@@ -152,21 +125,15 @@ class ReviewTreatmentScreen extends ConsumerWidget {
   ) {
     return SingleChildScrollView(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top +
-            kToolbarHeight +
-            24,
+        top: MediaQuery.of(context).padding.top + kToolbarHeight + 24,
         left: 24,
         right: 24,
         bottom: 150,
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ReviewHeroTitle(
-            title: serviceName,
-            subtitle: 'at $vendorName',
-          ),
+          ReviewHeroTitle(title: serviceName, subtitle: 'at $vendorName'),
           const SizedBox(height: 40),
           ReviewRatingCard(
             currentRating: state.rating,
@@ -179,15 +146,11 @@ class ReviewTreatmentScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 32),
           if (state.photoPaths.isEmpty)
-            ReviewPhotoCard(
-              onTap: () =>
-                  _handleAddPhotos(context, notifier),
-            )
+            ReviewPhotoCard(onTap: () => _handleAddPhotos(context, notifier))
           else
             ReviewPhotoGrid(
               imagePaths: state.photoPaths,
-              onAddMore: () =>
-                  _handleAddPhotos(context, notifier),
+              onAddMore: () => _handleAddPhotos(context, notifier),
               onRemovePhoto: notifier.removePhoto,
             ),
         ],
@@ -207,8 +170,7 @@ class ReviewTreatmentScreen extends ConsumerWidget {
       child: ReviewBottomAction(
         label: 'Next: Review Specialist',
         isLoading: state.isSubmitting,
-        onPressed: () =>
-            notifier.submitReview(appointmentId),
+        onPressed: () => notifier.submitReview(appointmentId),
       ),
     );
   }
@@ -223,9 +185,7 @@ class ReviewTreatmentScreen extends ConsumerWidget {
       final picker = ImagePicker();
       final images = await picker.pickMultiImage();
       if (images.isNotEmpty) {
-        notifier.addPhotos(
-          images.map((e) => e.path).toList(),
-        );
+        notifier.addPhotos(images.map((e) => e.path).toList());
       }
     } catch (e, s) {
       log(

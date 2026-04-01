@@ -152,7 +152,11 @@ describe('EmployeesService', () => {
         email: 'doctor@example.com',
         employeeId: 'DOC-001',
       };
-      const expectedEmployee = { id: 'uuid-1', ...inputDto, role: EmployeeRole.DOCTOR };
+      const expectedEmployee = {
+        id: 'uuid-1',
+        ...inputDto,
+        role: EmployeeRole.DOCTOR,
+      };
       mockCreateDoctorHandler.execute.mockResolvedValue(expectedEmployee);
 
       // Act
@@ -165,7 +169,12 @@ describe('EmployeesService', () => {
 
     it('should assign partnerId when provided', async () => {
       // Arrange
-      const inputDto = { email: 'doctor@example.com', firstName: 'Nguyen', lastName: 'Van A', employeeId: 'DOC-001' } as any;
+      const inputDto = {
+        email: 'doctor@example.com',
+        firstName: 'Nguyen',
+        lastName: 'Van A',
+        employeeId: 'DOC-001',
+      } as any;
       const partnerId = 'partner-uuid';
       mockCreateDoctorHandler.execute.mockResolvedValue({ id: 'uuid-1' });
 
@@ -188,7 +197,11 @@ describe('EmployeesService', () => {
         email: 'spa@example.com',
         employeeId: 'SPA-001',
       };
-      const expectedEmployee = { id: 'uuid-2', ...inputDto, role: EmployeeRole.THERAPIST };
+      const expectedEmployee = {
+        id: 'uuid-2',
+        ...inputDto,
+        role: EmployeeRole.THERAPIST,
+      };
       mockCreateTherapistHandler.execute.mockResolvedValue(expectedEmployee);
 
       // Act
@@ -196,12 +209,20 @@ describe('EmployeesService', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(inputDto, 'SPA');
+      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(
+        inputDto,
+        'SPA',
+      );
     });
 
     it('should assign partnerId when provided', async () => {
       // Arrange
-      const inputDto = { email: 'spa@example.com', firstName: 'Le', lastName: 'Thi C', employeeId: 'SPA-001' } as any;
+      const inputDto = {
+        email: 'spa@example.com',
+        firstName: 'Le',
+        lastName: 'Thi C',
+        employeeId: 'SPA-001',
+      } as any;
       const partnerId = 'partner-uuid';
       mockCreateTherapistHandler.execute.mockResolvedValue({ id: 'uuid-2' });
 
@@ -225,7 +246,11 @@ describe('EmployeesService', () => {
         email: 'massage@example.com',
         employeeId: 'MSG-001',
       };
-      const expectedEmployee = { id: 'uuid-3', ...inputDto, role: EmployeeRole.THERAPIST };
+      const expectedEmployee = {
+        id: 'uuid-3',
+        ...inputDto,
+        role: EmployeeRole.THERAPIST,
+      };
       mockCreateTherapistHandler.execute.mockResolvedValue(expectedEmployee);
 
       // Act
@@ -233,12 +258,20 @@ describe('EmployeesService', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(inputDto, 'MASSAGE');
+      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(
+        inputDto,
+        'MASSAGE',
+      );
     });
 
     it('should assign partnerId when provided', async () => {
       // Arrange
-      const inputDto = { email: 'massage@example.com', firstName: 'Hoang', lastName: 'Van E', employeeId: 'MSG-001' } as any;
+      const inputDto = {
+        email: 'massage@example.com',
+        firstName: 'Hoang',
+        lastName: 'Van E',
+        employeeId: 'MSG-001',
+      } as any;
       const partnerId = 'partner-uuid';
       mockCreateTherapistHandler.execute.mockResolvedValue({ id: 'uuid-3' });
 
@@ -320,7 +353,9 @@ describe('EmployeesService', () => {
       mockEmployeeRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.findOne('missing-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -331,7 +366,10 @@ describe('EmployeesService', () => {
       mockEmployeeRepository.findOne.mockResolvedValue(employee);
 
       // Act
-      const result = await service.findOneForPartner('emp-uuid', 'partner-uuid');
+      const result = await service.findOneForPartner(
+        'emp-uuid',
+        'partner-uuid',
+      );
 
       // Assert
       expect(result).toEqual(employee);
@@ -368,7 +406,10 @@ describe('EmployeesService', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(mockUpdateEmployeeHandler.execute).toHaveBeenCalledWith('uuid-1', updateDto);
+      expect(mockUpdateEmployeeHandler.execute).toHaveBeenCalledWith(
+        'uuid-1',
+        updateDto,
+      );
     });
   });
 
@@ -378,10 +419,17 @@ describe('EmployeesService', () => {
       const employee = { id: 'emp-uuid', partnerId: 'partner-uuid' };
       const updateDto = { fullName: 'Updated' } as any;
       mockEmployeeRepository.findOne.mockResolvedValue(employee);
-      mockUpdateEmployeeHandler.execute.mockResolvedValue({ ...employee, ...updateDto });
+      mockUpdateEmployeeHandler.execute.mockResolvedValue({
+        ...employee,
+        ...updateDto,
+      });
 
       // Act
-      const result = await service.updateForPartner('emp-uuid', 'partner-uuid', updateDto);
+      const result = await service.updateForPartner(
+        'emp-uuid',
+        'partner-uuid',
+        updateDto,
+      );
 
       // Assert
       expect(result).toEqual({ ...employee, ...updateDto });
@@ -389,7 +437,10 @@ describe('EmployeesService', () => {
         where: { id: 'emp-uuid', partnerId: 'partner-uuid' },
         relations: ['doctorProfile', 'therapistProfile'],
       });
-      expect(mockUpdateEmployeeHandler.execute).toHaveBeenCalledWith('emp-uuid', updateDto);
+      expect(mockUpdateEmployeeHandler.execute).toHaveBeenCalledWith(
+        'emp-uuid',
+        updateDto,
+      );
     });
 
     it('should throw NotFoundException if not owned', async () => {
@@ -431,7 +482,9 @@ describe('EmployeesService', () => {
         where: { id: 'emp-uuid', partnerId: 'partner-uuid' },
         relations: ['doctorProfile', 'therapistProfile'],
       });
-      expect(mockRemoveEmployeeHandler.execute).toHaveBeenCalledWith('emp-uuid');
+      expect(mockRemoveEmployeeHandler.execute).toHaveBeenCalledWith(
+        'emp-uuid',
+      );
     });
 
     it('should throw NotFoundException if not owned', async () => {

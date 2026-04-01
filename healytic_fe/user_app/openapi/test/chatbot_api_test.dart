@@ -24,5 +24,19 @@ void main() {
       // TODO
     });
 
+    // Get Conversations
+    //
+    //Future<ConversationsPageResponse> getConversationsChatbotConversationsGet(String userId, { int page, int limit }) async
+    test('test getConversationsChatbotConversationsGet', () async {
+      // TODO
+    });
+
+    // Get Messages
+    //
+    //Future<MessagesPageResponse> getMessagesChatbotConversationsConversationIdMessagesGet(String conversationId, { String userId, int page, int limit }) async
+    test('test getMessagesChatbotConversationsConversationIdMessagesGet', () async {
+      // TODO
+    });
+
   });
 }

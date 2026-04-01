@@ -8,29 +8,29 @@ import { DocumentType } from '@/partners/enum/document-type.enum';
  */
 @Entity('health_partner_document_requirement')
 export class DocumentRequirement {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({
-        name: 'business_type',
-        type: 'enum',
-        enum: BusinessType,
-    })
-    businessType: BusinessType;
+  @Column({
+    name: 'business_type',
+    type: 'enum',
+    enum: BusinessType,
+  })
+  businessType: BusinessType;
 
-    @Column({
-        name: 'document_type',
-        type: 'enum',
-        enum: DocumentType,
-    })
-    documentType: DocumentType;
+  @Column({
+    name: 'document_type',
+    type: 'enum',
+    enum: DocumentType,
+  })
+  documentType: DocumentType;
 
-    @Column({ name: 'is_required', default: true })
-    isRequired: boolean;
+  @Column({ name: 'is_required', default: true })
+  isRequired: boolean;
 
-    @Column({ type: 'text', nullable: true })
-    description: string;
+  @Column({ type: 'text', nullable: true })
+  description: string;
 
-    @Column({ name: 'display_order', default: 0 })
-    displayOrder: number; // For frontend ordering
+  @Column({ name: 'display_order', default: 0 })
+  displayOrder: number; // For frontend ordering
 }

@@ -1,7 +1,7 @@
 import { Expose, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { MessageType } from '@/chat/enums/message-type.enum';
-import { ChatMessage } from '@/common/entities/chat-message.entity';
+import { PartnerChatMessage } from '@/common/entities/partner-chat-message.entity';
 
 export class ChatAttachmentResponseDto {
   @ApiProperty()
@@ -38,6 +38,10 @@ export class ChatMessageResponseDto {
   @Expose()
   senderId: string;
 
+  @ApiProperty()
+  @Expose()
+  receiverId: string;
+
   @ApiPropertyOptional()
   @Expose()
   senderName?: string;
@@ -70,7 +74,7 @@ export class ChatMessageResponseDto {
   /**
    * Map a ChatMessage entity to the response DTO.
    */
-  static fromEntity(entity: ChatMessage): ChatMessageResponseDto {
+  static fromEntity(entity: PartnerChatMessage): ChatMessageResponseDto {
     const dto = new ChatMessageResponseDto();
     dto.id = entity.id;
     dto.conversationId = entity.conversationId;
@@ -83,7 +87,8 @@ export class ChatMessageResponseDto {
     // Sender info from joined relation
     if (entity.sender) {
       const profile = (entity.sender as any).userProfile;
-      dto.senderName = profile?.fullName ?? entity.sender.username ?? entity.sender.email;
+      dto.senderName =
+        profile?.fullName ?? entity.sender.username ?? entity.sender.email;
       dto.senderAvatar = profile?.avatarUrl ?? undefined;
     }
 
@@ -103,7 +108,9 @@ export class ChatMessageResponseDto {
     return dto;
   }
 
-  static fromEntities(entities: ChatMessage[]): ChatMessageResponseDto[] {
+  static fromEntities(
+    entities: PartnerChatMessage[],
+  ): ChatMessageResponseDto[] {
     return entities.map((e) => this.fromEntity(e));
   }
 }

@@ -16,7 +16,10 @@ export class GetAuditLogsQueryDto {
   @IsUUID()
   actorId?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by Action type', example: 'PARTNER_REVIEW' })
+  @ApiPropertyOptional({
+    description: 'Filter by Action type',
+    example: 'PARTNER_REVIEW',
+  })
   @IsOptional()
   @IsString()
   action?: string;

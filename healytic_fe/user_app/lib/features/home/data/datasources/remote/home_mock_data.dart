@@ -345,11 +345,12 @@ final List<AppointmentEntity> kMockRecentActivities = [
   AppointmentEntity(
     id: 'appt-1',
     serviceName: 'Aromatherapy',
-    vendorName: 'Spa Harmony',
+    healthPartnerName: 'Spa Harmony',
+    healthPartnerId: 'hp-1',
     imageUrl: '',
     status: 'completed',
     category: 'Spa',
-    providerName: 'Dr. Anna Nguyen',
+    specialistName: 'Dr. Anna Nguyen',
     address: 'District 1, HCMC',
     date: DateTime.now().subtract(
       const Duration(days: 1),
@@ -361,11 +362,12 @@ final List<AppointmentEntity> kMockRecentActivities = [
   AppointmentEntity(
     id: 'appt-2',
     serviceName: 'Wellness Consult',
-    vendorName: 'Harmony Wellness Hub',
+    healthPartnerName: 'Harmony Wellness Hub',
+    healthPartnerId: 'hp-2',
     imageUrl: '',
     status: 'upcoming',
     category: 'Wellness',
-    providerName: 'Dr. Hoa Le',
+    specialistName: 'Dr. Hoa Le',
     address: 'Thao Dien, Thu Duc',
     date: DateTime.now().add(
       const Duration(days: 1),

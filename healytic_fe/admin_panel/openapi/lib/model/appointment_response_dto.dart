@@ -15,12 +15,12 @@ class AppointmentResponseDto {
   AppointmentResponseDto({
     required this.id,
     required this.serviceName,
-    required this.vendorName,
+    required this.healthPartnerName,
     required this.imageUrl,
     required this.status,
     required this.category,
-    required this.providerName,
-    required this.providerId,
+    required this.specialistName,
+    required this.specialistId,
     required this.address,
     required this.date,
     required this.checkInTime,
@@ -28,13 +28,15 @@ class AppointmentResponseDto {
     required this.duration,
     required this.isReviewed,
     required this.distanceKm,
+    required this.healthPartnerId,
+    required this.serviceId,
   });
 
   String id;
 
   String serviceName;
 
-  String vendorName;
+  String healthPartnerName;
 
   String imageUrl;
 
@@ -42,9 +44,9 @@ class AppointmentResponseDto {
 
   String category;
 
-  String providerName;
+  String specialistName;
 
-  String providerId;
+  String specialistId;
 
   String address;
 
@@ -62,56 +64,66 @@ class AppointmentResponseDto {
   /// Distance from user to clinic in kilometers (null if coordinates not provided)
   num? distanceKm;
 
+  /// Account ID of the health partner (vendor). Used for chat.
+  Object? healthPartnerId;
+
+  /// Product/service ID for navigation to service details.
+  Object? serviceId;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is AppointmentResponseDto &&
     other.id == id &&
     other.serviceName == serviceName &&
-    other.vendorName == vendorName &&
+    other.healthPartnerName == healthPartnerName &&
     other.imageUrl == imageUrl &&
     other.status == status &&
     other.category == category &&
-    other.providerName == providerName &&
-    other.providerId == providerId &&
+    other.specialistName == specialistName &&
+    other.specialistId == specialistId &&
     other.address == address &&
     other.date == date &&
     other.checkInTime == checkInTime &&
     other.checkOutTime == checkOutTime &&
     other.duration == duration &&
     other.isReviewed == isReviewed &&
-    other.distanceKm == distanceKm;
+    other.distanceKm == distanceKm &&
+    other.healthPartnerId == healthPartnerId &&
+    other.serviceId == serviceId;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
     (serviceName.hashCode) +
-    (vendorName.hashCode) +
+    (healthPartnerName.hashCode) +
     (imageUrl.hashCode) +
     (status.hashCode) +
     (category.hashCode) +
-    (providerName.hashCode) +
-    (providerId.hashCode) +
+    (specialistName.hashCode) +
+    (specialistId.hashCode) +
     (address.hashCode) +
     (date.hashCode) +
     (checkInTime.hashCode) +
     (checkOutTime.hashCode) +
     (duration.hashCode) +
     (isReviewed.hashCode) +
-    (distanceKm == null ? 0 : distanceKm!.hashCode);
+    (distanceKm == null ? 0 : distanceKm!.hashCode) +
+    (healthPartnerId == null ? 0 : healthPartnerId!.hashCode) +
+    (serviceId == null ? 0 : serviceId!.hashCode);
 
   @override
-  String toString() => 'AppointmentResponseDto[id=$id, serviceName=$serviceName, vendorName=$vendorName, imageUrl=$imageUrl, status=$status, category=$category, providerName=$providerName, providerId=$providerId, address=$address, date=$date, checkInTime=$checkInTime, checkOutTime=$checkOutTime, duration=$duration, isReviewed=$isReviewed, distanceKm=$distanceKm]';
+  String toString() => 'AppointmentResponseDto[id=$id, serviceName=$serviceName, healthPartnerName=$healthPartnerName, imageUrl=$imageUrl, status=$status, category=$category, specialistName=$specialistName, specialistId=$specialistId, address=$address, date=$date, checkInTime=$checkInTime, checkOutTime=$checkOutTime, duration=$duration, isReviewed=$isReviewed, distanceKm=$distanceKm, healthPartnerId=$healthPartnerId, serviceId=$serviceId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
       json[r'serviceName'] = this.serviceName;
-      json[r'vendorName'] = this.vendorName;
+      json[r'healthPartnerName'] = this.healthPartnerName;
       json[r'imageUrl'] = this.imageUrl;
       json[r'status'] = this.status;
       json[r'category'] = this.category;
-      json[r'providerName'] = this.providerName;
-      json[r'providerId'] = this.providerId;
+      json[r'specialistName'] = this.specialistName;
+      json[r'specialistId'] = this.specialistId;
       json[r'address'] = this.address;
       json[r'date'] = this.date;
       json[r'checkInTime'] = this.checkInTime;
@@ -122,6 +134,16 @@ class AppointmentResponseDto {
       json[r'distanceKm'] = this.distanceKm;
     } else {
       json[r'distanceKm'] = null;
+    }
+    if (this.healthPartnerId != null) {
+      json[r'healthPartnerId'] = this.healthPartnerId;
+    } else {
+      json[r'healthPartnerId'] = null;
+    }
+    if (this.serviceId != null) {
+      json[r'serviceId'] = this.serviceId;
+    } else {
+      json[r'serviceId'] = null;
     }
     return json;
   }
@@ -147,12 +169,12 @@ class AppointmentResponseDto {
       return AppointmentResponseDto(
         id: mapValueOfType<String>(json, r'id')!,
         serviceName: mapValueOfType<String>(json, r'serviceName')!,
-        vendorName: mapValueOfType<String>(json, r'vendorName')!,
+        healthPartnerName: mapValueOfType<String>(json, r'healthPartnerName')!,
         imageUrl: mapValueOfType<String>(json, r'imageUrl')!,
         status: AppointmentResponseDtoStatusEnum.fromJson(json[r'status'])!,
         category: mapValueOfType<String>(json, r'category')!,
-        providerName: mapValueOfType<String>(json, r'providerName')!,
-        providerId: mapValueOfType<String>(json, r'providerId')!,
+        specialistName: mapValueOfType<String>(json, r'specialistName')!,
+        specialistId: mapValueOfType<String>(json, r'specialistId')!,
         address: mapValueOfType<String>(json, r'address')!,
         date: mapValueOfType<String>(json, r'date')!,
         checkInTime: mapValueOfType<String>(json, r'checkInTime')!,
@@ -162,6 +184,8 @@ class AppointmentResponseDto {
         distanceKm: json[r'distanceKm'] == null
             ? null
             : num.parse('${json[r'distanceKm']}'),
+        healthPartnerId: mapValueOfType<Object>(json, r'healthPartnerId'),
+        serviceId: mapValueOfType<Object>(json, r'serviceId'),
       );
     }
     return null;
@@ -211,12 +235,12 @@ class AppointmentResponseDto {
   static const requiredKeys = <String>{
     'id',
     'serviceName',
-    'vendorName',
+    'healthPartnerName',
     'imageUrl',
     'status',
     'category',
-    'providerName',
-    'providerId',
+    'specialistName',
+    'specialistId',
     'address',
     'date',
     'checkInTime',
@@ -224,6 +248,8 @@ class AppointmentResponseDto {
     'duration',
     'isReviewed',
     'distanceKm',
+    'healthPartnerId',
+    'serviceId',
   };
 }
 

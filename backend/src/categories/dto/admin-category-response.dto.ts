@@ -58,7 +58,9 @@ export class AdminCategoryResponseDto {
   isActive: boolean;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Icon identifier for frontend rendering' })
+  @ApiPropertyOptional({
+    description: 'Icon identifier for frontend rendering',
+  })
   iconName: string | null;
 
   @Expose()
@@ -83,15 +85,23 @@ export class AdminCategoryResponseDto {
 
   @Expose()
   @Type(() => CategorySummaryDto)
-  @ApiPropertyOptional({ type: CategorySummaryDto, description: 'Parent category' })
+  @ApiPropertyOptional({
+    type: CategorySummaryDto,
+    description: 'Parent category',
+  })
   parent: CategorySummaryDto | null;
 
   @Expose()
   @Type(() => CategorySummaryDto)
-  @ApiPropertyOptional({ type: [CategorySummaryDto], description: 'Child categories' })
+  @ApiPropertyOptional({
+    type: [CategorySummaryDto],
+    description: 'Child categories',
+  })
   children: CategorySummaryDto[];
 
-  static fromEntity(entity: Category & { serviceCount?: number }): AdminCategoryResponseDto {
+  static fromEntity(
+    entity: Category & { serviceCount?: number },
+  ): AdminCategoryResponseDto {
     const dto = new AdminCategoryResponseDto();
     dto.id = entity.id;
     dto.name = entity.name;
@@ -112,7 +122,9 @@ export class AdminCategoryResponseDto {
     return dto;
   }
 
-  static fromEntities(entities: (Category & { serviceCount?: number })[]): AdminCategoryResponseDto[] {
+  static fromEntities(
+    entities: (Category & { serviceCount?: number })[],
+  ): AdminCategoryResponseDto[] {
     return entities.map((e) => this.fromEntity(e));
   }
 }

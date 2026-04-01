@@ -1,7 +1,7 @@
 import { Expose, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ConversationStatus } from '@/chat/enums/conversation-status.enum';
-import { Conversation } from '@/common/entities/conversation.entity';
+import { PartnerConversation } from '@/common/entities/partner-conversation.entity';
 
 class ParticipantInfoDto {
   @ApiProperty()
@@ -74,7 +74,10 @@ export class ConversationResponseDto {
    * @param entity The conversation entity with loaded user/partnerAccount relations
    * @param viewerAccountId The account ID of the person viewing the list
    */
-  static fromEntity(entity: Conversation, viewerAccountId: string): ConversationResponseDto {
+  static fromEntity(
+    entity: PartnerConversation,
+    viewerAccountId: string,
+  ): ConversationResponseDto {
     const dto = new ConversationResponseDto();
     dto.id = entity.id;
     dto.status = entity.status;
@@ -85,16 +88,20 @@ export class ConversationResponseDto {
     const isUser = entity.userId === viewerAccountId;
 
     // Unread count for the viewer
-    dto.unreadCount = isUser ? entity.userUnreadCount : entity.partnerUnreadCount;
+    dto.unreadCount = isUser
+      ? entity.userUnreadCount
+      : entity.partnerUnreadCount;
 
     // Other participant info
     const otherAccount = isUser ? entity.partnerAccount : entity.user;
     dto.otherParticipant = {
-      id: otherAccount?.id ?? (isUser ? entity.partnerAccountId : entity.userId),
-      name: (otherAccount as any)?.userProfile?.fullName
-        ?? otherAccount?.username
-        ?? otherAccount?.email
-        ?? 'Unknown',
+      id:
+        otherAccount?.id ?? (isUser ? entity.partnerAccountId : entity.userId),
+      name:
+        (otherAccount as any)?.userProfile?.fullName ??
+        otherAccount?.username ??
+        otherAccount?.email ??
+        'Unknown',
       avatar: (otherAccount as any)?.userProfile?.avatarUrl ?? undefined,
       role: isUser ? 'partner' : 'user',
     };
@@ -109,7 +116,10 @@ export class ConversationResponseDto {
     return dto;
   }
 
-  static fromEntities(entities: Conversation[], viewerAccountId: string): ConversationResponseDto[] {
+  static fromEntities(
+    entities: PartnerConversation[],
+    viewerAccountId: string,
+  ): ConversationResponseDto[] {
     return entities.map((e) => this.fromEntity(e, viewerAccountId));
   }
 }

@@ -35,7 +35,10 @@ class PartnerProcedureStepDto {
 
 class PartnerServiceManualDto {
   @Expose()
-  @ApiPropertyOptional({ type: [String], example: ['Avoid heavy meals', 'Wear comfortable clothing'] })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['Avoid heavy meals', 'Wear comfortable clothing'],
+  })
   preServiceGuidelines?: string[];
 
   @Expose()
@@ -199,26 +202,41 @@ export class PartnerHealthServiceResponseDto {
 
   @Expose()
   @Type(() => PartnerCategorySummaryDto)
-  @ApiPropertyOptional({ type: PartnerCategorySummaryDto, description: 'Category' })
+  @ApiPropertyOptional({
+    type: PartnerCategorySummaryDto,
+    description: 'Category',
+  })
   category: PartnerCategorySummaryDto | null;
 
   @Expose()
   @Type(() => PartnerHealthServiceMediaDto)
-  @ApiPropertyOptional({ type: [PartnerHealthServiceMediaDto], description: 'Media assets' })
+  @ApiPropertyOptional({
+    type: [PartnerHealthServiceMediaDto],
+    description: 'Media assets',
+  })
   media: PartnerHealthServiceMediaDto[];
 
   @Expose()
   @Type(() => PartnerHealthServiceDefinitionDto)
-  @ApiPropertyOptional({ type: PartnerHealthServiceDefinitionDto, description: 'Definition for service type' })
+  @ApiPropertyOptional({
+    type: PartnerHealthServiceDefinitionDto,
+    description: 'Definition for service type',
+  })
   productDefinition: PartnerHealthServiceDefinitionDto | null;
 
   @Expose()
   @Type(() => PartnerHealthServiceEmployeeEligibilityDto)
-  @ApiPropertyOptional({ type: [PartnerHealthServiceEmployeeEligibilityDto], description: 'Eligible employees for service' })
+  @ApiPropertyOptional({
+    type: [PartnerHealthServiceEmployeeEligibilityDto],
+    description: 'Eligible employees for service',
+  })
   productEmployeeEligibilities: PartnerHealthServiceEmployeeEligibilityDto[];
 
   @Expose()
   @Type(() => PartnerServiceManualDto)
-  @ApiPropertyOptional({ type: PartnerServiceManualDto, description: 'Service manual (guidelines, rules, procedure steps)' })
+  @ApiPropertyOptional({
+    type: PartnerServiceManualDto,
+    description: 'Service manual (guidelines, rules, procedure steps)',
+  })
   serviceManual: PartnerServiceManualDto | null;
 }

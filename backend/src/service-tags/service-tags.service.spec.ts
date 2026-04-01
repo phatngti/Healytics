@@ -28,19 +28,22 @@ describe('ServiceTagsService', () => {
   let detachProductTagHandler: MockHandler;
 
   // Helper to create a mock entity for testing
-  const createMockTagEntity = (overrides: Partial<ProductFeatureTag> = {}): ProductFeatureTag => ({
-    id: 'tag-uuid-1',
-    userId: 'user-uuid-1',
-    name: 'Test Tag',
-    description: 'A test tag',
-    colorValue: '#FF6366F1',
-    usage: 0,
-    isActive: true,
-    sortOrder: 0,
-    createdAt: new Date('2026-01-14T22:45:00.000Z'),
-    updatedAt: new Date('2026-01-14T22:45:00.000Z'),
-    ...overrides,
-  } as ProductFeatureTag);
+  const createMockTagEntity = (
+    overrides: Partial<ProductFeatureTag> = {},
+  ): ProductFeatureTag =>
+    ({
+      id: 'tag-uuid-1',
+      userId: 'user-uuid-1',
+      name: 'Test Tag',
+      description: 'A test tag',
+      colorValue: '#FF6366F1',
+      usage: 0,
+      isActive: true,
+      sortOrder: 0,
+      createdAt: new Date('2026-01-14T22:45:00.000Z'),
+      updatedAt: new Date('2026-01-14T22:45:00.000Z'),
+      ...overrides,
+    }) as ProductFeatureTag;
 
   beforeEach(async () => {
     // Arrange - Create fresh mocks for each test
@@ -157,7 +160,13 @@ describe('ServiceTagsService', () => {
     it('should return only active service tags as response DTOs', async () => {
       // Arrange
       const userId = 'user-uuid-1';
-      const entities = [createMockTagEntity({ id: 'tag-1', name: 'Active Tag', isActive: true })];
+      const entities = [
+        createMockTagEntity({
+          id: 'tag-1',
+          name: 'Active Tag',
+          isActive: true,
+        }),
+      ];
       serviceTagRepository.find.mockResolvedValue(entities);
 
       // Act
@@ -211,7 +220,10 @@ describe('ServiceTagsService', () => {
       const tagId = 'tag-uuid-1';
       const userId = 'user-uuid-1';
       const dto = { name: 'Updated Name' };
-      const mockEntity = createMockTagEntity({ id: tagId, name: 'Updated Name' });
+      const mockEntity = createMockTagEntity({
+        id: tagId,
+        name: 'Updated Name',
+      });
       updateServiceTagHandler.execute.mockResolvedValue(mockEntity);
 
       // Act
@@ -220,7 +232,11 @@ describe('ServiceTagsService', () => {
       // Assert
       expect(result.id).toBe(tagId);
       expect(result.name).toBe('Updated Name');
-      expect(updateServiceTagHandler.execute).toHaveBeenCalledWith(tagId, dto, userId);
+      expect(updateServiceTagHandler.execute).toHaveBeenCalledWith(
+        tagId,
+        dto,
+        userId,
+      );
     });
   });
 
@@ -235,7 +251,10 @@ describe('ServiceTagsService', () => {
       await service.remove(tagId, userId);
 
       // Assert
-      expect(removeServiceTagHandler.execute).toHaveBeenCalledWith(tagId, userId);
+      expect(removeServiceTagHandler.execute).toHaveBeenCalledWith(
+        tagId,
+        userId,
+      );
     });
   });
 
@@ -246,7 +265,12 @@ describe('ServiceTagsService', () => {
       const productId = 'product-uuid-1';
       const userId = 'user-uuid-1';
       const mockCreatedAt = new Date('2026-01-14T22:45:00.000Z');
-      const mockProductTag = { id: 'pt-1', tagId, productId, createdAt: mockCreatedAt };
+      const mockProductTag = {
+        id: 'pt-1',
+        tagId,
+        productId,
+        createdAt: mockCreatedAt,
+      };
       attachProductTagHandler.execute.mockResolvedValue(mockProductTag);
 
       // Act
@@ -256,7 +280,11 @@ describe('ServiceTagsService', () => {
       expect(result.tagId).toBe(tagId);
       expect(result.productId).toBe(productId);
       expect(result.createdAt).toEqual(mockCreatedAt);
-      expect(attachProductTagHandler.execute).toHaveBeenCalledWith(tagId, productId, userId);
+      expect(attachProductTagHandler.execute).toHaveBeenCalledWith(
+        tagId,
+        productId,
+        userId,
+      );
     });
   });
 
@@ -272,7 +300,11 @@ describe('ServiceTagsService', () => {
       await service.detachFromProduct(tagId, productId, userId);
 
       // Assert
-      expect(detachProductTagHandler.execute).toHaveBeenCalledWith(tagId, productId, userId);
+      expect(detachProductTagHandler.execute).toHaveBeenCalledWith(
+        tagId,
+        productId,
+        userId,
+      );
     });
   });
 

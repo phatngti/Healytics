@@ -26,7 +26,11 @@ export class AttachProductTagHandler {
    * @param userId - The ID of the user (must own the tag)
    * @returns The created ProductTag entity
    */
-  async execute(tagId: string, productId: string, userId: string): Promise<ProductTag> {
+  async execute(
+    tagId: string,
+    productId: string,
+    userId: string,
+  ): Promise<ProductTag> {
     this.logger.log(`Attaching tag ${tagId} to product ${productId}`);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -44,7 +48,9 @@ export class AttachProductTagHandler {
 
       // 2. Invariant Check - Ownership
       if (tag.userId !== userId) {
-        throw new ForbiddenException('You do not have permission to use this tag');
+        throw new ForbiddenException(
+          'You do not have permission to use this tag',
+        );
       }
 
       // 3. Check existing attachment
@@ -62,10 +68,18 @@ export class AttachProductTagHandler {
         tagId,
       });
 
-      const savedProductTag = await queryRunner.manager.save(ProductTag, productTag);
+      const savedProductTag = await queryRunner.manager.save(
+        ProductTag,
+        productTag,
+      );
 
       // 5. Side Effect - Increment usage counter
-      await queryRunner.manager.increment(ProductFeatureTag, { id: tagId }, 'usage', 1);
+      await queryRunner.manager.increment(
+        ProductFeatureTag,
+        { id: tagId },
+        'usage',
+        1,
+      );
 
       await queryRunner.commitTransaction();
       this.logger.log(`Tag ${tagId} attached to product ${productId}`);

@@ -18,7 +18,8 @@ export class AiServiceController {
   @Post()
   @ApiOperation({ summary: 'Get service recommendations by IDs' })
   @ApiOkResponse({
-    description: 'Returns enriched recommendation data for the requested services.',
+    description:
+      'Returns enriched recommendation data for the requested services.',
     type: AiRecommendationsResponseDto,
   })
   getRecommendations(

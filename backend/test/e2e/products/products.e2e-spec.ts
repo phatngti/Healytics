@@ -38,7 +38,9 @@ describe('Products (e2e)', () => {
 
   describe('POST /products', () => {
     it('should create a new service product', async () => {
-      const productData = createServiceProductDto({ categoryId: createdCategoryId });
+      const productData = createServiceProductDto({
+        categoryId: createdCategoryId,
+      });
 
       const res = await authRequest(app, accessToken)
         .post('/products')
@@ -103,13 +105,11 @@ describe('Products (e2e)', () => {
     });
 
     it('should fail to create product without merchantId', async () => {
-      const res = await authRequest(app, accessToken)
-        .post('/products')
-        .send({
-          name: 'Test Product',
-          slug: 'test-product',
-          type: 'service',
-        });
+      const res = await authRequest(app, accessToken).post('/products').send({
+        name: 'Test Product',
+        slug: 'test-product',
+        type: 'service',
+      });
 
       expect(res.status).toBeGreaterThanOrEqual(400);
     });
@@ -124,7 +124,9 @@ describe('Products (e2e)', () => {
     });
 
     it('should filter products by merchantId', async () => {
-      const res = await authRequest(app, accessToken).get(`/products?merchantId=${TEST_MERCHANT_ID}`);
+      const res = await authRequest(app, accessToken).get(
+        `/products?merchantId=${TEST_MERCHANT_ID}`,
+      );
 
       expect([200, 201]).toContain(res.status);
       expect(Array.isArray(res.body)).toBe(true);
@@ -136,14 +138,18 @@ describe('Products (e2e)', () => {
 
   describe('GET /products/:id', () => {
     it('should get a product by id', async () => {
-      const res = await authRequest(app, accessToken).get(`/products/${createdProductId}`);
+      const res = await authRequest(app, accessToken).get(
+        `/products/${createdProductId}`,
+      );
 
       expect([200, 201]).toContain(res.status);
       expect(res.body.id).toBe(createdProductId);
     });
 
     it('should return 404 for non-existent product', async () => {
-      const res = await authRequest(app, accessToken).get(`/products/${FAKE_UUID}`);
+      const res = await authRequest(app, accessToken).get(
+        `/products/${FAKE_UUID}`,
+      );
 
       expect(res.status).toBe(404);
     });
@@ -151,17 +157,23 @@ describe('Products (e2e)', () => {
 
   describe('GET /products/slug/:slug', () => {
     it('should get a product by slug', async () => {
-      const getRes = await authRequest(app, accessToken).get(`/products/${createdProductId}`);
+      const getRes = await authRequest(app, accessToken).get(
+        `/products/${createdProductId}`,
+      );
       const slug = getRes.body.slug;
 
-      const res = await authRequest(app, accessToken).get(`/products/slug/${slug}`);
+      const res = await authRequest(app, accessToken).get(
+        `/products/slug/${slug}`,
+      );
 
       expect([200, 201]).toContain(res.status);
       expect(res.body.slug).toBe(slug);
     });
 
     it('should return 404 for non-existent slug', async () => {
-      const res = await authRequest(app, accessToken).get('/products/slug/non-existent-slug-12345');
+      const res = await authRequest(app, accessToken).get(
+        '/products/slug/non-existent-slug-12345',
+      );
 
       expect(res.status).toBe(404);
     });
@@ -217,17 +229,23 @@ describe('Products (e2e)', () => {
 
       const productToDeleteId = createRes.body.id;
 
-      const res = await authRequest(app, accessToken).delete(`/products/${productToDeleteId}`);
+      const res = await authRequest(app, accessToken).delete(
+        `/products/${productToDeleteId}`,
+      );
 
       expect([200, 201, 204]).toContain(res.status);
 
       // Verify deletion
-      const getRes = await authRequest(app, accessToken).get(`/products/${productToDeleteId}`);
+      const getRes = await authRequest(app, accessToken).get(
+        `/products/${productToDeleteId}`,
+      );
       expect(getRes.status).toBe(404);
     });
 
     it('should return 404 when deleting non-existent product', async () => {
-      const res = await authRequest(app, accessToken).delete(`/products/${FAKE_UUID}`);
+      const res = await authRequest(app, accessToken).delete(
+        `/products/${FAKE_UUID}`,
+      );
 
       expect(res.status).toBe(404);
     });

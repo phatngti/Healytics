@@ -1,9 +1,4 @@
-import {
-  Get,
-  Param,
-  Query,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import { Get, Param, Query, ParseUUIDPipe } from '@nestjs/common';
 import {
   ApiOperation,
   ApiOkResponse,
@@ -36,8 +31,18 @@ export class UserCategoriesController {
     type: [BookingServiceResponseDto],
   })
   @ApiNotFoundResponse({ description: 'Category not found.' })
-  @ApiQuery({ name: 'lat', required: false, type: Number, description: 'User latitude for distance calc' })
-  @ApiQuery({ name: 'lng', required: false, type: Number, description: 'User longitude for distance calc' })
+  @ApiQuery({
+    name: 'lat',
+    required: false,
+    type: Number,
+    description: 'User latitude for distance calc',
+  })
+  @ApiQuery({
+    name: 'lng',
+    required: false,
+    type: Number,
+    description: 'User longitude for distance calc',
+  })
   findServicesByCategory(
     @Param('categoryId', ParseUUIDPipe) categoryId: string,
     @Query('lat') lat?: string,
@@ -45,7 +50,11 @@ export class UserCategoriesController {
   ): Promise<BookingServiceResponseDto[]> {
     const userLat = lat ? parseFloat(lat) : undefined;
     const userLng = lng ? parseFloat(lng) : undefined;
-    return this.categoriesService.findServicesByCategory(categoryId, userLat, userLng);
+    return this.categoriesService.findServicesByCategory(
+      categoryId,
+      userLat,
+      userLng,
+    );
   }
 
   /**

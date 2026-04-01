@@ -58,11 +58,21 @@ export class Payment {
   amount: number;
 
   /** Gateway order ID (e.g., "BK-abcd1234_xyz12") */
-  @Column({ name: 'gateway_order_id', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'gateway_order_id',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   gatewayOrderId: string | null;
 
   /** Gateway transaction ID (MoMo transId — needed for refund) */
-  @Column({ name: 'gateway_trans_id', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'gateway_trans_id',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   gatewayTransId: string | null;
 
   /** Payment URL (MoMo payUrl for redirect — shows QR on desktop) */

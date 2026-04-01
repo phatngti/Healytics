@@ -22,11 +22,12 @@ export class AcquireMicroLockHandler {
     );
 
     const locked = token !== null;
-    this.logger.log(
-      `Micro-lock ${locked ? 'acquired' : 'denied'}: ${key}`,
-    );
+    this.logger.log(`Micro-lock ${locked ? 'acquired' : 'denied'}: ${key}`);
 
-    return new MicroLockResponseDto(locked, locked ? MICRO_LOCK_TTL_SECONDS : 0);
+    return new MicroLockResponseDto(
+      locked,
+      locked ? MICRO_LOCK_TTL_SECONDS : 0,
+    );
   }
 
   /**

@@ -54,7 +54,6 @@ part 'api/user_health_services_api.dart';
 part 'api/user_payments_api.dart';
 part 'api/user_reviews_api.dart';
 part 'api/user_slots_api.dart';
-part 'api/web_socket_chat_connection_guide_api.dart';
 
 part 'model/account_me_response_dto.dart';
 part 'model/account_request_dto.dart';
@@ -217,17 +216,6 @@ part 'model/verification_document_entry_dto.dart';
 part 'model/verified_field.dart';
 part 'model/work_history_entry_dto.dart';
 part 'model/work_schedule_entry_dto.dart';
-part 'model/ws_connection_info_dto.dart';
-part 'model/ws_error_event_dto.dart';
-part 'model/ws_join_conversation_payload_dto.dart';
-part 'model/ws_mark_read_payload_dto.dart';
-part 'model/ws_message_sent_ack_dto.dart';
-part 'model/ws_messages_read_event_dto.dart';
-part 'model/ws_new_message_event_dto.dart';
-part 'model/ws_send_message_payload_dto.dart';
-part 'model/ws_stop_typing_event_dto.dart';
-part 'model/ws_typing_event_dto.dart';
-part 'model/ws_typing_payload_dto.dart';
 
 
 /// An [ApiClient] instance that uses the default values obtained from

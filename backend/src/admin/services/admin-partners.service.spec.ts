@@ -3,7 +3,10 @@ import { AdminPartnersService } from './admin-partners.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Partner } from '@/common/entities/partner.entity';
 import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
-import { ReviewDecision, ReviewPartnerProfileDto } from '../dto/review-partner-profile.dto';
+import {
+  ReviewDecision,
+  ReviewPartnerProfileDto,
+} from '../dto/review-partner-profile.dto';
 import { ReviewPartnerHandler } from '../application/handlers/review-partner.handler';
 import { MockType } from '../../../test/mocks/mock-types';
 
@@ -38,7 +41,10 @@ describe('AdminPartnersService', () => {
       providers: [
         AdminPartnersService,
         { provide: getRepositoryToken(Partner), useValue: mockPartnerRepo },
-        { provide: getRepositoryToken(PartnerReviewLog), useValue: mockReviewLogRepo },
+        {
+          provide: getRepositoryToken(PartnerReviewLog),
+          useValue: mockReviewLogRepo,
+        },
         { provide: ReviewPartnerHandler, useValue: mockReviewPartnerHandler },
       ],
     }).compile();
@@ -71,7 +77,11 @@ describe('AdminPartnersService', () => {
       const result = await service.reviewPartner(partnerId, dto, adminId);
 
       // Assert
-      expect(reviewPartnerHandler.execute).toHaveBeenCalledWith(partnerId, dto, adminId);
+      expect(reviewPartnerHandler.execute).toHaveBeenCalledWith(
+        partnerId,
+        dto,
+        adminId,
+      );
       expect(result.message).toBe('Review submitted successfully');
     });
 
@@ -86,7 +96,9 @@ describe('AdminPartnersService', () => {
       );
 
       // Act & Assert
-      await expect(service.reviewPartner('p1', dto, 'admin1')).rejects.toThrow();
+      await expect(
+        service.reviewPartner('p1', dto, 'admin1'),
+      ).rejects.toThrow();
     });
   });
 
@@ -107,16 +119,18 @@ describe('AdminPartnersService', () => {
     it('should return paginated partners list', async () => {
       // Arrange
       const query = { page: 1, limit: 10 };
-      const mockPartners = [{
-        id: 'p1',
-        taxCode: '123',
-        legalName: 'Legal',
-        brandName: 'Brand',
-        businessType: ['SPA'],
-        verificationStatus: 'PENDING',
-        createdAt: new Date(),
-        account: { email: 'test@test.com' },
-      }];
+      const mockPartners = [
+        {
+          id: 'p1',
+          taxCode: '123',
+          legalName: 'Legal',
+          brandName: 'Brand',
+          businessType: ['SPA'],
+          verificationStatus: 'PENDING',
+          createdAt: new Date(),
+          account: { email: 'test@test.com' },
+        },
+      ];
       mockQueryBuilder.getManyAndCount.mockResolvedValue([mockPartners, 1]);
 
       // Act

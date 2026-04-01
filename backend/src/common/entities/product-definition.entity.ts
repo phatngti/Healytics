@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  OneToOne,
-  JoinColumn,
-  PrimaryColumn,
-} from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { StaffAssignmentType } from '@/health-service/enums/staff-assignment-type.enum';
 import { Product } from './product.entity';
 
@@ -25,11 +19,18 @@ export class ProductDefinition {
   @Column({ name: 'min_lead_time_hours', type: 'int', default: 0 })
   minLeadTimeHours: number;
 
-  @Column({ name: 'staff_assignment_type', type: 'varchar', length: 20, default: StaffAssignmentType.ANY })
+  @Column({
+    name: 'staff_assignment_type',
+    type: 'varchar',
+    length: 20,
+    default: StaffAssignmentType.ANY,
+  })
   staffAssignmentType: StaffAssignmentType;
 
   // Relations
-  @OneToOne(() => Product, (product) => product.productDefinition, { onDelete: 'CASCADE' })
+  @OneToOne(() => Product, (product) => product.productDefinition, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 }

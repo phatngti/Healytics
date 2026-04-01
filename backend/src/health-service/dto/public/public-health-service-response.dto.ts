@@ -153,21 +153,33 @@ export class PublicHealthServiceResponseDto {
 
   @Expose()
   @Type(() => PublicCategorySummaryDto)
-  @ApiPropertyOptional({ type: PublicCategorySummaryDto, description: 'Category' })
+  @ApiPropertyOptional({
+    type: PublicCategorySummaryDto,
+    description: 'Category',
+  })
   category: PublicCategorySummaryDto | null;
 
   @Expose()
   @Type(() => PublicHealthServiceMediaDto)
-  @ApiPropertyOptional({ type: [PublicHealthServiceMediaDto], description: 'Media assets' })
+  @ApiPropertyOptional({
+    type: [PublicHealthServiceMediaDto],
+    description: 'Media assets',
+  })
   media: PublicHealthServiceMediaDto[];
 
   @Expose()
   @Type(() => PublicHealthServiceDefinitionDto)
-  @ApiPropertyOptional({ type: PublicHealthServiceDefinitionDto, description: 'Definition for service type' })
+  @ApiPropertyOptional({
+    type: PublicHealthServiceDefinitionDto,
+    description: 'Definition for service type',
+  })
   productDefinition: PublicHealthServiceDefinitionDto | null;
 
   @Expose()
   @Type(() => PublicHealthServiceEmployeeEligibilityDto)
-  @ApiPropertyOptional({ type: [PublicHealthServiceEmployeeEligibilityDto], description: 'Eligible employees for service' })
+  @ApiPropertyOptional({
+    type: [PublicHealthServiceEmployeeEligibilityDto],
+    description: 'Eligible employees for service',
+  })
   productEmployeeEligibilities: PublicHealthServiceEmployeeEligibilityDto[];
 }

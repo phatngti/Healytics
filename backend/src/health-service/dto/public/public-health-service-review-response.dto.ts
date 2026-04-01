@@ -38,7 +38,9 @@ export class PublicHealthServiceReviewResponseDto {
    * Maps a TreatmentReview entity → public DTO.
    * Expects `review.user` and `review.user.userProfile` to be loaded.
    */
-  static fromEntity(review: TreatmentReview): PublicHealthServiceReviewResponseDto {
+  static fromEntity(
+    review: TreatmentReview,
+  ): PublicHealthServiceReviewResponseDto {
     const dto = new PublicHealthServiceReviewResponseDto();
 
     dto.id = review.id;
@@ -57,14 +59,19 @@ export class PublicHealthServiceReviewResponseDto {
     dto.comment = review.comment ?? null;
     dto.tags = review.tags ?? [];
     dto.photoUrls = review.photoUrls ?? [];
-    dto.createdAt = review.createdAt instanceof Date
-      ? review.createdAt.toISOString()
-      : String(review.createdAt);
+    dto.createdAt =
+      review.createdAt instanceof Date
+        ? review.createdAt.toISOString()
+        : String(review.createdAt);
 
     return dto;
   }
 
-  static fromEntities(reviews: TreatmentReview[]): PublicHealthServiceReviewResponseDto[] {
-    return reviews.map((r) => PublicHealthServiceReviewResponseDto.fromEntity(r));
+  static fromEntities(
+    reviews: TreatmentReview[],
+  ): PublicHealthServiceReviewResponseDto[] {
+    return reviews.map((r) =>
+      PublicHealthServiceReviewResponseDto.fromEntity(r),
+    );
   }
 }

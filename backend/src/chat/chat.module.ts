@@ -3,11 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from '@/auth/constants';
 import { AccountModule } from '@/account/account.module';
-import { Conversation } from '@/common/entities/conversation.entity';
-import { ChatMessage } from '@/common/entities/chat-message.entity';
-import { ChatAttachment } from '@/common/entities/chat-attachment.entity';
+import { PartnerConversation } from '@/common/entities/partner-conversation.entity';
+import { PartnerChatMessage } from '@/common/entities/partner-chat-message.entity';
+import { PartnerChatAttachment } from '@/common/entities/partner-chat-attachment.entity';
 import { ChatService } from './chat.service';
-import { WsChatDocsController } from './ws-chat-docs.controller';
+
 import { UserChatController } from './user-chat.controller';
 import { PartnerChatController } from './partner-chat.controller';
 import { UserChatGateway } from './ws/user-chat.gateway';
@@ -21,14 +21,18 @@ import { GetPartnerConversationsHandler } from './application/handlers/get-partn
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Conversation, ChatMessage, ChatAttachment]),
+    TypeOrmModule.forFeature([
+      PartnerConversation,
+      PartnerChatMessage,
+      PartnerChatAttachment,
+    ]),
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '3600s' },
     }),
     AccountModule, // Provides AccountService for WS JWT auth
   ],
-  controllers: [UserChatController, PartnerChatController, WsChatDocsController],
+  controllers: [UserChatController, PartnerChatController],
   providers: [
     // Service facade
     ChatService,

@@ -123,7 +123,7 @@ import 'package:admin_openapi/api.dart';
 final api_instance = UserChatApi();
 final id = id_example; // String | 
 final beforeId = beforeId_example; // String | Fetch messages older than this message ID (cursor)
-final limit = 8.14; // num | Number of messages to return
+final limit = 8.14; // num | Number of messages to return (max 50)
 
 try {
     api_instance.userChatControllerGetMessages(id, beforeId, limit);
@@ -138,7 +138,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **id** | **String**|  | 
  **beforeId** | **String**| Fetch messages older than this message ID (cursor) | [optional] 
- **limit** | **num**| Number of messages to return | [optional] [default to 20]
+ **limit** | **num**| Number of messages to return (max 50) | [optional] [default to 50]
 
 ### Return type
 

@@ -1,7 +1,7 @@
 import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Conversation } from '@/common/entities/conversation.entity';
+import { PartnerConversation } from '@/common/entities/partner-conversation.entity';
 
 /**
  * Handler: Mark all messages in a conversation as read for the requester.
@@ -13,8 +13,8 @@ export class MarkMessagesReadHandler {
   private readonly logger = new Logger(MarkMessagesReadHandler.name);
 
   constructor(
-    @InjectRepository(Conversation)
-    private readonly conversationRepo: Repository<Conversation>,
+    @InjectRepository(PartnerConversation)
+    private readonly conversationRepo: Repository<PartnerConversation>,
   ) {}
 
   async execute(conversationId: string, requesterId: string): Promise<void> {
@@ -30,14 +30,20 @@ export class MarkMessagesReadHandler {
     const isPartner = conversation.partnerAccountId === requesterId;
 
     if (!isUser && !isPartner) {
-      throw new ForbiddenException('You are not a participant of this conversation');
+      throw new ForbiddenException(
+        'You are not a participant of this conversation',
+      );
     }
 
     // Reset the viewer's unread count
     if (isUser) {
-      await this.conversationRepo.update(conversationId, { userUnreadCount: 0 });
+      await this.conversationRepo.update(conversationId, {
+        userUnreadCount: 0,
+      });
     } else {
-      await this.conversationRepo.update(conversationId, { partnerUnreadCount: 0 });
+      await this.conversationRepo.update(conversationId, {
+        partnerUnreadCount: 0,
+      });
     }
 
     this.logger.log(

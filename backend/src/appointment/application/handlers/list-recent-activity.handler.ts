@@ -82,7 +82,9 @@ export class ListRecentActivityHandler {
       .take(limit)
       .getMany();
 
-    this.logger.log(`Found ${bookings.length} recent activities (total: ${total})`);
+    this.logger.log(
+      `Found ${bookings.length} recent activities (total: ${total})`,
+    );
 
     return {
       data: RecentActivityResponseDto.fromEntities(bookings),

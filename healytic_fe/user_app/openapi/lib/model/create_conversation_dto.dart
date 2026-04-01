@@ -13,13 +13,13 @@ part of openapi.api;
 class CreateConversationDto {
   /// Returns a new [CreateConversationDto] instance.
   CreateConversationDto({
-    required this.participantAccountId,
+    required this.healthPartnerId,
     this.bookingId,
     this.initialMessage,
   });
 
-  /// Account ID of the other party (partner or user)
-  String participantAccountId;
+  /// Account ID of the health partner
+  String healthPartnerId;
 
   /// Optional booking context for the conversation
   ///
@@ -41,23 +41,23 @@ class CreateConversationDto {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is CreateConversationDto &&
-    other.participantAccountId == participantAccountId &&
+    other.healthPartnerId == healthPartnerId &&
     other.bookingId == bookingId &&
     other.initialMessage == initialMessage;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (participantAccountId.hashCode) +
+    (healthPartnerId.hashCode) +
     (bookingId == null ? 0 : bookingId!.hashCode) +
     (initialMessage == null ? 0 : initialMessage!.hashCode);
 
   @override
-  String toString() => 'CreateConversationDto[participantAccountId=$participantAccountId, bookingId=$bookingId, initialMessage=$initialMessage]';
+  String toString() => 'CreateConversationDto[healthPartnerId=$healthPartnerId, bookingId=$bookingId, initialMessage=$initialMessage]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'participantAccountId'] = this.participantAccountId;
+      json[r'healthPartnerId'] = this.healthPartnerId;
     if (this.bookingId != null) {
       json[r'bookingId'] = this.bookingId;
     } else {
@@ -90,7 +90,7 @@ class CreateConversationDto {
       }());
 
       return CreateConversationDto(
-        participantAccountId: mapValueOfType<String>(json, r'participantAccountId')!,
+        healthPartnerId: mapValueOfType<String>(json, r'healthPartnerId')!,
         bookingId: mapValueOfType<String>(json, r'bookingId'),
         initialMessage: mapValueOfType<String>(json, r'initialMessage'),
       );
@@ -140,7 +140,7 @@ class CreateConversationDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'participantAccountId',
+    'healthPartnerId',
   };
 }
 

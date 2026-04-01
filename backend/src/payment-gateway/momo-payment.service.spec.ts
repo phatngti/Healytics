@@ -60,9 +60,7 @@ describe('MoMo Security Utility', () => {
 
       // Verify alphabetical order
       expect(raw).toContain('accessKey=');
-      const keys = raw
-        .split('&')
-        .map((pair) => pair.split('=')[0]);
+      const keys = raw.split('&').map((pair) => pair.split('=')[0]);
       expect(keys).toEqual([
         'accessKey',
         'amount',
@@ -100,9 +98,7 @@ describe('MoMo Security Utility', () => {
 
     it('should build raw string in correct order', () => {
       const raw = createRefundRawSignature(accessKey, refundData);
-      const keys = raw
-        .split('&')
-        .map((pair) => pair.split('=')[0]);
+      const keys = raw.split('&').map((pair) => pair.split('=')[0]);
       expect(keys).toEqual([
         'accessKey',
         'amount',
@@ -163,9 +159,7 @@ describe('MoMo Security Utility', () => {
         ...ipnBase,
         signature: validSig,
       };
-      expect(
-        verifyIPNSignature(accessKey, secretKey, ipn),
-      ).toBe(true);
+      expect(verifyIPNSignature(accessKey, secretKey, ipn)).toBe(true);
     });
 
     it('should return false for tampered signature', () => {
@@ -173,9 +167,7 @@ describe('MoMo Security Utility', () => {
         ...ipnBase,
         signature: 'fake-signature-tampered',
       };
-      expect(
-        verifyIPNSignature(accessKey, secretKey, ipn),
-      ).toBe(false);
+      expect(verifyIPNSignature(accessKey, secretKey, ipn)).toBe(false);
     });
 
     it('should return false when amount is modified', () => {
@@ -205,9 +197,7 @@ describe('MoMo Security Utility', () => {
         signature: validSig,
       };
 
-      expect(
-        verifyIPNSignature(accessKey, secretKey, tamperedIPN),
-      ).toBe(false);
+      expect(verifyIPNSignature(accessKey, secretKey, tamperedIPN)).toBe(false);
     });
   });
 });
@@ -234,16 +224,15 @@ export const MOCK_MOMO_DATA = {
     resultCode: 0,
     message: 'Successful.',
     payUrl:
-      'https://test-payment.momo.vn/v2/gateway'
-      + '/pay?t=TU9NT0JLVU4yMDE4MDUyOXxNT0'
-      + '1PX0FUVF8yMDIwMDkyMl8xMTExMTEx',
+      'https://test-payment.momo.vn/v2/gateway' +
+      '/pay?t=TU9NT0JLVU4yMDE4MDUyOXxNT0' +
+      '1PX0FUVF8yMDIwMDkyMl8xMTExMTEx',
     deeplink:
-      'momo://app?action=payWithApp'
-      + '&isScanQR=false&sid=TU9NT0JLVU'
-      + '4yMDE4MDUyOXxNT01PX0FUVF8yMD',
+      'momo://app?action=payWithApp' +
+      '&isScanQR=false&sid=TU9NT0JLVU' +
+      '4yMDE4MDUyOXxNT01PX0FUVF8yMD',
     qrCodeUrl:
-      'https://test-payment.momo.vn'
-      + '/v2/gateway/qr?sid=TU9NT0JLVU4',
+      'https://test-payment.momo.vn' + '/v2/gateway/qr?sid=TU9NT0JLVU4',
     deeplinkMiniApp: null,
     signature: 'mock-signature-for-testing',
     userFee: 0,
