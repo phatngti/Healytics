@@ -52,7 +52,7 @@ _DISTANCE_UPPER_RE = re.compile(
 # Implicit proximity patterns - ordered most specific → least specific
 # Only trigger when "gần" = "near [me/here]", NOT "almost" (gần xong, gần bằng, gần cuối)
 IMPLICIT_PROXIMITY_PATTERNS = [
-    r"gần\s+(?:đây|chỗ\s*(?:này|đó)?|nơi\s*(?:này|đó)?|tôi|mình|đó)",  # gần đây / gần chỗ / gần tôi
+    r"gần\s+(?:đây|chỗ\s*(?:này|đó)?|nơi\s*(?:này|đó)?|tôi|mình|đó|nhà)",  # gần đây / gần chỗ / gần tôi / gần nhà
     r"gần\s+khu\s+vực",            # gần khu vực
     r"quanh\s+(?:đây|chỗ|nơi)",    # quanh đây / quanh chỗ
     r"xung\s+quanh",               # xung quanh

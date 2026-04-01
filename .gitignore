@@ -16,3 +16,5 @@ vectordb/
 # Data generated
 data/processed/
 ai_services/ner-service/.env
+/ai_services/ner-service/scripts
+/ai_services/ner-service/evaluation/archive
