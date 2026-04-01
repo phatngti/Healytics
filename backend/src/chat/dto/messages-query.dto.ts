@@ -9,16 +9,21 @@ import { Type } from 'class-transformer';
  * - `limit`: max messages per page (default 20, max 50)
  */
 export class MessagesQueryDto {
-  @ApiPropertyOptional({ description: 'Fetch messages older than this message ID (cursor)' })
+  @ApiPropertyOptional({
+    description: 'Fetch messages older than this message ID (cursor)',
+  })
   @IsOptional()
   @IsUUID()
   beforeId?: string;
 
-  @ApiPropertyOptional({ description: 'Number of messages to return', default: 20 })
+  @ApiPropertyOptional({
+    description: 'Number of messages to return (max 50)',
+    default: 50,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(50)
-  limit?: number = 20;
+  limit?: number = 50;
 }

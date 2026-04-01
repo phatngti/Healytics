@@ -20,8 +20,7 @@ class PartnerChatMessageBubble extends StatelessWidget {
     required this.currentUserId,
   });
 
-  bool get _isCurrentUser =>
-      message.senderId == currentUserId;
+  bool get _isCurrentUser => message.senderId == currentUserId;
 
   @override
   Widget build(BuildContext context) {
@@ -41,17 +40,13 @@ class _SentBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final timeStr =
-        DateFormat.jm().format(message.createdAt);
+    final timeStr = DateFormat.jm().format(message.createdAt);
 
     return Align(
       alignment: Alignment.centerRight,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: AppDimens.widthFraction(
-            context,
-            fraction: 0.78,
-          ),
+          maxWidth: AppDimens.widthFraction(context, fraction: 0.78),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -72,8 +67,7 @@ class _SentBubble extends StatelessWidget {
               ),
               child: Text(
                 message.content,
-                style:
-                    textTheme.bodyMedium?.copyWith(
+                style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onPrimary,
                   height: 1.4,
                 ),
@@ -89,23 +83,14 @@ class _SentBubble extends StatelessWidget {
                 children: [
                   Text(
                     timeStr,
-                    style: textTheme.labelSmall
-                        ?.copyWith(
-                      color: colorScheme
-                          .onSurfaceVariant
-                          .withValues(alpha: 0.5),
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.5,
+                      ),
                     ),
                   ),
-                  if (message.isRead) ...[
-                    SizedBox(
-                      width: AppDimens.spaceXxs,
-                    ),
-                    Icon(
-                      Icons.done_all_rounded,
-                      size: 14,
-                      color: colorScheme.primary,
-                    ),
-                  ],
+                  SizedBox(width: AppDimens.spaceXxs),
+                  _StatusIcon(message: message),
                 ],
               ),
             ),
@@ -126,42 +111,31 @@ class _ReceivedBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final timeStr =
-        DateFormat.jm().format(message.createdAt);
+    final timeStr = DateFormat.jm().format(message.createdAt);
 
     return Align(
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: AppDimens.widthFraction(
-            context,
-            fraction: 0.78,
-          ),
+          maxWidth: AppDimens.widthFraction(context, fraction: 0.78),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             // Partner avatar
             Padding(
-              padding: EdgeInsets.only(
-                bottom: AppDimens.spaceMd,
-              ),
+              padding: EdgeInsets.only(bottom: AppDimens.spaceMd),
               child: CircleAvatar(
                 radius: 16,
-                backgroundColor:
-                    colorScheme.primaryContainer,
-                backgroundImage:
-                    message.senderAvatar != null
-                        ? NetworkImage(
-                            message.senderAvatar!,
-                          )
-                        : null,
+                backgroundColor: colorScheme.primaryContainer,
+                backgroundImage: message.senderAvatar != null
+                    ? NetworkImage(message.senderAvatar!)
+                    : null,
                 child: message.senderAvatar == null
                     ? Icon(
                         Icons.storefront_rounded,
                         size: 14,
-                        color: colorScheme
-                            .onPrimaryContainer,
+                        color: colorScheme.onPrimaryContainer,
                       )
                     : null,
               ),
@@ -171,8 +145,7 @@ class _ReceivedBubble extends StatelessWidget {
             // Bubble + timestamp
             Flexible(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     padding: EdgeInsets.symmetric(
@@ -180,25 +153,20 @@ class _ReceivedBubble extends StatelessWidget {
                       vertical: AppDimens.spaceSm,
                     ),
                     decoration: BoxDecoration(
-                      color: colorScheme
-                          .surfaceContainerHighest
-                          .withValues(alpha: 0.5),
-                      borderRadius:
-                          const BorderRadius.only(
+                      color: colorScheme.surfaceContainerHighest.withValues(
+                        alpha: 0.5,
+                      ),
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(18),
                         topRight: Radius.circular(18),
-                        bottomLeft:
-                            Radius.circular(4),
-                        bottomRight:
-                            Radius.circular(18),
+                        bottomLeft: Radius.circular(4),
+                        bottomRight: Radius.circular(18),
                       ),
                     ),
                     child: Text(
                       message.content,
-                      style: textTheme.bodyMedium
-                          ?.copyWith(
-                        color:
-                            colorScheme.onSurface,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface,
                         height: 1.4,
                       ),
                     ),
@@ -210,11 +178,10 @@ class _ReceivedBubble extends StatelessWidget {
                     ),
                     child: Text(
                       timeStr,
-                      style: textTheme.labelSmall
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurfaceVariant
-                            .withValues(alpha: 0.5),
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                     ),
                   ),
@@ -224,6 +191,44 @@ class _ReceivedBubble extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ─── Delivery status icon ───────────────────────────
+
+/// Delivery status icon for sent messages:
+/// - [MessageStatus.sending] → clock (in-flight)
+/// - [MessageStatus.sent] + !read → single check
+/// - [MessageStatus.sent] + read → double check (blue)
+class _StatusIcon extends StatelessWidget {
+  final PartnerChatMessage message;
+  const _StatusIcon({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (message.status == MessageStatus.sending) {
+      return Icon(
+        Icons.access_time_rounded,
+        size: 14,
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+      );
+    }
+
+    if (message.isRead) {
+      return Icon(
+        Icons.done_all_rounded,
+        size: 14,
+        color: colorScheme.primary,
+      );
+    }
+
+    return Icon(
+      Icons.done_rounded,
+      size: 14,
+      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
     );
   }
 }

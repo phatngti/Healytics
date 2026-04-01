@@ -18,7 +18,9 @@ export class AuditController {
   @Get()
   @ApiOperation({ summary: 'Get audit logs with optional filters' })
   @ApiOkResponse({ description: 'List of audit logs.', type: [AuditLog] })
-  async getAuditLogs(@Query() query: GetAuditLogsQueryDto): Promise<AuditLog[]> {
+  async getAuditLogs(
+    @Query() query: GetAuditLogsQueryDto,
+  ): Promise<AuditLog[]> {
     return this.auditService.findAll(query);
   }
 }

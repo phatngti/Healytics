@@ -29,14 +29,20 @@ export class BookingService {
   // ── Slot Lock ─────────────────────────────────────────────
 
   async acquireMicroLock(dto: MicroLockDto): Promise<MicroLockResponseDto> {
-    this.logger.log(`acquireMicroLock: staff=${dto.staffId}, time=${dto.startTime}`);
+    this.logger.log(
+      `acquireMicroLock: staff=${dto.staffId}, time=${dto.startTime}`,
+    );
     return this.acquireMicroLockHandler.execute(dto);
   }
 
   // ── Async Checkout ────────────────────────────────────────
 
-  async asyncCheckout(dto: AsyncCheckoutDto): Promise<AsyncCheckoutResponseDto> {
-    this.logger.log(`asyncCheckout: user=${dto.userId}, key=${dto.idempotencyKey}`);
+  async asyncCheckout(
+    dto: AsyncCheckoutDto,
+  ): Promise<AsyncCheckoutResponseDto> {
+    this.logger.log(
+      `asyncCheckout: user=${dto.userId}, key=${dto.idempotencyKey}`,
+    );
     return this.createCheckoutTicketHandler.execute(dto);
   }
 

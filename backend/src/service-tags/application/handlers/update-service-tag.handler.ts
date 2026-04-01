@@ -49,7 +49,9 @@ export class UpdateServiceTagHandler {
       }
 
       if (tag.userId !== userId) {
-        throw new ForbiddenException('You do not have permission to update this tag');
+        throw new ForbiddenException(
+          'You do not have permission to update this tag',
+        );
       }
 
       // 3. Domain Action (Mutate)
@@ -69,7 +71,10 @@ export class UpdateServiceTagHandler {
         error.stack,
       );
 
-      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
         throw error;
       }
       throw new InternalServerErrorException(

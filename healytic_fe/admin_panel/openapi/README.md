@@ -162,16 +162,6 @@ Class | Method | HTTP request | Description
 *UserReviewsApi* | [**userReviewControllerSubmitSpecialistReview**](doc//UserReviewsApi.md#userreviewcontrollersubmitspecialistreview) | **POST** /user/reviews/specialist | Submit a specialist review for a completed appointment
 *UserReviewsApi* | [**userReviewControllerSubmitTreatmentReview**](doc//UserReviewsApi.md#userreviewcontrollersubmittreatmentreview) | **POST** /user/reviews/treatment | Submit a treatment review for a completed appointment
 *UserSlotsApi* | [**slotsControllerMicroLock**](doc//UserSlotsApi.md#slotscontrollermicrolock) | **POST** /user/slots/micro-lock | Acquire a micro-lock on a time slot (120s TTL)
-*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetErrorDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergeterrordocs) | **GET** /chat/ws-docs/events/error | 📥 error — Error notification
-*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetJoinConversationDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetjoinconversationdocs) | **GET** /chat/ws-docs/events/join-conversation | 📤 join_conversation — Join a conversation room
-*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetMarkReadDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetmarkreaddocs) | **GET** /chat/ws-docs/events/mark-read | 📤 mark_read — Mark messages as read
-*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetMessageSentDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetmessagesentdocs) | **GET** /chat/ws-docs/events/message-sent | 📥 message_sent — ACK for your sent message
-*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetMessagesReadDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetmessagesreaddocs) | **GET** /chat/ws-docs/events/messages-read | 📥 messages_read — Read receipt from other participant
-*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetNewMessageDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetnewmessagedocs) | **GET** /chat/ws-docs/events/new-message | 📥 new_message — Receive a new message
-*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetPartnerGatewayInfo**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetpartnergatewayinfo) | **GET** /chat/ws-docs/partner-gateway | 🟢 Partner Chat Gateway — ws://<host>:8080/partner-chat
-*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetSendMessageDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetsendmessagedocs) | **GET** /chat/ws-docs/events/send-message | 📤 send_message — Send a chat message
-*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetTypingDocs**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergettypingdocs) | **GET** /chat/ws-docs/events/typing | 📤 typing / stop_typing — Typing indicators
-*WebSocketChatConnectionGuideApi* | [**wsChatDocsControllerGetUserGatewayInfo**](doc//WebSocketChatConnectionGuideApi.md#wschatdocscontrollergetusergatewayinfo) | **GET** /chat/ws-docs/user-gateway | 🟢 User Chat Gateway — ws://<host>:8080/user-chat
 
 
 ## Documentation For Models
@@ -337,17 +327,6 @@ Class | Method | HTTP request | Description
  - [VerifiedField](doc//VerifiedField.md)
  - [WorkHistoryEntryDto](doc//WorkHistoryEntryDto.md)
  - [WorkScheduleEntryDto](doc//WorkScheduleEntryDto.md)
- - [WsConnectionInfoDto](doc//WsConnectionInfoDto.md)
- - [WsErrorEventDto](doc//WsErrorEventDto.md)
- - [WsJoinConversationPayloadDto](doc//WsJoinConversationPayloadDto.md)
- - [WsMarkReadPayloadDto](doc//WsMarkReadPayloadDto.md)
- - [WsMessageSentAckDto](doc//WsMessageSentAckDto.md)
- - [WsMessagesReadEventDto](doc//WsMessagesReadEventDto.md)
- - [WsNewMessageEventDto](doc//WsNewMessageEventDto.md)
- - [WsSendMessagePayloadDto](doc//WsSendMessagePayloadDto.md)
- - [WsStopTypingEventDto](doc//WsStopTypingEventDto.md)
- - [WsTypingEventDto](doc//WsTypingEventDto.md)
- - [WsTypingPayloadDto](doc//WsTypingPayloadDto.md)
 
 
 ## Documentation For Authorization

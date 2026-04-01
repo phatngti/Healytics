@@ -24,12 +24,18 @@ export class CreateServiceTagDto {
   @IsOptional()
   description?: string;
 
-  @ApiPropertyOptional({ example: '#FF6366F1', description: 'Color value as hex string' })
+  @ApiPropertyOptional({
+    example: '#FF6366F1',
+    description: 'Color value as hex string',
+  })
   @IsString()
   @IsOptional()
   colorValue?: string;
 
-  @ApiPropertyOptional({ example: true, description: 'Whether the tag is active' })
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Whether the tag is active',
+  })
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;

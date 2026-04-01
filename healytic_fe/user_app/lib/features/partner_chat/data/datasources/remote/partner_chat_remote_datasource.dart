@@ -60,7 +60,7 @@ class PartnerChatRemoteDatasourceImpl
     );
 
     final dto = CreateConversationDto(
-      participantAccountId: partnerAccountId,
+      healthPartnerId: partnerAccountId,
       initialMessage: initialMessage,
     );
 
@@ -113,12 +113,17 @@ class PartnerChatRemoteDatasourceImpl
       return [];
     }
 
+    // Backend returns DESC (newest first) — reverse
+    // to chronological order (oldest first) so the
+    // provider and reverse ListView work correctly.
     return list
         .map(
           (e) => _mapMessage(
             e as Map<String, dynamic>,
           ),
         )
+        .toList()
+        .reversed
         .toList();
   }
 

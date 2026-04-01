@@ -2,6 +2,12 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'partner_chat_message.entity.freezed.dart';
 
+/// Delivery status of a chat message.
+///
+/// Optimistic messages start as [sending] and
+/// transition to [sent] on server acknowledgement.
+enum MessageStatus { sending, sent }
+
 /// Types of messages in a partner chat conversation.
 enum PartnerMessageType {
   /// Plain text message.
@@ -26,10 +32,10 @@ sealed class PartnerChatMessage with _$PartnerChatMessage {
     String? senderName,
     String? senderAvatar,
     required String content,
-    @Default(PartnerMessageType.text)
-    PartnerMessageType messageType,
+    @Default(PartnerMessageType.text) PartnerMessageType messageType,
     String? clientMessageId,
     required DateTime createdAt,
     @Default(false) bool isRead,
+    @Default(MessageStatus.sent) MessageStatus status,
   }) = _PartnerChatMessage;
 }

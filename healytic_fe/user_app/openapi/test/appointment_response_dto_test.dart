@@ -26,8 +26,8 @@ void main() {
       // TODO
     });
 
-    // String vendorName
-    test('to test the property `vendorName`', () async {
+    // String healthPartnerName
+    test('to test the property `healthPartnerName`', () async {
       // TODO
     });
 
@@ -46,13 +46,13 @@ void main() {
       // TODO
     });
 
-    // String providerName
-    test('to test the property `providerName`', () async {
+    // String specialistName
+    test('to test the property `specialistName`', () async {
       // TODO
     });
 
-    // String providerId
-    test('to test the property `providerId`', () async {
+    // String specialistId
+    test('to test the property `specialistId`', () async {
       // TODO
     });
 
@@ -90,6 +90,18 @@ void main() {
     // Distance from user to clinic in kilometers (null if coordinates not provided)
     // num distanceKm
     test('to test the property `distanceKm`', () async {
+      // TODO
+    });
+
+    // Account ID of the health partner (vendor). Used for chat.
+    // Object healthPartnerId
+    test('to test the property `healthPartnerId`', () async {
+      // TODO
+    });
+
+    // Product/service ID for navigation to service details.
+    // Object serviceId
+    test('to test the property `serviceId`', () async {
       // TODO
     });
 

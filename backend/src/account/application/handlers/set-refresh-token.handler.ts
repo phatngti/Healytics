@@ -24,7 +24,9 @@ export class SetRefreshTokenHandler {
    * @returns The updated account
    */
   async execute(accountId: string, refreshTokenHash: string): Promise<Account> {
-    this.logger.log(`Executing SetRefreshTokenHandler for account: ${accountId}`);
+    this.logger.log(
+      `Executing SetRefreshTokenHandler for account: ${accountId}`,
+    );
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -45,7 +47,9 @@ export class SetRefreshTokenHandler {
 
       // 3. Commit transaction
       await queryRunner.commitTransaction();
-      this.logger.log(`Refresh token set successfully for account: ${accountId}`);
+      this.logger.log(
+        `Refresh token set successfully for account: ${accountId}`,
+      );
 
       return savedAccount;
     } catch (error) {

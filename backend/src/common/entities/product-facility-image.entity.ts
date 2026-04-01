@@ -27,7 +27,9 @@ export class ProductFacilityImage {
   sortOrder: number;
 
   // Relations
-  @ManyToOne(() => Product, (product) => product.facilityImages, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Product, (product) => product.facilityImages, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 }

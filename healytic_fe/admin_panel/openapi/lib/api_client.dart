@@ -506,28 +506,6 @@ class ApiClient {
           return WorkHistoryEntryDto.fromJson(value);
         case 'WorkScheduleEntryDto':
           return WorkScheduleEntryDto.fromJson(value);
-        case 'WsConnectionInfoDto':
-          return WsConnectionInfoDto.fromJson(value);
-        case 'WsErrorEventDto':
-          return WsErrorEventDto.fromJson(value);
-        case 'WsJoinConversationPayloadDto':
-          return WsJoinConversationPayloadDto.fromJson(value);
-        case 'WsMarkReadPayloadDto':
-          return WsMarkReadPayloadDto.fromJson(value);
-        case 'WsMessageSentAckDto':
-          return WsMessageSentAckDto.fromJson(value);
-        case 'WsMessagesReadEventDto':
-          return WsMessagesReadEventDto.fromJson(value);
-        case 'WsNewMessageEventDto':
-          return WsNewMessageEventDto.fromJson(value);
-        case 'WsSendMessagePayloadDto':
-          return WsSendMessagePayloadDto.fromJson(value);
-        case 'WsStopTypingEventDto':
-          return WsStopTypingEventDto.fromJson(value);
-        case 'WsTypingEventDto':
-          return WsTypingEventDto.fromJson(value);
-        case 'WsTypingPayloadDto':
-          return WsTypingPayloadDto.fromJson(value);
         default:
           dynamic match;
           if (value is List && (match = _regList.firstMatch(targetType)?.group(1)) != null) {

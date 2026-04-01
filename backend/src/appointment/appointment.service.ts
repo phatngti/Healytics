@@ -4,7 +4,10 @@ import { GetAppointmentHandler } from './application/handlers/get-appointment.ha
 import { ListAppointmentCategoriesHandler } from './application/handlers/list-appointment-categories.handler';
 import { ListRecommendedServicesHandler } from './application/handlers/list-recommended-services.handler';
 import { GetServiceManualHandler } from './application/handlers/get-service-manual.handler';
-import { ListRecentActivityHandler, RecentActivityResult } from './application/handlers/list-recent-activity.handler';
+import {
+  ListRecentActivityHandler,
+  RecentActivityResult,
+} from './application/handlers/list-recent-activity.handler';
 import { AppointmentResponseDto } from './dto/appointment-response.dto';
 import { AppointmentCategoryResponseDto } from './dto/appointment-category-response.dto';
 import { RecommendedServiceResponseDto } from './dto/recommended-service-response.dto';
@@ -45,7 +48,9 @@ export class AppointmentService {
 
   // ── Categories ───────────────────────────────────────────────
 
-  async listCategories(userId: string): Promise<AppointmentCategoryResponseDto[]> {
+  async listCategories(
+    userId: string,
+  ): Promise<AppointmentCategoryResponseDto[]> {
     this.logger.log(`listCategories: user=${userId}`);
     return this.listAppointmentCategoriesHandler.execute(userId);
   }
@@ -59,7 +64,9 @@ export class AppointmentService {
 
   // ── Service Manual ───────────────────────────────────────────
 
-  async getServiceManual(appointmentId: string): Promise<ServiceManualResponseDto> {
+  async getServiceManual(
+    appointmentId: string,
+  ): Promise<ServiceManualResponseDto> {
     this.logger.log(`getServiceManual: ${appointmentId}`);
     return this.getServiceManualHandler.execute(appointmentId);
   }

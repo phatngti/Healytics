@@ -1,11 +1,7 @@
-import {
-  Injectable,
-  Logger,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
 import { DataSource, QueryRunner } from 'typeorm';
-import { ChatMessage } from '@/common/entities/chat-message.entity';
-import { Conversation } from '@/common/entities/conversation.entity';
+import { PartnerChatMessage } from '@/common/entities/partner-chat-message.entity';
+import { PartnerConversation } from '@/common/entities/partner-conversation.entity';
 import { SendMessageDto } from '@/chat/dto/send-message.dto';
 import { ChatMessageResponseDto } from '@/chat/dto/chat-message-response.dto';
 import { MessageType } from '@/chat/enums/message-type.enum';
@@ -28,8 +24,13 @@ export class SendMessageHandler {
 
   constructor(private readonly dataSource: DataSource) {}
 
-  async execute(dto: SendMessageDto, senderId: string): Promise<ChatMessageResponseDto> {
-    this.logger.log(`Sending message in conversation ${dto.conversationId} from ${senderId}`);
+  async execute(
+    dto: SendMessageDto,
+    senderId: string,
+  ): Promise<ChatMessageResponseDto> {
+    this.logger.log(
+      `Sending message in conversation ${dto.conversationId} from ${senderId}`,
+    );
 
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -37,9 +38,12 @@ export class SendMessageHandler {
 
     try {
       // 1. Load conversation
-      const conversation = await queryRunner.manager.findOne(Conversation, {
-        where: { id: dto.conversationId },
-      });
+      const conversation = await queryRunner.manager.findOne(
+        PartnerConversation,
+        {
+          where: { id: dto.conversationId },
+        },
+      );
 
       if (!conversation) {
         throw new ForbiddenException('Conversation not found');
@@ -49,12 +53,14 @@ export class SendMessageHandler {
       const isUser = conversation.userId === senderId;
       const isPartner = conversation.partnerAccountId === senderId;
       if (!isUser && !isPartner) {
-        throw new ForbiddenException('You are not a participant of this conversation');
+        throw new ForbiddenException(
+          'You are not a participant of this conversation',
+        );
       }
 
       // 3. Idempotency check — if clientMessageId already exists, return existing
       if (dto.clientMessageId) {
-        const existing = await queryRunner.manager.findOne(ChatMessage, {
+        const existing = await queryRunner.manager.findOne(PartnerChatMessage, {
           where: {
             conversationId: dto.conversationId,
             clientMessageId: dto.clientMessageId,
@@ -62,24 +68,30 @@ export class SendMessageHandler {
           relations: ['sender', 'sender.userProfile', 'attachments'],
         });
         if (existing) {
-          this.logger.log(`Duplicate clientMessageId ${dto.clientMessageId} — returning existing`);
+          this.logger.log(
+            `Duplicate clientMessageId ${dto.clientMessageId} — returning existing`,
+          );
           await queryRunner.rollbackTransaction();
-          return ChatMessageResponseDto.fromEntity(existing);
+          const responseDto = ChatMessageResponseDto.fromEntity(existing);
+          responseDto.receiverId = isUser
+            ? conversation.partnerAccountId
+            : conversation.userId;
+          return responseDto;
         }
       }
 
       // 4. Create message
-      const message = queryRunner.manager.create(ChatMessage, {
+      const message = queryRunner.manager.create(PartnerChatMessage, {
         conversationId: dto.conversationId,
         senderId,
         content: dto.content,
         messageType: dto.messageType ?? MessageType.TEXT,
         clientMessageId: dto.clientMessageId ?? null,
       });
-      const saved = await queryRunner.manager.save(ChatMessage, message);
+      const saved = await queryRunner.manager.save(PartnerChatMessage, message);
 
       // 5. Update conversation denormalized fields
-      const updateData: Partial<Conversation> = {
+      const updateData: Partial<PartnerConversation> = {
         lastMessageText: dto.content.substring(0, 200),
         lastMessageAt: saved.createdAt,
         lastMessageSenderId: senderId,
@@ -89,7 +101,7 @@ export class SendMessageHandler {
       if (isUser) {
         await queryRunner.manager
           .createQueryBuilder()
-          .update(Conversation)
+          .update(PartnerConversation)
           .set({
             lastMessageText: updateData.lastMessageText,
             lastMessageAt: updateData.lastMessageAt,
@@ -99,13 +111,13 @@ export class SendMessageHandler {
           .execute();
 
         await queryRunner.query(
-          `UPDATE conversations SET partner_unread_count = partner_unread_count + 1 WHERE id = $1`,
+          `UPDATE partner_conversations SET partner_unread_count = partner_unread_count + 1 WHERE id = $1`,
           [conversation.id],
         );
       } else {
         await queryRunner.manager
           .createQueryBuilder()
-          .update(Conversation)
+          .update(PartnerConversation)
           .set({
             lastMessageText: updateData.lastMessageText,
             lastMessageAt: updateData.lastMessageAt,
@@ -115,7 +127,7 @@ export class SendMessageHandler {
           .execute();
 
         await queryRunner.query(
-          `UPDATE conversations SET user_unread_count = user_unread_count + 1 WHERE id = $1`,
+          `UPDATE partner_conversations SET user_unread_count = user_unread_count + 1 WHERE id = $1`,
           [conversation.id],
         );
       }
@@ -125,15 +137,26 @@ export class SendMessageHandler {
       this.logger.log(`Message sent: ${saved.id}`);
 
       // 7. Reload with relations for response
-      const fullMessage = await this.dataSource.manager.findOne(ChatMessage, {
-        where: { id: saved.id },
-        relations: ['sender', 'sender.userProfile', 'attachments'],
-      });
+      const fullMessage = await this.dataSource.manager.findOne(
+        PartnerChatMessage,
+        {
+          where: { id: saved.id },
+          relations: ['sender', 'sender.userProfile', 'attachments'],
+        },
+      );
 
-      return ChatMessageResponseDto.fromEntity(fullMessage!);
+      const responseDto = ChatMessageResponseDto.fromEntity(fullMessage!);
+      responseDto.receiverId = isUser
+        ? conversation.partnerAccountId
+        : conversation.userId;
+
+      return responseDto;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      this.logger.error(`Send message failed: ${(error as Error).message}`, (error as Error).stack);
+      this.logger.error(
+        `Send message failed: ${(error as Error).message}`,
+        (error as Error).stack,
+      );
       throw error;
     } finally {
       await queryRunner.release();

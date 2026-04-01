@@ -82,19 +82,23 @@ class PartnerRecommendedServiceDto {
 class PartnerDetailServiceRuleDto {
   @ApiProperty({ example: 'no-eating' }) iconSlug: string;
   @ApiProperty({ example: 'No Eating Before' }) title: string;
-  @ApiProperty({ example: 'Avoid eating 2 hours before the service' }) description: string;
+  @ApiProperty({ example: 'Avoid eating 2 hours before the service' })
+  description: string;
 }
 
 class PartnerDetailProcedureStepDto {
   @ApiProperty({ example: 1 }) stepNumber: number;
   @ApiProperty({ example: 'Check-in & Registration' }) title: string;
-  @ApiProperty({ example: 'Arrive at the reception and complete registration' }) description: string;
+  @ApiProperty({ example: 'Arrive at the reception and complete registration' })
+  description: string;
 }
 
 class PartnerDetailServiceManualDto {
   @ApiPropertyOptional({ type: [String] }) preServiceGuidelines?: string[];
-  @ApiPropertyOptional({ type: [PartnerDetailServiceRuleDto] }) serviceRules?: PartnerDetailServiceRuleDto[];
-  @ApiPropertyOptional({ type: [PartnerDetailProcedureStepDto] }) procedureSteps?: PartnerDetailProcedureStepDto[];
+  @ApiPropertyOptional({ type: [PartnerDetailServiceRuleDto] })
+  serviceRules?: PartnerDetailServiceRuleDto[];
+  @ApiPropertyOptional({ type: [PartnerDetailProcedureStepDto] })
+  procedureSteps?: PartnerDetailProcedureStepDto[];
 }
 
 // ─── Main DTO ────────────────────────────────────────────────
@@ -110,19 +114,28 @@ export class PartnerHealthServiceDetailResponseDto {
   @ApiProperty() isVerified: boolean;
   @ApiPropertyOptional() description: string | null;
   @ApiProperty() duration: number;
-  @ApiProperty({ type: [PartnerFeatureTagDto] }) featureTags: PartnerFeatureTagDto[];
+  @ApiProperty({ type: [PartnerFeatureTagDto] })
+  featureTags: PartnerFeatureTagDto[];
   @ApiProperty({ type: PartnerClinicDto }) clinic: PartnerClinicDto;
-  @ApiProperty({ type: [PartnerSpecialistDto] }) specialists: PartnerSpecialistDto[];
-  @ApiProperty({ type: [PartnerDayScheduleDto] }) daySchedules: PartnerDayScheduleDto[];
-  @ApiProperty({ type: [PartnerFacilityImageDto] }) facilityImages: PartnerFacilityImageDto[];
+  @ApiProperty({ type: [PartnerSpecialistDto] })
+  specialists: PartnerSpecialistDto[];
+  @ApiProperty({ type: [PartnerDayScheduleDto] })
+  daySchedules: PartnerDayScheduleDto[];
+  @ApiProperty({ type: [PartnerFacilityImageDto] })
+  facilityImages: PartnerFacilityImageDto[];
   @ApiProperty({ type: [PartnerReviewDto] }) reviews: PartnerReviewDto[];
-  @ApiProperty({ type: [PartnerRecommendedServiceDto] }) recommendedServices: PartnerRecommendedServiceDto[];
-  @ApiPropertyOptional({ type: PartnerDetailServiceManualDto }) serviceManual: PartnerDetailServiceManualDto | null;
+  @ApiProperty({ type: [PartnerRecommendedServiceDto] })
+  recommendedServices: PartnerRecommendedServiceDto[];
+  @ApiPropertyOptional({ type: PartnerDetailServiceManualDto })
+  serviceManual: PartnerDetailServiceManualDto | null;
 
   /**
    * Maps a Product entity + recommended products into the detail response DTO.
    */
-  static fromEntity(product: Product, recommended: Product[]): PartnerHealthServiceDetailResponseDto {
+  static fromEntity(
+    product: Product,
+    recommended: Product[],
+  ): PartnerHealthServiceDetailResponseDto {
     const dto = new PartnerHealthServiceDetailResponseDto();
 
     dto.id = product.slug;
@@ -159,22 +172,26 @@ export class PartnerHealthServiceDetailResponseDto {
     };
 
     // Specialists
-    dto.specialists = (product.productEmployeeEligibilities ?? []).map((elig) => {
-      const emp = elig.employee;
-      const doc = emp?.doctorProfile;
-      return {
-        id: emp?.id ?? '',
-        name: emp?.fullName ?? '',
-        role: emp?.jobTitle ?? emp?.role ?? '',
-        imageUrl: emp?.avatarUrl ?? null,
-        degrees: doc?.education?.join(', ') ?? null,
-        experience: doc?.experienceYears ? `${doc.experienceYears} years` : null,
-        specializations: doc?.specializations ?? [],
-        bio: emp?.description ?? null,
-        quote: emp?.description ?? null,
-        languages: ['Vietnamese', 'English'], // Mocked until entity supports it
-      };
-    });
+    dto.specialists = (product.productEmployeeEligibilities ?? []).map(
+      (elig) => {
+        const emp = elig.employee;
+        const doc = emp?.doctorProfile;
+        return {
+          id: emp?.id ?? '',
+          name: emp?.fullName ?? '',
+          role: emp?.jobTitle ?? emp?.role ?? '',
+          imageUrl: emp?.avatarUrl ?? null,
+          degrees: doc?.education?.join(', ') ?? null,
+          experience: doc?.experienceYears
+            ? `${doc.experienceYears} years`
+            : null,
+          specializations: doc?.specializations ?? [],
+          bio: emp?.description ?? null,
+          quote: emp?.description ?? null,
+          languages: ['Vietnamese', 'English'], // Mocked until entity supports it
+        };
+      },
+    );
 
     // Day schedules (mocked)
     dto.daySchedules = generateMockSchedules();
@@ -196,7 +213,8 @@ export class PartnerHealthServiceDetailResponseDto {
       return {
         id: p.slug,
         title: p.name,
-        imageUrl: p.media?.find((m) => m.isThumbnail)?.url ?? p.media?.[0]?.url ?? null,
+        imageUrl:
+          p.media?.find((m) => m.isThumbnail)?.url ?? p.media?.[0]?.url ?? null,
         rating: 0,
         reviewCount: 0,
         price: new Intl.NumberFormat('vi-VN').format(Number(rPrice)) + '₫',
@@ -215,10 +233,10 @@ export class PartnerHealthServiceDetailResponseDto {
 function mapTagToIcon(tagName?: string): string {
   const iconMap: Record<string, string> = {
     'Pain Relief': 'healing',
-    'Relaxation': 'spa',
-    'Rehabilitation': 'fitness_center',
-    'Beauty': 'face',
-    'Skincare': 'dermatology',
+    Relaxation: 'spa',
+    Rehabilitation: 'fitness_center',
+    Beauty: 'face',
+    Skincare: 'dermatology',
   };
   return iconMap[tagName ?? ''] ?? 'local_offer';
 }
@@ -237,7 +255,14 @@ function generateMockSchedules(): PartnerDayScheduleDto[] {
     const dateStr = date.toISOString().split('T')[0];
 
     const morningSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'];
-    const afternoonSlots = ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30'];
+    const afternoonSlots = [
+      '14:00',
+      '14:30',
+      '15:00',
+      '15:30',
+      '16:00',
+      '16:30',
+    ];
     const allSlots = [...morningSlots, ...afternoonSlots];
 
     return {

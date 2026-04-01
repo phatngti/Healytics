@@ -13,14 +13,20 @@ import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Partner, PartnerDocument, Account, PartnerReviewLog, DocumentRequirement]),
+    TypeOrmModule.forFeature([
+      Partner,
+      PartnerDocument,
+      Account,
+      PartnerReviewLog,
+      DocumentRequirement,
+    ]),
     AuditModule,
     PartnersModule,
   ],
   controllers: [AdminPartnersController],
   providers: [
     AdminPartnersService,
-    ReviewPartnerHandler,  // ← handler registered
+    ReviewPartnerHandler, // ← handler registered
   ],
   exports: [AdminPartnersService],
 })

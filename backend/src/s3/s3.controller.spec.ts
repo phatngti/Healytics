@@ -52,7 +52,10 @@ describe('S3Controller', () => {
 
       // Assert
       expect(result).toEqual(expectedResult);
-      expect(s3Service.getPresignedUploadUrl).toHaveBeenCalledWith(dto.fileName, dto.contentType);
+      expect(s3Service.getPresignedUploadUrl).toHaveBeenCalledWith(
+        dto.fileName,
+        dto.contentType,
+      );
     });
   });
 

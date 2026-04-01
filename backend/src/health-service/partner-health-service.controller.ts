@@ -32,47 +32,51 @@ import { PartnerHealthServiceDetailResponseDto } from './dto/partner/partner-hea
 @PartnerApi('health-services')
 export class PartnerHealthServiceController {
   constructor(private readonly healthServiceService: HealthServiceService) {}
-   /**
-     * Retrieves all health services.
-     */
-    @Get()
-    @ApiOperation({ summary: 'Get all health services' })
-    @ApiOkResponse({
-      description: 'Return all health services.',
-      type: [PartnerHealthServiceResponseDto],
-    })
-    findAll(): Promise<PartnerHealthServiceResponseDto[]> {
-      return this.healthServiceService.findAll();
-    }
-  
-    /**
-     * Retrieves full health service details by slug (enriched response).
-     */
-    @Get('slug/:slug/details')
-    @ApiOperation({ summary: 'Get full health service details by slug' })
-    @ApiOkResponse({
-      description: 'Return enriched health service details.',
-      type: PartnerHealthServiceDetailResponseDto,
-    })
-    @ApiNotFoundResponse({ description: 'Health service not found.' })
-    getDetails(@Param('slug') slug: string): Promise<PartnerHealthServiceDetailResponseDto> {
-      return this.healthServiceService.getProductDetails(slug);
-    }
-  
-    /**
-     * Retrieves a health service by slug.
-     */
-    @Get('slug/:slug')
-    @ApiOperation({ summary: 'Get a health service by slug' })
-    @ApiOkResponse({
-      description: 'Return the health service.',
-      type: PartnerHealthServiceResponseDto,
-    })
-    @ApiNotFoundResponse({ description: 'Health service not found.' })
-    findBySlug(@Param('slug') slug: string): Promise<PartnerHealthServiceResponseDto> {
-      return this.healthServiceService.findBySlug(slug);
-    }
-  
+  /**
+   * Retrieves all health services.
+   */
+  @Get()
+  @ApiOperation({ summary: 'Get all health services' })
+  @ApiOkResponse({
+    description: 'Return all health services.',
+    type: [PartnerHealthServiceResponseDto],
+  })
+  findAll(): Promise<PartnerHealthServiceResponseDto[]> {
+    return this.healthServiceService.findAll();
+  }
+
+  /**
+   * Retrieves full health service details by slug (enriched response).
+   */
+  @Get('slug/:slug/details')
+  @ApiOperation({ summary: 'Get full health service details by slug' })
+  @ApiOkResponse({
+    description: 'Return enriched health service details.',
+    type: PartnerHealthServiceDetailResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'Health service not found.' })
+  getDetails(
+    @Param('slug') slug: string,
+  ): Promise<PartnerHealthServiceDetailResponseDto> {
+    return this.healthServiceService.getProductDetails(slug);
+  }
+
+  /**
+   * Retrieves a health service by slug.
+   */
+  @Get('slug/:slug')
+  @ApiOperation({ summary: 'Get a health service by slug' })
+  @ApiOkResponse({
+    description: 'Return the health service.',
+    type: PartnerHealthServiceResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'Health service not found.' })
+  findBySlug(
+    @Param('slug') slug: string,
+  ): Promise<PartnerHealthServiceResponseDto> {
+    return this.healthServiceService.findBySlug(slug);
+  }
+
   /**
    * Creates a new health service.
    */
@@ -83,7 +87,9 @@ export class PartnerHealthServiceController {
     description: 'The health service has been successfully created.',
     type: PartnerHealthServiceResponseDto,
   })
-  create(@Body() createDto: CreatePartnerHealthServiceDto): Promise<PartnerHealthServiceResponseDto> {
+  create(
+    @Body() createDto: CreatePartnerHealthServiceDto,
+  ): Promise<PartnerHealthServiceResponseDto> {
     return this.healthServiceService.create(createDto);
   }
 

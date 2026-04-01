@@ -34,7 +34,9 @@ describe('CheckSlotAvailabilityHandler', () => {
       ],
     }).compile();
 
-    handler = module.get<CheckSlotAvailabilityHandler>(CheckSlotAvailabilityHandler);
+    handler = module.get<CheckSlotAvailabilityHandler>(
+      CheckSlotAvailabilityHandler,
+    );
   });
 
   afterEach(() => {
@@ -43,7 +45,9 @@ describe('CheckSlotAvailabilityHandler', () => {
 
   it('should return false when existing non-cancelled booking found in DB', async () => {
     // Arrange
-    const existingBooking = createBookingEntity({ status: BookingStatus.CONFIRMED });
+    const existingBooking = createBookingEntity({
+      status: BookingStatus.CONFIRMED,
+    });
     bookingRepo.findOne.mockResolvedValue(existingBooking);
 
     // Act

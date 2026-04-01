@@ -1,8 +1,8 @@
 import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan } from 'typeorm';
-import { ChatMessage } from '@/common/entities/chat-message.entity';
-import { Conversation } from '@/common/entities/conversation.entity';
+import { PartnerChatMessage } from '@/common/entities/partner-chat-message.entity';
+import { PartnerConversation } from '@/common/entities/partner-conversation.entity';
 import { MessagesQueryDto } from '@/chat/dto/messages-query.dto';
 import { ChatMessageResponseDto } from '@/chat/dto/chat-message-response.dto';
 
@@ -16,17 +16,21 @@ export class GetConversationMessagesHandler {
   private readonly logger = new Logger(GetConversationMessagesHandler.name);
 
   constructor(
-    @InjectRepository(ChatMessage)
-    private readonly messageRepo: Repository<ChatMessage>,
-    @InjectRepository(Conversation)
-    private readonly conversationRepo: Repository<Conversation>,
+    @InjectRepository(PartnerChatMessage)
+    private readonly messageRepo: Repository<PartnerChatMessage>,
+    @InjectRepository(PartnerConversation)
+    private readonly conversationRepo: Repository<PartnerConversation>,
   ) {}
 
   async execute(
     conversationId: string,
     requesterId: string,
     query: MessagesQueryDto,
-  ): Promise<{ messages: ChatMessageResponseDto[]; hasMore: boolean }> {
+  ): Promise<{
+    messages: ChatMessageResponseDto[];
+    hasMore: boolean;
+    nextCursor: string | null;
+  }> {
     // 1. Verify requester is a participant
     const conversation = await this.conversationRepo.findOne({
       where: { id: conversationId },
@@ -36,12 +40,17 @@ export class GetConversationMessagesHandler {
       throw new ForbiddenException('Conversation not found');
     }
 
-    if (conversation.userId !== requesterId && conversation.partnerAccountId !== requesterId) {
-      throw new ForbiddenException('You are not a participant of this conversation');
+    if (
+      conversation.userId !== requesterId &&
+      conversation.partnerAccountId !== requesterId
+    ) {
+      throw new ForbiddenException(
+        'You are not a participant of this conversation',
+      );
     }
 
     // 2. Build cursor-based query
-    const limit = query.limit ?? 20;
+    const limit = query.limit ?? 50;
 
     const qb = this.messageRepo
       .createQueryBuilder('msg')
@@ -52,7 +61,7 @@ export class GetConversationMessagesHandler {
       .orderBy('msg.createdAt', 'DESC')
       .take(limit + 1); // Fetch one extra to detect hasMore
 
-    // Apply cursor if provided
+    // Apply cursor if provided — resolve cursor ID to timestamp for indexed scan
     if (query.beforeId) {
       const cursorMessage = await this.messageRepo.findOne({
         where: { id: query.beforeId },
@@ -67,19 +76,26 @@ export class GetConversationMessagesHandler {
 
     const messages = await qb.getMany();
 
-    // 3. Detect hasMore
+    // 3. Detect hasMore and compute nextCursor
     const hasMore = messages.length > limit;
     if (hasMore) {
       messages.pop(); // Remove the extra item
     }
 
+    // nextCursor = ID of the oldest message in this page (last element)
+    const nextCursor =
+      hasMore && messages.length > 0
+        ? messages[messages.length - 1].id
+        : null;
+
     this.logger.log(
-      `Fetched ${messages.length} messages for conversation ${conversationId} (hasMore: ${hasMore})`,
+      `Fetched ${messages.length} messages for conversation ${conversationId} (hasMore: ${hasMore}, nextCursor: ${nextCursor ?? 'none'})`,
     );
 
     return {
       messages: ChatMessageResponseDto.fromEntities(messages),
       hasMore,
+      nextCursor,
     };
   }
 }

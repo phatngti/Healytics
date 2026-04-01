@@ -15,7 +15,7 @@ export class AppointmentResponseDto {
 
   @ApiProperty({ example: 'Healytics Spa Center' })
   @Expose()
-  vendorName: string;
+  healthPartnerName: string;
 
   @ApiProperty({ example: 'https://example.com/image.jpg' })
   @Expose()
@@ -31,11 +31,11 @@ export class AppointmentResponseDto {
 
   @ApiProperty({ example: 'Dr. Jane Smith' })
   @Expose()
-  providerName: string;
+  specialistName: string;
 
-  @ApiProperty({example: '550e8400-e29b-41d4-a716-446655440000'})
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
   @Expose()
-  providerId: string;
+  specialistId: string;
 
   @ApiProperty({ example: '123 Main Street, District 1' })
   @Expose()
@@ -57,18 +57,38 @@ export class AppointmentResponseDto {
   @Expose()
   duration: string;
 
-  @ApiProperty({ example: false, description: 'Whether the user has reviewed this appointment' })
+  @ApiProperty({
+    example: false,
+    description: 'Whether the user has reviewed this appointment',
+  })
   @Expose()
   isReviewed: boolean;
 
   @ApiProperty({
     example: 2.5,
     nullable: true,
-    description: 'Distance from user to clinic in kilometers (null if coordinates not provided)',
+    description:
+      'Distance from user to clinic in kilometers (null if coordinates not provided)',
   })
   @Type(() => Number)
   @Expose()
   distanceKm!: number;
+
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    nullable: true,
+    description: 'Account ID of the health partner (vendor). Used for chat.',
+  })
+  @Expose()
+  healthPartnerId!: string | null;
+
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    nullable: true,
+    description: 'Product/service ID for navigation to service details.',
+  })
+  @Expose()
+  serviceId!: string | null;
 
   /**
    * Maps a BookingStatus to the frontend's AppointmentStatus.
@@ -103,7 +123,11 @@ export class AppointmentResponseDto {
   /**
    * Computes duration string from start/end times.
    */
-  private static computeDuration(start: Date, end: Date | null, durationMinutes?: number): string {
+  private static computeDuration(
+    start: Date,
+    end: Date | null,
+    durationMinutes?: number,
+  ): string {
     if (durationMinutes) {
       return `${durationMinutes} min`;
     }
@@ -122,12 +146,14 @@ export class AppointmentResponseDto {
     const dto = new AppointmentResponseDto();
     dto.id = booking.id;
     dto.serviceName = booking.product?.name ?? 'Unknown Service';
-    dto.vendorName = booking.product?.vendorName ?? '';
+    dto.healthPartnerName = booking.product?.partner?.brandName ?? '';
+    dto.healthPartnerId = booking.product?.partner?.accountId ?? null;
+
     dto.imageUrl = booking.product?.media?.[0]?.url ?? '';
     dto.status = AppointmentResponseDto.mapStatus(booking.status);
     dto.category = booking.product?.category?.name ?? '';
-    dto.providerName = booking.staff?.fullName ?? '';
-    dto.providerId = booking.staff?.id ?? '';
+    dto.specialistName = booking.staff?.fullName ?? '';
+    dto.specialistId = booking.staff?.id ?? '';
     dto.address = options?.clinicAddress ?? '';
     dto.date = booking.startTime?.toISOString() ?? '';
     dto.checkInTime = AppointmentResponseDto.formatTime(booking.startTime);
@@ -142,6 +168,7 @@ export class AppointmentResponseDto {
       options?.distanceMeters != null
         ? Math.round((options.distanceMeters / 1000) * 10) / 10
         : -1;
+    dto.serviceId = booking.productId ?? null;
     return dto;
   }
 

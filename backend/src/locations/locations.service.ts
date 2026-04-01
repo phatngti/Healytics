@@ -34,7 +34,9 @@ export class LocationsService {
    * @returns Location list response DTO
    * @throws NotFoundException if province not found
    */
-  async getDistrictsByProvinceId(provinceId: string): Promise<LocationListResponseDto> {
+  async getDistrictsByProvinceId(
+    provinceId: string,
+  ): Promise<LocationListResponseDto> {
     const province = await this.locationRepo.findOne({
       where: { id: provinceId, level: LocationLevel.PROVINCE },
     });
@@ -61,7 +63,9 @@ export class LocationsService {
    * @returns Location list response DTO
    * @throws NotFoundException if district not found
    */
-  async getWardsByDistrictId(districtId: string): Promise<LocationListResponseDto> {
+  async getWardsByDistrictId(
+    districtId: string,
+  ): Promise<LocationListResponseDto> {
     const district = await this.locationRepo.findOne({
       where: { id: districtId, level: LocationLevel.DISTRICT },
     });

@@ -93,7 +93,9 @@ describe('AccountService', () => {
 
       // Assert
       expect(result).toEqual(expectedAccount);
-      expect(mockAccountRepository.findOneBy).toHaveBeenCalledWith({ email: 'test@example.com' });
+      expect(mockAccountRepository.findOneBy).toHaveBeenCalledWith({
+        email: 'test@example.com',
+      });
     });
 
     it('should return null when not found', async () => {
@@ -159,7 +161,10 @@ describe('AccountService', () => {
 
       // Assert
       expect(result).toEqual(expectedAccount);
-      expect(mockSetSurveyHandler.execute).toHaveBeenCalledWith('uuid-1', inputSurvey);
+      expect(mockSetSurveyHandler.execute).toHaveBeenCalledWith(
+        'uuid-1',
+        inputSurvey,
+      );
     });
   });
 
@@ -174,7 +179,10 @@ describe('AccountService', () => {
 
       // Assert
       expect(result).toEqual(expectedAccount);
-      expect(mockSetRefreshTokenHandler.execute).toHaveBeenCalledWith('uuid-1', 'hash');
+      expect(mockSetRefreshTokenHandler.execute).toHaveBeenCalledWith(
+        'uuid-1',
+        'hash',
+      );
     });
   });
 
@@ -187,7 +195,9 @@ describe('AccountService', () => {
       await service.removeRefreshToken('uuid-1');
 
       // Assert
-      expect(mockAccountRepository.update).toHaveBeenCalledWith('uuid-1', { refreshTokenHash: null });
+      expect(mockAccountRepository.update).toHaveBeenCalledWith('uuid-1', {
+        refreshTokenHash: null,
+      });
     });
   });
 });

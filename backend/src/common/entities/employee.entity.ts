@@ -24,8 +24,6 @@ export class Employee {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-
-
   @Index()
   @Column({ name: 'employee_code', unique: true, length: 50 })
   employeeCode: string;
@@ -38,8 +36,6 @@ export class Employee {
 
   @Column({ name: 'full_name', length: 100 })
   fullName: string;
-
-
 
   @Index()
   @Column({ unique: true, length: 100 })
@@ -79,13 +75,16 @@ export class Employee {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-
-
   @Column({ type: 'jsonb', nullable: true })
   schedule: { day: string; start: string; end: string; isWorking: boolean }[];
 
   @Column({ name: 'work_history', type: 'jsonb', nullable: true })
-  workHistory: { facility: string; position: string; period: string; isCurrent: boolean }[];
+  workHistory: {
+    facility: string;
+    position: string;
+    period: string;
+    isCurrent: boolean;
+  }[];
 
   @Column({ type: 'date', nullable: true })
   dob: Date;
@@ -109,13 +108,13 @@ export class Employee {
   @Column({ name: 'review_count', type: 'int', default: 0 })
   reviewCount: number;
 
-
-
   @Index()
   @Column({ name: 'partner_id', type: 'uuid', nullable: true })
   partnerId: string | null;
 
-  @ManyToOne(() => Partner, (partner) => partner.employees, { onDelete: 'SET NULL' })
+  @ManyToOne(() => Partner, (partner) => partner.employees, {
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'partner_id' })
   partner: Partner | null;
 

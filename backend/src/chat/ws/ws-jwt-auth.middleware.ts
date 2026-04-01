@@ -38,7 +38,9 @@ export function WsJwtAuthMiddleware(
 
       const user = await accountService.findOne(payload.sub);
       if (!user) {
-        logger.warn(`WebSocket connection rejected: user ${payload.sub} not found`);
+        logger.warn(
+          `WebSocket connection rejected: user ${payload.sub} not found`,
+        );
         return next(new Error('USER_NOT_FOUND'));
       }
 
@@ -46,10 +48,14 @@ export function WsJwtAuthMiddleware(
       const { passwordHash, refreshTokenHash, ...safeUser } = user as any;
       socket.data.user = safeUser;
 
-      logger.log(`WebSocket authenticated: ${safeUser.email} (${safeUser.role})`);
+      logger.log(
+        `WebSocket authenticated: ${safeUser.email} (${safeUser.role})`,
+      );
       next();
     } catch (error) {
-      logger.warn(`WebSocket connection rejected: invalid token — ${(error as Error).message}`);
+      logger.warn(
+        `WebSocket connection rejected: invalid token — ${(error as Error).message}`,
+      );
       next(new Error('INVALID_TOKEN'));
     }
   };

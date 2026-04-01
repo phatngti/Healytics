@@ -17,19 +17,36 @@ import 'package:admin_openapi/api.dart';
 /// Prefixes for different backend services behind
 /// the API gateway (Kong).
 ///
-/// Each value maps to a path segment appended to the
-/// base endpoint URL when creating its [ApiClient].
+/// **REST** entries produce an [ApiClient] in
+/// [ApiService.setEndpoint].
+/// **Real-time** entries (WS) are URL-only — used
+/// to build full URIs without duplicating path
+/// constants.
 enum ServicePrefix {
+  // ── REST (get an ApiClient) ───────────────────
   /// NestJS main backend: `/backend`
   backend('/backend'),
 
   /// AI / chatbot service: `/ai`
-  ai('/ai');
+  ai('/ai'),
 
-  const ServicePrefix(this.path);
+  // ── Real-time (URL-only, no ApiClient) ────────
+  /// WebSocket partner-chat namespace:
+  /// `/partner-chat`
+  partnerChat('/partner-chat', isRest: false);
+
+  const ServicePrefix(this.path, {this.isRest = true});
 
   /// The URL path segment for this service.
   final String path;
+
+  /// Whether an [ApiClient] should be created for
+  /// this prefix. `false` for WS entries.
+  final bool isRest;
+
+  /// All entries that need an [ApiClient].
+  static List<ServicePrefix> get restValues =>
+      values.where((v) => v.isRest).toList();
 }
 
 class ApiService implements Authentication {
@@ -45,6 +62,7 @@ class ApiService implements Authentication {
   late PartnerPartnersApi partnerPartnersApi;
   late PartnerEmployeesApi employeesApi;
   late PartnerHealthServicesApi partnerHealthServicesApi;
+  late PartnerChatApi partnerChatApi;
 
   // ── Health Services & Categories ──────────────────
   late UserHealthServicesApi healthServicesApi;
@@ -74,6 +92,16 @@ class ApiService implements Authentication {
   /// Returns the [ApiClient] for [prefix].
   ApiClient clientFor(ServicePrefix prefix) => _clients[prefix]!;
 
+  /// The raw API gateway URL **without** any service
+  /// prefix (e.g. `https://api.healytics.vn`).
+  ///
+  /// Used by [WsService] to build WebSocket URLs.
+  String get gatewayUrl => _gatewayUrl;
+  String _gatewayUrl = '';
+
+  /// The current access token, or `null` if not set.
+  String? get accessToken => _accessToken;
+
   String? _accessToken;
   final _log = Logger('ApiService');
 
@@ -91,8 +119,10 @@ class ApiService implements Authentication {
   // ── Endpoint management ───────────────────────────
 
   dynamic setEndpoint(String endPoint) {
-    // Create one ApiClient per service prefix.
-    for (final prefix in ServicePrefix.values) {
+    _gatewayUrl = endPoint;
+
+    // Create one ApiClient per REST service prefix.
+    for (final prefix in ServicePrefix.restValues) {
       _clients[prefix] = ApiClient(
         basePath: '$endPoint${prefix.path}',
         authentication: this,
@@ -120,6 +150,7 @@ class ApiService implements Authentication {
     adminCategoriesApi = AdminCategoriesApi(backend);
     serviceTagsApi = PartnerServiceTagsApi(backend);
     locationsApi = LocationsApi(backend);
+    partnerChatApi = PartnerChatApi(backend);
   }
 
   /// Applies the User-Agent header to every client.

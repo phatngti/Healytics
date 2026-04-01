@@ -1,7 +1,10 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PartnersService } from './partners.service';
-import { PartnersController, PartnerSelfController } from './partners.controller';
+import {
+  PartnersController,
+  PartnerSelfController,
+} from './partners.controller';
 import { Partner } from '@/common/entities/partner.entity';
 import { LegalRepresentative } from '@/common/entities/legal-representative.entity';
 import { Account } from '@/common/entities/account.entity';

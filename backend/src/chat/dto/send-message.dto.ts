@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, MaxLength, IsOptional, IsEnum, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  MaxLength,
+  IsOptional,
+  IsEnum,
+  IsUUID,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { MessageType } from '@/chat/enums/message-type.enum';
 
@@ -11,18 +18,33 @@ export class SendMessageDto {
   @IsNotEmpty()
   conversationId: string;
 
-  @ApiProperty({ description: 'Message content', example: 'Hello, I have a question about my appointment.' })
+  @ApiProperty({ description: 'ID of the recipient (User ID or Partner ID)' })
+  @IsUUID()
+  @IsNotEmpty()
+  receiverId: string;
+
+  @ApiProperty({
+    description: 'Message content',
+    example: 'Hello, I have a question about my appointment.',
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(5000)
   content: string;
 
-  @ApiPropertyOptional({ description: 'Type of message', enum: MessageType, default: MessageType.TEXT })
+  @ApiPropertyOptional({
+    description: 'Type of message',
+    enum: MessageType,
+    default: MessageType.TEXT,
+  })
   @IsOptional()
   @IsEnum(MessageType)
   messageType?: MessageType;
 
-  @ApiPropertyOptional({ description: 'Client-generated ID for idempotent delivery', example: 'client-uuid-123' })
+  @ApiPropertyOptional({
+    description: 'Client-generated ID for idempotent delivery',
+    example: 'client-uuid-123',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(100)

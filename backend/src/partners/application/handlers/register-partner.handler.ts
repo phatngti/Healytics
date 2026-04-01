@@ -60,9 +60,7 @@ export class RegisterPartnerHandler {
     });
 
     if (existingAccount) {
-      throw new ConflictException(
-        'An account with this email already exists',
-      );
+      throw new ConflictException('An account with this email already exists');
     }
 
     const existingPartner = await partnerRepo.findOne({
@@ -82,9 +80,7 @@ export class RegisterPartnerHandler {
         dto.partner.wardId,
       );
     } catch (error) {
-      throw new BadRequestException(
-        `Invalid address: ${error.message}`,
-      );
+      throw new BadRequestException(`Invalid address: ${error.message}`);
     }
 
     // 2. Geocode facility address (non-blocking — failure does NOT stop registration)
@@ -107,9 +103,7 @@ export class RegisterPartnerHandler {
         this.logger.warn(`Geocoding returned no results for: ${fullAddress}`);
       }
     } catch (error) {
-      this.logger.warn(
-        `Geocoding failed (non-blocking): ${error.message}`,
-      );
+      this.logger.warn(`Geocoding failed (non-blocking): ${error.message}`);
       // Continue registration without geo — coordinates will be null
     }
 
@@ -134,7 +128,7 @@ export class RegisterPartnerHandler {
         taxCode: dto.partner.taxCode,
         legalName: dto.partner.legalName,
         brandName: dto.partner.brandName,
-        businessType: dto.partner.businessType as BusinessType[],
+        businessType: dto.partner.businessType,
         provinceId: dto.partner.provinceId,
         districtId: dto.partner.districtId,
         wardId: dto.partner.wardId,

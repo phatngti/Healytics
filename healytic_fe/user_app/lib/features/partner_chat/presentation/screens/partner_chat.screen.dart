@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:intl/intl.dart';
 
-import 'package:user_app/features/partner_chat/data/datasources/remote/partner_chat_socket_service.dart';
+import 'package:user_app/core/services/ws/ws_client.dart';
+import 'package:user_app/features/partner_chat/domain/entities/partner_chat_message.entity.dart';
 import 'package:user_app/features/partner_chat/presentation/providers/partner_chat.provider.dart';
 import 'package:user_app/features/partner_chat/presentation/widgets/partner_chat_header.widget.dart';
 import 'package:user_app/features/partner_chat/presentation/widgets/partner_chat_input_bar.widget.dart';
 import 'package:user_app/features/partner_chat/presentation/widgets/partner_chat_message_bubble.widget.dart';
 import 'package:user_app/features/partner_chat/presentation/widgets/partner_chat_typing_indicator.widget.dart';
+import 'package:user_app/hooks/use_chat_scroll.dart';
 
 /// Full-screen chat screen for P2P conversations with
 /// a health partner.
 ///
+/// Uses a **reverse `ListView`** so the newest message
+/// sits at scroll offset 0 — auto-scroll to bottom is
+/// the natural default and requires no manual heuristic.
+///
 /// Composed of:
 /// - [PartnerChatHeader] appBar (frosted glass)
 /// - WS unavailable warning banner (when applicable)
-/// - Message list (scrollable, chronological)
+/// - Message list (reversed, newest at bottom)
+/// - "Load older" spinner at top edge
 /// - Typing indicator when partner is typing
 /// - [PartnerChatInputBar] sticky bottom
 /// - Scroll-to-bottom FAB when scrolled up
@@ -35,7 +41,8 @@ class PartnerChatScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme =
+        Theme.of(context).colorScheme;
     final chatState = ref.watch(
       partnerChatProvider(
         partnerAccountId,
@@ -45,45 +52,8 @@ class PartnerChatScreen extends HookConsumerWidget {
     final hPadding =
         AppDimens.horizontalPadding(context);
 
-    final scrollController = useScrollController();
-    final showFab = useState(false);
-
-    // Toggle FAB visibility on scroll.
-    useEffect(() {
-      void listener() {
-        if (!scrollController.hasClients) return;
-        final pos = scrollController.position;
-        showFab.value =
-            pos.pixels < pos.maxScrollExtent - 80;
-      }
-
-      scrollController.addListener(listener);
-      return () =>
-          scrollController.removeListener(listener);
-    }, [scrollController]);
-
-    // Auto-scroll on new messages.
-    final prevCount = useRef(0);
-    useEffect(() {
-      final count = chatState.messages.length;
-      if (count > prevCount.value &&
-          scrollController.hasClients) {
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) {
-          if (!scrollController.hasClients) return;
-          scrollController.animateTo(
-            scrollController
-                .position.maxScrollExtent,
-            duration: const Duration(
-              milliseconds: 300,
-            ),
-            curve: Curves.easeOutCubic,
-          );
-        });
-      }
-      prevCount.value = count;
-      return null;
-    }, [chatState.messages]);
+    // Shared hook — reverse-aware scroll + FAB.
+    final chat = useChatScroll();
 
     // Resolve the current user ID from the provider.
     final currentUserId = ref
@@ -124,8 +94,7 @@ class PartnerChatScreen extends HookConsumerWidget {
               chatState,
               colorScheme,
               hPadding,
-              scrollController,
-              showFab.value,
+              chat,
               currentUserId,
             ),
           ),
@@ -180,13 +149,12 @@ class PartnerChatScreen extends HookConsumerWidget {
     PartnerChatState chatState,
     ColorScheme colorScheme,
     double hPadding,
-    ScrollController scrollController,
-    bool showFab,
+    ChatScrollState chat,
     String currentUserId,
   ) {
     // Connecting state
     if (chatState.connectionStatus ==
-        ChatConnectionStatus.connecting) {
+        WsConnectionStatus.connecting) {
       return const Center(
         child: CircularProgressIndicator(),
       );
@@ -194,51 +162,13 @@ class PartnerChatScreen extends HookConsumerWidget {
 
     // Error state
     if (chatState.connectionStatus ==
-        ChatConnectionStatus.error) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.all(hPadding),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.error_outline_rounded,
-                size: 48,
-                color: colorScheme.error
-                    .withValues(alpha: 0.6),
-              ),
-              SizedBox(
-                height: AppDimens.spaceMd,
-              ),
-              Text(
-                chatState.error ??
-                    'Connection failed.',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(
-                      color: colorScheme
-                          .onSurfaceVariant,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(
-                height: AppDimens.spaceMd,
-              ),
-              FilledButton.tonal(
-                onPressed: () => ref
-                    .read(
-                      partnerChatProvider(
-                        partnerAccountId,
-                        partnerName,
-                      ).notifier,
-                    )
-                    .retry(),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
+        WsConnectionStatus.error) {
+      return _buildErrorState(
+        context,
+        ref,
+        chatState,
+        colorScheme,
+        hPadding,
       );
     }
 
@@ -258,83 +188,213 @@ class PartnerChatScreen extends HookConsumerWidget {
       );
     }
 
-    // Messages list
+    // Messages list — reversed so newest = index 0.
     final messages = chatState.messages;
+
+    // Extra item count for load-more spinner and
+    // date header at the oldest edge.
+    final hasLoadMore = chatState.hasMoreMessages;
+    // +1 for date header, +1 for load-more spinner
+    final extraTop = 1 + (hasLoadMore ? 1 : 0);
+    final itemCount = messages.length + extraTop;
 
     return Stack(
       children: [
-        ListView.builder(
-          controller: scrollController,
-          padding: EdgeInsets.symmetric(
-            horizontal: hPadding,
-            vertical: AppDimens.spaceMd,
-          ),
-          itemCount: messages.length + 1,
-          itemBuilder: (context, index) {
-            // Date header
-            if (index == 0) {
-              final firstDate =
-                  messages.first.createdAt;
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: AppDimens.spaceMd,
-                ),
-                child: _DateDivider(
-                  date: firstDate,
-                ),
-              );
-            }
-
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: AppDimens.spaceSm,
-              ),
-              child: PartnerChatMessageBubble(
-                key: ValueKey(
-                  messages[index - 1].id,
-                ),
-                message: messages[index - 1],
-                currentUserId: currentUserId,
-              ),
+        NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            _onScrollNotification(
+              notification,
+              ref,
+              chatState,
             );
+            return false;
           },
+          child: ListView.builder(
+            controller: chat.controller,
+            reverse: true,
+            padding: EdgeInsets.symmetric(
+              horizontal: hPadding,
+              vertical: AppDimens.spaceMd,
+            ),
+            itemCount: itemCount,
+            itemBuilder: (context, index) {
+              return _buildReversedItem(
+                index,
+                messages,
+                extraTop,
+                hasLoadMore,
+                chatState,
+                currentUserId,
+              );
+            },
+          ),
         ),
 
         // Scroll-to-bottom FAB
-        if (showFab)
+        if (chat.showFab)
           Positioned(
             right: hPadding,
             bottom: AppDimens.spaceSm,
-            child: Material(
-              color: colorScheme.primary,
-              shape: const CircleBorder(),
-              elevation: 4,
-              child: InkWell(
-                onTap: () =>
-                    scrollController.animateTo(
-                  scrollController
-                      .position.maxScrollExtent,
-                  duration: const Duration(
-                    milliseconds: 300,
-                  ),
-                  curve: Curves.easeOutCubic,
-                ),
-                customBorder: const CircleBorder(),
-                child: Padding(
-                  padding: EdgeInsets.all(
-                    AppDimens.spaceSm,
-                  ),
-                  child: Icon(
-                    Icons
-                        .keyboard_arrow_down_rounded,
-                    color: colorScheme.onPrimary,
-                    size: AppDimens.iconLg,
-                  ),
-                ),
-              ),
+            child: _ScrollToBottomFab(
+              onTap: chat.scrollToBottom,
             ),
           ),
       ],
+    );
+  }
+
+  /// Maps a reversed-list [index] to the correct
+  /// widget: message bubble, date header, or
+  /// load-more spinner.
+  ///
+  /// In a reversed `ListView`:
+  /// - index 0 = newest message (last in list)
+  /// - index (messages.length - 1) = oldest message
+  /// - index messages.length = date header
+  /// - index messages.length + 1 = load-more spinner
+  Widget _buildReversedItem(
+    int index,
+    List<PartnerChatMessage> messages,
+    int extraTop,
+    bool hasLoadMore,
+    PartnerChatState chatState,
+    String currentUserId,
+  ) {
+    // Load-more spinner (oldest edge of the list)
+    if (hasLoadMore &&
+        index == messages.length + extraTop - 1) {
+      return Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: AppDimens.spaceMd,
+        ),
+        child: Center(
+          child: chatState.isLoadingMessages
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child:
+                      CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+      );
+    }
+
+    // Date header (above oldest visible message)
+    if (index == messages.length + extraTop - 1 -
+            (hasLoadMore ? 1 : 0)) {
+      final oldestDate =
+          messages.first.createdAt;
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: AppDimens.spaceMd,
+        ),
+        child: _DateDivider(date: oldestDate),
+      );
+    }
+
+    // Message bubble — reversed index mapping
+    final msgIndex =
+        messages.length - 1 - index;
+    final message = messages[msgIndex];
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: AppDimens.spaceSm,
+      ),
+      child: PartnerChatMessageBubble(
+        key: ValueKey(message.id),
+        message: message,
+        currentUserId: currentUserId,
+      ),
+    );
+  }
+
+  /// Triggers [loadMoreMessages] when the user scrolls
+  /// near the top edge (oldest messages) of the
+  /// reversed list.
+  void _onScrollNotification(
+    ScrollNotification notification,
+    WidgetRef ref,
+    PartnerChatState chatState,
+  ) {
+    if (notification is! ScrollUpdateNotification) {
+      return;
+    }
+
+    final metrics = notification.metrics;
+    // In a reversed list, maxScrollExtent
+    // corresponds to the oldest messages.
+    final nearEdge = metrics.pixels >=
+        metrics.maxScrollExtent - 200;
+
+    if (nearEdge &&
+        chatState.hasMoreMessages &&
+        !chatState.isLoadingMessages) {
+      ref
+          .read(
+            partnerChatProvider(
+              partnerAccountId,
+              partnerName,
+            ).notifier,
+          )
+          .loadMoreMessages();
+    }
+  }
+
+  Widget _buildErrorState(
+    BuildContext context,
+    WidgetRef ref,
+    PartnerChatState chatState,
+    ColorScheme colorScheme,
+    double hPadding,
+  ) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(hPadding),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 48,
+              color: colorScheme.error
+                  .withValues(alpha: 0.6),
+            ),
+            SizedBox(
+              height: AppDimens.spaceMd,
+            ),
+            Text(
+              chatState.error ??
+                  'Connection failed.',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(
+                    color: colorScheme
+                        .onSurfaceVariant,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(
+              height: AppDimens.spaceMd,
+            ),
+            FilledButton.tonal(
+              onPressed: () => ref
+                  .read(
+                    partnerChatProvider(
+                      partnerAccountId,
+                      partnerName,
+                    ).notifier,
+                  )
+                  .retry(),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -361,7 +421,8 @@ class PartnerChatScreen extends HookConsumerWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.chat_bubble_outline_rounded,
+                Icons
+                    .chat_bubble_outline_rounded,
                 size: 36,
                 color: colorScheme.primary
                     .withValues(alpha: 0.6),
@@ -378,9 +439,9 @@ class PartnerChatScreen extends HookConsumerWidget {
             ),
             SizedBox(height: AppDimens.spaceXs),
             Text(
-              'Send a message to $partnerName to '
-              'start chatting about your health '
-              'services.',
+              'Send a message to $partnerName '
+              'to start chatting about your '
+              'health services.',
               style:
                   textTheme.bodyMedium?.copyWith(
                 color:
@@ -389,6 +450,39 @@ class PartnerChatScreen extends HookConsumerWidget {
               textAlign: TextAlign.center,
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Scroll-to-bottom FAB for the partner chat.
+class _ScrollToBottomFab extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ScrollToBottomFab({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme =
+        Theme.of(context).colorScheme;
+
+    return Material(
+      color: colorScheme.primary,
+      shape: const CircleBorder(),
+      elevation: 4,
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: Padding(
+          padding: EdgeInsets.all(
+            AppDimens.spaceSm,
+          ),
+          child: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: colorScheme.onPrimary,
+            size: AppDimens.iconLg,
+          ),
         ),
       ),
     );
@@ -408,7 +502,8 @@ class _WsUnavailableBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme =
+        Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
@@ -433,7 +528,8 @@ class _WsUnavailableBanner extends StatelessWidget {
               'Real-time chat is unavailable. '
               'You can view message history but '
               'sending is disabled.',
-              style: textTheme.labelSmall?.copyWith(
+              style:
+                  textTheme.labelSmall?.copyWith(
                 color:
                     colorScheme.onErrorContainer,
               ),
@@ -444,17 +540,18 @@ class _WsUnavailableBanner extends StatelessWidget {
           SizedBox(width: AppDimens.spaceXs),
           InkWell(
             onTap: onRetry,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius:
+                BorderRadius.circular(4),
             child: Padding(
               padding: EdgeInsets.all(
                 AppDimens.spaceXxs,
               ),
               child: Text(
                 'Retry',
-                style:
-                    textTheme.labelSmall?.copyWith(
-                  color:
-                      colorScheme.onErrorContainer,
+                style: textTheme.labelSmall
+                    ?.copyWith(
+                  color: colorScheme
+                      .onErrorContainer,
                   fontWeight: FontWeight.bold,
                   decoration:
                       TextDecoration.underline,
@@ -475,7 +572,8 @@ class _DateDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme =
+        Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     final now = DateTime.now();
@@ -493,14 +591,17 @@ class _DateDivider extends StatelessWidget {
           vertical: AppDimens.spaceXxs,
         ),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest
+          color: colorScheme
+              .surfaceContainerHighest
               .withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius:
+              BorderRadius.circular(12),
         ),
         child: Text(
           label,
           style: textTheme.labelSmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
+            color:
+                colorScheme.onSurfaceVariant,
           ),
         ),
       ),

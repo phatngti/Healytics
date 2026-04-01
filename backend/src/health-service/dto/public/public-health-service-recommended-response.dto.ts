@@ -51,7 +51,10 @@ export class PublicHealthServiceRecommendedResponseDto {
     ratingsMap?: Map<string, { rating: number; count: number }>,
   ): PublicHealthServiceRecommendedResponseDto[] {
     return products.map((p) =>
-      PublicHealthServiceRecommendedResponseDto.fromEntity(p, ratingsMap?.get(p.id)),
+      PublicHealthServiceRecommendedResponseDto.fromEntity(
+        p,
+        ratingsMap?.get(p.id),
+      ),
     );
   }
 }

@@ -129,9 +129,7 @@ export class AiRecommendationItemDto {
     products: Product[],
     partner?: Partner | null,
   ): AiRecommendationItemDto[] {
-    return products.map((p) =>
-      AiRecommendationItemDto.fromEntity(p, partner),
-    );
+    return products.map((p) => AiRecommendationItemDto.fromEntity(p, partner));
   }
 }
 

@@ -79,7 +79,10 @@ export class ServiceManualResponseDto {
   @Expose()
   imageUrl: string;
 
-  @ApiProperty({ type: [String], example: ['Avoid heavy meals', 'Wear comfortable clothing'] })
+  @ApiProperty({
+    type: [String],
+    example: ['Avoid heavy meals', 'Wear comfortable clothing'],
+  })
   @Expose()
   preServiceGuidelines: string[];
 
@@ -113,9 +116,12 @@ export class ServiceManualResponseDto {
 
     // Pre-service guidelines — use stored data or fallback to description
     const manual = product?.serviceManual;
-    dto.preServiceGuidelines = manual?.preServiceGuidelines
-      ?? (product?.description
-        ? product.description.split('\n').filter((line) => line.trim().length > 0)
+    dto.preServiceGuidelines =
+      manual?.preServiceGuidelines ??
+      (product?.description
+        ? product.description
+            .split('\n')
+            .filter((line) => line.trim().length > 0)
         : []);
 
     // Service rules — use stored data or return empty array
@@ -123,29 +129,31 @@ export class ServiceManualResponseDto {
 
     // Procedure steps — use stored data or create defaults from definition
     const durationMinutes = product?.productDefinition?.durationMinutes;
-    dto.procedureSteps = manual?.procedureSteps?.map((s) => ({ ...s, isActive: false }))
-      ?? [
-        {
-          stepNumber: 1,
-          title: 'Check-in & Registration',
-          description: 'Arrive at the reception and complete registration',
-          isActive: false,
-        },
-        {
-          stepNumber: 2,
-          title: 'Service Session',
-          description: durationMinutes
-            ? `Enjoy your ${durationMinutes}-minute session`
-            : 'Enjoy your service session',
-          isActive: false,
-        },
-        {
-          stepNumber: 3,
-          title: 'Post-Service',
-          description: 'Relax and receive aftercare instructions',
-          isActive: false,
-        },
-      ];
+    dto.procedureSteps = manual?.procedureSteps?.map((s) => ({
+      ...s,
+      isActive: false,
+    })) ?? [
+      {
+        stepNumber: 1,
+        title: 'Check-in & Registration',
+        description: 'Arrive at the reception and complete registration',
+        isActive: false,
+      },
+      {
+        stepNumber: 2,
+        title: 'Service Session',
+        description: durationMinutes
+          ? `Enjoy your ${durationMinutes}-minute session`
+          : 'Enjoy your service session',
+        isActive: false,
+      },
+      {
+        stepNumber: 3,
+        title: 'Post-Service',
+        description: 'Relax and receive aftercare instructions',
+        isActive: false,
+      },
+    ];
 
     // Facilities from facility images
     dto.facilities = (product?.facilityImages ?? []).map((fi) => ({

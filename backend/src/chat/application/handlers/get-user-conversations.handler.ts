@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Conversation } from '@/common/entities/conversation.entity';
+import { PartnerConversation } from '@/common/entities/partner-conversation.entity';
 import { ConversationResponseDto } from '@/chat/dto/conversation-response.dto';
 
 /**
@@ -15,8 +15,8 @@ export class GetUserConversationsHandler {
   private readonly logger = new Logger(GetUserConversationsHandler.name);
 
   constructor(
-    @InjectRepository(Conversation)
-    private readonly conversationRepo: Repository<Conversation>,
+    @InjectRepository(PartnerConversation)
+    private readonly conversationRepo: Repository<PartnerConversation>,
   ) {}
 
   async execute(userId: string): Promise<ConversationResponseDto[]> {
@@ -31,7 +31,9 @@ export class GetUserConversationsHandler {
       order: { lastMessageAt: { direction: 'DESC', nulls: 'LAST' } },
     });
 
-    this.logger.log(`Fetched ${conversations.length} conversations for user ${userId}`);
+    this.logger.log(
+      `Fetched ${conversations.length} conversations for user ${userId}`,
+    );
     return ConversationResponseDto.fromEntities(conversations, userId);
   }
 }
