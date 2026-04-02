@@ -369,42 +369,7 @@ async def fetch_candidates_from_db(
             except Exception as relax_exc:
                 logger.warning("[DBFetcher] Relaxation failed (%s): %s", plan_name, relax_exc)
 
-    # ── Mock fallback khi DB lỗi hoặc chưa có data ────────────────────────────
-    if not candidates:
-        from app.utils.query_builder import filter_mock_services
-        reason = f"DB error: {db_error}" if db_error else "DB returned empty — using mock"
-        logger.warning(f"[DBFetcher] Falling back to mock services. Reason: {reason}")
-
-        target_bts = _extract_business_types(query_params)
-        mock_results = filter_mock_services(query_params)
-        for svc in mock_results:
-            internal = svc.get("_internal", {})
-            base_price = internal.get("basePrice")
-            rating_val = internal.get("ratingValue", 0.0)
-            total_reviews = internal.get("totalReviews", 0)
-            loc = svc.get("location", {})
-            service_bts = _parse_service_business_types(internal.get("businessType"))
-            confidence = _compute_match_confidence(service_bts, target_bts)
-
-            candidates.append(ServiceCandidate(
-                service_id=svc["service_id"],
-                name=svc["name"],
-                image_url=svc.get("image_url"),
-                badge=svc.get("badge"),
-                booked_count=svc.get("booked_count"),
-                price=PriceInfo(amount=int(base_price), currency="VND") if base_price else None,
-                staff_name=svc.get("staff_name"),
-                rating=RatingInfo(average=float(rating_val), total_reviews=total_reviews),
-                location=LocationInfo(
-                    address=loc.get("address", ""),
-                    district=loc.get("district", ""),
-                    city=loc.get("city", ""),
-                ),
-                slots=svc.get("slots", []),
-                confidence=confidence,
-                distance_meters=None,
-            ))
-
+   
     return candidates
 
 
