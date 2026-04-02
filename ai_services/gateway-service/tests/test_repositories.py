@@ -12,6 +12,8 @@ Run:
 import uuid
 
 import pytest
+
+USER_1 = uuid.UUID("11111111-1111-1111-1111-111111111111")
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.conversation_repo import (
@@ -40,7 +42,7 @@ async def test_create_and_get_conversation(db_session: AsyncSession):
 
     # Act
     created = await create_conversation(
-        db_session, conv_id, user_id="user_1", title="Test Chat"
+        db_session, conv_id, user_id=USER_1, title="Test Chat"
     )
     fetched = await get_conversation_by_id(db_session, conv_id)
 
@@ -63,12 +65,12 @@ async def test_get_or_create_returns_existing(db_session: AsyncSession):
     # Arrange — create once
     conv_id = uuid.uuid4()
     original = await create_conversation(
-        db_session, conv_id, user_id="user_1"
+        db_session, conv_id, user_id=USER_1
     )
 
     # Act — get_or_create with same id should NOT insert a new row
     fetched = await get_or_create_conversation(
-        db_session, conv_id, user_id="user_1"
+        db_session, conv_id, user_id=USER_1
     )
 
     # Assert — same object, not a duplicate
@@ -80,7 +82,7 @@ async def test_update_conversation_title(db_session: AsyncSession):
     # Arrange
     conv_id = uuid.uuid4()
     await create_conversation(
-        db_session, conv_id, user_id="user_1", title="Old Title"
+        db_session, conv_id, user_id=USER_1, title="Old Title"
     )
 
     # Act
@@ -105,7 +107,7 @@ async def test_update_conversation_title_not_found(db_session: AsyncSession):
 async def test_delete_conversation(db_session: AsyncSession):
     # Arrange
     conv_id = uuid.uuid4()
-    await create_conversation(db_session, conv_id, user_id="user_1")
+    await create_conversation(db_session, conv_id, user_id=USER_1)
 
     # Act
     deleted = await delete_conversation(db_session, conv_id)
@@ -124,8 +126,8 @@ async def test_delete_conversation_not_found(db_session: AsyncSession):
 
 @pytest.mark.asyncio
 async def test_get_conversations_page(db_session: AsyncSession):
-    # Arrange — 15 conversations for user_page_test
-    user_id = f"user_page_{uuid.uuid4().hex[:6]}"
+    # Arrange — 15 conversations for one user UUID
+    user_id = uuid.uuid4()
     for i in range(15):
         await create_conversation(
             db_session, uuid.uuid4(), user_id=user_id, title=f"Chat {i}"
@@ -149,7 +151,7 @@ async def test_get_conversations_page(db_session: AsyncSession):
 async def test_create_and_list_messages(db_session: AsyncSession):
     # Arrange
     conv_id = uuid.uuid4()
-    await create_conversation(db_session, conv_id, user_id="user_1")
+    await create_conversation(db_session, conv_id, user_id=USER_1)
 
     # Act
     await create_message(db_session, conv_id, role="user", content="Hello")
@@ -166,7 +168,7 @@ async def test_create_and_list_messages(db_session: AsyncSession):
 async def test_get_messages_page_pagination(db_session: AsyncSession):
     # Arrange — 25 messages
     conv_id = uuid.uuid4()
-    await create_conversation(db_session, conv_id, user_id="user_1")
+    await create_conversation(db_session, conv_id, user_id=USER_1)
     for i in range(1, 26):
         await create_message(
             db_session, conv_id, role="user", content=f"Message {i}"
@@ -187,7 +189,7 @@ async def test_get_messages_page_pagination(db_session: AsyncSession):
 async def test_get_messages_page_last_page(db_session: AsyncSession):
     # Arrange — 25 messages, last page of 10 has only 5
     conv_id = uuid.uuid4()
-    await create_conversation(db_session, conv_id, user_id="user_1")
+    await create_conversation(db_session, conv_id, user_id=USER_1)
     for i in range(1, 26):
         await create_message(
             db_session, conv_id, role="user", content=f"Message {i}"
@@ -207,7 +209,7 @@ async def test_get_messages_page_last_page(db_session: AsyncSession):
 @pytest.mark.asyncio
 async def test_get_messages_empty_conversation(db_session: AsyncSession):
     conv_id = uuid.uuid4()
-    await create_conversation(db_session, conv_id, user_id="user_1")
+    await create_conversation(db_session, conv_id, user_id=USER_1)
 
     messages, total = await get_messages_page(
         db_session, conversation_id=conv_id

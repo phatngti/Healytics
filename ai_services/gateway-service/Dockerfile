@@ -2,7 +2,7 @@ FROM python:3.11-slim
 
 # docker build -t giahung2111/healytics_gateway:latest .
 # docker run --name healytics_gateway -p 9000:9000 --env-file .env healytics_gateway
-# uvicorn app.main:app --host 0.0.0.0 --port 9000
+# uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
 # docker start -ai healytics_gateway
 # docker tag healytics_gateway giahung2111/healytics_gateway:latest 
 # docker push giahung2111/healytics_gateway:latest
