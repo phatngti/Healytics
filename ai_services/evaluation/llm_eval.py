@@ -70,7 +70,9 @@ def generate_answer(rag_chain, query: str, history: str = "", services: str = ""
         _, llm, retriever = rag_chain
         from src.rag.offline_rag import rag_prompt  # type: ignore
 
-        docs = retriever.get_relevant_documents(str(query))
+        from retriever_eval import get_retrieved_documents
+
+        docs = get_retrieved_documents(retriever, str(query))
         context = "\n\n".join(getattr(d, "page_content", str(d)) for d in docs)
         prompt_str = rag_prompt.format(context=context, history=history, services=services, question=query)
         out = llm.invoke(prompt_str) if hasattr(llm, "invoke") else str(llm(prompt_str))

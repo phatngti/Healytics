@@ -13,7 +13,7 @@ class ChatbotRequest(BaseModel):
     """
 
     conversation_id: Optional[UUID] = None
-    user_id: str
+    user_id: UUID
 
     message: str = Field(..., min_length=1)
 
@@ -68,7 +68,7 @@ class PaginationMeta(BaseModel):
 
 class ConversationResponse(BaseModel):
     id: UUID
-    userId: Optional[str]
+    userId: Optional[UUID]
     title: str
     createdAt: datetime
     updatedAt: datetime

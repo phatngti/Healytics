@@ -50,13 +50,37 @@ def build_retriever(
         return db.as_retriever(search_kwargs={"k": int(top_k)})
 
 
+def get_retrieved_documents(retriever, query: str) -> List[Any]:
+    """
+    LangChain 0.2+: VectorStoreRetriever is Runnable — dùng invoke(query).
+    LangChain cũ: get_relevant_documents(query).
+    """
+    invoke_fn = getattr(retriever, "invoke", None)
+    if callable(invoke_fn):
+        try:
+            out = invoke_fn(query)
+        except TypeError:
+            out = invoke_fn({"query": query})
+        if out is None:
+            return []
+        return list(out)
+
+    grd = getattr(retriever, "get_relevant_documents", None)
+    if callable(grd):
+        return list(grd(query))
+
+    raise TypeError(
+        f"Retriever {type(retriever).__name__} không có invoke() hay get_relevant_documents()."
+    )
+
+
 def retrieve_top_k_doc_ids(retriever, query: str, top_k: int) -> Tuple[List[str], List[Any]]:
     """
     Returns:
       - doc_id list (length <= top_k)
       - raw langchain Document list
     """
-    docs = retriever.get_relevant_documents(query)
+    docs = get_retrieved_documents(retriever, query)
     docs = list(docs)[: int(top_k)]
 
     doc_ids: List[str] = []
