@@ -12,6 +12,7 @@ FROM python:3.11-slim
 # ── START/STOP ─────────────────────────────────────────────
 # docker start -ai healytics_ner
 # docker stop healytics_ner
+# uvicorn app.main:app --host 0.0.0.0 --port 7000 --reload
 
 # 1. Workdir
 WORKDIR /app

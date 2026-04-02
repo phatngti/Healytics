@@ -77,6 +77,59 @@ MOCK_SERVICES: Dict[str, Dict] = {
     "SV060": {"service_id": "SV060", "name": "Thực đơn Mediterranean diet", "description": "Chế độ ăn Địa Trung Hải - một trong những chế độ ăn lành mạnh nhất thế giới. Nhiều rau củ, cá, dầu ô liu.", "image_url": "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop", "badge": "Phổ biến", "booked_count": 370, "price": {"amount": 450000, "currency": "VND"}, "staff_name": "CN Trương Thị HHH", "rating": {"average": 4.7, "total_reviews": 125}, "location": {"address": "Online", "district": "Toàn quốc", "city": "Hồ Chí Minh"}, "slots": ["2026-03-12T14:00:00", "2026-03-14T14:00:00"]},
 }
 
+# products.id từ ner-service seed_local / môi trường test — trùng với DB mà NER filter ra.
+# MOCK_SERVICES chỉ có khóa SVxxx nên UUID từ pipeline sẽ thành "Unknown" nếu không có bảng này.
+SEED_PRODUCT_FALLBACK: dict[str, dict[str, str]] = {
+    "f0000001-0000-0000-0000-000000000001": {
+        "name": "Tư vấn tim mạch trực tuyến",
+        "description": "Tư vấn và đánh giá sức khỏe tim mạch qua video call với bác sĩ chuyên khoa.",
+    },
+    "f0000001-0000-0000-0000-000000000002": {
+        "name": "Vật lý trị liệu thoát vị đĩa đệm",
+        "description": "Chương trình phục hồi chuyên sâu cho bệnh nhân thoát vị đĩa đệm.",
+    },
+    "f0000001-0000-0000-0000-000000000003": {
+        "name": "Châm cứu bấm huyệt tại gia",
+        "description": "Dịch vụ châm cứu và bấm huyệt tại nhà bởi lương y có kinh nghiệm.",
+    },
+    "f0000001-0000-0000-0000-000000000004": {
+        "name": "Tư vấn tâm lý trị liệu",
+        "description": "Buổi tư vấn tâm lý 1-1 với chuyên gia trị liệu tâm lý.",
+    },
+    "f0000001-0000-0000-0000-000000000005": {
+        "name": "Làm sạch răng chuyên sâu",
+        "description": "Vệ sinh răng miệng chuyên sâu, loại bỏ cao răng và làm trắng nhẹ.",
+    },
+    "f0000001-0000-0000-0000-000000000006": {
+        "name": "Massage cổ vai gáy 45 phút",
+        "description": "Liệu trình massage cổ vai gáy giảm căng cứng, phù hợp dân văn phòng.",
+    },
+    "f0000001-0000-0000-0000-000000000007": {
+        "name": "Massage đá nóng thư giãn 60 phút",
+        "description": "Massage toàn thân kết hợp đá nóng giúp thư giãn sâu và ngủ ngon.",
+    },
+    "f0000001-0000-0000-0000-000000000008": {
+        "name": "Gội đầu dưỡng sinh 60 phút",
+        "description": "Gội đầu dưỡng sinh kết hợp bấm huyệt đầu vai gáy.",
+    },
+}
+
+
+def _enrichment_fallback_detail(service_id: str) -> dict:
+    """Khi không gọi được backend hoặc backend không trả đủ — vẫn hiển thị tên từ seed/mock."""
+    sid = str(service_id)
+    mock = MOCK_SERVICES.get(sid)
+    if mock:
+        return mock
+    seed = SEED_PRODUCT_FALLBACK.get(sid)
+    if seed:
+        return {
+            "service_id": sid,
+            "name": seed["name"],
+            "description": seed.get("description", ""),
+        }
+    return {"service_id": sid, "name": "Unknown", "description": ""}
+
 
 async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
     """Dùng API backend thật để lấy full thông tin service."""
@@ -85,10 +138,8 @@ async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
 
     # Don't break current system if key missing.
     if not settings.AI_API_KEY:
-        return [
-            MOCK_SERVICES.get(sid, {"service_id": sid, "name": "Unknown", "description": ""})
-            for sid in service_ids
-        ]
+        logger.debug("AI_API_KEY unset — enrich from MOCK_SERVICES / SEED_PRODUCT_FALLBACK only")
+        return [_enrichment_fallback_detail(sid) for sid in service_ids]
 
     client = BackendAIClient()
     try:
@@ -96,9 +147,13 @@ async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
     except Exception as e:
         # Do not break main recommendation flow if backend enrichment API is down.
         logger.warning("Backend enrichment failed, fallback to basic payload. error=%r", e)
-        return [{"service_id": sid, "name": "Unknown", "description": ""} for sid in service_ids]
+        return [_enrichment_fallback_detail(sid) for sid in service_ids]
     if not services:
-        return [{"service_id": sid, "name": "Unknown", "description": ""} for sid in service_ids]
+        logger.warning(
+            "Backend enrichment returned empty list for service_ids=%s — using local fallback",
+            service_ids,
+        )
+        return [_enrichment_fallback_detail(sid) for sid in service_ids]
 
     # Preserve the ordering from recommender response
     by_id: dict[str, dict] = {}
@@ -107,7 +162,10 @@ async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
         if sid is not None:
             by_id[str(sid)] = s
 
-    return [by_id.get(sid, {"service_id": sid, "name": "Unknown", "description": ""}) for sid in service_ids]
+    return [
+        by_id[sid] if sid in by_id else _enrichment_fallback_detail(sid)
+        for sid in service_ids
+    ]
 
 
 def _format_services_for_prompt(services: list[dict]) -> str:

@@ -35,7 +35,7 @@ async def client(db_session: AsyncSession):
 @pytest.mark.asyncio
 async def test_get_conversations_api(client: AsyncClient, db_session: AsyncSession):
     # Arrange: Seed 12 conversations for a test user
-    user_id = f"user_api_{uuid.uuid4().hex[:6]}"
+    user_id = uuid.uuid4()
     for i in range(12):
         await conversation_repo.create_conversation(
             db_session, uuid.uuid4(), user_id=user_id, title=f"Chat {i}"
@@ -43,7 +43,9 @@ async def test_get_conversations_api(client: AsyncClient, db_session: AsyncSessi
     await db_session.flush()
 
     # Act: Get page 1
-    response = await client.get(f"/chatbot/conversations?user_id={user_id}&page=1&limit=10")
+    response = await client.get(
+        f"/chatbot/conversations?user_id={user_id!s}&page=1&limit=10"
+    )
 
     # Assert
     assert response.status_code == 200
@@ -61,7 +63,7 @@ async def test_get_conversations_api(client: AsyncClient, db_session: AsyncSessi
 async def test_get_messages_api(client: AsyncClient, db_session: AsyncSession):
     # Arrange: Seed a conversation and 25 messages
     conv_id = uuid.uuid4()
-    user_id = "user_msg_api"
+    user_id = uuid.uuid4()
     await conversation_repo.create_conversation(db_session, conv_id, user_id=user_id)
     
     for i in range(25):
@@ -104,7 +106,7 @@ async def test_get_messages_api_with_owner_user_id(
     client: AsyncClient, db_session: AsyncSession
 ):
     conv_id = uuid.uuid4()
-    user_id = f"user_owner_{uuid.uuid4().hex[:6]}"
+    user_id = uuid.uuid4()
 
     await conversation_repo.create_conversation(
         db_session,
@@ -120,7 +122,7 @@ async def test_get_messages_api_with_owner_user_id(
     await db_session.flush()
 
     response = await client.get(
-        f"/chatbot/conversations/{conv_id}/messages?user_id={user_id}"
+        f"/chatbot/conversations/{conv_id}/messages?user_id={user_id!s}"
     )
 
     assert response.status_code == 200
@@ -135,10 +137,11 @@ async def test_get_messages_api_with_wrong_user_id_returns_404(
 ):
     conv_id = uuid.uuid4()
 
+    user_a = uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
     await conversation_repo.create_conversation(
         db_session,
         conv_id,
-        user_id="user_a",
+        user_id=user_a,
     )
     await message_repo.create_message(
         db_session,
@@ -148,8 +151,9 @@ async def test_get_messages_api_with_wrong_user_id_returns_404(
     )
     await db_session.flush()
 
+    user_b = uuid.UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
     response = await client.get(
-        f"/chatbot/conversations/{conv_id}/messages?user_id=user_b"
+        f"/chatbot/conversations/{conv_id}/messages?user_id={user_b!s}"
     )
 
     assert response.status_code == 404
