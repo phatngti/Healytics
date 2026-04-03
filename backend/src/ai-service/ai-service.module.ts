@@ -7,10 +7,7 @@ import { AiServiceService } from './ai-service.service';
 import { AiTokenAuthGuard } from './guards/ai-token-auth.guard';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Product]),
-    PartnersModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Product]), PartnersModule],
   controllers: [AiServiceController],
   providers: [AiServiceService, AiTokenAuthGuard],
   exports: [AiServiceService],

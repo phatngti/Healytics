@@ -57,7 +57,11 @@ async function bootstrap() {
       await seeder.seed();
     }
   } catch (error) {
-    const label = isClearAll ? '❌ Clear-all failed:' : isClear ? '❌ Clearing failed:' : '❌ Seeding failed:';
+    const label = isClearAll
+      ? '❌ Clear-all failed:'
+      : isClear
+        ? '❌ Clearing failed:'
+        : '❌ Seeding failed:';
     console.error(label, error);
     process.exitCode = 1;
   } finally {

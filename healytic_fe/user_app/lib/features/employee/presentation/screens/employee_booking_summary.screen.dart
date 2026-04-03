@@ -10,11 +10,11 @@ import 'package:user_app/features/checkout/presentation/providers/'
     'checkout.provider.dart';
 
 import '../../../../router/routes.dart';
-import '../../../home/domain/entities/'
+import 'package:user_app/features/booking/domain/entities/'
     'eligibility_detail.entity.dart';
-import '../../../home/presentation/providers/'
+import 'package:user_app/features/booking/presentation/providers/'
     'booking_flow.provider.dart';
-import '../../../home/presentation/providers/'
+import 'package:user_app/features/booking/presentation/providers/'
     'eligibility_detail.provider.dart';
 import '../widgets/employee_booking_summary/'
     'booking_bottom_action.widget.dart';

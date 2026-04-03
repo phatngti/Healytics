@@ -4,7 +4,10 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { CreateSpaTherapistDto, CreateMassageTherapistDto } from '../../dto/create-therapist.dto';
+import {
+  CreateSpaTherapistDto,
+  CreateMassageTherapistDto,
+} from '../../dto/create-therapist.dto';
 import { Employee } from '@/common/entities/employee.entity';
 import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
 import { EmployeeRole } from '../../enum/employee-role.enum';
@@ -79,12 +82,12 @@ export class CreateTherapistHandler {
 
       // SPA-specific: deviceProficiency
       if (therapistType === 'SPA' && 'deviceProficiency' in command) {
-        profileData.deviceProficiency = (command as CreateSpaTherapistDto).deviceProficiency;
+        profileData.deviceProficiency = command.deviceProficiency;
       }
 
       // MASSAGE-specific: strengthLevel
       if (therapistType === 'MASSAGE' && 'strengthLevel' in command) {
-        profileData.strengthLevel = (command as CreateMassageTherapistDto).strengthLevel;
+        profileData.strengthLevel = command.strengthLevel;
       }
 
       const therapistProfile = queryRunner.manager.create(

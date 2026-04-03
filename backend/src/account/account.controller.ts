@@ -47,8 +47,13 @@ export class AccountController {
    */
   @Get('me')
   @ApiOperation({ summary: 'Get current user account details' })
-  @ApiOkResponse({ description: 'Current user account data with role.', type: AccountMeResponseDto })
-  async getMe(@CurrentUser('id') userId: string): Promise<AccountMeResponseDto> {
+  @ApiOkResponse({
+    description: 'Current user account data with role.',
+    type: AccountMeResponseDto,
+  })
+  async getMe(
+    @CurrentUser('id') userId: string,
+  ): Promise<AccountMeResponseDto> {
     return this.accountService.getMe(userId);
   }
 
@@ -58,7 +63,9 @@ export class AccountController {
   @Get('survey')
   @ApiOperation({ summary: 'Get current user survey' })
   @ApiOkResponse({ description: 'User survey data.', type: SurveyResponseDto })
-  async getSurvey(@CurrentUser('id') userId: string): Promise<SurveyResponseDto> {
+  async getSurvey(
+    @CurrentUser('id') userId: string,
+  ): Promise<SurveyResponseDto> {
     return this.accountService.getSurveyResponse(userId);
   }
 
@@ -69,7 +76,10 @@ export class AccountController {
   @Post('survey')
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Create one-shot survey for current user' })
-  @ApiCreatedResponse({ description: 'Survey created.', type: SurveyResponseDto })
+  @ApiCreatedResponse({
+    description: 'Survey created.',
+    type: SurveyResponseDto,
+  })
   @ApiConflictResponse({ description: 'Survey already exists.' })
   async postSurvey(
     @CurrentUser('id') userId: string,

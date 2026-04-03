@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -48,7 +44,9 @@ export class CategoriesService {
    * @param createCategoryDto - The category data
    * @returns The created category response DTO
    */
-  async create(createCategoryDto: CreateCategoryDto): Promise<CategoryResponseDto> {
+  async create(
+    createCategoryDto: CreateCategoryDto,
+  ): Promise<CategoryResponseDto> {
     const entity = await this.createCategoryHandler.execute(createCategoryDto);
     return CategoryResponseDto.fromEntity(entity);
   }
@@ -128,7 +126,10 @@ export class CategoriesService {
     id: string,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<CategoryResponseDto> {
-    const entity = await this.updateCategoryHandler.execute(id, updateCategoryDto);
+    const entity = await this.updateCategoryHandler.execute(
+      id,
+      updateCategoryDto,
+    );
     return CategoryResponseDto.fromEntity(entity);
   }
 
@@ -212,7 +213,12 @@ export class CategoriesService {
     // Load partner for clinic info
     const partner = await this.partnersService.getFirstHealthPartner();
 
-    return BookingServiceResponseDto.fromEntities(products, partner, userLat, userLng);
+    return BookingServiceResponseDto.fromEntities(
+      products,
+      partner,
+      userLat,
+      userLng,
+    );
   }
 
   async remove(id: string): Promise<void> {
@@ -265,7 +271,9 @@ export class CategoriesService {
   /**
    * Facade for admin create: delegates to handler then returns admin DTO with serviceCount.
    */
-  async createForAdmin(createCategoryDto: CreateCategoryDto): Promise<AdminCategoryResponseDto> {
+  async createForAdmin(
+    createCategoryDto: CreateCategoryDto,
+  ): Promise<AdminCategoryResponseDto> {
     const entity = await this.createCategoryHandler.execute(createCategoryDto);
     return this.findOneForAdmin(entity.id);
   }
@@ -281,4 +289,3 @@ export class CategoriesService {
     return this.findOneForAdmin(id);
   }
 }
-

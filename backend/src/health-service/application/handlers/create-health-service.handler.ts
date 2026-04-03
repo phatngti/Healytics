@@ -24,13 +24,22 @@ export class CreateHealthServiceHandler {
   ) {}
 
   async execute(command: CreatePartnerHealthServiceDto): Promise<Product> {
-    this.logger.log(`Executing CreateHealthServiceHandler with name: ${command.name}`);
+    this.logger.log(
+      `Executing CreateHealthServiceHandler with name: ${command.name}`,
+    );
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const { media, productDefinition, employeeIds, facilityImages, serviceManual, ...baseData } = command;
+      const {
+        media,
+        productDefinition,
+        employeeIds,
+        facilityImages,
+        serviceManual,
+        ...baseData
+      } = command;
 
       // 1. Invariant Check (Validate)
       if (baseData.type === HealthServiceType.SERVICE && !productDefinition) {
@@ -104,10 +113,7 @@ export class CreateHealthServiceHandler {
 
       // 4. Publish Redis event — notify subscribers of new service
       try {
-        await this.redisService.publish(
-          'new_service_created',
-          savedProduct.id,
-        );
+        await this.redisService.publish('new_service_created', savedProduct.id);
       } catch (pubErr) {
         this.logger.warn(
           `Failed to publish new_service_created event for ${savedProduct.id}: ${pubErr.message}`,
@@ -127,7 +133,7 @@ export class CreateHealthServiceHandler {
           'facilityImages',
         ],
       });
-      
+
       return completeProduct!;
     } catch (error) {
       await queryRunner.rollbackTransaction();

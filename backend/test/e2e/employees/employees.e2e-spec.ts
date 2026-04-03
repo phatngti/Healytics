@@ -90,26 +90,22 @@ describe('Employees (e2e)', () => {
     });
 
     it('should fail to create employee without role', async () => {
-      const res = await authRequest(app, accessToken)
-        .post('/employees')
-        .send({
-          employeeCode: 'TEST001',
-          fullName: 'Test Employee',
-          email: 'test@example.com',
-        });
+      const res = await authRequest(app, accessToken).post('/employees').send({
+        employeeCode: 'TEST001',
+        fullName: 'Test Employee',
+        email: 'test@example.com',
+      });
 
       expect(res.status).toBeGreaterThanOrEqual(400);
     });
 
     it('should fail to create employee with invalid email', async () => {
-      const res = await authRequest(app, accessToken)
-        .post('/employees')
-        .send({
-          employeeCode: 'TEST002',
-          fullName: 'Test Employee',
-          email: 'invalid-email',
-          role: 'RECEPTIONIST',
-        });
+      const res = await authRequest(app, accessToken).post('/employees').send({
+        employeeCode: 'TEST002',
+        fullName: 'Test Employee',
+        email: 'invalid-email',
+        role: 'RECEPTIONIST',
+      });
 
       expect(res.status).toBeGreaterThanOrEqual(400);
     });
@@ -126,14 +122,18 @@ describe('Employees (e2e)', () => {
 
   describe('GET /employees/:id', () => {
     it('should get an employee by id', async () => {
-      const res = await authRequest(app, accessToken).get(`/employees/${createdEmployeeId}`);
+      const res = await authRequest(app, accessToken).get(
+        `/employees/${createdEmployeeId}`,
+      );
 
       expect([200, 201]).toContain(res.status);
       expect(res.body.id).toBe(createdEmployeeId);
     });
 
     it('should return 404 for non-existent employee', async () => {
-      const res = await authRequest(app, accessToken).get(`/employees/${FAKE_UUID}`);
+      const res = await authRequest(app, accessToken).get(
+        `/employees/${FAKE_UUID}`,
+      );
 
       expect(res.status).toBe(404);
     });
@@ -196,17 +196,23 @@ describe('Employees (e2e)', () => {
 
       const employeeToDeleteId = createRes.body.id;
 
-      const res = await authRequest(app, accessToken).delete(`/employees/${employeeToDeleteId}`);
+      const res = await authRequest(app, accessToken).delete(
+        `/employees/${employeeToDeleteId}`,
+      );
 
       expect([200, 201, 204]).toContain(res.status);
 
       // Verify deletion
-      const getRes = await authRequest(app, accessToken).get(`/employees/${employeeToDeleteId}`);
+      const getRes = await authRequest(app, accessToken).get(
+        `/employees/${employeeToDeleteId}`,
+      );
       expect(getRes.status).toBe(404);
     });
 
     it('should return 404 when deleting non-existent employee', async () => {
-      const res = await authRequest(app, accessToken).delete(`/employees/${FAKE_UUID}`);
+      const res = await authRequest(app, accessToken).delete(
+        `/employees/${FAKE_UUID}`,
+      );
 
       expect(res.status).toBe(404);
     });

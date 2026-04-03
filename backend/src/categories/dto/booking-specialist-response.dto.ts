@@ -20,14 +20,20 @@ export class BookingSpecialistResponseDto {
   name: string;
 
   @Expose()
-  @ApiProperty({ description: 'Short specialty label', example: 'Spa Therapist' })
+  @ApiProperty({
+    description: 'Short specialty label',
+    example: 'Spa Therapist',
+  })
   specialty: string;
 
   @Expose()
   @ApiPropertyOptional({ description: 'URL to avatar image', nullable: true })
   avatarUrl: string | null;
 
-  static fromEntity(entity: Employee, eligibilityId: string): BookingSpecialistResponseDto {
+  static fromEntity(
+    entity: Employee,
+    eligibilityId: string,
+  ): BookingSpecialistResponseDto {
     const dto = new BookingSpecialistResponseDto();
     dto.id = entity.id;
     dto.eligibilityId = eligibilityId;

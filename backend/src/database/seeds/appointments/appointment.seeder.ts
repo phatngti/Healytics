@@ -65,7 +65,11 @@ const SEED_APPOINTMENTS: {
     paidAt: Date | null;
   };
   /** Status log transitions from initial → current status */
-  statusLogs: { fromStatus: BookingStatus | null; toStatus: BookingStatus; changedBy: string }[];
+  statusLogs: {
+    fromStatus: BookingStatus | null;
+    toStatus: BookingStatus;
+    changedBy: string;
+  }[];
   /** Present only when isReviewed = true */
   treatmentReview?: {
     rating: number;
@@ -98,19 +102,33 @@ const SEED_APPOINTMENTS: {
       paidAt: daysAgo(14, 9, 30),
     },
     statusLogs: [
-      { fromStatus: null, toStatus: BookingStatus.PENDING_PAYMENT, changedBy: 'system' },
-      { fromStatus: BookingStatus.PENDING_PAYMENT, toStatus: BookingStatus.CONFIRMED, changedBy: 'system' },
-      { fromStatus: BookingStatus.CONFIRMED, toStatus: BookingStatus.COMPLETED, changedBy: 'staff:EMP-002' },
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.COMPLETED,
+        changedBy: 'staff:EMP-002',
+      },
     ],
     treatmentReview: {
       rating: 5,
-      comment: 'Absolutely incredible experience! The therapist was highly professional and the atmosphere was so calming. Left feeling completely rejuvenated.',
+      comment:
+        'Absolutely incredible experience! The therapist was highly professional and the atmosphere was so calming. Left feeling completely rejuvenated.',
       tags: ['Professional', 'Relaxing', 'Clean'],
       photoUrls: [],
     },
     specialistReview: {
       rating: 5,
-      comment: 'Sarah is truly exceptional. Her technique is both powerful and precise — I could feel the difference immediately. Highly recommend!',
+      comment:
+        'Sarah is truly exceptional. Her technique is both powerful and precise — I could feel the difference immediately. Highly recommend!',
       tags: ['Skilled', 'Friendly', 'Thorough'],
       wouldRecommend: true,
     },
@@ -134,9 +152,21 @@ const SEED_APPOINTMENTS: {
       paidAt: daysAgo(7, 14, 50),
     },
     statusLogs: [
-      { fromStatus: null, toStatus: BookingStatus.PENDING_PAYMENT, changedBy: 'system' },
-      { fromStatus: BookingStatus.PENDING_PAYMENT, toStatus: BookingStatus.CONFIRMED, changedBy: 'staff:EMP-001' },
-      { fromStatus: BookingStatus.CONFIRMED, toStatus: BookingStatus.COMPLETED, changedBy: 'staff:EMP-001' },
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'staff:EMP-001',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.COMPLETED,
+        changedBy: 'staff:EMP-001',
+      },
     ],
   },
 
@@ -158,19 +188,33 @@ const SEED_APPOINTMENTS: {
       paidAt: daysAgo(21, 10, 45),
     },
     statusLogs: [
-      { fromStatus: null, toStatus: BookingStatus.PENDING_PAYMENT, changedBy: 'system' },
-      { fromStatus: BookingStatus.PENDING_PAYMENT, toStatus: BookingStatus.CONFIRMED, changedBy: 'system' },
-      { fromStatus: BookingStatus.CONFIRMED, toStatus: BookingStatus.COMPLETED, changedBy: 'staff:EMP-002' },
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.COMPLETED,
+        changedBy: 'staff:EMP-002',
+      },
     ],
     treatmentReview: {
       rating: 4,
-      comment: 'Great facial treatment. My skin felt amazing afterwards. The Korean products used were top quality. Will definitely return!',
+      comment:
+        'Great facial treatment. My skin felt amazing afterwards. The Korean products used were top quality. Will definitely return!',
       tags: ['Clean', 'Friendly', 'Good Value'],
       photoUrls: [],
     },
     specialistReview: {
       rating: 4,
-      comment: 'Very knowledgeable and gentle. Sarah explained each step clearly and customized the treatment for my skin type.',
+      comment:
+        'Very knowledgeable and gentle. Sarah explained each step clearly and customized the treatment for my skin type.',
       tags: ['Professional', 'Knowledgeable'],
       wouldRecommend: true,
     },
@@ -194,8 +238,16 @@ const SEED_APPOINTMENTS: {
       paidAt: daysFromNow(-1, 10, 0),
     },
     statusLogs: [
-      { fromStatus: null, toStatus: BookingStatus.PENDING_PAYMENT, changedBy: 'system' },
-      { fromStatus: BookingStatus.PENDING_PAYMENT, toStatus: BookingStatus.CONFIRMED, changedBy: 'system' },
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
     ],
   },
 
@@ -217,8 +269,16 @@ const SEED_APPOINTMENTS: {
       paidAt: daysFromNow(-2, 9, 0),
     },
     statusLogs: [
-      { fromStatus: null, toStatus: BookingStatus.PENDING_PAYMENT, changedBy: 'system' },
-      { fromStatus: BookingStatus.PENDING_PAYMENT, toStatus: BookingStatus.CONFIRMED, changedBy: 'system' },
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
     ],
   },
 
@@ -240,9 +300,21 @@ const SEED_APPOINTMENTS: {
       paidAt: daysAgo(6, 14, 0),
     },
     statusLogs: [
-      { fromStatus: null, toStatus: BookingStatus.PENDING_PAYMENT, changedBy: 'system' },
-      { fromStatus: BookingStatus.PENDING_PAYMENT, toStatus: BookingStatus.CONFIRMED, changedBy: 'system' },
-      { fromStatus: BookingStatus.CONFIRMED, toStatus: BookingStatus.CANCELLED, changedBy: 'user' },
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.CANCELLED,
+        changedBy: 'user',
+      },
     ],
   },
 
@@ -264,7 +336,11 @@ const SEED_APPOINTMENTS: {
       paidAt: null,
     },
     statusLogs: [
-      { fromStatus: null, toStatus: BookingStatus.PENDING_PAYMENT, changedBy: 'system' },
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
     ],
   },
 
@@ -286,9 +362,21 @@ const SEED_APPOINTMENTS: {
       paidAt: daysAgo(45, 12, 40),
     },
     statusLogs: [
-      { fromStatus: null, toStatus: BookingStatus.PENDING_PAYMENT, changedBy: 'system' },
-      { fromStatus: BookingStatus.PENDING_PAYMENT, toStatus: BookingStatus.CONFIRMED, changedBy: 'system' },
-      { fromStatus: BookingStatus.CONFIRMED, toStatus: BookingStatus.COMPLETED, changedBy: 'staff:EMP-001' },
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.COMPLETED,
+        changedBy: 'staff:EMP-001',
+      },
     ],
   },
 ];
@@ -334,7 +422,9 @@ export class AppointmentSeeder implements ISeeder {
     });
 
     if (!userAccount) {
-      this.logger.warn('  ⚠ Test user "user@healytics.vn" not found — skipping appointment seeding. Run UserSeeder first.');
+      this.logger.warn(
+        '  ⚠ Test user "user@healytics.vn" not found — skipping appointment seeding. Run UserSeeder first.',
+      );
       return;
     }
 
@@ -351,13 +441,17 @@ export class AppointmentSeeder implements ISeeder {
       // we query bookings by userId + staffId + startTime (composite unique index)
       const employee = employeeMap.get(apt.staffCode);
       if (!employee) {
-        this.logger.warn(`  ⚠ Employee "${apt.staffCode}" not found — skipping ${apt.idempotencyKey}`);
+        this.logger.warn(
+          `  ⚠ Employee "${apt.staffCode}" not found — skipping ${apt.idempotencyKey}`,
+        );
         continue;
       }
 
       const product = apt.productSlug ? productMap.get(apt.productSlug) : null;
       if (apt.productSlug && !product) {
-        this.logger.warn(`  ⚠ Product "${apt.productSlug}" not found — skipping ${apt.idempotencyKey}`);
+        this.logger.warn(
+          `  ⚠ Product "${apt.productSlug}" not found — skipping ${apt.idempotencyKey}`,
+        );
         continue;
       }
 
@@ -367,7 +461,9 @@ export class AppointmentSeeder implements ISeeder {
       });
 
       if (existing) {
-        this.logger.log(`  ⏭ Booking ${apt.idempotencyKey} already exists (staffId=${employee.id}, startTime=${apt.startTime.toISOString()}), skipping`);
+        this.logger.log(
+          `  ⏭ Booking ${apt.idempotencyKey} already exists (staffId=${employee.id}, startTime=${apt.startTime.toISOString()}), skipping`,
+        );
         continue;
       }
 
@@ -387,7 +483,9 @@ export class AppointmentSeeder implements ISeeder {
       });
 
       await this.bookingRepo.save(booking);
-      this.logger.log(`  ✅ Created booking ${apt.idempotencyKey} (${apt.status}) → staff: ${apt.staffCode}, product: ${apt.productSlug ?? 'none'}`);
+      this.logger.log(
+        `  ✅ Created booking ${apt.idempotencyKey} (${apt.status}) → staff: ${apt.staffCode}, product: ${apt.productSlug ?? 'none'}`,
+      );
 
       // 2. Booking Status Logs (audit trail)
       for (const log of apt.statusLogs) {
@@ -415,11 +513,17 @@ export class AppointmentSeeder implements ISeeder {
         paymentUrl: null,
         paymentDeeplink: null,
         gatewayResultCode: apt.payment.status === PaymentStatus.PAID ? 0 : null,
-        gatewayMessage: apt.payment.status === PaymentStatus.PAID ? 'Success' : null,
-        refundedAt: apt.payment.status === PaymentStatus.REFUND ? apt.payment.paidAt : null,
+        gatewayMessage:
+          apt.payment.status === PaymentStatus.PAID ? 'Success' : null,
+        refundedAt:
+          apt.payment.status === PaymentStatus.REFUND
+            ? apt.payment.paidAt
+            : null,
       });
       await this.paymentRepo.save(payment);
-      this.logger.log(`    💳 Payment ${apt.payment.method} → ${apt.payment.status} (${apt.payment.amount.toLocaleString('vi-VN')} VND)`);
+      this.logger.log(
+        `    💳 Payment ${apt.payment.method} → ${apt.payment.status} (${apt.payment.amount.toLocaleString('vi-VN')} VND)`,
+      );
 
       // 4. TreatmentReview (only when isReviewed + reviewData present)
       if (apt.isReviewed && apt.treatmentReview && product) {
@@ -432,7 +536,9 @@ export class AppointmentSeeder implements ISeeder {
           photoUrls: apt.treatmentReview.photoUrls,
         });
         await this.treatmentReviewRepo.save(treatmentReview);
-        this.logger.log(`    ⭐ Treatment review: ${apt.treatmentReview.rating}/5 — "${apt.treatmentReview.comment.substring(0, 40)}..."`);
+        this.logger.log(
+          `    ⭐ Treatment review: ${apt.treatmentReview.rating}/5 — "${apt.treatmentReview.comment.substring(0, 40)}..."`,
+        );
       }
 
       // 5. SpecialistReview (only when isReviewed + reviewData present)
@@ -447,7 +553,9 @@ export class AppointmentSeeder implements ISeeder {
           wouldRecommend: apt.specialistReview.wouldRecommend,
         });
         await this.specialistReviewRepo.save(specialistReview);
-        this.logger.log(`    👨‍⚕️ Specialist review: ${apt.specialistReview.rating}/5 (wouldRecommend=${apt.specialistReview.wouldRecommend})`);
+        this.logger.log(
+          `    👨‍⚕️ Specialist review: ${apt.specialistReview.rating}/5 (wouldRecommend=${apt.specialistReview.wouldRecommend})`,
+        );
       }
     }
 
@@ -468,7 +576,9 @@ export class AppointmentSeeder implements ISeeder {
       return;
     }
 
-    const seedStaffCodes = [...new Set(SEED_APPOINTMENTS.map((a) => a.staffCode))];
+    const seedStaffCodes = [
+      ...new Set(SEED_APPOINTMENTS.map((a) => a.staffCode)),
+    ];
     const employees = await this.employeeRepo.find({
       where: { employeeCode: In(seedStaffCodes) },
     });

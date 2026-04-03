@@ -132,7 +132,9 @@ describe('AuthController', () => {
   describe('refresh', () => {
     it('should call authService.refresh with token and return new tokens', async () => {
       // Arrange
-      const dto: RefreshTokenRequestDto = { refresh_token: 'old-refresh-token' };
+      const dto: RefreshTokenRequestDto = {
+        refresh_token: 'old-refresh-token',
+      };
       const expectedTokens = {
         access_token: 'new-access-token',
         refresh_token: 'new-refresh-token',

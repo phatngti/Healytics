@@ -61,7 +61,7 @@ export class AuthService {
     private readonly accountService: AccountService,
     private readonly jwtService: JwtService,
     private readonly partnerService: PartnersService,
-  ) { }
+  ) {}
 
   /**
    * Creates access and refresh tokens for a user.
@@ -86,10 +86,13 @@ export class AuthService {
       payload.profileCompleted = profile.profileCompleted;
     }
 
-    this.logger.debug(`Partner verification info: ${JSON.stringify(partnerVerification)}`);
+    this.logger.debug(
+      `Partner verification info: ${JSON.stringify(partnerVerification)}`,
+    );
     if (partnerVerification) {
       payload.verificationStatus = partnerVerification.verificationStatus;
-      payload.verificationCompletedAt = partnerVerification.verificationCompletedAt?.toISOString() ?? null;
+      payload.verificationCompletedAt =
+        partnerVerification.verificationCompletedAt?.toISOString() ?? null;
     }
     const accessExpires = process.env.JWT_EXPIRES_IN || '3600s';
     const refreshExpires = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
@@ -149,12 +152,17 @@ export class AuthService {
    * @param password - User password
    * @returns The validated user or null
    */
-  async validateUser(email: string, password: string): Promise<ValidatedUser | null> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<ValidatedUser | null> {
     const user = await this.accountService.findByEmail(email);
     if (!user) return null;
     const isMatch = await bcrypt.compare(password, user.passwordHash || '');
     if (!isMatch) return null;
-    const { passwordHash, ...rest } = user as Account & { passwordHash?: string };
+    const { passwordHash, ...rest } = user as Account & {
+      passwordHash?: string;
+    };
     return rest as ValidatedUser;
   }
 
@@ -201,7 +209,12 @@ export class AuthService {
       );
     }
     this.logger.log(`User login: ${userId}`);
-    return this.createTokensForUser(userId, userEmail, userRole, user.userProfile);
+    return this.createTokensForUser(
+      userId,
+      userEmail,
+      userRole,
+      user.userProfile,
+    );
   }
 
   /**
@@ -227,7 +240,12 @@ export class AuthService {
       );
     }
     this.logger.log(`Admin login: ${userId}`);
-    return this.createTokensForUser(userId, userEmail, userRole, user.userProfile);
+    return this.createTokensForUser(
+      userId,
+      userEmail,
+      userRole,
+      user.userProfile,
+    );
   }
 
   /**
@@ -258,12 +276,17 @@ export class AuthService {
     }
 
     this.logger.log(`Partner login: ${userId}`);
-    return this.createTokensForUser(userId, userEmail, userRole, user.userProfile, {
-      verificationCompletedAt: partnerProfile.verificationCompletedAt,
-      verificationStatus: partnerProfile.verificationStatus,
-    });
+    return this.createTokensForUser(
+      userId,
+      userEmail,
+      userRole,
+      user.userProfile,
+      {
+        verificationCompletedAt: partnerProfile.verificationCompletedAt,
+        verificationStatus: partnerProfile.verificationStatus,
+      },
+    );
   }
-
 
   /**
    * Refreshes authentication tokens for a partner, including verification info.
@@ -288,9 +311,12 @@ export class AuthService {
     if (!user || !user.refreshTokenHash) {
       throw new UnauthorizedException('Refresh token revoked');
     }
-    const match = await bcrypt.compare(refreshToken, user.refreshTokenHash || '');
+    const match = await bcrypt.compare(
+      refreshToken,
+      user.refreshTokenHash || '',
+    );
     if (!match) {
-      await this.accountService.removeRefreshToken(userId).catch(() => { });
+      await this.accountService.removeRefreshToken(userId).catch(() => {});
       throw new UnauthorizedException('Refresh token does not match');
     }
 
@@ -302,7 +328,8 @@ export class AuthService {
     // Fetch partner profile for verification info
     let partnerVerification: PartnerVerificationInfo | undefined;
     try {
-      const partnerProfile = await this.partnerService.getPartnerProfile(userId);
+      const partnerProfile =
+        await this.partnerService.getPartnerProfile(userId);
       if (partnerProfile) {
         partnerVerification = {
           verificationStatus: partnerProfile.verificationStatus,
@@ -322,7 +349,6 @@ export class AuthService {
       partnerVerification,
     );
   }
-
 
   /**
    * Refreshes authentication tokens.
@@ -347,9 +373,12 @@ export class AuthService {
     if (!user || !user.refreshTokenHash) {
       throw new UnauthorizedException('Refresh token revoked');
     }
-    const match = await bcrypt.compare(refreshToken, user.refreshTokenHash || '');
+    const match = await bcrypt.compare(
+      refreshToken,
+      user.refreshTokenHash || '',
+    );
     if (!match) {
-      await this.accountService.removeRefreshToken(userId).catch(() => { });
+      await this.accountService.removeRefreshToken(userId).catch(() => {});
       throw new UnauthorizedException('Refresh token does not match');
     }
     this.logger.log(`Token refreshed for user: ${userId}`);
@@ -375,7 +404,10 @@ export class AuthService {
         this.logger.log(`User logged out: ${userId}`);
       }
     } catch (error) {
-      this.logger.warn(`Logout cleanup failed for user: ${userId}`, error.message);
+      this.logger.warn(
+        `Logout cleanup failed for user: ${userId}`,
+        error.message,
+      );
     }
 
     const response = new LogoutResponseDto();

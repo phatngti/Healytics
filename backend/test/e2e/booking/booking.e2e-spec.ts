@@ -82,15 +82,17 @@ describe('Booking (e2e)', () => {
 
   describe('GET /bookings/tickets/:id', () => {
     it('should return 404 for non-existent ticket', async () => {
-      const res = await authRequest(app, accessToken)
-        .get(`/bookings/tickets/${FAKE_UUID}`);
+      const res = await authRequest(app, accessToken).get(
+        `/bookings/tickets/${FAKE_UUID}`,
+      );
 
       expect(res.status).toBe(404);
     });
 
     it('should return 400 for non-UUID ticket ID', async () => {
-      const res = await authRequest(app, accessToken)
-        .get('/bookings/tickets/not-a-uuid');
+      const res = await authRequest(app, accessToken).get(
+        '/bookings/tickets/not-a-uuid',
+      );
 
       expect(res.status).toBe(400);
     });
@@ -100,16 +102,16 @@ describe('Booking (e2e)', () => {
 
   describe('GET /bookings', () => {
     it('should return paginated bookings list', async () => {
-      const res = await authRequest(app, accessToken)
-        .get(`/bookings?page=1&limit=10&userId=${FAKE_UUID}`);
+      const res = await authRequest(app, accessToken).get(
+        `/bookings?page=1&limit=10&userId=${FAKE_UUID}`,
+      );
 
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
     });
 
     it('should fail without authentication', async () => {
-      const res = await authRequest(app, '')
-        .get('/bookings');
+      const res = await authRequest(app, '').get('/bookings');
 
       expect(res.status).toBe(401);
     });
@@ -119,15 +121,17 @@ describe('Booking (e2e)', () => {
 
   describe('GET /bookings/:id', () => {
     it('should return 404 for non-existent booking', async () => {
-      const res = await authRequest(app, accessToken)
-        .get(`/bookings/${FAKE_UUID}`);
+      const res = await authRequest(app, accessToken).get(
+        `/bookings/${FAKE_UUID}`,
+      );
 
       expect(res.status).toBe(404);
     });
 
     it('should return 400 for non-UUID booking ID', async () => {
-      const res = await authRequest(app, accessToken)
-        .get('/bookings/not-a-uuid');
+      const res = await authRequest(app, accessToken).get(
+        '/bookings/not-a-uuid',
+      );
 
       expect(res.status).toBe(400);
     });

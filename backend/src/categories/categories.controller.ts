@@ -1,9 +1,4 @@
-import {
-  Get,
-  Param,
-  Query,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import { Get, Param, Query, ParseUUIDPipe } from '@nestjs/common';
 import {
   ApiOperation,
   ApiOkResponse,
@@ -32,7 +27,9 @@ export class CategoriesController {
     description: 'Return all categories.',
     type: [CategoryResponseDto],
   })
-  findAll(@Query() query: FindCategoriesQueryDto): Promise<CategoryResponseDto[]> {
+  findAll(
+    @Query() query: FindCategoriesQueryDto,
+  ): Promise<CategoryResponseDto[]> {
     return this.categoriesService.findAll(query.rootsOnly ?? false);
   }
 
@@ -46,7 +43,9 @@ export class CategoriesController {
     type: CategoryResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Category not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<CategoryResponseDto> {
+  findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<CategoryResponseDto> {
     return this.categoriesService.findOne(id);
   }
 

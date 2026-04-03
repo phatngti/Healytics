@@ -13,9 +13,12 @@ part of openapi.api;
 class PublicClinicDto {
   /// Returns a new [PublicClinicDto] instance.
   PublicClinicDto({
+    required this.id,
     required this.name,
     required this.address,
   });
+
+  String id;
 
   String name;
 
@@ -23,20 +26,23 @@ class PublicClinicDto {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is PublicClinicDto &&
+    other.id == id &&
     other.name == name &&
     other.address == address;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
+    (id.hashCode) +
     (name.hashCode) +
     (address.hashCode);
 
   @override
-  String toString() => 'PublicClinicDto[name=$name, address=$address]';
+  String toString() => 'PublicClinicDto[id=$id, name=$name, address=$address]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+      json[r'id'] = this.id;
       json[r'name'] = this.name;
       json[r'address'] = this.address;
     return json;
@@ -61,6 +67,7 @@ class PublicClinicDto {
       }());
 
       return PublicClinicDto(
+        id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
         address: mapValueOfType<String>(json, r'address')!,
       );
@@ -110,6 +117,7 @@ class PublicClinicDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'id',
     'name',
     'address',
   };

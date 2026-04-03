@@ -340,18 +340,23 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
       id: json['id']?.toString() ?? '',
       serviceName:
           json['title']?.toString() ?? '',
-      vendorName:
+      healthPartnerName:
           json['vendor_name']?.toString() ?? '',
+      healthPartnerId:
+          json['health_partner_id']?.toString() ??
+              '',
       imageUrl:
           json['image_url']?.toString() ?? '',
       status: status,
       category:
           json['service_type_code']?.toString() ??
               '',
-      providerName:
+      specialistName:
           json['provider_name']?.toString() ?? '',
-      providerId:
+      specialistId:
           json['provider_id']?.toString(),
+      serviceId:
+          json['service_id']?.toString(),
       address:
           json['address']?.toString() ?? '',
       date: localTime,

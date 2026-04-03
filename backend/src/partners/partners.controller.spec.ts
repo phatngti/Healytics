@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PartnersController, PartnerSelfController } from './partners.controller';
+import {
+  PartnersController,
+  PartnerSelfController,
+} from './partners.controller';
 import { PartnersService } from './partners.service';
 import { NotFoundException } from '@nestjs/common';
 import { BusinessType } from './enum/business-type.enum';
@@ -46,7 +49,9 @@ describe('PartnersController', () => {
   describe('getBusinessServices', () => {
     it('should return all business services', () => {
       // Arrange
-      mockPartnersService.getBusinessServices.mockReturnValue(mockBusinessServices);
+      mockPartnersService.getBusinessServices.mockReturnValue(
+        mockBusinessServices,
+      );
 
       // Act
       const result = controller.getBusinessServices();
@@ -132,7 +137,9 @@ describe('PartnerSelfController', () => {
       );
 
       // Act & Assert
-      await expect(controller.getMyProfile(userId)).rejects.toThrow(NotFoundException);
+      await expect(controller.getMyProfile(userId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

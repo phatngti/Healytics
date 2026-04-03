@@ -45,7 +45,11 @@ export class Booking {
   @Column({ name: 'end_time', type: 'timestamptz', nullable: true })
   endTime: Date | null;
 
-  @Column({ type: 'varchar', length: 30, default: BookingStatus.PENDING_PAYMENT })
+  @Column({
+    type: 'varchar',
+    length: 30,
+    default: BookingStatus.PENDING_PAYMENT,
+  })
   status: BookingStatus;
 
   @Column({ name: 'payment_url', type: 'text', nullable: true })

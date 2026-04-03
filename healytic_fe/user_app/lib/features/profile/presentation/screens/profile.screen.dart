@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
+import 'package:user_app/core/widgets/main_screen_layout.widget.dart';
 
 import '../providers/profile.provider.dart';
 import '../widgets/profile_header.widget.dart';
@@ -12,6 +13,9 @@ import '../widgets/profile_logout_button.widget.dart';
 
 /// Personal profile screen rendered inside the
 /// bottom navigation shell.
+///
+/// Uses [MainScreenLayout] for consistent
+/// header/background across navigation tabs.
 ///
 /// Layout mirrors the HTML reference with sections:
 /// 1. Profile Identity (avatar, name, email, edit)
@@ -29,70 +33,53 @@ class ProfilePage extends HookConsumerWidget {
     final bottomPadding = AppDimens.bottomScrollPadding(context);
     final sectionGap = AppDimens.sectionSpacing(context);
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Profile'),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-      ),
-      body: SafeArea(
-        child: MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: MediaQuery.of(
-              context,
-            ).textScaler.clamp(minScaleFactor: 0.8, maxScaleFactor: 1.3),
-          ),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(
-              hPadding,
-              AppDimens.spaceXl,
-              hPadding,
-              bottomPadding,
+    return MainScreenLayout(
+      title: 'Profile',
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          hPadding,
+          AppDimens.spaceXl,
+          hPadding,
+          bottomPadding,
+        ),
+        child: Column(
+          children: [
+            // § 1 — Profile Identity
+            accountMeState.when(
+              data: (user) => ProfileHeader(
+                displayName: user.displayName,
+                email: user.email,
+                onEditProfile: () => context.pushNamed('edit_profile'),
+              ),
+              loading: () => ProfileHeader(
+                displayName: userNameFallback ?? 'Loading...',
+                email: '',
+                onEditProfile: () => context.pushNamed('edit_profile'),
+              ),
+              error: (err, stack) => ProfileHeader(
+                displayName: userNameFallback ?? 'Guest',
+                email: 'Error loading profile',
+                onEditProfile: () => context.pushNamed('edit_profile'),
+              ),
             ),
-            child: Column(
-              children: [
-                // § 1 — Profile Identity
-                accountMeState.when(
-                  data: (user) => ProfileHeader(
-                    displayName: user.displayName,
-                    email: user.email,
-                    onEditProfile: () => context.pushNamed('edit_profile'),
-                  ),
-                  loading: () => ProfileHeader(
-                    displayName: userNameFallback ?? 'Loading...',
-                    email: '',
-                    onEditProfile: () => context.pushNamed('edit_profile'),
-                  ),
-                  error: (err, stack) => ProfileHeader(
-                    displayName: userNameFallback ?? 'Guest',
-                    email: 'Error loading profile',
-                    onEditProfile: () => context.pushNamed('edit_profile'),
-                  ),
-                ),
-                SizedBox(height: sectionGap * 1.5),
+            SizedBox(height: sectionGap * 1.5),
 
-                // § 2 — Quick Stats
-                const ProfileQuickStats(
-                  ordersCount: 12,
-                  wishlistCount: 48,
-                  points: '2.4k',
-                ),
-                SizedBox(height: sectionGap * 1.5),
-
-                // § 3 — Settings List
-                const ProfileSettingsList(),
-                SizedBox(height: sectionGap * 1.5),
-
-                // § 4 — Log Out
-                ProfileLogoutButton(
-                  onPressed: () => _handleLogout(context, ref),
-                ),
-                SizedBox(height: sectionGap),
-              ],
+            // § 2 — Quick Stats
+            const ProfileQuickStats(
+              ordersCount: 12,
+              wishlistCount: 48,
+              points: '2.4k',
             ),
-          ),
+            SizedBox(height: sectionGap * 1.5),
+
+            // § 3 — Settings List
+            const ProfileSettingsList(),
+            SizedBox(height: sectionGap * 1.5),
+
+            // § 4 — Log Out
+            ProfileLogoutButton(onPressed: () => _handleLogout(context, ref)),
+            SizedBox(height: sectionGap),
+          ],
         ),
       ),
     );
@@ -109,14 +96,14 @@ class ProfilePage extends HookConsumerWidget {
         title: Text(
           'Log Out',
           style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                color: Theme.of(ctx).colorScheme.onSurface,
-              ),
+            color: Theme.of(ctx).colorScheme.onSurface,
+          ),
         ),
         content: Text(
           'Are you sure you want to log out?',
           style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(ctx).colorScheme.onSurfaceVariant,
-              ),
+            color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+          ),
         ),
         actions: [
           TextButton(

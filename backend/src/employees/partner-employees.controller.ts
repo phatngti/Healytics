@@ -22,7 +22,10 @@ import { PartnerApi } from '@/common/decorators/api/partner-api.decorator';
 import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { EmployeesService } from './employees.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
-import { CreateSpaTherapistDto, CreateMassageTherapistDto } from './dto/create-therapist.dto';
+import {
+  CreateSpaTherapistDto,
+  CreateMassageTherapistDto,
+} from './dto/create-therapist.dto';
 import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { EmployeeResponseDto } from './dto/employee-response.dto';
@@ -52,7 +55,8 @@ export class PartnerEmployeesController {
     @CurrentUser('id') userId: string,
     @Body() createDoctorDto: CreateDoctorDto,
   ): Promise<EmployeeResponseDto> {
-    const partnerId = await this.employeesService.getPartnerIdByAccountId(userId);
+    const partnerId =
+      await this.employeesService.getPartnerIdByAccountId(userId);
     return this.employeesService.createDoctor(createDoctorDto, partnerId);
   }
 
@@ -70,7 +74,8 @@ export class PartnerEmployeesController {
     @CurrentUser('id') userId: string,
     @Body() dto: CreateSpaTherapistDto,
   ): Promise<EmployeeResponseDto> {
-    const partnerId = await this.employeesService.getPartnerIdByAccountId(userId);
+    const partnerId =
+      await this.employeesService.getPartnerIdByAccountId(userId);
     return this.employeesService.createSpaTherapist(dto, partnerId);
   }
 
@@ -88,7 +93,8 @@ export class PartnerEmployeesController {
     @CurrentUser('id') userId: string,
     @Body() dto: CreateMassageTherapistDto,
   ): Promise<EmployeeResponseDto> {
-    const partnerId = await this.employeesService.getPartnerIdByAccountId(userId);
+    const partnerId =
+      await this.employeesService.getPartnerIdByAccountId(userId);
     return this.employeesService.createMassageTherapist(dto, partnerId);
   }
 
@@ -105,7 +111,8 @@ export class PartnerEmployeesController {
     @CurrentUser('id') userId: string,
     @Query() query: GetEmployeesQueryDto,
   ): Promise<EmployeeResponseDto[]> {
-    const partnerId = await this.employeesService.getPartnerIdByAccountId(userId);
+    const partnerId =
+      await this.employeesService.getPartnerIdByAccountId(userId);
     return this.employeesService.findAll(query, partnerId);
   }
 
@@ -123,7 +130,8 @@ export class PartnerEmployeesController {
     @CurrentUser('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<EmployeeResponseDto> {
-    const partnerId = await this.employeesService.getPartnerIdByAccountId(userId);
+    const partnerId =
+      await this.employeesService.getPartnerIdByAccountId(userId);
     return this.employeesService.findOneForPartner(id, partnerId);
   }
 
@@ -143,7 +151,8 @@ export class PartnerEmployeesController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
   ): Promise<EmployeeResponseDto> {
-    const partnerId = await this.employeesService.getPartnerIdByAccountId(userId);
+    const partnerId =
+      await this.employeesService.getPartnerIdByAccountId(userId);
     return this.employeesService.updateForPartner(
       id,
       partnerId,
@@ -166,7 +175,8 @@ export class PartnerEmployeesController {
     @CurrentUser('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<void> {
-    const partnerId = await this.employeesService.getPartnerIdByAccountId(userId);
+    const partnerId =
+      await this.employeesService.getPartnerIdByAccountId(userId);
     return this.employeesService.removeForPartner(id, partnerId);
   }
 }

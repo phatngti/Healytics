@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -85,11 +81,10 @@ export class MoMoPaymentService {
       );
     }
 
-    const amount = await this.bookingPaymentService.resolveBookingAmount(booking);
+    const amount =
+      await this.bookingPaymentService.resolveBookingAmount(booking);
     if (!Number.isFinite(amount) || amount <= 0) {
-      throw new BadRequestException(
-        `Booking ${booking.id} has invalid amount`,
-      );
+      throw new BadRequestException(`Booking ${booking.id} has invalid amount`);
     }
 
     // 1. Create Payment record
@@ -185,7 +180,8 @@ export class MoMoPaymentService {
       bookingId,
       userId,
     );
-    const amount = await this.bookingPaymentService.resolveBookingAmount(booking);
+    const amount =
+      await this.bookingPaymentService.resolveBookingAmount(booking);
 
     // Find existing payment record
     const existingPayment = await this.paymentRepo.findOne({
@@ -212,9 +208,10 @@ export class MoMoPaymentService {
 
     // Log refund transaction
     if (existingPayment) {
-      const action = response.resultCode === 0
-        ? TransactionAction.REFUND_CONFIRMED
-        : TransactionAction.REFUND_REQUESTED;
+      const action =
+        response.resultCode === 0
+          ? TransactionAction.REFUND_CONFIRMED
+          : TransactionAction.REFUND_REQUESTED;
 
       await this.txLogRepo.save(
         this.txLogRepo.create({
@@ -260,11 +257,7 @@ export class MoMoPaymentService {
    * 4. Update booking status via BookingPaymentService
    */
   async handleIPN(ipn: MoMoIPNDto): Promise<boolean> {
-    const isValid = verifyIPNSignature(
-      this.accessKey,
-      this.secretKey,
-      ipn,
-    );
+    const isValid = verifyIPNSignature(this.accessKey, this.secretKey, ipn);
 
     // Try to find the payment by gateway order ID
     const payment = await this.paymentRepo.findOne({
@@ -329,9 +322,7 @@ export class MoMoPaymentService {
           `MoMo payment confirmed: transId=${ipn.transId}`,
         );
 
-        this.logger.log(
-          `IPN success: ${ipn.orderId} -> booking ${bookingId}`,
-        );
+        this.logger.log(`IPN success: ${ipn.orderId} -> booking ${bookingId}`);
       } else {
         this.logger.warn(
           `IPN failed: ${ipn.orderId} resultCode=${ipn.resultCode}`,
@@ -347,10 +338,7 @@ export class MoMoPaymentService {
     return true;
   }
 
-  private async callMoMoApi<T>(
-    path: string,
-    body: object,
-  ): Promise<T> {
+  private async callMoMoApi<T>(path: string, body: object): Promise<T> {
     const url = `${this.endpoint}${path}`;
 
     const response = await fetch(url, {

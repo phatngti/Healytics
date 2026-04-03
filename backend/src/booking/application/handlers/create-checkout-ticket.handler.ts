@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  Inject,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, Logger, Inject, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';

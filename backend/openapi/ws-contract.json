@@ -1,0 +1,451 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Auto-generated from backend WS decorators — DO NOT EDIT BY HAND. Run: yarn generate:ws-contract",
+  "namespaces": {
+    "notifications": {
+      "description": "Real-time notification delivery gateway",
+      "auth": {
+        "type": "jwt",
+        "roles": [
+          "user"
+        ]
+      },
+      "clientToServer": {},
+      "serverToClient": {
+        "new_notification": {
+          "description": "A new notification was pushed to the user",
+          "payload": "WsNewNotificationEvent"
+        },
+        "unread_count": {
+          "description": "The unread notification count changed (after new notification or mark-read)",
+          "payload": "WsUnreadCountEvent"
+        },
+        "broadcast_sent": {
+          "description": "A system-wide broadcast was sent (admin-facing)",
+          "payload": "WsBroadcastSentEvent"
+        }
+      }
+    },
+    "user-chat": {
+      "description": "User (patient) WebSocket gateway",
+      "auth": {
+        "type": "jwt",
+        "roles": [
+          "user"
+        ]
+      },
+      "clientToServer": {
+        "send_message": {
+          "description": "Send a chat message",
+          "payload": "WsSendMessagePayload",
+          "ack": "WsMessageSentAck"
+        },
+        "typing": {
+          "description": "Notify the other party that the user is typing",
+          "payload": "WsTypingPayload"
+        },
+        "stop_typing": {
+          "description": "Notify the other party that the user stopped typing",
+          "payload": "WsTypingPayload"
+        },
+        "mark_read": {
+          "description": "Mark all messages in a conversation as read",
+          "payload": "WsMarkReadPayload"
+        },
+        "join_conversation": {
+          "description": "Join a conversation room (auto-joined on connect; use for new conversations)",
+          "payload": "WsJoinConversationPayload"
+        }
+      },
+      "serverToClient": {
+        "new_message": {
+          "description": "A new message was sent in a conversation the user has joined",
+          "payload": "WsNewMessageEvent"
+        },
+        "message_sent": {
+          "description": "Acknowledgement that the server persisted the user's message",
+          "payload": "WsMessageSentAck"
+        },
+        "messages_read": {
+          "description": "The other party read messages in a conversation",
+          "payload": "WsMessagesReadEvent"
+        },
+        "typing": {
+          "description": "The other party is typing in a conversation",
+          "payload": "WsTypingEvent"
+        },
+        "stop_typing": {
+          "description": "The other party stopped typing",
+          "payload": "WsStopTypingEvent"
+        },
+        "error": {
+          "description": "A server error occurred while processing a WS event",
+          "payload": "WsErrorEvent"
+        }
+      }
+    },
+    "partner-chat": {
+      "description": "Health Partner WebSocket gateway",
+      "auth": {
+        "type": "jwt",
+        "roles": [
+          "health_partner",
+          "employee"
+        ]
+      },
+      "extends": "user-chat"
+    }
+  },
+  "models": {
+    "WsSendMessagePayload": {
+      "description": "Payload for sending a message via WebSocket",
+      "direction": "clientToServer",
+      "properties": {
+        "conversationId": {
+          "type": "String",
+          "required": true,
+          "description": "Target conversation UUID"
+        },
+        "receiverId": {
+          "type": "String",
+          "required": true,
+          "description": "Target receiver UUID"
+        },
+        "content": {
+          "type": "String",
+          "required": true,
+          "description": "Message text content (max 5000 chars)"
+        },
+        "messageType": {
+          "type": "WsMessageType",
+          "required": false,
+          "description": "Type of message",
+          "isEnum": true,
+          "default": "text"
+        },
+        "clientMessageId": {
+          "type": "String",
+          "required": false,
+          "description": "Client-generated UUID for idempotent delivery"
+        }
+      }
+    },
+    "WsTypingPayload": {
+      "description": "Payload containing only a conversation ID",
+      "direction": "clientToServer",
+      "properties": {
+        "conversationId": {
+          "type": "String",
+          "required": true,
+          "description": "Conversation UUID"
+        },
+        "receiverId": {
+          "type": "String",
+          "required": true,
+          "description": "Target receiver UUID"
+        }
+      }
+    },
+    "WsMarkReadPayload": {
+      "description": "Payload containing only a conversation ID",
+      "direction": "clientToServer",
+      "properties": {
+        "conversationId": {
+          "type": "String",
+          "required": true,
+          "description": "Conversation UUID"
+        },
+        "receiverId": {
+          "type": "String",
+          "required": true,
+          "description": "Target receiver UUID"
+        }
+      }
+    },
+    "WsJoinConversationPayload": {
+      "description": "Payload containing only a conversation ID",
+      "direction": "clientToServer",
+      "properties": {
+        "conversationId": {
+          "type": "String",
+          "required": true,
+          "description": "Conversation UUID"
+        }
+      }
+    },
+    "WsNewNotificationEvent": {
+      "description": "Server event: a new notification pushed to the user in real-time",
+      "direction": "serverToClient",
+      "properties": {
+        "id": {
+          "type": "String",
+          "required": true,
+          "description": "Notification UUID"
+        },
+        "type": {
+          "type": "WsNotificationType",
+          "required": true,
+          "description": "The type of notification",
+          "isEnum": true
+        },
+        "title": {
+          "type": "String",
+          "required": true,
+          "description": "Notification title"
+        },
+        "body": {
+          "type": "String",
+          "required": true,
+          "description": "Notification body text"
+        },
+        "data": {
+          "type": "object",
+          "required": false,
+          "description": "Deep-link data for frontend routing"
+        },
+        "isRead": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the notification has been read"
+        },
+        "readAt": {
+          "type": "DateTime",
+          "required": false,
+          "description": "When the notification was read"
+        },
+        "isBroadcast": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether this is a system-wide broadcast"
+        },
+        "createdAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the notification was created"
+        }
+      }
+    },
+    "WsUnreadCountEvent": {
+      "description": "Server event: updated unread notification count for the user",
+      "direction": "serverToClient",
+      "properties": {
+        "count": {
+          "type": "num",
+          "required": true,
+          "description": "Current unread notification count"
+        }
+      }
+    },
+    "WsBroadcastSentEvent": {
+      "description": "Server event: a system-wide broadcast was sent (admin-facing)",
+      "direction": "serverToClient",
+      "properties": {
+        "id": {
+          "type": "String",
+          "required": true,
+          "description": "Notification UUID"
+        },
+        "title": {
+          "type": "String",
+          "required": true,
+          "description": "Notification title"
+        },
+        "body": {
+          "type": "String",
+          "required": true,
+          "description": "Notification body text"
+        },
+        "createdAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the broadcast was created"
+        }
+      }
+    },
+    "WsMessageSentAck": {
+      "description": "Server acknowledgement after persisting a message",
+      "direction": "serverToClient",
+      "properties": {
+        "id": {
+          "type": "String",
+          "required": true,
+          "description": "Server-generated message UUID"
+        },
+        "clientMessageId": {
+          "type": "String",
+          "required": false,
+          "description": "Echoed client message ID for matching"
+        }
+      }
+    },
+    "WsNewMessageEvent": {
+      "description": "Server event: a new message in a conversation",
+      "direction": "serverToClient",
+      "properties": {
+        "id": {
+          "type": "String",
+          "required": true,
+          "description": "Server-generated message UUID"
+        },
+        "conversationId": {
+          "type": "String",
+          "required": true,
+          "description": "Conversation UUID"
+        },
+        "senderId": {
+          "type": "String",
+          "required": true,
+          "description": "Account ID of the sender"
+        },
+        "receiverId": {
+          "type": "String",
+          "required": true,
+          "description": "Account ID of the receiver"
+        },
+        "senderName": {
+          "type": "String",
+          "required": false,
+          "description": "Display name of the sender"
+        },
+        "senderAvatar": {
+          "type": "String",
+          "required": false,
+          "description": "Avatar URL of the sender"
+        },
+        "content": {
+          "type": "String",
+          "required": true,
+          "description": "Message text content"
+        },
+        "messageType": {
+          "type": "WsMessageType",
+          "required": true,
+          "description": "Type of message",
+          "isEnum": true
+        },
+        "clientMessageId": {
+          "type": "String",
+          "required": false,
+          "description": "Echoed client message ID for matching"
+        },
+        "createdAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the message was created"
+        }
+      }
+    },
+    "WsMessagesReadEvent": {
+      "description": "Server event: messages were read by the other party",
+      "direction": "serverToClient",
+      "properties": {
+        "conversationId": {
+          "type": "String",
+          "required": true,
+          "description": "Conversation UUID"
+        },
+        "readerId": {
+          "type": "String",
+          "required": true,
+          "description": "Account ID of the reader"
+        },
+        "receiverId": {
+          "type": "String",
+          "required": true,
+          "description": "Account ID of the message sender (who is being notified)"
+        },
+        "readAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the messages were marked as read"
+        }
+      }
+    },
+    "WsTypingEvent": {
+      "description": "Server event: the other party is typing",
+      "direction": "serverToClient",
+      "properties": {
+        "conversationId": {
+          "type": "String",
+          "required": true,
+          "description": "Conversation UUID"
+        },
+        "userId": {
+          "type": "String",
+          "required": true,
+          "description": "Account ID of the typer"
+        },
+        "receiverId": {
+          "type": "String",
+          "required": true,
+          "description": "Account ID of the receiver"
+        },
+        "userName": {
+          "type": "String",
+          "required": true,
+          "description": "Display name of the typer"
+        }
+      }
+    },
+    "WsStopTypingEvent": {
+      "description": "Server event: the other party stopped typing",
+      "direction": "serverToClient",
+      "properties": {
+        "conversationId": {
+          "type": "String",
+          "required": true,
+          "description": "Conversation UUID"
+        },
+        "userId": {
+          "type": "String",
+          "required": true,
+          "description": "Account ID"
+        },
+        "receiverId": {
+          "type": "String",
+          "required": true,
+          "description": "Account ID of the receiver"
+        }
+      }
+    },
+    "WsErrorEvent": {
+      "description": "Server error event",
+      "direction": "serverToClient",
+      "properties": {
+        "message": {
+          "type": "String",
+          "required": true,
+          "description": "Error message"
+        }
+      }
+    }
+  },
+  "enums": {
+    "WsMessageType": {
+      "description": "Type of chat message content",
+      "values": [
+        "text",
+        "image",
+        "file",
+        "system"
+      ]
+    },
+    "WsNotificationType": {
+      "description": "Type of notification in the Healytics platform",
+      "values": [
+        "booking_confirmed",
+        "booking_cancelled",
+        "booking_completed",
+        "appointment_reminder",
+        "appointment_updated",
+        "new_chat_message",
+        "payment_success",
+        "payment_failed",
+        "system_broadcast",
+        "system_maintenance",
+        "partner_verified",
+        "partner_rejected"
+      ]
+    }
+  }
+}

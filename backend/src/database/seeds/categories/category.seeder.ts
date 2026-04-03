@@ -15,19 +15,22 @@ const SEED_CATEGORIES = [
     name: 'Rehabilitation Massage',
     slug: 'rehabilitation-massage',
     description: 'Therapeutic and rehabilitation massage services',
-    imageUrl: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600',
+    imageUrl:
+      'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600',
   },
   {
     name: 'Spa & Beauty',
     slug: 'spa-beauty',
     description: 'Facial care, beauty treatments and spa services',
-    imageUrl: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600',
+    imageUrl:
+      'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600',
   },
   {
     name: 'Dental Care',
     slug: 'dental',
     description: 'Professional dental treatment services',
-    imageUrl: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600',
+    imageUrl:
+      'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600',
   },
   {
     name: 'Dermatology',
@@ -55,7 +58,9 @@ export class CategorySeeder implements ISeeder {
       });
 
       if (exists) {
-        this.logger.log(`  ⏭ Category "${catData.name}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ Category "${catData.name}" already exists, skipping`,
+        );
         continue;
       }
 

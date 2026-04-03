@@ -40,7 +40,9 @@ export class UpdatePartnerProfileHandler {
     this.logger.log(`Updating partner profile: ${partner.id}`);
 
     // 1. Invariant Check
-    if (partner.verificationStatus !== PartnerVerificationStatus.REQUIRED_RESUBMIT) {
+    if (
+      partner.verificationStatus !== PartnerVerificationStatus.REQUIRED_RESUBMIT
+    ) {
       throw new BadRequestException(
         'Profile can only be updated when verification status is REQUIRED_RESUBMIT',
       );
@@ -80,7 +82,8 @@ export class UpdatePartnerProfileHandler {
           const existing = await queryRunner.manager.findOne(Partner, {
             where: { taxCode: newTaxCode },
           });
-          if (existing) throw new BadRequestException('Tax code already exists');
+          if (existing)
+            throw new BadRequestException('Tax code already exists');
           partner.taxCode = newTaxCode;
           isModified = true;
           hasCriticalChange = true;
@@ -95,7 +98,10 @@ export class UpdatePartnerProfileHandler {
 
         // A.3 Update phone number
         const newPhoneNumber = getValue(bizInfo.phoneNumber);
-        if (newPhoneNumber !== undefined && newPhoneNumber !== partner.phoneNumber) {
+        if (
+          newPhoneNumber !== undefined &&
+          newPhoneNumber !== partner.phoneNumber
+        ) {
           partner.phoneNumber = newPhoneNumber;
           isModified = true;
         }
@@ -146,9 +152,12 @@ export class UpdatePartnerProfileHandler {
 
       // --- B. UPDATE LEGAL REPRESENTATIVE ---
       if (dto.legalRepresentative) {
-        const legalRep = await queryRunner.manager.findOne(LegalRepresentative, {
-          where: { partnerId: partner.id },
-        });
+        const legalRep = await queryRunner.manager.findOne(
+          LegalRepresentative,
+          {
+            where: { partnerId: partner.id },
+          },
+        );
         if (legalRep) {
           let repModified = false;
           const repDto = dto.legalRepresentative;
@@ -196,9 +205,12 @@ export class UpdatePartnerProfileHandler {
           if (docUpdate?.fileUrl) {
             const documentKey = docUpdate.fileType || 'OTHER_DOCUMENTS';
 
-            const existingDoc = await queryRunner.manager.findOne(PartnerDocument, {
-              where: { partnerId: partner.id, documentKey },
-            });
+            const existingDoc = await queryRunner.manager.findOne(
+              PartnerDocument,
+              {
+                where: { partnerId: partner.id, documentKey },
+              },
+            );
 
             if (existingDoc) {
               existingDoc.fileUrl = docUpdate.fileUrl;

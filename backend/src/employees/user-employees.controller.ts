@@ -41,7 +41,12 @@ export class UserEmployeesController {
     description: 'Return list of featured specialists.',
     type: [FeaturedSpecialistResponseDto],
   })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Max specialists to return (default 10)' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Max specialists to return (default 10)',
+  })
   getFeaturedSpecialists(
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ): Promise<FeaturedSpecialistResponseDto[]> {
@@ -57,7 +62,9 @@ export class UserEmployeesController {
     description: 'Return all employees.',
     type: [EmployeeResponseDto],
   })
-  findAll(@Query() query: GetEmployeesQueryDto): Promise<EmployeeResponseDto[]> {
+  findAll(
+    @Query() query: GetEmployeesQueryDto,
+  ): Promise<EmployeeResponseDto[]> {
     return this.employeesService.findAll(query);
   }
 
@@ -71,7 +78,9 @@ export class UserEmployeesController {
     type: EmployeeResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Employee not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<EmployeeResponseDto> {
+  findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<EmployeeResponseDto> {
     return this.employeesService.findOne(id);
   }
 
@@ -83,7 +92,8 @@ export class UserEmployeesController {
   @Get(':id/time-slots')
   @ApiOperation({ summary: 'Get time slots with availability for an employee' })
   @ApiOkResponse({
-    description: 'Return all time slots from the employee schedule, each marked free or busy.',
+    description:
+      'Return all time slots from the employee schedule, each marked free or busy.',
     type: EmployeeTimeSlotsResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Employee not found.' })
@@ -99,7 +109,7 @@ export class UserEmployeesController {
    * Used by the Book Appointment flow after selecting a specialist.
    */
   @Get(':id/services')
-    @LogResponse()
+  @LogResponse()
   @ApiOperation({ summary: 'Get services for a specialist' })
   @ApiOkResponse({
     description: 'Return list of services for the given specialist.',
@@ -112,4 +122,3 @@ export class UserEmployeesController {
     return this.employeesService.findServicesBySpecialist(id);
   }
 }
-

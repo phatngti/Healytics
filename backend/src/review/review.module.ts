@@ -12,7 +12,12 @@ import { SubmitSpecialistReviewHandler } from './application/handlers/submit-spe
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([TreatmentReview, SpecialistReview, Booking, Employee]),
+    TypeOrmModule.forFeature([
+      TreatmentReview,
+      SpecialistReview,
+      Booking,
+      Employee,
+    ]),
     S3Module,
   ],
   controllers: [UserReviewController],

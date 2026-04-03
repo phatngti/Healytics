@@ -37,7 +37,9 @@ export class BookingController {
    */
   @Post('async-checkout')
   @HttpCode(HttpStatus.ACCEPTED)
-  @ApiOperation({ summary: 'Start async checkout (returns 202 with ticket ID)' })
+  @ApiOperation({
+    summary: 'Start async checkout (returns 202 with ticket ID)',
+  })
   @ApiAcceptedResponse({ type: AsyncCheckoutResponseDto })
   async asyncCheckout(
     @Body() dto: AsyncCheckoutDto,

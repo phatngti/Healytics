@@ -73,6 +73,8 @@ Class | Method | HTTP request | Description
 *AdminCategoriesApi* | [**adminCategoriesControllerFindOne**](doc//AdminCategoriesApi.md#admincategoriescontrollerfindone) | **GET** /admin/categories/{id} | Get a category by id (admin view)
 *AdminCategoriesApi* | [**adminCategoriesControllerRemove**](doc//AdminCategoriesApi.md#admincategoriescontrollerremove) | **DELETE** /admin/categories/{id} | Delete a category
 *AdminCategoriesApi* | [**adminCategoriesControllerUpdate**](doc//AdminCategoriesApi.md#admincategoriescontrollerupdate) | **PATCH** /admin/categories/{id} | Update a category
+*AdminNotificationsApi* | [**adminNotificationControllerCreateBroadcast**](doc//AdminNotificationsApi.md#adminnotificationcontrollercreatebroadcast) | **POST** /admin/notifications/broadcast | Create and send a system-wide broadcast notification
+*AdminNotificationsApi* | [**adminNotificationControllerGetBroadcasts**](doc//AdminNotificationsApi.md#adminnotificationcontrollergetbroadcasts) | **GET** /admin/notifications/broadcasts | List sent broadcast notifications (audit)
 *AdminPartnersApi* | [**adminPartnersControllerGetPartnerDetail**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartnerdetail) | **GET** /admin/partners/{id} | Get partner details including documents
 *AdminPartnersApi* | [**adminPartnersControllerGetPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartners) | **GET** /admin/partners | List all partners
 *AdminPartnersApi* | [**adminPartnersControllerGetTotalPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergettotalpartners) | **GET** /admin/partners/total | Get total number of partners
@@ -89,6 +91,8 @@ Class | Method | HTTP request | Description
 *CategoriesApi* | [**categoriesControllerFindBySlug**](doc//CategoriesApi.md#categoriescontrollerfindbyslug) | **GET** /categories/slug/{slug} | Get a category by slug
 *CategoriesApi* | [**categoriesControllerFindOne**](doc//CategoriesApi.md#categoriescontrollerfindone) | **GET** /categories/{id} | Get a category by id
 *ChatbotApi* | [**generativeAiStreamGenerativeAiStreamPost**](doc//ChatbotApi.md#generativeaistreamgenerativeaistreampost) | **POST** /generative_ai/stream | Generative Ai Stream
+*ChatbotApi* | [**getConversationsChatbotConversationsGet**](doc//ChatbotApi.md#getconversationschatbotconversationsget) | **GET** /chatbot/conversations | Get Conversations
+*ChatbotApi* | [**getMessagesChatbotConversationsConversationIdMessagesGet**](doc//ChatbotApi.md#getmessageschatbotconversationsconversationidmessagesget) | **GET** /chatbot/conversations/{conversation_id}/messages | Get Messages
 *HealthApi* | [**healthHealthGet**](doc//HealthApi.md#healthhealthget) | **GET** /health | Health
 *LocationsApi* | [**locationsControllerGetDistricts**](doc//LocationsApi.md#locationscontrollergetdistricts) | **GET** /locations/provinces/{provinceId}/districts | Get all districts in a province
 *LocationsApi* | [**locationsControllerGetProvinces**](doc//LocationsApi.md#locationscontrollergetprovinces) | **GET** /locations/provinces | Get all provinces in Vietnam
@@ -98,6 +102,10 @@ Class | Method | HTTP request | Description
 *MapboxApi* | [**mapboxControllerGetClientKey**](doc//MapboxApi.md#mapboxcontrollergetclientkey) | **GET** /mapbox/client-key | Get public access token for frontend/mobile SDKs
 *MapboxApi* | [**mapboxControllerReverseGeocode**](doc//MapboxApi.md#mapboxcontrollerreversegeocode) | **GET** /mapbox/reverse-geocode | Reverse geocode lat/lng to address
 *MomoApi* | [**moMoControllerHandleMoMoIPN**](doc//MomoApi.md#momocontrollerhandlemomoipn) | **POST** /momo/ipn | MoMo IPN callback (server-to-server)
+*PartnerChatApi* | [**partnerChatControllerCreateConversation**](doc//PartnerChatApi.md#partnerchatcontrollercreateconversation) | **POST** /partner/chat/conversations | Create a new conversation with a user
+*PartnerChatApi* | [**partnerChatControllerGetConversations**](doc//PartnerChatApi.md#partnerchatcontrollergetconversations) | **GET** /partner/chat/conversations | List all conversations for the current partner
+*PartnerChatApi* | [**partnerChatControllerGetMessages**](doc//PartnerChatApi.md#partnerchatcontrollergetmessages) | **GET** /partner/chat/conversations/{id}/messages | Get message history for a conversation (cursor-paginated)
+*PartnerChatApi* | [**partnerChatControllerMarkRead**](doc//PartnerChatApi.md#partnerchatcontrollermarkread) | **POST** /partner/chat/conversations/{id}/read | Mark all messages in a conversation as read
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateDoctor**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatedoctor) | **POST** /partner/employees/doctors | Create a new doctor
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateMassageTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatemassagetherapist) | **POST** /partner/employees/massage-therapists | Create a new massage therapist
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateSpaTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
@@ -140,6 +148,12 @@ Class | Method | HTTP request | Description
 *UserBookingsApi* | [**bookingControllerListMyBookings**](doc//UserBookingsApi.md#bookingcontrollerlistmybookings) | **GET** /user/bookings | List my bookings
 *UserCategoriesApi* | [**userCategoriesControllerFindServicesByCategory**](doc//UserCategoriesApi.md#usercategoriescontrollerfindservicesbycategory) | **GET** /user/categories/{categoryId}/services | Get services for a category
 *UserCategoriesApi* | [**userCategoriesControllerFindSpecialistsByCategory**](doc//UserCategoriesApi.md#usercategoriescontrollerfindspecialistsbycategory) | **GET** /user/categories/{categoryId}/specialists | Get specialists for a category
+*UserChatApi* | [**userChatControllerCreateConversation**](doc//UserChatApi.md#userchatcontrollercreateconversation) | **POST** /user/chat/conversations | Create a new conversation with a health partner
+*UserChatApi* | [**userChatControllerGetConversations**](doc//UserChatApi.md#userchatcontrollergetconversations) | **GET** /user/chat/conversations | List all conversations for the current user
+*UserChatApi* | [**userChatControllerGetMessages**](doc//UserChatApi.md#userchatcontrollergetmessages) | **GET** /user/chat/conversations/{id}/messages | Get message history for a conversation (cursor-paginated)
+*UserChatApi* | [**userChatControllerMarkRead**](doc//UserChatApi.md#userchatcontrollermarkread) | **POST** /user/chat/conversations/{id}/read | Mark all messages in a conversation as read
+*UserDevicesApi* | [**userDeviceControllerRegisterDevice**](doc//UserDevicesApi.md#userdevicecontrollerregisterdevice) | **POST** /user/devices | Register a device token for push notifications
+*UserDevicesApi* | [**userDeviceControllerUnregisterDevice**](doc//UserDevicesApi.md#userdevicecontrollerunregisterdevice) | **DELETE** /user/devices/{token} | Unregister a device token (e.g. on logout)
 *UserEmployeesApi* | [**userEmployeesControllerFindAll**](doc//UserEmployeesApi.md#useremployeescontrollerfindall) | **GET** /user/employees | Get all employees
 *UserEmployeesApi* | [**userEmployeesControllerFindOne**](doc//UserEmployeesApi.md#useremployeescontrollerfindone) | **GET** /user/employees/{id} | Get an employee by id
 *UserEmployeesApi* | [**userEmployeesControllerFindServices**](doc//UserEmployeesApi.md#useremployeescontrollerfindservices) | **GET** /user/employees/{id}/services | Get services for a specialist
@@ -153,6 +167,10 @@ Class | Method | HTTP request | Description
 *UserHealthServicesApi* | [**userHealthServiceControllerGetProductInfo**](doc//UserHealthServicesApi.md#userhealthservicecontrollergetproductinfo) | **GET** /user/health-services/{id}/info | Get service info by ID
 *UserHealthServicesApi* | [**userHealthServiceControllerGetProductReviews**](doc//UserHealthServicesApi.md#userhealthservicecontrollergetproductreviews) | **GET** /user/health-services/{id}/reviews | Get reviews for a service
 *UserHealthServicesApi* | [**userHealthServiceControllerGetRecommendedProducts**](doc//UserHealthServicesApi.md#userhealthservicecontrollergetrecommendedproducts) | **GET** /user/health-services/{id}/recommended | Get recommended services
+*UserNotificationsApi* | [**userNotificationControllerGetNotifications**](doc//UserNotificationsApi.md#usernotificationcontrollergetnotifications) | **GET** /user/notifications | Get user notifications (paginated, cursor-based)
+*UserNotificationsApi* | [**userNotificationControllerGetUnreadCount**](doc//UserNotificationsApi.md#usernotificationcontrollergetunreadcount) | **GET** /user/notifications/unread-count | Get unread notification count
+*UserNotificationsApi* | [**userNotificationControllerMarkAllRead**](doc//UserNotificationsApi.md#usernotificationcontrollermarkallread) | **PATCH** /user/notifications/read-all | Mark all notifications as read
+*UserNotificationsApi* | [**userNotificationControllerMarkRead**](doc//UserNotificationsApi.md#usernotificationcontrollermarkread) | **PATCH** /user/notifications/{id}/read | Mark a specific notification as read
 *UserPaymentsApi* | [**userPaymentControllerCreateMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollercreatemomopayment) | **POST** /user/payments/momo/{bookingId} | Create MoMo payment for booking
 *UserPaymentsApi* | [**userPaymentControllerRefundMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundmomopayment) | **POST** /user/payments/momo/{bookingId}/refund | Request MoMo refund for booking
 *UserReviewsApi* | [**userReviewControllerSubmitSpecialistReview**](doc//UserReviewsApi.md#userreviewcontrollersubmitspecialistreview) | **POST** /user/reviews/specialist | Submit a specialist review for a completed appointment
@@ -198,7 +216,12 @@ Class | Method | HTTP request | Description
  - [ChatbotRequest](doc//ChatbotRequest.md)
  - [CheckoutTicketResponseDto](doc//CheckoutTicketResponseDto.md)
  - [ClientKeyResponseDto](doc//ClientKeyResponseDto.md)
+ - [ConversationResponse](doc//ConversationResponse.md)
+ - [ConversationResponseDto](doc//ConversationResponseDto.md)
+ - [ConversationsPageResponse](doc//ConversationsPageResponse.md)
+ - [CreateBroadcastDto](doc//CreateBroadcastDto.md)
  - [CreateCategoryDto](doc//CreateCategoryDto.md)
+ - [CreateConversationDto](doc//CreateConversationDto.md)
  - [CreateDoctorDto](doc//CreateDoctorDto.md)
  - [CreateDoctorProfileDto](doc//CreateDoctorProfileDto.md)
  - [CreateMassageTherapistDto](doc//CreateMassageTherapistDto.md)
@@ -208,7 +231,6 @@ Class | Method | HTTP request | Description
  - [CreatePartnerHealthServiceDto](doc//CreatePartnerHealthServiceDto.md)
  - [CreatePartnerHealthServiceFacilityImageDto](doc//CreatePartnerHealthServiceFacilityImageDto.md)
  - [CreatePartnerHealthServiceMediaDto](doc//CreatePartnerHealthServiceMediaDto.md)
- - [CreatePartnerHealthServiceReviewDto](doc//CreatePartnerHealthServiceReviewDto.md)
  - [CreateServiceTagDto](doc//CreateServiceTagDto.md)
  - [CreateSpaTherapistDto](doc//CreateSpaTherapistDto.md)
  - [CreateSpecialistReviewDto](doc//CreateSpecialistReviewDto.md)
@@ -230,6 +252,7 @@ Class | Method | HTTP request | Description
  - [GeocodeResultDto](doc//GeocodeResultDto.md)
  - [HomeRecommenderRequest](doc//HomeRecommenderRequest.md)
  - [KycDocumentDto](doc//KycDocumentDto.md)
+ - [LastMessageDto](doc//LastMessageDto.md)
  - [LegalRepresentativeDto](doc//LegalRepresentativeDto.md)
  - [LegalRepresentativeRequestDto](doc//LegalRepresentativeRequestDto.md)
  - [LocationInfo](doc//LocationInfo.md)
@@ -239,9 +262,14 @@ Class | Method | HTTP request | Description
  - [LoginDto](doc//LoginDto.md)
  - [LogoutResponseDto](doc//LogoutResponseDto.md)
  - [MedicalCredentialResponseDto](doc//MedicalCredentialResponseDto.md)
+ - [MessageResponse](doc//MessageResponse.md)
+ - [MessagesPageResponse](doc//MessagesPageResponse.md)
  - [MicroLockDto](doc//MicroLockDto.md)
  - [MicroLockResponseDto](doc//MicroLockResponseDto.md)
  - [MyProfileResponseDto](doc//MyProfileResponseDto.md)
+ - [NotificationResponseDto](doc//NotificationResponseDto.md)
+ - [PaginationMeta](doc//PaginationMeta.md)
+ - [ParticipantInfoDto](doc//ParticipantInfoDto.md)
  - [PartnerCategorySummaryDto](doc//PartnerCategorySummaryDto.md)
  - [PartnerClinicDto](doc//PartnerClinicDto.md)
  - [PartnerDayScheduleDto](doc//PartnerDayScheduleDto.md)
@@ -295,6 +323,7 @@ Class | Method | HTTP request | Description
  - [RecommendationResponse](doc//RecommendationResponse.md)
  - [RecommendedServiceResponseDto](doc//RecommendedServiceResponseDto.md)
  - [RefreshTokenRequestDto](doc//RefreshTokenRequestDto.md)
+ - [RegisterDeviceDto](doc//RegisterDeviceDto.md)
  - [RegisterDto](doc//RegisterDto.md)
  - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
  - [RegisterPartnerResponseDto](doc//RegisterPartnerResponseDto.md)

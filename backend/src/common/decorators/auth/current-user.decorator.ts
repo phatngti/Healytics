@@ -3,11 +3,11 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 /**
  * Decorator to extract the current authenticated user from the request.
  * Can extract the full user object or a specific property.
- * 
+ *
  * @example
  * // Get full user object
  * @CurrentUser() user: JwtPayload
- * 
+ *
  * // Get specific property
  * @CurrentUser('id') userId: string
  */
