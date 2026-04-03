@@ -26,11 +26,15 @@ export class ProductTag {
   createdAt: Date;
 
   // Relations
-  @ManyToOne(() => Product, (product) => product.productTags, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Product, (product) => product.productTags, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
-  @ManyToOne(() => ProductFeatureTag, (tag) => tag.productTags, { onDelete: 'CASCADE' })
+  @ManyToOne(() => ProductFeatureTag, (tag) => tag.productTags, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'tag_id' })
   tag: ProductFeatureTag;
 }

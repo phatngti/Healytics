@@ -1,9 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import {
-  createTestApp,
-  closeTestApp,
-} from '../../helpers/test-utils';
+import { createTestApp, closeTestApp } from '../../helpers/test-utils';
 import { createSurveyDto } from '../../fixtures/test-data.factory';
 
 describe('Auth + Survey (e2e)', () => {

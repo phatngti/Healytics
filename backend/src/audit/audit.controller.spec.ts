@@ -142,7 +142,9 @@ describe('AuditController', () => {
       const query: GetAuditLogsQueryDto = {};
 
       // Act & Assert
-      await expect(controller.getAuditLogs(query)).rejects.toThrow('Database error');
+      await expect(controller.getAuditLogs(query)).rejects.toThrow(
+        'Database error',
+      );
     });
   });
 });

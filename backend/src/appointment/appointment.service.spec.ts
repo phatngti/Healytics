@@ -6,10 +6,7 @@ import { ListAppointmentCategoriesHandler } from './application/handlers/list-ap
 import { ListRecommendedServicesHandler } from './application/handlers/list-recommended-services.handler';
 import { GetServiceManualHandler } from './application/handlers/get-service-manual.handler';
 import { ListAppointmentsQueryDto } from './dto/list-appointments-query.dto';
-import {
-  MockHandler,
-  createMockHandler,
-} from '../../test/mocks/mock-types';
+import { MockHandler, createMockHandler } from '../../test/mocks/mock-types';
 
 describe('AppointmentService', () => {
   let service: AppointmentService;
@@ -31,8 +28,14 @@ describe('AppointmentService', () => {
         AppointmentService,
         { provide: ListAppointmentsHandler, useValue: listAppointmentsHandler },
         { provide: GetAppointmentHandler, useValue: getAppointmentHandler },
-        { provide: ListAppointmentCategoriesHandler, useValue: listAppointmentCategoriesHandler },
-        { provide: ListRecommendedServicesHandler, useValue: listRecommendedServicesHandler },
+        {
+          provide: ListAppointmentCategoriesHandler,
+          useValue: listAppointmentCategoriesHandler,
+        },
+        {
+          provide: ListRecommendedServicesHandler,
+          useValue: listRecommendedServicesHandler,
+        },
         { provide: GetServiceManualHandler, useValue: getServiceManualHandler },
       ],
     }).compile();
@@ -53,7 +56,10 @@ describe('AppointmentService', () => {
       const result = await service.listAppointments(userId);
 
       expect(result).toEqual(expected);
-      expect(listAppointmentsHandler.execute).toHaveBeenCalledWith(userId, undefined);
+      expect(listAppointmentsHandler.execute).toHaveBeenCalledWith(
+        userId,
+        undefined,
+      );
       expect(listAppointmentsHandler.execute).toHaveBeenCalledTimes(1);
     });
 
@@ -68,7 +74,10 @@ describe('AppointmentService', () => {
       const result = await service.listAppointments(userId, query);
 
       expect(result).toEqual(expected);
-      expect(listAppointmentsHandler.execute).toHaveBeenCalledWith(userId, query);
+      expect(listAppointmentsHandler.execute).toHaveBeenCalledWith(
+        userId,
+        query,
+      );
       expect(listAppointmentsHandler.execute).toHaveBeenCalledTimes(1);
     });
   });
@@ -96,7 +105,9 @@ describe('AppointmentService', () => {
       const result = await service.listCategories(userId);
 
       expect(result).toEqual(expected);
-      expect(listAppointmentCategoriesHandler.execute).toHaveBeenCalledWith(userId);
+      expect(listAppointmentCategoriesHandler.execute).toHaveBeenCalledWith(
+        userId,
+      );
       expect(listAppointmentCategoriesHandler.execute).toHaveBeenCalledTimes(1);
     });
   });
@@ -122,7 +133,9 @@ describe('AppointmentService', () => {
       const result = await service.getServiceManual(appointmentId);
 
       expect(result).toEqual(expected);
-      expect(getServiceManualHandler.execute).toHaveBeenCalledWith(appointmentId);
+      expect(getServiceManualHandler.execute).toHaveBeenCalledWith(
+        appointmentId,
+      );
       expect(getServiceManualHandler.execute).toHaveBeenCalledTimes(1);
     });
   });

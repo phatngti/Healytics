@@ -256,8 +256,18 @@ class ApiClient {
           return CheckoutTicketResponseDto.fromJson(value);
         case 'ClientKeyResponseDto':
           return ClientKeyResponseDto.fromJson(value);
+        case 'ConversationResponse':
+          return ConversationResponse.fromJson(value);
+        case 'ConversationResponseDto':
+          return ConversationResponseDto.fromJson(value);
+        case 'ConversationsPageResponse':
+          return ConversationsPageResponse.fromJson(value);
+        case 'CreateBroadcastDto':
+          return CreateBroadcastDto.fromJson(value);
         case 'CreateCategoryDto':
           return CreateCategoryDto.fromJson(value);
+        case 'CreateConversationDto':
+          return CreateConversationDto.fromJson(value);
         case 'CreateDoctorDto':
           return CreateDoctorDto.fromJson(value);
         case 'CreateDoctorProfileDto':
@@ -276,8 +286,6 @@ class ApiClient {
           return CreatePartnerHealthServiceFacilityImageDto.fromJson(value);
         case 'CreatePartnerHealthServiceMediaDto':
           return CreatePartnerHealthServiceMediaDto.fromJson(value);
-        case 'CreatePartnerHealthServiceReviewDto':
-          return CreatePartnerHealthServiceReviewDto.fromJson(value);
         case 'CreateServiceTagDto':
           return CreateServiceTagDto.fromJson(value);
         case 'CreateSpaTherapistDto':
@@ -320,6 +328,8 @@ class ApiClient {
           return HomeRecommenderRequest.fromJson(value);
         case 'KycDocumentDto':
           return KycDocumentDto.fromJson(value);
+        case 'LastMessageDto':
+          return LastMessageDto.fromJson(value);
         case 'LegalRepresentativeDto':
           return LegalRepresentativeDto.fromJson(value);
         case 'LegalRepresentativeRequestDto':
@@ -338,12 +348,22 @@ class ApiClient {
           return LogoutResponseDto.fromJson(value);
         case 'MedicalCredentialResponseDto':
           return MedicalCredentialResponseDto.fromJson(value);
+        case 'MessageResponse':
+          return MessageResponse.fromJson(value);
+        case 'MessagesPageResponse':
+          return MessagesPageResponse.fromJson(value);
         case 'MicroLockDto':
           return MicroLockDto.fromJson(value);
         case 'MicroLockResponseDto':
           return MicroLockResponseDto.fromJson(value);
         case 'MyProfileResponseDto':
           return MyProfileResponseDto.fromJson(value);
+        case 'NotificationResponseDto':
+          return NotificationResponseDto.fromJson(value);
+        case 'PaginationMeta':
+          return PaginationMeta.fromJson(value);
+        case 'ParticipantInfoDto':
+          return ParticipantInfoDto.fromJson(value);
         case 'PartnerCategorySummaryDto':
           return PartnerCategorySummaryDto.fromJson(value);
         case 'PartnerClinicDto':
@@ -450,6 +470,8 @@ class ApiClient {
           return RecommendedServiceResponseDto.fromJson(value);
         case 'RefreshTokenRequestDto':
           return RefreshTokenRequestDto.fromJson(value);
+        case 'RegisterDeviceDto':
+          return RegisterDeviceDto.fromJson(value);
         case 'RegisterDto':
           return RegisterDto.fromJson(value);
         case 'RegisterPartnerDto':

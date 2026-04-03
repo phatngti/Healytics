@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:user_app/features/home/data/datasources/'
+import 'package:user_app/features/booking/data/datasources/'
     'remote/booking_remote_datasource.dart';
-import 'package:user_app/features/home/domain/entities/'
+import 'package:user_app/features/booking/domain/entities/'
     'booking.entity.dart';
 
 part 'employee_services.provider.g.dart';

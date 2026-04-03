@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '@/common/entities/product.entity';
@@ -18,10 +14,10 @@ export class RemoveHealthServiceHandler {
 
   async execute(id: string): Promise<void> {
     this.logger.log(`Executing RemoveHealthServiceHandler for ID: ${id}`);
-    
+
     // Soft Delete
     const result = await this.productRepository.softDelete(id);
-    
+
     if (result.affected === 0) {
       this.logger.warn(`Product not found for deletion: ${id}`);
       throw new NotFoundException(`Product with ID ${id} not found`);

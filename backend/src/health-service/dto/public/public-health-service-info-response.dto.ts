@@ -27,6 +27,9 @@ class PublicCategoryDto {
 }
 
 class PublicClinicDto {
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  id: string;
+
   @ApiProperty({ example: 'Healytics Wellness Center' })
   name: string;
 
@@ -68,10 +71,13 @@ export class PublicHealthServiceInfoResponseDto {
   @ApiProperty({ example: '$350.00' }) price: string;
   @ApiProperty({ example: true }) isVerified: boolean;
   @ApiPropertyOptional() description: string | null;
-  @ApiProperty({ type: [PublicFeatureTagDto] }) featureTags: PublicFeatureTagDto[];
+  @ApiProperty({ type: [PublicFeatureTagDto] })
+  featureTags: PublicFeatureTagDto[];
   @ApiProperty({ type: PublicClinicDto }) clinic: PublicClinicDto;
-  @ApiProperty({ type: [PublicFacilityImageDto] }) facilityImages: PublicFacilityImageDto[];
-  @ApiProperty({ type: [PublicServiceTagDto] }) serviceTags: PublicServiceTagDto[];
+  @ApiProperty({ type: [PublicFacilityImageDto] })
+  facilityImages: PublicFacilityImageDto[];
+  @ApiProperty({ type: [PublicServiceTagDto] })
+  serviceTags: PublicServiceTagDto[];
 
   static fromEntity(
     product: Product,
@@ -89,7 +95,12 @@ export class PublicHealthServiceInfoResponseDto {
           slug: product.category.slug,
           imageUrl: product.category.imageUrl,
         }
-      : { id: '', name: 'Uncategorized', slug: 'uncategorized', imageUrl: null };
+      : {
+          id: '',
+          name: 'Uncategorized',
+          slug: 'uncategorized',
+          imageUrl: null,
+        };
     dto.images = (product.media ?? [])
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .map((m) => m.url);
@@ -130,11 +141,13 @@ export class PublicHealthServiceInfoResponseDto {
       ].filter(Boolean);
 
       dto.clinic = {
+        id: partner.id,
         name: partner.brandName,
         address: addressParts.join(', '),
       };
     } else {
       dto.clinic = {
+        id: '',
         name: 'Healytics Wellness Center',
         address: '123 Health Street, District 1, Ho Chi Minh City',
       };
@@ -157,10 +170,10 @@ export class PublicHealthServiceInfoResponseDto {
 function mapTagToIcon(tagName?: string): string {
   const iconMap: Record<string, string> = {
     'Pain Relief': 'healing',
-    'Relaxation': 'spa',
-    'Rehabilitation': 'fitness_center',
-    'Beauty': 'face',
-    'Skincare': 'dermatology',
+    Relaxation: 'spa',
+    Rehabilitation: 'fitness_center',
+    Beauty: 'face',
+    Skincare: 'dermatology',
   };
   return iconMap[tagName ?? ''] ?? 'local_offer';
 }

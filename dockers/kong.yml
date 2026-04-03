@@ -1,17 +1,33 @@
 _format_version: "3.0"
 _transform: true
-_workspace: default   # <--- ADD THIS
 
 services:
   - name: backend-service
-    url: http://host.docker.internal:8080 # Global prefix baked into service URL
+    url: http://host.docker.internal:8080
     routes:
       - name: my-backend-route
         paths:
           - /backend
-        strip_path: true # Strips /api prefix, remainder is appended to service URL
+        strip_path: true
+
+  # ── WebSocket: all Socket.IO namespaces (user-chat, partner-chat) ──
+  # Namespaces are negotiated in the Socket.IO protocol handshake,
+  # NOT via URL path. All share a single /socket.io HTTP endpoint.
+  - name: chat-ws-service
+    url: http://host.docker.internal:8080
+    connect_timeout: 60000
+    write_timeout: 3600000   # 1 hour — keep WS connections alive
+    read_timeout: 3600000
+    routes:
+      - name: chat-ws-route
+        paths:
+          - /socket.io
+        strip_path: false
+        protocols:
+          - http
+          - https
   - name: ai-service
-    url: https://6yb3yz5bcy5mrm-9000.proxy.runpod.net
+    url: https://84497qqbeschs2-9000.proxy.runpod.net
     connect_timeout: 600000
     write_timeout: 600000
     read_timeout: 600000

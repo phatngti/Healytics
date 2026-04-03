@@ -16,9 +16,7 @@ describe('MapboxController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MapboxController],
-      providers: [
-        { provide: MapboxService, useValue: mockService },
-      ],
+      providers: [{ provide: MapboxService, useValue: mockService }],
     }).compile();
 
     controller = module.get(MapboxController);
@@ -28,7 +26,11 @@ describe('MapboxController', () => {
   afterEach(() => jest.clearAllMocks());
 
   it('geocode should delegate to service', async () => {
-    const expected = { results: [{ lat: 10, lng: 106, formattedAddress: 'A', placeId: 'address.1' }] };
+    const expected = {
+      results: [
+        { lat: 10, lng: 106, formattedAddress: 'A', placeId: 'address.1' },
+      ],
+    };
     mockService.geocode.mockResolvedValue(expected);
 
     const result = await controller.geocode({ address: 'test' });
@@ -46,10 +48,17 @@ describe('MapboxController', () => {
   });
 
   it('distanceMatrix should delegate to service', async () => {
-    const expected = { originAddresses: [], destinationAddresses: [], rows: [] };
+    const expected = {
+      originAddresses: [],
+      destinationAddresses: [],
+      rows: [],
+    };
     mockService.distanceMatrix.mockResolvedValue(expected);
 
-    const result = await controller.distanceMatrix({ origins: 'A', destinations: 'B' });
+    const result = await controller.distanceMatrix({
+      origins: 'A',
+      destinations: 'B',
+    });
     expect(service.distanceMatrix).toHaveBeenCalledWith('A', 'B');
     expect(result).toBe(expected);
   });

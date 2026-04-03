@@ -24,11 +24,17 @@ export class LocationResponseDto {
   nameEn?: string;
 
   @Expose()
-  @ApiProperty({ example: 'Thành phố Hà Nội', description: 'Full name with prefix' })
+  @ApiProperty({
+    example: 'Thành phố Hà Nội',
+    description: 'Full name with prefix',
+  })
   fullName: string;
 
   @Expose()
-  @ApiPropertyOptional({ example: 'Hanoi City', description: 'Full English name' })
+  @ApiPropertyOptional({
+    example: 'Hanoi City',
+    description: 'Full English name',
+  })
   fullNameEn?: string;
 
   @Expose()
@@ -58,7 +64,10 @@ export class LocationResponseDto {
  */
 export class LocationListResponseDto {
   @Expose()
-  @ApiProperty({ type: [LocationResponseDto], description: 'List of locations' })
+  @ApiProperty({
+    type: [LocationResponseDto],
+    description: 'List of locations',
+  })
   data: LocationResponseDto[];
 
   @Expose()

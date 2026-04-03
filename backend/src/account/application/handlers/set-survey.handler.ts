@@ -54,10 +54,7 @@ export class SetSurveyHandler {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       if (error instanceof NotFoundException) throw error;
-      this.logger.error(
-        `Failed to set survey: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Failed to set survey: ${error.message}`, error.stack);
       throw new InternalServerErrorException(
         'Transaction failed during survey update',
       );

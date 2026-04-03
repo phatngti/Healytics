@@ -13,7 +13,10 @@ import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
 import { RegisterPartnerDto } from './dto/request/register-partner.dto';
 import { UpdatePartnerDto } from './dto/request/update-partner.dto';
 import { RegisterPartnerResponseDto } from './dto/response/register-partner-response.dto';
-import { MyProfileResponseDto, FieldFeedbackMap } from './dto/response/my-profile-response.dto';
+import {
+  MyProfileResponseDto,
+  FieldFeedbackMap,
+} from './dto/response/my-profile-response.dto';
 import { Role } from '@/account/enum/role.enum';
 import { BusinessServicesResponseDto } from './dto/response/business-types-response.dto';
 import { bussinessServices } from './enum/business-type.enum';
@@ -57,7 +60,9 @@ export class PartnersService {
    * Registers a new partner (account + partner + legal rep + documents).
    * Delegates to RegisterPartnerHandler for transaction management.
    */
-  async registerPartner(dto: RegisterPartnerDto): Promise<RegisterPartnerResponseDto> {
+  async registerPartner(
+    dto: RegisterPartnerDto,
+  ): Promise<RegisterPartnerResponseDto> {
     this.logger.log(`Registering partner: ${dto.account.email}`);
     return this.registerPartnerHandler.execute(dto);
   }
@@ -140,6 +145,17 @@ export class PartnersService {
         'legalRepresentative',
         'documents',
       ],
+    });
+  }
+
+  /**
+   * Returns a partner profile by its primary key,
+   * with location relations loaded.
+   */
+  async findOneById(id: string): Promise<Partner | null> {
+    return this.partnerRepository.findOne({
+      where: { id },
+      relations: ['province', 'district', 'ward'],
     });
   }
 

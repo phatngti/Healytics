@@ -41,7 +41,9 @@ export class RemoveServiceTagHandler {
       }
 
       if (tag.userId !== userId) {
-        throw new ForbiddenException('You do not have permission to delete this tag');
+        throw new ForbiddenException(
+          'You do not have permission to delete this tag',
+        );
       }
 
       // 3. Domain Action & Persistence (Soft Delete)
@@ -56,7 +58,10 @@ export class RemoveServiceTagHandler {
         error.stack,
       );
 
-      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
         throw error;
       }
       throw new InternalServerErrorException(

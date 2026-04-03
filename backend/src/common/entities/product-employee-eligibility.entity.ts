@@ -10,7 +10,9 @@ import { Product } from './product.entity';
 import { Employee } from './employee.entity';
 
 @Entity('product_employee_eligibility')
-@Index('UQ_PRODUCT_EMPLOYEE_ELIGIBILITY', ['productId', 'employeeId'], { unique: true })
+@Index('UQ_PRODUCT_EMPLOYEE_ELIGIBILITY', ['productId', 'employeeId'], {
+  unique: true,
+})
 export class ProductEmployeeEligibility {
   /**
    * Surrogate primary key — enables direct lookup by eligibility ID

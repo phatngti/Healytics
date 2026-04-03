@@ -78,9 +78,7 @@ export function signHmacSha256(
   rawSignature: string,
   secretKey: string,
 ): string {
-  return createHmac('sha256', secretKey)
-    .update(rawSignature)
-    .digest('hex');
+  return createHmac('sha256', secretKey).update(rawSignature).digest('hex');
 }
 
 /**

@@ -17,43 +17,72 @@ export class LoggingMiddleware implements NestMiddleware {
     const body = req.body;
 
     // Log request
-    this.logger.log(
-      `→ ${method} ${originalUrl} - ${ip} - ${userAgent}`,
-    );
+    this.logger.log(`→ ${method} ${originalUrl} - ${ip} - ${userAgent}`);
 
-    [['access token', accessToken], ['query', query], ['body', body], ['params', params]].map(([key, value]) => {
+    [
+      ['access token', accessToken],
+      ['query', query],
+      ['body', body],
+      ['params', params],
+    ].map(([key, value]) => {
       if (JSON.stringify(value) !== '{}') {
         this.logger.debug(`${key}: ${JSON.stringify(value)}`);
       }
-    })
+    });
 
     // Capture response body
     const chunks: Buffer[] = [];
     const originalWrite = res.write.bind(res);
     const originalEnd = res.end.bind(res);
 
-    res.write = function (chunk: any, encodingOrCallback?: BufferEncoding | ((error: Error | null | undefined) => void), callback?: (error: Error | null | undefined) => void): boolean {
+    res.write = function (
+      chunk: any,
+      encodingOrCallback?:
+        | BufferEncoding
+        | ((error: Error | null | undefined) => void),
+      callback?: (error: Error | null | undefined) => void,
+    ): boolean {
       if (chunk) {
         if (Buffer.isBuffer(chunk)) {
           chunks.push(chunk);
         } else if (typeof chunk === 'string') {
-          const encoding = typeof encodingOrCallback === 'string' ? encodingOrCallback : 'utf8';
+          const encoding =
+            typeof encodingOrCallback === 'string'
+              ? encodingOrCallback
+              : 'utf8';
           chunks.push(Buffer.from(chunk, encoding));
         }
       }
-      return originalWrite.call(res, chunk, encodingOrCallback as BufferEncoding, callback);
+      return originalWrite.call(
+        res,
+        chunk,
+        encodingOrCallback as BufferEncoding,
+        callback,
+      );
     } as typeof res.write;
 
-    res.end = function (chunk?: any, encodingOrCallback?: BufferEncoding | (() => void), callback?: () => void): Response {
+    res.end = function (
+      chunk?: any,
+      encodingOrCallback?: BufferEncoding | (() => void),
+      callback?: () => void,
+    ): Response {
       if (chunk && typeof chunk !== 'function') {
         if (Buffer.isBuffer(chunk)) {
           chunks.push(chunk);
         } else if (typeof chunk === 'string') {
-          const encoding = typeof encodingOrCallback === 'string' ? encodingOrCallback : 'utf8';
+          const encoding =
+            typeof encodingOrCallback === 'string'
+              ? encodingOrCallback
+              : 'utf8';
           chunks.push(Buffer.from(chunk, encoding));
         }
       }
-      return originalEnd.call(res, chunk, encodingOrCallback as BufferEncoding, callback);
+      return originalEnd.call(
+        res,
+        chunk,
+        encodingOrCallback as BufferEncoding,
+        callback,
+      );
     } as typeof res.end;
 
     // Capture response

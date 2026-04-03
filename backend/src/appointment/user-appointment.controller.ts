@@ -28,7 +28,9 @@ export class UserAppointmentController {
    * List all appointments for the current user.
    */
   @Get()
-  @ApiOperation({ summary: 'List all user appointments with optional distance calculation' })
+  @ApiOperation({
+    summary: 'List all user appointments with optional distance calculation',
+  })
   @ApiOkResponse({ type: [AppointmentResponseDto] })
   async listAppointments(
     @CurrentUser('id') userId: string,
@@ -65,8 +67,10 @@ export class UserAppointmentController {
    * upcoming (nearest future first), then past (most recent first).
    */
   @Get('recent-activity')
-    @LogResponse()
-  @ApiOperation({ summary: 'Get recent appointment activity for home dashboard' })
+  @LogResponse()
+  @ApiOperation({
+    summary: 'Get recent appointment activity for home dashboard',
+  })
   @ApiOkResponse({
     description: 'Paginated list of recent activities with meta',
   })
@@ -81,6 +85,7 @@ export class UserAppointmentController {
    * Get a single appointment detail by ID.
    */
   @Get(':id')
+  @LogResponse()
   @ApiOperation({ summary: 'Get appointment details by ID' })
   @ApiOkResponse({ type: AppointmentResponseDto })
   @ApiNotFoundResponse({ description: 'Appointment not found' })

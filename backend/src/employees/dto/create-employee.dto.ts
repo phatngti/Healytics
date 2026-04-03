@@ -48,7 +48,11 @@ export class CreateDoctorProfileDto {
   @IsOptional()
   consultationFee?: number;
 
-  @ApiPropertyOptional({ type: [String], example: ['Cardiology'], description: 'Specializations' })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['Cardiology'],
+    description: 'Specializations',
+  })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
@@ -68,48 +72,69 @@ export class CreateDoctorProfileDto {
 }
 
 export class CreateTherapistProfileDto {
-  @ApiPropertyOptional({ enum: TherapistLevel, example: TherapistLevel.JUNIOR, description: 'Therapist level' })
+  @ApiPropertyOptional({
+    enum: TherapistLevel,
+    example: TherapistLevel.JUNIOR,
+    description: 'Therapist level',
+  })
   @IsEnum(TherapistLevel)
   @IsOptional()
   level?: TherapistLevel;
 
-  @ApiPropertyOptional({ example: 'Physical Therapist', description: 'Type of therapist' })
+  @ApiPropertyOptional({
+    example: 'Physical Therapist',
+    description: 'Type of therapist',
+  })
   @IsString()
   @IsOptional()
   type?: string;
 
-  @ApiPropertyOptional({ enum: StrengthLevel, example: StrengthLevel.STRONG, description: 'Therapist strength level' })
+  @ApiPropertyOptional({
+    enum: StrengthLevel,
+    example: StrengthLevel.STRONG,
+    description: 'Therapist strength level',
+  })
   @IsEnum(StrengthLevel)
   @IsOptional()
   strengthLevel?: StrengthLevel;
 
-  @ApiPropertyOptional({ example: 10.5, description: 'Commission rate percentage' })
+  @ApiPropertyOptional({
+    example: 10.5,
+    description: 'Commission rate percentage',
+  })
   @IsNumber()
   @IsOptional()
   commissionRate?: number;
 
-  @ApiPropertyOptional({ example: '2023-01-01', description: 'Last health check date' })
+  @ApiPropertyOptional({
+    example: '2023-01-01',
+    description: 'Last health check date',
+  })
   @IsDateString()
   @IsOptional()
   healthCheckDate?: string;
 
-  @ApiPropertyOptional({ type: [String], example: ['Massage', 'Acupuncture'], description: 'Therapist skills' })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['Massage', 'Acupuncture'],
+    description: 'Therapist skills',
+  })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
   skills?: string[];
 
-  @ApiPropertyOptional({ type: [String], description: 'Device proficiency list' })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Device proficiency list',
+  })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
   deviceProficiency?: string[];
-
 }
 
 export class CreateEmployeeDto {
-
-
   @ApiProperty({ example: 'EMP001', description: 'Unique employee code' })
   @IsString()
   @IsNotEmpty()
@@ -125,14 +150,18 @@ export class CreateEmployeeDto {
   @IsOptional()
   lastName?: string;
 
-  @ApiProperty({ example: 'John Doe', description: 'Full name of the employee' })
+  @ApiProperty({
+    example: 'John Doe',
+    description: 'Full name of the employee',
+  })
   @IsString()
   @IsNotEmpty()
   fullName: string;
 
-
-
-  @ApiProperty({ example: 'john.doe@example.com', description: 'Email address' })
+  @ApiProperty({
+    example: 'john.doe@example.com',
+    description: 'Email address',
+  })
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -142,7 +171,10 @@ export class CreateEmployeeDto {
   @IsOptional()
   phone?: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg', description: 'Avatar URL' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/avatar.jpg',
+    description: 'Avatar URL',
+  })
   @IsString()
   @IsOptional()
   avatarUrl?: string;
@@ -152,24 +184,37 @@ export class CreateEmployeeDto {
   @IsOptional()
   dob?: string;
 
-  @ApiPropertyOptional({ enum: Gender, example: Gender.MALE, description: 'Gender' })
+  @ApiPropertyOptional({
+    enum: Gender,
+    example: Gender.MALE,
+    description: 'Gender',
+  })
   @IsEnum(Gender)
   @IsOptional()
   gender?: Gender;
 
-  @ApiProperty({ enum: EmployeeRole, example: EmployeeRole.DOCTOR, description: 'Role of the employee' })
+  @ApiProperty({
+    enum: EmployeeRole,
+    example: EmployeeRole.DOCTOR,
+    description: 'Role of the employee',
+  })
   @IsEnum(EmployeeRole)
   @IsNotEmpty()
   role: EmployeeRole;
 
-  @ApiPropertyOptional({ enum: EmployeeStatus, example: EmployeeStatus.ACTIVE, description: 'Status of the employee' })
+  @ApiPropertyOptional({
+    enum: EmployeeStatus,
+    example: EmployeeStatus.ACTIVE,
+    description: 'Status of the employee',
+  })
   @IsEnum(EmployeeStatus)
   @IsOptional()
   status?: EmployeeStatus;
 
-
-
-  @ApiPropertyOptional({ example: 'uuid-partner-id', description: 'Partner ID the employee belongs to' })
+  @ApiPropertyOptional({
+    example: 'uuid-partner-id',
+    description: 'Partner ID the employee belongs to',
+  })
   @IsUUID()
   @IsOptional()
   partnerId?: string;
@@ -203,10 +248,26 @@ export class CreateEmployeeDto {
     type: [VerificationDocumentEntryDto],
     description: 'Verification documents (ID card, licenses, etc.)',
     example: [
-      { fieldKey: 'id_card', documents: [{ name: 'ID Card', url: 'https://storage.example.com/id-card.jpg', updatedTime: '2026-03-21T14:00:00.000Z' }] },
-      { fieldKey: 'other_documents', documents: [
-        { name: 'Health Certificate', url: 'https://storage.example.com/health-cert.pdf', updatedTime: '2026-03-21T14:00:00.000Z' },
-      ]},
+      {
+        fieldKey: 'id_card',
+        documents: [
+          {
+            name: 'ID Card',
+            url: 'https://storage.example.com/id-card.jpg',
+            updatedTime: '2026-03-21T14:00:00.000Z',
+          },
+        ],
+      },
+      {
+        fieldKey: 'other_documents',
+        documents: [
+          {
+            name: 'Health Certificate',
+            url: 'https://storage.example.com/health-cert.pdf',
+            updatedTime: '2026-03-21T14:00:00.000Z',
+          },
+        ],
+      },
     ],
   })
   @IsArray()
@@ -219,8 +280,6 @@ export class CreateEmployeeDto {
   @IsString()
   @IsNotEmpty()
   description: string;
-
-
 
   @ApiProperty({
     type: [WorkScheduleEntryDto],
@@ -240,7 +299,12 @@ export class CreateEmployeeDto {
     type: [WorkHistoryEntryDto],
     description: 'Work history entries',
     example: [
-      { facility: 'Glow Saigon Spa Retreat', position: 'Head of Dermatology', period: '2022–Present', isCurrent: true },
+      {
+        facility: 'Glow Saigon Spa Retreat',
+        position: 'Head of Dermatology',
+        period: '2022–Present',
+        isCurrent: true,
+      },
     ],
   })
   @IsArray()
@@ -249,13 +313,19 @@ export class CreateEmployeeDto {
   @IsOptional()
   workHistory?: WorkHistoryEntryDto[];
 
-  @ApiPropertyOptional({ type: CreateDoctorProfileDto, description: 'Doctor profile data if role is DOCTOR' })
+  @ApiPropertyOptional({
+    type: CreateDoctorProfileDto,
+    description: 'Doctor profile data if role is DOCTOR',
+  })
   @IsOptional()
   @ValidateNested()
   @Type(() => CreateDoctorProfileDto)
   doctorProfile?: CreateDoctorProfileDto;
 
-  @ApiPropertyOptional({ type: CreateTherapistProfileDto, description: 'Therapist profile data if role is THERAPIST' })
+  @ApiPropertyOptional({
+    type: CreateTherapistProfileDto,
+    description: 'Therapist profile data if role is THERAPIST',
+  })
   @IsOptional()
   @ValidateNested()
   @Type(() => CreateTherapistProfileDto)

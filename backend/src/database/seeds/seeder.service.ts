@@ -49,13 +49,13 @@ export class SeederService {
   ) {
     // ⚠️ ORDER MATTERS — seeders with dependencies come AFTER their dependencies
     this.seeders = [
-      this.userSeeder,         // 1. no deps
-      this.partnerSeeder,      // 2. depends on users
-      this.employeeSeeder,     // 3. depends on partners
-      this.serviceTagSeeder,   // 4. depends on users
-      this.categorySeeder,     // 5. no deps (but logically before products)
-      this.productSeeder,      // 6. depends on categories, tags, employees
-      this.appointmentSeeder,  // 7. depends on users, employees, products
+      this.userSeeder, // 1. no deps
+      this.partnerSeeder, // 2. depends on users
+      this.employeeSeeder, // 3. depends on partners
+      this.serviceTagSeeder, // 4. depends on users
+      this.categorySeeder, // 5. no deps (but logically before products)
+      this.productSeeder, // 6. depends on categories, tags, employees
+      this.appointmentSeeder, // 7. depends on users, employees, products
     ];
   }
 
@@ -119,6 +119,8 @@ export class SeederService {
     );
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-    this.logger.log(`🎉 Cleared all data in ${duration}s (${tablesToTruncate.length} tables truncated)`);
+    this.logger.log(
+      `🎉 Cleared all data in ${duration}s (${tablesToTruncate.length} tables truncated)`,
+    );
   }
 }

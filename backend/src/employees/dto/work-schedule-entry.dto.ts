@@ -9,14 +9,23 @@ export class WorkScheduleEntryDto {
   @ApiProperty({
     example: 'Monday',
     description: 'Day of the week',
-    enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    enum: [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ],
   })
   @IsString()
   day: string;
 
   @ApiPropertyOptional({
     example: '09:00',
-    description: 'Work start time in HH:mm format. Empty string if not working.',
+    description:
+      'Work start time in HH:mm format. Empty string if not working.',
   })
   @IsString()
   @IsOptional()

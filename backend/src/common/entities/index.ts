@@ -24,8 +24,17 @@ export { LocationLevel } from './location-level.enum';
 // Partners
 export { Partner } from './partner.entity';
 export { LegalRepresentative } from './legal-representative.entity';
-export { PartnerDocument, PartnerDocumentStatuses, DocumentTypes, DocumentFileTypes } from './partner-document.entity';
-export type { PartnerDocumentStatus, DocumentTypeValue, DocumentFileType } from './partner-document.entity';
+export {
+  PartnerDocument,
+  PartnerDocumentStatuses,
+  DocumentTypes,
+  DocumentFileTypes,
+} from './partner-document.entity';
+export type {
+  PartnerDocumentStatus,
+  DocumentTypeValue,
+  DocumentFileType,
+} from './partner-document.entity';
 export { DocumentRequirement } from './document-requirement.entity';
 
 // Products
@@ -53,3 +62,17 @@ export { PaymentTransactionLog } from './payment-transaction-log.entity';
 // Reviews
 export { TreatmentReview } from './treatment-review.entity';
 export { SpecialistReview } from './specialist-review.entity';
+
+// AI Chat
+export { AiConversation } from './conversation.entity';
+export { AiChatMessage } from './chat-message.entity';
+
+// Partner Chat
+export { PartnerConversation } from './partner-conversation.entity';
+export { PartnerChatMessage } from './partner-chat-message.entity';
+export { PartnerChatAttachment } from './partner-chat-attachment.entity';
+
+// Notifications
+export { Notification } from './notification.entity';
+export { NotificationRead } from './notification-read.entity';
+export { DeviceToken } from './device-token.entity';

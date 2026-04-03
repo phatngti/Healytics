@@ -16,7 +16,8 @@ import { DocumentEntryDto } from './other-document-entry.dto';
 export class VerificationDocumentEntryDto {
   @ApiProperty({
     example: 'id_card',
-    description: 'Unique key identifying the document field (e.g. "id_card", "other_documents")',
+    description:
+      'Unique key identifying the document field (e.g. "id_card", "other_documents")',
   })
   @IsString()
   fieldKey: string;
@@ -25,7 +26,11 @@ export class VerificationDocumentEntryDto {
     type: [DocumentEntryDto],
     description: 'Array of document entries for this field',
     example: [
-      { name: 'ID Card', url: 'https://storage.example.com/id-card.jpg', updatedTime: '2026-03-21T14:00:00.000Z' },
+      {
+        name: 'ID Card',
+        url: 'https://storage.example.com/id-card.jpg',
+        updatedTime: '2026-03-21T14:00:00.000Z',
+      },
     ],
   })
   @IsArray()

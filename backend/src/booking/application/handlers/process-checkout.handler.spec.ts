@@ -84,7 +84,8 @@ describe('ProcessCheckoutHandler', () => {
         paymentUrl: null,
       };
       queryRunner.manager.create.mockReturnValue({});
-      queryRunner.manager.save.mockResolvedValueOnce(savedBooking) // Save booking
+      queryRunner.manager.save
+        .mockResolvedValueOnce(savedBooking) // Save booking
         .mockResolvedValueOnce({}); // Save status log
 
       // Act

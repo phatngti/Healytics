@@ -9,7 +9,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateMoMoRefundDto {
   @ApiProperty({
     example: 987654321,
-    description: 'MoMo transaction ID from the original payment (required for refund)',
+    description:
+      'MoMo transaction ID from the original payment (required for refund)',
   })
   @IsNumber()
   @IsNotEmpty()

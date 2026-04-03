@@ -19,8 +19,7 @@ import { RedisService, REDIS_CLIENT } from './redis.service';
           username?: string;
         };
 
-        const isLocal =
-          cfg.host === 'localhost' || cfg.host === '127.0.0.1';
+        const isLocal = cfg.host === 'localhost' || cfg.host === '127.0.0.1';
 
         const client = new Redis({
           host: cfg.host,
@@ -45,7 +44,9 @@ import { RedisService, REDIS_CLIENT } from './redis.service';
         });
 
         client.on('connect', () => logger.log('Redis connected'));
-        client.on('error', (err) => logger.error(`Redis error: ${err.message}`));
+        client.on('error', (err) =>
+          logger.error(`Redis error: ${err.message}`),
+        );
         client.on('close', () => logger.warn('Redis connection closed'));
 
         // Connect eagerly but don't crash the app if Redis is unavailable

@@ -173,7 +173,9 @@ describe('CategoriesService', () => {
       mockCategoryRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.findOne('missing-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -195,7 +197,9 @@ describe('CategoriesService', () => {
       mockCategoryRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.findBySlug('missing-slug')).rejects.toThrow(NotFoundException);
+      await expect(service.findBySlug('missing-slug')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -212,7 +216,10 @@ describe('CategoriesService', () => {
       // Assert
       expect(result.id).toBe('uuid-1');
       expect(result.name).toBe('New Name');
-      expect(mockUpdateCategoryHandler.execute).toHaveBeenCalledWith('uuid-1', updateDto);
+      expect(mockUpdateCategoryHandler.execute).toHaveBeenCalledWith(
+        'uuid-1',
+        updateDto,
+      );
     });
   });
 

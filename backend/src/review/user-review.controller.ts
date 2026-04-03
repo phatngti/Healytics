@@ -29,12 +29,16 @@ export class UserReviewController {
    */
   @Post('treatment')
   @Throttle({ default: { limit: 10, ttl: 60000 } })
-  @ApiOperation({ summary: 'Submit a treatment review for a completed appointment' })
+  @ApiOperation({
+    summary: 'Submit a treatment review for a completed appointment',
+  })
   @ApiCreatedResponse({
     description: 'Treatment review submitted successfully.',
     type: TreatmentReviewResponseDto,
   })
-  @ApiBadRequestResponse({ description: 'Validation error or appointment not completed' })
+  @ApiBadRequestResponse({
+    description: 'Validation error or appointment not completed',
+  })
   @ApiNotFoundResponse({ description: 'Appointment not found' })
   @ApiConflictResponse({ description: 'Treatment review already submitted' })
   async submitTreatmentReview(
@@ -49,12 +53,16 @@ export class UserReviewController {
    */
   @Post('specialist')
   @Throttle({ default: { limit: 10, ttl: 60000 } })
-  @ApiOperation({ summary: 'Submit a specialist review for a completed appointment' })
+  @ApiOperation({
+    summary: 'Submit a specialist review for a completed appointment',
+  })
   @ApiCreatedResponse({
     description: 'Specialist review submitted successfully.',
     type: SpecialistReviewResponseDto,
   })
-  @ApiBadRequestResponse({ description: 'Validation error or appointment not completed' })
+  @ApiBadRequestResponse({
+    description: 'Validation error or appointment not completed',
+  })
   @ApiNotFoundResponse({ description: 'Appointment not found' })
   @ApiConflictResponse({ description: 'Specialist review already submitted' })
   async submitSpecialistReview(

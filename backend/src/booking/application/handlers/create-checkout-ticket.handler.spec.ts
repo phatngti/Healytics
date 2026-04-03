@@ -40,7 +40,9 @@ describe('CreateCheckoutTicketHandler', () => {
       ],
     }).compile();
 
-    handler = module.get<CreateCheckoutTicketHandler>(CreateCheckoutTicketHandler);
+    handler = module.get<CreateCheckoutTicketHandler>(
+      CreateCheckoutTicketHandler,
+    );
   });
 
   afterEach(() => {

@@ -257,7 +257,6 @@ class VerificationStatusRemoteDataSourceImpl
       throw Exception('Failed to fetch partner profile');
     }
 
-    print('profile: $profile');
     return _mapToEntity(profile);
   }
 
@@ -270,10 +269,9 @@ class VerificationStatusRemoteDataSourceImpl
     final updateDto = _buildUpdateDto(edits: edits, uploads: uploads);
 
     // Call the PUT /partners/me API
-    await apiService.partnerPartnersApi
-        .partnerSelfControllerUpdateMyProfile(
-          updateDto,
-        );
+    await apiService.partnerPartnersApi.partnerSelfControllerUpdateMyProfile(
+      updateDto,
+    );
 
     return true;
   }

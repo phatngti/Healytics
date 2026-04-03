@@ -18,7 +18,7 @@ import { HealthServiceStatus } from '@/health-service/enums/health-service-statu
 import { ProductDefinition } from './product-definition.entity';
 import { ProductEmployeeEligibility } from './product-employee-eligibility.entity';
 import { ProductTag } from './product-tag.entity';
-
+import { Partner } from './partner.entity';
 import { ProductFacilityImage } from './product-facility-image.entity';
 
 @Entity('products')
@@ -27,7 +27,8 @@ export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-
+  @Column({ name: 'partner_id', type: 'uuid', nullable: true })
+  partnerId: string | null;
 
   @Column({ name: 'category_id', type: 'uuid', nullable: true })
   categoryId: string | null;
@@ -45,10 +46,22 @@ export class Product {
   type: HealthServiceType;
 
   // Pricing
-  @Column({ name: 'base_price', type: 'decimal', precision: 15, scale: 2, default: 0 })
+  @Column({
+    name: 'base_price',
+    type: 'decimal',
+    precision: 15,
+    scale: 2,
+    default: 0,
+  })
   basePrice: number;
 
-  @Column({ name: 'sale_price', type: 'decimal', precision: 15, scale: 2, nullable: true })
+  @Column({
+    name: 'sale_price',
+    type: 'decimal',
+    precision: 15,
+    scale: 2,
+    nullable: true,
+  })
   salePrice: number | null;
 
   @Column({ length: 3, default: 'VND' })
@@ -65,7 +78,11 @@ export class Product {
   serviceManual: {
     preServiceGuidelines?: string[];
     serviceRules?: { iconSlug: string; title: string; description: string }[];
-    procedureSteps?: { stepNumber: number; title: string; description: string }[];
+    procedureSteps?: {
+      stepNumber: number;
+      title: string;
+      description: string;
+    }[];
   } | null;
 
   @Column({ type: 'varchar', name: 'vendor_name', length: 100, nullable: true })
@@ -81,14 +98,18 @@ export class Product {
   deletedAt: Date | null;
 
   // Relations
+  @ManyToOne(() => Partner, (partner) => partner.products, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'partner_id' })
+  partner: Partner | null;
+
   @ManyToOne(() => Category, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'category_id' })
   category: Category | null;
 
   @OneToMany(() => ProductMedia, (media) => media.product, { cascade: true })
   media: ProductMedia[];
-
-
 
   @OneToOne(() => ProductDefinition, (definition) => definition.product, {
     cascade: true,
@@ -106,9 +127,6 @@ export class Product {
   @OneToMany(() => ProductTag, (pt) => pt.product)
   productTags: ProductTag[];
 
-
-
   @OneToMany(() => ProductFacilityImage, (fi) => fi.product, { cascade: true })
   facilityImages: ProductFacilityImage[];
 }
-

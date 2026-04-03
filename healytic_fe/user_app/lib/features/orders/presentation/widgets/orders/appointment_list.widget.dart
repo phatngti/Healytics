@@ -16,12 +16,9 @@ class AppointmentList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncFiltered =
-        ref.watch(filteredAppointmentsProvider);
-    final asyncRecs =
-        ref.watch(appointmentRecommendationsProvider);
-    final hPad =
-        AppDimens.horizontalPadding(context);
+    final asyncFiltered = ref.watch(filteredAppointmentsProvider);
+    final asyncRecs = ref.watch(appointmentRecommendationsProvider);
+    final hPad = AppDimens.horizontalPadding(context);
 
     return switch (asyncFiltered) {
       AsyncData(:final value) =>
@@ -35,30 +32,19 @@ class AppointmentList extends ConsumerWidget {
                   AppDimens.spaceXxl,
                 ),
                 children: [
-                  _VendorHeader(
-                    appointments: value,
-                  ),
+                  _VendorHeader(appointments: value),
                   ...value.map(
                     (apt) => Padding(
-                      padding: EdgeInsets.only(
-                        bottom: AppDimens.spaceLg,
-                      ),
-                      child: AppointmentCard(
-                        appointment: apt,
-                      ),
+                      padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
+                      child: AppointmentCard(appointment: apt),
                     ),
                   ),
                   AppDimens.verticalSmall,
-                  _RecommendationsSection(
-                    asyncRecs: asyncRecs,
-                  ),
+                  _RecommendationsSection(asyncRecs: asyncRecs),
                 ],
               ),
-      AsyncError(:final error) =>
-        Center(child: Text('Error: $error')),
-      _ => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      AsyncError(:final error) => Center(child: Text('Error: $error')),
+      _ => const Center(child: CircularProgressIndicator()),
     };
   }
 }
@@ -79,16 +65,13 @@ class _EmptyState extends StatelessWidget {
             Icons.event_busy_rounded,
             // 64dp — one-off illustration-size icon
             size: 64,
-            color: theme.colorScheme.onSurfaceVariant
-                .withValues(alpha: 0.4),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
           ),
           AppDimens.verticalMedium,
           Text(
             'No appointments found',
-            style:
-                theme.textTheme.titleMedium?.copyWith(
-              color:
-                  theme.colorScheme.onSurfaceVariant,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -109,15 +92,12 @@ class _VendorHeader extends StatelessWidget {
       return const SizedBox.shrink();
     }
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: AppDimens.spaceLg,
-      ),
+      padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
       child: Text(
-        appointments.first.vendorName,
-        style: Theme.of(context)
-            .textTheme
-            .headlineSmall
-            ?.copyWith(fontWeight: FontWeight.bold),
+        appointments.first.healthPartnerName,
+        style: Theme.of(
+          context,
+        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -126,53 +106,44 @@ class _VendorHeader extends StatelessWidget {
 // ─── Recommendations section ───────────────────────
 
 class _RecommendationsSection extends StatelessWidget {
-  const _RecommendationsSection({
-    required this.asyncRecs,
-  });
+  const _RecommendationsSection({required this.asyncRecs});
 
-  final AsyncValue<List<RecommendedServiceEntity>>
-      asyncRecs;
+  final AsyncValue<List<RecommendedServiceEntity>> asyncRecs;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return switch (asyncRecs) {
-      AsyncData(:final value)
-          when value.isNotEmpty =>
-        Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-          children: [
-            AppDimens.verticalSmall,
-            Text(
-              'Recommend For You',
-              style: theme.textTheme.titleLarge
-                  ?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+      AsyncData(:final value) when value.isNotEmpty => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppDimens.verticalSmall,
+          Text(
+            'Recommend For You',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
             ),
-            AppDimens.verticalMedium,
-            SizedBox(
-              height: 124,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                clipBehavior: Clip.none,
-                itemCount: value.length,
-                separatorBuilder: (_, __) =>
-                    AppDimens.horizontalMedium,
-                itemBuilder: (context, index) {
-                  return RecommendationCard(
-                    service: value[index],
-                    isLast:
-                        index == value.length - 1,
-                  );
-                },
-              ),
+          ),
+          AppDimens.verticalMedium,
+          SizedBox(
+            height: 124,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              clipBehavior: Clip.none,
+              itemCount: value.length,
+              separatorBuilder: (_, __) => AppDimens.horizontalMedium,
+              itemBuilder: (context, index) {
+                return RecommendationCard(
+                  service: value[index],
+                  isLast: index == value.length - 1,
+                );
+              },
             ),
-            AppDimens.verticalLarge,
-          ],
-        ),
+          ),
+          AppDimens.verticalLarge,
+        ],
+      ),
       _ => const SizedBox.shrink(),
     };
   }

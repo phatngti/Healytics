@@ -58,7 +58,9 @@ describe('HealthServiceService', () => {
         },
         {
           provide: PartnersService,
-          useValue: { getFirstHealthPartner: jest.fn().mockResolvedValue(null) },
+          useValue: {
+            getFirstHealthPartner: jest.fn().mockResolvedValue(null),
+          },
         },
       ],
     }).compile();
@@ -73,7 +75,9 @@ describe('HealthServiceService', () => {
   describe('create', () => {
     it('should delegate to CreateHealthServiceHandler and return created product', async () => {
       // Arrange
-      const dto: CreatePartnerHealthServiceDto = { name: 'Test Product' } as CreatePartnerHealthServiceDto;
+      const dto: CreatePartnerHealthServiceDto = {
+        name: 'Test Product',
+      } as CreatePartnerHealthServiceDto;
       const expectedProduct = { id: 'uuid-1', name: 'Test Product' };
       createHandler.execute.mockResolvedValue(expectedProduct);
 
@@ -91,7 +95,9 @@ describe('HealthServiceService', () => {
     it('should delegate to UpdateHealthServiceHandler and return updated product', async () => {
       // Arrange
       const id = 'uuid-1';
-      const dto: UpdatePartnerHealthServiceDto = { name: 'Updated Product' } as UpdatePartnerHealthServiceDto;
+      const dto: UpdatePartnerHealthServiceDto = {
+        name: 'Updated Product',
+      } as UpdatePartnerHealthServiceDto;
       const expectedProduct = { id, name: 'Updated Product' };
       updateHandler.execute.mockResolvedValue(expectedProduct);
 
@@ -178,7 +184,9 @@ describe('HealthServiceService', () => {
 
       // Act & Assert
       await expect(service.findOne(id)).rejects.toThrow(NotFoundException);
-      await expect(service.findOne(id)).rejects.toThrow(`Product with ID ${id} not found`);
+      await expect(service.findOne(id)).rejects.toThrow(
+        `Product with ID ${id} not found`,
+      );
     });
   });
 
@@ -206,7 +214,9 @@ describe('HealthServiceService', () => {
 
       // Act & Assert
       await expect(service.findBySlug(slug)).rejects.toThrow(NotFoundException);
-      await expect(service.findBySlug(slug)).rejects.toThrow(`Product with slug "${slug}" not found`);
+      await expect(service.findBySlug(slug)).rejects.toThrow(
+        `Product with slug "${slug}" not found`,
+      );
     });
   });
 
@@ -216,7 +226,9 @@ describe('HealthServiceService', () => {
       productRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.getProductEmployees('missing-id')).rejects.toThrow(NotFoundException);
+      await expect(service.getProductEmployees('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should return empty array when product has no employees', async () => {
@@ -292,8 +304,13 @@ describe('HealthServiceService', () => {
       // Arrange — find next Monday from today
       const today = new Date();
       const todayDay = today.getDay();
-      const daysUntilMonday = todayDay === 1 ? 0 : todayDay === 0 ? 1 : 8 - todayDay;
-      const nextMonday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + daysUntilMonday);
+      const daysUntilMonday =
+        todayDay === 1 ? 0 : todayDay === 0 ? 1 : 8 - todayDay;
+      const nextMonday = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate() + daysUntilMonday,
+      );
 
       const employee = {
         id: 'emp-1',
@@ -328,11 +345,17 @@ describe('HealthServiceService', () => {
 
       // Assert
       const mondayDate = `${nextMonday.getFullYear()}-${String(nextMonday.getMonth() + 1).padStart(2, '0')}-${String(nextMonday.getDate()).padStart(2, '0')}`;
-      const mondaySchedule = result[0].daySchedules.find((d) => d.date === mondayDate);
+      const mondaySchedule = result[0].daySchedules.find(
+        (d) => d.date === mondayDate,
+      );
       expect(mondaySchedule).toBeDefined();
 
-      const slot9am = mondaySchedule!.timeSlots.find((s) => s.label === '09:00 AM');
-      const slot930am = mondaySchedule!.timeSlots.find((s) => s.label === '09:30 AM');
+      const slot9am = mondaySchedule!.timeSlots.find(
+        (s) => s.label === '09:00 AM',
+      );
+      const slot930am = mondaySchedule!.timeSlots.find(
+        (s) => s.label === '09:30 AM',
+      );
       expect(slot9am!.isAvailable).toBe(false); // booked
       expect(slot930am!.isAvailable).toBe(true); // not booked
     });
@@ -340,19 +363,43 @@ describe('HealthServiceService', () => {
     it('should set isSelected on the primary employee', async () => {
       // Arrange
       const emp1 = {
-        id: 'emp-1', fullName: 'Doctor A', jobTitle: 'Doctor', role: 'doctor',
-        avatarUrl: null, description: null, doctorProfile: null, therapistProfile: null, schedule: [],
+        id: 'emp-1',
+        fullName: 'Doctor A',
+        jobTitle: 'Doctor',
+        role: 'doctor',
+        avatarUrl: null,
+        description: null,
+        doctorProfile: null,
+        therapistProfile: null,
+        schedule: [],
       };
       const emp2 = {
-        id: 'emp-2', fullName: 'Doctor B', jobTitle: 'Doctor', role: 'doctor',
-        avatarUrl: null, description: null, doctorProfile: null, therapistProfile: null, schedule: [],
+        id: 'emp-2',
+        fullName: 'Doctor B',
+        jobTitle: 'Doctor',
+        role: 'doctor',
+        avatarUrl: null,
+        description: null,
+        doctorProfile: null,
+        therapistProfile: null,
+        schedule: [],
       };
 
       productRepository.findOne.mockResolvedValue({
         id: 'prod-1',
         productEmployeeEligibilities: [
-          { id: 'elig-1', employeeId: 'emp-1', isPrimary: false, employee: emp1 },
-          { id: 'elig-2', employeeId: 'emp-2', isPrimary: true, employee: emp2 },
+          {
+            id: 'elig-1',
+            employeeId: 'emp-1',
+            isPrimary: false,
+            employee: emp1,
+          },
+          {
+            id: 'elig-2',
+            employeeId: 'emp-2',
+            isPrimary: true,
+            employee: emp2,
+          },
         ],
       });
       bookingRepository.find.mockResolvedValue([]);
@@ -362,7 +409,7 @@ describe('HealthServiceService', () => {
 
       // Assert
       expect(result[0].isSelected).toBe(false); // emp-1
-      expect(result[1].isSelected).toBe(true);  // emp-2 is primary
+      expect(result[1].isSelected).toBe(true); // emp-2 is primary
     });
   });
 
@@ -370,7 +417,15 @@ describe('HealthServiceService', () => {
     it('should query active visible products and return card DTOs', async () => {
       // Arrange
       const mockProducts = [
-        { id: 'uuid-1', name: 'Product 1', type: 'service', basePrice: 500000, media: [], reviews: [], productEmployeeEligibilities: [] },
+        {
+          id: 'uuid-1',
+          name: 'Product 1',
+          type: 'service',
+          basePrice: 500000,
+          media: [],
+          reviews: [],
+          productEmployeeEligibilities: [],
+        },
       ];
       productRepository.find.mockResolvedValue(mockProducts);
 
@@ -404,7 +459,15 @@ describe('HealthServiceService', () => {
     it('should query active visible products and return card DTOs', async () => {
       // Arrange
       const mockProducts = [
-        { id: 'uuid-2', name: 'Product 2', type: 'package', basePrice: 750000, media: [], reviews: [], productEmployeeEligibilities: [] },
+        {
+          id: 'uuid-2',
+          name: 'Product 2',
+          type: 'package',
+          basePrice: 750000,
+          media: [],
+          reviews: [],
+          productEmployeeEligibilities: [],
+        },
       ];
       productRepository.find.mockResolvedValue(mockProducts);
 

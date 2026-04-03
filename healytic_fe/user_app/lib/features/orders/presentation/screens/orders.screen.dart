@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:user_app/core/widgets/main_screen_layout.widget.dart';
 import 'package:user_app/features/orders/presentation/providers/appointment.provider.dart';
 import 'package:user_app/features/orders/presentation/widgets/orders/appointment_list.widget.dart';
 import 'package:user_app/features/orders/presentation/widgets/orders/category_filters.widget.dart';
@@ -8,6 +9,9 @@ import 'package:user_app/features/orders/presentation/widgets/orders/orders_tab_
 
 /// Main appointment list screen, matching the
 /// "Appointment List V1" HTML design reference.
+///
+/// Uses [MainScreenLayout] for consistent
+/// header/background across navigation tabs.
 class OrdersPage extends HookConsumerWidget {
   const OrdersPage({super.key});
 
@@ -17,25 +21,11 @@ class OrdersPage extends HookConsumerWidget {
     // screen access; only re-renders when data
     // has actually changed.
     useEffect(() {
-      ref
-          .read(appointmentsProvider.notifier)
-          .silentRefresh();
+      ref.read(appointmentsProvider.notifier).silentRefresh();
       return null;
     }, const []);
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: 'Back',
-          onPressed: () =>
-              Navigator.of(context).maybePop(),
-        ),
-        title: const Text('Appointment'),
-        centerTitle: true,
-      ),
-      body: const _Body(),
-    );
+    return const MainScreenLayout(title: 'Appointments', body: _Body());
   }
 }
 

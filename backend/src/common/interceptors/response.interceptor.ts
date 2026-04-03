@@ -23,10 +23,10 @@ export class ResponseInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const { method, url } = request;
 
-    const shouldLog = this.reflector.getAllAndOverride<boolean>(LOG_RESPONSE_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const shouldLog = this.reflector.getAllAndOverride<boolean>(
+      LOG_RESPONSE_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     return next.handle().pipe(
       tap({
@@ -36,7 +36,9 @@ export class ResponseInterceptor implements NestInterceptor {
           }
         },
         error: (error) => {
-          this.logger.error(`Response Error [${method} ${url}]: ${error.message}`);
+          this.logger.error(
+            `Response Error [${method} ${url}]: ${error.message}`,
+          );
         },
       }),
     );
@@ -52,7 +54,9 @@ export class ResponseInterceptor implements NestInterceptor {
       const stringified = JSON.stringify(data, null, 2);
       this.logger.debug(`Response Body [${method} ${url}]: ${stringified}`);
     } catch {
-      this.logger.debug(`Response Body [${method} ${url}]: [Unable to serialize]`);
+      this.logger.debug(
+        `Response Body [${method} ${url}]: [Unable to serialize]`,
+      );
     }
   }
 }

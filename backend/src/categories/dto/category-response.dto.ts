@@ -57,7 +57,10 @@ export class CategoryResponseDto {
   isActive: boolean;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Category type for UI grouping', default: 'primary' })
+  @ApiPropertyOptional({
+    description: 'Category type for UI grouping',
+    default: 'primary',
+  })
   categoryType: string;
 
   @Expose()
@@ -70,12 +73,18 @@ export class CategoryResponseDto {
 
   @Expose()
   @Type(() => CategorySummaryDto)
-  @ApiPropertyOptional({ type: CategorySummaryDto, description: 'Parent category' })
+  @ApiPropertyOptional({
+    type: CategorySummaryDto,
+    description: 'Parent category',
+  })
   parent: CategorySummaryDto | null;
 
   @Expose()
   @Type(() => CategorySummaryDto)
-  @ApiPropertyOptional({ type: [CategorySummaryDto], description: 'Child categories' })
+  @ApiPropertyOptional({
+    type: [CategorySummaryDto],
+    description: 'Child categories',
+  })
   children: CategorySummaryDto[];
 
   static fromEntity(entity: Category): CategoryResponseDto {

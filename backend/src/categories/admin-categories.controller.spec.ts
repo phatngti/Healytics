@@ -28,7 +28,9 @@ describe('AdminCategoriesController', () => {
       ],
     }).compile();
 
-    controller = module.get<AdminCategoriesController>(AdminCategoriesController);
+    controller = module.get<AdminCategoriesController>(
+      AdminCategoriesController,
+    );
     categoriesService = module.get(CategoriesService);
   });
 
@@ -110,8 +112,16 @@ describe('AdminCategoriesController', () => {
     it('should call service.updateForAdmin with ID and DTO', async () => {
       // Arrange
       const id = 'uuid-1';
-      const dto: UpdateCategoryDto = { name: 'Updated', sortOrder: 2 } as UpdateCategoryDto;
-      const expectedCategory = { id, name: 'Updated', sortOrder: 2, serviceCount: 5 };
+      const dto: UpdateCategoryDto = {
+        name: 'Updated',
+        sortOrder: 2,
+      } as UpdateCategoryDto;
+      const expectedCategory = {
+        id,
+        name: 'Updated',
+        sortOrder: 2,
+        serviceCount: 5,
+      };
       categoriesService.updateForAdmin!.mockResolvedValue(expectedCategory);
 
       // Act

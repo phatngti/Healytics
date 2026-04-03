@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import fs from 'fs';
 import path from 'path';
+import { RedisIoAdapter } from '@/common/adapters/redis-io.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -22,6 +23,16 @@ async function bootstrap() {
   //   }),
   // );
 
+  // ── Redis WebSocket Adapter (for horizontal scaling) ─────
+  const redisIoAdapter = new RedisIoAdapter(app);
+  await redisIoAdapter.connectToRedis({
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    password: process.env.REDIS_PASSWORD || undefined,
+    username: process.env.REDIS_USERNAME || undefined,
+  });
+  app.useWebSocketAdapter(redisIoAdapter);
+
   app.enableCors();
   app.use(helmet());
 
@@ -36,7 +47,12 @@ async function bootstrap() {
       .setVersion('0.0.1')
       .addBearerAuth()
       .addApiKey(
-        { type: 'apiKey', name: 'X-AI-API-Key', in: 'header', description: 'AI Service API Token' },
+        {
+          type: 'apiKey',
+          name: 'X-AI-API-Key',
+          in: 'header',
+          description: 'AI Service API Token',
+        },
         'X-AI-API-Key',
       )
       .build();
@@ -58,7 +74,9 @@ async function bootstrap() {
   }
 
   // ── RabbitMQ Microservice Consumer ───────────────────────
-  const rmqUrl = process.env.RABBITMQ_URL || 'amqps://backend:backend%40rmq123@localhost:5671/healytics';
+  const rmqUrl =
+    process.env.RABBITMQ_URL ||
+    'amqps://backend:backend%40rmq123@localhost:5671/healytics';
   const rmqQueue = process.env.RABBITMQ_QUEUE_CHECKOUT || 'checkout_queue';
 
   // Build TLS socket options if cert env vars are provided

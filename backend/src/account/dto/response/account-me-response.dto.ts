@@ -23,7 +23,11 @@ class UserProfileDto {
   @Expose()
   bio?: string | null;
 
-  @ApiPropertyOptional({ description: 'Date of birth', type: String, example: '1990-01-15' })
+  @ApiPropertyOptional({
+    description: 'Date of birth',
+    type: String,
+    example: '1990-01-15',
+  })
   @Expose()
   dateOfBirth?: Date | null;
 
@@ -61,7 +65,10 @@ export class AccountMeResponseDto {
   @Expose()
   updatedAt: Date;
 
-  @ApiPropertyOptional({ description: 'User profile data', type: UserProfileDto })
+  @ApiPropertyOptional({
+    description: 'User profile data',
+    type: UserProfileDto,
+  })
   @Expose()
   @Type(() => UserProfileDto)
   userProfile?: UserProfileDto | null;

@@ -1,65 +1,387 @@
+import 'dart:convert';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:user_app/core/config/app_environment.dart';
+import 'package:user_app/core/providers/api.provider.dart';
+import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/notifications/domain/'
-    'repositories/notification.repository.dart';
-import 'notification_mock_data.dart';
+    'entities/notification.entity.dart';
+import 'package:user_openapi/api.dart';
+
+final _log = Logger('NotificationDatasource');
 
 // ─── Abstract Interface ────────────────────────────
 
 /// Contract for fetching notification data from
 /// a remote source.
 abstract class NotificationRemoteDatasource {
-  /// Returns grouped notification sections.
-  Future<List<NotificationSection>> getNotifications();
+  /// Fetches a cursor-paginated page of
+  /// notifications from the backend.
+  Future<NotificationPage> getNotifications({
+    int limit = 20,
+    String? cursor,
+  });
+
+  /// Returns the total unread count.
+  Future<int> getUnreadCount();
+
+  /// Mark a single notification as read.
+  Future<void> markRead(String notificationId);
+
+  /// Mark all notifications as read.
+  /// Returns the number marked.
+  Future<int> markAllRead();
+
+  /// Register a device token for push
+  /// notifications.
+  Future<void> registerDevice({
+    required String token,
+    required String platform,
+  });
+
+  /// Unregister a device token.
+  Future<void> unregisterDevice(String token);
 }
 
 // ─── Real Implementation ───────────────────────────
 
-/// Placeholder for real API integration.
+/// Calls the backend notification REST APIs via the
+/// generated [UserNotificationsApi] OpenAPI client:
+/// - GET    /v1/user/notifications
+/// - GET    /v1/user/notifications/unread-count
+/// - PATCH  /v1/user/notifications/:id/read
+/// - PATCH  /v1/user/notifications/read-all
 ///
-/// TODO(api): Wire to actual notification endpoint
-/// when the backend exposes one.
+/// Device token registration (POST /v1/user/devices
+/// and DELETE /v1/user/devices/:token) falls back to
+/// direct HTTP calls because they live under a
+/// separate controller not yet in the OpenAPI spec.
 class NotificationRemoteDatasourceImpl
     implements NotificationRemoteDatasource {
+  NotificationRemoteDatasourceImpl(this._apiService);
+  final ApiService _apiService;
+
+  UserNotificationsApi get _api =>
+      _apiService.userNotificationsApi;
+
+  // ── Helpers ──────────────────────────────────────
+
+  String get _basePath =>
+      _apiService
+          .clientFor(ServicePrefix.backend)
+          .basePath;
+
+  Map<String, String> get _headers =>
+      ApiService.getRequestHeaders();
+
+  // ── Methods ──────────────────────────────────────
+
   @override
-  Future<List<NotificationSection>>
-      getNotifications() async {
-    // Temporary: return mock data until the
-    // backend notification API is available.
-    await Future.delayed(
-      const Duration(milliseconds: 500),
+  Future<NotificationPage> getNotifications({
+    int limit = 20,
+    String? cursor,
+  }) async {
+    try {
+      final response = await _api
+          .userNotificationControllerGetNotificationsWithHttpInfo(
+        limit: limit,
+        cursor: cursor,
+      );
+
+      if (response.statusCode != 200) {
+        _log.warning(
+          'getNotifications failed: '
+          '${response.statusCode}',
+        );
+        return const NotificationPage(
+          notifications: [],
+          hasMore: false,
+        );
+      }
+
+      final json = jsonDecode(response.body)
+          as Map<String, dynamic>;
+      return _mapNotificationPage(json);
+    } catch (e, s) {
+      _log.severe('getNotifications error', e, s);
+      return const NotificationPage(
+        notifications: [],
+        hasMore: false,
+      );
+    }
+  }
+
+  @override
+  Future<int> getUnreadCount() async {
+    try {
+      final response = await _api
+          .userNotificationControllerGetUnreadCountWithHttpInfo();
+
+      if (response.statusCode != 200) {
+        _log.warning(
+          'getUnreadCount failed: '
+          '${response.statusCode}',
+        );
+        return 0;
+      }
+
+      final json = jsonDecode(response.body)
+          as Map<String, dynamic>;
+      // Defensive: backend may return 'count' or
+      // 'unreadCount' or a plain number.
+      final raw = json['count'] ?? json['unreadCount'];
+      if (raw is num) return raw.toInt();
+      return 0;
+    } catch (e, s) {
+      _log.severe('getUnreadCount error', e, s);
+      return 0;
+    }
+  }
+
+  @override
+  Future<void> markRead(String notificationId) async {
+    try {
+      await _api.userNotificationControllerMarkRead(
+        notificationId,
+      );
+    } catch (e, s) {
+      _log.warning('markRead error', e, s);
+    }
+  }
+
+  @override
+  Future<int> markAllRead() async {
+    try {
+      final response = await _api
+          .userNotificationControllerMarkAllReadWithHttpInfo();
+
+      if (response.statusCode != 200) {
+        _log.warning(
+          'markAllRead failed: '
+          '${response.statusCode}',
+        );
+        return 0;
+      }
+
+      final json = jsonDecode(response.body)
+          as Map<String, dynamic>;
+      final raw =
+          json['markedCount'] ?? json['count'] ?? 0;
+      if (raw is num) return raw.toInt();
+      return 0;
+    } catch (e, s) {
+      _log.severe('markAllRead error', e, s);
+      return 0;
+    }
+  }
+
+  @override
+  Future<void> registerDevice({
+    required String token,
+    required String platform,
+  }) async {
+    // Device registration lives in a separate
+    // controller not exposed via UserNotificationsApi.
+    // Falls back to a direct HTTP call.
+    final uri = Uri.parse('$_basePath/v1/user/devices');
+
+    try {
+      final response = await _apiService
+          .clientFor(ServicePrefix.backend)
+          .client
+          .post(
+            uri,
+            headers: {
+              ..._headers,
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'token': token,
+              'platform': platform,
+            }),
+          );
+
+      if (response.statusCode != 201) {
+        _log.warning(
+          'registerDevice failed: '
+          '${response.statusCode}',
+        );
+      }
+    } catch (e, s) {
+      _log.severe('registerDevice error', e, s);
+    }
+  }
+
+  @override
+  Future<void> unregisterDevice(String token) async {
+    final uri = Uri.parse(
+      '$_basePath/v1/user/devices/$token',
     );
-    return kMockNotificationSections;
+
+    try {
+      final response = await _apiService
+          .clientFor(ServicePrefix.backend)
+          .client
+          .delete(uri, headers: _headers);
+
+      if (response.statusCode != 204) {
+        _log.warning(
+          'unregisterDevice failed: '
+          '${response.statusCode}',
+        );
+      }
+    } catch (e, s) {
+      _log.severe('unregisterDevice error', e, s);
+    }
+  }
+
+  // ── DTO → Entity mappers ──────────────────────────
+
+  NotificationPage _mapNotificationPage(
+    Map<String, dynamic> json,
+  ) {
+    final list =
+        (json['notifications'] as List?)
+            ?.cast<Map<String, dynamic>>() ??
+        [];
+
+    final notifications = list
+        .map(_mapNotification)
+        .toList(growable: false);
+
+    return NotificationPage(
+      notifications: notifications,
+      hasMore: json['hasMore'] as bool? ?? false,
+      nextCursor: json['nextCursor'] as String?,
+    );
+  }
+
+  NotificationEntity _mapNotification(
+    Map<String, dynamic> json,
+  ) {
+    // map raw JSON (may come from WithHttpInfo body)
+    final dto = NotificationResponseDto.fromJson(json);
+    if (dto == null) {
+      throw FormatException(
+        'Failed to parse NotificationResponseDto: $json',
+      );
+    }
+    return _mapDto(dto);
+  }
+
+  NotificationEntity _mapDto(
+    NotificationResponseDto dto,
+  ) {
+    return NotificationEntity(
+      id: dto.id,
+      type: _mapNotificationType(dto.type),
+      title: dto.title,
+      body: dto.body,
+      data: _parseData(dto.data),
+      isRead: dto.isRead,
+      isBroadcast: dto.isBroadcast,
+      createdAt: dto.createdAt,
+      readAt: _parseReadAt(dto.readAt),
+    );
+  }
+
+  /// Safely cast the `Object?` DTO data field.
+  Map<String, dynamic>? _parseData(Object? raw) {
+    if (raw == null) return null;
+    if (raw is Map<String, dynamic>) return raw;
+    if (raw is Map) {
+      return raw.cast<String, dynamic>();
+    }
+    return null;
+  }
+
+  /// Safely parse the `Object?` DTO readAt field.
+  DateTime? _parseReadAt(Object? raw) {
+    if (raw == null) return null;
+    if (raw is DateTime) return raw;
+    if (raw is String) return DateTime.tryParse(raw);
+    return null;
+  }
+
+  NotificationType _mapNotificationType(
+    NotificationResponseDtoTypeEnum type,
+  ) {
+    return switch (type) {
+      NotificationResponseDtoTypeEnum.bookingConfirmed =>
+        NotificationType.bookingConfirmed,
+      NotificationResponseDtoTypeEnum.bookingCancelled =>
+        NotificationType.bookingCancelled,
+      NotificationResponseDtoTypeEnum.bookingCompleted =>
+        NotificationType.bookingCompleted,
+      NotificationResponseDtoTypeEnum.appointmentReminder =>
+        NotificationType.appointmentReminder,
+      NotificationResponseDtoTypeEnum.appointmentUpdated =>
+        NotificationType.appointmentUpdated,
+      NotificationResponseDtoTypeEnum.newChatMessage =>
+        NotificationType.newChatMessage,
+      NotificationResponseDtoTypeEnum.paymentSuccess =>
+        NotificationType.paymentSuccess,
+      NotificationResponseDtoTypeEnum.paymentFailed =>
+        NotificationType.paymentFailed,
+      NotificationResponseDtoTypeEnum.systemBroadcast =>
+        NotificationType.systemBroadcast,
+      NotificationResponseDtoTypeEnum.systemMaintenance =>
+        NotificationType.systemMaintenance,
+      NotificationResponseDtoTypeEnum.partnerVerified =>
+        NotificationType.partnerVerified,
+      NotificationResponseDtoTypeEnum.partnerRejected =>
+        NotificationType.partnerRejected,
+      _ => NotificationType.systemBroadcast,
+    };
   }
 }
 
 // ─── Mock Implementation ───────────────────────────
 
-/// Returns fake notification data after a simulated
-/// network delay.
+/// Returns empty data after a simulated delay.
 class NotificationRemoteDatasourceMock
     implements NotificationRemoteDatasource {
   @override
-  Future<List<NotificationSection>>
-      getNotifications() async {
+  Future<NotificationPage> getNotifications({
+    int limit = 20,
+    String? cursor,
+  }) async {
     await Future.delayed(
-      const Duration(milliseconds: 500),
+      const Duration(milliseconds: 300),
     );
-    return kMockNotificationSections;
+    return const NotificationPage(
+      notifications: [],
+      hasMore: false,
+    );
   }
+
+  @override
+  Future<int> getUnreadCount() async => 0;
+
+  @override
+  Future<void> markRead(String id) async {}
+
+  @override
+  Future<int> markAllRead() async => 0;
+
+  @override
+  Future<void> registerDevice({
+    required String token,
+    required String platform,
+  }) async {}
+
+  @override
+  Future<void> unregisterDevice(String token) async {}
 }
 
 // ─── Provider ──────────────────────────────────────
 
-/// Uses [AppEnvironment.useMock] to switch between
-/// real and mock implementations at runtime.
 final notificationRemoteDatasourceProvider =
     Provider<NotificationRemoteDatasource>((ref) {
-  final useMock = AppEnvironment.current.useMock;
-
-  if (useMock) {
+  if (AppEnvironment.current.useMock) {
     return NotificationRemoteDatasourceMock();
   }
-
-  return NotificationRemoteDatasourceImpl();
+  final apiService = ref.read(apiServiceProvider);
+  return NotificationRemoteDatasourceImpl(apiService);
 });
