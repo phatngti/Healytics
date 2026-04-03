@@ -2,12 +2,13 @@
 // AUTO-GENERATED from ws-contract.json — DO NOT EDIT BY HAND.
 //
 // Re-generate with:
-//   ./bin/generate-open-api.sh ws
+//   ./bin/generate-integration.sh ws
 // =============================================================
 
+// ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
 
-/// WebSocket event constants matching the backend's ChatEvent enum.
+/// WebSocket event constants matching the backend's event names.
 ///
 /// Client → Server events are used with `socket.emit()`.
 /// Server → Client events are used with `socket.on()`.

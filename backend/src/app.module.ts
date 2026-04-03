@@ -22,6 +22,7 @@ import { AiServiceModule } from './ai-service/ai-service.module';
 import { ReviewModule } from './review/review.module';
 import { PaymentGatewayModule } from './payment-gateway/payment-gateway.module';
 import { ChatModule } from './chat/chat.module';
+import { NotificationModule } from './notification/notification.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 import rabbitmqConfig from './config/rabbitmq.config';
@@ -84,6 +85,7 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
     ReviewModule,
     PaymentGatewayModule,
     ChatModule,
+    NotificationModule,
   ],
   providers: [
     {

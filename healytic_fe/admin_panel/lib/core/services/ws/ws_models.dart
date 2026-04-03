@@ -2,10 +2,55 @@
 // AUTO-GENERATED from ws-contract.json — DO NOT EDIT BY HAND.
 //
 // Re-generate with:
-//   ./bin/generate-open-api.sh ws
+//   ./bin/generate-integration.sh ws
 // =============================================================
 
+// ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
+
+Map<String, dynamic> _requireJsonMap(dynamic value, String context) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) {
+    return Map<String, dynamic>.from(value);
+  }
+  throw FormatException('Expected JSON object for $context, got ${value.runtimeType}');
+}
+
+Map<String, dynamic>? _jsonMapOrNull(dynamic value, String context) {
+  if (value == null) return null;
+  return _requireJsonMap(value, context);
+}
+
+DateTime _requireDateTime(dynamic value, String context) {
+  if (value is DateTime) return value;
+  if (value is String) return DateTime.parse(value);
+  throw FormatException('Expected DateTime string for $context, got ${value.runtimeType}');
+}
+
+DateTime? _dateTimeOrNull(dynamic value, String context) {
+  if (value == null) return null;
+  return _requireDateTime(value, context);
+}
+
+List<T> _requireJsonList<T>(
+  dynamic value,
+  String context,
+  T Function(dynamic item) convert,
+) {
+  if (value is! List) {
+    throw FormatException('Expected JSON list for $context, got ${value.runtimeType}');
+  }
+  return value.map(convert).toList(growable: false);
+}
+
+List<T>? _jsonListOrNull<T>(
+  dynamic value,
+  String context,
+  T Function(dynamic item) convert,
+) {
+  if (value == null) return null;
+  return _requireJsonList(value, context, convert);
+}
 
 /// Type of chat message content
 enum WsMessageType {
@@ -17,14 +62,33 @@ enum WsMessageType {
 
 WsMessageType wsMessageTypeFromJson(dynamic value) {
   if (value == null) return WsMessageType.text;
-  final str = value.toString().toLowerCase();
-  return WsMessageType.values.firstWhere(
-    (e) => e.name == str,
-    orElse: () => WsMessageType.text,
-  );
+  final str = value.toString();
+  switch (str) {
+    case 'text':
+      return WsMessageType.text;
+    case 'image':
+      return WsMessageType.image;
+    case 'file':
+      return WsMessageType.file;
+    case 'system':
+      return WsMessageType.system;
+    default:
+      return WsMessageType.text;
+  }
 }
 
-String wsMessageTypeToJson(WsMessageType value) => value.name;
+String wsMessageTypeToJson(WsMessageType value) {
+  switch (value) {
+    case WsMessageType.text:
+      return 'text';
+    case WsMessageType.image:
+      return 'image';
+    case WsMessageType.file:
+      return 'file';
+    case WsMessageType.system:
+      return 'system';
+  }
+}
 
 /// Payload for sending a message via WebSocket
 class WsSendMessagePayload {
@@ -51,14 +115,25 @@ class WsSendMessagePayload {
     this.clientMessageId,
   });
 
-  /// Serialize to a JSON map for Socket.IO emit.
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsSendMessagePayload.fromJson(Map<String, dynamic> json) {
+    return WsSendMessagePayload(
+      conversationId: json['conversationId'] as String,
+      receiverId: json['receiverId'] as String,
+      content: json['content'] as String,
+      messageType: json['messageType'] != null ? wsMessageTypeFromJson(json['messageType']) : null,
+      clientMessageId: json['clientMessageId'] as String?,
+    );
+  }
+
+  /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'conversationId': conversationId,
       'receiverId': receiverId,
       'content': content,
       if (messageType != null) 'messageType': wsMessageTypeToJson(messageType!),
-      if (clientMessageId != null) 'clientMessageId': clientMessageId,
+      if (clientMessageId != null) 'clientMessageId': clientMessageId!,
     };
   }
 
@@ -81,7 +156,15 @@ class WsTypingPayload {
     required this.receiverId,
   });
 
-  /// Serialize to a JSON map for Socket.IO emit.
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsTypingPayload.fromJson(Map<String, dynamic> json) {
+    return WsTypingPayload(
+      conversationId: json['conversationId'] as String,
+      receiverId: json['receiverId'] as String,
+    );
+  }
+
+  /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'conversationId': conversationId,
@@ -108,7 +191,15 @@ class WsMarkReadPayload {
     required this.receiverId,
   });
 
-  /// Serialize to a JSON map for Socket.IO emit.
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsMarkReadPayload.fromJson(Map<String, dynamic> json) {
+    return WsMarkReadPayload(
+      conversationId: json['conversationId'] as String,
+      receiverId: json['receiverId'] as String,
+    );
+  }
+
+  /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'conversationId': conversationId,
@@ -131,7 +222,14 @@ class WsJoinConversationPayload {
     required this.conversationId,
   });
 
-  /// Serialize to a JSON map for Socket.IO emit.
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsJoinConversationPayload.fromJson(Map<String, dynamic> json) {
+    return WsJoinConversationPayload(
+      conversationId: json['conversationId'] as String,
+    );
+  }
+
+  /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'conversationId': conversationId,
@@ -163,6 +261,14 @@ class WsMessageSentAck {
       id: json['id'] as String,
       clientMessageId: json['clientMessageId'] as String?,
     );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      if (clientMessageId != null) 'clientMessageId': clientMessageId!,
+    };
   }
 
   @override
@@ -228,8 +334,24 @@ class WsNewMessageEvent {
       content: json['content'] as String,
       messageType: wsMessageTypeFromJson(json['messageType']),
       clientMessageId: json['clientMessageId'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: _requireDateTime(json['createdAt'], 'WsNewMessageEvent.createdAt'),
     );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'conversationId': conversationId,
+      'senderId': senderId,
+      'receiverId': receiverId,
+      if (senderName != null) 'senderName': senderName!,
+      if (senderAvatar != null) 'senderAvatar': senderAvatar!,
+      'content': content,
+      'messageType': wsMessageTypeToJson(messageType),
+      if (clientMessageId != null) 'clientMessageId': clientMessageId!,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+    };
   }
 
   @override
@@ -265,8 +387,18 @@ class WsMessagesReadEvent {
       conversationId: json['conversationId'] as String,
       readerId: json['readerId'] as String,
       receiverId: json['receiverId'] as String,
-      readAt: DateTime.parse(json['readAt'] as String),
+      readAt: _requireDateTime(json['readAt'], 'WsMessagesReadEvent.readAt'),
     );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'conversationId': conversationId,
+      'readerId': readerId,
+      'receiverId': receiverId,
+      'readAt': readAt.toUtc().toIso8601String(),
+    };
   }
 
   @override
@@ -306,6 +438,16 @@ class WsTypingEvent {
     );
   }
 
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'conversationId': conversationId,
+      'userId': userId,
+      'receiverId': receiverId,
+      'userName': userName,
+    };
+  }
+
   @override
   String toString() {
     return 'WsTypingEvent(conversationId: $conversationId, userId: $userId, receiverId: $receiverId, userName: $userName)';
@@ -338,6 +480,15 @@ class WsStopTypingEvent {
     );
   }
 
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'conversationId': conversationId,
+      'userId': userId,
+      'receiverId': receiverId,
+    };
+  }
+
   @override
   String toString() {
     return 'WsStopTypingEvent(conversationId: $conversationId, userId: $userId, receiverId: $receiverId)';
@@ -358,6 +509,13 @@ class WsErrorEvent {
     return WsErrorEvent(
       message: json['message'] as String,
     );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'message': message,
+    };
   }
 
   @override

@@ -3,12 +3,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:common/utils/demensions.dart';
 
-import 'package:user_app/features/booking/domain/entities/booking.entity.dart';
-import 'package:user_app/features/booking/presentation/providers/booking.provider.dart';
-import 'package:user_app/features/booking/presentation/widgets/book_appointment/booking_bottom_action.widget.dart';
-import 'package:user_app/features/booking/presentation/widgets/book_appointment/date_picker_row.widget.dart';
-import 'package:user_app/features/booking/presentation/widgets/book_appointment/specialist_card_list.widget.dart';
-import 'package:user_app/features/booking/presentation/widgets/book_appointment/time_slot_section.widget.dart';
+import 'package:user_app/features/booking/'
+    'domain/entities/booking.entity.dart';
+import 'package:user_app/features/booking/'
+    'presentation/providers/booking.provider.dart';
+import 'package:user_app/features/booking/'
+    'presentation/providers/'
+    'booking_flow.provider.dart';
+import 'package:user_app/features/booking/'
+    'presentation/widgets/book_appointment/'
+    'booking_bottom_action.widget.dart';
+import 'package:user_app/features/booking/'
+    'presentation/widgets/book_appointment/'
+    'date_picker_row.widget.dart';
+import 'package:user_app/features/booking/'
+    'presentation/widgets/book_appointment/'
+    'specialist_card_list.widget.dart';
+import 'package:user_app/features/booking/'
+    'presentation/widgets/book_appointment/'
+    'time_slot_section.widget.dart';
+import 'package:user_app/features/service_details/'
+    'presentation/providers/'
+    'service_details.provider.dart';
+import 'package:user_app/router/routes.dart';
 import '../widgets/service_details/reviews_section_loader.widget.dart';
 
 /// Specialist selection screen for the Service
@@ -41,6 +58,9 @@ class _ServiceSpecialistScreenState
   int _selectedSpecialistIdx = -1;
   int _selectedDateIdx = -1;
   int _selectedTimeSlotIdx = -1;
+  String _selectedTimeSlotLabel = '';
+
+  List<BookingSpecialist> _specialists = [];
 
   bool get _canContinue =>
       _selectedSpecialistIdx >= 0 &&
@@ -53,7 +73,62 @@ class _ServiceSpecialistScreenState
 
   void _handleContinue() {
     if (!_canContinue) return;
-    // TODO: navigate to checkout or confirmation
+
+    final specialist =
+        _specialists[_selectedSpecialistIdx];
+    final flowNotifier =
+        ref.read(bookingFlowProvider.notifier);
+
+    // Build a BookingService from the cached
+    // ServiceDetailsEntity for this serviceId.
+    final detailsAsync = ref.read(
+      serviceDetailsProvider(
+        serviceId: widget.serviceId,
+      ),
+    );
+    detailsAsync.whenData((details) {
+      final service = BookingService(
+        id: details.id,
+        title: details.title,
+        duration: _extractDuration(details),
+        price: details.price,
+        imageUrl: details.images.isNotEmpty
+            ? details.images.first
+            : null,
+        clinicName: details.clinic.name,
+        clinicAddress: details.clinic.address,
+      );
+      flowNotifier.selectService(service);
+    });
+
+    flowNotifier.selectSpecialist(specialist);
+
+    final selectedDate = DateTime.now().add(
+      Duration(days: _selectedDateIdx),
+    );
+    flowNotifier.selectDate(selectedDate);
+
+    flowNotifier.selectTimeSlot(
+      _selectedTimeSlotIdx,
+      _selectedTimeSlotLabel,
+    );
+
+    const BookingSummaryRoute().push(context);
+  }
+
+  /// Extracts a duration label from feature tags
+  /// or falls back to a default.
+  String _extractDuration(
+    dynamic details,
+  ) {
+    for (final tag in details.featureTags) {
+      final label = tag.label.toLowerCase();
+      if (label.contains('min') ||
+          label.contains('hour')) {
+        return tag.label;
+      }
+    }
+    return '';
   }
 
   void _onSpecialistSelected(int index) {
@@ -75,7 +150,10 @@ class _ServiceSpecialistScreenState
     int index,
     String label,
   ) {
-    setState(() => _selectedTimeSlotIdx = index);
+    setState(() {
+      _selectedTimeSlotIdx = index;
+      _selectedTimeSlotLabel = label;
+    });
   }
 
   @override
@@ -111,6 +189,7 @@ class _ServiceSpecialistScreenState
           child: Text('Error: $e'),
         ),
         data: (specialists) {
+          _specialists = specialists;
           return _ServiceSpecialistBody(
             serviceId: widget.serviceId,
             hPad: hPad,

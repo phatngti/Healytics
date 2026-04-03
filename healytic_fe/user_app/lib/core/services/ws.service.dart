@@ -32,17 +32,21 @@ class WsService {
 
   UserChatSocket? _userChatSocket;
   PartnerChatSocket? _partnerChatSocket;
+  NotificationsSocket? _notificationSocket;
 
   /// The `/user-chat` namespace socket.
   ///
   /// Created lazily on first access to avoid
   /// allocating resources when not needed.
-  UserChatSocket get userChat =>
-      _userChatSocket ??= UserChatSocket();
+  UserChatSocket get userChat => _userChatSocket ??= UserChatSocket();
 
   /// The `/partner-chat` namespace socket.
   PartnerChatSocket get partnerChat =>
       _partnerChatSocket ??= PartnerChatSocket();
+
+  /// The `/notifications` namespace socket.
+  NotificationsSocket get notifications =>
+      _notificationSocket ??= NotificationsSocket();
 
   // ── Lifecycle ────────────────────────────────────
 
@@ -53,30 +57,24 @@ class WsService {
   /// Call this after the user has authenticated.
   void connectAll() {
     _log.info('Connecting all WS namespaces');
-    _connectSocket(
-      userChat,
-      ServicePrefix.userChat,
-    );
-    _connectSocket(
-      partnerChat,
-      ServicePrefix.partnerChat,
-    );
+    _connectSocket(userChat, ServicePrefix.userChat);
+    _connectSocket(partnerChat, ServicePrefix.partnerChat);
+    _connectSocket(notifications, ServicePrefix.notifications);
   }
 
   /// Connect only the user-chat namespace.
   void connectUserChat() {
-    _connectSocket(
-      userChat,
-      ServicePrefix.userChat,
-    );
+    _connectSocket(userChat, ServicePrefix.userChat);
   }
 
   /// Connect only the partner-chat namespace.
   void connectPartnerChat() {
-    _connectSocket(
-      partnerChat,
-      ServicePrefix.partnerChat,
-    );
+    _connectSocket(partnerChat, ServicePrefix.partnerChat);
+  }
+
+  /// Connect only the notifications namespace.
+  void connectNotifications() {
+    _connectSocket(notifications, ServicePrefix.notifications);
   }
 
   /// Disconnect **all** active sockets.
@@ -84,6 +82,7 @@ class WsService {
     _log.info('Disconnecting all WS namespaces');
     _userChatSocket?.disconnect();
     _partnerChatSocket?.disconnect();
+    _notificationSocket?.disconnect();
   }
 
   /// Dispose **all** sockets and release resources.
@@ -94,8 +93,10 @@ class WsService {
     _log.info('Disposing WS service');
     _userChatSocket?.dispose();
     _partnerChatSocket?.dispose();
+    _notificationSocket?.dispose();
     _userChatSocket = null;
     _partnerChatSocket = null;
+    _notificationSocket = null;
   }
 
   // ── Helpers ──────────────────────────────────────
@@ -107,8 +108,7 @@ class WsService {
   /// Falls back to [ApiService.accessToken] if the
   /// store value is empty.
   String _resolveAccessToken() {
-    final storeToken =
-        Store.tryGet(StoreKey.accessToken) ?? '';
+    final storeToken = Store.tryGet(StoreKey.accessToken) ?? '';
     if (storeToken.isNotEmpty) return storeToken;
     return _apiService.accessToken ?? '';
   }
@@ -121,15 +121,9 @@ class WsService {
   /// it and negotiates the namespace in the protocol
   /// handshake. The HTTP transport path is always the
   /// standard `/socket.io/`.
-  void _connectSocket(
-    WsNamespaceSocket socket,
-    ServicePrefix prefix,
-  ) {
-    if (socket.status ==
-        WsConnectionStatus.connected) {
-      _log.fine(
-        '${prefix.path} already connected',
-      );
+  void _connectSocket(WsNamespaceSocket socket, ServicePrefix prefix) {
+    if (socket.status == WsConnectionStatus.connected) {
+      _log.fine('${prefix.path} already connected');
       return;
     }
 
@@ -145,10 +139,7 @@ class WsService {
     }
 
     socket.connect(
-      server: (
-        url: '$baseUrl${prefix.path}',
-        path: '/socket.io/',
-      ),
+      server: (url: '$baseUrl${prefix.path}', path: '/socket.io/'),
       token: token,
     );
   }

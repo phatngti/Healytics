@@ -195,14 +195,19 @@ class FacilityImageEntity {
   final String label;
 }
 
-/// Basic clinic information.
+/// Basic clinic information embedded in the service
+/// details response.
 class ClinicEntity {
   const ClinicEntity({
+    required this.id,
     required this.name,
     required this.address,
     this.imageUrl = '',
   });
 
+  /// Stable partner identifier used to navigate to
+  /// the full clinic info screen.
+  final String id;
   final String name;
   final String address;
 

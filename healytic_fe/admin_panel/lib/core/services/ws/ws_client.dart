@@ -2,9 +2,10 @@
 // AUTO-GENERATED from ws-contract.json — DO NOT EDIT BY HAND.
 //
 // Re-generate with:
-//   ./bin/generate-open-api.sh ws
+//   ./bin/generate-integration.sh ws
 // =============================================================
 
+// ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'dart:async';
@@ -17,6 +18,14 @@ import 'ws_models.dart';
 
 export 'ws_events.dart';
 export 'ws_models.dart';
+
+Map<String, dynamic> _requireEventMap(dynamic value, String context) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) {
+    return Map<String, dynamic>.from(value);
+  }
+  throw FormatException('Expected JSON object for $context, got ${value.runtimeType}');
+}
 
 /// Suppresses verbose internal loggers from
 /// `socket_io_client` (Manager, engine, parser)
@@ -96,7 +105,7 @@ abstract interface class WsNamespaceSocket {
 ///   server: (url: gateway, path: '/partner-chat/socket.io/'),
 ///   token: token,
 /// );
-/// socket.onNewMessage.listen((msg) => print(msg));
+/// socket.onNewMessage.listen((event) => print(event));
 /// socket.sendMessage(WsSendMessagePayload(...));
 /// ```
 class PartnerChatSocket implements WsNamespaceSocket {
@@ -210,7 +219,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.newMessage, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.new_message');
         _newMessageController.add(WsNewMessageEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing new_message', e, st);
@@ -219,7 +228,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.messageSent, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.message_sent');
         _messageSentController.add(WsMessageSentAck.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing message_sent', e, st);
@@ -228,7 +237,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.messagesRead, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.messages_read');
         _messagesReadController.add(WsMessagesReadEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing messages_read', e, st);
@@ -237,7 +246,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.typing, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.typing');
         _typingController.add(WsTypingEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing typing', e, st);
@@ -246,7 +255,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.stopTyping, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.stop_typing');
         _stopTypingController.add(WsStopTypingEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing stop_typing', e, st);
@@ -255,7 +264,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.error, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.error');
         _errorController.add(WsErrorEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing error', e, st);
@@ -276,7 +285,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
       WsChatEvent.sendMessage,
       payload.toJson(),
       ack: (response) {
-        if (onAck != null && response is Map) {
+        if (onAck != null && response is Map<dynamic, dynamic>) {
           onAck(WsMessageSentAck.fromJson(
             Map<String, dynamic>.from(response),
           ));

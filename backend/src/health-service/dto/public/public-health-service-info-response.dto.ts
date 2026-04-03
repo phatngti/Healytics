@@ -27,6 +27,9 @@ class PublicCategoryDto {
 }
 
 class PublicClinicDto {
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  id: string;
+
   @ApiProperty({ example: 'Healytics Wellness Center' })
   name: string;
 
@@ -138,11 +141,13 @@ export class PublicHealthServiceInfoResponseDto {
       ].filter(Boolean);
 
       dto.clinic = {
+        id: partner.id,
         name: partner.brandName,
         address: addressParts.join(', '),
       };
     } else {
       dto.clinic = {
+        id: '',
         name: 'Healytics Wellness Center',
         address: '123 Health Street, District 1, Ho Chi Minh City',
       };

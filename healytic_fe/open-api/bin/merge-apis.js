@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Merge external OpenAPI spec files into the main user_apis.json / admin_apis.json.
+ * Merge ai_apis.json into both user_apis.json and admin_apis.json.
  *
  * Usage:
- *   node bin/merge-apis.js <source_file> <target_file>
- *
- * Examples:
- *   node bin/merge-apis.js ai_apis.json user_apis.json
- *   node bin/merge-apis.js ai_apis.json admin_apis.json
+ *   node bin/merge-apis.js
  */
 
 const fs = require('fs');
@@ -16,15 +12,10 @@ const path = require('path');
 
 const BASE_DIR = path.resolve(__dirname, '..');
 
-function main() {
-    const [sourceArg, targetArg] = process.argv.slice(2);
+const SOURCE_FILE = 'ai_apis.json';
+const TARGET_FILES = ['user_apis.json', 'admin_apis.json'];
 
-    if (!sourceArg || !targetArg) {
-        console.error('Usage: node bin/merge-apis.js <source_file> <target_file>');
-        console.error('Example: node bin/merge-apis.js ai_apis.json user_apis.json');
-        process.exit(1);
-    }
-
+function mergeInto(sourceArg, targetArg) {
     const sourcePath = path.resolve(BASE_DIR, sourceArg);
     const targetPath = path.resolve(BASE_DIR, targetArg);
 
@@ -105,6 +96,15 @@ function main() {
     console.log(`Merge complete: ${sourceArg} → ${targetArg}`);
     console.log(`  Paths:   ${addedPaths} added, ${skippedPaths} skipped`);
     console.log(`  Schemas: ${addedSchemas} added, ${skippedSchemas} skipped`);
+}
+
+function main() {
+    for (const targetFile of TARGET_FILES) {
+        console.log(`\n========================================`);
+        console.log(`Merging ${SOURCE_FILE} → ${targetFile}`);
+        console.log(`========================================`);
+        mergeInto(SOURCE_FILE, targetFile);
+    }
 }
 
 main();

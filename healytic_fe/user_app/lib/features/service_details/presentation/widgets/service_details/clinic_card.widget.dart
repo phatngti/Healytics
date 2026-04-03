@@ -3,17 +3,22 @@ import 'package:flutter/material.dart';
 
 /// Clinic info card with icon, name, address, favorite, and visit
 /// button.
+///
+/// The entire card is tappable via [onTap]. The visit
+/// button fires [onVisit] (or falls back to [onTap]).
 class ClinicCard extends StatelessWidget {
   const ClinicCard({
     super.key,
     required this.clinicName,
     required this.address,
+    this.onTap,
     this.onVisit,
     this.onFavorite,
   });
 
   final String clinicName;
   final String address;
+  final VoidCallback? onTap;
   final VoidCallback? onVisit;
   final VoidCallback? onFavorite;
 
@@ -24,125 +29,133 @@ class ClinicCard extends StatelessWidget {
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.only(
-        top: AppDimens.spaceSm,
-        bottom: AppDimens.spaceSm,
-      ),
-      decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.surfaceContainerHighest
-            : colorScheme.surface,
+    return Material(
+      color: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surface,
+      borderRadius: AppDimens.radiusMedium,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: AppDimens.radiusMedium,
-        border: Border.all(
-          color: isDark
-              ? colorScheme.outlineVariant
-              : colorScheme.outlineVariant.withValues(alpha: 0.3),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.only(
+            top: AppDimens.spaceSm,
+            bottom: AppDimens.spaceSm,
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Clinic icon
-                Container(
-                  width: AppDimens.touchTarget,
-                  height: AppDimens.touchTarget,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.4),
-                    borderRadius: AppDimens.radiusSmall,
-                  ),
-                  child: Icon(Icons.local_hospital, color: colorScheme.primary),
-                ),
-                AppDimens.horizontalSmall,
-                // Name + address
-                Flexible(
-                  child: Container(
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.sizeOf(context).width * 0.35,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          clinicName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        AppDimens.verticalExtraSmall,
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              size: AppDimens.iconXs,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            AppDimens.horizontalExtraSmall,
-                            Expanded(
-                              child: Text(
-                                address,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+          decoration: BoxDecoration(
+            borderRadius: AppDimens.radiusMedium,
+            border: Border.all(
+              color: isDark
+                  ? colorScheme.outlineVariant
+                  : colorScheme.outlineVariant.withValues(alpha: 0.3),
             ),
-          ),
-
-          // Actions
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Favorite
-              _ActionIcon(icon: Icons.favorite_border, onTap: onFavorite),
-              AppDimens.horizontalSmall,
-              // Visit button
-              Material(
-                color: colorScheme.primary,
-                borderRadius: AppDimens.radiusSmall,
-                child: InkWell(
-                  onTap: onVisit,
-                  borderRadius: AppDimens.radiusSmall,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimens.spaceLg,
-                      vertical: AppDimens.spaceSm,
-                    ),
-                    child: Text(
-                      'Visit',
-                      style: textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-        ],
+          child: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Clinic icon
+                    Container(
+                      width: AppDimens.touchTarget,
+                      height: AppDimens.touchTarget,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withValues(alpha: 0.4),
+                        borderRadius: AppDimens.radiusSmall,
+                      ),
+                      child: Icon(
+                        Icons.local_hospital,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                    AppDimens.horizontalSmall,
+                    // Name + address
+                    Flexible(
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.sizeOf(context).width * 0.35,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              clinicName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            AppDimens.verticalExtraSmall,
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  size: AppDimens.iconXs,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                                AppDimens.horizontalExtraSmall,
+                                Expanded(
+                                  child: Text(
+                                    address,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: textTheme.labelSmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Actions
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Favorite
+                  _ActionIcon(icon: Icons.favorite_border, onTap: onFavorite),
+                  AppDimens.horizontalSmall,
+                  // Visit button
+                  Material(
+                    color: colorScheme.primary,
+                    borderRadius: AppDimens.radiusSmall,
+                    child: InkWell(
+                      onTap: onVisit ?? onTap,
+                      borderRadius: AppDimens.radiusSmall,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimens.spaceLg,
+                          vertical: AppDimens.spaceSm,
+                        ),
+                        child: Text(
+                          'Visit',
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
