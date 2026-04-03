@@ -96,18 +96,21 @@ class AppointmentRemoteDatasourceImpl implements AppointmentRemoteDatasource {
     return AppointmentEntity(
       id: dto.id,
       serviceName: dto.serviceName,
-      vendorName: dto.vendorName,
+      healthPartnerName: dto.healthPartnerName,
+      healthPartnerId: _parseString(dto.healthPartnerId)!,
       imageUrl: dto.imageUrl,
       status: dto.status.value.toLowerCase(),
       category: dto.category,
-      providerName: dto.providerName,
-      providerId: dto.providerId,
+      specialistName: dto.specialistName,
+      specialistId: dto.specialistId,
+      serviceId: _parseString(dto.serviceId),
       address: dto.address,
       date: DateTime.tryParse(dto.date) ?? DateTime.now(),
       checkInTime: dto.checkInTime,
       checkOutTime: dto.checkOutTime,
       duration: dto.duration,
       distanceKm: _parseDistance(dto.distanceKm),
+      isReviewed: dto.isReviewed,
     );
   }
 
@@ -130,6 +133,13 @@ class AppointmentRemoteDatasourceImpl implements AppointmentRemoteDatasource {
       price: dto.price,
       duration: dto.duration,
     );
+  }
+
+  /// Defensively converts a DTO [Object?]
+  /// field into a [String?].
+  String? _parseString(Object? raw) {
+    if (raw == null) return null;
+    return raw.toString();
   }
 
   /// Defensively converts the DTO's [Object?]

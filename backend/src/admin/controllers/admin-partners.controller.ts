@@ -40,20 +40,26 @@ import { LogResponse } from '@/common/interceptors/response.interceptor';
 @AdminApi('partners')
 @UseInterceptors(AuditInterceptor)
 export class AdminPartnersController {
-  constructor(
-    private readonly adminPartnersService: AdminPartnersService,
-  ) {}
+  constructor(private readonly adminPartnersService: AdminPartnersService) {}
 
   @Get()
   @ApiOperation({ summary: 'List all partners' })
-  @ApiOkResponse({ description: 'List of partners.', type: PartnersResponseDto })
-  async getPartners(@Query() query: GetPartnersQueryDto): Promise<PartnersResponseDto> {
+  @ApiOkResponse({
+    description: 'List of partners.',
+    type: PartnersResponseDto,
+  })
+  async getPartners(
+    @Query() query: GetPartnersQueryDto,
+  ): Promise<PartnersResponseDto> {
     return this.adminPartnersService.getPartners(query);
   }
 
   @Get('total')
   @ApiOperation({ summary: 'Get total number of partners' })
-  @ApiOkResponse({ description: 'Total partner count.', type: TotalPartnersResponseDto })
+  @ApiOkResponse({
+    description: 'Total partner count.',
+    type: TotalPartnersResponseDto,
+  })
   async getTotalPartners(): Promise<TotalPartnersResponseDto> {
     return this.adminPartnersService.getTotalPartners();
   }
@@ -61,7 +67,10 @@ export class AdminPartnersController {
   @Get(':id')
   @ApiOperation({ summary: 'Get partner details including documents' })
   @ApiParam({ name: 'id', description: 'Partner ID' })
-  @ApiOkResponse({ description: 'Partner detail with verification data.', type: AdminPartnerDetailResponseDto })
+  @ApiOkResponse({
+    description: 'Partner detail with verification data.',
+    type: AdminPartnerDetailResponseDto,
+  })
   @ApiNotFoundResponse({ description: 'Partner not found.' })
   async getPartnerDetail(
     @Param('id', ParseUUIDPipe) id: string,
@@ -75,7 +84,10 @@ export class AdminPartnersController {
   @Audit('PARTNER_REVIEW', 'Partner')
   @ApiOperation({ summary: 'Review partner profile' })
   @ApiParam({ name: 'id', description: 'Partner ID' })
-  @ApiOkResponse({ description: 'Review submitted.', type: ReviewPartnerResponseDto })
+  @ApiOkResponse({
+    description: 'Review submitted.',
+    type: ReviewPartnerResponseDto,
+  })
   @ApiNotFoundResponse({ description: 'Partner not found.' })
   @ApiBadRequestResponse({ description: 'Partner is not in PENDING state.' })
   async reviewPartner(

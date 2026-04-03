@@ -42,7 +42,6 @@ export class CreatePartnerHealthServiceMediaDto {
   sortOrder?: number;
 }
 
-
 export class CreatePartnerHealthServiceDefinitionDto {
   @ApiProperty({ example: 60, description: 'Duration in minutes' })
   @IsNumber()
@@ -68,7 +67,10 @@ export class CreatePartnerHealthServiceDefinitionDto {
   @Min(0)
   minLeadTimeHours?: number;
 
-  @ApiPropertyOptional({ enum: StaffAssignmentType, example: StaffAssignmentType.ANY })
+  @ApiPropertyOptional({
+    enum: StaffAssignmentType,
+    example: StaffAssignmentType.ANY,
+  })
   @IsEnum(StaffAssignmentType)
   @IsOptional()
   staffAssignmentType?: StaffAssignmentType;
@@ -127,7 +129,10 @@ export class ProcedureStepInputDto {
 }
 
 export class ServiceManualInputDto {
-  @ApiPropertyOptional({ type: [String], example: ['Avoid heavy meals', 'Wear comfortable clothing'] })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['Avoid heavy meals', 'Wear comfortable clothing'],
+  })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
@@ -150,8 +155,6 @@ export class ServiceManualInputDto {
 
 // Main DTO
 export class CreatePartnerHealthServiceDto {
-
-
   @ApiPropertyOptional({ example: 'uuid-category-id' })
   @IsUUID()
   @IsOptional()
@@ -197,7 +200,10 @@ export class CreatePartnerHealthServiceDto {
   @MaxLength(3)
   currency?: string;
 
-  @ApiPropertyOptional({ enum: HealthServiceStatus, example: HealthServiceStatus.DRAFT })
+  @ApiPropertyOptional({
+    enum: HealthServiceStatus,
+    example: HealthServiceStatus.DRAFT,
+  })
   @IsEnum(HealthServiceStatus)
   @IsOptional()
   status?: HealthServiceStatus;
@@ -214,27 +220,39 @@ export class CreatePartnerHealthServiceDto {
   employeeIds?: string[];
 
   // Nested objects
-  @ApiPropertyOptional({ type: [CreatePartnerHealthServiceMediaDto], description: 'Product media (images/videos)' })
+  @ApiPropertyOptional({
+    type: [CreatePartnerHealthServiceMediaDto],
+    description: 'Product media (images/videos)',
+  })
   @IsArray()
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreatePartnerHealthServiceMediaDto)
   media?: CreatePartnerHealthServiceMediaDto[];
 
-  @ApiPropertyOptional({ type: CreatePartnerHealthServiceDefinitionDto, description: 'Product definition (required if type is service)' })
+  @ApiPropertyOptional({
+    type: CreatePartnerHealthServiceDefinitionDto,
+    description: 'Product definition (required if type is service)',
+  })
   @IsOptional()
   @ValidateNested()
   @Type(() => CreatePartnerHealthServiceDefinitionDto)
   productDefinition?: CreatePartnerHealthServiceDefinitionDto;
 
-  @ApiPropertyOptional({ type: [CreatePartnerHealthServiceFacilityImageDto], description: 'Facility/clinic images' })
+  @ApiPropertyOptional({
+    type: [CreatePartnerHealthServiceFacilityImageDto],
+    description: 'Facility/clinic images',
+  })
   @IsArray()
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreatePartnerHealthServiceFacilityImageDto)
   facilityImages?: CreatePartnerHealthServiceFacilityImageDto[];
 
-  @ApiPropertyOptional({ type: ServiceManualInputDto, description: 'Service manual (guidelines, rules, procedure steps)' })
+  @ApiPropertyOptional({
+    type: ServiceManualInputDto,
+    description: 'Service manual (guidelines, rules, procedure steps)',
+  })
   @IsOptional()
   @ValidateNested()
   @Type(() => ServiceManualInputDto)

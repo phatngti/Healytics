@@ -105,7 +105,11 @@ export class PublicHealthServiceCardResponseDto {
     ratingsMap?: Map<string, { rating: number; count: number }>,
   ): PublicHealthServiceCardResponseDto[] {
     return products.map((p) =>
-      PublicHealthServiceCardResponseDto.fromEntity(p, partner, ratingsMap?.get(p.id)?.rating),
+      PublicHealthServiceCardResponseDto.fromEntity(
+        p,
+        partner,
+        ratingsMap?.get(p.id)?.rating,
+      ),
     );
   }
 }

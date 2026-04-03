@@ -15,11 +15,17 @@ export class FeaturedSpecialistResponseDto {
   name: string;
 
   @Expose()
-  @ApiProperty({ description: 'Short specialty label', example: 'Spa Therapist' })
+  @ApiProperty({
+    description: 'Short specialty label',
+    example: 'Spa Therapist',
+  })
   specialty: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Profile image URL (nullable)', nullable: true })
+  @ApiPropertyOptional({
+    description: 'Profile image URL (nullable)',
+    nullable: true,
+  })
   avatarUrl: string | null;
 
   @Expose()
@@ -31,7 +37,10 @@ export class FeaturedSpecialistResponseDto {
   soldCount: number;
 
   @Expose()
-  @ApiProperty({ description: 'Associated clinic name', example: 'Healytics Spa & Wellness' })
+  @ApiProperty({
+    description: 'Associated clinic name',
+    example: 'Healytics Spa & Wellness',
+  })
   clinicName: string;
 
   /**

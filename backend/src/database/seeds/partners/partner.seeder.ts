@@ -44,7 +44,7 @@ interface SeedDocument {
 interface SeedAddress {
   provinceCode: string; // Official VN administrative code (e.g. "79" for HCMC)
   districtCode: string; // e.g. "760" for District 1
-  wardCode: string;     // e.g. "26734" for Bến Nghé ward
+  wardCode: string; // e.g. "26734" for Bến Nghé ward
 }
 
 interface SeedPartner {
@@ -96,14 +96,16 @@ const SEED_PARTNERS: SeedPartner[] = [
     documents: [
       {
         documentKey: 'partners/0123456789/business-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/0123456789/business-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/0123456789/business-license.pdf',
         type: DocumentTypes.BUSINESS_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.ACCEPTED,
       },
       {
         documentKey: 'partners/0123456789/id-front.jpg',
-        fileUrl: 'https://storage.healytics.vn/partners/0123456789/id-front.jpg',
+        fileUrl:
+          'https://storage.healytics.vn/partners/0123456789/id-front.jpg',
         type: DocumentTypes.IDENTITY_FRONT,
         fileType: DocumentFileTypes.IMAGE,
         status: PartnerDocumentStatuses.ACCEPTED,
@@ -141,21 +143,24 @@ const SEED_PARTNERS: SeedPartner[] = [
     documents: [
       {
         documentKey: 'partners/0987654321/business-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/0987654321/business-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/0987654321/business-license.pdf',
         type: DocumentTypes.BUSINESS_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.ACCEPTED,
       },
       {
         documentKey: 'partners/0987654321/kcb-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/0987654321/kcb-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/0987654321/kcb-license.pdf',
         type: DocumentTypes.KCB_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.ACCEPTED,
       },
       {
         documentKey: 'partners/0987654321/rhm-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/0987654321/rhm-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/0987654321/rhm-license.pdf',
         type: DocumentTypes.RHM_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.ACCEPTED,
@@ -186,14 +191,16 @@ const SEED_PARTNERS: SeedPartner[] = [
     documents: [
       {
         documentKey: 'partners/1122334455/business-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/1122334455/business-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/1122334455/business-license.pdf',
         type: DocumentTypes.BUSINESS_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.REJECTED,
       },
       {
         documentKey: 'partners/1122334455/id-front.jpg',
-        fileUrl: 'https://storage.healytics.vn/partners/1122334455/id-front.jpg',
+        fileUrl:
+          'https://storage.healytics.vn/partners/1122334455/id-front.jpg',
         type: DocumentTypes.IDENTITY_FRONT,
         fileType: DocumentFileTypes.IMAGE,
         status: PartnerDocumentStatuses.ACCEPTED,
@@ -224,7 +231,8 @@ const SEED_PARTNERS: SeedPartner[] = [
     documents: [
       {
         documentKey: 'partners/5566778899/business-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/5566778899/business-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/5566778899/business-license.pdf',
         type: DocumentTypes.BUSINESS_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.ACCEPTED,
@@ -238,7 +246,8 @@ const SEED_PARTNERS: SeedPartner[] = [
       },
       {
         documentKey: 'partners/5566778899/id-front.jpg',
-        fileUrl: 'https://storage.healytics.vn/partners/5566778899/id-front.jpg',
+        fileUrl:
+          'https://storage.healytics.vn/partners/5566778899/id-front.jpg',
         type: DocumentTypes.IDENTITY_FRONT,
         fileType: DocumentFileTypes.IMAGE,
         status: PartnerDocumentStatuses.ACCEPTED,
@@ -275,14 +284,16 @@ const SEED_PARTNERS: SeedPartner[] = [
     documents: [
       {
         documentKey: 'partners/6677889900/business-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/6677889900/business-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/6677889900/business-license.pdf',
         type: DocumentTypes.BUSINESS_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.ACCEPTED,
       },
       {
         documentKey: 'partners/6677889900/yhct-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/6677889900/yhct-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/6677889900/yhct-license.pdf',
         type: DocumentTypes.YHCT_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.ACCEPTED,
@@ -296,7 +307,11 @@ const SEED_PARTNERS: SeedPartner[] = [
     taxCode: '7788990011',
     legalName: 'MindSkin Wellness Center',
     brandName: 'MindSkin Clinic',
-    businessType: [BusinessType.DERMATOLOGY, BusinessType.PSYCHOLOGY, BusinessType.PSYCHIATRY],
+    businessType: [
+      BusinessType.DERMATOLOGY,
+      BusinessType.PSYCHOLOGY,
+      BusinessType.PSYCHIATRY,
+    ],
     streetAddress: '55 Nguyen Dinh Chieu',
     phoneNumber: '0286789012',
     verificationStatus: PartnerVerificationStatus.APPROVED,
@@ -313,28 +328,32 @@ const SEED_PARTNERS: SeedPartner[] = [
     documents: [
       {
         documentKey: 'partners/7788990011/business-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/7788990011/business-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/7788990011/business-license.pdf',
         type: DocumentTypes.BUSINESS_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.ACCEPTED,
       },
       {
         documentKey: 'partners/7788990011/dermatology-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/7788990011/dermatology-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/7788990011/dermatology-license.pdf',
         type: DocumentTypes.DERMATOLOGY_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.ACCEPTED,
       },
       {
         documentKey: 'partners/7788990011/psychology-license.pdf',
-        fileUrl: 'https://storage.healytics.vn/partners/7788990011/psychology-license.pdf',
+        fileUrl:
+          'https://storage.healytics.vn/partners/7788990011/psychology-license.pdf',
         type: DocumentTypes.PSYCHOLOGY_LICENSE,
         fileType: DocumentFileTypes.PDF,
         status: PartnerDocumentStatuses.ACCEPTED,
       },
       {
         documentKey: 'partners/7788990011/id-front.jpg',
-        fileUrl: 'https://storage.healytics.vn/partners/7788990011/id-front.jpg',
+        fileUrl:
+          'https://storage.healytics.vn/partners/7788990011/id-front.jpg',
         type: DocumentTypes.IDENTITY_FRONT,
         fileType: DocumentFileTypes.IMAGE,
         status: PartnerDocumentStatuses.ACCEPTED,
@@ -381,10 +400,15 @@ export class PartnerSeeder implements ISeeder {
    * Resolve a Location record by its official administrative code.
    * Returns null (with a warning) if the code is not found.
    */
-  private async resolveLocationByCode(code: string, label: string): Promise<string | null> {
+  private async resolveLocationByCode(
+    code: string,
+    label: string,
+  ): Promise<string | null> {
     const location = await this.locationRepo.findOne({ where: { code } });
     if (!location) {
-      this.logger.warn(`  ⚠ Location ${label} with code "${code}" not found — setting to null. Ensure location seed data is loaded.`);
+      this.logger.warn(
+        `  ⚠ Location ${label} with code "${code}" not found — setting to null. Ensure location seed data is loaded.`,
+      );
       return null;
     }
     return location.id;
@@ -399,7 +423,9 @@ export class PartnerSeeder implements ISeeder {
       });
 
       if (exists) {
-        this.logger.log(`  ⏭ Partner "${partnerData.taxCode}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ Partner "${partnerData.taxCode}" already exists, skipping`,
+        );
         continue;
       }
 
@@ -494,7 +520,7 @@ export class PartnerSeeder implements ISeeder {
 
       this.logger.log(
         `  ✅ Created partner "${partnerData.brandName}" (${partnerData.taxCode}) ` +
-        `[status: ${partnerData.verificationStatus}, docs: ${partnerData.documents.length}, coords: ${partnerData.coordinates ?? 'none'}]`,
+          `[status: ${partnerData.verificationStatus}, docs: ${partnerData.documents.length}, coords: ${partnerData.coordinates ?? 'none'}]`,
       );
     }
 
@@ -505,11 +531,15 @@ export class PartnerSeeder implements ISeeder {
     const taxCodes = SEED_PARTNERS.map((p) => p.taxCode);
 
     // Documents and legal representatives are cascade-deleted via FK
-    const { affected } = await this.partnerRepo.delete({ taxCode: In(taxCodes) });
+    const { affected } = await this.partnerRepo.delete({
+      taxCode: In(taxCodes),
+    });
     if (!affected) {
       this.logger.warn('⚠ No seed partners found to delete');
     } else {
-      this.logger.log(`🗑️ Hard-deleted ${affected} seed partner(s) (with cascaded docs & legal reps)`);
+      this.logger.log(
+        `🗑️ Hard-deleted ${affected} seed partner(s) (with cascaded docs & legal reps)`,
+      );
     }
   }
 }

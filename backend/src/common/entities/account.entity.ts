@@ -32,7 +32,12 @@ export class Account {
   @Column({ name: 'password_hash', nullable: true })
   passwordHash?: string;
 
-  @Column({ name: 'refresh_token_hash', type: 'text', nullable: true, select: false })
+  @Column({
+    name: 'refresh_token_hash',
+    type: 'text',
+    nullable: true,
+    select: false,
+  })
   refreshTokenHash: string | null;
 
   @Column({ type: 'enum', enum: Role, default: Role.USER })

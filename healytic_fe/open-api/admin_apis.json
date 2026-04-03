@@ -3478,6 +3478,804 @@
           }
         ]
       }
+    },
+    "/user/chat/conversations": {
+      "get": {
+        "operationId": "UserChatController_getConversations",
+        "summary": "List all conversations for the current user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConversationResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "UserChatController_createConversation",
+        "summary": "Create a new conversation with a health partner",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConversationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/chat/conversations/{id}/messages": {
+      "get": {
+        "operationId": "UserChatController_getMessages",
+        "summary": "Get message history for a conversation (cursor-paginated)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "beforeId",
+            "required": false,
+            "in": "query",
+            "description": "Fetch messages older than this message ID (cursor)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of messages to return (max 50)",
+            "schema": {
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated message list with hasMore flag"
+          },
+          "404": {
+            "description": "Conversation not found or not a participant"
+          }
+        },
+        "tags": [
+          "User Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/chat/conversations/{id}/read": {
+      "post": {
+        "operationId": "UserChatController_markRead",
+        "summary": "Mark all messages in a conversation as read",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/chat/conversations": {
+      "get": {
+        "operationId": "PartnerChatController_getConversations",
+        "summary": "List all conversations for the current partner",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConversationResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "PartnerChatController_createConversation",
+        "summary": "Create a new conversation with a user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConversationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/chat/conversations/{id}/messages": {
+      "get": {
+        "operationId": "PartnerChatController_getMessages",
+        "summary": "Get message history for a conversation (cursor-paginated)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "beforeId",
+            "required": false,
+            "in": "query",
+            "description": "Fetch messages older than this message ID (cursor)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of messages to return (max 50)",
+            "schema": {
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated message list with hasMore flag"
+          },
+          "404": {
+            "description": "Conversation not found or not a participant"
+          }
+        },
+        "tags": [
+          "Partner Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/chat/conversations/{id}/read": {
+      "post": {
+        "operationId": "PartnerChatController_markRead",
+        "summary": "Mark all messages in a conversation as read",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Partner Chat"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/notifications": {
+      "get": {
+        "operationId": "UserNotificationController_getNotifications",
+        "summary": "Get user notifications (paginated, cursor-based)",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of notifications to return",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor: fetch notifications before this ID (for pagination)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by notification type",
+            "schema": {
+              "enum": [
+                "booking_confirmed",
+                "booking_cancelled",
+                "booking_completed",
+                "appointment_reminder",
+                "appointment_updated",
+                "new_chat_message",
+                "payment_success",
+                "payment_failed",
+                "system_broadcast",
+                "system_maintenance",
+                "partner_verified",
+                "partner_rejected"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "isRead",
+            "required": false,
+            "in": "query",
+            "description": "Filter by read status",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of notifications"
+          }
+        },
+        "tags": [
+          "User Notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/notifications/unread-count": {
+      "get": {
+        "operationId": "UserNotificationController_getUnreadCount",
+        "summary": "Get unread notification count",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The current unread notification count"
+          }
+        },
+        "tags": [
+          "User Notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/notifications/{id}/read": {
+      "patch": {
+        "operationId": "UserNotificationController_markRead",
+        "summary": "Mark a specific notification as read",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Notification marked as read"
+          }
+        },
+        "tags": [
+          "User Notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/notifications/read-all": {
+      "patch": {
+        "operationId": "UserNotificationController_markAllRead",
+        "summary": "Mark all notifications as read",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Number of notifications marked as read"
+          }
+        },
+        "tags": [
+          "User Notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/notifications/broadcast": {
+      "post": {
+        "operationId": "AdminNotificationController_createBroadcast",
+        "summary": "Create and send a system-wide broadcast notification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBroadcastDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Broadcast created and pushed to all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/notifications/broadcasts": {
+      "get": {
+        "operationId": "AdminNotificationController_getBroadcasts",
+        "summary": "List sent broadcast notifications (audit)",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of broadcast notifications",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Notifications"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/devices": {
+      "post": {
+        "operationId": "UserDeviceController_registerDevice",
+        "summary": "Register a device token for push notifications",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDeviceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Device token registered"
+          }
+        },
+        "tags": [
+          "User Devices"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/devices/{token}": {
+      "delete": {
+        "operationId": "UserDeviceController_unregisterDevice",
+        "summary": "Unregister a device token (e.g. on logout)",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Device token unregistered"
+          }
+        },
+        "tags": [
+          "User Devices"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/generative_ai/stream": {
+      "post": {
+        "tags": [
+          "Chatbot"
+        ],
+        "summary": "Generative Ai Stream",
+        "operationId": "generative_ai_stream_generative_ai_stream_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatbotRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chatbot/conversations": {
+      "get": {
+        "tags": [
+          "Chatbot"
+        ],
+        "summary": "Get Conversations",
+        "operationId": "get_conversations_chatbot_conversations_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationsPageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chatbot/conversations/{conversation_id}/messages": {
+      "get": {
+        "tags": [
+          "Chatbot"
+        ],
+        "summary": "Get Messages",
+        "operationId": "get_messages_chatbot_conversations__conversation_id__messages_get",
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesPageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommender/home": {
+      "post": {
+        "tags": [
+          "Recommender"
+        ],
+        "summary": "Recommend Home",
+        "description": "Home recommender (non-stream).",
+        "operationId": "recommend_home_recommender_home_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HomeRecommenderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommender/chatbot": {
+      "post": {
+        "tags": [
+          "Recommender"
+        ],
+        "summary": "Recommend Chatbot",
+        "description": "Chatbot recommender (non-stream).",
+        "operationId": "recommend_chatbot_recommender_chatbot_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatbotRecommenderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatbotRecommendationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "info": {
@@ -4137,7 +4935,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-03-29T15:48:42.117Z"
+              "submittedAt": "2026-04-01T16:25:25.723Z"
             }
           }
         },
@@ -7515,51 +8313,6 @@
           "label"
         ]
       },
-      "CreatePartnerHealthServiceReviewDto": {
-        "type": "object",
-        "properties": {
-          "reviewerName": {
-            "type": "string",
-            "example": "John Smith"
-          },
-          "avatarUrl": {
-            "type": "string",
-            "example": "https://example.com/avatar.jpg"
-          },
-          "rating": {
-            "type": "number",
-            "example": 5,
-            "description": "Rating from 1 to 5"
-          },
-          "status": {
-            "type": "string",
-            "example": "Completed"
-          },
-          "date": {
-            "type": "string",
-            "example": "2025-05-11"
-          },
-          "text": {
-            "type": "string",
-            "example": "Excellent service and amazing results!"
-          },
-          "imageUrls": {
-            "example": [
-              "https://example.com/review-img.jpg"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "reviewerName",
-          "rating",
-          "date",
-          "text"
-        ]
-      },
       "ServiceRuleInputDto": {
         "type": "object",
         "properties": {
@@ -7714,13 +8467,6 @@
               "$ref": "#/components/schemas/CreatePartnerHealthServiceFacilityImageDto"
             }
           },
-          "reviews": {
-            "description": "Product reviews",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreatePartnerHealthServiceReviewDto"
-            }
-          },
           "serviceManual": {
             "description": "Service manual (guidelines, rules, procedure steps)",
             "allOf": [
@@ -7817,13 +8563,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CreatePartnerHealthServiceFacilityImageDto"
-            }
-          },
-          "reviews": {
-            "description": "Product reviews",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreatePartnerHealthServiceReviewDto"
             }
           },
           "serviceManual": {
@@ -8358,41 +9097,58 @@
       "PublicHealthServiceReviewResponseDto": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
           "reviewerName": {
-            "type": "string"
+            "type": "string",
+            "example": "Nguyen Van A"
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "object",
+            "example": "https://example.com/avatar.jpg"
           },
           "rating": {
             "type": "number",
             "example": 5
           },
-          "status": {
-            "type": "string",
-            "example": "Completed"
+          "comment": {
+            "type": "object",
+            "example": "Great session, very relaxing atmosphere."
           },
-          "date": {
-            "type": "string",
-            "example": "2025-05-11T00:00:00.000Z"
-          },
-          "text": {
-            "type": "string"
-          },
-          "imageUrls": {
+          "tags": {
+            "example": [
+              "On-time",
+              "Relaxing",
+              "Clean"
+            ],
             "type": "array",
             "items": {
               "type": "string"
             }
+          },
+          "photoUrls": {
+            "example": [
+              "https://cdn.healytics.com/reviews/photo1.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-03-29T13:00:00.000Z"
           }
         },
         "required": [
+          "id",
           "reviewerName",
           "rating",
-          "status",
-          "date",
-          "text",
-          "imageUrls"
+          "tags",
+          "photoUrls",
+          "createdAt"
         ]
       },
       "PublicHealthServiceRecommendedResponseDto": {
@@ -9255,7 +10011,7 @@
             "type": "string",
             "example": "Thai Massage"
           },
-          "vendorName": {
+          "healthPartnerName": {
             "type": "string",
             "example": "Healytics Spa Center"
           },
@@ -9276,11 +10032,11 @@
             "type": "string",
             "example": "Spa & Wellness"
           },
-          "providerName": {
+          "specialistName": {
             "type": "string",
             "example": "Dr. Jane Smith"
           },
-          "providerId": {
+          "specialistId": {
             "type": "string",
             "example": "550e8400-e29b-41d4-a716-446655440000"
           },
@@ -9314,24 +10070,38 @@
             "example": 2.5,
             "nullable": true,
             "description": "Distance from user to clinic in kilometers (null if coordinates not provided)"
+          },
+          "healthPartnerId": {
+            "type": "object",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "nullable": true,
+            "description": "Account ID of the health partner (vendor). Used for chat."
+          },
+          "serviceId": {
+            "type": "object",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "nullable": true,
+            "description": "Product/service ID for navigation to service details."
           }
         },
         "required": [
           "id",
           "serviceName",
-          "vendorName",
+          "healthPartnerName",
           "imageUrl",
           "status",
           "category",
-          "providerName",
-          "providerId",
+          "specialistName",
+          "specialistId",
           "address",
           "date",
           "checkInTime",
           "checkOutTime",
           "duration",
           "isReviewed",
-          "distanceKm"
+          "distanceKm",
+          "healthPartnerId",
+          "serviceId"
         ]
       },
       "AppointmentCategoryResponseDto": {
@@ -9927,6 +10697,686 @@
       "MoMoRefundResponseDto": {
         "type": "object",
         "properties": {}
+      },
+      "ParticipantInfoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role"
+        ]
+      },
+      "LastMessageDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "senderId": {
+            "type": "string"
+          }
+        }
+      },
+      "ConversationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "archived",
+              "closed"
+            ]
+          },
+          "bookingId": {
+            "type": "string"
+          },
+          "otherParticipant": {
+            "$ref": "#/components/schemas/ParticipantInfoDto"
+          },
+          "lastMessage": {
+            "$ref": "#/components/schemas/LastMessageDto"
+          },
+          "unreadCount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "otherParticipant",
+          "lastMessage",
+          "unreadCount",
+          "createdAt"
+        ]
+      },
+      "CreateConversationDto": {
+        "type": "object",
+        "properties": {
+          "healthPartnerId": {
+            "type": "string",
+            "description": "Account ID of the health partner"
+          },
+          "bookingId": {
+            "type": "string",
+            "description": "Optional booking context for the conversation"
+          },
+          "initialMessage": {
+            "type": "string",
+            "description": "Optional first message to start the conversation"
+          }
+        },
+        "required": [
+          "healthPartnerId"
+        ]
+      },
+      "CreateBroadcastDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Broadcast title",
+            "example": "System Maintenance Notice"
+          },
+          "body": {
+            "type": "string",
+            "description": "Broadcast body text",
+            "example": "The platform will undergo scheduled maintenance on April 5th from 2:00 AM to 4:00 AM."
+          },
+          "data": {
+            "type": "object",
+            "description": "Optional deep-link data for frontend routing",
+            "example": {
+              "action": "open_announcements"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "body"
+        ]
+      },
+      "NotificationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Notification UUID"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "booking_confirmed",
+              "booking_cancelled",
+              "booking_completed",
+              "appointment_reminder",
+              "appointment_updated",
+              "new_chat_message",
+              "payment_success",
+              "payment_failed",
+              "system_broadcast",
+              "system_maintenance",
+              "partner_verified",
+              "partner_rejected"
+            ],
+            "description": "The type of notification"
+          },
+          "title": {
+            "type": "string",
+            "description": "Notification title"
+          },
+          "body": {
+            "type": "string",
+            "description": "Notification body text"
+          },
+          "data": {
+            "type": "object",
+            "description": "Deep-link data for frontend routing"
+          },
+          "isRead": {
+            "type": "boolean",
+            "description": "Whether the notification has been read"
+          },
+          "readAt": {
+            "type": "object",
+            "description": "When the notification was read"
+          },
+          "isBroadcast": {
+            "type": "boolean",
+            "description": "Whether this is a system-wide broadcast"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "When the notification was created"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "title",
+          "body",
+          "isRead",
+          "isBroadcast",
+          "createdAt"
+        ]
+      },
+      "RegisterDeviceDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "FCM or APNs device token",
+            "example": "fMv7B4Yp...long_token_string"
+          },
+          "platform": {
+            "type": "string",
+            "description": "Device platform",
+            "enum": [
+              "ios",
+              "android"
+            ],
+            "example": "android"
+          }
+        },
+        "required": [
+          "token",
+          "platform"
+        ]
+      },
+      "ChatbotRecommendationResponse": {
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "title": "Conversation Id"
+          },
+          "recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceDetail"
+            },
+            "type": "array",
+            "title": "Recommendations"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "conversation_id",
+          "recommendations",
+          "total",
+          "timestamp"
+        ],
+        "title": "ChatbotRecommendationResponse"
+      },
+      "ChatbotRecommenderRequest": {
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "title": "Conversation Id"
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Query"
+          },
+          "top_k": {
+            "type": "integer",
+            "maximum": 20,
+            "minimum": 1,
+            "title": "Top K",
+            "default": 3
+          },
+          "filtered_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filtered Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "conversation_id",
+          "query"
+        ],
+        "title": "ChatbotRecommenderRequest"
+      },
+      "ChatbotRequest": {
+        "properties": {
+          "conversation_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Message"
+          },
+          "top_k": {
+            "type": "integer",
+            "maximum": 20,
+            "minimum": 1,
+            "title": "Top K",
+            "default": 3
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "message"
+        ],
+        "title": "ChatbotRequest",
+        "description": "POST /generative_ai/stream"
+      },
+      "ConversationResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "userId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Userid"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "userId",
+          "title",
+          "createdAt",
+          "updatedAt"
+        ],
+        "title": "ConversationResponse"
+      },
+      "ConversationsPageResponse": {
+        "properties": {
+          "conversations": {
+            "items": {
+              "$ref": "#/components/schemas/ConversationResponse"
+            },
+            "type": "array",
+            "title": "Conversations"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "conversations",
+          "meta"
+        ],
+        "title": "ConversationsPageResponse"
+      },
+      "HomeRecommenderRequest": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "top_k": {
+            "type": "integer",
+            "maximum": 20,
+            "minimum": 1,
+            "title": "Top K",
+            "default": 5
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "HomeRecommenderRequest"
+      },
+      "LocationInfo": {
+        "properties": {
+          "address": {
+            "type": "string",
+            "title": "Address"
+          },
+          "district": {
+            "type": "string",
+            "title": "District"
+          },
+          "city": {
+            "type": "string",
+            "title": "City"
+          }
+        },
+        "type": "object",
+        "required": [
+          "address",
+          "district",
+          "city"
+        ],
+        "title": "LocationInfo"
+      },
+      "MessageResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "conversationId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Conversationid"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "conversationId",
+          "role",
+          "content",
+          "createdAt"
+        ],
+        "title": "MessageResponse"
+      },
+      "MessagesPageResponse": {
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/MessageResponse"
+            },
+            "type": "array",
+            "title": "Messages"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        },
+        "type": "object",
+        "required": [
+          "messages",
+          "meta"
+        ],
+        "title": "MessagesPageResponse"
+      },
+      "PaginationMeta": {
+        "properties": {
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "totalPages": {
+            "type": "integer",
+            "title": "Totalpages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ],
+        "title": "PaginationMeta"
+      },
+      "PriceInfo": {
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "default": "VND"
+          }
+        },
+        "type": "object",
+        "required": [
+          "amount"
+        ],
+        "title": "PriceInfo"
+      },
+      "RatingInfo": {
+        "properties": {
+          "average": {
+            "type": "number",
+            "title": "Average"
+          },
+          "total_reviews": {
+            "type": "integer",
+            "title": "Total Reviews"
+          }
+        },
+        "type": "object",
+        "required": [
+          "average",
+          "total_reviews"
+        ],
+        "title": "RatingInfo"
+      },
+      "RecommendationResponse": {
+        "properties": {
+          "recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceDetail"
+            },
+            "type": "array",
+            "title": "Recommendations"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recommendations",
+          "total",
+          "timestamp"
+        ],
+        "title": "RecommendationResponse"
+      },
+      "ServiceDetail": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "title": "Service Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "badge": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Badge"
+          },
+          "booked_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booked Count"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PriceInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "staff_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Name"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RatingInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocationInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "slots": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slots"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_id",
+          "name"
+        ],
+        "title": "ServiceDetail"
       }
     }
   }

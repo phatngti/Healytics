@@ -180,7 +180,7 @@ class _ProviderInfo extends StatelessWidget {
 
     return Text(
       '$dayName $day • Service by '
-      '${appointment.providerName}',
+      '${appointment.specialistName}',
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
@@ -484,7 +484,7 @@ class _WriteReviewButton extends StatelessWidget {
         onPressed: () => ReviewTreatmentRoute(
           appointmentId: appointment.id,
           serviceName: appointment.serviceName,
-          vendorName: appointment.vendorName,
+          vendorName: appointment.healthPartnerName,
         ).push<void>(context),
         style: FilledButton.styleFrom(
           backgroundColor: colors.primary.withValues(alpha: 0.8),

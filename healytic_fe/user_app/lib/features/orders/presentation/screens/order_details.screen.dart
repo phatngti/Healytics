@@ -64,10 +64,10 @@ class _Content extends StatelessWidget {
                 DetailRow(
                   icon: Symbols.local_hospital,
                   title: 'Doctor or Therapist',
-                  subtitle: appointment.providerName,
-                  onTap: appointment.providerId != null
+                  subtitle: appointment.specialistName,
+                  onTap: appointment.specialistId != null
                       ? () => EmployeeDetailRoute(
-                          employeeId: appointment.providerId!,
+                          employeeId: appointment.specialistId!,
                         ).push(context)
                       : null,
                 ),
@@ -86,7 +86,11 @@ class _Content extends StatelessWidget {
                 DetailRow(
                   icon: Symbols.chat_bubble,
                   title: 'Message your services',
-                  subtitle: appointment.vendorName,
+                  subtitle: appointment.healthPartnerName,
+                  onTap: () => PartnerChatRoute(
+                    partnerAccountId: appointment.healthPartnerId,
+                    partnerName: appointment.healthPartnerName,
+                  ).push(context),
                 ),
                 AppDimens.verticalExtraLarge,
               ],

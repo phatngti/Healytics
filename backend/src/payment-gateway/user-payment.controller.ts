@@ -1,9 +1,4 @@
-import {
-  Post,
-  Body,
-  Param,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import { Post, Body, Param, ParseUUIDPipe } from '@nestjs/common';
 import {
   ApiOperation,
   ApiCreatedResponse,
@@ -29,9 +24,7 @@ import {
  */
 @UserApi('payments')
 export class UserPaymentController {
-  constructor(
-    private readonly momoService: MoMoPaymentService,
-  ) {}
+  constructor(private readonly momoService: MoMoPaymentService) {}
 
   /**
    * Create a MoMo payment link for a booking.
@@ -42,18 +35,16 @@ export class UserPaymentController {
   @Post('momo/:bookingId')
   @ApiOperation({ summary: 'Create MoMo payment for booking' })
   @ApiCreatedResponse({ type: MoMoPaymentResponseDto })
-  @ApiBadRequestResponse({ description: 'Booking not in PENDING_PAYMENT status or invalid amount' })
+  @ApiBadRequestResponse({
+    description: 'Booking not in PENDING_PAYMENT status or invalid amount',
+  })
   @ApiNotFoundResponse({ description: 'Booking not found' })
   async createMoMoPayment(
     @Param('bookingId', ParseUUIDPipe) bookingId: string,
     @CurrentUser('id') userId: string,
     @Body() dto: CreateMoMoPaymentDto,
   ): Promise<MoMoPaymentResponseDto> {
-    return this.momoService.createPayment(
-      bookingId,
-      userId,
-      dto.requestType,
-    );
+    return this.momoService.createPayment(bookingId, userId, dto.requestType);
   }
 
   /**
@@ -72,10 +63,6 @@ export class UserPaymentController {
     @CurrentUser('id') userId: string,
     @Body() dto: CreateMoMoRefundDto,
   ): Promise<MoMoRefundResponseDto> {
-    return this.momoService.refundPayment(
-      bookingId,
-      userId,
-      dto.transId,
-    );
+    return this.momoService.refundPayment(bookingId, userId, dto.transId);
   }
 }

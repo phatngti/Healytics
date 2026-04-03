@@ -87,7 +87,9 @@ export class AuthController {
     description: 'User login returns access and refresh tokens.',
     type: AuthTokensDto,
   })
-  @ApiForbiddenResponse({ description: 'Account not authorized for user login.' })
+  @ApiForbiddenResponse({
+    description: 'Account not authorized for user login.',
+  })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginUser(@Req() req): Promise<AuthTokensDto> {
     return this.authService.loginUser(req.user);
@@ -106,15 +108,20 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Register a new business partner',
-    description: 'Creates business entity, legal representative, and returns auth tokens immediately.',
+    description:
+      'Creates business entity, legal representative, and returns auth tokens immediately.',
   })
   @ApiCreatedResponse({
     description: 'Partner registration successful.',
     type: RegisterPartnerResponseDto,
   })
-  @ApiBadRequestResponse({ description: 'Invalid input data or address hierarchy.' })
+  @ApiBadRequestResponse({
+    description: 'Invalid input data or address hierarchy.',
+  })
   @ApiConflictResponse({ description: 'Email or tax code already exists.' })
-  async registerPartner(@Body() dto: RegisterPartnerDto): Promise<RegisterPartnerResponseDto> {
+  async registerPartner(
+    @Body() dto: RegisterPartnerDto,
+  ): Promise<RegisterPartnerResponseDto> {
     return this.partnersService.registerPartner(dto);
   }
 
@@ -132,7 +139,9 @@ export class AuthController {
     description: 'Partner login returns access and refresh tokens.',
     type: AuthTokensDto,
   })
-  @ApiForbiddenResponse({ description: 'Account not authorized for partner login.' })
+  @ApiForbiddenResponse({
+    description: 'Account not authorized for partner login.',
+  })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginPartner(@Req() req): Promise<AuthTokensDto> {
     return this.authService.loginPartner(req.user);
@@ -150,7 +159,9 @@ export class AuthController {
     type: AuthTokensDto,
   })
   @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token.' })
-  async refreshPartner(@Body() dto: RefreshTokenRequestDto): Promise<AuthTokensDto> {
+  async refreshPartner(
+    @Body() dto: RefreshTokenRequestDto,
+  ): Promise<AuthTokensDto> {
     return this.authService.refreshPartner(dto.refresh_token);
   }
 
@@ -168,7 +179,9 @@ export class AuthController {
     description: 'Admin login returns access and refresh tokens.',
     type: AuthTokensDto,
   })
-  @ApiForbiddenResponse({ description: 'Account not authorized for admin login.' })
+  @ApiForbiddenResponse({
+    description: 'Account not authorized for admin login.',
+  })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginAdmin(@Req() req): Promise<AuthTokensDto> {
     return this.authService.loginAdmin(req.user);
@@ -185,7 +198,10 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout current user' })
-  @ApiOkResponse({ description: 'Logout confirmation.', type: LogoutResponseDto })
+  @ApiOkResponse({
+    description: 'Logout confirmation.',
+    type: LogoutResponseDto,
+  })
   async logout(@Req() req): Promise<LogoutResponseDto> {
     return this.authService.logout(req.user?.id);
   }

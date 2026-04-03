@@ -1,5 +1,5 @@
 export enum LocationLevel {
-    PROVINCE = 'PROVINCE',
-    DISTRICT = 'DISTRICT',
-    WARD = 'WARD',
+  PROVINCE = 'PROVINCE',
+  DISTRICT = 'DISTRICT',
+  WARD = 'WARD',
 }

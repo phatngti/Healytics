@@ -4,10 +4,12 @@ import { HttpModule } from '@nestjs/axios';
 import { Booking } from '@/common/entities/booking.entity';
 import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
 import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
+import { NotificationModule } from '@/notification/notification.module';
 import { BookingController } from './booking.controller';
 import { SlotsController } from './slots.controller';
 import { BookingService } from './booking.service';
 import { AcquireMicroLockHandler } from './application/handlers/acquire-micro-lock.handler';
+import { CheckDuplicateSlotHandler } from './application/handlers/check-duplicate-slot.handler';
 import { CheckSlotAvailabilityHandler } from './application/handlers/check-slot-availability.handler';
 import { CreateCheckoutTicketHandler } from './application/handlers/create-checkout-ticket.handler';
 import { ProcessCheckoutHandler } from './application/handlers/process-checkout.handler';
@@ -20,11 +22,13 @@ import { WebhookService } from './services/webhook.service';
   imports: [
     TypeOrmModule.forFeature([Booking, CheckoutTicket, BookingStatusLog]),
     HttpModule.register({ timeout: 5000 }),
+    NotificationModule,
   ],
   controllers: [BookingController, SlotsController, ProcessCheckoutHandler],
   providers: [
     BookingService,
     AcquireMicroLockHandler,
+    CheckDuplicateSlotHandler,
     CheckSlotAvailabilityHandler,
     CreateCheckoutTicketHandler,
     ProcessCheckoutHandler,

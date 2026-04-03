@@ -20,10 +20,12 @@ export class GetAppointmentHandler {
       where: { id },
       relations: [
         'product',
+        'product.partner',
         'product.category',
         'product.media',
         'product.productDefinition',
         'staff',
+        'staff.partner',
       ],
     });
 

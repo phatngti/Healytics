@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol/patrol.dart';
 import 'package:user_app/features/home/presentation/screens/home_page.screen.dart';
-import 'package:user_app/features/home/presentation/screens/service_details.screen.dart';
-import 'package:user_app/features/home/presentation/screens/reviews.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/reviews.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/service_details.screen.dart';
 
 import 'common.dart';
 import 'helpers/auth_helper.dart';

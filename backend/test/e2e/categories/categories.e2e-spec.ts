@@ -5,10 +5,7 @@ import {
   authenticateTestUser,
   authRequest,
 } from '../../helpers/test-utils';
-import {
-  createCategoryDto,
-  FAKE_UUID,
-} from '../../fixtures/test-data.factory';
+import { createCategoryDto, FAKE_UUID } from '../../fixtures/test-data.factory';
 
 describe('Categories (e2e)', () => {
   let app: INestApplication;
@@ -76,7 +73,9 @@ describe('Categories (e2e)', () => {
     });
 
     it('should get only root categories with rootsOnly=true', async () => {
-      const res = await authRequest(app, accessToken).get('/categories?rootsOnly=true');
+      const res = await authRequest(app, accessToken).get(
+        '/categories?rootsOnly=true',
+      );
 
       expect([200, 201]).toContain(res.status);
       expect(Array.isArray(res.body)).toBe(true);
@@ -88,14 +87,18 @@ describe('Categories (e2e)', () => {
 
   describe('GET /categories/:id', () => {
     it('should get a category by id', async () => {
-      const res = await authRequest(app, accessToken).get(`/categories/${createdCategoryId}`);
+      const res = await authRequest(app, accessToken).get(
+        `/categories/${createdCategoryId}`,
+      );
 
       expect([200, 201]).toContain(res.status);
       expect(res.body.id).toBe(createdCategoryId);
     });
 
     it('should return 404 for non-existent category', async () => {
-      const res = await authRequest(app, accessToken).get(`/categories/${FAKE_UUID}`);
+      const res = await authRequest(app, accessToken).get(
+        `/categories/${FAKE_UUID}`,
+      );
 
       expect(res.status).toBe(404);
     });
@@ -103,17 +106,23 @@ describe('Categories (e2e)', () => {
 
   describe('GET /categories/slug/:slug', () => {
     it('should get a category by slug', async () => {
-      const getRes = await authRequest(app, accessToken).get(`/categories/${createdCategoryId}`);
+      const getRes = await authRequest(app, accessToken).get(
+        `/categories/${createdCategoryId}`,
+      );
       const slug = getRes.body.slug;
 
-      const res = await authRequest(app, accessToken).get(`/categories/slug/${slug}`);
+      const res = await authRequest(app, accessToken).get(
+        `/categories/slug/${slug}`,
+      );
 
       expect([200, 201]).toContain(res.status);
       expect(res.body.slug).toBe(slug);
     });
 
     it('should return 404 for non-existent slug', async () => {
-      const res = await authRequest(app, accessToken).get('/categories/slug/non-existent-slug-12345');
+      const res = await authRequest(app, accessToken).get(
+        '/categories/slug/non-existent-slug-12345',
+      );
 
       expect(res.status).toBe(404);
     });
@@ -157,17 +166,23 @@ describe('Categories (e2e)', () => {
 
       const categoryToDeleteId = createRes.body.id;
 
-      const res = await authRequest(app, accessToken).delete(`/categories/${categoryToDeleteId}`);
+      const res = await authRequest(app, accessToken).delete(
+        `/categories/${categoryToDeleteId}`,
+      );
 
       expect([200, 201, 204]).toContain(res.status);
 
       // Verify deletion
-      const getRes = await authRequest(app, accessToken).get(`/categories/${categoryToDeleteId}`);
+      const getRes = await authRequest(app, accessToken).get(
+        `/categories/${categoryToDeleteId}`,
+      );
       expect(getRes.status).toBe(404);
     });
 
     it('should return 404 when deleting non-existent category', async () => {
-      const res = await authRequest(app, accessToken).delete(`/categories/${FAKE_UUID}`);
+      const res = await authRequest(app, accessToken).delete(
+        `/categories/${FAKE_UUID}`,
+      );
 
       expect(res.status).toBe(404);
     });

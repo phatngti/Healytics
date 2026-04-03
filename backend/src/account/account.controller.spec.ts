@@ -79,7 +79,10 @@ describe('AccountController', () => {
 
       // Assert
       expect(result).toEqual(response);
-      expect(accountService.createSurvey).toHaveBeenCalledWith(userId, dto.survey);
+      expect(accountService.createSurvey).toHaveBeenCalledWith(
+        userId,
+        dto.survey,
+      );
     });
 
     it('should propagate ConflictException from service when survey already exists', async () => {
@@ -91,8 +94,12 @@ describe('AccountController', () => {
       );
 
       // Act & Assert
-      await expect(controller.postSurvey(userId, dto)).rejects.toThrow(ConflictException);
-      await expect(controller.postSurvey(userId, dto)).rejects.toThrow('Survey already exists');
+      await expect(controller.postSurvey(userId, dto)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(controller.postSurvey(userId, dto)).rejects.toThrow(
+        'Survey already exists',
+      );
     });
   });
 });

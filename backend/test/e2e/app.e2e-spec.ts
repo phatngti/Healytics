@@ -1,9 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import {
-  createTestApp,
-  closeTestApp,
-} from '../helpers/test-utils';
+import { createTestApp, closeTestApp } from '../helpers/test-utils';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -17,8 +14,6 @@ describe('AppController (e2e)', () => {
   });
 
   it('/ (GET) - should return 404 for undefined root route', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(404);
+    return request(app.getHttpServer()).get('/').expect(404);
   });
 });

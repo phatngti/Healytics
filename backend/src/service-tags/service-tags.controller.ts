@@ -74,7 +74,9 @@ export class ServiceTagsController {
     description: 'Return active service tags for the current user.',
     type: [ServiceTagResponseDto],
   })
-  findActive(@CurrentUser('id') userId: string): Promise<ServiceTagResponseDto[]> {
+  findActive(
+    @CurrentUser('id') userId: string,
+  ): Promise<ServiceTagResponseDto[]> {
     return this.serviceTagsService.findActiveByUser(userId);
   }
 
@@ -88,7 +90,9 @@ export class ServiceTagsController {
     type: ServiceTagResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Service tag not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ServiceTagResponseDto> {
+  findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ServiceTagResponseDto> {
     return this.serviceTagsService.findOne(id);
   }
 

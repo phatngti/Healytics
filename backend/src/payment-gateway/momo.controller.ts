@@ -1,14 +1,5 @@
-import {
-  Body,
-  HttpCode,
-  HttpStatus,
-  Logger,
-  Post,
-} from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiNoContentResponse,
-} from '@nestjs/swagger';
+import { Body, HttpCode, HttpStatus, Logger, Post } from '@nestjs/common';
+import { ApiOperation, ApiNoContentResponse } from '@nestjs/swagger';
 import { PublicApi } from '@/common/decorators/api/public-api.decorator';
 import { Public } from '@/common/decorators/auth/public.decorator';
 import { MoMoPaymentService } from './momo-payment.service';
@@ -28,18 +19,14 @@ import { MoMoIPNDto } from './dto';
 export class MoMoController {
   private readonly logger = new Logger(MoMoController.name);
 
-  constructor(
-    private readonly momoService: MoMoPaymentService,
-  ) {}
+  constructor(private readonly momoService: MoMoPaymentService) {}
 
   @Public()
   @Post('ipn')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'MoMo IPN callback (server-to-server)' })
   @ApiNoContentResponse({ description: 'IPN acknowledged' })
-  async handleMoMoIPN(
-    @Body() ipn: MoMoIPNDto,
-  ): Promise<void> {
+  async handleMoMoIPN(@Body() ipn: MoMoIPNDto): Promise<void> {
     this.logger.log(`MoMo IPN received: ${ipn.orderId}`);
     await this.momoService.handleIPN(ipn);
     // Luôn trả 204 — KHÔNG throw exception

@@ -1,11 +1,5 @@
-import {
-  Get,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiOkResponse,
-} from '@nestjs/swagger';
+import { Get, Query } from '@nestjs/common';
+import { ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { PublicApi } from '@/common/decorators/api/public-api.decorator';
 import { MapboxService } from './mapbox.service';
 import { GeocodeQueryDto } from './dto/geocode-query.dto';
@@ -34,14 +28,18 @@ export class MapboxController {
   @Get('reverse-geocode')
   @ApiOperation({ summary: 'Reverse geocode lat/lng to address' })
   @ApiOkResponse({ type: GeocodeResponseDto })
-  reverseGeocode(@Query() query: ReverseGeocodeQueryDto): Promise<GeocodeResponseDto> {
+  reverseGeocode(
+    @Query() query: ReverseGeocodeQueryDto,
+  ): Promise<GeocodeResponseDto> {
     return this.mapboxService.reverseGeocode(query.lat, query.lng);
   }
 
   @Get('distance-matrix')
   @ApiOperation({ summary: 'Get travel distance and duration' })
   @ApiOkResponse({ type: DistanceMatrixResponseDto })
-  distanceMatrix(@Query() query: DistanceMatrixQueryDto): Promise<DistanceMatrixResponseDto> {
+  distanceMatrix(
+    @Query() query: DistanceMatrixQueryDto,
+  ): Promise<DistanceMatrixResponseDto> {
     return this.mapboxService.distanceMatrix(query.origins, query.destinations);
   }
 

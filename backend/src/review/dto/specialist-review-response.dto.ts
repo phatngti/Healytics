@@ -19,7 +19,9 @@ export class SpecialistReviewResponseDto {
   @Expose()
   rating: number;
 
-  @ApiPropertyOptional({ example: 'Very attentive and professional throughout.' })
+  @ApiPropertyOptional({
+    example: 'Very attentive and professional throughout.',
+  })
   @Expose()
   comment: string | null;
 

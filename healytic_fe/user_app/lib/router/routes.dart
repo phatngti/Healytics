@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/widgets/adaptive_root_scaffold/adaptive_root_scraffold.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
-import 'package:user_app/features/bot_chat/presentation/screens/chat_page.dart';
-import 'package:user_app/features/bot_chat/presentation/screens/conversation_history_page.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/chat.screen.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/conversation_history.screen.dart';
 import 'package:user_app/features/home/presentation/screens/home_page.screen.dart';
-import 'package:user_app/features/home/presentation/screens/service_details.screen.dart';
-import 'package:user_app/features/home/presentation/screens/reviews.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/service_details.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/reviews.screen.dart';
 import 'package:user_app/features/notifications/presentation/screens/notifications.screen.dart';
 import 'package:user_app/features/onboarding/presentation/screens/lottie_splash.screen.dart';
 import 'package:user_app/features/onboarding/presentation/screens/onboard.screen.dart';
@@ -29,16 +30,22 @@ import 'package:user_app/features/employee/domain/entities/certificate.entity.da
 import 'package:user_app/features/employee/presentation/screens/certificate_viewer.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/certificates_list.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/employee_detail.screen.dart';
-import 'package:user_app/features/home/presentation/screens/book_appointment.screen.dart';
-import 'package:user_app/features/home/presentation/screens/select_specialist.screen.dart';
-import 'package:user_app/features/home/presentation/screens/service_specialist.screen.dart';
-import 'package:user_app/features/home/presentation/screens/booking_summary.screen.dart';
-import 'package:user_app/features/home/presentation/screens/ai_health_assistant.screen.dart';
+import 'package:user_app/features/booking/presentation/screens/book_appointment.screen.dart';
+import 'package:user_app/features/booking/presentation/screens/select_specialist.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/service_specialist.screen.dart';
+import 'package:user_app/features/booking/presentation/screens/booking_summary.screen.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/ai_health_assistant.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/employee_booking.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/employee_booking_summary.screen.dart';
 import 'package:user_app/features/review/presentation/screens/review_treatment.screen.dart';
 import 'package:user_app/features/review/presentation/screens/review_specialist.screen.dart';
 import 'package:user_app/features/review/presentation/screens/review_submitted.screen.dart';
+import 'package:user_app/features/partner_chat/presentation/screens/partner_chat.screen.dart';
+import 'package:user_app/features/clinic_info/presentation/screens/clinic_info.screen.dart';
+import 'package:user_app/features/notifications/'
+    'presentation/providers/notification.provider.dart';
+import 'package:user_app/core/services/'
+    'push_notification_flutter.service.dart';
 
 part 'routes.g.dart';
 
@@ -111,8 +118,30 @@ class MobileWrapperRoutes extends StatefulShellRouteData {
     GoRouterState state,
     StatefulNavigationShell navigationShell,
   ) {
+    return _MobileWrapperBody(navigationShell: navigationShell);
+  }
+}
+
+/// Extracted to a ConsumerWidget so we can
+/// watch the unread count provider.
+class _MobileWrapperBody extends ConsumerWidget {
+  const _MobileWrapperBody({required this.navigationShell});
+
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(unreadCountProvider).value ?? 0;
+
+    // Eagerly connect /notifications WS namespace
+    ref.watch(notificationWsConnectionProvider);
+
+    // Initialise mock push notification service
+    ref.watch(pushNotificationServiceProvider);
+
     return AdaptiveRootScraffold(
       navigationShell: navigationShell,
+      notificationBadgeCount: unreadCount,
       destinationKeys: [
         keys.bottomNav.homeTab,
         keys.bottomNav.ordersTab,
@@ -162,7 +191,7 @@ class ConversationHistoryRoute extends GoRouteData
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const ConversationHistoryPage(),
+      child: const ConversationHistoryScreen(),
     );
   }
 }
@@ -193,7 +222,7 @@ class ProfileRoute extends GoRouteData with $ProfileRoute {
   }
 }
 
-// --- BOT CHAT ROUTES ---
+// --- AI HEALTH ASSISTANT CHAT ROUTES ---
 
 @TypedGoRoute<ChatRoute>(path: '/chat', name: ChatRoute.name)
 class ChatRoute extends GoRouteData with $ChatRoute {
@@ -205,7 +234,7 @@ class ChatRoute extends GoRouteData with $ChatRoute {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: ChatPage(conversationId: conversationId),
+      child: ChatScreen(conversationId: conversationId),
     );
   }
 }
@@ -762,8 +791,7 @@ class EditProfileRoute extends GoRouteData with $EditProfileRoute {
   path: '/review_treatment',
   name: ReviewTreatmentRoute.name,
 )
-class ReviewTreatmentRoute extends GoRouteData
-    with $ReviewTreatmentRoute {
+class ReviewTreatmentRoute extends GoRouteData with $ReviewTreatmentRoute {
   final String appointmentId;
   final String serviceName;
   final String vendorName;
@@ -777,10 +805,7 @@ class ReviewTreatmentRoute extends GoRouteData
   static const name = 'review_treatment';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ReviewTreatmentScreen(
@@ -798,8 +823,7 @@ class ReviewTreatmentRoute extends GoRouteData
   path: '/review_specialist',
   name: ReviewSpecialistRoute.name,
 )
-class ReviewSpecialistRoute extends GoRouteData
-    with $ReviewSpecialistRoute {
+class ReviewSpecialistRoute extends GoRouteData with $ReviewSpecialistRoute {
   final String appointmentId;
   final String specialistId;
   final String specialistName;
@@ -817,10 +841,7 @@ class ReviewSpecialistRoute extends GoRouteData
   static const name = 'review_specialist';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ReviewSpecialistScreen(
@@ -828,8 +849,7 @@ class ReviewSpecialistRoute extends GoRouteData
         specialistId: specialistId,
         specialistName: specialistName,
         specialistRole: specialistRole,
-        specialistAvatarUrl:
-            specialistAvatarUrl,
+        specialistAvatarUrl: specialistAvatarUrl,
       ),
     );
   }
@@ -841,8 +861,7 @@ class ReviewSpecialistRoute extends GoRouteData
   path: '/review_submitted',
   name: ReviewSubmittedRoute.name,
 )
-class ReviewSubmittedRoute extends GoRouteData
-    with $ReviewSubmittedRoute {
+class ReviewSubmittedRoute extends GoRouteData with $ReviewSubmittedRoute {
   final String specialistName;
   final String? specialistAvatarUrl;
   final int rating;
@@ -856,18 +875,65 @@ class ReviewSubmittedRoute extends GoRouteData
   static const name = 'review_submitted';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ReviewSubmittedScreen(
         specialistName: specialistName,
-        specialistAvatarUrl:
-            specialistAvatarUrl,
+        specialistAvatarUrl: specialistAvatarUrl,
         rating: rating,
       ),
+    );
+  }
+}
+
+// --- PARTNER CHAT ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<PartnerChatRoute>(
+  path: '/partner_chat',
+  name: PartnerChatRoute.name,
+)
+class PartnerChatRoute extends GoRouteData with $PartnerChatRoute {
+  final String partnerAccountId;
+  final String partnerName;
+  final String? partnerAvatar;
+
+  const PartnerChatRoute({
+    required this.partnerAccountId,
+    required this.partnerName,
+    this.partnerAvatar,
+  });
+
+  static const name = 'partner_chat';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: PartnerChatScreen(
+        partnerAccountId: partnerAccountId,
+        partnerName: partnerName,
+        partnerAvatar: partnerAvatar,
+      ),
+    );
+  }
+}
+
+// --- CLINIC INFO ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ClinicInfoRoute>(path: '/clinic_info', name: ClinicInfoRoute.name)
+class ClinicInfoRoute extends GoRouteData with $ClinicInfoRoute {
+  final String clinicId;
+
+  const ClinicInfoRoute({required this.clinicId});
+
+  static const name = 'clinic_info';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ClinicInfoScreen(clinicId: clinicId),
     );
   }
 }

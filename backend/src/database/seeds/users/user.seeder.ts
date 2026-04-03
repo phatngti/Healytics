@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { Account } from '@/common/entities/account.entity';
 import { UserProfile } from '@/common/entities/user-profile.entity';
 import { Role } from '@/account/enum/role.enum';
@@ -78,7 +78,9 @@ export class UserSeeder implements ISeeder {
       });
 
       if (exists) {
-        this.logger.log(`  ⏭ User "${userData.email}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ User "${userData.email}" already exists, skipping`,
+        );
         continue;
       }
 
@@ -93,7 +95,9 @@ export class UserSeeder implements ISeeder {
       });
 
       await this.accountRepo.save(account);
-      this.logger.log(`  ✅ Created user "${userData.email}" (${userData.role})`);
+      this.logger.log(
+        `  ✅ Created user "${userData.email}" (${userData.role})`,
+      );
 
       // Create UserProfile for USER-role accounts
       if (userData.role === Role.USER) {

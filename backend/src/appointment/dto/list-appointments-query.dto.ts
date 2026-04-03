@@ -3,7 +3,10 @@ import { IsOptional, IsNumber, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ListAppointmentsQueryDto {
-  @ApiPropertyOptional({ example: 10.7769, description: 'User latitude (-90 to 90)' })
+  @ApiPropertyOptional({
+    example: 10.7769,
+    description: 'User latitude (-90 to 90)',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
@@ -11,7 +14,10 @@ export class ListAppointmentsQueryDto {
   @Max(90)
   latitude?: number;
 
-  @ApiPropertyOptional({ example: 106.7009, description: 'User longitude (-180 to 180)' })
+  @ApiPropertyOptional({
+    example: 106.7009,
+    description: 'User longitude (-180 to 180)',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()

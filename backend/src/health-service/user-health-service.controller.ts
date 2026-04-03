@@ -12,6 +12,7 @@ import { PublicHealthServiceEmployeeResponseDto } from './dto/public/public-heal
 import { PublicHealthServiceReviewResponseDto } from './dto/public/public-health-service-review-response.dto';
 import { PublicHealthServiceRecommendedResponseDto } from './dto/public/public-health-service-recommended-response.dto';
 import { PublicHealthServiceCardResponseDto } from './dto/public/public-health-service-card-response.dto';
+import { PublicClinicInfoResponseDto } from './dto/public/public-clinic-info-response.dto';
 import { UserEligibilityDetailResponseDto } from './dto/public/user-eligibility-detail-response.dto';
 
 /**
@@ -71,7 +72,8 @@ export class UserHealthServiceController {
       'looked up by the surrogate primary key on the product_employee_eligibility table.',
   })
   @ApiOkResponse({
-    description: 'Returns eligibility detail with category, product, and employee info.',
+    description:
+      'Returns eligibility detail with category, product, and employee info.',
     type: UserEligibilityDetailResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Eligibility not found.' })
@@ -79,6 +81,24 @@ export class UserHealthServiceController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<UserEligibilityDetailResponseDto> {
     return this.healthServiceService.getEligibilityDetail(id);
+  }
+
+  // ─── Clinic Info Endpoint ─────────────────────────────────
+
+  /**
+   * Returns public clinic profile by partner (clinic) ID.
+   */
+  @Get('clinics/:id/info')
+  @ApiOperation({ summary: 'Get public clinic info by ID' })
+  @ApiOkResponse({
+    description: 'Return clinic info for the clinic detail screen.',
+    type: PublicClinicInfoResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'Clinic not found.' })
+  getClinicInfo(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<PublicClinicInfoResponseDto> {
+    return this.healthServiceService.getClinicInfo(id);
   }
 
   // ─── Service Detail Endpoints ─────────────────────────────

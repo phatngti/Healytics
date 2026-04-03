@@ -1,8 +1,16 @@
-import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, Not, In } from 'typeorm';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
-import { CreateSpaTherapistDto, CreateMassageTherapistDto } from './dto/create-therapist.dto';
+import {
+  CreateSpaTherapistDto,
+  CreateMassageTherapistDto,
+} from './dto/create-therapist.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { GetTimeSlotsQueryDto } from './dto/get-time-slots-query.dto';
@@ -41,7 +49,13 @@ export class EmployeesService {
 
   /** Day-of-week names matching the employee schedule JSONB keys. */
   private static readonly DAY_NAMES = [
-    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
   ];
 
   constructor(
@@ -96,7 +110,7 @@ export class EmployeesService {
     const dtoWithPartner = partnerId
       ? { ...createDoctorDto, partnerId }
       : createDoctorDto;
-    return this.createDoctorHandler.execute(dtoWithPartner as CreateDoctorDto);
+    return this.createDoctorHandler.execute(dtoWithPartner);
   }
 
   /**
@@ -107,10 +121,7 @@ export class EmployeesService {
     partnerId?: string,
   ): Promise<Employee> {
     const dtoWithPartner = partnerId ? { ...dto, partnerId } : dto;
-    return this.createTherapistHandler.execute(
-      dtoWithPartner as CreateSpaTherapistDto,
-      'SPA',
-    );
+    return this.createTherapistHandler.execute(dtoWithPartner, 'SPA');
   }
 
   /**
@@ -121,10 +132,7 @@ export class EmployeesService {
     partnerId?: string,
   ): Promise<Employee> {
     const dtoWithPartner = partnerId ? { ...dto, partnerId } : dto;
-    return this.createTherapistHandler.execute(
-      dtoWithPartner as CreateMassageTherapistDto,
-      'MASSAGE',
-    );
+    return this.createTherapistHandler.execute(dtoWithPartner, 'MASSAGE');
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -176,9 +184,7 @@ export class EmployeesService {
       relations: ['doctorProfile', 'therapistProfile'],
     });
     if (!employee) {
-      this.logger.warn(
-        `Employee ${id} not found for partner ${partnerId}`,
-      );
+      this.logger.warn(`Employee ${id} not found for partner ${partnerId}`);
       throw new NotFoundException(`Employee with ID ${id} not found`);
     }
     return employee;
@@ -253,19 +259,13 @@ export class EmployeesService {
     // Query eligible products with their definitions and media
     const eligibilities = await this.eligibilityRepository.find({
       where: { employeeId: specialistId },
-      relations: [
-        'product',
-        'product.productDefinition',
-        'product.media',
-      ],
+      relations: ['product', 'product.productDefinition', 'product.media'],
     });
 
     // Filter to active products only
     const activeProducts = eligibilities
       .map((e) => e.product)
-      .filter(
-        (p) => p && p.status === HealthServiceStatus.ACTIVE,
-      );
+      .filter((p) => p && p.status === HealthServiceStatus.ACTIVE);
 
     // Load partner for clinic info
     const partner = await this.partnersService.getFirstHealthPartner();
@@ -298,7 +298,11 @@ export class EmployeesService {
     const days = query.days ?? this.DEFAULT_DAYS_AHEAD;
     const rangeStart = query.date
       ? new Date(query.date)
-      : new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      : new Date(
+          new Date().getFullYear(),
+          new Date().getMonth(),
+          new Date().getDate(),
+        );
     const rangeEnd = new Date(rangeStart);
     rangeEnd.setDate(rangeEnd.getDate() + days);
 
@@ -311,11 +315,18 @@ export class EmployeesService {
     });
 
     // 4. Index booked slots into a Set<"YYYY-MM-DD|HH:mm">
-    const bookedSlots = this.indexBookedSlotsForEmployee(bookings, rangeStart, rangeEnd);
+    const bookedSlots = this.indexBookedSlotsForEmployee(
+      bookings,
+      rangeStart,
+      rangeEnd,
+    );
 
     // 5. Build day-by-day schedule
     const weeklySchedule = employee.schedule ?? [];
-    const scheduleByDay = new Map<string, { start: string; end: string; isWorking: boolean }>();
+    const scheduleByDay = new Map<
+      string,
+      { start: string; end: string; isWorking: boolean }
+    >();
     for (const entry of weeklySchedule) {
       scheduleByDay.set(entry.day, entry);
     }
@@ -330,12 +341,27 @@ export class EmployeesService {
       const entry = scheduleByDay.get(dayName);
 
       if (!entry || !entry.isWorking || !entry.start || !entry.end) {
-        schedule.push({ date: dateStr, dayOfWeek: dayName, isWorkingDay: false, slots: [] });
+        schedule.push({
+          date: dateStr,
+          dayOfWeek: dayName,
+          isWorkingDay: false,
+          slots: [],
+        });
         continue;
       }
 
-      const slots = this.generateSlots(entry.start, entry.end, dateStr, bookedSlots);
-      schedule.push({ date: dateStr, dayOfWeek: dayName, isWorkingDay: true, slots });
+      const slots = this.generateSlots(
+        entry.start,
+        entry.end,
+        dateStr,
+        bookedSlots,
+      );
+      schedule.push({
+        date: dateStr,
+        dayOfWeek: dayName,
+        isWorkingDay: true,
+        slots,
+      });
     }
 
     // 6. Build response
@@ -391,7 +417,11 @@ export class EmployeesService {
     // 3. Sort by sold count DESC, then rating DESC, take limit
     const sorted = employees
       .map((emp) => ({ employee: emp, sold: soldMap.get(emp.id) ?? 0 }))
-      .sort((a, b) => b.sold - a.sold || Number(b.employee.rating) - Number(a.employee.rating))
+      .sort(
+        (a, b) =>
+          b.sold - a.sold ||
+          Number(b.employee.rating) - Number(a.employee.rating),
+      )
       .slice(0, limit);
 
     return sorted.map(({ employee, sold }) =>
@@ -441,7 +471,11 @@ export class EmployeesService {
 
     const slots: TimeSlotDto[] = [];
 
-    for (let m = startMinutes; m < endMinutes; m += this.SLOT_DURATION_MINUTES) {
+    for (
+      let m = startMinutes;
+      m < endMinutes;
+      m += this.SLOT_DURATION_MINUTES
+    ) {
       const h = Math.floor(m / 60);
       const min = m % 60;
       const time24 = `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;

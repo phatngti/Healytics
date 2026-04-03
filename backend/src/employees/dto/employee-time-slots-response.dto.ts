@@ -5,11 +5,17 @@ import { Expose } from 'class-transformer';
 
 export class TimeSlotDto {
   @Expose()
-  @ApiProperty({ example: '09:00 AM', description: 'Human-readable label in 12h format' })
+  @ApiProperty({
+    example: '09:00 AM',
+    description: 'Human-readable label in 12h format',
+  })
   label: string;
 
   @Expose()
-  @ApiProperty({ example: '09:00', description: 'Slot start time in HH:mm (24h) format' })
+  @ApiProperty({
+    example: '09:00',
+    description: 'Slot start time in HH:mm (24h) format',
+  })
   time: string;
 
   @Expose()
@@ -23,7 +29,10 @@ export class TimeSlotDto {
 
 export class DayScheduleDto {
   @Expose()
-  @ApiProperty({ example: '2026-03-26', description: 'Date in YYYY-MM-DD format' })
+  @ApiProperty({
+    example: '2026-03-26',
+    description: 'Date in YYYY-MM-DD format',
+  })
   date: string;
 
   @Expose()
@@ -31,11 +40,17 @@ export class DayScheduleDto {
   dayOfWeek: string;
 
   @Expose()
-  @ApiProperty({ example: true, description: 'Whether the employee works on this day' })
+  @ApiProperty({
+    example: true,
+    description: 'Whether the employee works on this day',
+  })
   isWorkingDay: boolean;
 
   @Expose()
-  @ApiProperty({ type: [TimeSlotDto], description: 'Time slots for this day (empty if not working)' })
+  @ApiProperty({
+    type: [TimeSlotDto],
+    description: 'Time slots for this day (empty if not working)',
+  })
   slots: TimeSlotDto[];
 }
 
@@ -47,7 +62,10 @@ export class EmployeeTimeSlotsResponseDto {
   employeeId: string;
 
   @Expose()
-  @ApiProperty({ example: 'Dr. Anna Nguyen', description: 'Employee full name' })
+  @ApiProperty({
+    example: 'Dr. Anna Nguyen',
+    description: 'Employee full name',
+  })
   employeeName: string;
 
   @Expose()
@@ -55,14 +73,23 @@ export class EmployeeTimeSlotsResponseDto {
   slotDurationMinutes: number;
 
   @Expose()
-  @ApiProperty({ type: [DayScheduleDto], description: 'Day-by-day schedule with time slots' })
+  @ApiProperty({
+    type: [DayScheduleDto],
+    description: 'Day-by-day schedule with time slots',
+  })
   schedule: DayScheduleDto[];
 
   @Expose()
-  @ApiProperty({ example: '2026-03-26', description: 'Start of the schedule range' })
+  @ApiProperty({
+    example: '2026-03-26',
+    description: 'Start of the schedule range',
+  })
   rangeStart: string;
 
   @Expose()
-  @ApiProperty({ example: '2026-04-25', description: 'End of the schedule range' })
+  @ApiProperty({
+    example: '2026-04-25',
+    description: 'End of the schedule range',
+  })
   rangeEnd: string;
 }

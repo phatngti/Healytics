@@ -23,7 +23,9 @@ export class AppointmentCategoryResponseDto {
     return dto;
   }
 
-  static fromEntities(categories: Category[]): AppointmentCategoryResponseDto[] {
+  static fromEntities(
+    categories: Category[],
+  ): AppointmentCategoryResponseDto[] {
     return categories.map((c) => AppointmentCategoryResponseDto.fromEntity(c));
   }
 }

@@ -116,7 +116,9 @@ export class SubmitTreatmentReviewHandler {
         `Failed to submit treatment review: ${error.message}`,
         error.stack,
       );
-      throw new InternalServerErrorException('Failed to submit treatment review');
+      throw new InternalServerErrorException(
+        'Failed to submit treatment review',
+      );
     } finally {
       await queryRunner.release();
     }
