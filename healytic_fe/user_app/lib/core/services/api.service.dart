@@ -41,7 +41,11 @@ enum ServicePrefix {
 
   /// WebSocket partner-chat namespace:
   /// `/partner-chat`
-  partnerChat('/partner-chat', isRest: false);
+  partnerChat('/partner-chat', isRest: false),
+
+  /// WebSocket notifications namespace:
+  /// `/notifications`
+  notifications('/notifications', isRest: false);
 
   const ServicePrefix(this.path, {this.isRest = true});
 
@@ -115,6 +119,9 @@ class ApiService implements Authentication {
 
   // ── Reviews ───────────────────────────────────────
   late UserReviewsApi userReviewsApi;
+
+  // ── Notifications ─────────────────────────────────
+  late UserNotificationsApi userNotificationsApi;
 
   // ── Chat ───────────────────────────────────────────
   late UserChatApi userChatApi;
@@ -209,6 +216,7 @@ class ApiService implements Authentication {
     userPaymentsApi = UserPaymentsApi(backend);
     userHealthServicesApi = UserHealthServicesApi(backend);
     userReviewsApi = UserReviewsApi(backend);
+    userNotificationsApi = UserNotificationsApi(backend);
     userChatApi = UserChatApi(backend);
 
     // ── AI APIs ─────────────────────────────────────

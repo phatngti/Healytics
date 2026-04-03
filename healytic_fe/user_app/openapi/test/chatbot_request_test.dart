@@ -36,16 +36,6 @@ void main() {
       // TODO
     });
 
-    // bool enableRecommendation (default value: true)
-    test('to test the property `enableRecommendation`', () async {
-      // TODO
-    });
-
-    // bool enableNer (default value: true)
-    test('to test the property `enableNer`', () async {
-      // TODO
-    });
-
 
   });
 

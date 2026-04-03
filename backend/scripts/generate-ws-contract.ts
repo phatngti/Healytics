@@ -16,10 +16,12 @@ import * as path from 'path';
 
 // ── Import enum registrations (side-effect: registers enums) ──
 import '@/chat/enums/message-type.enum';
+import '@/notification/enums/notification-type.enum';
 
 // ── Import gateway classes (side-effect: registers decorators) ──
 import { UserChatGateway } from '@/chat/ws/user-chat.gateway';
 import { PartnerChatGateway } from '@/chat/ws/partner-chat.gateway';
+import { NotificationGateway } from '@/notification/ws/notification.gateway';
 
 import { generateWsContract } from '@/common/decorators/ws';
 
@@ -37,7 +39,7 @@ const outputPath = outputIdx !== -1 && args[outputIdx + 1]
 console.log('\n🔌  WS Contract Generator (CLI)');
 console.log(`   Output: ${outputPath}\n`);
 
-const contract = generateWsContract([UserChatGateway, PartnerChatGateway]);
+const contract = generateWsContract([UserChatGateway, PartnerChatGateway, NotificationGateway]);
 
 // Ensure output directory exists
 const outputDir = path.dirname(outputPath);

@@ -85,6 +85,8 @@ function resolveType(meta: any): { type: string; isEnum?: boolean } {
   if (t === Number || t === 'Number' || t === 'number') return { type: 'num' };
   if (t === Boolean || t === 'Boolean' || t === 'boolean')
     return { type: 'bool' };
+  if (t === 'object' || t === Object || (typeof t === 'function' && t.name === 'Object'))
+    return { type: 'object' };
   return { type: 'String' };
 }
 

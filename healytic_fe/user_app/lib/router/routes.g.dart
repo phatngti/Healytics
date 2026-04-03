@@ -40,6 +40,7 @@ List<RouteBase> get $appRoutes => [
   $reviewSpecialistRoute,
   $reviewSubmittedRoute,
   $partnerChatRoute,
+  $clinicInfoRoute,
 ];
 
 RouteBase get $mobileWrapperRoutes => StatefulShellRouteData.$route(
@@ -1190,6 +1191,38 @@ mixin $PartnerChatRoute on GoRouteData {
       'partner-name': _self.partnerName,
       if (_self.partnerAvatar != null) 'partner-avatar': _self.partnerAvatar,
     },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $clinicInfoRoute => GoRouteData.$route(
+  path: '/clinic_info',
+  name: 'clinic_info',
+  factory: $ClinicInfoRoute._fromState,
+);
+
+mixin $ClinicInfoRoute on GoRouteData {
+  static ClinicInfoRoute _fromState(GoRouterState state) =>
+      ClinicInfoRoute(clinicId: state.uri.queryParameters['clinic-id']!);
+
+  ClinicInfoRoute get _self => this as ClinicInfoRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/clinic_info',
+    queryParams: {'clinic-id': _self.clinicId},
   );
 
   @override

@@ -160,7 +160,6 @@ class ChatRemoteDatasourceImpl
       conversationId: conversationId,
       userId: userId,
       message: text,
-      enableNer: false,
     ).toJson();
 
     _log.info(

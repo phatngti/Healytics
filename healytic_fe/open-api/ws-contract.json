@@ -70,6 +70,30 @@
         ]
       },
       "extends": "user-chat"
+    },
+    "notifications": {
+      "description": "Real-time notification delivery gateway",
+      "auth": {
+        "type": "jwt",
+        "roles": [
+          "user"
+        ]
+      },
+      "clientToServer": {},
+      "serverToClient": {
+        "new_notification": {
+          "description": "A new notification was pushed to the user",
+          "payload": "WsNewNotificationEvent"
+        },
+        "unread_count": {
+          "description": "The unread notification count changed (after new notification or mark-read)",
+          "payload": "WsUnreadCountEvent"
+        },
+        "broadcast_sent": {
+          "description": "A system-wide broadcast was sent (admin-facing)",
+          "payload": "WsBroadcastSentEvent"
+        }
+      }
     }
   },
   "models": {
@@ -305,6 +329,95 @@
           "description": "Error message"
         }
       }
+    },
+    "WsNewNotificationEvent": {
+      "description": "Server event: a new notification pushed to the user in real-time",
+      "direction": "serverToClient",
+      "properties": {
+        "id": {
+          "type": "String",
+          "required": true,
+          "description": "Notification UUID"
+        },
+        "type": {
+          "type": "WsNotificationType",
+          "required": true,
+          "description": "The type of notification",
+          "isEnum": true
+        },
+        "title": {
+          "type": "String",
+          "required": true,
+          "description": "Notification title"
+        },
+        "body": {
+          "type": "String",
+          "required": true,
+          "description": "Notification body text"
+        },
+        "data": {
+          "type": "object",
+          "required": false,
+          "description": "Deep-link data for frontend routing"
+        },
+        "isRead": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the notification has been read"
+        },
+        "readAt": {
+          "type": "DateTime",
+          "required": false,
+          "description": "When the notification was read"
+        },
+        "isBroadcast": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether this is a system-wide broadcast"
+        },
+        "createdAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the notification was created"
+        }
+      }
+    },
+    "WsUnreadCountEvent": {
+      "description": "Server event: updated unread notification count for the user",
+      "direction": "serverToClient",
+      "properties": {
+        "count": {
+          "type": "num",
+          "required": true,
+          "description": "Current unread notification count"
+        }
+      }
+    },
+    "WsBroadcastSentEvent": {
+      "description": "Server event: a system-wide broadcast was sent (admin-facing)",
+      "direction": "serverToClient",
+      "properties": {
+        "id": {
+          "type": "String",
+          "required": true,
+          "description": "Notification UUID"
+        },
+        "title": {
+          "type": "String",
+          "required": true,
+          "description": "Notification title"
+        },
+        "body": {
+          "type": "String",
+          "required": true,
+          "description": "Notification body text"
+        },
+        "createdAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the broadcast was created"
+        }
+      }
     }
   },
   "enums": {
@@ -315,6 +428,23 @@
         "image",
         "file",
         "system"
+      ]
+    },
+    "WsNotificationType": {
+      "description": "Type of notification in the Healytics platform",
+      "values": [
+        "booking_confirmed",
+        "booking_cancelled",
+        "booking_completed",
+        "appointment_reminder",
+        "appointment_updated",
+        "new_chat_message",
+        "payment_success",
+        "payment_failed",
+        "system_broadcast",
+        "system_maintenance",
+        "partner_verified",
+        "partner_rejected"
       ]
     }
   }

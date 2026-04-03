@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import fs from 'fs';
 import path from 'path';
+import { RedisIoAdapter } from '@/common/adapters/redis-io.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -21,6 +22,16 @@ async function bootstrap() {
   //     cookie: { secure: false },
   //   }),
   // );
+
+  // ── Redis WebSocket Adapter (for horizontal scaling) ─────
+  const redisIoAdapter = new RedisIoAdapter(app);
+  await redisIoAdapter.connectToRedis({
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    password: process.env.REDIS_PASSWORD || undefined,
+    username: process.env.REDIS_USERNAME || undefined,
+  });
+  app.useWebSocketAdapter(redisIoAdapter);
 
   app.enableCors();
   app.use(helmet());

@@ -13,7 +13,7 @@
  *
  * Defaults:
  *   --spec   ../ws-contract.json  (relative to this script)
- *   --output ../user_app/ws/
+ *   --output ../user_app/lib/core/services/ws
  */
 
 const fs = require('fs');
@@ -32,7 +32,7 @@ const BASE_DIR = path.resolve(SCRIPT_DIR, '..');
 const specPath = path.resolve(BASE_DIR, getArg('--spec', 'ws-contract.json'));
 const outputDir = path.resolve(
   BASE_DIR,
-  getArg('--output', '../user_app/ws'),
+  getArg('--output', '../user_app/lib/core/services/ws'),
 );
 const namespacesArg = getArg('--namespaces', '');
 
@@ -42,9 +42,10 @@ const HEADER = `// =============================================================
 // AUTO-GENERATED from ws-contract.json — DO NOT EDIT BY HAND.
 //
 // Re-generate with:
-//   ./bin/generate-open-api.sh ws
+//   ./bin/generate-integration.sh ws
 // =============================================================
 
+// ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
 
 `;
@@ -65,20 +66,77 @@ function camelToSnake(s) {
   return s.replace(/[A-Z]/g, (c) => '_' + c.toLowerCase());
 }
 
+/** Escape a string for a single-quoted Dart literal */
+function escapeDartString(value) {
+  return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function isNullable(prop) {
+  return prop.required === false || prop.nullable === true;
+}
+
+function isMapLikeType(type) {
+  return [
+    'Map',
+    'Map<String, dynamic>',
+    'Map<String,dynamic>',
+    'Map<String, Object?>',
+    'Map<String,Object?>',
+    'Record<string, any>',
+    'Record<String, dynamic>',
+    'Record<String,dynamic>',
+    'object',
+  ].includes(type);
+}
+
+function isDynamicType(type) {
+  return type === 'dynamic' || type === 'Object';
+}
+
+function isListType(type) {
+  return /^List<.+>$/.test(type) || type === 'List';
+}
+
+function getListItemType(type) {
+  const match = /^List<(.+)>$/.exec(type);
+  return match ? match[1].trim() : 'dynamic';
+}
+
+function normalizeType(type) {
+  if (isMapLikeType(type)) return 'Map<String, dynamic>';
+  if (isListType(type)) {
+    return `List<${normalizeType(getListItemType(type))}>`;
+  }
+  return type;
+}
+
 /** Dart type for a contract property */
 function dartType(prop) {
   if (prop.isEnum) return prop.type;
-  switch (prop.type) {
-    case 'DateTime':
-      return 'DateTime';
-    default:
-      return prop.type;
-  }
+  return normalizeType(prop.type);
 }
 
 /** Nullable suffix */
 function nullable(prop) {
-  return prop.required ? '' : '?';
+  return isNullable(prop) ? '?' : '';
+}
+
+function enumHelperName(enumName, suffix) {
+  return `${enumName.charAt(0).toLowerCase() + enumName.slice(1)}${suffix}`;
+}
+
+function dartDefaultValue(prop) {
+  if (prop.default === undefined) return null;
+  if (prop.isEnum) {
+    return `${prop.type}.${snakeToCamel(prop.default)}`;
+  }
+  if (prop.type === 'String') {
+    return `'${escapeDartString(prop.default)}'`;
+  }
+  if (['bool', 'num', 'int', 'double'].includes(prop.type)) {
+    return String(prop.default);
+  }
+  return `'${escapeDartString(prop.default)}'`;
 }
 
 // ── Load contract ─────────────────────────────────────────────
@@ -96,12 +154,14 @@ const contract = JSON.parse(fs.readFileSync(specPath, 'utf8'));
 for (const [, ns] of Object.entries(contract.namespaces)) {
   if (ns.extends && contract.namespaces[ns.extends]) {
     const parent = contract.namespaces[ns.extends];
-    if (!ns.clientToServer) {
-      ns.clientToServer = { ...parent.clientToServer };
-    }
-    if (!ns.serverToClient) {
-      ns.serverToClient = { ...parent.serverToClient };
-    }
+    ns.clientToServer = {
+      ...(parent.clientToServer || {}),
+      ...(ns.clientToServer || {}),
+    };
+    ns.serverToClient = {
+      ...(parent.serverToClient || {}),
+      ...(ns.serverToClient || {}),
+    };
     delete ns.extends;
   }
 }
@@ -150,13 +210,166 @@ function collectEvents(contract) {
 
 const { clientToServer, serverToClient } = collectEvents(contract);
 
+function isModelType(type) {
+  return !!contract.models?.[normalizeType(type)];
+}
+
+function isEnumType(type) {
+  return !!contract.enums?.[normalizeType(type)];
+}
+
+function collectReferencedTypes(contract) {
+  const referencedModels = new Set();
+  const referencedEnums = new Set();
+
+  function visitType(type) {
+    const normalized = normalizeType(type);
+
+    if (isListType(normalized)) {
+      visitType(getListItemType(normalized));
+      return;
+    }
+
+    if (contract.enums?.[normalized]) {
+      referencedEnums.add(normalized);
+      return;
+    }
+
+    if (contract.models?.[normalized]) {
+      visitModel(normalized);
+    }
+  }
+
+  function visitModel(modelName) {
+    if (referencedModels.has(modelName)) return;
+    const model = contract.models?.[modelName];
+    if (!model) return;
+
+    referencedModels.add(modelName);
+    for (const prop of Object.values(model.properties || {})) {
+      if (prop.isEnum) {
+        referencedEnums.add(prop.type);
+        continue;
+      }
+      visitType(prop.type);
+    }
+  }
+
+  for (const ns of Object.values(contract.namespaces)) {
+    for (const meta of Object.values(ns.clientToServer || {})) {
+      visitType(meta.payload);
+      if (meta.ack) visitType(meta.ack);
+    }
+    for (const meta of Object.values(ns.serverToClient || {})) {
+      visitType(meta.payload);
+      if (meta.ack) visitType(meta.ack);
+    }
+  }
+
+  return { referencedModels, referencedEnums };
+}
+
+const { referencedModels, referencedEnums } = collectReferencedTypes(contract);
+
+function fromJsonItemExpression(type, valueExpr, context) {
+  const normalized = normalizeType(type);
+
+  if (isEnumType(normalized)) {
+    return `${enumHelperName(normalized, 'FromJson')}(${valueExpr})`;
+  }
+  if (normalized === 'DateTime') {
+    return `_requireDateTime(${valueExpr}, '${context}')`;
+  }
+  if (normalized === 'int') {
+    return `(${valueExpr} as num).toInt()`;
+  }
+  if (normalized === 'double') {
+    return `(${valueExpr} as num).toDouble()`;
+  }
+  if (['String', 'bool', 'num'].includes(normalized)) {
+    return `${valueExpr} as ${normalized}`;
+  }
+  if (isDynamicType(normalized)) {
+    return valueExpr;
+  }
+  if (isMapLikeType(normalized)) {
+    return `_requireJsonMap(${valueExpr}, '${context}')`;
+  }
+  if (isListType(normalized)) {
+    const itemType = normalizeType(getListItemType(normalized));
+    const itemExpr = fromJsonItemExpression(itemType, 'item', `${context}[]`);
+    return `_requireJsonList<${itemType}>(${valueExpr}, '${context}', (item) => ${itemExpr})`;
+  }
+  if (isModelType(normalized)) {
+    return `${normalized}.fromJson(_requireJsonMap(${valueExpr}, '${context}'))`;
+  }
+  return `${valueExpr} as ${normalized}`;
+}
+
+function fromJsonExpression(prop, valueExpr, context) {
+  const normalized = dartType(prop);
+
+  if (isNullable(prop)) {
+    if (normalized === 'DateTime') {
+      return `_dateTimeOrNull(${valueExpr}, '${context}')`;
+    }
+    if (normalized === 'int') {
+      return `${valueExpr} != null ? (${valueExpr} as num).toInt() : null`;
+    }
+    if (normalized === 'double') {
+      return `${valueExpr} != null ? (${valueExpr} as num).toDouble() : null`;
+    }
+    if (isEnumType(normalized)) {
+      return `${valueExpr} != null ? ${enumHelperName(normalized, 'FromJson')}(${valueExpr}) : null`;
+    }
+    if (isMapLikeType(normalized)) {
+      return `_jsonMapOrNull(${valueExpr}, '${context}')`;
+    }
+    if (isListType(normalized)) {
+      const itemType = normalizeType(getListItemType(normalized));
+      const itemExpr = fromJsonItemExpression(itemType, 'item', `${context}[]`);
+      return `_jsonListOrNull<${itemType}>(${valueExpr}, '${context}', (item) => ${itemExpr})`;
+    }
+    if (isModelType(normalized)) {
+      return `${valueExpr} != null ? ${normalized}.fromJson(_requireJsonMap(${valueExpr}, '${context}')) : null`;
+    }
+    return `${valueExpr} as ${normalized}?`;
+  }
+
+  return fromJsonItemExpression(normalized, valueExpr, context);
+}
+
+function toJsonItemExpression(type, valueExpr) {
+  const normalized = normalizeType(type);
+
+  if (isEnumType(normalized)) {
+    return `${enumHelperName(normalized, 'ToJson')}(${valueExpr})`;
+  }
+  if (normalized === 'DateTime') {
+    return `${valueExpr}.toUtc().toIso8601String()`;
+  }
+  if (isListType(normalized)) {
+    const itemType = normalizeType(getListItemType(normalized));
+    const itemExpr = toJsonItemExpression(itemType, 'item');
+    return `${valueExpr}.map((item) => ${itemExpr}).toList(growable: false)`;
+  }
+  if (isModelType(normalized)) {
+    return `${valueExpr}.toJson()`;
+  }
+  return valueExpr;
+}
+
+function toJsonExpression(prop, valueExpr) {
+  return toJsonItemExpression(dartType(prop), valueExpr);
+}
+
 // ═════════════════════════════════════════════════════════════
 // 1. ws_events.dart
 // ═════════════════════════════════════════════════════════════
 
 function generateEvents() {
   let out = HEADER;
-  out += "/// WebSocket event constants matching the backend's ChatEvent enum.\n";
+  out += "/// WebSocket event constants matching the backend's event names.\n";
   out += '///\n';
   out += '/// Client → Server events are used with `socket.emit()`.\n';
   out += '/// Server → Client events are used with `socket.on()`.\n';
@@ -192,34 +405,91 @@ console.log('  ✓ ws_events.dart');
 function generateModels() {
   let out = HEADER;
 
+  out += 'Map<String, dynamic> _requireJsonMap(dynamic value, String context) {\n';
+  out += '  if (value is Map<String, dynamic>) return value;\n';
+  out += '  if (value is Map) {\n';
+  out += '    return Map<String, dynamic>.from(value);\n';
+  out += '  }\n';
+  out += "  throw FormatException('Expected JSON object for \$context, got \${value.runtimeType}');\n";
+  out += '}\n\n';
+
+  out += 'Map<String, dynamic>? _jsonMapOrNull(dynamic value, String context) {\n';
+  out += '  if (value == null) return null;\n';
+  out += '  return _requireJsonMap(value, context);\n';
+  out += '}\n\n';
+
+  out += 'DateTime _requireDateTime(dynamic value, String context) {\n';
+  out += '  if (value is DateTime) return value;\n';
+  out += '  if (value is String) return DateTime.parse(value);\n';
+  out += "  throw FormatException('Expected DateTime string for \$context, got \${value.runtimeType}');\n";
+  out += '}\n\n';
+
+  out += 'DateTime? _dateTimeOrNull(dynamic value, String context) {\n';
+  out += '  if (value == null) return null;\n';
+  out += '  return _requireDateTime(value, context);\n';
+  out += '}\n\n';
+
+  out += 'List<T> _requireJsonList<T>(\n';
+  out += '  dynamic value,\n';
+  out += '  String context,\n';
+  out += '  T Function(dynamic item) convert,\n';
+  out += ') {\n';
+  out += '  if (value is! List) {\n';
+  out += "    throw FormatException('Expected JSON list for \$context, got \${value.runtimeType}');\n";
+  out += '  }\n';
+  out += '  return value.map(convert).toList(growable: false);\n';
+  out += '}\n\n';
+
+  out += 'List<T>? _jsonListOrNull<T>(\n';
+  out += '  dynamic value,\n';
+  out += '  String context,\n';
+  out += '  T Function(dynamic item) convert,\n';
+  out += ') {\n';
+  out += '  if (value == null) return null;\n';
+  out += '  return _requireJsonList(value, context, convert);\n';
+  out += '}\n\n';
+
   // ── Enums ──────────────────────────────────────────────
   for (const [enumName, enumDef] of Object.entries(contract.enums || {})) {
+    if (!referencedEnums.has(enumName)) continue;
+
     out += `/// ${enumDef.description}\n`;
     out += `enum ${enumName} {\n`;
     for (const val of enumDef.values) {
-      out += `  ${val},\n`;
+      out += `  ${snakeToCamel(val)},\n`;
     }
     out += '}\n\n';
 
     // Helper: parse from string
-    out += `${enumName} ${enumName.charAt(0).toLowerCase() + enumName.slice(1)}FromJson(dynamic value) {\n`;
-    out += `  if (value == null) return ${enumName}.${enumDef.values[0]};\n`;
-    out += `  final str = value.toString().toLowerCase();\n`;
-    out += `  return ${enumName}.values.firstWhere(\n`;
-    out += `    (e) => e.name == str,\n`;
-    out += `    orElse: () => ${enumName}.${enumDef.values[0]},\n`;
-    out += `  );\n`;
+    out += `${enumName} ${enumHelperName(enumName, 'FromJson')}(dynamic value) {\n`;
+    out += `  if (value == null) return ${enumName}.${snakeToCamel(enumDef.values[0])};\n`;
+    out += `  final str = value.toString();\n`;
+    out += `  switch (str) {\n`;
+    for (const val of enumDef.values) {
+      out += `    case '${val}':\n`;
+      out += `      return ${enumName}.${snakeToCamel(val)};\n`;
+    }
+    out += `    default:\n`;
+    out += `      return ${enumName}.${snakeToCamel(enumDef.values[0])};\n`;
+    out += `  }\n`;
     out += '}\n\n';
 
     // Helper: to string
-    out += `String ${enumName.charAt(0).toLowerCase() + enumName.slice(1)}ToJson(${enumName} value) => value.name;\n\n`;
+    out += `String ${enumHelperName(enumName, 'ToJson')}(${enumName} value) {\n`;
+    out += `  switch (value) {\n`;
+    for (const val of enumDef.values) {
+      out += `    case ${enumName}.${snakeToCamel(val)}:\n`;
+      out += `      return '${val}';\n`;
+    }
+    out += `  }\n`;
+    out += `}\n\n`;
   }
 
   // ── Models ─────────────────────────────────────────────
   for (const [modelName, modelDef] of Object.entries(contract.models || {})) {
+    if (!referencedModels.has(modelName)) continue;
+
     const props = Object.entries(modelDef.properties || {});
-    const isClientPayload = modelDef.direction === 'clientToServer';
-    const isServerEvent = modelDef.direction === 'serverToClient';
 
     out += `/// ${modelDef.description}\n`;
     out += `class ${modelName} {\n`;
@@ -236,9 +506,7 @@ function generateModels() {
       if (prop.required) {
         out += `    required this.${propName},\n`;
       } else if (prop.default !== undefined) {
-        const defaultVal = prop.isEnum
-          ? `${prop.type}.${prop.default}`
-          : `'${prop.default}'`;
+        const defaultVal = dartDefaultValue(prop);
         out += `    this.${propName} = ${defaultVal},\n`;
       } else {
         out += `    this.${propName},\n`;
@@ -246,56 +514,27 @@ function generateModels() {
     }
     out += '  });\n\n';
 
-    // fromJson (for server → client models and ack models)
-    if (isServerEvent || modelName.includes('Ack')) {
-      out += `  /// Deserialize from a Socket.IO JSON map.\n`;
-      out += `  factory ${modelName}.fromJson(Map<String, dynamic> json) {\n`;
-      out += `    return ${modelName}(\n`;
-      for (const [propName, prop] of props) {
-        if (prop.isEnum) {
-          const fnName = `${prop.type.charAt(0).toLowerCase() + prop.type.slice(1)}FromJson`;
-          out += `      ${propName}: ${fnName}(json['${propName}']),\n`;
-        } else if (prop.type === 'DateTime') {
-          if (prop.required) {
-            out += `      ${propName}: DateTime.parse(json['${propName}'] as String),\n`;
-          } else {
-            out += `      ${propName}: json['${propName}'] != null\n`;
-            out += `          ? DateTime.parse(json['${propName}'] as String)\n`;
-            out += `          : null,\n`;
-          }
-        } else {
-          out += `      ${propName}: json['${propName}'] as ${dartType(prop)}${nullable(prop)},\n`;
-        }
-      }
-      out += '    );\n';
-      out += '  }\n\n';
+    out += `  /// Deserialize from a Socket.IO JSON map.\n`;
+    out += `  factory ${modelName}.fromJson(Map<String, dynamic> json) {\n`;
+    out += `    return ${modelName}(\n`;
+    for (const [propName, prop] of props) {
+      out += `      ${propName}: ${fromJsonExpression(prop, `json['${propName}']`, `${modelName}.${propName}`)},\n`;
     }
+    out += '    );\n';
+    out += '  }\n\n';
 
-    // toJson (for client → server models)
-    if (isClientPayload) {
-      out += `  /// Serialize to a JSON map for Socket.IO emit.\n`;
-      out += `  Map<String, dynamic> toJson() {\n`;
-      out += `    return <String, dynamic>{\n`;
-      for (const [propName, prop] of props) {
-        if (prop.required) {
-          if (prop.isEnum) {
-            const fnName = `${prop.type.charAt(0).toLowerCase() + prop.type.slice(1)}ToJson`;
-            out += `      '${propName}': ${fnName}(${propName}),\n`;
-          } else {
-            out += `      '${propName}': ${propName},\n`;
-          }
-        } else {
-          if (prop.isEnum) {
-            const fnName = `${prop.type.charAt(0).toLowerCase() + prop.type.slice(1)}ToJson`;
-            out += `      if (${propName} != null) '${propName}': ${fnName}(${propName}!),\n`;
-          } else {
-            out += `      if (${propName} != null) '${propName}': ${propName},\n`;
-          }
-        }
+    out += `  /// Serialize to a JSON map.\n`;
+    out += `  Map<String, dynamic> toJson() {\n`;
+    out += `    return <String, dynamic>{\n`;
+    for (const [propName, prop] of props) {
+      if (isNullable(prop)) {
+        out += `      if (${propName} != null) '${propName}': ${toJsonExpression(prop, `${propName}!`)},\n`;
+      } else {
+        out += `      '${propName}': ${toJsonExpression(prop, propName)},\n`;
       }
-      out += '    };\n';
-      out += '  }\n\n';
     }
+    out += '    };\n';
+    out += '  }\n\n';
 
     // toString
     out += `  @override\n`;
@@ -330,6 +569,14 @@ function generateClients() {
   out += "\n";
   out += "export 'ws_events.dart';\n";
   out += "export 'ws_models.dart';\n\n";
+
+  out += 'Map<String, dynamic> _requireEventMap(dynamic value, String context) {\n';
+  out += '  if (value is Map<String, dynamic>) return value;\n';
+  out += '  if (value is Map) {\n';
+  out += '    return Map<String, dynamic>.from(value);\n';
+  out += '  }\n';
+  out += "  throw FormatException('Expected JSON object for \$context, got \${value.runtimeType}');\n";
+  out += '}\n\n';
 
   // ── Socket.IO logger silencer ────────────────────────
   out += '/// Suppresses verbose internal loggers from\n';
@@ -401,6 +648,8 @@ function generateClients() {
     const source = ns.extends ? contract.namespaces[ns.extends] : ns;
     const className = snakeToPascal(nsName) + 'Socket';
     const loggerName = className;
+    const serverEvents = Object.entries(source.serverToClient || {});
+    const clientEvents = Object.entries(source.clientToServer || {});
 
     out += `/// Typed Socket.IO client for the \`/${nsName}\` namespace.\n`;
     out += `///\n`;
@@ -415,16 +664,28 @@ function generateClients() {
     out += `///   server: (url: gateway, path: '/${nsName}/socket.io/'),\n`;
     out += '///   token: token,\n';
     out += '/// );\n';
-    out += '/// socket.onNewMessage.listen((msg) => print(msg));\n';
-    out += '/// socket.sendMessage(WsSendMessagePayload(...));\n';
+    if (serverEvents[0]) {
+      out += `/// socket.on${snakeToPascal(serverEvents[0][0])}.listen((event) => print(event));\n`;
+    }
+    if (clientEvents[0]) {
+      const methodName = snakeToCamel(clientEvents[0][0]);
+      const payloadType = clientEvents[0][1].payload;
+      const payloadDef = contract.models[payloadType];
+      const propEntries = Object.entries(payloadDef?.properties || {});
+      const isSimple =
+        propEntries.length === 1 && propEntries[0][0] === 'conversationId';
+      if (isSimple) {
+        out += `/// socket.${methodName}('conversation-id');\n`;
+      } else {
+        out += `/// socket.${methodName}(${payloadType}(...));\n`;
+      }
+    }
     out += '/// ' + '```' + '\n';
     out += `class ${className} implements WsNamespaceSocket {\n`;
     out += `  static final _log = Logger('${loggerName}');\n\n`;
     out += `  io.Socket? _socket;\n\n`;
 
     // ── Stream controllers ──────────────────────────────
-    const serverEvents = Object.entries(source.serverToClient || {});
-
     for (const [event, meta] of serverEvents) {
       const camel = snakeToCamel(event);
       const payloadType = meta.payload;
@@ -509,7 +770,7 @@ function generateClients() {
       const payloadType = meta.payload;
       out += `    _socket!.on(WsChatEvent.${camel}, (data) {\n`;
       out += `      try {\n`;
-      out += `        final map = data as Map<String, dynamic>;\n`;
+      out += `        final map = _requireEventMap(data, '${nsName}.${event}');\n`;
       out += `        _${camel}Controller.add(${payloadType}.fromJson(map));\n`;
       out += `      } catch (e, st) {\n`;
       out += `        _log.severe('Error parsing ${event}', e, st);\n`;
@@ -548,7 +809,7 @@ function generateClients() {
           out += `      WsChatEvent.${camel},\n`;
           out += `      {'conversationId': conversationId},\n`;
           out += `      ack: (response) {\n`;
-          out += `        if (onAck != null && response is Map) {\n`;
+          out += `        if (onAck != null && response is Map<dynamic, dynamic>) {\n`;
           out += `          onAck(${ackType}.fromJson(\n`;
           out += `            Map<String, dynamic>.from(response),\n`;
           out += `          ));\n`;
@@ -574,7 +835,7 @@ function generateClients() {
           out += `      WsChatEvent.${camel},\n`;
           out += `      payload.toJson(),\n`;
           out += `      ack: (response) {\n`;
-          out += `        if (onAck != null && response is Map) {\n`;
+          out += `        if (onAck != null && response is Map<dynamic, dynamic>) {\n`;
           out += `          onAck(${ackType}.fromJson(\n`;
           out += `            Map<String, dynamic>.from(response),\n`;
           out += `          ));\n`;
@@ -634,8 +895,8 @@ const allEvents = new Set([
   ...clientToServer.keys(),
   ...serverToClient.keys(),
 ]);
-const modelCount = Object.keys(contract.models || {}).length;
-const enumCount = Object.keys(contract.enums || {}).length;
+const modelCount = referencedModels.size;
+const enumCount = referencedEnums.size;
 const nsCount = Object.keys(contract.namespaces).length;
 
 console.log('');

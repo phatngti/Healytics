@@ -9,7 +9,6 @@ import 'package:user_app/features/service_details/domain/entities/service_detail
 import 'package:user_app/features/service_details/presentation/providers/service_details.provider.dart';
 import 'package:user_app/router/routes.dart';
 
-
 import '../widgets/service_details/about_treatment.widget.dart';
 import '../widgets/service_details/clinic_card.widget.dart';
 import '../widgets/service_details/facility_tour_section.widget.dart';
@@ -18,7 +17,6 @@ import '../widgets/service_details/hero_image_carousel.widget.dart';
 import '../widgets/service_details/rating_price_row.widget.dart';
 import '../widgets/service_details/recommended_services_section.widget.dart';
 import '../widgets/service_details/reviews_section.widget.dart';
-
 
 /// Full-screen service detail view composed from smaller
 /// widgets matching the new HTML design spec.
@@ -42,10 +40,8 @@ class ServiceDetailsScreen extends ConsumerWidget {
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, _) =>
           Scaffold(body: Center(child: Text('Failed to load details: $error'))),
-      data: (details) => _ServiceDetailsBody(
-        details: details,
-        serviceId: serviceId,
-      ),
+      data: (details) =>
+          _ServiceDetailsBody(details: details, serviceId: serviceId),
     );
   }
 }
@@ -54,17 +50,13 @@ class ServiceDetailsScreen extends ConsumerWidget {
 /// available. Uses [CustomScrollView] with slivers so
 /// that off-screen sections are built lazily.
 class _ServiceDetailsBody extends StatefulWidget {
-  const _ServiceDetailsBody({
-    required this.details,
-    required this.serviceId,
-  });
+  const _ServiceDetailsBody({required this.details, required this.serviceId});
 
   final ServiceDetailsEntity details;
   final String serviceId;
 
   @override
-  State<_ServiceDetailsBody> createState() =>
-      _ServiceDetailsBodyState();
+  State<_ServiceDetailsBody> createState() => _ServiceDetailsBodyState();
 }
 
 class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
@@ -121,8 +113,6 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
       const HomeRoute().go(context);
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -201,6 +191,11 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
                           ClinicCard(
                             clinicName: details.clinic.name,
                             address: details.clinic.address,
+                            onTap: details.clinic.id.isNotEmpty
+                                ? () => ClinicInfoRoute(
+                                    clinicId: details.clinic.id,
+                                  ).push(context)
+                                : null,
                           ),
                         ],
                       ],
@@ -364,14 +359,10 @@ class _GlassCircleButton extends StatelessWidget {
   }
 }
 
-
 /// Fixed bottom bar with price and "Select Specialist"
 /// CTA. Uses a blurred backdrop matching the header.
 class _BottomActionBar extends StatelessWidget {
-  const _BottomActionBar({
-    required this.price,
-    required this.onPressed,
-  });
+  const _BottomActionBar({required this.price, required this.onPressed});
 
   final String price;
   final VoidCallback onPressed;
@@ -382,15 +373,11 @@ class _BottomActionBar extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
-    final bottomPad =
-        MediaQuery.paddingOf(context).bottom;
+    final bottomPad = MediaQuery.paddingOf(context).bottom;
 
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: 16,
-          sigmaY: 16,
-        ),
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: Container(
           padding: EdgeInsets.fromLTRB(
             AppDimens.spaceXxl,
@@ -400,16 +387,13 @@ class _BottomActionBar extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: isDark
-                ? colorScheme.surface
-                    .withValues(alpha: 0.8)
-                : Colors.white
-                    .withValues(alpha: 0.8),
+                ? colorScheme.surface.withValues(alpha: 0.8)
+                : Colors.white.withValues(alpha: 0.8),
             border: Border(
               top: BorderSide(
                 color: isDark
                     ? colorScheme.outlineVariant
-                    : colorScheme.outlineVariant
-                        .withValues(alpha: 0.3),
+                    : colorScheme.outlineVariant.withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -417,21 +401,17 @@ class _BottomActionBar extends StatelessWidget {
             children: [
               Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Total Price',
-                    style:
-                        textTheme.labelSmall?.copyWith(
-                      color:
-                          colorScheme.onSurfaceVariant,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   Text(
                     price,
-                    style:
-                        textTheme.titleLarge?.copyWith(
+                    style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -441,40 +421,29 @@ class _BottomActionBar extends StatelessWidget {
               Expanded(
                 child: Material(
                   color: colorScheme.primary,
-                  borderRadius:
-                      AppDimens.radiusMediumSmall,
+                  borderRadius: AppDimens.radiusMediumSmall,
                   elevation: 4,
-                  shadowColor: colorScheme.primary
-                      .withValues(alpha: 0.3),
+                  shadowColor: colorScheme.primary.withValues(alpha: 0.3),
                   child: InkWell(
                     onTap: onPressed,
-                    borderRadius:
-                        AppDimens.radiusMediumSmall,
+                    borderRadius: AppDimens.radiusMediumSmall,
                     child: Padding(
-                      padding:
-                          const EdgeInsets.symmetric(
-                        vertical: 14,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       child: Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             'Select Specialist',
-                            style: textTheme.labelLarge
-                                ?.copyWith(
-                              color: colorScheme
-                                  .onPrimary,
-                              fontWeight:
-                                  FontWeight.w600,
+                            style: textTheme.labelLarge?.copyWith(
+                              color: colorScheme.onPrimary,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           AppDimens.horizontalSmall,
                           Icon(
                             Icons.arrow_forward,
                             size: AppDimens.iconSm,
-                            color:
-                                colorScheme.onPrimary,
+                            color: colorScheme.onPrimary,
                           ),
                         ],
                       ),

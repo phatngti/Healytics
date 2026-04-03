@@ -4,6 +4,7 @@ import { Not, Repository, In } from 'typeorm';
 import { CreatePartnerHealthServiceDto } from './dto/partner/create-partner-health-service.dto';
 import { UpdatePartnerHealthServiceDto } from './dto/partner/update-partner-health-service.dto';
 import { Product } from '@/common/entities/product.entity';
+import { Employee } from '@/common/entities/employee.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
@@ -20,6 +21,7 @@ import {
 import { PublicHealthServiceReviewResponseDto } from './dto/public/public-health-service-review-response.dto';
 import { PublicHealthServiceRecommendedResponseDto } from './dto/public/public-health-service-recommended-response.dto';
 import { PublicHealthServiceCardResponseDto } from './dto/public/public-health-service-card-response.dto';
+import { PublicClinicInfoResponseDto } from './dto/public/public-clinic-info-response.dto';
 import { UserEligibilityDetailResponseDto } from './dto/public/user-eligibility-detail-response.dto';
 import { PartnersService } from '@/partners/partners.service';
 import { HealthServiceStatus } from './enums/health-service-status.enum';
@@ -385,6 +387,51 @@ export class HealthServiceService {
     const ratingsMap = await this.buildRatingsMap(recommended.map((p) => p.id));
     return PublicHealthServiceRecommendedResponseDto.fromEntities(
       recommended,
+      ratingsMap,
+    );
+  }
+
+  // ─── Clinic Info ─────────────────────────────────────────────
+
+  /**
+   * Returns a public clinic profile by partner ID.
+   * Aggregates employees, products, and ratings into
+   * the clinic info response.
+   */
+  async getClinicInfo(
+    partnerId: string,
+  ): Promise<PublicClinicInfoResponseDto> {
+    const partner = await this.partnersService.findOneById(partnerId);
+
+    if (!partner) {
+      this.logger.warn(`Partner not found for clinic info: ${partnerId}`);
+      throw new NotFoundException(
+        `Clinic with ID ${partnerId} not found`,
+      );
+    }
+
+    const products = await this.productRepository.find({
+      where: { partnerId: partner.id },
+      relations: ['media', 'facilityImages'],
+      order: { createdAt: 'DESC' },
+      take: 10,
+    });
+
+    const employees = await this.productRepository.manager
+      .getRepository(Employee)
+      .find({
+        where: { partnerId: partner.id },
+        take: 10,
+      });
+
+    const ratingsMap = await this.buildRatingsMap(
+      products.map((p) => p.id),
+    );
+
+    return PublicClinicInfoResponseDto.fromPartner(
+      partner,
+      employees,
+      products,
       ratingsMap,
     );
   }

@@ -2,9 +2,10 @@
 // AUTO-GENERATED from ws-contract.json — DO NOT EDIT BY HAND.
 //
 // Re-generate with:
-//   ./bin/generate-open-api.sh ws
+//   ./bin/generate-integration.sh ws
 // =============================================================
 
+// ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'dart:async';
@@ -17,6 +18,14 @@ import 'ws_models.dart';
 
 export 'ws_events.dart';
 export 'ws_models.dart';
+
+Map<String, dynamic> _requireEventMap(dynamic value, String context) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) {
+    return Map<String, dynamic>.from(value);
+  }
+  throw FormatException('Expected JSON object for $context, got ${value.runtimeType}');
+}
 
 /// Suppresses verbose internal loggers from
 /// `socket_io_client` (Manager, engine, parser)
@@ -96,7 +105,7 @@ abstract interface class WsNamespaceSocket {
 ///   server: (url: gateway, path: '/user-chat/socket.io/'),
 ///   token: token,
 /// );
-/// socket.onNewMessage.listen((msg) => print(msg));
+/// socket.onNewMessage.listen((event) => print(event));
 /// socket.sendMessage(WsSendMessagePayload(...));
 /// ```
 class UserChatSocket implements WsNamespaceSocket {
@@ -210,7 +219,7 @@ class UserChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.newMessage, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'user-chat.new_message');
         _newMessageController.add(WsNewMessageEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing new_message', e, st);
@@ -219,7 +228,7 @@ class UserChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.messageSent, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'user-chat.message_sent');
         _messageSentController.add(WsMessageSentAck.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing message_sent', e, st);
@@ -228,7 +237,7 @@ class UserChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.messagesRead, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'user-chat.messages_read');
         _messagesReadController.add(WsMessagesReadEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing messages_read', e, st);
@@ -237,7 +246,7 @@ class UserChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.typing, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'user-chat.typing');
         _typingController.add(WsTypingEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing typing', e, st);
@@ -246,7 +255,7 @@ class UserChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.stopTyping, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'user-chat.stop_typing');
         _stopTypingController.add(WsStopTypingEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing stop_typing', e, st);
@@ -255,7 +264,7 @@ class UserChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.error, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'user-chat.error');
         _errorController.add(WsErrorEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing error', e, st);
@@ -276,7 +285,7 @@ class UserChatSocket implements WsNamespaceSocket {
       WsChatEvent.sendMessage,
       payload.toJson(),
       ack: (response) {
-        if (onAck != null && response is Map) {
+        if (onAck != null && response is Map<dynamic, dynamic>) {
           onAck(WsMessageSentAck.fromJson(
             Map<String, dynamic>.from(response),
           ));
@@ -349,7 +358,7 @@ class UserChatSocket implements WsNamespaceSocket {
 ///   server: (url: gateway, path: '/partner-chat/socket.io/'),
 ///   token: token,
 /// );
-/// socket.onNewMessage.listen((msg) => print(msg));
+/// socket.onNewMessage.listen((event) => print(event));
 /// socket.sendMessage(WsSendMessagePayload(...));
 /// ```
 class PartnerChatSocket implements WsNamespaceSocket {
@@ -463,7 +472,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.newMessage, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.new_message');
         _newMessageController.add(WsNewMessageEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing new_message', e, st);
@@ -472,7 +481,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.messageSent, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.message_sent');
         _messageSentController.add(WsMessageSentAck.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing message_sent', e, st);
@@ -481,7 +490,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.messagesRead, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.messages_read');
         _messagesReadController.add(WsMessagesReadEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing messages_read', e, st);
@@ -490,7 +499,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.typing, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.typing');
         _typingController.add(WsTypingEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing typing', e, st);
@@ -499,7 +508,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.stopTyping, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.stop_typing');
         _stopTypingController.add(WsStopTypingEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing stop_typing', e, st);
@@ -508,7 +517,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatEvent.error, (data) {
       try {
-        final map = data as Map<String, dynamic>;
+        final map = _requireEventMap(data, 'partner-chat.error');
         _errorController.add(WsErrorEvent.fromJson(map));
       } catch (e, st) {
         _log.severe('Error parsing error', e, st);
@@ -529,7 +538,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
       WsChatEvent.sendMessage,
       payload.toJson(),
       ack: (response) {
-        if (onAck != null && response is Map) {
+        if (onAck != null && response is Map<dynamic, dynamic>) {
           onAck(WsMessageSentAck.fromJson(
             Map<String, dynamic>.from(response),
           ));
@@ -580,6 +589,170 @@ class PartnerChatSocket implements WsNamespaceSocket {
     _typingController.close();
     _stopTypingController.close();
     _errorController.close();
+    _connectionController.close();
+  }
+
+  void _updateStatus(WsConnectionStatus newStatus) {
+    _status = newStatus;
+    _connectionController.add(newStatus);
+  }
+}
+
+/// Typed Socket.IO client for the `/notifications` namespace.
+///
+/// Real-time notification delivery gateway
+///
+/// **Auth:** JWT — roles: user
+///
+/// Usage:
+/// ```dart
+/// final socket = NotificationsSocket();
+/// socket.connect(
+///   server: (url: gateway, path: '/notifications/socket.io/'),
+///   token: token,
+/// );
+/// socket.onNewNotification.listen((event) => print(event));
+/// ```
+class NotificationsSocket implements WsNamespaceSocket {
+  static final _log = Logger('NotificationsSocket');
+
+  io.Socket? _socket;
+
+  final _newNotificationController =
+      StreamController<WsNewNotificationEvent>.broadcast();
+  final _unreadCountController =
+      StreamController<WsUnreadCountEvent>.broadcast();
+  final _broadcastSentController =
+      StreamController<WsBroadcastSentEvent>.broadcast();
+  final _connectionController =
+      StreamController<WsConnectionStatus>.broadcast();
+
+  /// A new notification was pushed to the user
+  Stream<WsNewNotificationEvent> get onNewNotification =>
+      _newNotificationController.stream;
+
+  /// The unread notification count changed (after new notification or mark-read)
+  Stream<WsUnreadCountEvent> get onUnreadCount =>
+      _unreadCountController.stream;
+
+  /// A system-wide broadcast was sent (admin-facing)
+  Stream<WsBroadcastSentEvent> get onBroadcastSent =>
+      _broadcastSentController.stream;
+
+  /// Stream of connection state changes.
+  @override
+  Stream<WsConnectionStatus> get onConnectionChange =>
+      _connectionController.stream;
+
+  /// Current connection status.
+  WsConnectionStatus _status = WsConnectionStatus.disconnected;
+  @override
+  WsConnectionStatus get status => _status;
+
+  /// Connect to the `/notifications` WebSocket namespace.
+  ///
+  /// [server] provides the base URL and Socket.IO
+  /// transport path.
+  /// [token] is the JWT access token.
+  @override
+  void connect({
+    required WsServerConfig server,
+    required String token,
+  }) {
+    _silenceSocketIoLoggers();
+
+    if (_socket != null) {
+      _log.info('Already connected, disconnecting first');
+      disconnect();
+    }
+
+    _updateStatus(WsConnectionStatus.connecting);
+
+    _socket = io.io(
+      server.url,
+      io.OptionBuilder()
+          .setTransports(['websocket'])
+          .disableAutoConnect()
+          .setPath(server.path)
+          .setAuth({'token': token})
+          .build(),
+    );
+
+    _socket!.onConnect((_) {
+      _log.info('Connected to /notifications');
+      _updateStatus(WsConnectionStatus.connected);
+    });
+
+    _socket!.onDisconnect((_) {
+      _log.info('Disconnected from /notifications');
+      _updateStatus(WsConnectionStatus.disconnected);
+    });
+
+    _socket!.on('reconnecting', (_) {
+      _log.info('Reconnecting to /notifications');
+      _updateStatus(WsConnectionStatus.reconnecting);
+    });
+
+    _socket!.onConnectError((err) {
+      _log.severe('Connection error: $err');
+      _updateStatus(WsConnectionStatus.error);
+    });
+
+    _socket!.onError((err) {
+      _log.severe('Socket error: $err');
+    });
+
+    // ── Server → Client event listeners ─────────────
+
+    _socket!.on(WsChatEvent.newNotification, (data) {
+      try {
+        final map = _requireEventMap(data, 'notifications.new_notification');
+        _newNotificationController.add(WsNewNotificationEvent.fromJson(map));
+      } catch (e, st) {
+        _log.severe('Error parsing new_notification', e, st);
+      }
+    });
+
+    _socket!.on(WsChatEvent.unreadCount, (data) {
+      try {
+        final map = _requireEventMap(data, 'notifications.unread_count');
+        _unreadCountController.add(WsUnreadCountEvent.fromJson(map));
+      } catch (e, st) {
+        _log.severe('Error parsing unread_count', e, st);
+      }
+    });
+
+    _socket!.on(WsChatEvent.broadcastSent, (data) {
+      try {
+        final map = _requireEventMap(data, 'notifications.broadcast_sent');
+        _broadcastSentController.add(WsBroadcastSentEvent.fromJson(map));
+      } catch (e, st) {
+        _log.severe('Error parsing broadcast_sent', e, st);
+      }
+    });
+
+    _socket!.connect();
+  }
+
+  // ── Client → Server emitters ──────────────────────
+
+  /// Disconnect from the WebSocket server.
+  @override
+  void disconnect() {
+    _socket?.disconnect();
+    _socket?.dispose();
+    _socket = null;
+    _updateStatus(WsConnectionStatus.disconnected);
+  }
+
+  /// Clean up all resources. Call when the service
+  /// is permanently disposed.
+  @override
+  void dispose() {
+    disconnect();
+    _newNotificationController.close();
+    _unreadCountController.close();
+    _broadcastSentController.close();
     _connectionController.close();
   }
 

@@ -149,6 +149,17 @@ export class PartnersService {
   }
 
   /**
+   * Returns a partner profile by its primary key,
+   * with location relations loaded.
+   */
+  async findOneById(id: string): Promise<Partner | null> {
+    return this.partnerRepository.findOne({
+      where: { id },
+      relations: ['province', 'district', 'ward'],
+    });
+  }
+
+  /**
    * Returns the first health partner profile with location relations.
    * Used to populate clinic/location info on public product detail screens.
    */
