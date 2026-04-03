@@ -38,7 +38,6 @@ export class AiServiceService {
         'media',
         'productEmployeeEligibilities',
         'productEmployeeEligibilities.employee',
-        'reviews',
       ],
     });
 

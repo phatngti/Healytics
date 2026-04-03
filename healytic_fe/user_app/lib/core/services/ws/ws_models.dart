@@ -2,10 +2,55 @@
 // AUTO-GENERATED from ws-contract.json — DO NOT EDIT BY HAND.
 //
 // Re-generate with:
-//   ./bin/generate-open-api.sh ws
+//   ./bin/generate-integration.sh ws
 // =============================================================
 
+// ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
+
+Map<String, dynamic> _requireJsonMap(dynamic value, String context) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) {
+    return Map<String, dynamic>.from(value);
+  }
+  throw FormatException('Expected JSON object for $context, got ${value.runtimeType}');
+}
+
+Map<String, dynamic>? _jsonMapOrNull(dynamic value, String context) {
+  if (value == null) return null;
+  return _requireJsonMap(value, context);
+}
+
+DateTime _requireDateTime(dynamic value, String context) {
+  if (value is DateTime) return value;
+  if (value is String) return DateTime.parse(value);
+  throw FormatException('Expected DateTime string for $context, got ${value.runtimeType}');
+}
+
+DateTime? _dateTimeOrNull(dynamic value, String context) {
+  if (value == null) return null;
+  return _requireDateTime(value, context);
+}
+
+List<T> _requireJsonList<T>(
+  dynamic value,
+  String context,
+  T Function(dynamic item) convert,
+) {
+  if (value is! List) {
+    throw FormatException('Expected JSON list for $context, got ${value.runtimeType}');
+  }
+  return value.map(convert).toList(growable: false);
+}
+
+List<T>? _jsonListOrNull<T>(
+  dynamic value,
+  String context,
+  T Function(dynamic item) convert,
+) {
+  if (value == null) return null;
+  return _requireJsonList(value, context, convert);
+}
 
 /// Type of chat message content
 enum WsMessageType {
@@ -17,14 +62,111 @@ enum WsMessageType {
 
 WsMessageType wsMessageTypeFromJson(dynamic value) {
   if (value == null) return WsMessageType.text;
-  final str = value.toString().toLowerCase();
-  return WsMessageType.values.firstWhere(
-    (e) => e.name == str,
-    orElse: () => WsMessageType.text,
-  );
+  final str = value.toString();
+  switch (str) {
+    case 'text':
+      return WsMessageType.text;
+    case 'image':
+      return WsMessageType.image;
+    case 'file':
+      return WsMessageType.file;
+    case 'system':
+      return WsMessageType.system;
+    default:
+      return WsMessageType.text;
+  }
 }
 
-String wsMessageTypeToJson(WsMessageType value) => value.name;
+String wsMessageTypeToJson(WsMessageType value) {
+  switch (value) {
+    case WsMessageType.text:
+      return 'text';
+    case WsMessageType.image:
+      return 'image';
+    case WsMessageType.file:
+      return 'file';
+    case WsMessageType.system:
+      return 'system';
+  }
+}
+
+/// Type of notification in the Healytics platform
+enum WsNotificationType {
+  bookingConfirmed,
+  bookingCancelled,
+  bookingCompleted,
+  appointmentReminder,
+  appointmentUpdated,
+  newChatMessage,
+  paymentSuccess,
+  paymentFailed,
+  systemBroadcast,
+  systemMaintenance,
+  partnerVerified,
+  partnerRejected,
+}
+
+WsNotificationType wsNotificationTypeFromJson(dynamic value) {
+  if (value == null) return WsNotificationType.bookingConfirmed;
+  final str = value.toString();
+  switch (str) {
+    case 'booking_confirmed':
+      return WsNotificationType.bookingConfirmed;
+    case 'booking_cancelled':
+      return WsNotificationType.bookingCancelled;
+    case 'booking_completed':
+      return WsNotificationType.bookingCompleted;
+    case 'appointment_reminder':
+      return WsNotificationType.appointmentReminder;
+    case 'appointment_updated':
+      return WsNotificationType.appointmentUpdated;
+    case 'new_chat_message':
+      return WsNotificationType.newChatMessage;
+    case 'payment_success':
+      return WsNotificationType.paymentSuccess;
+    case 'payment_failed':
+      return WsNotificationType.paymentFailed;
+    case 'system_broadcast':
+      return WsNotificationType.systemBroadcast;
+    case 'system_maintenance':
+      return WsNotificationType.systemMaintenance;
+    case 'partner_verified':
+      return WsNotificationType.partnerVerified;
+    case 'partner_rejected':
+      return WsNotificationType.partnerRejected;
+    default:
+      return WsNotificationType.bookingConfirmed;
+  }
+}
+
+String wsNotificationTypeToJson(WsNotificationType value) {
+  switch (value) {
+    case WsNotificationType.bookingConfirmed:
+      return 'booking_confirmed';
+    case WsNotificationType.bookingCancelled:
+      return 'booking_cancelled';
+    case WsNotificationType.bookingCompleted:
+      return 'booking_completed';
+    case WsNotificationType.appointmentReminder:
+      return 'appointment_reminder';
+    case WsNotificationType.appointmentUpdated:
+      return 'appointment_updated';
+    case WsNotificationType.newChatMessage:
+      return 'new_chat_message';
+    case WsNotificationType.paymentSuccess:
+      return 'payment_success';
+    case WsNotificationType.paymentFailed:
+      return 'payment_failed';
+    case WsNotificationType.systemBroadcast:
+      return 'system_broadcast';
+    case WsNotificationType.systemMaintenance:
+      return 'system_maintenance';
+    case WsNotificationType.partnerVerified:
+      return 'partner_verified';
+    case WsNotificationType.partnerRejected:
+      return 'partner_rejected';
+  }
+}
 
 /// Payload for sending a message via WebSocket
 class WsSendMessagePayload {
@@ -51,14 +193,25 @@ class WsSendMessagePayload {
     this.clientMessageId,
   });
 
-  /// Serialize to a JSON map for Socket.IO emit.
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsSendMessagePayload.fromJson(Map<String, dynamic> json) {
+    return WsSendMessagePayload(
+      conversationId: json['conversationId'] as String,
+      receiverId: json['receiverId'] as String,
+      content: json['content'] as String,
+      messageType: json['messageType'] != null ? wsMessageTypeFromJson(json['messageType']) : null,
+      clientMessageId: json['clientMessageId'] as String?,
+    );
+  }
+
+  /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'conversationId': conversationId,
       'receiverId': receiverId,
       'content': content,
       if (messageType != null) 'messageType': wsMessageTypeToJson(messageType!),
-      if (clientMessageId != null) 'clientMessageId': clientMessageId,
+      if (clientMessageId != null) 'clientMessageId': clientMessageId!,
     };
   }
 
@@ -81,7 +234,15 @@ class WsTypingPayload {
     required this.receiverId,
   });
 
-  /// Serialize to a JSON map for Socket.IO emit.
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsTypingPayload.fromJson(Map<String, dynamic> json) {
+    return WsTypingPayload(
+      conversationId: json['conversationId'] as String,
+      receiverId: json['receiverId'] as String,
+    );
+  }
+
+  /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'conversationId': conversationId,
@@ -108,7 +269,15 @@ class WsMarkReadPayload {
     required this.receiverId,
   });
 
-  /// Serialize to a JSON map for Socket.IO emit.
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsMarkReadPayload.fromJson(Map<String, dynamic> json) {
+    return WsMarkReadPayload(
+      conversationId: json['conversationId'] as String,
+      receiverId: json['receiverId'] as String,
+    );
+  }
+
+  /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'conversationId': conversationId,
@@ -131,7 +300,14 @@ class WsJoinConversationPayload {
     required this.conversationId,
   });
 
-  /// Serialize to a JSON map for Socket.IO emit.
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsJoinConversationPayload.fromJson(Map<String, dynamic> json) {
+    return WsJoinConversationPayload(
+      conversationId: json['conversationId'] as String,
+    );
+  }
+
+  /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'conversationId': conversationId,
@@ -163,6 +339,14 @@ class WsMessageSentAck {
       id: json['id'] as String,
       clientMessageId: json['clientMessageId'] as String?,
     );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      if (clientMessageId != null) 'clientMessageId': clientMessageId!,
+    };
   }
 
   @override
@@ -228,8 +412,24 @@ class WsNewMessageEvent {
       content: json['content'] as String,
       messageType: wsMessageTypeFromJson(json['messageType']),
       clientMessageId: json['clientMessageId'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: _requireDateTime(json['createdAt'], 'WsNewMessageEvent.createdAt'),
     );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'conversationId': conversationId,
+      'senderId': senderId,
+      'receiverId': receiverId,
+      if (senderName != null) 'senderName': senderName!,
+      if (senderAvatar != null) 'senderAvatar': senderAvatar!,
+      'content': content,
+      'messageType': wsMessageTypeToJson(messageType),
+      if (clientMessageId != null) 'clientMessageId': clientMessageId!,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+    };
   }
 
   @override
@@ -265,8 +465,18 @@ class WsMessagesReadEvent {
       conversationId: json['conversationId'] as String,
       readerId: json['readerId'] as String,
       receiverId: json['receiverId'] as String,
-      readAt: DateTime.parse(json['readAt'] as String),
+      readAt: _requireDateTime(json['readAt'], 'WsMessagesReadEvent.readAt'),
     );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'conversationId': conversationId,
+      'readerId': readerId,
+      'receiverId': receiverId,
+      'readAt': readAt.toUtc().toIso8601String(),
+    };
   }
 
   @override
@@ -306,6 +516,16 @@ class WsTypingEvent {
     );
   }
 
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'conversationId': conversationId,
+      'userId': userId,
+      'receiverId': receiverId,
+      'userName': userName,
+    };
+  }
+
   @override
   String toString() {
     return 'WsTypingEvent(conversationId: $conversationId, userId: $userId, receiverId: $receiverId, userName: $userName)';
@@ -338,6 +558,15 @@ class WsStopTypingEvent {
     );
   }
 
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'conversationId': conversationId,
+      'userId': userId,
+      'receiverId': receiverId,
+    };
+  }
+
   @override
   String toString() {
     return 'WsStopTypingEvent(conversationId: $conversationId, userId: $userId, receiverId: $receiverId)';
@@ -360,9 +589,169 @@ class WsErrorEvent {
     );
   }
 
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'message': message,
+    };
+  }
+
   @override
   String toString() {
     return 'WsErrorEvent(message: $message)';
+  }
+}
+
+/// Server event: a new notification pushed to the user in real-time
+class WsNewNotificationEvent {
+  /// Notification UUID
+  final String id;
+
+  /// The type of notification
+  final WsNotificationType type;
+
+  /// Notification title
+  final String title;
+
+  /// Notification body text
+  final String body;
+
+  /// Deep-link data for frontend routing
+  final Map<String, dynamic>? data;
+
+  /// Whether the notification has been read
+  final bool isRead;
+
+  /// When the notification was read
+  final DateTime? readAt;
+
+  /// Whether this is a system-wide broadcast
+  final bool isBroadcast;
+
+  /// When the notification was created
+  final DateTime createdAt;
+
+  const WsNewNotificationEvent({
+    required this.id,
+    required this.type,
+    required this.title,
+    required this.body,
+    this.data,
+    required this.isRead,
+    this.readAt,
+    required this.isBroadcast,
+    required this.createdAt,
+  });
+
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsNewNotificationEvent.fromJson(Map<String, dynamic> json) {
+    return WsNewNotificationEvent(
+      id: json['id'] as String,
+      type: wsNotificationTypeFromJson(json['type']),
+      title: json['title'] as String,
+      body: json['body'] as String,
+      data: _jsonMapOrNull(json['data'], 'WsNewNotificationEvent.data'),
+      isRead: json['isRead'] as bool,
+      readAt: _dateTimeOrNull(json['readAt'], 'WsNewNotificationEvent.readAt'),
+      isBroadcast: json['isBroadcast'] as bool,
+      createdAt: _requireDateTime(json['createdAt'], 'WsNewNotificationEvent.createdAt'),
+    );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'type': wsNotificationTypeToJson(type),
+      'title': title,
+      'body': body,
+      if (data != null) 'data': data!,
+      'isRead': isRead,
+      if (readAt != null) 'readAt': readAt!.toUtc().toIso8601String(),
+      'isBroadcast': isBroadcast,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+    };
+  }
+
+  @override
+  String toString() {
+    return 'WsNewNotificationEvent(id: $id, type: $type, title: $title, body: $body, data: $data, isRead: $isRead, readAt: $readAt, isBroadcast: $isBroadcast, createdAt: $createdAt)';
+  }
+}
+
+/// Server event: updated unread notification count for the user
+class WsUnreadCountEvent {
+  /// Current unread notification count
+  final num count;
+
+  const WsUnreadCountEvent({
+    required this.count,
+  });
+
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsUnreadCountEvent.fromJson(Map<String, dynamic> json) {
+    return WsUnreadCountEvent(
+      count: json['count'] as num,
+    );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'count': count,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'WsUnreadCountEvent(count: $count)';
+  }
+}
+
+/// Server event: a system-wide broadcast was sent (admin-facing)
+class WsBroadcastSentEvent {
+  /// Notification UUID
+  final String id;
+
+  /// Notification title
+  final String title;
+
+  /// Notification body text
+  final String body;
+
+  /// When the broadcast was created
+  final DateTime createdAt;
+
+  const WsBroadcastSentEvent({
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.createdAt,
+  });
+
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsBroadcastSentEvent.fromJson(Map<String, dynamic> json) {
+    return WsBroadcastSentEvent(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      body: json['body'] as String,
+      createdAt: _requireDateTime(json['createdAt'], 'WsBroadcastSentEvent.createdAt'),
+    );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'body': body,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+    };
+  }
+
+  @override
+  String toString() {
+    return 'WsBroadcastSentEvent(id: $id, title: $title, body: $body, createdAt: $createdAt)';
   }
 }
 

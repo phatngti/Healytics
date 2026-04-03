@@ -36,7 +36,10 @@ export class AiTokenAuthGuard implements CanActivate {
       throw new UnauthorizedException('AI service is not configured');
     }
 
-    if (apiKey !== expectedToken) {
+    console.log('API Key:', apiKey);
+    console.log('Expected Token:', expectedToken);
+
+    if (apiKey.trim() !== expectedToken.trim()) {
       this.logger.warn('Invalid AI API key provided');
       throw new UnauthorizedException('Invalid API key');
     }

@@ -71,3 +71,8 @@ export { AiChatMessage } from './chat-message.entity';
 export { PartnerConversation } from './partner-conversation.entity';
 export { PartnerChatMessage } from './partner-chat-message.entity';
 export { PartnerChatAttachment } from './partner-chat-attachment.entity';
+
+// Notifications
+export { Notification } from './notification.entity';
+export { NotificationRead } from './notification-read.entity';
+export { DeviceToken } from './device-token.entity';

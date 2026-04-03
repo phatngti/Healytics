@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/widgets/adaptive_root_scaffold/adaptive_root_scraffold.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/ai_health_assistant/presentation/screens/chat.screen.dart';
@@ -40,6 +41,11 @@ import 'package:user_app/features/review/presentation/screens/review_treatment.s
 import 'package:user_app/features/review/presentation/screens/review_specialist.screen.dart';
 import 'package:user_app/features/review/presentation/screens/review_submitted.screen.dart';
 import 'package:user_app/features/partner_chat/presentation/screens/partner_chat.screen.dart';
+import 'package:user_app/features/clinic_info/presentation/screens/clinic_info.screen.dart';
+import 'package:user_app/features/notifications/'
+    'presentation/providers/notification.provider.dart';
+import 'package:user_app/core/services/'
+    'push_notification_flutter.service.dart';
 
 part 'routes.g.dart';
 
@@ -112,8 +118,30 @@ class MobileWrapperRoutes extends StatefulShellRouteData {
     GoRouterState state,
     StatefulNavigationShell navigationShell,
   ) {
+    return _MobileWrapperBody(navigationShell: navigationShell);
+  }
+}
+
+/// Extracted to a ConsumerWidget so we can
+/// watch the unread count provider.
+class _MobileWrapperBody extends ConsumerWidget {
+  const _MobileWrapperBody({required this.navigationShell});
+
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(unreadCountProvider).value ?? 0;
+
+    // Eagerly connect /notifications WS namespace
+    ref.watch(notificationWsConnectionProvider);
+
+    // Initialise mock push notification service
+    ref.watch(pushNotificationServiceProvider);
+
     return AdaptiveRootScraffold(
       navigationShell: navigationShell,
+      notificationBadgeCount: unreadCount,
       destinationKeys: [
         keys.bottomNav.homeTab,
         keys.bottomNav.ordersTab,
@@ -763,8 +791,7 @@ class EditProfileRoute extends GoRouteData with $EditProfileRoute {
   path: '/review_treatment',
   name: ReviewTreatmentRoute.name,
 )
-class ReviewTreatmentRoute extends GoRouteData
-    with $ReviewTreatmentRoute {
+class ReviewTreatmentRoute extends GoRouteData with $ReviewTreatmentRoute {
   final String appointmentId;
   final String serviceName;
   final String vendorName;
@@ -778,10 +805,7 @@ class ReviewTreatmentRoute extends GoRouteData
   static const name = 'review_treatment';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ReviewTreatmentScreen(
@@ -799,8 +823,7 @@ class ReviewTreatmentRoute extends GoRouteData
   path: '/review_specialist',
   name: ReviewSpecialistRoute.name,
 )
-class ReviewSpecialistRoute extends GoRouteData
-    with $ReviewSpecialistRoute {
+class ReviewSpecialistRoute extends GoRouteData with $ReviewSpecialistRoute {
   final String appointmentId;
   final String specialistId;
   final String specialistName;
@@ -818,10 +841,7 @@ class ReviewSpecialistRoute extends GoRouteData
   static const name = 'review_specialist';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ReviewSpecialistScreen(
@@ -829,8 +849,7 @@ class ReviewSpecialistRoute extends GoRouteData
         specialistId: specialistId,
         specialistName: specialistName,
         specialistRole: specialistRole,
-        specialistAvatarUrl:
-            specialistAvatarUrl,
+        specialistAvatarUrl: specialistAvatarUrl,
       ),
     );
   }
@@ -842,8 +861,7 @@ class ReviewSpecialistRoute extends GoRouteData
   path: '/review_submitted',
   name: ReviewSubmittedRoute.name,
 )
-class ReviewSubmittedRoute extends GoRouteData
-    with $ReviewSubmittedRoute {
+class ReviewSubmittedRoute extends GoRouteData with $ReviewSubmittedRoute {
   final String specialistName;
   final String? specialistAvatarUrl;
   final int rating;
@@ -857,16 +875,12 @@ class ReviewSubmittedRoute extends GoRouteData
   static const name = 'review_submitted';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ReviewSubmittedScreen(
         specialistName: specialistName,
-        specialistAvatarUrl:
-            specialistAvatarUrl,
+        specialistAvatarUrl: specialistAvatarUrl,
         rating: rating,
       ),
     );
@@ -879,8 +893,7 @@ class ReviewSubmittedRoute extends GoRouteData
   path: '/partner_chat',
   name: PartnerChatRoute.name,
 )
-class PartnerChatRoute extends GoRouteData
-    with $PartnerChatRoute {
+class PartnerChatRoute extends GoRouteData with $PartnerChatRoute {
   final String partnerAccountId;
   final String partnerName;
   final String? partnerAvatar;
@@ -894,10 +907,7 @@ class PartnerChatRoute extends GoRouteData
   static const name = 'partner_chat';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: PartnerChatScreen(
@@ -905,6 +915,25 @@ class PartnerChatRoute extends GoRouteData
         partnerName: partnerName,
         partnerAvatar: partnerAvatar,
       ),
+    );
+  }
+}
+
+// --- CLINIC INFO ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ClinicInfoRoute>(path: '/clinic_info', name: ClinicInfoRoute.name)
+class ClinicInfoRoute extends GoRouteData with $ClinicInfoRoute {
+  final String clinicId;
+
+  const ClinicInfoRoute({required this.clinicId});
+
+  static const name = 'clinic_info';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ClinicInfoScreen(clinicId: clinicId),
     );
   }
 }

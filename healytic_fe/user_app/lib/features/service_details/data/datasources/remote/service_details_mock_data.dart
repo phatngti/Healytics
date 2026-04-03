@@ -82,6 +82,7 @@ final kMockServiceInfo = ServiceDetailsEntity(
     FeatureTagEntity(iconName: 'biotech', label: 'Advanced Tech'),
   ],
   clinic: const ClinicEntity(
+    id: 'clinic-elite-dermatology',
     name: 'Elite Dermatology',
     address: '42 West St, NY',
   ),
@@ -140,6 +141,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
       FeatureTagEntity(iconName: 'self_improvement', label: 'Pain Relief'),
     ],
     clinic: const ClinicEntity(
+      id: 'clinic-spa-harmony',
       name: 'Spa Harmony',
       address: 'District 1, Ho Chi Minh City',
     ),
@@ -187,6 +189,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
       FeatureTagEntity(iconName: 'spa', label: 'All Levels'),
     ],
     clinic: const ClinicEntity(
+      id: 'clinic-zen-studio',
       name: 'Zen Studio',
       address: 'Thao Dien, Thu Duc City',
     ),
@@ -228,6 +231,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
       FeatureTagEntity(iconName: 'biotech', label: 'Custom Plan'),
     ],
     clinic: const ClinicEntity(
+      id: 'clinic-fitlife-center',
       name: 'FitLife Center',
       address: 'District 7, Ho Chi Minh City',
     ),
@@ -272,6 +276,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
       ),
     ],
     clinic: const ClinicEntity(
+      id: 'clinic-royal-spa',
       name: 'Royal Spa',
       address: 'District 3, Ho Chi Minh City',
     ),
@@ -744,8 +749,7 @@ const Map<String, List<RecommendedServiceEntity>> kMockRecommendedMap = {
 ///
 /// Used when showing reviews based on the selected
 /// specialist.
-final Map<String, List<ReviewEntity>>
-    kMockEmployeeReviewsMap = {
+final Map<String, List<ReviewEntity>> kMockEmployeeReviewsMap = {
   'spec-1': [
     ReviewEntity(
       reviewerName: 'Tran Van Nam',

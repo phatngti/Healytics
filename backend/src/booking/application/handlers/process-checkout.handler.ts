@@ -9,6 +9,8 @@ import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
 import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { CheckoutTicketStatus } from '@/booking/enums/checkout-ticket-status.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { NotificationType } from '@/notification/enums/notification-type.enum';
+import { NotificationEventService } from '@/notification/services/notification-event.service';
 import { RedisService } from '@/redis/redis.service';
 import { WebhookService, WebhookPayload } from '../../services/webhook.service';
 
@@ -33,6 +35,7 @@ export class ProcessCheckoutHandler {
     private readonly ticketRepo: Repository<CheckoutTicket>,
     private readonly redisService: RedisService,
     private readonly webhookService: WebhookService,
+    private readonly notificationEventService: NotificationEventService,
   ) {}
 
   @EventPattern('checkout.process')
@@ -88,18 +91,24 @@ export class ProcessCheckoutHandler {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
+    let savedBooking: Booking | null = null;
+    let serviceName: string | null = null;
+
     try {
       // Calculate endTime from product definition
       let endTime: Date | null = null;
       if (data.productId) {
         const definition = await queryRunner.manager.findOne(
           ProductDefinition,
-          { where: { productId: data.productId } },
+          { where: { productId: data.productId }, relations: ['product'] },
         );
         if (definition?.durationMinutes) {
           endTime = new Date(
             startDate.getTime() + definition.durationMinutes * 60 * 1000,
           );
+        }
+        if ((definition as any)?.product?.name) {
+          serviceName = (definition as any).product.name as string;
         }
       }
 
@@ -115,7 +124,7 @@ export class ProcessCheckoutHandler {
         paymentUrl: null, // Will be set by payment service later
         paymentExpiresAt,
       });
-      const savedBooking = await queryRunner.manager.save(Booking, booking);
+      savedBooking = await queryRunner.manager.save(Booking, booking);
 
       // Create status log
       const log = queryRunner.manager.create(BookingStatusLog, {
@@ -150,6 +159,20 @@ export class ProcessCheckoutHandler {
         error: null,
       };
       await this.webhookService.notify(data.webhookUrl ?? null, webhookPayload);
+
+      // Send booking confirmation notification (fire-and-forget, outside transaction)
+      this.notificationEventService.emit({
+        type: NotificationType.BOOKING_CONFIRMED,
+        recipientId: data.userId,
+        title: 'Booking Confirmed! 🎉',
+        body: serviceName
+          ? `Your booking for "${serviceName}" on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`
+          : `Your booking on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`,
+        data: {
+          bookingId: savedBooking.id,
+          action: 'view_booking',
+        },
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(

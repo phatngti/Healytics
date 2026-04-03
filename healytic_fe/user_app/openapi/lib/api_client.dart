@@ -262,6 +262,8 @@ class ApiClient {
           return ConversationResponseDto.fromJson(value);
         case 'ConversationsPageResponse':
           return ConversationsPageResponse.fromJson(value);
+        case 'CreateBroadcastDto':
+          return CreateBroadcastDto.fromJson(value);
         case 'CreateCategoryDto':
           return CreateCategoryDto.fromJson(value);
         case 'CreateConversationDto':
@@ -356,6 +358,8 @@ class ApiClient {
           return MicroLockResponseDto.fromJson(value);
         case 'MyProfileResponseDto':
           return MyProfileResponseDto.fromJson(value);
+        case 'NotificationResponseDto':
+          return NotificationResponseDto.fromJson(value);
         case 'PaginationMeta':
           return PaginationMeta.fromJson(value);
         case 'ParticipantInfoDto':
@@ -466,6 +470,8 @@ class ApiClient {
           return RecommendedServiceResponseDto.fromJson(value);
         case 'RefreshTokenRequestDto':
           return RefreshTokenRequestDto.fromJson(value);
+        case 'RegisterDeviceDto':
+          return RegisterDeviceDto.fromJson(value);
         case 'RegisterDto':
           return RegisterDto.fromJson(value);
         case 'RegisterPartnerDto':

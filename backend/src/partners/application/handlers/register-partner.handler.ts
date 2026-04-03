@@ -8,7 +8,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { Account } from '@/common/entities/account.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { LegalRepresentative } from '@/common/entities/legal-representative.entity';

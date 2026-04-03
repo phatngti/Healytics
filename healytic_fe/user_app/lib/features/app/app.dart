@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/app/widgets/'
     'global_error_listener.widget.dart';
+import 'package:user_app/features/notifications/'
+    'presentation/widgets/'
+    'notification_toast_listener.widget.dart';
 import 'package:user_app/router/app_router.dart';
 import 'package:user_app/theme/app_theme.dart';
 
@@ -14,12 +17,14 @@ class App extends HookConsumerWidget {
     final theme = AppTheme();
 
     return GlobalErrorListener(
-      child: MaterialApp.router(
-        title: 'GoHealh',
-        routerConfig: router,
-        debugShowCheckedModeBanner: false,
-        theme: theme.lightTheme(),
-        darkTheme: theme.darkTheme(),
+      child: NotificationToastListener(
+        child: MaterialApp.router(
+          title: 'GoHealh',
+          routerConfig: router,
+          debugShowCheckedModeBanner: false,
+          theme: theme.lightTheme(),
+          darkTheme: theme.darkTheme(),
+        ),
       ),
     );
   }

@@ -22,7 +22,6 @@ export class GetServiceManualHandler {
         'product',
         'product.media',
         'product.productDefinition',
-        'product.reviews',
         'product.facilityImages',
       ],
     });
