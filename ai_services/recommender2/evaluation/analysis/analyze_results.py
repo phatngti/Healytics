@@ -11,6 +11,8 @@ Usage (from recommender2/ root):
 Outputs:
     - Cosine similarity score distribution (histogram)
     - Category-wise metric breakdown (grouped bar chart)
+    - Latency distribution (histogram with p50/p95/p99 markers)
+    - Hard Negative Rate per category (bar chart)
     - Metrics summary as CSV
     - Plots saved to evaluation/results/plots/
 """
@@ -217,7 +219,153 @@ def plot_category_breakdown(run_data: Dict, output_dir: str = PLOTS_DIR) -> str:
 
 
 # ---------------------------------------------------------------------------
-# 3. Metrics Summary CSV
+# 3. Latency Distribution
+# ---------------------------------------------------------------------------
+
+def plot_latency_distribution(run_data: Dict, output_dir: str = PLOTS_DIR) -> str:
+    """Plot histogram of per-query latency with p50/p95/p99 markers."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    predictions = run_data.get("predictions", [])
+    latencies = [p["latency_ms"] for p in predictions if "latency_ms" in p]
+
+    if not latencies:
+        print("⚠️  No latency data — skipping latency plot")
+        return ""
+
+    latencies_sorted = sorted(latencies)
+    n = len(latencies_sorted)
+    avg_lat = sum(latencies) / n
+    p50 = latencies_sorted[n // 2]
+    p95 = latencies_sorted[min(int(n * 0.95), n - 1)]
+    p99 = latencies_sorted[min(int(n * 0.99), n - 1)]
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    ax.hist(latencies, bins=30, alpha=0.7, color="#3b82f6", edgecolor="white")
+
+    # Percentile markers
+    ax.axvline(avg_lat, color="#22c55e", linestyle="-", linewidth=2,
+               label=f"Avg: {avg_lat:.1f}ms")
+    ax.axvline(p50, color="#f59e0b", linestyle="--", linewidth=1.5,
+               label=f"P50: {p50:.1f}ms")
+    ax.axvline(p95, color="#ef4444", linestyle="--", linewidth=1.5,
+               label=f"P95: {p95:.1f}ms")
+    ax.axvline(p99, color="#dc2626", linestyle="-.", linewidth=1.5,
+               label=f"P99: {p99:.1f}ms")
+
+    ax.set_xlabel("Latency (ms)", fontsize=12)
+    ax.set_ylabel("Count", fontsize=12)
+    ax.set_title(
+        f"Retrieval Latency — {run_data['run_name']}\n"
+        f"({n} queries)",
+        fontsize=14
+    )
+    ax.legend(fontsize=10)
+    ax.grid(axis="y", alpha=0.3)
+
+    plt.tight_layout()
+    os.makedirs(output_dir, exist_ok=True)
+
+    filename = f"latency_dist_{run_data['run_name']}.png"
+    out_path = os.path.join(output_dir, filename)
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+
+    print(f"📊 Latency distribution saved to: {out_path}")
+    return out_path
+
+
+# ---------------------------------------------------------------------------
+# 4. Hard Negative Rate per Category
+# ---------------------------------------------------------------------------
+
+def plot_hard_negative_breakdown(run_data: Dict, output_dir: str = PLOTS_DIR) -> str:
+    """Plot hard negative rate per category (bar chart)."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    predictions = run_data.get("predictions", [])
+    per_query = run_data.get("per_query", [])
+
+    # Check if HNR data exists
+    if not any("HNR@3" in pq for pq in per_query):
+        print("⚠️  No hard negative data — skipping HNR breakdown")
+        return ""
+
+    categories = sorted(set(
+        p.get("category", "") for p in predictions if p.get("category")
+    ))
+    pq_by_id = {pq["id"]: pq for pq in per_query}
+
+    # Fall back to "all" if no categories
+    if not categories:
+        categories = ["all"]
+        for p in predictions:
+            p.setdefault("category", "all")
+
+    hnr_metrics = ["HNR@1", "HNR@3", "HNR@5"]
+    cat_data: Dict[str, Dict[str, float]] = {}
+
+    for cat in categories:
+        cat_preds = [p for p in predictions if p.get("category", "all") == cat]
+        n = len(cat_preds)
+        if n == 0:
+            continue
+        cat_data[cat] = {}
+        for metric in hnr_metrics:
+            total = sum(pq_by_id[p["id"]].get(metric, 0) for p in cat_preds)
+            cat_data[cat][metric] = total / n
+
+    if not cat_data:
+        return ""
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    x_labels = list(cat_data.keys())
+    x = range(len(x_labels))
+    bar_width = 0.25
+    colors = ["#ef4444", "#f97316", "#eab308"]
+
+    for i, metric in enumerate(hnr_metrics):
+        values = [cat_data[cat].get(metric, 0) for cat in x_labels]
+        offsets = [xi + i * bar_width - bar_width for xi in x]
+        ax.bar(offsets, values, bar_width, label=metric, color=colors[i],
+               edgecolor="white", linewidth=0.8)
+
+    ax.set_xlabel("Category", fontsize=12)
+    ax.set_ylabel("Hard Negative Rate (↓ lower is better)", fontsize=12)
+    ax.set_title(
+        f"Hard Negative Rate — {run_data['run_name']}\n"
+        f"(Lower = model avoids confusing services better)",
+        fontsize=14
+    )
+    ax.set_xticks(list(x))
+    ax.set_xticklabels(x_labels, fontsize=11)
+    ax.set_ylim(0, max(0.5, max(
+        max(cat_data[cat].get(m, 0) for m in hnr_metrics)
+        for cat in x_labels
+    ) * 1.2))
+    ax.legend(fontsize=10)
+    ax.grid(axis="y", alpha=0.3)
+
+    plt.tight_layout()
+    os.makedirs(output_dir, exist_ok=True)
+
+    filename = f"hnr_breakdown_{run_data['run_name']}.png"
+    out_path = os.path.join(output_dir, filename)
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+
+    print(f"📊 Hard Negative Rate breakdown saved to: {out_path}")
+    return out_path
+
+
+# ---------------------------------------------------------------------------
+# 5. Metrics Summary CSV
 # ---------------------------------------------------------------------------
 
 def save_metrics_csv(run_data: Dict, output_dir: str = RESULTS_DIR) -> str:
@@ -256,7 +404,7 @@ def save_metrics_csv(run_data: Dict, output_dir: str = RESULTS_DIR) -> str:
 
 
 # ---------------------------------------------------------------------------
-# 4. Run comparison (if multiple runs exist)
+# 6. Run comparison (if multiple runs exist)
 # ---------------------------------------------------------------------------
 
 def compare_runs(run_paths: List[str], output_dir: str = PLOTS_DIR) -> str:
@@ -374,6 +522,8 @@ def main():
     # Generate all visualizations
     plot_cosine_distribution(run_data, output_dir=args.output_dir)
     plot_category_breakdown(run_data, output_dir=args.output_dir)
+    plot_latency_distribution(run_data, output_dir=args.output_dir)
+    plot_hard_negative_breakdown(run_data, output_dir=args.output_dir)
 
     if not args.no_csv:
         save_metrics_csv(run_data)
