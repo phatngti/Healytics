@@ -42,19 +42,89 @@ _ALLOWED_BUSINESS_TYPES = {
     "PHARMACY",
 }
 
-_BT_FALLBACK_KEYWORDS = {
-    "massage trị liệu": "MASSAGE_REHABILITATION",
-    "vật lý trị liệu": "MASSAGE_REHABILITATION",
-    "phục hồi chức năng": "MASSAGE_REHABILITATION",
-    "massage": "MASSAGE_THERAPY",
-    "mát xa": "MASSAGE_THERAPY",
-    "spa": "SPA_BEAUTY",
-    "làm đẹp": "SPA_BEAUTY",
-    "nha": "DENTAL",
-    "tâm lý": "PSYCHOLOGY",
-    "đông y": "TRADITIONAL_MEDICINE",
-    "nhà thuốc": "PHARMACY",
+# ============================================================================
+# Validation constants and functions
+# ============================================================================
+
+VALID_LOCATION_CODES = {
+    # Provinces
+    "01", "79", "48",  # HN, HCM, DN
+    # HCM Districts
+    "760", "769", "770", "771", "773", "774", "775", "776", "777", "778",
+    "761", "762", "763", "764", "765", "766", "767", "768",
+    # HN Districts  
+    "001", "002", "003", "005", "006", "007", "008", "009",
+    "016", "017", "018", "019", "020", "021",
+    # DN Districts
+    "490", "491", "492", "493",
 }
+
+GENERIC_WORDS = {
+    "dịch vụ", "service", "ở", "tìm", "find", "cần", "need",
+    "gần", "near", "khu vực", "area", "tại", "at", "trong", "in",
+    "cao cấp", "premium", "chất lượng", "quality", "tốt", "good"
+}
+
+
+def _validate_location_code(entity: dict) -> bool:
+    """
+    Validate location code is in whitelist.
+    Returns True if valid or no location_code, False if invalid.
+    """
+    loc_code = entity.get("location_code")
+    if not loc_code:
+        return True
+    
+    loc_code_str = str(loc_code).strip()
+    
+    if loc_code_str not in VALID_LOCATION_CODES:
+        logger.warning(
+            "[ValidationPenalty] Invalid location_code rejected: %s (entity: %s)",
+            loc_code_str,
+            entity.get("value", "")
+        )
+        return False
+    
+    return True
+
+
+def _validate_business_evidence(entity: dict, query_text: str) -> bool:
+    """
+    Validate BUSINESS_TYPE has legitimate evidence.
+    Returns True if valid, False if should reject.
+    """
+    if entity.get("type") != "BUSINESS_TYPE":
+        return True
+    
+    evidence = entity.get("business_evidence", "").strip().lower()
+    
+    # Must have evidence
+    if not evidence:
+        logger.warning(
+            "[ValidationPenalty] BUSINESS_TYPE without evidence rejected: %s",
+            entity.get("business_type", "")
+        )
+        return False
+    
+    # Evidence must be in query
+    if evidence not in query_text.lower():
+        logger.warning(
+            "[ValidationPenalty] BUSINESS_TYPE evidence not in query: '%s' | query: '%s'",
+            evidence,
+            query_text[:50]
+        )
+        return False
+    
+    # Evidence must not be generic word ONLY
+    evidence_words = set(evidence.split())
+    if evidence_words.issubset(GENERIC_WORDS):
+        logger.warning(
+            "[ValidationPenalty] BUSINESS_TYPE with generic evidence rejected: '%s'",
+            evidence
+        )
+        return False
+    
+    return True
 
 
 def _strip_code_fence(text: str) -> str:
@@ -98,14 +168,6 @@ def _extract_outermost_json_block(text: str) -> str:
     # Fallback to the earliest bounds if both parse checks fail.
     start, end = min(candidates, key=lambda item: item[0])
     return text[start:end]
-
-
-def _guess_business_type_from_value(value: str) -> str | None:
-    value_lower = value.lower().strip()
-    for keyword, bt in _BT_FALLBACK_KEYWORDS.items():
-        if keyword in value_lower:
-            return bt
-    return None
 
 
 def _preview_for_log(value: Any, max_chars: int = _LOG_PREVIEW_MAX_CHARS) -> str:
@@ -195,10 +257,25 @@ def _sanitize_entities(entity: dict[str, Any], text: str) -> list[dict[str, Any]
     if not value:
         return []
 
-    try:
-        confidence = float(entity.get("confidence", 0.8))
-    except (TypeError, ValueError):
-        confidence = 0.8
+    # Extract confidence from Gemini response
+    confidence_raw = entity.get("confidence")
+    if confidence_raw is None:
+        confidence = 0.85  # Default to high confidence if not provided
+        logger.debug(
+            "[Confidence] Entity missing confidence field, using default 0.85: %s",
+            entity.get("type")
+        )
+    else:
+        try:
+            confidence = float(confidence_raw)
+        except (TypeError, ValueError):
+            logger.warning(
+                "[Confidence] Invalid confidence value '%s', using default 0.85: %s",
+                confidence_raw,
+                entity.get("type")
+            )
+            confidence = 0.85
+    
     confidence = max(0.0, min(1.0, confidence))
 
     cleaned: dict[str, Any] = {
@@ -207,7 +284,34 @@ def _sanitize_entities(entity: dict[str, Any], text: str) -> list[dict[str, Any]
         "confidence": confidence,
     }
 
+    # Validate location code (only for LOCATION entities)
+    if entity_type == "LOC" and not _validate_location_code(entity):
+        logger.warning(
+            "[ValidationPenalty] Entity rejected due to invalid location_code"
+        )
+        return []
+
+    # ============================================================================
+    # BUSINESS_TYPE SPECIFIC PROCESSING
+    # ============================================================================
     if entity_type == "BUSINESS_TYPE":
+        # Apply confidence threshold filter ONLY for BUSINESS_TYPE
+        # Based on evaluation: FP cluster at 0.75, TP cluster at 0.9
+        # Threshold 0.8 filters all FP while losing only 5/103 TP
+        if confidence < settings.NER_MIN_CONFIDENCE:
+            logger.info(
+                "[ConfidenceFilter] Rejected BUSINESS_TYPE with low confidence %.2f < %.2f threshold",
+                confidence,
+                settings.NER_MIN_CONFIDENCE
+            )
+            return []
+        
+        # Validate business evidence
+        if not _validate_business_evidence(entity, text):
+            logger.warning(
+                "[ValidationPenalty] BUSINESS_TYPE rejected due to invalid evidence"
+            )
+            return []
         raw_bt = entity.get("business_type")
         bt_candidates: list[str] = []
         if isinstance(raw_bt, str):
@@ -223,11 +327,6 @@ def _sanitize_entities(entity: dict[str, Any], text: str) -> list[dict[str, Any]
         # Preserve order while deduplicating.
         bt_candidates = list(dict.fromkeys(bt_candidates))
         valid_bts = [bt for bt in bt_candidates if bt in _ALLOWED_BUSINESS_TYPES]
-
-        if not valid_bts:
-            guessed = _guess_business_type_from_value(value)
-            if guessed:
-                valid_bts = [guessed]
 
         if not valid_bts:
             return []
@@ -541,13 +640,14 @@ async def extract_entities_with_gemini(text: str) -> list[dict] | None:
         "SPA_BEAUTY, FITNESS, DENTAL, MASSAGE_THERAPY, MASSAGE_REHABILITATION, "
         "PSYCHOLOGY, PSYCHIATRY, DERMATOLOGY, NUTRITION, TRADITIONAL_MEDICINE, PHARMACY."
         "\n"
-        "Quy tắc BUSINESS_TYPE: "
-        "(1) Chỉ trả BUSINESS_TYPE nếu thật sự khớp ngữ nghĩa rõ ràng với 1 trong 11 loại. "
-        "(2) Nếu không chắc hoặc không thuộc 11 loại, KHÔNG trả BUSINESS_TYPE (dùng MISC nếu cần). "
-        "(3) Không suy diễn quá mức từ từ chung chung. "
-        "(4) Với mỗi BUSINESS_TYPE, phải thêm key 'business_evidence' chứa chuỗi bằng chứng trích từ query; "
-        "chuỗi này có thể là cụm ngắn hoặc cả một đoạn substring dài hơn."
-        " (5) Nếu query thể hiện rõ NHIỀU loại hình, cho phép trả 'business_type' dưới dạng array enum, "
+        "Quy tắc BUSINESS_TYPE (STRICT MODE - BẮT BUỘC TUÂN THỦ): "
+        "(1) CHỈ trả BUSINESS_TYPE khi có BẮT BUỘC cụm từ RÕ RÀNG về loại hình dịch vụ. "
+        "(2) NGHIÊM CẤM suy diễn BUSINESS_TYPE từ context chung chung như 'dịch vụ', 'ở', 'tìm'. "
+        "(3) NGHIÊM CẤM trả BUSINESS_TYPE nếu query CHỈ có location/price/distance. "
+        "(4) Nếu KHÔNG CHẮC hoặc không thuộc 11 loại → KHÔNG trả BUSINESS_TYPE (trả MISC hoặc bỏ qua). "
+        "(5) Với mỗi BUSINESS_TYPE, BẮT BUỘC phải có 'business_evidence' chứa EXACT substring từ query. "
+        "(6) Evidence PHẢI là keyword RÕ RÀNG, KHÔNG được là từ chung chung ('dịch vụ', 'ở', 'tìm', 'gần'). "
+        "(7) Nếu query thể hiện rõ NHIỀU loại hình, cho phép trả 'business_type' dưới dạng array enum, "
         "ví dụ ['SPA_BEAUTY','FITNESS']; nếu chỉ 1 loại thì dùng string như bình thường."
         "\n"
         "Quy tắc LOC: nếu query có địa danh rõ ràng (tỉnh/thành/quận/huyện/phường), luôn trả LOC với value là cụm địa danh gốc trong query."
@@ -558,12 +658,34 @@ async def extract_entities_with_gemini(text: str) -> list[dict] | None:
         "\n"
         "DISTANCE có thể gồm operator (lte|gte|between), amount, amount_max, radius_meters, distance_unit, proximity_intent."
         "\n\n"
-        "Ví dụ 1: query='tìm spa và phòng gym ở hồ chí minh' => "
+        "Ví dụ 1 (POSITIVE - có keyword rõ ràng): "
+        "query='tìm spa và phòng gym ở hồ chí minh' => "
         "[{\"type\":\"BUSINESS_TYPE\",\"value\":\"spa và phòng gym\",\"confidence\":0.9,\"business_type\":[\"SPA_BEAUTY\",\"FITNESS\"],\"business_evidence\":\"spa và phòng gym\"},"
         "{\"type\":\"LOC\",\"value\":\"hồ chí minh\",\"confidence\":0.9}]"
         "\n"
-        "Ví dụ 2: query='dịch vụ chăm sóc toàn diện cho người cao tuổi' (không rõ 11 loại) => "
+        "Ví dụ 2 (POSITIVE - keyword rõ nhưng không thuộc 11 loại): "
+        "query='dịch vụ chăm sóc toàn diện cho người cao tuổi' => "
         "[{\"type\":\"MISC\",\"value\":\"chăm sóc toàn diện\",\"confidence\":0.6}]"
+        "\n"
+        "Ví dụ 3 (NEGATIVE - CHỈ có location): "
+        "query='Ở quận một' => [{\"type\":\"LOC\",\"value\":\"quận một\",\"confidence\":0.9}]"
+        "\n"
+        "Ví dụ 4 (NEGATIVE - CHỈ có price): "
+        "query='Giá 2 triệu' => [{\"type\":\"PRICE\",\"value\":\"2 triệu\",\"confidence\":0.9,\"operator\":\"between\",\"amount\":1700000,\"amount_max\":2300000}]"
+        "\n"
+        "Ví dụ 5 (NEGATIVE - location + price, KHÔNG có business keyword): "
+        "query='Dịch vụ ở Q1 giá 500k' => "
+        "[{\"type\":\"LOC\",\"value\":\"Q1\",\"confidence\":0.9},"
+        "{\"type\":\"PRICE\",\"value\":\"500k\",\"confidence\":0.9,\"operator\":\"between\",\"amount\":425000,\"amount_max\":575000}]"
+        "\n"
+        "Ví dụ 6 (NEGATIVE - từ chung chung): "
+        "query='Dịch vụ y tế' => [{\"type\":\"MISC\",\"value\":\"dịch vụ y tế\",\"confidence\":0.5}]"
+        "\n"
+        "Ví dụ 7 (NEGATIVE - không thuộc 11 loại): "
+        "query='bệnh viện' => [{\"type\":\"MISC\",\"value\":\"bệnh viện\",\"confidence\":0.6}]"
+        "\n\n"
+        "⚠️ PENALTY: Nếu trả BUSINESS_TYPE không đúng quy tắc strict trên, output sẽ bị REJECT. "
+        "Vì vậy, khi KHÔNG CHẮC → đừng trả BUSINESS_TYPE. Better safe than sorry!"
         "\n\n"
         f"Query: {text}"
     )
