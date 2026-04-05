@@ -526,8 +526,66 @@ Dữ liệu phục vụ các pipeline AI trong mã nguồn hiện tại được
     \item \textbf{RAG Chatbot:} Kho tri thức gồm các tài liệu PDF; khi khởi động dịch vụ, toàn bộ PDF trong thư mục tri thức được đọc song song, loại bỏ ký tự ngoài ASCII (UTF-8), sau đó chia nhỏ bằng \textit{Recursive Character Text Splitter} với độ dài đoạn 300 ký tự và không chồng lấp giữa các đoạn.
     \item \textbf{Recommender (vector search):} Danh mục dịch vụ nguồn đọc từ tệp JSON; mỗi bản ghi được ghép thành một văn bản gồm tên và mô tả, gắn metadata \texttt{service\_id} và \texttt{category}, rồi được embedding và lưu vào Chroma persistent để truy vấn tương đồng.
     \item \textbf{Recommender Home (hồ sơ người dùng):} Dịch vụ gợi ý trang chủ đọc PostgreSQL: khảo sát người dùng lưu trong trường JSON trên bảng tài khoản (chuẩn hóa thành ba nhóm \textit{goals}, \textit{interests}, \textit{health\_conditions}), đồng thời có thể đọc hồ sơ cá nhân (tên, ngày sinh suy ra tuổi, v.v.). Danh sách mã dịch vụ đã dùng được dự kiến lấy từ lịch sử đơn hàng nhưng trong triển khai hiện tại luôn trả về rỗng cho đến khi tích hợp bảng đơn hàng.
-    \item \textbf{NER / PreFilter:} Dịch vụ tải cache địa điểm và danh mục từ cơ sở dữ liệu quan hệ khi khởi động; hỗ trợ truy vấn không gian (PostGIS) khi có ngữ cảnh khoảng cách hợp lệ.
+    \item \textbf{NER / PreFilter:} Dịch vụ tải cache địa điểm và dữ liệu phục vụ lọc từ cơ sở dữ liệu quan hệ khi khởi động; hỗ trợ truy vấn không gian (PostGIS) khi có ngữ cảnh khoảng cách hợp lệ.
 \end{itemize}
+
+\subsection{Thiết kế hệ thống NER/PreFilter}
+
+\subsubsection{Mục tiêu thiết kế và vai trò trong pipeline}
+
+NER Service được thiết kế như một vi dịch vụ độc lập để tiếp nhận truy vấn ngôn ngữ tự nhiên, trích xuất thực thể và chuyển đổi thành điều kiện lọc cho tầng gợi ý. Trong pipeline hội thoại, dịch vụ này đóng vai trò \textit{pre-filtering gate}: giảm không gian tìm kiếm của recommender trước khi đưa vào bước xếp hạng ngữ nghĩa.
+
+Các endpoint chính gồm:
+\begin{itemize}
+    \item \texttt{/ner/extract}: trả danh sách thực thể đã chuẩn hóa.
+    \item \texttt{/prefilter/search}: chạy luồng extract $\rightarrow$ normalize $\rightarrow$ spatial filter và trả danh sách \texttt{service\_id} phù hợp.
+\end{itemize}
+
+\subsubsection{Kiến trúc Hybrid NER}
+
+Hệ thống áp dụng kiến trúc lai (Hybrid NER), kết hợp nhiều kỹ thuật để cân bằng giữa độ chính xác và tính ổn định vận hành:
+\begin{itemize}
+    \item \textbf{LLM-based extraction (Gemini):} xử lý tốt các thực thể ngữ nghĩa như loại hình dịch vụ và cụm ý định phức tạp.
+    \item \textbf{Rule-based extraction:} parser cục bộ cho dữ liệu định lượng giúp kiểm soát tốt operator và đơn vị đo.
+    \item \textbf{NLP + Dictionary fallback:} underthesea, keyword scan và bộ dò địa danh (Aho-Corasick hoặc n-gram fallback) để duy trì khả năng hoạt động khi LLM lỗi hoặc timeout.
+\end{itemize}
+
+\subsubsection{Thiết kế luồng xử lý thực thể}
+
+Một truy vấn đầu vào được xử lý theo chuỗi bước:
+\begin{enumerate}
+    \item \textbf{Gemini extraction}: lấy thực thể thô theo schema JSON.
+    \item \textbf{Local enrichment}: chạy bổ sung underthesea, keyword scan và location fallback.
+    \item \textbf{Numeric policy}:
+    \begin{itemize}
+        \item \texttt{PRICE}: \textbf{Gemini-first}, chỉ fallback regex local khi Gemini không trả PRICE.
+        \item \texttt{DISTANCE}: \textbf{Gemini-first}, fallback local deterministic extractor khi Gemini không trả DISTANCE.
+        \item \texttt{RATING}: hiện tắt trong output để tránh nhiễu ở pha pre-filter.
+    \end{itemize}
+    \item \textbf{Normalization}: ánh xạ về các trường chuẩn như \texttt{business\_type}, \texttt{location\_code}, \texttt{operator}, \texttt{amount}.
+    \item \textbf{Query building}: tổng hợp tham số lọc cho truy vấn PostgreSQL/PostGIS.
+\end{enumerate}
+
+\subsubsection{Chiến lược tối ưu và độ bền hệ thống}
+
+Để đáp ứng yêu cầu thời gian thực, thiết kế dịch vụ ưu tiên tính ổn định theo các cơ chế sau:
+\begin{itemize}
+    \item \textbf{LRU query cache}: lưu truy vấn gần nhất để giảm chi phí xử lý lặp.
+    \item \textbf{Startup preload}: nạp cache địa danh ngay khi khởi động.
+    \item \textbf{Stale-while-revalidate}: khi refresh cache thất bại, vẫn dùng dữ liệu cũ để tránh gián đoạn.
+    \item \textbf{Confidence gating}: lọc confidence thấp cho các thực thể ngữ nghĩa trọng yếu nhằm giảm false positive trước pha truy vấn.
+\end{itemize}
+
+\subsubsection{Thiết kế schema trao đổi dữ liệu}
+
+Contract giữa Gateway và NER Service dùng mô hình dữ liệu có cấu trúc để đảm bảo tính xác định khi chuyển sang điều kiện truy vấn:
+\begin{itemize}
+    \item Trường lõi: \texttt{type}, \texttt{value}, \texttt{confidence}.
+    \item Trường chuẩn hóa theo miền: \texttt{business\_type}, \texttt{location\_code}, \texttt{location\_level}.
+    \item Trường định lượng: \texttt{operator}, \texttt{amount}, \texttt{amount\_max}, \texttt{radius\_meters}.
+\end{itemize}
+
+Thiết kế này giúp quá trình kiểm thử, phân tích lỗi và hiệu chỉnh pipeline diễn ra minh bạch hơn, đồng thời giảm sai khác giữa môi trường đánh giá và môi trường vận hành thực tế.
 % ============================================================
 % THIẾT KẾ HỆ THỐNG
 % ============================================================

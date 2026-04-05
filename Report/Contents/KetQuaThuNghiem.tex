@@ -1,4 +1,4 @@
-\chapter{Kết quả thử nghiệm}
+﻿\chapter{Kết quả thử nghiệm}
 
 \section{Kết quả thử nghiệm \& đánh giá}
 
@@ -110,4 +110,238 @@ Sao lưu \& phục hồi dữ liệu & \textit{(chưa kiểm tra)} & -- \\
 \end{table}
 
 \subsection{Đánh giá hiệu quả AI trong gợi ý dịch vụ}
+
+Phần này trình bày phương pháp, tiêu chí và kết quả đánh giá cho ba thành phần cốt lõi của hệ thống AI:
+\begin{itemize}
+    \item Mô hình phân loại ý định (Intent Classifier).
+    \item Dịch vụ trích xuất thực thể (NER Service).
+    \item Hệ thống gợi ý (Recommender Service).
+\end{itemize}
+
+\subsubsection{Mô hình phân loại ý định (Intent Classifier)}
+
+\textbf{Phương pháp và tiêu chí đánh giá:}
+
+\begin{itemize}
+    \item Quy trình: làm sạch dữ liệu, chia 80\% train -- 20\% test bằng stratified split.
+    \item Mô hình: \texttt{SentenceTransformer(all-MiniLM-L6-v2)} để mã hóa văn bản, \texttt{LogisticRegression} để phân lớp nhị phân.
+    \item Ngưỡng đạt yêu cầu:
+    \begin{itemize}
+        \item Accuracy, Macro F1: $\geq 0.85$.
+        \item Precision và Recall cho lớp 1: $\geq 0.83$.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Kết quả định lượng:}
+
+\begin{itemize}
+    \item Tập test: 187 mẫu (94 mẫu lớp 0, 93 mẫu lớp 1).
+    \item Ma trận nhầm lẫn được thể hiện ở Hình \ref{fig:intent_confusion_matrix}.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{Images/evaluation/intent/intent_confusion_matrix.png}
+\caption{Biểu đồ trực quan ma trận nhầm lẫn của Intent Classifier}
+\label{fig:intent_confusion_matrix}
+\end{figure}
+
+\begin{itemize}
+    \item Từ ma trận nhầm lẫn: $TP=81$, $FP=8$, $FN=12$, $TN=86$.
+    \item Các chỉ số chính được tổng hợp trong Bảng \ref{tab:intent_results}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Chỉ số} & \textbf{Giá trị} & \textbf{Đánh giá (Ngưỡng)} \\
+\hline
+Accuracy & 0.8930 & PASS ($\geq 0.85$) \\
+\hline
+Macro F1 & 0.8926 & PASS ($\geq 0.85$) \\
+\hline
+Precision (label 1) & 0.9101 & PASS ($\geq 0.83$) \\
+\hline
+Recall (label 1) & 0.8710 & PASS ($\geq 0.83$) \\
+\hline
+\end{tabular}
+\caption{Kết quả đánh giá định lượng cho Intent Classification}
+\label{tab:intent_results}
+\end{table}
+
+\textbf{Diễn giải các chỉ số chính:}
+\begin{itemize}
+    \item Accuracy: tỷ lệ dự đoán đúng trên toàn bộ mẫu.
+    \item Macro F1: trung bình F1 giữa các lớp, phản ánh độ cân bằng.
+    \item Precision (label 1): mức độ đúng khi hệ thống quyết định gợi ý dịch vụ.
+    \item Recall (label 1): khả năng bắt đúng các câu thực sự cần gợi ý dịch vụ.
+    \item Specificity = 0.9149 và MCC = 0.7868 cho thấy mô hình ổn định và ít thiên lệch.
+\end{itemize}
+
+\textbf{Phân tích lỗi và kết luận:}
+
+\begin{itemize}
+    \item Mô hình vượt toàn bộ tiêu chí đặt ra.
+    \item False Negative lớp 1 còn 12.90\%, tức vẫn có truy vấn diễn đạt gián tiếp bị bỏ sót.
+    \item Kết luận: đã đủ chất lượng để vận hành trong pipeline gợi ý dịch vụ.
+\end{itemize}
+
+\subsubsection{Dịch vụ trích xuất thực thể (NER Service)}
+
+\textbf{Phương pháp và tiêu chí đánh giá:}
+
+\begin{itemize}
+    \item Pipeline gọi endpoint \texttt{/ner/extract} cho từng truy vấn và so khớp với gold dataset.
+    \item Tiêu chí so khớp:
+    \begin{itemize}
+        \item \texttt{business\_type}, \texttt{location\_code}: khớp chính xác.
+        \item \texttt{price}: cho phép sai số 10\%.
+        \item \texttt{distance}: cho phép sai số 20\%.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Kết quả định lượng:}
+
+\begin{itemize}
+    \item Số truy vấn đánh giá: 193.
+    \item Độ trễ trung bình: 4502 ms/truy vấn.
+    \item Độ chính xác tổng hợp theo trường (Overall): 0.964.
+    \item Độ chính xác theo từng trường được thể hiện trong Bảng \ref{tab:ner_field_acc}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|p{8cm}|}
+\hline
+\textbf{Trường thông tin} & \textbf{Độ chính xác} & \textbf{Nhận xét} \\
+\hline
+business\_type & 0.9689 & Xử lý tốt các ý định dịch vụ chính yếu. \\
+\hline
+location\_code & 0.9793 & Hoạt động hiệu quả với các bí danh quận/huyện. \\
+\hline
+price & 0.9689 & Độ chính xác cao \\
+\hline
+distance & 0.9378 & Bắt tốt cả biểu đạt khoảng cách tường minh và ẩn ý. \\
+\hline
+\end{tabular}
+\caption{Độ chính xác theo trường thông tin của NER Service}
+\label{tab:ner_field_acc}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.66\textwidth]{Images/evaluation/ner/ner_f1_by_entity.png}
+\caption{F1-score theo từng nhóm thực thể trong NER evaluation}
+\label{fig:ner_f1_entities}
+\end{figure}
+
+\textbf{Diễn giải các chỉ số chính:}
+\begin{itemize}
+    \item Exact-match: một truy vấn chỉ được tính đúng khi tất cả trường đều đúng.
+    \item Field Accuracy: độ đúng của từng trường riêng lẻ.
+    \item Micro Avg F1: chất lượng tổng thể trên tất cả thực thể.
+\end{itemize}
+
+\textbf{Phân tích lỗi và kết luận:}
+
+\begin{itemize}
+    \item Tổng số lỗi ghi nhận: 22 lỗi, trong đó \texttt{price\_parser} chiếm 4 lỗi (18.2\%), \texttt{semantic\_miss} chiếm 18 lỗi (81.8\%).
+    \item Lỗi \texttt{price\_parser} tập trung ở các mẫu có giá trị khoảng hoặc kết hợp nhiều ràng buộc (ví dụ: \textit{giá khoảng 300k}, \textit{dưới 500k gần đây}).
+    \item Lỗi \texttt{semantic\_miss} chủ yếu đến từ nhầm lẫn loại hình gần nghĩa (\texttt{MASSAGE\_THERAPY} vs \texttt{MASSAGE\_REHABILITATION}) và một số trường hợp ánh xạ location/distance chưa ổn định.
+    \item \textbf{Kết luận:} Dịch vụ NER đạt chất lượng cao (Micro F1 = 95.4\%, Macro F1 = 95.2\%) và đáp ứng tốt vai trò pre-filtering; hướng cải tiến ưu tiên là tinh chỉnh parser giá và tăng dữ liệu huấn luyện cho các cụm truy vấn nhập nhằng ngữ nghĩa.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Entity} & \textbf{TP} & \textbf{FP} & \textbf{FN} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
+\hline
+BUSINESS\_TYPE & 127 & 3 & 4 & 97.7\% & 96.9\% & 97.3\% \\
+\hline
+LOCATION & 95 & 4 & 2 & 96.0\% & 97.9\% & 96.9\% \\
+\hline
+PRICE & 99 & 5 & 6 & 95.2\% & 94.3\% & 94.7\% \\
+\hline
+DISTANCE & 86 & 5 & 10 & 94.5\% & 89.6\% & 92.0\% \\
+\hline
+Micro Average & 407 & 17 & 22 & 96.0\% & 94.9\% & 95.4\% \\
+\hline
+Macro Average & - & - & - & 95.8\% & 94.7\% & 95.2\% \\
+\hline
+\end{tabular}
+\caption{Chỉ số Precision/Recall/F1 theo từng loại thực thể của NER Service}
+\label{tab:ner_prf_metrics}
+\end{table}
+
+\subsubsection{Hệ thống gợi ý (Recommender Service)}
+
+\textbf{Phương pháp và tiêu chí đánh giá:}
+
+\begin{itemize}
+    \item Hai kịch bản đánh giá độc lập:
+    \begin{itemize}
+        \item Chatbot: truy vấn hội thoại.
+        \item Home: truy vấn dựa trên hồ sơ người dùng.
+    \end{itemize}
+    \item Bộ chỉ số: Hit@K, Recall@K, MRR@K, NDCG@K, HNR và thống kê latency.
+    \item Kết quả Home dùng cấu hình \texttt{query\_mode=keyword}, \texttt{score\_mode=distance}.
+\end{itemize}
+
+\textbf{Kết quả định lượng:}
+
+\begin{itemize}
+    \item Bảng \ref{tab:rec_comparison} so sánh trực tiếp hai run \texttt{chatbot\_baseline\_v1} và \texttt{home\_keyword\_distance\_v1}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Chỉ số (@3)} & \textbf{Kịch bản Chatbot} & \textbf{Kịch bản Home} \\
+\hline
+Hit & 0.8194 & 0.4056 \\
+\hline
+Recall & 0.5407 & 0.2500 \\
+\hline
+MRR & 0.7176 & 0.3315 \\
+\hline
+NDCG & 0.5478 & 0.2458 \\
+\hline
+HNR (càng thấp càng tốt) & 0.0102 & 0.0296 \\
+\hline
+Latency Avg (ms) & 88.92 & 83.23 \\
+\hline
+Latency P95 (ms) & 104.42 & 91.58 \\
+\hline
+\end{tabular}
+\caption{So sánh kết quả đánh giá giữa kịch bản Chatbot và Home}
+\label{tab:rec_comparison}
+\end{table}
+
+\textbf{Diễn giải các chỉ số chính:}
+\begin{itemize}
+    \item Hit@3: tỷ lệ truy vấn có ít nhất 1 kết quả đúng trong top-3.
+    \item Recall@3: mức bao phủ kết quả liên quan trong top-3.
+    \item MRR@3: ưu tiên đúng kết quả liên quan ở vị trí càng cao càng tốt.
+    \item NDCG@3: chất lượng xếp hạng có xét vị trí.
+    \item HNR@3: tỷ lệ hard-negative lọt top-3 (càng thấp càng tốt).
+\end{itemize}
+
+\textbf{Phân tích lỗi và kết luận:}
+
+\begin{itemize}
+    \item Chatbot cho chất lượng truy xuất tốt hơn rõ rệt (đặc biệt Hit@3 và MRR@3).
+    \item Home có lợi thế về tốc độ nhưng Recall thấp hơn đáng kể, còn bỏ sót kết quả liên quan.
+    \item HNR@3 của cả hai kịch bản đều thấp ($<0.03$), cho thấy hệ thống lọc nhiễu tốt ở top đầu.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{Images/evaluation/recommender/run_comparison.png}
+\caption{Biểu đồ so sánh các run recommender trong pipeline phân tích}
+\label{fig:rec_run_compare}
+\end{figure}
+
 \subsection{Phản hồi từ người dùng thử nghiệm}
