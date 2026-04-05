@@ -1,0 +1,302 @@
+[
+    {
+        "id": "CB_001",
+        "query": "Tôi muốn tư vấn về bệnh tim mạch",
+        "relevant_ids": ["SV001", "SV004", "SV057"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_002",
+        "query": "Tôi bị huyết áp cao, có dịch vụ nào giúp tôi không?",
+        "relevant_ids": ["SV004", "SV001", "SV057"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_003",
+        "query": "Tôi cần khám sức khỏe tổng quát",
+        "relevant_ids": ["SV002", "SV005", "SV009", "SV011"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_004",
+        "query": "Tôi bị tiểu đường type 2, cần tư vấn chế độ ăn và điều trị",
+        "relevant_ids": ["SV003", "SV055", "SV051"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_005",
+        "query": "Con tôi 5 tuổi bị ho sốt, tôi cần tư vấn bác sĩ nhi",
+        "relevant_ids": ["SV006"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_006",
+        "query": "Tôi bị mụn nhiều và muốn điều trị da",
+        "relevant_ids": ["SV007"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_007",
+        "query": "Hay bị đau bụng và trào ngược dạ dày",
+        "relevant_ids": ["SV008"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_008",
+        "query": "Tôi muốn khám mắt vì gần đây mắt nhìn mờ",
+        "relevant_ids": ["SV009"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_009",
+        "query": "Tôi muốn bỏ thuốc lá",
+        "relevant_ids": ["SV010"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_010",
+        "query": "Đau khớp gối khi đi cầu thang, có dịch vụ nào cho xương khớp?",
+        "relevant_ids": ["SV012", "SV035", "SV049"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_011",
+        "query": "Viêm xoang mãn tính, cần khám tai mũi họng",
+        "relevant_ids": ["SV013"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_012",
+        "query": "Tôi bị gan nhiễm mỡ, cần tư vấn",
+        "relevant_ids": ["SV014"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_013",
+        "query": "Gần đây tôi rất căng thẳng và lo âu, cần ai đó lắng nghe",
+        "relevant_ids": ["SV016", "SV017", "SV021", "SV027"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_014",
+        "query": "Tôi muốn học thiền để giảm stress",
+        "relevant_ids": ["SV017", "SV016", "SV037"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_015",
+        "query": "Vợ chồng tôi hay cãi nhau, cần tư vấn gia đình",
+        "relevant_ids": ["SV018", "SV024"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_016",
+        "query": "Con tôi bị tự kỷ, cần chuyên gia tâm lý trẻ em",
+        "relevant_ids": ["SV019"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_017",
+        "query": "Tôi sợ nói trước đám đông, muốn tự tin hơn",
+        "relevant_ids": ["SV020", "SV028"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_018",
+        "query": "Tôi đang bị trầm cảm nặng, không muốn làm gì cả",
+        "relevant_ids": ["SV021", "SV016", "SV027"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_019",
+        "query": "Con tôi nghiện game online, không chịu học",
+        "relevant_ids": ["SV023", "SV019"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_020",
+        "query": "Tôi bị chấn thương tâm lý sau tai nạn",
+        "relevant_ids": ["SV025"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_021",
+        "query": "Tôi ăn vô độ rồi nôn ra, cần giúp đỡ",
+        "relevant_ids": ["SV026", "SV051"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_022",
+        "query": "Tôi muốn phát triển bản thân và đạt mục tiêu",
+        "relevant_ids": ["SV028", "SV029"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_023",
+        "query": "Tôi cảm thấy burnout vì công việc quá nhiều",
+        "relevant_ids": ["SV030", "SV016", "SV017"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_024",
+        "query": "Tôi hay nổi giận vô cớ, muốn kiểm soát cảm xúc",
+        "relevant_ids": ["SV022"],
+        "category": "tam_ly"
+    },
+    {
+        "id": "CB_025",
+        "query": "Tôi bị đau lưng mãn tính, có lớp yoga nào phù hợp?",
+        "relevant_ids": ["SV031", "SV037", "SV047"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_026",
+        "query": "Tôi muốn tập gym để tăng cơ bắp",
+        "relevant_ids": ["SV032", "SV054", "SV050"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_027",
+        "query": "Ngồi văn phòng nhiều, tư thế xấu, cần tập gì?",
+        "relevant_ids": ["SV033", "SV047", "SV031"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_028",
+        "query": "Tôi muốn bắt đầu chạy bộ và tập cho marathon",
+        "relevant_ids": ["SV034"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_029",
+        "query": "Bà tôi bị đau khớp, có bơi trị liệu không?",
+        "relevant_ids": ["SV035", "SV049"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_030",
+        "query": "Tôi muốn hít đốt calo nhanh và xả stress sau giờ làm",
+        "relevant_ids": ["SV036", "SV050", "SV044"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_031",
+        "query": "Có lớp yoga online nào tập buổi sáng không?",
+        "relevant_ids": ["SV037", "SV031"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_032",
+        "query": "Tôi mang thai tháng thứ 5, muốn tập yoga cho bà bầu",
+        "relevant_ids": ["SV040", "SV056"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_033",
+        "query": "Giảm cân hiệu quả bằng bài tập aerobic",
+        "relevant_ids": ["SV041", "SV044", "SV050"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_034",
+        "query": "Con tôi 6 tuổi, muốn cho bé học thể dục dụng cụ",
+        "relevant_ids": ["SV043"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_035",
+        "query": "Tôi muốn leo núi cuối tuần, có nhóm nào không?",
+        "relevant_ids": ["SV045", "SV039"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_036",
+        "query": "Phụ nữ học võ tự vệ ở đâu?",
+        "relevant_ids": ["SV046"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_037",
+        "query": "Ông tôi 70 tuổi cần tập thể dục nhẹ nhàng",
+        "relevant_ids": ["SV049", "SV035", "SV047"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_038",
+        "query": "HIIT training để giảm mỡ bụng nhanh",
+        "relevant_ids": ["SV050", "SV036", "SV032"],
+        "category": "the_thao"
+    },
+    {
+        "id": "CB_039",
+        "query": "Tôi muốn tư vấn dinh dưỡng để giảm cân khoa học",
+        "relevant_ids": ["SV051", "SV052", "SV058"],
+        "category": "dinh_duong"
+    },
+    {
+        "id": "CB_040",
+        "query": "Chế độ ăn keto là gì? Có phù hợp với tôi không?",
+        "relevant_ids": ["SV052", "SV051"],
+        "category": "dinh_duong"
+    },
+    {
+        "id": "CB_041",
+        "query": "Tôi muốn ăn chay mà vẫn đủ dinh dưỡng",
+        "relevant_ids": ["SV053"],
+        "category": "dinh_duong"
+    },
+    {
+        "id": "CB_042",
+        "query": "Tập gym thì nên ăn gì để tăng cơ?",
+        "relevant_ids": ["SV054", "SV032", "SV059"],
+        "category": "dinh_duong"
+    },
+    {
+        "id": "CB_043",
+        "query": "Người bị tiểu đường nên ăn uống thế nào?",
+        "relevant_ids": ["SV055", "SV003"],
+        "category": "dinh_duong"
+    },
+    {
+        "id": "CB_044",
+        "query": "Tôi đang mang thai, cần thực đơn cho bà bầu",
+        "relevant_ids": ["SV056", "SV040"],
+        "category": "dinh_duong"
+    },
+    {
+        "id": "CB_045",
+        "query": "Cholesterol cao quá, ăn gì để giảm?",
+        "relevant_ids": ["SV057", "SV060", "SV001"],
+        "category": "dinh_duong"
+    },
+    {
+        "id": "CB_046",
+        "query": "Nhịn ăn gián đoạn intermittent fasting có tốt không?",
+        "relevant_ids": ["SV058", "SV051"],
+        "category": "dinh_duong"
+    },
+    {
+        "id": "CB_047",
+        "query": "Tôi là vận động viên, cần kế hoạch dinh dưỡng chuyên nghiệp",
+        "relevant_ids": ["SV059", "SV054"],
+        "category": "dinh_duong"
+    },
+    {
+        "id": "CB_048",
+        "query": "Chế độ Mediterranean diet là gì?",
+        "relevant_ids": ["SV060"],
+        "category": "dinh_duong"
+    },
+    {
+        "id": "CB_049",
+        "query": "Tôi hay bị khó thở khi leo cầu thang, có bệnh gì không?",
+        "relevant_ids": ["SV001", "SV002", "SV004"],
+        "category": "y_te"
+    },
+    {
+        "id": "CB_050",
+        "query": "Gần đây tôi ngủ không ngon giấc, mệt mỏi suốt",
+        "relevant_ids": ["SV017", "SV016", "SV030"],
+        "category": "tam_ly"
+    }
+]
