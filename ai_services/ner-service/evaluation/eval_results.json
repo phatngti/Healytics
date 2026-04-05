@@ -51,7 +51,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 86
+      "latency_ms": 5240
     },
     "phong kham dong y": {
       "expected": {
@@ -122,7 +122,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5431
+      "latency_ms": 4581
     },
     "massage khoang 400k gan day": {
       "expected": {
@@ -137,16 +137,16 @@
       "predicted": {
         "business_type": "MASSAGE_THERAPY",
         "location_code": null,
-        "price_op": null,
-        "price_amount": null,
-        "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "price_op": "between",
+        "price_amount": 340000,
+        "price_max": 460000,
+        "distance_meters": 10000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": null,
-          "distance": null
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -166,16 +166,52 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "gan day",
+            "confidence": 0.8,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 10000.0,
+            "amount_max": null,
+            "radius_meters": 10000,
+            "distance_unit": "implicit",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "khoang 400k",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "between",
+            "amount": 340000.0,
+            "amount_max": 460000.0,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
           }
         ]
       },
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
-        "distance": false
+        "price": true,
+        "distance": true
       },
-      "latency_ms": 5112
+      "latency_ms": 4893
     },
     "phong kham dong y o thu duc khoang 1 trieu": {
       "expected": {
@@ -190,15 +226,15 @@
       "predicted": {
         "business_type": "TRADITIONAL_MEDICINE",
         "location_code": "06337",
-        "price_op": null,
-        "price_amount": null,
-        "price_max": null,
+        "price_op": "between",
+        "price_amount": 850000,
+        "price_max": 1150000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.85,
-          "price": null,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -215,6 +251,24 @@
             "operator": null,
             "amount": null,
             "amount_max": null,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "khoang 1 trieu",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "between",
+            "amount": 850000.0,
+            "amount_max": 1150000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -243,10 +297,10 @@
       "matches": {
         "business_type": true,
         "location_code": false,
-        "price": false,
+        "price": true,
         "distance": true
       },
-      "latency_ms": 5199
+      "latency_ms": 3167
     },
     "spa o quan 1 gan day": {
       "expected": {
@@ -264,13 +318,13 @@
         "price_op": null,
         "price_amount": null,
         "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "distance_meters": 10000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": null
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -308,6 +362,24 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "gan day",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 10000.0,
+            "amount_max": null,
+            "radius_meters": 10000,
+            "distance_unit": "implicit",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
           }
         ]
       },
@@ -315,9 +387,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": false
+        "distance": true
       },
-      "latency_ms": 3322
+      "latency_ms": 3674
     },
     "yoga o ha noi lan can": {
       "expected": {
@@ -388,7 +460,7 @@
         "price": true,
         "distance": false
       },
-      "latency_ms": 6313
+      "latency_ms": 6381
     },
     "phong kham o q3 cach 2 cay so": {
       "expected": {
@@ -406,13 +478,13 @@
         "price_op": null,
         "price_amount": null,
         "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "distance_meters": 2000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.57,
           "location": 0.9,
           "price": null,
-          "distance": null
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -450,6 +522,24 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "2 cay so",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 2.0,
+            "amount_max": null,
+            "radius_meters": 2000,
+            "distance_unit": "kilometers",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
           }
         ]
       },
@@ -457,9 +547,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": false
+        "distance": true
       },
-      "latency_ms": 6047
+      "latency_ms": 5663
     },
     "hieu thuoc o q10 gan nha": {
       "expected": {
@@ -477,13 +567,13 @@
         "price_op": null,
         "price_amount": null,
         "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "distance_meters": 10000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": null
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -521,6 +611,24 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "gan nha",
+            "confidence": 0.8,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 10000.0,
+            "amount_max": null,
+            "radius_meters": 10000,
+            "distance_unit": "implicit",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
           }
         ]
       },
@@ -528,9 +636,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": false
+        "distance": true
       },
-      "latency_ms": 5556
+      "latency_ms": 3869
     },
     "phong kham dong y o thu duc trong vong 10km": {
       "expected": {
@@ -549,12 +657,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 10000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.85,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -578,7 +686,7 @@
           {
             "type": "DISTANCE",
             "value": "10km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -586,11 +694,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 10000.0,
+            "amount": 10.0,
             "amount_max": null,
             "radius_meters": 10000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
@@ -619,7 +727,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3196
+      "latency_ms": 2860
     },
     "gym o binh thanh cach 1 cay so": {
       "expected": {
@@ -637,13 +745,13 @@
         "price_op": null,
         "price_amount": null,
         "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "distance_meters": 1000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": null
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -681,6 +789,24 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "1 cay so",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 1.0,
+            "amount_max": null,
+            "radius_meters": 1000,
+            "distance_unit": "km",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
           }
         ]
       },
@@ -688,9 +814,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": false
+        "distance": true
       },
-      "latency_ms": 3460
+      "latency_ms": 5217
     },
     "spa duoi 500k gan day": {
       "expected": {
@@ -705,16 +831,16 @@
       "predicted": {
         "business_type": "SPA_BEAUTY",
         "location_code": null,
-        "price_op": null,
-        "price_amount": null,
+        "price_op": "lte",
+        "price_amount": 500000,
         "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "distance_meters": 10000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": null,
-          "distance": null
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -734,16 +860,52 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "gan day",
+            "confidence": 0.8,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 10000.0,
+            "amount_max": null,
+            "radius_meters": 10000,
+            "distance_unit": "implicit",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "duoi 500k",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 500000.0,
+            "amount_max": null,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
           }
         ]
       },
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
-        "distance": false
+        "price": true,
+        "distance": true
       },
-      "latency_ms": 5004
+      "latency_ms": 4528
     },
     "spa tu 100k den 300k gan day": {
       "expected": {
@@ -758,16 +920,16 @@
       "predicted": {
         "business_type": "SPA_BEAUTY",
         "location_code": null,
-        "price_op": null,
-        "price_amount": null,
-        "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "price_op": "between",
+        "price_amount": 100000,
+        "price_max": 300000,
+        "distance_meters": 10000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": null,
-          "distance": null
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -787,16 +949,52 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "gan day",
+            "confidence": 0.8,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 10000.0,
+            "amount_max": null,
+            "radius_meters": 10000,
+            "distance_unit": "implicit",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "tu 100k den 300k",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "between",
+            "amount": 100000.0,
+            "amount_max": 300000.0,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
           }
         ]
       },
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
-        "distance": false
+        "price": true,
+        "distance": true
       },
-      "latency_ms": 4903
+      "latency_ms": 3578
     },
     "phong kham gia 800k lan can": {
       "expected": {
@@ -811,15 +1009,15 @@
       "predicted": {
         "business_type": "TRADITIONAL_MEDICINE",
         "location_code": null,
-        "price_op": null,
-        "price_amount": null,
-        "price_max": null,
+        "price_op": "between",
+        "price_amount": 680000,
+        "price_max": 920000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.57,
           "location": null,
-          "price": null,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -840,16 +1038,34 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "800k",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "between",
+            "amount": 680000.0,
+            "amount_max": 920000.0,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
           }
         ]
       },
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
+        "price": true,
         "distance": false
       },
-      "latency_ms": 8015
+      "latency_ms": 15499
     },
     "yoga tren 200k gan nha": {
       "expected": {
@@ -864,22 +1080,22 @@
       "predicted": {
         "business_type": "FITNESS",
         "location_code": null,
-        "price_op": null,
-        "price_amount": null,
+        "price_op": "gte",
+        "price_amount": 200000,
         "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "distance_meters": 10000,
+        "distance_implicit": true,
         "confidence_scores": {
-          "business_type": 0.7,
+          "business_type": 0.9,
           "location": null,
-          "price": null,
-          "distance": null
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
             "type": "BUSINESS_TYPE",
             "value": "yoga",
-            "confidence": 0.7,
+            "confidence": 0.9,
             "business_type": "FITNESS",
             "business_evidence": "yoga",
             "business_phrase": "yoga",
@@ -893,16 +1109,52 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "gan nha",
+            "confidence": 0.8,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 10000.0,
+            "amount_max": null,
+            "radius_meters": 10000,
+            "distance_unit": "implicit",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "tren 200k",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "gte",
+            "amount": 200000.0,
+            "amount_max": null,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
           }
         ]
       },
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
-        "distance": false
+        "price": true,
+        "distance": true
       },
-      "latency_ms": 6123
+      "latency_ms": 5254
     },
     "hieu thuoc duoi 300k trong vong 3km": {
       "expected": {
@@ -917,16 +1169,16 @@
       "predicted": {
         "business_type": "PHARMACY",
         "location_code": null,
-        "price_op": null,
-        "price_amount": null,
+        "price_op": "lte",
+        "price_amount": 300000,
         "price_max": null,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": null,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -949,8 +1201,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "3km",
-            "confidence": 1.0,
+            "value": "trong vong 3km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -958,11 +1210,29 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "duoi 300k",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 300000.0,
+            "amount_max": null,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -970,10 +1240,10 @@
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
+        "price": true,
         "distance": true
       },
-      "latency_ms": 3771
+      "latency_ms": 3793
     },
     "phong kham dong y khoang 1 trieu trong vong 10km": {
       "expected": {
@@ -988,16 +1258,16 @@
       "predicted": {
         "business_type": "TRADITIONAL_MEDICINE",
         "location_code": "06337",
-        "price_op": null,
-        "price_amount": null,
-        "price_max": null,
+        "price_op": "between",
+        "price_amount": 850000,
+        "price_max": 1150000,
         "distance_meters": 10000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.85,
-          "price": null,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -1039,7 +1309,7 @@
           {
             "type": "DISTANCE",
             "value": "10km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -1047,11 +1317,29 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 10000.0,
+            "amount": 10.0,
             "amount_max": null,
             "radius_meters": 10000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "1 trieu",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "between",
+            "amount": 850000.0,
+            "amount_max": 1150000.0,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -1059,10 +1347,10 @@
       "matches": {
         "business_type": true,
         "location_code": false,
-        "price": false,
+        "price": true,
         "distance": true
       },
-      "latency_ms": 5547
+      "latency_ms": 4061
     },
     "gym khoang 500k cach 1 cay so": {
       "expected": {
@@ -1077,16 +1365,16 @@
       "predicted": {
         "business_type": "FITNESS",
         "location_code": null,
-        "price_op": null,
-        "price_amount": null,
-        "price_max": null,
-        "distance_meters": null,
+        "price_op": "between",
+        "price_amount": 425000,
+        "price_max": 575000,
+        "distance_meters": 1000,
         "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": null,
-          "distance": null
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -1106,16 +1394,52 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "1 cay so",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 1.0,
+            "amount_max": null,
+            "radius_meters": 1000,
+            "distance_unit": "km",
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "khoang 500k",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "between",
+            "amount": 425000.0,
+            "amount_max": 575000.0,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
           }
         ]
       },
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
-        "distance": false
+        "price": true,
+        "distance": true
       },
-      "latency_ms": 5000
+      "latency_ms": 3997
     },
     "massage gia 2tr xung quanh day": {
       "expected": {
@@ -1130,16 +1454,16 @@
       "predicted": {
         "business_type": "MASSAGE_THERAPY",
         "location_code": null,
-        "price_op": null,
-        "price_amount": null,
-        "price_max": null,
-        "distance_meters": 10000,
+        "price_op": "between",
+        "price_amount": 1700000,
+        "price_max": 2300000,
+        "distance_meters": 5000,
         "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": null,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -1162,20 +1486,38 @@
           },
           {
             "type": "DISTANCE",
-            "value": "xung quanh",
-            "confidence": 0.85,
+            "value": "xung quanh day",
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
             "location_code": null,
             "location_level": null,
             "location_intent": null,
-            "operator": "lte",
-            "amount": 10000.0,
+            "operator": null,
+            "amount": null,
             "amount_max": null,
-            "radius_meters": 10000,
-            "distance_unit": "implicit",
+            "radius_meters": 5000,
+            "distance_unit": null,
             "proximity_intent": true,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "2tr",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "between",
+            "amount": 1700000.0,
+            "amount_max": 2300000.0,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -1183,10 +1525,10 @@
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
-        "distance": true
+        "price": true,
+        "distance": false
       },
-      "latency_ms": 5381
+      "latency_ms": 4829
     },
     "nha khoa gia 1.5 trieu trong vong 3km": {
       "expected": {
@@ -1201,16 +1543,16 @@
       "predicted": {
         "business_type": "DENTAL",
         "location_code": null,
-        "price_op": null,
-        "price_amount": null,
-        "price_max": null,
+        "price_op": "between",
+        "price_amount": 1275000,
+        "price_max": 1725000,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": null,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -1234,7 +1576,7 @@
           {
             "type": "DISTANCE",
             "value": "3km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -1242,11 +1584,29 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "1.5 trieu",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "between",
+            "amount": 1275000.0,
+            "amount_max": 1725000.0,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -1254,10 +1614,10 @@
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
+        "price": true,
         "distance": true
       },
-      "latency_ms": 6033
+      "latency_ms": 5028
     },
     "spa tu 200k den 400k gan day": {
       "expected": {
@@ -1272,16 +1632,16 @@
       "predicted": {
         "business_type": "SPA_BEAUTY",
         "location_code": null,
-        "price_op": null,
-        "price_amount": null,
-        "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "price_op": "between",
+        "price_amount": 200000,
+        "price_max": 400000,
+        "distance_meters": 10000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": null,
-          "distance": null
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -1301,16 +1661,52 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "gan day",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 10000.0,
+            "amount_max": null,
+            "radius_meters": 10000,
+            "distance_unit": "implicit",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "tu 200k den 400k",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "between",
+            "amount": 200000.0,
+            "amount_max": 400000.0,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
           }
         ]
       },
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
-        "distance": false
+        "price": true,
+        "distance": true
       },
-      "latency_ms": 5370
+      "latency_ms": 4551
     },
     "trung tam yoga o q7 gia 250k trong vong 2km": {
       "expected": {
@@ -1325,16 +1721,16 @@
       "predicted": {
         "business_type": "FITNESS",
         "location_code": "778",
-        "price_op": null,
-        "price_amount": null,
-        "price_max": null,
+        "price_op": "between",
+        "price_amount": 212500,
+        "price_max": 287500,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": null,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -1394,7 +1790,7 @@
           {
             "type": "DISTANCE",
             "value": "2km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -1402,11 +1798,29 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "250k",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "between",
+            "amount": 212500.0,
+            "amount_max": 287500.0,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -1414,10 +1828,10 @@
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": false,
+        "price": true,
         "distance": true
       },
-      "latency_ms": 7598
+      "latency_ms": 7667
     },
     "cho tap gym re q7": {
       "expected": {
@@ -1440,7 +1854,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": null,
+          "price": 0.8,
           "distance": null
         },
         "raw_entities": [
@@ -1479,6 +1893,24 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "re",
+            "confidence": 0.8,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": null,
+            "amount": null,
+            "amount_max": null,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
           }
         ]
       },
@@ -1488,7 +1920,7 @@
         "price": false,
         "distance": true
       },
-      "latency_ms": 16688
+      "latency_ms": 7883
     },
     "Tìm spa": {
       "expected": {
@@ -1541,7 +1973,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3307
+      "latency_ms": 2822
     },
     "Cần gym": {
       "expected": {
@@ -1594,7 +2026,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3224
+      "latency_ms": 3219
     },
     "Tìm nha sĩ": {
       "expected": {
@@ -1647,7 +2079,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4105
+      "latency_ms": 4055
     },
     "Phòng khám nha khoa": {
       "expected": {
@@ -1700,7 +2132,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3988
+      "latency_ms": 4468
     },
     "Massage trị liệu": {
       "expected": {
@@ -1753,7 +2185,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4047
+      "latency_ms": 5805
     },
     "Tiệm làm đẹp": {
       "expected": {
@@ -1806,7 +2238,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4247
+      "latency_ms": 2975
     },
     "Hiệu thuốc": {
       "expected": {
@@ -1859,7 +2291,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3822
+      "latency_ms": 3517
     },
     "Phòng khám đa khoa": {
       "expected": {
@@ -1880,7 +2312,7 @@
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
-          "business_type": 0.57,
+          "business_type": 0.6649999999999999,
           "location": null,
           "price": null,
           "distance": null
@@ -1889,7 +2321,7 @@
           {
             "type": "BUSINESS_TYPE",
             "value": "Phòng khám đa khoa",
-            "confidence": 0.57,
+            "confidence": 0.6649999999999999,
             "business_type": "TRADITIONAL_MEDICINE",
             "business_evidence": "Phòng khám đa khoa",
             "business_phrase": "Phòng khám đa khoa",
@@ -1912,7 +2344,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4002
+      "latency_ms": 4196
     },
     "Trung tâm yoga": {
       "expected": {
@@ -1983,7 +2415,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6661
+      "latency_ms": 4358
     },
     "Phòng khám đông y": {
       "expected": {
@@ -2036,7 +2468,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5569
+      "latency_ms": 5785
     },
     "Spa thư giãn": {
       "expected": {
@@ -2089,7 +2521,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4859
+      "latency_ms": 3660
     },
     "Phòng khám da liễu": {
       "expected": {
@@ -2142,7 +2574,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3274
+      "latency_ms": 4812
     },
     "Dịch vụ ở Quận 1": {
       "expected": {
@@ -2195,7 +2627,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4769
+      "latency_ms": 4702
     },
     "Ở Q1": {
       "expected": {
@@ -2248,7 +2680,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 2905
+      "latency_ms": 2521
     },
     "Khu vực Q.1": {
       "expected": {
@@ -2301,7 +2733,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 2773
+      "latency_ms": 3126
     },
     "Ở quận một": {
       "expected": {
@@ -2354,7 +2786,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 2883
+      "latency_ms": 2322
     },
     "Ở TPHCM": {
       "expected": {
@@ -2407,7 +2839,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 2573
+      "latency_ms": 2502
     },
     "Ở HCM": {
       "expected": {
@@ -2460,7 +2892,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 2510
+      "latency_ms": 2447
     },
     "Ở Hồ Chí Minh": {
       "expected": {
@@ -2513,7 +2945,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 2236
+      "latency_ms": 2160
     },
     "Ở Quận 3": {
       "expected": {
@@ -2566,7 +2998,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3260
+      "latency_ms": 2786
     },
     "Khu vực Q7": {
       "expected": {
@@ -2619,7 +3051,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3276
+      "latency_ms": 3162
     },
     "Ở Quận Tân Bình": {
       "expected": {
@@ -2672,7 +3104,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3992
+      "latency_ms": 2341
     },
     "Ở Hà Nội": {
       "expected": {
@@ -2725,7 +3157,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3286
+      "latency_ms": 2894
     },
     "Ở Đà Nẵng": {
       "expected": {
@@ -2778,7 +3210,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 2760
+      "latency_ms": 2383
     },
     "Khu vực Q10": {
       "expected": {
@@ -2831,7 +3263,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3415
+      "latency_ms": 3273
     },
     "Ở Thủ Đức": {
       "expected": {
@@ -2884,7 +3316,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3008
+      "latency_ms": 2964
     },
     "Gần Bình Thạnh": {
       "expected": {
@@ -2902,13 +3334,13 @@
         "price_op": null,
         "price_amount": null,
         "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "distance_meters": 10000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": null,
           "location": 0.9,
           "price": null,
-          "distance": null
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -2928,6 +3360,24 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "Gần",
+            "confidence": 0.9,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 10000.0,
+            "amount_max": null,
+            "radius_meters": 10000,
+            "distance_unit": "implicit",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
           }
         ]
       },
@@ -2935,9 +3385,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": true
+        "distance": false
       },
-      "latency_ms": 5267
+      "latency_ms": 5083
     },
     "Ở Q5": {
       "expected": {
@@ -2990,7 +3440,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4816
+      "latency_ms": 4015
     },
     "Giá dưới 500k": {
       "expected": {
@@ -3013,14 +3463,14 @@
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
             "value": "dưới 500k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3043,7 +3493,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 2963
+      "latency_ms": 5702
     },
     "Chi phí 2 triệu": {
       "expected": {
@@ -3072,7 +3522,7 @@
         "raw_entities": [
           {
             "type": "PRICE",
-            "value": "Chi phí 2 triệu",
+            "value": "2 triệu",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -3096,7 +3546,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3236
+      "latency_ms": 2786
     },
     "Giá 2tr": {
       "expected": {
@@ -3125,7 +3575,7 @@
         "raw_entities": [
           {
             "type": "PRICE",
-            "value": "Giá 2tr",
+            "value": "2tr",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -3149,7 +3599,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5776
+      "latency_ms": 3636
     },
     "Khoảng 1.5 triệu": {
       "expected": {
@@ -3166,20 +3616,20 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 1275000,
-        "price_max": 1724999,
+        "price_max": 1725000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
-            "value": "Khoảng 1.5 triệu",
-            "confidence": 1.0,
+            "value": "1.5 triệu",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3188,7 +3638,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 1275000.0,
-            "amount_max": 1724999.9999999998,
+            "amount_max": 1725000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -3202,7 +3652,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5800
+      "latency_ms": 4359
     },
     "Giá khoảng 300k": {
       "expected": {
@@ -3218,21 +3668,21 @@
         "business_type": null,
         "location_code": null,
         "price_op": "between",
-        "price_amount": 255000,
+        "price_amount": 300000,
         "price_max": 345000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
-            "value": "khoảng 300k",
-            "confidence": 1.0,
+            "value": "300k",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3240,7 +3690,7 @@
             "location_level": null,
             "location_intent": null,
             "operator": "between",
-            "amount": 255000.0,
+            "amount": 300000.0,
             "amount_max": 345000.0,
             "radius_meters": null,
             "distance_unit": null,
@@ -3252,10 +3702,10 @@
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": true,
+        "price": false,
         "distance": true
       },
-      "latency_ms": 3643
+      "latency_ms": 4177
     },
     "Từ 100k đến 300k": {
       "expected": {
@@ -3278,14 +3728,14 @@
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
             "value": "Từ 100k đến 300k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3308,7 +3758,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6816
+      "latency_ms": 5127
     },
     "Trên 1 triệu": {
       "expected": {
@@ -3331,14 +3781,14 @@
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
             "value": "Trên 1 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3361,7 +3811,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5194
+      "latency_ms": 4264
     },
     "Chi phí 500 nghìn": {
       "expected": {
@@ -3390,7 +3840,7 @@
         "raw_entities": [
           {
             "type": "PRICE",
-            "value": "Chi phí 500 nghìn",
+            "value": "500 nghìn",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -3414,7 +3864,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3829
+      "latency_ms": 2668
     },
     "Giá 1.5tr": {
       "expected": {
@@ -3431,7 +3881,7 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 1275000,
-        "price_max": 1724999,
+        "price_max": 1725000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
@@ -3443,7 +3893,7 @@
         "raw_entities": [
           {
             "type": "PRICE",
-            "value": "Giá 1.5tr",
+            "value": "1.5tr",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -3453,7 +3903,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 1275000.0,
-            "amount_max": 1724999.9999999998,
+            "amount_max": 1725000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -3467,7 +3917,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3706
+      "latency_ms": 4076
     },
     "Dưới 1tr": {
       "expected": {
@@ -3490,14 +3940,14 @@
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
             "value": "Dưới 1tr",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3520,7 +3970,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4003
+      "latency_ms": 2461
     },
     "Giá 800k": {
       "expected": {
@@ -3537,7 +3987,7 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 680000,
-        "price_max": 919999,
+        "price_max": 920000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
@@ -3549,7 +3999,7 @@
         "raw_entities": [
           {
             "type": "PRICE",
-            "value": "Giá 800k",
+            "value": "800k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -3559,7 +4009,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 680000.0,
-            "amount_max": 919999.9999999999,
+            "amount_max": 920000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -3573,7 +4023,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5023
+      "latency_ms": 3776
     },
     "Khoảng 200 nghìn": {
       "expected": {
@@ -3590,20 +4040,20 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 170000,
-        "price_max": 229999,
+        "price_max": 230000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
-            "value": "Khoảng 200 nghìn",
-            "confidence": 1.0,
+            "value": "200 nghìn",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3612,7 +4062,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 170000.0,
-            "amount_max": 229999.99999999997,
+            "amount_max": 230000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -3626,7 +4076,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3583
+      "latency_ms": 3404
     },
     "Từ 200k đến 500k": {
       "expected": {
@@ -3649,14 +4099,14 @@
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
             "value": "Từ 200k đến 500k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3679,7 +4129,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4748
+      "latency_ms": 3849
     },
     "Trên 2 triệu": {
       "expected": {
@@ -3702,14 +4152,14 @@
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
             "value": "Trên 2 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3732,7 +4182,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4166
+      "latency_ms": 3609
     },
     "Gần đây": {
       "expected": {
@@ -3756,13 +4206,13 @@
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 0.85
+          "distance": 0.9
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "gần đây",
-            "confidence": 0.85,
+            "value": "Gần đây",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3785,7 +4235,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5093
+      "latency_ms": 6326
     },
     "Trong vòng 5km": {
       "expected": {
@@ -3804,18 +4254,18 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 5000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "trong vòng 5km",
-            "confidence": 1.0,
+            "value": "5km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3823,11 +4273,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 5000.0,
+            "amount": 5.0,
             "amount_max": null,
             "radius_meters": 5000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -3838,7 +4288,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5640
+      "latency_ms": 4016
     },
     "Cách 2 cây số": {
       "expected": {
@@ -3857,18 +4307,18 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
             "value": "2 cây số",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3876,11 +4326,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
-            "distance_unit": "cây số",
-            "proximity_intent": false,
+            "distance_unit": "kilometers",
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -3891,7 +4341,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3973
+      "latency_ms": 3860
     },
     "Xung quanh đây": {
       "expected": {
@@ -3915,13 +4365,13 @@
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "quanh đây",
-            "confidence": 0.85,
+            "value": "Xung quanh đây",
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3944,7 +4394,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4402
+      "latency_ms": 3947
     },
     "Trong vòng 3km": {
       "expected": {
@@ -3963,18 +4413,18 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "trong vòng 3km",
-            "confidence": 1.0,
+            "value": "3km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -3982,11 +4432,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -3997,7 +4447,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3954
+      "latency_ms": 3927
     },
     "Lân cận": {
       "expected": {
@@ -4021,13 +4471,13 @@
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "lân cận",
-            "confidence": 0.85,
+            "value": "Lân cận",
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -4050,7 +4500,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6280
+      "latency_ms": 3825
     },
     "Gần nhà": {
       "expected": {
@@ -4074,13 +4524,13 @@
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 0.85
+          "distance": 0.9
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "gần nhà",
-            "confidence": 0.85,
+            "value": "Gần nhà",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -4103,7 +4553,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4669
+      "latency_ms": 6463
     },
     "Trong bán kính 2km": {
       "expected": {
@@ -4122,18 +4572,18 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "2km",
-            "confidence": 1.0,
+            "value": "Trong bán kính 2km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -4141,11 +4591,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           }
         ]
@@ -4156,7 +4606,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5398
+      "latency_ms": 4017
     },
     "Cách 1 cây số": {
       "expected": {
@@ -4175,18 +4625,18 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 1000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
             "value": "1 cây số",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -4194,11 +4644,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 1000.0,
+            "amount": 1.0,
             "amount_max": null,
             "radius_meters": 1000,
-            "distance_unit": "cây số",
-            "proximity_intent": false,
+            "distance_unit": "km",
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -4209,7 +4659,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3109
+      "latency_ms": 3495
     },
     "Trong vòng 10km": {
       "expected": {
@@ -4228,18 +4678,18 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 10000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "trong vòng 10km",
-            "confidence": 1.0,
+            "value": "10km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -4247,11 +4697,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 10000.0,
+            "amount": 10.0,
             "amount_max": null,
             "radius_meters": 10000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           }
         ]
@@ -4262,7 +4712,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4687
+      "latency_ms": 4356
     },
     "Spa ở Quận 1": {
       "expected": {
@@ -4333,7 +4783,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4972
+      "latency_ms": 3889
     },
     "Gym ở Q7": {
       "expected": {
@@ -4404,7 +4854,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4379
+      "latency_ms": 3987
     },
     "Nha khoa ở HCM": {
       "expected": {
@@ -4475,7 +4925,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 2659
+      "latency_ms": 2831
     },
     "Massage ở Đà Nẵng": {
       "expected": {
@@ -4546,7 +4996,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3016
+      "latency_ms": 2720
     },
     "Phòng khám ở Q3": {
       "expected": {
@@ -4617,7 +5067,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6559
+      "latency_ms": 4053
     },
     "Spa gần Tân Bình": {
       "expected": {
@@ -4635,13 +5085,13 @@
         "price_op": null,
         "price_amount": null,
         "price_max": null,
-        "distance_meters": null,
-        "distance_implicit": null,
+        "distance_meters": 10000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": null
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -4679,6 +5129,24 @@
             "distance_unit": null,
             "proximity_intent": null,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "DISTANCE",
+            "value": "gần",
+            "confidence": 0.8,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": 10000.0,
+            "amount_max": null,
+            "radius_meters": 10000,
+            "distance_unit": "implicit",
+            "proximity_intent": true,
+            "fallback_to_registered_address": null
           }
         ]
       },
@@ -4686,9 +5154,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": true
+        "distance": false
       },
-      "latency_ms": 6676
+      "latency_ms": 7169
     },
     "Yoga ở Hà Nội": {
       "expected": {
@@ -4759,7 +5227,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 2994
+      "latency_ms": 2622
     },
     "Hiệu thuốc ở Q10": {
       "expected": {
@@ -4830,7 +5298,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3329
+      "latency_ms": 2831
     },
     "Phòng khám đông y ở Thủ Đức": {
       "expected": {
@@ -4901,7 +5369,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4645
+      "latency_ms": 5039
     },
     "Spa ở Q.1": {
       "expected": {
@@ -4972,7 +5440,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4154
+      "latency_ms": 3825
     },
     "Gym ở quận một": {
       "expected": {
@@ -5043,7 +5511,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4430
+      "latency_ms": 4515
     },
     "Nha sĩ ở TPHCM": {
       "expected": {
@@ -5114,7 +5582,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3877
+      "latency_ms": 3888
     },
     "Phòng khám ở Bình Thạnh": {
       "expected": {
@@ -5185,7 +5653,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6072
+      "latency_ms": 5407
     },
     "Gym dưới 500k": {
       "expected": {
@@ -5208,7 +5676,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -5233,7 +5701,7 @@
           {
             "type": "PRICE",
             "value": "dưới 500k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -5256,7 +5724,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 7137
+      "latency_ms": 4471
     },
     "Spa khoảng 300k": {
       "expected": {
@@ -5279,7 +5747,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -5304,7 +5772,7 @@
           {
             "type": "PRICE",
             "value": "khoảng 300k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -5327,7 +5795,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5013
+      "latency_ms": 3787
     },
     "Nha sĩ chi phí 2 triệu": {
       "expected": {
@@ -5374,7 +5842,7 @@
           },
           {
             "type": "PRICE",
-            "value": "chi phí 2 triệu",
+            "value": "2 triệu",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -5398,7 +5866,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3910
+      "latency_ms": 5414
     },
     "Massage giá 400k": {
       "expected": {
@@ -5415,7 +5883,7 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 340000,
-        "price_max": 459999,
+        "price_max": 460000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
@@ -5445,7 +5913,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 400k",
+            "value": "400k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -5455,7 +5923,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 340000.0,
-            "amount_max": 459999.99999999994,
+            "amount_max": 460000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -5469,7 +5937,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4945
+      "latency_ms": 5791
     },
     "Phòng khám trên 1 triệu": {
       "expected": {
@@ -5492,7 +5960,7 @@
         "confidence_scores": {
           "business_type": 0.57,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -5517,7 +5985,7 @@
           {
             "type": "PRICE",
             "value": "trên 1 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -5540,7 +6008,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6317
+      "latency_ms": 3614
     },
     "Spa từ 100k đến 300k": {
       "expected": {
@@ -5563,7 +6031,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -5588,7 +6056,7 @@
           {
             "type": "PRICE",
             "value": "từ 100k đến 300k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -5611,7 +6079,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3676
+      "latency_ms": 3370
     },
     "Gym giá 1.5tr": {
       "expected": {
@@ -5628,7 +6096,7 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 1275000,
-        "price_max": 1724999,
+        "price_max": 1725000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
@@ -5658,7 +6126,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 1.5tr",
+            "value": "1.5tr",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -5668,7 +6136,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 1275000.0,
-            "amount_max": 1724999.9999999998,
+            "amount_max": 1725000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -5682,7 +6150,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6787
+      "latency_ms": 6446
     },
     "Nha khoa dưới 3 triệu": {
       "expected": {
@@ -5705,7 +6173,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -5730,7 +6198,7 @@
           {
             "type": "PRICE",
             "value": "dưới 3 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -5753,7 +6221,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3775
+      "latency_ms": 4084
     },
     "Massage khoảng 800k": {
       "expected": {
@@ -5770,13 +6238,13 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 680000,
-        "price_max": 919999,
+        "price_max": 920000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -5801,7 +6269,7 @@
           {
             "type": "PRICE",
             "value": "khoảng 800k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -5810,7 +6278,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 680000.0,
-            "amount_max": 919999.9999999999,
+            "amount_max": 920000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -5824,7 +6292,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3980
+      "latency_ms": 3932
     },
     "Yoga giá 200k": {
       "expected": {
@@ -5841,7 +6309,7 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 170000,
-        "price_max": 229999,
+        "price_max": 230000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
@@ -5871,7 +6339,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 200k",
+            "value": "200k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -5881,7 +6349,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 170000.0,
-            "amount_max": 229999.99999999997,
+            "amount_max": 230000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -5895,7 +6363,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 7117
+      "latency_ms": 6698
     },
     "Hiệu thuốc dưới 200k": {
       "expected": {
@@ -5918,7 +6386,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -5943,7 +6411,7 @@
           {
             "type": "PRICE",
             "value": "dưới 200k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -5966,7 +6434,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3289
+      "latency_ms": 3562
     },
     "Spa gần đây": {
       "expected": {
@@ -5990,7 +6458,7 @@
           "business_type": 0.9,
           "location": null,
           "price": null,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -6014,7 +6482,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6037,7 +6505,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6146
+      "latency_ms": 4946
     },
     "Gym trong vòng 3km": {
       "expected": {
@@ -6056,12 +6524,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -6084,8 +6552,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "trong vòng 3km",
-            "confidence": 1.0,
+            "value": "3km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6093,11 +6561,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           }
         ]
@@ -6108,7 +6576,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4973
+      "latency_ms": 4722
     },
     "Nha khoa gần đây": {
       "expected": {
@@ -6132,7 +6600,7 @@
           "business_type": 0.9,
           "location": null,
           "price": null,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -6156,7 +6624,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6179,7 +6647,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4090
+      "latency_ms": 3935
     },
     "Phòng khám cách 2 cây số": {
       "expected": {
@@ -6198,12 +6666,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.57,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -6227,7 +6695,7 @@
           {
             "type": "DISTANCE",
             "value": "2 cây số",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6235,11 +6703,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
-            "distance_unit": "cây số",
-            "proximity_intent": false,
+            "distance_unit": "km",
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -6250,7 +6718,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5047
+      "latency_ms": 4767
     },
     "Massage xung quanh": {
       "expected": {
@@ -6274,7 +6742,7 @@
           "business_type": 0.9,
           "location": null,
           "price": null,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -6298,7 +6766,7 @@
           {
             "type": "DISTANCE",
             "value": "xung quanh",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6321,7 +6789,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4615
+      "latency_ms": 4517
     },
     "Yoga lân cận": {
       "expected": {
@@ -6345,7 +6813,7 @@
           "business_type": 0.9,
           "location": null,
           "price": null,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -6369,7 +6837,7 @@
           {
             "type": "DISTANCE",
             "value": "lân cận",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6392,7 +6860,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5950
+      "latency_ms": 6219
     },
     "Hiệu thuốc gần nhà": {
       "expected": {
@@ -6416,7 +6884,7 @@
           "business_type": 0.9,
           "location": null,
           "price": null,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -6440,7 +6908,7 @@
           {
             "type": "DISTANCE",
             "value": "gần nhà",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6463,7 +6931,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6218
+      "latency_ms": 3755
     },
     "Phòng khám đông y trong vòng 10km": {
       "expected": {
@@ -6482,12 +6950,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 10000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -6510,8 +6978,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "trong vòng 10km",
-            "confidence": 1.0,
+            "value": "10km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6519,11 +6987,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 10000.0,
+            "amount": 10.0,
             "amount_max": null,
             "radius_meters": 10000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -6534,7 +7002,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3485
+      "latency_ms": 3361
     },
     "Spa trong vòng 5km": {
       "expected": {
@@ -6553,12 +7021,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 5000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -6581,8 +7049,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "trong vòng 5km",
-            "confidence": 1.0,
+            "value": "5km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6590,11 +7058,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 5000.0,
+            "amount": 5.0,
             "amount_max": null,
             "radius_meters": 5000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -6605,7 +7073,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3826
+      "latency_ms": 4418
     },
     "Gym cách 1 cây số": {
       "expected": {
@@ -6624,12 +7092,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 1000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -6653,7 +7121,7 @@
           {
             "type": "DISTANCE",
             "value": "1 cây số",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6661,11 +7129,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 1000.0,
+            "amount": 1.0,
             "amount_max": null,
             "radius_meters": 1000,
-            "distance_unit": "cây số",
-            "proximity_intent": false,
+            "distance_unit": "km",
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           }
         ]
@@ -6676,7 +7144,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5566
+      "latency_ms": 4936
     },
     "Ở Q1 giá dưới 500k": {
       "expected": {
@@ -6699,7 +7167,7 @@
         "confidence_scores": {
           "business_type": null,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -6724,7 +7192,7 @@
           {
             "type": "PRICE",
             "value": "dưới 500k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6747,7 +7215,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4534
+      "latency_ms": 4473
     },
     "Ở Quận 3 khoảng 300k": {
       "expected": {
@@ -6770,7 +7238,7 @@
         "confidence_scores": {
           "business_type": null,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -6794,8 +7262,8 @@
           },
           {
             "type": "PRICE",
-            "value": "khoảng 300k",
-            "confidence": 1.0,
+            "value": "300k",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6818,7 +7286,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3577
+      "latency_ms": 4022
     },
     "Ở HCM giá 2 triệu": {
       "expected": {
@@ -6865,7 +7333,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 2 triệu",
+            "value": "2 triệu",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -6889,7 +7357,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5572
+      "latency_ms": 2956
     },
     "Ở Q7 trên 1 triệu": {
       "expected": {
@@ -6912,7 +7380,7 @@
         "confidence_scores": {
           "business_type": null,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -6937,7 +7405,7 @@
           {
             "type": "PRICE",
             "value": "trên 1 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -6960,7 +7428,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5687
+      "latency_ms": 5932
     },
     "Ở Đà Nẵng dưới 800k": {
       "expected": {
@@ -6983,7 +7451,7 @@
         "confidence_scores": {
           "business_type": null,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -7008,7 +7476,7 @@
           {
             "type": "PRICE",
             "value": "dưới 800k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7031,7 +7499,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3630
+      "latency_ms": 3821
     },
     "Giá dưới 500k gần đây": {
       "expected": {
@@ -7047,21 +7515,21 @@
         "business_type": null,
         "location_code": null,
         "price_op": "lte",
-        "price_amount": 500000,
-        "price_max": null,
+        "price_amount": null,
+        "price_max": 500000,
         "distance_meters": 10000,
         "distance_implicit": true,
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7079,7 +7547,7 @@
           {
             "type": "PRICE",
             "value": "dưới 500k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7087,8 +7555,8 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 500000.0,
-            "amount_max": null,
+            "amount": null,
+            "amount_max": 500000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -7099,10 +7567,10 @@
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": true,
+        "price": false,
         "distance": true
       },
-      "latency_ms": 3373
+      "latency_ms": 3015
     },
     "Khoảng 300k trong vòng 3km": {
       "expected": {
@@ -7120,19 +7588,19 @@
         "price_op": "between",
         "price_amount": 255000,
         "price_max": 345000,
-        "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_meters": 10000,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "trong vòng 3km",
-            "confidence": 1.0,
+            "value": "3km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7142,15 +7610,15 @@
             "operator": "lte",
             "amount": 3000.0,
             "amount_max": null,
-            "radius_meters": 3000,
+            "radius_meters": 10000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "Khoảng 300k",
-            "confidence": 1.0,
+            "value": "300k",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7171,9 +7639,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": true
+        "distance": false
       },
-      "latency_ms": 4559
+      "latency_ms": 4598
     },
     "Giá 2 triệu lân cận": {
       "expected": {
@@ -7191,36 +7659,36 @@
         "price_op": "between",
         "price_amount": 1700000,
         "price_max": 2300000,
-        "distance_meters": 10000,
-        "distance_implicit": true,
+        "distance_meters": null,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": null,
           "location": null,
           "price": 0.9,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
             "value": "lân cận",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
             "location_code": null,
             "location_level": null,
             "location_intent": null,
-            "operator": "lte",
-            "amount": 10000.0,
+            "operator": null,
+            "amount": null,
             "amount_max": null,
-            "radius_meters": 10000,
-            "distance_unit": "implicit",
-            "proximity_intent": true,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "Giá 2 triệu",
+            "value": "2 triệu",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -7242,9 +7710,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": true
+        "distance": false
       },
-      "latency_ms": 5502
+      "latency_ms": 4724
     },
     "Từ 100k đến 300k xung quanh": {
       "expected": {
@@ -7262,37 +7730,37 @@
         "price_op": "between",
         "price_amount": 100000,
         "price_max": 300000,
-        "distance_meters": 10000,
-        "distance_implicit": true,
+        "distance_meters": null,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.7
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
             "value": "xung quanh",
-            "confidence": 0.85,
+            "confidence": 0.7,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
             "location_code": null,
             "location_level": null,
             "location_intent": null,
-            "operator": "lte",
-            "amount": 10000.0,
+            "operator": null,
+            "amount": null,
             "amount_max": null,
-            "radius_meters": 10000,
-            "distance_unit": "implicit",
-            "proximity_intent": true,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "Từ 100k đến 300k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7313,9 +7781,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": true
+        "distance": false
       },
-      "latency_ms": 7089
+      "latency_ms": 5342
     },
     "Ở Q1 gần đây": {
       "expected": {
@@ -7339,7 +7807,7 @@
           "business_type": null,
           "location": 0.9,
           "price": null,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -7363,7 +7831,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7386,7 +7854,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4258
+      "latency_ms": 3534
     },
     "Ở HCM trong vòng 5km": {
       "expected": {
@@ -7405,12 +7873,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 5000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": null,
           "location": 0.9,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -7434,7 +7902,7 @@
           {
             "type": "DISTANCE",
             "value": "trong vòng 5km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7442,11 +7910,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 5000.0,
+            "amount": 5.0,
             "amount_max": null,
             "radius_meters": 5000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           }
         ]
@@ -7457,7 +7925,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5164
+      "latency_ms": 3243
     },
     "Spa ở Q1 dưới 500k": {
       "expected": {
@@ -7473,14 +7941,14 @@
         "business_type": "SPA_BEAUTY",
         "location_code": "760",
         "price_op": "lte",
-        "price_amount": 500000,
-        "price_max": null,
+        "price_amount": null,
+        "price_max": 500000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -7523,7 +7991,7 @@
           {
             "type": "PRICE",
             "value": "dưới 500k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7531,8 +7999,8 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 500000.0,
-            "amount_max": null,
+            "amount": null,
+            "amount_max": 500000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -7543,10 +8011,10 @@
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": true,
+        "price": false,
         "distance": true
       },
-      "latency_ms": 6687
+      "latency_ms": 4716
     },
     "Gym ở HCM trong vòng 3km": {
       "expected": {
@@ -7565,12 +8033,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -7611,8 +8079,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "trong vòng 3km",
-            "confidence": 1.0,
+            "value": "3km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7620,11 +8088,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -7635,7 +8103,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5576
+      "latency_ms": 3968
     },
     "Massage khoảng 400k gần đây": {
       "expected": {
@@ -7652,14 +8120,14 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 340000,
-        "price_max": 459999,
+        "price_max": 460000,
         "distance_meters": 10000,
         "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -7683,7 +8151,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7701,7 +8169,7 @@
           {
             "type": "PRICE",
             "value": "khoảng 400k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7710,7 +8178,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 340000.0,
-            "amount_max": 459999.99999999994,
+            "amount_max": 460000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -7724,7 +8192,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5854
+      "latency_ms": 4940
     },
     "Nha khoa ở HCM khoảng 2 triệu": {
       "expected": {
@@ -7747,7 +8215,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -7790,7 +8258,7 @@
           {
             "type": "PRICE",
             "value": "khoảng 2 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7813,7 +8281,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4621
+      "latency_ms": 3625
     },
     "Phòng khám ở Q3 giá 300k": {
       "expected": {
@@ -7860,7 +8328,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 300k",
+            "value": "300k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -7884,7 +8352,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5120
+      "latency_ms": 4360
     },
     "Spa ở Quận 1 từ 100k đến 300k": {
       "expected": {
@@ -7907,7 +8375,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -7950,7 +8418,7 @@
           {
             "type": "PRICE",
             "value": "từ 100k đến 300k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -7973,7 +8441,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5321
+      "latency_ms": 4502
     },
     "Gym ở Q7 giá 1.5tr": {
       "expected": {
@@ -7990,7 +8458,7 @@
         "location_code": "778",
         "price_op": "between",
         "price_amount": 1275000,
-        "price_max": 1724999,
+        "price_max": 1725000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
@@ -8038,7 +8506,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 1.5tr",
+            "value": "1.5tr",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -8048,7 +8516,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 1275000.0,
-            "amount_max": 1724999.9999999998,
+            "amount_max": 1725000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -8062,7 +8530,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5376
+      "latency_ms": 7729
     },
     "Massage ở Đà Nẵng dưới 800k": {
       "expected": {
@@ -8085,7 +8553,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -8128,7 +8596,7 @@
           {
             "type": "PRICE",
             "value": "dưới 800k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -8151,7 +8619,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5126
+      "latency_ms": 4000
     },
     "Yoga ở Hà Nội trên 500k": {
       "expected": {
@@ -8174,7 +8642,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -8217,7 +8685,7 @@
           {
             "type": "PRICE",
             "value": "trên 500k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -8240,7 +8708,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5103
+      "latency_ms": 4657
     },
     "Hiệu thuốc ở Q10 giá 200k": {
       "expected": {
@@ -8257,7 +8725,7 @@
         "location_code": "771",
         "price_op": "between",
         "price_amount": 170000,
-        "price_max": 229999,
+        "price_max": 230000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
@@ -8305,7 +8773,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 200k",
+            "value": "200k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -8315,7 +8783,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 170000.0,
-            "amount_max": 229999.99999999997,
+            "amount_max": 230000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -8329,7 +8797,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4781
+      "latency_ms": 4832
     },
     "Phòng khám đông y ở Thủ Đức khoảng 1 triệu": {
       "expected": {
@@ -8352,7 +8820,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -8395,7 +8863,7 @@
           {
             "type": "PRICE",
             "value": "khoảng 1 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -8418,7 +8886,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5248
+      "latency_ms": 3991
     },
     "Nha sĩ ở Tân Bình chi phí 2tr": {
       "expected": {
@@ -8483,7 +8951,7 @@
           },
           {
             "type": "PRICE",
-            "value": "chi phí 2tr",
+            "value": "2tr",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -8507,7 +8975,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6582
+      "latency_ms": 5798
     },
     "Spa ở Q.1 dưới 600k": {
       "expected": {
@@ -8530,7 +8998,7 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -8573,7 +9041,7 @@
           {
             "type": "PRICE",
             "value": "dưới 600k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -8596,7 +9064,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3216
+      "latency_ms": 2571
     },
     "Gym gần quận một giá 250k": {
       "expected": {
@@ -8618,7 +9086,7 @@
         "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
-          "location": 0.85,
+          "location": 0.9,
           "price": 0.9,
           "distance": null
         },
@@ -8644,7 +9112,7 @@
           {
             "type": "LOCATION",
             "value": "quận một",
-            "confidence": 0.85,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -8661,7 +9129,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 250k",
+            "value": "250k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -8685,7 +9153,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 18364
+      "latency_ms": 3998
     },
     "Phòng khám ở TPHCM giá 500 nghìn": {
       "expected": {
@@ -8732,7 +9200,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 500 nghìn",
+            "value": "500 nghìn",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -8756,7 +9224,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6801
+      "latency_ms": 5367
     },
     "Spa ở Quận 1 gần đây": {
       "expected": {
@@ -8845,7 +9313,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3078
+      "latency_ms": 2836
     },
     "Gym ở Q7 trong vòng 5km": {
       "expected": {
@@ -8864,12 +9332,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 5000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -8911,7 +9379,7 @@
           {
             "type": "DISTANCE",
             "value": "trong vòng 5km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -8919,11 +9387,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 5000.0,
+            "amount": 5.0,
             "amount_max": null,
             "radius_meters": 5000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -8934,7 +9402,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6176
+      "latency_ms": 4573
     },
     "Nha khoa ở HCM cách 3km": {
       "expected": {
@@ -8953,12 +9421,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -9000,7 +9468,7 @@
           {
             "type": "DISTANCE",
             "value": "3km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9008,11 +9476,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           }
         ]
@@ -9023,7 +9491,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4701
+      "latency_ms": 3236
     },
     "Massage ở Đà Nẵng xung quanh": {
       "expected": {
@@ -9112,7 +9580,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5400
+      "latency_ms": 5034
     },
     "Yoga ở Hà Nội lân cận": {
       "expected": {
@@ -9136,7 +9604,7 @@
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -9178,7 +9646,7 @@
           {
             "type": "DISTANCE",
             "value": "lân cận",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9201,7 +9669,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4680
+      "latency_ms": 4951
     },
     "Phòng khám ở Q3 cách 2 cây số": {
       "expected": {
@@ -9220,12 +9688,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.57,
           "location": 0.9,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -9267,7 +9735,7 @@
           {
             "type": "DISTANCE",
             "value": "2 cây số",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9275,11 +9743,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
-            "distance_unit": "cây số",
-            "proximity_intent": false,
+            "distance_unit": "km",
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -9290,7 +9758,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6537
+      "latency_ms": 3762
     },
     "Hiệu thuốc ở Q10 gần nhà": {
       "expected": {
@@ -9314,7 +9782,7 @@
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": 0.85
+          "distance": 0.7
         },
         "raw_entities": [
           {
@@ -9356,7 +9824,7 @@
           {
             "type": "DISTANCE",
             "value": "gần nhà",
-            "confidence": 0.85,
+            "confidence": 0.7,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9379,7 +9847,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3714
+      "latency_ms": 3230
     },
     "Phòng khám đông y ở Thủ Đức trong vòng 10km": {
       "expected": {
@@ -9398,12 +9866,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 10000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -9445,7 +9913,7 @@
           {
             "type": "DISTANCE",
             "value": "trong vòng 10km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9453,11 +9921,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 10000.0,
+            "amount": 10.0,
             "amount_max": null,
             "radius_meters": 10000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           }
         ]
@@ -9468,7 +9936,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3851
+      "latency_ms": 3716
     },
     "Spa ở Tân Bình trong bán kính 2km": {
       "expected": {
@@ -9487,12 +9955,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -9533,8 +10001,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "2km",
-            "confidence": 1.0,
+            "value": "trong bán kính 2km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9542,11 +10010,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           }
         ]
@@ -9557,7 +10025,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4236
+      "latency_ms": 4825
     },
     "Gym ở Bình Thạnh cách 1 cây số": {
       "expected": {
@@ -9576,12 +10044,12 @@
         "price_amount": null,
         "price_max": null,
         "distance_meters": 1000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": null,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -9623,7 +10091,7 @@
           {
             "type": "DISTANCE",
             "value": "1 cây số",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9631,11 +10099,11 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 1000.0,
+            "amount": 1.0,
             "amount_max": null,
             "radius_meters": 1000,
-            "distance_unit": "cây số",
-            "proximity_intent": false,
+            "distance_unit": "km",
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           }
         ]
@@ -9646,7 +10114,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 7364
+      "latency_ms": 5033
     },
     "Spa dưới 500k gần đây": {
       "expected": {
@@ -9669,8 +10137,8 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -9694,7 +10162,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9712,7 +10180,7 @@
           {
             "type": "PRICE",
             "value": "dưới 500k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9735,7 +10203,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6185
+      "latency_ms": 3659
     },
     "Gym giá 300k trong vòng 2km": {
       "expected": {
@@ -9754,12 +10222,12 @@
         "price_amount": 255000,
         "price_max": 345000,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
           "price": 0.9,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -9782,8 +10250,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "trong vòng 2km",
-            "confidence": 1.0,
+            "value": "2km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9791,16 +10259,16 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "giá 300k",
+            "value": "300k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -9824,7 +10292,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6674
+      "latency_ms": 6895
     },
     "Massage khoảng 400k cách 5km": {
       "expected": {
@@ -9841,14 +10309,14 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 340000,
-        "price_max": 459999,
+        "price_max": 460000,
         "distance_meters": 5000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -9872,7 +10340,7 @@
           {
             "type": "DISTANCE",
             "value": "5km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9880,17 +10348,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 5000.0,
+            "amount": 5.0,
             "amount_max": null,
             "radius_meters": 5000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "khoảng 400k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9899,7 +10367,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 340000.0,
-            "amount_max": 459999.99999999994,
+            "amount_max": 460000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -9913,7 +10381,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4592
+      "latency_ms": 5291
     },
     "Nha khoa chi phí 2 triệu xung quanh": {
       "expected": {
@@ -9937,7 +10405,7 @@
           "business_type": 0.9,
           "location": null,
           "price": 0.9,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -9961,7 +10429,7 @@
           {
             "type": "DISTANCE",
             "value": "xung quanh",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -9978,7 +10446,7 @@
           },
           {
             "type": "PRICE",
-            "value": "chi phí 2 triệu",
+            "value": "2 triệu",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -10002,7 +10470,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4334
+      "latency_ms": 3946
     },
     "Spa từ 100k đến 300k gần đây": {
       "expected": {
@@ -10025,8 +10493,8 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -10050,7 +10518,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10068,7 +10536,7 @@
           {
             "type": "PRICE",
             "value": "từ 100k đến 300k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10091,7 +10559,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4351
+      "latency_ms": 5180
     },
     "Phòng khám giá 800k lân cận": {
       "expected": {
@@ -10104,24 +10572,42 @@
         "distance_implicit": true
       },
       "predicted": {
-        "business_type": null,
+        "business_type": "TRADITIONAL_MEDICINE",
         "location_code": null,
         "price_op": "between",
         "price_amount": 680000,
-        "price_max": 919999,
-        "distance_meters": 10000,
+        "price_max": 920000,
+        "distance_meters": 5000,
         "distance_implicit": true,
         "confidence_scores": {
-          "business_type": null,
+          "business_type": 0.57,
           "location": null,
           "price": 0.9,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
+            "type": "BUSINESS_TYPE",
+            "value": "Phòng khám",
+            "confidence": 0.57,
+            "business_type": "TRADITIONAL_MEDICINE",
+            "business_evidence": "Phòng khám",
+            "business_phrase": "Phòng khám",
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": null,
+            "amount": null,
+            "amount_max": null,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
+          },
+          {
             "type": "DISTANCE",
             "value": "lân cận",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10129,16 +10615,16 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 10000.0,
+            "amount": null,
             "amount_max": null,
-            "radius_meters": 10000,
-            "distance_unit": "implicit",
+            "radius_meters": 5000,
+            "distance_unit": "meters",
             "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "giá 800k",
+            "value": "800k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -10148,7 +10634,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 680000.0,
-            "amount_max": 919999.9999999999,
+            "amount_max": 920000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -10157,12 +10643,12 @@
         ]
       },
       "matches": {
-        "business_type": false,
+        "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": true
+        "distance": false
       },
-      "latency_ms": 17223
+      "latency_ms": 15250
     },
     "Yoga trên 200k gần nhà": {
       "expected": {
@@ -10180,19 +10666,19 @@
         "price_op": "gte",
         "price_amount": 200000,
         "price_max": null,
-        "distance_meters": 10000,
-        "distance_implicit": true,
+        "distance_meters": null,
+        "distance_implicit": null,
         "confidence_scores": {
-          "business_type": 0.7,
+          "business_type": 0.9,
           "location": null,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
             "type": "BUSINESS_TYPE",
             "value": "Yoga",
-            "confidence": 0.7,
+            "confidence": 0.9,
             "business_type": "FITNESS",
             "business_evidence": "Yoga",
             "business_phrase": "Yoga",
@@ -10210,25 +10696,25 @@
           {
             "type": "DISTANCE",
             "value": "gần nhà",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
             "location_code": null,
             "location_level": null,
             "location_intent": null,
-            "operator": "lte",
-            "amount": 10000.0,
+            "operator": null,
+            "amount": null,
             "amount_max": null,
-            "radius_meters": 10000,
-            "distance_unit": "implicit",
-            "proximity_intent": true,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "trên 200k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10249,9 +10735,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": true
+        "distance": false
       },
-      "latency_ms": 5865
+      "latency_ms": 7755
     },
     "Hiệu thuốc dưới 300k trong vòng 3km": {
       "expected": {
@@ -10270,12 +10756,12 @@
         "price_amount": 300000,
         "price_max": null,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -10299,7 +10785,7 @@
           {
             "type": "DISTANCE",
             "value": "trong vòng 3km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10307,17 +10793,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "dưới 300k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10340,7 +10826,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4668
+      "latency_ms": 3692
     },
     "Phòng khám đông y khoảng 1 triệu trong vòng 10km": {
       "expected": {
@@ -10359,12 +10845,12 @@
         "price_amount": 850000,
         "price_max": 1150000,
         "distance_meters": 10000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -10388,7 +10874,7 @@
           {
             "type": "DISTANCE",
             "value": "trong vòng 10km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10396,17 +10882,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 10000.0,
+            "amount": 10.0,
             "amount_max": null,
             "radius_meters": 10000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "khoảng 1 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10429,7 +10915,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5128
+      "latency_ms": 4972
     },
     "Gym khoảng 500k cách 1 cây số": {
       "expected": {
@@ -10448,12 +10934,12 @@
         "price_amount": 425000,
         "price_max": 575000,
         "distance_meters": 1000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -10477,7 +10963,7 @@
           {
             "type": "DISTANCE",
             "value": "1 cây số",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10485,17 +10971,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 1000.0,
+            "amount": 1.0,
             "amount_max": null,
             "radius_meters": 1000,
-            "distance_unit": "cây số",
-            "proximity_intent": false,
+            "distance_unit": "km",
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "khoảng 500k",
-            "confidence": 1.0,
+            "value": "500k",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10518,7 +11004,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5389
+      "latency_ms": 4727
     },
     "Massage giá 2tr xung quanh đây": {
       "expected": {
@@ -10542,7 +11028,7 @@
           "business_type": 0.9,
           "location": null,
           "price": 0.9,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -10565,8 +11051,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "quanh đây",
-            "confidence": 0.85,
+            "value": "xung quanh đây",
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10583,7 +11069,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 2tr",
+            "value": "2tr",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -10607,7 +11093,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3970
+      "latency_ms": 4894
     },
     "Nha khoa giá 1.5 triệu trong vòng 3km": {
       "expected": {
@@ -10624,14 +11110,14 @@
         "location_code": null,
         "price_op": "between",
         "price_amount": 1275000,
-        "price_max": 1724999,
+        "price_max": 1725000,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
           "price": 0.9,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -10654,8 +11140,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "trong vòng 3km",
-            "confidence": 1.0,
+            "value": "3km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10663,16 +11149,16 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "giá 1.5 triệu",
+            "value": "1.5 triệu",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -10682,7 +11168,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 1275000.0,
-            "amount_max": 1724999.9999999998,
+            "amount_max": 1725000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -10696,7 +11182,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4378
+      "latency_ms": 6278
     },
     "Spa từ 200k đến 400k gần đây": {
       "expected": {
@@ -10719,8 +11205,8 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": null,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -10744,7 +11230,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10762,7 +11248,7 @@
           {
             "type": "PRICE",
             "value": "từ 200k đến 400k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10785,7 +11271,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5187
+      "latency_ms": 3449
     },
     "Tìm spa ở Quận 1 giá dưới 500k trong vòng 2km": {
       "expected": {
@@ -10804,12 +11290,12 @@
         "price_amount": 500000,
         "price_max": null,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -10851,7 +11337,7 @@
           {
             "type": "DISTANCE",
             "value": "trong vòng 2km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10859,17 +11345,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "dưới 500k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10892,7 +11378,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 10269
+      "latency_ms": 4919
     },
     "Gym gần Q7 chi phí khoảng 300k cách 5km": {
       "expected": {
@@ -10911,12 +11397,12 @@
         "price_amount": 255000,
         "price_max": 345000,
         "distance_meters": 5000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -10958,7 +11444,7 @@
           {
             "type": "DISTANCE",
             "value": "5km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10966,17 +11452,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 5000.0,
+            "amount": 5.0,
             "amount_max": null,
             "radius_meters": 5000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "khoảng 300k",
-            "confidence": 1.0,
+            "value": "300k",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -10999,7 +11485,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 7690
+      "latency_ms": 5640
     },
     "Nha khoa ở HCM khoảng 2 triệu gần đây": {
       "expected": {
@@ -11022,8 +11508,8 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -11065,7 +11551,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11083,7 +11569,7 @@
           {
             "type": "PRICE",
             "value": "khoảng 2 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11106,7 +11592,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4208
+      "latency_ms": 3933
     },
     "Massage ở Đà Nẵng từ 100k đến 300k trong vòng 3km": {
       "expected": {
@@ -11125,12 +11611,12 @@
         "price_amount": 100000,
         "price_max": 300000,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -11172,7 +11658,7 @@
           {
             "type": "DISTANCE",
             "value": "trong vòng 3km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11180,17 +11666,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "từ 100k đến 300k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11213,7 +11699,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5516
+      "latency_ms": 4828
     },
     "Phòng khám ở Q3 giá 300k cách 2 cây số": {
       "expected": {
@@ -11232,12 +11718,12 @@
         "price_amount": 255000,
         "price_max": 345000,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.57,
           "location": 0.9,
           "price": 0.9,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -11279,7 +11765,7 @@
           {
             "type": "DISTANCE",
             "value": "2 cây số",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11287,16 +11773,16 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
-            "distance_unit": "cây số",
-            "proximity_intent": false,
+            "distance_unit": "km",
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "giá 300k",
+            "value": "300k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -11320,7 +11806,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 7064
+      "latency_ms": 6284
     },
     "Yoga ở Hà Nội giá 200k xung quanh đây": {
       "expected": {
@@ -11337,14 +11823,14 @@
         "location_code": "01",
         "price_op": "between",
         "price_amount": 170000,
-        "price_max": 229999,
+        "price_max": 230000,
         "distance_meters": 10000,
         "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": 0.9,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -11385,8 +11871,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "quanh đây",
-            "confidence": 0.85,
+            "value": "xung quanh đây",
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11403,7 +11889,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 200k",
+            "value": "200k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -11413,7 +11899,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 170000.0,
-            "amount_max": 229999.99999999997,
+            "amount_max": 230000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -11427,7 +11913,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5688
+      "latency_ms": 4849
     },
     "Spa ở Tân Bình chi phí 2tr trong bán kính 2km": {
       "expected": {
@@ -11446,12 +11932,12 @@
         "price_amount": 1700000,
         "price_max": 2300000,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": 0.9,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -11493,7 +11979,7 @@
           {
             "type": "DISTANCE",
             "value": "2km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11501,16 +11987,16 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "chi phí 2tr",
+            "value": "2tr",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -11534,7 +12020,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5806
+      "latency_ms": 5261
     },
     "Gym ở Bình Thạnh giá 1.5tr cách 1 cây số": {
       "expected": {
@@ -11551,14 +12037,14 @@
         "location_code": "765",
         "price_op": "between",
         "price_amount": 1275000,
-        "price_max": 1724999,
+        "price_max": 1725000,
         "distance_meters": 1000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": 0.9,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -11600,7 +12086,7 @@
           {
             "type": "DISTANCE",
             "value": "1 cây số",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11608,16 +12094,16 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 1000.0,
+            "amount": 1.0,
             "amount_max": null,
             "radius_meters": 1000,
-            "distance_unit": "cây số",
-            "proximity_intent": false,
+            "distance_unit": "km",
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "giá 1.5tr",
+            "value": "1.5tr",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -11627,7 +12113,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 1275000.0,
-            "amount_max": 1724999.9999999998,
+            "amount_max": 1725000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -11641,7 +12127,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3665
+      "latency_ms": 3801
     },
     "Hiệu thuốc ở Q10 dưới 300k lân cận": {
       "expected": {
@@ -11664,8 +12150,8 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -11707,7 +12193,7 @@
           {
             "type": "DISTANCE",
             "value": "lân cận",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11725,7 +12211,7 @@
           {
             "type": "PRICE",
             "value": "dưới 300k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11748,7 +12234,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 14137
+      "latency_ms": 4906
     },
     "Phòng khám đông y ở Thủ Đức khoảng 1 triệu trong vòng 10km": {
       "expected": {
@@ -11767,12 +12253,12 @@
         "price_amount": 850000,
         "price_max": 1150000,
         "distance_meters": 10000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -11813,8 +12299,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "trong vòng 10km",
-            "confidence": 1.0,
+            "value": "10km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11822,17 +12308,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 10000.0,
+            "amount": 10.0,
             "amount_max": null,
             "radius_meters": 10000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "khoảng 1 triệu",
-            "confidence": 1.0,
+            "value": "1 triệu",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11855,7 +12341,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6051
+      "latency_ms": 5622
     },
     "Nha sĩ ở Q.1 trên 1 triệu gần nhà": {
       "expected": {
@@ -11878,8 +12364,8 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -11921,7 +12407,7 @@
           {
             "type": "DISTANCE",
             "value": "gần nhà",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11939,7 +12425,7 @@
           {
             "type": "PRICE",
             "value": "trên 1 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -11962,7 +12448,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3767
+      "latency_ms": 3524
     },
     "Massage trị liệu ở HCM giá 600k trong vòng 5km": {
       "expected": {
@@ -11981,12 +12467,12 @@
         "price_amount": 510000,
         "price_max": 690000,
         "distance_meters": 5000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": 0.9,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -12028,7 +12514,7 @@
           {
             "type": "DISTANCE",
             "value": "trong vòng 5km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12036,16 +12522,16 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 5000.0,
+            "amount": 5.0,
             "amount_max": null,
             "radius_meters": 5000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "giá 600k",
+            "value": "600k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -12069,7 +12555,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5180
+      "latency_ms": 5005
     },
     "Phòng khám da liễu ở TPHCM giá 500 nghìn gần đây": {
       "expected": {
@@ -12093,7 +12579,7 @@
           "business_type": 0.9,
           "location": 0.9,
           "price": 0.9,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -12135,7 +12621,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12152,7 +12638,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 500 nghìn",
+            "value": "500 nghìn",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -12176,7 +12662,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5592
+      "latency_ms": 4761
     },
     "Spa thư giãn ở quận một khoảng 400k lân cận": {
       "expected": {
@@ -12193,14 +12679,14 @@
         "location_code": "760",
         "price_op": "between",
         "price_amount": 340000,
-        "price_max": 459999,
+        "price_max": 460000,
         "distance_meters": 10000,
         "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -12242,7 +12728,7 @@
           {
             "type": "DISTANCE",
             "value": "lân cận",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12259,8 +12745,8 @@
           },
           {
             "type": "PRICE",
-            "value": "khoảng 400k",
-            "confidence": 1.0,
+            "value": "400k",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12269,7 +12755,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 340000.0,
-            "amount_max": 459999.99999999994,
+            "amount_max": 460000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -12283,7 +12769,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4490
+      "latency_ms": 6066
     },
     "Trung tâm yoga ở Q7 giá 250k trong vòng 2km": {
       "expected": {
@@ -12296,38 +12782,20 @@
         "distance_implicit": false
       },
       "predicted": {
-        "business_type": "FITNESS",
+        "business_type": null,
         "location_code": "778",
         "price_op": "between",
         "price_amount": 212500,
         "price_max": 287500,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
-          "business_type": 0.57,
+          "business_type": null,
           "location": 0.9,
           "price": 0.9,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
-          {
-            "type": "BUSINESS_TYPE",
-            "value": "Trung tâm yoga",
-            "confidence": 0.57,
-            "business_type": "FITNESS",
-            "business_evidence": "Trung tâm yoga",
-            "business_phrase": "Trung tâm yoga",
-            "location_code": null,
-            "location_level": null,
-            "location_intent": null,
-            "operator": null,
-            "amount": null,
-            "amount_max": null,
-            "radius_meters": null,
-            "distance_unit": null,
-            "proximity_intent": null,
-            "fallback_to_registered_address": null
-          },
           {
             "type": "LOCATION",
             "value": "Q7",
@@ -12366,8 +12834,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "trong vòng 2km",
-            "confidence": 1.0,
+            "value": "2km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12375,16 +12843,16 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "giá 250k",
+            "value": "250k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -12403,12 +12871,12 @@
         ]
       },
       "matches": {
-        "business_type": true,
+        "business_type": false,
         "location_code": true,
         "price": true,
         "distance": true
       },
-      "latency_ms": 18486
+      "latency_ms": 5032
     },
     "Tiệm làm đẹp ở Đà Nẵng giá 350k xung quanh": {
       "expected": {
@@ -12425,14 +12893,14 @@
         "location_code": "48",
         "price_op": "between",
         "price_amount": 297500,
-        "price_max": 402499,
-        "distance_meters": 10000,
-        "distance_implicit": true,
+        "price_max": 402500,
+        "distance_meters": null,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": 0.9,
-          "distance": 0.85
+          "distance": 0.7
         },
         "raw_entities": [
           {
@@ -12440,8 +12908,8 @@
             "value": "Tiệm làm đẹp",
             "confidence": 0.9,
             "business_type": "SPA_BEAUTY",
-            "business_evidence": "làm đẹp",
-            "business_phrase": "làm đẹp",
+            "business_evidence": "Tiệm làm đẹp",
+            "business_phrase": "Tiệm làm đẹp",
             "location_code": null,
             "location_level": null,
             "location_intent": null,
@@ -12474,24 +12942,24 @@
           {
             "type": "DISTANCE",
             "value": "xung quanh",
-            "confidence": 0.85,
+            "confidence": 0.7,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
             "location_code": null,
             "location_level": null,
             "location_intent": null,
-            "operator": "lte",
-            "amount": 10000.0,
+            "operator": null,
+            "amount": null,
             "amount_max": null,
-            "radius_meters": 10000,
-            "distance_unit": "implicit",
-            "proximity_intent": true,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "giá 350k",
+            "value": "350k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -12501,7 +12969,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 297500.0,
-            "amount_max": 402499.99999999994,
+            "amount_max": 402500.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -12513,9 +12981,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": true
+        "distance": false
       },
-      "latency_ms": 5366
+      "latency_ms": 4235
     },
     "Phòng khám đa khoa ở Hà Nội trên 800k trong bán kính 3km": {
       "expected": {
@@ -12534,12 +13002,12 @@
         "price_amount": 800000,
         "price_max": null,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.57,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -12581,7 +13049,7 @@
           {
             "type": "DISTANCE",
             "value": "3km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12589,17 +13057,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "trên 800k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12622,7 +13090,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 16333
+      "latency_ms": 5974
     },
     "Gym ở Q3 từ 200k đến 400k cách 3km": {
       "expected": {
@@ -12641,12 +13109,12 @@
         "price_amount": 200000,
         "price_max": 400000,
         "distance_meters": 3000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -12688,7 +13156,7 @@
           {
             "type": "DISTANCE",
             "value": "3km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12696,17 +13164,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 3000.0,
+            "amount": 3.0,
             "amount_max": null,
             "radius_meters": 3000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "từ 200k đến 400k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12729,7 +13197,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6095
+      "latency_ms": 5232
     },
     "Massage ở Q10 giá 2tr gần đây": {
       "expected": {
@@ -12753,7 +13221,7 @@
           "business_type": 0.9,
           "location": 0.9,
           "price": 0.9,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -12795,7 +13263,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12812,7 +13280,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 2tr",
+            "value": "2tr",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -12836,7 +13304,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4336
+      "latency_ms": 4007
     },
     "Nha khoa ở Thủ Đức giá 1.5 triệu trong vòng 5km": {
       "expected": {
@@ -12853,14 +13321,14 @@
         "location_code": "762",
         "price_op": "between",
         "price_amount": 1275000,
-        "price_max": 1724999,
+        "price_max": 1725000,
         "distance_meters": 5000,
-        "distance_implicit": false,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": 0.9,
-          "distance": 1.0
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -12902,7 +13370,7 @@
           {
             "type": "DISTANCE",
             "value": "trong vòng 5km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -12910,16 +13378,16 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 5000.0,
+            "amount": 5.0,
             "amount_max": null,
             "radius_meters": 5000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "giá 1.5 triệu",
+            "value": "1.5 triệu",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -12929,7 +13397,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 1275000.0,
-            "amount_max": 1724999.9999999998,
+            "amount_max": 1725000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -12943,7 +13411,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 7749
+      "latency_ms": 6967
     },
     "Hiệu thuốc ở Hà Nội dưới 200k gần đây": {
       "expected": {
@@ -12966,8 +13434,8 @@
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -13009,7 +13477,7 @@
           {
             "type": "DISTANCE",
             "value": "gần đây",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13027,7 +13495,7 @@
           {
             "type": "PRICE",
             "value": "dưới 200k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13050,7 +13518,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4379
+      "latency_ms": 4265
     },
     "Yoga ở Q5 khoảng 300k trong vòng 2km": {
       "expected": {
@@ -13069,12 +13537,12 @@
         "price_amount": 255000,
         "price_max": 345000,
         "distance_meters": 2000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -13116,7 +13584,7 @@
           {
             "type": "DISTANCE",
             "value": "trong vòng 2km",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13124,17 +13592,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 2000.0,
+            "amount": 2.0,
             "amount_max": null,
             "radius_meters": 2000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "khoảng 300k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13157,7 +13625,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 6995
+      "latency_ms": 4967
     },
     "Spa ở Hồ Chí Minh từ 300k đến 600k xung quanh": {
       "expected": {
@@ -13175,13 +13643,13 @@
         "price_op": "between",
         "price_amount": 300000,
         "price_max": 600000,
-        "distance_meters": 10000,
-        "distance_implicit": true,
+        "distance_meters": null,
+        "distance_implicit": null,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 0.85
+          "price": 0.9,
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -13223,25 +13691,25 @@
           {
             "type": "DISTANCE",
             "value": "xung quanh",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
             "location_code": null,
             "location_level": null,
             "location_intent": null,
-            "operator": "lte",
-            "amount": 10000.0,
+            "operator": null,
+            "amount": null,
             "amount_max": null,
-            "radius_meters": 10000,
-            "distance_unit": "implicit",
-            "proximity_intent": true,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
-            "value": "từ 300k đến 600k",
-            "confidence": 1.0,
+            "value": "300k đến 600k",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13262,9 +13730,9 @@
         "business_type": true,
         "location_code": true,
         "price": true,
-        "distance": true
+        "distance": false
       },
-      "latency_ms": 3893
+      "latency_ms": 3805
     },
     "Phòng khám đông y ở Q7 trên 2 triệu cách 5km": {
       "expected": {
@@ -13283,12 +13751,12 @@
         "price_amount": 2000000,
         "price_max": null,
         "distance_meters": 5000,
-        "distance_implicit": false,
+        "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
-          "price": 1.0,
-          "distance": 1.0
+          "price": 0.9,
+          "distance": 0.9
         },
         "raw_entities": [
           {
@@ -13329,8 +13797,8 @@
           },
           {
             "type": "DISTANCE",
-            "value": "5km",
-            "confidence": 1.0,
+            "value": "cách 5km",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13338,17 +13806,17 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 5000.0,
+            "amount": 5.0,
             "amount_max": null,
             "radius_meters": 5000,
             "distance_unit": "km",
-            "proximity_intent": false,
+            "proximity_intent": true,
             "fallback_to_registered_address": null
           },
           {
             "type": "PRICE",
             "value": "trên 2 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13371,7 +13839,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4830
+      "latency_ms": 6037
     },
     "Massage trị liệu ở Tân Bình giá 800k lân cận": {
       "expected": {
@@ -13388,14 +13856,14 @@
         "location_code": "766",
         "price_op": "between",
         "price_amount": 680000,
-        "price_max": 919999,
+        "price_max": 920000,
         "distance_meters": 10000,
         "distance_implicit": true,
         "confidence_scores": {
           "business_type": 0.9,
           "location": 0.9,
           "price": 0.9,
-          "distance": 0.85
+          "distance": 0.8
         },
         "raw_entities": [
           {
@@ -13437,7 +13905,7 @@
           {
             "type": "DISTANCE",
             "value": "lân cận",
-            "confidence": 0.85,
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13454,7 +13922,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 800k",
+            "value": "800k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -13464,7 +13932,7 @@
             "location_intent": null,
             "operator": "between",
             "amount": 680000.0,
-            "amount_max": 919999.9999999999,
+            "amount_max": 920000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -13478,7 +13946,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5468
+      "latency_ms": 4242
     },
     "Ở Q3": {
       "expected": {
@@ -13531,7 +13999,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3628
+      "latency_ms": 3438
     },
     "Dưới 500k": {
       "expected": {
@@ -13554,14 +14022,14 @@
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
             "value": "Dưới 500k",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13584,7 +14052,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3367
+      "latency_ms": 3431
     },
     "Khoảng 1 triệu": {
       "expected": {
@@ -13607,14 +14075,14 @@
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
           {
             "type": "PRICE",
             "value": "Khoảng 1 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13637,7 +14105,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4649
+      "latency_ms": 4542
     },
     "Dịch vụ y tế": {
       "expected": {
@@ -13666,11 +14134,11 @@
         "raw_entities": [
           {
             "type": "BUSINESS_TYPE",
-            "value": "dịch vụ y tế",
+            "value": "Dịch vụ y tế",
             "confidence": 0.475,
             "business_type": "TRADITIONAL_MEDICINE",
-            "business_evidence": "dịch vụ y tế",
-            "business_phrase": "dịch vụ y tế",
+            "business_evidence": "Dịch vụ y tế",
+            "business_phrase": "Dịch vụ y tế",
             "location_code": null,
             "location_level": null,
             "location_intent": null,
@@ -13690,7 +14158,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4102
+      "latency_ms": 3415
     },
     "Chăm sóc sức khỏe": {
       "expected": {
@@ -13743,7 +14211,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5556
+      "latency_ms": 5060
     },
     "Dịch vụ cao cấp": {
       "expected": {
@@ -13796,7 +14264,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 4038
+      "latency_ms": 3880
     },
     "Ở Q1 giá 500k": {
       "expected": {
@@ -13843,7 +14311,7 @@
           },
           {
             "type": "PRICE",
-            "value": "giá 500k",
+            "value": "500k",
             "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
@@ -13867,7 +14335,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5207
+      "latency_ms": 6021
     },
     "Quận 3 dưới 1 triệu": {
       "expected": {
@@ -13883,14 +14351,14 @@
         "business_type": null,
         "location_code": "770",
         "price_op": "lte",
-        "price_amount": 1000000,
-        "price_max": null,
+        "price_amount": null,
+        "price_max": 1000000,
         "distance_meters": null,
         "distance_implicit": null,
         "confidence_scores": {
           "business_type": null,
           "location": 0.9,
-          "price": 1.0,
+          "price": 0.9,
           "distance": null
         },
         "raw_entities": [
@@ -13915,7 +14383,7 @@
           {
             "type": "PRICE",
             "value": "dưới 1 triệu",
-            "confidence": 1.0,
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13923,8 +14391,8 @@
             "location_level": null,
             "location_intent": null,
             "operator": "lte",
-            "amount": 1000000.0,
-            "amount_max": null,
+            "amount": null,
+            "amount_max": 1000000.0,
             "radius_meters": null,
             "distance_unit": null,
             "proximity_intent": null,
@@ -13935,10 +14403,10 @@
       "matches": {
         "business_type": true,
         "location_code": true,
-        "price": true,
+        "price": false,
         "distance": true
       },
-      "latency_ms": 4655
+      "latency_ms": 4967
     },
     "Gần đây giá rẻ": {
       "expected": {
@@ -13953,7 +14421,7 @@
       "predicted": {
         "business_type": null,
         "location_code": null,
-        "price_op": null,
+        "price_op": "lte",
         "price_amount": null,
         "price_max": null,
         "distance_meters": 10000,
@@ -13961,14 +14429,14 @@
         "confidence_scores": {
           "business_type": null,
           "location": null,
-          "price": null,
-          "distance": 0.85
+          "price": 0.8,
+          "distance": 0.8
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "gần đây",
-            "confidence": 0.85,
+            "value": "Gần đây",
+            "confidence": 0.8,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -13982,6 +14450,24 @@
             "distance_unit": "implicit",
             "proximity_intent": true,
             "fallback_to_registered_address": null
+          },
+          {
+            "type": "PRICE",
+            "value": "giá rẻ",
+            "confidence": 0.8,
+            "business_type": null,
+            "business_evidence": null,
+            "business_phrase": null,
+            "location_code": null,
+            "location_level": null,
+            "location_intent": null,
+            "operator": "lte",
+            "amount": null,
+            "amount_max": null,
+            "radius_meters": null,
+            "distance_unit": null,
+            "proximity_intent": null,
+            "fallback_to_registered_address": null
           }
         ]
       },
@@ -13991,7 +14477,7 @@
         "price": false,
         "distance": true
       },
-      "latency_ms": 5462
+      "latency_ms": 5324
     },
     "Tìm ở đây": {
       "expected": {
@@ -14025,7 +14511,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 5404
+      "latency_ms": 6376
     },
     "Gần tôi": {
       "expected": {
@@ -14049,13 +14535,13 @@
           "business_type": null,
           "location": null,
           "price": null,
-          "distance": 0.85
+          "distance": 0.9
         },
         "raw_entities": [
           {
             "type": "DISTANCE",
-            "value": "gần tôi",
-            "confidence": 0.85,
+            "value": "Gần tôi",
+            "confidence": 0.9,
             "business_type": null,
             "business_evidence": null,
             "business_phrase": null,
@@ -14078,7 +14564,7 @@
         "price": true,
         "distance": true
       },
-      "latency_ms": 3682
+      "latency_ms": 4111
     }
   },
   "errors": []
