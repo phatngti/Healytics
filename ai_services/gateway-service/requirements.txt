@@ -1,0 +1,8 @@
+# Requirements for intent classification evaluation notebook
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+joblib
+sentence-transformers
