@@ -135,6 +135,88 @@ Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, l
 \end{itemize}
 
 
+\subsection{Hiện thực dịch vụ nhận dạng thực thể (NER Service)}
+
+
+\subsubsection{Kiến trúc Hybrid NER và quyết định thiết kế}
+
+Hệ thống dùng kiến trúc \textbf{Hybrid NER}, kết hợp ba lớp xử lý bổ trợ nhau:
+\begin{itemize}
+    \item \textbf{LLM extraction (Gemini):} xử lý các thực thể ngữ nghĩa trong \texttt{gemini\_ner.py}, với model mặc định \texttt{gemini-2.5-flash}.
+    \item \textbf{Rule-based extraction (Regex):} xử lý các mẫu định lượng và làm lớp dự phòng trong \texttt{extractor.py} và \texttt{distance\_extractor.py}.
+    \item \textbf{Fallback nội bộ:} kết hợp \texttt{underthesea}, keyword scan và bộ so khớp địa danh (Aho-Corasick hoặc n-gram fallback) trong \texttt{extractor.py}.
+\end{itemize}
+
+Các tham số cấu hình chính nằm trong \texttt{config.py}:
+\begin{itemize}
+    \item \texttt{QUERY\_CACHE\_MAXSIZE = 1000}.
+    \item \texttt{LOCATION\_CACHE\_TTL = 3600} giây.
+    \item \texttt{GEMINI\_TIMEOUT\_MS = 1500}, \texttt{GEMINI\_MAX\_RETRIES = 1}, \texttt{GEMINI\_COOLDOWN\_SECONDS = 5}.
+    \item \texttt{NER\_MIN\_CONFIDENCE = 0.8} cho lọc \texttt{BUSINESS\_TYPE}.
+    \item \texttt{DEFAULT\_PROXIMITY\_RADIUS\_M = 10000}, \texttt{MAX\_PROXIMITY\_RADIUS\_M = 50000}.
+\end{itemize}
+
+
+\subsubsection{Pipeline xử lý truy vấn}
+
+Khi nhận truy vấn tự nhiên, NER Service xử lý theo pipeline tuần tự:
+\begin{enumerate}
+    \item \textbf{Hybrid extraction} (\texttt{extractor.py}): nhận thực thể từ Gemini rồi bổ sung bằng underthesea, keyword và location fallback.
+    \item \textbf{Numeric policy} (\texttt{extractor.py}): \texttt{PRICE} và \texttt{DISTANCE} dùng hướng \textit{Gemini-first}; khi Gemini không trả kết quả thì mới rơi về parser cục bộ.
+    \item \textbf{Entity normalization} (\texttt{normalizer.py}): quy đổi về schema chuẩn gồm \texttt{business\_type}, \texttt{location\_code}, \texttt{operator}, \texttt{amount}.
+    \item \textbf{Spatial resolution} (\texttt{spatial\_context.py}): xử lý ngữ cảnh khoảng cách và tọa độ người dùng.
+    \item \textbf{Pre-filter query} (\texttt{query\_builder.py}, \texttt{db\_fetcher.py}): dựng điều kiện truy vấn và lấy ứng viên từ DB/PostGIS.
+\end{enumerate}
+
+Đầu ra endpoint:
+\begin{itemize}
+    \item \texttt{/ner/extract}: trả \texttt{NerResponse} (entities + \texttt{extraction\_source}) trong \texttt{ner\_routes.py}.
+    \item \texttt{/prefilter/search}: trả \textbf{List[String]} (danh sách \texttt{service\_id}) trong \texttt{prefilter\_routes.py}.
+\end{itemize}
+
+\subsubsection{Tối ưu hiệu năng và độ bền vận hành}
+
+NER Service có một số cơ chế tối ưu quan trọng để giữ độ trễ ổn định trong môi trường thời gian thực:
+\begin{itemize}
+    \item \textbf{LRU query cache:} giữ tối đa 1000 truy vấn (\texttt{QUERY\_CACHE\_MAXSIZE}) trong \texttt{extractor.py}.
+    \item \textbf{Aho-Corasick location matching:} bật/tắt bằng \texttt{LOCATION\_MATCHER\_USE\_AHO}; nếu không khả dụng thì chuyển sang n-gram fallback trong \texttt{extractor.py}.
+    \item \textbf{Stale-while-revalidate cho cache địa lý:} TTL 3600 giây trong \texttt{cache.py}.
+    \item \textbf{Confidence gating:} ngưỡng \texttt{NER\_MIN\_CONFIDENCE = 0.8} cho \texttt{BUSINESS\_TYPE} trong \texttt{gemini\_ner.py}.
+\end{itemize}
+
+\subsubsection{Schema giao tiếp và tính xác định đầu ra}
+
+Dữ liệu trao đổi giữa Gateway và NER Service được chuẩn hóa bằng Pydantic models. Ngoài bộ trường \texttt{type/value/confidence}, mỗi thực thể còn mang thêm thông tin ngữ nghĩa để phục vụ bước dựng truy vấn:
+\begin{itemize}
+    \item \texttt{business\_type} cho thực thể loại hình dịch vụ.
+    \item \texttt{location\_code}, \texttt{location\_level} cho thực thể địa điểm.
+    \item \texttt{operator}, \texttt{amount}, \texttt{amount\_max} cho thực thể định lượng.
+\end{itemize}
+
+Trong mã hiện thực, schema entity được định nghĩa ở \texttt{ner\_schema.py}. Một ví dụ điển hình là entity \texttt{DISTANCE}:
+\begin{itemize}
+    \item \texttt{type}: \texttt{"DISTANCE"}
+    \item \texttt{value}: chuỗi gốc trong câu hỏi (ví dụ \texttt{"trong bán kính 5km"})
+    \item \texttt{confidence}: điểm tin cậy trong đoạn $[0,1]$
+    \item \texttt{operator}: \texttt{lte/gte/between}
+    \item \texttt{amount}, \texttt{amount\_max}: giá trị số đã chuẩn hóa
+    \item \texttt{radius\_meters}: bán kính theo mét để đưa xuống truy vấn không gian
+    \item \texttt{distance\_unit}: đơn vị người dùng nhập (\texttt{km}, \texttt{m}, ...)
+    \item \texttt{proximity\_intent}: cờ thể hiện ý định tìm gần (tường minh hoặc ngầm định)
+\end{itemize}
+
+Các loại entity trong NER Service (theo \texttt{extractor.py}, \texttt{normalizer.py}, \texttt{ner\_schema.py}) gồm:
+\begin{itemize}
+    \item \texttt{BUSINESS\_TYPE}: loại hình dịch vụ (spa, gym, nha khoa, ...).
+    \item \texttt{LOCATION}: địa điểm hành chính (tỉnh/huyện/xã) sau bước chuẩn hóa code.
+    \item \texttt{PRICE}: ràng buộc giá, mang \texttt{operator/amount/amount\_max}.
+    \item \texttt{DISTANCE}: ràng buộc khoảng cách, mang thêm \texttt{radius\_meters} và \texttt{distance\_unit}.
+\end{itemize}
+
+Thiết kế schema như vậy giúp việc chuyển từ ngôn ngữ tự nhiên sang điều kiện SQL/PostGIS rõ ràng hơn, dễ kiểm thử hơn và cũng thuận lợi cho truy vết lỗi trong thực nghiệm.
+
+
+
 
 \subsection{Hiện thực hệ thống RAG Chatbot}
 
