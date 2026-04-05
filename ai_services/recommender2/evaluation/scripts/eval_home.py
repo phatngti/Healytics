@@ -15,6 +15,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from datetime import datetime
 from typing import List, Dict
 
@@ -41,6 +42,28 @@ def load_dataset(path: str) -> List[Dict]:
     """Load the home evaluation dataset (JSON array)."""
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def _get_embeddings_for_ids(
+    recommender: Home_Recommender,
+    doc_ids: List[str],
+) -> List[List[float]] | None:
+    """Retrieve embedding vectors from the ChromaDB collection.
+
+    Returns None if the collection is unavailable or IDs are empty.
+    """
+    if not doc_ids:
+        return None
+    try:
+        collection = recommender.collection
+        result = collection.get(ids=doc_ids, include=["embeddings"])
+        embeddings = result.get("embeddings")
+        if embeddings and len(embeddings) == len(doc_ids):
+            id_to_emb = dict(zip(result["ids"], embeddings))
+            return [id_to_emb[did] for did in doc_ids if did in id_to_emb]
+        return embeddings
+    except Exception:
+        return None
 
 
 def run_evaluation(
@@ -94,7 +117,8 @@ def run_evaluation(
         service_history_ids = item.get("service_history_ids", [])
         relevant_ids = item["relevant_ids"]
 
-        # Call the recommender
+        # --- Latency measurement ---
+        t_start = time.perf_counter()
         raw = recommender.recommend(
             health_conditions=health_conditions,
             interests=interests,
@@ -102,11 +126,13 @@ def run_evaluation(
             service_history_ids=service_history_ids,
             top_k_home_results=top_k,
         )
+        t_end = time.perf_counter()
+        latency_ms = (t_end - t_start) * 1000.0
 
         retrieved_ids = raw["ids"][0] if raw["ids"] else []
         scores = raw["distances"][0] if raw["distances"] else []
 
-        predictions.append({
+        pred: Dict = {
             "id": profile_id,
             "description": item.get("description", ""),
             "health_conditions": health_conditions,
@@ -118,7 +144,23 @@ def run_evaluation(
             # ChromaDB returns cosine distance (1 - similarity).
             # Convert to similarity so higher = more similar.
             "scores": [(1.0 - float(s)) for s in scores],
-        })
+            "latency_ms": round(latency_ms, 2),
+        }
+
+        # --- Hard negatives (if present in dataset) ---
+        if "hard_negative_ids" in item:
+            pred["hard_negative_ids"] = item["hard_negative_ids"]
+
+        # --- Graded relevance (if present in dataset) ---
+        if "relevance_grades" in item:
+            pred["relevance_grades"] = item["relevance_grades"]
+
+        # --- Embeddings for diversity metric ---
+        embeddings = _get_embeddings_for_ids(recommender, retrieved_ids)
+        if embeddings:
+            pred["retrieved_embeddings"] = embeddings
+
+        predictions.append(pred)
 
         if (i + 1) % 10 == 0:
             print(f"   ✅ Processed {i + 1}/{len(dataset)} profiles")
@@ -144,7 +186,11 @@ def run_evaluation(
         },
         "aggregate": results["aggregate"],
         "per_query": results["per_query"],
-        "predictions": predictions,
+        # Strip embeddings from saved output (too large)
+        "predictions": [
+            {k: v for k, v in p.items() if k != "retrieved_embeddings"}
+            for p in predictions
+        ],
     }
 
     # 6. Print summary
@@ -192,7 +238,43 @@ def _print_summary(run_output: Dict) -> None:
             row += f"{val:>10.4f}"
         print(row)
 
+    # --- Graded NDCG (if available) ---
+    if any(f"NDCG_G@{k}" in agg for k in k_values):
+        row = f"{'NDCG_G':<12}"
+        for k in k_values:
+            key = f"NDCG_G@{k}"
+            val = agg.get(key, 0.0)
+            row += f"{val:>10.4f}"
+        print(row)
+
+    # --- Hard Negative Rate (if available) ---
+    if any(f"HNR@{k}" in agg for k in k_values):
+        row = f"{'HNR ↓':<12}"
+        for k in k_values:
+            key = f"HNR@{k}"
+            val = agg.get(key, 0.0)
+            row += f"{val:>10.4f}"
+        print(row)
+
+    # --- Diversity (if available) ---
+    if any(f"Diversity@{k}" in agg for k in k_values):
+        row = f"{'Diversity':<12}"
+        for k in k_values:
+            key = f"Diversity@{k}"
+            val = agg.get(key, 0.0)
+            row += f"{val:>10.4f}"
+        print(row)
+
     print("=" * 60)
+
+    # --- Latency stats ---
+    if "Latency_avg_ms" in agg:
+        print(f"\n  ⏱️  Latency:")
+        print(f"    Avg: {agg['Latency_avg_ms']:.2f}ms  |  "
+              f"P50: {agg.get('Latency_p50_ms', 0):.2f}ms  |  "
+              f"P95: {agg.get('Latency_p95_ms', 0):.2f}ms  |  "
+              f"P99: {agg.get('Latency_p99_ms', 0):.2f}ms  |  "
+              f"Max: {agg.get('Latency_max_ms', 0):.2f}ms")
 
     # Per-profile score distribution
     predictions = run_output["predictions"]

@@ -2,271 +2,976 @@
     {
         "id": "HOME_001",
         "description": "Người cao tuổi bị tim mạch và huyết áp cao",
-        "health_conditions": ["tim mạch", "huyết áp cao"],
-        "interests": ["đi bộ nhẹ", "thiền"],
-        "goals": ["kiểm soát huyết áp", "sống khỏe mạnh"],
+        "health_conditions": [
+            "tim mạch",
+            "huyết áp cao"
+        ],
+        "interests": [
+            "đi bộ nhẹ",
+            "thiền"
+        ],
+        "goals": [
+            "kiểm soát huyết áp",
+            "sống khỏe mạnh"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV001", "SV004", "SV049", "SV057", "SV017"]
+        "relevant_ids": [
+            "SV001",
+            "SV004",
+            "SV049",
+            "SV057",
+            "SV017"
+        ],
+        "relevance_grades": {
+            "SV001": 2,
+            "SV004": 2,
+            "SV049": 2,
+            "SV057": 2,
+            "SV017": 2
+        },
+        "hard_negative_ids": [
+            "SV013",
+            "SV010",
+            "SV043",
+            "SV031"
+        ]
     },
     {
         "id": "HOME_002",
         "description": "Dân văn phòng bị stress và đau lưng",
-        "health_conditions": ["đau lưng", "căng thẳng", "ngồi nhiều"],
-        "interests": ["yoga", "pilates"],
-        "goals": ["giảm stress", "hết đau lưng"],
+        "health_conditions": [
+            "đau lưng",
+            "căng thẳng",
+            "ngồi nhiều"
+        ],
+        "interests": [
+            "yoga",
+            "pilates"
+        ],
+        "goals": [
+            "giảm stress",
+            "hết đau lưng"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV031", "SV033", "SV016", "SV047", "SV030"]
+        "relevant_ids": [
+            "SV031",
+            "SV033",
+            "SV016",
+            "SV047",
+            "SV030"
+        ],
+        "relevance_grades": {
+            "SV031": 1,
+            "SV033": 1,
+            "SV016": 2,
+            "SV047": 2,
+            "SV030": 1
+        },
+        "hard_negative_ids": [
+            "SV058",
+            "SV040",
+            "SV020",
+            "SV051"
+        ]
     },
     {
         "id": "HOME_003",
         "description": "Thanh niên muốn tăng cơ giảm mỡ",
         "health_conditions": [],
-        "interests": ["gym", "chạy bộ", "thể thao"],
-        "goals": ["tăng cơ", "giảm mỡ"],
+        "interests": [
+            "gym",
+            "chạy bộ",
+            "thể thao"
+        ],
+        "goals": [
+            "tăng cơ",
+            "giảm mỡ"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV032", "SV054", "SV050", "SV034", "SV036"]
+        "relevant_ids": [
+            "SV032",
+            "SV054",
+            "SV050",
+            "SV034",
+            "SV036"
+        ],
+        "relevance_grades": {
+            "SV032": 2,
+            "SV054": 2,
+            "SV050": 2,
+            "SV034": 1,
+            "SV036": 1
+        },
+        "hard_negative_ids": [
+            "SV027",
+            "SV039",
+            "SV053"
+        ]
     },
     {
         "id": "HOME_004",
         "description": "Phụ nữ mang thai tháng 6",
-        "health_conditions": ["mang thai"],
-        "interests": ["yoga", "dinh dưỡng"],
-        "goals": ["thai kỳ khỏe mạnh", "sinh an toàn"],
+        "health_conditions": [
+            "mang thai"
+        ],
+        "interests": [
+            "yoga",
+            "dinh dưỡng"
+        ],
+        "goals": [
+            "thai kỳ khỏe mạnh",
+            "sinh an toàn"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV040", "SV056", "SV005", "SV037"]
+        "relevant_ids": [
+            "SV040",
+            "SV056",
+            "SV005",
+            "SV037"
+        ],
+        "relevance_grades": {
+            "SV040": 2,
+            "SV056": 1,
+            "SV005": 1,
+            "SV037": 2
+        },
+        "hard_negative_ids": [
+            "SV029",
+            "SV058",
+            "SV007",
+            "SV020"
+        ]
     },
     {
         "id": "HOME_005",
         "description": "Người bị trầm cảm và lo âu",
-        "health_conditions": ["trầm cảm", "mất ngủ"],
-        "interests": ["thiền", "đọc sách"],
-        "goals": ["hết trầm cảm", "ngủ ngon"],
+        "health_conditions": [
+            "trầm cảm",
+            "mất ngủ"
+        ],
+        "interests": [
+            "thiền",
+            "đọc sách"
+        ],
+        "goals": [
+            "hết trầm cảm",
+            "ngủ ngon"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV021", "SV016", "SV017", "SV027"]
+        "relevant_ids": [
+            "SV021",
+            "SV016",
+            "SV017",
+            "SV027"
+        ],
+        "relevance_grades": {
+            "SV021": 1,
+            "SV016": 1,
+            "SV017": 2,
+            "SV027": 1
+        },
+        "hard_negative_ids": [
+            "SV044",
+            "SV060"
+        ]
     },
     {
         "id": "HOME_006",
         "description": "Người bị tiểu đường type 2",
-        "health_conditions": ["tiểu đường", "thừa cân"],
-        "interests": ["nấu ăn", "đi bộ"],
-        "goals": ["kiểm soát đường huyết", "giảm cân"],
+        "health_conditions": [
+            "tiểu đường",
+            "thừa cân"
+        ],
+        "interests": [
+            "nấu ăn",
+            "đi bộ"
+        ],
+        "goals": [
+            "kiểm soát đường huyết",
+            "giảm cân"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV003", "SV055", "SV051", "SV041"]
+        "relevant_ids": [
+            "SV003",
+            "SV055",
+            "SV051",
+            "SV041"
+        ],
+        "relevance_grades": {
+            "SV003": 1,
+            "SV055": 1,
+            "SV051": 2,
+            "SV041": 2
+        },
+        "hard_negative_ids": [
+            "SV021",
+            "SV046",
+            "SV020"
+        ]
     },
     {
         "id": "HOME_007",
         "description": "Phụ huynh có con bị chậm phát triển",
         "health_conditions": [],
-        "interests": ["nuôi dạy con", "tâm lý"],
-        "goals": ["con phát triển tốt", "hiểu con hơn"],
+        "interests": [
+            "nuôi dạy con",
+            "tâm lý"
+        ],
+        "goals": [
+            "con phát triển tốt",
+            "hiểu con hơn"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV019", "SV006", "SV043", "SV018"]
+        "relevant_ids": [
+            "SV019",
+            "SV006",
+            "SV043",
+            "SV018"
+        ],
+        "relevance_grades": {
+            "SV019": 2,
+            "SV006": 2,
+            "SV043": 2,
+            "SV018": 1
+        },
+        "hard_negative_ids": [
+            "SV024",
+            "SV007",
+            "SV012",
+            "SV040"
+        ]
     },
     {
         "id": "HOME_008",
         "description": "Người muốn giảm cân bằng ăn kiêng",
-        "health_conditions": ["thừa cân"],
-        "interests": ["dinh dưỡng", "giảm cân"],
-        "goals": ["giảm 10kg", "ăn uống khoa học"],
+        "health_conditions": [
+            "thừa cân"
+        ],
+        "interests": [
+            "dinh dưỡng",
+            "giảm cân"
+        ],
+        "goals": [
+            "giảm 10kg",
+            "ăn uống khoa học"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV051", "SV052", "SV058", "SV041", "SV050"]
+        "relevant_ids": [
+            "SV051",
+            "SV052",
+            "SV058",
+            "SV041",
+            "SV050"
+        ],
+        "relevance_grades": {
+            "SV051": 1,
+            "SV052": 2,
+            "SV058": 1,
+            "SV041": 2,
+            "SV050": 2
+        },
+        "hard_negative_ids": [
+            "SV053",
+            "SV056"
+        ]
     },
     {
         "id": "HOME_009",
         "description": "Vận động viên cần dinh dưỡng chuyên nghiệp",
         "health_conditions": [],
-        "interests": ["tập gym", "chạy marathon", "bơi lội"],
-        "goals": ["nâng cao hiệu suất", "phục hồi nhanh"],
-        "service_history_ids": ["SV032"],
-        "relevant_ids": ["SV059", "SV054", "SV034", "SV050"]
+        "interests": [
+            "tập gym",
+            "chạy marathon",
+            "bơi lội"
+        ],
+        "goals": [
+            "nâng cao hiệu suất",
+            "phục hồi nhanh"
+        ],
+        "service_history_ids": [
+            "SV032"
+        ],
+        "relevant_ids": [
+            "SV059",
+            "SV054",
+            "SV034",
+            "SV050"
+        ],
+        "relevance_grades": {
+            "SV059": 2,
+            "SV054": 2,
+            "SV034": 2,
+            "SV050": 2
+        },
+        "hard_negative_ids": [
+            "SV041",
+            "SV015"
+        ]
     },
     {
         "id": "HOME_010",
         "description": "Người cao tuổi bị viêm khớp",
-        "health_conditions": ["viêm khớp", "thoái hóa khớp", "đau lưng"],
-        "interests": ["đi bộ nhẹ"],
-        "goals": ["giảm đau", "vận động linh hoạt hơn"],
+        "health_conditions": [
+            "viêm khớp",
+            "thoái hóa khớp",
+            "đau lưng"
+        ],
+        "interests": [
+            "đi bộ nhẹ"
+        ],
+        "goals": [
+            "giảm đau",
+            "vận động linh hoạt hơn"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV012", "SV035", "SV049", "SV047"]
+        "relevant_ids": [
+            "SV012",
+            "SV035",
+            "SV049",
+            "SV047"
+        ],
+        "relevance_grades": {
+            "SV012": 1,
+            "SV035": 2,
+            "SV049": 2,
+            "SV047": 1
+        },
+        "hard_negative_ids": [
+            "SV017",
+            "SV023",
+            "SV032",
+            "SV011"
+        ]
     },
     {
         "id": "HOME_011",
         "description": "Người mới cai thuốc lá",
-        "health_conditions": ["nghiện thuốc lá", "ho kéo dài"],
-        "interests": ["sức khỏe phổi"],
-        "goals": ["bỏ thuốc lá", "phổi khỏe hơn"],
+        "health_conditions": [
+            "nghiện thuốc lá",
+            "ho kéo dài"
+        ],
+        "interests": [
+            "sức khỏe phổi"
+        ],
+        "goals": [
+            "bỏ thuốc lá",
+            "phổi khỏe hơn"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV010", "SV002", "SV034"]
+        "relevant_ids": [
+            "SV010",
+            "SV002",
+            "SV034"
+        ],
+        "relevance_grades": {
+            "SV010": 2,
+            "SV002": 1,
+            "SV034": 1
+        },
+        "hard_negative_ids": [
+            "SV054",
+            "SV005",
+            "SV047",
+            "SV044"
+        ]
     },
     {
         "id": "HOME_012",
         "description": "Cặp đôi chuẩn bị kết hôn",
         "health_conditions": [],
-        "interests": ["gia đình", "tâm lý"],
-        "goals": ["hôn nhân hạnh phúc", "chuẩn bị kết hôn"],
+        "interests": [
+            "gia đình",
+            "tâm lý"
+        ],
+        "goals": [
+            "hôn nhân hạnh phúc",
+            "chuẩn bị kết hôn"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV024", "SV018"]
+        "relevant_ids": [
+            "SV024",
+            "SV018"
+        ],
+        "relevance_grades": {
+            "SV024": 1,
+            "SV018": 2
+        },
+        "hard_negative_ids": [
+            "SV011",
+            "SV019"
+        ]
     },
     {
         "id": "HOME_013",
         "description": "Người bị gan nhiễm mỡ và cholesterol cao",
-        "health_conditions": ["gan nhiễm mỡ", "cholesterol cao"],
-        "interests": ["ăn uống lành mạnh"],
-        "goals": ["hạ cholesterol", "bảo vệ gan"],
+        "health_conditions": [
+            "gan nhiễm mỡ",
+            "cholesterol cao"
+        ],
+        "interests": [
+            "ăn uống lành mạnh"
+        ],
+        "goals": [
+            "hạ cholesterol",
+            "bảo vệ gan"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV014", "SV057", "SV060", "SV051"]
+        "relevant_ids": [
+            "SV014",
+            "SV057",
+            "SV060",
+            "SV051"
+        ],
+        "relevance_grades": {
+            "SV014": 1,
+            "SV057": 1,
+            "SV060": 1,
+            "SV051": 2
+        },
+        "hard_negative_ids": [
+            "SV026",
+            "SV050"
+        ]
     },
     {
         "id": "HOME_014",
         "description": "Người bị viêm dạ dày mãn tính",
-        "health_conditions": ["viêm dạ dày", "trào ngược"],
-        "interests": ["ăn kiêng"],
-        "goals": ["hết đau dạ dày", "ăn uống phù hợp"],
+        "health_conditions": [
+            "viêm dạ dày",
+            "trào ngược"
+        ],
+        "interests": [
+            "ăn kiêng"
+        ],
+        "goals": [
+            "hết đau dạ dày",
+            "ăn uống phù hợp"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV008", "SV051"]
+        "relevant_ids": [
+            "SV008",
+            "SV051"
+        ],
+        "relevance_grades": {
+            "SV008": 1,
+            "SV051": 2
+        },
+        "hard_negative_ids": [
+            "SV044",
+            "SV031",
+            "SV050",
+            "SV034"
+        ]
     },
     {
         "id": "HOME_015",
         "description": "Người muốn bắt đầu ăn chay",
         "health_conditions": [],
-        "interests": ["ăn chay", "thiền", "yoga"],
-        "goals": ["sống lành mạnh", "bảo vệ môi trường"],
+        "interests": [
+            "ăn chay",
+            "thiền",
+            "yoga"
+        ],
+        "goals": [
+            "sống lành mạnh",
+            "bảo vệ môi trường"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV053", "SV060", "SV031", "SV017"]
+        "relevant_ids": [
+            "SV053",
+            "SV060",
+            "SV031",
+            "SV017"
+        ],
+        "relevance_grades": {
+            "SV053": 2,
+            "SV060": 1,
+            "SV031": 2,
+            "SV017": 1
+        },
+        "hard_negative_ids": [
+            "SV033",
+            "SV016",
+            "SV047",
+            "SV058"
+        ]
     },
     {
         "id": "HOME_016",
         "description": "Phụ nữ muốn học tự vệ và tự tin hơn",
         "health_conditions": [],
-        "interests": ["võ thuật", "thể thao"],
-        "goals": ["tự tin", "an toàn bản thân"],
+        "interests": [
+            "võ thuật",
+            "thể thao"
+        ],
+        "goals": [
+            "tự tin",
+            "an toàn bản thân"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV046", "SV036", "SV020", "SV028"]
+        "relevant_ids": [
+            "SV046",
+            "SV036",
+            "SV020",
+            "SV028"
+        ],
+        "relevance_grades": {
+            "SV046": 2,
+            "SV036": 2,
+            "SV020": 1,
+            "SV028": 1
+        },
+        "hard_negative_ids": [
+            "SV044",
+            "SV027",
+            "SV013"
+        ]
     },
     {
         "id": "HOME_017",
         "description": "Người hay bị đau cổ vai gáy",
-        "health_conditions": ["đau cổ vai gáy", "ngồi máy tính nhiều"],
-        "interests": ["kéo giãn", "massage"],
-        "goals": ["hết đau", "tư thế đúng"],
+        "health_conditions": [
+            "đau cổ vai gáy",
+            "ngồi máy tính nhiều"
+        ],
+        "interests": [
+            "kéo giãn",
+            "massage"
+        ],
+        "goals": [
+            "hết đau",
+            "tư thế đúng"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV047", "SV033", "SV031", "SV012"]
+        "relevant_ids": [
+            "SV047",
+            "SV033",
+            "SV031",
+            "SV012"
+        ],
+        "relevance_grades": {
+            "SV047": 2,
+            "SV033": 1,
+            "SV031": 2,
+            "SV012": 1
+        },
+        "hard_negative_ids": [
+            "SV045",
+            "SV022",
+            "SV024"
+        ]
     },
     {
         "id": "HOME_018",
         "description": "Trẻ béo phì cần giảm cân",
-        "health_conditions": ["thừa cân"],
-        "interests": ["bơi lội", "thể thao"],
-        "goals": ["giảm cân cho bé", "phát triển khỏe mạnh"],
+        "health_conditions": [
+            "thừa cân"
+        ],
+        "interests": [
+            "bơi lội",
+            "thể thao"
+        ],
+        "goals": [
+            "giảm cân cho bé",
+            "phát triển khỏe mạnh"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV042", "SV043", "SV006", "SV051"]
+        "relevant_ids": [
+            "SV042",
+            "SV043",
+            "SV006",
+            "SV051"
+        ],
+        "relevance_grades": {
+            "SV042": 2,
+            "SV043": 2,
+            "SV006": 2,
+            "SV051": 1
+        },
+        "hard_negative_ids": [
+            "SV008",
+            "SV031",
+            "SV050"
+        ]
     },
     {
         "id": "HOME_019",
         "description": "Người burnout muốn cân bằng cuộc sống",
-        "health_conditions": ["kiệt sức", "mất ngủ", "stress"],
-        "interests": ["thiền", "yoga", "du lịch"],
-        "goals": ["work-life balance", "giảm stress"],
+        "health_conditions": [
+            "kiệt sức",
+            "mất ngủ",
+            "stress"
+        ],
+        "interests": [
+            "thiền",
+            "yoga",
+            "du lịch"
+        ],
+        "goals": [
+            "work-life balance",
+            "giảm stress"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV030", "SV017", "SV016", "SV037"]
+        "relevant_ids": [
+            "SV030",
+            "SV017",
+            "SV016",
+            "SV037"
+        ],
+        "relevance_grades": {
+            "SV030": 1,
+            "SV017": 1,
+            "SV016": 1,
+            "SV037": 1
+        },
+        "hard_negative_ids": [
+            "SV018",
+            "SV058"
+        ]
     },
     {
         "id": "HOME_020",
         "description": "Người bị sỏi thận",
-        "health_conditions": ["sỏi thận", "đau lưng"],
-        "interests": ["sức khỏe"],
-        "goals": ["điều trị sỏi thận", "phòng ngừa tái phát"],
+        "health_conditions": [
+            "sỏi thận",
+            "đau lưng"
+        ],
+        "interests": [
+            "sức khỏe"
+        ],
+        "goals": [
+            "điều trị sỏi thận",
+            "phòng ngừa tái phát"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV015", "SV002"]
+        "relevant_ids": [
+            "SV015",
+            "SV002"
+        ],
+        "relevance_grades": {
+            "SV015": 1,
+            "SV002": 1
+        },
+        "hard_negative_ids": [
+            "SV006",
+            "SV016",
+            "SV007",
+            "SV049"
+        ]
     },
     {
         "id": "HOME_021",
         "description": "Thanh niên muốn tham gia hoạt động ngoài trời",
         "health_conditions": [],
-        "interests": ["leo núi", "đạp xe", "chạy bộ"],
-        "goals": ["khám phá thiên nhiên", "tăng sức bền"],
+        "interests": [
+            "leo núi",
+            "đạp xe",
+            "chạy bộ"
+        ],
+        "goals": [
+            "khám phá thiên nhiên",
+            "tăng sức bền"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV045", "SV039", "SV034"]
+        "relevant_ids": [
+            "SV045",
+            "SV039",
+            "SV034"
+        ],
+        "relevance_grades": {
+            "SV045": 2,
+            "SV039": 1,
+            "SV034": 2
+        },
+        "hard_negative_ids": [
+            "SV020",
+            "SV010",
+            "SV017",
+            "SV035"
+        ]
     },
     {
         "id": "HOME_022",
         "description": "Người đã từng bị bạo lực gia đình",
-        "health_conditions": ["chấn thương tâm lý"],
-        "interests": ["tâm lý"],
-        "goals": ["hồi phục tinh thần", "bắt đầu cuộc sống mới"],
+        "health_conditions": [
+            "chấn thương tâm lý"
+        ],
+        "interests": [
+            "tâm lý"
+        ],
+        "goals": [
+            "hồi phục tinh thần",
+            "bắt đầu cuộc sống mới"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV025", "SV021", "SV027", "SV046"]
+        "relevant_ids": [
+            "SV025",
+            "SV021",
+            "SV027",
+            "SV046"
+        ],
+        "relevance_grades": {
+            "SV025": 2,
+            "SV021": 2,
+            "SV027": 1,
+            "SV046": 2
+        },
+        "hard_negative_ids": [
+            "SV014",
+            "SV038",
+            "SV028"
+        ]
     },
     {
         "id": "HOME_023",
         "description": "Người muốn CrossFit và tập cường độ cao",
         "health_conditions": [],
-        "interests": ["crossfit", "HIIT", "gym"],
-        "goals": ["thể lực toàn diện", "sức mạnh"],
-        "service_history_ids": ["SV032"],
-        "relevant_ids": ["SV038", "SV050", "SV048", "SV036"]
+        "interests": [
+            "crossfit",
+            "HIIT",
+            "gym"
+        ],
+        "goals": [
+            "thể lực toàn diện",
+            "sức mạnh"
+        ],
+        "service_history_ids": [
+            "SV032"
+        ],
+        "relevant_ids": [
+            "SV038",
+            "SV050",
+            "SV048",
+            "SV036"
+        ],
+        "relevance_grades": {
+            "SV038": 2,
+            "SV050": 1,
+            "SV048": 2,
+            "SV036": 1
+        },
+        "hard_negative_ids": [
+            "SV045",
+            "SV054",
+            "SV009",
+            "SV022"
+        ]
     },
     {
         "id": "HOME_024",
         "description": "Phụ nữ sau sinh muốn lấy lại vóc dáng",
-        "health_conditions": ["sau sinh"],
-        "interests": ["yoga", "dinh dưỡng"],
-        "goals": ["giảm cân sau sinh", "phục hồi sức khỏe"],
-        "service_history_ids": ["SV040"],
-        "relevant_ids": ["SV031", "SV033", "SV051", "SV041"]
+        "health_conditions": [
+            "sau sinh"
+        ],
+        "interests": [
+            "yoga",
+            "dinh dưỡng"
+        ],
+        "goals": [
+            "giảm cân sau sinh",
+            "phục hồi sức khỏe"
+        ],
+        "service_history_ids": [
+            "SV040"
+        ],
+        "relevant_ids": [
+            "SV031",
+            "SV033",
+            "SV051",
+            "SV041"
+        ],
+        "relevance_grades": {
+            "SV031": 1,
+            "SV033": 1,
+            "SV051": 1,
+            "SV041": 2
+        },
+        "hard_negative_ids": [
+            "SV057",
+            "SV040"
+        ]
     },
     {
         "id": "HOME_025",
         "description": "Người bị lo âu xã hội",
-        "health_conditions": ["lo âu xã hội", "sợ giao tiếp"],
-        "interests": ["tâm lý", "phát triển bản thân"],
-        "goals": ["tự tin giao tiếp", "vượt qua nỗi sợ"],
+        "health_conditions": [
+            "lo âu xã hội",
+            "sợ giao tiếp"
+        ],
+        "interests": [
+            "tâm lý",
+            "phát triển bản thân"
+        ],
+        "goals": [
+            "tự tin giao tiếp",
+            "vượt qua nỗi sợ"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV020", "SV028", "SV016"]
+        "relevant_ids": [
+            "SV020",
+            "SV028",
+            "SV016"
+        ],
+        "relevance_grades": {
+            "SV020": 1,
+            "SV028": 1,
+            "SV016": 1
+        },
+        "hard_negative_ids": [
+            "SV043",
+            "SV057",
+            "SV026"
+        ]
     },
     {
         "id": "HOME_026",
         "description": "Người lớn chưa biết bơi",
         "health_conditions": [],
-        "interests": ["bơi lội", "thể thao dưới nước"],
-        "goals": ["học bơi", "an toàn dưới nước"],
+        "interests": [
+            "bơi lội",
+            "thể thao dưới nước"
+        ],
+        "goals": [
+            "học bơi",
+            "an toàn dưới nước"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV042", "SV035"]
+        "relevant_ids": [
+            "SV042",
+            "SV035"
+        ],
+        "relevance_grades": {
+            "SV042": 1,
+            "SV035": 1
+        },
+        "hard_negative_ids": [
+            "SV041",
+            "SV005"
+        ]
     },
     {
         "id": "HOME_027",
         "description": "Người bị viêm xoang và dị ứng",
-        "health_conditions": ["viêm xoang", "dị ứng", "ngạt mũi"],
-        "interests": ["sức khỏe hô hấp"],
-        "goals": ["hết viêm xoang", "thở dễ hơn"],
+        "health_conditions": [
+            "viêm xoang",
+            "dị ứng",
+            "ngạt mũi"
+        ],
+        "interests": [
+            "sức khỏe hô hấp"
+        ],
+        "goals": [
+            "hết viêm xoang",
+            "thở dễ hơn"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV013", "SV002"]
+        "relevant_ids": [
+            "SV013",
+            "SV002"
+        ],
+        "relevance_grades": {
+            "SV013": 1,
+            "SV002": 2
+        },
+        "hard_negative_ids": [
+            "SV059",
+            "SV058"
+        ]
     },
     {
         "id": "HOME_028",
         "description": "Người muốn nhảy Zumba vui vẻ",
         "health_conditions": [],
-        "interests": ["nhảy", "âm nhạc", "giảm cân"],
-        "goals": ["vui vẻ", "giảm cân", "gặp bạn mới"],
+        "interests": [
+            "nhảy",
+            "âm nhạc",
+            "giảm cân"
+        ],
+        "goals": [
+            "vui vẻ",
+            "giảm cân",
+            "gặp bạn mới"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV044", "SV041", "SV036"]
+        "relevant_ids": [
+            "SV044",
+            "SV041",
+            "SV036"
+        ],
+        "relevance_grades": {
+            "SV044": 1,
+            "SV041": 2,
+            "SV036": 2
+        },
+        "hard_negative_ids": [
+            "SV016",
+            "SV049",
+            "SV057",
+            "SV040"
+        ]
     },
     {
         "id": "HOME_029",
         "description": "Người muốn chuyển đổi nghề nghiệp",
-        "health_conditions": ["stress"],
-        "interests": ["phát triển bản thân", "kỹ năng mới"],
-        "goals": ["tìm nghề phù hợp", "phát triển sự nghiệp"],
+        "health_conditions": [
+            "stress"
+        ],
+        "interests": [
+            "phát triển bản thân",
+            "kỹ năng mới"
+        ],
+        "goals": [
+            "tìm nghề phù hợp",
+            "phát triển sự nghiệp"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV029", "SV028", "SV030"]
+        "relevant_ids": [
+            "SV029",
+            "SV028",
+            "SV030"
+        ],
+        "relevance_grades": {
+            "SV029": 1,
+            "SV028": 2,
+            "SV030": 1
+        },
+        "hard_negative_ids": [
+            "SV019",
+            "SV060",
+            "SV023",
+            "SV053"
+        ]
     },
     {
         "id": "HOME_030",
         "description": "Người bị rối loạn ăn uống",
-        "health_conditions": ["rối loạn ăn uống", "thiếu dinh dưỡng"],
-        "interests": ["tâm lý", "dinh dưỡng"],
-        "goals": ["ăn uống lành mạnh", "hồi phục sức khỏe"],
+        "health_conditions": [
+            "rối loạn ăn uống",
+            "thiếu dinh dưỡng"
+        ],
+        "interests": [
+            "tâm lý",
+            "dinh dưỡng"
+        ],
+        "goals": [
+            "ăn uống lành mạnh",
+            "hồi phục sức khỏe"
+        ],
         "service_history_ids": [],
-        "relevant_ids": ["SV026", "SV051", "SV053"]
+        "relevant_ids": [
+            "SV026",
+            "SV051",
+            "SV053"
+        ],
+        "relevance_grades": {
+            "SV026": 1,
+            "SV051": 2,
+            "SV053": 2
+        },
+        "hard_negative_ids": [
+            "SV050",
+            "SV009",
+            "SV011"
+        ]
     }
 ]
