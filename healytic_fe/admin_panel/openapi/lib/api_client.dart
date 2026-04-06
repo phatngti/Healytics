@@ -188,6 +188,8 @@ class ApiClient {
           return AccountMeResponseDto.fromJson(value);
         case 'AccountRequestDto':
           return AccountRequestDto.fromJson(value);
+        case 'AddToCartDto':
+          return AddToCartDto.fromJson(value);
         case 'AddressDto':
           return AddressDto.fromJson(value);
         case 'AddressInfoDto':
@@ -210,6 +212,8 @@ class ApiClient {
           return AiRecommendationsRequestDto.fromJson(value);
         case 'AiRecommendationsResponseDto':
           return AiRecommendationsResponseDto.fromJson(value);
+        case 'ApplyCouponDto':
+          return ApplyCouponDto.fromJson(value);
         case 'AppointmentCategoryResponseDto':
           return AppointmentCategoryResponseDto.fromJson(value);
         case 'AppointmentResponseDto':
@@ -240,6 +244,8 @@ class ApiClient {
           return BusinessServicesResponseDto.fromJson(value);
         case 'BusinessType':
           return BusinessTypeTypeTransformer().decode(value);
+        case 'CartItemResponseDto':
+          return CartItemResponseDto.fromJson(value);
         case 'CategoryInfoDto':
           return CategoryInfoDto.fromJson(value);
         case 'CategoryResponseDto':
@@ -252,10 +258,38 @@ class ApiClient {
           return ChatbotRecommenderRequest.fromJson(value);
         case 'ChatbotRequest':
           return ChatbotRequest.fromJson(value);
+        case 'CheckDuplicateSlotDto':
+          return CheckDuplicateSlotDto.fromJson(value);
+        case 'CheckDuplicateSlotResponseDto':
+          return CheckDuplicateSlotResponseDto.fromJson(value);
         case 'CheckoutTicketResponseDto':
           return CheckoutTicketResponseDto.fromJson(value);
         case 'ClientKeyResponseDto':
           return ClientKeyResponseDto.fromJson(value);
+        case 'ClinicCertificationDto':
+          return ClinicCertificationDto.fromJson(value);
+        case 'ClinicInfoResponseDto':
+          return ClinicInfoResponseDto.fromJson(value);
+        case 'ClinicProductCategoryDto':
+          return ClinicProductCategoryDto.fromJson(value);
+        case 'ClinicProductDto':
+          return ClinicProductDto.fromJson(value);
+        case 'ClinicProductsResponseDto':
+          return ClinicProductsResponseDto.fromJson(value);
+        case 'ClinicReviewDto':
+          return ClinicReviewDto.fromJson(value);
+        case 'ClinicReviewFilterDto':
+          return ClinicReviewFilterDto.fromJson(value);
+        case 'ClinicReviewResponseSubDto':
+          return ClinicReviewResponseSubDto.fromJson(value);
+        case 'ClinicReviewSummaryDto':
+          return ClinicReviewSummaryDto.fromJson(value);
+        case 'ClinicReviewsResponseDto':
+          return ClinicReviewsResponseDto.fromJson(value);
+        case 'ClinicSpecialistPreviewDto':
+          return ClinicSpecialistPreviewDto.fromJson(value);
+        case 'ClinicTrustMetricsDto':
+          return ClinicTrustMetricsDto.fromJson(value);
         case 'ConversationResponse':
           return ConversationResponse.fromJson(value);
         case 'ConversationResponseDto':
@@ -432,8 +466,20 @@ class ApiClient {
           return PublicCategoryDto.fromJson(value);
         case 'PublicCategorySummaryDto':
           return PublicCategorySummaryDto.fromJson(value);
+        case 'PublicClinicCertificationDto':
+          return PublicClinicCertificationDto.fromJson(value);
         case 'PublicClinicDto':
           return PublicClinicDto.fromJson(value);
+        case 'PublicClinicFacilityImageDto':
+          return PublicClinicFacilityImageDto.fromJson(value);
+        case 'PublicClinicFeaturedServiceDto':
+          return PublicClinicFeaturedServiceDto.fromJson(value);
+        case 'PublicClinicInfoResponseDto':
+          return PublicClinicInfoResponseDto.fromJson(value);
+        case 'PublicClinicSpecialistPreviewDto':
+          return PublicClinicSpecialistPreviewDto.fromJson(value);
+        case 'PublicClinicTrustMetricsDto':
+          return PublicClinicTrustMetricsDto.fromJson(value);
         case 'PublicEmployeeTimeSlotDto':
           return PublicEmployeeTimeSlotDto.fromJson(value);
         case 'PublicFacilityImageDto':

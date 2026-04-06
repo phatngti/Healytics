@@ -1,0 +1,15 @@
+# admin_openapi.model.AddToCartDto
+
+## Load the model package
+```dart
+import 'package:admin_openapi/api.dart';
+```
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**serviceId** | **String** | UUID of the health service | 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

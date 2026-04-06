@@ -17,6 +17,13 @@ void main() {
   // final instance = UserSlotsApi();
 
   group('tests for UserSlotsApi', () {
+    // Check if the user already has a booking at the same datetime
+    //
+    //Future<CheckDuplicateSlotResponseDto> slotsControllerCheckDuplicateSlot(CheckDuplicateSlotDto checkDuplicateSlotDto) async
+    test('test slotsControllerCheckDuplicateSlot', () async {
+      // TODO
+    });
+
     // Acquire a micro-lock on a time slot (120s TTL)
     //
     //Future<MicroLockResponseDto> slotsControllerMicroLock(MicroLockDto microLockDto) async

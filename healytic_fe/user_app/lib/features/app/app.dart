@@ -16,17 +16,19 @@ class App extends HookConsumerWidget {
     final router = ref.watch(routerProvider);
     final theme = AppTheme();
 
-    return GlobalErrorListener(
-      child: NotificationToastListener(
-        child: MaterialApp.router(
-          title: 'GoHealh',
-          routerConfig: router,
-          debugShowCheckedModeBanner: false,
-          theme: theme.lightTheme(),
-          darkTheme: theme.darkTheme(),
-        ),
-      ),
+    return MaterialApp.router(
+      title: 'GoHealh',
+      routerConfig: router,
+      debugShowCheckedModeBanner: false,
+      theme: theme.lightTheme(),
+      darkTheme: theme.darkTheme(),
+      builder: (context, child) {
+        return GlobalErrorListener(
+          child: NotificationToastListener(
+            child: child ?? const SizedBox.shrink(),
+          ),
+        );
+      },
     );
   }
 }
-
