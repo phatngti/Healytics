@@ -19,6 +19,7 @@ import { PartnerReviewLog } from './partner-review-log.entity';
 import { LegalRepresentative } from './legal-representative.entity';
 import { Employee } from './employee.entity';
 import { Product } from './product.entity';
+import { PartnerCertification } from '@/clinic/entities/partner-certification.entity';
 
 @Entity('health_partner_profile')
 export class Partner {
@@ -108,6 +109,21 @@ export class Partner {
   @Column({ name: 'phone_number', type: 'varchar', length: 20, nullable: true })
   phoneNumber: string | null;
 
+  @Column({ name: 'cover_image_url', type: 'text', nullable: true })
+  coverImageUrl: string | null;
+
+  @Column({ name: 'logo_image_url', type: 'text', nullable: true })
+  logoImageUrl: string | null;
+
+  @Column({ type: 'jsonb', default: '[]' })
+  gallery: string[];
+
+  @Column({ type: 'text', nullable: true })
+  description: string | null;
+
+  @Column({ name: 'follower_count', type: 'int', default: 0 })
+  followerCount: number;
+
   // Relationship to Account
   @Column({ name: 'account_id' })
   accountId: string;
@@ -137,6 +153,10 @@ export class Partner {
 
   @OneToMany(() => Product, (product) => product.partner)
   products: Product[];
+
+  @OneToMany(() => PartnerCertification, (cert) => cert.partner)
+  certifications: PartnerCertification[];
+
   // --- Verification Logic ---
 
   @Column({

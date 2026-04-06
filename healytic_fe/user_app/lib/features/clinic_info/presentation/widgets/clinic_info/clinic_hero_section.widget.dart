@@ -13,7 +13,6 @@ class ClinicHeroSection extends StatelessWidget {
     required this.isVerified,
     this.coverImageUrl,
     this.logoImageUrl,
-    this.galleryCount = 0,
   });
 
   final String name;
@@ -21,7 +20,6 @@ class ClinicHeroSection extends StatelessWidget {
   final bool isVerified;
   final String? coverImageUrl;
   final String? logoImageUrl;
-  final int galleryCount;
 
   @override
   Widget build(BuildContext context) {
@@ -41,39 +39,6 @@ class ClinicHeroSection extends StatelessWidget {
                 NetworkImageAuto(imageUrl: coverImageUrl!, fit: BoxFit.cover)
               else
                 Container(color: colorScheme.surfaceContainerHighest),
-              if (galleryCount > 0)
-                Positioned(
-                  bottom: AppDimens.spaceSm,
-                  right: AppDimens.spaceSm,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimens.spaceSm,
-                      vertical: AppDimens.spaceXxs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      borderRadius: AppDimens.radiusPill,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.photo_library,
-                          size: 12,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Gallery ($galleryCount)',
-                          style: textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
             ],
           ),
         ),

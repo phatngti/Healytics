@@ -33,22 +33,19 @@ base class ErrorObserver extends ProviderObserver {
 
     // Skip 401 errors — AuthHttpClient already
     // handles token refresh and forced logout.
-    if (appError is ServerException &&
-        appError.statusCode == 401) {
+    if (appError is ServerException && appError.statusCode == 401) {
       return;
     }
 
-    final name = context.provider.name ??
-        context.provider.runtimeType.toString();
+    final name =
+        context.provider.name ?? context.provider.runtimeType.toString();
 
     _log.severe(
       'Provider "$name" failed',
       error,
-      stackTrace,
+      // stackTrace,
     );
 
-    context.container
-        .read(globalErrorStreamProvider.notifier)
-        .emit(appError);
+    context.container.read(globalErrorStreamProvider.notifier).emit(appError);
   }
 }

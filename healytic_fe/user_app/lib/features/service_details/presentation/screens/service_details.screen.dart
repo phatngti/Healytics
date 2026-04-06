@@ -4,7 +4,9 @@ import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
+import 'package:user_app/features/cart/presentation/providers/cart.provider.dart';
 import 'package:user_app/features/service_details/domain/entities/service_details.entity.dart';
 import 'package:user_app/features/service_details/presentation/providers/service_details.provider.dart';
 import 'package:user_app/router/routes.dart';
@@ -254,6 +256,7 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
             child: RepaintBoundary(
               child: _BottomActionBar(
                 price: details.price,
+                serviceId: widget.serviceId,
                 onPressed: () {
                   ServiceSpecialistRoute(
                     serviceId: widget.serviceId,
@@ -359,25 +362,72 @@ class _GlassCircleButton extends StatelessWidget {
   }
 }
 
-/// Fixed bottom bar with price and "Select Specialist"
-/// CTA. Uses a blurred backdrop matching the header.
-class _BottomActionBar extends StatelessWidget {
-  const _BottomActionBar({required this.price, required this.onPressed});
+/// Fixed bottom bar with price, "Add to Cart" icon,
+/// and "Select Specialist" CTA.
+class _BottomActionBar extends ConsumerStatefulWidget {
+  const _BottomActionBar({
+    required this.price,
+    required this.serviceId,
+    required this.onPressed,
+  });
 
   final String price;
+  final String serviceId;
   final VoidCallback onPressed;
+
+  @override
+  ConsumerState<_BottomActionBar> createState() =>
+      _BottomActionBarState();
+}
+
+class _BottomActionBarState
+    extends ConsumerState<_BottomActionBar> {
+  bool _isAddingToCart = false;
+
+  Future<void> _handleAddToCart() async {
+    if (_isAddingToCart) return;
+    setState(() => _isAddingToCart = true);
+    try {
+      await ref
+          .read(cartProvider.notifier)
+          .addItem(serviceId: widget.serviceId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Added to cart'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to add: $e'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isAddingToCart = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final isDark = theme.brightness == Brightness.dark;
-    final bottomPad = MediaQuery.paddingOf(context).bottom;
+    final isDark =
+        theme.brightness == Brightness.dark;
+    final bottomPad =
+        MediaQuery.paddingOf(context).bottom;
 
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        filter: ImageFilter.blur(
+          sigmaX: 16,
+          sigmaY: 16,
+        ),
         child: Container(
           padding: EdgeInsets.fromLTRB(
             AppDimens.spaceXxl,
@@ -387,13 +437,16 @@ class _BottomActionBar extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: isDark
-                ? colorScheme.surface.withValues(alpha: 0.8)
-                : Colors.white.withValues(alpha: 0.8),
+                ? colorScheme.surface
+                    .withValues(alpha: 0.8)
+                : Colors.white
+                    .withValues(alpha: 0.8),
             border: Border(
               top: BorderSide(
                 color: isDark
                     ? colorScheme.outlineVariant
-                    : colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    : colorScheme.outlineVariant
+                        .withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -401,49 +454,75 @@ class _BottomActionBar extends StatelessWidget {
             children: [
               Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Total Price',
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                    style: textTheme.labelSmall
+                        ?.copyWith(
+                      color: colorScheme
+                          .onSurfaceVariant,
                     ),
                   ),
                   Text(
-                    price,
-                    style: textTheme.titleLarge?.copyWith(
+                    widget.price,
+                    style: textTheme.titleLarge
+                        ?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
               AppDimens.horizontalMedium,
+              // Add to Cart button
+              _AddToCartButton(
+                isLoading: _isAddingToCart,
+                onTap: _handleAddToCart,
+              ),
+              SizedBox(
+                width: AppDimens.spaceSm,
+              ),
               Expanded(
                 child: Material(
                   color: colorScheme.primary,
-                  borderRadius: AppDimens.radiusMediumSmall,
+                  borderRadius:
+                      AppDimens.radiusMediumSmall,
                   elevation: 4,
-                  shadowColor: colorScheme.primary.withValues(alpha: 0.3),
+                  shadowColor: colorScheme.primary
+                      .withValues(alpha: 0.3),
                   child: InkWell(
-                    onTap: onPressed,
-                    borderRadius: AppDimens.radiusMediumSmall,
+                    onTap: widget.onPressed,
+                    borderRadius:
+                        AppDimens.radiusMediumSmall,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding:
+                          const EdgeInsets.symmetric(
+                        vertical: 14,
+                      ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment:
+                            MainAxisAlignment.center,
                         children: [
                           Text(
                             'Select Specialist',
-                            style: textTheme.labelLarge?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontWeight: FontWeight.w600,
+                            style: textTheme
+                                .labelLarge
+                                ?.copyWith(
+                              color: colorScheme
+                                  .onPrimary,
+                              fontWeight:
+                                  FontWeight.w600,
                             ),
                           ),
-                          AppDimens.horizontalSmall,
+                          AppDimens
+                              .horizontalSmall,
                           Icon(
                             Icons.arrow_forward,
-                            size: AppDimens.iconSm,
-                            color: colorScheme.onPrimary,
+                            size:
+                                AppDimens.iconSm,
+                            color: colorScheme
+                                .onPrimary,
                           ),
                         ],
                       ),
@@ -452,6 +531,58 @@ class _BottomActionBar extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Outlined cart icon button with loading state.
+class _AddToCartButton extends StatelessWidget {
+  final bool isLoading;
+  final VoidCallback onTap;
+
+  const _AddToCartButton({
+    required this.isLoading,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Material(
+      color: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: AppDimens.radiusMediumSmall,
+        side: BorderSide(
+          color: colorScheme.primary,
+        ),
+      ),
+      child: InkWell(
+        onTap: isLoading ? null : onTap,
+        borderRadius: AppDimens.radiusMediumSmall,
+        child: SizedBox(
+          width: AppDimens.touchTarget,
+          height: AppDimens.touchTarget,
+          child: Center(
+            child: isLoading
+                ? SizedBox(
+                    width: AppDimens.iconMd,
+                    height: AppDimens.iconMd,
+                    child:
+                        CircularProgressIndicator(
+                      strokeWidth:
+                          AppDimens.spaceXxs,
+                      color: colorScheme.primary,
+                    ),
+                  )
+                : Icon(
+                    Symbols.add_shopping_cart,
+                    size: AppDimens.iconLg,
+                    color: colorScheme.primary,
+                  ),
           ),
         ),
       ),

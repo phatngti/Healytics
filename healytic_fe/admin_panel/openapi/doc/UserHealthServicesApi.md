@@ -10,6 +10,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**userHealthServiceControllerFindOne**](UserHealthServicesApi.md#userhealthservicecontrollerfindone) | **GET** /user/health-services/{id} | Get a service by ID
+[**userHealthServiceControllerGetClinicInfo**](UserHealthServicesApi.md#userhealthservicecontrollergetclinicinfo) | **GET** /user/health-services/clinics/{id}/info | Get public clinic info by ID
 [**userHealthServiceControllerGetEligibilityDetail**](UserHealthServicesApi.md#userhealthservicecontrollergeteligibilitydetail) | **GET** /user/health-services/eligibilities/{id} | Get eligibility detail by ID
 [**userHealthServiceControllerGetHomeRecommend**](UserHealthServicesApi.md#userhealthservicecontrollergethomerecommend) | **GET** /user/health-services/home-recommend | Get home recommendations
 [**userHealthServiceControllerGetPremiumTreatments**](UserHealthServicesApi.md#userhealthservicecontrollergetpremiumtreatments) | **GET** /user/health-services/premium-treatments | Get premium treatments
@@ -54,6 +55,53 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**PublicHealthServiceResponseDto**](PublicHealthServiceResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **userHealthServiceControllerGetClinicInfo**
+> PublicClinicInfoResponseDto userHealthServiceControllerGetClinicInfo(id)
+
+Get public clinic info by ID
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = UserHealthServicesApi();
+final id = id_example; // String | 
+
+try {
+    final result = api_instance.userHealthServiceControllerGetClinicInfo(id);
+    print(result);
+} catch (e) {
+    print('Exception when calling UserHealthServicesApi->userHealthServiceControllerGetClinicInfo: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
+
+### Return type
+
+[**PublicClinicInfoResponseDto**](PublicClinicInfoResponseDto.md)
 
 ### Authorization
 

@@ -87,6 +87,12 @@ Class | Method | HTTP request | Description
 *AuthenticationApi* | [**authControllerRefreshPartner**](doc//AuthenticationApi.md#authcontrollerrefreshpartner) | **POST** /auth/partner/refresh | Refresh partner tokens with verification info
 *AuthenticationApi* | [**authControllerRegisterPartner**](doc//AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
 *AuthenticationApi* | [**authControllerRegisterUser**](doc//AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | Register a new user
+*CartApi* | [**cartControllerAddItem**](doc//CartApi.md#cartcontrolleradditem) | **POST** /cart | Add service to cart
+*CartApi* | [**cartControllerApplyCoupon**](doc//CartApi.md#cartcontrollerapplycoupon) | **POST** /cart/{cartItemId}/coupon | Apply coupon to cart item
+*CartApi* | [**cartControllerClearCart**](doc//CartApi.md#cartcontrollerclearcart) | **DELETE** /cart | Clear all cart items
+*CartApi* | [**cartControllerGetItems**](doc//CartApi.md#cartcontrollergetitems) | **GET** /cart | Get all cart items for current user
+*CartApi* | [**cartControllerRemoveCoupon**](doc//CartApi.md#cartcontrollerremovecoupon) | **DELETE** /cart/{cartItemId}/coupon | Remove coupon from cart item
+*CartApi* | [**cartControllerRemoveItem**](doc//CartApi.md#cartcontrollerremoveitem) | **DELETE** /cart/{cartItemId} | Remove an item from cart
 *CategoriesApi* | [**categoriesControllerFindAll**](doc//CategoriesApi.md#categoriescontrollerfindall) | **GET** /categories | Get all categories
 *CategoriesApi* | [**categoriesControllerFindBySlug**](doc//CategoriesApi.md#categoriescontrollerfindbyslug) | **GET** /categories/slug/{slug} | Get a category by slug
 *CategoriesApi* | [**categoriesControllerFindOne**](doc//CategoriesApi.md#categoriescontrollerfindone) | **GET** /categories/{id} | Get a category by id
@@ -152,6 +158,9 @@ Class | Method | HTTP request | Description
 *UserChatApi* | [**userChatControllerGetConversations**](doc//UserChatApi.md#userchatcontrollergetconversations) | **GET** /user/chat/conversations | List all conversations for the current user
 *UserChatApi* | [**userChatControllerGetMessages**](doc//UserChatApi.md#userchatcontrollergetmessages) | **GET** /user/chat/conversations/{id}/messages | Get message history for a conversation (cursor-paginated)
 *UserChatApi* | [**userChatControllerMarkRead**](doc//UserChatApi.md#userchatcontrollermarkread) | **POST** /user/chat/conversations/{id}/read | Mark all messages in a conversation as read
+*UserClinicsApi* | [**userClinicControllerGetClinicInfo**](doc//UserClinicsApi.md#usercliniccontrollergetclinicinfo) | **GET** /user/clinics/{id}/info | Get public clinic profile
+*UserClinicsApi* | [**userClinicControllerGetClinicProducts**](doc//UserClinicsApi.md#usercliniccontrollergetclinicproducts) | **GET** /user/clinics/{id}/products | Get clinic products/services catalog
+*UserClinicsApi* | [**userClinicControllerGetClinicReviews**](doc//UserClinicsApi.md#usercliniccontrollergetclinicreviews) | **GET** /user/clinics/{id}/reviews | Get paginated clinic reviews
 *UserDevicesApi* | [**userDeviceControllerRegisterDevice**](doc//UserDevicesApi.md#userdevicecontrollerregisterdevice) | **POST** /user/devices | Register a device token for push notifications
 *UserDevicesApi* | [**userDeviceControllerUnregisterDevice**](doc//UserDevicesApi.md#userdevicecontrollerunregisterdevice) | **DELETE** /user/devices/{token} | Unregister a device token (e.g. on logout)
 *UserEmployeesApi* | [**userEmployeesControllerFindAll**](doc//UserEmployeesApi.md#useremployeescontrollerfindall) | **GET** /user/employees | Get all employees
@@ -160,6 +169,7 @@ Class | Method | HTTP request | Description
 *UserEmployeesApi* | [**userEmployeesControllerGetFeaturedSpecialists**](doc//UserEmployeesApi.md#useremployeescontrollergetfeaturedspecialists) | **GET** /user/employees/featured-specialists | Get featured specialists for home page
 *UserEmployeesApi* | [**userEmployeesControllerGetTimeSlots**](doc//UserEmployeesApi.md#useremployeescontrollergettimeslots) | **GET** /user/employees/{id}/time-slots | Get time slots with availability for an employee
 *UserHealthServicesApi* | [**userHealthServiceControllerFindOne**](doc//UserHealthServicesApi.md#userhealthservicecontrollerfindone) | **GET** /user/health-services/{id} | Get a service by ID
+*UserHealthServicesApi* | [**userHealthServiceControllerGetClinicInfo**](doc//UserHealthServicesApi.md#userhealthservicecontrollergetclinicinfo) | **GET** /user/health-services/clinics/{id}/info | Get public clinic info by ID
 *UserHealthServicesApi* | [**userHealthServiceControllerGetEligibilityDetail**](doc//UserHealthServicesApi.md#userhealthservicecontrollergeteligibilitydetail) | **GET** /user/health-services/eligibilities/{id} | Get eligibility detail by ID
 *UserHealthServicesApi* | [**userHealthServiceControllerGetHomeRecommend**](doc//UserHealthServicesApi.md#userhealthservicecontrollergethomerecommend) | **GET** /user/health-services/home-recommend | Get home recommendations
 *UserHealthServicesApi* | [**userHealthServiceControllerGetPremiumTreatments**](doc//UserHealthServicesApi.md#userhealthservicecontrollergetpremiumtreatments) | **GET** /user/health-services/premium-treatments | Get premium treatments
@@ -175,6 +185,7 @@ Class | Method | HTTP request | Description
 *UserPaymentsApi* | [**userPaymentControllerRefundMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundmomopayment) | **POST** /user/payments/momo/{bookingId}/refund | Request MoMo refund for booking
 *UserReviewsApi* | [**userReviewControllerSubmitSpecialistReview**](doc//UserReviewsApi.md#userreviewcontrollersubmitspecialistreview) | **POST** /user/reviews/specialist | Submit a specialist review for a completed appointment
 *UserReviewsApi* | [**userReviewControllerSubmitTreatmentReview**](doc//UserReviewsApi.md#userreviewcontrollersubmittreatmentreview) | **POST** /user/reviews/treatment | Submit a treatment review for a completed appointment
+*UserSlotsApi* | [**slotsControllerCheckDuplicateSlot**](doc//UserSlotsApi.md#slotscontrollercheckduplicateslot) | **POST** /user/slots/check-duplicate | Check if the user already has a booking at the same datetime
 *UserSlotsApi* | [**slotsControllerMicroLock**](doc//UserSlotsApi.md#slotscontrollermicrolock) | **POST** /user/slots/micro-lock | Acquire a micro-lock on a time slot (120s TTL)
 
 
@@ -182,6 +193,7 @@ Class | Method | HTTP request | Description
 
  - [AccountMeResponseDto](doc//AccountMeResponseDto.md)
  - [AccountRequestDto](doc//AccountRequestDto.md)
+ - [AddToCartDto](doc//AddToCartDto.md)
  - [AddressDto](doc//AddressDto.md)
  - [AddressInfoDto](doc//AddressInfoDto.md)
  - [AdminCategoryResponseDto](doc//AdminCategoryResponseDto.md)
@@ -193,6 +205,7 @@ Class | Method | HTTP request | Description
  - [AiRecommendationItemDto](doc//AiRecommendationItemDto.md)
  - [AiRecommendationsRequestDto](doc//AiRecommendationsRequestDto.md)
  - [AiRecommendationsResponseDto](doc//AiRecommendationsResponseDto.md)
+ - [ApplyCouponDto](doc//ApplyCouponDto.md)
  - [AppointmentCategoryResponseDto](doc//AppointmentCategoryResponseDto.md)
  - [AppointmentResponseDto](doc//AppointmentResponseDto.md)
  - [AsyncCheckoutDto](doc//AsyncCheckoutDto.md)
@@ -208,14 +221,29 @@ Class | Method | HTTP request | Description
  - [BusinessServiceDto](doc//BusinessServiceDto.md)
  - [BusinessServicesResponseDto](doc//BusinessServicesResponseDto.md)
  - [BusinessType](doc//BusinessType.md)
+ - [CartItemResponseDto](doc//CartItemResponseDto.md)
  - [CategoryInfoDto](doc//CategoryInfoDto.md)
  - [CategoryResponseDto](doc//CategoryResponseDto.md)
  - [CategorySummaryDto](doc//CategorySummaryDto.md)
  - [ChatbotRecommendationResponse](doc//ChatbotRecommendationResponse.md)
  - [ChatbotRecommenderRequest](doc//ChatbotRecommenderRequest.md)
  - [ChatbotRequest](doc//ChatbotRequest.md)
+ - [CheckDuplicateSlotDto](doc//CheckDuplicateSlotDto.md)
+ - [CheckDuplicateSlotResponseDto](doc//CheckDuplicateSlotResponseDto.md)
  - [CheckoutTicketResponseDto](doc//CheckoutTicketResponseDto.md)
  - [ClientKeyResponseDto](doc//ClientKeyResponseDto.md)
+ - [ClinicCertificationDto](doc//ClinicCertificationDto.md)
+ - [ClinicInfoResponseDto](doc//ClinicInfoResponseDto.md)
+ - [ClinicProductCategoryDto](doc//ClinicProductCategoryDto.md)
+ - [ClinicProductDto](doc//ClinicProductDto.md)
+ - [ClinicProductsResponseDto](doc//ClinicProductsResponseDto.md)
+ - [ClinicReviewDto](doc//ClinicReviewDto.md)
+ - [ClinicReviewFilterDto](doc//ClinicReviewFilterDto.md)
+ - [ClinicReviewResponseSubDto](doc//ClinicReviewResponseSubDto.md)
+ - [ClinicReviewSummaryDto](doc//ClinicReviewSummaryDto.md)
+ - [ClinicReviewsResponseDto](doc//ClinicReviewsResponseDto.md)
+ - [ClinicSpecialistPreviewDto](doc//ClinicSpecialistPreviewDto.md)
+ - [ClinicTrustMetricsDto](doc//ClinicTrustMetricsDto.md)
  - [ConversationResponse](doc//ConversationResponse.md)
  - [ConversationResponseDto](doc//ConversationResponseDto.md)
  - [ConversationsPageResponse](doc//ConversationsPageResponse.md)
@@ -304,7 +332,13 @@ Class | Method | HTTP request | Description
  - [ProcedureStepInputDto](doc//ProcedureStepInputDto.md)
  - [PublicCategoryDto](doc//PublicCategoryDto.md)
  - [PublicCategorySummaryDto](doc//PublicCategorySummaryDto.md)
+ - [PublicClinicCertificationDto](doc//PublicClinicCertificationDto.md)
  - [PublicClinicDto](doc//PublicClinicDto.md)
+ - [PublicClinicFacilityImageDto](doc//PublicClinicFacilityImageDto.md)
+ - [PublicClinicFeaturedServiceDto](doc//PublicClinicFeaturedServiceDto.md)
+ - [PublicClinicInfoResponseDto](doc//PublicClinicInfoResponseDto.md)
+ - [PublicClinicSpecialistPreviewDto](doc//PublicClinicSpecialistPreviewDto.md)
+ - [PublicClinicTrustMetricsDto](doc//PublicClinicTrustMetricsDto.md)
  - [PublicEmployeeTimeSlotDto](doc//PublicEmployeeTimeSlotDto.md)
  - [PublicFacilityImageDto](doc//PublicFacilityImageDto.md)
  - [PublicFeatureTagDto](doc//PublicFeatureTagDto.md)
