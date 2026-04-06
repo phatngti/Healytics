@@ -27,7 +27,7 @@ async def generative_ai_stream(
 
 @router.get("/chatbot/conversations", response_model=ConversationsPageResponse)
 async def get_conversations(
-    user_id: str = Query(..., min_length=1),
+    user_id: UUID = Query(..., description="Account / user UUID"),
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1),
     session: AsyncSession = Depends(get_db),
@@ -41,7 +41,7 @@ async def get_conversations(
 @router.get("/chatbot/conversations/{conversation_id}/messages", response_model=MessagesPageResponse)
 async def get_messages(
     conversation_id: UUID,
-    user_id: str | None = Query(default=None, min_length=1),
+    user_id: UUID | None = Query(default=None, description="Must match conversation owner"),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1),
     session: AsyncSession = Depends(get_db),

@@ -1,0 +1,1339 @@
+{
+    "documents": [
+      {
+        "doc_id": "doc_1",
+        "content": "Paracetamol (acetaminophen) is a common over-the-counter analgesic and antipyretic used to relieve mild to moderate pain and reduce fever. The standard adult dose is 500–1000 mg every 4–6 hours, not exceeding 4000 mg per day. Overdose can cause severe liver damage, especially in individuals who consume alcohol regularly. It is generally considered safe when taken at recommended doses and is suitable for most adults, including pregnant women."
+      },
+      {
+        "doc_id": "doc_2",
+        "content": "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID) used to treat pain, fever, and inflammation. The typical adult dose is 200–400 mg every 4–6 hours, with a maximum of 1200 mg per day for self-medication. Ibuprofen should be taken with food or milk to reduce the risk of stomach upset and gastrointestinal bleeding. It is contraindicated in patients with peptic ulcers, kidney disease, or those in the third trimester of pregnancy."
+      },
+      {
+        "doc_id": "doc_3",
+        "content": "Metformin is the first-line oral medication for type 2 diabetes mellitus. It works by decreasing hepatic glucose production and improving insulin sensitivity. The typical starting dose is 500 mg once or twice daily with meals, and can be increased gradually to a maximum of 2000–2500 mg per day. Common side effects include nausea, diarrhea, and abdominal discomfort, which usually subside with continued use. Metformin is contraindicated in patients with severe renal impairment (eGFR < 30 mL/min/1.73m²)."
+      },
+      {
+        "doc_id": "doc_4",
+        "content": "Amoxicillin is a broad-spectrum penicillin antibiotic used to treat bacterial infections including ear infections, urinary tract infections, and pneumonia. The standard adult dose is 250–500 mg every 8 hours or 500–875 mg every 12 hours, depending on the severity of the infection. Patients with known penicillin allergy should not take amoxicillin. Common side effects include diarrhea, skin rash, and nausea."
+      },
+      {
+        "doc_id": "doc_5",
+        "content": "Atorvastatin is a statin medication used to lower LDL cholesterol and reduce the risk of cardiovascular disease. The starting dose is typically 10–20 mg once daily, and can be increased up to 80 mg daily. It should be taken at the same time each day, with or without food. Common side effects include muscle pain, headache, and digestive issues. Patients should immediately report unexplained muscle pain or weakness, as this may indicate rare but serious rhabdomyolysis."
+      },
+      {
+        "doc_id": "doc_6",
+        "content": "High blood pressure (hypertension) is defined as a systolic pressure consistently above 140 mmHg or diastolic above 90 mmHg. It is often called the 'silent killer' because it typically has no symptoms until serious complications occur. Untreated hypertension increases the risk of heart attack, stroke, and kidney failure. Lifestyle modifications such as reducing sodium intake, exercising regularly, and limiting alcohol can help lower blood pressure."
+      },
+      {
+        "doc_id": "doc_7",
+        "content": "Type 2 diabetes is a metabolic disorder characterized by insulin resistance and relative insulin deficiency. Symptoms include increased thirst, frequent urination, blurred vision, fatigue, and slow-healing wounds. Long-term complications include neuropathy, retinopathy, nephropathy, and cardiovascular disease. Management involves lifestyle changes, blood glucose monitoring, and medications such as metformin or insulin."
+      },
+      {
+        "doc_id": "doc_8",
+        "content": "Omeprazole is a proton pump inhibitor (PPI) used to treat gastroesophageal reflux disease (GERD), peptic ulcers, and Helicobacter pylori infection. The standard dose for GERD is 20 mg once daily before a meal for 4–8 weeks. Long-term use of PPIs has been associated with decreased magnesium absorption, increased risk of bone fractures, and Clostridium difficile infection. Omeprazole may interact with clopidogrel and reduce its antiplatelet effect."
+      },
+      {
+        "doc_id": "doc_9",
+        "content": "Asthma is a chronic inflammatory disease of the airways characterized by recurrent episodes of wheezing, shortness of breath, chest tightness, and cough. Common triggers include allergens (dust mites, pollen, pet dander), exercise, cold air, and respiratory infections. Short-acting beta-agonists (SABAs) like salbutamol are used for quick relief during an asthma attack. Inhaled corticosteroids are the cornerstone of long-term asthma management and reduce airway inflammation."
+      },
+      {
+        "doc_id": "doc_10",
+        "content": "Regular physical activity is essential for maintaining good health. Adults should aim for at least 150 minutes of moderate-intensity aerobic activity or 75 minutes of vigorous activity per week, as recommended by the World Health Organization. Physical activity reduces the risk of cardiovascular disease, type 2 diabetes, certain cancers, and mental health disorders. Strength training exercises should be performed at least two days per week to maintain muscle mass and bone density."
+      },
+      {
+        "doc_id": "doc_11",
+        "content": "Amlodipine is a calcium channel blocker used to treat hypertension and angina. The usual starting dose is 5 mg once daily, which can be increased to 10 mg daily. Common side effects include peripheral edema (ankle swelling), flushing, and headache. Amlodipine is generally well-tolerated and can be used in patients with kidney disease. It should be used with caution in patients with severe aortic stenosis."
+      },
+      {
+        "doc_id": "doc_12",
+        "content": "Warfarin is an anticoagulant medication used to prevent and treat blood clots, including deep vein thrombosis and pulmonary embolism. The dose is individualized based on INR (International Normalized Ratio) monitoring, with a target INR of 2.0–3.0 for most indications. Foods high in vitamin K (such as leafy green vegetables) can reduce warfarin's effectiveness. Patients must avoid NSAIDs and aspirin unless directed by a physician, as these increase the risk of bleeding."
+      },
+      {
+        "doc_id": "doc_13",
+        "content": "Iron deficiency anemia is the most common nutritional deficiency worldwide, caused by insufficient iron intake, poor absorption, or blood loss. Symptoms include fatigue, pallor, shortness of breath on exertion, and pica (craving for non-food substances). Treatment involves oral iron supplementation (e.g., ferrous sulfate 325 mg, 1–3 times daily) and addressing the underlying cause. Vitamin C taken alongside iron supplements enhances iron absorption."
+      },
+      {
+        "doc_id": "doc_14",
+        "content": "Insomnia is a sleep disorder characterized by difficulty falling asleep, staying asleep, or waking too early. Good sleep hygiene practices include maintaining a consistent sleep schedule, avoiding caffeine and alcohol before bedtime, keeping the bedroom dark and cool, and limiting screen time in the hour before sleep. Cognitive-behavioral therapy for insomnia (CBT-I) is the first-line treatment for chronic insomnia. Sedative medications like zolpidem should only be used short-term due to the risk of dependence."
+      },
+      {
+        "doc_id": "doc_15",
+        "content": "Salbutamol (albuterol) is a short-acting beta-2 agonist bronchodilator used for rapid relief of bronchospasm in asthma and COPD. The inhaled dose is typically 100–200 mcg (1–2 puffs) as needed, and the nebulized dose is 2.5 mg every 20 minutes for acute exacerbations. Side effects include tremor, tachycardia, and hypokalemia with high doses. Overuse of salbutamol (more than 3 canisters per month) suggests poorly controlled asthma and requires medication review."
+      },
+      {
+        "doc_id": "doc_16",
+        "content": "Chronic obstructive pulmonary disease (COPD) is a progressive lung disease that causes obstructed airflow, primarily caused by smoking. Symptoms include persistent cough with sputum, shortness of breath, and frequent respiratory infections. Spirometry showing FEV1/FVC ratio below 0.70 confirms the diagnosis. Treatment includes smoking cessation, bronchodilators, inhaled corticosteroids, pulmonary rehabilitation, and supplemental oxygen for severe cases."
+      },
+      {
+        "doc_id": "doc_17",
+        "content": "Vitamin D deficiency is common worldwide and is associated with bone disorders (rickets in children, osteomalacia and osteoporosis in adults), muscle weakness, and increased susceptibility to infections. The recommended daily intake is 600–800 IU for most adults, and up to 2000 IU for those at risk of deficiency. Sun exposure triggers vitamin D synthesis in the skin. Supplementation with vitamin D3 (cholecalciferol) is generally preferred over D2."
+      },
+      {
+        "doc_id": "doc_18",
+        "content": "Sertraline is a selective serotonin reuptake inhibitor (SSRI) antidepressant used to treat depression, anxiety disorders, obsessive-compulsive disorder, and PTSD. The usual starting dose is 50 mg once daily, and can be increased to 200 mg daily. Common side effects include nausea, diarrhea, insomnia, and sexual dysfunction. SSRIs carry a black-box warning for increased suicidal ideation in children, adolescents, and young adults. It may take 4–6 weeks before full therapeutic effects are noticed."
+      },
+      {
+        "doc_id": "doc_19",
+        "content": "A healthy diet should include a variety of fruits, vegetables, whole grains, lean proteins, and healthy fats. The Mediterranean diet, which emphasizes olive oil, fish, legumes, and whole grains, is associated with reduced risk of cardiovascular disease, diabetes, and cognitive decline. Adults should limit sodium intake to less than 2300 mg per day to help control blood pressure. Consuming at least 5 portions of fruits and vegetables per day provides essential vitamins, minerals, and fiber."
+      },
+      {
+        "doc_id": "doc_20",
+        "content": "Ciprofloxacin is a fluoroquinolone antibiotic effective against a wide range of gram-negative and some gram-positive bacteria. It is commonly used to treat urinary tract infections, respiratory infections, and traveler's diarrhea. The standard adult dose is 250–750 mg twice daily depending on the infection type. Ciprofloxacin should not be taken with dairy products or antacids containing calcium, magnesium, or aluminum, as these can reduce absorption. It is contraindicated in children and pregnant women due to risk of cartilage damage."
+      },
+      {
+        "doc_id": "doc_21",
+        "content": "Hypertension in pregnancy (preeclampsia) is defined as new-onset hypertension (≥140/90 mmHg) after 20 weeks of gestation with proteinuria or other organ dysfunction. It affects approximately 5–8% of pregnancies and is a leading cause of maternal and fetal morbidity. Treatment involves antihypertensive medications safe in pregnancy (such as labetalol, nifedipine, or methyldopa) and close monitoring. Delivery is the definitive treatment and may need to be expedited if the condition worsens."
+      },
+      {
+        "doc_id": "doc_22",
+        "content": "Dengue fever is a mosquito-borne viral infection caused by the dengue virus, transmitted by Aedes mosquitoes. Symptoms include sudden high fever, severe headache, pain behind the eyes, joint and muscle pain, and a characteristic skin rash. There is no specific antiviral treatment; management is supportive with rest, hydration, and paracetamol for fever. NSAIDs and aspirin should be avoided in dengue due to the risk of bleeding. Warning signs of severe dengue include abdominal pain, persistent vomiting, and bleeding."
+      },
+      {
+        "doc_id": "doc_23",
+        "content": "Allergic rhinitis (hay fever) is an inflammatory condition of the nasal passages triggered by allergens such as pollen, dust mites, and pet dander. Symptoms include sneezing, runny nose, nasal congestion, and itchy eyes. Second-generation antihistamines (e.g., cetirizine, loratadine) are preferred over first-generation ones due to less sedation. Intranasal corticosteroids (e.g., fluticasone) are the most effective treatment for persistent allergic rhinitis. Allergen immunotherapy can provide long-term relief."
+      },
+      {
+        "doc_id": "doc_24",
+        "content": "Osteoporosis is a condition characterized by reduced bone mass and deterioration of bone microarchitecture, leading to increased fracture risk. Risk factors include advanced age, female sex, low body weight, smoking, excessive alcohol use, and prolonged corticosteroid use. Bone mineral density (BMD) measured by DEXA scan is used for diagnosis. Treatment includes calcium (1000–1200 mg/day), vitamin D (800–1000 IU/day), bisphosphonates, and fall prevention strategies."
+      },
+      {
+        "doc_id": "doc_25",
+        "content": "Gabapentin is an anticonvulsant medication also used to treat neuropathic pain and restless legs syndrome. The dose for neuropathic pain typically starts at 300 mg three times daily, and can be increased to 3600 mg per day. Common side effects include dizziness, somnolence, peripheral edema, and weight gain. Gabapentin should be tapered slowly when discontinuing to avoid withdrawal symptoms. It is considered a controlled substance in some jurisdictions due to potential for misuse."
+      },
+      {
+        "doc_id": "doc_26",
+        "content": "Urinary tract infections (UTIs) are more common in women due to the shorter urethra and are usually caused by Escherichia coli. Symptoms include dysuria (painful urination), frequency, urgency, and cloudy or foul-smelling urine. Uncomplicated UTIs in women are typically treated with a 3–7 day course of antibiotics such as nitrofurantoin or trimethoprim-sulfamethoxazole. Increasing fluid intake and urinating after sexual intercourse can help prevent recurrent UTIs."
+      },
+      {
+        "doc_id": "doc_27",
+        "content": "Hypothyroidism occurs when the thyroid gland produces insufficient thyroid hormone, leading to symptoms such as fatigue, weight gain, cold intolerance, constipation, dry skin, and depression. The most common cause in iodine-sufficient countries is Hashimoto's thyroiditis, an autoimmune condition. Treatment is with levothyroxine (T4), starting at 25–50 mcg daily and adjusted based on TSH levels. Levothyroxine should be taken on an empty stomach, 30–60 minutes before breakfast, for optimal absorption."
+      },
+      {
+        "doc_id": "doc_28",
+        "content": "Gastroenteritis (stomach flu) is inflammation of the stomach and intestines caused by viral or bacterial infections. Symptoms include nausea, vomiting, diarrhea, abdominal cramps, and sometimes fever. The primary concern is dehydration, especially in young children and the elderly. Oral rehydration solutions (ORS) containing sodium, potassium, and glucose should be used to replace lost fluids and electrolytes. Most cases resolve within 1–3 days without antibiotic treatment."
+      },
+      {
+        "doc_id": "doc_29",
+        "content": "Sleep apnea is a disorder in which breathing repeatedly stops and starts during sleep. Obstructive sleep apnea (OSA) is the most common type, caused by relaxation of throat muscles blocking the airway. Risk factors include obesity, large neck circumference, smoking, and alcohol use. Symptoms include loud snoring, gasping during sleep, and daytime sleepiness. Continuous positive airway pressure (CPAP) therapy is the gold-standard treatment for moderate to severe OSA."
+      },
+      {
+        "doc_id": "doc_30",
+        "content": "Lisinopril is an ACE inhibitor used to treat hypertension, heart failure, and to protect the kidneys in diabetic patients. The starting dose for hypertension is 10 mg once daily, and can be increased to 40 mg daily. A dry, persistent cough is the most common side effect, occurring in up to 20% of patients. Lisinopril is contraindicated in pregnancy and should not be combined with potassium-sparing diuretics due to risk of hyperkalemia. Angioedema is a rare but serious side effect requiring immediate discontinuation."
+      },
+      {
+        "doc_id": "doc_31",
+        "content": "Migraine headache is a neurological disorder characterized by recurrent severe headaches, often with throbbing pain on one side of the head, nausea, vomiting, and sensitivity to light and sound. Triggers include stress, hormonal changes, certain foods (like red wine and aged cheese), and disrupted sleep. Triptans (e.g., sumatriptan) are effective acute treatments when taken early during an attack. Preventive medications include propranolol, topiramate, and amitriptyline for frequent migraines."
+      },
+      {
+        "doc_id": "doc_32",
+        "content": "Metronidazole is an antibiotic and antiprotozoal medication used to treat infections caused by anaerobic bacteria and protozoa, including Clostridioides difficile, Trichomonas vaginalis, and bacterial vaginosis. The standard dose for mild C. difficile infection is 500 mg three times daily for 10 days. Patients must avoid all alcohol during treatment and for 48 hours after finishing metronidazole, as it causes a disulfiram-like reaction with severe nausea and vomiting. Common side effects include a metallic taste and nausea."
+      },
+      {
+        "doc_id": "doc_33",
+        "content": "Chronic kidney disease (CKD) is the gradual loss of kidney function, often caused by diabetes and hypertension. It is classified into stages 1–5 based on GFR and albuminuria. Early stages may be asymptomatic; later stages present with fatigue, swelling, decreased urination, and uremic symptoms. Management includes controlling the underlying cause, restricting protein and potassium intake, avoiding nephrotoxic drugs (like NSAIDs), and in end-stage disease, dialysis or kidney transplantation."
+      },
+      {
+        "doc_id": "doc_34",
+        "content": "Smoking is the leading preventable cause of death and causes lung cancer, COPD, cardiovascular disease, and many other conditions. Nicotine replacement therapy (NRT) in forms such as patches, gum, or lozenges can double the chance of successfully quitting compared to willpower alone. Varenicline (Champix) and bupropion are prescription medications that aid smoking cessation. Combining NRT with behavioral support provides the highest success rates for quitting."
+      },
+      {
+        "doc_id": "doc_35",
+        "content": "Constipation is defined as having fewer than three bowel movements per week, with stools that are hard, dry, and difficult to pass. Common causes include low fiber intake, inadequate fluid intake, physical inactivity, and certain medications (e.g., opioids, calcium channel blockers). Increasing dietary fiber (25–38 g per day), drinking plenty of water, and regular exercise are first-line management strategies. Osmotic laxatives such as polyethylene glycol are safe for short-term use."
+      },
+      {
+        "doc_id": "doc_36",
+        "content": "Clopidogrel is an antiplatelet medication used to prevent blood clots in patients with acute coronary syndrome or those who have had a stroke or heart attack. The usual dose is 75 mg once daily. It should not be combined with PPIs like omeprazole, which reduce its activation. Patients taking clopidogrel have an increased risk of bleeding; they should inform all healthcare providers before any surgical procedure. Dual antiplatelet therapy (clopidogrel + aspirin) is used after coronary stent placement."
+      },
+      {
+        "doc_id": "doc_37",
+        "content": "Anaphylaxis is a severe, potentially life-threatening allergic reaction that can occur within minutes of exposure to an allergen such as a food, insect sting, latex, or medication. Symptoms include hives, swelling of the throat, difficulty breathing, a drop in blood pressure, and loss of consciousness. Epinephrine (adrenaline) auto-injector (e.g., EpiPen) is the first-line treatment and should be administered immediately into the outer thigh. Following epinephrine administration, the patient must be taken to an emergency department for monitoring."
+      },
+      {
+        "doc_id": "doc_38",
+        "content": "Diabetes management through diet requires controlling carbohydrate intake, as carbohydrates have the greatest effect on blood glucose levels. Patients should focus on low glycemic index foods, including legumes, non-starchy vegetables, and whole grains. Sugary beverages, white bread, and processed foods should be minimized. Consistent meal timing and portion control help maintain stable blood glucose levels throughout the day."
+      },
+      {
+        "doc_id": "doc_39",
+        "content": "Prednisone is a synthetic corticosteroid used to treat inflammation, autoimmune diseases, allergic reactions, and certain cancers. It is typically taken in the morning to mimic the natural cortisol rhythm and reduce sleep disturbance. Long-term use causes significant side effects including weight gain, osteoporosis, hyperglycemia, hypertension, adrenal suppression, and increased infection risk. Prednisone should never be stopped abruptly after prolonged use; the dose must be tapered gradually to prevent adrenal crisis."
+      },
+      {
+        "doc_id": "doc_40",
+        "content": "Vitamin B12 deficiency causes megaloblastic anemia and neurological damage including peripheral neuropathy and subacute combined degeneration of the spinal cord. It is common in vegans, elderly individuals, and patients on long-term metformin or PPIs. Symptoms include fatigue, pallor, numbness and tingling in extremities, and cognitive changes. Treatment involves intramuscular B12 injections or high-dose oral supplementation (1000–2000 mcg daily). Folate supplementation alone will not prevent the neurological damage of B12 deficiency."
+      },
+      {
+        "doc_id": "doc_41",
+        "content": "Heartburn (gastroesophageal reflux) is caused by stomach acid rising into the esophagus. Lifestyle measures to reduce heartburn include eating smaller meals, avoiding fatty and spicy foods, not lying down within 2–3 hours of eating, elevating the head of the bed, and losing weight if overweight. Antacids provide quick but temporary relief. H2 blockers (e.g., famotidine) and proton pump inhibitors (e.g., omeprazole) provide more sustained acid suppression."
+      },
+      {
+        "doc_id": "doc_42",
+        "content": "Deep vein thrombosis (DVT) is a blood clot that forms in a deep vein, usually in the leg, causing pain, swelling, warmth, and redness. Risk factors include prolonged immobility (such as long flights), surgery, cancer, oral contraceptive use, and inherited clotting disorders. DVT can be complicated by pulmonary embolism (PE) if the clot dislodges and travels to the lungs. Treatment involves anticoagulation with low-molecular-weight heparin followed by oral anticoagulants (warfarin or DOACs such as rivaroxaban)."
+      },
+      {
+        "doc_id": "doc_43",
+        "content": "Alcohol use disorder is characterized by compulsive drinking despite adverse consequences. Abrupt cessation in heavy drinkers can cause dangerous withdrawal symptoms including seizures, delirium tremens, and autonomic instability. Withdrawal management should be supervised medically, often using benzodiazepines to prevent seizures. Long-term pharmacological support includes naltrexone (reduces craving), acamprosate (reduces withdrawal discomfort), and disulfiram (aversion therapy). Counseling and support groups (Alcoholics Anonymous) are integral to long-term recovery."
+      },
+      {
+        "doc_id": "doc_44",
+        "content": "Gout is a form of inflammatory arthritis caused by the deposition of monosodium urate crystals in joints due to hyperuricemia (elevated serum uric acid). It classically presents with sudden, severe pain and swelling in the big toe. Acute attacks are treated with colchicine, NSAIDs, or corticosteroids. Long-term management includes allopurinol to lower uric acid levels, adequate hydration, and dietary modifications (avoiding red meat, organ meats, shellfish, and alcohol, especially beer)."
+      },
+      {
+        "doc_id": "doc_45",
+        "content": "Mental health conditions, including depression and anxiety, affect about 1 in 4 people globally at some point in their lives. Depression is characterized by persistent low mood, loss of interest or pleasure, changes in sleep and appetite, fatigue, and thoughts of worthlessness or self-harm. Effective treatments include psychotherapy (cognitive-behavioral therapy), antidepressant medications (SSRIs or SNRIs), and lifestyle interventions such as regular exercise and social connection. Early intervention leads to better outcomes."
+      },
+      {
+        "doc_id": "doc_46",
+        "content": "Skin cancer includes basal cell carcinoma, squamous cell carcinoma, and melanoma. UV radiation from sun exposure and tanning beds is the primary risk factor. Prevention includes applying broad-spectrum sunscreen (SPF 30 or higher) to all exposed skin, wearing protective clothing, and avoiding sun exposure between 10 AM and 4 PM. Regular skin self-examinations should be performed monthly; any new or changing moles should be evaluated by a dermatologist."
+      },
+      {
+        "doc_id": "doc_47",
+        "content": "Childhood vaccinations are one of the most effective public health interventions. Core vaccines recommended in the first two years of life include those against hepatitis B, diphtheria, tetanus, pertussis (DTaP), Haemophilus influenzae type b (Hib), polio, rotavirus, pneumococcal disease (PCV), measles, mumps, rubella (MMR), and varicella. Vaccine-preventable diseases can cause severe complications including death, meningitis, and permanent disability. Herd immunity protects those who cannot be vaccinated."
+      },
+      {
+        "doc_id": "doc_48",
+        "content": "First aid for burns involves immediately cooling the burn with cool (not cold) running water for at least 20 minutes. Do not apply ice, butter, toothpaste, or any home remedies to burns, as these can worsen tissue damage. Cover the burn loosely with a clean, non-fluffy material. Seek medical attention for burns larger than 5 cm, burns on the face, hands, feet, genitals, or major joints, all electrical burns, and any burn in a child or elderly person."
+      },
+      {
+        "doc_id": "doc_49",
+        "content": "Antibiotic resistance occurs when bacteria evolve to survive treatment with antibiotics, making infections harder or impossible to treat. Key causes include overprescription of antibiotics, patient non-compliance with completing a full antibiotic course, and agricultural use of antibiotics. Patients should always complete the full course of antibiotics as prescribed, even if they feel better. Antibiotics are not effective against viral infections such as the common cold or influenza."
+      },
+      {
+        "doc_id": "doc_50",
+        "content": "Oral rehydration solution (ORS) is used to prevent and treat dehydration caused by diarrhea and vomiting. The standard WHO ORS formulation contains sodium chloride (2.6 g), trisodium citrate (2.9 g), potassium chloride (1.5 g), and anhydrous glucose (13.5 g) per liter of clean water. ORS should be sipped slowly and frequently, not gulped, especially in children. In cases of severe dehydration, intravenous fluids may be necessary and the patient should be hospitalized."
+      },
+      {
+        "doc_id": "doc_51",
+        "content": "Paracetamol (hay còn gọi là acetaminophen) là thuốc giảm đau và hạ sốt phổ biến không cần kê đơn. Liều dùng tiêu chuẩn cho người lớn là 500–1000 mg mỗi 4–6 giờ, không vượt quá 4000 mg mỗi ngày. Uống quá liều paracetamol có thể gây tổn thương gan nghiêm trọng, đặc biệt ở người có thói quen uống rượu. Paracetamol được coi là an toàn khi dùng đúng liều khuyến cáo và phù hợp cho hầu hết người lớn, kể cả phụ nữ mang thai."
+      },
+      {
+        "doc_id": "doc_52",
+        "content": "Ibuprofen là thuốc chống viêm không steroid (NSAID) dùng để điều trị đau, sốt và viêm. Liều thông thường cho người lớn là 200–400 mg mỗi 4–6 giờ, tối đa 1200 mg mỗi ngày khi tự dùng. Ibuprofen nên được uống cùng thức ăn hoặc sữa để giảm nguy cơ khó chịu dạ dày và xuất huyết tiêu hóa. Thuốc này chống chỉ định ở bệnh nhân loét dạ dày, bệnh thận, hoặc phụ nữ trong 3 tháng cuối thai kỳ."
+      },
+      {
+        "doc_id": "doc_53",
+        "content": "Tiểu đường type 2 là rối loạn chuyển hóa đặc trưng bởi kháng insulin và thiếu hụt insulin tương đối. Triệu chứng bao gồm khát nước nhiều, tiểu nhiều lần, mờ mắt, mệt mỏi và vết thương lâu lành. Biến chứng lâu dài bao gồm bệnh thần kinh ngoại biên, bệnh võng mạc, bệnh thận và bệnh tim mạch. Quản lý bệnh gồm thay đổi lối sống, theo dõi đường huyết và dùng thuốc như metformin hoặc insulin."
+      },
+      {
+        "doc_id": "doc_54",
+        "content": "Metformin là thuốc điều trị tiểu đường type 2 hàng đầu, giúp giảm sản xuất glucose ở gan và cải thiện độ nhạy insulin. Liều khởi đầu thường là 500 mg một hoặc hai lần mỗi ngày trong bữa ăn, có thể tăng dần lên tối đa 2000–2500 mg mỗi ngày. Tác dụng phụ thường gặp là buồn nôn, tiêu chảy và khó chịu bụng, thường giảm dần khi tiếp tục dùng. Metformin chống chỉ định ở bệnh nhân suy thận nặng (eGFR < 30 mL/phút/1,73m²)."
+      },
+      {
+        "doc_id": "doc_55",
+        "content": "Tăng huyết áp (huyết áp cao) được định nghĩa là huyết áp tâm thu liên tục trên 140 mmHg hoặc huyết áp tâm trương trên 90 mmHg. Thường được gọi là 'kẻ giết người thầm lặng' vì thường không có triệu chứng cho đến khi xảy ra biến chứng nghiêm trọng. Tăng huyết áp không được điều trị làm tăng nguy cơ nhồi máu cơ tim, đột quỵ và suy thận. Thay đổi lối sống như giảm muối, tập thể dục đều đặn và hạn chế rượu có thể giúp hạ huyết áp."
+      },
+      {
+        "doc_id": "doc_56",
+        "content": "Amlodipine là thuốc chẹn kênh canxi dùng để điều trị tăng huyết áp và đau thắt ngực. Liều khởi đầu thường là 5 mg một lần mỗi ngày, có thể tăng lên 10 mg mỗi ngày. Tác dụng phụ thường gặp bao gồm phù ngoại biên (phù mắt cá chân), bừng đỏ mặt và đau đầu. Amlodipine được dung nạp tốt và có thể dùng ở bệnh nhân suy thận. Cần thận trọng ở bệnh nhân hẹp van động mạch chủ nặng."
+      },
+      {
+        "doc_id": "doc_57",
+        "content": "Viêm họng do vi khuẩn (thường do liên cầu nhóm A) cần được điều trị bằng kháng sinh để ngăn ngừa biến chứng như thấp tim. Amoxicillin hoặc penicillin V thường là lựa chọn đầu tay, dùng trong 10 ngày. Đối với bệnh nhân dị ứng penicillin, có thể dùng azithromycin. Không nên dùng kháng sinh cho viêm họng do virus (cảm lạnh thông thường), vì kháng sinh không có tác dụng với virus và có thể góp phần vào kháng thuốc."
+      },
+      {
+        "doc_id": "doc_58",
+        "content": "Sốt xuất huyết dengue là bệnh nhiễm virus do muỗi Aedes truyền. Triệu chứng bao gồm sốt cao đột ngột, đau đầu dữ dội, đau sau mắt, đau cơ khớp và phát ban da đặc trưng. Không có thuốc kháng virus đặc hiệu; điều trị chủ yếu là hỗ trợ gồm nghỉ ngơi, bù nước và paracetamol hạ sốt. Cần tránh dùng ibuprofen và aspirin trong sốt xuất huyết vì tăng nguy cơ chảy máu. Dấu hiệu cảnh báo nặng bao gồm đau bụng dữ dội, nôn liên tục và chảy máu bất thường."
+      },
+      {
+        "doc_id": "doc_59",
+        "content": "Hen phế quản là bệnh viêm mạn tính đường thở với triệu chứng tái phát gồm khò khè, khó thở, tức ngực và ho. Tác nhân kích hoạt phổ biến bao gồm dị nguyên (bụi nhà, phấn hoa, lông thú cưng), gắng sức, không khí lạnh và nhiễm khuẩn hô hấp. Thuốc cường beta-2 tác dụng ngắn như salbutamol được dùng để cắt cơn hen cấp. Corticosteroid dạng hít là nền tảng điều trị hen mạn tính giúp kiểm soát viêm đường thở lâu dài."
+      },
+      {
+        "doc_id": "doc_60",
+        "content": "Thiếu máu do thiếu sắt là thiếu hụt dinh dưỡng phổ biến nhất thế giới, do không đủ lượng sắt trong chế độ ăn, hấp thu kém hoặc mất máu. Triệu chứng bao gồm mệt mỏi, da xanh xao, khó thở khi gắng sức và thèm ăn dị vật (pica). Điều trị gồm bổ sung sắt uống (ví dụ ferrous sulfate 325 mg, 1–3 lần mỗi ngày) và điều trị nguyên nhân. Uống vitamin C cùng với viên sắt giúp tăng hấp thu sắt."
+      },
+      {
+        "doc_id": "doc_61",
+        "content": "Mất ngủ là rối loạn giấc ngủ với triệu chứng khó vào giấc, hay thức giữa đêm hoặc thức dậy quá sớm. Vệ sinh giấc ngủ tốt bao gồm ngủ và thức dậy đúng giờ mỗi ngày, tránh cà phê và rượu trước khi ngủ, giữ phòng ngủ tối và mát, hạn chế màn hình điện tử trong 1 giờ trước khi ngủ. Liệu pháp nhận thức hành vi cho mất ngủ (CBT-I) là điều trị hàng đầu cho mất ngủ mạn tính. Thuốc an thần như zolpidem chỉ nên dùng ngắn hạn do nguy cơ lệ thuộc thuốc."
+      },
+      {
+        "doc_id": "doc_62",
+        "content": "Viêm loét dạ dày tá tràng thường liên quan đến vi khuẩn Helicobacter pylori (H. pylori) hoặc sử dụng thuốc NSAID kéo dài. Triệu chứng điển hình là đau bụng vùng thượng vị, thường có liên quan đến bữa ăn, buồn nôn và đầy hơi. Phác đồ điều trị H. pylori thường gồm 2 kháng sinh (amoxicillin và clarithromycin) kết hợp với thuốc ức chế bơm proton (PPI) như omeprazole trong 14 ngày. Bệnh nhân dùng NSAID dài hạn cần được bảo vệ dạ dày bằng PPI."
+      },
+      {
+        "doc_id": "doc_63",
+        "content": "Loãng xương là tình trạng giảm khối lượng xương và suy giảm vi cấu trúc xương, dẫn đến tăng nguy cơ gãy xương. Yếu tố nguy cơ gồm tuổi cao, giới nữ, cân nặng thấp, hút thuốc lá, sử dụng rượu quá mức và dùng corticosteroid kéo dài. Mật độ xương đo bằng DEXA được dùng để chẩn đoán. Điều trị gồm canxi (1000–1200 mg/ngày), vitamin D (800–1000 IU/ngày), thuốc bisphosphonate và các biện pháp phòng ngã."
+      },
+      {
+        "doc_id": "doc_64",
+        "content": "Bệnh gút là dạng viêm khớp do lắng đọng tinh thể urate monosodium tại khớp vì tăng acid uric máu. Cơn gút điển hình là đau dữ dội đột ngột và sưng khớp ngón chân cái. Điều trị cơn cấp bằng colchicine, thuốc NSAID hoặc corticosteroid. Điều trị lâu dài gồm allopurinol để hạ acid uric, uống đủ nước và thay đổi chế độ ăn (tránh thịt đỏ, nội tạng, hải sản và rượu bia)."
+      },
+      {
+        "doc_id": "doc_65",
+        "content": "Bệnh thận mạn tính (CKD) là tình trạng suy giảm chức năng thận dần dần, thường do đái tháo đường và tăng huyết áp. Giai đoạn sớm thường không triệu chứng; giai đoạn muộn xuất hiện mệt mỏi, phù, giảm tiểu và các triệu chứng urê huyết. Quản lý gồm kiểm soát bệnh nền, hạn chế protein và kali trong khẩu phần, tránh thuốc độc thận (như NSAIDs) và ở giai đoạn cuối là lọc thận hoặc ghép thận."
+      },
+      {
+        "doc_id": "doc_66",
+        "content": "Táo bón được định nghĩa là đi tiêu ít hơn 3 lần mỗi tuần, phân cứng và khó đi. Nguyên nhân thường gặp gồm ít chất xơ trong chế độ ăn, uống không đủ nước, ít vận động và một số thuốc (như opioid, thuốc chẹn kênh canxi). Biện pháp đầu tay gồm tăng chất xơ (25–38 g mỗi ngày), uống nhiều nước và tập thể dục đều đặn. Thuốc nhuận tràng thẩm thấu như polyethylene glycol an toàn để dùng ngắn hạn."
+      },
+      {
+        "doc_id": "doc_67",
+        "content": "Viêm đường tiết niệu (UTI) phổ biến hơn ở nữ giới do niệu đạo ngắn hơn và thường do vi khuẩn Escherichia coli gây ra. Triệu chứng bao gồm đái buốt, tiểu nhiều lần, tiểu gấp và nước tiểu đục hoặc có mùi hôi. UTI không biến chứng ở phụ nữ thường được điều trị bằng kháng sinh ngắn ngày (3–7 ngày) như nitrofurantoin hoặc trimethoprim-sulfamethoxazole. Uống nhiều nước và đi tiểu sau quan hệ tình dục giúp ngăn ngừa UTI tái phát."
+      },
+      {
+        "doc_id": "doc_68",
+        "content": "Suy giáp xảy ra khi tuyến giáp sản xuất không đủ hormone giáp, với triệu chứng mệt mỏi, tăng cân, sợ lạnh, táo bón, da khô và trầm cảm. Nguyên nhân phổ biến nhất ở vùng đủ iod là viêm tuyến giáp Hashimoto, một bệnh tự miễn. Điều trị bằng levothyroxine (T4), bắt đầu 25–50 mcg mỗi ngày, điều chỉnh theo nồng độ TSH. Levothyroxine nên uống lúc bụng đói, 30–60 phút trước bữa sáng để hấp thu tối ưu."
+      },
+      {
+        "doc_id": "doc_69",
+        "content": "Sức khỏe tâm thần bao gồm trầm cảm và lo âu, ảnh hưởng đến khoảng 1/4 dân số thế giới vào một thời điểm nào đó trong cuộc đời. Trầm cảm đặc trưng bởi tâm trạng buồn bã kéo dài, mất hứng thú, thay đổi giấc ngủ và ăn uống, mệt mỏi và suy nghĩ về sự vô dụng hoặc tự làm hại bản thân. Các phương pháp điều trị hiệu quả gồm liệu pháp tâm lý (CBT), thuốc chống trầm cảm (SSRIs hoặc SNRIs) và các can thiệp lối sống như tập thể dục đều đặn và kết nối xã hội."
+      },
+      {
+        "doc_id": "doc_70",
+        "content": "Bệnh phổi tắc nghẽn mạn tính (COPD) là bệnh phổi tiến triển gây tắc nghẽn dòng khí, chủ yếu do hút thuốc lá. Triệu chứng gồm ho mạn tính có đờm, khó thở và nhiễm khuẩn hô hấp tái phát. Xét nghiệm đo chức năng hô hấp (spirometry) cho thấy tỷ lệ FEV1/FVC dưới 0,70 xác nhận chẩn đoán. Điều trị gồm bỏ thuốc lá, thuốc giãn phế quản, corticosteroid dạng hít, phục hồi chức năng hô hấp và oxy liệu pháp cho những trường hợp nặng."
+      },
+      {
+        "doc_id": "doc_71",
+        "content": "Thuốc ức chế bơm proton (PPI) như omeprazole, esomeprazole được dùng để điều trị bệnh trào ngược dạ dày thực quản (GERD), loét dạ dày và nhiễm Helicobacter pylori. Liều tiêu chuẩn cho GERD là 20 mg một lần mỗi ngày trước bữa ăn trong 4–8 tuần. Dùng PPI lâu dài có thể làm giảm hấp thu magie, tăng nguy cơ gãy xương và nhiễm khuẩn Clostridioides difficile. PPI có thể làm giảm hiệu quả của clopidogrel."
+      },
+      {
+        "doc_id": "doc_72",
+        "content": "Chế độ ăn lành mạnh nên bao gồm đa dạng rau củ, trái cây, ngũ cốc nguyên hạt, protein nạc và chất béo lành mạnh. Chế độ ăn Địa Trung Hải, nhấn mạnh dầu ô liu, cá, đậu và ngũ cốc nguyên hạt, liên quan đến giảm nguy cơ bệnh tim mạch, tiểu đường và suy giảm nhận thức. Người lớn nên hạn chế lượng natri dưới 2300 mg mỗi ngày để kiểm soát huyết áp. Ăn ít nhất 5 phần trái cây và rau củ mỗi ngày cung cấp vitamin, khoáng chất và chất xơ thiết yếu."
+      },
+      {
+        "doc_id": "doc_73",
+        "content": "Hoạt động thể chất thường xuyên rất quan trọng để duy trì sức khỏe tốt. Người lớn nên đặt mục tiêu ít nhất 150 phút hoạt động aerobic cường độ vừa hoặc 75 phút hoạt động cường độ cao mỗi tuần theo khuyến cáo của Tổ chức Y tế Thế giới. Hoạt động thể chất giảm nguy cơ bệnh tim mạch, tiểu đường type 2, một số loại ung thư và rối loạn sức khỏe tâm thần. Bài tập tăng cường cơ bắp nên thực hiện ít nhất hai ngày mỗi tuần để duy trì khối cơ và mật độ xương."
+      },
+      {
+        "doc_id": "doc_74",
+        "content": "Phản ứng phản vệ là phản ứng dị ứng nghiêm trọng, đe dọa tính mạng, có thể xảy ra trong vài phút sau khi tiếp xúc với dị nguyên như thực phẩm, vết côn trùng đốt, latex hoặc thuốc. Triệu chứng gồm nổi mề đay, phù nề họng, khó thở, tụt huyết áp và mất ý thức. Epinephrine (adrenaline) tiêm tự động (như EpiPen) là điều trị đầu tay, cần tiêm ngay vào mặt ngoài đùi. Sau khi tiêm epinephrine, bệnh nhân phải được đưa đến cơ sở y tế để theo dõi."
+      },
+      {
+        "doc_id": "doc_75",
+        "content": "Bệnh trào ngược dạ dày thực quản (GERD) gây ra bởi axit dạ dày trào ngược vào thực quản. Các biện pháp lối sống để giảm ợ chua gồm ăn ít hơn, tránh thức ăn nhiều dầu mỡ và cay, không nằm xuống trong vòng 2–3 giờ sau ăn, nâng đầu giường và giảm cân nếu thừa cân. Thuốc kháng acid giảm triệu chứng nhanh nhưng tạm thời. Thuốc H2 blocker (như famotidine) và PPI (như omeprazole) cho hiệu quả ức chế axit bền hơn."
+      },
+      {
+        "doc_id": "doc_76",
+        "content": "Vắc xin trẻ em là một trong những can thiệp y tế công cộng hiệu quả nhất. Các vắc xin cốt lõi được khuyến cáo trong 2 năm đầu đời gồm: viêm gan B, bạch hầu-ho gà-uốn ván (DPT), Hib, bại liệt, rotavirus, phế cầu (PCV), sởi-quai bị-rubella (MMR) và thủy đậu. Bệnh có thể phòng ngừa bằng vắc xin có thể gây biến chứng nặng như viêm màng não, tử vong và tàn tật vĩnh viễn. Miễn dịch cộng đồng bảo vệ những người không thể tiêm vắc xin."
+      },
+      {
+        "doc_id": "doc_77",
+        "content": "Hút thuốc lá là nguyên nhân hàng đầu có thể phòng ngừa của tử vong và gây ung thư phổi, COPD, bệnh tim mạch và nhiều bệnh khác. Liệu pháp thay thế nicotine (NRT) dưới dạng miếng dán, kẹo cao su hoặc viên ngậm có thể tăng gấp đôi khả năng bỏ thuốc thành công so với chỉ dựa vào ý chí. Varenicline và bupropion là thuốc kê đơn hỗ trợ cai thuốc lá. Kết hợp NRT với tư vấn hành vi cho tỷ lệ cai thuốc cao nhất."
+      },
+      {
+        "doc_id": "doc_78",
+        "content": "Viêm da dị ứng (eczema) là bệnh viêm da mạn tính với triệu chứng ngứa, da khô và phát ban đỏ. Thường gặp nhất ở trẻ em nhưng cũng ảnh hưởng đến người lớn. Chăm sóc da bao gồm dưỡng ẩm thường xuyên với kem bôi không mùi, tránh xà phòng có chất tẩy mạnh và các tác nhân gây khó chịu đã biết. Corticosteroid tại chỗ là điều trị chính cho đợt bùng phát. Thuốc kháng histamin có thể giúp giảm ngứa và cải thiện giấc ngủ."
+      },
+      {
+        "doc_id": "doc_79",
+        "content": "Bệnh tiểu đường cần quản lý chế độ ăn qua kiểm soát lượng carbohydrate, vì carbohydrate ảnh hưởng lớn nhất đến đường huyết. Bệnh nhân nên tập trung vào thực phẩm có chỉ số glycemic thấp như đậu, rau không tinh bột và ngũ cốc nguyên hạt. Nên hạn chế đồ uống có đường, bánh mì trắng và thực phẩm chế biến sẵn. Ăn đúng giờ và kiểm soát khẩu phần giúp duy trì đường huyết ổn định trong ngày."
+      },
+      {
+        "doc_id": "doc_80",
+        "content": "Thiếu vitamin D rất phổ biến và liên quan đến rối loạn xương (còi xương ở trẻ em, nhuyễn xương và loãng xương ở người lớn), yếu cơ và tăng dễ mắc bệnh nhiễm khuẩn. Lượng vitamin D khuyến cáo hàng ngày là 600–800 IU cho hầu hết người lớn, lên đến 2000 IU cho những người có nguy cơ thiếu hụt. Ánh sáng mặt trời kích hoạt tổng hợp vitamin D trong da. Bổ sung vitamin D3 (cholecalciferol) thường được ưu tiên hơn D2."
+      },
+      {
+        "doc_id": "doc_81",
+        "content": "Thuốc chống đông warfarin được dùng để ngăn ngừa và điều trị huyết khối, bao gồm huyết khối tĩnh mạch sâu và tắc mạch phổi. Liều được điều chỉnh theo chỉ số INR với mục tiêu thông thường 2,0–3,0. Thực phẩm giàu vitamin K như rau lá xanh có thể làm giảm hiệu quả của warfarin. Bệnh nhân phải tránh NSAIDs và aspirin (trừ khi có chỉ định bác sĩ) vì tăng nguy cơ chảy máu."
+      },
+      {
+        "doc_id": "doc_82",
+        "content": "Ngộ độc thực phẩm xảy ra khi ăn thực phẩm bị ô nhiễm bởi vi khuẩn, virus hoặc độc tố. Triệu chứng thường xuất hiện trong vài giờ đến vài ngày sau khi ăn thực phẩm ô nhiễm, gồm buồn nôn, nôn, tiêu chảy và đau bụng. Điều trị chủ yếu là bù nước bằng dung dịch bù điện giải đường uống (ORS). Nên rửa tay sạch trước khi chế biến thực phẩm, bảo quản thực phẩm đúng nhiệt độ và tránh để thức ăn đã nấu ở nhiệt độ phòng quá 2 giờ."
+      },
+      {
+        "doc_id": "doc_83",
+        "content": "Đau nửa đầu (migraine) là rối loạn thần kinh với đau đầu dữ dội tái phát, thường đau một bên, kèm buồn nôn, nôn và nhạy cảm với ánh sáng và tiếng ồn. Các yếu tố kích hoạt gồm căng thẳng, thay đổi hormone, một số thực phẩm (như rượu vang đỏ, pho mát lên men) và thiếu ngủ. Thuốc triptan như sumatriptan hiệu quả trong điều trị cắt cơn khi dùng sớm. Thuốc dự phòng gồm propranolol, topiramate và amitriptyline cho bệnh nhân đau đầu thường xuyên."
+      },
+      {
+        "doc_id": "doc_84",
+        "content": "Kháng sinh amoxicillin là kháng sinh phổ rộng thuộc nhóm penicillin dùng để điều trị nhiễm khuẩn tai, đường tiết niệu và viêm phổi. Liều tiêu chuẩn cho người lớn là 250–500 mg mỗi 8 giờ hoặc 500–875 mg mỗi 12 giờ tùy mức độ nhiễm khuẩn. Bệnh nhân dị ứng penicillin không được dùng amoxicillin. Tác dụng phụ thường gặp gồm tiêu chảy, phát ban da và buồn nôn."
+      },
+      {
+        "doc_id": "doc_85",
+        "content": "Kháng thuốc kháng sinh xảy ra khi vi khuẩn tiến hóa để kháng lại tác dụng của kháng sinh. Nguyên nhân chính gồm lạm dụng kháng sinh, bệnh nhân không dùng đủ liệu trình đã kê và sử dụng kháng sinh trong chăn nuôi. Bệnh nhân cần uống đủ liệu trình kháng sinh theo đơn, dù cảm thấy khỏe hơn. Kháng sinh không có hiệu quả với các bệnh nhiễm virus như cảm lạnh thông thường hay cúm."
+      },
+      {
+        "doc_id": "doc_86",
+        "content": "Huyết khối tĩnh mạch sâu (DVT) là cục máu đông hình thành trong tĩnh mạch sâu, thường ở chân, gây đau, sưng, ấm nóng và đỏ. Yếu tố nguy cơ gồm bất động kéo dài (như các chuyến bay dài), phẫu thuật, ung thư, dùng thuốc tránh thai và rối loạn đông máu di truyền. DVT có thể biến chứng thành tắc mạch phổi (PE) nếu cục máu đông di chuyển lên phổi. Điều trị gồm thuốc chống đông (heparin trọng lượng phân tử thấp sau đó warfarin hoặc DOAC như rivaroxaban)."
+      },
+      {
+        "doc_id": "doc_87",
+        "content": "Prednisone là corticosteroid tổng hợp dùng để điều trị viêm, bệnh tự miễn, phản ứng dị ứng và một số loại ung thư. Thường được uống vào buổi sáng để bắt chước nhịp cortisol tự nhiên và giảm rối loạn giấc ngủ. Dùng lâu dài gây nhiều tác dụng phụ nghiêm trọng như tăng cân, loãng xương, tăng đường huyết, tăng huyết áp, ức chế thượng thận và tăng nguy cơ nhiễm khuẩn. Không được ngừng prednisone đột ngột sau khi dùng kéo dài; liều phải được giảm dần từ từ để tránh suy thượng thận cấp."
+      },
+      {
+        "doc_id": "doc_88",
+        "content": "Dung dịch bù điện giải đường uống (ORS) được dùng để phòng ngừa và điều trị mất nước do tiêu chảy và nôn mửa. Công thức ORS tiêu chuẩn của WHO chứa natri clorid (2,6 g), trisodium citrate (2,9 g), kali clorid (1,5 g) và glucose khan (13,5 g) trong một lít nước sạch. ORS nên được uống từng ngụm nhỏ thường xuyên, không uống một lúc nhiều, đặc biệt ở trẻ em. Trong trường hợp mất nước nặng, cần truyền dịch tĩnh mạch và nhập viện."
+      },
+      {
+        "doc_id": "doc_89",
+        "content": "Ung thư da bao gồm ung thư tế bào đáy, ung thư tế bào vảy và melanoma. Bức xạ UV từ ánh nắng mặt trời và giường tắm nắng là yếu tố nguy cơ chính. Phòng ngừa gồm thoa kem chống nắng phổ rộng (SPF 30 trở lên) lên tất cả da tiếp xúc, mặc quần áo bảo hộ và tránh ra nắng từ 10 giờ sáng đến 4 giờ chiều. Cần tự kiểm tra da hàng tháng; bất kỳ nốt ruồi mới hoặc thay đổi đều cần được bác sĩ da liễu đánh giá."
+      },
+      {
+        "doc_id": "doc_90",
+        "content": "Sertraline là thuốc chống trầm cảm nhóm SSRI dùng để điều trị trầm cảm, rối loạn lo âu, OCD và PTSD. Liều khởi đầu thường là 50 mg mỗi ngày, có thể tăng lên 200 mg mỗi ngày. Tác dụng phụ thường gặp gồm buồn nôn, tiêu chảy, mất ngủ và rối loạn chức năng tình dục. SSRIs có cảnh báo hộp đen về nguy cơ tăng ý tưởng tự tử ở trẻ em, thanh thiếu niên và người lớn trẻ. Có thể mất 4–6 tuần mới thấy đầy đủ hiệu quả điều trị."
+      },
+      {
+        "doc_id": "doc_91",
+        "content": "Bệnh lý thần kinh ngoại biên do tiểu đường (bệnh thần kinh đái tháo đường) là biến chứng thường gặp của tiểu đường, gây tê bì, ngứa ran và đau, thường bắt đầu ở bàn chân và lan dần lên. Kiểm soát đường huyết tốt là biện pháp phòng ngừa và làm chậm tiến triển bệnh quan trọng nhất. Điều trị triệu chứng gồm thuốc như pregabalin, duloxetine hoặc amitriptyline. Chăm sóc bàn chân mỗi ngày và kiểm tra định kỳ bởi bác sĩ rất cần thiết để phòng ngừa loét chân."
+      },
+      {
+        "doc_id": "doc_92",
+        "content": "Viêm khớp dạng thấp (RA) là bệnh tự miễn mạn tính gây viêm các khớp, thường gặp nhất ở khớp nhỏ của bàn tay và bàn chân. Triệu chứng gồm đau khớp, sưng, cứng khớp buổi sáng kéo dài hơn 1 giờ và mệt mỏi. Điều trị cơ bản gồm methotrexate và các thuốc chống thấp khớp điều chỉnh bệnh (DMARDs). Thuốc sinh học như ức chế TNF-alpha được dùng cho bệnh nhân không đáp ứng với DMARDs thông thường."
+      },
+      {
+        "doc_id": "doc_93",
+        "content": "Thiếu vitamin B12 gây thiếu máu hồng cầu to và tổn thương thần kinh bao gồm bệnh thần kinh ngoại biên và thoái hóa kết hợp bán cấp tủy sống. Phổ biến ở người ăn chay trường, người cao tuổi và bệnh nhân dùng metformin hoặc PPIs kéo dài. Triệu chứng gồm mệt mỏi, da xanh, tê bì và ngứa ran ở chi và thay đổi nhận thức. Điều trị gồm tiêm B12 bắp thịt hoặc bổ sung đường uống liều cao (1000–2000 mcg mỗi ngày). Bổ sung folate đơn thuần không ngăn được tổn thương thần kinh do thiếu B12."
+      },
+      {
+        "doc_id": "doc_94",
+        "content": "Ngưng thở khi ngủ là rối loạn mà hô hấp liên tục dừng và bắt đầu lại trong khi ngủ. Ngưng thở tắc nghẽn (OSA) là dạng phổ biến nhất, do cơ họng giãn ra làm tắc nghẽn đường thở. Yếu tố nguy cơ gồm béo phì, vòng cổ lớn, hút thuốc và uống rượu. Triệu chứng gồm ngáy to, thở hổn hển khi ngủ và buồn ngủ ban ngày. Liệu pháp CPAP (áp lực đường thở dương liên tục) là phương pháp điều trị chuẩn cho OSA mức độ vừa đến nặng."
+      },
+      {
+        "doc_id": "doc_95",
+        "content": "Bỏng cần được sơ cứu ngay bằng cách làm mát vết bỏng dưới vòi nước mát (không lạnh) trong ít nhất 20 phút. Không dùng đá, bơ, kem đánh răng hoặc bất kỳ biện pháp dân gian nào, vì có thể làm tổn thương mô nặng hơn. Phủ vết bỏng bằng vật liệu sạch, không xơ. Cần đến cơ sở y tế khi bỏng rộng hơn 5 cm, bỏng ở mặt, tay, chân, bộ phận sinh dục hoặc khớp lớn, tất cả bỏng điện và bất kỳ trường hợp bỏng ở trẻ em hay người cao tuổi."
+      },
+      {
+        "doc_id": "doc_96",
+        "content": "Cholesterol LDL cao (cholesterol xấu) là yếu tố nguy cơ chính của bệnh tim mạch và đột quỵ. Thay đổi chế độ ăn để hạ cholesterol gồm giảm chất béo bão hòa và chất béo trans, tăng chất xơ hòa tan (yến mạch, đậu, trái cây), và ăn cá béo 2 lần mỗi tuần. Thuốc statin như atorvastatin là liệu pháp dùng thuốc hiệu quả nhất để hạ LDL. Bệnh nhân dùng statin nên báo ngay nếu đau cơ không giải thích được vì có thể là dấu hiệu tiêu cơ vân hiếm gặp."
+      },
+      {
+        "doc_id": "doc_97",
+        "content": "Tiêm vắc xin cúm hàng năm được khuyến cáo cho mọi người từ 6 tháng tuổi trở lên, đặc biệt cho người cao tuổi, phụ nữ mang thai, trẻ em dưới 5 tuổi và người mắc bệnh mạn tính. Vắc xin cúm được sản xuất dựa trên dự đoán chủng cúm lưu hành trong mùa, nên hiệu quả có thể thay đổi theo từng năm. Tác dụng phụ phổ biến gồm đau, đỏ tại chỗ tiêm và đôi khi sốt nhẹ. Vắc xin cúm không gây bệnh cúm vì chứa virus bất hoạt hoặc mảnh protein virus."
+      },
+      {
+        "doc_id": "doc_98",
+        "content": "Bệnh cơ tim giãn nở (dilated cardiomyopathy) là tình trạng buồng tim giãn rộng và suy yếu chức năng bơm. Nguyên nhân thường gặp gồm bệnh mạch vành, tăng huyết áp lâu dài, tiểu đường, lạm dụng rượu và một số bệnh di truyền. Triệu chứng gồm khó thở khi gắng sức hoặc nằm, mệt mỏi và phù chân. Điều trị gồm thuốc ức chế men chuyển, thuốc chẹn beta, lợi tiểu và trong một số trường hợp ghép tim."
+      },
+      {
+        "doc_id": "doc_99",
+        "content": "Bệnh trĩ là sự giãn nở bất thường của các đám rối tĩnh mạch trong và xung quanh hậu môn và trực tràng. Triệu chứng gồm chảy máu đỏ tươi sau đại tiện, ngứa hậu môn, đau và cảm giác đầy ở hậu môn. Chế độ ăn giàu chất xơ, uống nhiều nước và tránh rặn khi đại tiện giúp phòng ngừa và giảm nhẹ triệu chứng. Tắm ngâm nước ấm 10–15 phút nhiều lần mỗi ngày giúp giảm đau và kích ứng. Trường hợp nặng có thể cần can thiệp như thắt dây cao su hoặc phẫu thuật."
+      },
+      {
+        "doc_id": "doc_100",
+        "content": "Tác dụng phụ thường gặp khi dùng thuốc kháng sinh nhóm fluoroquinolone như ciprofloxacin gồm rối loạn tiêu hóa, buồn nôn, tiêu chảy và nhức đầu. Nghiêm trọng hơn có thể xảy ra viêm gân và đứt gân (đặc biệt gân Achilles), kéo dài khoảng QT trên điện tim và gây hại sụn ở người trẻ đang phát triển. Fluoroquinolone không được dùng ở trẻ em dưới 18 tuổi và phụ nữ mang thai. Không nên dùng cùng với sản phẩm sữa hoặc thuốc kháng acid chứa nhôm, magie vì làm giảm hấp thu thuốc."
+      }
+    ],
+    "eval_dataset": [
+      {
+        "id": "q1",
+        "query": "What is the maximum daily dose of paracetamol for adults?",
+        "ground_truth": "The maximum daily dose of paracetamol for adults is 4000 mg (4 grams).",
+        "relevant_doc_ids": [
+          "doc_1"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q2",
+        "query": "Should I take ibuprofen with food?",
+        "ground_truth": "Yes, ibuprofen should be taken with food or milk to reduce the risk of stomach upset and gastrointestinal bleeding.",
+        "relevant_doc_ids": [
+          "doc_2"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q3",
+        "query": "What is the starting dose of metformin for type 2 diabetes?",
+        "ground_truth": "The typical starting dose of metformin is 500 mg once or twice daily with meals.",
+        "relevant_doc_ids": [
+          "doc_3"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q4",
+        "query": "Can people with penicillin allergy take amoxicillin?",
+        "ground_truth": "No, patients with a known penicillin allergy should not take amoxicillin.",
+        "relevant_doc_ids": [
+          "doc_4"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q5",
+        "query": "What is the most common side effect of lisinopril?",
+        "ground_truth": "A dry, persistent cough is the most common side effect of lisinopril, occurring in up to 20% of patients.",
+        "relevant_doc_ids": [
+          "doc_30"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q6",
+        "query": "How much physical activity does WHO recommend for adults per week?",
+        "ground_truth": "WHO recommends at least 150 minutes of moderate-intensity aerobic activity or 75 minutes of vigorous activity per week for adults.",
+        "relevant_doc_ids": [
+          "doc_10"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q7",
+        "query": "What is the first-line treatment for obstructive sleep apnea?",
+        "ground_truth": "Continuous positive airway pressure (CPAP) therapy is the gold-standard treatment for moderate to severe obstructive sleep apnea (OSA).",
+        "relevant_doc_ids": [
+          "doc_29"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q8",
+        "query": "What medicine is used for quick relief during an asthma attack?",
+        "ground_truth": "Short-acting beta-agonists (SABAs) like salbutamol are used for quick relief during an asthma attack.",
+        "relevant_doc_ids": [
+          "doc_9"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q9",
+        "query": "What is epinephrine used for in allergic reactions?",
+        "ground_truth": "Epinephrine (adrenaline) auto-injector is the first-line treatment for anaphylaxis (severe allergic reaction) and should be administered immediately into the outer thigh.",
+        "relevant_doc_ids": [
+          "doc_37"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q10",
+        "query": "What foods should I avoid if I have gout?",
+        "ground_truth": "For gout, you should avoid red meat, organ meats, shellfish, and alcohol (especially beer), as these can raise uric acid levels and trigger attacks.",
+        "relevant_doc_ids": [
+          "doc_44"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q11",
+        "query": "Is vitamin D3 or D2 better for supplementation?",
+        "ground_truth": "Vitamin D3 (cholecalciferol) is generally preferred over D2 for supplementation.",
+        "relevant_doc_ids": [
+          "doc_17"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q12",
+        "query": "How long does it take for sertraline to work?",
+        "ground_truth": "It may take 4–6 weeks before the full therapeutic effects of sertraline are noticed.",
+        "relevant_doc_ids": [
+          "doc_18"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q13",
+        "query": "What is the correct way to cool a burn?",
+        "ground_truth": "Cool the burn with cool (not cold) running water for at least 20 minutes. Do not apply ice, butter, or toothpaste.",
+        "relevant_doc_ids": [
+          "doc_48"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q14",
+        "query": "What bacteria most commonly causes urinary tract infections in women?",
+        "ground_truth": "Urinary tract infections in women are usually caused by Escherichia coli (E. coli).",
+        "relevant_doc_ids": [
+          "doc_26"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q15",
+        "query": "When should levothyroxine be taken for best absorption?",
+        "ground_truth": "Levothyroxine should be taken on an empty stomach, 30–60 minutes before breakfast, for optimal absorption.",
+        "relevant_doc_ids": [
+          "doc_27"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q16",
+        "query": "I have type 2 diabetes and high blood pressure. Which drug treats both conditions and also protects the kidneys?",
+        "ground_truth": "Lisinopril, an ACE inhibitor, is used to treat hypertension and also helps protect the kidneys in diabetic patients.",
+        "relevant_doc_ids": [
+          "doc_30",
+          "doc_7"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q17",
+        "query": "What happens if I take too much paracetamol and I drink alcohol regularly?",
+        "ground_truth": "Overdose of paracetamol can cause severe liver damage. This risk is especially high in people who drink alcohol regularly, as alcohol compounds the hepatotoxic effect.",
+        "relevant_doc_ids": [
+          "doc_1"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q18",
+        "query": "I'm on warfarin. Is it safe to take ibuprofen for my joint pain?",
+        "ground_truth": "No, patients taking warfarin should avoid NSAIDs like ibuprofen unless directed by a physician, because combining them significantly increases the risk of bleeding.",
+        "relevant_doc_ids": [
+          "doc_12",
+          "doc_2"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q19",
+        "query": "Can I use omeprazole together with my heart medication clopidogrel?",
+        "ground_truth": "Omeprazole may interact with clopidogrel and reduce its antiplatelet effect, so this combination should generally be avoided or supervised by a physician.",
+        "relevant_doc_ids": [
+          "doc_8",
+          "doc_36"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q20",
+        "query": "What's the best way to treat iron deficiency anemia, and is there anything I can take alongside the iron to help?",
+        "ground_truth": "Iron deficiency anemia is treated with oral iron supplementation (e.g., ferrous sulfate 325 mg, 1–3 times daily). Taking vitamin C alongside iron supplements enhances iron absorption.",
+        "relevant_doc_ids": [
+          "doc_13"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q21",
+        "query": "My doctor wants to start me on atorvastatin. What muscle-related symptom should I watch out for?",
+        "ground_truth": "You should watch out for unexplained muscle pain or weakness, which may indicate rare but serious rhabdomyolysis. These symptoms should be reported to a doctor immediately.",
+        "relevant_doc_ids": [
+          "doc_5"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q22",
+        "query": "What lifestyle changes can help with both high blood pressure and high cholesterol?",
+        "ground_truth": "For high blood pressure, lifestyle changes include reducing sodium intake, exercising regularly, and limiting alcohol. For cholesterol, dietary changes include reducing saturated and trans fats, increasing soluble fiber, and eating oily fish. Regular physical activity benefits both conditions.",
+        "relevant_doc_ids": [
+          "doc_6",
+          "doc_19"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q23",
+        "query": "I have asthma and I use my salbutamol inhaler more than 3 canisters a month. Should I be concerned?",
+        "ground_truth": "Yes, using more than 3 salbutamol canisters per month suggests poorly controlled asthma and requires a medication review by a healthcare provider.",
+        "relevant_doc_ids": [
+          "doc_15",
+          "doc_9"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q24",
+        "query": "What are the signs that dengue fever might be becoming severe and dangerous?",
+        "ground_truth": "Warning signs of severe dengue include abdominal pain, persistent vomiting, and bleeding. These require urgent medical attention.",
+        "relevant_doc_ids": [
+          "doc_22"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q25",
+        "query": "I've been taking prednisone for 3 months. Can I just stop taking it now?",
+        "ground_truth": "No, prednisone should never be stopped abruptly after prolonged use. The dose must be tapered gradually to prevent adrenal crisis.",
+        "relevant_doc_ids": [
+          "doc_39"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q26",
+        "query": "Can antibiotics help my cold or flu?",
+        "ground_truth": "No, antibiotics are not effective against viral infections such as the common cold or influenza. Using them unnecessarily contributes to antibiotic resistance.",
+        "relevant_doc_ids": [
+          "doc_49"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q27",
+        "query": "I have a peptic ulcer. Which common painkillers should I avoid and what can I take instead?",
+        "ground_truth": "Patients with peptic ulcers should avoid ibuprofen and other NSAIDs, as these can worsen ulcers and cause gastrointestinal bleeding. Paracetamol is a safer alternative for pain relief.",
+        "relevant_doc_ids": [
+          "doc_2",
+          "doc_1"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q28",
+        "query": "What causes osteoporosis and what daily supplements are recommended to help?",
+        "ground_truth": "Osteoporosis is caused by factors including advanced age, female sex, low body weight, smoking, excessive alcohol, and prolonged corticosteroid use. Treatment includes calcium (1000–1200 mg/day) and vitamin D (800–1000 IU/day) supplementation.",
+        "relevant_doc_ids": [
+          "doc_24",
+          "doc_17"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q29",
+        "query": "What should I avoid eating and drinking while on metronidazole?",
+        "ground_truth": "Patients must avoid all alcohol during treatment with metronidazole and for 48 hours after finishing, as it causes a disulfiram-like reaction with severe nausea and vomiting.",
+        "relevant_doc_ids": [
+          "doc_32"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q30",
+        "query": "Is it safe to take ibuprofen during pregnancy?",
+        "ground_truth": "Ibuprofen is contraindicated in patients in the third trimester of pregnancy. It should be avoided during this period.",
+        "relevant_doc_ids": [
+          "doc_2"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q31",
+        "query": "I'm a vegan who has been on metformin for years and I'm feeling very tired with numbness in my hands. What might be going on?",
+        "ground_truth": "Long-term metformin use can reduce vitamin B12 absorption. Vegans are already at high risk of vitamin B12 deficiency. Symptoms of B12 deficiency include fatigue and numbness and tingling in the extremities. Treatment involves intramuscular B12 injections or high-dose oral B12 (1000–2000 mcg daily).",
+        "relevant_doc_ids": [
+          "doc_3",
+          "doc_40"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q32",
+        "query": "Can I take something for my migraine headache if I also have high blood pressure?",
+        "ground_truth": "Propranolol is a preventive medication used for frequent migraines. It is a beta-blocker that is also used to treat hypertension, making it suitable for patients with both conditions. Triptans like sumatriptan are used for acute migraine relief. However, patients should consult their physician since triptans can affect blood pressure.",
+        "relevant_doc_ids": [
+          "doc_31",
+          "doc_6"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q33",
+        "query": "I have CKD and bad knee pain. What painkillers are safe for me?",
+        "ground_truth": "Patients with chronic kidney disease (CKD) should avoid NSAIDs like ibuprofen, as these are nephrotoxic and worsen kidney function. Paracetamol is a safer alternative for pain relief at recommended doses.",
+        "relevant_doc_ids": [
+          "doc_33",
+          "doc_2",
+          "doc_1"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q34",
+        "query": "Is it safe to use my salbutamol inhaler every day for my asthma, or do I need something extra?",
+        "ground_truth": "Salbutamol (a SABA) is intended for quick relief of acute symptoms, not for daily regular use. If it is needed daily, this suggests poorly controlled asthma, and inhaled corticosteroids should be added as the cornerstone of long-term asthma management to reduce airway inflammation.",
+        "relevant_doc_ids": [
+          "doc_15",
+          "doc_9"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q35",
+        "query": "I've been taking omeprazole long-term. Are there any hidden risks I should know about?",
+        "ground_truth": "Long-term use of omeprazole (a PPI) is associated with decreased magnesium absorption, increased risk of bone fractures, and Clostridium difficile infection. It may also reduce the effectiveness of clopidogrel.",
+        "relevant_doc_ids": [
+          "doc_8"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q36",
+        "query": "My elderly parent was just diagnosed with both osteoporosis and vitamin D deficiency. What is the connection and how should both be managed?",
+        "ground_truth": "Vitamin D deficiency is directly linked to osteoporosis because vitamin D is essential for calcium absorption and bone health. Management includes vitamin D3 supplementation (up to 2000 IU/day for those at risk of deficiency) along with calcium (1000–1200 mg/day) and possibly bisphosphonates for osteoporosis.",
+        "relevant_doc_ids": [
+          "doc_24",
+          "doc_17"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q37",
+        "query": "I drink heavily and want to stop suddenly. Is it safe to just quit on my own?",
+        "ground_truth": "No, abrupt cessation of heavy alcohol use is dangerous and can cause withdrawal symptoms including seizures and delirium tremens. Withdrawal management should be medically supervised, often using benzodiazepines to prevent seizures.",
+        "relevant_doc_ids": [
+          "doc_43"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q38",
+        "query": "After my leg surgery, my doctor put me on warfarin for a blood clot in my leg. What should I avoid eating and taking?",
+        "ground_truth": "Patients on warfarin should avoid foods high in vitamin K (such as leafy green vegetables), which can reduce warfarin's effectiveness. They should also avoid NSAIDs and aspirin unless directed by a physician, as these increase the risk of bleeding.",
+        "relevant_doc_ids": [
+          "doc_12",
+          "doc_42"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q39",
+        "query": "My doctor said I might have sleep apnea and I'm also overweight. What is the connection and what can I do?",
+        "ground_truth": "Obesity is a major risk factor for obstructive sleep apnea (OSA), as excess weight causes relaxation of throat muscles and can block the airway during sleep. Other risk factors include large neck circumference, smoking, and alcohol use. CPAP therapy is the gold-standard treatment for moderate to severe OSA.",
+        "relevant_doc_ids": [
+          "doc_29"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q40",
+        "query": "I have COPD and I smoke. What is the most important thing I can do, and what treatments are available?",
+        "ground_truth": "Smoking cessation is the most important intervention for COPD, as smoking is the primary cause of the disease. Medical treatments include bronchodilators, inhaled corticosteroids, and pulmonary rehabilitation. Supplemental oxygen may be needed for severe cases.",
+        "relevant_doc_ids": [
+          "doc_16",
+          "doc_34"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q41",
+        "query": "What is CBT-I and why is it preferred over sleeping pills for insomnia?",
+        "ground_truth": "Cognitive-behavioral therapy for insomnia (CBT-I) is the first-line treatment for chronic insomnia. Sedative medications like zolpidem should only be used short-term due to the risk of dependence, making CBT-I a safer long-term option.",
+        "relevant_doc_ids": [
+          "doc_14"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q42",
+        "query": "How does dengue fever differ from the flu and why should I not take ibuprofen for it?",
+        "ground_truth": "Dengue fever is caused by the dengue virus transmitted by Aedes mosquitoes, presenting with fever, severe headache, eye pain, joint pain, and rash. NSAIDs and aspirin should be avoided in dengue because they increase the risk of bleeding, which is a serious complication of dengue. Paracetamol should be used for fever instead.",
+        "relevant_doc_ids": [
+          "doc_22"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q43",
+        "query": "I have H. pylori infection. What kind of treatment will my doctor likely prescribe?",
+        "ground_truth": "H. pylori infection is typically treated with a combination of two antibiotics (such as amoxicillin and clarithromycin) together with a proton pump inhibitor like omeprazole for 14 days.",
+        "relevant_doc_ids": [
+          "doc_62"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q44",
+        "query": "What is the difference between first-generation and second-generation antihistamines for hay fever?",
+        "ground_truth": "Second-generation antihistamines (e.g., cetirizine, loratadine) are preferred over first-generation ones due to causing less sedation, making them more suitable for daytime use in allergic rhinitis (hay fever).",
+        "relevant_doc_ids": [
+          "doc_23"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q45",
+        "query": "What lifestyle changes help prevent recurrent UTIs in women?",
+        "ground_truth": "Increasing fluid intake and urinating after sexual intercourse can help prevent recurrent urinary tract infections in women.",
+        "relevant_doc_ids": [
+          "doc_26"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q46",
+        "query": "Why do diabetic patients need to take special care of their feet?",
+        "ground_truth": "Diabetes can cause peripheral neuropathy (numbness, tingling, pain) starting in the feet, reducing sensation. This increases the risk of unnoticed injuries leading to ulcers. Daily foot care and regular medical check-ups are essential to prevent diabetic foot complications.",
+        "relevant_doc_ids": [
+          "doc_91"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q47",
+        "query": "What are the dangers of ignoring high blood pressure?",
+        "ground_truth": "Untreated hypertension increases the risk of serious complications including heart attack, stroke, and kidney failure. It is often called the 'silent killer' because it typically has no symptoms until complications occur.",
+        "relevant_doc_ids": [
+          "doc_6"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q48",
+        "query": "What sun protection measures reduce the risk of skin cancer?",
+        "ground_truth": "Prevention of skin cancer includes applying broad-spectrum sunscreen (SPF 30 or higher) to all exposed skin, wearing protective clothing, and avoiding sun exposure between 10 AM and 4 PM. Regular monthly skin self-examinations should also be performed.",
+        "relevant_doc_ids": [
+          "doc_46"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q49",
+        "query": "Why shouldn't antibiotics be stopped early when prescribed a full course?",
+        "ground_truth": "Patients should always complete the full course of antibiotics as prescribed, even if they feel better. Stopping early contributes to antibiotic resistance by allowing bacteria to survive and evolve resistance to the antibiotic.",
+        "relevant_doc_ids": [
+          "doc_49"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q50",
+        "query": "Can I give my child the same dose of ibuprofen as an adult?",
+        "ground_truth": "No. The dosing information provided is for adults (200–400 mg every 4–6 hours). Additionally, ibuprofen is contraindicated in certain populations. Children require weight-appropriate dosing and a physician or pharmacist should be consulted for the correct pediatric dose.",
+        "relevant_doc_ids": [
+          "doc_2"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q51",
+        "query": "Liều tối đa paracetamol cho người lớn trong một ngày là bao nhiêu?",
+        "ground_truth": "Liều tối đa paracetamol cho người lớn là 4000 mg (4 gram) mỗi ngày.",
+        "relevant_doc_ids": [
+          "doc_51"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q52",
+        "query": "Thuốc ibuprofen có cần uống cùng thức ăn không?",
+        "ground_truth": "Có, ibuprofen nên được uống cùng thức ăn hoặc sữa để giảm nguy cơ khó chịu dạ dày và xuất huyết tiêu hóa.",
+        "relevant_doc_ids": [
+          "doc_52"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q53",
+        "query": "Liều khởi đầu thông thường của metformin là bao nhiêu?",
+        "ground_truth": "Liều khởi đầu thông thường của metformin là 500 mg một hoặc hai lần mỗi ngày trong bữa ăn.",
+        "relevant_doc_ids": [
+          "doc_54"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q54",
+        "query": "Tác dụng phụ phổ biến nhất của amlodipine là gì?",
+        "ground_truth": "Tác dụng phụ phổ biến nhất của amlodipine bao gồm phù ngoại biên (phù mắt cá chân), bừng đỏ mặt và đau đầu.",
+        "relevant_doc_ids": [
+          "doc_56"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q55",
+        "query": "Thuốc nào được dùng để cắt cơn hen phế quản cấp tính?",
+        "ground_truth": "Thuốc cường beta-2 tác dụng ngắn như salbutamol được dùng để cắt cơn hen cấp.",
+        "relevant_doc_ids": [
+          "doc_59"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q56",
+        "query": "Tại sao không nên dùng ibuprofen khi bị sốt xuất huyết?",
+        "ground_truth": "Cần tránh dùng ibuprofen trong sốt xuất huyết vì làm tăng nguy cơ chảy máu, đây là biến chứng nghiêm trọng của bệnh.",
+        "relevant_doc_ids": [
+          "doc_58"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q57",
+        "query": "Liệu pháp CPAP điều trị bệnh gì?",
+        "ground_truth": "Liệu pháp CPAP (áp lực đường thở dương liên tục) là phương pháp điều trị chuẩn cho ngưng thở tắc nghẽn khi ngủ (OSA) mức độ vừa đến nặng.",
+        "relevant_doc_ids": [
+          "doc_94"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q58",
+        "query": "Vitamin C có giúp gì khi uống cùng viên sắt không?",
+        "ground_truth": "Có, uống vitamin C cùng với viên sắt giúp tăng hấp thu sắt.",
+        "relevant_doc_ids": [
+          "doc_60"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q59",
+        "query": "Levothyroxine nên uống khi nào để hấp thu tốt nhất?",
+        "ground_truth": "Levothyroxine nên uống lúc bụng đói, 30–60 phút trước bữa sáng để hấp thu tối ưu.",
+        "relevant_doc_ids": [
+          "doc_68"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q60",
+        "query": "Khi bỏng, nên làm mát vết bỏng trong bao lâu?",
+        "ground_truth": "Cần làm mát vết bỏng dưới vòi nước mát trong ít nhất 20 phút.",
+        "relevant_doc_ids": [
+          "doc_95"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q61",
+        "query": "Tăng huyết áp được gọi là gì vì thường không có triệu chứng?",
+        "ground_truth": "Tăng huyết áp thường được gọi là 'kẻ giết người thầm lặng' vì thường không có triệu chứng cho đến khi xảy ra biến chứng nghiêm trọng.",
+        "relevant_doc_ids": [
+          "doc_55"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q62",
+        "query": "Sertraline mất bao lâu mới có tác dụng đầy đủ?",
+        "ground_truth": "Có thể mất 4–6 tuần mới thấy đầy đủ hiệu quả điều trị của sertraline.",
+        "relevant_doc_ids": [
+          "doc_90"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q63",
+        "query": "Thuốc nào là hàng đầu trong điều trị mất ngủ mạn tính?",
+        "ground_truth": "Liệu pháp nhận thức hành vi cho mất ngủ (CBT-I) là điều trị hàng đầu cho mất ngủ mạn tính.",
+        "relevant_doc_ids": [
+          "doc_61"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q64",
+        "query": "Thực phẩm nào nên tránh khi bị bệnh gút?",
+        "ground_truth": "Cần tránh thịt đỏ, nội tạng động vật, hải sản và rượu bia (đặc biệt là bia) khi bị bệnh gút vì những thứ này có thể làm tăng acid uric máu.",
+        "relevant_doc_ids": [
+          "doc_64"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q65",
+        "query": "Vitamin D3 hay D2 tốt hơn để bổ sung?",
+        "ground_truth": "Vitamin D3 (cholecalciferol) thường được ưu tiên hơn D2 khi bổ sung.",
+        "relevant_doc_ids": [
+          "doc_80"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q66",
+        "query": "Tôi bị tiểu đường type 2 và tăng huyết áp. Thuốc nào vừa điều trị cả hai vừa bảo vệ thận?",
+        "ground_truth": "Lisinopril, một thuốc ức chế men chuyển ACE, được dùng để điều trị tăng huyết áp và cũng giúp bảo vệ thận ở bệnh nhân tiểu đường.",
+        "relevant_doc_ids": [
+          "doc_30",
+          "doc_53"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q67",
+        "query": "Tôi đang dùng warfarin thì có thể uống ibuprofen giảm đau khớp không?",
+        "ground_truth": "Không, bệnh nhân dùng warfarin phải tránh NSAID như ibuprofen vì kết hợp này làm tăng đáng kể nguy cơ chảy máu.",
+        "relevant_doc_ids": [
+          "doc_81",
+          "doc_52"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q68",
+        "query": "Tôi bị loét dạ dày. Nên dùng thuốc giảm đau nào và nên tránh thuốc nào?",
+        "ground_truth": "Bệnh nhân loét dạ dày nên tránh ibuprofen và các NSAID khác vì có thể làm loét nặng hơn và gây xuất huyết tiêu hóa. Paracetamol là lựa chọn an toàn hơn để giảm đau.",
+        "relevant_doc_ids": [
+          "doc_52",
+          "doc_51"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q69",
+        "query": "Những thay đổi lối sống nào giúp cải thiện cả huyết áp lẫn cholesterol?",
+        "ground_truth": "Để hạ huyết áp, nên giảm muối, tập thể dục đều đặn và hạn chế rượu. Để hạ cholesterol, nên giảm chất béo bão hòa, tăng chất xơ hòa tan và ăn cá béo. Hoạt động thể chất đều đặn có lợi cho cả hai.",
+        "relevant_doc_ids": [
+          "doc_55",
+          "doc_72",
+          "doc_73"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q70",
+        "query": "Tôi dùng omeprazole lâu dài có nguy hiểm không?",
+        "ground_truth": "Dùng PPI như omeprazole lâu dài có thể làm giảm hấp thu magie, tăng nguy cơ gãy xương và nhiễm khuẩn Clostridioides difficile. Ngoài ra có thể làm giảm hiệu quả của clopidogrel.",
+        "relevant_doc_ids": [
+          "doc_71"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q71",
+        "query": "Dấu hiệu nào cho thấy sốt xuất huyết đang chuyển nặng?",
+        "ground_truth": "Dấu hiệu cảnh báo sốt xuất huyết nặng bao gồm đau bụng dữ dội, nôn liên tục và chảy máu bất thường. Các dấu hiệu này cần được cấp cứu y tế ngay.",
+        "relevant_doc_ids": [
+          "doc_58"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q72",
+        "query": "Tôi bị hen suyễn và cần xịt thuốc salbutamol hàng ngày. Điều đó có nghĩa gì?",
+        "ground_truth": "Dùng salbutamol hàng ngày cho thấy hen suyễn chưa được kiểm soát tốt và cần được xem xét điều trị thêm corticosteroid dạng hít là nền tảng kiểm soát viêm đường thở lâu dài.",
+        "relevant_doc_ids": [
+          "doc_59"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q73",
+        "query": "Kháng sinh có chữa được bệnh cảm lạnh hoặc cúm không?",
+        "ground_truth": "Không, kháng sinh không có tác dụng với các bệnh nhiễm virus như cảm lạnh thông thường hay cúm. Sử dụng kháng sinh không cần thiết góp phần vào tình trạng kháng thuốc.",
+        "relevant_doc_ids": [
+          "doc_85"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q74",
+        "query": "Tôi bị loãng xương và thiếu vitamin D. Cần bổ sung gì hàng ngày?",
+        "ground_truth": "Cần bổ sung canxi (1000–1200 mg/ngày) và vitamin D3 (800–1000 IU/ngày, lên đến 2000 IU nếu có nguy cơ thiếu hụt) để hỗ trợ xương. Có thể cần thêm thuốc bisphosphonate tùy chỉ định.",
+        "relevant_doc_ids": [
+          "doc_63",
+          "doc_80"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q75",
+        "query": "Tôi đang uống metronidazole thì có uống được rượu bia không?",
+        "ground_truth": "Không, phải tránh tuyệt đối rượu bia trong suốt thời gian dùng metronidazole và 48 giờ sau khi dùng xong, vì gây phản ứng kiểu disulfiram với buồn nôn và nôn dữ dội.",
+        "relevant_doc_ids": [
+          "doc_32"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q76",
+        "query": "Bệnh thận mạn tính ảnh hưởng đến việc dùng thuốc như thế nào?",
+        "ground_truth": "Bệnh nhân bệnh thận mạn tính cần tránh các thuốc độc thận như NSAIDs (ibuprofen). Metformin cũng chống chỉ định khi eGFR < 30 mL/phút/1,73m².",
+        "relevant_doc_ids": [
+          "doc_65",
+          "doc_54",
+          "doc_52"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q77",
+        "query": "Làm thế nào để ngăn ngừa UTI tái phát ở phụ nữ?",
+        "ground_truth": "Uống nhiều nước và đi tiểu sau quan hệ tình dục giúp ngăn ngừa viêm đường tiết niệu tái phát ở phụ nữ.",
+        "relevant_doc_ids": [
+          "doc_67"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q78",
+        "query": "Prednisone gây ra những tác dụng phụ nghiêm trọng nào khi dùng lâu dài?",
+        "ground_truth": "Dùng prednisone lâu dài gây tăng cân, loãng xương, tăng đường huyết, tăng huyết áp, ức chế thượng thận và tăng nguy cơ nhiễm khuẩn.",
+        "relevant_doc_ids": [
+          "doc_87"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q79",
+        "query": "Tôi bị thiếu máu thiếu sắt. Cần uống sắt loại gì và bao nhiêu?",
+        "ground_truth": "Điều trị thiếu máu thiếu sắt bằng bổ sung sắt đường uống, ví dụ ferrous sulfate 325 mg, 1–3 lần mỗi ngày. Uống kèm vitamin C giúp tăng hấp thu sắt.",
+        "relevant_doc_ids": [
+          "doc_60"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q80",
+        "query": "Tại sao không được ngừng prednisone đột ngột?",
+        "ground_truth": "Không được ngừng prednisone đột ngột sau khi dùng kéo dài vì có thể gây suy thượng thận cấp. Liều phải được giảm dần từ từ.",
+        "relevant_doc_ids": [
+          "doc_87"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q81",
+        "query": "Tôi là người ăn chay và đang dùng metformin nhiều năm, bây giờ hay bị tê tay chân và mệt mỏi. Có thể do thiếu gì không?",
+        "ground_truth": "Dùng metformin lâu dài làm giảm hấp thu vitamin B12. Người ăn chay trường đã có nguy cơ thiếu B12 cao. Triệu chứng thiếu B12 bao gồm mệt mỏi và tê bì ngứa ran ở chi. Cần điều trị bằng tiêm B12 bắp thịt hoặc bổ sung đường uống liều cao (1000–2000 mcg mỗi ngày).",
+        "relevant_doc_ids": [
+          "doc_54",
+          "doc_93"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q82",
+        "query": "Tôi bị suy thận và đau gối dữ dội. Tôi có thể uống thuốc giảm đau nào?",
+        "ground_truth": "Bệnh nhân suy thận cần tránh NSAID như ibuprofen vì gây độc thận và làm tình trạng thận tệ hơn. Paracetamol là lựa chọn an toàn hơn để giảm đau ở liều khuyến cáo.",
+        "relevant_doc_ids": [
+          "doc_65",
+          "doc_52",
+          "doc_51"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q83",
+        "query": "Tôi nghiện rượu nặng và muốn bỏ đột ngột. Điều đó có an toàn không?",
+        "ground_truth": "Không, bỏ rượu đột ngột ở người nghiện rượu nặng rất nguy hiểm và có thể gây co giật và mê sảng. Cai rượu cần được theo dõi y tế, thường dùng benzodiazepin để phòng co giật.",
+        "relevant_doc_ids": [
+          "doc_43"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q84",
+        "query": "Bố tôi vừa được chẩn đoán loãng xương lẫn thiếu vitamin D. Hai bệnh này liên quan nhau như thế nào và cần điều trị gì?",
+        "ground_truth": "Thiếu vitamin D ảnh hưởng trực tiếp đến loãng xương vì vitamin D cần thiết cho hấp thu canxi và sức khỏe xương. Điều trị cần bổ sung vitamin D3 (lên đến 2000 IU/ngày khi có nguy cơ thiếu) và canxi (1000–1200 mg/ngày), có thể kết hợp thuốc bisphosphonate.",
+        "relevant_doc_ids": [
+          "doc_63",
+          "doc_80"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q85",
+        "query": "Tôi bị COPD và vẫn đang hút thuốc. Điều quan trọng nhất tôi cần làm là gì?",
+        "ground_truth": "Bỏ thuốc lá là can thiệp quan trọng nhất trong COPD vì hút thuốc là nguyên nhân chính gây bệnh. Các điều trị y tế gồm thuốc giãn phế quản, corticosteroid dạng hít, phục hồi chức năng hô hấp và oxy liệu pháp cho trường hợp nặng.",
+        "relevant_doc_ids": [
+          "doc_70",
+          "doc_77"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q86",
+        "query": "Sau ca phẫu thuật chân, tôi được kê warfarin. Tôi cần tránh ăn gì và uống thuốc gì?",
+        "ground_truth": "Bệnh nhân dùng warfarin cần tránh thực phẩm giàu vitamin K như rau lá xanh vì làm giảm hiệu quả của thuốc. Cũng cần tránh NSAID và aspirin (trừ khi có chỉ định) vì tăng nguy cơ chảy máu.",
+        "relevant_doc_ids": [
+          "doc_81",
+          "doc_86"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q87",
+        "query": "Bác sĩ nói tôi có thể bị ngưng thở khi ngủ và tôi đang thừa cân. Hai điều này liên quan thế nào?",
+        "ground_truth": "Béo phì là yếu tố nguy cơ chính của ngưng thở tắc nghẽn khi ngủ vì mỡ thừa ở vùng cổ và họng gây tắc nghẽn đường thở khi ngủ. Liệu pháp CPAP là điều trị chuẩn cho OSA mức độ vừa đến nặng.",
+        "relevant_doc_ids": [
+          "doc_94"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q88",
+        "query": "Tôi bị tiểu đường lâu năm và bây giờ thấy tê bì và ngứa ran ở bàn chân. Đây là dấu hiệu của bệnh gì và cần làm gì?",
+        "ground_truth": "Đây là triệu chứng của bệnh thần kinh ngoại biên do tiểu đường (biến chứng thần kinh). Kiểm soát đường huyết tốt là biện pháp quan trọng nhất để làm chậm tiến triển. Điều trị triệu chứng gồm pregabalin, duloxetine hoặc amitriptyline. Cần chăm sóc và kiểm tra bàn chân hàng ngày để phòng loét chân.",
+        "relevant_doc_ids": [
+          "doc_91",
+          "doc_53"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q89",
+        "query": "Tôi hay bị đau đầu nửa đầu và cũng có huyết áp cao. Thuốc phòng ngừa nào phù hợp cho cả hai bệnh?",
+        "ground_truth": "Propranolol là thuốc phòng ngừa đau nửa đầu cũng được dùng điều trị tăng huyết áp, phù hợp cho bệnh nhân có cả hai bệnh này. Bệnh nhân nên tham khảo bác sĩ vì sumatriptan (thuốc cắt cơn) có thể ảnh hưởng đến huyết áp.",
+        "relevant_doc_ids": [
+          "doc_83",
+          "doc_55"
+        ],
+        "difficulty": "hard"
+      },
+      {
+        "id": "q90",
+        "query": "Trẻ em có thể uống cùng liều ibuprofen như người lớn không?",
+        "ground_truth": "Không, liều ibuprofen dành cho người lớn là 200–400 mg mỗi 4–6 giờ. Trẻ em cần liều theo cân nặng và nên hỏi bác sĩ hoặc dược sĩ để được tư vấn liều phù hợp.",
+        "relevant_doc_ids": [
+          "doc_52"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q91",
+        "query": "Tôi mắc bệnh viêm khớp dạng thấp. Thuốc cơ bản đầu tiên thường được dùng là gì?",
+        "ground_truth": "Điều trị cơ bản bệnh viêm khớp dạng thấp gồm methotrexate và các thuốc chống thấp khớp điều chỉnh bệnh (DMARDs). Thuốc sinh học như ức chế TNF-alpha được dùng cho bệnh nhân không đáp ứng với DMARDs thông thường.",
+        "relevant_doc_ids": [
+          "doc_92"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q92",
+        "query": "Làm thế nào để biết tôi có bị COPD không?",
+        "ground_truth": "COPD được xác nhận bằng xét nghiệm đo chức năng hô hấp (spirometry) cho thấy tỷ lệ FEV1/FVC dưới 0,70. Triệu chứng gợi ý gồm ho mạn tính có đờm, khó thở và nhiễm khuẩn hô hấp tái phát, đặc biệt ở người hút thuốc.",
+        "relevant_doc_ids": [
+          "doc_70"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q93",
+        "query": "Tôi bị ngộ độc thực phẩm với tiêu chảy nhiều. Tôi nên làm gì?",
+        "ground_truth": "Điều trị chính của ngộ độc thực phẩm là bù nước bằng dung dịch bù điện giải đường uống (ORS). ORS nên được uống từng ngụm nhỏ thường xuyên. Trường hợp mất nước nặng cần truyền dịch tĩnh mạch và nhập viện.",
+        "relevant_doc_ids": [
+          "doc_82",
+          "doc_88"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q94",
+        "query": "Vắc xin cúm có gây bệnh cúm không?",
+        "ground_truth": "Không, vắc xin cúm không gây bệnh cúm vì chứa virus bất hoạt hoặc mảnh protein virus. Tác dụng phụ phổ biến chỉ là đau, đỏ tại chỗ tiêm và đôi khi sốt nhẹ.",
+        "relevant_doc_ids": [
+          "doc_97"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q95",
+        "query": "Bệnh trĩ có những triệu chứng gì và phòng ngừa như thế nào?",
+        "ground_truth": "Triệu chứng bệnh trĩ gồm chảy máu đỏ tươi sau đại tiện, ngứa hậu môn, đau và cảm giác đầy ở hậu môn. Phòng ngừa bằng chế độ ăn giàu chất xơ, uống nhiều nước và tránh rặn khi đại tiện.",
+        "relevant_doc_ids": [
+          "doc_99"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q96",
+        "query": "Fluoroquinolone như ciprofloxacin có an toàn cho trẻ em không?",
+        "ground_truth": "Không, fluoroquinolone không được dùng ở trẻ em dưới 18 tuổi vì nguy cơ gây hại sụn ở người trẻ đang phát triển.",
+        "relevant_doc_ids": [
+          "doc_100"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q97",
+        "query": "Tôi bị viêm da dị ứng (eczema). Làm thế nào để chăm sóc da hàng ngày?",
+        "ground_truth": "Chăm sóc da eczema hàng ngày gồm dưỡng ẩm thường xuyên với kem bôi không mùi, tránh xà phòng có chất tẩy mạnh và các tác nhân gây khó chịu. Corticosteroid tại chỗ là điều trị chính cho đợt bùng phát; thuốc kháng histamin có thể giảm ngứa và cải thiện giấc ngủ.",
+        "relevant_doc_ids": [
+          "doc_78"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q98",
+        "query": "Phản ứng phản vệ là gì và cần xử trí như thế nào?",
+        "ground_truth": "Phản ứng phản vệ là dị ứng nghiêm trọng, đe dọa tính mạng, với triệu chứng nổi mề đay, phù họng, khó thở và tụt huyết áp. Cần tiêm epinephrine (adrenaline) tự động ngay vào mặt ngoài đùi, sau đó đưa bệnh nhân đến cơ sở y tế ngay.",
+        "relevant_doc_ids": [
+          "doc_74"
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "id": "q99",
+        "query": "Tôi bị suy giáp nhưng hay quên uống thuốc buổi sáng, nên uống vào lúc nào khác được không?",
+        "ground_truth": "Levothyroxine phải được uống lúc bụng đói, 30–60 phút trước bữa sáng để hấp thu tối ưu. Nếu quên, không nên uống cùng lúc với thức ăn vì sẽ giảm hấp thu thuốc.",
+        "relevant_doc_ids": [
+          "doc_68"
+        ],
+        "difficulty": "medium"
+      },
+      {
+        "id": "q100",
+        "query": "Tôi bị huyết khối tĩnh mạch sâu ở chân sau chuyến bay dài. Bệnh này nguy hiểm như thế nào và điều trị ra sao?",
+        "ground_truth": "Huyết khối tĩnh mạch sâu (DVT) có thể gây biến chứng nguy hiểm là tắc mạch phổi (PE) nếu cục máu đông di chuyển lên phổi. Điều trị gồm thuốc chống đông: heparin trọng lượng phân tử thấp ban đầu, tiếp theo là warfarin hoặc DOAC như rivaroxaban đường uống.",
+        "relevant_doc_ids": [
+          "doc_86",
+          "doc_81"
+        ],
+        "difficulty": "hard"
+      }
+    ]
+  }
