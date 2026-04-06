@@ -4,20 +4,23 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/entities/app_exception.dart';
 import 'package:user_app/core/providers/'
     'global_error_stream.provider.dart';
+import 'package:user_app/router/app_router.dart';
 
 /// Listens to [globalErrorStreamProvider] and
 /// displays a toast notification for every new
 /// [AppException].
 ///
-/// Place this widget **above** [MaterialApp.router]
-/// so that the overlay context can show toasts on
-/// any screen.
+/// Place this widget inside [MaterialApp.router]'s
+/// `builder` so it can display toasts on any screen.
+///
+/// Uses [rootNavigatorKey] to obtain a context that
+/// lives below the [Navigator]'s [Overlay], which
+/// [FToast] requires.
 ///
 /// Identical consecutive errors within a short
 /// window are deduplicated to prevent toast spam.
 class GlobalErrorListener extends ConsumerWidget {
-  /// The child widget tree (typically
-  /// [MaterialApp.router]).
+  /// The child widget tree.
   final Widget child;
 
   const GlobalErrorListener({
@@ -38,8 +41,15 @@ class GlobalErrorListener extends ConsumerWidget {
           return;
         }
 
+        // Use the navigator's context (below the
+        // Overlay) instead of the builder context
+        // which sits above it.
+        final navContext =
+            rootNavigatorKey.currentContext;
+        if (navContext == null) return;
+
         ToastContext.showToast(
-          context,
+          navContext,
           ToastType.error,
           next.userMessage,
         );

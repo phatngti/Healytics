@@ -2,6 +2,9 @@
 // Platform-agnostic — no Flutter or Riverpod imports.
 
 /// Sort options for the clinic product list.
+///
+/// Maps to backend query parameter values via
+/// [toApiValue].
 enum ClinicProductSort {
   /// Default ordering (as returned by API).
   popular,
@@ -16,13 +19,25 @@ enum ClinicProductSort {
   priceAsc,
 
   /// Most expensive first.
-  priceDesc,
+  priceDesc;
+
+  /// Converts this enum to the API query string.
+  String toApiValue() => switch (this) {
+        popular => 'popular',
+        latest => 'latest',
+        topSales => 'top_sales',
+        priceAsc => 'price_asc',
+        priceDesc => 'price_desc',
+      };
 }
 
 /// A product category chip (e.g. "All Services",
 /// "Massage Therapy").
 class ClinicProductCategory {
-  const ClinicProductCategory({required this.id, required this.label});
+  const ClinicProductCategory({
+    required this.id,
+    required this.label,
+  });
 
   final String id;
   final String label;
@@ -35,6 +50,7 @@ class ClinicProductEntity {
     required this.title,
     this.imageUrl,
     required this.price,
+    required this.priceAmount,
     this.originalPrice,
     this.discountLabel,
     this.badgeLabel,
@@ -54,6 +70,9 @@ class ClinicProductEntity {
 
   /// Formatted current price, e.g. "990.000đ".
   final String price;
+
+  /// Numeric price for client-side comparisons.
+  final double priceAmount;
 
   /// Formatted original price shown with
   /// strikethrough when discounted.
@@ -83,13 +102,26 @@ class ClinicProductEntity {
   final int createdAtMs;
 
   /// Whether this product has a discount.
-  bool get hasDiscount => discountLabel != null && originalPrice != null;
+  bool get hasDiscount =>
+      discountLabel != null && originalPrice != null;
 }
 
-/// Bundle returned by the clinic products endpoint.
+/// Paginated bundle returned by the clinic products
+/// endpoint.
 class ClinicProductsData {
-  const ClinicProductsData({required this.categories, required this.products});
+  const ClinicProductsData({
+    required this.categories,
+    required this.products,
+    required this.totalCount,
+    required this.hasMore,
+  });
 
   final List<ClinicProductCategory> categories;
   final List<ClinicProductEntity> products;
+
+  /// Total number of products matching the filter.
+  final int totalCount;
+
+  /// Whether more pages are available.
+  final bool hasMore;
 }

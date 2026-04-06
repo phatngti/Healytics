@@ -8,107 +8,6 @@ part of 'clinic_products.provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Fetches all products and categories for a clinic.
-///
-/// Family provider — each [clinicId] gets its own
-/// cached async state with auto-dispose.
-
-@ProviderFor(clinicProducts)
-const clinicProductsProvider = ClinicProductsFamily._();
-
-/// Fetches all products and categories for a clinic.
-///
-/// Family provider — each [clinicId] gets its own
-/// cached async state with auto-dispose.
-
-final class ClinicProductsProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<ClinicProductsData>,
-          ClinicProductsData,
-          FutureOr<ClinicProductsData>
-        >
-    with
-        $FutureModifier<ClinicProductsData>,
-        $FutureProvider<ClinicProductsData> {
-  /// Fetches all products and categories for a clinic.
-  ///
-  /// Family provider — each [clinicId] gets its own
-  /// cached async state with auto-dispose.
-  const ClinicProductsProvider._({
-    required ClinicProductsFamily super.from,
-    required String super.argument,
-  }) : super(
-         retry: null,
-         name: r'clinicProductsProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         $allTransitiveDependencies: null,
-       );
-
-  @override
-  String debugGetCreateSourceHash() => _$clinicProductsHash();
-
-  @override
-  String toString() {
-    return r'clinicProductsProvider'
-        ''
-        '($argument)';
-  }
-
-  @$internal
-  @override
-  $FutureProviderElement<ClinicProductsData> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<ClinicProductsData> create(Ref ref) {
-    final argument = this.argument as String;
-    return clinicProducts(ref, clinicId: argument);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is ClinicProductsProvider && other.argument == argument;
-  }
-
-  @override
-  int get hashCode {
-    return argument.hashCode;
-  }
-}
-
-String _$clinicProductsHash() => r'959da1152db97b0abc15abeeeb6b1e65dc3a8cc4';
-
-/// Fetches all products and categories for a clinic.
-///
-/// Family provider — each [clinicId] gets its own
-/// cached async state with auto-dispose.
-
-final class ClinicProductsFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<ClinicProductsData>, String> {
-  const ClinicProductsFamily._()
-    : super(
-        retry: null,
-        name: r'clinicProductsProvider',
-        dependencies: null,
-        $allTransitiveDependencies: null,
-        isAutoDispose: true,
-      );
-
-  /// Fetches all products and categories for a clinic.
-  ///
-  /// Family provider — each [clinicId] gets its own
-  /// cached async state with auto-dispose.
-
-  ClinicProductsProvider call({required String clinicId}) =>
-      ClinicProductsProvider._(argument: clinicId, from: this);
-
-  @override
-  String toString() => r'clinicProductsProvider';
-}
-
 /// Tracks the active sort option for the product
 /// grid. Defaults to [ClinicProductSort.popular].
 
@@ -302,66 +201,59 @@ abstract class _$ClinicProductSearchNotifier extends $Notifier<String> {
   }
 }
 
-/// Reactively combines raw product data with sort,
-/// category, and search state to produce the final
-/// list displayed in the grid.
+/// Manages server-side paginated product loading.
+///
+/// Watches sort, category, and search state.
+/// When any of them change, fetches fresh data
+/// from page 1. Supports "load more" pagination.
 
-@ProviderFor(filteredClinicProducts)
-const filteredClinicProductsProvider = FilteredClinicProductsFamily._();
+@ProviderFor(ClinicProductsPaginated)
+const clinicProductsPaginatedProvider = ClinicProductsPaginatedFamily._();
 
-/// Reactively combines raw product data with sort,
-/// category, and search state to produce the final
-/// list displayed in the grid.
-
-final class FilteredClinicProductsProvider
+/// Manages server-side paginated product loading.
+///
+/// Watches sort, category, and search state.
+/// When any of them change, fetches fresh data
+/// from page 1. Supports "load more" pagination.
+final class ClinicProductsPaginatedProvider
     extends
-        $FunctionalProvider<
-          AsyncValue<List<ClinicProductEntity>>,
-          List<ClinicProductEntity>,
-          FutureOr<List<ClinicProductEntity>>
-        >
-    with
-        $FutureModifier<List<ClinicProductEntity>>,
-        $FutureProvider<List<ClinicProductEntity>> {
-  /// Reactively combines raw product data with sort,
-  /// category, and search state to produce the final
-  /// list displayed in the grid.
-  const FilteredClinicProductsProvider._({
-    required FilteredClinicProductsFamily super.from,
+        $AsyncNotifierProvider<
+          ClinicProductsPaginated,
+          ClinicProductsAccumulated
+        > {
+  /// Manages server-side paginated product loading.
+  ///
+  /// Watches sort, category, and search state.
+  /// When any of them change, fetches fresh data
+  /// from page 1. Supports "load more" pagination.
+  const ClinicProductsPaginatedProvider._({
+    required ClinicProductsPaginatedFamily super.from,
     required String super.argument,
   }) : super(
          retry: null,
-         name: r'filteredClinicProductsProvider',
+         name: r'clinicProductsPaginatedProvider',
          isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
 
   @override
-  String debugGetCreateSourceHash() => _$filteredClinicProductsHash();
+  String debugGetCreateSourceHash() => _$clinicProductsPaginatedHash();
 
   @override
   String toString() {
-    return r'filteredClinicProductsProvider'
+    return r'clinicProductsPaginatedProvider'
         ''
         '($argument)';
   }
 
   @$internal
   @override
-  $FutureProviderElement<List<ClinicProductEntity>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<ClinicProductEntity>> create(Ref ref) {
-    final argument = this.argument as String;
-    return filteredClinicProducts(ref, clinicId: argument);
-  }
+  ClinicProductsPaginated create() => ClinicProductsPaginated();
 
   @override
   bool operator ==(Object other) {
-    return other is FilteredClinicProductsProvider &&
+    return other is ClinicProductsPaginatedProvider &&
         other.argument == argument;
   }
 
@@ -371,32 +263,79 @@ final class FilteredClinicProductsProvider
   }
 }
 
-String _$filteredClinicProductsHash() =>
-    r'6757bfef6d8e5289f07d14ea7c67ea24813965e8';
+String _$clinicProductsPaginatedHash() =>
+    r'19c56b1673fb310d83fc746b3368bd46823a8fcc';
 
-/// Reactively combines raw product data with sort,
-/// category, and search state to produce the final
-/// list displayed in the grid.
+/// Manages server-side paginated product loading.
+///
+/// Watches sort, category, and search state.
+/// When any of them change, fetches fresh data
+/// from page 1. Supports "load more" pagination.
 
-final class FilteredClinicProductsFamily extends $Family
+final class ClinicProductsPaginatedFamily extends $Family
     with
-        $FunctionalFamilyOverride<FutureOr<List<ClinicProductEntity>>, String> {
-  const FilteredClinicProductsFamily._()
+        $ClassFamilyOverride<
+          ClinicProductsPaginated,
+          AsyncValue<ClinicProductsAccumulated>,
+          ClinicProductsAccumulated,
+          FutureOr<ClinicProductsAccumulated>,
+          String
+        > {
+  const ClinicProductsPaginatedFamily._()
     : super(
         retry: null,
-        name: r'filteredClinicProductsProvider',
+        name: r'clinicProductsPaginatedProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
-  /// Reactively combines raw product data with sort,
-  /// category, and search state to produce the final
-  /// list displayed in the grid.
+  /// Manages server-side paginated product loading.
+  ///
+  /// Watches sort, category, and search state.
+  /// When any of them change, fetches fresh data
+  /// from page 1. Supports "load more" pagination.
 
-  FilteredClinicProductsProvider call({required String clinicId}) =>
-      FilteredClinicProductsProvider._(argument: clinicId, from: this);
+  ClinicProductsPaginatedProvider call({required String clinicId}) =>
+      ClinicProductsPaginatedProvider._(argument: clinicId, from: this);
 
   @override
-  String toString() => r'filteredClinicProductsProvider';
+  String toString() => r'clinicProductsPaginatedProvider';
+}
+
+/// Manages server-side paginated product loading.
+///
+/// Watches sort, category, and search state.
+/// When any of them change, fetches fresh data
+/// from page 1. Supports "load more" pagination.
+
+abstract class _$ClinicProductsPaginated
+    extends $AsyncNotifier<ClinicProductsAccumulated> {
+  late final _$args = ref.$arg as String;
+  String get clinicId => _$args;
+
+  FutureOr<ClinicProductsAccumulated> build({required String clinicId});
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build(clinicId: _$args);
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<ClinicProductsAccumulated>,
+              ClinicProductsAccumulated
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<ClinicProductsAccumulated>,
+                ClinicProductsAccumulated
+              >,
+              AsyncValue<ClinicProductsAccumulated>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
 }

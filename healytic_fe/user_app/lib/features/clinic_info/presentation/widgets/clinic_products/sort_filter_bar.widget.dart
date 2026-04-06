@@ -40,7 +40,7 @@ class SortFilterBar extends ConsumerWidget {
                   .read(clinicProductSortProvider.notifier)
                   .select(ClinicProductSort.popular),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimens.spaceLg),
             _SortButton(
               label: 'Latest',
               isActive: activeSort == ClinicProductSort.latest,
@@ -48,7 +48,7 @@ class SortFilterBar extends ConsumerWidget {
                   .read(clinicProductSortProvider.notifier)
                   .select(ClinicProductSort.latest),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimens.spaceLg),
             _SortButton(
               label: 'Top Sales',
               isActive: activeSort == ClinicProductSort.topSales,
@@ -56,10 +56,10 @@ class SortFilterBar extends ConsumerWidget {
                   .read(clinicProductSortProvider.notifier)
                   .select(ClinicProductSort.topSales),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppDimens.spaceLg),
             _PriceSortButton(activeSort: activeSort),
-            const SizedBox(width: 16),
-            _FilterButton(),
+            const SizedBox(width: AppDimens.spaceLg),
+            const _FilterButton(),
           ],
         ),
       ),
@@ -68,6 +68,9 @@ class SortFilterBar extends ConsumerWidget {
 }
 
 /// Individual sort button with active/inactive styling.
+///
+/// Wraps content in a [SizedBox] to ensure the touch
+/// target meets the 48dp minimum height guideline.
 class _SortButton extends StatelessWidget {
   const _SortButton({
     required this.label,
@@ -84,13 +87,26 @@ class _SortButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Text(
-        label,
-        style: textTheme.bodySmall?.copyWith(
-          fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-          color: isActive ? colorScheme.primary : colorScheme.onSurfaceVariant,
+    return Semantics(
+      button: true,
+      selected: isActive,
+      label: '$label sort',
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox(
+          height: AppDimens.touchTarget,
+          child: Center(
+            child: Text(
+              label,
+              style: textTheme.bodySmall?.copyWith(
+                fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                color: isActive
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -111,29 +127,40 @@ class _PriceSortButton extends ConsumerWidget {
         activeSort == ClinicProductSort.priceAsc ||
         activeSort == ClinicProductSort.priceDesc;
 
-    return GestureDetector(
-      onTap: () => ref.read(clinicProductSortProvider.notifier).togglePrice(),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Price',
-            style: textTheme.bodySmall?.copyWith(
-              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-              color: isActive
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
+    return Semantics(
+      button: true,
+      selected: isActive,
+      label: 'Price sort',
+      child: GestureDetector(
+        onTap: () => ref.read(clinicProductSortProvider.notifier).togglePrice(),
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox(
+          height: AppDimens.touchTarget,
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Price',
+                  style: textTheme.bodySmall?.copyWith(
+                    fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                    color: isActive
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(width: AppDimens.spaceXxs),
+                Icon(
+                  Icons.unfold_more,
+                  size: AppDimens.iconXs,
+                  color: isActive
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 2),
-          Icon(
-            Icons.unfold_more,
-            size: 14,
-            color: isActive
-                ? colorScheme.primary
-                : colorScheme.onSurfaceVariant,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -141,32 +168,44 @@ class _PriceSortButton extends ConsumerWidget {
 
 /// Trailing filter icon button.
 class _FilterButton extends StatelessWidget {
+  const _FilterButton();
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return GestureDetector(
-      onTap: () {
-        // TODO(product): Open filter bottom sheet
-      },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Filter',
-            style: textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w500,
-              color: colorScheme.onSurfaceVariant,
+    return Semantics(
+      button: true,
+      label: 'Filter products',
+      child: GestureDetector(
+        onTap: () {
+          // TODO(product): Open filter bottom sheet
+        },
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox(
+          height: AppDimens.touchTarget,
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Filter',
+                  style: textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(width: AppDimens.spaceXs),
+                Icon(
+                  Icons.filter_alt_outlined,
+                  size: AppDimens.iconSm,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 4),
-          Icon(
-            Icons.filter_alt_outlined,
-            size: 16,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ],
+        ),
       ),
     );
   }

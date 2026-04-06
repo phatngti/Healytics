@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
+import 'package:user_app/router/app_router.dart';
 import 'package:user_app/core/services/ws/ws_client.dart';
 import 'package:user_app/features/notifications/'
     'presentation/providers/notification.provider.dart';
@@ -54,7 +55,13 @@ class NotificationToastListener extends ConsumerWidget {
           '${event.id} — ${event.title}',
         );
 
-        _showToast(context, event);
+        // Use the navigator's context (below the
+        // Overlay) instead of the builder context.
+        final navCtx =
+            rootNavigatorKey.currentContext;
+        if (navCtx == null) return;
+
+        _showToast(navCtx, event);
       },
     );
 

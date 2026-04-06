@@ -19,14 +19,14 @@ class CategoryScroller extends ConsumerWidget {
     final selectedId = ref.watch(clinicProductCategoryProvider);
 
     return SizedBox(
-      height: 40,
+      height: AppDimens.ctaButtonMd,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(
           horizontal: AppDimens.horizontalPadding(context),
         ),
         itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) => const SizedBox(width: AppDimens.spaceSm),
         itemBuilder: (context, index) {
           final category = categories[index];
           final isSelected = category.id == selectedId;
@@ -61,24 +61,32 @@ class _CategoryChip extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primary
-              : colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          label,
-          style: textTheme.labelSmall?.copyWith(
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '$label category',
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.spaceLg,
+            vertical: AppDimens.spaceXs + AppDimens.spaceXxs,
+          ),
+          decoration: BoxDecoration(
             color: isSelected
-                ? colorScheme.onPrimary
-                : colorScheme.onSurfaceVariant,
+                ? colorScheme.primary
+                : colorScheme.surfaceContainerHighest,
+            borderRadius: AppDimens.radiusSmall,
+          ),
+          child: Text(
+            label,
+            style: textTheme.labelSmall?.copyWith(
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              color: isSelected
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ),
