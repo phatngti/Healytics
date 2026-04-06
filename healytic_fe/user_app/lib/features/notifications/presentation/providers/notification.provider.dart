@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:user_app/core/entities/store.entity.dart';
+import 'package:user_app/core/models/store.model.dart';
+import 'package:user_app/core/providers/auth_session.provider.dart';
 import 'package:user_app/core/providers/ws.provider.dart';
 import 'package:user_app/core/services/ws/ws_client.dart';
 import 'package:user_app/features/notifications/'
@@ -31,12 +34,52 @@ final _log = Logger('NotificationProvider');
 Stream<WsConnectionStatus> notificationWsConnection(
   Ref ref,
 ) {
+  final authSessionStore = ref.read(authSessionStoreProvider);
   final wsService = ref.read(wsServiceProvider);
-  wsService.connectNotifications();
-  _log.info('Connecting /notifications WS namespace');
+  String previousToken = '';
+
+  void syncWithToken(String? token) {
+    final currentToken = (token ?? '').trim();
+    if (currentToken.isEmpty) {
+      if (wsService.notifications.status !=
+          WsConnectionStatus.disconnected) {
+        _log.info(
+          'Disconnecting /notifications WS '
+          'because token is empty',
+        );
+        wsService.notifications.disconnect();
+      }
+      previousToken = '';
+      return;
+    }
+
+    final shouldReconnect =
+        previousToken.isNotEmpty &&
+        previousToken != currentToken;
+    previousToken = currentToken;
+
+    if (shouldReconnect) {
+      _log.info(
+        'Reconnecting /notifications WS '
+        'after token change',
+      );
+      wsService.reconnectNotifications();
+      return;
+    }
+
+    _log.info('Connecting /notifications WS namespace');
+    wsService.connectNotifications();
+  }
+
+  final tokenStream = authSessionStore.watchAccessToken();
+  syncWithToken(Store.tryGet(StoreKey.accessToken));
+  final tokenSub = tokenStream.listen(
+    syncWithToken,
+  );
 
   ref.onDispose(() {
-    _log.info('Disposing /notifications WS connection');
+    tokenSub.cancel();
+    _log.info('Disposed /notifications WS connection');
   });
 
   return wsService.notifications.onConnectionChange;

@@ -19,7 +19,6 @@ import {
 } from './dto/clinic-info-response.dto';
 import {
   ClinicProductsResponseDto,
-  ClinicProductCategoryDto,
   ClinicProductDto,
 } from './dto/clinic-products-response.dto';
 import {
@@ -165,25 +164,9 @@ export class ClinicService {
       throw new NotFoundException(`Clinic with ID ${partnerId} not found`);
     }
 
-    const { categoryId, sort = 'popular', search } = options;
+    const { sort = 'popular', search } = options;
     const page = options.page ?? 1;
     const limit = Math.min(options.limit ?? 20, 50);
-
-    // Query all categories for this partner (independent of pagination)
-    const allCategories = await this.productRepo
-      .createQueryBuilder('p')
-      .innerJoin('p.category', 'c')
-      .where('p.partner_id = :partnerId', { partnerId })
-      .andWhere('p.status = :status', { status: HealthServiceStatus.ACTIVE })
-      .andWhere('p.is_visible_online = true')
-      .select('DISTINCT c.id', 'id')
-      .addSelect('c.name', 'label')
-      .getRawMany<{ id: string; label: string }>();
-
-    const categories: ClinicProductCategoryDto[] = [
-      { id: 'all', label: 'All Services' },
-      ...allCategories,
-    ];
 
     // Build filtered query
     let qb = this.productRepo
@@ -195,9 +178,6 @@ export class ClinicService {
       .andWhere('p.status = :status', { status: HealthServiceStatus.ACTIVE })
       .andWhere('p.is_visible_online = true');
 
-    if (categoryId && categoryId !== 'all') {
-      qb = qb.andWhere('p.category_id = :categoryId', { categoryId });
-    }
     if (search) {
       qb = qb.andWhere('p.name ILIKE :search', { search: `%${search}%` });
     }
@@ -219,16 +199,20 @@ export class ClinicService {
     } else {
       switch (sort) {
         case 'latest':
-          qb = qb.orderBy('p.created_at', 'DESC');
+          qb = qb.orderBy('p.createdAt', 'DESC');
           break;
         case 'price_asc':
-          qb = qb.orderBy('COALESCE(p.sale_price, p.base_price)', 'ASC');
+          qb = qb
+            .addSelect('COALESCE(p.sale_price, p.base_price)', 'price')
+            .orderBy('price', 'ASC');
           break;
         case 'price_desc':
-          qb = qb.orderBy('COALESCE(p.sale_price, p.base_price)', 'DESC');
+          qb = qb
+            .addSelect('COALESCE(p.sale_price, p.base_price)', 'price')
+            .orderBy('price', 'DESC');
           break;
         default:
-          qb = qb.orderBy('p.created_at', 'DESC');
+          qb = qb.orderBy('p.createdAt', 'DESC');
       }
     }
 
@@ -269,7 +253,6 @@ export class ClinicService {
     });
 
     return {
-      categories,
       products: productDtos,
       totalCount,
       hasMore: page * limit < totalCount,

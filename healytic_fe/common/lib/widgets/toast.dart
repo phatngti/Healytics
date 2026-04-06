@@ -184,3 +184,71 @@ class ToastContext {
     });
   }
 }
+
+/// App-level toast facade used by feature modules.
+///
+/// This helper ensures toasts are shown on the root
+/// navigator context when available, so they work
+/// reliably from nested navigators.
+final class AppToast {
+  const AppToast._();
+
+  static void success(
+    BuildContext context,
+    String message,
+  ) {
+    _show(
+      context,
+      type: ToastType.success,
+      message: message,
+    );
+  }
+
+  static void error(
+    BuildContext context,
+    String message,
+  ) {
+    _show(
+      context,
+      type: ToastType.error,
+      message: message,
+    );
+  }
+
+  static void warning(
+    BuildContext context,
+    String message,
+  ) {
+    _show(
+      context,
+      type: ToastType.warning,
+      message: message,
+    );
+  }
+
+  static void info(
+    BuildContext context,
+    String message,
+  ) {
+    _show(
+      context,
+      type: ToastType.info,
+      message: message,
+    );
+  }
+
+  static void _show(
+    BuildContext context, {
+    required ToastType type,
+    required String message,
+  }) {
+    final rootContext =
+        Navigator.maybeOf(
+          context,
+          rootNavigator: true,
+        )?.context;
+    final targetContext = rootContext ?? context;
+    if (!targetContext.mounted) return;
+    ToastContext.showToast(targetContext, type, message);
+  }
+}

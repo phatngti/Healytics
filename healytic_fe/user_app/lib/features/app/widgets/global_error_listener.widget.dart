@@ -1,10 +1,9 @@
-import 'package:common/widgets/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:common/widgets/toast.dart';
 import 'package:user_app/core/entities/app_exception.dart';
 import 'package:user_app/core/providers/'
     'global_error_stream.provider.dart';
-import 'package:user_app/router/app_router.dart';
 
 /// Listens to [globalErrorStreamProvider] and
 /// displays a toast notification for every new
@@ -41,16 +40,8 @@ class GlobalErrorListener extends ConsumerWidget {
           return;
         }
 
-        // Use the navigator's context (below the
-        // Overlay) instead of the builder context
-        // which sits above it.
-        final navContext =
-            rootNavigatorKey.currentContext;
-        if (navContext == null) return;
-
-        ToastContext.showToast(
-          navContext,
-          ToastType.error,
+        AppToast.error(
+          context,
           next.userMessage,
         );
 
