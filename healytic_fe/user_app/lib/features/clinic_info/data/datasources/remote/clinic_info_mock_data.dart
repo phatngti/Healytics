@@ -6,7 +6,6 @@ const kMockClinicInfo = ClinicInfoEntity(
   id: 'clinic-elite-dermatology',
   name: 'An Mien Spa & Clinic',
   address: '42 West St., District 1, HCM',
-  isVerified: true,
   coverImageUrl:
       'https://lh3.googleusercontent.com/aida-public/'
       'AB6AXuCEVF8gVYMud0aSZMOFJdwnVTPvmmtOq86O6fAghUnFKzSvG2i'
@@ -29,12 +28,9 @@ const kMockClinicInfo = ClinicInfoEntity(
         '2AS__2TGRfJ_q3BwgW159fhxYKaCmmige5qp_rIQsf2y2P17JV0jrEHO'
         'zHj33HC9_I9WSbBImrLezcmVIb3nBaV0wFH7m6x5Ke94SrzITCg8',
   ],
-  rating: 4.9,
-  reviewCount: 2500,
   followersLabel: '15k',
-  phone: '+84 28 1234 5678',
-  coordinates: '10.7769,106.7009',
-  chatPartnerId: 'partner-account-1',
+  reviewsLabel: '2.5k',
+  phoneNumber: '+84 28 1234 5678',
   description:
       'Experience world-class skin treatments with our '
       'advanced CO2 laser resurfacing technology. We '
@@ -110,6 +106,11 @@ const kMockClinicInfo = ClinicInfoEntity(
       experienceLabel: '12 Yrs Exp',
     ),
   ],
+  businessTypes: [
+    'Spa',
+    'Dermatology',
+    'Aesthetic Clinic',
+  ],
   facilityImages: [
     ClinicFacilityImage(
       imageUrl:
@@ -143,64 +144,6 @@ const kMockClinicInfo = ClinicInfoEntity(
       label: 'Laser Room',
     ),
   ],
-  featuredServices: [
-    ClinicFeaturedService(
-      id: 'service-massage-relax',
-      title: 'Relaxation Massage',
-      imageUrl:
-          'https://lh3.googleusercontent.com/aida-public/'
-          'AB6AXuB_QoJnBUbmiG3JQrFE1_TdjQosMR7GCbUfZ9f-3GuXbwR1jhL'
-          'o53PuzxrNqh3QjeBRdfnrNwpVxJ8VHd_5GtR0YhzBO_PcnqGNso1r7h'
-          'kW3tjjz73SBHgdQ1DG4ApzJw0hfxQyKdY3_f5Mz0XUm24VpI7_-4gCK'
-          'pD8fhWcPbjM3z3jcKoEDkaTonkhDNOKi_hL4qkCDx0neljj7ZXG5qUK'
-          '_T12VGb8BcKEYwnq4oR3Q7EvTOSO6IhE55rvRD-4mTTLVBFueis2PTjp',
-      price: '890,000₫',
-      rating: 4.9,
-      bookedLabel: '1.2k booked',
-    ),
-    ClinicFeaturedService(
-      id: 'service-laser-co2',
-      title: 'CO2 Fractional Skin Resurfacing',
-      imageUrl:
-          'https://lh3.googleusercontent.com/aida-public/'
-          'AB6AXuBegWVqBl5jxBcYFcOZvG57O36qIK9rnPMaiOIePkM_-juzaNFV'
-          '0ICFNeGFyxK8R9mSbZWEdDeNrWNa5JORYXiB6_eaxbN2TMiUkDIKIsSG'
-          'InXs4ic2q_HFlJa6eGNorlPYQ8tsi6bg3dT5Kdw45sB2fQR7CVjA972i'
-          'MnIA2cbg3bGkiJXQuq1A9uIUuyiN-p-YKlHKKsMXuUpJ33PAfL_WOvqR'
-          'MHbWW8HpQcX-AAyMreQfTCBUtBI0L62qcta5E6qwbeDW9TVhyqlu',
-      price: '2,500,000₫',
-      rating: 5.0,
-      bookedLabel: '850 booked',
-    ),
-    ClinicFeaturedService(
-      id: 'service-hifu-lift',
-      title: 'Ultra HIFU Face Lift Therapy',
-      imageUrl:
-          'https://lh3.googleusercontent.com/aida-public/'
-          'AB6AXuC6almYJ_FWJLo9pD_j1cHIRbu71mg0f8pUihFk9cRr0rVbkR26'
-          'kJdbvfPb5Wy7hDl92toYUrLUljrA7-e2h8kjq8XFPYTAUP9E-4pIDeWM'
-          '3vAs44NtELOsWwZs2Pi9K3ju-4H_cDEikwSxDc8cI2E8hHJw72LtdCOQ'
-          '4emF8BH0-CpLmcQsph1MDZ2jth2nSbZ_fIYQUVwQEGSx6yUdvYQBJW21'
-          'ZVKKsIXcgXCRQ3ONF8nGb_fwDd6HtMrocFIV-OKlvDuSTx_4-404',
-      price: '4,200,000₫',
-      rating: 4.8,
-      bookedLabel: '420 booked',
-    ),
-    ClinicFeaturedService(
-      id: 'service-vitamin-c',
-      title: 'Brightening Vitamin C Facial',
-      imageUrl:
-          'https://lh3.googleusercontent.com/aida-public/'
-          'AB6AXuCxqaIWqF0RBSXRB2bnqgEsA3nUdB7XjYjeaeeNldGEQK6fY0I'
-          '-_rZ2nd4KVngEIMP9XLwnHFsZHQuC3kDXVYEuWvYQdC25dV0bSnk4X9_'
-          '-txq-4LCbpWqwxi5Op2JTgDrTiDPvoyjiN8NYhC2iWldytd-E9vJy--4M'
-          'we-RAv2MOBe20cSxzFryk1o0WEFuvPT0CkhfZ_JAwD9eh08Ky7-C7sdvZ'
-          'Z10QUORWvIwDJOr_aXUX9AESJm9_KqcqubUEDZztpCQj0nuLsl_',
-      price: '750,000₫',
-      rating: 4.9,
-      bookedLabel: '2.1k booked',
-    ),
-  ],
 );
 
 /// Clinic info keyed by clinic ID for mock lookups.
@@ -210,10 +153,8 @@ final Map<String, ClinicInfoEntity> kMockClinicInfoMap = {
     id: 'clinic-spa-harmony',
     name: 'Spa Harmony',
     address: 'District 1, Ho Chi Minh City',
-    isVerified: true,
-    rating: 4.7,
-    reviewCount: 800,
     followersLabel: '5k',
+    reviewsLabel: '800',
     trustMetrics: const ClinicTrustMetrics(
       experienceLabel: '5+ Yrs',
       specialistsCount: 8,

@@ -24,6 +24,13 @@ void main() {
       // TODO
     });
 
+    // Get public clinic info by ID
+    //
+    //Future<PublicClinicInfoResponseDto> userHealthServiceControllerGetClinicInfo(String id) async
+    test('test userHealthServiceControllerGetClinicInfo', () async {
+      // TODO
+    });
+
     // Get eligibility detail by ID
     //
     // Returns the full eligibility record enriched with category, service, and employee information, looked up by the surrogate primary key on the product_employee_eligibility table.
