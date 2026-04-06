@@ -105,6 +105,8 @@ async def main(do_clean: bool):
         if do_clean:
             await clean(conn)
 
+        print("Starting seeding...")
+
         await seed_accounts(conn)
         await seed_locations(conn)
         await seed_categories(conn)
@@ -114,11 +116,16 @@ async def main(do_clean: bool):
         await seed_product_definitions(conn)
         await seed_product_media(conn)
         await seed_eligibility(conn)
-        await seed_reviews(conn)
+        # await seed_reviews(conn)           # ← Bỏ tạm vì bảng chưa có
         await seed_feature_tags(conn)
         await seed_product_tags(conn)
 
-        print("🎉 Seed Azure complete!")
+        print("🎉 Seed Azure completed successfully!")
+        
+    except Exception as e:
+        print(f"❌ Seed error: {e}")
+        import traceback
+        traceback.print_exc()
     finally:
         await conn.close()
 

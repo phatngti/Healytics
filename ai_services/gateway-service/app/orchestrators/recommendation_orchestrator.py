@@ -130,6 +130,37 @@ def _enrichment_fallback_detail(service_id: str) -> dict:
         }
     return {"service_id": sid, "name": "Unknown", "description": ""}
 
+def _safe_sample(values: list[str], max_items: int = 5) -> list[str]:
+    if not values:
+        return []
+    out: list[str] = []
+    for v in values[:max_items]:
+        try:
+            out.append(str(v))
+        except Exception:
+            out.append("<unprintable>")
+    return out
+
+
+def _extract_service_id_any_shape(obj: dict) -> str | None:
+    """
+    Extract service identifier from various backend response shapes without changing behavior.
+    (Used for logging + ordering diagnostics only.)
+    """
+    if not isinstance(obj, dict):
+        return None
+    for key in ("service_id", "serviceId", "id", "serviceID", "service_id_str"):
+        val = obj.get(key)
+        if val is None:
+            continue
+        try:
+            s = str(val).strip()
+        except Exception:
+            continue
+        if s:
+            return s
+    return None
+
 
 async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
     """Dùng API backend thật để lấy full thông tin service."""
@@ -138,11 +169,23 @@ async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
 
     # Don't break current system if key missing.
     if not settings.AI_API_KEY:
-        logger.debug("AI_API_KEY unset — enrich from MOCK_SERVICES / SEED_PRODUCT_FALLBACK only")
+        logger.warning(
+            "[ENRICH] skip_backend reason=AI_API_KEY_unset service_ids_count=%s service_ids_sample=%s backend_base_url=%s",
+            len(service_ids),
+            _safe_sample(service_ids),
+            settings.BACKEND_BASE_URL,
+        )
         return [_enrichment_fallback_detail(sid) for sid in service_ids]
 
     client = BackendAIClient()
     try:
+        logger.info(
+            "[ENRICH] backend_request endpoint=/backend/ai/recommendations service_ids_count=%s service_ids_sample=%s backend_base_url=%s header=%s",
+            len(service_ids),
+            _safe_sample(service_ids),
+            settings.BACKEND_BASE_URL,
+            settings.AI_API_KEY_HEADER,
+        )
         services = await client.get_service_details(service_ids)
     except Exception as e:
         # Do not break main recommendation flow if backend enrichment API is down.
@@ -157,10 +200,27 @@ async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
 
     # Preserve the ordering from recommender response
     by_id: dict[str, dict] = {}
+    returned_ids: list[str] = []
     for s in services:
         sid = s.get("service_id") or s.get("id")
         if sid is not None:
-            by_id[str(sid)] = s
+            sid_str = str(sid)
+            by_id[sid_str] = s
+            returned_ids.append(sid_str)
+
+    # Diagnostics: detect missing IDs / mismatched key naming.
+    returned_any = [_extract_service_id_any_shape(s) for s in services if isinstance(s, dict)]
+    returned_any = [r for r in returned_any if r]
+    missing = [sid for sid in service_ids if sid not in by_id]
+    logger.info(
+        "[ENRICH] backend_response services_count=%s returned_ids_count=%s returned_ids_sample=%s returned_any_ids_sample=%s missing_count=%s missing_sample=%s",
+        len(services),
+        len(returned_ids),
+        _safe_sample(returned_ids),
+        _safe_sample(returned_any),
+        len(missing),
+        _safe_sample(missing),
+    )
 
     return [
         by_id[sid] if sid in by_id else _enrichment_fallback_detail(sid)

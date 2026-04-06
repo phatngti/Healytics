@@ -86,62 +86,33 @@ NOW = datetime.now(timezone.utc)
 
 async def clean(conn: asyncpg.Connection):
     print("🗑  Cleaning seed data...")
-    product_ids = [
-        IDS[k] for k in ("pro_1", "pro_2", "pro_3", "pro_4", "pro_5", "pro_6", "pro_7", "pro_8")
-    ]
-    tag_ids = [
-        IDS[k] for k in (
-            "tag_co_vai_gay", "tag_thoat_vi", "tag_thu_gian", "tag_da_nong",
-            "tag_bam_huyet", "tag_rang_su", "tag_stress", "tag_tim_mach",
-        )
-    ]
-    partner_tax_codes = ["TAX001SEED", "TAX002SEED", "TAX003SEED", "TAX004SEED"]
-    employee_codes = ["EMP001SEED", "EMP002SEED", "EMP003SEED", "EMP004SEED"]
-    category_slugs = ["tim-mach", "vat-ly-tri-lieu", "dong-y", "tam-ly", "nha-khoa", "massage", "spa-beauty"]
-    account_emails = [
-        "partner1@healytics.test",
-        "partner2@healytics.test",
-        "partner3@healytics.test",
-        "partner4@healytics.test",
+
+    # Xóa theo thứ tự từ bảng con đến bảng cha
+    cleanup_queries = [
+        "DELETE FROM product_tags",
+        "DELETE FROM product_employee_eligibility",
+        "DELETE FROM product_media",
+        "DELETE FROM product_definitions",
+        "DELETE FROM products",
+        "DELETE FROM product_feature_tags",
+        "DELETE FROM employees",
+        "DELETE FROM health_partner_profile",
+        "DELETE FROM categories",
+        "DELETE FROM account",
+        "DELETE FROM location WHERE code IN ('79','01','48','760','770','001','774','771')",
     ]
 
-    # Junction and dependent tables keyed by product_id.
-    await conn.execute(
-        "DELETE FROM product_tags WHERE product_id = ANY($1::uuid[])", product_ids
-    )
-    await conn.execute(
-        "DELETE FROM product_employee_eligibility WHERE product_id = ANY($1::uuid[])", product_ids
-    )
+    for query in cleanup_queries:
+        try:
+            await conn.execute(query)
+            print(f"   ✓ Executed: {query.split('FROM')[1].split()[0].strip()}")
+        except asyncpg.exceptions.UndefinedTableError:
+            table_name = query.split('FROM')[1].split()[0].strip()
+            print(f"   ⚠ Table '{table_name}' does not exist → skipped")
+        except Exception as e:
+            print(f"   ⚠ Error on query: {query[:80]}... → {e}")
 
-    await conn.execute(
-        "DELETE FROM product_reviews WHERE product_id = ANY($1::uuid[])", product_ids
-    )
-    await conn.execute(
-        "DELETE FROM product_media WHERE product_id = ANY($1::uuid[])", product_ids
-    )
-    await conn.execute(
-        "DELETE FROM product_definitions WHERE product_id = ANY($1::uuid[])", product_ids
-    )
-    await conn.execute(
-        "DELETE FROM products WHERE id = ANY($1::uuid[])", product_ids
-    )
-
-    await conn.execute(
-        "DELETE FROM product_feature_tags WHERE id = ANY($1::uuid[])", tag_ids
-    )
-    await conn.execute(
-        "DELETE FROM employees WHERE employee_code = ANY($1::text[])", employee_codes
-    )
-    await conn.execute(
-        "DELETE FROM health_partner_profile WHERE tax_code = ANY($1::text[])", partner_tax_codes
-    )
-    await conn.execute(
-        "DELETE FROM categories WHERE slug = ANY($1::text[])", category_slugs
-    )
-    await conn.execute(
-        "DELETE FROM account WHERE email = ANY($1::text[])", account_emails
-    )
-    print("   Done.\n")
+    print("   Clean completed.\n")
 
 
 async def seed_accounts(conn: asyncpg.Connection):
@@ -167,7 +138,7 @@ async def seed_locations(conn: asyncpg.Connection):
     # Provinces — keyed by IDS key, not pre-resolved UUID
     provinces = [
         ("loc_hcm", "79",  "Hồ Chí Minh",  "Thành phố Hồ Chí Minh",  "PROVINCE"),
-        ("loc_hn",  "01",  "Hà Nội",        "Thành phố Hà Nội",        "PROVINCE"),
+        ("loc_hn",  "01",  "Hà Nội",        "Thủ đô Hà Nội",        "PROVINCE"),
         ("loc_dn",  "48",  "Đà Nẵng",       "Thành phố Đà Nẵng",       "PROVINCE"),
     ]
     # Districts — parent referenced by IDS key

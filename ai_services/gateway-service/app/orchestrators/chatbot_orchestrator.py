@@ -188,6 +188,14 @@ class ChatbotOrchestrator:
                 "text": request.message
             }
             filtered_ids = await self.ner_client.get_service_ids(payload=ner_payload)
+            logger.info(
+                "[TRACE] ner_prefilter conversation_id=%s message_len=%s filtered_ids_count=%s filtered_ids_sample=%s ner_url=%s",
+                str(request.conversation_id),
+                len(request.message or ""),
+                len(filtered_ids) if isinstance(filtered_ids, list) else -1,
+                [str(x) for x in (filtered_ids or [])[:5]] if isinstance(filtered_ids, list) else [],
+                self.ner_client.base_url,
+            )
             recommender_payload = {
                 "conversation_id": str(request.conversation_id),
                 "query": request.message,
@@ -201,10 +209,28 @@ class ChatbotOrchestrator:
                 result["recommendations"][0]["service_ids"]
                 if result.get("recommendations") else []
             )
+            scores = (
+                result["recommendations"][0].get("scores")
+                if result.get("recommendations") else []
+            )
+            logger.info(
+                "[TRACE] recommender_chatbot conversation_id=%s top_k=%s service_ids_count=%s service_ids_sample=%s scores_sample=%s recommender_url=%s",
+                str(request.conversation_id),
+                request.top_k,
+                len(service_ids) if isinstance(service_ids, list) else -1,
+                [str(x) for x in (service_ids or [])[:5]] if isinstance(service_ids, list) else [],
+                (scores or [])[:5] if isinstance(scores, list) else [],
+                self.recommender_client.base_url,
+            )
 
             # Enrich thành thông tin chi tiết
             services = await self.recommendation_orchestrator.get_enriched_services(service_ids)
             services_text = await self.recommendation_orchestrator.get_enriched_services_for_prompt(service_ids)
+            logger.info(
+                "[TRACE] enrich_done conversation_id=%s services_count=%s",
+                str(request.conversation_id),
+                len(services) if isinstance(services, list) else -1,
+            )
 
             return {
                 "services": services,        # list dict chi tiết → dùng cho SSE
