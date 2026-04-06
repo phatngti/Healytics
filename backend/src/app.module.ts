@@ -23,6 +23,8 @@ import { ReviewModule } from './review/review.module';
 import { PaymentGatewayModule } from './payment-gateway/payment-gateway.module';
 import { ChatModule } from './chat/chat.module';
 import { NotificationModule } from './notification/notification.module';
+import { CartModule } from './cart/cart.module';
+import { ClinicModule } from './clinic/clinic.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 import rabbitmqConfig from './config/rabbitmq.config';
@@ -86,6 +88,8 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
     PaymentGatewayModule,
     ChatModule,
     NotificationModule,
+    CartModule,
+    ClinicModule,
   ],
   providers: [
     {

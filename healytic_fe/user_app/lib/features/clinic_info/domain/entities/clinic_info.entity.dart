@@ -7,44 +7,38 @@ class ClinicInfoEntity {
   const ClinicInfoEntity({
     required this.id,
     required this.name,
-    required this.address,
-    required this.isVerified,
     this.coverImageUrl,
     this.logoImageUrl,
     this.gallery = const [],
-    required this.rating,
-    required this.reviewCount,
     required this.followersLabel,
-    this.phone,
-    this.coordinates,
-    this.chatPartnerId,
+    required this.reviewsLabel,
     this.description,
+    this.address,
+    this.phoneNumber,
     required this.trustMetrics,
     this.certifications = const [],
     this.specialists = const [],
+    this.businessTypes = const [],
     this.facilityImages = const [],
-    this.featuredServices = const [],
   });
 
   final String id;
   final String name;
-  final String address;
-  final bool isVerified;
   final String? coverImageUrl;
   final String? logoImageUrl;
   final List<String> gallery;
-  final double rating;
-  final int reviewCount;
   final String followersLabel;
-  final String? phone;
-  final String? coordinates;
-  final String? chatPartnerId;
+  final String reviewsLabel;
   final String? description;
+  final String? address;
+  final String? phoneNumber;
   final ClinicTrustMetrics trustMetrics;
   final List<ClinicCertification> certifications;
   final List<ClinicSpecialistPreview> specialists;
+  final List<String> businessTypes;
+
+  /// Facility tour images derived from [gallery].
   final List<ClinicFacilityImage> facilityImages;
-  final List<ClinicFeaturedService> featuredServices;
 }
 
 /// Trust metrics bar displayed below the header.
@@ -97,27 +91,11 @@ class ClinicSpecialistPreview {
 
 /// Facility tour image with caption.
 class ClinicFacilityImage {
-  const ClinicFacilityImage({required this.imageUrl, required this.label});
+  const ClinicFacilityImage({
+    required this.imageUrl,
+    required this.label,
+  });
 
   final String imageUrl;
   final String label;
-}
-
-/// Featured service card shown in the grid.
-class ClinicFeaturedService {
-  const ClinicFeaturedService({
-    required this.id,
-    required this.title,
-    this.imageUrl,
-    required this.price,
-    required this.rating,
-    required this.bookedLabel,
-  });
-
-  final String id;
-  final String title;
-  final String? imageUrl;
-  final String price;
-  final double rating;
-  final String bookedLabel;
 }

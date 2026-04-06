@@ -2,10 +2,22 @@ import 'package:user_app/features/clinic_info/domain/entities/clinic_product.ent
 
 /// Mock categories for the clinic products tab.
 const kMockClinicProductCategories = [
-  ClinicProductCategory(id: 'all', label: 'All Services'),
-  ClinicProductCategory(id: 'massage', label: 'Massage Therapy'),
-  ClinicProductCategory(id: 'skincare', label: 'Skincare & Laser'),
-  ClinicProductCategory(id: 'herbal', label: 'Herbal Hair Wash'),
+  ClinicProductCategory(
+    id: 'all',
+    label: 'All Services',
+  ),
+  ClinicProductCategory(
+    id: 'massage',
+    label: 'Massage Therapy',
+  ),
+  ClinicProductCategory(
+    id: 'skincare',
+    label: 'Skincare & Laser',
+  ),
+  ClinicProductCategory(
+    id: 'herbal',
+    label: 'Herbal Hair Wash',
+  ),
 ];
 
 /// Mock products matching the HTML design spec.
@@ -22,13 +34,14 @@ const kMockClinicProducts = [
         '5DqgeoCcY5BlLyGYSccFCXaNZWG8hGZsB72JPJmw2npxc9cH'
         'PjTlxBDjWY71y3JwnDSiWiSs4u9cUvztLfAap9Uc',
     price: '990.000đ',
+    priceAmount: 990000,
     originalPrice: '1.250.000đ',
     discountLabel: '-20%',
     durationLabel: '60 min',
     specialistLabel: 'Specialist',
     categoryId: 'skincare',
     soldCount: 320,
-    createdAtMs: 1743465600000, // 2025-04-01
+    createdAtMs: 1743465600000,
   ),
   ClinicProductEntity(
     id: 'prod-deep-tissue',
@@ -42,12 +55,13 @@ const kMockClinicProducts = [
         'SbszXwptaWSVnqsrFeZ0ECVMcxN5_Cbs_0IlC_sHM8Dzt-V7'
         'Y4IJ_HADMdeZ1Z3HaG9S5aXwQi1rmKVDvjRiE',
     price: '650.000đ',
+    priceAmount: 650000,
     badgeLabel: 'HOT',
     durationLabel: '90 min',
     specialistLabel: 'Top Therapist',
     categoryId: 'massage',
     soldCount: 580,
-    createdAtMs: 1743552000000, // 2025-04-02
+    createdAtMs: 1743552000000,
   ),
   ClinicProductEntity(
     id: 'prod-herbal-hair',
@@ -61,11 +75,12 @@ const kMockClinicProducts = [
         'Ot9e6zwKU9WnWy6kQZcWoUBuJyglyFN8iHXd2soKznCbkdEj'
         'Ada3rv_wGO5703xVxCtsxOydat_SWveDy8QN',
     price: '280.000đ',
+    priceAmount: 280000,
     durationLabel: '45 min',
     specialistLabel: 'Signature',
     categoryId: 'herbal',
     soldCount: 210,
-    createdAtMs: 1743638400000, // 2025-04-03
+    createdAtMs: 1743638400000,
   ),
   ClinicProductEntity(
     id: 'prod-acne-treatment',
@@ -79,13 +94,14 @@ const kMockClinicProducts = [
         'krZXJKfVspYHL2iNmPlVPDDfjpma9I3Yv0U5k3tLZGupr_Wqp'
         'W6erde09_SzUwW61BrF7HnPf3IRV89k1n02',
     price: '460.000đ',
+    priceAmount: 460000,
     originalPrice: '550.000đ',
     discountLabel: '-15%',
     durationLabel: '75 min',
     specialistLabel: 'Specialist',
     categoryId: 'skincare',
     soldCount: 410,
-    createdAtMs: 1743724800000, // 2025-04-04
+    createdAtMs: 1743724800000,
   ),
   ClinicProductEntity(
     id: 'prod-hot-stone',
@@ -99,10 +115,11 @@ const kMockClinicProducts = [
         'tdWxYRcjBsPaVAABvKxVIIuNg1UTsIsZcv6rZnllYM7BRZAOGq'
         'cLkfIM_c5Vlax2sWSvh0hrcL3fHynZzxJB',
     price: '520.000đ',
+    priceAmount: 520000,
     durationLabel: '60 min',
     categoryId: 'massage',
     soldCount: 290,
-    createdAtMs: 1743811200000, // 2025-04-05
+    createdAtMs: 1743811200000,
   ),
   ClinicProductEntity(
     id: 'prod-vitamin-c',
@@ -116,10 +133,11 @@ const kMockClinicProducts = [
         'RUEbex2f4XWNEbXrrjMtwYdpj4vM3reiR-O4awtST1MC_i2a_'
         '6kTt-C2t86XxDMctXISpVjOWqwGT3zGSZ7S',
     price: '750.000đ',
+    priceAmount: 750000,
     durationLabel: '60 min',
     specialistLabel: 'Specialist',
     categoryId: 'skincare',
     soldCount: 350,
-    createdAtMs: 1743897600000, // 2025-04-06
+    createdAtMs: 1743897600000,
   ),
 ];

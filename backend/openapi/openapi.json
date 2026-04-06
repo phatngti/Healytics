@@ -1997,6 +1997,45 @@
         ]
       }
     },
+    "/user/health-services/clinics/{id}/info": {
+      "get": {
+        "operationId": "UserHealthServiceController_getClinicInfo",
+        "summary": "Get public clinic info by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return clinic info for the clinic detail screen.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicClinicInfoResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Clinic not found."
+          }
+        },
+        "tags": [
+          "User Health-services"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/user/health-services/{id}/info": {
       "get": {
         "operationId": "UserHealthServiceController_getProductInfo",
@@ -4074,6 +4113,430 @@
           }
         ]
       }
+    },
+    "/cart": {
+      "get": {
+        "operationId": "CartController_getItems",
+        "summary": "Get all cart items for current user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CartItemResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "CartController_addItem",
+        "summary": "Add service to cart",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToCartDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartItemResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid service or inactive service."
+          },
+          "409": {
+            "description": "Service already exists in cart."
+          }
+        },
+        "tags": [
+          "Cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "CartController_clearCart",
+        "summary": "Clear all cart items",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Cart cleared successfully."
+          }
+        },
+        "tags": [
+          "Cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/cart/{cartItemId}": {
+      "delete": {
+        "operationId": "CartController_removeItem",
+        "summary": "Remove an item from cart",
+        "parameters": [
+          {
+            "name": "cartItemId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Item removed from cart."
+          },
+          "404": {
+            "description": "Cart item not found."
+          }
+        },
+        "tags": [
+          "Cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/cart/{cartItemId}/coupon": {
+      "post": {
+        "operationId": "CartController_applyCoupon",
+        "summary": "Apply coupon to cart item",
+        "parameters": [
+          {
+            "name": "cartItemId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyCouponDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartItemResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired coupon."
+          },
+          "404": {
+            "description": "Cart item not found."
+          }
+        },
+        "tags": [
+          "Cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "CartController_removeCoupon",
+        "summary": "Remove coupon from cart item",
+        "parameters": [
+          {
+            "name": "cartItemId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartItemResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cart item not found."
+          }
+        },
+        "tags": [
+          "Cart"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/clinics/{id}/info": {
+      "get": {
+        "operationId": "userClinicControllerGetClinicInfo",
+        "summary": "Get public clinic profile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicInfoResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Clinic not found."
+          }
+        },
+        "tags": [
+          "User Clinics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/clinics/{id}/products": {
+      "get": {
+        "operationId": "userClinicControllerGetClinicProducts",
+        "summary": "Get clinic products/services catalog",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by category UUID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "Sort order for products",
+            "schema": {
+              "default": "popular",
+              "enum": [
+                "popular",
+                "latest",
+                "top_sales",
+                "price_asc",
+                "price_desc"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Case-insensitive service name search",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicProductsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Clinic not found."
+          }
+        },
+        "tags": [
+          "User Clinics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/clinics/{id}/reviews": {
+      "get": {
+        "operationId": "userClinicControllerGetClinicReviews",
+        "summary": "Get paginated clinic reviews",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "starCount",
+            "required": false,
+            "in": "query",
+            "description": "Filter: only reviews with this rating (1–5)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 5,
+              "type": "number"
+            }
+          },
+          {
+            "name": "hasMedia",
+            "required": false,
+            "in": "query",
+            "description": "Filter: only reviews with photos",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicReviewsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Clinic not found."
+          }
+        },
+        "tags": [
+          "User Clinics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -4733,7 +5196,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-04-02T13:01:47.578Z"
+              "submittedAt": "2026-04-06T08:06:41.734Z"
             }
           }
         },
@@ -8612,6 +9075,242 @@
           "priceBreakdown"
         ]
       },
+      "PublicClinicTrustMetricsDto": {
+        "type": "object",
+        "properties": {
+          "experienceLabel": {
+            "type": "string",
+            "example": "10+ Yrs"
+          },
+          "specialistsCount": {
+            "type": "number",
+            "example": 15
+          },
+          "certifiedLabel": {
+            "type": "string",
+            "example": "100%"
+          },
+          "clientsLabel": {
+            "type": "string",
+            "example": "30k+"
+          }
+        },
+        "required": [
+          "experienceLabel",
+          "specialistsCount",
+          "certifiedLabel",
+          "clientsLabel"
+        ]
+      },
+      "PublicClinicCertificationDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Medical License #124"
+          },
+          "subtitle": {
+            "type": "string",
+            "example": "Ministry of Health"
+          },
+          "iconName": {
+            "type": "string",
+            "example": "workspace_premium"
+          }
+        },
+        "required": [
+          "title",
+          "subtitle",
+          "iconName"
+        ]
+      },
+      "PublicClinicSpecialistPreviewDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "name": {
+            "type": "string",
+            "example": "Dr. Sarah Lin"
+          },
+          "role": {
+            "type": "string",
+            "example": "Dermatologist"
+          },
+          "imageUrl": {
+            "type": "object",
+            "example": "https://example.com/avatar.jpg"
+          },
+          "experienceLabel": {
+            "type": "object",
+            "example": "10 Yrs Exp"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role"
+        ]
+      },
+      "PublicClinicFacilityImageDto": {
+        "type": "object",
+        "properties": {
+          "imageUrl": {
+            "type": "string",
+            "example": "https://example.com/facility.jpg"
+          },
+          "label": {
+            "type": "string",
+            "example": "Main Hall"
+          }
+        },
+        "required": [
+          "imageUrl",
+          "label"
+        ]
+      },
+      "PublicClinicFeaturedServiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "title": {
+            "type": "string",
+            "example": "Relaxation Massage"
+          },
+          "imageUrl": {
+            "type": "object",
+            "example": "https://example.com/service.jpg"
+          },
+          "price": {
+            "type": "string",
+            "example": "890,000₫"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.9
+          },
+          "bookedLabel": {
+            "type": "string",
+            "example": "1.2k booked"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "price",
+          "rating",
+          "bookedLabel"
+        ]
+      },
+      "PublicClinicInfoResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "name": {
+            "type": "string",
+            "example": "An Mien Spa & Clinic"
+          },
+          "address": {
+            "type": "string",
+            "example": "42 West St., District 1, HCM"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "example": true
+          },
+          "coverImageUrl": {
+            "type": "object",
+            "example": "https://example.com/cover.jpg"
+          },
+          "logoImageUrl": {
+            "type": "object",
+            "example": "https://example.com/logo.jpg"
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.9
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 2500
+          },
+          "followersLabel": {
+            "type": "string",
+            "example": "15k"
+          },
+          "phone": {
+            "type": "object",
+            "example": "+84 28 1234 5678"
+          },
+          "coordinates": {
+            "type": "object",
+            "example": "10.7769,106.7009"
+          },
+          "chatPartnerId": {
+            "type": "object",
+            "example": "a1b2c3d4-..."
+          },
+          "description": {
+            "type": "object"
+          },
+          "trustMetrics": {
+            "$ref": "#/components/schemas/PublicClinicTrustMetricsDto"
+          },
+          "certifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicClinicCertificationDto"
+            }
+          },
+          "specialists": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicClinicSpecialistPreviewDto"
+            }
+          },
+          "facilityImages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicClinicFacilityImageDto"
+            }
+          },
+          "featuredServices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicClinicFeaturedServiceDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "address",
+          "isVerified",
+          "gallery",
+          "rating",
+          "reviewCount",
+          "followersLabel",
+          "trustMetrics",
+          "certifications",
+          "specialists",
+          "facilityImages",
+          "featuredServices"
+        ]
+      },
       "PublicCategoryDto": {
         "type": "object",
         "properties": {
@@ -10746,6 +11445,530 @@
         },
         "required": [
           "healthPartnerId"
+        ]
+      },
+      "CartItemResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceName": {
+            "type": "string",
+            "example": "Swedish Relax Massage"
+          },
+          "serviceImageUrl": {
+            "type": "string",
+            "example": "https://cdn.example.com/service.jpg"
+          },
+          "price": {
+            "type": "string",
+            "example": "500.000đ"
+          },
+          "priceAmount": {
+            "type": "number",
+            "example": 500000
+          },
+          "clinicId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clinicName": {
+            "type": "string",
+            "example": "Spa An Nhien"
+          },
+          "clinicAddress": {
+            "type": "string",
+            "example": "123 Dien Bien Phu, Q1, HCM"
+          },
+          "clinicImageUrl": {
+            "type": "object",
+            "example": null
+          },
+          "couponCode": {
+            "type": "object",
+            "nullable": true,
+            "example": "WELCOME10"
+          },
+          "couponDiscountPercent": {
+            "type": "object",
+            "nullable": true,
+            "example": 10
+          },
+          "couponDiscountAmount": {
+            "type": "object",
+            "nullable": true,
+            "example": 50000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "serviceId",
+          "serviceName",
+          "serviceImageUrl",
+          "price",
+          "priceAmount",
+          "clinicId",
+          "clinicName",
+          "clinicAddress",
+          "createdAt"
+        ]
+      },
+      "AddToCartDto": {
+        "type": "object",
+        "properties": {
+          "serviceId": {
+            "type": "string",
+            "description": "UUID of the health service",
+            "example": "0f3a4726-2f17-4d39-9518-b5303b4a0a95"
+          }
+        },
+        "required": [
+          "serviceId"
+        ]
+      },
+      "ApplyCouponDto": {
+        "type": "object",
+        "properties": {
+          "couponCode": {
+            "type": "string",
+            "description": "Coupon code to apply",
+            "example": "WELCOME10"
+          }
+        },
+        "required": [
+          "couponCode"
+        ]
+      },
+      "ClinicTrustMetricsDto": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "number",
+            "example": 4.9
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 2500
+          },
+          "experienceLabel": {
+            "type": "string",
+            "example": "5+ Yrs"
+          },
+          "clientsLabel": {
+            "type": "string",
+            "example": "15k"
+          }
+        },
+        "required": [
+          "rating",
+          "reviewCount",
+          "experienceLabel",
+          "clientsLabel"
+        ]
+      },
+      "ClinicCertificationDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "ISO 9001:2015"
+          },
+          "subtitle": {
+            "type": "object",
+            "example": "Quality Management"
+          },
+          "iconName": {
+            "type": "string",
+            "example": "workspace_premium"
+          }
+        },
+        "required": [
+          "title",
+          "iconName"
+        ]
+      },
+      "ClinicSpecialistPreviewDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "example": "Dr. Sarah"
+          },
+          "role": {
+            "type": "string",
+            "example": "Senior Therapist"
+          },
+          "imageUrl": {
+            "type": "object"
+          },
+          "experienceLabel": {
+            "type": "object",
+            "example": "5 Yrs Exp"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role"
+        ]
+      },
+      "ClinicInfoResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "example": "Healytics Wellness Center"
+          },
+          "coverImageUrl": {
+            "type": "object"
+          },
+          "logoImageUrl": {
+            "type": "object"
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "followersLabel": {
+            "type": "string",
+            "example": "15k"
+          },
+          "reviewsLabel": {
+            "type": "string",
+            "example": "2.5k"
+          },
+          "description": {
+            "type": "object"
+          },
+          "trustMetrics": {
+            "$ref": "#/components/schemas/ClinicTrustMetricsDto"
+          },
+          "certifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicCertificationDto"
+            }
+          },
+          "specialists": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicSpecialistPreviewDto"
+            }
+          },
+          "businessTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "address": {
+            "type": "object"
+          },
+          "phoneNumber": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "gallery",
+          "followersLabel",
+          "reviewsLabel",
+          "trustMetrics",
+          "certifications",
+          "specialists",
+          "businessTypes"
+        ]
+      },
+      "ClinicProductCategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "label": {
+            "type": "string",
+            "example": "Massage Therapy"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ]
+      },
+      "ClinicProductDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "example": "Premium CO2 Laser"
+          },
+          "imageUrl": {
+            "type": "object"
+          },
+          "price": {
+            "type": "string",
+            "example": "990.000đ"
+          },
+          "priceAmount": {
+            "type": "number",
+            "example": 990000
+          },
+          "originalPrice": {
+            "type": "object",
+            "example": "1.250.000đ"
+          },
+          "discountLabel": {
+            "type": "object",
+            "example": "-20%"
+          },
+          "badgeLabel": {
+            "type": "object",
+            "example": "HOT"
+          },
+          "durationLabel": {
+            "type": "object",
+            "example": "60 min"
+          },
+          "specialistLabel": {
+            "type": "object",
+            "example": "Specialist"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "soldCount": {
+            "type": "number",
+            "example": 320
+          },
+          "createdAtMs": {
+            "type": "number",
+            "example": 1743465600000
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "price",
+          "priceAmount",
+          "categoryId",
+          "soldCount",
+          "createdAtMs"
+        ]
+      },
+      "ClinicProductsResponseDto": {
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicProductCategoryDto"
+            }
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicProductDto"
+            }
+          },
+          "totalCount": {
+            "type": "number",
+            "example": 45
+          },
+          "hasMore": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "categories",
+          "products",
+          "totalCount",
+          "hasMore"
+        ]
+      },
+      "ClinicReviewSummaryDto": {
+        "type": "object",
+        "properties": {
+          "averageRating": {
+            "type": "number",
+            "example": 4.9
+          },
+          "totalReviewCount": {
+            "type": "number",
+            "example": 2500
+          },
+          "ratingLabel": {
+            "type": "string",
+            "example": "Excellent"
+          },
+          "starDistribution": {
+            "type": "object",
+            "example": {
+              "1": 0.005,
+              "2": 0.005,
+              "3": 0.01,
+              "4": 0.06,
+              "5": 0.92
+            }
+          }
+        },
+        "required": [
+          "averageRating",
+          "totalReviewCount",
+          "ratingLabel",
+          "starDistribution"
+        ]
+      },
+      "ClinicReviewFilterDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "all"
+          },
+          "label": {
+            "type": "string",
+            "example": "All (2.5k)"
+          },
+          "starCount": {
+            "type": "object",
+            "example": 5
+          },
+          "requiresMedia": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "requiresMedia"
+        ]
+      },
+      "ClinicReviewResponseSubDto": {
+        "type": "object",
+        "properties": {
+          "responseText": {
+            "type": "object"
+          }
+        }
+      },
+      "ClinicReviewDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reviewerName": {
+            "type": "string",
+            "example": "n***a",
+            "description": "Masked name for privacy"
+          },
+          "reviewerInitial": {
+            "type": "string",
+            "example": "N"
+          },
+          "starCount": {
+            "type": "number",
+            "example": 5,
+            "minimum": 1,
+            "maximum": 5
+          },
+          "memberBadge": {
+            "type": "object",
+            "description": "null for MVP"
+          },
+          "dateLabel": {
+            "type": "string",
+            "example": "04-04-2026"
+          },
+          "serviceName": {
+            "type": "object",
+            "example": "Salt Stone Massage (90 min)"
+          },
+          "serviceIcon": {
+            "type": "object",
+            "example": "spa"
+          },
+          "reviewText": {
+            "type": "string"
+          },
+          "mediaUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "clinicResponse": {
+            "$ref": "#/components/schemas/ClinicReviewResponseSubDto"
+          }
+        },
+        "required": [
+          "id",
+          "reviewerName",
+          "reviewerInitial",
+          "starCount",
+          "dateLabel",
+          "reviewText",
+          "mediaUrls"
+        ]
+      },
+      "ClinicReviewsResponseDto": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/ClinicReviewSummaryDto"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicReviewFilterDto"
+            }
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicReviewDto"
+            }
+          },
+          "totalCount": {
+            "type": "number",
+            "example": 150
+          },
+          "hasMore": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "summary",
+          "filters",
+          "reviews",
+          "totalCount",
+          "hasMore"
         ]
       }
     }
