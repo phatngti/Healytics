@@ -122,6 +122,12 @@ def build_backend_query(entities: List[NerEntity], limit: int = 50, spatial_cont
         elif e_type == "LOCATION" and e.location_code:
             # LOCATION pruning/disambiguation happens upstream; apply resolved location directly.
             query["locationCode"] = e.location_code
+            # Propagate whether the user explicitly intended a location filter.
+            # Used downstream to avoid cross-location fallbacks when user said "ở Hà Nội", etc.
+            if getattr(e, "location_intent", None) is not None:
+                query["locationIntent"] = bool(e.location_intent)
+            else:
+                query["locationIntent"] = True
 
         elif e_type == "PRICE" and e.amount is not None:
             # Backend Product.basePrice/salePrice
