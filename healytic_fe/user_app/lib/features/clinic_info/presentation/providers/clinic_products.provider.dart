@@ -5,32 +5,20 @@ import 'package:user_app/features/clinic_info/domain/entities/clinic_product.ent
 
 part 'clinic_products.provider.g.dart';
 
-// ── 1. Raw Data Fetch (family by clinicId) ──────────
-
-/// Fetches all products and categories for a clinic.
-///
-/// Family provider — each [clinicId] gets its own
-/// cached async state with auto-dispose.
-@riverpod
-Future<ClinicProductsData> clinicProducts(
-  Ref ref, {
-  required String clinicId,
-}) async {
-  final repo = ref.read(clinicInfoRepositoryProvider);
-  return repo.getClinicProducts(clinicId);
-}
-
-// ── 2. Sort State ───────────────────────────────────
+// ── 1. Sort State ───────────────────────────────────
 
 /// Tracks the active sort option for the product
 /// grid. Defaults to [ClinicProductSort.popular].
 @riverpod
-class ClinicProductSortNotifier extends _$ClinicProductSortNotifier {
+class ClinicProductSortNotifier
+    extends _$ClinicProductSortNotifier {
   @override
-  ClinicProductSort build() => ClinicProductSort.popular;
+  ClinicProductSort build() =>
+      ClinicProductSort.popular;
 
   /// Selects a specific sort option.
-  void select(ClinicProductSort sort) => state = sort;
+  void select(ClinicProductSort sort) =>
+      state = sort;
 
   /// Toggles between ascending/descending price when
   /// the "Price" button is tapped repeatedly.
@@ -41,87 +29,178 @@ class ClinicProductSortNotifier extends _$ClinicProductSortNotifier {
   }
 }
 
-// ── 3. Category Filter State ────────────────────────
+// ── 2. Category Filter State ────────────────────────
 
 /// Tracks the selected category chip ID.
 /// Defaults to `'all'` (show everything).
 @riverpod
-class ClinicProductCategoryNotifier extends _$ClinicProductCategoryNotifier {
+class ClinicProductCategoryNotifier
+    extends _$ClinicProductCategoryNotifier {
   @override
   String build() => 'all';
 
   /// Selects a category by its ID.
-  void select(String categoryId) => state = categoryId;
+  void select(String categoryId) =>
+      state = categoryId;
 }
 
-// ── 4. Search State ─────────────────────────────────
+// ── 3. Search State ─────────────────────────────────
 
 /// Tracks the search query for title-based filtering.
 /// Defaults to an empty string (no search).
 @riverpod
-class ClinicProductSearchNotifier extends _$ClinicProductSearchNotifier {
+class ClinicProductSearchNotifier
+    extends _$ClinicProductSearchNotifier {
   @override
   String build() => '';
 
   /// Updates the search query.
-  void updateQuery(String query) => state = query;
+  void updateQuery(String query) =>
+      state = query;
 
   /// Clears the search query.
   void clear() => state = '';
 }
 
-// ── 5. Computed Filtered + Sorted Products ──────────
+// ── 4. Accumulated Products State ───────────────────
 
-/// Reactively combines raw product data with sort,
-/// category, and search state to produce the final
-/// list displayed in the grid.
-@riverpod
-Future<List<ClinicProductEntity>> filteredClinicProducts(
-  Ref ref, {
-  required String clinicId,
-}) async {
-  final data = await ref.watch(
-    clinicProductsProvider(clinicId: clinicId).future,
-  );
-  final sort = ref.watch(clinicProductSortProvider);
-  final categoryId = ref.watch(clinicProductCategoryProvider);
-  final searchQuery = ref.watch(clinicProductSearchProvider);
+/// Holds the accumulated products list across
+/// all loaded pages, plus pagination metadata
+/// and the categories from the first response.
+class ClinicProductsAccumulated {
+  const ClinicProductsAccumulated({
+    required this.categories,
+    required this.products,
+    required this.totalCount,
+    required this.hasMore,
+    required this.currentPage,
+    this.isLoadingMore = false,
+  });
 
-  var items = data.products;
+  final List<ClinicProductCategory> categories;
+  final List<ClinicProductEntity> products;
+  final int totalCount;
+  final bool hasMore;
+  final int currentPage;
+  final bool isLoadingMore;
 
-  // ── Category filter ──
-  if (categoryId != 'all') {
-    items = items.where((p) => p.categoryId == categoryId).toList();
+  /// Creates a copy with updated fields.
+  ClinicProductsAccumulated copyWith({
+    List<ClinicProductCategory>? categories,
+    List<ClinicProductEntity>? products,
+    int? totalCount,
+    bool? hasMore,
+    int? currentPage,
+    bool? isLoadingMore,
+  }) {
+    return ClinicProductsAccumulated(
+      categories: categories ?? this.categories,
+      products: products ?? this.products,
+      totalCount: totalCount ?? this.totalCount,
+      hasMore: hasMore ?? this.hasMore,
+      currentPage:
+          currentPage ?? this.currentPage,
+      isLoadingMore:
+          isLoadingMore ?? this.isLoadingMore,
+    );
   }
-
-  // ── Search filter ──
-  if (searchQuery.isNotEmpty) {
-    final q = searchQuery.toLowerCase();
-    items = items.where((p) => p.title.toLowerCase().contains(q)).toList();
-  }
-
-  // ── Sort ──
-  switch (sort) {
-    case ClinicProductSort.popular:
-      break; // default API order
-    case ClinicProductSort.latest:
-      items = [...items]
-        ..sort((a, b) => b.createdAtMs.compareTo(a.createdAtMs));
-    case ClinicProductSort.topSales:
-      items = [...items]..sort((a, b) => b.soldCount.compareTo(a.soldCount));
-    case ClinicProductSort.priceAsc:
-      items = [...items]
-        ..sort((a, b) => _parsePrice(a.price).compareTo(_parsePrice(b.price)));
-    case ClinicProductSort.priceDesc:
-      items = [...items]
-        ..sort((a, b) => _parsePrice(b.price).compareTo(_parsePrice(a.price)));
-  }
-
-  return items;
 }
 
-/// Extracts numeric value from a formatted price
-/// string, e.g. "990.000đ" → 990000.
-int _parsePrice(String formatted) {
-  return int.tryParse(formatted.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+// ── 5. Paginated Products Provider ──────────────────
+
+/// Manages server-side paginated product loading.
+///
+/// Watches sort, category, and search state.
+/// When any of them change, fetches fresh data
+/// from page 1. Supports "load more" pagination.
+@riverpod
+class ClinicProductsPaginated
+    extends _$ClinicProductsPaginated {
+  @override
+  Future<ClinicProductsAccumulated> build({
+    required String clinicId,
+  }) async {
+    final sort = ref.watch(
+      clinicProductSortProvider,
+    );
+    final categoryId = ref.watch(
+      clinicProductCategoryProvider,
+    );
+    final searchQuery = ref.watch(
+      clinicProductSearchProvider,
+    );
+
+    final repo = ref.read(
+      clinicInfoRepositoryProvider,
+    );
+    final data = await repo.getClinicProducts(
+      clinicId,
+      categoryId:
+          categoryId == 'all' ? null : categoryId,
+      sort: sort,
+      search: searchQuery.isEmpty
+          ? null
+          : searchQuery,
+    );
+
+    return ClinicProductsAccumulated(
+      categories: data.categories,
+      products: data.products,
+      totalCount: data.totalCount,
+      hasMore: data.hasMore,
+      currentPage: 1,
+    );
+  }
+
+  /// Loads the next page and appends to the list.
+  Future<void> loadMore() async {
+    final current = state.value;
+    if (current == null ||
+        !current.hasMore ||
+        current.isLoadingMore) {
+      return;
+    }
+
+    state = AsyncData(
+      current.copyWith(isLoadingMore: true),
+    );
+
+    final sort = ref.read(
+      clinicProductSortProvider,
+    );
+    final categoryId = ref.read(
+      clinicProductCategoryProvider,
+    );
+    final searchQuery = ref.read(
+      clinicProductSearchProvider,
+    );
+
+    final nextPage = current.currentPage + 1;
+    final repo = ref.read(
+      clinicInfoRepositoryProvider,
+    );
+    final data = await repo.getClinicProducts(
+      clinicId,
+      categoryId:
+          categoryId == 'all' ? null : categoryId,
+      sort: sort,
+      search: searchQuery.isEmpty
+          ? null
+          : searchQuery,
+      page: nextPage,
+    );
+
+    state = AsyncData(
+      current.copyWith(
+        products: [
+          ...current.products,
+          ...data.products,
+        ],
+        totalCount: data.totalCount,
+        hasMore: data.hasMore,
+        currentPage: nextPage,
+        isLoadingMore: false,
+      ),
+    );
+  }
 }

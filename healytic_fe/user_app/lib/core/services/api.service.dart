@@ -141,6 +141,9 @@ class ApiService implements Authentication {
   // ── Payments ──────────────────────────────────────
   late UserPaymentsApi userPaymentsApi;
 
+  // ── Clinics ───────────────────────────────────────
+  late UserClinicsApi userClinicsApi;
+
   ApiService({AuthHttpClient? httpClient}) : _authHttpClient = httpClient {
     // Eagerly initialise so late fields are never
     // accessed before the endpoint is resolved.
@@ -214,6 +217,7 @@ class ApiService implements Authentication {
     userEmployeesApi = UserEmployeesApi(backend);
     userCategoriesApi = UserCategoriesApi(backend);
     userPaymentsApi = UserPaymentsApi(backend);
+    userClinicsApi = UserClinicsApi(backend);
     userHealthServicesApi = UserHealthServicesApi(backend);
     userReviewsApi = UserReviewsApi(backend);
     userNotificationsApi = UserNotificationsApi(backend);

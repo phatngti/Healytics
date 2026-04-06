@@ -2,18 +2,19 @@ import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 /// Rating / followers row + Follow and Chat buttons.
+///
+/// Now uses pre-formatted labels from the API
+/// instead of raw numeric values.
 class ClinicStatsActions extends StatelessWidget {
   const ClinicStatsActions({
     super.key,
-    required this.rating,
-    required this.reviewCount,
+    required this.reviewsLabel,
     required this.followersLabel,
     this.onFollow,
     this.onChat,
   });
 
-  final double rating;
-  final int reviewCount;
+  final String reviewsLabel;
   final String followersLabel;
   final VoidCallback? onFollow;
   final VoidCallback? onChat;
@@ -25,7 +26,8 @@ class ClinicStatsActions extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: AppDimens.horizontalPadding(context),
+        horizontal:
+            AppDimens.horizontalPadding(context),
       ),
       child: Row(
         children: [
@@ -34,29 +36,33 @@ class ClinicStatsActions extends StatelessWidget {
               TextSpan(
                 children: [
                   TextSpan(
-                    text: '$rating ★',
-                    style: textTheme.labelSmall?.copyWith(
+                    text: reviewsLabel,
+                    style:
+                        textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   TextSpan(
-                    text:
-                        ' ($reviewCount Reviews)'
-                        ' • ',
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                    text: ' Reviews • ',
+                    style:
+                        textTheme.labelSmall?.copyWith(
+                      color:
+                          colorScheme.onSurfaceVariant,
                     ),
                   ),
                   TextSpan(
                     text: followersLabel,
-                    style: textTheme.labelSmall?.copyWith(
+                    style:
+                        textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   TextSpan(
                     text: ' Followers',
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+                    style:
+                        textTheme.labelSmall?.copyWith(
+                      color:
+                          colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -71,8 +77,10 @@ class ClinicStatsActions extends StatelessWidget {
                 vertical: AppDimens.spaceXs,
               ),
               minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              textStyle: textTheme.labelSmall?.copyWith(
+              tapTargetSize:
+                  MaterialTapTargetSize.shrinkWrap,
+              textStyle:
+                  textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -87,9 +95,13 @@ class ClinicStatsActions extends StatelessWidget {
                 vertical: AppDimens.spaceXs,
               ),
               minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              side: BorderSide(color: colorScheme.primary),
-              textStyle: textTheme.labelSmall?.copyWith(
+              tapTargetSize:
+                  MaterialTapTargetSize.shrinkWrap,
+              side: BorderSide(
+                color: colorScheme.primary,
+              ),
+              textStyle:
+                  textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -100,7 +112,8 @@ class ClinicStatsActions extends StatelessWidget {
             ),
             label: Text(
               'Chat',
-              style: textTheme.labelSmall?.copyWith(
+              style:
+                  textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.primary,
               ),

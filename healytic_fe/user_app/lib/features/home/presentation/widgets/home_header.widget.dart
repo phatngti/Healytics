@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/images/avatar.dart';
+import 'package:user_app/features/cart/presentation/providers/cart.provider.dart';
+import 'package:user_app/router/routes.dart';
 
-class HomeHeader extends StatelessWidget {
+class HomeHeader extends ConsumerWidget {
   final String userName;
 
   const HomeHeader({super.key, required this.userName});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cartCount =
+        ref.watch(cartBadgeCountProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -74,10 +79,24 @@ class HomeHeader extends StatelessWidget {
           ),
           Row(
             children: [
-              _HeaderIconButton(
-                icon: Symbols.shopping_cart,
-                tooltip: 'Shopping cart',
-                onTap: () {},
+              Badge(
+                isLabelVisible: cartCount > 0,
+                label: Text(
+                  '$cartCount',
+                  style: textTheme.labelSmall
+                      ?.copyWith(
+                    color: colorScheme.onError,
+                    fontSize: 10,
+                  ),
+                ),
+                backgroundColor:
+                    colorScheme.error,
+                child: _HeaderIconButton(
+                  icon: Symbols.shopping_cart,
+                  tooltip: 'Shopping cart',
+                  onTap: () => const CartRoute()
+                      .push(context),
+                ),
               ),
               SizedBox(width: AppDimens.spaceMd),
               _HeaderIconButton(

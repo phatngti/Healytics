@@ -2,10 +2,11 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Partner } from '@/common/entities/partner.entity';
 import { Product } from '@/common/entities/product.entity';
 import { Employee } from '@/common/entities/employee.entity';
+import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 
 // ─── Nested DTOs ─────────────────────────────────────────────
 
-class ClinicCertificationDto {
+class PublicClinicCertificationDto {
   @ApiProperty({ example: 'Medical License #124' })
   title: string;
 
@@ -16,7 +17,7 @@ class ClinicCertificationDto {
   iconName: string;
 }
 
-class ClinicSpecialistPreviewDto {
+class PublicClinicSpecialistPreviewDto {
   @ApiProperty({ example: 'a1b2c3d4-...' })
   id: string;
 
@@ -33,7 +34,7 @@ class ClinicSpecialistPreviewDto {
   experienceLabel: string | null;
 }
 
-class ClinicFacilityImageDto {
+class PublicClinicFacilityImageDto {
   @ApiProperty({ example: 'https://example.com/facility.jpg' })
   imageUrl: string;
 
@@ -41,7 +42,7 @@ class ClinicFacilityImageDto {
   label: string;
 }
 
-class ClinicFeaturedServiceDto {
+class PublicClinicFeaturedServiceDto {
   @ApiProperty({ example: 'a1b2c3d4-...' })
   id: string;
 
@@ -61,7 +62,7 @@ class ClinicFeaturedServiceDto {
   bookedLabel: string;
 }
 
-class ClinicTrustMetricsDto {
+export class PublicClinicTrustMetricsDto {
   @ApiProperty({ example: '10+ Yrs' })
   experienceLabel: string;
 
@@ -120,20 +121,20 @@ export class PublicClinicInfoResponseDto {
   @ApiPropertyOptional()
   description: string | null;
 
-  @ApiProperty({ type: ClinicTrustMetricsDto })
-  trustMetrics: ClinicTrustMetricsDto;
+  @ApiProperty({ type: PublicClinicTrustMetricsDto })
+  trustMetrics: PublicClinicTrustMetricsDto;
 
-  @ApiProperty({ type: [ClinicCertificationDto] })
-  certifications: ClinicCertificationDto[];
+  @ApiProperty({ type: [PublicClinicCertificationDto] })
+  certifications: PublicClinicCertificationDto[];
 
-  @ApiProperty({ type: [ClinicSpecialistPreviewDto] })
-  specialists: ClinicSpecialistPreviewDto[];
+  @ApiProperty({ type: [PublicClinicSpecialistPreviewDto] })
+  specialists: PublicClinicSpecialistPreviewDto[];
 
-  @ApiProperty({ type: [ClinicFacilityImageDto] })
-  facilityImages: ClinicFacilityImageDto[];
+  @ApiProperty({ type: [PublicClinicFacilityImageDto] })
+  facilityImages: PublicClinicFacilityImageDto[];
 
-  @ApiProperty({ type: [ClinicFeaturedServiceDto] })
-  featuredServices: ClinicFeaturedServiceDto[];
+  @ApiProperty({ type: [PublicClinicFeaturedServiceDto] })
+  featuredServices: PublicClinicFeaturedServiceDto[];
 
   static fromPartner(
     partner: Partner,
@@ -154,10 +155,10 @@ export class PublicClinicInfoResponseDto {
     ].filter(Boolean);
     dto.address = addressParts.join(', ');
 
-    dto.isVerified = partner.verificationStatus === 'approved';
-    dto.coverImageUrl = null;
-    dto.logoImageUrl = null;
-    dto.gallery = [];
+    dto.isVerified = partner.verificationStatus === PartnerVerificationStatus.APPROVED;
+    dto.coverImageUrl = partner.coverImageUrl ?? null;
+    dto.logoImageUrl = partner.logoImageUrl ?? null;
+    dto.gallery = partner.gallery ?? [];
     dto.phone = partner.phoneNumber;
     dto.coordinates = partner.coordinates;
     dto.chatPartnerId = partner.accountId;
@@ -173,8 +174,8 @@ export class PublicClinicInfoResponseDto {
       ? Math.round((totalRating / totalCount) * 10) / 10
       : 0;
     dto.reviewCount = totalCount;
-    dto.followersLabel = '0';
-    dto.description = null;
+    dto.followersLabel = String(partner.followerCount ?? 0);
+    dto.description = partner.description ?? null;
 
     // Trust metrics — derived from partner data
     dto.trustMetrics = {

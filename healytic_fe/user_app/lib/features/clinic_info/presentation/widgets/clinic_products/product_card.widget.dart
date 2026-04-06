@@ -19,33 +19,37 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: AppDimens.radiusMediumSmall,
-          border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+    return Semantics(
+      button: onTap != null,
+      label: product.title,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: AppDimens.radiusMediumSmall,
+            border: Border.all(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.3),
             ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Image + badge ──
-            Expanded(flex: 3, child: _ProductImage(product: product)),
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.shadow.withValues(alpha: 0.05),
+                blurRadius: AppDimens.spaceSm,
+                offset: const Offset(0, AppDimens.spaceXxs),
+              ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Image + badge ──
+              Expanded(flex: 3, child: _ProductImage(product: product)),
 
-            // ── Content area ──
-            Expanded(flex: 2, child: _ProductContent(product: product)),
-          ],
+              // ── Content area ──
+              Expanded(flex: 2, child: _ProductContent(product: product)),
+            ],
+          ),
         ),
       ),
     );
@@ -65,17 +69,16 @@ class _ProductImage extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Image
         if (product.imageUrl != null)
           NetworkImageAuto(imageUrl: product.imageUrl!, fit: BoxFit.cover)
         else
           Container(color: colorScheme.surfaceContainerHighest),
 
-        // Discount badge (red)
+        // Discount badge (error color)
         if (product.discountLabel != null)
           Positioned(
-            top: 6,
-            left: 6,
+            top: AppDimens.spaceXs + AppDimens.spaceXxs,
+            left: AppDimens.spaceXs + AppDimens.spaceXxs,
             child: _Badge(
               text: product.discountLabel!,
               backgroundColor: colorScheme.error,
@@ -86,8 +89,8 @@ class _ProductImage extends StatelessWidget {
         // HOT / special badge (primary)
         if (product.badgeLabel != null && product.discountLabel == null)
           Positioned(
-            top: 6,
-            left: 6,
+            top: AppDimens.spaceXs + AppDimens.spaceXxs,
+            left: AppDimens.spaceXs + AppDimens.spaceXxs,
             child: _Badge(
               text: product.badgeLabel!,
               backgroundColor: colorScheme.primary,
@@ -121,11 +124,11 @@ class _ProductContent extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              letterSpacing: 0.3,
+              letterSpacing: AppDimens.letterSpacingSmall * 0.6,
               height: 1.2,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppDimens.spaceXs),
 
           // Duration + specialist chips
           _ChipRow(product: product),
@@ -152,13 +155,12 @@ class _ChipRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final chipStyle = textTheme.labelSmall?.copyWith(
-      fontSize: 9,
       fontWeight: FontWeight.w500,
     );
 
     return Wrap(
-      spacing: 4,
-      runSpacing: 4,
+      spacing: AppDimens.spaceXs,
+      runSpacing: AppDimens.spaceXs,
       children: [
         if (product.durationLabel != null)
           _InfoChip(
@@ -198,7 +200,6 @@ class _PriceRow extends StatelessWidget {
           Text(
             product.originalPrice!,
             style: textTheme.labelSmall?.copyWith(
-              fontSize: 10,
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
               decoration: TextDecoration.lineThrough,
             ),
@@ -230,15 +231,17 @@ class _Badge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimens.spaceXs + AppDimens.spaceXxs,
+        vertical: AppDimens.spaceXxs,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: AppDimens.radiusExtraSmall,
       ),
       child: Text(
         text,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          fontSize: 10,
           fontWeight: FontWeight.bold,
           color: textColor,
         ),
@@ -264,10 +267,13 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimens.spaceXs + AppDimens.spaceXxs,
+        vertical: AppDimens.spaceXxs,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: AppDimens.radiusExtraSmall,
       ),
       child: Text(text, style: style?.copyWith(color: textColor)),
     );

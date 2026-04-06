@@ -42,6 +42,7 @@ import 'package:user_app/features/review/presentation/screens/review_specialist.
 import 'package:user_app/features/review/presentation/screens/review_submitted.screen.dart';
 import 'package:user_app/features/partner_chat/presentation/screens/partner_chat.screen.dart';
 import 'package:user_app/features/clinic_info/presentation/screens/clinic_info.screen.dart';
+import 'package:user_app/features/cart/presentation/screens/cart.screen.dart';
 import 'package:user_app/features/notifications/'
     'presentation/providers/notification.provider.dart';
 import 'package:user_app/core/services/'
@@ -934,6 +935,29 @@ class ClinicInfoRoute extends GoRouteData with $ClinicInfoRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ClinicInfoScreen(clinicId: clinicId),
+    );
+  }
+}
+
+// --- CART ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<CartRoute>(
+  path: '/cart',
+  name: CartRoute.name,
+)
+class CartRoute extends GoRouteData
+    with $CartRoute {
+  const CartRoute();
+  static const name = 'cart';
+
+  @override
+  Page<void> buildPage(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const CartScreen(),
     );
   }
 }

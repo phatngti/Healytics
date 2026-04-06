@@ -12,19 +12,31 @@ import 'package:user_app/router/routes.dart';
 /// [ClinicInfoScreen].
 ///
 /// Orchestrates the sort bar, category scroller,
-/// and product grid. Watches filtered products
-/// provider for reactive updates.
+/// and product grid. Watches the paginated products
+/// provider for reactive server-side filtering and
+/// sorting.
 class ProductTabContent extends ConsumerWidget {
-  const ProductTabContent({super.key, required this.clinicId});
+  const ProductTabContent({
+    super.key,
+    required this.clinicId,
+  });
 
   final String clinicId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
+    final colorScheme =
+        Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     final asyncProducts = ref.watch(
-      filteredClinicProductsProvider(clinicId: clinicId),
+      clinicProductsPaginatedProvider(
+        clinicId: clinicId,
+      ),
     );
-    final asyncData = ref.watch(clinicProductsProvider(clinicId: clinicId));
 
     return Column(
       children: [
@@ -34,10 +46,15 @@ class ProductTabContent extends ConsumerWidget {
         AppDimens.verticalSmall,
 
         // ── Category chips ──
-        asyncData.when(
-          data: (data) => CategoryScroller(categories: data.categories),
-          loading: () => const SizedBox(height: 40),
-          error: (_, __) => const SizedBox.shrink(),
+        asyncProducts.when(
+          data: (data) => CategoryScroller(
+            categories: data.categories,
+          ),
+          loading: () => const SizedBox(
+            height: AppDimens.ctaButtonMd,
+          ),
+          error: (_, __) =>
+              const SizedBox.shrink(),
         ),
 
         AppDimens.verticalSmall,
@@ -45,14 +62,34 @@ class ProductTabContent extends ConsumerWidget {
         // ── Product grid ──
         Expanded(
           child: asyncProducts.when(
-            data: (products) => ProductGrid(
-              products: products,
+            data: (data) => ProductGrid(
+              products: data.products,
               onProductTap: (id) {
-                ServiceDetailsRoute(serviceId: id).push(context);
+                ServiceDetailsRoute(
+                  serviceId: id,
+                ).push(context);
               },
             ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, _) => Center(child: Text('Error: $err')),
+            loading: () => const Center(
+              child: CircularProgressIndicator(),
+            ),
+            error: (err, _) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(
+                  AppDimens.spaceXxl,
+                ),
+                child: Text(
+                  'Something went wrong.\n'
+                  'Please try again.',
+                  textAlign: TextAlign.center,
+                  style:
+                      textTheme.bodyMedium?.copyWith(
+                    color:
+                        colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ],
