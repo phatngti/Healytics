@@ -4377,15 +4377,6 @@
             }
           },
           {
-            "name": "categoryId",
-            "required": false,
-            "in": "query",
-            "description": "Filter by category UUID",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "sort",
             "required": false,
             "in": "query",
@@ -5435,7 +5426,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-04-06T08:06:41.734Z"
+              "submittedAt": "2026-04-06T11:39:08.731Z"
             }
           }
         },
@@ -11937,23 +11928,6 @@
           "businessTypes"
         ]
       },
-      "ClinicProductCategoryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "a1b2c3d4-..."
-          },
-          "label": {
-            "type": "string",
-            "example": "Massage Therapy"
-          }
-        },
-        "required": [
-          "id",
-          "label"
-        ]
-      },
       "ClinicProductDto": {
         "type": "object",
         "properties": {
@@ -12020,12 +11994,6 @@
       "ClinicProductsResponseDto": {
         "type": "object",
         "properties": {
-          "categories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClinicProductCategoryDto"
-            }
-          },
           "products": {
             "type": "array",
             "items": {
@@ -12042,7 +12010,6 @@
           }
         },
         "required": [
-          "categories",
           "products",
           "totalCount",
           "hasMore"

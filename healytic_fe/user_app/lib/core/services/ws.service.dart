@@ -77,6 +77,15 @@ class WsService {
     _connectSocket(notifications, ServicePrefix.notifications);
   }
 
+  /// Force reconnect the notifications namespace.
+  ///
+  /// Useful when auth token changes (login/refresh)
+  /// and the namespace must re-authenticate.
+  void reconnectNotifications() {
+    notifications.disconnect();
+    _connectSocket(notifications, ServicePrefix.notifications);
+  }
+
   /// Disconnect **all** active sockets.
   void disconnectAll() {
     _log.info('Disconnecting all WS namespaces');
