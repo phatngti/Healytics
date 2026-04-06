@@ -56,7 +56,6 @@ doc/CheckoutTicketResponseDto.md
 doc/ClientKeyResponseDto.md
 doc/ClinicCertificationDto.md
 doc/ClinicInfoResponseDto.md
-doc/ClinicProductCategoryDto.md
 doc/ClinicProductDto.md
 doc/ClinicProductsResponseDto.md
 doc/ClinicReviewDto.md
@@ -325,7 +324,6 @@ lib/model/checkout_ticket_response_dto.dart
 lib/model/client_key_response_dto.dart
 lib/model/clinic_certification_dto.dart
 lib/model/clinic_info_response_dto.dart
-lib/model/clinic_product_category_dto.dart
 lib/model/clinic_product_dto.dart
 lib/model/clinic_products_response_dto.dart
 lib/model/clinic_review_dto.dart
@@ -537,7 +535,6 @@ test/checkout_ticket_response_dto_test.dart
 test/client_key_response_dto_test.dart
 test/clinic_certification_dto_test.dart
 test/clinic_info_response_dto_test.dart
-test/clinic_product_category_dto_test.dart
 test/clinic_product_dto_test.dart
 test/clinic_products_response_dto_test.dart
 test/clinic_review_dto_test.dart

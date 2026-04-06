@@ -13,13 +13,10 @@ part of openapi.api;
 class ClinicProductsResponseDto {
   /// Returns a new [ClinicProductsResponseDto] instance.
   ClinicProductsResponseDto({
-    this.categories = const [],
     this.products = const [],
     required this.totalCount,
     required this.hasMore,
   });
-
-  List<ClinicProductCategoryDto> categories;
 
   List<ClinicProductDto> products;
 
@@ -29,7 +26,6 @@ class ClinicProductsResponseDto {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is ClinicProductsResponseDto &&
-    _deepEquality.equals(other.categories, categories) &&
     _deepEquality.equals(other.products, products) &&
     other.totalCount == totalCount &&
     other.hasMore == hasMore;
@@ -37,17 +33,15 @@ class ClinicProductsResponseDto {
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (categories.hashCode) +
     (products.hashCode) +
     (totalCount.hashCode) +
     (hasMore.hashCode);
 
   @override
-  String toString() => 'ClinicProductsResponseDto[categories=$categories, products=$products, totalCount=$totalCount, hasMore=$hasMore]';
+  String toString() => 'ClinicProductsResponseDto[products=$products, totalCount=$totalCount, hasMore=$hasMore]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'categories'] = this.categories;
       json[r'products'] = this.products;
       json[r'totalCount'] = this.totalCount;
       json[r'hasMore'] = this.hasMore;
@@ -73,7 +67,6 @@ class ClinicProductsResponseDto {
       }());
 
       return ClinicProductsResponseDto(
-        categories: ClinicProductCategoryDto.listFromJson(json[r'categories']),
         products: ClinicProductDto.listFromJson(json[r'products']),
         totalCount: num.parse('${json[r'totalCount']}'),
         hasMore: mapValueOfType<bool>(json, r'hasMore')!,
@@ -124,7 +117,6 @@ class ClinicProductsResponseDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'categories',
     'products',
     'totalCount',
     'hasMore',

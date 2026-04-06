@@ -80,7 +80,6 @@ class ClinicInfoRemoteDatasourceImpl
     final dto = await _api
         .userClinicControllerGetClinicProducts(
       clinicId,
-      categoryId: categoryId,
       sort: sort.toApiValue(),
       search: search,
       page: page,
@@ -198,23 +197,12 @@ class ClinicInfoRemoteDatasourceImpl
     ClinicProductsResponseDto dto,
   ) {
     return ClinicProductsData(
-      categories: dto.categories
-          .map(_mapCategory)
-          .toList(),
+      categories: const [],
       products: dto.products
           .map(_mapProduct)
           .toList(),
       totalCount: dto.totalCount.toInt(),
       hasMore: dto.hasMore,
-    );
-  }
-
-  ClinicProductCategory _mapCategory(
-    ClinicProductCategoryDto dto,
-  ) {
-    return ClinicProductCategory(
-      id: dto.id,
-      label: dto.label,
     );
   }
 
