@@ -43,8 +43,8 @@ class ChatbotOrchestrator:
         # 1. Get or create conversation
         conversation = await conversation_repo.get_or_create_conversation(
             session=session,
-            conversation_id=str(request.conversation_id),
-            user_id=getattr(request, "user_id", None),
+            conversation_id=request.conversation_id,
+            user_id=request.user_id,
         )
 
         # 2. Save user message
@@ -145,7 +145,7 @@ class ChatbotOrchestrator:
     async def get_conversations(
         self,
         session: Any,
-        user_id: str,
+        user_id: UUID,
         page: int = 1,
         limit: int = 10,
     ) -> Dict[str, Any]:

@@ -32,7 +32,8 @@ RUN pip install --no-cache-dir \
     fastapi \
     uvicorn \
     sqlalchemy \
-    asyncpg
+    asyncpg \
+    redis
 
 # 5. Copy source
 COPY . /app

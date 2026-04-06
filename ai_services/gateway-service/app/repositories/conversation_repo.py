@@ -36,7 +36,7 @@ async def get_conversation_by_id(
 async def create_conversation(
     session: AsyncSession,
     conversation_id: str | uuid.UUID,
-    user_id: str | None,
+    user_id: uuid.UUID | None,
     title: str = "New conversation",
 ) -> Conversation:
     """
@@ -64,7 +64,7 @@ async def create_conversation(
 async def get_or_create_conversation(
     session: AsyncSession,
     conversation_id: str | uuid.UUID,
-    user_id: str | None,
+    user_id: uuid.UUID | None,
     title: str = "New conversation",
 ) -> Conversation:
     """
@@ -137,7 +137,7 @@ async def update_conversation_title(
 
 async def get_conversations_page(
     session: AsyncSession,
-    user_id: str,
+    user_id: uuid.UUID,
     page: int = 1,
     limit: int = 10,
 ) -> tuple[list[Conversation], int]:

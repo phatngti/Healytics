@@ -44,7 +44,7 @@ def make_conversation(**kwargs) -> Conversation:
     now = datetime.now(tz=timezone.utc)
     return Conversation(
         id=kwargs.get("id", uuid.uuid4()),
-        user_id=kwargs.get("user_id", "user_test"),
+        user_id=kwargs.get("user_id", uuid.uuid4()),
         title=kwargs.get("title", "Test Chat"),
         created_at=kwargs.get("created_at", now),
         updated_at=kwargs.get("updated_at", now),
@@ -128,12 +128,13 @@ def test_format_conversation_fields():
     conv_id = uuid.uuid4()
     ts = datetime(2024, 6, 1, 8, 0, 0, tzinfo=timezone.utc)
 
-    conv = make_conversation(id=conv_id, user_id="user_42",
+    owner = uuid.UUID("42424242-4242-4242-4242-424242424242")
+    conv = make_conversation(id=conv_id, user_id=owner,
                              title="My Chat", created_at=ts, updated_at=ts)
     result = format_conversation(conv)
 
     assert result["id"] == str(conv_id)
-    assert result["userId"] == "user_42"
+    assert result["userId"] == str(owner)
     assert result["title"] == "My Chat"
     assert result["createdAt"] == "2024-06-01T08:00:00+00:00"
     assert result["updatedAt"] == "2024-06-01T08:00:00+00:00"
