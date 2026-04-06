@@ -55,6 +55,26 @@ _SELECT_BASE = """
             0
         ) AS avg_rating"""
 
+# Some environments (notably early Azure DB snapshots) do not have `product_reviews`.
+# In that case, we must not reference the table at all or Postgres will error at parse time.
+_SELECT_BASE_NO_REVIEWS = """
+    SELECT DISTINCT
+        p.id,
+        p.name,
+        p.slug,
+        p.base_price,
+        p.sale_price,
+        p.type,
+        p.vendor_name,
+        p.created_at,
+        c.name AS category_name,
+        pd.duration_minutes,
+        pm.url AS image_url,
+        hpp.brand_name AS partner_brand,
+        loc_d.full_name AS district_name,
+        loc_p.full_name AS province_name,
+        0 AS avg_rating"""
+
 _ST_DISTANCE_EXPR = """ST_Distance(
             hpp.location,
             ST_SetSRID(ST_MakePoint(:center_lng, :center_lat), 4326)::geography
@@ -232,7 +252,8 @@ async def fetch_candidates_from_db(
 
     has_distance_col = spatial_case in ("TH1", "TH3")
 
-    select_sql = _SELECT_BASE + f",\n        {confidence_expr} AS match_confidence" + (_SELECT_DISTANCE if has_distance_col else "")
+    select_base = _SELECT_BASE
+    select_sql = select_base + f",\n        {confidence_expr} AS match_confidence" + (_SELECT_DISTANCE if has_distance_col else "")
     sql = select_sql + _FROM_JOINS
 
     if spatial_case in ("TH1", "TH3"):
@@ -312,23 +333,69 @@ async def fetch_candidates_from_db(
         db_error = e
         logger.error(f"[DBFetcher] Query failed (case={spatial_case}): {e}")
 
+        # Backward-compatible fallback: if `product_reviews` table does not exist,
+        # retry once with rating hardcoded to 0 to keep filtering functional.
+        err_txt = str(e)
+        if "UndefinedTableError" in err_txt and "product_reviews" in err_txt:
+            try:
+                select_base = _SELECT_BASE_NO_REVIEWS
+                retry_sql = (
+                    select_base
+                    + f",\n        {confidence_expr} AS match_confidence"
+                    + (_SELECT_DISTANCE if has_distance_col else "")
+                    + _FROM_JOINS
+                )
+                if spatial_case in ("TH1", "TH3"):
+                    retry_sql += _WHERE_LOCATION_NOT_NULL
+                if conditions:
+                    retry_sql += " AND " + " AND ".join(conditions)
+                if spatial_case in ("TH1", "TH3"):
+                    retry_sql += " ORDER BY match_confidence DESC, avg_rating DESC, distance_meters ASC"
+                elif spatial_case == "TH2":
+                    retry_sql += " ORDER BY match_confidence DESC, avg_rating DESC"
+                else:
+                    retry_sql += " ORDER BY match_confidence DESC, avg_rating DESC, p.created_at DESC"
+                retry_sql += " LIMIT :limit"
+
+                candidates = await _execute_query(retry_sql, params)
+                db_error = None
+                logger.warning(
+                    "[DBFetcher] Retried without product_reviews table, candidates=%s",
+                    len(candidates),
+                )
+            except Exception as retry_exc:
+                logger.error("[DBFetcher] Retry without reviews failed: %s", retry_exc)
+
     # ── Progressive relaxation for sparse data (non-spatial only) ───────────
-    # Keep businessTypes as strongest signal; relax location if needed.
+    # Prefer keeping explicit location intent; relax business types first.
     if not candidates and db_error is None and spatial_case is None:
         bt_list = _extract_business_types(query_params)
         loc_code = query_params.get("locationCode")
+        location_intent = bool(query_params.get("locationIntent")) if loc_code else False
 
         relax_plans: list[tuple[str, Dict[str, Any]]] = []
         if bt_list and loc_code:
-            relax_plans.append(("drop_location", {**query_params, "locationCode": None}))
-        if bt_list and loc_code:
-            relax_plans.append((
-                "bt_only",
-                {
-                    **query_params,
-                    "locationCode": None,
-                },
-            ))
+            # User said a location (e.g. "ở Hà Nội") → keep location, drop BT to avoid cross-city leakage.
+            relax_plans.append(
+                (
+                    "drop_business_type_keep_location",
+                    {
+                        **query_params,
+                        "businessTypes": None,
+                        "businessType": None,
+                    },
+                )
+            )
+            # Only if location wasn't explicitly intended, allow cross-location fallbacks.
+            if not location_intent:
+                relax_plans.append(("drop_location", {**query_params, "locationCode": None}))
+                relax_plans.append((
+                    "bt_only",
+                    {
+                        **query_params,
+                        "locationCode": None,
+                    },
+                ))
 
         for plan_name, relaxed_params in relax_plans:
             try:
@@ -356,7 +423,19 @@ async def fetch_candidates_from_db(
                     relaxed_sql += " AND " + " AND ".join(relaxed_conditions)
                 relaxed_sql += " ORDER BY match_confidence DESC, avg_rating DESC, p.created_at DESC LIMIT :limit"
 
-                relaxed_candidates = await _execute_query(relaxed_sql, relaxed_bind)
+                try:
+                    relaxed_candidates = await _execute_query(relaxed_sql, relaxed_bind)
+                except Exception as relax_query_exc:
+                    # Same compatibility fallback as the main query path.
+                    err_txt = str(relax_query_exc)
+                    if "UndefinedTableError" in err_txt and "product_reviews" in err_txt:
+                        relaxed_sql = _SELECT_BASE_NO_REVIEWS + f",\n        {relaxed_conf_expr} AS match_confidence" + _FROM_JOINS
+                        if relaxed_conditions:
+                            relaxed_sql += " AND " + " AND ".join(relaxed_conditions)
+                        relaxed_sql += " ORDER BY match_confidence DESC, avg_rating DESC, p.created_at DESC LIMIT :limit"
+                        relaxed_candidates = await _execute_query(relaxed_sql, relaxed_bind)
+                    else:
+                        raise
                 if relaxed_candidates:
                     logger.info(
                         "[DBFetcher] Relaxation hit (%s): %s candidates",
