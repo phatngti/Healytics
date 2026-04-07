@@ -45,7 +45,11 @@ enum ServicePrefix {
 
   /// WebSocket notifications namespace:
   /// `/notifications`
-  notifications('/notifications', isRest: false);
+  notifications('/notifications', isRest: false),
+
+  /// WebSocket chat notifications namespace:
+  /// `/chat-notifications`
+  chatNotifications('/chat-notifications', isRest: false);
 
   const ServicePrefix(this.path, {this.isRest = true});
 
@@ -144,6 +148,9 @@ class ApiService implements Authentication {
   // ── Clinics ───────────────────────────────────────
   late UserClinicsApi userClinicsApi;
 
+  // ── Cart ────────────────────────────────────────
+  late CartApi cartApi;
+
   ApiService({AuthHttpClient? httpClient}) : _authHttpClient = httpClient {
     // Eagerly initialise so late fields are never
     // accessed before the endpoint is resolved.
@@ -218,6 +225,7 @@ class ApiService implements Authentication {
     userCategoriesApi = UserCategoriesApi(backend);
     userPaymentsApi = UserPaymentsApi(backend);
     userClinicsApi = UserClinicsApi(backend);
+    cartApi = CartApi(backend);
     userHealthServicesApi = UserHealthServicesApi(backend);
     userReviewsApi = UserReviewsApi(backend);
     userNotificationsApi = UserNotificationsApi(backend);

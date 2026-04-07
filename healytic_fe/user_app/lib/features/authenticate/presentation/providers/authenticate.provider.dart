@@ -2,7 +2,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
-import 'package:user_app/core/providers/ws.provider.dart';
 import 'package:user_app/core/utils/error_message_code.dart';
 import 'package:user_app/features/authenticate/data/repositories/authenticate_repository_impl.dart';
 import 'package:user_app/features/authenticate/domain/entities/authenticate.entity.dart';
@@ -36,22 +35,13 @@ class AuthenticateNotifier extends _$AuthenticateNotifier {
 
       // Persist tokens so the router guard recognises
       // the session as authenticated.
-      await Store.put(
-        StoreKey.accessToken,
-        authenticate.accessToken,
-      );
-      await Store.put(
-        StoreKey.refreshToken,
-        authenticate.refreshToken,
-      );
-
-      // Reconnect WS after token becomes available.
-      // This fixes the case where the global listener
-      // initialized notification WS before login.
-      ref.read(wsServiceProvider).connectNotifications();
+      await Store.put(StoreKey.accessToken, authenticate.accessToken);
+      await Store.put(StoreKey.refreshToken, authenticate.refreshToken);
 
       state = AsyncData(
-        AuthenticateStateData(authenticate: authenticate),
+        AuthenticateStateData(
+          authenticate: authenticate,
+        ),
       );
     } on ApiException catch (e) {
       state = AsyncError<AuthenticateStateData>(

@@ -249,11 +249,13 @@ class _PeriodGroup extends StatelessWidget {
                   child: _TimeChip(
                     label: indexed.slot.label,
                     isSelected: indexed.index == selectedIndex,
-                    isDisabled: indexed.slot.isBusy,
-                    onTap: indexed.slot.isBusy
-                        ? null
-                        : () =>
-                              onSlotSelected(indexed.index, indexed.slot.label),
+                    isDisabled: !indexed.slot.isAvailable,
+                    onTap: indexed.slot.isAvailable
+                        ? () => onSlotSelected(
+                              indexed.index,
+                              indexed.slot.label,
+                            )
+                        : null,
                   ),
                 );
               }).toList(),

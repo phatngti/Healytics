@@ -4751,7 +4751,7 @@
           },
           "phoneNumber": {
             "type": "string",
-            "description": "Contact phone number for the business",
+            "description": "Clinic/business contact phone number. This is the public-facing phone shown on the clinic info screen — NOT the legal representative's personal phone.",
             "example": "0901234567",
             "maxLength": 20
           }
@@ -5187,7 +5187,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-04-06T11:39:08.731Z"
+              "submittedAt": "2026-04-07T12:27:59.272Z"
             }
           }
         },

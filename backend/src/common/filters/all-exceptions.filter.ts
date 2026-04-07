@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
+import { QueryFailedError } from 'typeorm';
 import { Request, Response } from 'express';
 
 @Catch()
@@ -27,13 +28,59 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getResponse()
         : 'Internal server error';
 
-    const stack = exception instanceof Error ? exception.stack : '';
+    // ── Build rich error context ─────────────────────────────
+    const errorContext: Record<string, unknown> = {
+      httpStatus: status,
+      method: request.method,
+      path: request.url,
+      message:
+        typeof message === 'string'
+          ? message
+          : (message as any)?.message ?? message,
+    };
 
+    // Include request body for mutation endpoints (POST/PUT/PATCH)
+    if (['POST', 'PUT', 'PATCH'].includes(request.method) && request.body) {
+      errorContext.requestBody = this.sanitizeBody(request.body);
+    }
+
+    // Include route params if present
+    if (request.params && Object.keys(request.params).length > 0) {
+      errorContext.params = request.params;
+    }
+
+    // Include query params if present
+    if (request.query && Object.keys(request.query).length > 0) {
+      errorContext.query = request.query;
+    }
+
+    // Include authenticated user id if available
+    if ((request as any).user?.id) {
+      errorContext.authenticatedUserId = (request as any).user.id;
+    }
+
+    // ── Database-specific error context ─────────────────────
+    if (exception instanceof QueryFailedError) {
+      const dbError = exception as QueryFailedError & {
+        code?: string;
+        detail?: string;
+        constraint?: string;
+        table?: string;
+      };
+      errorContext.dbErrorCode = dbError.code;
+      errorContext.dbDetail = dbError.detail;
+      errorContext.dbConstraint = dbError.constraint;
+      errorContext.dbTable = dbError.table;
+    }
+
+    // ── Log ──────────────────────────────────────────────────
     this.logger.error(
-      `Http Status: ${status} Error Message: ${JSON.stringify(message)}`,
+      `[${request.method} ${request.url}] ${status} — ${JSON.stringify(errorContext)}`,
     );
 
-    this.logger.error(`Stack: ${stack}`);
+    if (exception instanceof Error) {
+      this.logger.error(`Stack: ${exception.stack}`);
+    }
 
     response.status(status).json({
       statusCode: status,
@@ -41,5 +88,29 @@ export class AllExceptionsFilter implements ExceptionFilter {
       path: request.url,
       message: message,
     });
+  }
+
+  /**
+   * Redact sensitive fields from request body before logging.
+   */
+  private sanitizeBody(body: Record<string, unknown>): Record<string, unknown> {
+    const sensitiveKeys = [
+      'password',
+      'token',
+      'secret',
+      'authorization',
+      'accessToken',
+      'refreshToken',
+      'creditCard',
+      'cardNumber',
+      'cvv',
+    ];
+    const sanitized = { ...body };
+    for (const key of Object.keys(sanitized)) {
+      if (sensitiveKeys.some((s) => key.toLowerCase().includes(s.toLowerCase()))) {
+        sanitized[key] = '***REDACTED***';
+      }
+    }
+    return sanitized;
   }
 }

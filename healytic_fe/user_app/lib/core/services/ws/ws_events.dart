@@ -7,8 +7,9 @@
 
 // ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
+// ignore_for_file: unused_element
 
-/// WebSocket event constants matching the backend's event names.
+/// WebSocket event constants for the WsChatEvent namespace(s).
 ///
 /// Client → Server events are used with `socket.emit()`.
 /// Server → Client events are used with `socket.on()`.
@@ -45,13 +46,18 @@ abstract final class WsChatEvent {
 
   /// A server error occurred while processing a WS event
   static const error = 'error';
-
-  /// A new notification was pushed to the user
-  static const newNotification = 'new_notification';
-
-  /// The unread notification count changed (after new notification or mark-read)
-  static const unreadCount = 'unread_count';
-
-  /// A system-wide broadcast was sent (admin-facing)
-  static const broadcastSent = 'broadcast_sent';
 }
+
+/// WebSocket event constants for the WsChatNotificationsEvent namespace(s).
+///
+/// Client → Server events are used with `socket.emit()`.
+/// Server → Client events are used with `socket.on()`.
+abstract final class WsChatNotificationsEvent {
+  WsChatNotificationsEvent._();
+
+  // ── Server → Client ────────────────────────────────
+
+  /// A new chat message was received — show a popup notification
+  static const newMessageNotification = 'new_message_notification';
+}
+

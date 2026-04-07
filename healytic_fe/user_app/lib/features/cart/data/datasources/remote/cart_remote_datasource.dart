@@ -2,9 +2,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/providers/api.provider.dart';
-import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/cart/domain/entities/cart_item.entity.dart';
 import 'package:user_app/features/cart/domain/entities/voucher.entity.dart';
+import 'package:user_openapi/api.dart';
 
 import 'cart_mock_data.dart';
 
@@ -47,77 +47,134 @@ abstract class CartRemoteDataSource {
 // Real Implementation
 // ────────────────────────────────────────────────────
 
-/// Real API implementation backed by OpenAPI clients.
-///
-/// Endpoints are not yet available — throws
-/// [UnimplementedError] until backend delivers the
-/// cart API.
-class CartRemoteDataSourceImpl implements CartRemoteDataSource {
-  static final _log = Logger('CartRemoteDataSourceImpl');
+/// Real API implementation backed by the generated
+/// [CartApi] OpenAPI client.
+class CartRemoteDataSourceImpl
+    implements CartRemoteDataSource {
+  static final _log =
+      Logger('CartRemoteDataSourceImpl');
 
-  final ApiService _apiService;
+  final CartApi _cartApi;
 
-  const CartRemoteDataSourceImpl(this._apiService);
+  const CartRemoteDataSourceImpl(this._cartApi);
 
   @override
   Future<List<CartItemEntity>> getCartItems() async {
-    _log.info('GET /cart — not implemented yet');
-    // TODO: Wire to generated API client
-    // final response = await _apiService
-    //     .userCartApi.cartControllerGetItems();
-    // return response.map(_mapDto).toList();
-    throw UnimplementedError('Cart API not implemented yet');
+    final dtos =
+        await _cartApi.cartControllerGetItems();
+    return dtos?.map(_mapDto).toList() ?? [];
   }
 
   @override
-  Future<CartItemEntity> addItem({required String serviceId}) async {
-    _log.info('POST /cart — not implemented yet');
-    throw UnimplementedError('Cart API not implemented yet');
+  Future<CartItemEntity> addItem({
+    required String serviceId,
+  }) async {
+    final dto = await _cartApi.cartControllerAddItem(
+      AddToCartDto(serviceId: serviceId),
+    );
+    if (dto == null) {
+      throw ApiException(
+        500,
+        'Empty response from POST /cart',
+      );
+    }
+    return _mapDto(dto);
   }
 
   @override
-  Future<void> removeItem(String cartItemId) async {
-    _log.info('DELETE /cart/$cartItemId — not implemented');
-    throw UnimplementedError('Cart API not implemented yet');
-  }
+  Future<void> removeItem(String cartItemId) =>
+      _cartApi.cartControllerRemoveItem(cartItemId);
 
   @override
   Future<CartItemEntity> applyCoupon({
     required String cartItemId,
     required String couponCode,
   }) async {
-    _log.info(
-      'POST /cart/$cartItemId/coupon — '
-      'not implemented',
+    final dto =
+        await _cartApi.cartControllerApplyCoupon(
+      cartItemId,
+      ApplyCouponDto(couponCode: couponCode),
     );
-    throw UnimplementedError('Cart API not implemented yet');
+    if (dto == null) {
+      throw ApiException(
+        500,
+        'Empty response from '
+        'POST /cart/$cartItemId/coupon',
+      );
+    }
+    return _mapDto(dto);
   }
 
   @override
-  Future<CartItemEntity> removeCoupon(String cartItemId) async {
-    _log.info(
-      'DELETE /cart/$cartItemId/coupon — '
-      'not implemented',
+  Future<CartItemEntity> removeCoupon(
+    String cartItemId,
+  ) async {
+    final dto =
+        await _cartApi.cartControllerRemoveCoupon(
+      cartItemId,
     );
-    throw UnimplementedError('Cart API not implemented yet');
+    if (dto == null) {
+      throw ApiException(
+        500,
+        'Empty response from '
+        'DELETE /cart/$cartItemId/coupon',
+      );
+    }
+    return _mapDto(dto);
   }
 
+  /// Voucher listing is not yet part of the backend
+  /// OpenAPI spec. Returns an empty list so the UI
+  /// degrades gracefully in UAT / prod.
   @override
   Future<List<VoucherEntity>> getAvailableVouchers({
     required String serviceId,
     required String clinicId,
   }) async {
-    _log.info(
-      'GET /vouchers?service=$serviceId'
-      '&clinic=$clinicId — not implemented',
+    _log.warning(
+      'Voucher API not in spec yet — '
+      'returning empty list',
     );
-    throw UnimplementedError('Voucher API not implemented yet');
+    return const [];
   }
 
   @override
-  Future<void> clearCart() async {
-    _log.info('DELETE /cart — not implemented');
-    throw UnimplementedError('Cart API not implemented yet');
+  Future<void> clearCart() =>
+      _cartApi.cartControllerClearCart();
+
+  // ── DTO → Entity mapping ────────────────────────
+
+  static CartItemEntity _mapDto(
+    CartItemResponseDto dto,
+  ) {
+    return CartItemEntity(
+      id: dto.id,
+      serviceId: dto.serviceId,
+      serviceName: dto.serviceName,
+      serviceImageUrl: dto.serviceImageUrl,
+      price: dto.price,
+      priceAmount: dto.priceAmount.toInt(),
+      clinicId: dto.clinicId,
+      clinicName: dto.clinicName,
+      clinicAddress: dto.clinicAddress,
+      clinicImageUrl:
+          dto.clinicImageUrl?.toString() ?? '',
+      couponCode:
+          dto.couponCode?.toString(),
+      couponDiscountPercent:
+          _parseInt(dto.couponDiscountPercent),
+      couponDiscountAmount:
+          _parseInt(dto.couponDiscountAmount),
+      createdAt: dto.createdAt,
+    );
+  }
+
+  /// Safely parses an [Object?] that may be a [num]
+  /// or numeric [String] from the generated DTO.
+  static int? _parseInt(Object? value) {
+    if (value == null) return null;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString());
   }
 }
 
@@ -261,10 +318,11 @@ class CartRemoteDataSourceMock implements CartRemoteDataSource {
 
 /// Switches between real and mock implementations
 /// using [AppEnvironment.useMock].
-final cartRemoteDatasourceProvider = Provider<CartRemoteDataSource>((ref) {
+final cartRemoteDatasourceProvider =
+    Provider<CartRemoteDataSource>((ref) {
   if (AppEnvironment.current.useMock) {
     return CartRemoteDataSourceMock();
   }
-
-  return CartRemoteDataSourceImpl(ref.read(apiServiceProvider));
+  final api = ref.read(apiServiceProvider);
+  return CartRemoteDataSourceImpl(api.cartApi);
 });

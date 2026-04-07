@@ -33,7 +33,11 @@ enum ServicePrefix {
   // ── Real-time (URL-only, no ApiClient) ────────
   /// WebSocket partner-chat namespace:
   /// `/partner-chat`
-  partnerChat('/partner-chat', isRest: false);
+  partnerChat('/partner-chat', isRest: false),
+
+  /// WebSocket global chat-notifications namespace:
+  /// `/chat-notifications`
+  chatNotifications('/chat-notifications', isRest: false);
 
   const ServicePrefix(this.path, {this.isRest = true});
 
