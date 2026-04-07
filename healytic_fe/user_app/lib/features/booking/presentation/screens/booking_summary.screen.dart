@@ -1,9 +1,12 @@
+import 'package:common/widgets/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:intl/intl.dart';
+import 'package:user_app/features/cart/presentation/'
+    'providers/cart.provider.dart';
 import 'package:user_app/features/checkout/domain/entities/'
     'booking_params.entity.dart';
 import 'package:user_app/features/checkout/presentation/providers/'
@@ -52,9 +55,36 @@ class BookingSummaryScreen extends ConsumerStatefulWidget {
       _BookingSummaryScreenState();
 }
 
-class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
+class _BookingSummaryScreenState
+    extends ConsumerState<BookingSummaryScreen> {
+  bool _isAddingToCart = false;
+
   void _handleBack() {
     if (context.canPop()) context.pop();
+  }
+
+  Future<void> _handleAddToCart(
+    String? serviceId,
+  ) async {
+    if (_isAddingToCart || serviceId == null) return;
+    setState(() => _isAddingToCart = true);
+    try {
+      await ref
+          .read(cartProvider.notifier)
+          .addItem(serviceId: serviceId);
+      if (!mounted) return;
+      AppToast.success(context, 'Added to cart');
+    } catch (e) {
+      if (!mounted) return;
+      AppToast.error(
+        context,
+        'Failed to add to cart',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isAddingToCart = false);
+      }
+    }
   }
 
   void _handleConfirm(
@@ -142,13 +172,19 @@ class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
     final sectionGap = AppDimens.sectionSpacing(context);
     final flowState = ref.watch(bookingFlowProvider);
 
-    final eligibilityId = flowState.selectedSpecialist?.eligibilityId;
+    final eligibilityId =
+        flowState.selectedSpecialist?.eligibilityId;
     final detail = eligibilityId != null
         ? ref
-            .watch(eligibilityDetailProvider(eligibilityId))
+            .watch(
+              eligibilityDetailProvider(eligibilityId),
+            )
             .asData
             ?.value
         : null;
+
+    final serviceId = detail?.service.id ??
+        flowState.selectedService?.id;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -174,9 +210,14 @@ class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
             ),
       bottomNavigationBar: BookingBottomAction(
         canContinue: flowState.isStep2Complete,
-        onContinue: () => _handleConfirm(flowState, detail),
+        onContinue: () =>
+            _handleConfirm(flowState, detail),
         label: 'Confirm & Pay',
         icon: Symbols.arrow_forward,
+        onAddToCart: serviceId != null
+            ? () => _handleAddToCart(serviceId)
+            : null,
+        isAddingToCart: _isAddingToCart,
       ),
     );
   }

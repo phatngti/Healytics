@@ -268,3 +268,63 @@ export class WsErrorEventDto {
   })
   message: string;
 }
+
+// ─── Global Chat Notification Payloads ─────────────────────────
+
+@WsModel({
+  description:
+    'Global notification event: a new chat message was received. ' +
+    'Emitted on /chat-notifications namespace for popup notifications.',
+})
+export class WsNewMessageNotificationDto {
+  @ApiProperty({
+    description: 'Conversation UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  conversationId: string;
+
+  @ApiProperty({
+    description: 'Server-generated message UUID',
+    example: '660e8400-e29b-41d4-a716-446655440000',
+  })
+  messageId: string;
+
+  @ApiProperty({
+    description: 'Account ID of the message sender',
+    example: '770e8400-e29b-41d4-a716-446655440000',
+  })
+  senderId: string;
+
+  @ApiProperty({
+    description: 'Display name of the sender (for notification title)',
+    example: 'Dr. Nguyen Van A',
+  })
+  senderName: string;
+
+  @ApiPropertyOptional({
+    description: 'Avatar URL of the sender (for notification icon)',
+    example: 'https://s3.example.com/avatars/doctor.jpg',
+  })
+  senderAvatar?: string;
+
+  @ApiProperty({
+    description: 'First ~100 characters of the message content (for preview)',
+    example: 'Hello, I have a question about my appointment.',
+  })
+  messagePreview: string;
+
+  @ApiProperty({
+    description: 'Type of message (text, image, file, etc.)',
+    enum: MessageType,
+    enumName: 'MessageType',
+    example: MessageType.TEXT,
+  })
+  messageType: MessageType;
+
+  @ApiProperty({
+    description: 'When the message was created',
+    example: '2026-04-06T00:00:00.000Z',
+    type: Date,
+  })
+  createdAt: Date;
+}

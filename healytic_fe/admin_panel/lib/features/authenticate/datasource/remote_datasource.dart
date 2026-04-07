@@ -208,30 +208,49 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
   // Private Helper Methods
   // ===========================================================================
 
-  List<BusinessType> _mapBusinessTypes(List<String> businessTypes) {
+  static const _businessTypeMap = {
+    'MASSAGE_THERAPY': BusinessType.MASSAGE_THERAPY,
+    'MASSAGE_REHABILITATION': BusinessType.MASSAGE_REHABILITATION,
+    'SPA_BEAUTY': BusinessType.SPA_BEAUTY,
+    'FITNESS': BusinessType.FITNESS,
+    'PHARMACY': BusinessType.PHARMACY,
+    'DENTAL': BusinessType.DENTAL,
+    'TRADITIONAL_MEDICINE': BusinessType.TRADITIONAL_MEDICINE,
+    'PSYCHOLOGY': BusinessType.PSYCHOLOGY,
+    'DERMATOLOGY': BusinessType.DERMATOLOGY,
+    'NUTRITION': BusinessType.NUTRITION,
+    'PSYCHIATRY': BusinessType.PSYCHIATRY,
+  };
+
+  List<BusinessType> _mapBusinessTypes(
+    List<String> businessTypes,
+  ) {
     return businessTypes.map((type) {
-      return switch (type.toUpperCase()) {
-        'MASSAGE_THERAPY' => BusinessType.MASSAGE_THERAPY,
-        'MASSAGE_REHABILITATION' => BusinessType.MASSAGE_REHABILITATION,
-        'SPA_BEAUTY' => BusinessType.SPA_BEAUTY,
-        'FITNESS' => BusinessType.FITNESS,
-        'PHARMACY' => BusinessType.PHARMACY,
-        'DENTAL' => BusinessType.DENTAL,
-        'TRADITIONAL_MEDICINE' => BusinessType.TRADITIONAL_MEDICINE,
-        'PSYCHOLOGY' => BusinessType.PSYCHOLOGY,
-        'DERMATOLOGY' => BusinessType.DERMATOLOGY,
-        'NUTRITION' => BusinessType.NUTRITION,
-        'PSYCHIATRY' => BusinessType.PSYCHIATRY,
-        _ => BusinessType.SPA_BEAUTY,
-      };
+      final key = type.toUpperCase();
+      final mapped = _businessTypeMap[key];
+      if (mapped == null) {
+        developer.log(
+          'Unknown business type "$type", '
+          'falling back to SPA_BEAUTY',
+          name: 'AuthenticateRemoteDatasource',
+          level: 900,
+        );
+        return BusinessType.SPA_BEAUTY;
+      }
+      return mapped;
     }).toList();
   }
 
-  LegalRepresentativeRequestDtoIdTypeEnum _mapIdType(String idType) {
+  LegalRepresentativeRequestDtoIdTypeEnum _mapIdType(
+    String idType,
+  ) {
     return switch (idType.toUpperCase()) {
-      'CITIZEN_ID' => LegalRepresentativeRequestDtoIdTypeEnum.CITIZEN_ID,
-      'PASSPORT' => LegalRepresentativeRequestDtoIdTypeEnum.PASSPORT,
-      'MILITARY_ID' => LegalRepresentativeRequestDtoIdTypeEnum.MILITARY_ID,
+      'CITIZEN_ID' =>
+        LegalRepresentativeRequestDtoIdTypeEnum.CITIZEN_ID,
+      'PASSPORT' =>
+        LegalRepresentativeRequestDtoIdTypeEnum.PASSPORT,
+      'MILITARY_ID' =>
+        LegalRepresentativeRequestDtoIdTypeEnum.MILITARY_ID,
       _ => LegalRepresentativeRequestDtoIdTypeEnum.CITIZEN_ID,
     };
   }

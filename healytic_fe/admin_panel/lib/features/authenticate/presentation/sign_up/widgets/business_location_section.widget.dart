@@ -130,13 +130,65 @@ class _BusinessLocationSectionState
         ),
         AppDimens.verticalMedium,
 
-        // Row 2: Street Address
-        _buildTextFieldWithLabel(
-          context,
-          label: 'Street Address (House No, Street Name)',
-          fieldKey: 'street_address',
-          hintText: 'e.g. 123 Nguyen Hue Street',
-          initialValue: widget.initialStreetAddress,
+        // Row 2: Street Address & Clinic Phone
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth > 600;
+
+            if (isWide) {
+              return Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: _buildTextFieldWithLabel(
+                      context,
+                      label: 'Street Address',
+                      fieldKey: 'street_address',
+                      hintText:
+                          'e.g. 123 Nguyen Hue Street',
+                      initialValue:
+                          widget.initialStreetAddress,
+                    ),
+                  ),
+                  AppDimens.horizontalMedium,
+                  Expanded(
+                    child: FormFieldBuilders.buildTextField(
+                      context,
+                      fieldKey: 'clinic_phone',
+                      label: 'Clinic Phone',
+                      hintText: '028 1234 5678',
+                      keyboardType:
+                          TextInputType.phone,
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return Column(
+              children: [
+                _buildTextFieldWithLabel(
+                  context,
+                  label: 'Street Address',
+                  fieldKey: 'street_address',
+                  hintText:
+                      'e.g. 123 Nguyen Hue Street',
+                  initialValue:
+                      widget.initialStreetAddress,
+                ),
+                AppDimens.verticalMedium,
+                FormFieldBuilders.buildTextField(
+                  context,
+                  fieldKey: 'clinic_phone',
+                  label: 'Clinic Phone',
+                  hintText: '028 1234 5678',
+                  keyboardType: TextInputType.phone,
+                ),
+              ],
+            );
+          },
         ),
       ],
     );

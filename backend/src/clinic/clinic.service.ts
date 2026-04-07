@@ -133,6 +133,13 @@ export class ClinicService {
       iconName: c.iconName,
     }));
 
+    const addressParts = [
+      partner.streetAddress,
+      partner.ward?.fullName,
+      partner.district?.fullName,
+      partner.province?.fullName,
+    ].filter(Boolean);
+
     return {
       id: partner.id,
       name: partner.brandName,
@@ -146,7 +153,7 @@ export class ClinicService {
       certifications: certDtos,
       specialists,
       businessTypes: partner.businessType as unknown as string[],
-      address: partner.streetAddress,
+      address: addressParts.join(', ') || null,
       phoneNumber: partner.phoneNumber,
     };
   }

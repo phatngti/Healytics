@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BookingService } from './booking.service';
 import { AcquireMicroLockHandler } from './application/handlers/acquire-micro-lock.handler';
+import { CheckDuplicateSlotHandler } from './application/handlers/check-duplicate-slot.handler';
 import { CreateCheckoutTicketHandler } from './application/handlers/create-checkout-ticket.handler';
 import { GetBookingHandler } from './application/handlers/get-booking.handler';
 import { GetCheckoutTicketHandler } from './application/handlers/get-checkout-ticket.handler';
@@ -10,6 +11,7 @@ import { MockHandler, createMockHandler } from '../../test/mocks/mock-types';
 describe('BookingService', () => {
   let service: BookingService;
   let acquireMicroLockHandler: MockHandler;
+  let checkDuplicateSlotHandler: MockHandler;
   let createCheckoutTicketHandler: MockHandler;
   let getBookingHandler: MockHandler;
   let getCheckoutTicketHandler: MockHandler;
@@ -17,6 +19,7 @@ describe('BookingService', () => {
 
   beforeEach(async () => {
     acquireMicroLockHandler = createMockHandler();
+    checkDuplicateSlotHandler = createMockHandler();
     createCheckoutTicketHandler = createMockHandler();
     getBookingHandler = createMockHandler();
     getCheckoutTicketHandler = createMockHandler();
@@ -26,6 +29,10 @@ describe('BookingService', () => {
       providers: [
         BookingService,
         { provide: AcquireMicroLockHandler, useValue: acquireMicroLockHandler },
+        {
+          provide: CheckDuplicateSlotHandler,
+          useValue: checkDuplicateSlotHandler,
+        },
         {
           provide: CreateCheckoutTicketHandler,
           useValue: createCheckoutTicketHandler,

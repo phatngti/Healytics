@@ -63,7 +63,7 @@ void main() {
       // TODO
     });
 
-    // Contact phone number for the business
+    // Clinic/business contact phone number. This is the public-facing phone shown on the clinic info screen — NOT the legal representative's personal phone.
     // String phoneNumber
     test('to test the property `phoneNumber`', () async {
       // TODO

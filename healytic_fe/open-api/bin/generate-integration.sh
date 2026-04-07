@@ -48,7 +48,8 @@ function ws_client {
   echo "Generating WebSocket client for user_app..."
   node $BASE_DIR/open-api/bin/generate-ws-client.js \
     --spec $BASE_DIR/open-api/ws-contract.json \
-    --output $BASE_DIR/user_app/lib/core/services/ws
+    --output $BASE_DIR/user_app/lib/core/services/ws \
+    --namespaces user-chat,chat-notifications
 }
 
 function ws_admin {
@@ -56,7 +57,7 @@ function ws_admin {
   node $BASE_DIR/open-api/bin/generate-ws-client.js \
     --spec $BASE_DIR/open-api/ws-contract.json \
     --output $BASE_DIR/admin_panel/lib/core/services/ws \
-    --namespaces partner-chat
+    --namespaces partner-chat,chat-notifications
 }
 
 # requires server to be built

@@ -14,10 +14,22 @@ class TrustMetricsBar extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final items = [
-      _MetricItem(value: metrics.experienceLabel, label: 'EXPERIENCE'),
-      _MetricItem(value: '${metrics.specialistsCount}', label: 'SPECIALISTS'),
-      _MetricItem(value: metrics.certifiedLabel, label: 'CERTIFIED'),
-      _MetricItem(value: metrics.clientsLabel, label: 'CLIENTS'),
+      _MetricItem(
+        value: metrics.experienceLabel,
+        label: 'EXPERIENCE',
+      ),
+      _MetricItem(
+        value: metrics.rating.toStringAsFixed(1),
+        label: 'RATING',
+      ),
+      _MetricItem(
+        value: '${metrics.reviewCount}',
+        label: 'REVIEWS',
+      ),
+      _MetricItem(
+        value: metrics.clientsLabel,
+        label: 'CLIENTS',
+      ),
     ];
 
     return Container(

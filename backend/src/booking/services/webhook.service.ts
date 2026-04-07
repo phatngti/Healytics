@@ -38,15 +38,21 @@ export class WebhookService {
         this.logger.log(`Webhook delivered to ${url} (attempt ${attempt})`);
         return;
       } catch (error) {
+        const httpStatus = error?.response?.status ?? 'N/A';
+        const httpData = error?.response?.data
+          ? JSON.stringify(error.response.data).substring(0, 200)
+          : 'N/A';
         this.logger.warn(
-          `Webhook attempt ${attempt}/3 failed for ${url}: ${error.message}`,
+          `Webhook attempt ${attempt}/3 failed — url=${url}, ticketId=${payload.ticket_id}, status=${payload.status}, httpStatus=${httpStatus}, responseBody=${httpData}: ${error.message}`,
         );
         if (attempt < 3) {
           await this.sleep(attempt * 1000);
         }
       }
     }
-    this.logger.error(`Webhook exhausted all 3 retries for ${url}`);
+    this.logger.error(
+      `Webhook exhausted all 3 retries — url=${url}, payload=${JSON.stringify(payload)}`,
+    );
   }
 
   private sleep(ms: number): Promise<void> {
