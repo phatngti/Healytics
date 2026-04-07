@@ -149,84 +149,6 @@ services:
       kong-cp:
         condition: service_healthy
 
-  # This service runs ONCE to configure the Cloudflare Tunnel via API
-  cloudflare-configurator:
-    image: alpine:latest
-    container_name: cloudflare-configurator
-    networks:
-      - services
-    volumes:
-      - ./cloudflare-tunnel-setup.sh:/setup.sh:ro
-      - ./.env:/app/.env
-      - ./cloudflare-tunnels.json:/app/cloudflare-tunnels.json:ro
-      - tunnel-token:/tmp/tunnel-token
-    entrypoint: ["sh", "-c", "apk add --no-cache curl jq >/dev/null 2>&1 && sh /setup.sh"]
-    environment:
-      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
-      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
-      CLOUDFLARE_ZONE_ID: ${CLOUDFLARE_ZONE_ID}
-      CLOUDFLARE_TUNNELS_FILE: ${CLOUDFLARE_TUNNELS_FILE:-/app/cloudflare-tunnels.json}
-    depends_on:
-      kong-cp:
-        condition: service_healthy
-
-  # Reads the tunnel token from the shared volume (written by cloudflare-configurator).
-  cloudflare-token-reader:
-    image: alpine:latest
-    container_name: cloudflare-token-reader
-    networks:
-      - services
-    volumes:
-      - tunnel-token:/tmp/tunnel-token
-    entrypoint: ["sh", "-c"]
-    command:
-      - |
-        if [ -f /tmp/tunnel-token/TUNNEL_TOKEN ] && [ -s /tmp/tunnel-token/TUNNEL_TOKEN ]; then
-          echo "Using tunnel token from shared volume"
-        else
-          echo "ERROR: No tunnel token found. Run cloudflare-configurator first."
-          exit 1
-        fi
-    depends_on:
-      cloudflare-configurator:
-        condition: service_completed_successfully
-
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared
-    restart: on-failure
-    networks:
-      - services
-    command: ["tunnel", "--no-autoupdate", "run", "--token-file", "/tmp/tunnel-token/TUNNEL_TOKEN"]
-    volumes:
-      - tunnel-token:/tmp/tunnel-token:ro
-    depends_on:
-      cloudflare-token-reader:
-        condition: service_completed_successfully
-
-  # TCP access proxy for PostgreSQL via Cloudflare Tunnel.
-  # Exposes the tunneled Postgres on host port 15432 (to avoid conflict
-  # with the local Postgres on 5432).
-  # Connect via: psql -h localhost -p 15432 -U <user> -d <db>
-  cloudflared-db-access:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared-db-access
-    restart: unless-stopped
-    networks:
-      - services
-    command:
-      - access
-      - tcp
-      - --hostname
-      - database.healytics.me
-      - --url
-      - 0.0.0.0:5432
-    ports:
-      - "15432:5432"
-    depends_on:
-      cloudflared:
-        condition: service_started
-
   # =============================================================================
   # RabbitMQ Cluster (3 nodes + HAProxy)
   # =============================================================================
@@ -368,7 +290,6 @@ services:
 volumes:
   pgdata:
   redisdata:
-  tunnel-token:
   rabbitmq1-data:
   rabbitmq1-logs:
   rabbitmq2-data:

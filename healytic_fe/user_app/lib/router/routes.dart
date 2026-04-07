@@ -132,10 +132,8 @@ class _MobileWrapperBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final unreadCount = ref.watch(unreadCountProvider).value ?? 0;
-
-    // Eagerly connect /notifications WS namespace
-    ref.watch(notificationWsConnectionProvider);
+    final unreadCount =
+        ref.watch(unreadCountProvider).value ?? 0;
 
     // Initialise mock push notification service
     ref.watch(pushNotificationServiceProvider);

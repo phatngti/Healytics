@@ -158,12 +158,9 @@ class ClinicInfoRemoteDatasourceImpl
     ClinicTrustMetricsDto dto,
   ) {
     return ClinicTrustMetrics(
+      rating: dto.rating.toDouble(),
+      reviewCount: dto.reviewCount.toInt(),
       experienceLabel: dto.experienceLabel,
-      // DTO no longer provides specialists count; use review count as
-      // a stable numeric fallback for the second metric slot.
-      specialistsCount: dto.reviewCount.toInt(),
-      // DTO no longer provides certified label; expose rating text.
-      certifiedLabel: dto.rating.toString(),
       clientsLabel: dto.clientsLabel,
     );
   }

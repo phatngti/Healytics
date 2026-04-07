@@ -31,6 +31,7 @@ class WsService {
   // ── Socket instances ─────────────────────────────
 
   PartnerChatSocket? _partnerChatSocket;
+  ChatNotificationsSocket? _chatNotificationsSocket;
 
   /// The `/partner-chat` namespace socket.
   ///
@@ -38,6 +39,13 @@ class WsService {
   /// allocating resources when not needed.
   PartnerChatSocket get partnerChat =>
       _partnerChatSocket ??= PartnerChatSocket();
+
+  /// The `/chat-notifications` namespace socket.
+  ///
+  /// Created lazily on first access to avoid
+  /// allocating resources when not needed.
+  ChatNotificationsSocket get chatNotifications =>
+      _chatNotificationsSocket ??= ChatNotificationsSocket();
 
   // ── Lifecycle ────────────────────────────────────
 
@@ -52,6 +60,10 @@ class WsService {
       partnerChat,
       ServicePrefix.partnerChat,
     );
+    _connectSocket(
+      chatNotifications,
+      ServicePrefix.chatNotifications,
+    );
   }
 
   /// Connect only the partner-chat namespace.
@@ -62,10 +74,19 @@ class WsService {
     );
   }
 
+  /// Connect only the global chat-notifications namespace.
+  void connectChatNotifications() {
+    _connectSocket(
+      chatNotifications,
+      ServicePrefix.chatNotifications,
+    );
+  }
+
   /// Disconnect **all** active sockets.
   void disconnectAll() {
     _log.info('Disconnecting all WS namespaces');
     _partnerChatSocket?.disconnect();
+    _chatNotificationsSocket?.disconnect();
   }
 
   /// Dispose **all** sockets and release resources.
@@ -75,7 +96,9 @@ class WsService {
   void dispose() {
     _log.info('Disposing WS service');
     _partnerChatSocket?.dispose();
+    _chatNotificationsSocket?.dispose();
     _partnerChatSocket = null;
+    _chatNotificationsSocket = null;
   }
 
   // ── Helpers ──────────────────────────────────────

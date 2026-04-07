@@ -14,6 +14,7 @@ import 'package:user_app/features/partner_chat/data/repositories/partner_chat_im
 import 'package:user_app/features/partner_chat/domain/entities/partner_chat_message.entity.dart';
 import 'package:user_app/features/partner_chat/domain/entities/partner_conversation.entity.dart';
 import 'package:user_app/features/partner_chat/domain/repositories/partner_chat.repository.dart';
+import 'package:user_app/features/partner_chat/presentation/providers/chat_message_event.provider.dart';
 
 part 'partner_chat.provider.g.dart';
 
@@ -137,6 +138,19 @@ class PartnerChat extends _$PartnerChat {
     );
   }
 
+  /// Mark this conversation as active to suppress
+  /// inline toasts while the user is viewing it.
+  void _setActiveConversation(String conversationId) {
+    ref.read(activeChatConversationIdProvider.notifier).set(conversationId);
+  }
+
+  /// Clear active conversation on dispose.
+  void _clearActiveConversation() {
+    if (ref.exists(activeChatConversationIdProvider)) {
+      ref.read(activeChatConversationIdProvider.notifier).set(null);
+    }
+  }
+
   /// The current user's account ID for bubble
   /// alignment and filtering.
   String get currentUserId => _currentUserId ?? 'current-user';
@@ -166,18 +180,21 @@ class PartnerChat extends _$PartnerChat {
       if (!ref.mounted) return;
 
       // 3. Load message history
-      final messages = await _repository.getMessages(conversation.id);
+      final result = await _repository.getMessages(conversation.id);
 
       if (!ref.mounted) return;
 
       state = state.copyWith(
         connectionStatus: WsConnectionStatus.connected,
         conversation: conversation,
-        messages: messages,
+        messages: result.messages,
         isLoadingMessages: false,
-        hasMoreMessages: messages.length >= 20,
+        hasMoreMessages: result.hasMore,
         wsUnavailable: _isRealMode && !wsConnected,
       );
+
+      // Suppress inline toasts for this conversation
+      _setActiveConversation(conversation.id);
 
       // 4. Join conversation room & mark read
       if (wsConnected) {
@@ -475,14 +492,14 @@ class PartnerChat extends _$PartnerChat {
           ? state.messages.first.id
           : null;
 
-      final older = await _repository.getMessages(convId, beforeId: oldestId);
+      final result = await _repository.getMessages(convId, beforeId: oldestId);
 
       if (!ref.mounted) return;
 
       state = state.copyWith(
-        messages: [...older, ...state.messages],
+        messages: [...result.messages, ...state.messages],
         isLoadingMessages: false,
-        hasMoreMessages: older.length >= 20,
+        hasMoreMessages: result.hasMore,
       );
     } catch (e) {
       if (!ref.mounted) return;
@@ -499,6 +516,7 @@ class PartnerChat extends _$PartnerChat {
   }
 
   void _cleanup() {
+    _clearActiveConversation();
     for (final sub in _subscriptions) {
       sub.cancel();
     }

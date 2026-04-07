@@ -92,6 +92,12 @@ export class GetConversationMessagesHandler {
       `Fetched ${messages.length} messages for conversation ${conversationId} (hasMore: ${hasMore}, nextCursor: ${nextCursor ?? 'none'})`,
     );
 
+    // Return messages in chronological order (ASC) so clients
+    // can render directly without reversing.
+    // The query uses DESC internally for cursor-based "fetch older"
+    // to work with the composite index.
+    messages.reverse();
+
     return {
       messages: ChatMessageResponseDto.fromEntities(messages),
       hasMore,

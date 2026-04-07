@@ -5,6 +5,9 @@ import 'package:user_app/features/app/widgets/'
 import 'package:user_app/features/notifications/'
     'presentation/widgets/'
     'notification_toast_listener.widget.dart';
+import 'package:user_app/features/partner_chat/'
+    'presentation/widgets/'
+    'chat_message_toast_listener.widget.dart';
 import 'package:user_app/router/app_router.dart';
 import 'package:user_app/theme/app_theme.dart';
 
@@ -25,7 +28,10 @@ class App extends HookConsumerWidget {
       builder: (context, child) {
         return GlobalErrorListener(
           child: NotificationToastListener(
-            child: child ?? const SizedBox.shrink(),
+            child: ChatMessageToastListener(
+              child:
+                  child ?? const SizedBox.shrink(),
+            ),
           ),
         );
       },

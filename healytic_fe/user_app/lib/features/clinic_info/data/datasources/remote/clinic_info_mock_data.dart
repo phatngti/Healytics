@@ -40,9 +40,9 @@ const kMockClinicInfo = ClinicInfoEntity(
       'combines medical expertise with a tranquil spa '
       'environment.',
   trustMetrics: ClinicTrustMetrics(
+    rating: 4.9,
+    reviewCount: 2500,
     experienceLabel: '10+ Yrs',
-    specialistsCount: 15,
-    certifiedLabel: '100%',
     clientsLabel: '30k+',
   ),
   certifications: [
@@ -156,9 +156,9 @@ final Map<String, ClinicInfoEntity> kMockClinicInfoMap = {
     followersLabel: '5k',
     reviewsLabel: '800',
     trustMetrics: const ClinicTrustMetrics(
+      rating: 4.5,
+      reviewCount: 800,
       experienceLabel: '5+ Yrs',
-      specialistsCount: 8,
-      certifiedLabel: '100%',
       clientsLabel: '10k+',
     ),
   ),

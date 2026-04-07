@@ -13,13 +13,6 @@
             "keepAliveTimeout": 3600,
             "keepAliveConnections": 100
           }
-        },
-        {
-          "hostname": "database.healytics.me",
-          "origin": "tcp://host.docker.internal:5432",
-          "originRequest": {
-            "noTLSVerify": true
-          }
         }
       ]
     }
