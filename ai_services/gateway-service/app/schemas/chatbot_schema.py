@@ -17,9 +17,20 @@ class ChatbotRequest(BaseModel):
 
     message: str = Field(..., min_length=1)
 
+    current_lat: Optional[float] = Field(
+        default=None,
+        ge=-90,
+        le=90,
+        description="User's current latitude",
+    )
+    current_lng: Optional[float] = Field(
+        default=None,
+        ge=-180,
+        le=180,
+        description="User's current longitude",
+    )
+
     top_k: int = Field(default=3, ge=1, le=20)
-
-
 
 
 class TokenEvent(BaseModel):
