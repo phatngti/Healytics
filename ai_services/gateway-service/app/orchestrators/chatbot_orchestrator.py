@@ -185,7 +185,9 @@ class ChatbotOrchestrator:
     async def _call_recommender_safe(self, request: Any) -> Optional[Dict[str, Any]]:
         try:
             ner_payload = {
-                "text": request.message
+                "text": request.message,
+                "current_lat": getattr(request, "current_lat", None),
+                "current_lng": getattr(request, "current_lng", None),
             }
             filtered_ids = await self.ner_client.get_service_ids(payload=ner_payload)
             logger.info(
