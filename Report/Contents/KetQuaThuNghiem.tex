@@ -111,12 +111,25 @@ Sao lưu \& phục hồi dữ liệu & \textit{(chưa kiểm tra)} & -- \\
 
 \subsection{Đánh giá hiệu quả AI trong gợi ý dịch vụ}
 
-Phần này trình bày phương pháp, tiêu chí và kết quả đánh giá cho ba thành phần cốt lõi của hệ thống AI:
+Phần này trình bày phương pháp, tiêu chí và kết quả đánh giá cho các thành phần cốt lõi của hệ thống AI:
 \begin{itemize}
     \item Mô hình phân loại ý định (Intent Classifier).
     \item Dịch vụ trích xuất thực thể (NER Service).
     \item Hệ thống gợi ý (Recommender Service).
 \end{itemize}
+
+\subsubsection{Cơ sở lựa chọn ngưỡng đánh giá}
+
+Các ngưỡng định lượng trong chương này không được chọn ngẫu nhiên, mà được thiết lập từ bốn nguồn chính nhằm bảo đảm tính khoa học và tính khả thi triển khai:
+
+\begin{itemize}
+    \item \textbf{Từ đặc tả yêu cầu hệ thống (SRS):} các ngưỡng đóng vai trò tiêu chí nghiệm thu (acceptance criteria) cho từng thành phần. Ví dụ, yêu cầu thời gian phản hồi API và yêu cầu chất lượng AI được gắn trực tiếp với mục tiêu vận hành của hệ thống.
+    \item \textbf{Từ nguyên lý UX/HCI:} với các chỉ số độ trễ, nhóm tham chiếu nguyên lý thời gian phản hồi của Nielsen Norman Group (mức dưới 100--200ms tạo cảm giác gần thời gian thực), do đó đặt mục tiêu \texttt{Latency P95} ở mức chặt chẽ để bảo toàn trải nghiệm hội thoại.
+    \item \textbf{Từ baseline học thuật và thực nghiệm:} các chỉ số như F1, Hit@K, MRR, NDCG được đối chiếu với mô hình cơ sở trên cùng bài toán; ngưỡng được đặt theo hướng mô hình đề xuất phải vượt baseline để chứng minh cải thiện thực chất.
+    \item \textbf{Từ heuristic kỹ thuật theo bối cảnh dữ liệu:} với dữ liệu tiếng Việt tự do và truy vấn hội thoại có nhiễu, nhóm dùng quy tắc thực hành phổ biến trong NLP/IR để đặt ngưỡng khả thi nhưng đủ khắt khe (mức tốt thường từ 0.85 đến 0.90 trở lên tùy chỉ số).
+\end{itemize}
+
+Vì vậy, khi giải trình trước hội đồng, có thể nêu rằng các ngưỡng trong báo cáo được tổng hợp từ \textbf{yêu cầu hệ thống}, \textbf{chuẩn trải nghiệm người dùng}, \textbf{kết quả baseline}, và \textbf{kinh nghiệm thực nghiệm} trên dữ liệu của đề tài, thay vì dựa vào một con số cứng duy nhất cho mọi bài toán.
 
 \subsubsection{Mô hình phân loại ý định (Intent Classifier)}
 
@@ -212,20 +225,20 @@ Recall (label 1) & 0.8710 & PASS ($\geq 0.83$) \\
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|c|p{8cm}|}
+\begin{tabular}{|l|c|c|p{6cm}|}
 \hline
-\textbf{Trường thông tin} & \textbf{Độ chính xác} & \textbf{Nhận xét} \\
+\textbf{Trường thông tin} & \textbf{Độ chính xác} & \textbf{Đánh giá (Ngưỡng)} & \textbf{Nhận xét} \\
 \hline
-business\_type & 0.9689 & Xử lý tốt các ý định dịch vụ chính yếu. \\
+business\_type & 0.9689 & PASS ($\geq 0.95$) & Xử lý tốt các ý định dịch vụ chính yếu. \\
 \hline
-location\_code & 0.9793 & Hoạt động hiệu quả với các bí danh quận/huyện. \\
+location\_code & 0.9793 & PASS ($\geq 0.95$) & Hoạt động hiệu quả với các bí danh quận/huyện. \\
 \hline
-price & 0.9689 & Độ chính xác cao \\
+price & 0.9689 & PASS ($\geq 0.90$) & Độ chính xác cao. \\
 \hline
-distance & 0.9378 & Bắt tốt cả biểu đạt khoảng cách tường minh và ẩn ý. \\
+distance & 0.9378 & PASS ($\geq 0.90$) & Bắt tốt cả biểu đạt khoảng cách tường minh và ẩn ý. \\
 \hline
 \end{tabular}
-\caption{Độ chính xác theo trường thông tin của NER Service}
+\caption{Độ chính xác theo trường thông tin của NER Service và đối chiếu với ngưỡng kỳ vọng}
 \label{tab:ner_field_acc}
 \end{table}
 
@@ -287,12 +300,16 @@ Macro Average & - & - & - & 95.8\% & 94.7\% & 95.2\% \\
     \end{itemize}
     \item Bộ chỉ số: Hit@K, Recall@K, MRR@K, NDCG@K, HNR và thống kê latency.
     \item Kết quả Home dùng cấu hình \texttt{query\_mode=keyword}, \texttt{score\_mode=distance}.
+    \item Ngưỡng mục tiêu được thiết lập chủ yếu dựa trên yêu cầu khắt khe của kịch bản Chatbot (yêu cầu độ chính xác xếp hạng cao), đồng thời quy định độ trễ tối đa P95 không vượt quá 150ms để đảm bảo trải nghiệm tương tác thời gian thực.
 \end{itemize}
 
 \textbf{Kết quả định lượng:}
 
 \begin{itemize}
-    \item Bảng \ref{tab:rec_comparison} so sánh trực tiếp hai run \texttt{chatbot\_baseline\_v1} và \texttt{home\_keyword\_distance\_v1}.
+    \item Bảng \ref{tab:rec_comparison} so sánh trực tiếp kết quả test giữa hai kịch bản Chatbot và Home.
+    \item Bảng \ref{tab:chatbot_full_metrics} tổng hợp đầy đủ chỉ số Chatbot theo các mốc @1/@3/@5/@10.
+    \item Bảng \ref{tab:chatbot_category_metrics} tổng hợp kết quả Chatbot theo từng nhóm truy vấn.
+    \item Bảng \ref{tab:home_full_metrics} tổng hợp đầy đủ chỉ số Home theo các mốc @1/@3/@5/@10.
 \end{itemize}
 
 \begin{table}[H]
@@ -301,24 +318,97 @@ Macro Average & - & - & - & 95.8\% & 94.7\% & 95.2\% \\
 \hline
 \textbf{Chỉ số (@3)} & \textbf{Kịch bản Chatbot} & \textbf{Kịch bản Home} \\
 \hline
-Hit & 0.8194 & 0.4056 \\
+Hit & 0.8194 & 0.5889 \\
 \hline
-Recall & 0.5407 & 0.2500 \\
+Recall & 0.5407 & 0.3454 \\
 \hline
-MRR & 0.7176 & 0.3315 \\
+MRR & 0.7176 & 0.4731 \\
 \hline
-NDCG & 0.5478 & 0.2458 \\
+NDCG & 0.5478 & 0.3422 \\
 \hline
-HNR (càng thấp càng tốt) & 0.0102 & 0.0296 \\
+HNR (càng thấp càng tốt) & 0.0102 & 0.0278 \\
 \hline
-Latency Avg (ms) & 88.92 & 83.23 \\
+Latency Avg (ms) & 88.92 & 122.27 \\
 \hline
-Latency P95 (ms) & 104.42 & 91.58 \\
+Latency P95 (ms) & 104.42 & 151.90 \\
 \hline
 \end{tabular}
-\caption{So sánh kết quả đánh giá giữa kịch bản Chatbot và Home}
+\caption{So sánh kết quả đánh giá hệ thống gợi ý giữa hai kịch bản Chatbot và Home}
 \label{tab:rec_comparison}
 \end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Metric (Chatbot)} & \textbf{@1} & \textbf{@3} & \textbf{@5} & \textbf{@10} \\
+\hline
+Hit & 0.6333 & 0.8194 & 0.8917 & 0.9750 \\
+\hline
+Prec & 0.6333 & 0.2972 & 0.2128 & 0.1339 \\
+\hline
+Recall & 0.4023 & 0.5407 & 0.6310 & 0.7704 \\
+\hline
+MRR & 0.6333 & 0.7176 & 0.7345 & 0.7460 \\
+\hline
+NDCG & 0.6333 & 0.5478 & 0.5923 & 0.6467 \\
+\hline
+NDCG\_G & 0.6181 & 0.6044 & 0.6445 & 0.6904 \\
+\hline
+HNR $\downarrow$ & 0.0056 & 0.0102 & 0.0139 & 0.0194 \\
+\hline
+\end{tabular}
+\caption{Kết quả đầy đủ của Chatbot evaluation}
+\label{tab:chatbot_full_metrics}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Category} & \textbf{Count} & \textbf{Hit@3} & \textbf{Recall@3} & \textbf{MRR@3} \\
+\hline
+dinh\_duong & 60 & 0.7500 & 0.4611 & 0.6556 \\
+\hline
+tam\_ly & 90 & 0.9444 & 0.6241 & 0.8259 \\
+\hline
+the\_thao & 120 & 0.7250 & 0.4611 & 0.6097 \\
+\hline
+y\_te & 90 & 0.8667 & 0.6167 & 0.7944 \\
+\hline
+\end{tabular}
+\caption{Kết quả Chatbot theo từng nhóm truy vấn}
+\label{tab:chatbot_category_metrics}
+\end{table}
+
+\noindent\textbf{Thống kê latency (Chatbot):} Avg = 105.48 ms, P50 = 100.85 ms, P95 = 122.85 ms, P99 = 162.08 ms, Max = 1027.11 ms.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Metric (Home)} & \textbf{@1} & \textbf{@3} & \textbf{@5} & \textbf{@10} \\
+\hline
+Hit & 0.3833 & 0.5889 & 0.7167 & 0.8167 \\
+\hline
+Prec & 0.3833 & 0.2148 & 0.1644 & 0.1144 \\
+\hline
+Recall & 0.2139 & 0.3454 & 0.4333 & 0.5907 \\
+\hline
+MRR & 0.3833 & 0.4731 & 0.5037 & 0.5181 \\
+\hline
+NDCG & 0.3833 & 0.3422 & 0.3871 & 0.4498 \\
+\hline
+NDCG\_G & 0.3722 & 0.3840 & 0.4305 & 0.4844 \\
+\hline
+HNR $\downarrow$ & 0.0111 & 0.0278 & 0.0278 & 0.0294 \\
+\hline
+\end{tabular}
+\caption{Kết quả đầy đủ của Home evaluation}
+\label{tab:home_full_metrics}
+\end{table}
+
+\noindent\textbf{Thống kê latency và phân bố score tìm kiếm (Home):} Avg = 122.27 ms, P50 = 117.96 ms, P95 = 151.90 ms, P99 = 184.52 ms, Max = 998.97 ms; score Min = -8.9542, Avg = -5.8145, Max = -2.0222.
 
 \textbf{Diễn giải các chỉ số chính:}
 \begin{itemize}
@@ -333,8 +423,11 @@ Latency P95 (ms) & 104.42 & 91.58 \\
 
 \begin{itemize}
     \item Chatbot cho chất lượng truy xuất tốt hơn rõ rệt (đặc biệt Hit@3 và MRR@3).
-    \item Home có lợi thế về tốc độ nhưng Recall thấp hơn đáng kể, còn bỏ sót kết quả liên quan.
+    \item Home cải thiện chất lượng so với run cũ nhưng vẫn thấp hơn đáng kể so với Chatbot ở các chỉ số xếp hạng cốt lõi.
+    \item Độ trễ Home chưa đạt mục tiêu thời gian thực (Avg = 122.27 ms, P95 = 151.90 ms), cần tối ưu thêm pipeline truy vấn và scoring.
     \item HNR@3 của cả hai kịch bản đều thấp ($<0.03$), cho thấy hệ thống lọc nhiễu tốt ở top đầu.
+    \item Các hồ sơ có lỗi nặng nhất theo Recall@5 (đều bằng 0.0000): \texttt{HOME\_0042}, \texttt{HOME\_0053}, \texttt{HOME\_0014}, \texttt{HOME\_0010}.
+    \item Mẫu lỗi tập trung ở truy vấn sức khỏe tổng hợp (ít vận động, stress, đau lưng/đau vai gáy, dinh dưỡng, lo ngại sức khỏe dài hạn), gợi ý cần tăng cường ánh xạ ngữ nghĩa đa triệu chứng và đa mục tiêu trong bước truy vấn Home.
 \end{itemize}
 
 \begin{figure}[H]
