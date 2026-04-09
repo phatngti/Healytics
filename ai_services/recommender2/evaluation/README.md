@@ -66,7 +66,7 @@ From `ai_services/recommender2`:
 python -m evaluation.scripts.eval_chatbot --top-k 10 --run-name chatbot_baseline_v1
 
 # 2) Run home evaluation
-python -m evaluation.scripts.eval_home --top-k 10 --run-name home_baseline_v1
+python -m evaluation.scripts.eval_home --query-mode keyword --score-mode distance --run-name home_keyword_distance_clean_v1
 
 # 3) Analyze latest run and generate plots
 python -m evaluation.analysis.analyze_results
