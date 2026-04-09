@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from datetime import datetime
@@ -41,6 +42,32 @@ RUNS_DIR = os.path.join(RESULTS_DIR, "runs")
 EVAL_COLLECTION_NAME = "healytics_eval_collection"
 
 
+def _clean_text(text: str) -> str:
+    """Lowercase and collapse repeated whitespace."""
+    return " ".join(str(text).strip().lower().split())
+
+
+def _stable_unique(values: List[str]) -> List[str]:
+    """Preserve insertion order while removing duplicates."""
+    return list(dict.fromkeys(values))
+
+
+def _description_snippet(description: str, max_chars: int = 180) -> str:
+    """Extract a short natural-language context snippet from profile description."""
+    text = _clean_text(description)
+    if not text:
+        return ""
+
+    sentences = [s.strip() for s in re.split(r"[.!?;]+", text) if s.strip()]
+    if not sentences:
+        return text[:max_chars]
+
+    snippet = sentences[0]
+    if len(sentences) > 1 and len(snippet) < 80:
+        snippet = f"{snippet}. {sentences[1]}"
+    return snippet[:max_chars]
+
+
 def _build_profile_inputs(item: Dict, query_mode: str) -> Tuple[List[str], List[str], List[str], List[str]]:
     """Build inputs for Home_Recommender using evaluation-side query formulation.
 
@@ -59,8 +86,14 @@ def _build_profile_inputs(item: Dict, query_mode: str) -> Tuple[List[str], List[
     service_history_ids = item.get("service_history_ids", [])
 
     if query_mode == "keyword":
-        # Keep the query dense and focused on immediate intent keywords.
-        merged = [str(x).strip() for x in [*health_conditions, *interests] if str(x).strip()]
+        # Default v3-like single-query keyword formulation.
+        cond = _stable_unique([_clean_text(x) for x in health_conditions if _clean_text(x)])
+        intr = _stable_unique([_clean_text(x) for x in interests if _clean_text(x)])
+        goal = _stable_unique([_clean_text(x) for x in goals if _clean_text(x)])
+        snippet = _description_snippet(item.get("description", ""))
+        merged = cond + goal + goal + intr
+        if snippet:
+            merged.append(snippet)
         return merged, [], [], []
 
     return health_conditions, interests, goals, service_history_ids
@@ -278,19 +311,17 @@ def run_evaluation(
             service_history_ids=service_history_ids,
             top_k_home_results=top_k,
         )
-        t_end = time.perf_counter()
-        latency_ms = (t_end - t_start) * 1000.0
-
         retrieved_ids = raw["ids"][0] if raw["ids"] else []
         raw_scores = raw["distances"][0] if raw["distances"] else []
-
         resolved_mode = _resolve_score_mode(raw_scores, requested_mode=score_mode)
-        resolved_modes.append(resolved_mode)
         retrieved_ids, aligned_scores = _align_scores_and_rank(
             retrieved_ids,
             raw_scores,
             resolved_score_mode=resolved_mode,
         )
+        t_end = time.perf_counter()
+        latency_ms = (t_end - t_start) * 1000.0
+        resolved_modes.append(resolved_mode)
 
         pred: Dict = {
             "id": profile_id,
