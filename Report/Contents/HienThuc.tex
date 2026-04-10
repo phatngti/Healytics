@@ -134,7 +134,570 @@ Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, l
     \end{itemize}
 \end{itemize}
 
+% -----------------------------------------------------------------
+% PHẦN 4: CÔNG NGHỆ AI/ML
+% -----------------------------------------------------------------
+\subsection{Hạ tầng Trí tuệ Nhân tạo (AI/ML Infrastructure)}
 
+Hệ thống AI được triển khai như một cụm microservices độc lập, giao tiếp với Backend chính thông qua REST API. Toàn bộ được xây dựng bằng Python, tận dụng hệ sinh thái phong phú về Machine Learning và xử lý ngôn ngữ tự nhiên.
+
+\subsubsection{Application Framework (FastAPI)}
+\begin{itemize}
+    \item \textbf{Lý do chọn FastAPI:} Là framework Python hiện đại, hỗ trợ async/await native, tự động sinh tài liệu OpenAPI, và có hiệu năng ngang ngửa NodeJS nhờ ASGI server (Uvicorn). Đặc biệt phù hợp cho các AI service cần xử lý I/O-intensive (gọi LLM API, truy vấn vector database) mà không block main thread.
+    \item \textbf{Tính năng nổi bật}:
+    \begin{itemize}
+        \item \textbf{Async-Native}: Hỗ trợ \texttt{async def} cho mọi endpoint, cho phép xử lý đồng thời hàng nghìn request mà không tạo thread; Flask/Django truyền thống dùng mô hình đồng bộ, cần Gunicorn workers để scale; Express (Node) cũng async nhưng không có type safety mạnh bằng Pydantic của FastAPI.
+
+        \item \textbf{Streaming Response (SSE)}: Hỗ trợ \texttt{StreamingResponse} native, cho phép gửi dữ liệu theo luồng (Server-Sent Events) — cốt lõi cho tính năng chatbot streaming; Flask cần extension bên ngoài cho SSE; Django không hỗ trợ streaming ở mức framework.
+
+        \item \textbf{Pydantic Validation}: Tự động validate request/response với type hints và Pydantic models, phát hiện lỗi dữ liệu trước khi vào logic AI; Flask/Django dùng Marshmallow hoặc serializers thủ công, dài dòng hơn.
+
+        \item \textbf{Performance}: Benchmark đạt 15k--20k req/s nhờ Uvicorn (ASGI), nhanh gấp 3--5 lần Flask (WSGI), và tương đương Express (Node); Kết hợp \texttt{uvloop} tăng thêm 20--30\% throughput.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Orchestration Framework (LangChain)}
+\begin{itemize}
+    \item \textbf{Lý do chọn LangChain:} Cung cấp abstraction layer để kết nối các thành phần AI (LLM, vector store, retriever, prompt template) thành pipeline hoàn chỉnh. Cho phép chuyển đổi giữa các LLM backend (HuggingFace, OpenAI, Gemini) mà không thay đổi logic ứng dụng.
+    \item \textbf{Tính năng nổi bật}:
+    \begin{itemize}
+        \item \textbf{Runnable Interface}: Chain các bước xử lý (retrieval $\rightarrow$ prompt $\rightarrow$ LLM $\rightarrow$ parser) theo dạng pipeline khai báo, dễ debug từng bước; LlamaIndex cũng hỗ trợ RAG nhưng thiên về indexing, thiếu linh hoạt về chain composition; Tự build pipeline thủ công cần nhiều boilerplate code.
+
+        \item \textbf{Multi-Provider Support}: Tích hợp sẵn với HuggingFace (\texttt{langchain-huggingface}), ChromaDB (\texttt{langchain-chroma}), OpenAI, và nhiều provider khác chỉ qua config; Semantic Kernel (Microsoft) hỗ trợ ít provider hơn; Haystack (deepset) mạnh nhưng hệ sinh thái nhỏ hơn.
+
+        \item \textbf{Text Splitters}: \texttt{RecursiveCharacterTextSplitter} tách tài liệu thông minh theo ngữ nghĩa (ưu tiên tách ở dấu chấm, xuống dòng) thay vì cắt cứng; Hỗ trợ tùy chỉnh \texttt{chunk\_size} và \texttt{chunk\_overlap} phù hợp với từng embedding model.
+
+        \item \textbf{LangGraph}: Mở rộng LangChain thành đồ thị trạng thái (state graph) cho các agent phức tạp, hỗ trợ checkpoint và phân nhánh; AutoGen (Microsoft) cũng hỗ trợ multi-agent nhưng thiên về conversation, không mạnh về RAG pipeline.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Mô hình ngôn ngữ lớn (Large Language Models)}
+\begin{itemize}
+    \item \textbf{Các mô hình sử dụng:}
+    \begin{itemize}
+        \item \textbf{Meta Llama 3.1 8B Instruct}: Mô hình mã nguồn mở chạy local cho RAG Chatbot, lượng tử hóa 4-bit (NF4) giúp giảm VRAM từ $\sim$24GB xuống $\sim$8GB mà vẫn giữ chất lượng suy luận; GPT-4o mạnh hơn nhưng yêu cầu API trả phí; Gemma 2 (Google) nhẹ hơn nhưng kém về tiếng Việt.
+
+        \item \textbf{Google Gemini (2.5 Flash)}: Sử dụng qua API cho NER Service, tận dụng khả năng xử lý tiếng Việt tốt hơn so với các mô hình mã nguồn mở; Độ trễ thấp ($<$1.5 giây với timeout cấu hình) và hỗ trợ structured output (JSON) ổn định.
+    \end{itemize}
+
+    \item \textbf{Tối ưu suy luận:}
+    \begin{itemize}
+        \item \textbf{vLLM}: Engine suy luận hiệu suất cao, hỗ trợ PagedAttention giúp tăng throughput gấp 2--4 lần so với HuggingFace Transformers thuần; TensorRT-LLM (NVIDIA) nhanh hơn nhưng chỉ chạy trên GPU NVIDIA, khó triển khai; Ollama đơn giản nhưng thiếu tính năng production (batching, scaling).
+
+        \item \textbf{BitsAndBytes (4-bit Quantization)}: Sử dụng NF4 quantization với double quantization, giảm 75\% bộ nhớ mà chỉ giảm $<$3\% chất lượng output; GPTQ cũng quantize tốt nhưng cần pre-process lâu; AWQ (Activation-aware) mới hơn nhưng support model ít hơn.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Embedding và Vector Database}
+\begin{itemize}
+    \item \textbf{Sentence Transformers}: Sử dụng mô hình \texttt{paraphrase-multilingual-mpnet-base-v2} cho embedding đa ngôn ngữ (bao gồm tiếng Việt), cho vector 768 chiều với hiệu năng tốt trên các benchmark semantic similarity; \texttt{all-MiniLM-L6-v2} nhanh hơn nhưng chỉ hỗ trợ tiếng Anh; OpenAI \texttt{text-embedding-3-small} tốt nhưng tốn phí API.
+
+    \item \textbf{ChromaDB}: Vector database mã nguồn mở, hỗ trợ persistent storage và tích hợp trực tiếp với LangChain; Pinecone mạnh hơn nhưng là SaaS trả phí; Weaviate phức tạp cấu hình; Qdrant hiệu năng cao nhưng hệ sinh thái nhỏ hơn.
+
+    \item \textbf{FAISS (Facebook AI Similarity Search)}: Thư viện tìm kiếm vector hiệu suất cao, sử dụng cho offline evaluation và benchmark; Hỗ trợ nhiều thuật toán index (Flat, IVF, HNSW) với trade-off khác nhau giữa tốc độ và độ chính xác.
+\end{itemize}
+
+\subsubsection{Xử lý Ngôn ngữ Tự nhiên tiếng Việt (Vietnamese NLP)}
+\begin{itemize}
+    \item \textbf{Underthesea}: Thư viện NLP tiếng Việt, sử dụng cho word segmentation và POS tagging trong NER Service; VnCoreNLP mạnh hơn nhưng yêu cầu JVM, khó tích hợp với Python async; PhoBERT cho kết quả tốt nhưng nặng cho real-time inference.
+
+    \item \textbf{spaCy}: Pipeline NLP công nghiệp, sử dụng cho tokenization và entity extraction nhanh; NLTK cũ hơn, chậm hơn và thiếu hỗ trợ tiếng Việt; Stanza (Stanford) chính xác nhưng chậm hơn spaCy 10 lần.
+
+    \item \textbf{Aho-Corasick Algorithm}: Thuật toán so khớp chuỗi đa mẫu, sử dụng cho location matching với độ phức tạp $\mathcal{O}(n + m + z)$ ($n$: chiều dài text, $m$: tổng chiều dài patterns, $z$: số match); nhanh hơn regex đáng kể khi phải khớp hàng nghìn địa danh Việt Nam cùng lúc.
+\end{itemize}
+
+\subsubsection{Kiến trúc Microservices AI}
+
+Hệ thống AI được tổ chức thành 4 microservices độc lập, mỗi service đảm nhận một chức năng chuyên biệt:
+
+\begin{itemize}
+    \item \textbf{Gateway Service}: Điểm vào duy nhất cho Backend gọi các AI service, chịu trách nhiệm orchestrate luồng xử lý (intent classification $\rightarrow$ NER $\rightarrow$ pre-filter $\rightarrow$ recommendation/chatbot), quản lý lịch sử hội thoại và wrap response thành SSE stream.
+
+    \item \textbf{NER Service}: Trích xuất thực thể từ truy vấn tự nhiên (loại dịch vụ, địa điểm, giá, khoảng cách), sử dụng kiến trúc Hybrid kết hợp Gemini LLM, regex, và underthesea.
+
+    \item \textbf{RAG Chatbot Service}: Sinh câu trả lời dựa trên kiến thức y tế (PDF) kết hợp thông tin dịch vụ thực tế, sử dụng LangChain pipeline với Llama 3.1.
+
+    \item \textbf{Recommender Service}: Gợi ý dịch vụ phù hợp dựa trên hồ sơ người dùng hoặc ngữ cảnh hội thoại, sử dụng ChromaDB để tìm kiếm tương đồng ngữ nghĩa.
+\end{itemize}
+
+
+\section{Kiến trúc hiện thực}
+Dựa trên nền tảng logic vững chắc của bản kiến trúc trừu tượng (Abstract Architecture) Hình \ref{fig:sys_arch}, bản thiết kế hiện thực hóa (Implementation Architecture) Hình \ref{fig:imple_arch} đã cụ thể hóa các mô hình chức năng thành một hệ sinh thái công nghệ hiện đại và tối ưu hiệu năng. Vẫn tuân thủ chặt chẽ cấu trúc Microservices 5 tầng, bản thiết kế thực tế đã thay thế các khái niệm tổng quát bằng những công nghệ hàng đầu trong ngành: Hệ sinh thái Flutter đảm bảo trải nghiệm đồng nhất trên mọi nền tảng người dùng; Kong được lựa chọn làm API Gateway mạnh mẽ để điều phối luồng dữ liệu; và tầng hạ tầng dữ liệu được phân tách chuyên biệt với PostgreSQL cho nghiệp vụ cốt lõi, FAISS cho xử lý AI vector và MinIO cho lưu trữ đối tượng. Sự chuyển dịch từ trừu tượng sang thực tế này không chỉ đảm bảo tính khả thi khi triển khai mà còn tối ưu hóa khả năng mở rộng (scalability) và tính ổn định cho toàn bộ nền tảng
+\begin{figure}[H]
+    % Căn giữa hình ảnh
+    \centering
+    \includegraphics[width=1\textwidth]{Images/implement_arch.png}
+    \vspace{10pt}
+    
+    % Thêm chú thích cho hình ảnh
+    \caption{Kiến trúc hiện thực hệ thống}
+    
+    % Đặt nhãn để tham chiếu chéo (cross-reference)
+    \label{fig:imple_arch}
+\end{figure}
+
+Hệ thống được thiết kế dựa trên mô hình Microservices hiện đại, chia thành 5 tầng chính với các công nghệ cụ thể như sau:
+
+\subsection*{Tầng Giao Diện (Presentation Layer)}
+Đây là tầng tương tác trực tiếp với người dùng cuối (tương ứng với Client Layer trong bản thiết kế trừu tượng).
+
+\begin{itemize}
+    \item \textbf{Công nghệ:} Flutter.
+    \item \textbf{Mô tả:} Sử dụng Flutter làm công nghệ chủ đạo (Cross-platform) để xây dựng cả 3 ứng dụng client:
+    \begin{itemize}
+        \item \textit{User App:} Ứng dụng di động dành cho người dùng phổ thông.
+        \item \textit{Admin Panel:} Trang quản trị hệ thống.
+        \item \textit{Provider Portal:} Cổng thông tin dành cho các nhà cung cấp dịch vụ y tế/làm đẹp.
+    \end{itemize}
+    \item \textbf{Giao thức:} Các ứng dụng này giao tiếp với hệ thống backend thông qua RESTful API và WebSocket (dành cho các tính năng thời gian thực).
+\end{itemize}
+
+\subsection*{Tầng Kết Nối \& API (Connection \& API Layer)}
+Đóng vai trò là cổng vào duy nhất (Entry point) cho mọi yêu cầu từ phía Client.
+
+\begin{itemize}
+    \item \textbf{Công nghệ:} Kong API Gateway.
+    \item \textbf{Mô tả:} Thay thế cho khối "API Gateway" trừu tượng. Kong chịu trách nhiệm:
+    \begin{itemize}
+        \item Routing (định tuyến) request đến đúng microservice.
+        \item Load balancing (cân bằng tải).
+        \item Authentication/Authorization cơ bản (xác thực sơ bộ).
+        \item Rate limiting (giới hạn băng thông) để bảo vệ hệ thống.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Tầng Server \& Nghiệp Vụ (Server/Business Layer)}
+Đây là lõi của hệ thống, được triển khai theo kiến trúc Microservices.
+
+\begin{itemize}
+    \item \textbf{Hạ tầng:} Compute Engine (Google Cloud Platform - GCP). Các dịch vụ được triển khai trên các máy ảo (VM) hoặc Container chạy trên VM.
+    \item \textbf{Các dịch vụ thành phần:}
+    \begin{itemize}
+        \item \textit{Authenticate Service:} Xử lý đăng ký, đăng nhập, cấp phát token (JWT).
+        \item \textit{Core Healthcare Service:} Xử lý nghiệp vụ chính như đặt lịch hẹn (Appointments), quản lý hồ sơ y tế, thanh toán.
+        \item \textit{AI Service:} Chịu trách nhiệm về các tính năng thông minh (Chatbot, Recommendation System). Dịch vụ này giao tiếp chặt chẽ với Vector Database.
+        \item \textit{Notification Service:} Quản lý việc gửi thông báo đẩy (Push) và Email.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Tầng Dữ Liệu \& Hạ Tầng (Data \& Infrastructure Layer)}
+Tầng này lưu trữ và quản lý luồng dữ liệu, cụ thể hóa các khối database trừu tượng:
+
+\begin{itemize}
+    \item \textbf{Relational Database (SQL):} Sử dụng \textbf{PostgreSQL}. Dùng để lưu trữ dữ liệu có cấu trúc (thông tin user, đơn hàng, lịch hẹn).
+    \item \textbf{Vector Database:} Sử dụng \textbf{FAISS} (Facebook AI Similarity Search). Dùng để lưu trữ vector embeddings phục vụ cho AI Service (tìm kiếm ngữ nghĩa, gợi ý).
+    \item \textbf{Cache:} Sử dụng \textbf{Redis}. Giúp tăng tốc độ truy xuất dữ liệu thường xuyên sử dụng và giảm tải cho Database chính.
+    \item \textbf{Message Queue:} Sử dụng \textbf{RabbitMQ}. Đảm bảo giao tiếp bất đồng bộ (asynchronous) giữa các microservices (ví dụ: Core Service gửi sự kiện đến Notification Service mà không cần chờ đợi).
+    \item \textbf{Object Storage:} Sử dụng \textbf{MinIO}. Giải pháp lưu trữ đối tượng (tương thích S3) dùng để lưu trữ file tĩnh, hình ảnh, tài liệu y tế (thay thế cho khối Cloud Storage trừu tượng).
+\end{itemize}
+
+\subsection*{Tầng Tích Hợp Bên Thứ Ba (Third-Party Integrations Layer)}
+Kết nối với các dịch vụ bên ngoài để mở rộng tính năng.
+
+\begin{itemize}
+    \item \textbf{Cổng thanh toán (Payment Methods):} Tích hợp đa dạng bao gồm MoMo, Stripe (quốc tế), và VNPay (nội địa Việt Nam).
+    \item \textbf{Dịch vụ thông báo (App Notification Service):}
+    \begin{itemize}
+        \item \textit{APNs (Apple Push Notification service):} Dành riêng cho thiết bị iOS.
+        \item \textit{Firebase (FCM):} Dành cho Android và quản lý thông báo chung.
+    \end{itemize}
+\end{itemize}
+
+\vspace{1cm} % Khoảng cách một chút trước phần nhận xét
+
+\subsection*{Nhận xét tổng quan}
+Kiến trúc này rất hiện đại và phù hợp với quy mô dự án nền tảng Health/Beauty. Việc tách biệt rõ ràng giữa PostgreSQL (nghiệp vụ) và FAISS (AI) cho thấy sự đầu tư kỹ lưỡng vào hiệu năng xử lý dữ liệu thông minh. Sử dụng MinIO cũng là một giải pháp hay để tự chủ (self-hosted) việc lưu trữ dữ liệu thay vì phụ thuộc hoàn toàn vào cloud public storage đắt đỏ.
+\section{Phần Software – Triển khai ứng dụng}
+% \subsection{User Mobile App}
+% \subsection{Partner Portal (Web/App)}
+% \subsection{Admin Dashboard (Web)}
+% \subsection{Tích hợp AI với hệ thống ứng dụng}
+% \subsection{Bảo mật và quản lý dữ liệu}
+Hệ thống Backend được xây dựng dựa trên \textbf{NestJS Framework}, tuân theo kiến trúc module hóa để đảm bảo tính mở rộng và bảo mật. Dưới đây là các chi tiết hiện thực cụ thể dựa trên mã nguồn thực tế.
+
+\subsection{Cấu hình và Khởi tạo hệ thống (Bootstrap \& Configuration)}
+
+Điểm khởi chạy của ứng dụng nằm tại \texttt{src/main.ts}, nơi thiết lập các cấu hình toàn cục quan trọng cho bảo mật và tài liệu hóa API:
+
+\begin{itemize}
+    \item \textbf{Bảo mật HTTP:} Tích hợp thư viện \texttt{helmet} để thiết lập các HTTP headers an toàn và kích hoạt \texttt{enableCors()} cho phép các ứng dụng Client (Mobile/Web) truy cập tài nguyên.
+    
+    \item \textbf{Kiểm soát dữ liệu đầu vào:} Sử dụng \texttt{ValidationPipe} ở mức toàn cục (\texttt{globalPipes}) với tùy chọn \texttt{whitelist: true}. Điều này giúp tự động loại bỏ các trường dữ liệu thừa không được định nghĩa trong DTO, đảm bảo tính sạch sẽ của dữ liệu trước khi vào Controller.
+    
+    \item \textbf{Tài liệu hóa API (Swagger):} Hệ thống tự động sinh tài liệu API chuẩn OpenAPI. \texttt{DocumentBuilder} được cấu hình để tạo giao diện Swagger UI tại đường dẫn \texttt{/api/docs}, hỗ trợ đội ngũ phát triển Mobile và Web tích hợp nhanh chóng.
+    
+    \item \textbf{Kết nối Cơ sở dữ liệu:} Cấu hình Database được tách biệt trong \texttt{src/config/database.config.ts}, sử dụng các biến môi trường (\texttt{process.env}) để kết nối tới PostgreSQL, đảm bảo không lộ thông tin nhạy cảm (credentials) trong mã nguồn.
+\end{itemize}
+
+\subsection{Module Xác thực và Bảo mật (Authentication \& Security)}
+
+Module \texttt{AuthModule} đóng vai trò trung tâm trong việc quản lý định danh, sử dụng kết hợp \textbf{Passport} và \textbf{JWT}.
+
+\subsubsection{Quy trình Đăng ký \& Đăng nhập}
+\begin{itemize}
+    \item \textbf{Đăng ký (\texttt{register}):} \texttt{AuthService} tiếp nhận DTO đăng ký, thực hiện băm mật khẩu (hashing) bằng thuật toán \texttt{bcrypt} trước khi lưu vào cơ sở dữ liệu. Nếu có thông tin \texttt{profile}, hệ thống sẽ khởi tạo đồng thời \texttt{Account} và \texttt{UserProfile} nhờ cơ chế \texttt{cascade: true} của TypeORM.
+    
+    \item \textbf{Đăng nhập (\texttt{login}):} Sử dụng \texttt{LocalStrategy} để xác thực email/password. Sau khi thành công, hệ thống cấp phát cặp token gồm \texttt{access\_token} (ngắn hạn) và \texttt{refresh\_token} (dài hạn).
+\end{itemize}
+
+\subsubsection{Cơ chế Bảo mật Token (JWT Strategy)}
+\begin{itemize}
+    \item \textbf{Access Token:} Được ký (sign) bằng \texttt{jwtConstants.secret}. Các request đến API được bảo vệ bởi \texttt{JwtAuthGuard}, sử dụng \texttt{JwtStrategy} để trích xuất và xác thực token từ Header (\texttt{Bearer Token}).
+    
+    \item \textbf{Refresh Token Rotation \& Hashing:} Để tăng cường bảo mật, \texttt{refresh\_token} không được lưu trực tiếp dưới dạng plain-text. Hệ thống chỉ lưu bản băm (hash) của nó vào cột \texttt{refreshTokenHash} trong bảng \texttt{Account}. Khi user yêu cầu cấp mới token (\texttt{/auth/refresh}), hệ thống so sánh token gửi lên với hash trong DB. Điều này ngăn chặn việc sử dụng lại token cũ nếu bị lộ.
+    
+    \item \textbf{Logout an toàn:} API \texttt{/auth/logout} thực hiện xóa \texttt{refreshTokenHash} trong DB, đảm bảo token cũ mất hiệu lực ngay lập tức.
+\end{itemize}
+
+\subsection{Quản lý Tài khoản và Dữ liệu Người dùng (Account Management)}
+
+Module \texttt{AccountModule} chịu trách nhiệm quản lý thông tin người dùng và các dữ liệu sức khỏe liên quan.
+
+\begin{itemize}
+    \item \textbf{Mô hình dữ liệu (Entities):}
+    \begin{itemize}
+        \item \textbf{Account:} Là thực thể lõi, chứa thông tin đăng nhập (\texttt{email}, \texttt{passwordHash}) và vai trò (\texttt{role}). Cấu trúc hỗ trợ lưu trữ dữ liệu khảo sát linh hoạt thông qua cột \texttt{survey} kiểu \texttt{jsonb}, cho phép lưu trữ các câu trả lời khảo sát sức khỏe phức tạp mà không cần thay đổi schema cứng.
+        \item \textbf{UserProfile:} Chứa thông tin cá nhân (tên, ngày sinh, bio) và liên kết 1-1 với Account. Entity này cũng hỗ trợ quan hệ với \texttt{Address} để lưu địa chỉ chi tiết.
+    \end{itemize}
+    
+    \item \textbf{Xử lý Khảo sát (Survey Feature):}
+    \texttt{AccountController} cung cấp các endpoints \texttt{GET/POST /account/survey} để Client gửi và lấy dữ liệu khảo sát. Dữ liệu này được \texttt{AccountService} lưu trực tiếp vào cột \texttt{jsonb} của user, phục vụ cho đầu vào của hệ thống AI gợi ý sau này.
+\end{itemize}
+
+\subsection{Kiến trúc DTO và Validation}
+
+Hệ thống áp dụng chặt chẽ mô hình \textbf{Data Transfer Object (DTO)} để kiểm soát dữ liệu giao tiếp:
+
+\begin{itemize}
+    \item \textbf{Validation Rules:} Sử dụng các decorator như \texttt{@IsEmail}, \texttt{@MinLength(8)} cho mật khẩu, và \texttt{@Matches} cho số điện thoại (Regex kiểm tra định dạng số Việt Nam \texttt{+84...}).
+    
+    \item \textbf{Nested Validation:} Hỗ trợ validate dữ liệu lồng nhau (ví dụ: object \texttt{profile} bên trong \texttt{register} request) thông qua \texttt{@ValidateNested} và \texttt{Type(() => RegisterProfileDto)}.
+\end{itemize}
+
+\subsection{Quy trình Đăng ký \& Xác minh Đối tác (Partner Registration \& Verification)}
+
+Module \texttt{PartnersModule} quản lý toàn bộ quy trình từ lúc đối tác đăng ký tài khoản, nộp hồ sơ kinh doanh, cho đến khi được quản trị viên phê duyệt hoặc yêu cầu bổ sung. Toàn bộ quy trình được vận hành theo mô hình máy trạng thái (State Machine) gồm 5 trạng thái.
+
+\subsubsection{Các trạng thái xác minh đối tác}
+
+Mỗi đối tác luôn ở một trong 5 trạng thái sau, được định nghĩa trong enum \texttt{PartnerVerificationStatus}:
+
+\begin{itemize}
+    \item \texttt{ONBOARDING}: Đối tác vừa tạo tài khoản, đang trong quá trình bổ sung thông tin và tải lên giấy tờ.
+    \item \texttt{PENDING}: Hồ sơ đã được nộp đầy đủ, đang chờ quản trị viên xem xét.
+    \item \texttt{APPROVED}: Hồ sơ đã được chấp thuận, đối tác có thể bắt đầu cung cấp dịch vụ trên nền tảng.
+    \item \texttt{REJECTED}: Hồ sơ bị từ chối vĩnh viễn, không thể nộp lại.
+    \item \texttt{REQUIRED\_RESUBMIT}: Hồ sơ cần chỉnh sửa hoặc bổ sung thêm tài liệu trước khi nộp lại.
+\end{itemize}
+
+Sơ đồ chuyển đổi trạng thái:
+
+\begin{center}
+\begin{tabular}{@{}r@{\;}c@{\;}l@{}}
+\texttt{ONBOARDING} $\rightarrow$ \texttt{PENDING} & $\rightarrow$ & \texttt{APPROVED} \\
+& $\searrow$ & \texttt{REJECTED} \\
+& $\searrow$ & \texttt{REQUIRED\_RESUBMIT} $\rightarrow$ \texttt{PENDING} $\rightarrow$ \ldots \\
+\end{tabular}
+\end{center}
+
+\subsubsection{Đăng ký đối tác}
+
+Khi đối tác đăng ký, hệ thống thực hiện các bước sau trong cùng một giao dịch (transaction) để đảm bảo tính toàn vẹn dữ liệu:
+
+\begin{enumerate}
+    \item \textbf{Kiểm tra trùng lặp:} Đảm bảo email và mã số thuế chưa có trong hệ thống.
+    \item \textbf{Kiểm tra địa chỉ:} Xác nhận thông tin tỉnh/huyện/xã hợp lệ thông qua \texttt{LocationsService}.
+    \item \textbf{Khởi tạo dữ liệu:} Khởi tạo thông tin tài khoản, thông tin doanh nghiệp, người đại diện pháp lý, và các giấy tờ KYC ban đầu.
+    \item \textbf{Cấp quyền truy cập:} Tạo token truy cập để đối tác có thể đăng nhập ngay.
+\end{enumerate}
+
+Sau khi đăng ký thành công, đối tác được gán trạng thái \texttt{PENDING} và tự động vào hàng đợi chờ xét duyệt.
+
+\subsubsection{Cập nhật hồ sơ thông minh }
+
+Khi đối tác chỉnh sửa hồ sơ (đặc biệt sau khi bị yêu cầu bổ sung), hệ thống áp dụng cơ chế cập nhật thông minh (Smart Update) gồm 3 bước:
+
+\begin{itemize}
+    \item \textbf{Nhận diện thay đổi:} Mỗi trường gửi lên đều kèm theo \texttt{fieldKey}, giúp hệ thống biết chính xác trường nào đã được sửa mà không cần so sánh toàn bộ dữ liệu.
+    \item \textbf{Phân loại mức độ quan trọng:} Hệ thống phân biệt rõ giữa thay đổi nhạy cảm (mã số thuế, địa chỉ, thông tin người đại diện) và thay đổi thông thường (số điện thoại, tên thương hiệu).
+    \item \textbf{Tự động chuyển trạng thái:}
+    \begin{itemize}
+        \item Nếu đối tác đang ở trạng thái \texttt{REQUIRED\_RESUBMIT} hoặc \texttt{ONBOARDING} và đã sửa hết các lỗi $\rightarrow$ tự động chuyển sang \texttt{PENDING} để chờ xét duyệt lại.
+        \item Nếu đối tác đã được \texttt{APPROVED} nhưng sửa thông tin nhạy cảm $\rightarrow$ thu hồi phê duyệt và chuyển về \texttt{REQUIRED\_RESUBMIT} để quản trị viên xem xét lại.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Hiển thị phản hồi từ quản trị viên}
+
+Khi đối tác mở xem hồ sơ của mình, hệ thống sẽ:
+
+\begin{enumerate}
+    \item Lấy bản đánh giá gần nhất từ bảng \texttt{PartnerReviewLog}.
+    \item Tổng hợp phản hồi thành 2 danh sách: phản hồi theo từng trường thông tin (\texttt{fieldFeedbackMap}) và phản hồi theo từng tài liệu (\texttt{documentFeedbackMap}).
+    \item Trả về kèm theo hồ sơ, giúp ứng dụng đánh dấu trực quan những mục cần sửa và hiển thị lý do cụ thể từ quản trị viên.
+\end{enumerate}
+
+\subsection{Module Quản trị và Nhật ký Kiểm toán (Admin Management \& Audit Trail)}
+
+\subsubsection{Xét duyệt đối tác (\texttt{reviewPartner})}
+
+Các API quản trị nằm trong \texttt{AdminModule}, chỉ cho phép truy cập bởi người dùng có vai trò \texttt{ADMIN} (được bảo vệ bằng \texttt{JwtAuthGuard} và \texttt{RolesGuard}).
+
+Khi quản trị viên xét duyệt một hồ sơ đối tác, hệ thống xử lý theo các bước:
+
+\begin{enumerate}
+    \item \textbf{Kiểm tra điều kiện:} Chỉ cho phép xét duyệt khi đối tác đang ở trạng thái \texttt{PENDING}. Nếu không, hệ thống trả về lỗi.
+
+    \item \textbf{Phân loại đánh giá:} Quản trị viên gửi danh sách các mục cần đánh giá, mỗi mục gồm \texttt{fieldKey} và \texttt{feedback}. Hệ thống tự động phân loại:
+    \begin{itemize}
+        \item Nếu \texttt{fieldKey} nằm trong danh sách trường thông tin đã biết $\rightarrow$ đánh giá trường hồ sơ.
+        \item Nếu không $\rightarrow$ đánh giá tài liệu (khớp theo mã tài liệu).
+    \end{itemize}
+
+    \item \textbf{Lưu ảnh chụp dữ liệu:} Với mỗi mục được đánh giá, hệ thống lưu lại giá trị hiện tại (snapshot) kèm kết quả hợp lệ hay không và phản hồi chi tiết. Điều này giúp truy vết lại chính xác dữ liệu tại thời điểm xét duyệt.
+
+    \item \textbf{Xác định kết quả cuối cùng:} Hệ thống áp dụng quy tắc ưu tiên:
+    \begin{itemize}
+        \item Nếu quản trị viên chọn từ chối $\rightarrow$ \texttt{REJECTED} (ưu tiên cao nhất, không thể đảo ngược).
+        \item Nếu có bất kỳ mục nào bị đánh dấu lỗi $\rightarrow$ \texttt{REQUIRED\_RESUBMIT} (yêu cầu sửa lại).
+        \item Nếu tất cả hợp lệ và đủ tài liệu bắt buộc $\rightarrow$ \texttt{APPROVED}.
+    \end{itemize}
+
+    \item \textbf{Ghi nhận lịch sử:} Toàn bộ kết quả xét duyệt được lưu vào bảng \texttt{PartnerReviewLog} dưới dạng bản ghi không thể sửa đổi, bao gồm: kết quả, người duyệt, nhận xét chung, và chi tiết đánh giá từng trường/tài liệu.
+\end{enumerate}
+
+\subsubsection{Nhật ký kiểm toán (Audit Logging)}
+
+Ngoài lịch sử xét duyệt, hệ thống còn ghi lại mọi thao tác quan trọng của quản trị viên thông qua module \texttt{AuditModule}:
+
+\begin{itemize}
+    \item \textbf{Đánh dấu hành động:} Sử dụng decorator \texttt{@Audit} gắn trực tiếp trên các API cần theo dõi, ví dụ: \texttt{@Audit('PARTNER\_REVIEW', 'Partner')}.
+    \item \textbf{Tự động ghi nhận:} \texttt{AuditInterceptor} tự động thu thập thông tin trước và sau khi API được thực thi, bao gồm: ai thực hiện, thao tác gì, tác động đến đối tượng nào, và thời điểm cụ thể.
+    \item \textbf{Tra cứu linh hoạt:} \texttt{AuditService} cho phép tìm kiếm nhật ký theo người thực hiện, đối tượng bị tác động, hoặc loại hành động.
+\end{itemize}
+
+Nhờ kết hợp giữa \texttt{PartnerReviewLog} và \texttt{AuditLog}, hệ thống đảm bảo khả năng truy vết toàn diện: ai đã duyệt hồ sơ nào, vào lúc nào, và dữ liệu lúc đó trông ra sao.
+
+\subsection{Quản lý Tệp tin và Lưu trữ (S3 File Management)}
+
+Module \texttt{S3Module} tích hợp với dịch vụ lưu trữ đối tượng tương thích S3 (MinIO) để quản lý tệp tin:
+
+\begin{itemize}
+    \item \textbf{Upload:} Tạo Pre-signed URL cho phép Client upload trực tiếp đến storage mà không qua Backend, giảm tải cho server.
+    \item \textbf{Download:} Sinh Pre-signed URL có thời hạn để truy cập tệp tin (tài liệu doanh nghiệp, hình ảnh sản phẩm).
+    \item \textbf{Quản lý tài liệu đối tác:} Thực thể \texttt{PartnerDocument} lưu metadata (loại tài liệu, URL, trạng thái) trong PostgreSQL, trong khi nội dung tệp thực tế nằm trên Object Storage.
+\end{itemize}
+
+\subsection{Quản lý Dịch vụ Sức khỏe (Health Service Management)}
+
+Module \texttt{HealthServiceModule} là module nghiệp vụ cốt lõi, quản lý toàn bộ vòng đời của các dịch vụ sức khỏe (sản phẩm) trên nền tảng. Hệ thống phân tách rõ ràng giữa hai luồng truy cập thông qua hai controller riêng biệt:
+
+\begin{itemize}
+    \item \textbf{Controller phía người dùng (\texttt{UserHealthServiceController}):} Cung cấp các API cho phép người dùng cuối tìm kiếm, lọc và xem chi tiết dịch vụ. Hỗ trợ phân trang, sắp xếp theo nhiều tiêu chí (giá, đánh giá, khoảng cách), và lọc theo danh mục hoặc tags.
+
+    \item \textbf{Controller phía đối tác (\texttt{PartnerHealthServiceController}):} Cho phép đối tác tạo mới, cập nhật, xóa và quản lý trạng thái hiển thị (ẩn/hiện) của dịch vụ. Mỗi đối tác chỉ có thể thao tác trên các dịch vụ thuộc sở hữu của mình.
+
+    \item \textbf{Mô hình dữ liệu:} Mỗi dịch vụ (\texttt{Product}) liên kết với nhiều thực thể con:
+    \begin{itemize}
+        \item \texttt{ProductMedia}: Hình ảnh và video giới thiệu dịch vụ.
+        \item \texttt{ProductFacilityImage}: Ảnh cơ sở vật chất nơi cung cấp dịch vụ.
+        \item \texttt{ProductTag} và \texttt{ProductFeatureTag}: Hệ thống tags đa tầng phục vụ tìm kiếm và phân loại.
+        \item \texttt{ProductEmployeeEligibility}: Danh sách chuyên gia đủ điều kiện thực hiện dịch vụ.
+        \item \texttt{ProductResourceRequirement}: Yêu cầu về trang thiết bị, phòng ốc.
+        \item \texttt{DocumentRequirement}: Giấy tờ cần thiết từ phía bệnh nhân/khách hàng.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Quản lý Danh mục và Tags (Categories \& Service Tags)}
+
+\subsubsection{Danh mục dịch vụ (\texttt{CategoriesModule})}
+
+Hệ thống danh mục được tổ chức theo cấu trúc phân cấp (parent-child), cho phép phân loại dịch vụ theo nhiều cấp độ (ví dụ: Y tế → Tim mạch → Khám tổng quát). Module cung cấp ba controller riêng biệt theo vai trò:
+
+\begin{itemize}
+    \item \texttt{AdminCategoriesController}: Tạo, sửa, xóa danh mục (chỉ dành cho quản trị viên).
+    \item \texttt{UserCategoriesController}: Lấy danh sách danh mục kèm bộ lọc, phục vụ hiển thị trên ứng dụng.
+    \item \texttt{CategoriesController}: API công khai cho các chức năng không yêu cầu xác thực.
+\end{itemize}
+
+\subsubsection{Tags dịch vụ (\texttt{ServiceTagsModule})}
+
+Module quản lý hệ thống tags gắn với dịch vụ (ví dụ: ``yoga'', ``giảm cân'', ``tim mạch''), hỗ trợ tìm kiếm đa chiều. Tags được tổ chức theo quan hệ many-to-many với \texttt{Product}, cho phép một dịch vụ có nhiều tags và ngược lại. API hỗ trợ tạo, cập nhật, xóa tags và tìm kiếm dịch vụ theo tổ hợp tags.
+
+\subsection{Quản lý Nhân viên và Chuyên gia (Employee Management)}
+
+Module \texttt{EmployeesModule} quản lý thông tin nhân viên, bác sĩ, và các chuyên gia y tế/thể thao/dinh dưỡng trên nền tảng. Đây là module phức tạp với logic nghiệp vụ dày đặc (service 19KB):
+
+\begin{itemize}
+    \item \textbf{Phân quyền Controller:}
+    \begin{itemize}
+        \item \texttt{PartnerEmployeesController}: Cho phép đối tác quản lý (CRUD) nhân viên thuộc tổ chức mình, bao gồm cập nhật lịch làm việc, chuyên môn, và trạng thái hoạt động.
+        \item \texttt{UserEmployeesController}: Cho phép người dùng cuối xem thông tin chuyên gia, tìm kiếm theo chuyên khoa, và xem lịch trống.
+    \end{itemize}
+
+    \item \textbf{Hồ sơ chuyên biệt:} Hệ thống hỗ trợ hai loại hồ sơ chuyên gia được mở rộng từ thực thể \texttt{Employee} cơ bản:
+    \begin{itemize}
+        \item \texttt{DoctorProfile}: Chứa thông tin chuyên khoa, số giấy phép hành nghề, chứng chỉ.
+        \item \texttt{TherapistProfile}: Chứa thông tin về phương pháp trị liệu, lĩnh vực chuyên môn, kinh nghiệm.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Quản lý Phòng khám và Cơ sở (Clinic Management)}
+
+Module \texttt{ClinicModule} quản lý thông tin phòng khám, trung tâm y tế, và các cơ sở cung cấp dịch vụ. Service (21KB) xử lý:
+
+\begin{itemize}
+    \item Quản lý thông tin cơ sở: tên, mô tả, hình ảnh, giờ hoạt động.
+    \item Liên kết với hệ thống địa chỉ (\texttt{Address}) và tọa độ địa lý để hỗ trợ tìm kiếm theo vị trí.
+    \item \texttt{UserClinicController} cung cấp API cho người dùng tìm kiếm phòng khám gần vị trí hiện tại, lọc theo dịch vụ hoặc danh mục.
+\end{itemize}
+
+\subsection{Quản lý Đặt lịch và Lịch hẹn (Booking \& Appointment)}
+
+\subsubsection{Đặt lịch (\texttt{BookingModule})}
+
+Module xử lý toàn bộ quy trình đặt lịch dịch vụ sức khỏe, hoạt động theo mô hình máy trạng thái:
+
+\begin{itemize}
+    \item \textbf{Luồng trạng thái:} \texttt{PENDING} → \texttt{CONFIRMED} → \texttt{IN\_PROGRESS} → \texttt{COMPLETED} hoặc \texttt{CANCELLED}. Mỗi lần chuyển trạng thái đều được ghi lại trong bảng \texttt{BookingStatusLog} để đảm bảo truy vết.
+
+    \item \textbf{Quản lý slot thời gian:} \texttt{SlotsController} cung cấp API kiểm tra và quản lý các khung giờ trống, ngăn chặn tình trạng đặt trùng (double-booking) thông qua cơ chế khóa phân tán Redis.
+
+    \item \textbf{Tích hợp thanh toán:} Sau khi booking được xác nhận, hệ thống tự động kích hoạt quy trình thanh toán thông qua \texttt{BookingPaymentService}.
+\end{itemize}
+
+\subsubsection{Lịch hẹn (\texttt{AppointmentModule})}
+
+Module quản lý chi tiết lịch hẹn sau khi booking đã được xác nhận:
+
+\begin{itemize}
+    \item \texttt{UserAppointmentController}: Cho phép người dùng xem danh sách lịch hẹn sắp tới, hủy hoặc đổi lịch.
+    \item Mỗi appointment liên kết 1-1 với booking gốc, đảm bảo tính nhất quán dữ liệu.
+    \item Hỗ trợ nhắc nhở tự động thông qua tích hợp với \texttt{NotificationModule}.
+\end{itemize}
+
+\subsection{Giỏ hàng (Cart Management)}
+
+Module \texttt{CartModule} quản lý giỏ hàng với mô hình checkout-ticket:
+
+\begin{itemize}
+    \item \textbf{Thêm/xóa dịch vụ:} API cho phép thêm, xóa, hoặc cập nhật số lượng dịch vụ trong giỏ.
+    \item \textbf{Checkout Ticket:} Khi người dùng tiến hành thanh toán, hệ thống tạo \texttt{CheckoutTicket} chứa toàn bộ thông tin đơn hàng (dịch vụ, giá, mã giảm giá) tại thời điểm checkout, đảm bảo giá không thay đổi trong quá trình thanh toán.
+    \item \textbf{Giới hạn:} Hệ thống áp dụng các ràng buộc (constants) về số lượng tối đa trong giỏ và thời gian hết hạn của checkout ticket.
+\end{itemize}
+
+\subsection{Cổng Thanh toán (Payment Gateway)}
+
+Module \texttt{PaymentGatewayModule} tích hợp thanh toán trực tuyến, hiện hỗ trợ cổng thanh toán \textbf{MoMo}:
+
+\begin{itemize}
+    \item \textbf{Tạo giao dịch (\texttt{MoMoPaymentService}):} Khi người dùng chọn thanh toán qua MoMo, hệ thống tạo request chứa thông tin đơn hàng, ký HMAC-SHA256, và gửi đến MoMo API. Người dùng được chuyển hướng đến trang thanh toán MoMo.
+
+    \item \textbf{Xử lý callback (IPN):} \texttt{MoMoController} cung cấp webhook endpoint nhận thông báo kết quả thanh toán từ MoMo (Instant Payment Notification). Hệ thống xác thực chữ ký (signature verification) để đảm bảo request hợp lệ.
+
+    \item \textbf{Liên kết với Booking:} \texttt{BookingPaymentService} đóng vai trò cầu nối, tự động cập nhật trạng thái booking sau khi nhận kết quả thanh toán (thành công → \texttt{CONFIRMED}, thất bại → \texttt{PAYMENT\_FAILED}).
+
+    \item \textbf{Ghi nhận giao dịch:} Mọi giao dịch đều được lưu trong thực thể \texttt{Payment} và \texttt{PaymentTransactionLog}, ghi nhận chi tiết về số tiền, phương thức, mã giao dịch, và trạng thái.
+\end{itemize}
+
+\subsection{Hệ thống Chat thời gian thực (Real-time Chat)}
+
+Module \texttt{ChatModule} triển khai hệ thống nhắn tin thời gian thực giữa người dùng và đối tác (phòng khám/chuyên gia), sử dụng kết hợp REST API và WebSocket:
+
+\begin{itemize}
+    \item \textbf{Kiến trúc song song:} Hệ thống tách biệt hoàn toàn hai phía giao tiếp:
+    \begin{itemize}
+        \item \textit{Phía người dùng:} \texttt{UserChatController} (REST) + \texttt{UserChatGateway} (WebSocket).
+        \item \textit{Phía đối tác:} \texttt{PartnerChatController} (REST) + \texttt{PartnerChatGateway} (WebSocket).
+    \end{itemize}
+
+    \item \textbf{WebSocket Authentication:} Middleware \texttt{ws-jwt-auth.middleware.ts} xác thực JWT token khi client thiết lập kết nối WebSocket, đảm bảo chỉ người dùng hợp lệ mới có thể tham gia chat.
+
+    \item \textbf{Mô hình dữ liệu:}
+    \begin{itemize}
+        \item \texttt{Conversation}/\texttt{PartnerConversation}: Quản lý cuộc trò chuyện, bao gồm thông tin người tham gia và trạng thái.
+        \item \texttt{ChatMessage}/\texttt{PartnerChatMessage}: Lưu trữ nội dung tin nhắn, thời gian gửi, trạng thái đã đọc.
+        \item \texttt{PartnerChatAttachment}: Hỗ trợ gửi tệp đính kèm (hình ảnh, tài liệu y tế).
+    \end{itemize}
+
+    \item \textbf{REST API bổ trợ:} Ngoài WebSocket cho giao tiếp thời gian thực, REST API cung cấp các chức năng như: lấy lịch sử tin nhắn (có phân trang), danh sách cuộc trò chuyện, đánh dấu đã đọc.
+\end{itemize}
+
+\subsection{Hệ thống Thông báo (Notification System)}
+
+Module \texttt{NotificationModule} quản lý toàn bộ hệ thống thông báo đa kênh, bao gồm thông báo trong ứng dụng (in-app), thông báo thời gian thực (WebSocket), và thông báo đẩy (push notification):
+
+\begin{itemize}
+    \item \textbf{Thông báo thời gian thực:} \texttt{NotificationGateway} (WebSocket) đẩy thông báo tức thì đến client khi có sự kiện mới (đặt lịch thành công, tin nhắn mới, nhắc hẹn).
+
+    \item \textbf{Push Notification (FCM):} \texttt{PushNotificationService} tích hợp Firebase Cloud Messaging để gửi thông báo đẩy đến thiết bị di động ngay cả khi ứng dụng không mở.
+    \begin{itemize}
+        \item \texttt{UserDeviceController}: API đăng ký/hủy đăng ký device token từ client.
+        \item Thực thể \texttt{DeviceToken} lưu token FCM của từng thiết bị, liên kết với tài khoản người dùng.
+    \end{itemize}
+
+    \item \textbf{Quản lý thông báo:}
+    \begin{itemize}
+        \item \texttt{UserNotificationController}: Lấy danh sách thông báo, đánh dấu đã đọc, xóa thông báo.
+        \item \texttt{AdminNotificationController}: Gửi thông báo broadcast đến nhóm người dùng hoặc toàn bộ hệ thống.
+        \item Thực thể \texttt{NotificationRead} theo dõi trạng thái đã đọc cho từng người dùng, hỗ trợ badge count.
+    \end{itemize}
+
+    \item \textbf{Tích hợp RabbitMQ:} Các sự kiện thông báo được phát qua message queue, đảm bảo tính bất đồng bộ và không làm chậm luồng nghiệp vụ chính.
+\end{itemize}
+
+\subsection{Hệ thống Địa lý và Bản đồ (Location \& Map Services)}
+
+\subsubsection{Quản lý địa chỉ hành chính (\texttt{LocationsModule})}
+
+Module quản lý hệ thống địa chỉ phân cấp theo chuẩn hành chính Việt Nam:
+
+\begin{itemize}
+    \item Cấu trúc phân cấp: Tỉnh/Thành phố → Quận/Huyện → Phường/Xã, được định nghĩa trong \texttt{LocationLevel} enum.
+    \item API tìm kiếm theo cấp: lấy danh sách tỉnh, quận thuộc tỉnh, xã thuộc quận.
+    \item Phục vụ validation địa chỉ khi đăng ký đối tác, tạo phòng khám, và lưu địa chỉ người dùng.
+\end{itemize}
+
+\subsubsection{Tích hợp bản đồ (\texttt{MapboxModule})}
+
+Module tích hợp Mapbox API để cung cấp các tính năng địa lý nâng cao:
+
+\begin{itemize}
+    \item \textbf{Geocoding:} Chuyển đổi địa chỉ văn bản thành tọa độ (latitude/longitude) và ngược lại (reverse geocoding).
+    \item \textbf{Tìm kiếm theo vị trí:} Cho phép người dùng tìm phòng khám, chuyên gia gần vị trí hiện tại với bán kính tùy chỉnh.
+    \item \textbf{Tính khoảng cách:} Hỗ trợ tính khoảng cách giữa hai điểm, phục vụ sắp xếp kết quả tìm kiếm theo độ gần.
+\end{itemize}
+
+\subsection{Hệ thống Đánh giá (Review System)}
+
+Module \texttt{ReviewModule} cho phép người dùng đánh giá dịch vụ và chuyên gia sau khi sử dụng:
+
+\begin{itemize}
+    \item \texttt{UserReviewController}: API gửi đánh giá, xem đánh giá của mình, và xem đánh giá từ người dùng khác.
+    \item \textbf{Hai loại đánh giá:}
+    \begin{itemize}
+        \item \texttt{SpecialistReview}: Đánh giá chuyên gia (bác sĩ, huấn luyện viên) về chuyên môn, thái độ, và hiệu quả.
+        \item \texttt{TreatmentReview}: Đánh giá trải nghiệm điều trị, bao gồm cơ sở vật chất, quy trình, và kết quả.
+    \end{itemize}
+    \item Điểm đánh giá trung bình được tổng hợp và hiển thị trên trang chi tiết dịch vụ và hồ sơ chuyên gia.
+\end{itemize}
+
+\subsection{Tích hợp cross-cutting: Middleware, Interceptor và Guard}
+
+Ngoài các module nghiệp vụ, hệ thống triển khai các cơ chế xuyên suốt (cross-cutting concerns) để đảm bảo chất lượng vận hành:
+
+\begin{itemize}
+    \item \textbf{LoggingMiddleware:} Được áp dụng toàn cục trên mọi route, ghi nhận method, URL, thời gian phản hồi, và status code của mỗi request, phục vụ giám sát và debug.
+
+    \item \textbf{ResponseInterceptor:} Chuẩn hóa toàn bộ response API về một format thống nhất bao gồm \texttt{statusCode}, \texttt{message}, và \texttt{data}, giúp phía Client xử lý dữ liệu nhất quán.
+
+    \item \textbf{PublicThrottlerGuard:} Áp dụng rate limiting 100 request/60 giây cho các route công khai, ngăn chặn tấn công brute-force và DDoS cơ bản.
+
+    \item \textbf{WebSocket Contract Bootstrap:} Service \texttt{WsContractBootstrapService} tự động đăng ký và xác thực các WebSocket event contracts khi ứng dụng khởi động, đảm bảo tính nhất quán giữa client và server.
+\end{itemize}
+
+
+\section{Hiện thực và Tích hợp các dịch vụ Trí tuệ Nhân tạo (AI Services)}
 \subsection{Hiện thực dịch vụ nhận dạng thực thể (NER Service)}
 
 
@@ -214,8 +777,6 @@ Các loại entity trong NER Service (theo \texttt{extractor.py}, \texttt{normal
 \end{itemize}
 
 Thiết kế schema như vậy giúp việc chuyển từ ngôn ngữ tự nhiên sang điều kiện SQL/PostGIS rõ ràng hơn, dễ kiểm thử hơn và cũng thuận lợi cho truy vết lỗi trong thực nghiệm.
-
-
 
 
 \subsection{Hiện thực hệ thống RAG Chatbot}
@@ -851,269 +1412,3 @@ Thiết kế hiện tại cho phép mở rộng dễ dàng:
 
 Ngoài ra, do component này độc lập với RAG và Recommender, có thể tách thành microservice riêng nếu hệ thống scale lớn hơn.
 
-\section{Kiến trúc hiện thực}
-Dựa trên nền tảng logic vững chắc của bản kiến trúc trừu tượng (Abstract Architecture) Hình \ref{fig:sys_arch}, bản thiết kế hiện thực hóa (Implementation Architecture) Hình \ref{fig:imple_arch} đã cụ thể hóa các mô hình chức năng thành một hệ sinh thái công nghệ hiện đại và tối ưu hiệu năng. Vẫn tuân thủ chặt chẽ cấu trúc Microservices 5 tầng, bản thiết kế thực tế đã thay thế các khái niệm tổng quát bằng những công nghệ hàng đầu trong ngành: Hệ sinh thái Flutter đảm bảo trải nghiệm đồng nhất trên mọi nền tảng người dùng; Kong được lựa chọn làm API Gateway mạnh mẽ để điều phối luồng dữ liệu; và tầng hạ tầng dữ liệu được phân tách chuyên biệt với PostgreSQL cho nghiệp vụ cốt lõi, FAISS cho xử lý AI vector và MinIO cho lưu trữ đối tượng. Sự chuyển dịch từ trừu tượng sang thực tế này không chỉ đảm bảo tính khả thi khi triển khai mà còn tối ưu hóa khả năng mở rộng (scalability) và tính ổn định cho toàn bộ nền tảng
-\begin{figure}[H]
-    % Căn giữa hình ảnh
-    \centering
-    \includegraphics[width=1\textwidth]{Images/implement_arch.png}
-    \vspace{10pt}
-    
-    % Thêm chú thích cho hình ảnh
-    \caption{Kiến trúc hiện thực hệ thống}
-    
-    % Đặt nhãn để tham chiếu chéo (cross-reference)
-    \label{fig:imple_arch}
-\end{figure}
-
-Hệ thống được thiết kế dựa trên mô hình Microservices hiện đại, chia thành 5 tầng chính với các công nghệ cụ thể như sau:
-
-\subsection*{Tầng Giao Diện (Presentation Layer)}
-Đây là tầng tương tác trực tiếp với người dùng cuối (tương ứng với Client Layer trong bản thiết kế trừu tượng).
-
-\begin{itemize}
-    \item \textbf{Công nghệ:} Flutter.
-    \item \textbf{Mô tả:} Sử dụng Flutter làm công nghệ chủ đạo (Cross-platform) để xây dựng cả 3 ứng dụng client:
-    \begin{itemize}
-        \item \textit{User App:} Ứng dụng di động dành cho người dùng phổ thông.
-        \item \textit{Admin Panel:} Trang quản trị hệ thống.
-        \item \textit{Provider Portal:} Cổng thông tin dành cho các nhà cung cấp dịch vụ y tế/làm đẹp.
-    \end{itemize}
-    \item \textbf{Giao thức:} Các ứng dụng này giao tiếp với hệ thống backend thông qua RESTful API và WebSocket (dành cho các tính năng thời gian thực).
-\end{itemize}
-
-\subsection*{Tầng Kết Nối \& API (Connection \& API Layer)}
-Đóng vai trò là cổng vào duy nhất (Entry point) cho mọi yêu cầu từ phía Client.
-
-\begin{itemize}
-    \item \textbf{Công nghệ:} Kong API Gateway.
-    \item \textbf{Mô tả:} Thay thế cho khối "API Gateway" trừu tượng. Kong chịu trách nhiệm:
-    \begin{itemize}
-        \item Routing (định tuyến) request đến đúng microservice.
-        \item Load balancing (cân bằng tải).
-        \item Authentication/Authorization cơ bản (xác thực sơ bộ).
-        \item Rate limiting (giới hạn băng thông) để bảo vệ hệ thống.
-    \end{itemize}
-\end{itemize}
-
-\subsection*{Tầng Server \& Nghiệp Vụ (Server/Business Layer)}
-Đây là lõi của hệ thống, được triển khai theo kiến trúc Microservices.
-
-\begin{itemize}
-    \item \textbf{Hạ tầng:} Compute Engine (Google Cloud Platform - GCP). Các dịch vụ được triển khai trên các máy ảo (VM) hoặc Container chạy trên VM.
-    \item \textbf{Các dịch vụ thành phần:}
-    \begin{itemize}
-        \item \textit{Authenticate Service:} Xử lý đăng ký, đăng nhập, cấp phát token (JWT).
-        \item \textit{Core Healthcare Service:} Xử lý nghiệp vụ chính như đặt lịch hẹn (Appointments), quản lý hồ sơ y tế, thanh toán.
-        \item \textit{AI Service:} Chịu trách nhiệm về các tính năng thông minh (Chatbot, Recommendation System). Dịch vụ này giao tiếp chặt chẽ với Vector Database.
-        \item \textit{Notification Service:} Quản lý việc gửi thông báo đẩy (Push) và Email.
-    \end{itemize}
-\end{itemize}
-
-\subsection*{Tầng Dữ Liệu \& Hạ Tầng (Data \& Infrastructure Layer)}
-Tầng này lưu trữ và quản lý luồng dữ liệu, cụ thể hóa các khối database trừu tượng:
-
-\begin{itemize}
-    \item \textbf{Relational Database (SQL):} Sử dụng \textbf{PostgreSQL}. Dùng để lưu trữ dữ liệu có cấu trúc (thông tin user, đơn hàng, lịch hẹn).
-    \item \textbf{Vector Database:} Sử dụng \textbf{FAISS} (Facebook AI Similarity Search). Dùng để lưu trữ vector embeddings phục vụ cho AI Service (tìm kiếm ngữ nghĩa, gợi ý).
-    \item \textbf{Cache:} Sử dụng \textbf{Redis}. Giúp tăng tốc độ truy xuất dữ liệu thường xuyên sử dụng và giảm tải cho Database chính.
-    \item \textbf{Message Queue:} Sử dụng \textbf{RabbitMQ}. Đảm bảo giao tiếp bất đồng bộ (asynchronous) giữa các microservices (ví dụ: Core Service gửi sự kiện đến Notification Service mà không cần chờ đợi).
-    \item \textbf{Object Storage:} Sử dụng \textbf{MinIO}. Giải pháp lưu trữ đối tượng (tương thích S3) dùng để lưu trữ file tĩnh, hình ảnh, tài liệu y tế (thay thế cho khối Cloud Storage trừu tượng).
-\end{itemize}
-
-\subsection*{Tầng Tích Hợp Bên Thứ Ba (Third-Party Integrations Layer)}
-Kết nối với các dịch vụ bên ngoài để mở rộng tính năng.
-
-\begin{itemize}
-    \item \textbf{Cổng thanh toán (Payment Methods):} Tích hợp đa dạng bao gồm MoMo, Stripe (quốc tế), và VNPay (nội địa Việt Nam).
-    \item \textbf{Dịch vụ thông báo (App Notification Service):}
-    \begin{itemize}
-        \item \textit{APNs (Apple Push Notification service):} Dành riêng cho thiết bị iOS.
-        \item \textit{Firebase (FCM):} Dành cho Android và quản lý thông báo chung.
-    \end{itemize}
-\end{itemize}
-
-\vspace{1cm} % Khoảng cách một chút trước phần nhận xét
-
-\subsection*{Nhận xét tổng quan}
-Kiến trúc này rất hiện đại và phù hợp với quy mô dự án nền tảng Health/Beauty. Việc tách biệt rõ ràng giữa PostgreSQL (nghiệp vụ) và FAISS (AI) cho thấy sự đầu tư kỹ lưỡng vào hiệu năng xử lý dữ liệu thông minh. Sử dụng MinIO cũng là một giải pháp hay để tự chủ (self-hosted) việc lưu trữ dữ liệu thay vì phụ thuộc hoàn toàn vào cloud public storage đắt đỏ.
-\section{Phần Software – Triển khai ứng dụng}
-% \subsection{User Mobile App}
-% \subsection{Partner Portal (Web/App)}
-% \subsection{Admin Dashboard (Web)}
-% \subsection{Tích hợp AI với hệ thống ứng dụng}
-% \subsection{Bảo mật và quản lý dữ liệu}
-Hệ thống Backend được xây dựng dựa trên \textbf{NestJS Framework}, tuân theo kiến trúc module hóa để đảm bảo tính mở rộng và bảo mật. Dưới đây là các chi tiết hiện thực cụ thể dựa trên mã nguồn thực tế.
-
-\subsection{Cấu hình và Khởi tạo hệ thống (Bootstrap \& Configuration)}
-
-Điểm khởi chạy của ứng dụng nằm tại \texttt{src/main.ts}, nơi thiết lập các cấu hình toàn cục quan trọng cho bảo mật và tài liệu hóa API:
-
-\begin{itemize}
-    \item \textbf{Bảo mật HTTP:} Tích hợp thư viện \texttt{helmet} để thiết lập các HTTP headers an toàn và kích hoạt \texttt{enableCors()} cho phép các ứng dụng Client (Mobile/Web) truy cập tài nguyên.
-    
-    \item \textbf{Kiểm soát dữ liệu đầu vào:} Sử dụng \texttt{ValidationPipe} ở mức toàn cục (\texttt{globalPipes}) với tùy chọn \texttt{whitelist: true}. Điều này giúp tự động loại bỏ các trường dữ liệu thừa không được định nghĩa trong DTO, đảm bảo tính sạch sẽ của dữ liệu trước khi vào Controller.
-    
-    \item \textbf{Tài liệu hóa API (Swagger):} Hệ thống tự động sinh tài liệu API chuẩn OpenAPI. \texttt{DocumentBuilder} được cấu hình để tạo giao diện Swagger UI tại đường dẫn \texttt{/api/docs}, hỗ trợ đội ngũ phát triển Mobile và Web tích hợp nhanh chóng.
-    
-    \item \textbf{Kết nối Cơ sở dữ liệu:} Cấu hình Database được tách biệt trong \texttt{src/config/database.config.ts}, sử dụng các biến môi trường (\texttt{process.env}) để kết nối tới PostgreSQL, đảm bảo không lộ thông tin nhạy cảm (credentials) trong mã nguồn.
-\end{itemize}
-
-\subsection{Module Xác thực và Bảo mật (Authentication \& Security)}
-
-Module \texttt{AuthModule} đóng vai trò trung tâm trong việc quản lý định danh, sử dụng kết hợp \textbf{Passport} và \textbf{JWT}.
-
-\subsubsection{Quy trình Đăng ký \& Đăng nhập}
-\begin{itemize}
-    \item \textbf{Đăng ký (\texttt{register}):} \texttt{AuthService} tiếp nhận DTO đăng ký, thực hiện băm mật khẩu (hashing) bằng thuật toán \texttt{bcrypt} trước khi lưu vào cơ sở dữ liệu. Nếu có thông tin \texttt{profile}, hệ thống sẽ khởi tạo đồng thời \texttt{Account} và \texttt{UserProfile} nhờ cơ chế \texttt{cascade: true} của TypeORM.
-    
-    \item \textbf{Đăng nhập (\texttt{login}):} Sử dụng \texttt{LocalStrategy} để xác thực email/password. Sau khi thành công, hệ thống cấp phát cặp token gồm \texttt{access\_token} (ngắn hạn) và \texttt{refresh\_token} (dài hạn).
-\end{itemize}
-
-\subsubsection{Cơ chế Bảo mật Token (JWT Strategy)}
-\begin{itemize}
-    \item \textbf{Access Token:} Được ký (sign) bằng \texttt{jwtConstants.secret}. Các request đến API được bảo vệ bởi \texttt{JwtAuthGuard}, sử dụng \texttt{JwtStrategy} để trích xuất và xác thực token từ Header (\texttt{Bearer Token}).
-    
-    \item \textbf{Refresh Token Rotation \& Hashing:} Để tăng cường bảo mật, \texttt{refresh\_token} không được lưu trực tiếp dưới dạng plain-text. Hệ thống chỉ lưu bản băm (hash) của nó vào cột \texttt{refreshTokenHash} trong bảng \texttt{Account}. Khi user yêu cầu cấp mới token (\texttt{/auth/refresh}), hệ thống so sánh token gửi lên với hash trong DB. Điều này ngăn chặn việc sử dụng lại token cũ nếu bị lộ.
-    
-    \item \textbf{Logout an toàn:} API \texttt{/auth/logout} thực hiện xóa \texttt{refreshTokenHash} trong DB, đảm bảo token cũ mất hiệu lực ngay lập tức.
-\end{itemize}
-
-\subsection{Quản lý Tài khoản và Dữ liệu Người dùng (Account Management)}
-
-Module \texttt{AccountModule} chịu trách nhiệm quản lý thông tin người dùng và các dữ liệu sức khỏe liên quan.
-
-\begin{itemize}
-    \item \textbf{Mô hình dữ liệu (Entities):}
-    \begin{itemize}
-        \item \textbf{Account:} Là thực thể lõi, chứa thông tin đăng nhập (\texttt{email}, \texttt{passwordHash}) và vai trò (\texttt{role}). Cấu trúc hỗ trợ lưu trữ dữ liệu khảo sát linh hoạt thông qua cột \texttt{survey} kiểu \texttt{jsonb}, cho phép lưu trữ các câu trả lời khảo sát sức khỏe phức tạp mà không cần thay đổi schema cứng.
-        \item \textbf{UserProfile:} Chứa thông tin cá nhân (tên, ngày sinh, bio) và liên kết 1-1 với Account. Entity này cũng hỗ trợ quan hệ với \texttt{Address} để lưu địa chỉ chi tiết.
-    \end{itemize}
-    
-    \item \textbf{Xử lý Khảo sát (Survey Feature):}
-    \texttt{AccountController} cung cấp các endpoints \texttt{GET/POST /account/survey} để Client gửi và lấy dữ liệu khảo sát. Dữ liệu này được \texttt{AccountService} lưu trực tiếp vào cột \texttt{jsonb} của user, phục vụ cho đầu vào của hệ thống AI gợi ý sau này.
-\end{itemize}
-
-\subsection{Kiến trúc DTO và Validation}
-
-Hệ thống áp dụng chặt chẽ mô hình \textbf{Data Transfer Object (DTO)} để kiểm soát dữ liệu giao tiếp:
-
-\begin{itemize}
-    \item \textbf{Validation Rules:} Sử dụng các decorator như \texttt{@IsEmail}, \texttt{@MinLength(8)} cho mật khẩu, và \texttt{@Matches} cho số điện thoại (Regex kiểm tra định dạng số Việt Nam \texttt{+84...}).
-    
-    \item \textbf{Nested Validation:} Hỗ trợ validate dữ liệu lồng nhau (ví dụ: object \texttt{profile} bên trong \texttt{register} request) thông qua \texttt{@ValidateNested} và \texttt{Type(() => RegisterProfileDto)}.
-\end{itemize}
-
-\subsection{Quy trình Đăng ký \& Xác minh Đối tác (Partner Registration \& Verification)}
-
-Module \texttt{PartnersModule} quản lý toàn bộ quy trình từ lúc đối tác đăng ký tài khoản, nộp hồ sơ kinh doanh, cho đến khi được quản trị viên phê duyệt hoặc yêu cầu bổ sung. Toàn bộ quy trình được vận hành theo mô hình máy trạng thái (State Machine) gồm 5 trạng thái.
-
-\subsubsection{Các trạng thái xác minh đối tác}
-
-Mỗi đối tác luôn ở một trong 5 trạng thái sau, được định nghĩa trong enum \texttt{PartnerVerificationStatus}:
-
-\begin{itemize}
-    \item \texttt{ONBOARDING}: Đối tác vừa tạo tài khoản, đang trong quá trình bổ sung thông tin và tải lên giấy tờ.
-    \item \texttt{PENDING}: Hồ sơ đã được nộp đầy đủ, đang chờ quản trị viên xem xét.
-    \item \texttt{APPROVED}: Hồ sơ đã được chấp thuận, đối tác có thể bắt đầu cung cấp dịch vụ trên nền tảng.
-    \item \texttt{REJECTED}: Hồ sơ bị từ chối vĩnh viễn, không thể nộp lại.
-    \item \texttt{REQUIRED\_RESUBMIT}: Hồ sơ cần chỉnh sửa hoặc bổ sung thêm tài liệu trước khi nộp lại.
-\end{itemize}
-
-Sơ đồ chuyển đổi trạng thái:
-
-\begin{center}
-\begin{tabular}{@{}r@{\;}c@{\;}l@{}}
-\texttt{ONBOARDING} $\rightarrow$ \texttt{PENDING} & $\rightarrow$ & \texttt{APPROVED} \\
-& $\searrow$ & \texttt{REJECTED} \\
-& $\searrow$ & \texttt{REQUIRED\_RESUBMIT} $\rightarrow$ \texttt{PENDING} $\rightarrow$ \ldots \\
-\end{tabular}
-\end{center}
-
-\subsubsection{Đăng ký đối tác}
-
-Khi đối tác đăng ký, hệ thống thực hiện các bước sau trong cùng một giao dịch (transaction) để đảm bảo tính toàn vẹn dữ liệu:
-
-\begin{enumerate}
-    \item \textbf{Kiểm tra trùng lặp:} Đảm bảo email và mã số thuế chưa có trong hệ thống.
-    \item \textbf{Kiểm tra địa chỉ:} Xác nhận thông tin tỉnh/huyện/xã hợp lệ thông qua \texttt{LocationsService}.
-    \item \textbf{Khởi tạo dữ liệu:} Khởi tạo thông tin tài khoản, thông tin doanh nghiệp, người đại diện pháp lý, và các giấy tờ KYC ban đầu.
-    \item \textbf{Cấp quyền truy cập:} Tạo token truy cập để đối tác có thể đăng nhập ngay.
-\end{enumerate}
-
-Sau khi đăng ký thành công, đối tác được gán trạng thái \texttt{PENDING} và tự động vào hàng đợi chờ xét duyệt.
-
-\subsubsection{Cập nhật hồ sơ thông minh }
-
-Khi đối tác chỉnh sửa hồ sơ (đặc biệt sau khi bị yêu cầu bổ sung), hệ thống áp dụng cơ chế cập nhật thông minh (Smart Update) gồm 3 bước:
-
-\begin{itemize}
-    \item \textbf{Nhận diện thay đổi:} Mỗi trường gửi lên đều kèm theo \texttt{fieldKey}, giúp hệ thống biết chính xác trường nào đã được sửa mà không cần so sánh toàn bộ dữ liệu.
-    \item \textbf{Phân loại mức độ quan trọng:} Hệ thống phân biệt rõ giữa thay đổi nhạy cảm (mã số thuế, địa chỉ, thông tin người đại diện) và thay đổi thông thường (số điện thoại, tên thương hiệu).
-    \item \textbf{Tự động chuyển trạng thái:}
-    \begin{itemize}
-        \item Nếu đối tác đang ở trạng thái \texttt{REQUIRED\_RESUBMIT} hoặc \texttt{ONBOARDING} và đã sửa hết các lỗi $\rightarrow$ tự động chuyển sang \texttt{PENDING} để chờ xét duyệt lại.
-        \item Nếu đối tác đã được \texttt{APPROVED} nhưng sửa thông tin nhạy cảm $\rightarrow$ thu hồi phê duyệt và chuyển về \texttt{REQUIRED\_RESUBMIT} để quản trị viên xem xét lại.
-    \end{itemize}
-\end{itemize}
-
-\subsubsection{Hiển thị phản hồi từ quản trị viên}
-
-Khi đối tác mở xem hồ sơ của mình, hệ thống sẽ:
-
-\begin{enumerate}
-    \item Lấy bản đánh giá gần nhất từ bảng \texttt{PartnerReviewLog}.
-    \item Tổng hợp phản hồi thành 2 danh sách: phản hồi theo từng trường thông tin (\texttt{fieldFeedbackMap}) và phản hồi theo từng tài liệu (\texttt{documentFeedbackMap}).
-    \item Trả về kèm theo hồ sơ, giúp ứng dụng đánh dấu trực quan những mục cần sửa và hiển thị lý do cụ thể từ quản trị viên.
-\end{enumerate}
-
-\subsection{Module Quản trị và Nhật ký Kiểm toán (Admin Management \& Audit Trail)}
-
-\subsubsection{Xét duyệt đối tác (\texttt{reviewPartner})}
-
-Các API quản trị nằm trong \texttt{AdminModule}, chỉ cho phép truy cập bởi người dùng có vai trò \texttt{ADMIN} (được bảo vệ bằng \texttt{JwtAuthGuard} và \texttt{RolesGuard}).
-
-Khi quản trị viên xét duyệt một hồ sơ đối tác, hệ thống xử lý theo các bước:
-
-\begin{enumerate}
-    \item \textbf{Kiểm tra điều kiện:} Chỉ cho phép xét duyệt khi đối tác đang ở trạng thái \texttt{PENDING}. Nếu không, hệ thống trả về lỗi.
-
-    \item \textbf{Phân loại đánh giá:} Quản trị viên gửi danh sách các mục cần đánh giá, mỗi mục gồm \texttt{fieldKey} và \texttt{feedback}. Hệ thống tự động phân loại:
-    \begin{itemize}
-        \item Nếu \texttt{fieldKey} nằm trong danh sách trường thông tin đã biết $\rightarrow$ đánh giá trường hồ sơ.
-        \item Nếu không $\rightarrow$ đánh giá tài liệu (khớp theo mã tài liệu).
-    \end{itemize}
-
-    \item \textbf{Lưu ảnh chụp dữ liệu:} Với mỗi mục được đánh giá, hệ thống lưu lại giá trị hiện tại (snapshot) kèm kết quả hợp lệ hay không và phản hồi chi tiết. Điều này giúp truy vết lại chính xác dữ liệu tại thời điểm xét duyệt.
-
-    \item \textbf{Xác định kết quả cuối cùng:} Hệ thống áp dụng quy tắc ưu tiên:
-    \begin{itemize}
-        \item Nếu quản trị viên chọn từ chối $\rightarrow$ \texttt{REJECTED} (ưu tiên cao nhất, không thể đảo ngược).
-        \item Nếu có bất kỳ mục nào bị đánh dấu lỗi $\rightarrow$ \texttt{REQUIRED\_RESUBMIT} (yêu cầu sửa lại).
-        \item Nếu tất cả hợp lệ và đủ tài liệu bắt buộc $\rightarrow$ \texttt{APPROVED}.
-    \end{itemize}
-
-    \item \textbf{Ghi nhận lịch sử:} Toàn bộ kết quả xét duyệt được lưu vào bảng \texttt{PartnerReviewLog} dưới dạng bản ghi không thể sửa đổi, bao gồm: kết quả, người duyệt, nhận xét chung, và chi tiết đánh giá từng trường/tài liệu.
-\end{enumerate}
-
-\subsubsection{Nhật ký kiểm toán (Audit Logging)}
-
-Ngoài lịch sử xét duyệt, hệ thống còn ghi lại mọi thao tác quan trọng của quản trị viên thông qua module \texttt{AuditModule}:
-
-\begin{itemize}
-    \item \textbf{Đánh dấu hành động:} Sử dụng decorator \texttt{@Audit} gắn trực tiếp trên các API cần theo dõi, ví dụ: \texttt{@Audit('PARTNER\_REVIEW', 'Partner')}.
-    \item \textbf{Tự động ghi nhận:} \texttt{AuditInterceptor} tự động thu thập thông tin trước và sau khi API được thực thi, bao gồm: ai thực hiện, thao tác gì, tác động đến đối tượng nào, và thời điểm cụ thể.
-    \item \textbf{Tra cứu linh hoạt:} \texttt{AuditService} cho phép tìm kiếm nhật ký theo người thực hiện, đối tượng bị tác động, hoặc loại hành động.
-\end{itemize}
-
-Nhờ kết hợp giữa \texttt{PartnerReviewLog} và \texttt{AuditLog}, hệ thống đảm bảo khả năng truy vết toàn diện: ai đã duyệt hồ sơ nào, vào lúc nào, và dữ liệu lúc đó trông ra sao.
-
-\subsection{Quản lý Tệp tin và Lưu trữ (S3 File Management)}
-
-Module \texttt{S3Module} tích hợp với dịch vụ lưu trữ đối tượng tương thích S3 (MinIO) để quản lý tệp tin:
-
-\begin{itemize}
-    \item \textbf{Upload:} Tạo Pre-signed URL cho phép Client upload trực tiếp đến storage mà không qua Backend, giảm tải cho server.
-    \item \textbf{Download:} Sinh Pre-signed URL có thời hạn để truy cập tệp tin (tài liệu doanh nghiệp, hình ảnh sản phẩm).
-    \item \textbf{Quản lý tài liệu đối tác:} Thực thể \texttt{PartnerDocument} lưu metadata (loại tài liệu, URL, trạng thái) trong PostgreSQL, trong khi nội dung tệp thực tế nằm trên Object Storage.
-\end{itemize}
