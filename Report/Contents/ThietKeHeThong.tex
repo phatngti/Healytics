@@ -560,7 +560,6 @@ Một truy vấn đầu vào được xử lý theo chuỗi bước:
     \begin{itemize}
         \item \texttt{PRICE}: \textbf{Gemini-first}, chỉ fallback regex local khi Gemini không trả PRICE.
         \item \texttt{DISTANCE}: \textbf{Gemini-first}, fallback local deterministic extractor khi Gemini không trả DISTANCE.
-        \item \texttt{RATING}: hiện tắt trong output để tránh nhiễu ở pha pre-filter.
     \end{itemize}
     \item \textbf{Normalization}: ánh xạ về các trường chuẩn như \texttt{business\_type}, \texttt{location\_code}, \texttt{operator}, \texttt{amount}.
     \item \textbf{Query building}: tổng hợp tham số lọc cho truy vấn PostgreSQL/PostGIS.
@@ -571,7 +570,7 @@ Một truy vấn đầu vào được xử lý theo chuỗi bước:
 Để đáp ứng yêu cầu thời gian thực, thiết kế dịch vụ ưu tiên tính ổn định theo các cơ chế sau:
 \begin{itemize}
     \item \textbf{LRU query cache}: lưu truy vấn gần nhất để giảm chi phí xử lý lặp.
-    \item \textbf{Startup preload}: nạp cache địa danh ngay khi khởi động.
+    \item \textbf{Startup preload}: nạp cache vị trí từ database ngay khi khởi động.
     \item \textbf{Stale-while-revalidate}: khi refresh cache thất bại, vẫn dùng dữ liệu cũ để tránh gián đoạn.
     \item \textbf{Confidence gating}: lọc confidence thấp cho các thực thể ngữ nghĩa trọng yếu nhằm giảm false positive trước pha truy vấn.
 \end{itemize}
