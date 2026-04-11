@@ -40,13 +40,12 @@ import 'package:user_app/features/employee/presentation/screens/employee_booking
 import 'package:user_app/features/review/presentation/screens/review_treatment.screen.dart';
 import 'package:user_app/features/review/presentation/screens/review_specialist.screen.dart';
 import 'package:user_app/features/review/presentation/screens/review_submitted.screen.dart';
+import 'package:user_app/features/review/presentation/screens/review_facility.screen.dart';
 import 'package:user_app/features/partner_chat/presentation/screens/partner_chat.screen.dart';
 import 'package:user_app/features/clinic_info/presentation/screens/clinic_info.screen.dart';
 import 'package:user_app/features/cart/presentation/screens/cart.screen.dart';
 import 'package:user_app/features/notifications/'
     'presentation/providers/notification.provider.dart';
-import 'package:user_app/core/services/'
-    'push_notification_flutter.service.dart';
 
 part 'routes.g.dart';
 
@@ -134,9 +133,6 @@ class _MobileWrapperBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final unreadCount =
         ref.watch(unreadCountProvider).value ?? 0;
-
-    // Initialise mock push notification service
-    ref.watch(pushNotificationServiceProvider);
 
     return AdaptiveRootScraffold(
       navigationShell: navigationShell,
@@ -828,6 +824,9 @@ class ReviewSpecialistRoute extends GoRouteData with $ReviewSpecialistRoute {
   final String specialistName;
   final String specialistRole;
   final String? specialistAvatarUrl;
+  final String facilityId;
+  final String facilityName;
+  final String? facilityAddress;
 
   const ReviewSpecialistRoute({
     required this.appointmentId,
@@ -835,6 +834,9 @@ class ReviewSpecialistRoute extends GoRouteData with $ReviewSpecialistRoute {
     required this.specialistName,
     required this.specialistRole,
     this.specialistAvatarUrl,
+    required this.facilityId,
+    required this.facilityName,
+    this.facilityAddress,
   });
 
   static const name = 'review_specialist';
@@ -849,6 +851,58 @@ class ReviewSpecialistRoute extends GoRouteData with $ReviewSpecialistRoute {
         specialistName: specialistName,
         specialistRole: specialistRole,
         specialistAvatarUrl: specialistAvatarUrl,
+        facilityId: facilityId,
+        facilityName: facilityName,
+        facilityAddress: facilityAddress,
+      ),
+    );
+  }
+}
+
+// --- REVIEW FACILITY ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ReviewFacilityRoute>(
+  path: '/review_facility',
+  name: ReviewFacilityRoute.name,
+)
+class ReviewFacilityRoute extends GoRouteData
+    with $ReviewFacilityRoute {
+  final String appointmentId;
+  final String facilityId;
+  final String facilityName;
+  final String? facilityAddress;
+  final String specialistName;
+  final String? specialistAvatarUrl;
+  final int specialistRating;
+
+  const ReviewFacilityRoute({
+    required this.appointmentId,
+    required this.facilityId,
+    required this.facilityName,
+    this.facilityAddress,
+    required this.specialistName,
+    this.specialistAvatarUrl,
+    required this.specialistRating,
+  });
+
+  static const name = 'review_facility';
+
+  @override
+  Page<void> buildPage(
+    BuildContext context,
+    GoRouterState state,
+  ) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ReviewFacilityScreen(
+        appointmentId: appointmentId,
+        facilityId: facilityId,
+        facilityName: facilityName,
+        facilityAddress: facilityAddress,
+        specialistName: specialistName,
+        specialistAvatarUrl:
+            specialistAvatarUrl,
+        specialistRating: specialistRating,
       ),
     );
   }

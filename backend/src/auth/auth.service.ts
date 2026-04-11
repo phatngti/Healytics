@@ -27,6 +27,7 @@ const USER_ROLES: Role[] = [Role.USER];
 export interface PartnerVerificationInfo {
   verificationStatus: PartnerVerificationStatus;
   verificationCompletedAt: Date | null;
+  partnerProfileCompleted: boolean;
 }
 
 /** JWT payload structure */
@@ -39,6 +40,7 @@ interface AuthJwtPayload {
   profileCompleted?: boolean;
   verificationStatus?: PartnerVerificationStatus;
   verificationCompletedAt?: string | null;
+  partnerProfileCompleted?: boolean;
 }
 
 /** Validated user from authentication */
@@ -93,6 +95,8 @@ export class AuthService {
       payload.verificationStatus = partnerVerification.verificationStatus;
       payload.verificationCompletedAt =
         partnerVerification.verificationCompletedAt?.toISOString() ?? null;
+      payload.partnerProfileCompleted =
+        partnerVerification.partnerProfileCompleted;
     }
     const accessExpires = process.env.JWT_EXPIRES_IN || '3600s';
     const refreshExpires = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
@@ -284,6 +288,8 @@ export class AuthService {
       {
         verificationCompletedAt: partnerProfile.verificationCompletedAt,
         verificationStatus: partnerProfile.verificationStatus,
+        partnerProfileCompleted:
+          this.partnerService.isPartnerProfileCompleted(partnerProfile),
       },
     );
   }
@@ -334,6 +340,8 @@ export class AuthService {
         partnerVerification = {
           verificationStatus: partnerProfile.verificationStatus,
           verificationCompletedAt: partnerProfile.verificationCompletedAt,
+          partnerProfileCompleted:
+            this.partnerService.isPartnerProfileCompleted(partnerProfile),
         };
       }
     } catch {

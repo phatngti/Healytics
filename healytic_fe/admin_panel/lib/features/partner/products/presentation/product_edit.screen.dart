@@ -7,6 +7,7 @@ import 'package:admin_panel/features/partner/products/presentation/widgets/produ
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product_details.provider.dart';
 import 'package:admin_panel/router/partner_routes.dart';
+import 'package:common/widgets/card/error_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';
@@ -48,7 +49,14 @@ class ProductEditScreen extends ConsumerWidget {
           ),
         ),
         body: Center(
-          child: Text('Error loading product: $error'),
+          child: ErrorCard(
+            title: 'Error loading product',
+            error: error,
+            stackTrace: stack,
+            onRetry: () => ref.invalidate(
+              productDetailsProvider(productId),
+            ),
+          ),
         ),
       ),
     );

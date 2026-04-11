@@ -8,16 +8,18 @@ import 'package:admin_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**serviceId** | **String** |  | 
+**id** | **String** |  | 
 **name** | **String** |  | 
+**slug** | **String** |  | 
 **imageUrl** | [**Object**](.md) |  | [optional] 
-**badge** | [**Object**](.md) |  | [optional] 
-**bookedCount** | **num** |  | 
-**price** | [**AiPriceDto**](AiPriceDto.md) |  | 
-**staffName** | [**Object**](.md) |  | [optional] 
-**rating** | [**AiRatingDto**](AiRatingDto.md) |  | 
-**location** | [**AiLocationDto**](AiLocationDto.md) |  | 
-**slots** | **List<String>** |  | [default to const []]
+**category** | **String** |  | 
+**duration** | **String** |  | 
+**price** | **String** |  | 
+**rating** | **String** |  | 
+**vendorName** | **String** |  | 
+**location** | **String** |  | 
+**staffAvatars** | **List<String>** |  | [default to const []]
+**type** | **String** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

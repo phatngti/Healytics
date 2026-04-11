@@ -11,55 +11,40 @@ import 'package:flutter/foundation.dart';
 
 class OnboardPageKeys {
   final signInButton = const Key('onboardSignInButton');
-  final createAccountButton = const Key(
-    'onboardCreateAccountButton',
-  );
+  final createAccountButton = const Key('onboardCreateAccountButton');
 }
 
 // --- Sign In ---
 
 class SignInPageKeys {
   final emailTextField = const Key('signInEmailTextField');
-  final passwordTextField = const Key(
-    'signInPasswordTextField',
-  );
+  final passwordTextField = const Key('signInPasswordTextField');
   final signInButton = const Key('signInButton');
-  final forgotPasswordButton = const Key(
-    'forgotPasswordButton',
-  );
+  final forgotPasswordButton = const Key('forgotPasswordButton');
   final googleButton = const Key('googleSignInButton');
-  final facebookButton = const Key(
-    'facebookSignInButton',
-  );
+  final facebookButton = const Key('facebookSignInButton');
 }
 
 // --- Sign Up: Email Form ---
 
 class EmailFormPageKeys {
-  final emailTextField = const Key(
-    'emailFormEmailTextField',
-  );
-  final continueButton = const Key(
-    'emailFormContinueButton',
-  );
+  final emailTextField = const Key('emailFormEmailTextField');
+  final continueButton = const Key('emailFormContinueButton');
 }
 
 // --- Sign Up: Code Confirmation ---
 
 class CodeConfirmationPageKeys {
   final pinput = const Key('codeConfirmationPinput');
-  final submitButton = const Key(
-    'codeConfirmationSubmitButton',
-  );
-  final resendLink = const Key(
-    'codeConfirmationResendLink',
-  );
+  final submitButton = const Key('codeConfirmationSubmitButton');
+  final resendLink = const Key('codeConfirmationResendLink');
 }
 
 // --- Home ---
 
 class HomePageKeys {
   final searchField = const Key('homeSearchField');
+  final cartButton = const Key('homeCartButton');
 }
 
 // --- AI Health Assistant Chat ---
@@ -73,9 +58,24 @@ class ChatScreenKeys {
 // --- Checkout ---
 
 class CheckoutPageKeys {
-  final confirmButton = const Key(
-    'checkoutConfirmButton',
-  );
+  final confirmButton = const Key('checkoutConfirmButton');
+
+  Key paymentMethodTile(String method) =>
+      ValueKey('checkoutPaymentMethod-$method');
+}
+
+// --- Cart ---
+
+class CartPageKeys {
+  final searchField = const Key('cartSearchField');
+  final checkoutButton = const Key('cartCheckoutButton');
+  final voucherApplyButton = const Key('cartVoucherApplyButton');
+
+  Key itemSelection(String itemId) => ValueKey('cartItemSelection-$itemId');
+
+  Key voucherSelector(String itemId) => ValueKey('cartVoucherSelector-$itemId');
+
+  Key voucherTile(String code) => ValueKey('cartVoucherTile-$code');
 }
 
 // --- Profile ---
@@ -83,17 +83,13 @@ class CheckoutPageKeys {
 class ProfilePageKeys {
   final editButton = const Key('profileEditButton');
   final saveButton = const Key('profileSaveButton');
-  final displayNameField = const Key(
-    'profileDisplayNameField',
-  );
+  final displayNameField = const Key('profileDisplayNameField');
 }
 
 // --- Notifications ---
 
 class NotificationsPageKeys {
-  final notificationsList = const Key(
-    'notificationsList',
-  );
+  final notificationsList = const Key('notificationsList');
 }
 
 // --- Bottom Navigation ---
@@ -102,9 +98,7 @@ class BottomNavKeys {
   final homeTab = const Key('bottomNavHome');
   final ordersTab = const Key('bottomNavOrders');
   final chatTab = const Key('bottomNavChat');
-  final notificationsTab = const Key(
-    'bottomNavNotifications',
-  );
+  final notificationsTab = const Key('bottomNavNotifications');
   final profileTab = const Key('bottomNavProfile');
 }
 
@@ -118,6 +112,7 @@ class Keys {
   final homePage = HomePageKeys();
   final chatScreen = ChatScreenKeys();
   final checkoutPage = CheckoutPageKeys();
+  final cartPage = CartPageKeys();
   final profilePage = ProfilePageKeys();
   final notificationsPage = NotificationsPageKeys();
   final bottomNav = BottomNavKeys();

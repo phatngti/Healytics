@@ -13,21 +13,25 @@ part of openapi.api;
 class AiRecommendationItemDto {
   /// Returns a new [AiRecommendationItemDto] instance.
   AiRecommendationItemDto({
-    required this.serviceId,
+    required this.id,
     required this.name,
+    required this.slug,
     this.imageUrl,
-    this.badge,
-    required this.bookedCount,
+    required this.category,
+    required this.duration,
     required this.price,
-    this.staffName,
     required this.rating,
+    required this.vendorName,
     required this.location,
-    this.slots = const [],
+    this.staffAvatars = const [],
+    required this.type,
   });
 
-  String serviceId;
+  String id;
 
   String name;
+
+  String slug;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -37,86 +41,74 @@ class AiRecommendationItemDto {
   ///
   Object? imageUrl;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? badge;
+  String category;
 
-  num bookedCount;
+  String duration;
 
-  AiPriceDto price;
+  String price;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? staffName;
+  String rating;
 
-  AiRatingDto rating;
+  String vendorName;
 
-  AiLocationDto location;
+  String location;
 
-  List<String> slots;
+  List<String> staffAvatars;
+
+  String type;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is AiRecommendationItemDto &&
-    other.serviceId == serviceId &&
+    other.id == id &&
     other.name == name &&
+    other.slug == slug &&
     other.imageUrl == imageUrl &&
-    other.badge == badge &&
-    other.bookedCount == bookedCount &&
+    other.category == category &&
+    other.duration == duration &&
     other.price == price &&
-    other.staffName == staffName &&
     other.rating == rating &&
+    other.vendorName == vendorName &&
     other.location == location &&
-    _deepEquality.equals(other.slots, slots);
+    _deepEquality.equals(other.staffAvatars, staffAvatars) &&
+    other.type == type;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (serviceId.hashCode) +
+    (id.hashCode) +
     (name.hashCode) +
+    (slug.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
-    (badge == null ? 0 : badge!.hashCode) +
-    (bookedCount.hashCode) +
+    (category.hashCode) +
+    (duration.hashCode) +
     (price.hashCode) +
-    (staffName == null ? 0 : staffName!.hashCode) +
     (rating.hashCode) +
+    (vendorName.hashCode) +
     (location.hashCode) +
-    (slots.hashCode);
+    (staffAvatars.hashCode) +
+    (type.hashCode);
 
   @override
-  String toString() => 'AiRecommendationItemDto[serviceId=$serviceId, name=$name, imageUrl=$imageUrl, badge=$badge, bookedCount=$bookedCount, price=$price, staffName=$staffName, rating=$rating, location=$location, slots=$slots]';
+  String toString() => 'AiRecommendationItemDto[id=$id, name=$name, slug=$slug, imageUrl=$imageUrl, category=$category, duration=$duration, price=$price, rating=$rating, vendorName=$vendorName, location=$location, staffAvatars=$staffAvatars, type=$type]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'service_id'] = this.serviceId;
+      json[r'id'] = this.id;
       json[r'name'] = this.name;
+      json[r'slug'] = this.slug;
     if (this.imageUrl != null) {
-      json[r'image_url'] = this.imageUrl;
+      json[r'imageUrl'] = this.imageUrl;
     } else {
-      json[r'image_url'] = null;
+      json[r'imageUrl'] = null;
     }
-    if (this.badge != null) {
-      json[r'badge'] = this.badge;
-    } else {
-      json[r'badge'] = null;
-    }
-      json[r'booked_count'] = this.bookedCount;
+      json[r'category'] = this.category;
+      json[r'duration'] = this.duration;
       json[r'price'] = this.price;
-    if (this.staffName != null) {
-      json[r'staff_name'] = this.staffName;
-    } else {
-      json[r'staff_name'] = null;
-    }
       json[r'rating'] = this.rating;
+      json[r'vendorName'] = this.vendorName;
       json[r'location'] = this.location;
-      json[r'slots'] = this.slots;
+      json[r'staffAvatars'] = this.staffAvatars;
+      json[r'type'] = this.type;
     return json;
   }
 
@@ -139,18 +131,20 @@ class AiRecommendationItemDto {
       }());
 
       return AiRecommendationItemDto(
-        serviceId: mapValueOfType<String>(json, r'service_id')!,
+        id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
-        imageUrl: mapValueOfType<Object>(json, r'image_url'),
-        badge: mapValueOfType<Object>(json, r'badge'),
-        bookedCount: num.parse('${json[r'booked_count']}'),
-        price: AiPriceDto.fromJson(json[r'price'])!,
-        staffName: mapValueOfType<Object>(json, r'staff_name'),
-        rating: AiRatingDto.fromJson(json[r'rating'])!,
-        location: AiLocationDto.fromJson(json[r'location'])!,
-        slots: json[r'slots'] is Iterable
-            ? (json[r'slots'] as Iterable).cast<String>().toList(growable: false)
+        slug: mapValueOfType<String>(json, r'slug')!,
+        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
+        category: mapValueOfType<String>(json, r'category')!,
+        duration: mapValueOfType<String>(json, r'duration')!,
+        price: mapValueOfType<String>(json, r'price')!,
+        rating: mapValueOfType<String>(json, r'rating')!,
+        vendorName: mapValueOfType<String>(json, r'vendorName')!,
+        location: mapValueOfType<String>(json, r'location')!,
+        staffAvatars: json[r'staffAvatars'] is Iterable
+            ? (json[r'staffAvatars'] as Iterable).cast<String>().toList(growable: false)
             : const [],
+        type: mapValueOfType<String>(json, r'type')!,
       );
     }
     return null;
@@ -198,13 +192,17 @@ class AiRecommendationItemDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'service_id',
+    'id',
     'name',
-    'booked_count',
+    'slug',
+    'category',
+    'duration',
     'price',
     'rating',
+    'vendorName',
     'location',
-    'slots',
+    'staffAvatars',
+    'type',
   };
 }
 

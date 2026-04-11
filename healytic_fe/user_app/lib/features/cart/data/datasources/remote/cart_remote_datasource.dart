@@ -17,8 +17,12 @@ abstract class CartRemoteDataSource {
   /// Fetches all cart items.
   Future<List<CartItemEntity>> getCartItems();
 
-  /// Adds a service to the cart.
-  Future<CartItemEntity> addItem({required String serviceId});
+  /// Adds a scheduled service to the cart.
+  Future<CartItemEntity> addItem({
+    required String serviceId,
+    required String employeeId,
+    required DateTime timeSlot,
+  });
 
   /// Removes an item by its cart item ID.
   Future<void> removeItem(String cartItemId);
@@ -68,9 +72,15 @@ class CartRemoteDataSourceImpl
   @override
   Future<CartItemEntity> addItem({
     required String serviceId,
+    required String employeeId,
+    required DateTime timeSlot,
   }) async {
     final dto = await _cartApi.cartControllerAddItem(
-      AddToCartDto(serviceId: serviceId),
+      AddToCartDto(
+        serviceId: serviceId,
+        employeeId: employeeId,
+        timeSlot: timeSlot.toUtc().toIso8601String(),
+      ),
     );
     if (dto == null) {
       throw ApiException(
@@ -89,39 +99,18 @@ class CartRemoteDataSourceImpl
   Future<CartItemEntity> applyCoupon({
     required String cartItemId,
     required String couponCode,
-  }) async {
-    final dto =
-        await _cartApi.cartControllerApplyCoupon(
-      cartItemId,
-      ApplyCouponDto(couponCode: couponCode),
-    );
-    if (dto == null) {
-      throw ApiException(
-        500,
-        'Empty response from '
-        'POST /cart/$cartItemId/coupon',
-      );
-    }
-    return _mapDto(dto);
-  }
+  }) => _returnUnchangedItem(
+    cartItemId,
+    action: 'apply coupon',
+  );
 
   @override
   Future<CartItemEntity> removeCoupon(
     String cartItemId,
-  ) async {
-    final dto =
-        await _cartApi.cartControllerRemoveCoupon(
-      cartItemId,
-    );
-    if (dto == null) {
-      throw ApiException(
-        500,
-        'Empty response from '
-        'DELETE /cart/$cartItemId/coupon',
-      );
-    }
-    return _mapDto(dto);
-  }
+  ) => _returnUnchangedItem(
+    cartItemId,
+    action: 'remove coupon',
+  );
 
   /// Voucher listing is not yet part of the backend
   /// OpenAPI spec. Returns an empty list so the UI
@@ -159,22 +148,46 @@ class CartRemoteDataSourceImpl
       clinicAddress: dto.clinicAddress,
       clinicImageUrl:
           dto.clinicImageUrl?.toString() ?? '',
-      couponCode:
-          dto.couponCode?.toString(),
-      couponDiscountPercent:
-          _parseInt(dto.couponDiscountPercent),
-      couponDiscountAmount:
-          _parseInt(dto.couponDiscountAmount),
-      createdAt: dto.createdAt,
+      specialistId: dto.employeeId,
+      specialistName: dto.employeeName,
+      specialistPosition:
+          _formatEmployeeRole(dto.employeeRole),
+      slotTime: dto.timeSlot.toLocal(),
+      createdAt: dto.createdAt.toLocal(),
     );
   }
 
-  /// Safely parses an [Object?] that may be a [num]
-  /// or numeric [String] from the generated DTO.
-  static int? _parseInt(Object? value) {
-    if (value == null) return null;
-    if (value is num) return value.toInt();
-    return int.tryParse(value.toString());
+  static String _formatEmployeeRole(
+    CartItemResponseDtoEmployeeRoleEnum role,
+  ) {
+    if (role == CartItemResponseDtoEmployeeRoleEnum.DOCTOR) {
+      return 'Doctor';
+    }
+    if (role == CartItemResponseDtoEmployeeRoleEnum.THERAPIST) {
+      return 'Therapist';
+    }
+    return role.value;
+  }
+
+  Future<CartItemEntity> _returnUnchangedItem(
+    String cartItemId, {
+    required String action,
+  }) async {
+    _log.warning(
+      'Coupon API not in spec yet — cannot '
+      '$action for cart item $cartItemId. '
+      'Returning the current item unchanged.',
+    );
+
+    final items = await getCartItems();
+    try {
+      return items.firstWhere((item) => item.id == cartItemId);
+    } on StateError {
+      throw ApiException(
+        404,
+        'Cart item not found: $cartItemId',
+      );
+    }
   }
 }
 
@@ -199,7 +212,11 @@ class CartRemoteDataSourceMock implements CartRemoteDataSource {
   }
 
   @override
-  Future<CartItemEntity> addItem({required String serviceId}) async {
+  Future<CartItemEntity> addItem({
+    required String serviceId,
+    required String employeeId,
+    required DateTime timeSlot,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
     // Simulate creating a new cart item with
@@ -215,6 +232,10 @@ class CartRemoteDataSourceMock implements CartRemoteDataSource {
       clinicName: 'Healytics Clinic',
       clinicAddress: '456 Nguyen Hue, Q1, HCM',
       clinicImageUrl: 'https://picsum.photos/seed/clinic/100',
+      specialistId: employeeId,
+      specialistName: 'Specialist $employeeId',
+      specialistPosition: 'Therapist',
+      slotTime: timeSlot,
       createdAt: DateTime.now(),
     );
 

@@ -6,6 +6,7 @@ import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/legal_representative_section.widget.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/review/review_header.widget.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/card/error_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,8 +31,16 @@ class ViewPartnerDetailDesktop extends ConsumerWidget {
     return partnerDetailAsync.when(
       loading: () =>
           const Center(child: CircularProgressIndicator()),
-      error: (error, stack) =>
-          Center(child: Text('Error: $error')),
+      error: (error, stack) => Center(
+        child: ErrorCard(
+          title: 'Failed to load partner details',
+          error: error,
+          stackTrace: stack,
+          onRetry: () => ref.invalidate(
+            partnerDetailProvider(partnerId),
+          ),
+        ),
+      ),
       data: (partnerDetail) =>
           _buildContent(context, partnerDetail),
     );

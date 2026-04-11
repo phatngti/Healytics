@@ -16,8 +16,8 @@ void main() {
   // final instance = AiRecommendationItemDto();
 
   group('test AiRecommendationItemDto', () {
-    // String serviceId
-    test('to test the property `serviceId`', () async {
+    // String id
+    test('to test the property `id`', () async {
       // TODO
     });
 
@@ -26,43 +26,53 @@ void main() {
       // TODO
     });
 
+    // String slug
+    test('to test the property `slug`', () async {
+      // TODO
+    });
+
     // Object imageUrl
     test('to test the property `imageUrl`', () async {
       // TODO
     });
 
-    // Object badge
-    test('to test the property `badge`', () async {
+    // String category
+    test('to test the property `category`', () async {
       // TODO
     });
 
-    // num bookedCount
-    test('to test the property `bookedCount`', () async {
+    // String duration
+    test('to test the property `duration`', () async {
       // TODO
     });
 
-    // AiPriceDto price
+    // String price
     test('to test the property `price`', () async {
       // TODO
     });
 
-    // Object staffName
-    test('to test the property `staffName`', () async {
-      // TODO
-    });
-
-    // AiRatingDto rating
+    // String rating
     test('to test the property `rating`', () async {
       // TODO
     });
 
-    // AiLocationDto location
+    // String vendorName
+    test('to test the property `vendorName`', () async {
+      // TODO
+    });
+
+    // String location
     test('to test the property `location`', () async {
       // TODO
     });
 
-    // List<String> slots (default value: const [])
-    test('to test the property `slots`', () async {
+    // List<String> staffAvatars (default value: const [])
+    test('to test the property `staffAvatars`', () async {
+      // TODO
+    });
+
+    // String type
+    test('to test the property `type`', () async {
       // TODO
     });
 
