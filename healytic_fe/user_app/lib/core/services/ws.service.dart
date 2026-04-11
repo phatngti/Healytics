@@ -31,22 +31,19 @@ class WsService {
   // ── Socket instances ─────────────────────────────
 
   UserChatSocket? _userChatSocket;
-  PartnerChatSocket? _partnerChatSocket;
-  NotificationsSocket? _notificationSocket;
+  ChatNotificationsSocket? _chatNotificationsSocket;
 
   /// The `/user-chat` namespace socket.
   ///
   /// Created lazily on first access to avoid
   /// allocating resources when not needed.
-  UserChatSocket get userChat => _userChatSocket ??= UserChatSocket();
+  UserChatSocket get userChat =>
+      _userChatSocket ??= UserChatSocket();
 
-  /// The `/partner-chat` namespace socket.
-  PartnerChatSocket get partnerChat =>
-      _partnerChatSocket ??= PartnerChatSocket();
-
-  /// The `/notifications` namespace socket.
-  NotificationsSocket get notifications =>
-      _notificationSocket ??= NotificationsSocket();
+  /// The `/chat-notifications` namespace socket.
+  ChatNotificationsSocket get chatNotifications =>
+      _chatNotificationsSocket ??=
+          ChatNotificationsSocket();
 
   // ── Lifecycle ────────────────────────────────────
 
@@ -57,9 +54,14 @@ class WsService {
   /// Call this after the user has authenticated.
   void connectAll() {
     _log.info('Connecting all WS namespaces');
-    _connectSocket(userChat, ServicePrefix.userChat);
-    _connectSocket(partnerChat, ServicePrefix.partnerChat);
-    _connectSocket(notifications, ServicePrefix.notifications);
+    _connectSocket(
+      userChat,
+      ServicePrefix.userChat,
+    );
+    _connectSocket(
+      chatNotifications,
+      ServicePrefix.chatNotifications,
+    );
   }
 
   /// Connect only the user-chat namespace.
@@ -67,22 +69,22 @@ class WsService {
     _connectSocket(userChat, ServicePrefix.userChat);
   }
 
-  /// Connect only the partner-chat namespace.
-  void connectPartnerChat() {
-    _connectSocket(partnerChat, ServicePrefix.partnerChat);
+  /// Connect only the chat-notifications namespace.
+  void connectChatNotifications() {
+    _connectSocket(chatNotifications, ServicePrefix.chatNotifications);
   }
 
-  /// Connect only the notifications namespace.
-  void connectNotifications() {
-    _connectSocket(notifications, ServicePrefix.notifications);
+  /// Force reconnect the chat-notifications namespace.
+  void reconnectChatNotifications() {
+    chatNotifications.disconnect();
+    _connectSocket(chatNotifications, ServicePrefix.chatNotifications);
   }
 
   /// Disconnect **all** active sockets.
   void disconnectAll() {
     _log.info('Disconnecting all WS namespaces');
     _userChatSocket?.disconnect();
-    _partnerChatSocket?.disconnect();
-    _notificationSocket?.disconnect();
+    _chatNotificationsSocket?.disconnect();
   }
 
   /// Dispose **all** sockets and release resources.
@@ -92,11 +94,9 @@ class WsService {
   void dispose() {
     _log.info('Disposing WS service');
     _userChatSocket?.dispose();
-    _partnerChatSocket?.dispose();
-    _notificationSocket?.dispose();
+    _chatNotificationsSocket?.dispose();
     _userChatSocket = null;
-    _partnerChatSocket = null;
-    _notificationSocket = null;
+    _chatNotificationsSocket = null;
   }
 
   // ── Helpers ──────────────────────────────────────

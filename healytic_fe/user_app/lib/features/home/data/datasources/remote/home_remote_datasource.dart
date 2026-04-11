@@ -225,44 +225,33 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   AiRecommendation _mapAiItemToEntity(
     AiRecommendationItemDto dto,
   ) {
-    final amount = dto.price.amount.toDouble();
-    final currency = dto.price.currency;
-    final formatted = _formatPrice(amount, currency);
+    double parsedAmount = 0.0;
+    String parsedCurrency = 'VND';
+    
+    final priceParts = dto.price.split(' ');
+    if (priceParts.isNotEmpty) {
+      final digits = priceParts.first.replaceAll(',', '').replaceAll('.', '');
+      parsedAmount = double.tryParse(digits) ?? 0.0;
+      if (priceParts.length > 1) {
+        parsedCurrency = priceParts.sublist(1).join(' ');
+      }
+    }
 
     return AiRecommendation(
-      serviceId: dto.serviceId,
+      serviceId: dto.id,
       name: dto.name,
       imageUrl: dto.imageUrl?.toString() ?? '',
-      badge: dto.badge?.toString(),
-      bookedCount: dto.bookedCount.toInt(),
-      price: formatted,
-      priceAmount: amount,
-      currency: currency,
-      rating: dto.rating.average.toDouble(),
-      totalReviews: dto.rating.totalReviews.toInt(),
-      location: _formatLocation(dto.location),
-      staffName: dto.staffName?.toString(),
-      slots: dto.slots,
+      badge: null,
+      bookedCount: 0,
+      price: dto.price,
+      priceAmount: parsedAmount,
+      currency: parsedCurrency,
+      rating: double.tryParse(dto.rating) ?? 0.0,
+      totalReviews: 0,
+      location: dto.location,
+      staffName: dto.vendorName,
+      slots: const [],
     );
-  }
-
-  /// Builds a human-readable location string.
-  String _formatLocation(AiLocationDto loc) {
-    return '${loc.district}, ${loc.city}';
-  }
-
-  /// Formats price amount with thousands separator.
-  String _formatPrice(double amount, String currency) {
-    final intAmount = amount.toInt();
-    final buffer = StringBuffer();
-    final digits = intAmount.toString();
-    for (var i = 0; i < digits.length; i++) {
-      if (i > 0 && (digits.length - i) % 3 == 0) {
-        buffer.write(',');
-      }
-      buffer.write(digits[i]);
-    }
-    return '$buffer $currency';
   }
 
   @override

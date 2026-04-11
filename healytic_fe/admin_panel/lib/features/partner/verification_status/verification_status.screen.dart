@@ -1,5 +1,6 @@
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/utils/user_role_helper.dart';
 import 'package:admin_panel/features/authenticate/domain/location.entity.dart';
 import 'package:admin_panel/features/authenticate/presentation/providers/location.provider.dart';
 import 'package:admin_panel/features/common/providers/authen_token.provider.dart';
@@ -11,6 +12,7 @@ import 'package:admin_panel/features/partner/verification_status/presentation/wi
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/verification_bottom_bar.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/verification_header.widget.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/verification_section_card.widget.dart';
+import 'package:common/widgets/card/error_card.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -167,7 +169,10 @@ class _VerificationStatusScreenState
       if (status != null &&
           status.verificationStatus == VerificationRevisionStatus.approved) {
         if (context.mounted) {
-          context.go('/provider/dashboard');
+          final target = UserRoleHelper.isProviderProfileCompleted()
+              ? '/provider/dashboard'
+              : '/provider/profile-completion';
+          context.go(target);
         }
       }
     });
@@ -192,6 +197,7 @@ class _VerificationStatusScreenState
               await ref.read(authenTokenProvider.notifier).removeToken();
               await Store.delete(StoreKey.accessToken);
               await Store.delete(StoreKey.refreshToken);
+              await UserRoleHelper.clearPartnerFlags();
               if (context.mounted) {
                 context.go('/');
               }
@@ -336,36 +342,17 @@ class _VerificationStatusScreenState
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, stack) => Scaffold(
-        appBar: AppBar(title: const Text('Verification Status')),
+        appBar: AppBar(
+          title: const Text('Verification Status'),
+        ),
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 48,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              AppDimens.verticalMedium,
-              Text(
-                'Failed to load verification status',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              AppDimens.verticalSmall,
-              Text(
-                error.toString(),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              AppDimens.verticalLarge,
-              FilledButton.icon(
-                onPressed: () => ref.invalidate(verificationStatusProvider),
-                icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
-              ),
-            ],
+          child: ErrorCard(
+            title: 'Failed to load verification status',
+            error: error,
+            stackTrace: stack,
+            onRetry: () => ref.invalidate(
+              verificationStatusProvider,
+            ),
           ),
         ),
       ),

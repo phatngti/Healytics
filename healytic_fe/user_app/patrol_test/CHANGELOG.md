@@ -89,3 +89,32 @@
 | `orders_test.dart` | All | Updated to use `TabKeys` for navigation |
 | `profile_test.dart` | All | Updated to use `keys.profilePage.*` finders |
 | `notifications_test.dart` | All | Updated to use `TabKeys` + `keys.notificationsPage.*` finders |
+
+---
+
+## [2026-04-10] — Cart And Checkout Coverage
+
+### Added
+
+| File | Test Case | Description |
+|------|-----------|-------------|
+| `cart_test.dart` | Cart renders | Opens cart from home header and verifies seeded mock items |
+| `cart_test.dart` | Cart search | Filters cart list by service name |
+| `cart_test.dart` | Voucher flow | Selects a cart item, opens voucher picker, applies coupon, verifies discount summary |
+| `checkout_test.dart` | Checkout summary | Navigates from cart to checkout and verifies selected booking details |
+| `checkout_test.dart` | Checkout confirm | Switches payment method to pay later and verifies successful submission dialog |
+
+### Modified
+
+| File | Test Case | Description |
+|------|-----------|-------------|
+| `../lib/core/keys/integration_test_keys.dart` | — | Added stable keys for home cart entry, cart interactions, voucher picker, and checkout payment method selectors |
+| `../lib/features/home/presentation/widgets/home_header.widget.dart` | — | Added cart button integration test key |
+| `../lib/features/cart/presentation/widgets/cart_app_bar.widget.dart` | — | Added cart search field integration test key |
+| `../lib/features/cart/presentation/widgets/cart_item_card.widget.dart` | — | Added per-item selection key and passed item ID into voucher selector |
+| `../lib/features/cart/presentation/widgets/voucher_selector_row.widget.dart` | — | Added per-item voucher selector integration test key |
+| `../lib/features/cart/presentation/widgets/voucher_picker_sheet.widget.dart` | — | Added voucher tile and apply button integration test keys |
+| `../lib/features/cart/presentation/widgets/cart_summary_footer.widget.dart` | — | Added checkout CTA integration test key |
+| `../lib/features/checkout/presentation/widgets/payment_method_section.widget.dart` | — | Added payment method tile integration test keys |
+| `../lib/features/checkout/presentation/widgets/checkout_bottom_bar.widget.dart` | — | Wired `keys.checkoutPage.confirmButton` into the confirm CTA |
+| `test_bundle.dart` | — | Registered `cart_test.dart` and `checkout_test.dart` in the Patrol bundle entrypoint |

@@ -45,19 +45,28 @@ class ProductTabContent extends ConsumerWidget {
 
         AppDimens.verticalSmall,
 
-        // ── Category chips ──
+        // ── Category chips (hidden when API
+        //    returns no categories) ──
         asyncProducts.when(
-          data: (data) => CategoryScroller(
-            categories: data.categories,
-          ),
+          data: (data) =>
+              data.categories.isEmpty
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding:
+                          const EdgeInsets.only(
+                        bottom: AppDimens.spaceSm,
+                      ),
+                      child: CategoryScroller(
+                        categories:
+                            data.categories,
+                      ),
+                    ),
           loading: () => const SizedBox(
             height: AppDimens.ctaButtonMd,
           ),
           error: (_, __) =>
               const SizedBox.shrink(),
         ),
-
-        AppDimens.verticalSmall,
 
         // ── Product grid ──
         Expanded(

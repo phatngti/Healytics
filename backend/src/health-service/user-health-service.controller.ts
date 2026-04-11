@@ -14,6 +14,7 @@ import { PublicHealthServiceRecommendedResponseDto } from './dto/public/public-h
 import { PublicHealthServiceCardResponseDto } from './dto/public/public-health-service-card-response.dto';
 import { PublicClinicInfoResponseDto } from './dto/public/public-clinic-info-response.dto';
 import { UserEligibilityDetailResponseDto } from './dto/public/user-eligibility-detail-response.dto';
+import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 /**
  * User-authenticated controller for health service endpoints.
@@ -107,6 +108,7 @@ export class UserHealthServiceController {
    * Retrieves service info by ID.
    */
   @Get(':id/info')
+  @LogResponse()
   @ApiOperation({ summary: 'Get service info by ID' })
   @ApiOkResponse({
     description: 'Return service info for the detail screen.',

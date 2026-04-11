@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'package:user_app/features/cart/presentation/providers/cart.provider.dart';
 import 'package:user_app/features/service_details/domain/entities/service_details.entity.dart';
 import 'package:user_app/features/service_details/presentation/providers/service_details.provider.dart';
 import 'package:user_app/router/routes.dart';
@@ -387,28 +386,19 @@ class _BottomActionBarState
   Future<void> _handleAddToCart() async {
     if (_isAddingToCart) return;
     setState(() => _isAddingToCart = true);
-    try {
-      await ref
-          .read(cartProvider.notifier)
-          .addItem(serviceId: widget.serviceId);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Added to cart'),
-          duration: Duration(seconds: 2),
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Select a specialist and time slot before '
+          'adding to cart.',
         ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to add: $e'),
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isAddingToCart = false);
-      }
+      ),
+    );
+
+    if (mounted) {
+      setState(() => _isAddingToCart = false);
     }
   }
 

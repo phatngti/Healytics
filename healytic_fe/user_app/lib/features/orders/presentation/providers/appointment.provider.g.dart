@@ -293,6 +293,68 @@ abstract class _$SelectedCategoryNotifier extends $Notifier<String> {
   }
 }
 
+/// Holds the currently selected layout view mode.
+
+@ProviderFor(SelectedViewLayoutNotifier)
+const selectedViewLayoutProvider = SelectedViewLayoutNotifierProvider._();
+
+/// Holds the currently selected layout view mode.
+final class SelectedViewLayoutNotifierProvider
+    extends
+        $NotifierProvider<SelectedViewLayoutNotifier, AppointmentViewLayout> {
+  /// Holds the currently selected layout view mode.
+  const SelectedViewLayoutNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'selectedViewLayoutProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$selectedViewLayoutNotifierHash();
+
+  @$internal
+  @override
+  SelectedViewLayoutNotifier create() => SelectedViewLayoutNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AppointmentViewLayout value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AppointmentViewLayout>(value),
+    );
+  }
+}
+
+String _$selectedViewLayoutNotifierHash() =>
+    r'c71dbcea281f31b8610d5b443c8c4a2aee1c1dec';
+
+/// Holds the currently selected layout view mode.
+
+abstract class _$SelectedViewLayoutNotifier
+    extends $Notifier<AppointmentViewLayout> {
+  AppointmentViewLayout build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AppointmentViewLayout, AppointmentViewLayout>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AppointmentViewLayout, AppointmentViewLayout>,
+              AppointmentViewLayout,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
 /// Derived provider that filters appointments by
 /// the current tab and category selection.
 
@@ -428,3 +490,247 @@ final class AppointmentByIdFamily extends $Family
   @override
   String toString() => r'appointmentByIdProvider';
 }
+
+/// Tracks the currently focused (visible) month
+/// in calendar view. Updated on page swipe or
+/// chevron tap.
+
+@ProviderFor(CalendarFocusedDayNotifier)
+const calendarFocusedDayProvider = CalendarFocusedDayNotifierProvider._();
+
+/// Tracks the currently focused (visible) month
+/// in calendar view. Updated on page swipe or
+/// chevron tap.
+final class CalendarFocusedDayNotifierProvider
+    extends $NotifierProvider<CalendarFocusedDayNotifier, DateTime> {
+  /// Tracks the currently focused (visible) month
+  /// in calendar view. Updated on page swipe or
+  /// chevron tap.
+  const CalendarFocusedDayNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'calendarFocusedDayProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$calendarFocusedDayNotifierHash();
+
+  @$internal
+  @override
+  CalendarFocusedDayNotifier create() => CalendarFocusedDayNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DateTime value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DateTime>(value),
+    );
+  }
+}
+
+String _$calendarFocusedDayNotifierHash() =>
+    r'efbd0cd87026fc8d2ea000ef5b712864fc839d5e';
+
+/// Tracks the currently focused (visible) month
+/// in calendar view. Updated on page swipe or
+/// chevron tap.
+
+abstract class _$CalendarFocusedDayNotifier extends $Notifier<DateTime> {
+  DateTime build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<DateTime, DateTime>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<DateTime, DateTime>,
+              DateTime,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
+/// Tracks the user-selected day in calendar view.
+/// Defaults to today.
+
+@ProviderFor(CalendarSelectedDayNotifier)
+const calendarSelectedDayProvider = CalendarSelectedDayNotifierProvider._();
+
+/// Tracks the user-selected day in calendar view.
+/// Defaults to today.
+final class CalendarSelectedDayNotifierProvider
+    extends $NotifierProvider<CalendarSelectedDayNotifier, DateTime> {
+  /// Tracks the user-selected day in calendar view.
+  /// Defaults to today.
+  const CalendarSelectedDayNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'calendarSelectedDayProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$calendarSelectedDayNotifierHash();
+
+  @$internal
+  @override
+  CalendarSelectedDayNotifier create() => CalendarSelectedDayNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DateTime value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DateTime>(value),
+    );
+  }
+}
+
+String _$calendarSelectedDayNotifierHash() =>
+    r'e350a231f9711bec0e9dcb2667da7e50ee038644';
+
+/// Tracks the user-selected day in calendar view.
+/// Defaults to today.
+
+abstract class _$CalendarSelectedDayNotifier extends $Notifier<DateTime> {
+  DateTime build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<DateTime, DateTime>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<DateTime, DateTime>,
+              DateTime,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
+/// Groups ALL appointments into a date-keyed map
+/// for O(1) lookup by the calendar's [eventLoader].
+///
+/// Uses [DateUtils.dateOnly] to strip time
+/// components for reliable map key matching.
+
+@ProviderFor(appointmentsByDateMap)
+const appointmentsByDateMapProvider = AppointmentsByDateMapProvider._();
+
+/// Groups ALL appointments into a date-keyed map
+/// for O(1) lookup by the calendar's [eventLoader].
+///
+/// Uses [DateUtils.dateOnly] to strip time
+/// components for reliable map key matching.
+
+final class AppointmentsByDateMapProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<DateTime, List<AppointmentEntity>>>,
+          Map<DateTime, List<AppointmentEntity>>,
+          FutureOr<Map<DateTime, List<AppointmentEntity>>>
+        >
+    with
+        $FutureModifier<Map<DateTime, List<AppointmentEntity>>>,
+        $FutureProvider<Map<DateTime, List<AppointmentEntity>>> {
+  /// Groups ALL appointments into a date-keyed map
+  /// for O(1) lookup by the calendar's [eventLoader].
+  ///
+  /// Uses [DateUtils.dateOnly] to strip time
+  /// components for reliable map key matching.
+  const AppointmentsByDateMapProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'appointmentsByDateMapProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$appointmentsByDateMapHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Map<DateTime, List<AppointmentEntity>>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Map<DateTime, List<AppointmentEntity>>> create(Ref ref) {
+    return appointmentsByDateMap(ref);
+  }
+}
+
+String _$appointmentsByDateMapHash() =>
+    r'f4201437458d172ed04c6b2acfa47be2bd2ee958';
+
+/// Returns appointments for the currently selected
+/// calendar day, derived from the date map +
+/// selected day provider.
+
+@ProviderFor(appointmentsForDay)
+const appointmentsForDayProvider = AppointmentsForDayProvider._();
+
+/// Returns appointments for the currently selected
+/// calendar day, derived from the date map +
+/// selected day provider.
+
+final class AppointmentsForDayProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<AppointmentEntity>>,
+          List<AppointmentEntity>,
+          FutureOr<List<AppointmentEntity>>
+        >
+    with
+        $FutureModifier<List<AppointmentEntity>>,
+        $FutureProvider<List<AppointmentEntity>> {
+  /// Returns appointments for the currently selected
+  /// calendar day, derived from the date map +
+  /// selected day provider.
+  const AppointmentsForDayProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'appointmentsForDayProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$appointmentsForDayHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<AppointmentEntity>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<AppointmentEntity>> create(Ref ref) {
+    return appointmentsForDay(ref);
+  }
+}
+
+String _$appointmentsForDayHash() =>
+    r'1d456516436955591a7c0e13b82d6e4b9b4082d4';

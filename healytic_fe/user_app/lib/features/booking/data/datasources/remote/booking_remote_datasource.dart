@@ -432,7 +432,8 @@ class BookingRemoteDatasourceImpl
     return TimeSlotEntity(
       label: j['label']?.toString() ?? '',
       time: j['time']?.toString() ?? '',
-      isBusy: j['isBusy']?.toString() == 'busy',
+      isAvailable:
+          j['isBusy']?.toString() != 'busy',
     );
   }
   /// Parses the eligibility detail JSON into

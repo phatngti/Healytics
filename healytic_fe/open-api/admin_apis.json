@@ -466,6 +466,152 @@
         ]
       }
     },
+    "/partner/partners/me/completion": {
+      "get": {
+        "operationId": "PartnerSelfController_getMyProfileCompletion",
+        "summary": "Get partner clinic profile completion data",
+        "description": "Returns verified clinic identity data and editable post-verification profile fields.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Profile completion data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyProfileCompletionResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Partner not found."
+          }
+        },
+        "tags": [
+          "Partner Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "PartnerSelfController_updateMyProfileCompletion",
+        "summary": "Update partner clinic profile completion data",
+        "description": "Immediately publishes post-verification clinic profile fields without entering admin review again.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePartnerProfileCompletionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile completion data updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyProfileCompletionResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Partner not found."
+          }
+        },
+        "tags": [
+          "Partner Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/partners/public-profile": {
+      "get": {
+        "operationId": "PartnerSelfController_getPublicProfile",
+        "summary": "Get partner public profile edit aggregate",
+        "description": "Returns the full partner profile with read-only business context and editable storefront fields. Only available after profile completion.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Public profile aggregate retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerPublicProfileResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Profile not completed or not approved."
+          },
+          "404": {
+            "description": "Partner not found."
+          }
+        },
+        "tags": [
+          "Partner Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "PartnerSelfController_updatePublicProfile",
+        "summary": "Update partner public profile (storefront only)",
+        "description": "Updates public-facing clinic profile fields (cover image, logo, description, gallery, certifications). Does not affect admin-verified business data.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePartnerPublicProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Public profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerPublicProfileResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Profile not completed or not approved."
+          },
+          "404": {
+            "description": "Partner not found."
+          }
+        },
+        "tags": [
+          "Partner Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/locations/provinces": {
       "get": {
         "operationId": "LocationsController_getProvinces",
@@ -4169,10 +4315,10 @@
             }
           },
           "400": {
-            "description": "Invalid service or inactive service."
+            "description": "Invalid service, employee, or inactive service."
           },
           "409": {
-            "description": "Service already exists in cart."
+            "description": "Same service/employee/slot already in cart."
           }
         },
         "tags": [
@@ -4220,95 +4366,6 @@
         "responses": {
           "204": {
             "description": "Item removed from cart."
-          },
-          "404": {
-            "description": "Cart item not found."
-          }
-        },
-        "tags": [
-          "Cart"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/cart/{cartItemId}/coupon": {
-      "post": {
-        "operationId": "CartController_applyCoupon",
-        "summary": "Apply coupon to cart item",
-        "parameters": [
-          {
-            "name": "cartItemId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ApplyCouponDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartItemResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid or expired coupon."
-          },
-          "404": {
-            "description": "Cart item not found."
-          }
-        },
-        "tags": [
-          "Cart"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "delete": {
-        "operationId": "CartController_removeCoupon",
-        "summary": "Remove coupon from cart item",
-        "parameters": [
-          {
-            "name": "cartItemId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartItemResponseDto"
-                }
-              }
-            }
           },
           "404": {
             "description": "Cart item not found."
@@ -4372,15 +4429,6 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "categoryId",
-            "required": false,
-            "in": "query",
-            "description": "Filter by category UUID",
             "schema": {
               "type": "string"
             }
@@ -4530,6 +4578,359 @@
         },
         "tags": [
           "User Clinics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/dashboard/stats": {
+      "get": {
+        "operationId": "PartnerDashboardController_getStats",
+        "summary": "Get aggregated KPI statistics",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period filter for revenue and KPI aggregation",
+            "schema": {
+              "default": "this_month",
+              "enum": [
+                "today",
+                "this_week",
+                "this_month",
+                "this_quarter",
+                "this_year"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardStatsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/dashboard/revenue": {
+      "get": {
+        "operationId": "PartnerDashboardController_getRevenue",
+        "summary": "Get revenue time-series data",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period filter for revenue and KPI aggregation",
+            "schema": {
+              "default": "this_month",
+              "enum": [
+                "today",
+                "this_week",
+                "this_month",
+                "this_quarter",
+                "this_year"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RevenueDataPointDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/dashboard/appointments/upcoming": {
+      "get": {
+        "operationId": "PartnerDashboardController_getUpcomingAppointments",
+        "summary": "Get upcoming appointments",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximum number of items to return",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UpcomingAppointmentDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/dashboard/services/performance": {
+      "get": {
+        "operationId": "PartnerDashboardController_getServicePerformance",
+        "summary": "Get service performance metrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServicePerformanceDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/dashboard/employees/distribution": {
+      "get": {
+        "operationId": "PartnerDashboardController_getEmployeeDistribution",
+        "summary": "Get employee role distribution",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmployeeDistributionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/dashboard/reviews/recent": {
+      "get": {
+        "operationId": "PartnerDashboardController_getRecentReviews",
+        "summary": "Get recent customer reviews",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximum number of items to return",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardReviewDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/dashboard/staff/schedule": {
+      "get": {
+        "operationId": "PartnerDashboardController_getStaffSchedule",
+        "summary": "Get staff schedule for a date",
+        "parameters": [
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "description": "Target date for schedule lookup (ISO 8601 date)",
+            "schema": {
+              "example": "2026-04-09",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffScheduleEntryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/dashboard/notifications": {
+      "get": {
+        "operationId": "PartnerDashboardController_getNotifications",
+        "summary": "Get dashboard notifications",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximum number of items to return",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardNotificationDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/dashboard/inventory/alerts": {
+      "get": {
+        "operationId": "PartnerDashboardController_getInventoryAlerts",
+        "summary": "Get inventory alerts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryAlertDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Dashboard"
         ],
         "security": [
           {
@@ -4999,7 +5400,7 @@
           },
           "phoneNumber": {
             "type": "string",
-            "description": "Contact phone number for the business",
+            "description": "Clinic/business contact phone number. This is the public-facing phone shown on the clinic info screen — NOT the legal representative's personal phone.",
             "example": "0901234567",
             "maxLength": 20
           }
@@ -5435,7 +5836,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-04-06T08:06:41.734Z"
+              "submittedAt": "2026-04-10T17:04:22.733Z"
             }
           }
         },
@@ -5545,6 +5946,9 @@
           "brandName": {
             "$ref": "#/components/schemas/VerifiedField"
           },
+          "legalName": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
           "taxRegistrationCode": {
             "$ref": "#/components/schemas/VerifiedField"
           },
@@ -5558,6 +5962,9 @@
             "$ref": "#/components/schemas/VerifiedField"
           },
           "phoneNumber": {
+            "$ref": "#/components/schemas/VerifiedField"
+          },
+          "username": {
             "$ref": "#/components/schemas/VerifiedField"
           }
         },
@@ -5955,6 +6362,557 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/KycDocumentDto"
+            }
+          }
+        }
+      },
+      "PartnerProfileCompletionIdentityDto": {
+        "type": "object",
+        "properties": {
+          "brandName": {
+            "type": "string",
+            "example": "Healytics Wellness Center"
+          },
+          "legalName": {
+            "type": "string",
+            "example": "Healytics Wellness Joint Stock Company"
+          },
+          "businessType": {
+            "example": [
+              "SPA_BEAUTY"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "phoneNumber": {
+            "type": "object",
+            "example": "0901234567",
+            "nullable": true
+          },
+          "address": {
+            "type": "object",
+            "example": "123 Main Street, Ward 1, District 1, Ho Chi Minh City",
+            "nullable": true
+          }
+        },
+        "required": [
+          "brandName",
+          "legalName",
+          "businessType"
+        ]
+      },
+      "PartnerProfileCompletionCertificationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8d2ee5c7-4f58-46a5-8f8d-4a14a8fd9e2b"
+          },
+          "title": {
+            "type": "string",
+            "example": "ISO 9001:2015"
+          },
+          "subtitle": {
+            "type": "object",
+            "example": "Quality Management",
+            "nullable": true
+          },
+          "iconName": {
+            "type": "string",
+            "example": "workspace_premium"
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "iconName",
+          "sortOrder"
+        ]
+      },
+      "CompletionChecklistItemDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "coverImageUrl"
+          },
+          "label": {
+            "type": "string",
+            "example": "Clinic cover image"
+          },
+          "required": {
+            "type": "boolean",
+            "example": true
+          },
+          "completed": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "required",
+          "completed"
+        ]
+      },
+      "MyProfileCompletionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "7ec0e7fb-9e19-4f64-bcee-beaf3c12fd5d"
+          },
+          "clinicIdentity": {
+            "$ref": "#/components/schemas/PartnerProfileCompletionIdentityDto"
+          },
+          "coverImageUrl": {
+            "type": "object",
+            "example": "https://cdn.example.com/clinic-cover.jpg",
+            "nullable": true
+          },
+          "logoImageUrl": {
+            "type": "object",
+            "example": "https://cdn.example.com/clinic-logo.jpg",
+            "nullable": true
+          },
+          "description": {
+            "type": "object",
+            "example": "A modern wellness clinic focused on long-term care.",
+            "nullable": true
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "certifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerProfileCompletionCertificationDto"
+            }
+          },
+          "checklist": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompletionChecklistItemDto"
+            }
+          },
+          "completionPercent": {
+            "type": "number",
+            "example": 50
+          },
+          "isCompleted": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "id",
+          "clinicIdentity",
+          "gallery",
+          "certifications",
+          "checklist",
+          "completionPercent",
+          "isCompleted"
+        ]
+      },
+      "UpdatePartnerCertificationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Existing certification id. Omit to create a new one.",
+            "example": "8d2ee5c7-4f58-46a5-8f8d-4a14a8fd9e2b"
+          },
+          "title": {
+            "type": "string",
+            "description": "Certification title displayed on the public clinic profile",
+            "example": "ISO 9001:2015"
+          },
+          "subtitle": {
+            "type": "object",
+            "description": "Optional certification subtitle",
+            "example": "Quality Management"
+          },
+          "iconName": {
+            "type": "string",
+            "description": "Material icon slug used by the public clinic UI",
+            "example": "workspace_premium"
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "Sort order for certifications on the clinic profile",
+            "example": 1
+          }
+        }
+      },
+      "UpdatePartnerProfileCompletionDto": {
+        "type": "object",
+        "properties": {
+          "coverImageUrl": {
+            "type": "string",
+            "description": "Public clinic cover image URL",
+            "example": "https://cdn.example.com/clinic-cover.jpg"
+          },
+          "logoImageUrl": {
+            "type": "string",
+            "description": "Public clinic logo image URL",
+            "example": "https://cdn.example.com/clinic-logo.jpg"
+          },
+          "description": {
+            "type": "string",
+            "description": "Public clinic profile description",
+            "example": "A modern wellness clinic focused on long-term care."
+          },
+          "gallery": {
+            "description": "Gallery image URLs shown on the clinic profile",
+            "example": [
+              "https://cdn.example.com/gallery-1.jpg",
+              "https://cdn.example.com/gallery-2.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "certifications": {
+            "description": "Optional trust badges/certifications shown on the clinic",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdatePartnerCertificationDto"
+            }
+          }
+        }
+      },
+      "PublicProfileBusinessInfoDto": {
+        "type": "object",
+        "properties": {
+          "brandName": {
+            "type": "string",
+            "example": "Healytics Wellness Center"
+          },
+          "legalName": {
+            "type": "string",
+            "example": "Healytics Wellness Joint Stock Company"
+          },
+          "taxCode": {
+            "type": "string",
+            "example": "0123456789"
+          },
+          "businessType": {
+            "example": [
+              "SPA_BEAUTY"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "phoneNumber": {
+            "type": "object",
+            "example": "0901234567",
+            "nullable": true
+          },
+          "email": {
+            "type": "object",
+            "example": "clinic@example.com",
+            "nullable": true
+          },
+          "username": {
+            "type": "object",
+            "example": "healytics_clinic",
+            "nullable": true
+          }
+        },
+        "required": [
+          "brandName",
+          "legalName",
+          "taxCode",
+          "businessType"
+        ]
+      },
+      "PublicProfileAddressDto": {
+        "type": "object",
+        "properties": {
+          "streetAddress": {
+            "type": "string",
+            "example": "123 Nguyen Hue, Ward 1"
+          },
+          "ward": {
+            "type": "object",
+            "example": {
+              "id": "uuid",
+              "name": "Phường 1"
+            },
+            "nullable": true
+          },
+          "district": {
+            "type": "object",
+            "example": {
+              "id": "uuid",
+              "name": "Quận 1"
+            },
+            "nullable": true
+          },
+          "province": {
+            "type": "object",
+            "example": {
+              "id": "uuid",
+              "name": "TP. Hồ Chí Minh"
+            },
+            "nullable": true
+          },
+          "latitude": {
+            "type": "number",
+            "example": 21.0285,
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "example": 105.8542,
+            "nullable": true
+          },
+          "formattedAddress": {
+            "type": "object",
+            "example": "123 Nguyen Hue, Phường 1, Quận 1, TP. Hồ Chí Minh",
+            "nullable": true
+          }
+        },
+        "required": [
+          "streetAddress"
+        ]
+      },
+      "PublicProfileLegalSummaryDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "Nguyễn Văn A"
+          },
+          "position": {
+            "type": "string",
+            "example": "Giám đốc"
+          },
+          "idType": {
+            "type": "string",
+            "example": "cccd"
+          },
+          "idNumber": {
+            "type": "string",
+            "example": "012345678901"
+          }
+        },
+        "required": [
+          "fullName",
+          "position",
+          "idType",
+          "idNumber"
+        ]
+      },
+      "PublicProfileCertificationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8d2ee5c7-4f58-46a5-8f8d-4a14a8fd9e2b"
+          },
+          "title": {
+            "type": "string",
+            "example": "ISO 9001:2015"
+          },
+          "subtitle": {
+            "type": "object",
+            "example": "Quality Management",
+            "nullable": true
+          },
+          "iconName": {
+            "type": "string",
+            "example": "workspace_premium"
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "iconName",
+          "sortOrder"
+        ]
+      },
+      "PublicProfileStorefrontDto": {
+        "type": "object",
+        "properties": {
+          "coverImageUrl": {
+            "type": "object",
+            "example": "https://cdn.example.com/clinic-cover.jpg",
+            "nullable": true
+          },
+          "logoImageUrl": {
+            "type": "object",
+            "example": "https://cdn.example.com/clinic-logo.jpg",
+            "nullable": true
+          },
+          "description": {
+            "type": "object",
+            "example": "A modern wellness clinic focused on long-term care.",
+            "nullable": true
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "certifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicProfileCertificationDto"
+            }
+          }
+        },
+        "required": [
+          "gallery",
+          "certifications"
+        ]
+      },
+      "PublicProfileChecklistItemDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "coverImageUrl"
+          },
+          "label": {
+            "type": "string",
+            "example": "Clinic cover image"
+          },
+          "required": {
+            "type": "boolean",
+            "example": true
+          },
+          "completed": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "required",
+          "completed"
+        ]
+      },
+      "PublicProfileCompletionSummaryDto": {
+        "type": "object",
+        "properties": {
+          "checklist": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicProfileChecklistItemDto"
+            }
+          },
+          "completionPercent": {
+            "type": "number",
+            "example": 75
+          },
+          "isCompleted": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "checklist",
+          "completionPercent",
+          "isCompleted"
+        ]
+      },
+      "PartnerPublicProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "7ec0e7fb-9e19-4f64-bcee-beaf3c12fd5d"
+          },
+          "businessInfo": {
+            "$ref": "#/components/schemas/PublicProfileBusinessInfoDto"
+          },
+          "address": {
+            "$ref": "#/components/schemas/PublicProfileAddressDto"
+          },
+          "readOnlyLegalSummary": {
+            "$ref": "#/components/schemas/PublicProfileLegalSummaryDto"
+          },
+          "verificationStatus": {
+            "type": "string",
+            "enum": [
+              "ONBOARDING",
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "REQUIRED_RESUBMIT"
+            ],
+            "example": "APPROVED"
+          },
+          "publicProfile": {
+            "$ref": "#/components/schemas/PublicProfileStorefrontDto"
+          },
+          "completionSummary": {
+            "$ref": "#/components/schemas/PublicProfileCompletionSummaryDto"
+          }
+        },
+        "required": [
+          "id",
+          "businessInfo",
+          "address",
+          "verificationStatus",
+          "publicProfile",
+          "completionSummary"
+        ]
+      },
+      "UpdatePartnerPublicProfileDto": {
+        "type": "object",
+        "properties": {
+          "coverImageUrl": {
+            "type": "string",
+            "description": "Public clinic cover image URL",
+            "example": "https://cdn.example.com/clinic-cover.jpg"
+          },
+          "logoImageUrl": {
+            "type": "string",
+            "description": "Public clinic logo image URL",
+            "example": "https://cdn.example.com/clinic-logo.jpg"
+          },
+          "description": {
+            "type": "string",
+            "description": "Public clinic profile description (120–1000 chars recommended)",
+            "example": "A modern wellness clinic focused on long-term care."
+          },
+          "gallery": {
+            "description": "Gallery image URLs shown on the clinic profile (max 8)",
+            "example": [
+              "https://cdn.example.com/gallery-1.jpg",
+              "https://cdn.example.com/gallery-2.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "certifications": {
+            "description": "Trust badges and certifications shown on the clinic profile",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdatePartnerCertificationDto"
             }
           }
         }
@@ -9604,6 +10562,10 @@
             "type": "string",
             "example": "Healytics Wellness Center"
           },
+          "avatarUrl": {
+            "type": "object",
+            "example": "https://example.com/logo.jpg"
+          },
           "address": {
             "type": "string",
             "example": "123 Health Street, District 1, HCMC"
@@ -11223,116 +12185,75 @@
           "serviceIds"
         ]
       },
-      "AiPriceDto": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "number",
-            "example": 800000
-          },
-          "currency": {
-            "type": "string",
-            "example": "VND"
-          }
-        },
-        "required": [
-          "amount",
-          "currency"
-        ]
-      },
-      "AiRatingDto": {
-        "type": "object",
-        "properties": {
-          "average": {
-            "type": "number",
-            "example": 4.8
-          },
-          "total_reviews": {
-            "type": "number",
-            "example": 124
-          }
-        },
-        "required": [
-          "average",
-          "total_reviews"
-        ]
-      },
-      "AiLocationDto": {
-        "type": "object",
-        "properties": {
-          "address": {
-            "type": "string",
-            "example": "123 Nguyễn Huệ"
-          },
-          "district": {
-            "type": "string",
-            "example": "Quận 1"
-          },
-          "city": {
-            "type": "string",
-            "example": "Hồ Chí Minh"
-          }
-        },
-        "required": [
-          "address",
-          "district",
-          "city"
-        ]
-      },
       "AiRecommendationItemDto": {
         "type": "object",
         "properties": {
-          "service_id": {
+          "id": {
             "type": "string",
-            "example": "SV002"
+            "example": "a1b2c3d4-..."
           },
           "name": {
             "type": "string",
             "example": "Phục hồi cột sống chuyên sâu"
           },
-          "image_url": {
+          "slug": {
+            "type": "string",
+            "example": "phuc-hoi-cot-song-chuyen-sau"
+          },
+          "imageUrl": {
             "type": "object",
             "example": "https://images.unsplash.com/photo-..."
           },
-          "badge": {
-            "type": "object",
-            "example": "Premium"
+          "category": {
+            "type": "string",
+            "example": "Massage"
           },
-          "booked_count": {
-            "type": "number",
-            "example": 1200
+          "duration": {
+            "type": "string",
+            "example": "60 min"
           },
           "price": {
-            "$ref": "#/components/schemas/AiPriceDto"
-          },
-          "staff_name": {
-            "type": "object",
-            "example": "BS Nguyễn Văn A"
+            "type": "string",
+            "example": "₫800,000"
           },
           "rating": {
-            "$ref": "#/components/schemas/AiRatingDto"
+            "type": "string",
+            "example": "4.8"
+          },
+          "vendorName": {
+            "type": "string",
+            "example": "Healytics Spa"
           },
           "location": {
-            "$ref": "#/components/schemas/AiLocationDto"
+            "type": "string",
+            "example": "Quận 1, Hồ Chí Minh"
           },
-          "slots": {
+          "staffAvatars": {
             "example": [
-              "2026-02-21T09:00:00"
+              "https://example.com/avatar1.jpg"
             ],
             "type": "array",
             "items": {
               "type": "string"
             }
+          },
+          "type": {
+            "type": "string",
+            "example": "service"
           }
         },
         "required": [
-          "service_id",
+          "id",
           "name",
-          "booked_count",
+          "slug",
+          "category",
+          "duration",
           "price",
           "rating",
+          "vendorName",
           "location",
-          "slots"
+          "staffAvatars",
+          "type"
         ]
       },
       "AiRecommendationsResponseDto": {
@@ -11729,20 +12650,46 @@
             "type": "object",
             "example": null
           },
-          "couponCode": {
-            "type": "object",
-            "nullable": true,
-            "example": "WELCOME10"
+          "employeeId": {
+            "type": "string",
+            "format": "uuid"
           },
-          "couponDiscountPercent": {
-            "type": "object",
-            "nullable": true,
-            "example": 10
+          "employeeName": {
+            "type": "string",
+            "example": "Dr. Anna Nguyen"
           },
-          "couponDiscountAmount": {
+          "employeeRole": {
+            "type": "string",
+            "example": "DOCTOR",
+            "enum": [
+              "DOCTOR",
+              "THERAPIST"
+            ]
+          },
+          "employeeAvatarUrl": {
             "type": "object",
-            "nullable": true,
-            "example": 50000
+            "example": "https://cdn.example.com/avatar.jpg"
+          },
+          "timeSlot": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-04-10T09:00:00.000Z",
+            "description": "Selected time slot for the appointment"
+          },
+          "isTimeSlotAvailable": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the selected time slot is still available in the employee schedule."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "BOOKED",
+              "DELETED"
+            ],
+            "example": "ACTIVE",
+            "description": "Cart item status: ACTIVE, BOOKED, or DELETED"
           },
           "createdAt": {
             "type": "string",
@@ -11759,6 +12706,12 @@
           "clinicId",
           "clinicName",
           "clinicAddress",
+          "employeeId",
+          "employeeName",
+          "employeeRole",
+          "timeSlot",
+          "isTimeSlotAvailable",
+          "status",
           "createdAt"
         ]
       },
@@ -11769,23 +12722,22 @@
             "type": "string",
             "description": "UUID of the health service",
             "example": "0f3a4726-2f17-4d39-9518-b5303b4a0a95"
-          }
-        },
-        "required": [
-          "serviceId"
-        ]
-      },
-      "ApplyCouponDto": {
-        "type": "object",
-        "properties": {
-          "couponCode": {
+          },
+          "employeeId": {
             "type": "string",
-            "description": "Coupon code to apply",
-            "example": "WELCOME10"
+            "description": "UUID of the assigned employee (doctor or therapist)",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "timeSlot": {
+            "type": "string",
+            "description": "Desired time slot in ISO 8601 datetime format",
+            "example": "2026-04-10T09:00:00.000Z"
           }
         },
         "required": [
-          "couponCode"
+          "serviceId",
+          "employeeId",
+          "timeSlot"
         ]
       },
       "ClinicTrustMetricsDto": {
@@ -11937,23 +12889,6 @@
           "businessTypes"
         ]
       },
-      "ClinicProductCategoryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "a1b2c3d4-..."
-          },
-          "label": {
-            "type": "string",
-            "example": "Massage Therapy"
-          }
-        },
-        "required": [
-          "id",
-          "label"
-        ]
-      },
       "ClinicProductDto": {
         "type": "object",
         "properties": {
@@ -12020,12 +12955,6 @@
       "ClinicProductsResponseDto": {
         "type": "object",
         "properties": {
-          "categories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ClinicProductCategoryDto"
-            }
-          },
           "products": {
             "type": "array",
             "items": {
@@ -12042,7 +12971,6 @@
           }
         },
         "required": [
-          "categories",
           "products",
           "totalCount",
           "hasMore"
@@ -12208,6 +13136,366 @@
           "reviews",
           "totalCount",
           "hasMore"
+        ]
+      },
+      "DashboardStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalAppointments": {
+            "type": "number",
+            "example": 342
+          },
+          "completedAppointments": {
+            "type": "number",
+            "example": 285
+          },
+          "cancelledAppointments": {
+            "type": "number",
+            "example": 18
+          },
+          "pendingAppointments": {
+            "type": "number",
+            "example": 39
+          },
+          "totalRevenue": {
+            "type": "number",
+            "example": 48750000,
+            "description": "Total revenue in VND"
+          },
+          "revenueGrowthPercent": {
+            "type": "number",
+            "example": 12.5,
+            "description": "Revenue growth % vs previous period"
+          },
+          "totalServices": {
+            "type": "number",
+            "example": 24
+          },
+          "activeServices": {
+            "type": "number",
+            "example": 18
+          },
+          "totalEmployees": {
+            "type": "number",
+            "example": 15
+          },
+          "activeEmployees": {
+            "type": "number",
+            "example": 12
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.7,
+            "description": "Weighted average rating"
+          },
+          "totalReviews": {
+            "type": "number",
+            "example": 156
+          }
+        },
+        "required": [
+          "totalAppointments",
+          "completedAppointments",
+          "cancelledAppointments",
+          "pendingAppointments",
+          "totalRevenue",
+          "revenueGrowthPercent",
+          "totalServices",
+          "activeServices",
+          "totalEmployees",
+          "activeEmployees",
+          "averageRating",
+          "totalReviews"
+        ]
+      },
+      "RevenueDataPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-04-01T00:00:00.000Z"
+          },
+          "revenue": {
+            "type": "number",
+            "example": 1500000,
+            "description": "Revenue amount in VND"
+          }
+        },
+        "required": [
+          "date",
+          "revenue"
+        ]
+      },
+      "UpcomingAppointmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "patientName": {
+            "type": "string",
+            "example": "Nguyễn Văn An"
+          },
+          "serviceName": {
+            "type": "string",
+            "example": "Full Body Massage"
+          },
+          "employeeName": {
+            "type": "string",
+            "example": "Dr. Trần Minh"
+          },
+          "scheduledAt": {
+            "type": "string",
+            "example": "2026-04-09T09:00:00.000Z"
+          },
+          "status": {
+            "type": "string",
+            "example": "confirmed",
+            "enum": [
+              "confirmed",
+              "pending"
+            ],
+            "description": "Mapped from BookingStatus"
+          }
+        },
+        "required": [
+          "id",
+          "patientName",
+          "serviceName",
+          "employeeName",
+          "scheduledAt",
+          "status"
+        ]
+      },
+      "ServicePerformanceDto": {
+        "type": "object",
+        "properties": {
+          "serviceName": {
+            "type": "string",
+            "example": "Full Body Massage"
+          },
+          "bookingCount": {
+            "type": "number",
+            "example": 85
+          },
+          "revenue": {
+            "type": "number",
+            "example": 12750000,
+            "description": "Total revenue in VND"
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.8
+          }
+        },
+        "required": [
+          "serviceName",
+          "bookingCount",
+          "revenue",
+          "averageRating"
+        ]
+      },
+      "EmployeeDistributionDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "example": "Doctor"
+          },
+          "count": {
+            "type": "number",
+            "example": 4
+          },
+          "status": {
+            "type": "string",
+            "example": "active"
+          }
+        },
+        "required": [
+          "role",
+          "count",
+          "status"
+        ]
+      },
+      "DashboardReviewDto": {
+        "type": "object",
+        "properties": {
+          "reviewerName": {
+            "type": "string",
+            "example": "Nguyễn Văn Hùng"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "example": "https://example.com/avatar.jpg"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5
+          },
+          "status": {
+            "type": "string",
+            "example": "published",
+            "enum": [
+              "published",
+              "hidden"
+            ]
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-04-09T12:00:00.000Z"
+          },
+          "text": {
+            "type": "string",
+            "example": "Dịch vụ tuyệt vời! Nhân viên rất chuyên nghiệp."
+          },
+          "imageUrls": {
+            "example": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "reviewerName",
+          "rating",
+          "status",
+          "date",
+          "text",
+          "imageUrls"
+        ]
+      },
+      "StaffScheduleEntryDto": {
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "employeeName": {
+            "type": "string",
+            "example": "Dr. Trần Minh"
+          },
+          "role": {
+            "type": "string",
+            "example": "Doctor"
+          },
+          "startTime": {
+            "type": "string",
+            "example": "2026-04-09T08:00:00.000Z"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "2026-04-09T09:00:00.000Z"
+          },
+          "serviceName": {
+            "type": "string",
+            "example": "General Consultation"
+          },
+          "patientName": {
+            "type": "string",
+            "example": "Nguyễn Văn An"
+          }
+        },
+        "required": [
+          "employeeId",
+          "employeeName",
+          "role",
+          "startTime",
+          "endTime",
+          "serviceName"
+        ]
+      },
+      "DashboardNotificationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "title": {
+            "type": "string",
+            "example": "New Appointment"
+          },
+          "message": {
+            "type": "string",
+            "example": "Nguyễn Văn An booked a Full Body Massage."
+          },
+          "type": {
+            "type": "string",
+            "example": "appointment",
+            "enum": [
+              "appointment",
+              "review",
+              "system",
+              "alert"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-04-09T08:45:00.000Z"
+          },
+          "isRead": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "message",
+          "type",
+          "createdAt",
+          "isRead"
+        ]
+      },
+      "InventoryAlertDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "productName": {
+            "type": "string",
+            "example": "Essential Oil — Lavender"
+          },
+          "alertType": {
+            "type": "string",
+            "example": "low_stock",
+            "enum": [
+              "low_stock",
+              "expiring",
+              "out_of_stock"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "example": "Only 3 units remaining. Reorder threshold: 10."
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-04-09T06:00:00.000Z"
+          },
+          "severity": {
+            "type": "string",
+            "example": "warning",
+            "enum": [
+              "info",
+              "warning",
+              "critical"
+            ],
+            "default": "warning"
+          }
+        },
+        "required": [
+          "id",
+          "productName",
+          "alertType",
+          "message",
+          "createdAt",
+          "severity"
         ]
       },
       "ChatbotRecommendationResponse": {

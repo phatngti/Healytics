@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/images/avatar.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/cart/presentation/providers/cart.provider.dart';
 import 'package:user_app/router/routes.dart';
 
@@ -13,8 +14,7 @@ class HomeHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cartCount =
-        ref.watch(cartBadgeCountProvider);
+    final cartCount = ref.watch(cartBadgeCountProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -83,19 +83,17 @@ class HomeHeader extends ConsumerWidget {
                 isLabelVisible: cartCount > 0,
                 label: Text(
                   '$cartCount',
-                  style: textTheme.labelSmall
-                      ?.copyWith(
+                  style: textTheme.labelSmall?.copyWith(
                     color: colorScheme.onError,
                     fontSize: 10,
                   ),
                 ),
-                backgroundColor:
-                    colorScheme.error,
+                backgroundColor: colorScheme.error,
                 child: _HeaderIconButton(
+                  key: keys.homePage.cartButton,
                   icon: Symbols.shopping_cart,
                   tooltip: 'Shopping cart',
-                  onTap: () => const CartRoute()
-                      .push(context),
+                  onTap: () => const CartRoute().push(context),
                 ),
               ),
               SizedBox(width: AppDimens.spaceMd),
@@ -118,6 +116,7 @@ class _HeaderIconButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const _HeaderIconButton({
+    super.key,
     required this.icon,
     required this.tooltip,
     required this.onTap,

@@ -23,9 +23,13 @@ class CartItemResponseDto {
     required this.clinicName,
     required this.clinicAddress,
     this.clinicImageUrl,
-    this.couponCode,
-    this.couponDiscountPercent,
-    this.couponDiscountAmount,
+    required this.employeeId,
+    required this.employeeName,
+    required this.employeeRole,
+    this.employeeAvatarUrl,
+    required this.timeSlot,
+    required this.isTimeSlotAvailable,
+    required this.status,
     required this.createdAt,
   });
 
@@ -55,11 +59,28 @@ class CartItemResponseDto {
   ///
   Object? clinicImageUrl;
 
-  Object? couponCode;
+  String employeeId;
 
-  Object? couponDiscountPercent;
+  String employeeName;
 
-  Object? couponDiscountAmount;
+  CartItemResponseDtoEmployeeRoleEnum employeeRole;
+
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  Object? employeeAvatarUrl;
+
+  /// Selected time slot for the appointment
+  DateTime timeSlot;
+
+  /// Whether the selected time slot is still available in the employee schedule.
+  bool isTimeSlotAvailable;
+
+  /// Cart item status: ACTIVE, BOOKED, or DELETED
+  CartItemResponseDtoStatusEnum status;
 
   DateTime createdAt;
 
@@ -75,9 +96,13 @@ class CartItemResponseDto {
     other.clinicName == clinicName &&
     other.clinicAddress == clinicAddress &&
     other.clinicImageUrl == clinicImageUrl &&
-    other.couponCode == couponCode &&
-    other.couponDiscountPercent == couponDiscountPercent &&
-    other.couponDiscountAmount == couponDiscountAmount &&
+    other.employeeId == employeeId &&
+    other.employeeName == employeeName &&
+    other.employeeRole == employeeRole &&
+    other.employeeAvatarUrl == employeeAvatarUrl &&
+    other.timeSlot == timeSlot &&
+    other.isTimeSlotAvailable == isTimeSlotAvailable &&
+    other.status == status &&
     other.createdAt == createdAt;
 
   @override
@@ -93,13 +118,17 @@ class CartItemResponseDto {
     (clinicName.hashCode) +
     (clinicAddress.hashCode) +
     (clinicImageUrl == null ? 0 : clinicImageUrl!.hashCode) +
-    (couponCode == null ? 0 : couponCode!.hashCode) +
-    (couponDiscountPercent == null ? 0 : couponDiscountPercent!.hashCode) +
-    (couponDiscountAmount == null ? 0 : couponDiscountAmount!.hashCode) +
+    (employeeId.hashCode) +
+    (employeeName.hashCode) +
+    (employeeRole.hashCode) +
+    (employeeAvatarUrl == null ? 0 : employeeAvatarUrl!.hashCode) +
+    (timeSlot.hashCode) +
+    (isTimeSlotAvailable.hashCode) +
+    (status.hashCode) +
     (createdAt.hashCode);
 
   @override
-  String toString() => 'CartItemResponseDto[id=$id, serviceId=$serviceId, serviceName=$serviceName, serviceImageUrl=$serviceImageUrl, price=$price, priceAmount=$priceAmount, clinicId=$clinicId, clinicName=$clinicName, clinicAddress=$clinicAddress, clinicImageUrl=$clinicImageUrl, couponCode=$couponCode, couponDiscountPercent=$couponDiscountPercent, couponDiscountAmount=$couponDiscountAmount, createdAt=$createdAt]';
+  String toString() => 'CartItemResponseDto[id=$id, serviceId=$serviceId, serviceName=$serviceName, serviceImageUrl=$serviceImageUrl, price=$price, priceAmount=$priceAmount, clinicId=$clinicId, clinicName=$clinicName, clinicAddress=$clinicAddress, clinicImageUrl=$clinicImageUrl, employeeId=$employeeId, employeeName=$employeeName, employeeRole=$employeeRole, employeeAvatarUrl=$employeeAvatarUrl, timeSlot=$timeSlot, isTimeSlotAvailable=$isTimeSlotAvailable, status=$status, createdAt=$createdAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -117,21 +146,17 @@ class CartItemResponseDto {
     } else {
       json[r'clinicImageUrl'] = null;
     }
-    if (this.couponCode != null) {
-      json[r'couponCode'] = this.couponCode;
+      json[r'employeeId'] = this.employeeId;
+      json[r'employeeName'] = this.employeeName;
+      json[r'employeeRole'] = this.employeeRole;
+    if (this.employeeAvatarUrl != null) {
+      json[r'employeeAvatarUrl'] = this.employeeAvatarUrl;
     } else {
-      json[r'couponCode'] = null;
+      json[r'employeeAvatarUrl'] = null;
     }
-    if (this.couponDiscountPercent != null) {
-      json[r'couponDiscountPercent'] = this.couponDiscountPercent;
-    } else {
-      json[r'couponDiscountPercent'] = null;
-    }
-    if (this.couponDiscountAmount != null) {
-      json[r'couponDiscountAmount'] = this.couponDiscountAmount;
-    } else {
-      json[r'couponDiscountAmount'] = null;
-    }
+      json[r'timeSlot'] = this.timeSlot.toUtc().toIso8601String();
+      json[r'isTimeSlotAvailable'] = this.isTimeSlotAvailable;
+      json[r'status'] = this.status;
       json[r'createdAt'] = this.createdAt.toUtc().toIso8601String();
     return json;
   }
@@ -165,9 +190,13 @@ class CartItemResponseDto {
         clinicName: mapValueOfType<String>(json, r'clinicName')!,
         clinicAddress: mapValueOfType<String>(json, r'clinicAddress')!,
         clinicImageUrl: mapValueOfType<Object>(json, r'clinicImageUrl'),
-        couponCode: mapValueOfType<Object>(json, r'couponCode'),
-        couponDiscountPercent: mapValueOfType<Object>(json, r'couponDiscountPercent'),
-        couponDiscountAmount: mapValueOfType<Object>(json, r'couponDiscountAmount'),
+        employeeId: mapValueOfType<String>(json, r'employeeId')!,
+        employeeName: mapValueOfType<String>(json, r'employeeName')!,
+        employeeRole: CartItemResponseDtoEmployeeRoleEnum.fromJson(json[r'employeeRole'])!,
+        employeeAvatarUrl: mapValueOfType<Object>(json, r'employeeAvatarUrl'),
+        timeSlot: mapDateTime(json, r'timeSlot', r'')!,
+        isTimeSlotAvailable: mapValueOfType<bool>(json, r'isTimeSlotAvailable')!,
+        status: CartItemResponseDtoStatusEnum.fromJson(json[r'status'])!,
         createdAt: mapDateTime(json, r'createdAt', r'')!,
       );
     }
@@ -225,7 +254,164 @@ class CartItemResponseDto {
     'clinicId',
     'clinicName',
     'clinicAddress',
+    'employeeId',
+    'employeeName',
+    'employeeRole',
+    'timeSlot',
+    'isTimeSlotAvailable',
+    'status',
     'createdAt',
   };
 }
+
+
+class CartItemResponseDtoEmployeeRoleEnum {
+  /// Instantiate a new enum with the provided [value].
+  const CartItemResponseDtoEmployeeRoleEnum._(this.value);
+
+  /// The underlying value of this enum member.
+  final String value;
+
+  @override
+  String toString() => value;
+
+  String toJson() => value;
+
+  static const DOCTOR = CartItemResponseDtoEmployeeRoleEnum._(r'DOCTOR');
+  static const THERAPIST = CartItemResponseDtoEmployeeRoleEnum._(r'THERAPIST');
+
+  /// List of all possible values in this [enum][CartItemResponseDtoEmployeeRoleEnum].
+  static const values = <CartItemResponseDtoEmployeeRoleEnum>[
+    DOCTOR,
+    THERAPIST,
+  ];
+
+  static CartItemResponseDtoEmployeeRoleEnum? fromJson(dynamic value) => CartItemResponseDtoEmployeeRoleEnumTypeTransformer().decode(value);
+
+  static List<CartItemResponseDtoEmployeeRoleEnum> listFromJson(dynamic json, {bool growable = false,}) {
+    final result = <CartItemResponseDtoEmployeeRoleEnum>[];
+    if (json is List && json.isNotEmpty) {
+      for (final row in json) {
+        final value = CartItemResponseDtoEmployeeRoleEnum.fromJson(row);
+        if (value != null) {
+          result.add(value);
+        }
+      }
+    }
+    return result.toList(growable: growable);
+  }
+}
+
+/// Transformation class that can [encode] an instance of [CartItemResponseDtoEmployeeRoleEnum] to String,
+/// and [decode] dynamic data back to [CartItemResponseDtoEmployeeRoleEnum].
+class CartItemResponseDtoEmployeeRoleEnumTypeTransformer {
+  factory CartItemResponseDtoEmployeeRoleEnumTypeTransformer() => _instance ??= const CartItemResponseDtoEmployeeRoleEnumTypeTransformer._();
+
+  const CartItemResponseDtoEmployeeRoleEnumTypeTransformer._();
+
+  String encode(CartItemResponseDtoEmployeeRoleEnum data) => data.value;
+
+  /// Decodes a [dynamic value][data] to a CartItemResponseDtoEmployeeRoleEnum.
+  ///
+  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
+  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
+  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
+  ///
+  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
+  /// and users are still using an old app with the old code.
+  CartItemResponseDtoEmployeeRoleEnum? decode(dynamic data, {bool allowNull = true}) {
+    if (data != null) {
+      switch (data) {
+        case r'DOCTOR': return CartItemResponseDtoEmployeeRoleEnum.DOCTOR;
+        case r'THERAPIST': return CartItemResponseDtoEmployeeRoleEnum.THERAPIST;
+        default:
+          if (!allowNull) {
+            throw ArgumentError('Unknown enum value to decode: $data');
+          }
+      }
+    }
+    return null;
+  }
+
+  /// Singleton [CartItemResponseDtoEmployeeRoleEnumTypeTransformer] instance.
+  static CartItemResponseDtoEmployeeRoleEnumTypeTransformer? _instance;
+}
+
+
+/// Cart item status: ACTIVE, BOOKED, or DELETED
+class CartItemResponseDtoStatusEnum {
+  /// Instantiate a new enum with the provided [value].
+  const CartItemResponseDtoStatusEnum._(this.value);
+
+  /// The underlying value of this enum member.
+  final String value;
+
+  @override
+  String toString() => value;
+
+  String toJson() => value;
+
+  static const ACTIVE = CartItemResponseDtoStatusEnum._(r'ACTIVE');
+  static const BOOKED = CartItemResponseDtoStatusEnum._(r'BOOKED');
+  static const DELETED = CartItemResponseDtoStatusEnum._(r'DELETED');
+
+  /// List of all possible values in this [enum][CartItemResponseDtoStatusEnum].
+  static const values = <CartItemResponseDtoStatusEnum>[
+    ACTIVE,
+    BOOKED,
+    DELETED,
+  ];
+
+  static CartItemResponseDtoStatusEnum? fromJson(dynamic value) => CartItemResponseDtoStatusEnumTypeTransformer().decode(value);
+
+  static List<CartItemResponseDtoStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
+    final result = <CartItemResponseDtoStatusEnum>[];
+    if (json is List && json.isNotEmpty) {
+      for (final row in json) {
+        final value = CartItemResponseDtoStatusEnum.fromJson(row);
+        if (value != null) {
+          result.add(value);
+        }
+      }
+    }
+    return result.toList(growable: growable);
+  }
+}
+
+/// Transformation class that can [encode] an instance of [CartItemResponseDtoStatusEnum] to String,
+/// and [decode] dynamic data back to [CartItemResponseDtoStatusEnum].
+class CartItemResponseDtoStatusEnumTypeTransformer {
+  factory CartItemResponseDtoStatusEnumTypeTransformer() => _instance ??= const CartItemResponseDtoStatusEnumTypeTransformer._();
+
+  const CartItemResponseDtoStatusEnumTypeTransformer._();
+
+  String encode(CartItemResponseDtoStatusEnum data) => data.value;
+
+  /// Decodes a [dynamic value][data] to a CartItemResponseDtoStatusEnum.
+  ///
+  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
+  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
+  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
+  ///
+  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
+  /// and users are still using an old app with the old code.
+  CartItemResponseDtoStatusEnum? decode(dynamic data, {bool allowNull = true}) {
+    if (data != null) {
+      switch (data) {
+        case r'ACTIVE': return CartItemResponseDtoStatusEnum.ACTIVE;
+        case r'BOOKED': return CartItemResponseDtoStatusEnum.BOOKED;
+        case r'DELETED': return CartItemResponseDtoStatusEnum.DELETED;
+        default:
+          if (!allowNull) {
+            throw ArgumentError('Unknown enum value to decode: $data');
+          }
+      }
+    }
+    return null;
+  }
+
+  /// Singleton [CartItemResponseDtoStatusEnumTypeTransformer] instance.
+  static CartItemResponseDtoStatusEnumTypeTransformer? _instance;
+}
+
 

@@ -1,0 +1,174 @@
+## Edit Profile Page with `/partner/info-update` State Machines
+
+### Summary
+- Build a new partner-facing page at `/provider/profile/edit` for post-onboarding edits, separate from [profile_completion](/Volumes/WD850X/Users/workspace/datn/Healytics/healytic_fe/admin_panel/lib/features/partner/profile_completion).
+- Replace split frontend integration with one aggregate backend contract:
+  - `GET /partner/info-update`
+  - `PUT /partner/info-update`
+- Add explicit state machines for each API and for the page-level edit flow so implementation is decision-complete.
+
+### Key Changes
+- Create `lib/features/partner/profile_edit/` with clean-architecture layers:
+  - domain: aggregate entity, update request, form-field enum, page state enum/sealed state
+  - data: datasource + repository for `/partner/info-update`
+  - presentation: Riverpod codegen notifier, screen, widgets
+- Reuse storefront UI pieces from `profile_completion` for branding, description, gallery, certifications, and section-card styling.
+- Add `ProfileEditRoute` in [partner_routes.dart](/Volumes/WD850X/Users/workspace/datn/Healytics/healytic_fe/admin_panel/lib/router/partner_routes.dart) and a sidebar item in [app_router.dart](/Volumes/WD850X/Users/workspace/datn/Healytics/healytic_fe/admin_panel/lib/router/app_router.dart).
+- Preserve routing gate:
+  - verified + incomplete provider -> `/provider/profile-completion`
+  - verified + completed provider -> may access `/provider/profile/edit`
+
+### API State Machines
+- `GET /partner/info-update` backend state machine:
+  - `request_received`
+  - `authenticate_partner`
+  - `authorize_completed_profile_access`
+  - `load_partner_edit_aggregate`
+  - `build_response_dto`
+  - terminal states:
+    - `success`
+    - `unauthorized`
+    - `forbidden_incomplete_profile`
+    - `not_found_partner`
+    - `server_error`
+- `GET /partner/info-update` frontend state machine:
+  - `idle`
+  - `initial_loading`
+  - `loaded_clean`
+  - `refreshing`
+  - terminal/error branch:
+    - `load_error`
+  - transitions:
+    - `idle -> initial_loading` on first build
+    - `initial_loading -> loaded_clean` on success
+    - `initial_loading -> load_error` on failure
+    - `loaded_clean -> refreshing` on manual refresh
+    - `refreshing -> loaded_clean` on success
+    - `refreshing -> load_error` only if no usable snapshot remains; otherwise retain prior snapshot and surface banner error
+- `PUT /partner/info-update` backend state machine:
+  - `request_received`
+  - `authenticate_partner`
+  - `authorize_edit_access`
+  - `validate_payload`
+  - `load_partner_and_related_records`
+  - `apply_business_updates`
+  - `apply_storefront_updates`
+  - `sync_certifications`
+  - `recalculate_completion_summary`
+  - `recalculate_verification_status_if_needed`
+  - `persist_transaction`
+  - `build_response_dto`
+  - terminal states:
+    - `success`
+    - `validation_error`
+    - `unauthorized`
+    - `forbidden_edit_scope`
+    - `not_found_partner`
+    - `conflict_duplicate_email_or_username_or_tax_code`
+    - `server_error`
+- `PUT /partner/info-update` frontend state machine:
+  - `loaded_clean`
+  - `loaded_dirty`
+  - `validating_before_save`
+  - `saving`
+  - terminal/branch states:
+    - `save_success`
+    - `save_error`
+  - transitions:
+    - `loaded_clean -> loaded_dirty` on first field mutation
+    - `loaded_dirty -> validating_before_save` on save
+    - `validating_before_save -> loaded_dirty` on client validation failure
+    - `validating_before_save -> saving` on valid payload
+    - `saving -> save_success` on successful PUT + refetch
+    - `save_success -> loaded_clean` after snapshot replacement
+    - `saving -> save_error` on failure
+    - `save_error -> loaded_dirty` after error is acknowledged and draft remains editable
+- Page-level edit state machine in Riverpod notifier:
+  - `bootstrapping`
+  - `ready_clean`
+  - `ready_dirty`
+  - `refreshing`
+  - `saving`
+  - `load_failed`
+  - `save_failed`
+  - invariants:
+    - only `ready_dirty` can transition to `saving`
+    - `discardChanges()` always returns to `ready_clean`
+    - route-leave warning appears only in `ready_dirty` and `save_failed`
+
+### Frontend Implementation Details
+- Domain models:
+  - `PartnerProfileEditEntity`
+    - `businessInfo`
+    - `address`
+    - `publicProfile`
+    - `verificationStatus`
+    - `readOnlyLegalSummary`
+    - `completionSummary`
+  - `PartnerProfileEditUpdateRequest`
+  - `PartnerProfileEditFormField`
+  - `PartnerProfileEditPageState` as Freezed sealed state or equivalent explicit state object
+- Notifier responsibilities:
+  - keep `serverSnapshot`
+  - keep `draft`
+  - compute dirty sections and full dirty flag
+  - compute validation errors
+  - expose `refresh()`, `updateBusinessField()`, `updateStorefrontField()`, `discardChanges()`, `save()`
+  - after successful PUT, replace snapshot and draft with fresh GET response and invalidate `accountMeProvider`
+- UI layout:
+  - `ResponsiveWrapper(useLayout: true, ...)`
+  - left column: Business Overview, Business Address, Contact & Visibility, Branding, Description, Gallery, Certifications
+  - right rail: verification chip, completion summary, legal summary, CTA to verification page
+  - sticky save/discard bar bound directly to page state machine
+- UX rules:
+  - explicit save/discard only
+  - unsaved-changes guard on back/route leave
+  - keep stale content visible during refresh where possible
+  - preserve draft on save failure
+  - use theme colors/text styles and project spacing tokens only
+
+### Public APIs and DTOs
+- Backend adds:
+  - `GET /partner/info-update`
+  - `PUT /partner/info-update`
+- Recommended DTOs:
+  - `PartnerInfoUpdateResponseDto`
+  - `UpdatePartnerInfoDto`
+  - nested DTOs for business info, address, storefront profile, certifications, legal summary, completion summary
+- Response contract should always include:
+  - editable business/contact/location fields
+  - editable storefront fields
+  - read-only legal summary
+  - completion checklist/percent/isCompleted
+  - verification status
+  - field-level or section-level metadata only if required to render editability or warnings
+- `PUT` must not accept:
+  - legal representative edits
+  - KYC document mutations
+
+### Test Plan
+- Frontend notifier tests:
+  - boot load success/failure
+  - dirty transitions `ready_clean <-> ready_dirty`
+  - validation failure prevents `saving`
+  - successful save returns to `ready_clean`
+  - failed save returns to `save_failed` with draft preserved
+  - refresh from `ready_clean` and `ready_dirty`
+- Frontend widget tests:
+  - loading, loaded, error states
+  - sticky save bar enable/disable by state
+  - route guard prompts only when dirty
+  - responsive layouts at 320, 393, 430, tablet, desktop
+  - legal/KYC CTA navigation
+- Backend tests:
+  - GET success and each failure terminal state
+  - PUT success and each failure terminal state
+  - certification sync lifecycle
+  - forbidden edits to legal/KYC fields
+  - verification/completion summaries returned correctly after mutation
+
+### Assumptions
+- `/partner/info-update` is the exact final path.
+- The page is available only after `partnerProfileCompleted == true`.
+- Legal representative and KYC remain read-only on this page.
+- A single unified PUT eliminates the need for frontend partial-save recovery logic.

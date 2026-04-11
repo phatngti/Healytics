@@ -56,6 +56,17 @@ class SignUpFormScreen extends HookConsumerWidget {
     return [];
   }
 
+  /// Maps UI ID type label to backend `IdType` enum
+  /// value.
+  String _mapIdTypeToApiValue(String uiLabel) {
+    return switch (uiLabel) {
+      'ID Card' => 'CITIZEN_ID',
+      'Citizen Identity Card' => 'CITIZEN_ID',
+      'Passport' => 'PASSPORT',
+      _ => 'CITIZEN_ID',
+    };
+  }
+
   /// Extracts user-friendly error message from API
   /// exceptions.
   String _extractErrorMessage(Object error) {
@@ -157,7 +168,8 @@ class SignUpFormScreen extends HookConsumerWidget {
           districtId: values['district'] ?? '',
           wardId: values['ward'] ?? '',
           streetAddress: values['street_address'] ?? '',
-          phoneNumber: values['representative_phone'],
+          phoneNumber: values['clinic_phone'] ??
+              values['representative_phone'],
         );
 
         // Build documents list
@@ -208,7 +220,9 @@ class SignUpFormScreen extends HookConsumerWidget {
               values['representative_position'],
           phoneNumber:
               values['representative_phone'],
-          idType: values['id_type'] ?? 'ID Card',
+          idType: _mapIdTypeToApiValue(
+            values['id_type'] ?? 'Citizen Identity Card',
+          ),
           idNumber: values['id_number'] ?? '',
           idIssueDate: values['id_issue_date']
                   ?.toString()
@@ -311,13 +325,27 @@ class SignUpFormScreen extends HookConsumerWidget {
                         AppDimens.verticalLarge,
 
                         // Section 4: Document Verification
-                        FormSectionCard(
-                          sectionNumber: '4',
-                          title: 'Document Verification',
-                          child:
-                              const DocumentVerificationSection(
-                            scope: 'SPA_BEAUTY',
-                          ),
+                        Builder(
+                          builder: (context) {
+                            final formState =
+                                FormBuilder.of(context);
+                            final types = formState
+                                    ?.fields['business_types']
+                                    ?.value as List<dynamic>?;
+                            final scope = (types != null &&
+                                    types.isNotEmpty)
+                                ? types.first.toString()
+                                : 'SPA_BEAUTY';
+                            return FormSectionCard(
+                              sectionNumber: '4',
+                              title:
+                                  'Document Verification',
+                              child:
+                                  DocumentVerificationSection(
+                                scope: scope,
+                              ),
+                            );
+                          },
                         ),
                         AppDimens.verticalLarge,
 

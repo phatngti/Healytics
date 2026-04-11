@@ -138,7 +138,7 @@ final class ClinicReviewsPaginatedProvider
 }
 
 String _$clinicReviewsPaginatedHash() =>
-    r'89dd57521300c5475eeb5912a9a08f7ea73fe40a';
+    r'6b52a6716a2a035a45d2f87a196fdaef1d7040a6';
 
 /// Manages paginated review loading with server-side
 /// filtering.

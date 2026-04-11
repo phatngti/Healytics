@@ -590,40 +590,102 @@ class _ChatDetailPanel extends HookConsumerWidget {
                         ),
                       ),
                     )
-                  : ListView.builder(
-                      controller: scrollController,
-                      padding:
-                          const EdgeInsets.all(16),
-                      itemCount: detailState
-                          .messages.length,
-                      itemBuilder:
-                          (context, index) {
-                        final msg = detailState
-                            .messages[index];
-                        final outgoingStatus =
-                            _resolveOutgoingMessageStatus(
-                          msg,
-                          detailState
-                              .pendingClientMessageIds,
-                        );
-                        return Padding(
-                          padding:
-                              const EdgeInsets.only(
-                            bottom: 8,
-                          ),
-                          child:
-                              _DesktopMessageBubble(
-                            message: msg,
-                            isPartner:
-                                _isCurrentPartnerMessage(
-                              msg,
-                              conversation,
-                            ),
-                            outgoingStatus:
-                                outgoingStatus,
-                          ),
-                        );
+                  : NotificationListener<
+                        ScrollNotification>(
+                      onNotification:
+                          (notification) {
+                        if (notification
+                            is ScrollUpdateNotification) {
+                          final metrics =
+                              notification.metrics;
+                          // Near the top edge —
+                          // load older messages
+                          if (metrics.pixels <=
+                                  200 &&
+                              detailState
+                                  .hasMoreMessages &&
+                              !detailState
+                                  .isLoadingMore) {
+                            ref
+                                .read(
+                                  partnerChatDetailProvider(
+                                    conversationId,
+                                  ).notifier,
+                                )
+                                .loadMoreMessages();
+                          }
+                        }
+                        return false;
                       },
+                      child: ListView.builder(
+                        controller:
+                            scrollController,
+                        padding:
+                            const EdgeInsets.all(
+                          16,
+                        ),
+                        itemCount: detailState
+                                .messages.length +
+                            (detailState
+                                    .isLoadingMore
+                                ? 1
+                                : 0),
+                        itemBuilder:
+                            (context, index) {
+                          // Loading spinner at top
+                          if (detailState
+                                  .isLoadingMore &&
+                              index == 0) {
+                            return const Padding(
+                              padding:
+                                  EdgeInsets.symmetric(
+                                vertical: 12,
+                              ),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child:
+                                      CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
+                          final msgIndex = detailState
+                                  .isLoadingMore
+                              ? index - 1
+                              : index;
+                          final msg = detailState
+                              .messages[msgIndex];
+                          final outgoingStatus =
+                              _resolveOutgoingMessageStatus(
+                            msg,
+                            detailState
+                                .pendingClientMessageIds,
+                          );
+                          return Padding(
+                            padding:
+                                const EdgeInsets
+                                    .only(
+                              bottom: 8,
+                            ),
+                            child:
+                                _DesktopMessageBubble(
+                              message: msg,
+                              isPartner:
+                                  _isCurrentPartnerMessage(
+                                msg,
+                                conversation,
+                              ),
+                              outgoingStatus:
+                                  outgoingStatus,
+                            ),
+                          );
+                        },
+                      ),
                     ),
         ),
 

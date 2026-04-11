@@ -16,6 +16,8 @@ describe('PartnersController', () => {
     getBusinessServices: jest.fn(),
     getMyProfile: jest.fn(),
     updateMyProfile: jest.fn(),
+    getMyProfileCompletion: jest.fn(),
+    updateMyProfileCompletion: jest.fn(),
   };
 
   const mockBusinessServices = {
@@ -71,6 +73,8 @@ describe('PartnerSelfController', () => {
     getBusinessServices: jest.fn(),
     getMyProfile: jest.fn(),
     updateMyProfile: jest.fn(),
+    getMyProfileCompletion: jest.fn(),
+    updateMyProfileCompletion: jest.fn(),
   };
 
   const mockProfile = {
@@ -164,6 +168,49 @@ describe('PartnerSelfController', () => {
         userId,
         updateDto,
       );
+    });
+  });
+
+  describe('profile completion', () => {
+    it('should return profile completion data', async () => {
+      const userId = 'account-uuid';
+      const completion = {
+        id: 'partner-uuid',
+        isCompleted: false,
+        completionPercent: 25,
+      };
+      mockPartnersService.getMyProfileCompletion.mockResolvedValue(completion);
+
+      const result = await controller.getMyProfileCompletion(userId);
+
+      expect(result).toEqual(completion);
+      expect(mockPartnersService.getMyProfileCompletion).toHaveBeenCalledWith(
+        userId,
+      );
+    });
+
+    it('should update profile completion data', async () => {
+      const userId = 'account-uuid';
+      const dto = {
+        coverImageUrl: 'https://cdn.example.com/cover.jpg',
+        gallery: ['https://cdn.example.com/gallery-1.jpg'],
+      };
+      const updated = {
+        id: 'partner-uuid',
+        isCompleted: false,
+        completionPercent: 50,
+      };
+      mockPartnersService.updateMyProfileCompletion.mockResolvedValue(updated);
+
+      const result = await controller.updateMyProfileCompletion(
+        userId,
+        dto as any,
+      );
+
+      expect(result).toEqual(updated);
+      expect(
+        mockPartnersService.updateMyProfileCompletion,
+      ).toHaveBeenCalledWith(userId, dto);
     });
   });
 });

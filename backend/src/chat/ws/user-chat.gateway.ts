@@ -33,6 +33,9 @@ import {
   WsJwtAuthMiddleware,
   WsRoleMiddleware,
 } from './ws-jwt-auth.middleware';
+import { ChatNotificationGateway } from './chat-notification.gateway';
+import { NotificationEventService } from '@/notification/services/notification-event.service';
+import { NotificationType } from '@/notification/enums/notification-type.enum';
 
 /**
  * WebSocket gateway for the **User** (patient) side of the chat.
@@ -100,6 +103,8 @@ export class UserChatGateway
     private readonly chatService: ChatService,
     private readonly jwtService: JwtService,
     private readonly accountService: AccountService,
+    private readonly chatNotificationGateway: ChatNotificationGateway,
+    private readonly notificationEventService: NotificationEventService,
   ) {}
 
   // ── Lifecycle ────────────────────────────────────────────────
@@ -196,6 +201,34 @@ export class UserChatGateway
       this.logger.log(
         `[WS Sent] event=new_message messageId=${message.id} conversationId=${payload.conversationId} sender=${user.email}`,
       );
+
+      // ── Global notification (popup anywhere in the app) ──────
+      this.chatNotificationGateway.pushNewMessageNotification(
+        message.receiverId,
+        {
+          conversationId: message.conversationId,
+          messageId: message.id,
+          senderId: message.senderId,
+          senderName: message.senderName ?? user.email,
+          senderAvatar: message.senderAvatar,
+          messagePreview: message.content?.substring(0, 100) ?? '',
+          messageType: message.messageType,
+          createdAt: message.createdAt,
+        },
+      );
+
+      // ── Persist notification + offline push (FCM/APNs) ───────
+      this.notificationEventService.emit({
+        type: NotificationType.NEW_CHAT_MESSAGE,
+        recipientId: message.receiverId,
+        title: message.senderName ?? 'New Message',
+        body: message.content?.substring(0, 200) ?? '',
+        data: {
+          conversationId: message.conversationId,
+          messageId: message.id,
+          senderId: message.senderId,
+        },
+      });
 
       // Acknowledge to the sender
       return {

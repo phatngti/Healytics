@@ -3,6 +3,11 @@
 // Pure Dart — no Flutter or framework imports.
 
 /// A single bookable time slot.
+///
+/// Aligns with [TimeSlotDto] from the OpenAPI spec:
+/// `isBusy` enum (`free`/`busy`) is mapped to the
+/// boolean [isAvailable] for consistency with
+/// [PublicEmployeeTimeSlotDto].
 class TimeSlotEntity {
   /// Human-readable label (e.g. "09:00 AM").
   final String label;
@@ -10,13 +15,15 @@ class TimeSlotEntity {
   /// Slot start time in HH:mm (24h) format.
   final String time;
 
-  /// Whether the slot is already occupied.
-  final bool isBusy;
+  /// Whether the slot can be booked.
+  ///
+  /// `false` when the DTO reports `isBusy: busy`.
+  final bool isAvailable;
 
   const TimeSlotEntity({
     required this.label,
     required this.time,
-    required this.isBusy,
+    required this.isAvailable,
   });
 }
 

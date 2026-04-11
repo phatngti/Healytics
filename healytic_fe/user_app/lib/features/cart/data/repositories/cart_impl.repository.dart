@@ -18,8 +18,15 @@ class CartRepositoryImpl implements CartRepository {
       _remoteDatasource.getCartItems();
 
   @override
-  Future<CartItemEntity> addItem({required String serviceId}) =>
-      _remoteDatasource.addItem(serviceId: serviceId);
+  Future<CartItemEntity> addItem({
+    required String serviceId,
+    required String employeeId,
+    required DateTime timeSlot,
+  }) => _remoteDatasource.addItem(
+    serviceId: serviceId,
+    employeeId: employeeId,
+    timeSlot: timeSlot,
+  );
 
   @override
   Future<void> removeItem(String cartItemId) =>

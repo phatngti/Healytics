@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -47,7 +49,7 @@ class _Content extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
-        const _SliverBackButton(),
+        const _SliverHeader(),
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: hPad),
@@ -102,28 +104,53 @@ class _Content extends StatelessWidget {
   }
 }
 
-// ─── Sliver back button ────────────────────────────
+// ─── Pinned header ─────────────────────────────────
 
-class _SliverBackButton extends StatelessWidget {
-  const _SliverBackButton();
+class _SliverHeader extends StatelessWidget {
+  const _SliverHeader();
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: EdgeInsets.only(
-            left: AppDimens.spaceSm,
-            top: AppDimens.spaceXs,
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return SliverAppBar(
+      pinned: true,
+      centerTitle: true,
+      backgroundColor: colors.surface.withValues(
+        alpha: 0.8,
+      ),
+      surfaceTintColor: Colors.transparent,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: 'Back',
+        onPressed: () =>
+            Navigator.of(context).maybePop(),
+      ),
+      title: Text(
+        'Appointment Details',
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: 12,
+            sigmaY: 12,
           ),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: IconButton(
-              tooltip: 'Go back',
-              icon: Icon(Icons.arrow_back, size: AppDimens.iconLg),
-              onPressed: () => Navigator.of(context).maybePop(),
-            ),
+          child: const SizedBox.expand(),
+        ),
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(
+          AppDimens.borderWidth,
+        ),
+        child: Divider(
+          height: AppDimens.borderWidth,
+          thickness: AppDimens.borderWidth,
+          color: colors.outlineVariant.withValues(
+            alpha: 0.3,
           ),
         ),
       ),

@@ -80,7 +80,6 @@ class ClinicInfoRemoteDatasourceImpl
     final dto = await _api
         .userClinicControllerGetClinicProducts(
       clinicId,
-      categoryId: categoryId,
       sort: sort.toApiValue(),
       search: search,
       page: page,
@@ -159,12 +158,9 @@ class ClinicInfoRemoteDatasourceImpl
     ClinicTrustMetricsDto dto,
   ) {
     return ClinicTrustMetrics(
+      rating: dto.rating.toDouble(),
+      reviewCount: dto.reviewCount.toInt(),
       experienceLabel: dto.experienceLabel,
-      // DTO no longer provides specialists count; use review count as
-      // a stable numeric fallback for the second metric slot.
-      specialistsCount: dto.reviewCount.toInt(),
-      // DTO no longer provides certified label; expose rating text.
-      certifiedLabel: dto.rating.toString(),
       clientsLabel: dto.clientsLabel,
     );
   }
@@ -198,23 +194,12 @@ class ClinicInfoRemoteDatasourceImpl
     ClinicProductsResponseDto dto,
   ) {
     return ClinicProductsData(
-      categories: dto.categories
-          .map(_mapCategory)
-          .toList(),
+      categories: const [],
       products: dto.products
           .map(_mapProduct)
           .toList(),
       totalCount: dto.totalCount.toInt(),
       hasMore: dto.hasMore,
-    );
-  }
-
-  ClinicProductCategory _mapCategory(
-    ClinicProductCategoryDto dto,
-  ) {
-    return ClinicProductCategory(
-      id: dto.id,
-      label: dto.label,
     );
   }
 

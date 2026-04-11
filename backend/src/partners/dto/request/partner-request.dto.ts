@@ -87,7 +87,10 @@ export class PartnerRequestDto {
   streetAddress: string;
 
   @ApiPropertyOptional({
-    description: 'Contact phone number for the business',
+    description:
+      'Clinic/business contact phone number. This is the public-facing ' +
+      'phone shown on the clinic info screen — NOT the legal ' +
+      "representative's personal phone.",
     example: '0901234567',
     maxLength: 20,
   })

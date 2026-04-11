@@ -32,6 +32,7 @@ export class UserClinicController {
   }
 
   @Get(':id/products')
+    @LogResponse()
   @ApiOperation({
     operationId: 'userClinicControllerGetClinicProducts',
     summary: 'Get clinic products/services catalog',

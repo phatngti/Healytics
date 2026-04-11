@@ -102,6 +102,7 @@ class _DetailCard extends StatelessWidget {
     required this.iconColor,
     required this.iconBgColor,
     required this.label,
+    // ignore: unused_element_parameter
     this.subtitle,
     this.onTap,
   });

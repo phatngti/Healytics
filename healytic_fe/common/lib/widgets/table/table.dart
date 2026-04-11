@@ -132,15 +132,18 @@ class _AppTableState extends State<AppTable>
       return const SizedBox.shrink();
     }
 
-    // Last ppage example uses extra API call to get the number of items in datasource
-    final columns = widget.columns;
+    // Create a local copy so we never mutate
+    // widget.columns on rebuild.
+    final columns = [...widget.columns];
     if (widget.actionButtons) {
       columns.add(
         DataColumn(
           label: Center(
             child: Text(
               'Action',
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium,
             ),
           ),
         ),

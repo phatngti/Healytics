@@ -1,5 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+/**
+ * Trust metrics bar displayed on the clinic info screen.
+ *
+ * Field-mapping contract (Partner -> ClinicService -> DTO -> user_app):
+ * | DTO field        | Source                                          | user_app entity field    |
+ * |------------------|-------------------------------------------------|--------------------------|
+ * | rating           | avg treatment-review rating across products      | ClinicTrustMetrics.rating          |
+ * | reviewCount      | total treatment-review count across products     | ClinicTrustMetrics.reviewCount     |
+ * | experienceLabel  | derived from Partner.createdAt (years active)    | ClinicTrustMetrics.experienceLabel |
+ * | clientsLabel     | unique booking users across products             | ClinicTrustMetrics.clientsLabel    |
+ */
 export class ClinicTrustMetricsDto {
   @ApiProperty({ example: 4.9 })
   rating: number;
@@ -42,6 +53,27 @@ export class ClinicSpecialistPreviewDto {
   experienceLabel: string | null;
 }
 
+/**
+ * Clinic profile returned by `GET /user/clinics/:id/info`.
+ *
+ * Field-mapping contract (admin_panel sign-up -> Partner entity -> this DTO):
+ * | DTO field      | Partner column / derivation            | Admin sign-up form key         |
+ * |----------------|----------------------------------------|--------------------------------|
+ * | id             | Partner.id (auto UUID)                 | —                              |
+ * | name           | Partner.brandName                      | brand_name                     |
+ * | coverImageUrl  | Partner.coverImageUrl (post-signup)     | —                              |
+ * | logoImageUrl   | Partner.logoImageUrl (post-signup)      | —                              |
+ * | gallery        | Partner.gallery (post-signup)           | —                              |
+ * | followersLabel | formatCount(Partner.followerCount)      | — (derived)                   |
+ * | reviewsLabel   | formatCount(totalReviewCount)           | — (derived)                   |
+ * | description    | Partner.description (post-signup)       | —                              |
+ * | trustMetrics   | see ClinicTrustMetricsDto              | — (derived)                   |
+ * | certifications | PartnerCertification rows              | — (post-signup)               |
+ * | specialists    | Employee rows (active, limit 5)        | — (post-signup)               |
+ * | businessTypes  | Partner.businessType (BusinessType[])   | business_types (enum codes)   |
+ * | address        | Partner.streetAddress                   | street_address                |
+ * | phoneNumber    | Partner.phoneNumber                     | clinic_phone (dedicated field)|
+ */
 export class ClinicInfoResponseDto {
   @ApiProperty()
   id: string;

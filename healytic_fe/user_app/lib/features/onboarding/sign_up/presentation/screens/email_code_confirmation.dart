@@ -5,10 +5,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:common/widgets/button/button.dart';
+import 'package:common/widgets/toast.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/router/router.dart'; // Đảm bảo import đúng Router
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
+import 'package:user_app/core/utils/form_validators.dart';
 import 'package:user_app/utils/device.dart';
 
 class EmailCodeConfirmationScreen extends HookConsumerWidget {
@@ -32,29 +34,33 @@ class EmailCodeConfirmationScreen extends HookConsumerWidget {
 
     // 4. Hàm Submit (Đã thêm Timeout)
     Future<void> submitCode() async {
+      final code = codeController.text.trim();
+      final validation = FormValidators.otpCode(code, length: 5);
+      if (validation != null) {
+        AppToast.warning(context, validation);
+        return;
+      }
+
       // Close keyboard
       FocusScope.of(context).unfocus();
 
       // Bật trạng thái loading cục bộ
       isSubmitLoading.value = true;
       try {
-        final code = codeController.text;
         await ref.read(registerFlowProvider.notifier).verifyCode(code);
 
-        if (context.mounted) {
-          // Code đúng, chuyển sang màn hình tiếp theo
-          context.pushReplacementNamed(FinishSignUpRoute.name);
-        }
-      } catch (e) {
-        debugPrint('Error verifying code: $e');
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('An error occurred. Please try again.'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
+        if (!context.mounted) return;
+        AppToast.success(
+          context,
+          'Code verified successfully.',
+        );
+        context.pushReplacementNamed(FinishSignUpRoute.name);
+      } catch (_) {
+        if (!context.mounted) return;
+        AppToast.error(
+          context,
+          'Invalid verification code. Please try again.',
+        );
       } finally {
         // Tắt trạng thái loading cục bộ
         isSubmitLoading.value = false;
@@ -166,7 +172,11 @@ class EmailCodeConfirmationScreen extends HookConsumerWidget {
                     buttonType: ButtonType.elevated,
                     // Logic Disable: Chưa nhập đủ 5 số HOẶC đang loading
                     onPressed:
-                        (codeController.text.length != 5 ||
+                        (FormValidators.otpCode(
+                              codeController.text.trim(),
+                              length: 5,
+                            ) !=
+                            null ||
                             isSubmitLoading.value)
                         ? null
                         : submitCode,

@@ -11,6 +11,7 @@ import 'package:user_app/features/onboarding/sign_up/domain/entities/user_entity
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/utils/form_validators.dart';
 import 'package:user_app/utils/device.dart';
 
 class FinishSignUpScreen extends HookConsumerWidget {
@@ -28,19 +29,20 @@ class FinishSignUpScreen extends HookConsumerWidget {
 
     ref.listen(registerFlowProvider, (previous, next) {
       if (next.hasError && !next.isLoading) {
-        if (context.mounted) {
-          ToastContext.showToast(
-            context,
-            ToastType.success,
-            next.error.toString(),
-          );
-        }
+        AppToast.error(
+          context,
+          'Sign up failed. Please review your information.',
+        );
       }
 
       if (next.value?.isRegistrationCompleted == true &&
           next.hasValue &&
           !next.isLoading) {
         if (context.mounted) {
+          AppToast.success(
+            context,
+            'Registration completed successfully.',
+          );
           context.pushReplacementNamed(SurveyScreenRoute.name);
         }
       }
@@ -83,19 +85,15 @@ class FinishSignUpScreen extends HookConsumerWidget {
     }
 
     submit() {
-      debugPrint('submit: called');
       isSubmitLoading.value = true;
       if (formKey.currentState?.saveAndValidate() ?? false) {
-        debugPrint('submit: form valid');
         final formData = formKey.currentState?.value ?? {};
-        // Handle the form submission logic here
         if (formData.isNotEmpty) {
           final firstName = formData['first_name'] as String;
           final lastName = formData['last_name'] as String;
           final dateOfBirth = formData['date_of_birth'] as String? ?? '';
           final email = ref.read(registerFlowProvider).value?.user?.email ?? '';
           final password = formData['password'] as String? ?? '';
-          debugPrint('submit: calling completeRegistration');
           ref
               .read(registerFlowProvider.notifier)
               .completeRegistration(
@@ -115,13 +113,11 @@ class FinishSignUpScreen extends HookConsumerWidget {
               );
         }
       } else {
-        if (context.mounted) {
-          ToastContext.showToast(
-            context,
-            ToastType.error,
-            'Please fill in all the required fields.',
-          );
-        }
+        isSubmitLoading.value = false;
+        AppToast.warning(
+          context,
+          'Please complete all required fields correctly.',
+        );
       }
     }
 
@@ -170,6 +166,10 @@ class FinishSignUpScreen extends HookConsumerWidget {
                         fieldKey: 'first_name',
                         label: 'First name',
                         uppercaseLabel: false,
+                        validator: (value) => FormValidators.fullName(
+                          value,
+                          fieldName: 'First name',
+                        ),
                       ),
                       AppDimens.verticalSmall,
                       FormFieldBuilders.buildTextField(
@@ -177,6 +177,10 @@ class FinishSignUpScreen extends HookConsumerWidget {
                         fieldKey: 'last_name',
                         label: 'Last name',
                         uppercaseLabel: false,
+                        validator: (value) => FormValidators.fullName(
+                          value,
+                          fieldName: 'Last name',
+                        ),
                       ),
                       AppDimens.verticalSmall,
                       Text(
@@ -245,6 +249,7 @@ class FinishSignUpScreen extends HookConsumerWidget {
                         label: 'Password',
                         uppercaseLabel: false,
                         obscureText: true,
+                        validator: FormValidators.password,
                       ),
                       AppDimens.verticalSmall,
                       FormFieldBuilders.buildTextField(
@@ -253,6 +258,16 @@ class FinishSignUpScreen extends HookConsumerWidget {
                         label: 'Confirm Password',
                         uppercaseLabel: false,
                         obscureText: true,
+                        validator: (value) =>
+                            FormValidators.confirmPassword(
+                          value,
+                          password:
+                              formKey.currentState
+                                  ?.fields['password']
+                                  ?.value
+                                  ?.toString() ??
+                              '',
+                        ),
                       ),
                       AppDimens.verticalSmall,
                       Text(
@@ -289,6 +304,11 @@ class FinishSignUpScreen extends HookConsumerWidget {
                           fieldKey: 'street_address',
                           label: 'Street Address',
                           uppercaseLabel: false,
+                          validator: (value) =>
+                              FormValidators.requiredField(
+                            value,
+                            fieldName: 'street address',
+                          ),
                         ),
 
                         AppDimens.verticalSmall,
@@ -297,6 +317,11 @@ class FinishSignUpScreen extends HookConsumerWidget {
                           fieldKey: 'ward',
                           label: 'Ward',
                           uppercaseLabel: false,
+                          validator: (value) =>
+                              FormValidators.requiredField(
+                            value,
+                            fieldName: 'ward',
+                          ),
                         ),
                         AppDimens.verticalSmall,
 
@@ -309,6 +334,11 @@ class FinishSignUpScreen extends HookConsumerWidget {
                                 fieldKey: 'district',
                                 label: 'District',
                                 uppercaseLabel: false,
+                                validator: (value) =>
+                                    FormValidators.requiredField(
+                                  value,
+                                  fieldName: 'district',
+                                ),
                               ),
                             ),
                             AppDimens.horizontalSmall,
@@ -318,6 +348,11 @@ class FinishSignUpScreen extends HookConsumerWidget {
                                 fieldKey: 'city_or_province',
                                 label: 'City or Province',
                                 uppercaseLabel: false,
+                                validator: (value) =>
+                                    FormValidators.requiredField(
+                                  value,
+                                  fieldName: 'city or province',
+                                ),
                               ),
                             ),
                           ],

@@ -18,7 +18,7 @@ class PartnerInboxChatRepositoryImpl
           _datasource.getConversations();
 
   @override
-  Future<List<PartnerChatMessage>> getMessages(
+  Future<PaginatedMessages> getMessages(
     String conversationId, {
     String? beforeId,
     int limit = 20,

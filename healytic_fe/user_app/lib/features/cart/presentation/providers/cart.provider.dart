@@ -81,14 +81,22 @@ class CartNotifier extends _$CartNotifier {
     return CartState(items: items);
   }
 
-  /// Adds a service from the service details screen.
+  /// Adds a scheduled service to the cart.
   ///
   /// Re-fetches the entire cart from backend to stay
   /// in sync.
-  Future<void> addItem({required String serviceId}) async {
+  Future<void> addItem({
+    required String serviceId,
+    required String employeeId,
+    required DateTime timeSlot,
+  }) async {
     try {
       final repo = ref.read(cartRepositoryProvider);
-      await repo.addItem(serviceId: serviceId);
+      await repo.addItem(
+        serviceId: serviceId,
+        employeeId: employeeId,
+        timeSlot: timeSlot,
+      );
       if (!ref.mounted) return;
       ref.invalidateSelf();
     } catch (e, st) {

@@ -47,12 +47,24 @@ const HEADER = `// =============================================================
 
 // ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
+// ignore_for_file: unused_element
 
 `;
 
 /** snake_case / kebab-case → camelCase */
 function snakeToCamel(s) {
   return s.replace(/[-_]([a-z])/g, (_, c) => c.toUpperCase());
+}
+
+/** Derive the Dart event-constants class name for a namespace.
+ *  e.g. 'user-chat' → 'WsChatEvent',
+ *       'notifications' → 'WsNotificationEvent',
+ *       'chat-notifications' → 'WsChatNotificationsEvent' */
+function eventClassName(nsName) {
+  // Special-case: drop leading 'user-'/'partner-' prefix for chat namespaces
+  // so both user-chat and partner-chat share WsChatEvent.
+  const stripped = nsName.replace(/^(user|partner)-/, '');
+  return `Ws${snakeToPascal(stripped)}Event`;
 }
 
 /** snake_case / kebab-case → PascalCase */
@@ -369,28 +381,61 @@ function toJsonExpression(prop, valueExpr) {
 
 function generateEvents() {
   let out = HEADER;
-  out += "/// WebSocket event constants matching the backend's event names.\n";
-  out += '///\n';
-  out += '/// Client → Server events are used with `socket.emit()`.\n';
-  out += '/// Server → Client events are used with `socket.on()`.\n';
-  out += 'abstract final class WsChatEvent {\n';
-  out += '  WsChatEvent._();\n\n';
 
-  out += '  // ── Client → Server ────────────────────────────────\n';
-  for (const [event, meta] of clientToServer) {
-    out += `\n  /// ${meta.description}\n`;
-    out += `  static const ${snakeToCamel(event)} = '${event}';\n`;
+  // Deduplicate: namespaces that share the same event class
+  // (e.g. user-chat and partner-chat both map to WsChatEvent)
+  // are merged so we only emit one class.
+  const classBuckets = new Map(); // className → { c2s, s2c }
+
+  for (const [nsName, ns] of Object.entries(contract.namespaces)) {
+    const source = ns.extends
+      ? contract.namespaces[ns.extends]
+      : ns;
+    const clsName = eventClassName(nsName);
+
+    if (!classBuckets.has(clsName)) {
+      classBuckets.set(clsName, {
+        c2s: new Map(),
+        s2c: new Map(),
+      });
+    }
+    const bucket = classBuckets.get(clsName);
+    for (const [ev, meta] of Object.entries(source.clientToServer || {})) {
+      if (!bucket.c2s.has(ev)) bucket.c2s.set(ev, meta);
+    }
+    for (const [ev, meta] of Object.entries(source.serverToClient || {})) {
+      if (!bucket.s2c.has(ev)) bucket.s2c.set(ev, meta);
+    }
   }
 
-  out += '\n  // ── Server → Client ────────────────────────────────\n';
-  for (const [event, meta] of serverToClient) {
-    // Skip duplicates (e.g. 'typing' appears in both directions)
-    if (clientToServer.has(event)) continue;
-    out += `\n  /// ${meta.description}\n`;
-    out += `  static const ${snakeToCamel(event)} = '${event}';\n`;
+  for (const [clsName, { c2s, s2c }] of classBuckets) {
+    out += `/// WebSocket event constants for the ${clsName} namespace(s).\n`;
+    out += '///\n';
+    out += '/// Client → Server events are used with `socket.emit()`.\n';
+    out += '/// Server → Client events are used with `socket.on()`.\n';
+    out += `abstract final class ${clsName} {\n`;
+    out += `  ${clsName}._();\n\n`;
+
+    if (c2s.size > 0) {
+      out += '  // ── Client → Server ────────────────────────────────\n';
+      for (const [event, meta] of c2s) {
+        out += `\n  /// ${meta.description}\n`;
+        out += `  static const ${snakeToCamel(event)} = '${event}';\n`;
+      }
+      out += '\n';
+    }
+
+    out += '  // ── Server → Client ────────────────────────────────\n';
+    for (const [event, meta] of s2c) {
+      // Skip duplicates that already appeared in c2s
+      if (c2s.has(event)) continue;
+      out += `\n  /// ${meta.description}\n`;
+      out += `  static const ${snakeToCamel(event)} = '${event}';\n`;
+    }
+
+    out += '}\n\n';
   }
 
-  out += '}\n';
   return out;
 }
 
@@ -768,7 +813,7 @@ function generateClients() {
     for (const [event, meta] of serverEvents) {
       const camel = snakeToCamel(event);
       const payloadType = meta.payload;
-      out += `    _socket!.on(WsChatEvent.${camel}, (data) {\n`;
+      out += `    _socket!.on(${eventClassName(nsName)}.${camel}, (data) {\n`;
       out += `      try {\n`;
       out += `        final map = _requireEventMap(data, '${nsName}.${event}');\n`;
       out += `        _${camel}Controller.add(${payloadType}.fromJson(map));\n`;
@@ -806,7 +851,7 @@ function generateClients() {
           out += `    void Function(${ackType})? onAck,\n`;
           out += `  }) {\n`;
           out += `    _socket?.emitWithAck(\n`;
-          out += `      WsChatEvent.${camel},\n`;
+          out += `      ${eventClassName(nsName)}.${camel},\n`;
           out += `      {'conversationId': conversationId},\n`;
           out += `      ack: (response) {\n`;
           out += `        if (onAck != null && response is Map<dynamic, dynamic>) {\n`;
@@ -819,7 +864,7 @@ function generateClients() {
           out += `  }\n\n`;
         } else {
           out += `  void ${camel}(String conversationId) {\n`;
-          out += `    _socket?.emit(WsChatEvent.${camel}, {\n`;
+          out += `    _socket?.emit(${eventClassName(nsName)}.${camel}, {\n`;
           out += `      'conversationId': conversationId,\n`;
           out += `    });\n`;
           out += `  }\n\n`;
@@ -832,7 +877,7 @@ function generateClients() {
           out += `    void Function(${ackType})? onAck,\n`;
           out += `  }) {\n`;
           out += `    _socket?.emitWithAck(\n`;
-          out += `      WsChatEvent.${camel},\n`;
+          out += `      ${eventClassName(nsName)}.${camel},\n`;
           out += `      payload.toJson(),\n`;
           out += `      ack: (response) {\n`;
           out += `        if (onAck != null && response is Map<dynamic, dynamic>) {\n`;
@@ -845,7 +890,7 @@ function generateClients() {
           out += `  }\n\n`;
         } else {
           out += `  void ${camel}(${payloadType} payload) {\n`;
-          out += `    _socket?.emit(WsChatEvent.${camel}, payload.toJson());\n`;
+          out += `    _socket?.emit(${eventClassName(nsName)}.${camel}, payload.toJson());\n`;
           out += `  }\n\n`;
         }
       }
