@@ -13,6 +13,7 @@ export class CreateCartAndCouponTables1775300000000
   name = 'CreateCartAndCouponTables1775300000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // ─── Coupons table ────────────────────────────────────────
     await queryRunner.createTable(
       new Table({
         name: 'coupons',
@@ -131,6 +132,7 @@ export class CreateCartAndCouponTables1775300000000
       }),
     );
 
+    // ─── Cart items table ─────────────────────────────────────
     await queryRunner.createTable(
       new Table({
         name: 'cart_items',
@@ -152,20 +154,18 @@ export class CreateCartAndCouponTables1775300000000
             type: 'uuid',
           },
           {
-            name: 'coupon_code',
+            name: 'employee_id',
+            type: 'uuid',
+          },
+          {
+            name: 'time_slot',
+            type: 'timestamptz',
+          },
+          {
+            name: 'status',
             type: 'varchar',
-            length: '50',
-            isNullable: true,
-          },
-          {
-            name: 'coupon_discount_percent',
-            type: 'int',
-            isNullable: true,
-          },
-          {
-            name: 'coupon_discount_amount',
-            type: 'int',
-            isNullable: true,
+            length: '20',
+            default: `'ACTIVE'`,
           },
           {
             name: 'created_at',
@@ -182,6 +182,7 @@ export class CreateCartAndCouponTables1775300000000
       true,
     );
 
+    // Indexes
     await queryRunner.createIndex(
       'cart_items',
       new TableIndex({
@@ -198,14 +199,24 @@ export class CreateCartAndCouponTables1775300000000
       }),
     );
 
-    await queryRunner.createUniqueConstraint(
+    await queryRunner.createIndex(
       'cart_items',
-      new TableUnique({
-        name: 'UQ_CART_ITEMS_USER_SERVICE',
-        columnNames: ['user_id', 'service_id'],
+      new TableIndex({
+        name: 'IDX_CART_ITEMS_EMPLOYEE_ID',
+        columnNames: ['employee_id'],
       }),
     );
 
+    // Unique constraint: same user + service + employee + time slot
+    await queryRunner.createUniqueConstraint(
+      'cart_items',
+      new TableUnique({
+        name: 'UQ_CART_ITEMS_USER_SERVICE_EMPLOYEE_SLOT',
+        columnNames: ['user_id', 'service_id', 'employee_id', 'time_slot'],
+      }),
+    );
+
+    // Foreign keys
     await queryRunner.createForeignKey(
       'cart_items',
       new TableForeignKey({
@@ -227,19 +238,34 @@ export class CreateCartAndCouponTables1775300000000
         onDelete: 'CASCADE',
       }),
     );
+
+    await queryRunner.createForeignKey(
+      'cart_items',
+      new TableForeignKey({
+        name: 'FK_CART_ITEMS_EMPLOYEE_ID',
+        columnNames: ['employee_id'],
+        referencedTableName: 'employees',
+        referencedColumnNames: ['id'],
+        onDelete: 'CASCADE',
+      }),
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    // Drop cart_items
+    await queryRunner.dropForeignKey('cart_items', 'FK_CART_ITEMS_EMPLOYEE_ID');
     await queryRunner.dropForeignKey('cart_items', 'FK_CART_ITEMS_SERVICE_ID');
     await queryRunner.dropForeignKey('cart_items', 'FK_CART_ITEMS_USER_ID');
     await queryRunner.dropUniqueConstraint(
       'cart_items',
-      'UQ_CART_ITEMS_USER_SERVICE',
+      'UQ_CART_ITEMS_USER_SERVICE_EMPLOYEE_SLOT',
     );
+    await queryRunner.dropIndex('cart_items', 'IDX_CART_ITEMS_EMPLOYEE_ID');
     await queryRunner.dropIndex('cart_items', 'IDX_CART_ITEMS_SERVICE_ID');
     await queryRunner.dropIndex('cart_items', 'IDX_CART_ITEMS_USER_ID');
     await queryRunner.dropTable('cart_items', true);
 
+    // Drop coupons
     await queryRunner.dropForeignKey('coupons', 'FK_COUPONS_CATEGORY_ID');
     await queryRunner.dropForeignKey('coupons', 'FK_COUPONS_SERVICE_ID');
     await queryRunner.dropIndex('coupons', 'IDX_COUPONS_CATEGORY_ID');

@@ -64,8 +64,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
 
     if (success && mounted) {
-      ToastContext.showToast(context, ToastType.success, 'Profile updated successfully');
+      AppToast.success(
+        context,
+        'Profile updated successfully.',
+      );
       context.pop();
+      return;
+    }
+
+    if (!success && mounted) {
+      final controllerState = ref.read(editProfileControllerProvider);
+      final errorText = controllerState.error?.toString();
+      AppToast.error(
+        context,
+        errorText ?? 'Unable to update profile.',
+      );
     }
   }
 

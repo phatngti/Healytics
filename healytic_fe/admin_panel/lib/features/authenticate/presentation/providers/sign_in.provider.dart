@@ -25,11 +25,11 @@ class SignInProvider extends _$SignInProvider {
 
       // Save access token to store
       await Store.put(StoreKey.accessToken, response.accessToken);
+      await Store.put(StoreKey.refreshToken, response.refreshToken);
 
       // For health_partner role, determine verification status
       if (role == Role.health_partner.value) {
-        final isVerified = response.verificationCompletedAt != null;
-        UserRoleHelper.setPartnerVerified(isVerified);
+        UserRoleHelper.syncPartnerFlagsFromAccessToken(response.accessToken);
       }
 
       return response;

@@ -28,6 +28,14 @@ export class NotificationEventService {
     this.logger.log(
       `Emitting notification event: type=${event.type} recipientId=${event.recipientId ?? 'broadcast'}`,
     );
-    this.rmqClient.emit('notification.event', event);
+    try {
+      this.rmqClient.emit('notification.event', event);
+    } catch (error) {
+      this.logger.error(
+        `RabbitMQ emit failed for notification.event — type=${event.type}, recipientId=${event.recipientId ?? 'broadcast'}, title="${event.title}", data=${JSON.stringify(event.data ?? {})}`,
+        error.stack,
+      );
+      // Don't re-throw — fire-and-forget semantics
+    }
   }
 }

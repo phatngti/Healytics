@@ -41,6 +41,7 @@ class _SettingsItemData {
   const _SettingsItemData({
     required this.icon,
     required this.title,
+    // ignore: unused_element_parameter
     this.onTap,
   });
 

@@ -20,6 +20,9 @@ class ReviewSpecialistScreen extends ConsumerWidget {
     required this.specialistName,
     required this.specialistRole,
     this.specialistAvatarUrl,
+    required this.facilityId,
+    required this.facilityName,
+    this.facilityAddress,
   });
 
   /// ID of the appointment being reviewed.
@@ -36,6 +39,15 @@ class ReviewSpecialistScreen extends ConsumerWidget {
 
   /// Optional avatar URL for the specialist.
   final String? specialistAvatarUrl;
+
+  /// ID of the facility — forwarded to facility review.
+  final String facilityId;
+
+  /// Name of the facility — forwarded.
+  final String facilityName;
+
+  /// Address of the facility — forwarded.
+  final String? facilityAddress;
 
   /// Tags available for specialist review.
   static const _availableTags = [
@@ -60,11 +72,15 @@ class ReviewSpecialistScreen extends ConsumerWidget {
       (prev, next) {
         if (next.isSubmitted &&
             !(prev?.isSubmitted ?? false)) {
-          ReviewSubmittedRoute(
+          ReviewFacilityRoute(
+            appointmentId: appointmentId,
+            facilityId: facilityId,
+            facilityName: facilityName,
+            facilityAddress: facilityAddress,
             specialistName: specialistName,
             specialistAvatarUrl:
                 specialistAvatarUrl,
-            rating: next.rating,
+            specialistRating: next.rating,
           ).push(context);
         }
       },

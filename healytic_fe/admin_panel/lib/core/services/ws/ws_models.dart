@@ -7,6 +7,7 @@
 
 // ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
+// ignore_for_file: unused_element
 
 Map<String, dynamic> _requireJsonMap(dynamic value, String context) {
   if (value is Map<String, dynamic>) return value;
@@ -521,6 +522,77 @@ class WsErrorEvent {
   @override
   String toString() {
     return 'WsErrorEvent(message: $message)';
+  }
+}
+
+/// Global notification event: a new chat message was received. Emitted on /chat-notifications namespace for popup notifications.
+class WsNewMessageNotification {
+  /// Conversation UUID
+  final String conversationId;
+
+  /// Server-generated message UUID
+  final String messageId;
+
+  /// Account ID of the message sender
+  final String senderId;
+
+  /// Display name of the sender (for notification title)
+  final String senderName;
+
+  /// Avatar URL of the sender (for notification icon)
+  final String? senderAvatar;
+
+  /// First ~100 characters of the message content (for preview)
+  final String messagePreview;
+
+  /// Type of message (text, image, file, etc.)
+  final WsMessageType messageType;
+
+  /// When the message was created
+  final DateTime createdAt;
+
+  const WsNewMessageNotification({
+    required this.conversationId,
+    required this.messageId,
+    required this.senderId,
+    required this.senderName,
+    this.senderAvatar,
+    required this.messagePreview,
+    required this.messageType,
+    required this.createdAt,
+  });
+
+  /// Deserialize from a Socket.IO JSON map.
+  factory WsNewMessageNotification.fromJson(Map<String, dynamic> json) {
+    return WsNewMessageNotification(
+      conversationId: json['conversationId'] as String,
+      messageId: json['messageId'] as String,
+      senderId: json['senderId'] as String,
+      senderName: json['senderName'] as String,
+      senderAvatar: json['senderAvatar'] as String?,
+      messagePreview: json['messagePreview'] as String,
+      messageType: wsMessageTypeFromJson(json['messageType']),
+      createdAt: _requireDateTime(json['createdAt'], 'WsNewMessageNotification.createdAt'),
+    );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'conversationId': conversationId,
+      'messageId': messageId,
+      'senderId': senderId,
+      'senderName': senderName,
+      if (senderAvatar != null) 'senderAvatar': senderAvatar!,
+      'messagePreview': messagePreview,
+      'messageType': wsMessageTypeToJson(messageType),
+      'createdAt': createdAt.toUtc().toIso8601String(),
+    };
+  }
+
+  @override
+  String toString() {
+    return 'WsNewMessageNotification(conversationId: $conversationId, messageId: $messageId, senderId: $senderId, senderName: $senderName, senderAvatar: $senderAvatar, messagePreview: $messagePreview, messageType: $messageType, createdAt: $createdAt)';
   }
 }
 

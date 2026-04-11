@@ -29,30 +29,38 @@ export class CheckDuplicateSlotHandler {
       `Checking duplicate slot: user=${userId}, time=${startTime}`,
     );
 
-    const conflicting = await this.bookingRepo
-      .createQueryBuilder('booking')
-      .leftJoinAndSelect('booking.product', 'product')
-      .leftJoinAndSelect('booking.staff', 'staff')
-      .where('booking.userId = :userId', { userId })
-      .andWhere('booking.startTime = :startTime', { startTime: parsedTime })
-      .andWhere('booking.status NOT IN (:...excludedStatuses)', {
-        excludedStatuses: [BookingStatus.CANCELLED],
-      })
-      .getOne();
+    try {
+      const conflicting = await this.bookingRepo
+        .createQueryBuilder('booking')
+        .leftJoinAndSelect('booking.product', 'product')
+        .leftJoinAndSelect('booking.staff', 'staff')
+        .where('booking.userId = :userId', { userId })
+        .andWhere('booking.startTime = :startTime', { startTime: parsedTime })
+        .andWhere('booking.status NOT IN (:...excludedStatuses)', {
+          excludedStatuses: [BookingStatus.CANCELLED],
+        })
+        .getOne();
 
-    if (conflicting) {
-      const serviceName = conflicting.product?.name ?? 'Unknown service';
-      this.logger.warn(
-        `Duplicate slot found: user=${userId}, booking=${conflicting.id}, service="${serviceName}"`,
+      if (conflicting) {
+        const serviceName = conflicting.product?.name ?? 'Unknown service';
+        this.logger.warn(
+          `Duplicate slot found: user=${userId}, booking=${conflicting.id}, service="${serviceName}"`,
+        );
+        return new CheckDuplicateSlotResponseDto(
+          true,
+          serviceName,
+          conflicting.id,
+        );
+      }
+
+      this.logger.debug(`No duplicate slot: user=${userId}, time=${startTime}`);
+      return new CheckDuplicateSlotResponseDto(false);
+    } catch (error) {
+      this.logger.error(
+        `DB error checking duplicate slot — userId=${userId}, startTime=${startTime}`,
+        error.stack,
       );
-      return new CheckDuplicateSlotResponseDto(
-        true,
-        serviceName,
-        conflicting.id,
-      );
+      throw error;
     }
-
-    this.logger.debug(`No duplicate slot: user=${userId}, time=${startTime}`);
-    return new CheckDuplicateSlotResponseDto(false);
   }
 }

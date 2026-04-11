@@ -16,18 +16,27 @@ export class AcquireMicroLockHandler {
     const key = `lock:intent:${dto.staffId}_${dateStr}`;
 
     this.logger.log(`Attempting micro-lock: ${key}`);
-    const token = await this.redisService.acquireLock(
-      key,
-      MICRO_LOCK_TTL_SECONDS,
-    );
 
-    const locked = token !== null;
-    this.logger.log(`Micro-lock ${locked ? 'acquired' : 'denied'}: ${key}`);
+    try {
+      const token = await this.redisService.acquireLock(
+        key,
+        MICRO_LOCK_TTL_SECONDS,
+      );
 
-    return new MicroLockResponseDto(
-      locked,
-      locked ? MICRO_LOCK_TTL_SECONDS : 0,
-    );
+      const locked = token !== null;
+      this.logger.log(`Micro-lock ${locked ? 'acquired' : 'denied'}: ${key}`);
+
+      return new MicroLockResponseDto(
+        locked,
+        locked ? MICRO_LOCK_TTL_SECONDS : 0,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Redis error during micro-lock — key=${key}, staffId=${dto.staffId}, startTime=${dto.startTime}`,
+        error.stack,
+      );
+      throw error;
+    }
   }
 
   /**

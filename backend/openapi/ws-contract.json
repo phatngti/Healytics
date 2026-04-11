@@ -94,6 +94,24 @@
         ]
       },
       "extends": "user-chat"
+    },
+    "chat-notifications": {
+      "description": "Global chat notification gateway for popup notifications (all roles)",
+      "auth": {
+        "type": "jwt",
+        "roles": [
+          "user",
+          "health_partner",
+          "employee"
+        ]
+      },
+      "clientToServer": {},
+      "serverToClient": {
+        "new_message_notification": {
+          "description": "A new chat message was received — show a popup notification",
+          "payload": "WsNewMessageNotification"
+        }
+      }
     }
   },
   "models": {
@@ -416,6 +434,53 @@
           "type": "String",
           "required": true,
           "description": "Error message"
+        }
+      }
+    },
+    "WsNewMessageNotification": {
+      "description": "Global notification event: a new chat message was received. Emitted on /chat-notifications namespace for popup notifications.",
+      "direction": "serverToClient",
+      "properties": {
+        "conversationId": {
+          "type": "String",
+          "required": true,
+          "description": "Conversation UUID"
+        },
+        "messageId": {
+          "type": "String",
+          "required": true,
+          "description": "Server-generated message UUID"
+        },
+        "senderId": {
+          "type": "String",
+          "required": true,
+          "description": "Account ID of the message sender"
+        },
+        "senderName": {
+          "type": "String",
+          "required": true,
+          "description": "Display name of the sender (for notification title)"
+        },
+        "senderAvatar": {
+          "type": "String",
+          "required": false,
+          "description": "Avatar URL of the sender (for notification icon)"
+        },
+        "messagePreview": {
+          "type": "String",
+          "required": true,
+          "description": "First ~100 characters of the message content (for preview)"
+        },
+        "messageType": {
+          "type": "WsMessageType",
+          "required": true,
+          "description": "Type of message (text, image, file, etc.)",
+          "isEnum": true
+        },
+        "createdAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the message was created"
         }
       }
     }

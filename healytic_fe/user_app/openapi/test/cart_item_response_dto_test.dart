@@ -66,18 +66,41 @@ void main() {
       // TODO
     });
 
-    // Object couponCode
-    test('to test the property `couponCode`', () async {
+    // String employeeId
+    test('to test the property `employeeId`', () async {
       // TODO
     });
 
-    // Object couponDiscountPercent
-    test('to test the property `couponDiscountPercent`', () async {
+    // String employeeName
+    test('to test the property `employeeName`', () async {
       // TODO
     });
 
-    // Object couponDiscountAmount
-    test('to test the property `couponDiscountAmount`', () async {
+    // String employeeRole
+    test('to test the property `employeeRole`', () async {
+      // TODO
+    });
+
+    // Object employeeAvatarUrl
+    test('to test the property `employeeAvatarUrl`', () async {
+      // TODO
+    });
+
+    // Selected time slot for the appointment
+    // DateTime timeSlot
+    test('to test the property `timeSlot`', () async {
+      // TODO
+    });
+
+    // Whether the selected time slot is still available in the employee schedule.
+    // bool isTimeSlotAvailable
+    test('to test the property `isTimeSlotAvailable`', () async {
+      // TODO
+    });
+
+    // Cart item status: ACTIVE, BOOKED, or DELETED
+    // String status
+    test('to test the property `status`', () async {
       // TODO
     });
 

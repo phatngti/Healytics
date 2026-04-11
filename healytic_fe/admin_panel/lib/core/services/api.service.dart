@@ -33,7 +33,11 @@ enum ServicePrefix {
   // ── Real-time (URL-only, no ApiClient) ────────
   /// WebSocket partner-chat namespace:
   /// `/partner-chat`
-  partnerChat('/partner-chat', isRest: false);
+  partnerChat('/partner-chat', isRest: false),
+
+  /// WebSocket global chat-notifications namespace:
+  /// `/chat-notifications`
+  chatNotifications('/chat-notifications', isRest: false);
 
   const ServicePrefix(this.path, {this.isRest = true});
 
@@ -63,6 +67,7 @@ class ApiService implements Authentication {
   late PartnerEmployeesApi employeesApi;
   late PartnerHealthServicesApi partnerHealthServicesApi;
   late PartnerChatApi partnerChatApi;
+  late PartnerDashboardApi partnerDashboardApi;
 
   // ── Health Services & Categories ──────────────────
   late UserHealthServicesApi healthServicesApi;
@@ -151,6 +156,8 @@ class ApiService implements Authentication {
     serviceTagsApi = PartnerServiceTagsApi(backend);
     locationsApi = LocationsApi(backend);
     partnerChatApi = PartnerChatApi(backend);
+    partnerDashboardApi =
+        PartnerDashboardApi(backend);
   }
 
   /// Applies the User-Agent header to every client.

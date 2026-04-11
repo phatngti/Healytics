@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/chat/data/datasources/remote/partner_inbox_remote_datasource.dart';
 import 'package:admin_panel/features/partner/chat/domain/entities/partner_chat_message.entity.dart';
 import 'package:admin_panel/features/partner/chat/domain/entities/partner_conversation.entity.dart';
 
@@ -7,7 +8,7 @@ abstract class PartnerInboxChatRepository {
   Future<List<PartnerConversation>> getConversations();
 
   /// Fetch paginated messages for a conversation.
-  Future<List<PartnerChatMessage>> getMessages(
+  Future<PaginatedMessages> getMessages(
     String conversationId, {
     String? beforeId,
     int limit = 20,

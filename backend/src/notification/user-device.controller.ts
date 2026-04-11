@@ -33,7 +33,10 @@ export class UserDeviceController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Unregister a device token (e.g. on logout)' })
   @ApiNoContentResponse({ description: 'Device token unregistered' })
-  async unregisterDevice(@Param('token') token: string): Promise<void> {
-    await this.notificationService.unregisterDevice(token);
+  async unregisterDevice(
+    @Param('token') token: string,
+    @CurrentUser('id') userId: string,
+  ): Promise<void> {
+    await this.notificationService.unregisterDevice(userId, token);
   }
 }

@@ -56,11 +56,14 @@ export class RegisterPartnerHandler {
     const partnerRepo = this.dataSource.getRepository(Partner);
 
     const existingAccount = await accountRepo.findOne({
-      where: [{ email: dto.account.email }],
+      where: [{ email: dto.account.email }, { username: dto.account.username }],
     });
 
     if (existingAccount) {
-      throw new ConflictException('An account with this email already exists');
+      if (existingAccount.email === dto.account.email) {
+        throw new ConflictException('An account with this email already exists');
+      }
+      throw new ConflictException('An account with this username already exists');
     }
 
     const existingPartner = await partnerRepo.findOne({
@@ -116,6 +119,7 @@ export class RegisterPartnerHandler {
       // Create Account
       const passwordHash = await bcrypt.hash(dto.account.password, 10);
       const account = queryRunner.manager.create(Account, {
+        username: dto.account.username,
         email: dto.account.email,
         passwordHash,
         role: Role.HEALTH_PARTNER,

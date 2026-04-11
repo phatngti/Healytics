@@ -48,6 +48,7 @@ class VerificationStatus extends _$VerificationStatus {
       if (response != null) {
         await apiService.setAccessToken(response.accessToken);
         await Store.put(StoreKey.refreshToken, response.refreshToken);
+        UserRoleHelper.syncPartnerFlagsFromAccessToken(response.accessToken);
       }
     } catch (e) {
       developer.log('Token refresh failed: $e', name: 'VerificationStatus');

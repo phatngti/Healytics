@@ -2,73 +2,57 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Product } from '@/common/entities/product.entity';
 import { Partner } from '@/common/entities/partner.entity';
 
-// ─── Nested DTOs ─────────────────────────────────────────────
-
-export class AiPriceDto {
-  @ApiProperty({ example: 800000 })
-  amount: number;
-
-  @ApiProperty({ example: 'VND' })
-  currency: string;
-}
-
-export class AiRatingDto {
-  @ApiProperty({ example: 4.8 })
-  average: number;
-
-  @ApiProperty({ example: 124 })
-  total_reviews: number;
-}
-
-export class AiLocationDto {
-  @ApiProperty({ example: '123 Nguyễn Huệ' })
-  address: string;
-
-  @ApiProperty({ example: 'Quận 1' })
-  district: string;
-
-  @ApiProperty({ example: 'Hồ Chí Minh' })
-  city: string;
-}
-
 // ─── Single Recommendation ──────────────────────────────────
 
+/**
+ * Flat health service recommendation DTO aligned with
+ * PublicHealthServiceCardResponseDto for frontend consistency.
+ */
 export class AiRecommendationItemDto {
-  @ApiProperty({ example: 'SV002' })
-  service_id: string;
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  id: string;
 
   @ApiProperty({ example: 'Phục hồi cột sống chuyên sâu' })
   name: string;
 
+  @ApiProperty({ example: 'phuc-hoi-cot-song-chuyen-sau' })
+  slug: string;
+
   @ApiPropertyOptional({ example: 'https://images.unsplash.com/photo-...' })
-  image_url: string | null;
+  imageUrl: string | null;
 
-  @ApiPropertyOptional({ example: 'Premium' })
-  badge: string | null;
+  @ApiProperty({ example: 'Massage' })
+  category: string;
 
-  @ApiProperty({ example: 1200 })
-  booked_count: number;
+  @ApiProperty({ example: '60 min' })
+  duration: string;
 
-  @ApiProperty({ type: AiPriceDto })
-  price: AiPriceDto;
+  @ApiProperty({ example: '₫800,000' })
+  price: string;
 
-  @ApiPropertyOptional({ example: 'BS Nguyễn Văn A' })
-  staff_name: string | null;
+  @ApiProperty({ example: '4.8' })
+  rating: string;
 
-  @ApiProperty({ type: AiRatingDto })
-  rating: AiRatingDto;
+  @ApiProperty({ example: 'Healytics Spa' })
+  vendorName: string;
 
-  @ApiProperty({ type: AiLocationDto })
-  location: AiLocationDto;
+  @ApiProperty({ example: 'Quận 1, Hồ Chí Minh' })
+  location: string;
 
-  @ApiProperty({ type: [String], example: ['2026-02-21T09:00:00'] })
-  slots: string[];
+  @ApiProperty({
+    type: [String],
+    example: ['https://example.com/avatar1.jpg'],
+  })
+  staffAvatars: string[];
+
+  @ApiProperty({ example: 'service' })
+  type: string;
 
   /**
    * Maps a Product entity + Partner to the AI recommendation item shape.
    *
-   * Fields not yet stored in DB (`booked_count`, `slots`, `badge`)
-   * are set to sensible defaults.
+   * Mirrors the flat format of PublicHealthServiceCardResponseDto
+   * so the AI chatbot and frontend share a consistent data contract.
    */
   static fromEntity(
     product: Product,
@@ -76,51 +60,50 @@ export class AiRecommendationItemDto {
   ): AiRecommendationItemDto {
     const dto = new AiRecommendationItemDto();
 
-    dto.service_id = product.id;
+    dto.id = product.id;
     dto.name = product.name;
+    dto.slug = product.slug;
 
     // Thumbnail image
-    dto.image_url =
+    dto.imageUrl =
       product.media?.find((m) => m.isThumbnail)?.url ??
       product.media?.[0]?.url ??
       null;
 
-    // Badge — not yet in DB, default null
-    dto.badge = null;
+    // Category label
+    dto.category = product.category?.name ?? 'Uncategorized';
 
-    // Booked count — not yet in DB, default 0
-    dto.booked_count = 0;
+    // Duration from product definition
+    const minutes = product.productDefinition?.durationMinutes;
+    dto.duration = minutes ? `${minutes} min` : '';
 
-    // Price
-    dto.price = {
-      amount: Number(product.salePrice ?? product.basePrice),
-      currency: product.currency || 'VND',
-    };
+    // Price formatting (Vietnamese đồng)
+    const price = product.salePrice ?? product.basePrice;
+    dto.price = '₫' + new Intl.NumberFormat('vi-VN').format(Number(price));
 
-    // Staff name — first eligible employee
-    const firstEmployee =
-      product.productEmployeeEligibilities?.[0]?.employee ?? null;
-    dto.staff_name = firstEmployee?.fullName ?? null;
+    // Average rating — defaults to 0 until computed from TreatmentReview aggregate
+    dto.rating = '0';
 
-    // Rating — product_reviews table dropped; defaults to 0 until aggregated separately
-    dto.rating = {
-      average: 0,
-      total_reviews: 0,
-    };
+    // Vendor name: prefer product-level, fall back to partner brand
+    dto.vendorName = product.vendorName ?? partner?.brandName ?? '';
 
-    // Location from partner
+    // Location from partner address hierarchy
     if (partner) {
-      dto.location = {
-        address: partner.streetAddress ?? '',
-        district: partner.district?.fullName ?? '',
-        city: partner.province?.fullName ?? '',
-      };
+      const parts = [
+        partner.district?.fullName,
+        partner.province?.fullName,
+      ].filter(Boolean);
+      dto.location = parts.join(', ');
     } else {
-      dto.location = { address: '', district: '', city: '' };
+      dto.location = '';
     }
 
-    // Slots — not yet in DB, default empty array
-    dto.slots = [];
+    // Staff avatars from eligible employees
+    dto.staffAvatars = (product.productEmployeeEligibilities ?? [])
+      .map((elig) => elig.employee?.avatarUrl)
+      .filter((url): url is string => !!url);
+
+    dto.type = product.type;
 
     return dto;
   }

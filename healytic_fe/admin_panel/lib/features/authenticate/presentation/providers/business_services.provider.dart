@@ -14,38 +14,37 @@ Future<List<BusinessServiceDto>> businessServices(Ref ref) async {
   final isMock = Store.get(StoreKey.mockFlag, false);
 
   if (isMock) {
-    // Return mock data for development/testing
     await Future.delayed(const Duration(milliseconds: 300));
     return [
       BusinessServiceDto(
-        value: 'spa',
-        label: 'Spa & Wellness',
-        description: 'Relaxation and wellness services',
+        value: 'SPA_BEAUTY',
+        label: 'Spa & Beauty',
+        description: 'Spa & Làm đẹp',
       ),
       BusinessServiceDto(
-        value: 'beauty',
-        label: 'Beauty & Aesthetics',
-        description: 'Beauty treatments and aesthetics',
-      ),
-      BusinessServiceDto(
-        value: 'medical',
-        label: 'Medical Services',
-        description: 'Medical and healthcare services',
-      ),
-      BusinessServiceDto(
-        value: 'fitness',
-        label: 'Fitness & Health',
-        description: 'Fitness and health services',
-      ),
-      BusinessServiceDto(
-        value: 'salon',
-        label: 'Hair Salon',
-        description: 'Hair care and styling services',
-      ),
-      BusinessServiceDto(
-        value: 'massage',
+        value: 'MASSAGE_THERAPY',
         label: 'Massage Therapy',
-        description: 'Professional massage services',
+        description: 'Massage Thư giãn',
+      ),
+      BusinessServiceDto(
+        value: 'MASSAGE_REHABILITATION',
+        label: 'Rehabilitation Massage',
+        description: 'Massage Trị liệu',
+      ),
+      BusinessServiceDto(
+        value: 'FITNESS',
+        label: 'Fitness (Gym/Yoga)',
+        description: 'Thể hình (Gym/Yoga)',
+      ),
+      BusinessServiceDto(
+        value: 'DENTAL',
+        label: 'Dental',
+        description: 'Nha khoa',
+      ),
+      BusinessServiceDto(
+        value: 'DERMATOLOGY',
+        label: 'Dermatology & Aesthetics',
+        description: 'Da liễu & Thẩm mỹ',
       ),
     ];
   }

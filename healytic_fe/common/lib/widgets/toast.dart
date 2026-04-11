@@ -49,89 +49,81 @@ class ToastContext {
     Color? warningColor,
     Color? infoColor,
   }) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-
     final icon = switch (type) {
-      ToastType.success => Icons.check,
-      ToastType.error => Icons.error,
-      ToastType.warning => Icons.warning,
-      ToastType.info => Icons.info,
-    };
-
-    final iconColor = switch (type) {
       ToastType.success =>
-        successColor ?? colorScheme.primary,
+        Icons.check_circle_rounded,
       ToastType.error =>
-        errorColor ?? colorScheme.error,
+        Icons.error_rounded,
       ToastType.warning =>
-        warningColor ?? Colors.orange.shade700,
+        Icons.warning_rounded,
       ToastType.info =>
-        infoColor ?? colorScheme.primary,
+        Icons.info_rounded,
     };
 
     final bgColor = switch (type) {
       ToastType.success =>
-        (successColor ?? colorScheme.primary)
-            .withAlpha(25),
+        successColor ??
+            const Color(0xFF2E7D32),
       ToastType.error =>
-        (errorColor ?? colorScheme.error)
-            .withAlpha(25),
+        errorColor ??
+            const Color(0xFFC62828),
       ToastType.warning =>
-        Colors.orange.withAlpha(25),
+        warningColor ??
+            const Color(0xFFE65100),
       ToastType.info =>
-        colorScheme.primary.withAlpha(25),
+        infoColor ??
+            const Color(0xFF1565C0),
     };
 
-    final textColor = switch (type) {
-      ToastType.success =>
-        successColor ?? colorScheme.primary,
-      ToastType.error =>
-        errorColor ?? colorScheme.error,
-      ToastType.warning =>
-        warningColor ?? Colors.orange.shade700,
-      ToastType.info =>
-        infoColor ?? colorScheme.primary,
-    };
-
-    final maxWidthFraction = responsive<double>(
+    final maxWidthFraction =
+        responsive<double>(
       context,
-      mobile: 0.85,
+      mobile: 0.92,
       tablet: 0.5,
       web: 0.3,
     );
 
-    return Container(
-      constraints: BoxConstraints(
-        maxWidth:
-            screenWidth(context) * maxWidthFraction,
-      ),
-      padding:
-          AppDimens.responsivePadding(context),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: AppDimens.radiusSmall,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: iconColor),
-          AppDimens.horizontalSmall,
-          Expanded(
-            child: Text(
-              message,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(
-                    color: textColor,
-                    fontWeight: FontWeight.w500,
-                  ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 4,
+    return Material(
+      color: Colors.transparent,
+      elevation: 8,
+      shadowColor: Colors.black54,
+      borderRadius: AppDimens.radiusMedium,
+      child: Container(
+        constraints: BoxConstraints(
+          maxWidth: screenWidth(context) *
+              maxWidthFraction,
+        ),
+        padding:
+            AppDimens.responsivePadding(context),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: AppDimens.radiusMedium,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: Colors.white,
+              size: 22,
             ),
-          ),
-        ],
+            AppDimens.horizontalSmall,
+            Expanded(
+              child: Text(
+                message,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 4,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -167,11 +159,16 @@ class ToastContext {
       final fToast = FToast()..init(context);
       fToast.showToast(
         positionedToastBuilder:
-            (context, child, gravity) => Positioned(
-          top: AppDimens.sizeSmall.height,
-          right: AppDimens.sizeSmall.width,
-          child: child,
-        ),
+            (context, child, gravity) {
+          final safeTop =
+              MediaQuery.of(context).padding.top;
+          return Positioned(
+            top: safeTop + AppDimens.sizeSmall.height!,
+            left: AppDimens.sizeSmall.width,
+            right: AppDimens.sizeSmall.width,
+            child: child,
+          );
+        },
         child: ToastContext.switchToast(
           context,
           type,
@@ -182,5 +179,73 @@ class ToastContext {
             const Duration(seconds: 2),
       );
     });
+  }
+}
+
+/// App-level toast facade used by feature modules.
+///
+/// This helper ensures toasts are shown on the root
+/// navigator context when available, so they work
+/// reliably from nested navigators.
+final class AppToast {
+  const AppToast._();
+
+  static void success(
+    BuildContext context,
+    String message,
+  ) {
+    _show(
+      context,
+      type: ToastType.success,
+      message: message,
+    );
+  }
+
+  static void error(
+    BuildContext context,
+    String message,
+  ) {
+    _show(
+      context,
+      type: ToastType.error,
+      message: message,
+    );
+  }
+
+  static void warning(
+    BuildContext context,
+    String message,
+  ) {
+    _show(
+      context,
+      type: ToastType.warning,
+      message: message,
+    );
+  }
+
+  static void info(
+    BuildContext context,
+    String message,
+  ) {
+    _show(
+      context,
+      type: ToastType.info,
+      message: message,
+    );
+  }
+
+  static void _show(
+    BuildContext context, {
+    required ToastType type,
+    required String message,
+  }) {
+    final rootContext =
+        Navigator.maybeOf(
+          context,
+          rootNavigator: true,
+        )?.context;
+    final targetContext = rootContext ?? context;
+    if (!targetContext.mounted) return;
+    ToastContext.showToast(targetContext, type, message);
   }
 }

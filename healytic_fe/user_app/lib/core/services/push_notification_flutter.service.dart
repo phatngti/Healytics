@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
+import 'package:user_app/core/services/ws/ws_models.dart';
 import 'package:user_app/features/notifications/'
     'data/datasources/remote/'
     'notification_remote_datasource.dart';
@@ -20,17 +22,31 @@ final _log = Logger('PushNotificationFlutter');
 ///
 /// To enable real push support, replace the mock
 /// methods with `firebase_messaging` and
-/// `flutter_local_notifications` calls.
+/// `flutter_local_notifications` calls, then call
+/// [handleChatPushMessage] from
+/// `FirebaseMessaging.onMessage` for foreground chat
+/// notifications.
 class PushNotificationFlutterService {
   PushNotificationFlutterService({
     required NotificationRemoteDatasource datasource,
-    required String? userId,
+    required AuthSessionStore authSessionStore,
   })  : _datasource = datasource,
-        _userId = userId;
+        _authSessionStore = authSessionStore;
 
   final NotificationRemoteDatasource _datasource;
-  final String? _userId;
+  final AuthSessionStore _authSessionStore;
   bool _initialized = false;
+
+  final _chatPushController =
+      StreamController<WsNewMessageEvent>.broadcast();
+
+  /// Stream of chat messages received via push
+  /// notification while the app is in the foreground.
+  ///
+  /// [ChatMessageToastListener] subscribes to this
+  /// alongside the WS stream for inline toasts.
+  Stream<WsNewMessageEvent> get onChatPushMessage =>
+      _chatPushController.stream;
 
   /// Initialise the service. Safe to call multiple
   /// times — subsequent calls are no-ops.
@@ -52,12 +68,63 @@ class PushNotificationFlutterService {
 
     // Register mock token
     final token = getToken();
-    if (_userId != null) {
+    final userId = _authSessionStore.currentUserId;
+    if (userId != null) {
       await _registerToken(token);
     } else {
       _log.warning(
         'No userId available — skipping token'
         ' registration',
+      );
+    }
+  }
+
+  /// Handle a foreground push notification containing
+  /// a chat message payload.
+  ///
+  /// Call this from `FirebaseMessaging.onMessage` when
+  /// the notification data contains a `type` of
+  /// `new_chat_message`:
+  ///
+  /// ```dart
+  /// FirebaseMessaging.onMessage.listen((msg) {
+  ///   final data = msg.data;
+  ///   if (data['type'] == 'new_chat_message') {
+  ///     service.handleChatPushMessage(data);
+  ///   }
+  /// });
+  /// ```
+  void handleChatPushMessage(
+    Map<String, dynamic> data,
+  ) {
+    try {
+      final event = WsNewMessageEvent(
+        id: data['messageId'] as String? ??
+            'push-${DateTime.now().millisecondsSinceEpoch}',
+        conversationId:
+            data['conversationId'] as String? ?? '',
+        senderId: data['senderId'] as String? ?? '',
+        receiverId:
+            data['receiverId'] as String? ?? '',
+        senderName: data['senderName'] as String?,
+        senderAvatar:
+            data['senderAvatar'] as String?,
+        content:
+            data['content'] as String? ??
+            data['body'] as String? ??
+            '',
+        messageType: WsMessageType.text,
+        createdAt: DateTime.now(),
+      );
+
+      _chatPushController.add(event);
+      _log.fine(
+        'Forwarded chat push to inline toast: '
+        '${event.id}',
+      );
+    } catch (e) {
+      _log.warning(
+        'Failed to parse chat push payload: $e',
       );
     }
   }
@@ -94,28 +161,33 @@ class PushNotificationFlutterService {
       );
     }
   }
+
+  /// Release resources.
+  void dispose() {
+    _chatPushController.close();
+  }
 }
 
 // ─── Provider ──────────────────────────────────────
 
-/// Provides and eagerly initialises the mock push
-/// notification service after the user authenticates.
+/// Provides the push notification service instance.
 ///
-/// Watch this in the shell route alongside the WS
-/// connection provider.
+/// Initialization is triggered explicitly after
+/// authentication succeeds so `/v1/user/devices`
+/// is not called during app startup.
 @Riverpod(keepAlive: true)
 Future<PushNotificationFlutterService>
     pushNotificationService(Ref ref) async {
   final datasource = ref.read(
     notificationRemoteDatasourceProvider,
   );
-  final userId = ref.read(currentUserIdProvider);
+  final authSessionStore = ref.read(
+    authSessionStoreProvider,
+  );
 
   final service = PushNotificationFlutterService(
     datasource: datasource,
-    userId: userId,
+    authSessionStore: authSessionStore,
   );
-
-  await service.initialize();
   return service;
 }

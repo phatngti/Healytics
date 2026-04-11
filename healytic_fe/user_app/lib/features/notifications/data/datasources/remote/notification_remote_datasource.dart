@@ -9,6 +9,8 @@ import 'package:user_app/features/notifications/domain/'
     'entities/notification.entity.dart';
 import 'package:user_openapi/api.dart';
 
+import 'notification_mock_data.dart';
+
 final _log = Logger('NotificationDatasource');
 
 // ─── Abstract Interface ────────────────────────────
@@ -18,10 +20,7 @@ final _log = Logger('NotificationDatasource');
 abstract class NotificationRemoteDatasource {
   /// Fetches a cursor-paginated page of
   /// notifications from the backend.
-  Future<NotificationPage> getNotifications({
-    int limit = 20,
-    String? cursor,
-  });
+  Future<NotificationPage> getNotifications({int limit = 20, String? cursor});
 
   /// Returns the total unread count.
   Future<int> getUnreadCount();
@@ -57,23 +56,17 @@ abstract class NotificationRemoteDatasource {
 /// and DELETE /v1/user/devices/:token) falls back to
 /// direct HTTP calls because they live under a
 /// separate controller not yet in the OpenAPI spec.
-class NotificationRemoteDatasourceImpl
-    implements NotificationRemoteDatasource {
+class NotificationRemoteDatasourceImpl implements NotificationRemoteDatasource {
   NotificationRemoteDatasourceImpl(this._apiService);
   final ApiService _apiService;
 
-  UserNotificationsApi get _api =>
-      _apiService.userNotificationsApi;
+  UserNotificationsApi get _api => _apiService.userNotificationsApi;
 
   // ── Helpers ──────────────────────────────────────
 
-  String get _basePath =>
-      _apiService
-          .clientFor(ServicePrefix.backend)
-          .basePath;
+  String get _basePath => _apiService.clientFor(ServicePrefix.backend).basePath;
 
-  Map<String, String> get _headers =>
-      ApiService.getRequestHeaders();
+  Map<String, String> get _headers => ApiService.getRequestHeaders();
 
   // ── Methods ──────────────────────────────────────
 
@@ -85,30 +78,23 @@ class NotificationRemoteDatasourceImpl
     try {
       final response = await _api
           .userNotificationControllerGetNotificationsWithHttpInfo(
-        limit: limit,
-        cursor: cursor,
-      );
+            limit: limit,
+            cursor: cursor,
+          );
 
       if (response.statusCode != 200) {
         _log.warning(
           'getNotifications failed: '
           '${response.statusCode}',
         );
-        return const NotificationPage(
-          notifications: [],
-          hasMore: false,
-        );
+        return const NotificationPage(notifications: [], hasMore: false);
       }
 
-      final json = jsonDecode(response.body)
-          as Map<String, dynamic>;
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
       return _mapNotificationPage(json);
     } catch (e, s) {
       _log.severe('getNotifications error', e, s);
-      return const NotificationPage(
-        notifications: [],
-        hasMore: false,
-      );
+      return const NotificationPage(notifications: [], hasMore: false);
     }
   }
 
@@ -126,8 +112,7 @@ class NotificationRemoteDatasourceImpl
         return 0;
       }
 
-      final json = jsonDecode(response.body)
-          as Map<String, dynamic>;
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
       // Defensive: backend may return 'count' or
       // 'unreadCount' or a plain number.
       final raw = json['count'] ?? json['unreadCount'];
@@ -142,9 +127,7 @@ class NotificationRemoteDatasourceImpl
   @override
   Future<void> markRead(String notificationId) async {
     try {
-      await _api.userNotificationControllerMarkRead(
-        notificationId,
-      );
+      await _api.userNotificationControllerMarkRead(notificationId);
     } catch (e, s) {
       _log.warning('markRead error', e, s);
     }
@@ -164,10 +147,8 @@ class NotificationRemoteDatasourceImpl
         return 0;
       }
 
-      final json = jsonDecode(response.body)
-          as Map<String, dynamic>;
-      final raw =
-          json['markedCount'] ?? json['count'] ?? 0;
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final raw = json['markedCount'] ?? json['count'] ?? 0;
       if (raw is num) return raw.toInt();
       return 0;
     } catch (e, s) {
@@ -192,14 +173,8 @@ class NotificationRemoteDatasourceImpl
           .client
           .post(
             uri,
-            headers: {
-              ..._headers,
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode({
-              'token': token,
-              'platform': platform,
-            }),
+            headers: {..._headers, 'Content-Type': 'application/json'},
+            body: jsonEncode({'token': token, 'platform': platform}),
           );
 
       if (response.statusCode != 201) {
@@ -215,9 +190,7 @@ class NotificationRemoteDatasourceImpl
 
   @override
   Future<void> unregisterDevice(String token) async {
-    final uri = Uri.parse(
-      '$_basePath/v1/user/devices/$token',
-    );
+    final uri = Uri.parse('$_basePath/v1/user/devices/$token');
 
     try {
       final response = await _apiService
@@ -238,17 +211,11 @@ class NotificationRemoteDatasourceImpl
 
   // ── DTO → Entity mappers ──────────────────────────
 
-  NotificationPage _mapNotificationPage(
-    Map<String, dynamic> json,
-  ) {
+  NotificationPage _mapNotificationPage(Map<String, dynamic> json) {
     final list =
-        (json['notifications'] as List?)
-            ?.cast<Map<String, dynamic>>() ??
-        [];
+        (json['notifications'] as List?)?.cast<Map<String, dynamic>>() ?? [];
 
-    final notifications = list
-        .map(_mapNotification)
-        .toList(growable: false);
+    final notifications = list.map(_mapNotification).toList(growable: false);
 
     return NotificationPage(
       notifications: notifications,
@@ -257,22 +224,16 @@ class NotificationRemoteDatasourceImpl
     );
   }
 
-  NotificationEntity _mapNotification(
-    Map<String, dynamic> json,
-  ) {
+  NotificationEntity _mapNotification(Map<String, dynamic> json) {
     // map raw JSON (may come from WithHttpInfo body)
     final dto = NotificationResponseDto.fromJson(json);
     if (dto == null) {
-      throw FormatException(
-        'Failed to parse NotificationResponseDto: $json',
-      );
+      throw FormatException('Failed to parse NotificationResponseDto: $json');
     }
     return _mapDto(dto);
   }
 
-  NotificationEntity _mapDto(
-    NotificationResponseDto dto,
-  ) {
+  NotificationEntity _mapDto(NotificationResponseDto dto) {
     return NotificationEntity(
       id: dto.id,
       type: _mapNotificationType(dto.type),
@@ -304,9 +265,7 @@ class NotificationRemoteDatasourceImpl
     return null;
   }
 
-  NotificationType _mapNotificationType(
-    NotificationResponseDtoTypeEnum type,
-  ) {
+  NotificationType _mapNotificationType(NotificationResponseDtoTypeEnum type) {
     return switch (type) {
       NotificationResponseDtoTypeEnum.bookingConfirmed =>
         NotificationType.bookingConfirmed,
@@ -340,48 +299,87 @@ class NotificationRemoteDatasourceImpl
 // ─── Mock Implementation ───────────────────────────
 
 /// Returns empty data after a simulated delay.
-class NotificationRemoteDatasourceMock
-    implements NotificationRemoteDatasource {
+class NotificationRemoteDatasourceMock implements NotificationRemoteDatasource {
+  NotificationRemoteDatasourceMock()
+    : _items = List<NotificationEntity>.from(kMockNotifications);
+
+  final List<NotificationEntity> _items;
+
   @override
   Future<NotificationPage> getNotifications({
     int limit = 20,
     String? cursor,
   }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 300),
-    );
-    return const NotificationPage(
-      notifications: [],
-      hasMore: false,
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    final start = _resolveStartIndex(cursor);
+    final end = (start + limit).clamp(0, _items.length);
+    final pageItems = _items.sublist(start, end);
+    final hasMore = end < _items.length;
+    final nextCursor = hasMore ? pageItems.last.id : null;
+
+    return NotificationPage(
+      notifications: pageItems,
+      hasMore: hasMore,
+      nextCursor: nextCursor,
     );
   }
 
   @override
-  Future<int> getUnreadCount() async => 0;
+  Future<int> getUnreadCount() async {
+    await Future.delayed(const Duration(milliseconds: 160));
+    return _items.where((item) => !item.isRead).length;
+  }
 
   @override
-  Future<void> markRead(String id) async {}
+  Future<void> markRead(String id) async {
+    await Future.delayed(const Duration(milliseconds: 120));
+    final index = _items.indexWhere((item) => item.id == id);
+    if (index == -1) return;
+    _items[index] = _items[index].copyWith(isRead: true);
+  }
 
   @override
-  Future<int> markAllRead() async => 0;
+  Future<int> markAllRead() async {
+    await Future.delayed(const Duration(milliseconds: 180));
+
+    var changed = 0;
+    for (var i = 0; i < _items.length; i++) {
+      if (_items[i].isRead) continue;
+      _items[i] = _items[i].copyWith(isRead: true);
+      changed++;
+    }
+    return changed;
+  }
 
   @override
   Future<void> registerDevice({
     required String token,
     required String platform,
-  }) async {}
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 120));
+  }
 
   @override
-  Future<void> unregisterDevice(String token) async {}
+  Future<void> unregisterDevice(String token) async {
+    await Future.delayed(const Duration(milliseconds: 120));
+  }
+
+  int _resolveStartIndex(String? cursor) {
+    if (cursor == null || cursor.isEmpty) return 0;
+    final cursorIndex = _items.indexWhere((item) => item.id == cursor);
+    if (cursorIndex == -1) return 0;
+    return cursorIndex + 1;
+  }
 }
 
 // ─── Provider ──────────────────────────────────────
 
 final notificationRemoteDatasourceProvider =
     Provider<NotificationRemoteDatasource>((ref) {
-  if (AppEnvironment.current.useMock) {
-    return NotificationRemoteDatasourceMock();
-  }
-  final apiService = ref.read(apiServiceProvider);
-  return NotificationRemoteDatasourceImpl(apiService);
-});
+      if (AppEnvironment.current.useMock) {
+        return NotificationRemoteDatasourceMock();
+      }
+      final apiService = ref.read(apiServiceProvider);
+      return NotificationRemoteDatasourceImpl(apiService);
+    });

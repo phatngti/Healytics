@@ -289,6 +289,9 @@ export class BusinessInfoDto {
   brandName: VerifiedField<string>;
 
   @ApiPropertyOptional({ type: VerifiedField })
+  legalName?: VerifiedField<string>;
+
+  @ApiPropertyOptional({ type: VerifiedField })
   taxRegistrationCode?: VerifiedField<string>;
 
   @ApiProperty({ type: VerifiedField })
@@ -302,6 +305,9 @@ export class BusinessInfoDto {
 
   @ApiPropertyOptional({ type: VerifiedField })
   phoneNumber?: VerifiedField<string>;
+
+  @ApiPropertyOptional({ type: VerifiedField })
+  username?: VerifiedField<string>;
 
   static fromPartner(
     partner: Partner,
@@ -325,6 +331,16 @@ export class BusinessInfoDto {
       brandNameFb.reason,
     );
 
+    if (partner.legalName) {
+      const legalNameFb = getFeedback(PartnerFieldKeys.legalName);
+      dto.legalName = VerifiedField.of(
+        PartnerFieldKeys.legalName,
+        partner.legalName,
+        legalNameFb.isVerified,
+        legalNameFb.reason,
+      );
+    }
+
     if (partner.taxCode) {
       const taxCodeFb = getFeedback(PartnerFieldKeys.taxCode);
       dto.taxRegistrationCode = VerifiedField.of(
@@ -344,6 +360,16 @@ export class BusinessInfoDto {
     );
 
     dto.address = AddressInfoDto.fromPartner(partner, feedbackMap);
+
+    if (partner.account?.username) {
+      const usernameFb = getFeedback(PartnerFieldKeys.username);
+      dto.username = VerifiedField.of(
+        PartnerFieldKeys.username,
+        partner.account.username,
+        usernameFb.isVerified,
+        usernameFb.reason,
+      );
+    }
 
     if (partner.account?.email) {
       const emailFb = getFeedback(PartnerFieldKeys.email);

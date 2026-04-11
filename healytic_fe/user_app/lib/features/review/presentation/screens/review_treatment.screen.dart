@@ -67,6 +67,10 @@ class ReviewTreatmentScreen extends ConsumerWidget {
           specialistId: apt?.specialistId ?? '',
           specialistName: apt?.specialistName ?? 'Your Specialist',
           specialistRole: 'Specialist',
+          facilityId: apt?.healthPartnerId ?? '',
+          facilityName:
+              apt?.healthPartnerName ?? vendorName,
+          facilityAddress: apt?.address,
         ).push(context);
       }
     });

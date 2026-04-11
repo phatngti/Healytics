@@ -1,9 +1,12 @@
+import 'package:common/widgets/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:intl/intl.dart';
+import 'package:user_app/features/cart/presentation/'
+    'providers/cart.provider.dart';
 import 'package:user_app/features/checkout/domain/entities/'
     'booking_params.entity.dart';
 import 'package:user_app/features/checkout/presentation/providers/'
@@ -52,9 +55,86 @@ class BookingSummaryScreen extends ConsumerStatefulWidget {
       _BookingSummaryScreenState();
 }
 
-class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
+class _BookingSummaryScreenState
+    extends ConsumerState<BookingSummaryScreen> {
+  bool _isAddingToCart = false;
+
   void _handleBack() {
     if (context.canPop()) context.pop();
+  }
+
+  Future<void> _handleAddToCart(
+    BookingFlowState flowState,
+    EligibilityDetailEntity? detail,
+  ) async {
+    if (_isAddingToCart) return;
+
+    final bookingParams = _buildBookingParams(
+      flowState: flowState,
+      detail: detail,
+    );
+    if (bookingParams == null) {
+      AppToast.error(
+        context,
+        'Select a specialist and time slot first',
+      );
+      return;
+    }
+
+    setState(() => _isAddingToCart = true);
+    try {
+      final timeSlot = _buildCartTimeSlot(
+        bookingParams.selectedDate,
+        bookingParams.selectedTimeSlot,
+      );
+      await ref
+          .read(cartProvider.notifier)
+          .addItem(
+            serviceId: bookingParams.serviceId,
+            employeeId: bookingParams.employeeId,
+            timeSlot: timeSlot,
+          );
+      if (!mounted) return;
+      AppToast.success(context, 'Added to cart');
+    } catch (e) {
+      if (!mounted) return;
+      AppToast.error(
+        context,
+        'Failed to add to cart',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isAddingToCart = false);
+      }
+    }
+  }
+
+  DateTime _buildCartTimeSlot(
+    DateTime date,
+    String timeLabel,
+  ) {
+    final parts = timeLabel.split(RegExp(r'[\s:]+'));
+    if (parts.length >= 3) {
+      var hour = int.tryParse(parts[0]) ?? 0;
+      final minute = int.tryParse(parts[1]) ?? 0;
+      final period = parts[2].toUpperCase();
+      if (period == 'PM' && hour != 12) hour += 12;
+      if (period == 'AM' && hour == 12) hour = 0;
+
+      return DateTime(
+        date.year,
+        date.month,
+        date.day,
+        hour,
+        minute,
+      );
+    }
+
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+    );
   }
 
   void _handleConfirm(
@@ -142,10 +222,13 @@ class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
     final sectionGap = AppDimens.sectionSpacing(context);
     final flowState = ref.watch(bookingFlowProvider);
 
-    final eligibilityId = flowState.selectedSpecialist?.eligibilityId;
+    final eligibilityId =
+        flowState.selectedSpecialist?.eligibilityId;
     final detail = eligibilityId != null
         ? ref
-            .watch(eligibilityDetailProvider(eligibilityId))
+            .watch(
+              eligibilityDetailProvider(eligibilityId),
+            )
             .asData
             ?.value
         : null;
@@ -174,9 +257,15 @@ class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
             ),
       bottomNavigationBar: BookingBottomAction(
         canContinue: flowState.isStep2Complete,
-        onContinue: () => _handleConfirm(flowState, detail),
+        onContinue: () =>
+            _handleConfirm(flowState, detail),
         label: 'Confirm & Pay',
         icon: Symbols.arrow_forward,
+        onAddToCart: () => _handleAddToCart(
+          flowState,
+          detail,
+        ),
+        isAddingToCart: _isAddingToCart,
       ),
     );
   }

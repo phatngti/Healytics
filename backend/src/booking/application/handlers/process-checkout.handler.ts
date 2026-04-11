@@ -43,25 +43,43 @@ export class ProcessCheckoutHandler {
     @Payload() data: CheckoutMessage,
     @Ctx() context: RmqContext,
   ): Promise<void> {
-    this.logger.log(`Processing checkout: ticket=${data.ticketId}`);
+    const msgContext = `ticket=${data.ticketId}, user=${data.userId}, staff=${data.staffId}, time=${data.startTime}`;
+    this.logger.log(`Processing checkout: ${msgContext}`);
     const channel = context.getChannelRef();
     const originalMsg = context.getMessage();
 
     try {
       // 1. Update ticket → PROCESSING
-      await this.ticketRepo.update(data.ticketId, {
-        status: CheckoutTicketStatus.PROCESSING,
-      });
+      try {
+        await this.ticketRepo.update(data.ticketId, {
+          status: CheckoutTicketStatus.PROCESSING,
+        });
+      } catch (dbError) {
+        this.logger.error(
+          `DB error updating ticket to PROCESSING — ${msgContext}`,
+          dbError.stack,
+        );
+        throw dbError;
+      }
 
       // 2. Attempt checkout lock
       const startDate = new Date(data.startTime);
       const dateStr = this.formatSlotKey(startDate);
       const lockKey = `lock:checkout:${data.staffId}_${dateStr}`;
 
-      const lockToken = await this.redisService.acquireLock(
-        lockKey,
-        CHECKOUT_LOCK_TTL_SECONDS,
-      );
+      let lockToken: string | null;
+      try {
+        lockToken = await this.redisService.acquireLock(
+          lockKey,
+          CHECKOUT_LOCK_TTL_SECONDS,
+        );
+      } catch (redisError) {
+        this.logger.error(
+          `Redis lock acquisition failed — key=${lockKey}, ${msgContext}`,
+          redisError.stack,
+        );
+        throw redisError;
+      }
 
       if (lockToken) {
         // ── SUCCESS PATH ───────────────────────────
@@ -72,7 +90,7 @@ export class ProcessCheckoutHandler {
       }
     } catch (error) {
       this.logger.error(
-        `Checkout processing error: ticket=${data.ticketId}: ${error.message}`,
+        `Checkout processing error — ${msgContext}, payload=${JSON.stringify(data)}: ${error.message}`,
         error.stack,
       );
       await this.handleFailure(data, `Internal error: ${error.message}`);
@@ -87,6 +105,7 @@ export class ProcessCheckoutHandler {
     startDate: Date,
     lockKey: string,
   ): Promise<void> {
+    const msgContext = `ticket=${data.ticketId}, user=${data.userId}, staff=${data.staffId}`;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -144,7 +163,7 @@ export class ProcessCheckoutHandler {
 
       await queryRunner.commitTransaction();
       this.logger.log(
-        `Booking created: ${savedBooking.id} for ticket=${data.ticketId}`,
+        `Booking created: ${savedBooking.id} for ${msgContext}`,
       );
 
       // Notify webhook (fire-and-forget, outside transaction)
@@ -161,26 +180,41 @@ export class ProcessCheckoutHandler {
       await this.webhookService.notify(data.webhookUrl ?? null, webhookPayload);
 
       // Send booking confirmation notification (fire-and-forget, outside transaction)
-      this.notificationEventService.emit({
-        type: NotificationType.BOOKING_CONFIRMED,
-        recipientId: data.userId,
-        title: 'Booking Confirmed! 🎉',
-        body: serviceName
-          ? `Your booking for "${serviceName}" on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`
-          : `Your booking on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`,
-        data: {
-          bookingId: savedBooking.id,
-          action: 'view_booking',
-        },
-      });
+      try {
+        this.notificationEventService.emit({
+          type: NotificationType.BOOKING_CONFIRMED,
+          recipientId: data.userId,
+          title: 'Booking Confirmed! 🎉',
+          body: serviceName
+            ? `Your booking for "${serviceName}" on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`
+            : `Your booking on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`,
+          data: {
+            bookingId: savedBooking.id,
+            action: 'view_booking',
+          },
+        });
+      } catch (notifError) {
+        this.logger.error(
+          `RabbitMQ notification emit failed — ${msgContext}, bookingId=${savedBooking.id}, notificationType=${NotificationType.BOOKING_CONFIRMED}`,
+          notifError.stack,
+        );
+        // Don't throw — booking is already committed
+      }
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(
-        `Transaction failed for ticket=${data.ticketId}: ${error.message}`,
+        `Transaction failed — ${msgContext}, payload=${JSON.stringify(data)}: ${error.message}`,
         error.stack,
       );
       // Release the lock since we failed
-      await this.redisService.releaseLock(lockKey, '');
+      try {
+        await this.redisService.releaseLock(lockKey, '');
+      } catch (redisError) {
+        this.logger.error(
+          `Redis lock release failed — key=${lockKey}, ${msgContext}`,
+          redisError.stack,
+        );
+      }
       throw error;
     } finally {
       await queryRunner.release();
@@ -191,13 +225,22 @@ export class ProcessCheckoutHandler {
     data: CheckoutMessage,
     errorMessage: string,
   ): Promise<void> {
-    await this.ticketRepo.update(data.ticketId, {
-      status: CheckoutTicketStatus.FAILED,
-      errorMessage,
-    });
+    const msgContext = `ticket=${data.ticketId}, user=${data.userId}, staff=${data.staffId}`;
+
+    try {
+      await this.ticketRepo.update(data.ticketId, {
+        status: CheckoutTicketStatus.FAILED,
+        errorMessage,
+      });
+    } catch (dbError) {
+      this.logger.error(
+        `DB error updating ticket to FAILED — ${msgContext}, originalError="${errorMessage}"`,
+        dbError.stack,
+      );
+    }
 
     this.logger.warn(
-      `Checkout failed: ticket=${data.ticketId}: ${errorMessage}`,
+      `Checkout failed: ${msgContext}: ${errorMessage}`,
     );
 
     const webhookPayload: WebhookPayload = {

@@ -47,8 +47,8 @@ describe('AiServiceController', () => {
       const expected = {
         total: 2,
         recommendations: [
-          { service_id: 'uuid-1', name: 'Service A' },
-          { service_id: 'uuid-2', name: 'Service B' },
+          { id: 'uuid-1', name: 'Service A' },
+          { id: 'uuid-2', name: 'Service B' },
         ],
       };
       aiServiceService.getRecommendations!.mockResolvedValue(expected);

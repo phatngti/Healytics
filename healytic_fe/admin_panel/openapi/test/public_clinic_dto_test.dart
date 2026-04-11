@@ -26,6 +26,11 @@ void main() {
       // TODO
     });
 
+    // Object avatarUrl
+    test('to test the property `avatarUrl`', () async {
+      // TODO
+    });
+
     // String address
     test('to test the property `address`', () async {
       // TODO

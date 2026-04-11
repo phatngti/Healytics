@@ -11,6 +11,7 @@ export 'widgets/button/back_button.dart';
 export 'widgets/button/selector_switch.dart';
 
 // Widgets - Card
+export 'widgets/card/error_card.dart';
 export 'widgets/card/statistic_card.dart';
 
 // Widgets - Images

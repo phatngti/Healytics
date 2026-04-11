@@ -5,6 +5,7 @@ import { Notification } from '@/common/entities/notification.entity';
 import { NotificationRead } from '@/common/entities/notification-read.entity';
 import { DeviceToken } from '@/common/entities/device-token.entity';
 import { NotificationType } from '@/notification/enums/notification-type.enum';
+import { DevicePlatform } from '@/notification/enums/device-platform.enum';
 import { NotificationResponseDto } from '@/notification/dto/notification-response.dto';
 import { NotificationsQueryDto } from '@/notification/dto/notifications-query.dto';
 import { CreateNotificationHandler } from './application/handlers/create-notification.handler';
@@ -264,7 +265,7 @@ export class NotificationService {
   async registerDevice(
     userId: string,
     token: string,
-    platform: string,
+    platform: DevicePlatform,
   ): Promise<void> {
     // Upsert: if token exists, update user and platform
     const existing = await this.deviceTokenRepo.findOne({
@@ -274,7 +275,7 @@ export class NotificationService {
     if (existing) {
       await this.deviceTokenRepo.update(existing.id, {
         userId,
-        platform: platform as any,
+        platform,
         isActive: true,
       });
       this.logger.log(
@@ -285,7 +286,7 @@ export class NotificationService {
         this.deviceTokenRepo.create({
           userId,
           token,
-          platform: platform as any,
+          platform,
           isActive: true,
         }),
       );
@@ -295,8 +296,8 @@ export class NotificationService {
     }
   }
 
-  async unregisterDevice(token: string): Promise<void> {
-    await this.deviceTokenRepo.update({ token }, { isActive: false });
+  async unregisterDevice(userId: string, token: string): Promise<void> {
+    await this.deviceTokenRepo.update({ userId, token }, { isActive: false });
     this.logger.log(`Unregistered device token: ${token.substring(0, 20)}...`);
   }
 }

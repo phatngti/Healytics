@@ -5,6 +5,7 @@ import { ProcessCheckoutHandler } from './process-checkout.handler';
 import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
 import { RedisService } from '@/redis/redis.service';
 import { WebhookService } from '../../services/webhook.service';
+import { NotificationEventService } from '@/notification/services/notification-event.service';
 import { CheckoutTicketStatus } from '@/booking/enums/checkout-ticket-status.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import {
@@ -20,6 +21,7 @@ describe('ProcessCheckoutHandler', () => {
   let ticketRepo: MockRepository<CheckoutTicket>;
   let redisService: { [key: string]: jest.Mock };
   let webhookService: { notify: jest.Mock };
+  let notificationEventService: { emit: jest.Mock };
   let queryRunner: MockQueryRunner;
 
   // Common RMQ context mock
@@ -45,6 +47,7 @@ describe('ProcessCheckoutHandler', () => {
       getLockTTL: jest.fn(),
     };
     webhookService = { notify: jest.fn().mockResolvedValue(undefined) };
+    notificationEventService = { emit: jest.fn() };
     queryRunner = createMockQueryRunner();
 
     const mockDataSource = createMockDataSource(queryRunner);
@@ -59,6 +62,7 @@ describe('ProcessCheckoutHandler', () => {
         { provide: DataSource, useValue: mockDataSource },
         { provide: RedisService, useValue: redisService },
         { provide: WebhookService, useValue: webhookService },
+        { provide: NotificationEventService, useValue: notificationEventService },
       ],
     }).compile();
 

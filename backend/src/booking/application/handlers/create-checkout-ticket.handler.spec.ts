@@ -2,6 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateCheckoutTicketHandler } from './create-checkout-ticket.handler';
 import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
+import { Account } from '@/common/entities/account.entity';
+import { Employee } from '@/common/entities/employee.entity';
+import { Product } from '@/common/entities/product.entity';
 import { CheckSlotAvailabilityHandler } from './check-slot-availability.handler';
 import { AsyncCheckoutResponseDto } from '../../dto/async-checkout-response.dto';
 import { CheckoutTicketStatus } from '@/booking/enums/checkout-ticket-status.enum';
@@ -10,15 +13,22 @@ import {
   createMockRepository,
 } from '../../../../test/mocks/mock-types';
 import { createCheckoutTicketEntity } from '../../../../test/fixtures/test-data.factory';
+import { BadRequestException } from '@nestjs/common';
 
 describe('CreateCheckoutTicketHandler', () => {
   let handler: CreateCheckoutTicketHandler;
   let ticketRepo: MockRepository<CheckoutTicket>;
+  let accountRepo: MockRepository<Account>;
+  let employeeRepo: MockRepository<Employee>;
+  let productRepo: MockRepository<Product>;
   let slotChecker: { execute: jest.Mock };
   let rmqClient: { emit: jest.Mock };
 
   beforeEach(async () => {
     ticketRepo = createMockRepository<CheckoutTicket>();
+    accountRepo = createMockRepository<Account>();
+    employeeRepo = createMockRepository<Employee>();
+    productRepo = createMockRepository<Product>();
     slotChecker = { execute: jest.fn() };
     rmqClient = { emit: jest.fn() };
 
@@ -28,6 +38,18 @@ describe('CreateCheckoutTicketHandler', () => {
         {
           provide: getRepositoryToken(CheckoutTicket),
           useValue: ticketRepo,
+        },
+        {
+          provide: getRepositoryToken(Account),
+          useValue: accountRepo,
+        },
+        {
+          provide: getRepositoryToken(Employee),
+          useValue: employeeRepo,
+        },
+        {
+          provide: getRepositoryToken(Product),
+          useValue: productRepo,
         },
         {
           provide: 'RABBITMQ_CLIENT',
@@ -43,6 +65,11 @@ describe('CreateCheckoutTicketHandler', () => {
     handler = module.get<CreateCheckoutTicketHandler>(
       CreateCheckoutTicketHandler,
     );
+
+    // Default: FK validation passes (entities exist)
+    accountRepo.findOne.mockResolvedValue({ id: 'user-1' });
+    employeeRepo.findOne.mockResolvedValue({ id: 'staff-1' });
+    productRepo.findOne.mockResolvedValue({ id: 'prod-1' });
   });
 
   afterEach(() => {
@@ -79,6 +106,44 @@ describe('CreateCheckoutTicketHandler', () => {
       // Should not check slot or create new ticket
       expect(slotChecker.execute).not.toHaveBeenCalled();
       expect(ticketRepo.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('FK validation', () => {
+    it('should throw BadRequestException when userId does not exist', async () => {
+      // Arrange
+      ticketRepo.findOne.mockResolvedValue(null); // No existing ticket
+      accountRepo.findOne.mockResolvedValue(null); // User not found
+
+      // Act & Assert
+      await expect(handler.execute(baseDto as any)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(slotChecker.execute).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestException when staffId does not exist', async () => {
+      // Arrange
+      ticketRepo.findOne.mockResolvedValue(null);
+      employeeRepo.findOne.mockResolvedValue(null); // Staff not found
+
+      // Act & Assert
+      await expect(handler.execute(baseDto as any)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw BadRequestException when productId does not exist', async () => {
+      // Arrange
+      ticketRepo.findOne.mockResolvedValue(null);
+      productRepo.findOne.mockResolvedValue(null); // Product not found
+
+      const dtoWithProduct = { ...baseDto, productId: 'non-existent' };
+
+      // Act & Assert
+      await expect(handler.execute(dtoWithProduct as any)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 

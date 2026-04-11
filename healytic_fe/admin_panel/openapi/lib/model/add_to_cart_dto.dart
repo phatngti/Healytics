@@ -14,26 +14,40 @@ class AddToCartDto {
   /// Returns a new [AddToCartDto] instance.
   AddToCartDto({
     required this.serviceId,
+    required this.employeeId,
+    required this.timeSlot,
   });
 
   /// UUID of the health service
   String serviceId;
 
+  /// UUID of the assigned employee (doctor or therapist)
+  String employeeId;
+
+  /// Desired time slot in ISO 8601 datetime format
+  String timeSlot;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is AddToCartDto &&
-    other.serviceId == serviceId;
+    other.serviceId == serviceId &&
+    other.employeeId == employeeId &&
+    other.timeSlot == timeSlot;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (serviceId.hashCode);
+    (serviceId.hashCode) +
+    (employeeId.hashCode) +
+    (timeSlot.hashCode);
 
   @override
-  String toString() => 'AddToCartDto[serviceId=$serviceId]';
+  String toString() => 'AddToCartDto[serviceId=$serviceId, employeeId=$employeeId, timeSlot=$timeSlot]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'serviceId'] = this.serviceId;
+      json[r'employeeId'] = this.employeeId;
+      json[r'timeSlot'] = this.timeSlot;
     return json;
   }
 
@@ -57,6 +71,8 @@ class AddToCartDto {
 
       return AddToCartDto(
         serviceId: mapValueOfType<String>(json, r'serviceId')!,
+        employeeId: mapValueOfType<String>(json, r'employeeId')!,
+        timeSlot: mapValueOfType<String>(json, r'timeSlot')!,
       );
     }
     return null;
@@ -105,6 +121,8 @@ class AddToCartDto {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'serviceId',
+    'employeeId',
+    'timeSlot',
   };
 }
 

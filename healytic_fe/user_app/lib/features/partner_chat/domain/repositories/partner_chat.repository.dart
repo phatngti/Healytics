@@ -1,3 +1,4 @@
+import 'package:user_app/features/partner_chat/data/datasources/remote/partner_chat_remote_datasource.dart';
 import 'package:user_app/features/partner_chat/domain/entities/partner_chat_message.entity.dart';
 import 'package:user_app/features/partner_chat/domain/entities/partner_conversation.entity.dart';
 
@@ -21,9 +22,9 @@ abstract class PartnerChatRepository {
   /// Fetch paginated message history for a
   /// conversation.
   ///
-  /// Returns messages ordered newest-first. Use
-  /// [beforeId] for cursor-based pagination.
-  Future<List<PartnerChatMessage>> getMessages(
+  /// Returns a [PaginatedMessages] with messages in
+  /// chronological order (ASC) and pagination metadata.
+  Future<PaginatedMessages> getMessages(
     String conversationId, {
     String? beforeId,
     int limit = 20,

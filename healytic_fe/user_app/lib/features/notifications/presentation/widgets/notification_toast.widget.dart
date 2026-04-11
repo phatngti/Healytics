@@ -2,10 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:user_app/core/services/ws/ws_models.dart';
+import 'package:user_app/features/notifications/'
+    'domain/entities/notification.entity.dart';
 
 /// A premium in-app toast card shown when a real-time
-/// notification arrives over WebSocket.
+/// notification arrives.
 ///
 /// Features:
 /// - Glassmorphism backdrop blur
@@ -28,7 +29,7 @@ class NotificationToast extends StatelessWidget {
 
   final String title;
   final String body;
-  final WsNotificationType type;
+  final NotificationType type;
   final VoidCallback? onTap;
   final VoidCallback? onDismiss;
 
@@ -36,7 +37,8 @@ class NotificationToast extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final accentColor = _resolveAccentColor(type, colorScheme);
+    final accentColor =
+        _resolveAccentColor(type, colorScheme);
     final icon = _resolveIcon(type);
 
     return GestureDetector(
@@ -66,7 +68,8 @@ class NotificationToast extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: colorScheme.surface
                       .withValues(alpha: 0.92),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius:
+                      BorderRadius.circular(16),
                   border: Border.all(
                     color: colorScheme.outlineVariant
                         .withValues(alpha: 0.3),
@@ -90,7 +93,8 @@ class NotificationToast extends StatelessWidget {
                           color: accentColor,
                           borderRadius:
                               const BorderRadius.only(
-                            topLeft: Radius.circular(16),
+                            topLeft:
+                                Radius.circular(16),
                             bottomLeft:
                                 Radius.circular(16),
                           ),
@@ -163,7 +167,9 @@ class NotificationToast extends StatelessWidget {
                       // Close hint
                       Padding(
                         padding:
-                            const EdgeInsets.only(right: 12),
+                            const EdgeInsets.only(
+                          right: 12,
+                        ),
                         child: Icon(
                           Icons.chevron_right_rounded,
                           color: colorScheme
@@ -185,56 +191,56 @@ class NotificationToast extends StatelessWidget {
 
   // ── Icon & Color Resolution ──────────────────────
 
-  IconData _resolveIcon(WsNotificationType type) {
+  IconData _resolveIcon(NotificationType type) {
     return switch (type) {
-      WsNotificationType.bookingConfirmed =>
+      NotificationType.bookingConfirmed =>
         Symbols.event_available,
-      WsNotificationType.bookingCancelled =>
+      NotificationType.bookingCancelled =>
         Symbols.event_busy,
-      WsNotificationType.bookingCompleted =>
+      NotificationType.bookingCompleted =>
         Symbols.check_circle,
-      WsNotificationType.appointmentReminder =>
+      NotificationType.appointmentReminder =>
         Symbols.alarm,
-      WsNotificationType.appointmentUpdated =>
+      NotificationType.appointmentUpdated =>
         Symbols.edit_calendar,
-      WsNotificationType.newChatMessage =>
+      NotificationType.newChatMessage =>
         Symbols.chat_bubble,
-      WsNotificationType.paymentSuccess =>
+      NotificationType.paymentSuccess =>
         Symbols.payments,
-      WsNotificationType.paymentFailed =>
+      NotificationType.paymentFailed =>
         Symbols.credit_card_off,
-      WsNotificationType.systemBroadcast =>
+      NotificationType.systemBroadcast =>
         Symbols.campaign,
-      WsNotificationType.systemMaintenance =>
+      NotificationType.systemMaintenance =>
         Symbols.engineering,
-      WsNotificationType.partnerVerified =>
+      NotificationType.partnerVerified =>
         Symbols.verified,
-      WsNotificationType.partnerRejected =>
+      NotificationType.partnerRejected =>
         Symbols.block,
     };
   }
 
   Color _resolveAccentColor(
-    WsNotificationType type,
+    NotificationType type,
     ColorScheme cs,
   ) {
     return switch (type) {
-      WsNotificationType.bookingConfirmed ||
-      WsNotificationType.bookingCompleted ||
-      WsNotificationType.paymentSuccess ||
-      WsNotificationType.partnerVerified =>
+      NotificationType.bookingConfirmed ||
+      NotificationType.bookingCompleted ||
+      NotificationType.paymentSuccess ||
+      NotificationType.partnerVerified =>
         const Color(0xFF2E7D32), // green
-      WsNotificationType.bookingCancelled ||
-      WsNotificationType.paymentFailed ||
-      WsNotificationType.partnerRejected =>
+      NotificationType.bookingCancelled ||
+      NotificationType.paymentFailed ||
+      NotificationType.partnerRejected =>
         cs.error,
-      WsNotificationType.appointmentReminder ||
-      WsNotificationType.appointmentUpdated =>
+      NotificationType.appointmentReminder ||
+      NotificationType.appointmentUpdated =>
         const Color(0xFFF57C00), // orange
-      WsNotificationType.newChatMessage =>
+      NotificationType.newChatMessage =>
         cs.primary,
-      WsNotificationType.systemBroadcast ||
-      WsNotificationType.systemMaintenance =>
+      NotificationType.systemBroadcast ||
+      NotificationType.systemMaintenance =>
         cs.tertiary,
     };
   }
