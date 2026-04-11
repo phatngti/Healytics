@@ -21,7 +21,9 @@ function generate_dart {
   cd ../../
   
   # Generate Client with custom package name
-  npx --yes @openapitools/openapi-generator-cli generate -g dart -i $SWAGGER_FILE -o $OUTPUT_DIR -t $BASE_DIR/open-api/templates/mobile --additional-properties pubName=$PUB_NAME
+  # JAVA_TOOL_OPTIONS is read directly by the JVM (unlike JAVA_OPTS which needs launcher support)
+  export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS} -Dorg.slf4j.simpleLogger.defaultLogLevel=warn"
+  npx --yes @openapitools/openapi-generator-cli generate -g dart -i $SWAGGER_FILE -o $OUTPUT_DIR -t $BASE_DIR/open-api/templates/mobile --additional-properties pubName=$PUB_NAME --type-mappings Date=DateTime 2>&1 | grep -v '^\[main\] INFO'
   
   # Post generate patches
   # Don't include analysis_options.yaml for the generated openapi files

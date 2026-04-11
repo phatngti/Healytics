@@ -1,5 +1,6 @@
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/theme/app_theme.dart';
 
 /// Fixed bottom bar with total price, savings badge,
@@ -19,8 +20,7 @@ class CheckoutBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final semanticColors = Theme.of(context)
-        .extension<SemanticColors>();
+    final semanticColors = Theme.of(context).extension<SemanticColors>();
     final pad = AppDimens.horizontalPadding(context);
 
     return Container(
@@ -32,15 +32,10 @@ class CheckoutBottomBar extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: colorScheme.outlineVariant,
-          ),
-        ),
+        border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow
-                .withValues(alpha: 0.05),
+            color: colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: AppDimens.spaceXl,
             offset: const Offset(0, -AppDimens.spaceXs),
           ),
@@ -54,11 +49,7 @@ class CheckoutBottomBar extends StatelessWidget {
             semanticColors: semanticColors,
           ),
           AppDimens.horizontalMedium,
-          Expanded(
-            child: _ConfirmButton(
-              onConfirm: onConfirm,
-            ),
-          ),
+          Expanded(child: _ConfirmButton(onConfirm: onConfirm)),
         ],
       ),
     );
@@ -108,20 +99,18 @@ class _PriceColumn extends StatelessWidget {
               vertical: AppDimens.spaceXxs,
             ),
             decoration: BoxDecoration(
-              color: (semanticColors?.success ??
-                      Colors.green)
-                  .withValues(alpha: 0.1),
-              borderRadius: AppDimens.radiusExtraSmall
-                  + const BorderRadius.all(
-                    Radius.circular(2),
-                  ),
+              color: (semanticColors?.success ?? Colors.green).withValues(
+                alpha: 0.1,
+              ),
+              borderRadius:
+                  AppDimens.radiusExtraSmall +
+                  const BorderRadius.all(Radius.circular(2)),
             ),
             child: Text(
               'Save ${_formatCurrency(saved)}',
               style: textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w500,
-                color: semanticColors?.success ??
-                    Colors.green,
+                color: semanticColors?.success ?? Colors.green,
               ),
             ),
           ),
@@ -131,8 +120,7 @@ class _PriceColumn extends StatelessWidget {
   }
 
   String _formatCurrency(int amount) {
-    final formatted =
-        amount.toString().replaceAllMapped(
+    final formatted = amount.toString().replaceAllMapped(
       RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
       (m) => '${m[1]},',
     );
@@ -152,6 +140,7 @@ class _ConfirmButton extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return FilledButton(
+      key: keys.checkoutPage.confirmButton,
       onPressed: onConfirm,
       style: FilledButton.styleFrom(
         backgroundColor: colorScheme.primary,
@@ -163,14 +152,11 @@ class _ConfirmButton extends StatelessWidget {
           borderRadius: AppDimens.radiusMediumSmall,
         ),
         elevation: 4,
-        shadowColor: colorScheme.primary
-            .withValues(alpha: 0.3),
+        shadowColor: colorScheme.primary.withValues(alpha: 0.3),
       ),
       child: Text(
         'Confirm Payment',
-        style: textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
+        style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }

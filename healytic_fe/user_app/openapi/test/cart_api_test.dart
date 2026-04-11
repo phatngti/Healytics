@@ -24,13 +24,6 @@ void main() {
       // TODO
     });
 
-    // Apply coupon to cart item
-    //
-    //Future<CartItemResponseDto> cartControllerApplyCoupon(String cartItemId, ApplyCouponDto applyCouponDto) async
-    test('test cartControllerApplyCoupon', () async {
-      // TODO
-    });
-
     // Clear all cart items
     //
     //Future cartControllerClearCart() async
@@ -42,13 +35,6 @@ void main() {
     //
     //Future<List<CartItemResponseDto>> cartControllerGetItems() async
     test('test cartControllerGetItems', () async {
-      // TODO
-    });
-
-    // Remove coupon from cart item
-    //
-    //Future<CartItemResponseDto> cartControllerRemoveCoupon(String cartItemId) async
-    test('test cartControllerRemoveCoupon', () async {
       // TODO
     });
 

@@ -14,14 +14,24 @@ class BusinessInfoDto {
   /// Returns a new [BusinessInfoDto] instance.
   BusinessInfoDto({
     required this.brandName,
+    this.legalName,
     this.taxRegistrationCode,
     required this.businessType,
     this.address,
     this.email,
     this.phoneNumber,
+    this.username,
   });
 
   VerifiedField brandName;
+
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  VerifiedField? legalName;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -57,31 +67,48 @@ class BusinessInfoDto {
   ///
   VerifiedField? phoneNumber;
 
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  VerifiedField? username;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is BusinessInfoDto &&
     other.brandName == brandName &&
+    other.legalName == legalName &&
     other.taxRegistrationCode == taxRegistrationCode &&
     other.businessType == businessType &&
     other.address == address &&
     other.email == email &&
-    other.phoneNumber == phoneNumber;
+    other.phoneNumber == phoneNumber &&
+    other.username == username;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (brandName.hashCode) +
+    (legalName == null ? 0 : legalName!.hashCode) +
     (taxRegistrationCode == null ? 0 : taxRegistrationCode!.hashCode) +
     (businessType.hashCode) +
     (address == null ? 0 : address!.hashCode) +
     (email == null ? 0 : email!.hashCode) +
-    (phoneNumber == null ? 0 : phoneNumber!.hashCode);
+    (phoneNumber == null ? 0 : phoneNumber!.hashCode) +
+    (username == null ? 0 : username!.hashCode);
 
   @override
-  String toString() => 'BusinessInfoDto[brandName=$brandName, taxRegistrationCode=$taxRegistrationCode, businessType=$businessType, address=$address, email=$email, phoneNumber=$phoneNumber]';
+  String toString() => 'BusinessInfoDto[brandName=$brandName, legalName=$legalName, taxRegistrationCode=$taxRegistrationCode, businessType=$businessType, address=$address, email=$email, phoneNumber=$phoneNumber, username=$username]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'brandName'] = this.brandName;
+    if (this.legalName != null) {
+      json[r'legalName'] = this.legalName;
+    } else {
+      json[r'legalName'] = null;
+    }
     if (this.taxRegistrationCode != null) {
       json[r'taxRegistrationCode'] = this.taxRegistrationCode;
     } else {
@@ -102,6 +129,11 @@ class BusinessInfoDto {
       json[r'phoneNumber'] = this.phoneNumber;
     } else {
       json[r'phoneNumber'] = null;
+    }
+    if (this.username != null) {
+      json[r'username'] = this.username;
+    } else {
+      json[r'username'] = null;
     }
     return json;
   }
@@ -126,11 +158,13 @@ class BusinessInfoDto {
 
       return BusinessInfoDto(
         brandName: VerifiedField.fromJson(json[r'brandName'])!,
+        legalName: VerifiedField.fromJson(json[r'legalName']),
         taxRegistrationCode: VerifiedField.fromJson(json[r'taxRegistrationCode']),
         businessType: VerifiedField.fromJson(json[r'businessType'])!,
         address: AddressInfoDto.fromJson(json[r'address']),
         email: VerifiedField.fromJson(json[r'email']),
         phoneNumber: VerifiedField.fromJson(json[r'phoneNumber']),
+        username: VerifiedField.fromJson(json[r'username']),
       );
     }
     return null;

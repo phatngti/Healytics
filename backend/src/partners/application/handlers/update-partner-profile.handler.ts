@@ -7,6 +7,7 @@ import {
 import { DataSource } from 'typeorm';
 import { Partner } from '@/common/entities/partner.entity';
 import { LegalRepresentative } from '@/common/entities/legal-representative.entity';
+import { Account } from '@/common/entities/account.entity';
 import {
   PartnerDocument,
   PartnerDocumentStatuses,
@@ -96,7 +97,18 @@ export class UpdatePartnerProfileHandler {
           isModified = true;
         }
 
-        // A.3 Update phone number
+        // A.3 Update business type from legacy `serviceTags` field
+        const newBusinessType = getValue<string[]>(bizInfo.serviceTags);
+        if (
+          Array.isArray(newBusinessType) &&
+          JSON.stringify(newBusinessType) !== JSON.stringify(partner.businessType)
+        ) {
+          partner.businessType = newBusinessType as any;
+          isModified = true;
+          hasCriticalChange = true;
+        }
+
+        // A.4 Update phone number
         const newPhoneNumber = getValue(bizInfo.phoneNumber);
         if (
           newPhoneNumber !== undefined &&
@@ -106,7 +118,41 @@ export class UpdatePartnerProfileHandler {
           isModified = true;
         }
 
-        // A.4 Update address
+        const account = await queryRunner.manager.findOne(Account, {
+          where: { id: partner.accountId },
+        });
+        if (account) {
+          const newUsername = getValue(bizInfo.username);
+          if (
+            newUsername !== undefined &&
+            newUsername !== account.username
+          ) {
+            const existing = await queryRunner.manager.findOne(Account, {
+              where: { username: newUsername },
+            });
+            if (existing && existing.id !== account.id) {
+              throw new BadRequestException('Username already exists');
+            }
+            account.username = newUsername;
+            await queryRunner.manager.save(account);
+            isModified = true;
+          }
+
+          const newEmail = getValue(bizInfo.email);
+          if (newEmail !== undefined && newEmail !== account.email) {
+            const existing = await queryRunner.manager.findOne(Account, {
+              where: { email: newEmail },
+            });
+            if (existing && existing.id !== account.id) {
+              throw new BadRequestException('Email already exists');
+            }
+            account.email = newEmail;
+            await queryRunner.manager.save(account);
+            isModified = true;
+          }
+        }
+
+        // A.5 Update address
         if (bizInfo.address) {
           const addressDto = bizInfo.address;
 

@@ -170,6 +170,7 @@ export class AccountService {
       select: [
         'id',
         'email',
+        'role',
         'passwordHash',
         'refreshTokenHash',
         'isActive',

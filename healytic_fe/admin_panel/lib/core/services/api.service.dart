@@ -67,6 +67,7 @@ class ApiService implements Authentication {
   late PartnerEmployeesApi employeesApi;
   late PartnerHealthServicesApi partnerHealthServicesApi;
   late PartnerChatApi partnerChatApi;
+  late PartnerDashboardApi partnerDashboardApi;
 
   // ── Health Services & Categories ──────────────────
   late UserHealthServicesApi healthServicesApi;
@@ -155,6 +156,8 @@ class ApiService implements Authentication {
     serviceTagsApi = PartnerServiceTagsApi(backend);
     locationsApi = LocationsApi(backend);
     partnerChatApi = PartnerChatApi(backend);
+    partnerDashboardApi =
+        PartnerDashboardApi(backend);
   }
 
   /// Applies the User-Agent header to every client.

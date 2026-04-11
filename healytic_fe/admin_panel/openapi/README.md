@@ -88,10 +88,8 @@ Class | Method | HTTP request | Description
 *AuthenticationApi* | [**authControllerRegisterPartner**](doc//AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
 *AuthenticationApi* | [**authControllerRegisterUser**](doc//AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | Register a new user
 *CartApi* | [**cartControllerAddItem**](doc//CartApi.md#cartcontrolleradditem) | **POST** /cart | Add service to cart
-*CartApi* | [**cartControllerApplyCoupon**](doc//CartApi.md#cartcontrollerapplycoupon) | **POST** /cart/{cartItemId}/coupon | Apply coupon to cart item
 *CartApi* | [**cartControllerClearCart**](doc//CartApi.md#cartcontrollerclearcart) | **DELETE** /cart | Clear all cart items
 *CartApi* | [**cartControllerGetItems**](doc//CartApi.md#cartcontrollergetitems) | **GET** /cart | Get all cart items for current user
-*CartApi* | [**cartControllerRemoveCoupon**](doc//CartApi.md#cartcontrollerremovecoupon) | **DELETE** /cart/{cartItemId}/coupon | Remove coupon from cart item
 *CartApi* | [**cartControllerRemoveItem**](doc//CartApi.md#cartcontrollerremoveitem) | **DELETE** /cart/{cartItemId} | Remove an item from cart
 *CategoriesApi* | [**categoriesControllerFindAll**](doc//CategoriesApi.md#categoriescontrollerfindall) | **GET** /categories | Get all categories
 *CategoriesApi* | [**categoriesControllerFindBySlug**](doc//CategoriesApi.md#categoriescontrollerfindbyslug) | **GET** /categories/slug/{slug} | Get a category by slug
@@ -112,6 +110,15 @@ Class | Method | HTTP request | Description
 *PartnerChatApi* | [**partnerChatControllerGetConversations**](doc//PartnerChatApi.md#partnerchatcontrollergetconversations) | **GET** /partner/chat/conversations | List all conversations for the current partner
 *PartnerChatApi* | [**partnerChatControllerGetMessages**](doc//PartnerChatApi.md#partnerchatcontrollergetmessages) | **GET** /partner/chat/conversations/{id}/messages | Get message history for a conversation (cursor-paginated)
 *PartnerChatApi* | [**partnerChatControllerMarkRead**](doc//PartnerChatApi.md#partnerchatcontrollermarkread) | **POST** /partner/chat/conversations/{id}/read | Mark all messages in a conversation as read
+*PartnerDashboardApi* | [**partnerDashboardControllerGetEmployeeDistribution**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetemployeedistribution) | **GET** /partner/dashboard/employees/distribution | Get employee role distribution
+*PartnerDashboardApi* | [**partnerDashboardControllerGetInventoryAlerts**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetinventoryalerts) | **GET** /partner/dashboard/inventory/alerts | Get inventory alerts
+*PartnerDashboardApi* | [**partnerDashboardControllerGetNotifications**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetnotifications) | **GET** /partner/dashboard/notifications | Get dashboard notifications
+*PartnerDashboardApi* | [**partnerDashboardControllerGetRecentReviews**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetrecentreviews) | **GET** /partner/dashboard/reviews/recent | Get recent customer reviews
+*PartnerDashboardApi* | [**partnerDashboardControllerGetRevenue**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetrevenue) | **GET** /partner/dashboard/revenue | Get revenue time-series data
+*PartnerDashboardApi* | [**partnerDashboardControllerGetServicePerformance**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetserviceperformance) | **GET** /partner/dashboard/services/performance | Get service performance metrics
+*PartnerDashboardApi* | [**partnerDashboardControllerGetStaffSchedule**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetstaffschedule) | **GET** /partner/dashboard/staff/schedule | Get staff schedule for a date
+*PartnerDashboardApi* | [**partnerDashboardControllerGetStats**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetstats) | **GET** /partner/dashboard/stats | Get aggregated KPI statistics
+*PartnerDashboardApi* | [**partnerDashboardControllerGetUpcomingAppointments**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetupcomingappointments) | **GET** /partner/dashboard/appointments/upcoming | Get upcoming appointments
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateDoctor**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatedoctor) | **POST** /partner/employees/doctors | Create a new doctor
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateMassageTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatemassagetherapist) | **POST** /partner/employees/massage-therapists | Create a new massage therapist
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateSpaTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
@@ -126,7 +133,11 @@ Class | Method | HTTP request | Description
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerRemove**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollerremove) | **DELETE** /partner/health-services/{id} | Delete a health service
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerUpdate**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollerupdate) | **PATCH** /partner/health-services/{id} | Update a health service
 *PartnerPartnersApi* | [**partnerSelfControllerGetMyProfile**](doc//PartnerPartnersApi.md#partnerselfcontrollergetmyprofile) | **GET** /partner/partners/me | Get own business profile
+*PartnerPartnersApi* | [**partnerSelfControllerGetMyProfileCompletion**](doc//PartnerPartnersApi.md#partnerselfcontrollergetmyprofilecompletion) | **GET** /partner/partners/me/completion | Get partner clinic profile completion data
+*PartnerPartnersApi* | [**partnerSelfControllerGetPublicProfile**](doc//PartnerPartnersApi.md#partnerselfcontrollergetpublicprofile) | **GET** /partner/partners/public-profile | Get partner public profile edit aggregate
 *PartnerPartnersApi* | [**partnerSelfControllerUpdateMyProfile**](doc//PartnerPartnersApi.md#partnerselfcontrollerupdatemyprofile) | **PUT** /partner/partners/me | Update own business profile
+*PartnerPartnersApi* | [**partnerSelfControllerUpdateMyProfileCompletion**](doc//PartnerPartnersApi.md#partnerselfcontrollerupdatemyprofilecompletion) | **PUT** /partner/partners/me/completion | Update partner clinic profile completion data
+*PartnerPartnersApi* | [**partnerSelfControllerUpdatePublicProfile**](doc//PartnerPartnersApi.md#partnerselfcontrollerupdatepublicprofile) | **PUT** /partner/partners/public-profile | Update partner public profile (storefront only)
 *PartnerServiceTagsApi* | [**serviceTagsControllerAttachToProduct**](doc//PartnerServiceTagsApi.md#servicetagscontrollerattachtoproduct) | **POST** /partner/service-tags/{id}/products/{productId} | Attach a tag to a product
 *PartnerServiceTagsApi* | [**serviceTagsControllerCreate**](doc//PartnerServiceTagsApi.md#servicetagscontrollercreate) | **POST** /partner/service-tags | Create a new service tag
 *PartnerServiceTagsApi* | [**serviceTagsControllerDetachFromProduct**](doc//PartnerServiceTagsApi.md#servicetagscontrollerdetachfromproduct) | **DELETE** /partner/service-tags/{id}/products/{productId} | Detach a tag from a product
@@ -199,13 +210,9 @@ Class | Method | HTTP request | Description
  - [AdminCategoryResponseDto](doc//AdminCategoryResponseDto.md)
  - [AdminLoginDto](doc//AdminLoginDto.md)
  - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
- - [AiLocationDto](doc//AiLocationDto.md)
- - [AiPriceDto](doc//AiPriceDto.md)
- - [AiRatingDto](doc//AiRatingDto.md)
  - [AiRecommendationItemDto](doc//AiRecommendationItemDto.md)
  - [AiRecommendationsRequestDto](doc//AiRecommendationsRequestDto.md)
  - [AiRecommendationsResponseDto](doc//AiRecommendationsResponseDto.md)
- - [ApplyCouponDto](doc//ApplyCouponDto.md)
  - [AppointmentCategoryResponseDto](doc//AppointmentCategoryResponseDto.md)
  - [AppointmentResponseDto](doc//AppointmentResponseDto.md)
  - [AsyncCheckoutDto](doc//AsyncCheckoutDto.md)
@@ -243,6 +250,7 @@ Class | Method | HTTP request | Description
  - [ClinicReviewsResponseDto](doc//ClinicReviewsResponseDto.md)
  - [ClinicSpecialistPreviewDto](doc//ClinicSpecialistPreviewDto.md)
  - [ClinicTrustMetricsDto](doc//ClinicTrustMetricsDto.md)
+ - [CompletionChecklistItemDto](doc//CompletionChecklistItemDto.md)
  - [ConversationResponse](doc//ConversationResponse.md)
  - [ConversationResponseDto](doc//ConversationResponseDto.md)
  - [ConversationsPageResponse](doc//ConversationsPageResponse.md)
@@ -263,6 +271,9 @@ Class | Method | HTTP request | Description
  - [CreateSpecialistReviewDto](doc//CreateSpecialistReviewDto.md)
  - [CreateTherapistProfileDto](doc//CreateTherapistProfileDto.md)
  - [CreateTreatmentReviewDto](doc//CreateTreatmentReviewDto.md)
+ - [DashboardNotificationDto](doc//DashboardNotificationDto.md)
+ - [DashboardReviewDto](doc//DashboardReviewDto.md)
+ - [DashboardStatsResponseDto](doc//DashboardStatsResponseDto.md)
  - [DayScheduleDto](doc//DayScheduleDto.md)
  - [DeleteFileResponseDto](doc//DeleteFileResponseDto.md)
  - [DistanceMatrixElementDto](doc//DistanceMatrixElementDto.md)
@@ -270,6 +281,7 @@ Class | Method | HTTP request | Description
  - [DistanceMatrixRowDto](doc//DistanceMatrixRowDto.md)
  - [DoctorProfileResponseDto](doc//DoctorProfileResponseDto.md)
  - [DocumentEntryDto](doc//DocumentEntryDto.md)
+ - [EmployeeDistributionDto](doc//EmployeeDistributionDto.md)
  - [EmployeeResponseDto](doc//EmployeeResponseDto.md)
  - [EmployeeTimeSlotsResponseDto](doc//EmployeeTimeSlotsResponseDto.md)
  - [FacilityDto](doc//FacilityDto.md)
@@ -278,6 +290,7 @@ Class | Method | HTTP request | Description
  - [GeocodeResponseDto](doc//GeocodeResponseDto.md)
  - [GeocodeResultDto](doc//GeocodeResultDto.md)
  - [HomeRecommenderRequest](doc//HomeRecommenderRequest.md)
+ - [InventoryAlertDto](doc//InventoryAlertDto.md)
  - [KycDocumentDto](doc//KycDocumentDto.md)
  - [LastMessageDto](doc//LastMessageDto.md)
  - [LegalRepresentativeDto](doc//LegalRepresentativeDto.md)
@@ -293,6 +306,7 @@ Class | Method | HTTP request | Description
  - [MessagesPageResponse](doc//MessagesPageResponse.md)
  - [MicroLockDto](doc//MicroLockDto.md)
  - [MicroLockResponseDto](doc//MicroLockResponseDto.md)
+ - [MyProfileCompletionResponseDto](doc//MyProfileCompletionResponseDto.md)
  - [MyProfileResponseDto](doc//MyProfileResponseDto.md)
  - [NotificationResponseDto](doc//NotificationResponseDto.md)
  - [PaginationMeta](doc//PaginationMeta.md)
@@ -314,6 +328,9 @@ Class | Method | HTTP request | Description
  - [PartnerItemDto](doc//PartnerItemDto.md)
  - [PartnerLoginDto](doc//PartnerLoginDto.md)
  - [PartnerProcedureStepDto](doc//PartnerProcedureStepDto.md)
+ - [PartnerProfileCompletionCertificationDto](doc//PartnerProfileCompletionCertificationDto.md)
+ - [PartnerProfileCompletionIdentityDto](doc//PartnerProfileCompletionIdentityDto.md)
+ - [PartnerPublicProfileResponseDto](doc//PartnerPublicProfileResponseDto.md)
  - [PartnerRecommendedServiceDto](doc//PartnerRecommendedServiceDto.md)
  - [PartnerRequestDto](doc//PartnerRequestDto.md)
  - [PartnerReviewDto](doc//PartnerReviewDto.md)
@@ -351,6 +368,13 @@ Class | Method | HTTP request | Description
  - [PublicHealthServiceRecommendedResponseDto](doc//PublicHealthServiceRecommendedResponseDto.md)
  - [PublicHealthServiceResponseDto](doc//PublicHealthServiceResponseDto.md)
  - [PublicHealthServiceReviewResponseDto](doc//PublicHealthServiceReviewResponseDto.md)
+ - [PublicProfileAddressDto](doc//PublicProfileAddressDto.md)
+ - [PublicProfileBusinessInfoDto](doc//PublicProfileBusinessInfoDto.md)
+ - [PublicProfileCertificationDto](doc//PublicProfileCertificationDto.md)
+ - [PublicProfileChecklistItemDto](doc//PublicProfileChecklistItemDto.md)
+ - [PublicProfileCompletionSummaryDto](doc//PublicProfileCompletionSummaryDto.md)
+ - [PublicProfileLegalSummaryDto](doc//PublicProfileLegalSummaryDto.md)
+ - [PublicProfileStorefrontDto](doc//PublicProfileStorefrontDto.md)
  - [PublicServiceTagDto](doc//PublicServiceTagDto.md)
  - [RatingInfo](doc//RatingInfo.md)
  - [RecommendationResponse](doc//RecommendationResponse.md)
@@ -361,6 +385,7 @@ Class | Method | HTTP request | Description
  - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
  - [RegisterPartnerResponseDto](doc//RegisterPartnerResponseDto.md)
  - [RegisterProfileDto](doc//RegisterProfileDto.md)
+ - [RevenueDataPointDto](doc//RevenueDataPointDto.md)
  - [ReviewItemDto](doc//ReviewItemDto.md)
  - [ReviewPartnerProfileDto](doc//ReviewPartnerProfileDto.md)
  - [ReviewPartnerResponseDto](doc//ReviewPartnerResponseDto.md)
@@ -369,21 +394,27 @@ Class | Method | HTTP request | Description
  - [ServiceInfoDto](doc//ServiceInfoDto.md)
  - [ServiceManualInputDto](doc//ServiceManualInputDto.md)
  - [ServiceManualResponseDto](doc//ServiceManualResponseDto.md)
+ - [ServicePerformanceDto](doc//ServicePerformanceDto.md)
  - [ServiceRuleDto](doc//ServiceRuleDto.md)
  - [ServiceRuleInputDto](doc//ServiceRuleInputDto.md)
  - [ServiceTagResponseDto](doc//ServiceTagResponseDto.md)
  - [SpecialistInfoDto](doc//SpecialistInfoDto.md)
  - [SpecialistReviewResponseDto](doc//SpecialistReviewResponseDto.md)
+ - [StaffScheduleEntryDto](doc//StaffScheduleEntryDto.md)
  - [SurveyDto](doc//SurveyDto.md)
  - [SurveyResponseDto](doc//SurveyResponseDto.md)
  - [TherapistProfileResponseDto](doc//TherapistProfileResponseDto.md)
  - [TimeSlotDto](doc//TimeSlotDto.md)
  - [TotalPartnersResponseDto](doc//TotalPartnersResponseDto.md)
  - [TreatmentReviewResponseDto](doc//TreatmentReviewResponseDto.md)
+ - [UpcomingAppointmentDto](doc//UpcomingAppointmentDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)
  - [UpdateEmployeeDto](doc//UpdateEmployeeDto.md)
+ - [UpdatePartnerCertificationDto](doc//UpdatePartnerCertificationDto.md)
  - [UpdatePartnerDto](doc//UpdatePartnerDto.md)
  - [UpdatePartnerHealthServiceDto](doc//UpdatePartnerHealthServiceDto.md)
+ - [UpdatePartnerProfileCompletionDto](doc//UpdatePartnerProfileCompletionDto.md)
+ - [UpdatePartnerPublicProfileDto](doc//UpdatePartnerPublicProfileDto.md)
  - [UpdateServiceTagDto](doc//UpdateServiceTagDto.md)
  - [UserEligibilityDetailResponseDto](doc//UserEligibilityDetailResponseDto.md)
  - [UserProfileDto](doc//UserProfileDto.md)

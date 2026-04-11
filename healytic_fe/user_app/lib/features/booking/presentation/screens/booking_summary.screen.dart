@@ -64,14 +64,36 @@ class _BookingSummaryScreenState
   }
 
   Future<void> _handleAddToCart(
-    String? serviceId,
+    BookingFlowState flowState,
+    EligibilityDetailEntity? detail,
   ) async {
-    if (_isAddingToCart || serviceId == null) return;
+    if (_isAddingToCart) return;
+
+    final bookingParams = _buildBookingParams(
+      flowState: flowState,
+      detail: detail,
+    );
+    if (bookingParams == null) {
+      AppToast.error(
+        context,
+        'Select a specialist and time slot first',
+      );
+      return;
+    }
+
     setState(() => _isAddingToCart = true);
     try {
+      final timeSlot = _buildCartTimeSlot(
+        bookingParams.selectedDate,
+        bookingParams.selectedTimeSlot,
+      );
       await ref
           .read(cartProvider.notifier)
-          .addItem(serviceId: serviceId);
+          .addItem(
+            serviceId: bookingParams.serviceId,
+            employeeId: bookingParams.employeeId,
+            timeSlot: timeSlot,
+          );
       if (!mounted) return;
       AppToast.success(context, 'Added to cart');
     } catch (e) {
@@ -85,6 +107,34 @@ class _BookingSummaryScreenState
         setState(() => _isAddingToCart = false);
       }
     }
+  }
+
+  DateTime _buildCartTimeSlot(
+    DateTime date,
+    String timeLabel,
+  ) {
+    final parts = timeLabel.split(RegExp(r'[\s:]+'));
+    if (parts.length >= 3) {
+      var hour = int.tryParse(parts[0]) ?? 0;
+      final minute = int.tryParse(parts[1]) ?? 0;
+      final period = parts[2].toUpperCase();
+      if (period == 'PM' && hour != 12) hour += 12;
+      if (period == 'AM' && hour == 12) hour = 0;
+
+      return DateTime(
+        date.year,
+        date.month,
+        date.day,
+        hour,
+        minute,
+      );
+    }
+
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+    );
   }
 
   void _handleConfirm(
@@ -183,9 +233,6 @@ class _BookingSummaryScreenState
             ?.value
         : null;
 
-    final serviceId = detail?.service.id ??
-        flowState.selectedService?.id;
-
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
@@ -214,9 +261,10 @@ class _BookingSummaryScreenState
             _handleConfirm(flowState, detail),
         label: 'Confirm & Pay',
         icon: Symbols.arrow_forward,
-        onAddToCart: serviceId != null
-            ? () => _handleAddToCart(serviceId)
-            : null,
+        onAddToCart: () => _handleAddToCart(
+          flowState,
+          detail,
+        ),
         isAddingToCart: _isAddingToCart,
       ),
     );

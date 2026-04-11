@@ -1,5 +1,6 @@
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 
 /// Radio-style payment method selector section.
@@ -28,27 +29,18 @@ class PaymentMethodSection extends StatelessWidget {
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(
-          color: colorScheme.outlineVariant
-              .withValues(alpha: 0.5),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow
-                .withValues(alpha: 0.08),
+            color: colorScheme.shadow.withValues(alpha: 0.08),
             blurRadius: AppDimens.spaceMd,
-            offset: const Offset(
-              0,
-              AppDimens.spaceXxs,
-            ),
+            offset: const Offset(0, AppDimens.spaceXxs),
           ),
           BoxShadow(
-            color: colorScheme.shadow
-                .withValues(alpha: 0.04),
+            color: colorScheme.shadow.withValues(alpha: 0.04),
             blurRadius: AppDimens.spaceXxl,
-            offset: const Offset(
-              0,
-              AppDimens.spaceXs + 2,
-            ),
+            offset: const Offset(0, AppDimens.spaceXs + 2),
           ),
         ],
       ),
@@ -65,13 +57,11 @@ class PaymentMethodSection extends StatelessWidget {
           AppDimens.verticalMedium,
           ...methods.map(
             (method) => Padding(
-              padding: const EdgeInsets.only(
-                bottom: AppDimens.spaceMd,
-              ),
+              padding: const EdgeInsets.only(bottom: AppDimens.spaceMd),
               child: _PaymentOptionTile(
+                key: keys.checkoutPage.paymentMethodTile(method.type.name),
                 method: method,
-                isSelected:
-                    method.type == selectedType,
+                isSelected: method.type == selectedType,
                 onTap: () => onSelected(method.type),
               ),
             ),
@@ -90,6 +80,7 @@ class _PaymentOptionTile extends StatelessWidget {
   final VoidCallback onTap;
 
   const _PaymentOptionTile({
+    super.key,
     required this.method,
     required this.isSelected,
     required this.onTap,
@@ -113,26 +104,17 @@ class _PaymentOptionTile extends StatelessWidget {
                 : colorScheme.outlineVariant,
           ),
           color: isSelected
-              ? colorScheme.primary
-                  .withValues(alpha: 0.05)
+              ? colorScheme.primary.withValues(alpha: 0.05)
               : Colors.transparent,
         ),
         child: Row(
           children: [
-            _PaymentIcon(
-              type: method.type,
-              isSelected: isSelected,
-            ),
+            _PaymentIcon(type: method.type, isSelected: isSelected),
             AppDimens.horizontalMediumSmall,
             Expanded(
-              child: _PaymentLabel(
-                method: method,
-                isSelected: isSelected,
-              ),
+              child: _PaymentLabel(method: method, isSelected: isSelected),
             ),
-            _RadioIndicator(
-              isSelected: isSelected,
-            ),
+            _RadioIndicator(isSelected: isSelected),
           ],
         ),
       ),
@@ -145,10 +127,7 @@ class _PaymentIcon extends StatelessWidget {
   final PaymentMethodType type;
   final bool isSelected;
 
-  const _PaymentIcon({
-    required this.type,
-    required this.isSelected,
-  });
+  const _PaymentIcon({required this.type, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -156,33 +135,33 @@ class _PaymentIcon extends StatelessWidget {
 
     return switch (type) {
       PaymentMethodType.card => Container(
-          width: AppDimens.avatarSm,
-          height: AppDimens.iconMd,
-          decoration: BoxDecoration(
-            color: colorScheme.onSurface,
-            borderRadius: AppDimens.radiusExtraSmall,
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            'VISA',
-            style: TextStyle(
-              fontSize: AppDimens.spaceXs + 2,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
-              color: colorScheme.surface,
-            ),
+        width: AppDimens.avatarSm,
+        height: AppDimens.iconMd,
+        decoration: BoxDecoration(
+          color: colorScheme.onSurface,
+          borderRadius: AppDimens.radiusExtraSmall,
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          'VISA',
+          style: TextStyle(
+            fontSize: AppDimens.spaceXs + 2,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+            color: colorScheme.surface,
           ),
         ),
+      ),
       PaymentMethodType.eWallet => Icon(
-          Icons.account_balance_wallet,
-          color: colorScheme.tertiary,
-          size: AppDimens.iconMd,
-        ),
+        Icons.account_balance_wallet,
+        color: colorScheme.tertiary,
+        size: AppDimens.iconMd,
+      ),
       PaymentMethodType.payLater => Icon(
-          Icons.schedule,
-          color: colorScheme.secondary,
-          size: AppDimens.iconMd,
-        ),
+        Icons.schedule,
+        color: colorScheme.secondary,
+        size: AppDimens.iconMd,
+      ),
     };
   }
 }
@@ -193,10 +172,7 @@ class _PaymentLabel extends StatelessWidget {
   final PaymentMethodOption method;
   final bool isSelected;
 
-  const _PaymentLabel({
-    required this.method,
-    required this.isSelected,
-  });
+  const _PaymentLabel({required this.method, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -242,9 +218,7 @@ class _RadioIndicator extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: isSelected
-              ? colorScheme.primary
-              : colorScheme.outline,
+          color: isSelected ? colorScheme.primary : colorScheme.outline,
           width: AppDimens.borderWidthThick,
         ),
       ),

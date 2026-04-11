@@ -22,6 +22,18 @@ void main() {
       // TODO
     });
 
+    // UUID of the assigned employee (doctor or therapist)
+    // String employeeId
+    test('to test the property `employeeId`', () async {
+      // TODO
+    });
+
+    // Desired time slot in ISO 8601 datetime format
+    // String timeSlot
+    test('to test the property `timeSlot`', () async {
+      // TODO
+    });
+
 
   });
 

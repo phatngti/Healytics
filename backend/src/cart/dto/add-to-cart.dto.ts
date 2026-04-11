@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID } from 'class-validator';
+import { IsDateString, IsUUID } from 'class-validator';
 
 export class AddToCartDto {
   @ApiProperty({
@@ -8,4 +8,18 @@ export class AddToCartDto {
   })
   @IsUUID()
   serviceId: string;
+
+  @ApiProperty({
+    description: 'UUID of the assigned employee (doctor or therapist)',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
+  @IsUUID()
+  employeeId: string;
+
+  @ApiProperty({
+    description: 'Desired time slot in ISO 8601 datetime format',
+    example: '2026-04-10T09:00:00.000Z',
+  })
+  @IsDateString()
+  timeSlot: string;
 }
