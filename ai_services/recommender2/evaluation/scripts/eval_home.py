@@ -86,14 +86,11 @@ def _build_profile_inputs(item: Dict, query_mode: str) -> Tuple[List[str], List[
     service_history_ids = item.get("service_history_ids", [])
 
     if query_mode == "keyword":
-        # Default v3-like single-query keyword formulation.
+        # Condensed keyword formulation: conditions + goals + interests.
         cond = _stable_unique([_clean_text(x) for x in health_conditions if _clean_text(x)])
         intr = _stable_unique([_clean_text(x) for x in interests if _clean_text(x)])
         goal = _stable_unique([_clean_text(x) for x in goals if _clean_text(x)])
-        snippet = _description_snippet(item.get("description", ""))
-        merged = cond + goal + goal + intr
-        if snippet:
-            merged.append(snippet)
+        merged = cond + goal + intr
         return merged, [], [], []
 
     return health_conditions, interests, goals, service_history_ids
