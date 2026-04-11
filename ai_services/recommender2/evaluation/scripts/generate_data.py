@@ -229,24 +229,41 @@ Trả về JSON đúng schema sau (không có thêm text nào khác):
 
 
 def _home_prompt_for_service(service: Dict[str, Any], per_service: int) -> str:
-    """Prompt LLM to generate realistic home profile descriptions."""
-    tags = ", ".join(service.get("tags", []))
-    return f"""Bạn là hệ thống phân tích hành vi người dùng (User Profiler).
-Hãy tạo ra {per_service} hồ sơ khách hàng (user profile) ĐA DẠNG và CHÂN THỰC, sao cho dịch vụ dưới đây là GỢI Ý PHÙ HỢP NHẤT dành cho họ.
+    """Prompt LLM to generate realistic home profile descriptions.
 
-Thông tin dịch vụ đích:
-- Tên dịch vụ: {service.get('name', '')}
+    The prompt is designed to produce profiles whose keywords have strong
+    semantic overlap with the target service description stored in ChromaDB.
+    This means:
+    - health_conditions = symptoms/conditions the service actually treats
+    - interests = health/wellness activities relevant to the service domain
+    - goals = outcomes the service delivers (not vague life goals)
+    """
+    tags = ", ".join(service.get("tags", []))
+    return f"""Bạn là chuyên gia tạo dữ liệu đánh giá (Evaluation Data Expert) cho hệ thống gợi ý dịch vụ sức khỏe.
+
+Nhiệm vụ: Tạo {per_service} hồ sơ khách hàng sao cho dịch vụ dưới đây là KẾT QUẢ TÌM KIẾM PHÙ HỢP NHẤT cho họ.
+
+Dịch vụ đích:
+- Tên: {service.get('name', '')}
 - Danh mục: {service.get('category', '')}
 - Tags: {tags}
 - Mô tả: {service.get('description', '')}
 
-Yêu cầu cho mỗi Profile:
-1. "description": 2-3 câu mô tả hoàn cảnh sống, độ tuổi, nghề nghiệp và khó khăn họ đang gặp phải. Viết mượt mà, hợp logic.
-2. "health_conditions": Mảng chứa 1-3 từ khóa NGẮN GỌN về bệnh lý/tình trạng sức khỏe thực tế (vd: "đau vai gáy", "thừa cân", "mất ngủ").
-3. "interests": Mảng chứa 1-3 từ khóa về sở thích (vd: "tập tại nhà", "ăn chay", "yoga").
-4. "goals": Mảng chứa 1-2 mục tiêu ngắn gọn (vd: "giảm mỡ bụng", "giảm stress").
+QUY TẮC BẮT BUỘC:
+1. "description": 1-2 câu ngắn gọn mô tả VẤN ĐỀ SỨC KHỎE cụ thể mà người này gặp phải. Tập trung vào triệu chứng và nhu cầu, KHÔNG viết dài dòng về nghề nghiệp hay cuộc sống.
+2. "health_conditions": Mảng chứa 2-3 từ khóa NGẮN GỌN (2-4 từ) về triệu chứng hoặc bệnh lý MÀ DỊCH VỤ NÀY CÓ THỂ GIẢI QUYẾT.
+   - Ví dụ tốt: "đau khớp gối", "trào ngược dạ dày", "mất ngủ"
+   - Ví dụ XẤU (TRÁNH): "stress", "mệt mỏi" (quá chung chung)
+3. "interests": Mảng chứa 1-2 từ khóa về hoạt động SỨC KHỎE / THỂ CHẤT liên quan đến dịch vụ.
+   - Ví dụ tốt: "yoga", "chạy bộ", "ăn chay", "thiền"
+   - Ví dụ XẤU (TRÁNH): "xem phim", "du lịch", "đọc sách" (không liên quan sức khỏe)
+4. "goals": Mảng chứa 1-2 mục tiêu CỤ THỂ mà dịch vụ này giúp đạt được.
+   - Ví dụ tốt: "giảm đau khớp", "kiểm soát đường huyết", "cai thuốc lá"
+   - Ví dụ XẤU (TRÁNH): "làm gương cho con", "tìm lại động lực" (quá mơ hồ)
 
-Trả về JSON schema:
+QUAN TRỌNG: Các từ khóa trong health_conditions, interests, goals PHẢI có liên quan ngữ nghĩa trực tiếp đến dịch vụ đích. Hệ thống sẽ dùng embedding model để tìm kiếm, nên từ khóa cần gần nghĩa với mô tả dịch vụ.
+
+Trả về JSON (không thêm text nào khác):
 {{
     "profiles": [
         {{
