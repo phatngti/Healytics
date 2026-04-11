@@ -1,4 +1,4 @@
-\chapter{Hiện thực}
+﻿\chapter{Hiện thực}
 \section{Các công nghệ liên quan}
 
 \subsection{Mobile App Development (iOS/Android, Flutter)}
@@ -488,212 +488,194 @@ Module \texttt{S3Module} tích hợp với dịch vụ lưu trữ đối tượn
     \item \textbf{Quản lý tài liệu đối tác:} Thực thể \texttt{PartnerDocument} lưu metadata (loại tài liệu, URL, trạng thái) trong PostgreSQL, trong khi nội dung tệp thực tế nằm trên Object Storage.
 \end{itemize}
 
-\subsection{Quản lý Dịch vụ Sức khỏe (Health Service Management)}
+\subsection{Quản lý Dịch vụ và Danh mục}
 
-Module \texttt{HealthServiceModule} là module nghiệp vụ cốt lõi, quản lý toàn bộ vòng đời của các dịch vụ sức khỏe (sản phẩm) trên nền tảng. Hệ thống phân tách rõ ràng giữa hai luồng truy cập thông qua hai controller riêng biệt:
+\subsubsection{Module Dịch vụ Sức khỏe (\texttt{HealthServiceModule})}
+
+Module nghiệp vụ cốt lõi, quản lý vòng đời dịch vụ sức khỏe trên nền tảng. Hai controller tách biệt hai phía truy cập:
 
 \begin{itemize}
-    \item \textbf{Controller phía người dùng (\texttt{UserHealthServiceController}):} Cung cấp các API cho phép người dùng cuối tìm kiếm, lọc và xem chi tiết dịch vụ. Hỗ trợ phân trang, sắp xếp theo nhiều tiêu chí (giá, đánh giá, khoảng cách), và lọc theo danh mục hoặc tags.
+    \item \textbf{\texttt{UserHealthServiceController}:} Tìm kiếm, lọc, xem chi tiết dịch vụ. Hỗ trợ phân trang, sắp xếp (giá, đánh giá, khoảng cách) và lọc theo danh mục hoặc tags.
+    \item \textbf{\texttt{PartnerHealthServiceController}:} CRUD dịch vụ, quản lý trạng thái hiển thị (ẩn/hiện). Đối tác chỉ thao tác trên dịch vụ thuộc sở hữu của mình.
+\end{itemize}
 
-    \item \textbf{Controller phía đối tác (\texttt{PartnerHealthServiceController}):} Cho phép đối tác tạo mới, cập nhật, xóa và quản lý trạng thái hiển thị (ẩn/hiện) của dịch vụ. Mỗi đối tác chỉ có thể thao tác trên các dịch vụ thuộc sở hữu của mình.
+Mỗi dịch vụ (\texttt{Product}) liên kết với các thực thể con: \texttt{ProductMedia} (hình ảnh/video), \texttt{ProductFacilityImage} (ảnh cơ sở), \texttt{ProductTag}/\texttt{ProductFeatureTag} (tags), \texttt{ProductEmployeeEligibility} (chuyên gia đủ điều kiện), \texttt{ProductResourceRequirement} (yêu cầu thiết bị), và \texttt{DocumentRequirement} (giấy tờ cần từ phía bệnh nhân).
 
-    \item \textbf{Mô hình dữ liệu:} Mỗi dịch vụ (\texttt{Product}) liên kết với nhiều thực thể con:
+% TODO: Thêm hình minh họa mô hình dữ liệu Product và các quan hệ
+
+\subsubsection{Module Danh mục (\texttt{CategoriesModule})}
+
+Tổ chức danh mục theo cấu trúc phân cấp parent-child (ví dụ: Y tế $\rightarrow$ Tim mạch $\rightarrow$ Khám tổng quát). Ba controller phân quyền rõ ràng:
+
+\begin{itemize}
+    \item \texttt{AdminCategoriesController}: CRUD danh mục (chỉ admin).
+    \item \texttt{UserCategoriesController}: Lấy danh sách kèm bộ lọc cho ứng dụng.
+    \item \texttt{CategoriesController}: API công khai không yêu cầu xác thực.
+\end{itemize}
+
+\subsubsection{Module Tags dịch vụ (\texttt{ServiceTagsModule})}
+
+Quản lý hệ thống tags gắn với dịch vụ (\textit{yoga}, \textit{giảm cân}, \textit{tim mạch}). Quan hệ many-to-many với \texttt{Product}, hỗ trợ tìm kiếm đa chiều. API cho phép CRUD tags và tìm dịch vụ theo tổ hợp tags.
+
+\subsection{Quản lý Nhân sự và Cơ sở}
+
+\subsubsection{Module Nhân viên (\texttt{EmployeesModule})}
+
+Quản lý nhân viên, bác sĩ và chuyên gia trên nền tảng:
+
+\begin{itemize}
+    \item \texttt{PartnerEmployeesController}: Đối tác CRUD nhân viên, cập nhật lịch làm việc, chuyên môn và trạng thái hoạt động.
+    \item \texttt{UserEmployeesController}: Người dùng xem thông tin, tìm kiếm theo chuyên khoa, xem lịch trống.
+    \item \textbf{Hồ sơ chuyên biệt:} Mở rộng từ \texttt{Employee} thành \texttt{DoctorProfile} (chuyên khoa, giấy phép hành nghề) và \texttt{TherapistProfile} (phương pháp trị liệu, kinh nghiệm).
+\end{itemize}
+
+\subsubsection{Module Phòng khám (\texttt{ClinicModule})}
+
+Quản lý phòng khám và cơ sở dịch vụ: tên, mô tả, hình ảnh, giờ hoạt động. Liên kết \texttt{Address} và tọa độ địa lý phục vụ tìm kiếm theo vị trí. \texttt{UserClinicController} cho phép tìm phòng khám gần vị trí hiện tại, lọc theo dịch vụ hoặc danh mục.
+
+\subsection{Quản lý Đặt lịch, Giỏ hàng và Thanh toán}
+
+\subsubsection{Module Đặt lịch (\texttt{BookingModule})}
+
+Xử lý quy trình đặt lịch theo mô hình máy trạng thái:
+
+\begin{itemize}
+    \item \textbf{Luồng trạng thái:} \texttt{PENDING} $\rightarrow$ \texttt{CONFIRMED} $\rightarrow$ \texttt{IN\_PROGRESS} $\rightarrow$ \texttt{COMPLETED} hoặc \texttt{CANCELLED}. Mỗi chuyển trạng thái được ghi vào \texttt{BookingStatusLog}.
+    \item \textbf{Quản lý slot:} \texttt{SlotsController} kiểm tra khung giờ trống, ngăn double-booking qua khóa phân tán Redis.
+    \item \textbf{Tích hợp thanh toán:} Booking xác nhận tự động kích hoạt thanh toán qua \texttt{BookingPaymentService}.
+\end{itemize}
+
+% TODO: Thêm hình minh họa state machine của Booking
+
+\subsubsection{Module Lịch hẹn (\texttt{AppointmentModule})}
+
+Quản lý lịch hẹn sau khi booking được xác nhận. \texttt{UserAppointmentController} cho phép xem, hủy, đổi lịch. Mỗi appointment liên kết 1-1 với booking gốc, tích hợp nhắc nhở tự động qua \texttt{NotificationModule}.
+
+\subsubsection{Module Giỏ hàng (\texttt{CartModule})}
+
+Quản lý giỏ hàng theo mô hình checkout-ticket:
+
+\begin{itemize}
+    \item Thêm/xóa/cập nhật số lượng dịch vụ trong giỏ.
+    \item \textbf{Checkout Ticket:} Khi thanh toán, tạo \texttt{CheckoutTicket} ``đóng băng'' thông tin đơn hàng, đảm bảo giá không thay đổi trong quá trình thanh toán.
+    \item Áp dụng ràng buộc về số lượng tối đa và thời gian hết hạn ticket.
+\end{itemize}
+
+\subsubsection{Module Thanh toán (\texttt{PaymentGatewayModule})}
+
+Tích hợp thanh toán trực tuyến qua cổng \textbf{MoMo}:
+
+\begin{itemize}
+    \item \textbf{Tạo giao dịch:} \texttt{MoMoPaymentService} tạo request, ký HMAC-SHA256, gửi đến MoMo API.
+    \item \textbf{Xử lý callback (IPN):} \texttt{MoMoController} nhận kết quả từ MoMo, xác thực chữ ký.
+    \item \textbf{Liên kết Booking:} \texttt{BookingPaymentService} cập nhật trạng thái (thành công $\rightarrow$ \texttt{CONFIRMED}, thất bại $\rightarrow$ \texttt{PAYMENT\_FAILED}).
+    \item Giao dịch lưu trong \texttt{Payment} và \texttt{PaymentTransactionLog}.
+\end{itemize}
+
+% TODO: Thêm hình minh họa luồng thanh toán MoMo (sequence diagram)
+
+\subsection{Hệ thống Giao tiếp và Thông báo}
+
+\subsubsection{Module Chat thời gian thực (\texttt{ChatModule})}
+
+Nhắn tin thời gian thực giữa người dùng và đối tác, kết hợp REST API và WebSocket:
+
+\begin{itemize}
+    \item \textbf{Kiến trúc song song:}
     \begin{itemize}
-        \item \texttt{ProductMedia}: Hình ảnh và video giới thiệu dịch vụ.
-        \item \texttt{ProductFacilityImage}: Ảnh cơ sở vật chất nơi cung cấp dịch vụ.
-        \item \texttt{ProductTag} và \texttt{ProductFeatureTag}: Hệ thống tags đa tầng phục vụ tìm kiếm và phân loại.
-        \item \texttt{ProductEmployeeEligibility}: Danh sách chuyên gia đủ điều kiện thực hiện dịch vụ.
-        \item \texttt{ProductResourceRequirement}: Yêu cầu về trang thiết bị, phòng ốc.
-        \item \texttt{DocumentRequirement}: Giấy tờ cần thiết từ phía bệnh nhân/khách hàng.
+        \item Phía người dùng: \texttt{UserChatController} (REST) + \texttt{UserChatGateway} (WebSocket).
+        \item Phía đối tác: \texttt{PartnerChatController} (REST) + \texttt{PartnerChatGateway} (WebSocket).
     \end{itemize}
+    \item \textbf{Xác thực WebSocket:} Middleware \texttt{ws-jwt-auth} xác thực JWT khi thiết lập kết nối.
+    \item \textbf{Dữ liệu:} \texttt{Conversation}/\texttt{ChatMessage} (nội dung, thời gian, trạng thái đã đọc), \texttt{PartnerChatAttachment} (tệp đính kèm).
+    \item \textbf{REST bổ trợ:} Lịch sử tin nhắn (phân trang), danh sách cuộc trò chuyện, đánh dấu đã đọc.
 \end{itemize}
 
-\subsection{Quản lý Danh mục và Tags (Categories \& Service Tags)}
+\subsubsection{Module Thông báo (\texttt{NotificationModule})}
 
-\subsubsection{Danh mục dịch vụ (\texttt{CategoriesModule})}
-
-Hệ thống danh mục được tổ chức theo cấu trúc phân cấp (parent-child), cho phép phân loại dịch vụ theo nhiều cấp độ (ví dụ: Y tế → Tim mạch → Khám tổng quát). Module cung cấp ba controller riêng biệt theo vai trò:
+Thông báo đa kênh:
 
 \begin{itemize}
-    \item \texttt{AdminCategoriesController}: Tạo, sửa, xóa danh mục (chỉ dành cho quản trị viên).
-    \item \texttt{UserCategoriesController}: Lấy danh sách danh mục kèm bộ lọc, phục vụ hiển thị trên ứng dụng.
-    \item \texttt{CategoriesController}: API công khai cho các chức năng không yêu cầu xác thực.
+    \item \textbf{WebSocket:} \texttt{NotificationGateway} đẩy thông báo tức thì (đặt lịch, tin nhắn mới, nhắc hẹn).
+    \item \textbf{Push Notification (FCM):} \texttt{PushNotificationService} tích hợp Firebase Cloud Messaging. \texttt{UserDeviceController} quản lý đăng ký device token.
+    \item \textbf{Quản lý:} \texttt{UserNotificationController} (xem, đánh dấu đã đọc), \texttt{AdminNotificationController} (broadcast hệ thống).
+    \item \textbf{Bất đồng bộ:} Sự kiện thông báo phát qua RabbitMQ, không làm chậm luồng nghiệp vụ chính.
 \end{itemize}
 
-\subsubsection{Tags dịch vụ (\texttt{ServiceTagsModule})}
+\subsection{Hệ thống Hỗ trợ Nghiệp vụ}
 
-Module quản lý hệ thống tags gắn với dịch vụ (ví dụ: ``yoga'', ``giảm cân'', ``tim mạch''), hỗ trợ tìm kiếm đa chiều. Tags được tổ chức theo quan hệ many-to-many với \texttt{Product}, cho phép một dịch vụ có nhiều tags và ngược lại. API hỗ trợ tạo, cập nhật, xóa tags và tìm kiếm dịch vụ theo tổ hợp tags.
+\subsubsection{Module Địa chỉ hành chính (\texttt{LocationsModule})}
 
-\subsection{Quản lý Nhân viên và Chuyên gia (Employee Management)}
+Quản lý hệ thống địa chỉ phân cấp theo chuẩn hành chính Việt Nam: Tỉnh/Thành phố $\rightarrow$ Quận/Huyện $\rightarrow$ Phường/Xã (\texttt{LocationLevel} enum). Phục vụ validation địa chỉ khi đăng ký đối tác, tạo phòng khám và lưu địa chỉ người dùng.
 
-Module \texttt{EmployeesModule} quản lý thông tin nhân viên, bác sĩ, và các chuyên gia y tế/thể thao/dinh dưỡng trên nền tảng. Đây là module phức tạp với logic nghiệp vụ dày đặc (service 19KB):
+\subsubsection{Module Bản đồ (\texttt{MapboxModule})}
+
+Tích hợp Mapbox API: Geocoding (địa chỉ $\leftrightarrow$ tọa độ), tìm kiếm theo vị trí với bán kính tùy chỉnh, và tính khoảng cách giữa hai điểm phục vụ sắp xếp kết quả.
+
+\subsubsection{Module Đánh giá (\texttt{ReviewModule})}
+
+Cho phép đánh giá sau khi sử dụng dịch vụ. Hai loại: \texttt{SpecialistReview} (đánh giá chuyên gia về chuyên môn, thái độ) và \texttt{TreatmentReview} (đánh giá trải nghiệm điều trị, cơ sở vật chất). Điểm trung bình được tổng hợp và hiển thị trên trang chi tiết.
+
+\subsection{Dashboard Đối tác và Tích hợp AI}
+
+\subsubsection{Dashboard Đối tác (\texttt{DashboardPartnerModule})}
+
+Cung cấp bảng điều khiển phân tích nghiệp vụ cho đối tác thông qua \texttt{PartnerDashboardController}, bao gồm các endpoint:
 
 \begin{itemize}
-    \item \textbf{Phân quyền Controller:}
-    \begin{itemize}
-        \item \texttt{PartnerEmployeesController}: Cho phép đối tác quản lý (CRUD) nhân viên thuộc tổ chức mình, bao gồm cập nhật lịch làm việc, chuyên môn, và trạng thái hoạt động.
-        \item \texttt{UserEmployeesController}: Cho phép người dùng cuối xem thông tin chuyên gia, tìm kiếm theo chuyên khoa, và xem lịch trống.
-    \end{itemize}
-
-    \item \textbf{Hồ sơ chuyên biệt:} Hệ thống hỗ trợ hai loại hồ sơ chuyên gia được mở rộng từ thực thể \texttt{Employee} cơ bản:
-    \begin{itemize}
-        \item \texttt{DoctorProfile}: Chứa thông tin chuyên khoa, số giấy phép hành nghề, chứng chỉ.
-        \item \texttt{TherapistProfile}: Chứa thông tin về phương pháp trị liệu, lĩnh vực chuyên môn, kinh nghiệm.
-    \end{itemize}
+    \item \textbf{\texttt{GET /stats}:} Thống kê KPI tổng hợp (doanh thu, số booking, tỷ lệ hoàn thành) theo kỳ tuần/tháng/quý.
+    \item \textbf{\texttt{GET /revenue}:} Dữ liệu doanh thu time-series phục vụ vẽ biểu đồ xu hướng.
+    \item \textbf{\texttt{GET /appointments/upcoming}:} Danh sách lịch hẹn sắp tới cần xử lý.
+    \item \textbf{\texttt{GET /services/performance}:} Xếp hạng hiệu suất dịch vụ theo doanh thu và lượt đặt.
+    \item \textbf{\texttt{GET /employees/distribution}:} Thống kê phân bố nhân sự theo vai trò.
+    \item \textbf{\texttt{GET /reviews/recent}:} Đánh giá gần nhất từ khách hàng.
+    \item \textbf{\texttt{GET /staff/schedule}:} Lịch nhân viên theo ngày cụ thể.
+    \item \textbf{\texttt{GET /notifications}:} Thông báo và cảnh báo cho đối tác.
+    \item \textbf{\texttt{GET /inventory/alerts}:} Cảnh báo về thiết bị hoặc vật tư cần bổ sung.
 \end{itemize}
 
-\subsection{Quản lý Phòng khám và Cơ sở (Clinic Management)}
+Toàn bộ endpoint bảo vệ bởi \texttt{@PartnerApi} decorator, đảm bảo đối tác chỉ xem dữ liệu thuộc tổ chức mình. Business logic được tách thành các handler riêng biệt (Handler Pattern) trong thư mục \texttt{handlers/} để dễ bảo trì.
 
-Module \texttt{ClinicModule} quản lý thông tin phòng khám, trung tâm y tế, và các cơ sở cung cấp dịch vụ. Service (21KB) xử lý:
+% TODO: Thêm hình minh họa giao diện dashboard đối tác
+
+\subsubsection{Module Tích hợp AI (\texttt{AiServiceModule})}
+
+Cầu nối giữa Backend NestJS và cụm microservices AI (Python/FastAPI). Luồng hoạt động:
+
+\begin{enumerate}
+    \item AI Gateway gọi endpoint \texttt{/ai/recommendations} kèm danh sách \texttt{service\_id} cần làm giàu thông tin.
+    \item \texttt{AiServiceService} truy vấn bảng \texttt{products} kèm quan hệ (category, media, employees) từ PostgreSQL.
+    \item Kết quả ánh xạ thành \texttt{AiRecommendationsResponseDto} chứa đầy đủ thông tin (tên, mô tả, giá, hình ảnh, vị trí) để hiển thị trên ứng dụng.
+\end{enumerate}
+
+Endpoint bảo vệ bằng \texttt{AiApiKeyGuard}, chỉ service nội bộ được phép truy cập.
+
+\subsection{Hạ tầng Liên kết và Cross-cutting Concerns}
+
+\subsubsection{Module RabbitMQ}
+
+Cấu hình kết nối RabbitMQ cho giao tiếp bất đồng bộ giữa các module. Module đăng ký \texttt{ClientsModule} với giao thức AMQP, hỗ trợ TLS và virtual host riêng biệt. Sử dụng chính bởi \texttt{NotificationModule} (sự kiện thông báo) và \texttt{HealthServiceModule} (đồng bộ dữ liệu với AI Recommender).
+
+\subsubsection{Module Redis}
+
+Cung cấp kết nối Redis cho toàn bộ ứng dụng qua \texttt{RedisService}:
 
 \begin{itemize}
-    \item Quản lý thông tin cơ sở: tên, mô tả, hình ảnh, giờ hoạt động.
-    \item Liên kết với hệ thống địa chỉ (\texttt{Address}) và tọa độ địa lý để hỗ trợ tìm kiếm theo vị trí.
-    \item \texttt{UserClinicController} cung cấp API cho người dùng tìm kiếm phòng khám gần vị trí hiện tại, lọc theo dịch vụ hoặc danh mục.
+    \item \textbf{Caching:} Dữ liệu tra cứu thường xuyên (dịch vụ, banner).
+    \item \textbf{Pub/Sub:} Phát sự kiện \texttt{service:created}, \texttt{service:updated}, \texttt{service:deleted} để AI Recommender đồng bộ vector store.
+    \item \textbf{Distributed Locking:} Khóa phân tán cho slot đặt lịch, ngăn double-booking.
+    \item \textbf{Session/TTL:} Checkout ticket, OTP, dữ liệu tạm thời.
 \end{itemize}
 
-\subsection{Quản lý Đặt lịch và Lịch hẹn (Booking \& Appointment)}
+\subsubsection{Middleware, Interceptor và Guard}
 
-\subsubsection{Đặt lịch (\texttt{BookingModule})}
-
-Module xử lý toàn bộ quy trình đặt lịch dịch vụ sức khỏe, hoạt động theo mô hình máy trạng thái:
+Các cơ chế xuyên suốt (cross-cutting concerns):
 
 \begin{itemize}
-    \item \textbf{Luồng trạng thái:} \texttt{PENDING} → \texttt{CONFIRMED} → \texttt{IN\_PROGRESS} → \texttt{COMPLETED} hoặc \texttt{CANCELLED}. Mỗi lần chuyển trạng thái đều được ghi lại trong bảng \texttt{BookingStatusLog} để đảm bảo truy vết.
-
-    \item \textbf{Quản lý slot thời gian:} \texttt{SlotsController} cung cấp API kiểm tra và quản lý các khung giờ trống, ngăn chặn tình trạng đặt trùng (double-booking) thông qua cơ chế khóa phân tán Redis.
-
-    \item \textbf{Tích hợp thanh toán:} Sau khi booking được xác nhận, hệ thống tự động kích hoạt quy trình thanh toán thông qua \texttt{BookingPaymentService}.
-\end{itemize}
-
-\subsubsection{Lịch hẹn (\texttt{AppointmentModule})}
-
-Module quản lý chi tiết lịch hẹn sau khi booking đã được xác nhận:
-
-\begin{itemize}
-    \item \texttt{UserAppointmentController}: Cho phép người dùng xem danh sách lịch hẹn sắp tới, hủy hoặc đổi lịch.
-    \item Mỗi appointment liên kết 1-1 với booking gốc, đảm bảo tính nhất quán dữ liệu.
-    \item Hỗ trợ nhắc nhở tự động thông qua tích hợp với \texttt{NotificationModule}.
-\end{itemize}
-
-\subsection{Giỏ hàng (Cart Management)}
-
-Module \texttt{CartModule} quản lý giỏ hàng với mô hình checkout-ticket:
-
-\begin{itemize}
-    \item \textbf{Thêm/xóa dịch vụ:} API cho phép thêm, xóa, hoặc cập nhật số lượng dịch vụ trong giỏ.
-    \item \textbf{Checkout Ticket:} Khi người dùng tiến hành thanh toán, hệ thống tạo \texttt{CheckoutTicket} chứa toàn bộ thông tin đơn hàng (dịch vụ, giá, mã giảm giá) tại thời điểm checkout, đảm bảo giá không thay đổi trong quá trình thanh toán.
-    \item \textbf{Giới hạn:} Hệ thống áp dụng các ràng buộc (constants) về số lượng tối đa trong giỏ và thời gian hết hạn của checkout ticket.
-\end{itemize}
-
-\subsection{Cổng Thanh toán (Payment Gateway)}
-
-Module \texttt{PaymentGatewayModule} tích hợp thanh toán trực tuyến, hiện hỗ trợ cổng thanh toán \textbf{MoMo}:
-
-\begin{itemize}
-    \item \textbf{Tạo giao dịch (\texttt{MoMoPaymentService}):} Khi người dùng chọn thanh toán qua MoMo, hệ thống tạo request chứa thông tin đơn hàng, ký HMAC-SHA256, và gửi đến MoMo API. Người dùng được chuyển hướng đến trang thanh toán MoMo.
-
-    \item \textbf{Xử lý callback (IPN):} \texttt{MoMoController} cung cấp webhook endpoint nhận thông báo kết quả thanh toán từ MoMo (Instant Payment Notification). Hệ thống xác thực chữ ký (signature verification) để đảm bảo request hợp lệ.
-
-    \item \textbf{Liên kết với Booking:} \texttt{BookingPaymentService} đóng vai trò cầu nối, tự động cập nhật trạng thái booking sau khi nhận kết quả thanh toán (thành công → \texttt{CONFIRMED}, thất bại → \texttt{PAYMENT\_FAILED}).
-
-    \item \textbf{Ghi nhận giao dịch:} Mọi giao dịch đều được lưu trong thực thể \texttt{Payment} và \texttt{PaymentTransactionLog}, ghi nhận chi tiết về số tiền, phương thức, mã giao dịch, và trạng thái.
-\end{itemize}
-
-\subsection{Hệ thống Chat thời gian thực (Real-time Chat)}
-
-Module \texttt{ChatModule} triển khai hệ thống nhắn tin thời gian thực giữa người dùng và đối tác (phòng khám/chuyên gia), sử dụng kết hợp REST API và WebSocket:
-
-\begin{itemize}
-    \item \textbf{Kiến trúc song song:} Hệ thống tách biệt hoàn toàn hai phía giao tiếp:
-    \begin{itemize}
-        \item \textit{Phía người dùng:} \texttt{UserChatController} (REST) + \texttt{UserChatGateway} (WebSocket).
-        \item \textit{Phía đối tác:} \texttt{PartnerChatController} (REST) + \texttt{PartnerChatGateway} (WebSocket).
-    \end{itemize}
-
-    \item \textbf{WebSocket Authentication:} Middleware \texttt{ws-jwt-auth.middleware.ts} xác thực JWT token khi client thiết lập kết nối WebSocket, đảm bảo chỉ người dùng hợp lệ mới có thể tham gia chat.
-
-    \item \textbf{Mô hình dữ liệu:}
-    \begin{itemize}
-        \item \texttt{Conversation}/\texttt{PartnerConversation}: Quản lý cuộc trò chuyện, bao gồm thông tin người tham gia và trạng thái.
-        \item \texttt{ChatMessage}/\texttt{PartnerChatMessage}: Lưu trữ nội dung tin nhắn, thời gian gửi, trạng thái đã đọc.
-        \item \texttt{PartnerChatAttachment}: Hỗ trợ gửi tệp đính kèm (hình ảnh, tài liệu y tế).
-    \end{itemize}
-
-    \item \textbf{REST API bổ trợ:} Ngoài WebSocket cho giao tiếp thời gian thực, REST API cung cấp các chức năng như: lấy lịch sử tin nhắn (có phân trang), danh sách cuộc trò chuyện, đánh dấu đã đọc.
-\end{itemize}
-
-\subsection{Hệ thống Thông báo (Notification System)}
-
-Module \texttt{NotificationModule} quản lý toàn bộ hệ thống thông báo đa kênh, bao gồm thông báo trong ứng dụng (in-app), thông báo thời gian thực (WebSocket), và thông báo đẩy (push notification):
-
-\begin{itemize}
-    \item \textbf{Thông báo thời gian thực:} \texttt{NotificationGateway} (WebSocket) đẩy thông báo tức thì đến client khi có sự kiện mới (đặt lịch thành công, tin nhắn mới, nhắc hẹn).
-
-    \item \textbf{Push Notification (FCM):} \texttt{PushNotificationService} tích hợp Firebase Cloud Messaging để gửi thông báo đẩy đến thiết bị di động ngay cả khi ứng dụng không mở.
-    \begin{itemize}
-        \item \texttt{UserDeviceController}: API đăng ký/hủy đăng ký device token từ client.
-        \item Thực thể \texttt{DeviceToken} lưu token FCM của từng thiết bị, liên kết với tài khoản người dùng.
-    \end{itemize}
-
-    \item \textbf{Quản lý thông báo:}
-    \begin{itemize}
-        \item \texttt{UserNotificationController}: Lấy danh sách thông báo, đánh dấu đã đọc, xóa thông báo.
-        \item \texttt{AdminNotificationController}: Gửi thông báo broadcast đến nhóm người dùng hoặc toàn bộ hệ thống.
-        \item Thực thể \texttt{NotificationRead} theo dõi trạng thái đã đọc cho từng người dùng, hỗ trợ badge count.
-    \end{itemize}
-
-    \item \textbf{Tích hợp RabbitMQ:} Các sự kiện thông báo được phát qua message queue, đảm bảo tính bất đồng bộ và không làm chậm luồng nghiệp vụ chính.
-\end{itemize}
-
-\subsection{Hệ thống Địa lý và Bản đồ (Location \& Map Services)}
-
-\subsubsection{Quản lý địa chỉ hành chính (\texttt{LocationsModule})}
-
-Module quản lý hệ thống địa chỉ phân cấp theo chuẩn hành chính Việt Nam:
-
-\begin{itemize}
-    \item Cấu trúc phân cấp: Tỉnh/Thành phố → Quận/Huyện → Phường/Xã, được định nghĩa trong \texttt{LocationLevel} enum.
-    \item API tìm kiếm theo cấp: lấy danh sách tỉnh, quận thuộc tỉnh, xã thuộc quận.
-    \item Phục vụ validation địa chỉ khi đăng ký đối tác, tạo phòng khám, và lưu địa chỉ người dùng.
-\end{itemize}
-
-\subsubsection{Tích hợp bản đồ (\texttt{MapboxModule})}
-
-Module tích hợp Mapbox API để cung cấp các tính năng địa lý nâng cao:
-
-\begin{itemize}
-    \item \textbf{Geocoding:} Chuyển đổi địa chỉ văn bản thành tọa độ (latitude/longitude) và ngược lại (reverse geocoding).
-    \item \textbf{Tìm kiếm theo vị trí:} Cho phép người dùng tìm phòng khám, chuyên gia gần vị trí hiện tại với bán kính tùy chỉnh.
-    \item \textbf{Tính khoảng cách:} Hỗ trợ tính khoảng cách giữa hai điểm, phục vụ sắp xếp kết quả tìm kiếm theo độ gần.
-\end{itemize}
-
-\subsection{Hệ thống Đánh giá (Review System)}
-
-Module \texttt{ReviewModule} cho phép người dùng đánh giá dịch vụ và chuyên gia sau khi sử dụng:
-
-\begin{itemize}
-    \item \texttt{UserReviewController}: API gửi đánh giá, xem đánh giá của mình, và xem đánh giá từ người dùng khác.
-    \item \textbf{Hai loại đánh giá:}
-    \begin{itemize}
-        \item \texttt{SpecialistReview}: Đánh giá chuyên gia (bác sĩ, huấn luyện viên) về chuyên môn, thái độ, và hiệu quả.
-        \item \texttt{TreatmentReview}: Đánh giá trải nghiệm điều trị, bao gồm cơ sở vật chất, quy trình, và kết quả.
-    \end{itemize}
-    \item Điểm đánh giá trung bình được tổng hợp và hiển thị trên trang chi tiết dịch vụ và hồ sơ chuyên gia.
-\end{itemize}
-
-\subsection{Tích hợp cross-cutting: Middleware, Interceptor và Guard}
-
-Ngoài các module nghiệp vụ, hệ thống triển khai các cơ chế xuyên suốt (cross-cutting concerns) để đảm bảo chất lượng vận hành:
-
-\begin{itemize}
-    \item \textbf{LoggingMiddleware:} Được áp dụng toàn cục trên mọi route, ghi nhận method, URL, thời gian phản hồi, và status code của mỗi request, phục vụ giám sát và debug.
-
-    \item \textbf{ResponseInterceptor:} Chuẩn hóa toàn bộ response API về một format thống nhất bao gồm \texttt{statusCode}, \texttt{message}, và \texttt{data}, giúp phía Client xử lý dữ liệu nhất quán.
-
-    \item \textbf{PublicThrottlerGuard:} Áp dụng rate limiting 100 request/60 giây cho các route công khai, ngăn chặn tấn công brute-force và DDoS cơ bản.
-
-    \item \textbf{WebSocket Contract Bootstrap:} Service \texttt{WsContractBootstrapService} tự động đăng ký và xác thực các WebSocket event contracts khi ứng dụng khởi động, đảm bảo tính nhất quán giữa client và server.
+    \item \textbf{LoggingMiddleware:} Ghi method, URL, thời gian phản hồi, status code trên mọi route.
+    \item \textbf{ResponseInterceptor:} Chuẩn hóa response về format \texttt{\{statusCode, message, data\}}.
+    \item \textbf{PublicThrottlerGuard:} Rate limiting 100 request/60 giây cho route công khai.
+    \item \textbf{WsContractBootstrapService:} Tự động đăng ký WebSocket event contracts khi khởi động.
 \end{itemize}
 
 
@@ -1411,4 +1393,88 @@ Thiết kế hiện tại cho phép mở rộng dễ dàng:
 \end{itemize}
 
 Ngoài ra, do component này độc lập với RAG và Recommender, có thể tách thành microservice riêng nếu hệ thống scale lớn hơn.
+
+
+\section{Triển khai hệ thống (Deployment)}
+
+Toàn bộ hạ tầng hệ thống được container hóa và triển khai trên hai môi trường riêng biệt: server CPU (cho Backend và hạ tầng dữ liệu) và server GPU cloud (cho các mô hình AI).
+
+\subsection{Container hóa với Docker Compose}
+
+File \texttt{docker-compose.yml} tại thư mục \texttt{dockers/} định nghĩa toàn bộ hạ tầng hệ thống, đảm bảo nhất quán giữa môi trường phát triển và production.
+
+% TODO: Thêm hình minh họa tổng quan Docker Compose stack
+
+\subsubsection{PostgreSQL với PostGIS}
+
+\begin{itemize}
+    \item \textbf{Image:} \texttt{postgis/postgis:17-3.5} — PostgreSQL 17 tích hợp PostGIS 3.5 cho truy vấn không gian (tìm dịch vụ gần vị trí người dùng).
+    \item \textbf{Khởi tạo:} Script \texttt{init-databases.sh} tự động tạo các database bổ sung cho Kong Gateway và các service phụ.
+    \item \textbf{Healthcheck:} \texttt{pg\_isready} kiểm tra trạng thái sẵn sàng trước khi các service phụ thuộc khởi động.
+    \item \textbf{Persistence:} Volume \texttt{pgdata} gắn vào \texttt{/var/lib/postgresql/data} giữ dữ liệu khi container restart.
+\end{itemize}
+
+\subsubsection{Redis}
+
+\begin{itemize}
+    \item \textbf{Image:} \texttt{redis:7-alpine} — phiên bản nhẹ, tối ưu cho container.
+    \item \textbf{Persistence:} AOF (Append Only File) kết hợp RDB snapshot (\texttt{--save 20 1}).
+    \item \textbf{Bảo mật:} Yêu cầu mật khẩu qua \texttt{--requirepass}, cấu hình từ biến môi trường.
+\end{itemize}
+
+\subsubsection{RabbitMQ Cluster (3 nodes + HAProxy)}
+
+Hệ thống triển khai RabbitMQ dạng cluster 3 node đảm bảo tính sẵn sàng cao (High Availability):
+
+\begin{itemize}
+    \item \textbf{3 node:} \texttt{rabbitmq1} (primary), \texttt{rabbitmq2}, \texttt{rabbitmq3} tự động join cluster khi khởi động thông qua script \texttt{cluster-entrypoint.sh}.
+    \item \textbf{TLS/SSL:} Certificate sinh tự động bởi container \texttt{rabbitmq-cert-gen}, mã hóa giao tiếp giữa các node và client.
+    \item \textbf{HAProxy:} Container \texttt{rabbitmq-haproxy} cân bằng tải kết nối AMQP giữa 3 node, đảm bảo failover tự động.
+    \item \textbf{Khởi tạo:} Container \texttt{rabbitmq-init} tạo user, vhost và phân quyền cho backend application.
+\end{itemize}
+
+% TODO: Thêm hình minh họa kiến trúc RabbitMQ cluster với HAProxy
+
+\subsection{Kong API Gateway}
+
+Kong đóng vai trò cổng vào duy nhất cho toàn bộ hệ thống, được triển khai gồm 3 thành phần Docker:
+
+\begin{enumerate}
+    \item \textbf{Kong Bootstrap (\texttt{kong-bootstrap}):} Container chạy một lần duy nhất để khởi tạo schema database cho Kong trên PostgreSQL.
+    \item \textbf{Kong Control Plane (\texttt{kong-cp}):} Instance chính xử lý request. Proxy endpoint tại port 8000, Admin API tại port 8001, Manager UI tại port 8002 cho quản trị trực quan.
+    \item \textbf{Kong Configurator (decK):} Sử dụng công cụ \texttt{decK} để đồng bộ cấu hình route, service, plugin từ file \texttt{kong.yml} vào Kong, đảm bảo cấu hình được version control và có thể tái tạo.
+\end{enumerate}
+
+Cấu hình route trong \texttt{kong.yml} định tuyến request đến các upstream service tương ứng (NestJS Backend, AI Gateway), đồng thời áp dụng các plugin bảo mật (rate limiting, authentication).
+
+% TODO: Thêm hình minh họa request flow qua Kong Gateway
+
+\subsection{Cloudflare Tunnel}
+
+Hệ thống sử dụng Cloudflare Tunnel để expose các service nội bộ ra Internet một cách an toàn, không cần mở port trực tiếp trên server vật lý. Script \texttt{cloudflare-tunnel-setup.sh} (23KB) tự động cấu hình tunnel cho các endpoint cần thiết, bao gồm API Backend, AI Gateway và Kong Admin. Cấu hình tunnel được lưu trong file \texttt{cloudflare-tunnels.json}.
+
+\subsection{Triển khai AI trên RunPod GPU Cloud}
+
+Các mô hình AI yêu cầu GPU mạnh (đặc biệt Llama 3.1 8B với quantization 4-bit) được triển khai trên RunPod — nền tảng GPU cloud theo nhu cầu (on-demand):
+
+\begin{itemize}
+    \item \textbf{\texttt{deploy\_runpod.py}:} Script tự động hóa toàn bộ quy trình triển khai: tạo pod GPU trên RunPod, cài đặt môi trường Python và dependencies, tải mô hình từ HuggingFace, và khởi động các AI service (RAG Chatbot, Recommender, NER, Gateway).
+    \item \textbf{\texttt{teardown\_runpod.py}:} Script gỡ bỏ pod và giải phóng tài nguyên GPU khi không cần thiết, tiết kiệm chi phí vận hành.
+    \item \textbf{Yêu cầu phần cứng:} GPU NVIDIA với tối thiểu 16GB VRAM cho inference Llama 3.1 8B (quantized 4-bit NF4).
+\end{itemize}
+
+\subsection{Kiến trúc triển khai tổng thể}
+
+Kiến trúc triển khai tách biệt thành hai cụm độc lập giao tiếp qua REST API:
+
+\begin{itemize}
+    \item \textbf{Cụm Backend (Server CPU):} Docker Compose chạy PostgreSQL, Redis, RabbitMQ, Kong và NestJS Backend. Triển khai trên máy chủ thông thường hoặc VM cloud.
+    \item \textbf{Cụm AI (RunPod GPU):} Các microservices Python (Gateway, NER, Chatbot, Recommender) chạy trên pod GPU cloud. Có thể scale lên/xuống theo nhu cầu thực tế.
+    \item \textbf{Kết nối:} Cloudflare Tunnel đảm bảo kết nối an toàn giữa hai cụm và với client bên ngoài.
+\end{itemize}
+
+Thiết kế này cho phép scale từng phần linh hoạt: tăng GPU khi lượng truy vấn AI tăng mà không ảnh hưởng đến Backend, hoặc mở rộng Backend khi lượng booking tăng mà không tốn thêm chi phí GPU.
+
+% TODO: Thêm hình minh họa kiến trúc triển khai tổng thể (Backend Docker + RunPod GPU + Cloudflare Tunnel)
+
 
