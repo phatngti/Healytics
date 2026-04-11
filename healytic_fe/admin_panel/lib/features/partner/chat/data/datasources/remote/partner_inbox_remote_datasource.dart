@@ -10,12 +10,25 @@ import 'package:admin_panel/features/partner/chat/domain/entities/partner_conver
 
 import 'partner_chat_mock_data.dart';
 
+/// Paginated result from message fetching.
+class PaginatedMessages {
+  final List<PartnerChatMessage> messages;
+  final bool hasMore;
+  final String? nextCursor;
+
+  const PaginatedMessages({
+    required this.messages,
+    required this.hasMore,
+    this.nextCursor,
+  });
+}
+
 // ─── Part A: Interface ───────────────────────────────
 
 /// Data source contract for partner inbox REST calls.
 abstract class PartnerInboxRemoteDatasource {
   Future<List<PartnerConversation>> getConversations();
-  Future<List<PartnerChatMessage>> getMessages(
+  Future<PaginatedMessages> getMessages(
     String conversationId, {
     String? beforeId,
     int limit = 20,
@@ -53,7 +66,7 @@ class PartnerInboxRemoteDatasourceImpl
   }
 
   @override
-  Future<List<PartnerChatMessage>> getMessages(
+  Future<PaginatedMessages> getMessages(
     String conversationId, {
     String? beforeId,
     int limit = 20,
@@ -74,30 +87,49 @@ class PartnerInboxRemoteDatasourceImpl
       );
     }
 
-    if (response.body.isEmpty) return [];
+    if (response.body.isEmpty) {
+      return const PaginatedMessages(
+        messages: [],
+        hasMore: false,
+      );
+    }
 
     final decoded = jsonDecode(response.body);
 
     // The backend returns a paginated wrapper:
-    // { "messages": [...], "hasMore": bool }.
+    // { "messages": [...], "hasMore": bool, "nextCursor": ... }.
     final List<dynamic> items;
-    if (decoded is List) {
-      items = decoded;
-    } else if (decoded is Map<String, dynamic>) {
+    bool hasMore = false;
+    String? nextCursor;
+
+    if (decoded is Map<String, dynamic>) {
       items = (decoded['messages']
               as List<dynamic>?) ??
           [];
+      hasMore = decoded['hasMore'] as bool? ?? false;
+      nextCursor = decoded['nextCursor'] as String?;
+    } else if (decoded is List) {
+      items = decoded;
     } else {
       _log.warning(
         'Unexpected messages format: '
         '${decoded.runtimeType}',
       );
-      return [];
+      return const PaginatedMessages(
+        messages: [],
+        hasMore: false,
+      );
     }
 
-    return items
-        .map(_mapMessage)
-        .toList(growable: false);
+    // Backend returns messages in ASC (chronological)
+    // order — render directly.
+    return PaginatedMessages(
+      messages: items
+          .map(_mapMessage)
+          .toList(growable: false),
+      hasMore: hasMore,
+      nextCursor: nextCursor,
+    );
   }
 
   @override
@@ -195,7 +227,7 @@ class PartnerInboxRemoteDatasourceMock
   }
 
   @override
-  Future<List<PartnerChatMessage>> getMessages(
+  Future<PaginatedMessages> getMessages(
     String conversationId, {
     String? beforeId,
     int limit = 20,
@@ -203,7 +235,10 @@ class PartnerInboxRemoteDatasourceMock
     await Future.delayed(
       const Duration(milliseconds: 400),
     );
-    return kMockInboxMessages;
+    return PaginatedMessages(
+      messages: kMockInboxMessages,
+      hasMore: false,
+    );
   }
 
   @override

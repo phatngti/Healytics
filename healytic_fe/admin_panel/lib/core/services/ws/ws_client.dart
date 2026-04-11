@@ -7,6 +7,7 @@
 
 // ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
+// ignore_for_file: unused_element
 
 import 'dart:async';
 
@@ -336,6 +337,138 @@ class PartnerChatSocket implements WsNamespaceSocket {
     _typingController.close();
     _stopTypingController.close();
     _errorController.close();
+    _connectionController.close();
+  }
+
+  void _updateStatus(WsConnectionStatus newStatus) {
+    _status = newStatus;
+    _connectionController.add(newStatus);
+  }
+}
+
+/// Typed Socket.IO client for the `/chat-notifications` namespace.
+///
+/// Global chat notification gateway for popup notifications (all roles)
+///
+/// **Auth:** JWT — roles: user, health_partner, employee
+///
+/// Usage:
+/// ```dart
+/// final socket = ChatNotificationsSocket();
+/// socket.connect(
+///   server: (url: gateway, path: '/chat-notifications/socket.io/'),
+///   token: token,
+/// );
+/// socket.onNewMessageNotification.listen((event) => print(event));
+/// ```
+class ChatNotificationsSocket implements WsNamespaceSocket {
+  static final _log = Logger('ChatNotificationsSocket');
+
+  io.Socket? _socket;
+
+  final _newMessageNotificationController =
+      StreamController<WsNewMessageNotification>.broadcast();
+  final _connectionController =
+      StreamController<WsConnectionStatus>.broadcast();
+
+  /// A new chat message was received — show a popup notification
+  Stream<WsNewMessageNotification> get onNewMessageNotification =>
+      _newMessageNotificationController.stream;
+
+  /// Stream of connection state changes.
+  @override
+  Stream<WsConnectionStatus> get onConnectionChange =>
+      _connectionController.stream;
+
+  /// Current connection status.
+  WsConnectionStatus _status = WsConnectionStatus.disconnected;
+  @override
+  WsConnectionStatus get status => _status;
+
+  /// Connect to the `/chat-notifications` WebSocket namespace.
+  ///
+  /// [server] provides the base URL and Socket.IO
+  /// transport path.
+  /// [token] is the JWT access token.
+  @override
+  void connect({
+    required WsServerConfig server,
+    required String token,
+  }) {
+    _silenceSocketIoLoggers();
+
+    if (_socket != null) {
+      _log.info('Already connected, disconnecting first');
+      disconnect();
+    }
+
+    _updateStatus(WsConnectionStatus.connecting);
+
+    _socket = io.io(
+      server.url,
+      io.OptionBuilder()
+          .setTransports(['websocket'])
+          .disableAutoConnect()
+          .setPath(server.path)
+          .setAuth({'token': token})
+          .build(),
+    );
+
+    _socket!.onConnect((_) {
+      _log.info('Connected to /chat-notifications');
+      _updateStatus(WsConnectionStatus.connected);
+    });
+
+    _socket!.onDisconnect((_) {
+      _log.info('Disconnected from /chat-notifications');
+      _updateStatus(WsConnectionStatus.disconnected);
+    });
+
+    _socket!.on('reconnecting', (_) {
+      _log.info('Reconnecting to /chat-notifications');
+      _updateStatus(WsConnectionStatus.reconnecting);
+    });
+
+    _socket!.onConnectError((err) {
+      _log.severe('Connection error: $err');
+      _updateStatus(WsConnectionStatus.error);
+    });
+
+    _socket!.onError((err) {
+      _log.severe('Socket error: $err');
+    });
+
+    // ── Server → Client event listeners ─────────────
+
+    _socket!.on(WsChatNotificationsEvent.newMessageNotification, (data) {
+      try {
+        final map = _requireEventMap(data, 'chat-notifications.new_message_notification');
+        _newMessageNotificationController.add(WsNewMessageNotification.fromJson(map));
+      } catch (e, st) {
+        _log.severe('Error parsing new_message_notification', e, st);
+      }
+    });
+
+    _socket!.connect();
+  }
+
+  // ── Client → Server emitters ──────────────────────
+
+  /// Disconnect from the WebSocket server.
+  @override
+  void disconnect() {
+    _socket?.disconnect();
+    _socket?.dispose();
+    _socket = null;
+    _updateStatus(WsConnectionStatus.disconnected);
+  }
+
+  /// Clean up all resources. Call when the service
+  /// is permanently disposed.
+  @override
+  void dispose() {
+    disconnect();
+    _newMessageNotificationController.close();
     _connectionController.close();
   }
 

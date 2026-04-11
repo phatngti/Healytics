@@ -8,20 +8,20 @@ part of 'push_notification_flutter.service.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Provides and eagerly initialises the mock push
-/// notification service after the user authenticates.
+/// Provides the push notification service instance.
 ///
-/// Watch this in the shell route alongside the WS
-/// connection provider.
+/// Initialization is triggered explicitly after
+/// authentication succeeds so `/v1/user/devices`
+/// is not called during app startup.
 
 @ProviderFor(pushNotificationService)
 const pushNotificationServiceProvider = PushNotificationServiceProvider._();
 
-/// Provides and eagerly initialises the mock push
-/// notification service after the user authenticates.
+/// Provides the push notification service instance.
 ///
-/// Watch this in the shell route alongside the WS
-/// connection provider.
+/// Initialization is triggered explicitly after
+/// authentication succeeds so `/v1/user/devices`
+/// is not called during app startup.
 
 final class PushNotificationServiceProvider
     extends
@@ -33,11 +33,11 @@ final class PushNotificationServiceProvider
     with
         $FutureModifier<PushNotificationFlutterService>,
         $FutureProvider<PushNotificationFlutterService> {
-  /// Provides and eagerly initialises the mock push
-  /// notification service after the user authenticates.
+  /// Provides the push notification service instance.
   ///
-  /// Watch this in the shell route alongside the WS
-  /// connection provider.
+  /// Initialization is triggered explicitly after
+  /// authentication succeeds so `/v1/user/devices`
+  /// is not called during app startup.
   const PushNotificationServiceProvider._()
     : super(
         from: null,
@@ -65,4 +65,4 @@ final class PushNotificationServiceProvider
 }
 
 String _$pushNotificationServiceHash() =>
-    r'8f427e724c946de1e0e0065d582a2a01c314cfd9';
+    r'e9bbc3a23e8cdd5882757cef8773385b2b7e5048';

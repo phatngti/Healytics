@@ -21,6 +21,11 @@ void main() {
       // TODO
     });
 
+    // VerifiedField legalName
+    test('to test the property `legalName`', () async {
+      // TODO
+    });
+
     // VerifiedField taxRegistrationCode
     test('to test the property `taxRegistrationCode`', () async {
       // TODO
@@ -43,6 +48,11 @@ void main() {
 
     // VerifiedField phoneNumber
     test('to test the property `phoneNumber`', () async {
+      // TODO
+    });
+
+    // VerifiedField username
+    test('to test the property `username`', () async {
       // TODO
     });
 

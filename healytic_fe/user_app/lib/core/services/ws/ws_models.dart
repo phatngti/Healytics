@@ -7,6 +7,7 @@
 
 // ignore_for_file: type=lint
 // ignore_for_file: lines_longer_than_80_chars
+// ignore_for_file: unused_element
 
 Map<String, dynamic> _requireJsonMap(dynamic value, String context) {
   if (value is Map<String, dynamic>) return value;
@@ -87,84 +88,6 @@ String wsMessageTypeToJson(WsMessageType value) {
       return 'file';
     case WsMessageType.system:
       return 'system';
-  }
-}
-
-/// Type of notification in the Healytics platform
-enum WsNotificationType {
-  bookingConfirmed,
-  bookingCancelled,
-  bookingCompleted,
-  appointmentReminder,
-  appointmentUpdated,
-  newChatMessage,
-  paymentSuccess,
-  paymentFailed,
-  systemBroadcast,
-  systemMaintenance,
-  partnerVerified,
-  partnerRejected,
-}
-
-WsNotificationType wsNotificationTypeFromJson(dynamic value) {
-  if (value == null) return WsNotificationType.bookingConfirmed;
-  final str = value.toString();
-  switch (str) {
-    case 'booking_confirmed':
-      return WsNotificationType.bookingConfirmed;
-    case 'booking_cancelled':
-      return WsNotificationType.bookingCancelled;
-    case 'booking_completed':
-      return WsNotificationType.bookingCompleted;
-    case 'appointment_reminder':
-      return WsNotificationType.appointmentReminder;
-    case 'appointment_updated':
-      return WsNotificationType.appointmentUpdated;
-    case 'new_chat_message':
-      return WsNotificationType.newChatMessage;
-    case 'payment_success':
-      return WsNotificationType.paymentSuccess;
-    case 'payment_failed':
-      return WsNotificationType.paymentFailed;
-    case 'system_broadcast':
-      return WsNotificationType.systemBroadcast;
-    case 'system_maintenance':
-      return WsNotificationType.systemMaintenance;
-    case 'partner_verified':
-      return WsNotificationType.partnerVerified;
-    case 'partner_rejected':
-      return WsNotificationType.partnerRejected;
-    default:
-      return WsNotificationType.bookingConfirmed;
-  }
-}
-
-String wsNotificationTypeToJson(WsNotificationType value) {
-  switch (value) {
-    case WsNotificationType.bookingConfirmed:
-      return 'booking_confirmed';
-    case WsNotificationType.bookingCancelled:
-      return 'booking_cancelled';
-    case WsNotificationType.bookingCompleted:
-      return 'booking_completed';
-    case WsNotificationType.appointmentReminder:
-      return 'appointment_reminder';
-    case WsNotificationType.appointmentUpdated:
-      return 'appointment_updated';
-    case WsNotificationType.newChatMessage:
-      return 'new_chat_message';
-    case WsNotificationType.paymentSuccess:
-      return 'payment_success';
-    case WsNotificationType.paymentFailed:
-      return 'payment_failed';
-    case WsNotificationType.systemBroadcast:
-      return 'system_broadcast';
-    case WsNotificationType.systemMaintenance:
-      return 'system_maintenance';
-    case WsNotificationType.partnerVerified:
-      return 'partner_verified';
-    case WsNotificationType.partnerRejected:
-      return 'partner_rejected';
   }
 }
 
@@ -602,156 +525,74 @@ class WsErrorEvent {
   }
 }
 
-/// Server event: a new notification pushed to the user in real-time
-class WsNewNotificationEvent {
-  /// Notification UUID
-  final String id;
+/// Global notification event: a new chat message was received. Emitted on /chat-notifications namespace for popup notifications.
+class WsNewMessageNotification {
+  /// Conversation UUID
+  final String conversationId;
 
-  /// The type of notification
-  final WsNotificationType type;
+  /// Server-generated message UUID
+  final String messageId;
 
-  /// Notification title
-  final String title;
+  /// Account ID of the message sender
+  final String senderId;
 
-  /// Notification body text
-  final String body;
+  /// Display name of the sender (for notification title)
+  final String senderName;
 
-  /// Deep-link data for frontend routing
-  final Map<String, dynamic>? data;
+  /// Avatar URL of the sender (for notification icon)
+  final String? senderAvatar;
 
-  /// Whether the notification has been read
-  final bool isRead;
+  /// First ~100 characters of the message content (for preview)
+  final String messagePreview;
 
-  /// When the notification was read
-  final DateTime? readAt;
+  /// Type of message (text, image, file, etc.)
+  final WsMessageType messageType;
 
-  /// Whether this is a system-wide broadcast
-  final bool isBroadcast;
-
-  /// When the notification was created
+  /// When the message was created
   final DateTime createdAt;
 
-  const WsNewNotificationEvent({
-    required this.id,
-    required this.type,
-    required this.title,
-    required this.body,
-    this.data,
-    required this.isRead,
-    this.readAt,
-    required this.isBroadcast,
+  const WsNewMessageNotification({
+    required this.conversationId,
+    required this.messageId,
+    required this.senderId,
+    required this.senderName,
+    this.senderAvatar,
+    required this.messagePreview,
+    required this.messageType,
     required this.createdAt,
   });
 
   /// Deserialize from a Socket.IO JSON map.
-  factory WsNewNotificationEvent.fromJson(Map<String, dynamic> json) {
-    return WsNewNotificationEvent(
-      id: json['id'] as String,
-      type: wsNotificationTypeFromJson(json['type']),
-      title: json['title'] as String,
-      body: json['body'] as String,
-      data: _jsonMapOrNull(json['data'], 'WsNewNotificationEvent.data'),
-      isRead: json['isRead'] as bool,
-      readAt: _dateTimeOrNull(json['readAt'], 'WsNewNotificationEvent.readAt'),
-      isBroadcast: json['isBroadcast'] as bool,
-      createdAt: _requireDateTime(json['createdAt'], 'WsNewNotificationEvent.createdAt'),
+  factory WsNewMessageNotification.fromJson(Map<String, dynamic> json) {
+    return WsNewMessageNotification(
+      conversationId: json['conversationId'] as String,
+      messageId: json['messageId'] as String,
+      senderId: json['senderId'] as String,
+      senderName: json['senderName'] as String,
+      senderAvatar: json['senderAvatar'] as String?,
+      messagePreview: json['messagePreview'] as String,
+      messageType: wsMessageTypeFromJson(json['messageType']),
+      createdAt: _requireDateTime(json['createdAt'], 'WsNewMessageNotification.createdAt'),
     );
   }
 
   /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'id': id,
-      'type': wsNotificationTypeToJson(type),
-      'title': title,
-      'body': body,
-      if (data != null) 'data': data!,
-      'isRead': isRead,
-      if (readAt != null) 'readAt': readAt!.toUtc().toIso8601String(),
-      'isBroadcast': isBroadcast,
+      'conversationId': conversationId,
+      'messageId': messageId,
+      'senderId': senderId,
+      'senderName': senderName,
+      if (senderAvatar != null) 'senderAvatar': senderAvatar!,
+      'messagePreview': messagePreview,
+      'messageType': wsMessageTypeToJson(messageType),
       'createdAt': createdAt.toUtc().toIso8601String(),
     };
   }
 
   @override
   String toString() {
-    return 'WsNewNotificationEvent(id: $id, type: $type, title: $title, body: $body, data: $data, isRead: $isRead, readAt: $readAt, isBroadcast: $isBroadcast, createdAt: $createdAt)';
-  }
-}
-
-/// Server event: updated unread notification count for the user
-class WsUnreadCountEvent {
-  /// Current unread notification count
-  final num count;
-
-  const WsUnreadCountEvent({
-    required this.count,
-  });
-
-  /// Deserialize from a Socket.IO JSON map.
-  factory WsUnreadCountEvent.fromJson(Map<String, dynamic> json) {
-    return WsUnreadCountEvent(
-      count: json['count'] as num,
-    );
-  }
-
-  /// Serialize to a JSON map.
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'count': count,
-    };
-  }
-
-  @override
-  String toString() {
-    return 'WsUnreadCountEvent(count: $count)';
-  }
-}
-
-/// Server event: a system-wide broadcast was sent (admin-facing)
-class WsBroadcastSentEvent {
-  /// Notification UUID
-  final String id;
-
-  /// Notification title
-  final String title;
-
-  /// Notification body text
-  final String body;
-
-  /// When the broadcast was created
-  final DateTime createdAt;
-
-  const WsBroadcastSentEvent({
-    required this.id,
-    required this.title,
-    required this.body,
-    required this.createdAt,
-  });
-
-  /// Deserialize from a Socket.IO JSON map.
-  factory WsBroadcastSentEvent.fromJson(Map<String, dynamic> json) {
-    return WsBroadcastSentEvent(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      body: json['body'] as String,
-      createdAt: _requireDateTime(json['createdAt'], 'WsBroadcastSentEvent.createdAt'),
-    );
-  }
-
-  /// Serialize to a JSON map.
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'id': id,
-      'title': title,
-      'body': body,
-      'createdAt': createdAt.toUtc().toIso8601String(),
-    };
-  }
-
-  @override
-  String toString() {
-    return 'WsBroadcastSentEvent(id: $id, title: $title, body: $body, createdAt: $createdAt)';
+    return 'WsNewMessageNotification(conversationId: $conversationId, messageId: $messageId, senderId: $senderId, senderName: $senderName, senderAvatar: $senderAvatar, messagePreview: $messagePreview, messageType: $messageType, createdAt: $createdAt)';
   }
 }
 

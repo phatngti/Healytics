@@ -3,7 +3,6 @@ import { CartController } from '@/cart/cart.controller';
 import { CartService } from '@/cart/cart.service';
 import { MockType } from '../../test/mocks/mock-types';
 import { AddToCartDto } from '@/cart/dto/add-to-cart.dto';
-import { ApplyCouponDto } from '@/cart/dto/apply-coupon.dto';
 
 describe('CartController', () => {
   let controller: CartController;
@@ -14,8 +13,6 @@ describe('CartController', () => {
       getCartItems: jest.fn(),
       addItem: jest.fn(),
       removeItem: jest.fn(),
-      applyCoupon: jest.fn(),
-      removeCoupon: jest.fn(),
       clearCart: jest.fn(),
     };
 
@@ -39,7 +36,14 @@ describe('CartController', () => {
 
   it('should return current user cart items', async () => {
     const userId = 'user-1';
-    const expected = [{ id: 'cart-1' }];
+    const expected = [
+      {
+        id: 'cart-1',
+        employeeId: 'emp-1',
+        isTimeSlotAvailable: true,
+        status: 'ACTIVE',
+      },
+    ];
     cartService.getCartItems!.mockResolvedValue(expected);
 
     const result = await controller.getItems(userId);
@@ -48,12 +52,20 @@ describe('CartController', () => {
     expect(cartService.getCartItems).toHaveBeenCalledWith(userId);
   });
 
-  it('should add a service to cart', async () => {
+  it('should add a service to cart with employee and time slot', async () => {
     const userId = 'user-1';
     const dto: AddToCartDto = {
       serviceId: 'eb286357-c1fa-4ffd-9d3e-f9a26ef4a783',
+      employeeId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      timeSlot: '2026-04-10T09:00:00.000Z',
     };
-    const expected = { id: 'cart-1', serviceId: dto.serviceId };
+    const expected = {
+      id: 'cart-1',
+      serviceId: dto.serviceId,
+      employeeId: dto.employeeId,
+      timeSlot: dto.timeSlot,
+      status: 'ACTIVE',
+    };
     cartService.addItem!.mockResolvedValue(expected);
 
     const result = await controller.addItem(userId, dto);
@@ -70,31 +82,6 @@ describe('CartController', () => {
     await controller.removeItem(userId, cartItemId);
 
     expect(cartService.removeItem).toHaveBeenCalledWith(userId, cartItemId);
-  });
-
-  it('should apply coupon to cart item', async () => {
-    const userId = 'user-1';
-    const cartItemId = 'b4687717-a2d4-4c92-8091-6e8e729ad9b7';
-    const dto: ApplyCouponDto = { couponCode: 'WELCOME10' };
-    const expected = { id: cartItemId, couponCode: 'WELCOME10' };
-    cartService.applyCoupon!.mockResolvedValue(expected);
-
-    const result = await controller.applyCoupon(userId, cartItemId, dto);
-
-    expect(result).toEqual(expected);
-    expect(cartService.applyCoupon).toHaveBeenCalledWith(userId, cartItemId, dto);
-  });
-
-  it('should remove coupon from cart item', async () => {
-    const userId = 'user-1';
-    const cartItemId = 'b4687717-a2d4-4c92-8091-6e8e729ad9b7';
-    const expected = { id: cartItemId, couponCode: null };
-    cartService.removeCoupon!.mockResolvedValue(expected);
-
-    const result = await controller.removeCoupon(userId, cartItemId);
-
-    expect(result).toEqual(expected);
-    expect(cartService.removeCoupon).toHaveBeenCalledWith(userId, cartItemId);
   });
 
   it('should clear all cart items', async () => {

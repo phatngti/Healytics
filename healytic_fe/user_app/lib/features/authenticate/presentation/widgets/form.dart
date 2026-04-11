@@ -10,6 +10,7 @@ import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:common/widgets/toast.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/utils/form_validators.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
 
 final _log = Logger('AuthForm');
@@ -25,44 +26,57 @@ class LoginForm extends HookConsumerWidget {
     final isPasswordVisible = useState(false);
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
+    useListenable(emailController);
+    useListenable(passwordController);
+
+    final hasValidInput =
+        FormValidators.email(emailController.text.trim()) == null &&
+        FormValidators.password(passwordController.text) == null;
 
     ref.listen(authenticateProvider, (previous, next) {
       _log.fine('Auth state: $next');
-      if (next.hasError && !next.isLoading) {
-        if (context.mounted) {
-          ToastContext.showToast(
-            context,
-            ToastType.error,
-            next.error.toString(),
-          );
-        }
+      if (next.hasError && !next.isLoading && context.mounted) {
+        AppToast.error(
+          context,
+          'Unable to sign in. Please check your credentials.',
+        );
       }
 
-      isLoading.value = false;
+      isLoading.value = next.isLoading;
 
-      if (next.hasValue && !next.isLoading) {
-        if (next.value?.authenticate != null) {
-          if (context.mounted) {
-            context.pushReplacementNamed(HomeRoute.name);
-          }
-        }
+      final hasCompletedSignIn =
+          previous?.isLoading == true &&
+          next.hasValue &&
+          !next.isLoading &&
+          next.value?.authenticate != null;
+
+      if (hasCompletedSignIn && context.mounted) {
+        AppToast.success(
+          context,
+          'Signed in successfully.',
+        );
+        context.pushReplacementNamed(HomeRoute.name);
       }
     });
 
     Future<void> signIn() async {
-      isLoading.value = true;
-      if (formKey.currentState?.saveAndValidate() ?? false) {
-        final formData = formKey.currentState?.value;
-
-        final email = formData?['email'] as String;
-        final password = formData?['password'] as String;
-
-        await ref
-            .read(authenticateProvider.notifier)
-            .login(email: email, password: password);
-      } else {
-        debugPrint('Validation failed');
+      final isValid = formKey.currentState?.saveAndValidate() ?? false;
+      if (!isValid) {
+        if (context.mounted) {
+          AppToast.warning(
+            context,
+            'Please fix the highlighted fields.',
+          );
+        }
+        return;
       }
+
+      final formData = formKey.currentState?.value;
+      final email = formData?['email'] as String;
+      final password = formData?['password'] as String;
+      await ref
+          .read(authenticateProvider.notifier)
+          .login(email: email, password: password);
     }
 
     return FormBuilder(
@@ -80,16 +94,7 @@ class LoginForm extends HookConsumerWidget {
               suffixIcon: Icon(Icons.email),
               uppercaseLabel: false,
               widgetKey: keys.signInPage.emailTextField,
-              validator: (value) {
-                if (value == null || value.toString().isEmpty) {
-                  return 'Please enter your email address';
-                }
-                final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                if (!emailRegex.hasMatch(value.toString())) {
-                  return 'Please enter a valid email address';
-                }
-                return null;
-              },
+              validator: FormValidators.email,
             ),
             AppDimens.verticalSmall,
             FormFieldBuilders.buildTextField(
@@ -108,15 +113,7 @@ class LoginForm extends HookConsumerWidget {
                     ? Icon(Icons.visibility_off)
                     : Icon(Icons.visibility),
               ),
-              validator: (value) {
-                if (value == null || value.toString().isEmpty) {
-                  return 'Please enter your password';
-                }
-                if (value.toString().length < 6) {
-                  return 'Password must be at least 6 characters long';
-                }
-                return null;
-              },
+              validator: FormValidators.password,
             ),
             // AppDimens.verticalSmall,
             SizedBox(
@@ -141,7 +138,10 @@ class LoginForm extends HookConsumerWidget {
                 widthFactor: 0.8,
                 child: AppButton(
                   key: keys.signInPage.signInButton,
-                  onPressed: isLoading.value ? null : signIn,
+                  onPressed:
+                      (isLoading.value || !hasValidInput)
+                      ? null
+                      : signIn,
                   buttonType: ButtonType.elevated,
                   customStyle: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,

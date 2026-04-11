@@ -1,6 +1,7 @@
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/cart/presentation/providers/cart.provider.dart';
 import 'package:user_app/theme/app_theme.dart';
 
@@ -222,6 +223,7 @@ class _CheckoutButton extends StatelessWidget {
       width: double.infinity,
       height: AppDimens.touchTarget,
       child: FilledButton(
+        key: keys.cartPage.checkoutButton,
         onPressed: isEnabled ? onCheckout : null,
         style: FilledButton.styleFrom(
           backgroundColor: colorScheme.primary,

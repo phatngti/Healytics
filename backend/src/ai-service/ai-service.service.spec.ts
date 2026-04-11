@@ -54,26 +54,35 @@ describe('AiServiceService', () => {
         {
           id: 'uuid-1',
           name: 'Service A',
+          slug: 'service-a',
           basePrice: 500000,
           currency: 'VND',
+          type: 'service',
+          vendorName: null,
           media: [{ url: 'https://example.com/img.jpg', isThumbnail: true }],
+          category: { name: 'Massage' },
+          productDefinition: { durationMinutes: 60 },
           productEmployeeEligibilities: [
-            { employee: { fullName: 'Dr. Test' } },
+            { employee: { fullName: 'Dr. Test', avatarUrl: 'https://example.com/avatar.jpg' } },
           ],
-          reviews: [{ rating: 5 }, { rating: 4 }],
         },
         {
           id: 'uuid-2',
           name: 'Service B',
+          slug: 'service-b',
           basePrice: 300000,
           salePrice: 250000,
           currency: 'VND',
+          type: 'service',
+          vendorName: null,
           media: [],
+          category: null,
+          productDefinition: null,
           productEmployeeEligibilities: [],
-          reviews: [],
         },
       ];
       const mockPartner = {
+        brandName: 'Healytics Spa',
         streetAddress: '123 Test St',
         district: { fullName: 'Quận 1' },
         province: { fullName: 'Hồ Chí Minh' },
@@ -89,31 +98,28 @@ describe('AiServiceService', () => {
       expect(result.total).toBe(2);
       expect(result.recommendations).toHaveLength(2);
 
-      // First recommendation
-      expect(result.recommendations[0].service_id).toBe('uuid-1');
-      expect(result.recommendations[0].name).toBe('Service A');
-      expect(result.recommendations[0].image_url).toBe(
-        'https://example.com/img.jpg',
-      );
-      expect(result.recommendations[0].price).toEqual({
-        amount: 500000,
-        currency: 'VND',
-      });
-      expect(result.recommendations[0].staff_name).toBe('Dr. Test');
-      expect(result.recommendations[0].rating).toEqual({
-        average: 4.5,
-        total_reviews: 2,
-      });
-      expect(result.recommendations[0].location).toEqual({
-        address: '123 Test St',
-        district: 'Quận 1',
-        city: 'Hồ Chí Minh',
-      });
+      // First recommendation — flat card-style fields
+      const rec0 = result.recommendations[0];
+      expect(rec0.id).toBe('uuid-1');
+      expect(rec0.name).toBe('Service A');
+      expect(rec0.slug).toBe('service-a');
+      expect(rec0.imageUrl).toBe('https://example.com/img.jpg');
+      expect(rec0.category).toBe('Massage');
+      expect(rec0.duration).toBe('60 min');
+      expect(rec0.price).toBe('₫500.000');
+      expect(rec0.rating).toBe('0');
+      expect(rec0.vendorName).toBe('Healytics Spa');
+      expect(rec0.location).toBe('Quận 1, Hồ Chí Minh');
+      expect(rec0.staffAvatars).toEqual(['https://example.com/avatar.jpg']);
+      expect(rec0.type).toBe('service');
 
-      // Second recommendation — uses salePrice
-      expect(result.recommendations[1].price.amount).toBe(250000);
-      expect(result.recommendations[1].staff_name).toBeNull();
-      expect(result.recommendations[1].image_url).toBeNull();
+      // Second recommendation — uses salePrice, no category/duration
+      const rec1 = result.recommendations[1];
+      expect(rec1.price).toBe('₫250.000');
+      expect(rec1.imageUrl).toBeNull();
+      expect(rec1.category).toBe('Uncategorized');
+      expect(rec1.duration).toBe('');
+      expect(rec1.staffAvatars).toEqual([]);
     });
 
     it('should return empty when no products match', async () => {
@@ -135,11 +141,15 @@ describe('AiServiceService', () => {
         {
           id: 'uuid-1',
           name: 'Service A',
+          slug: 'service-a',
           basePrice: 100000,
           currency: 'VND',
+          type: 'service',
+          vendorName: null,
           media: [],
+          category: null,
+          productDefinition: null,
           productEmployeeEligibilities: [],
-          reviews: [],
         },
       ];
       productRepo.find.mockResolvedValue(mockProducts);
@@ -150,11 +160,8 @@ describe('AiServiceService', () => {
 
       // Assert
       expect(result.total).toBe(1);
-      expect(result.recommendations[0].location).toEqual({
-        address: '',
-        district: '',
-        city: '',
-      });
+      expect(result.recommendations[0].location).toBe('');
+      expect(result.recommendations[0].vendorName).toBe('');
     });
   });
 });

@@ -2,6 +2,30 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Auto-generated from backend WS decorators — DO NOT EDIT BY HAND. Run: yarn generate:ws-contract",
   "namespaces": {
+    "notifications": {
+      "description": "Real-time notification delivery gateway",
+      "auth": {
+        "type": "jwt",
+        "roles": [
+          "user"
+        ]
+      },
+      "clientToServer": {},
+      "serverToClient": {
+        "new_notification": {
+          "description": "A new notification was pushed to the user",
+          "payload": "WsNewNotificationEvent"
+        },
+        "unread_count": {
+          "description": "The unread notification count changed (after new notification or mark-read)",
+          "payload": "WsUnreadCountEvent"
+        },
+        "broadcast_sent": {
+          "description": "A system-wide broadcast was sent (admin-facing)",
+          "payload": "WsBroadcastSentEvent"
+        }
+      }
+    },
     "user-chat": {
       "description": "User (patient) WebSocket gateway",
       "auth": {
@@ -71,27 +95,21 @@
       },
       "extends": "user-chat"
     },
-    "notifications": {
-      "description": "Real-time notification delivery gateway",
+    "chat-notifications": {
+      "description": "Global chat notification gateway for popup notifications (all roles)",
       "auth": {
         "type": "jwt",
         "roles": [
-          "user"
+          "user",
+          "health_partner",
+          "employee"
         ]
       },
       "clientToServer": {},
       "serverToClient": {
-        "new_notification": {
-          "description": "A new notification was pushed to the user",
-          "payload": "WsNewNotificationEvent"
-        },
-        "unread_count": {
-          "description": "The unread notification count changed (after new notification or mark-read)",
-          "payload": "WsUnreadCountEvent"
-        },
-        "broadcast_sent": {
-          "description": "A system-wide broadcast was sent (admin-facing)",
-          "payload": "WsBroadcastSentEvent"
+        "new_message_notification": {
+          "description": "A new chat message was received — show a popup notification",
+          "payload": "WsNewMessageNotification"
         }
       }
     }
@@ -170,6 +188,95 @@
           "type": "String",
           "required": true,
           "description": "Conversation UUID"
+        }
+      }
+    },
+    "WsNewNotificationEvent": {
+      "description": "Server event: a new notification pushed to the user in real-time",
+      "direction": "serverToClient",
+      "properties": {
+        "id": {
+          "type": "String",
+          "required": true,
+          "description": "Notification UUID"
+        },
+        "type": {
+          "type": "WsNotificationType",
+          "required": true,
+          "description": "The type of notification",
+          "isEnum": true
+        },
+        "title": {
+          "type": "String",
+          "required": true,
+          "description": "Notification title"
+        },
+        "body": {
+          "type": "String",
+          "required": true,
+          "description": "Notification body text"
+        },
+        "data": {
+          "type": "object",
+          "required": false,
+          "description": "Deep-link data for frontend routing"
+        },
+        "isRead": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the notification has been read"
+        },
+        "readAt": {
+          "type": "DateTime",
+          "required": false,
+          "description": "When the notification was read"
+        },
+        "isBroadcast": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether this is a system-wide broadcast"
+        },
+        "createdAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the notification was created"
+        }
+      }
+    },
+    "WsUnreadCountEvent": {
+      "description": "Server event: updated unread notification count for the user",
+      "direction": "serverToClient",
+      "properties": {
+        "count": {
+          "type": "num",
+          "required": true,
+          "description": "Current unread notification count"
+        }
+      }
+    },
+    "WsBroadcastSentEvent": {
+      "description": "Server event: a system-wide broadcast was sent (admin-facing)",
+      "direction": "serverToClient",
+      "properties": {
+        "id": {
+          "type": "String",
+          "required": true,
+          "description": "Notification UUID"
+        },
+        "title": {
+          "type": "String",
+          "required": true,
+          "description": "Notification title"
+        },
+        "body": {
+          "type": "String",
+          "required": true,
+          "description": "Notification body text"
+        },
+        "createdAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the broadcast was created"
         }
       }
     },
@@ -330,92 +437,50 @@
         }
       }
     },
-    "WsNewNotificationEvent": {
-      "description": "Server event: a new notification pushed to the user in real-time",
+    "WsNewMessageNotification": {
+      "description": "Global notification event: a new chat message was received. Emitted on /chat-notifications namespace for popup notifications.",
       "direction": "serverToClient",
       "properties": {
-        "id": {
+        "conversationId": {
           "type": "String",
           "required": true,
-          "description": "Notification UUID"
+          "description": "Conversation UUID"
         },
-        "type": {
-          "type": "WsNotificationType",
+        "messageId": {
+          "type": "String",
           "required": true,
-          "description": "The type of notification",
+          "description": "Server-generated message UUID"
+        },
+        "senderId": {
+          "type": "String",
+          "required": true,
+          "description": "Account ID of the message sender"
+        },
+        "senderName": {
+          "type": "String",
+          "required": true,
+          "description": "Display name of the sender (for notification title)"
+        },
+        "senderAvatar": {
+          "type": "String",
+          "required": false,
+          "description": "Avatar URL of the sender (for notification icon)"
+        },
+        "messagePreview": {
+          "type": "String",
+          "required": true,
+          "description": "First ~100 characters of the message content (for preview)"
+        },
+        "messageType": {
+          "type": "WsMessageType",
+          "required": true,
+          "description": "Type of message (text, image, file, etc.)",
           "isEnum": true
         },
-        "title": {
-          "type": "String",
-          "required": true,
-          "description": "Notification title"
-        },
-        "body": {
-          "type": "String",
-          "required": true,
-          "description": "Notification body text"
-        },
-        "data": {
-          "type": "object",
-          "required": false,
-          "description": "Deep-link data for frontend routing"
-        },
-        "isRead": {
-          "type": "bool",
-          "required": true,
-          "description": "Whether the notification has been read"
-        },
-        "readAt": {
-          "type": "DateTime",
-          "required": false,
-          "description": "When the notification was read"
-        },
-        "isBroadcast": {
-          "type": "bool",
-          "required": true,
-          "description": "Whether this is a system-wide broadcast"
-        },
         "createdAt": {
           "type": "DateTime",
           "required": true,
-          "description": "When the notification was created"
-        }
-      }
-    },
-    "WsUnreadCountEvent": {
-      "description": "Server event: updated unread notification count for the user",
-      "direction": "serverToClient",
-      "properties": {
-        "count": {
-          "type": "num",
-          "required": true,
-          "description": "Current unread notification count"
-        }
-      }
-    },
-    "WsBroadcastSentEvent": {
-      "description": "Server event: a system-wide broadcast was sent (admin-facing)",
-      "direction": "serverToClient",
-      "properties": {
-        "id": {
-          "type": "String",
-          "required": true,
-          "description": "Notification UUID"
-        },
-        "title": {
-          "type": "String",
-          "required": true,
-          "description": "Notification title"
-        },
-        "body": {
-          "type": "String",
-          "required": true,
-          "description": "Notification body text"
-        },
-        "createdAt": {
-          "type": "DateTime",
-          "required": true,
-          "description": "When the broadcast was created"
+          "description": "When the message was created"
         }
       }
     }

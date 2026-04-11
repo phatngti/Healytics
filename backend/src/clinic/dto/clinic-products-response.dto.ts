@@ -1,13 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class ClinicProductCategoryDto {
-  @ApiProperty({ example: 'a1b2c3d4-...' })
-  id: string;
-
-  @ApiProperty({ example: 'Massage Therapy' })
-  label: string;
-}
-
 export class ClinicProductDto {
   @ApiProperty()
   id: string;
@@ -50,8 +42,7 @@ export class ClinicProductDto {
 }
 
 export class ClinicProductsResponseDto {
-  @ApiProperty({ type: [ClinicProductCategoryDto] })
-  categories: ClinicProductCategoryDto[];
+
 
   @ApiProperty({ type: [ClinicProductDto] })
   products: ClinicProductDto[];

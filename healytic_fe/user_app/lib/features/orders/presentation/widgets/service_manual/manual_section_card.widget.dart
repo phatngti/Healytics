@@ -29,7 +29,6 @@ class ManualSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final effectivePadding =
         padding ?? const EdgeInsets.only(top: AppDimens.spaceLg);
 

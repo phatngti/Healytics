@@ -1,6 +1,7 @@
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/cart/domain/entities/voucher.entity.dart';
 
 /// Modal bottom sheet listing available vouchers
@@ -271,6 +272,7 @@ class _VoucherTile extends StatelessWidget {
     return Semantics(
       label: 'Voucher: ${voucher.code}',
       child: InkWell(
+        key: keys.cartPage.voucherTile(voucher.code),
         onTap: onTap,
         borderRadius: AppDimens.radiusMediumSmall,
         child: AnimatedContainer(
@@ -397,6 +399,7 @@ class _ConfirmButton extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
+          key: keys.cartPage.voucherApplyButton,
           onPressed: hasSelection
               ? () {
                   final selected = vouchers.firstWhere(

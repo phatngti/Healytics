@@ -42,17 +42,25 @@ class ClinicInfoEntity {
 }
 
 /// Trust metrics bar displayed below the header.
+///
+/// Fields map 1:1 to [ClinicTrustMetricsDto] from the
+/// backend: rating, reviewCount, experienceLabel,
+/// clientsLabel.
 class ClinicTrustMetrics {
   const ClinicTrustMetrics({
+    required this.rating,
+    required this.reviewCount,
     required this.experienceLabel,
-    required this.specialistsCount,
-    required this.certifiedLabel,
     required this.clientsLabel,
   });
 
+  /// Average rating across all clinic products.
+  final double rating;
+
+  /// Total number of treatment reviews.
+  final int reviewCount;
+
   final String experienceLabel;
-  final int specialistsCount;
-  final String certifiedLabel;
   final String clientsLabel;
 }
 

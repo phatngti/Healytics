@@ -4,6 +4,9 @@ import { HttpModule } from '@nestjs/axios';
 import { Booking } from '@/common/entities/booking.entity';
 import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
 import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
+import { Account } from '@/common/entities/account.entity';
+import { Employee } from '@/common/entities/employee.entity';
+import { Product } from '@/common/entities/product.entity';
 import { NotificationModule } from '@/notification/notification.module';
 import { BookingController } from './booking.controller';
 import { SlotsController } from './slots.controller';
@@ -20,7 +23,14 @@ import { WebhookService } from './services/webhook.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Booking, CheckoutTicket, BookingStatusLog]),
+    TypeOrmModule.forFeature([
+      Booking,
+      CheckoutTicket,
+      BookingStatusLog,
+      Account,
+      Employee,
+      Product,
+    ]),
     HttpModule.register({ timeout: 5000 }),
     NotificationModule,
   ],

@@ -149,21 +149,23 @@ class ClinicReviewsPaginated
   }
 
   /// Resolves filter pill ID to server-side query
-  /// params.
+  /// params. Accepts both legacy formats (`5star`,
+  /// `media`) and backend-canonical formats
+  /// (`5-star`, `with-media`).
   _ReviewFilterParams _resolveFilterParams(
     String filterId,
   ) {
     if (filterId == 'all') {
       return const _ReviewFilterParams();
     }
-    if (filterId == 'media') {
+    if (filterId == 'media' ||
+        filterId == 'with-media') {
       return const _ReviewFilterParams(
         hasMedia: true,
       );
     }
-    // Parse star-count filters like "5star"
-    final starMatch = RegExp(r'^(\d)star$')
-        .firstMatch(filterId);
+    final starMatch =
+        RegExp(r'^(\d)-?star$').firstMatch(filterId);
     if (starMatch != null) {
       return _ReviewFilterParams(
         starCount: int.parse(starMatch.group(1)!),

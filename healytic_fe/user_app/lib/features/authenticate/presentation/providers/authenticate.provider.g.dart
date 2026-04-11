@@ -53,7 +53,7 @@ final class AuthenticateNotifierProvider
 }
 
 String _$authenticateNotifierHash() =>
-    r'cedbb4da933f7a4f096e42b5a2bddd51740b93e8';
+    r'c27bd2d6e8a3e8433603591f03d62f7a086d96ee';
 
 abstract class _$AuthenticateNotifier
     extends $AsyncNotifier<AuthenticateStateData> {

@@ -75,17 +75,32 @@ class PartnerInboxState {
 }
 
 /// Manages the conversation list (left panel).
+///
+/// Subscribes to [PartnerChatSocket] events so the
+/// list stays in sync with real-time messages and
+/// read-receipts without polling.
 @riverpod
 class PartnerInbox extends _$PartnerInbox {
   static final _log = Logger('PartnerInbox');
   late final PartnerInboxChatRepository _repository;
+  late final PartnerChatSocket _socket;
+  final List<StreamSubscription> _subscriptions = [];
 
   @override
   PartnerInboxState build() {
     _repository =
         ref.read(partnerInboxChatRepositoryProvider);
 
-    Future.microtask(_loadConversations);
+    final wsService = ref.read(wsServiceProvider);
+    wsService.connectPartnerChat();
+    _socket = wsService.partnerChat;
+
+    ref.onDispose(_cleanup);
+
+    Future.microtask(() async {
+      await _loadConversations();
+      _setupWsListeners();
+    });
     return const PartnerInboxState(isLoading: true);
   }
 
@@ -108,15 +123,87 @@ class PartnerInbox extends _$PartnerInbox {
     }
   }
 
+  void _setupWsListeners() {
+    _subscriptions.add(
+      _socket.onNewMessage.listen(_handleNewMessage),
+    );
+
+    _subscriptions.add(
+      _socket.onMessagesRead.listen(_handleMessagesRead),
+    );
+  }
+
+  void _handleNewMessage(WsNewMessageEvent event) {
+    if (!ref.mounted) return;
+
+    final conversations = [...state.conversations];
+    final index = conversations.indexWhere(
+      (c) => c.id == event.conversationId,
+    );
+    if (index < 0) return;
+
+    final conv = conversations[index];
+    final isActive =
+        state.activeConversationId == conv.id;
+
+    final updated = conv.copyWith(
+      lastMessage: LastMessagePreview(
+        text: event.content,
+        timestamp: event.createdAt,
+        senderId: event.senderId,
+      ),
+      unreadCount:
+          isActive ? 0 : conv.unreadCount + 1,
+    );
+
+    conversations
+      ..removeAt(index)
+      ..insert(0, updated);
+
+    state = state.copyWith(
+      conversations: conversations,
+    );
+  }
+
+  void _handleMessagesRead(WsMessagesReadEvent event) {
+    if (!ref.mounted) return;
+
+    final conversations = state.conversations.map((c) {
+      if (c.id == event.conversationId) {
+        return c.copyWith(unreadCount: 0);
+      }
+      return c;
+    }).toList();
+
+    state = state.copyWith(
+      conversations: conversations,
+    );
+  }
+
   void selectConversation(String conversationId) {
+    final conversations = state.conversations.map((c) {
+      if (c.id == conversationId && c.unreadCount > 0) {
+        return c.copyWith(unreadCount: 0);
+      }
+      return c;
+    }).toList();
+
     state = state.copyWith(
       activeConversationId: conversationId,
+      conversations: conversations,
     );
   }
 
   Future<void> refresh() async {
     state = state.copyWith(isLoading: true);
     await _loadConversations();
+  }
+
+  void _cleanup() {
+    for (final sub in _subscriptions) {
+      sub.cancel();
+    }
+    _subscriptions.clear();
   }
 }
 
@@ -125,34 +212,42 @@ class PartnerInbox extends _$PartnerInbox {
 class ChatDetailState {
   final List<PartnerChatMessage> messages;
   final bool isLoading;
+  final bool isLoadingMore;
   final bool isSending;
   final Set<String> pendingClientMessageIds;
   final bool userIsTyping;
   final String? typingUserName;
   final String? error;
+  final bool hasMoreMessages;
 
   const ChatDetailState({
     this.messages = const [],
     this.isLoading = false,
+    this.isLoadingMore = false,
     this.isSending = false,
     this.pendingClientMessageIds = const <String>{},
     this.userIsTyping = false,
     this.typingUserName,
     this.error,
+    this.hasMoreMessages = true,
   });
 
   ChatDetailState copyWith({
     List<PartnerChatMessage>? messages,
     bool? isLoading,
+    bool? isLoadingMore,
     bool? isSending,
     Set<String>? pendingClientMessageIds,
     bool? userIsTyping,
     String? typingUserName,
     String? error,
+    bool? hasMoreMessages,
   }) {
     return ChatDetailState(
       messages: messages ?? this.messages,
       isLoading: isLoading ?? this.isLoading,
+      isLoadingMore:
+          isLoadingMore ?? this.isLoadingMore,
       isSending: isSending ?? this.isSending,
       pendingClientMessageIds:
           pendingClientMessageIds ??
@@ -162,6 +257,8 @@ class ChatDetailState {
       typingUserName:
           typingUserName ?? this.typingUserName,
       error: error,
+      hasMoreMessages:
+          hasMoreMessages ?? this.hasMoreMessages,
     );
   }
 }
@@ -191,14 +288,15 @@ class PartnerChatDetail extends _$PartnerChatDetail {
 
   Future<void> _loadMessages() async {
     try {
-      final messages = await _repository.getMessages(
+      final result = await _repository.getMessages(
         conversationId,
       );
       if (!ref.mounted) return;
 
       state = state.copyWith(
-        messages: messages,
+        messages: result.messages,
         isLoading: false,
+        hasMoreMessages: result.hasMore,
       );
 
       _socket.joinConversation(conversationId);
@@ -212,6 +310,41 @@ class PartnerChatDetail extends _$PartnerChatDetail {
         isLoading: false,
         error: 'Failed to load messages.',
       );
+    }
+  }
+
+  /// Load older messages (pagination).
+  Future<void> loadMoreMessages() async {
+    if (state.isLoadingMore || !state.hasMoreMessages) {
+      return;
+    }
+
+    state = state.copyWith(isLoadingMore: true);
+
+    try {
+      final oldestId = state.messages.isNotEmpty
+          ? state.messages.first.id
+          : null;
+
+      final result = await _repository.getMessages(
+        conversationId,
+        beforeId: oldestId,
+      );
+
+      if (!ref.mounted) return;
+
+      state = state.copyWith(
+        messages: [
+          ...result.messages,
+          ...state.messages,
+        ],
+        isLoadingMore: false,
+        hasMoreMessages: result.hasMore,
+      );
+    } catch (e) {
+      _log.warning('Load more messages failed: $e');
+      if (!ref.mounted) return;
+      state = state.copyWith(isLoadingMore: false);
     }
   }
 

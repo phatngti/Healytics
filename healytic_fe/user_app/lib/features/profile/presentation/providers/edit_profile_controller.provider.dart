@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:user_app/core/utils/form_validators.dart';
 
 part 'edit_profile_controller.provider.g.dart';
 
@@ -22,6 +22,24 @@ class EditProfileController extends _$EditProfileController {
     state = const AsyncValue.loading();
 
     state = await AsyncValue.guard(() async {
+      final fullNameError = FormValidators.fullName(
+        fullName,
+        fieldName: 'Full name',
+      );
+      if (fullNameError != null) {
+        throw Exception(fullNameError);
+      }
+
+      final emailError = FormValidators.email(email);
+      if (emailError != null) {
+        throw Exception(emailError);
+      }
+
+      final phoneError = FormValidators.phone(phone);
+      if (phoneError != null) {
+        throw Exception(phoneError);
+      }
+
       // Simulate network request
       await Future.delayed(const Duration(seconds: 1));
 

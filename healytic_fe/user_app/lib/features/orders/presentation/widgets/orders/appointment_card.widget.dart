@@ -460,7 +460,7 @@ class _ReviewAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (appointment.isReviewed) {
-      return SizedBox.shrink();
+      return const _ReviewedChip();
     }
     return _WriteReviewButton(appointment: appointment);
   }

@@ -7,6 +7,19 @@ import 'package:user_openapi/api.dart';
 
 import 'partner_chat_mock_data.dart';
 
+/// Paginated result from message fetching.
+class PaginatedMessages {
+  final List<PartnerChatMessage> messages;
+  final bool hasMore;
+  final String? nextCursor;
+
+  const PaginatedMessages({
+    required this.messages,
+    required this.hasMore,
+    this.nextCursor,
+  });
+}
+
 // ─── Part A: Abstract Interface ──────────────────────
 
 /// Data source contract for partner chat REST
@@ -19,7 +32,7 @@ abstract class PartnerChatRemoteDatasource {
   });
 
   /// Fetch paginated messages for a conversation.
-  Future<List<PartnerChatMessage>> getMessages(
+  Future<PaginatedMessages> getMessages(
     String conversationId, {
     String? beforeId,
     int limit = 20,
@@ -78,7 +91,7 @@ class PartnerChatRemoteDatasourceImpl
   }
 
   @override
-  Future<List<PartnerChatMessage>> getMessages(
+  Future<PaginatedMessages> getMessages(
     String conversationId, {
     String? beforeId,
     int limit = 20,
@@ -99,32 +112,48 @@ class PartnerChatRemoteDatasourceImpl
       );
     }
 
-    if (response.body.isEmpty) return [];
+    if (response.body.isEmpty) {
+      return const PaginatedMessages(
+        messages: [],
+        hasMore: false,
+      );
+    }
 
     final data = jsonDecode(response.body);
-    // Backend may wrap in {messages: [...]}
-    // or return a flat list.
+    // Backend wraps in {messages: [...], hasMore, nextCursor}
+    // or may return a flat list.
     final List<dynamic> list;
+    bool hasMore = false;
+    String? nextCursor;
+
     if (data is Map<String, dynamic>) {
       list = data['messages'] as List<dynamic>? ?? [];
+      hasMore = data['hasMore'] as bool? ?? false;
+      nextCursor = data['nextCursor'] as String?;
     } else if (data is List) {
       list = data;
     } else {
-      return [];
+      return const PaginatedMessages(
+        messages: [],
+        hasMore: false,
+      );
     }
 
-    // Backend returns DESC (newest first) — reverse
-    // to chronological order (oldest first) so the
-    // provider and reverse ListView work correctly.
-    return list
+    // Backend returns messages in ASC (chronological)
+    // order — render directly.
+    final messages = list
         .map(
           (e) => _mapMessage(
             e as Map<String, dynamic>,
           ),
         )
-        .toList()
-        .reversed
         .toList();
+
+    return PaginatedMessages(
+      messages: messages,
+      hasMore: hasMore,
+      nextCursor: nextCursor,
+    );
   }
 
   @override
@@ -235,7 +264,7 @@ class PartnerChatRemoteDatasourceMock
   }
 
   @override
-  Future<List<PartnerChatMessage>> getMessages(
+  Future<PaginatedMessages> getMessages(
     String conversationId, {
     String? beforeId,
     int limit = 20,
@@ -243,7 +272,10 @@ class PartnerChatRemoteDatasourceMock
     await Future.delayed(
       const Duration(milliseconds: 400),
     );
-    return kMockMessages;
+    return PaginatedMessages(
+      messages: kMockMessages,
+      hasMore: false,
+    );
   }
 
   @override
