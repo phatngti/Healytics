@@ -10,10 +10,12 @@ import {
 } from 'typeorm';
 import { Account } from '@/common/entities/account.entity';
 import { Product } from '@/common/entities/product.entity';
+import { Employee } from '@/common/entities/employee.entity';
+import { CartItemStatus } from '@/cart/enums/cart-item-status.enum';
 
 @Entity('cart_items')
 @Index('IDX_CART_ITEMS_USER_ID', ['userId'])
-@Index('UQ_CART_ITEMS_USER_SERVICE', ['userId', 'serviceId'], { unique: true })
+@Index('UQ_CART_ITEMS_USER_SERVICE_EMPLOYEE_SLOT', ['userId', 'serviceId', 'employeeId', 'timeSlot'], { unique: true })
 export class CartItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -24,22 +26,19 @@ export class CartItem {
   @Column({ name: 'service_id', type: 'uuid' })
   serviceId: string;
 
-  @Column({ name: 'coupon_code', type: 'varchar', length: 50, nullable: true })
-  couponCode: string | null;
+  @Column({ name: 'employee_id', type: 'uuid' })
+  employeeId: string;
+
+  @Column({ name: 'time_slot', type: 'timestamptz' })
+  timeSlot: Date;
 
   @Column({
-    name: 'coupon_discount_percent',
-    type: 'int',
-    nullable: true,
+    name: 'status',
+    type: 'varchar',
+    length: 20,
+    default: CartItemStatus.ACTIVE,
   })
-  couponDiscountPercent: number | null;
-
-  @Column({
-    name: 'coupon_discount_amount',
-    type: 'int',
-    nullable: true,
-  })
-  couponDiscountAmount: number | null;
+  status: CartItemStatus;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
@@ -54,4 +53,8 @@ export class CartItem {
   @ManyToOne(() => Product, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'service_id' })
   service: Product;
+
+  @ManyToOne(() => Employee, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'employee_id' })
+  employee: Employee;
 }

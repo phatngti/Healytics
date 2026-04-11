@@ -28,7 +28,6 @@ import { CartService } from '@/cart/cart.service';
 import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { AddToCartDto } from '@/cart/dto/add-to-cart.dto';
 import { CartItemResponseDto } from '@/cart/dto/cart-item-response.dto';
-import { ApplyCouponDto } from '@/cart/dto/apply-coupon.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/auth/roles.decorator';
@@ -54,8 +53,8 @@ export class CartController {
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Add service to cart' })
   @ApiCreatedResponse({ type: CartItemResponseDto })
-  @ApiBadRequestResponse({ description: 'Invalid service or inactive service.' })
-  @ApiConflictResponse({ description: 'Service already exists in cart.' })
+  @ApiBadRequestResponse({ description: 'Invalid service, employee, or inactive service.' })
+  @ApiConflictResponse({ description: 'Same service/employee/slot already in cart.' })
   async addItem(
     @CurrentUser('id') userId: string,
     @Body() dto: AddToCartDto,
@@ -74,32 +73,6 @@ export class CartController {
     @Param('cartItemId', ParseUUIDPipe) cartItemId: string,
   ): Promise<void> {
     return this.cartService.removeItem(userId, cartItemId);
-  }
-
-  @Post(':cartItemId/coupon')
-  @Throttle({ default: { limit: 30, ttl: 60000 } })
-  @ApiOperation({ summary: 'Apply coupon to cart item' })
-  @ApiOkResponse({ type: CartItemResponseDto })
-  @ApiBadRequestResponse({ description: 'Invalid or expired coupon.' })
-  @ApiNotFoundResponse({ description: 'Cart item not found.' })
-  async applyCoupon(
-    @CurrentUser('id') userId: string,
-    @Param('cartItemId', ParseUUIDPipe) cartItemId: string,
-    @Body() dto: ApplyCouponDto,
-  ): Promise<CartItemResponseDto> {
-    return this.cartService.applyCoupon(userId, cartItemId, dto);
-  }
-
-  @Delete(':cartItemId/coupon')
-  @Throttle({ default: { limit: 30, ttl: 60000 } })
-  @ApiOperation({ summary: 'Remove coupon from cart item' })
-  @ApiOkResponse({ type: CartItemResponseDto })
-  @ApiNotFoundResponse({ description: 'Cart item not found.' })
-  async removeCoupon(
-    @CurrentUser('id') userId: string,
-    @Param('cartItemId', ParseUUIDPipe) cartItemId: string,
-  ): Promise<CartItemResponseDto> {
-    return this.cartService.removeCoupon(userId, cartItemId);
   }
 
   @Delete()

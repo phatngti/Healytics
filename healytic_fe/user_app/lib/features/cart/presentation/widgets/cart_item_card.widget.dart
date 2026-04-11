@@ -2,6 +2,7 @@ import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/images/network_image_auto.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/cart/domain/entities/cart_item.entity.dart';
 import 'package:user_app/features/cart/domain/entities/voucher.entity.dart';
 
@@ -96,10 +97,9 @@ class CartItemCard extends StatelessWidget {
           children: [
             // Radio — single-service checkout
             Padding(
-              padding: const EdgeInsets.only(
-                top: AppDimens.spaceXxs,
-              ),
+              padding: const EdgeInsets.only(top: AppDimens.spaceXxs),
               child: GestureDetector(
+                key: keys.cartPage.itemSelection(item.id),
                 onTap: onToggleSelection,
                 child: SizedBox(
                   width: AppDimens.iconLg,
@@ -108,8 +108,7 @@ class CartItemCard extends StatelessWidget {
                     child: _RadioIndicator(
                       isSelected: isSelected,
                       activeColor: colorScheme.primary,
-                      inactiveColor:
-                          colorScheme.outline,
+                      inactiveColor: colorScheme.outline,
                     ),
                   ),
                 ),
@@ -130,6 +129,7 @@ class CartItemCard extends StatelessWidget {
                   // Conditional voucher selector
                   if (isSelected)
                     VoucherSelectorRow(
+                      itemId: item.id,
                       appliedCoupon: item.couponCode,
                       vouchers: availableVouchers,
                       isVouchersLoading: isVouchersLoading,
@@ -193,63 +193,44 @@ class _ItemHeader extends StatelessWidget {
         // Name + Price + Specialist + Slot
         Expanded(
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Service name + price + actions
               Row(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           item.serviceName,
-                          style: textTheme
-                              .titleSmall
-                              ?.copyWith(
-                            fontWeight:
-                                FontWeight.bold,
-                            color: colorScheme
-                                .onSurface,
+                          style: textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
                           ),
                           maxLines: 2,
-                          overflow:
-                              TextOverflow.ellipsis,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(
-                          height:
-                              AppDimens.spaceXxs,
-                        ),
+                        SizedBox(height: AppDimens.spaceXxs),
                         Text(
                           item.price,
-                          style: textTheme
-                              .titleSmall
-                              ?.copyWith(
-                            fontWeight:
-                                FontWeight.bold,
-                            color:
-                                colorScheme.primary,
+                          style: textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.primary,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  _ActionIcons(
-                    onEdit: onEdit,
-                    onDelete: onDelete,
-                  ),
+                  _ActionIcons(onEdit: onEdit, onDelete: onDelete),
                 ],
               ),
               // Specialist info
               if (item.hasSpecialist)
                 _SpecialistInfo(
                   name: item.specialistName!,
-                  position:
-                      item.specialistPosition,
+                  position: item.specialistPosition,
                   colorScheme: colorScheme,
                   textTheme: textTheme,
                 ),
@@ -285,17 +266,12 @@ class _SpecialistInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        top: AppDimens.spaceXs,
-      ),
+      padding: const EdgeInsets.only(top: AppDimens.spaceXs),
       child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-              top: AppDimens.spaceXxs,
-            ),
+            padding: const EdgeInsets.only(top: AppDimens.spaceXxs),
             child: Icon(
               Symbols.person,
               size: AppDimens.iconXs,
@@ -305,40 +281,29 @@ class _SpecialistInfo extends StatelessWidget {
           SizedBox(width: AppDimens.spaceXxs),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   name,
-                  style: textTheme.labelSmall
-                      ?.copyWith(
+                  style: textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: colorScheme
-                        .onSurfaceVariant,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                   maxLines: 1,
-                  overflow:
-                      TextOverflow.ellipsis,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (position != null)
                   Padding(
-                    padding:
-                        const EdgeInsets.only(
-                      top: AppDimens.spaceXxs,
-                    ),
+                    padding: const EdgeInsets.only(top: AppDimens.spaceXxs),
                     child: Text(
                       position!,
-                      style: textTheme
-                          .labelSmall
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurfaceVariant
-                            .withValues(
-                                alpha: 0.7),
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.7,
+                        ),
                       ),
                       maxLines: 1,
-                      overflow:
-                          TextOverflow.ellipsis,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
               ],
@@ -489,24 +454,18 @@ class _RadioIndicator extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: isSelected
-              ? activeColor
-              : inactiveColor,
+          color: isSelected ? activeColor : inactiveColor,
           width: _borderWidth,
         ),
       ),
       child: Center(
         child: AnimatedContainer(
-          duration: const Duration(
-            milliseconds: 200,
-          ),
+          duration: const Duration(milliseconds: 200),
           width: isSelected ? _innerSize : 0,
           height: isSelected ? _innerSize : 0,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isSelected
-                ? activeColor
-                : Colors.transparent,
+            color: isSelected ? activeColor : Colors.transparent,
           ),
         ),
       ),

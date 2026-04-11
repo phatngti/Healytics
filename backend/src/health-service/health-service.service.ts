@@ -229,6 +229,10 @@ export class HealthServiceService {
         'productTags',
         'productTags.tag',
         'facilityImages',
+        'partner',
+        'partner.province',
+        'partner.district',
+        'partner.ward',
       ],
     });
 
@@ -237,14 +241,11 @@ export class HealthServiceService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    const [partner, ratingData] = await Promise.all([
-      this.partnersService.getFirstHealthPartner(),
-      this.getProductRatingData(id),
-    ]);
+    const ratingData = await this.getProductRatingData(id);
 
     return PublicHealthServiceInfoResponseDto.fromEntity(
       product,
-      partner,
+      product.partner,
       ratingData,
     );
   }

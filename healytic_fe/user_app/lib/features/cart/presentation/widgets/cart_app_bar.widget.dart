@@ -1,5 +1,6 @@
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 
 /// Cart screen app bar with back button, search field,
 /// share and overflow menu actions.
@@ -37,6 +38,7 @@ class CartAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: SizedBox(
         height: AppDimens.ctaButtonMd,
         child: TextField(
+          key: keys.cartPage.searchField,
           onChanged: onSearchChanged,
           style: textTheme.bodyMedium,
           decoration: InputDecoration(

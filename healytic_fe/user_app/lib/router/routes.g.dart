@@ -38,6 +38,7 @@ List<RouteBase> get $appRoutes => [
   $editProfileRoute,
   $reviewTreatmentRoute,
   $reviewSpecialistRoute,
+  $reviewFacilityRoute,
   $reviewSubmittedRoute,
   $partnerChatRoute,
   $clinicInfoRoute,
@@ -1097,6 +1098,9 @@ mixin $ReviewSpecialistRoute on GoRouteData {
         specialistName: state.uri.queryParameters['specialist-name']!,
         specialistRole: state.uri.queryParameters['specialist-role']!,
         specialistAvatarUrl: state.uri.queryParameters['specialist-avatar-url'],
+        facilityId: state.uri.queryParameters['facility-id']!,
+        facilityName: state.uri.queryParameters['facility-name']!,
+        facilityAddress: state.uri.queryParameters['facility-address'],
       );
 
   ReviewSpecialistRoute get _self => this as ReviewSpecialistRoute;
@@ -1111,6 +1115,62 @@ mixin $ReviewSpecialistRoute on GoRouteData {
       'specialist-role': _self.specialistRole,
       if (_self.specialistAvatarUrl != null)
         'specialist-avatar-url': _self.specialistAvatarUrl,
+      'facility-id': _self.facilityId,
+      'facility-name': _self.facilityName,
+      if (_self.facilityAddress != null)
+        'facility-address': _self.facilityAddress,
+    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $reviewFacilityRoute => GoRouteData.$route(
+  path: '/review_facility',
+  name: 'review_facility',
+  factory: $ReviewFacilityRoute._fromState,
+);
+
+mixin $ReviewFacilityRoute on GoRouteData {
+  static ReviewFacilityRoute _fromState(GoRouterState state) =>
+      ReviewFacilityRoute(
+        appointmentId: state.uri.queryParameters['appointment-id']!,
+        facilityId: state.uri.queryParameters['facility-id']!,
+        facilityName: state.uri.queryParameters['facility-name']!,
+        facilityAddress: state.uri.queryParameters['facility-address'],
+        specialistName: state.uri.queryParameters['specialist-name']!,
+        specialistAvatarUrl: state.uri.queryParameters['specialist-avatar-url'],
+        specialistRating: int.parse(
+          state.uri.queryParameters['specialist-rating']!,
+        ),
+      );
+
+  ReviewFacilityRoute get _self => this as ReviewFacilityRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/review_facility',
+    queryParams: {
+      'appointment-id': _self.appointmentId,
+      'facility-id': _self.facilityId,
+      'facility-name': _self.facilityName,
+      if (_self.facilityAddress != null)
+        'facility-address': _self.facilityAddress,
+      'specialist-name': _self.specialistName,
+      if (_self.specialistAvatarUrl != null)
+        'specialist-avatar-url': _self.specialistAvatarUrl,
+      'specialist-rating': _self.specialistRating.toString(),
     },
   );
 

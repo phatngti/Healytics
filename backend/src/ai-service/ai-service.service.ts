@@ -35,7 +35,9 @@ export class AiServiceService {
     const products = await this.productRepository.find({
       where: { id: In(serviceIds) },
       relations: [
+        'category',
         'media',
+        'productDefinition',
         'productEmployeeEligibilities',
         'productEmployeeEligibilities.employee',
       ],

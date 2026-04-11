@@ -9,11 +9,15 @@ abstract class CartRepository {
   /// Fetches all cart items from the backend.
   Future<List<CartItemEntity>> getCartItems();
 
-  /// Adds a service to the cart by its ID.
+  /// Adds a scheduled service to the cart by its ID.
   ///
   /// Returns the created [CartItemEntity] from the
   /// backend response.
-  Future<CartItemEntity> addItem({required String serviceId});
+  Future<CartItemEntity> addItem({
+    required String serviceId,
+    required String employeeId,
+    required DateTime timeSlot,
+  });
 
   /// Removes an item by its cart item ID.
   Future<void> removeItem(String cartItemId);

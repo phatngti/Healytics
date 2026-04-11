@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
+import 'package:user_app/core/services/push_notification_flutter.service.dart';
 import 'package:user_app/core/utils/error_message_code.dart';
 import 'package:user_app/features/authenticate/data/repositories/authenticate_repository_impl.dart';
 import 'package:user_app/features/authenticate/domain/entities/authenticate.entity.dart';
@@ -9,6 +13,8 @@ import 'package:user_openapi/api.dart';
 
 part 'authenticate.provider.freezed.dart';
 part 'authenticate.provider.g.dart';
+
+final _log = Logger('AuthenticateNotifier');
 
 @Freezed(toJson: true)
 abstract class AuthenticateStateData with _$AuthenticateStateData {
@@ -43,6 +49,8 @@ class AuthenticateNotifier extends _$AuthenticateNotifier {
           authenticate: authenticate,
         ),
       );
+
+      unawaited(_initializePushNotifications());
     } on ApiException catch (e) {
       state = AsyncError<AuthenticateStateData>(
         errorMessageCode(e.code),
@@ -52,6 +60,21 @@ class AuthenticateNotifier extends _$AuthenticateNotifier {
     } catch (e, stack) {
       state = AsyncError<AuthenticateStateData>(e, stack);
       rethrow;
+    }
+  }
+
+  Future<void> _initializePushNotifications() async {
+    try {
+      final service = await ref.read(
+        pushNotificationServiceProvider.future,
+      );
+      await service.initialize();
+    } catch (e, stack) {
+      _log.warning(
+        'Failed to initialize push notifications after login',
+        e,
+        stack,
+      );
     }
   }
 }

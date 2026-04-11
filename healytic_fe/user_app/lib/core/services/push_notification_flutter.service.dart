@@ -29,12 +29,12 @@ final _log = Logger('PushNotificationFlutter');
 class PushNotificationFlutterService {
   PushNotificationFlutterService({
     required NotificationRemoteDatasource datasource,
-    required String? userId,
+    required AuthSessionStore authSessionStore,
   })  : _datasource = datasource,
-        _userId = userId;
+        _authSessionStore = authSessionStore;
 
   final NotificationRemoteDatasource _datasource;
-  final String? _userId;
+  final AuthSessionStore _authSessionStore;
   bool _initialized = false;
 
   final _chatPushController =
@@ -68,7 +68,8 @@ class PushNotificationFlutterService {
 
     // Register mock token
     final token = getToken();
-    if (_userId != null) {
+    final userId = _authSessionStore.currentUserId;
+    if (userId != null) {
       await _registerToken(token);
     } else {
       _log.warning(
@@ -169,24 +170,24 @@ class PushNotificationFlutterService {
 
 // ─── Provider ──────────────────────────────────────
 
-/// Provides and eagerly initialises the mock push
-/// notification service after the user authenticates.
+/// Provides the push notification service instance.
 ///
-/// Watch this in the shell route alongside the WS
-/// connection provider.
+/// Initialization is triggered explicitly after
+/// authentication succeeds so `/v1/user/devices`
+/// is not called during app startup.
 @Riverpod(keepAlive: true)
 Future<PushNotificationFlutterService>
     pushNotificationService(Ref ref) async {
   final datasource = ref.read(
     notificationRemoteDatasourceProvider,
   );
-  final userId = ref.read(currentUserIdProvider);
+  final authSessionStore = ref.read(
+    authSessionStoreProvider,
+  );
 
   final service = PushNotificationFlutterService(
     datasource: datasource,
-    userId: userId,
+    authSessionStore: authSessionStore,
   );
-
-  await service.initialize();
   return service;
 }

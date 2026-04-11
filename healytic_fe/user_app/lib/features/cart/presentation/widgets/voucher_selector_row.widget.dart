@@ -1,6 +1,7 @@
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/cart/domain/entities/voucher.entity.dart';
 
 import 'voucher_picker_sheet.widget.dart';
@@ -11,6 +12,8 @@ import 'voucher_picker_sheet.widget.dart';
 /// Opens [VoucherPickerSheet] on tap and calls
 /// [onApply] with the selected voucher's code.
 class VoucherSelectorRow extends StatelessWidget {
+  final String itemId;
+
   /// Currently applied coupon code (null if none).
   final String? appliedCoupon;
 
@@ -31,6 +34,7 @@ class VoucherSelectorRow extends StatelessWidget {
 
   const VoucherSelectorRow({
     super.key,
+    required this.itemId,
     this.appliedCoupon,
     required this.vouchers,
     this.isVouchersLoading = false,
@@ -61,6 +65,7 @@ class VoucherSelectorRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: AppDimens.spaceMd),
       child: InkWell(
+        key: keys.cartPage.voucherSelector(itemId),
         onTap: isCouponLoading ? null : () => _openPicker(context),
         borderRadius: AppDimens.radiusMediumSmall,
         child: Container(
