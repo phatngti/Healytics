@@ -17,8 +17,14 @@ from config import (  # noqa: E402
     BASE_URL,
     DATASET_PATH,
     EMBEDDING_DEVICE,
+    JUDGE_BACKEND,
+    JUDGE_MAX_TOKENS,
+    JUDGE_MODEL,
+    JUDGE_TEMPERATURE,
     LOG_LEVEL,
     MAX_NEW_TOKENS,
+    MISTRAL_API_KEY,
+    MISTRAL_BASE_URL,
     MODE,
     MODEL_NAME,
     SEED,
@@ -28,7 +34,7 @@ from config import (  # noqa: E402
 )
 from dataset_loader import load_eval_dataset  # noqa: E402
 from judge_eval import judge_sample  # noqa: E402
-from llm_eval import build_rag_chain, generate_answer, get_llm  # noqa: E402
+from llm_eval import build_rag_chain, generate_answer, get_judge_llm, get_llm  # noqa: E402
 from metrics import hit_at_k, mrr, recall_at_k  # noqa: E402
 from retriever_eval import build_retriever, retrieve_top_k_doc_ids  # noqa: E402
 
@@ -71,6 +77,21 @@ def main():
         api_key=API_KEY,
         temperature=TEMPERATURE,
         max_new_tokens=MAX_NEW_TOKENS,
+    )
+
+    judge_llm = get_judge_llm(
+        judge_backend=JUDGE_BACKEND,
+        generator_llm=llm,
+        mistral_base_url=MISTRAL_BASE_URL,
+        mistral_api_key=MISTRAL_API_KEY,
+        judge_model=JUDGE_MODEL,
+        judge_temperature=JUDGE_TEMPERATURE,
+        judge_max_tokens=JUDGE_MAX_TOKENS,
+    )
+    logger.info(
+        "Judge LLM (backend=%s, model=%s)",
+        JUDGE_BACKEND,
+        JUDGE_MODEL if JUDGE_BACKEND != "same" else MODEL_NAME,
     )
 
     rag_chain = build_rag_chain(mode=MODE, llm=llm, retriever=retriever)
@@ -118,7 +139,7 @@ def main():
             answer = generate_answer(rag_chain, query=query, history="", services="")
 
             judge_scores = judge_sample(
-                llm=llm,
+                llm=judge_llm,
                 question=query,
                 context=retrieved_context,
                 answer=answer,
@@ -147,6 +168,8 @@ def main():
         "top_k": TOP_K,
         "mode": MODE,
         "model_name": MODEL_NAME,
+        "judge_backend": JUDGE_BACKEND,
+        "judge_model": JUDGE_MODEL if JUDGE_BACKEND != "same" else MODEL_NAME,
         "vectorstore_backend": VECTORSTORE_BACKEND,
         "embedding_device": EMBEDDING_DEVICE,
     }
