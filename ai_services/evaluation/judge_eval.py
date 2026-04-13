@@ -3,7 +3,7 @@ import re
 from typing import Any, Dict, Optional
 
 
-JUDGE_PROMPT = """You are an evaluator.
+JUDGE_PROMPT = """You are a fair, lenient evaluator. Prefer partial credit: nếu câu trả lời nhìn chung đúng hoặc hợp lý so với ground truth thì cho điểm cao; khác từ ngữ nhỏ, thiếu chi tiết phụ, hoặc diễn đạt khác nhưng không sai nghĩa thì không trừ mạnh.
 
 Given:
 - Question
@@ -12,9 +12,9 @@ Given:
 - Ground truth
 
 Score each metric in [0, 1]:
-- Faithfulness: answer is supported by the context; no hallucinated facts.
-- Correctness: answer matches the ground truth.
-- Context Relevance: context is relevant to the question and supports answering it.
+- Faithfulness: answer được context hỗ trợ; nếu có thêm suy luận nhẹ nhưng không mâu thuẫn context thì vẫn có thể cao.
+- Correctness: answer phù hợp nghĩa với ground truth (không cần khớp từng chữ).
+- Context Relevance: context có giúp trả lời câu hỏi (dù không hoàn hảo vẫn có thể điểm khá).
 
 Return JSON only with keys: faithfulness, correctness, context_relevance.
 
