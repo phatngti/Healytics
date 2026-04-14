@@ -22,14 +22,10 @@ enum MedicalCertification {
 
   /// Returns the user-friendly display name.
   String get displayName => switch (this) {
-    MedicalCertification.bls =>
-      'Basic Life Support (BLS)',
-    MedicalCertification.acls =>
-      'Advanced Cardiovascular Life Support (ACLS)',
-    MedicalCertification.pals =>
-      'Pediatric Advanced Life Support (PALS)',
-    MedicalCertification.boardCertified =>
-      'Board Certified',
+    MedicalCertification.bls => 'Basic Life Support (BLS)',
+    MedicalCertification.acls => 'Advanced Cardiovascular Life Support (ACLS)',
+    MedicalCertification.pals => 'Pediatric Advanced Life Support (PALS)',
+    MedicalCertification.boardCertified => 'Board Certified',
     MedicalCertification.firstAid => 'First Aid',
     MedicalCertification.other => 'Other',
   };
@@ -39,8 +35,7 @@ enum MedicalCertification {
     MedicalCertification.bls => 'BLS',
     MedicalCertification.acls => 'ACLS',
     MedicalCertification.pals => 'PALS',
-    MedicalCertification.boardCertified =>
-      'Board Certified',
+    MedicalCertification.boardCertified => 'Board Certified',
     MedicalCertification.firstAid => 'First Aid',
     MedicalCertification.other => 'Other',
   };

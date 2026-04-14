@@ -34,7 +34,8 @@ class PublicClinicDto {
   name: string;
 
   @ApiPropertyOptional({ example: 'https://example.com/logo.jpg' })
-  avatarUrl: string | null;
+    
+  avatarUrl?: string;
 
   @ApiProperty({ example: '123 Health Street, District 1, HCMC' })
   address: string;
@@ -146,14 +147,14 @@ export class PublicHealthServiceInfoResponseDto {
       dto.clinic = {
         id: partner.id,
         name: partner.brandName,
-        avatarUrl: partner.logoImageUrl ?? null,
+        avatarUrl: partner.logoImageUrl!,
         address: addressParts.join(', '),
       };
     } else {
       dto.clinic = {
         id: '',
         name: 'Healytics Wellness Center',
-        avatarUrl: null,
+        avatarUrl: '',
         address: '123 Health Street, District 1, Ho Chi Minh City',
       };
     }

@@ -18,15 +18,13 @@ class EmployeeAddFormSection extends StatelessWidget {
   final TherapistType selectedTherapistType;
 
   /// Called when the therapist type toggle changes.
-  final ValueChanged<TherapistType>?
-      onTherapistTypeChanged;
+  final ValueChanged<TherapistType>? onTherapistTypeChanged;
 
   const EmployeeAddFormSection({
     super.key,
     required this.selectedRole,
     required this.onRoleChanged,
-    this.selectedTherapistType =
-        TherapistType.massage,
+    this.selectedTherapistType = TherapistType.massage,
     this.onTherapistTypeChanged,
   });
 
@@ -45,21 +43,15 @@ class EmployeeAddFormSection extends StatelessWidget {
           child: selectedRole == EmployeeRole.therapist
               ? TherapistFieldsCard(
                   key: const ValueKey('therapist'),
-                  initialTherapistType:
-                      selectedTherapistType,
-                  onTherapistTypeChanged:
-                      onTherapistTypeChanged,
+                  initialTherapistType: selectedTherapistType,
+                  onTherapistTypeChanged: onTherapistTypeChanged,
                 )
               : Column(
                   key: const ValueKey('doctor'),
                   children: const [
-                    DoctorFieldsCard(
-                      isEditing: true,
-                    ),
+                    DoctorFieldsCard(isEditing: true),
                     AppDimens.verticalMedium,
-                    DoctorExperienceCard(
-                      isEditing: true,
-                    ),
+                    DoctorExperienceCard(isEditing: true),
                   ],
                 ),
         ),

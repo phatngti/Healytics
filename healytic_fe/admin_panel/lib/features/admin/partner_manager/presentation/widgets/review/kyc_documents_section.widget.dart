@@ -9,11 +9,7 @@ import 'package:intl/intl.dart';
 
 /// KYC Documents section showing uploaded verification documents
 class KycDocumentsSection extends HookConsumerWidget {
-  const KycDocumentsSection({
-    this.documents,
-    this.readOnly = false,
-    super.key,
-  });
+  const KycDocumentsSection({this.documents, this.readOnly = false, super.key});
 
   final List<KycDocument>? documents;
 

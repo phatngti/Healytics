@@ -159,10 +159,7 @@ class ProductFacilityImagesCard extends StatelessWidget {
       child: OutlinedButton.icon(
         onPressed: () {
           final list = List<Map<String, String>>.from(images);
-          list.add({
-            FacilityImageKey.imageUrl: '',
-            FacilityImageKey.label: '',
-          });
+          list.add({FacilityImageKey.imageUrl: '', FacilityImageKey.label: ''});
           field.didChange(list);
         },
         icon: const Icon(Icons.add, size: 18),
@@ -211,8 +208,7 @@ class _FacilityImageRowState extends ConsumerState<_FacilityImageRow> {
   @override
   void initState() {
     super.initState();
-    _labelController.text =
-        widget.data[FacilityImageKey.label] ?? '';
+    _labelController.text = widget.data[FacilityImageKey.label] ?? '';
   }
 
   @override
@@ -250,10 +246,7 @@ class _FacilityImageRowState extends ConsumerState<_FacilityImageRow> {
         setState(() => _isUploading = false);
 
         if (url != null) {
-          widget.onUpdate({
-            ...widget.data,
-            FacilityImageKey.imageUrl: url,
-          });
+          widget.onUpdate({...widget.data, FacilityImageKey.imageUrl: url});
         }
       } else {
         _showError('Upload failed – could not get storage key.');
@@ -281,11 +274,9 @@ class _FacilityImageRowState extends ConsumerState<_FacilityImageRow> {
 
   bool get _hasImage =>
       _selectedFile != null ||
-      (widget.data[FacilityImageKey.imageUrl]?.isNotEmpty ??
-          false);
+      (widget.data[FacilityImageKey.imageUrl]?.isNotEmpty ?? false);
 
-  String get _imageUrl =>
-      widget.data[FacilityImageKey.imageUrl] ?? '';
+  String get _imageUrl => widget.data[FacilityImageKey.imageUrl] ?? '';
 
   ImageProvider? get _previewImage {
     if (_selectedFile != null) {
@@ -362,10 +353,8 @@ class _FacilityImageRowState extends ConsumerState<_FacilityImageRow> {
         contentPadding: AppDimens.paddingAllSmall,
       ),
       style: textTheme.bodyMedium,
-      onChanged: (value) => widget.onUpdate({
-        ...widget.data,
-        FacilityImageKey.label: value,
-      }),
+      onChanged: (value) =>
+          widget.onUpdate({...widget.data, FacilityImageKey.label: value}),
     );
   }
 

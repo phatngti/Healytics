@@ -129,9 +129,7 @@ class _FinanceSummarySection extends ConsumerWidget {
         title: 'Failed to load finance summary',
         error: error,
         stackTrace: stack,
-        onRetry: () => ref.invalidate(
-          financeSummaryProvider,
-        ),
+        onRetry: () => ref.invalidate(financeSummaryProvider),
       ),
     );
   }
@@ -163,9 +161,7 @@ class _FinanceTrendSection extends ConsumerWidget {
         title: 'Failed to load trend data',
         error: error,
         stackTrace: stack,
-        onRetry: () => ref.invalidate(
-          financeTrendProvider,
-        ),
+        onRetry: () => ref.invalidate(financeTrendProvider),
       ),
     );
   }

@@ -29,8 +29,7 @@ import '../widgets/book_appointment/service_radio_list.widget.dart';
 ///
 /// Navigates to [SelectSpecialistRoute] on
 /// continue.
-class BookAppointmentScreen
-    extends ConsumerStatefulWidget {
+class BookAppointmentScreen extends ConsumerStatefulWidget {
   const BookAppointmentScreen({super.key});
 
   @override
@@ -38,16 +37,14 @@ class BookAppointmentScreen
       _BookAppointmentScreenState();
 }
 
-class _BookAppointmentScreenState
-    extends ConsumerState<BookAppointmentScreen> {
+class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
   int _selectedCategoryIdx = -1;
   int _selectedServiceIdx = -1;
 
   List<HomeCategory> _categories = [];
 
   bool get _canContinue =>
-      _selectedCategoryIdx >= 0 &&
-      _selectedServiceIdx >= 0;
+      _selectedCategoryIdx >= 0 && _selectedServiceIdx >= 0;
 
   void _handleBack() {
     // Reset flow state when leaving Step 1.
@@ -59,28 +56,19 @@ class _BookAppointmentScreenState
     if (!_canContinue) return;
 
     // Persist selections to shared flow state.
-    final category =
-        _categories[_selectedCategoryIdx];
-    ref
-        .read(bookingFlowProvider.notifier)
-        .selectCategory(category);
+    final category = _categories[_selectedCategoryIdx];
+    ref.read(bookingFlowProvider.notifier).selectCategory(category);
 
-    final servicesAsync = ref.read(
-      servicesByCategoryProvider(category.id),
-    );
+    final servicesAsync = ref.read(servicesByCategoryProvider(category.id));
     servicesAsync.whenData((services) {
       if (_selectedServiceIdx < services.length) {
         ref
             .read(bookingFlowProvider.notifier)
-            .selectService(
-              services[_selectedServiceIdx],
-            );
+            .selectService(services[_selectedServiceIdx]);
       }
     });
 
-    SelectSpecialistRoute(
-      categoryId: category.id,
-    ).push(context);
+    SelectSpecialistRoute(categoryId: category.id).push(context);
   }
 
   void _onCategorySelected(int index) {
@@ -97,19 +85,13 @@ class _BookAppointmentScreenState
   /// Handles tapping a service from the search
   /// popup by matching it to a category and
   /// service index.
-  void _onSearchServiceSelected(
-    BookingService service,
-  ) {
+  void _onSearchServiceSelected(BookingService service) {
     for (var ci = 0; ci < _categories.length; ci++) {
       final asyncServices = ref.read(
-        servicesByCategoryProvider(
-          _categories[ci].id,
-        ),
+        servicesByCategoryProvider(_categories[ci].id),
       );
       asyncServices.whenData((services) {
-        final si = services.indexWhere(
-          (s) => s.id == service.id,
-        );
+        final si = services.indexWhere((s) => s.id == service.id);
         if (si >= 0) {
           setState(() {
             _selectedCategoryIdx = ci;
@@ -120,21 +102,15 @@ class _BookAppointmentScreenState
     }
 
     // Immediately route to the service details screen
-    ServiceDetailsRoute(
-      serviceId: service.id,
-    ).push(context);
+    ServiceDetailsRoute(serviceId: service.id).push(context);
   }
 
   /// Handles tapping a specialist from the
   /// search popup — navigates to their screen.
-  void _onSearchSpecialistSelected(
-    BookingSpecialist specialist,
-  ) {
+  void _onSearchSpecialistSelected(BookingSpecialist specialist) {
     // Navigate to the specialist's detail page.
     ref
-        .read(
-          employeePreviewCacheProvider.notifier,
-        )
+        .read(employeePreviewCacheProvider.notifier)
         .seed(
           EmployeePreview(
             id: specialist.id,
@@ -143,25 +119,17 @@ class _BookAppointmentScreenState
             specialty: specialist.specialty,
           ),
         );
-    EmployeeDetailRoute(
-      employeeId: specialist.id,
-    ).push(context);
+    EmployeeDetailRoute(employeeId: specialist.id).push(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final hPad =
-        AppDimens.horizontalPadding(context);
-    final sectionGap =
-        AppDimens.sectionSpacing(context);
+    final hPad = AppDimens.horizontalPadding(context);
+    final sectionGap = AppDimens.sectionSpacing(context);
 
-    final categoriesAsync = ref.watch(
-      categoriesProvider,
-    );
+    final categoriesAsync = ref.watch(categoriesProvider);
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -171,31 +139,21 @@ class _BookAppointmentScreenState
         title: const Text('Book Appointment'),
       ),
       body: categoriesAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (e, _) => Center(
-          child: Text(
-            'Error loading categories: $e',
-          ),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error loading categories: $e')),
         data: (categories) {
           _categories = categories;
           return _Step1Body(
             hPad: hPad,
             sectionGap: sectionGap,
             categories: categories,
-            selectedCategoryIdx:
-                _selectedCategoryIdx,
+            selectedCategoryIdx: _selectedCategoryIdx,
             selectedServiceIdx: _selectedServiceIdx,
             onCategorySelected: _onCategorySelected,
             onServiceSelected: _onServiceSelected,
-            onSearchServiceSelected:
-                _onSearchServiceSelected,
-            onSearchSpecialistSelected:
-                _onSearchSpecialistSelected,
-            serviceSection:
-                _buildServiceSection(sectionGap),
+            onSearchServiceSelected: _onSearchServiceSelected,
+            onSearchSpecialistSelected: _onSearchSpecialistSelected,
+            serviceSection: _buildServiceSection(sectionGap),
           );
         },
       ),
@@ -209,23 +167,17 @@ class _BookAppointmentScreenState
   /// Builds the service section when a category
   /// is selected.
   Widget _buildServiceSection(double sectionGap) {
-    if (_selectedCategoryIdx < 0 ||
-        _categories.isEmpty) {
+    if (_selectedCategoryIdx < 0 || _categories.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    final categoryId =
-        _categories[_selectedCategoryIdx].id;
-    final servicesAsync = ref.watch(
-      servicesByCategoryProvider(categoryId),
-    );
+    final categoryId = _categories[_selectedCategoryIdx].id;
+    final servicesAsync = ref.watch(servicesByCategoryProvider(categoryId));
 
     return servicesAsync.when(
       loading: () => Padding(
         padding: EdgeInsets.only(top: sectionGap),
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        child: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, _) => Padding(
         padding: EdgeInsets.only(top: sectionGap),
@@ -233,8 +185,7 @@ class _BookAppointmentScreenState
       ),
       data: (services) {
         return Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: sectionGap),
             _SectionTitle(title: 'Select Service'),
@@ -277,24 +228,19 @@ class _Step1Body extends StatelessWidget {
 
   /// Called when a service is tapped in the
   /// search popup.
-  final ValueChanged<BookingService>?
-      onSearchServiceSelected;
+  final ValueChanged<BookingService>? onSearchServiceSelected;
 
   /// Called when a specialist is tapped in the
   /// search popup.
-  final ValueChanged<BookingSpecialist>?
-      onSearchSpecialistSelected;
+  final ValueChanged<BookingSpecialist>? onSearchSpecialistSelected;
 
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
-        textScaler: MediaQuery.of(context)
-            .textScaler
-            .clamp(
-              minScaleFactor: 0.8,
-              maxScaleFactor: 1.3,
-            ),
+        textScaler: MediaQuery.of(
+          context,
+        ).textScaler.clamp(minScaleFactor: 0.8, maxScaleFactor: 1.3),
       ),
       child: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -302,8 +248,7 @@ class _Step1Body extends StatelessWidget {
           vertical: AppDimens.spaceLg,
         ),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Progress indicator
             BookingStepIndicator(
@@ -315,17 +260,13 @@ class _Step1Body extends StatelessWidget {
 
             // Search bar
             BookingSearchBar(
-              onServiceSelected:
-                  onSearchServiceSelected,
-              onSpecialistSelected:
-                  onSearchSpecialistSelected,
+              onServiceSelected: onSearchServiceSelected,
+              onSpecialistSelected: onSearchSpecialistSelected,
             ),
             SizedBox(height: sectionGap),
 
             // Select Category
-            _SectionTitle(
-              title: 'Select Category',
-            ),
+            _SectionTitle(title: 'Select Category'),
             CategoryFilterRow(
               categories: categories,
               selectedIndex: selectedCategoryIdx,
@@ -354,9 +295,7 @@ class _SectionTitle extends StatelessWidget {
     final theme = Theme.of(context);
     return Text(
       title,
-      style: theme.textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.bold,
-      ),
+      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
     );
   }
 }

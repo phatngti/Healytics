@@ -51,9 +51,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
             icon: TextEditingController(
               text: r[ServiceManualKey.iconSlug] ?? '',
             ),
-            title: TextEditingController(
-              text: r[ServiceManualKey.title] ?? '',
-            ),
+            title: TextEditingController(text: r[ServiceManualKey.title] ?? ''),
             desc: TextEditingController(
               text: r[ServiceManualKey.description] ?? '',
             ),
@@ -63,9 +61,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
     _stepControllers = widget.initialSteps
         .map(
           (s) => _StepControllers(
-            title: TextEditingController(
-              text: s[ServiceManualKey.title] ?? '',
-            ),
+            title: TextEditingController(text: s[ServiceManualKey.title] ?? ''),
             desc: TextEditingController(
               text: s[ServiceManualKey.description] ?? '',
             ),
@@ -115,9 +111,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
             padding: AppDimens.paddingAllLarge,
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: colorScheme.outlineVariant,
-                ),
+                bottom: BorderSide(color: colorScheme.outlineVariant),
               ),
             ),
             child: Column(
@@ -125,21 +119,17 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
               children: [
                 Text(
                   'Service Manual',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 AppDimens.verticalExtraSmall,
                 Text(
                   'Guidelines, rules, and procedure '
                   'steps for this service.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -353,8 +343,7 @@ class _GuidelineRow extends StatelessWidget {
           Expanded(
             child: FormFieldBuilders.buildTextField(
               context,
-              fieldKey:
-                  '${ServiceManualKey.guidelinePrefix}$index',
+              fieldKey: '${ServiceManualKey.guidelinePrefix}$index',
               label: 'Guideline ${index + 1}',
               hintText: 'e.g. Arrive 15 min early',
               controller: controller,
@@ -390,8 +379,7 @@ class _RuleRow extends StatelessWidget {
                 width: 120,
                 child: FormFieldBuilders.buildTextField(
                   context,
-                  fieldKey:
-                      '${ServiceManualKey.ruleIconPrefix}$index',
+                  fieldKey: '${ServiceManualKey.ruleIconPrefix}$index',
                   label: 'Icon Slug',
                   hintText: 'e.g. clock',
                   controller: controllers.icon,
@@ -401,8 +389,7 @@ class _RuleRow extends StatelessWidget {
               Expanded(
                 child: FormFieldBuilders.buildTextField(
                   context,
-                  fieldKey:
-                      '${ServiceManualKey.ruleTitlePrefix}$index',
+                  fieldKey: '${ServiceManualKey.ruleTitlePrefix}$index',
                   label: 'Title',
                   hintText: 'e.g. Punctuality',
                   controller: controllers.title,
@@ -414,8 +401,7 @@ class _RuleRow extends StatelessWidget {
           AppDimens.verticalExtraSmall,
           FormFieldBuilders.buildTextField(
             context,
-            fieldKey:
-                '${ServiceManualKey.ruleDescPrefix}$index',
+            fieldKey: '${ServiceManualKey.ruleDescPrefix}$index',
             label: 'Description',
             hintText: 'Rule details…',
             controller: controllers.desc,
@@ -468,8 +454,7 @@ class _StepRow extends StatelessWidget {
               Expanded(
                 child: FormFieldBuilders.buildTextField(
                   context,
-                  fieldKey:
-                      '${ServiceManualKey.stepTitlePrefix}$index',
+                  fieldKey: '${ServiceManualKey.stepTitlePrefix}$index',
                   label: 'Step Title',
                   hintText: 'e.g. Consultation',
                   controller: controllers.title,
@@ -483,8 +468,7 @@ class _StepRow extends StatelessWidget {
             padding: const EdgeInsets.only(left: 44),
             child: FormFieldBuilders.buildTextField(
               context,
-              fieldKey:
-                  '${ServiceManualKey.stepDescPrefix}$index',
+              fieldKey: '${ServiceManualKey.stepDescPrefix}$index',
               label: 'Description',
               hintText: 'Step details…',
               controller: controllers.desc,

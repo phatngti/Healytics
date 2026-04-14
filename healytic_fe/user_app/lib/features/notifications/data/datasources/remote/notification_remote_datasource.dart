@@ -127,9 +127,18 @@ class NotificationRemoteDatasourceImpl implements NotificationRemoteDatasource {
   @override
   Future<void> markRead(String notificationId) async {
     try {
-      await _api.userNotificationControllerMarkRead(notificationId);
+      final response = await _api
+          .userNotificationControllerMarkReadWithHttpInfo(notificationId);
+
+      if (response.statusCode != 204 && response.statusCode != 200) {
+        throw ApiException(
+          response.statusCode,
+          'markRead failed: ${response.body}',
+        );
+      }
     } catch (e, s) {
       _log.warning('markRead error', e, s);
+      rethrow;
     }
   }
 
@@ -140,11 +149,10 @@ class NotificationRemoteDatasourceImpl implements NotificationRemoteDatasource {
           .userNotificationControllerMarkAllReadWithHttpInfo();
 
       if (response.statusCode != 200) {
-        _log.warning(
-          'markAllRead failed: '
-          '${response.statusCode}',
+        throw ApiException(
+          response.statusCode,
+          'markAllRead failed: ${response.body}',
         );
-        return 0;
       }
 
       final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -153,7 +161,7 @@ class NotificationRemoteDatasourceImpl implements NotificationRemoteDatasource {
       return 0;
     } catch (e, s) {
       _log.severe('markAllRead error', e, s);
-      return 0;
+      rethrow;
     }
   }
 

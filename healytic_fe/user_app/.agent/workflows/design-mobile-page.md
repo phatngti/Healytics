@@ -1,3 +1,7 @@
+---
+description: 
+---
+
 # Design Mobile Page
 
 Description: Creates a mobile page following the UI design system with proper theming, responsive layout, shared components, and a compliance checklist.
@@ -29,7 +33,6 @@ Description: Creates a mobile page following the UI design system with proper th
              'Page Title',
              style: textTheme.titleLarge,
            ),
-           backgroundColor: colorScheme.surface,
          ),
          body: SafeArea(
            child: SingleChildScrollView(

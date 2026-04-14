@@ -1,3 +1,4 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -34,10 +35,13 @@ class FinanceStatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.spaceSmMd,
+        vertical: AppDimens.spaceXs,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor ?? colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppDimens.radiusPill,
       ),
       child: Text(
         label,

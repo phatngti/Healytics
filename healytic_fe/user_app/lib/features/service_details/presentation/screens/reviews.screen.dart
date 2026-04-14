@@ -27,7 +27,6 @@ class ReviewsScreen extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,

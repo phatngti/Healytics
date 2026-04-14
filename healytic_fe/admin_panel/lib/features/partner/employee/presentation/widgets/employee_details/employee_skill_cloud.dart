@@ -50,12 +50,9 @@ class EmployeeSkillCloud extends StatelessWidget {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer
-                      .withAlpha(25),
+                  color: colorScheme.primaryContainer.withAlpha(25),
                   borderRadius: AppDimens.radiusLarge,
-                  border: Border.all(
-                    color: colorScheme.primary.withAlpha(75),
-                  ),
+                  border: Border.all(color: colorScheme.primary.withAlpha(75)),
                 ),
                 child: Text(
                   skill,

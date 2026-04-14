@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 
 /// Read-only card displaying the partner's address.
 class AddressCardWidget extends StatelessWidget {
-  const AddressCardWidget({
-    required this.address,
-    super.key,
-  });
+  const AddressCardWidget({required this.address, super.key});
 
   final PublicProfileAddress address;
 
@@ -18,24 +15,18 @@ class AddressCardWidget extends StatelessWidget {
 
     final parts = <String>[
       address.streetAddress,
-      if (address.ward != null)
-        address.ward!.name,
-      if (address.district != null)
-        address.district!.name,
-      if (address.province != null)
-        address.province!.name,
+      if (address.ward != null) address.ward!.name,
+      if (address.district != null) address.district!.name,
+      if (address.province != null) address.province!.name,
     ];
 
-    final displayAddress =
-        address.formattedAddress ??
-            parts.join(', ');
+    final displayAddress = address.formattedAddress ?? parts.join(', ');
 
     return Card(
       child: Padding(
         padding: AppDimens.paddingAllLarge,
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
@@ -47,41 +38,31 @@ class AddressCardWidget extends StatelessWidget {
                 AppDimens.horizontalSmall,
                 Text(
                   'Address',
-                  style: tt.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: AppDimens.spaceSm,
                     vertical: AppDimens.spaceXxs,
                   ),
                   decoration: BoxDecoration(
-                    color: cs
-                        .surfaceContainerHighest,
-                    borderRadius:
-                        AppDimens.radiusSmall,
+                    color: cs.surfaceContainerHighest,
+                    borderRadius: AppDimens.radiusSmall,
                   ),
                   child: Row(
-                    mainAxisSize:
-                        MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons
-                            .lock_outline_rounded,
+                        Icons.lock_outline_rounded,
                         size: AppDimens.iconXs,
-                        color: cs
-                            .onSurfaceVariant,
+                        color: cs.onSurfaceVariant,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         'Read-only',
-                        style: tt.labelSmall
-                            ?.copyWith(
-                          color: cs
-                              .onSurfaceVariant,
+                        style: tt.labelSmall?.copyWith(
+                          color: cs.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -90,20 +71,14 @@ class AddressCardWidget extends StatelessWidget {
               ],
             ),
             AppDimens.verticalMedium,
-            Text(
-              displayAddress,
-              style: tt.bodyMedium,
-            ),
-            if (address.latitude != null &&
-                address.longitude != null) ...[
+            Text(displayAddress, style: tt.bodyMedium),
+            if (address.latitude != null && address.longitude != null) ...[
               AppDimens.verticalSmall,
               Text(
                 'Coordinates: '
                 '${address.latitude!.toStringAsFixed(4)}, '
                 '${address.longitude!.toStringAsFixed(4)}',
-                style: tt.bodySmall?.copyWith(
-                  color: cs.onSurfaceVariant,
-                ),
+                style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
               ),
             ],
           ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/images/network_image_auto.dart';
 
 import 'package:user_app/features/home/domain/entities/'
     'home.entity.dart';
@@ -88,12 +89,11 @@ class _CardImageSection extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.vertical(top: Radius.circular(cardRad)),
-            child: Image.network(
-              product.imageUrl,
+            child: NetworkImageAuto(
+              imageUrl: product.imageUrl,
               fit: BoxFit.cover,
-              semanticLabel: product.name,
-              errorBuilder: (_, __, ___) => Container(
-                color: colorScheme.surfaceContainerHighest,
+              errorWidget: (_) => Container(
+                color: colorScheme.surface,
                 child: Icon(
                   Symbols.image,
                   color: colorScheme.onSurfaceVariant,
@@ -144,7 +144,7 @@ class _CategoryChip extends StatelessWidget {
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.08),
             blurRadius: AppDimens.spaceXs,
-            offset: const Offset(0, 1),
+            offset: Offset(0, AppDimens.spaceXxs),
           ),
         ],
       ),
@@ -222,81 +222,85 @@ class _CardContentSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final cardColor = theme.cardTheme;
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        contentPad,
-        AppDimens.spaceSm,
-        contentPad,
-        AppDimens.spaceSm,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            product.name,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+    return Container(
+      decoration: BoxDecoration(color: cardColor.surfaceTintColor),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          contentPad,
+          AppDimens.spaceSm,
+          contentPad,
+          AppDimens.spaceSm,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              product.name,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: AppDimens.spaceXxs),
-
-          // Duration
-          _InfoRow(icon: Symbols.schedule, text: product.duration),
-
-          // Location
-          if (product.location.isNotEmpty) ...[
             SizedBox(height: AppDimens.spaceXxs),
-            _InfoRow(icon: Symbols.location_on, text: product.location),
-          ],
 
-          // Vendor name
-          if (product.vendorName.isNotEmpty) ...[
-            SizedBox(height: AppDimens.spaceXxs),
-            _InfoRow(icon: Symbols.storefront, text: product.vendorName),
-          ],
+            // Duration
+            _InfoRow(icon: Symbols.schedule, text: product.duration),
 
-          SizedBox(height: AppDimens.spaceSm),
-
-          // Price + CTA
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Text(
-                  product.price,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: AppDimens.ctaButtonSm,
-                width: AppDimens.ctaButtonSm,
-                child: IconButton.filled(
-                  onPressed: () =>
-                      ServiceDetailsRoute(serviceId: product.id).go(context),
-                  tooltip: 'View details',
-                  padding: EdgeInsets.zero,
-                  icon: Icon(
-                    Symbols.arrow_forward,
-                    size: AppDimens.iconSm,
-                    color: colorScheme.onPrimary,
-                  ),
-                  style: IconButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    shape: const CircleBorder(),
-                  ),
-                ),
-              ),
+            // Location
+            if (product.location.isNotEmpty) ...[
+              SizedBox(height: AppDimens.spaceXxs),
+              _InfoRow(icon: Symbols.location_on, text: product.location),
             ],
-          ),
-        ],
+
+            // Vendor name
+            if (product.vendorName.isNotEmpty) ...[
+              SizedBox(height: AppDimens.spaceXxs),
+              _InfoRow(icon: Symbols.storefront, text: product.vendorName),
+            ],
+
+            SizedBox(height: AppDimens.spaceSm),
+
+            // Price + CTA
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Text(
+                    product.price,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: AppDimens.ctaButtonSm,
+                  width: AppDimens.ctaButtonSm,
+                  child: IconButton.filled(
+                    onPressed: () =>
+                        ServiceDetailsRoute(serviceId: product.id).go(context),
+                    tooltip: 'View details',
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      Symbols.arrow_forward,
+                      size: AppDimens.iconSm,
+                      color: colorScheme.onPrimary,
+                    ),
+                    style: IconButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      shape: const CircleBorder(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -38,10 +38,7 @@ class EmployeeBadgesStrength extends StatelessWidget {
           runSpacing: 8,
           children: [
             _LevelBadge(label: _levelLabel),
-            _LevelBadge(
-              label: _typeLabel,
-              showBorder: true,
-            ),
+            _LevelBadge(label: _typeLabel, showBorder: true),
           ],
         ),
         AppDimens.verticalMedium,
@@ -63,8 +60,7 @@ class EmployeeBadgesStrength extends StatelessWidget {
   String get _levelLabel {
     return switch (employee) {
       DoctorEntity() => 'DOCTOR',
-      SpaTherapistEntity e =>
-        e.therapistLevel?.toUpperCase() ?? 'THERAPIST',
+      SpaTherapistEntity e => e.therapistLevel?.toUpperCase() ?? 'THERAPIST',
       MassageTherapistEntity e =>
         e.therapistLevel?.toUpperCase() ?? 'THERAPIST',
       _ => employee.role.toUpperCase(),
@@ -86,20 +82,14 @@ class _LevelBadge extends StatelessWidget {
   final String label;
   final bool showBorder;
 
-  const _LevelBadge({
-    required this.label,
-    this.showBorder = false,
-  });
+  const _LevelBadge({required this.label, this.showBorder = false});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 8,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
         borderRadius: AppDimens.radiusSmall,
@@ -155,23 +145,17 @@ class _TimeJoinedCard extends StatelessWidget {
             children: [
               Text(
                 duration,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 2),
               Text(
                 since,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -207,11 +191,20 @@ class _TimeJoinedCard extends StatelessWidget {
     if (parts.isEmpty) parts.add('Just started');
 
     final monthNames = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
-    final since =
-        'Since ${monthNames[parsed.month - 1]} ${parsed.year}';
+    final since = 'Since ${monthNames[parsed.month - 1]} ${parsed.year}';
 
     return (parts.join(', '), since);
   }

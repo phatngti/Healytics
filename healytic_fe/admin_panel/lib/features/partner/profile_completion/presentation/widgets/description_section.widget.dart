@@ -41,16 +41,8 @@ class DescriptionSectionWidget extends StatelessWidget {
           'experience.',
       trailing: FilledButton.tonalIcon(
         onPressed: onEdit,
-        icon: Icon(
-          hasDescription
-              ? Icons.edit_outlined
-              : Icons.add_rounded,
-        ),
-        label: Text(
-          hasDescription
-              ? 'Edit description'
-              : 'Add description',
-        ),
+        icon: Icon(hasDescription ? Icons.edit_outlined : Icons.add_rounded),
+        label: Text(hasDescription ? 'Edit description' : 'Add description'),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,16 +54,10 @@ class DescriptionSectionWidget extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: hasDescription
-                  ? colorScheme
-                      .surfaceContainerHighest
-                      .withValues(alpha: 0.3)
-                  : colorScheme
-                      .surfaceContainerHigh
-                      .withValues(alpha: 0.2),
+                  ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+                  : colorScheme.surfaceContainerHigh.withValues(alpha: 0.2),
               borderRadius: const BorderRadius.all(
-                Radius.circular(
-                  AppDimens.spaceLg + AppDimens.spaceXxs,
-                ),
+                Radius.circular(AppDimens.spaceLg + AppDimens.spaceXxs),
               ),
               border: Border.all(
                 color: isInvalid
@@ -82,45 +68,32 @@ class DescriptionSectionWidget extends StatelessWidget {
             child: hasDescription
                 ? Text(
                     description,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   )
                 : Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(
                         Icons.notes_rounded,
-                        color: colorScheme
-                            .onSurfaceVariant,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                       AppDimens.verticalMediumSmall,
                       Text(
                         'No clinic description '
                         'added yet.',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(
-                        height: AppDimens.spaceXs +
-                            AppDimens.spaceXxs,
+                        height: AppDimens.spaceXs + AppDimens.spaceXxs,
                       ),
                       Text(
                         'Add a short profile summary '
                         'to explain specialties, '
                         'patient experience, and '
                         'care approach.',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(
-                          color: colorScheme
-                              .onSurfaceVariant,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -149,14 +122,10 @@ class DescriptionSectionWidget extends StatelessWidget {
                           '$maxLength characters.'
                     : '$trimmedLength/$minLength '
                           'minimum characters',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: isDescriptionValid
                       ? colorScheme.primary
-                      : colorScheme
-                          .onSurfaceVariant,
+                      : colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -166,10 +135,7 @@ class DescriptionSectionWidget extends StatelessWidget {
             Text(
               'Description must be at least '
               '$minLength characters.',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.error,
                 fontWeight: FontWeight.w600,
               ),

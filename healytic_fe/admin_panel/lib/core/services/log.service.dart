@@ -16,8 +16,7 @@ class LogService {
 
   Timer? _flushTimer;
 
-  late final StreamSubscription<LogRecord>
-      _logSubscription;
+  late final StreamSubscription<LogRecord> _logSubscription;
 
   static LogService? _instance;
   static LogService get I {
@@ -27,18 +26,12 @@ class LogService {
     return _instance!;
   }
 
-  static Future<LogService> init({
-    bool shouldBuffer = true,
-  }) async {
-    _instance ??= await create(
-      shouldBuffer: shouldBuffer,
-    );
+  static Future<LogService> init({bool shouldBuffer = true}) async {
+    _instance ??= await create(shouldBuffer: shouldBuffer);
     return _instance!;
   }
 
-  static Future<LogService> create({
-    bool shouldBuffer = true,
-  }) async {
+  static Future<LogService> create({bool shouldBuffer = true}) async {
     final instance = LogService._(shouldBuffer);
 
     Logger.root.level = Level.ALL;
@@ -46,9 +39,7 @@ class LogService {
   }
 
   LogService._(this._shouldBuffer) {
-    _logSubscription = Logger.root.onRecord.listen(
-      _handleLogRecord,
-    );
+    _logSubscription = Logger.root.onRecord.listen(_handleLogRecord);
   }
 
   void _handleLogRecord(LogRecord r) {

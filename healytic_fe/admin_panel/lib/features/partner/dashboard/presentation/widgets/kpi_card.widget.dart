@@ -1,4 +1,5 @@
 import 'package:admin_panel/theme/app_theme.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 /// Animated KPI card displaying a metric with trend.
@@ -42,61 +43,54 @@ class KpiCard extends StatelessWidget {
         return Card(
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppDimens.radiusMediumSmall,
             side: BorderSide(
-              color: colorScheme.outlineVariant
-                  .withValues(alpha: 0.5),
+              color: colorScheme.outlineVariant.withValues(alpha: 0.5),
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppDimens.paddingAllMedium,
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: AppDimens.paddingAllSmall,
                       decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer
-                            .withValues(alpha: 0.3),
-                        borderRadius:
-                            BorderRadius.circular(8),
+                        color: colorScheme.primaryContainer.withValues(
+                          alpha: 0.3,
+                        ),
+                        borderRadius: AppDimens.radiusSmall,
                       ),
                       child: Icon(
                         icon,
-                        size: 20,
+                        size: AppDimens.iconMd,
                         color: colorScheme.primary,
                       ),
                     ),
                     if (trend != null)
-                      _TrendBadge(
-                        trend: trend!,
-                        isPositive: trendPositive,
-                      ),
+                      _TrendBadge(trend: trend!, isPositive: trendPositive),
                   ],
                 ),
                 const Spacer(),
                 Text(
-                  '$prefix${_formatValue(animatedValue)}'
+                  '$prefix'
+                  '${_formatValue(animatedValue)}'
                   '$suffix',
-                  style: theme.textTheme.headlineSmall
-                      ?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: AppDimens.fontWeightBold,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                AppDimens.verticalExtraSmall,
                 Text(
                   label,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -123,10 +117,7 @@ class KpiCard extends StatelessWidget {
 }
 
 class _TrendBadge extends StatelessWidget {
-  const _TrendBadge({
-    required this.trend,
-    required this.isPositive,
-  });
+  const _TrendBadge({required this.trend, required this.isPositive});
 
   final double trend;
   final bool isPositive;
@@ -134,21 +125,19 @@ class _TrendBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final semanticColors =
-        theme.extension<SemanticColors>();
+    final semanticColors = theme.extension<SemanticColors>();
     final color = isPositive
-        ? semanticColors?.success ??
-            theme.colorScheme.primary
+        ? semanticColors?.success ?? theme.colorScheme.primary
         : theme.colorScheme.error;
 
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 4,
+        horizontal: AppDimens.spaceSm,
+        vertical: AppDimens.spaceXs,
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMediumSmall,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -157,21 +146,19 @@ class _TrendBadge extends StatelessWidget {
             isPositive
                 ? Icons.trending_up_rounded
                 : Icons.trending_down_rounded,
-            size: 14,
+            size: AppDimens.iconXs,
             color: color,
           ),
-          const SizedBox(width: 4),
+          AppDimens.horizontalExtraSmall,
           Text(
             '${trend.toStringAsFixed(1)}%',
-            style: theme.textTheme.labelSmall
-                ?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.w600,
-                ),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: color,
+              fontWeight: AppDimens.fontWeightSemiBold,
+            ),
           ),
         ],
       ),
     );
   }
 }
-

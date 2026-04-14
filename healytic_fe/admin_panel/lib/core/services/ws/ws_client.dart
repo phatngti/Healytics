@@ -25,7 +25,9 @@ Map<String, dynamic> _requireEventMap(dynamic value, String context) {
   if (value is Map) {
     return Map<String, dynamic>.from(value);
   }
-  throw FormatException('Expected JSON object for $context, got ${value.runtimeType}');
+  throw FormatException(
+    'Expected JSON object for $context, got ${value.runtimeType}',
+  );
 }
 
 /// Suppresses verbose internal loggers from
@@ -81,10 +83,7 @@ abstract interface class WsNamespaceSocket {
   /// [server] provides the URL and Socket.IO
   /// transport path.
   /// [token] is the JWT access token.
-  void connect({
-    required WsServerConfig server,
-    required String token,
-  });
+  void connect({required WsServerConfig server, required String token});
 
   /// Disconnect from the WebSocket server.
   void disconnect();
@@ -114,44 +113,34 @@ class PartnerChatSocket implements WsNamespaceSocket {
 
   io.Socket? _socket;
 
-  final _newMessageController =
-      StreamController<WsNewMessageEvent>.broadcast();
-  final _messageSentController =
-      StreamController<WsMessageSentAck>.broadcast();
+  final _newMessageController = StreamController<WsNewMessageEvent>.broadcast();
+  final _messageSentController = StreamController<WsMessageSentAck>.broadcast();
   final _messagesReadController =
       StreamController<WsMessagesReadEvent>.broadcast();
-  final _typingController =
-      StreamController<WsTypingEvent>.broadcast();
-  final _stopTypingController =
-      StreamController<WsStopTypingEvent>.broadcast();
-  final _errorController =
-      StreamController<WsErrorEvent>.broadcast();
+  final _typingController = StreamController<WsTypingEvent>.broadcast();
+  final _stopTypingController = StreamController<WsStopTypingEvent>.broadcast();
+  final _errorController = StreamController<WsErrorEvent>.broadcast();
   final _connectionController =
       StreamController<WsConnectionStatus>.broadcast();
 
   /// A new message was sent in a conversation the user has joined
-  Stream<WsNewMessageEvent> get onNewMessage =>
-      _newMessageController.stream;
+  Stream<WsNewMessageEvent> get onNewMessage => _newMessageController.stream;
 
   /// Acknowledgement that the server persisted the user's message
-  Stream<WsMessageSentAck> get onMessageSent =>
-      _messageSentController.stream;
+  Stream<WsMessageSentAck> get onMessageSent => _messageSentController.stream;
 
   /// The other party read messages in a conversation
   Stream<WsMessagesReadEvent> get onMessagesRead =>
       _messagesReadController.stream;
 
   /// The other party is typing in a conversation
-  Stream<WsTypingEvent> get onTyping =>
-      _typingController.stream;
+  Stream<WsTypingEvent> get onTyping => _typingController.stream;
 
   /// The other party stopped typing
-  Stream<WsStopTypingEvent> get onStopTyping =>
-      _stopTypingController.stream;
+  Stream<WsStopTypingEvent> get onStopTyping => _stopTypingController.stream;
 
   /// A server error occurred while processing a WS event
-  Stream<WsErrorEvent> get onError =>
-      _errorController.stream;
+  Stream<WsErrorEvent> get onError => _errorController.stream;
 
   /// Stream of connection state changes.
   @override
@@ -169,10 +158,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
   /// transport path.
   /// [token] is the JWT access token.
   @override
-  void connect({
-    required WsServerConfig server,
-    required String token,
-  }) {
+  void connect({required WsServerConfig server, required String token}) {
     _silenceSocketIoLoggers();
 
     if (_socket != null) {
@@ -287,9 +273,7 @@ class PartnerChatSocket implements WsNamespaceSocket {
       payload.toJson(),
       ack: (response) {
         if (onAck != null && response is Map<dynamic, dynamic>) {
-          onAck(WsMessageSentAck.fromJson(
-            Map<String, dynamic>.from(response),
-          ));
+          onAck(WsMessageSentAck.fromJson(Map<String, dynamic>.from(response)));
         }
       },
     );
@@ -391,10 +375,7 @@ class ChatNotificationsSocket implements WsNamespaceSocket {
   /// transport path.
   /// [token] is the JWT access token.
   @override
-  void connect({
-    required WsServerConfig server,
-    required String token,
-  }) {
+  void connect({required WsServerConfig server, required String token}) {
     _silenceSocketIoLoggers();
 
     if (_socket != null) {
@@ -442,8 +423,13 @@ class ChatNotificationsSocket implements WsNamespaceSocket {
 
     _socket!.on(WsChatNotificationsEvent.newMessageNotification, (data) {
       try {
-        final map = _requireEventMap(data, 'chat-notifications.new_message_notification');
-        _newMessageNotificationController.add(WsNewMessageNotification.fromJson(map));
+        final map = _requireEventMap(
+          data,
+          'chat-notifications.new_message_notification',
+        );
+        _newMessageNotificationController.add(
+          WsNewMessageNotification.fromJson(map),
+        );
       } catch (e, st) {
         _log.severe('Error parsing new_message_notification', e, st);
       }
@@ -477,4 +463,3 @@ class ChatNotificationsSocket implements WsNamespaceSocket {
     _connectionController.add(newStatus);
   }
 }
-

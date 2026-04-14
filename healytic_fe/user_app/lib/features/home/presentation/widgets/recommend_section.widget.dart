@@ -447,8 +447,8 @@ class _CardTitle extends StatelessWidget {
         fontSize: AppDimens.adaptive(
           context,
           small: AppDimens.spaceLg,
-          medium: AppDimens.spaceXl - 2,
-          large: AppDimens.spaceXl - 2,
+          medium: AppDimens.iconSmMd,
+          large: AppDimens.iconSmMd,
         ),
       ),
       maxLines: 1,
@@ -539,7 +539,7 @@ class _CardFooter extends StatelessWidget {
                     theme.colorScheme.secondary.withValues(
                   alpha: 0.3,
                 ),
-                blurRadius: AppDimens.spaceLg - 1,
+                blurRadius: AppDimens.spaceMdLg,
               ),
             ],
           ),

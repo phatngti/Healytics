@@ -30,24 +30,18 @@ class EmployeeServicesSection extends StatelessWidget {
           children: [
             Text(
               'PERFORMABLE SERVICES',
-              style: Theme.of(context)
-                  .textTheme
-                  .labelSmall
-                  ?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                  ),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1,
+              ),
             ),
             if (services.isNotEmpty)
               Text(
                 'Showing ${services.length}',
-                style: Theme.of(context)
-                    .textTheme
-                    .labelSmall
-                    ?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
           ],
         ),
@@ -55,28 +49,22 @@ class EmployeeServicesSection extends StatelessWidget {
         if (services.isEmpty)
           Text(
             'No services assigned',
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           )
         else
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount =
-                  constraints.maxWidth >= 600
-                      ? 3
-                      : (constraints.maxWidth >= 400
-                          ? 2
-                          : 1);
+              final crossAxisCount = constraints.maxWidth >= 600
+                  ? 3
+                  : (constraints.maxWidth >= 400 ? 2 : 1);
               return Wrap(
                 spacing: 12,
                 runSpacing: 12,
                 children: services.map((service) {
-                  final itemWidth = (constraints.maxWidth -
-                          12 * (crossAxisCount - 1)) /
+                  final itemWidth =
+                      (constraints.maxWidth - 12 * (crossAxisCount - 1)) /
                       crossAxisCount;
                   return SizedBox(
                     width: itemWidth,
@@ -95,22 +83,21 @@ class EmployeeServicesSection extends StatelessWidget {
 
   List<_ServiceData> _getServices() {
     return switch (employee) {
-      DoctorEntity e => e.specializations
-          .map(
-            (s) => _ServiceData(
-              name: _capitalize(s),
-              subtitle: e.consultationFee != null
-                  ? '\$${e.consultationFee!.toStringAsFixed(0)}'
-                  : null,
-            ),
-          )
-          .toList(),
-      SpaTherapistEntity e => e.skills
-          .map((s) => _ServiceData(name: s))
-          .toList(),
-      MassageTherapistEntity e => e.skills
-          .map((s) => _ServiceData(name: s))
-          .toList(),
+      DoctorEntity e =>
+        e.specializations
+            .map(
+              (s) => _ServiceData(
+                name: _capitalize(s),
+                subtitle: e.consultationFee != null
+                    ? '\$${e.consultationFee!.toStringAsFixed(0)}'
+                    : null,
+              ),
+            )
+            .toList(),
+      SpaTherapistEntity e =>
+        e.skills.map((s) => _ServiceData(name: s)).toList(),
+      MassageTherapistEntity e =>
+        e.skills.map((s) => _ServiceData(name: s)).toList(),
       _ => [],
     };
   }
@@ -132,10 +119,7 @@ class _ServiceItem extends StatelessWidget {
   final String name;
   final String? subtitle;
 
-  const _ServiceItem({
-    required this.name,
-    this.subtitle,
-  });
+  const _ServiceItem({required this.name, this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -146,9 +130,7 @@ class _ServiceItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: colorScheme.outlineVariant,
-        ),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
         children: [
@@ -172,24 +154,18 @@ class _ServiceItem extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelMedium
-                      ?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle!,
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelSmall
-                        ?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
               ],
             ),

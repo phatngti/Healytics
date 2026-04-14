@@ -103,6 +103,7 @@ part 'model/checkout_ticket_response_dto.dart';
 part 'model/client_key_response_dto.dart';
 part 'model/clinic_certification_dto.dart';
 part 'model/clinic_info_response_dto.dart';
+part 'model/clinic_product_category_dto.dart';
 part 'model/clinic_product_dto.dart';
 part 'model/clinic_products_response_dto.dart';
 part 'model/clinic_review_dto.dart';
