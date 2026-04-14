@@ -41,9 +41,8 @@ class EmployeeDetailsScreen extends ConsumerWidget {
           title: 'Failed to load employee details',
           error: error,
           stackTrace: stack,
-          onRetry: () => ref.refresh(
-            employeeDetailsProvider(EmployeeId(employeeId)),
-          ),
+          onRetry: () =>
+              ref.refresh(employeeDetailsProvider(EmployeeId(employeeId))),
         ),
       ),
     );

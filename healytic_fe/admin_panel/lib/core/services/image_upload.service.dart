@@ -33,15 +33,11 @@ class ImageUploadService {
   /// the list of public URLs.
   ///
   /// Returns an empty list when the user cancels.
-  Future<List<String>> pickAndUploadMultiple({
-    int? maxFiles,
-  }) async {
+  Future<List<String>> pickAndUploadMultiple({int? maxFiles}) async {
     final files = await _pickMultipleImages();
     if (files.isEmpty) return const <String>[];
 
-    final selected = maxFiles != null
-        ? files.take(maxFiles).toList()
-        : files;
+    final selected = maxFiles != null ? files.take(maxFiles).toList() : files;
 
     final urls = <String>[];
     for (final f in selected) {
@@ -58,9 +54,7 @@ class ImageUploadService {
   Future<String> uploadFile(XFile file) async {
     final key = await _s3.uploadFile(file);
     if (key == null || key.isEmpty) {
-      throw Exception(
-        'Upload did not return a file key.',
-      );
+      throw Exception('Upload did not return a file key.');
     }
     return formatR2Url(key) ?? key;
   }
@@ -99,9 +93,7 @@ class ImageUploadService {
       return XFile.fromData(
         bytes,
         name: file.name,
-        mimeType: file.extension == null
-            ? null
-            : 'image/${file.extension}',
+        mimeType: file.extension == null ? null : 'image/${file.extension}',
       );
     }
     final path = file.path;

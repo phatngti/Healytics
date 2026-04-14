@@ -68,7 +68,6 @@ class MainScreenLayout extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: _resolveAppBar(context, colorScheme),
       body: SafeArea(
         top: !useAppBar && appBar == null,
@@ -102,7 +101,6 @@ class MainScreenLayout extends StatelessWidget {
 ///
 /// Provides a consistent visual appearance:
 /// - Centred title with semi-bold weight.
-/// - Surface background, no elevation.
 /// - Subtle bottom border.
 /// - Standard icon sizing and spacing.
 class _StandardAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -124,16 +122,12 @@ class _StandardAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       leading: leading,
       centerTitle: true,
-      elevation: 0,
       scrolledUnderElevation: 0,
-      backgroundColor: colorScheme.surface,
-      surfaceTintColor: Colors.transparent,
       title: title != null
           ? Text(
               title!,
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: AppDimens.fontWeightSemiBold,
-                color: colorScheme.onSurface,
               ),
             )
           : null,

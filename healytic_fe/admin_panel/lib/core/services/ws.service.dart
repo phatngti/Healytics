@@ -56,30 +56,18 @@ class WsService {
   /// Call this after the user has authenticated.
   void connectAll() {
     _log.info('Connecting all WS namespaces');
-    _connectSocket(
-      partnerChat,
-      ServicePrefix.partnerChat,
-    );
-    _connectSocket(
-      chatNotifications,
-      ServicePrefix.chatNotifications,
-    );
+    _connectSocket(partnerChat, ServicePrefix.partnerChat);
+    _connectSocket(chatNotifications, ServicePrefix.chatNotifications);
   }
 
   /// Connect only the partner-chat namespace.
   void connectPartnerChat() {
-    _connectSocket(
-      partnerChat,
-      ServicePrefix.partnerChat,
-    );
+    _connectSocket(partnerChat, ServicePrefix.partnerChat);
   }
 
   /// Connect only the global chat-notifications namespace.
   void connectChatNotifications() {
-    _connectSocket(
-      chatNotifications,
-      ServicePrefix.chatNotifications,
-    );
+    _connectSocket(chatNotifications, ServicePrefix.chatNotifications);
   }
 
   /// Disconnect **all** active sockets.
@@ -110,8 +98,7 @@ class WsService {
   /// Falls back to [ApiService.accessToken] if the
   /// store value is empty.
   String _resolveAccessToken() {
-    final storeToken =
-        Store.tryGet(StoreKey.accessToken) ?? '';
+    final storeToken = Store.tryGet(StoreKey.accessToken) ?? '';
     if (storeToken.isNotEmpty) return storeToken;
     return _apiService.accessToken ?? '';
   }
@@ -124,10 +111,7 @@ class WsService {
   /// parses it and negotiates the namespace in the
   /// protocol handshake. The HTTP transport path is
   /// always the standard `/socket.io/`.
-  void _connectSocket(
-    WsNamespaceSocket socket,
-    ServicePrefix prefix,
-  ) {
+  void _connectSocket(WsNamespaceSocket socket, ServicePrefix prefix) {
     if (socket.status == WsConnectionStatus.connected ||
         socket.status == WsConnectionStatus.connecting ||
         socket.status == WsConnectionStatus.reconnecting) {
@@ -150,10 +134,7 @@ class WsService {
     }
 
     socket.connect(
-      server: (
-        url: '$baseUrl${prefix.path}',
-        path: '/socket.io/',
-      ),
+      server: (url: '$baseUrl${prefix.path}', path: '/socket.io/'),
       token: token,
     );
   }

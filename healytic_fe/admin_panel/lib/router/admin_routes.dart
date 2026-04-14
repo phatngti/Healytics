@@ -1,6 +1,9 @@
 import 'package:admin_panel/features/admin/category/presentation/category_add.dart';
 import 'package:admin_panel/features/admin/category/presentation/category_home.dart';
 import 'package:admin_panel/features/admin/dashboard/presentation/admin_dashboard_screen.dart';
+import 'package:admin_panel/features/admin/system_notification/presentation/notification_campaign_composer.screen.dart';
+import 'package:admin_panel/features/admin/system_notification/presentation/notification_campaign_detail.screen.dart';
+import 'package:admin_panel/features/admin/system_notification/presentation/notification_campaign_index.screen.dart';
 import 'package:admin_panel/features/authenticate/presentation/forgot_password/forgot_password.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_in.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_up/email_code_verification.screen.dart';
@@ -18,9 +21,7 @@ part 'admin_routes.g.dart';
 
 // --- AUTH & ONBOARDING ROUTES ---
 
-@TypedGoRoute<SignInRoute>(path: '/', name: SignInRoute.name, routes: [
-  ],
-)
+@TypedGoRoute<SignInRoute>(path: '/', name: SignInRoute.name, routes: [])
 class SignInRoute extends GoRouteData with $SignInRoute {
   const SignInRoute({this.autofill});
   static const name = "signin";
@@ -80,9 +81,7 @@ class SignUpRoute extends GoRouteData with $SignUpRoute {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: SignUpFormScreen(
-        autofill: autofill ?? false,
-      ),
+      child: SignUpFormScreen(autofill: autofill ?? false),
     );
   }
 }
@@ -143,6 +142,18 @@ class SuccessRegistrationRoute extends GoRouteData
       path: '/admin/category/add',
       name: CategoryAddRoute.name,
     ),
+    TypedGoRoute<AdminNotificationCampaignIndexRoute>(
+      path: '/admin/notifications',
+      name: AdminNotificationCampaignIndexRoute.name,
+    ),
+    TypedGoRoute<AdminNotificationCampaignNewRoute>(
+      path: '/admin/notifications/new',
+      name: AdminNotificationCampaignNewRoute.name,
+    ),
+    TypedGoRoute<AdminNotificationCampaignDetailRoute>(
+      path: '/admin/notifications/:id',
+      name: AdminNotificationCampaignDetailRoute.name,
+    ),
   ],
 )
 class AdminShellRouteData extends ShellRouteData {
@@ -198,8 +209,7 @@ class ReviewApplicationRoute extends GoRouteData with $ReviewApplicationRoute {
 }
 
 /// Route for viewing partner details (read-only)
-class ViewPartnerDetailRoute extends GoRouteData
-    with $ViewPartnerDetailRoute {
+class ViewPartnerDetailRoute extends GoRouteData with $ViewPartnerDetailRoute {
   const ViewPartnerDetailRoute({required this.partnerId});
 
   /// The partner ID to view
@@ -208,15 +218,10 @@ class ViewPartnerDetailRoute extends GoRouteData
   static const name = 'view-partner-detail';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: ViewPartnerDetailScreen(
-        partnerId: partnerId,
-      ),
+      child: ViewPartnerDetailScreen(partnerId: partnerId),
     );
   }
 }
@@ -246,6 +251,53 @@ class CategoryAddRoute extends GoRouteData with $CategoryAddRoute {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: CategoryAddScreen(autofill: autofill ?? false),
+    );
+  }
+}
+
+class AdminNotificationCampaignIndexRoute extends GoRouteData
+    with $AdminNotificationCampaignIndexRoute {
+  const AdminNotificationCampaignIndexRoute();
+
+  static const name = 'admin-notification-campaign-index';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const NotificationCampaignIndexScreen(),
+    );
+  }
+}
+
+class AdminNotificationCampaignNewRoute extends GoRouteData
+    with $AdminNotificationCampaignNewRoute {
+  const AdminNotificationCampaignNewRoute();
+
+  static const name = 'admin-notification-campaign-new';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const NotificationCampaignComposerScreen(),
+    );
+  }
+}
+
+class AdminNotificationCampaignDetailRoute extends GoRouteData
+    with $AdminNotificationCampaignDetailRoute {
+  const AdminNotificationCampaignDetailRoute({required this.id});
+
+  static const name = 'admin-notification-campaign-detail';
+
+  final String id;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: NotificationCampaignDetailScreen(campaignId: id),
     );
   }
 }

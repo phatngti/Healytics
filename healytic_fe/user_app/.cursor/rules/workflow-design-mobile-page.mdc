@@ -29,7 +29,6 @@ alwaysApply: false
        return Scaffold(
          appBar: AppBar(
            title: Text('Page Title', style: textTheme.titleLarge),
-           backgroundColor: colorScheme.surface,
          ),
          body: SafeArea(
            child: SingleChildScrollView(

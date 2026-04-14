@@ -26,9 +26,7 @@ class LoggingClient extends BaseClient {
   LoggingClient(this._inner);
 
   @override
-  Future<StreamedResponse> send(
-    BaseRequest request,
-  ) async {
+  Future<StreamedResponse> send(BaseRequest request) async {
     // Capture call stack before any await so we can
     // trace back to the originating datasource.
     final callerTrace = StackTrace.current;
@@ -43,8 +41,7 @@ class LoggingClient extends BaseClient {
         return response;
       }
 
-      if (response.statusCode < 200 ||
-          response.statusCode >= 300) {
+      if (response.statusCode < 200 || response.statusCode >= 300) {
         return _handleErrorResponse(
           request: request,
           response: response,
@@ -80,10 +77,7 @@ class LoggingClient extends BaseClient {
     required StackTrace callerTrace,
   }) async {
     final bytes = await response.stream.toBytes();
-    final body = utf8.decode(
-      bytes,
-      allowMalformed: true,
-    );
+    final body = utf8.decode(bytes, allowMalformed: true);
 
     _logHttpError(
       request: request,
@@ -102,8 +96,7 @@ class LoggingClient extends BaseClient {
       request: response.request,
       headers: response.headers,
       isRedirect: response.isRedirect,
-      persistentConnection:
-          response.persistentConnection,
+      persistentConnection: response.persistentConnection,
       reasonPhrase: response.reasonPhrase,
     );
   }
@@ -119,22 +112,21 @@ class LoggingClient extends BaseClient {
     required StackTrace callerTrace,
   }) {
     final errorMsg = _parseErrorMessage(body);
-    final callerInfo =
-        _extractCallerInfo(callerTrace);
-    final callerLines = callerInfo
-        .split('\n')
-        .map((l) => '║   $l')
-        .join('\n');
+    final callerInfo = _extractCallerInfo(callerTrace);
+    final callerLines = callerInfo.split('\n').map((l) => '║   $l').join('\n');
 
     final message = StringBuffer()
-      ..writeln('╔══ HTTP ERROR '
-          '${'═' * 40}')
       ..writeln(
-          '║ ${request.method} ${request.url}')
+        '╔══ HTTP ERROR '
+        '${'═' * 40}',
+      )
+      ..writeln('║ ${request.method} ${request.url}')
       ..writeln('║ Status: $statusCode')
       ..writeln('║ Message: $errorMsg')
-      ..writeln('║ Duration: '
-          '${elapsed.inMilliseconds}ms')
+      ..writeln(
+        '║ Duration: '
+        '${elapsed.inMilliseconds}ms',
+      )
       ..writeln('║ Called from:')
       ..writeln(callerLines)
       ..write('╚${'═' * 54}');
@@ -151,20 +143,19 @@ class LoggingClient extends BaseClient {
     required Duration elapsed,
   }) {
     final message = StringBuffer()
-      ..writeln('╔══ NETWORK ERROR '
-          '${'═' * 37}')
       ..writeln(
-          '║ ${request.method} ${request.url}')
+        '╔══ NETWORK ERROR '
+        '${'═' * 37}',
+      )
+      ..writeln('║ ${request.method} ${request.url}')
       ..writeln('║ Error: $error')
-      ..writeln('║ Duration: '
-          '${elapsed.inMilliseconds}ms')
+      ..writeln(
+        '║ Duration: '
+        '${elapsed.inMilliseconds}ms',
+      )
       ..write('╚${'═' * 54}');
 
-    _log.severe(
-      message.toString(),
-      error,
-      stackTrace,
-    );
+    _log.severe(message.toString(), error, stackTrace);
   }
 
   /// Clears the stored access token so
@@ -201,9 +192,7 @@ class LoggingClient extends BaseClient {
       return body;
     } catch (_) {
       // Not JSON — return truncated raw body.
-      return body.length > 200
-          ? '${body.substring(0, 200)}...'
-          : body;
+      return body.length > 200 ? '${body.substring(0, 200)}...' : body;
     }
   }
 
@@ -217,9 +206,7 @@ class LoggingClient extends BaseClient {
     for (final frame in frames) {
       final isProjectFrame =
           frame.contains('package:admin_panel/') ||
-              frame.contains(
-                'package:admin_openapi/',
-              );
+          frame.contains('package:admin_openapi/');
       if (!isProjectFrame) continue;
 
       // Skip internal logging/network frames.

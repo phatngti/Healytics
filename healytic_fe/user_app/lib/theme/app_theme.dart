@@ -230,74 +230,89 @@ class AppTheme {
     displayColor: Colors.white,
   );
 
-  ThemeData lightTheme() =>
-      FlexThemeData.light(
-        scheme: FlexScheme.aquaBlue,
-        // Input color modifiers.
-        useMaterial3ErrorColors: true,
-        // Component theme configurations for light mode.
-        subThemesData: const FlexSubThemesData(
-          interactionEffects: true,
-          tintedDisabledControls: true,
-          useM2StyleDividerInM3: true,
-          adaptiveRadius: FlexAdaptive.all(),
-          inputDecoratorIsFilled: true,
-          inputDecoratorBorderType: FlexInputBorderType.outline,
-          alignedDropdown: true,
-          navigationRailUseIndicator: true,
+  ThemeData lightTheme() {
+    final base = FlexThemeData.light(
+      scheme: FlexScheme.aquaBlue,
+      // Input color modifiers.
+      useMaterial3ErrorColors: true,
+      // Component theme configurations for light mode.
+      subThemesData: const FlexSubThemesData(
+        interactionEffects: true,
+        tintedDisabledControls: true,
+        useM2StyleDividerInM3: true,
+        adaptiveRadius: FlexAdaptive.all(),
+        inputDecoratorIsFilled: true,
+        inputDecoratorBorderType: FlexInputBorderType.outline,
+        alignedDropdown: true,
+        navigationRailUseIndicator: true,
+      ),
+      textTheme: lightTextTheme,
+      visualDensity: FlexColorScheme.comfortablePlatformDensity,
+      cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+    );
+    return base.copyWith(
+      scaffoldBackgroundColor: base.colorScheme.surfaceBright.withValues(
+        alpha: 0.8,
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: base.colorScheme.surfaceBright.withValues(alpha: 0.8),
+        surfaceTintColor: Colors.transparent,
+      ),
+      extensions: <ThemeExtension<dynamic>>[
+        SemanticColors(
+          success: const Color.fromARGB(255, 130, 226, 196),
+          onSuccess: Colors.white,
+          onSuccessContainer: const Color.fromARGB(255, 81, 223, 88),
+          warning: Colors.orange,
+          onWarning: Colors.white,
+          onWarningContainer: Colors.orange.shade300,
+          info: Colors.blue,
+          onInfo: Colors.white,
+          onInfoContainer: Colors.blue.shade300,
+          error: Colors.red,
+          onError: Colors.white,
+          onErrorContainer: Colors.red.shade300,
         ),
-        textTheme: lightTextTheme,
-        visualDensity: FlexColorScheme.comfortablePlatformDensity,
-        cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-      ).copyWith(
-        extensions: <ThemeExtension<dynamic>>[
-          SemanticColors(
-            success: const Color.fromARGB(255, 130, 226, 196),
-            onSuccess: Colors.white,
-            onSuccessContainer: const Color.fromARGB(255, 81, 223, 88),
-            warning: Colors.orange,
-            onWarning: Colors.white,
-            onWarningContainer: Colors.orange.shade300,
-            info: Colors.blue,
-            onInfo: Colors.white,
-            onInfoContainer: Colors.blue.shade300,
-            error: Colors.red,
-            onError: Colors.white,
-            onErrorContainer: Colors.red.shade300,
-            // Light Blue
-          ),
-        ],
-      );
+      ],
+    );
+  }
 
-  ThemeData darkTheme() =>
-      FlexThemeData.dark(
-        colors: FlexColor.schemes[FlexScheme.deepPurple]!.light.defaultError
-            .toDark(10, true),
-        swapLegacyOnMaterial3: true,
-        swapColors: true,
-        subThemesData: const FlexSubThemesData(
-          interactionEffects: true,
-          tintedDisabledControls: true,
-          blendOnColors: true,
-          useM2StyleDividerInM3: true,
-          splashType: FlexSplashType.inkSparkle,
-          defaultRadius: 10.0,
-          inputDecoratorIsFilled: true,
-          inputDecoratorBorderType: FlexInputBorderType.outline,
-          alignedDropdown: true,
-          navigationRailUseIndicator: true,
+  ThemeData darkTheme() {
+    final base = FlexThemeData.dark(
+      colors: FlexColor.schemes[FlexScheme.deepPurple]!.light.defaultError
+          .toDark(10, true),
+      swapLegacyOnMaterial3: true,
+      swapColors: true,
+      subThemesData: const FlexSubThemesData(
+        interactionEffects: true,
+        tintedDisabledControls: true,
+        blendOnColors: true,
+        useM2StyleDividerInM3: true,
+        splashType: FlexSplashType.inkSparkle,
+        defaultRadius: 10.0,
+        inputDecoratorIsFilled: true,
+        inputDecoratorBorderType: FlexInputBorderType.outline,
+        alignedDropdown: true,
+        navigationRailUseIndicator: true,
+      ),
+      textTheme: darkTextTheme,
+      visualDensity: FlexColorScheme.comfortablePlatformDensity,
+      cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+    );
+    return base.copyWith(
+      scaffoldBackgroundColor: base.colorScheme.surface,
+      appBarTheme: AppBarTheme(
+        backgroundColor: base.colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+      ),
+      extensions: <ThemeExtension<dynamic>>[
+        SemanticColors(
+          success: Colors.green,
+          warning: Colors.orange,
+          info: Colors.blue,
+          error: Colors.red,
         ),
-        textTheme: darkTextTheme,
-        visualDensity: FlexColorScheme.comfortablePlatformDensity,
-        cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-      ).copyWith(
-        extensions: <ThemeExtension<dynamic>>[
-          SemanticColors(
-            success: Colors.green, // Green
-            warning: Colors.orange, // Orange
-            info: Colors.blue, // Light Blue
-            error: Colors.red,
-          ),
-        ],
-      );
+      ],
+    );
+  }
 }

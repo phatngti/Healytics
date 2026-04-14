@@ -39,30 +39,22 @@ abstract class PartnerInboxRemoteDatasource {
 // ─── Part B: Real Implementation ─────────────────────
 
 /// Wired to [PartnerChatApi] from the OpenAPI client.
-class PartnerInboxRemoteDatasourceImpl
-    implements PartnerInboxRemoteDatasource {
+class PartnerInboxRemoteDatasourceImpl implements PartnerInboxRemoteDatasource {
   final ApiService _apiService;
-  static final _log =
-      Logger('PartnerInboxRemoteDatasourceImpl');
+  static final _log = Logger('PartnerInboxRemoteDatasourceImpl');
 
-  PartnerInboxRemoteDatasourceImpl({
-    required ApiService apiService,
-  }) : _apiService = apiService;
+  PartnerInboxRemoteDatasourceImpl({required ApiService apiService})
+    : _apiService = apiService;
 
-  PartnerChatApi get _chatApi =>
-      _apiService.partnerChatApi;
+  PartnerChatApi get _chatApi => _apiService.partnerChatApi;
 
   @override
-  Future<List<PartnerConversation>>
-      getConversations() async {
-    final dtos = await _chatApi
-        .partnerChatControllerGetConversations();
+  Future<List<PartnerConversation>> getConversations() async {
+    final dtos = await _chatApi.partnerChatControllerGetConversations();
 
     if (dtos == null) return [];
 
-    return dtos
-        .map(_mapConversation)
-        .toList(growable: false);
+    return dtos.map(_mapConversation).toList(growable: false);
   }
 
   @override
@@ -75,23 +67,17 @@ class PartnerInboxRemoteDatasourceImpl
     // the raw HTTP response manually.
     final response = await _chatApi
         .partnerChatControllerGetMessagesWithHttpInfo(
-      conversationId,
-      beforeId: beforeId,
-      limit: limit,
-    );
+          conversationId,
+          beforeId: beforeId,
+          limit: limit,
+        );
 
     if (response.statusCode >= 400) {
-      throw ApiException(
-        response.statusCode,
-        'Failed to load messages',
-      );
+      throw ApiException(response.statusCode, 'Failed to load messages');
     }
 
     if (response.body.isEmpty) {
-      return const PaginatedMessages(
-        messages: [],
-        hasMore: false,
-      );
+      return const PaginatedMessages(messages: [], hasMore: false);
     }
 
     final decoded = jsonDecode(response.body);
@@ -103,9 +89,7 @@ class PartnerInboxRemoteDatasourceImpl
     String? nextCursor;
 
     if (decoded is Map<String, dynamic>) {
-      items = (decoded['messages']
-              as List<dynamic>?) ??
-          [];
+      items = (decoded['messages'] as List<dynamic>?) ?? [];
       hasMore = decoded['hasMore'] as bool? ?? false;
       nextCursor = decoded['nextCursor'] as String?;
     } else if (decoded is List) {
@@ -115,39 +99,28 @@ class PartnerInboxRemoteDatasourceImpl
         'Unexpected messages format: '
         '${decoded.runtimeType}',
       );
-      return const PaginatedMessages(
-        messages: [],
-        hasMore: false,
-      );
+      return const PaginatedMessages(messages: [], hasMore: false);
     }
 
     // Backend returns messages in ASC (chronological)
     // order — render directly.
     return PaginatedMessages(
-      messages: items
-          .map(_mapMessage)
-          .toList(growable: false),
+      messages: items.map(_mapMessage).toList(growable: false),
       hasMore: hasMore,
       nextCursor: nextCursor,
     );
   }
 
   @override
-  Future<void> markAsRead(
-    String conversationId,
-  ) async {
-    await _chatApi.partnerChatControllerMarkRead(
-      conversationId,
-    );
+  Future<void> markAsRead(String conversationId) async {
+    await _chatApi.partnerChatControllerMarkRead(conversationId);
   }
 
   // ── DTO → Entity Mappers ──────────────────────────
 
   /// Maps [ConversationResponseDto] to domain
   /// [PartnerConversation].
-  PartnerConversation _mapConversation(
-    ConversationResponseDto dto,
-  ) {
+  PartnerConversation _mapConversation(ConversationResponseDto dto) {
     return PartnerConversation(
       id: dto.id,
       status: dto.status.value,
@@ -173,28 +146,23 @@ class PartnerInboxRemoteDatasourceImpl
   ///
   /// Uses defensive parsing because the generated
   /// client lacks a typed response DTO for messages.
-  PartnerChatMessage _mapMessage(
-    dynamic json,
-  ) {
+  PartnerChatMessage _mapMessage(dynamic json) {
     final map = json as Map<String, dynamic>;
 
-    final rawType =
-        map['messageType']?.toString() ?? 'text';
+    final rawType = map['messageType']?.toString() ?? 'text';
     final messageType = rawType == 'system'
         ? PartnerMessageType.system
         : PartnerMessageType.text;
 
     return PartnerChatMessage(
       id: map['id']?.toString() ?? '',
-      conversationId:
-          map['conversationId']?.toString() ?? '',
+      conversationId: map['conversationId']?.toString() ?? '',
       senderId: map['senderId']?.toString() ?? '',
       senderName: map['senderName']?.toString(),
       senderAvatar: map['senderAvatar']?.toString(),
       content: map['content']?.toString() ?? '',
       messageType: messageType,
-      clientMessageId:
-          map['clientMessageId']?.toString(),
+      clientMessageId: map['clientMessageId']?.toString(),
       createdAt: _parseDateTime(map['createdAt']),
       isRead: map['isRead'] == true,
     );
@@ -203,26 +171,19 @@ class PartnerInboxRemoteDatasourceImpl
   /// Safely parses a date-time value from the API.
   DateTime _parseDateTime(dynamic value) {
     if (value is String) {
-      return DateTime.tryParse(value) ??
-          DateTime.now();
+      return DateTime.tryParse(value) ?? DateTime.now();
     }
-    _log.warning(
-      'Unexpected date format: $value',
-    );
+    _log.warning('Unexpected date format: $value');
     return DateTime.now();
   }
 }
 
 // ─── Part C: Mock Implementation ─────────────────────
 
-class PartnerInboxRemoteDatasourceMock
-    implements PartnerInboxRemoteDatasource {
+class PartnerInboxRemoteDatasourceMock implements PartnerInboxRemoteDatasource {
   @override
-  Future<List<PartnerConversation>>
-      getConversations() async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<List<PartnerConversation>> getConversations() async {
+    await Future.delayed(const Duration(milliseconds: 500));
     return kMockInboxConversations;
   }
 
@@ -232,24 +193,13 @@ class PartnerInboxRemoteDatasourceMock
     String? beforeId,
     int limit = 20,
   }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 400),
-    );
-    return PaginatedMessages(
-      messages: kMockInboxMessages,
-      hasMore: false,
-    );
+    await Future.delayed(const Duration(milliseconds: 400));
+    return PaginatedMessages(messages: kMockInboxMessages, hasMore: false);
   }
 
   @override
-  Future<void> markAsRead(
-    String conversationId,
-  ) async {
-    await Future.delayed(
-      const Duration(milliseconds: 200),
-    );
-    debugPrint(
-      '[Mock] Marked $conversationId as read',
-    );
+  Future<void> markAsRead(String conversationId) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    debugPrint('[Mock] Marked $conversationId as read');
   }
 }

@@ -62,6 +62,11 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
     "label": 'Provider',
     "route": admin.PartnerManagerRoute().location,
   },
+  {
+    "icon": Icons.notifications_active_outlined,
+    "label": 'Notifications',
+    "route": admin.AdminNotificationCampaignIndexRoute().location,
+  },
 ];
 
 @riverpod
@@ -130,8 +135,7 @@ GoRouter router(Ref ref) {
           if (!isProfileCompletionRoute) {
             return '/provider/profile-completion';
           }
-        } else if (
-            isProviderVerified &&
+        } else if (isProviderVerified &&
             isProviderProfileCompleted &&
             (isVerificationRoute || isProfileCompletionRoute)) {
           return '/provider/dashboard';

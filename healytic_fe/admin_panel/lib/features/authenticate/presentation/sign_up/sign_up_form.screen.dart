@@ -35,10 +35,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 /// - Legal Representative (Section 3)
 /// - Document Verification (Section 4)
 class SignUpFormScreen extends HookConsumerWidget {
-  const SignUpFormScreen({
-    super.key,
-    this.autofill = false,
-  });
+  const SignUpFormScreen({super.key, this.autofill = false});
 
   /// When `true` (debug builds only), pre-fills all
   /// registration fields. Activate via
@@ -77,8 +74,7 @@ class SignUpFormScreen extends HookConsumerWidget {
         if (json is Map<String, dynamic>) {
           final message = json['message'];
           if (message is Map<String, dynamic>) {
-            return message['message'] as String? ??
-                error.message!;
+            return message['message'] as String? ?? error.message!;
           } else if (message is String) {
             return message;
           }
@@ -93,9 +89,7 @@ class SignUpFormScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(
-      () => GlobalKey<FormBuilderState>(),
-    );
+    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final scrollController = useScrollController();
 
     final colorScheme = Theme.of(context).colorScheme;
@@ -103,14 +97,11 @@ class SignUpFormScreen extends HookConsumerWidget {
 
     // Resolve autofill: URL param OR store config flag,
     // gated behind kDebugMode.
-    final shouldAutofill = kDebugMode &&
-        (autofill ||
-            (Store.tryGet(StoreKey.autoFill) ?? false));
+    final shouldAutofill =
+        kDebugMode && (autofill || (Store.tryGet(StoreKey.autoFill) ?? false));
 
     final initialValue = useMemoized(
-      () => shouldAutofill
-          ? _buildAutofillValues()
-          : const <String, dynamic>{},
+      () => shouldAutofill ? _buildAutofillValues() : const <String, dynamic>{},
     );
 
     // Listen for state changes
@@ -123,25 +114,15 @@ class SignUpFormScreen extends HookConsumerWidget {
         data: (data) {
           // Only redirect on successful registration
           if (data.registrationSuccess) {
-            ref
-                .read(signUpProviderProvider.notifier)
-                .reset();
-            context.go(
-              const SuccessRegistrationRoute().location,
-            );
+            ref.read(signUpProviderProvider.notifier).reset();
+            context.go(const SuccessRegistrationRoute().location);
           }
         },
         error: (error, stackTrace) {
           final message = _extractErrorMessage(error);
-          ToastContext.showToast(
-            context,
-            ToastType.error,
-            message,
-          );
+          ToastContext.showToast(context, ToastType.error, message);
           // Reset loading state after error
-          ref
-              .read(signUpProviderProvider.notifier)
-              .reset();
+          ref.read(signUpProviderProvider.notifier).reset();
         },
       );
     });
@@ -161,23 +142,18 @@ class SignUpFormScreen extends HookConsumerWidget {
           taxCode: values['tax_code'] ?? '',
           legalName: values['legal_name'] ?? '',
           brandName: values['brand_name'] ?? '',
-          businessType: _extractBusinessTypes(
-            values['business_types'],
-          ),
+          businessType: _extractBusinessTypes(values['business_types']),
           provinceId: values['province'] ?? '',
           districtId: values['district'] ?? '',
           wardId: values['ward'] ?? '',
           streetAddress: values['street_address'] ?? '',
-          phoneNumber: values['clinic_phone'] ??
-              values['representative_phone'],
+          phoneNumber: values['clinic_phone'] ?? values['representative_phone'],
         );
 
         // Build documents list
-        final documents =
-            <PartnerDocumentVerificationEntity>[];
+        final documents = <PartnerDocumentVerificationEntity>[];
         for (final entry in values.entries) {
-          if (entry.key.startsWith('documents.') &&
-              entry.value != null) {
+          if (entry.key.startsWith('documents.') && entry.value != null) {
             final value = entry.value;
             if (value is DocumentUploadType) {
               documents.add(
@@ -188,22 +164,15 @@ class SignUpFormScreen extends HookConsumerWidget {
                   urls: [value.url],
                 ),
               );
-            } else if (value
-                    is List<DocumentUploadType> &&
-                value.isNotEmpty) {
-              final docKey = entry.key.replaceFirst(
-                'documents.',
-                '',
-              );
+            } else if (value is List<DocumentUploadType> && value.isNotEmpty) {
+              final docKey = entry.key.replaceFirst('documents.', '');
               documents.addAll(
                 value.indexed
                     .map(
-                      (indexed) =>
-                          PartnerDocumentVerificationEntity(
+                      (indexed) => PartnerDocumentVerificationEntity(
                         fileType: indexed.$2.fileType,
                         type: docKey.toUpperCase(),
-                        documentKey:
-                            '${docKey}_${indexed.$1 + 1}',
+                        documentKey: '${docKey}_${indexed.$1 + 1}',
                         urls: [indexed.$2.url],
                       ),
                     )
@@ -212,34 +181,24 @@ class SignUpFormScreen extends HookConsumerWidget {
             }
           }
         }
-        final legalRepresentativeRequest =
-            LegalRepresentativeEntity(
-          fullName:
-              values['representative_name'] ?? '',
-          position:
-              values['representative_position'],
-          phoneNumber:
-              values['representative_phone'],
+        final legalRepresentativeRequest = LegalRepresentativeEntity(
+          fullName: values['representative_name'] ?? '',
+          position: values['representative_position'],
+          phoneNumber: values['representative_phone'],
           idType: _mapIdTypeToApiValue(
             values['id_type'] ?? 'Citizen Identity Card',
           ),
           idNumber: values['id_number'] ?? '',
-          idIssueDate: values['id_issue_date']
-                  ?.toString()
-                  .split(' ')
-                  .first ??
-              DateTime.now()
-                  .toIso8601String()
-                  .split('T')
-                  .first,
+          idIssueDate:
+              values['id_issue_date']?.toString().split(' ').first ??
+              DateTime.now().toIso8601String().split('T').first,
           documents: documents,
         );
 
         final request = RegisterPartnerRequestEntity(
           account: accountRequest,
           partner: partnerRequest,
-          legalRepresentative:
-              legalRepresentativeRequest,
+          legalRepresentative: legalRepresentativeRequest,
         );
 
         await ref
@@ -259,21 +218,15 @@ class SignUpFormScreen extends HookConsumerWidget {
           Expanded(
             child: SingleChildScrollView(
               controller: scrollController,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 40,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: 800,
-                  ),
+                  constraints: const BoxConstraints(maxWidth: 800),
                   child: FormBuilder(
                     key: formKey,
                     initialValue: initialValue,
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Title section
                         const RegistrationTitleSection(),
@@ -283,32 +236,26 @@ class SignUpFormScreen extends HookConsumerWidget {
                         FormSectionCard(
                           sectionNumber: '1',
                           title: 'Account Information',
-                          child:
-                              const AccountInformationSection(),
+                          child: const AccountInformationSection(),
                         ),
                         AppDimens.verticalLarge,
 
                         // Section 2: Business & Partner
                         FormSectionCard(
                           sectionNumber: '2',
-                          title:
-                              'Business & Partner Information',
+                          title: 'Business & Partner Information',
                           child: Column(
                             children: [
                               BusinessPartnerSection(
-                                initialServiceTags:
-                                    shouldAutofill
-                                        ? SignUpFormAutofill
-                                            .businessTypes
-                                        : null,
+                                initialServiceTags: shouldAutofill
+                                    ? SignUpFormAutofill.businessTypes
+                                    : null,
                               ),
                               AppDimens.verticalMedium,
                               BusinessLocationSection(
-                                initialStreetAddress:
-                                    shouldAutofill
-                                        ? SignUpFormAutofill
-                                            .streetAddress
-                                        : null,
+                                initialStreetAddress: shouldAutofill
+                                    ? SignUpFormAutofill.streetAddress
+                                    : null,
                               ),
                             ],
                           ),
@@ -319,31 +266,24 @@ class SignUpFormScreen extends HookConsumerWidget {
                         FormSectionCard(
                           sectionNumber: '3',
                           title: 'Legal Representative',
-                          child:
-                              LegalRepresentativeSectionV2(),
+                          child: LegalRepresentativeSectionV2(),
                         ),
                         AppDimens.verticalLarge,
 
                         // Section 4: Document Verification
                         Builder(
                           builder: (context) {
-                            final formState =
-                                FormBuilder.of(context);
-                            final types = formState
-                                    ?.fields['business_types']
-                                    ?.value as List<dynamic>?;
-                            final scope = (types != null &&
-                                    types.isNotEmpty)
+                            final formState = FormBuilder.of(context);
+                            final types =
+                                formState?.fields['business_types']?.value
+                                    as List<dynamic>?;
+                            final scope = (types != null && types.isNotEmpty)
                                 ? types.first.toString()
                                 : 'SPA_BEAUTY';
                             return FormSectionCard(
                               sectionNumber: '4',
-                              title:
-                                  'Document Verification',
-                              child:
-                                  DocumentVerificationSection(
-                                scope: scope,
-                              ),
+                              title: 'Document Verification',
+                              child: DocumentVerificationSection(scope: scope),
                             );
                           },
                         ),
@@ -370,28 +310,22 @@ class SignUpFormScreen extends HookConsumerWidget {
   /// Autofill map for all simple `FormBuilder` fields.
   /// Only used when [shouldAutofill] is active.
   static Map<String, dynamic> _buildAutofillValues() => {
-        // Section 1
-        'username': SignUpFormAutofill.username,
-        'email': SignUpFormAutofill.email,
-        'password': SignUpFormAutofill.password,
-        'confirm_password':
-            SignUpFormAutofill.confirmPassword,
-        // Section 2
-        'brand_name': SignUpFormAutofill.brandName,
-        'legal_name': SignUpFormAutofill.legalName,
-        'tax_code': SignUpFormAutofill.taxCode,
-        'street_address':
-            SignUpFormAutofill.streetAddress,
-        // Section 3
-        'representative_name':
-            SignUpFormAutofill.representativeName,
-        'representative_position':
-            SignUpFormAutofill.representativePosition,
-        'representative_phone':
-            SignUpFormAutofill.representativePhone,
-        'id_type': SignUpFormAutofill.idType,
-        'id_number': SignUpFormAutofill.idNumber,
-        'id_issue_date':
-            SignUpFormAutofill.idIssueDate,
-      };
+    // Section 1
+    'username': SignUpFormAutofill.username,
+    'email': SignUpFormAutofill.email,
+    'password': SignUpFormAutofill.password,
+    'confirm_password': SignUpFormAutofill.confirmPassword,
+    // Section 2
+    'brand_name': SignUpFormAutofill.brandName,
+    'legal_name': SignUpFormAutofill.legalName,
+    'tax_code': SignUpFormAutofill.taxCode,
+    'street_address': SignUpFormAutofill.streetAddress,
+    // Section 3
+    'representative_name': SignUpFormAutofill.representativeName,
+    'representative_position': SignUpFormAutofill.representativePosition,
+    'representative_phone': SignUpFormAutofill.representativePhone,
+    'id_type': SignUpFormAutofill.idType,
+    'id_number': SignUpFormAutofill.idNumber,
+    'id_issue_date': SignUpFormAutofill.idIssueDate,
+  };
 }

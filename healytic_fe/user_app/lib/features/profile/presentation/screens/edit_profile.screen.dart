@@ -91,7 +91,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final accountData = ref.watch(accountMeProvider).value;
     
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(

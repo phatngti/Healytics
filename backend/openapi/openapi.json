@@ -4434,6 +4434,16 @@
             }
           },
           {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "description": "Filter products by category ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
             "name": "sort",
             "required": false,
             "in": "query",
@@ -5597,7 +5607,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-04-10T17:04:22.733Z"
+              "submittedAt": "2026-04-14T06:58:19.139Z"
             }
           }
         },
@@ -10324,7 +10334,7 @@
             "example": "Healytics Wellness Center"
           },
           "avatarUrl": {
-            "type": "object",
+            "type": "string",
             "example": "https://example.com/logo.jpg"
           },
           "address": {
@@ -12650,6 +12660,22 @@
           "businessTypes"
         ]
       },
+      "ClinicProductCategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string",
+            "example": "Facial Treatments"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ]
+      },
       "ClinicProductDto": {
         "type": "object",
         "properties": {
@@ -12716,6 +12742,12 @@
       "ClinicProductsResponseDto": {
         "type": "object",
         "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicProductCategoryDto"
+            }
+          },
           "products": {
             "type": "array",
             "items": {
@@ -12732,6 +12764,7 @@
           }
         },
         "required": [
+          "categories",
           "products",
           "totalCount",
           "hasMore"

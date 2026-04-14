@@ -156,8 +156,7 @@ class ApiService implements Authentication {
     serviceTagsApi = PartnerServiceTagsApi(backend);
     locationsApi = LocationsApi(backend);
     partnerChatApi = PartnerChatApi(backend);
-    partnerDashboardApi =
-        PartnerDashboardApi(backend);
+    partnerDashboardApi = PartnerDashboardApi(backend);
   }
 
   /// Applies the User-Agent header to every client.

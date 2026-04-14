@@ -1,0 +1,479 @@
+import 'dart:math' as math;
+
+import 'package:admin_panel/core/entities/store.entity.dart';
+import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/features/common/widgets/analytics/analytics_status_badge.widget.dart';
+import 'package:admin_panel/features/partner/dashboard/domain/dashboard_time_period.dart';
+import 'package:admin_panel/features/partner/products/data/data/product_mock_data.dart';
+import 'package:admin_panel/features/partner/products/data/product_impl.repository.dart';
+import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/product.repository.dart';
+import 'package:admin_panel/features/partner/products/domain/product_analytics.entity.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'product_analytics_remote.datasource.g.dart';
+
+abstract class ProductAnalyticsRemoteDataSource {
+  Future<ProductOverviewAnalytics> getOverviewAnalytics({
+    required DashboardTimePeriod period,
+  });
+
+  Future<ProductDetailAnalytics> getDetailAnalytics({
+    required ProductId productId,
+    required DashboardTimePeriod period,
+  });
+}
+
+class ProductAnalyticsRemoteDataSourceImpl
+    implements ProductAnalyticsRemoteDataSource {
+  ProductAnalyticsRemoteDataSourceImpl({required ProductRepository repository})
+    : _repository = repository;
+
+  final ProductRepository _repository;
+
+  @override
+  Future<ProductOverviewAnalytics> getOverviewAnalytics({
+    required DashboardTimePeriod period,
+  }) async {
+    final products = await _loadProducts();
+    return _buildOverviewAnalytics(products, period);
+  }
+
+  @override
+  Future<ProductDetailAnalytics> getDetailAnalytics({
+    required ProductId productId,
+    required DashboardTimePeriod period,
+  }) async {
+    final product = await _repository.getProductById(productId);
+    final products = await _loadProducts();
+    return _buildDetailAnalytics(
+      product: product,
+      products: products,
+      period: period,
+    );
+  }
+
+  Future<List<Product>> _loadProducts() async {
+    final totalRows = await _repository.getTotalRows();
+    final count = totalRows == 0 ? 1 : totalRows;
+    return _repository.getProducts(0, count, null, null);
+  }
+}
+
+class ProductAnalyticsRemoteDataSourceMock
+    implements ProductAnalyticsRemoteDataSource {
+  @override
+  Future<ProductOverviewAnalytics> getOverviewAnalytics({
+    required DashboardTimePeriod period,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    return _buildOverviewAnalytics(productMockData.values.toList(), period);
+  }
+
+  @override
+  Future<ProductDetailAnalytics> getDetailAnalytics({
+    required ProductId productId,
+    required DashboardTimePeriod period,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    final products = productMockData.values.toList();
+    final product = productMockData[productId.value] ?? productMockDefault;
+    return _buildDetailAnalytics(
+      product: product.copyWith(id: productId),
+      products: products,
+      period: period,
+    );
+  }
+}
+
+@riverpod
+ProductAnalyticsRemoteDataSource productAnalyticsRemoteDataSource(Ref ref) {
+  final isMock = Store.get(StoreKey.mockFlag, false);
+  if (isMock) {
+    return ProductAnalyticsRemoteDataSourceMock();
+  }
+
+  final repository = ref.read(productRepositoryProvider);
+  return ProductAnalyticsRemoteDataSourceImpl(repository: repository);
+}
+
+ProductOverviewAnalytics _buildOverviewAnalytics(
+  List<Product> products,
+  DashboardTimePeriod period,
+) {
+  final scale = _periodScale(period);
+  final activeProducts = products.where(_isActiveProduct).length;
+  final averageRating = _averageRating(products);
+  final reviewCount = products.fold<int>(
+    0,
+    (sum, product) => sum + _serviceReviewCount(product),
+  );
+  final topServices =
+      products.map((product) => _servicePerformance(product, scale)).toList()
+        ..sort((left, right) => right.revenue.compareTo(left.revenue));
+
+  final bookings = topServices.fold<int>(0, (sum, item) => sum + item.bookings);
+  final revenue = topServices.fold<double>(
+    0,
+    (sum, item) => sum + item.revenue,
+  );
+
+  final alerts = <ProductCatalogAlert>[
+    if (products.any((product) => product.status == 'draft'))
+      const ProductCatalogAlert(
+        title: 'Draft services waiting for launch',
+        detail: 'Review pricing, staffing, and content before publishing.',
+        tone: AnalyticsStatusTone.warning,
+      ),
+    if (products.any((product) => product.images.isEmpty))
+      const ProductCatalogAlert(
+        title: 'Media gaps lower conversion confidence',
+        detail: 'Some services still lack gallery assets or thumbnails.',
+        tone: AnalyticsStatusTone.critical,
+      ),
+    if (products.any(_requiresSpecificStaffWithoutAssignment))
+      const ProductCatalogAlert(
+        title: 'Specific-staff services are understaffed',
+        detail: 'Assign at least one employee to avoid booking friction.',
+        tone: AnalyticsStatusTone.warning,
+      ),
+  ];
+
+  return ProductOverviewAnalytics(
+    totalProducts: products.length,
+    activeProducts: activeProducts,
+    draftProducts: products
+        .where((product) => product.status == 'draft')
+        .length,
+    archivedProducts: products
+        .where((product) => product.status == 'archived')
+        .length,
+    hiddenProducts: products.where((product) => !product.onlineStore).length,
+    missingMediaProducts: products
+        .where((product) => product.images.isEmpty)
+        .length,
+    missingManualProducts: products
+        .where((product) => product.serviceManual == null)
+        .length,
+    missingStaffProducts: products
+        .where(_requiresSpecificStaffWithoutAssignment)
+        .length,
+    bookings: bookings,
+    bookingsDelta: 6.2 + scale * 1.5,
+    revenue: revenue,
+    revenueDelta: 4.8 + scale * 1.2,
+    averageRating: averageRating,
+    ratingDelta: 1.3 + scale * 0.4,
+    reviewCount: reviewCount,
+    trendPoints: _buildTrendPoints(
+      scale: scale,
+      seed: products.length,
+      baseBookings: bookings / _periodDivisor(period),
+      baseRevenue: revenue / _periodDivisor(period),
+      period: period,
+    ),
+    categoryPerformance: _buildCategoryPerformance(products, scale),
+    topServices: topServices.take(5).toList(),
+    catalogAlerts: alerts,
+  );
+}
+
+ProductDetailAnalytics _buildDetailAnalytics({
+  required Product product,
+  required List<Product> products,
+  required DashboardTimePeriod period,
+}) {
+  final scale = _periodScale(period);
+  final detailPerformance = _servicePerformance(product, scale);
+  final completionRate = math.min(
+    98.0,
+    78 + (product.duration ?? 60) / 6 - (product.buffer ?? 0) / 12,
+  );
+  final peerRanking =
+      products.map((item) => _servicePerformance(item, scale)).toList()..sort(
+        (left, right) => right.averageRating.compareTo(left.averageRating),
+      );
+
+  final alerts = <ProductCatalogAlert>[
+    if (!product.onlineStore)
+      const ProductCatalogAlert(
+        title: 'Online visibility disabled',
+        detail: 'This service is hidden from the public booking experience.',
+        tone: AnalyticsStatusTone.warning,
+      ),
+    if (product.serviceManual == null)
+      const ProductCatalogAlert(
+        title: 'Service manual is incomplete',
+        detail: 'Document treatment steps and contraindications for staff.',
+        tone: AnalyticsStatusTone.critical,
+      ),
+    if (_requiresSpecificStaffWithoutAssignment(product))
+      const ProductCatalogAlert(
+        title: 'No assigned staff',
+        detail: 'Bookings may fail when a service requires named staff.',
+        tone: AnalyticsStatusTone.critical,
+      ),
+  ];
+
+  return ProductDetailAnalytics(
+    productId: product.id,
+    bookings: detailPerformance.bookings,
+    bookingsDelta: 5.4 + scale,
+    revenue: detailPerformance.revenue,
+    revenueDelta: 4.2 + scale,
+    completionRate: completionRate,
+    completionRateDelta: 1.1 + scale * 0.3,
+    averageRating: detailPerformance.averageRating,
+    reviewCount: _serviceReviewCount(product),
+    trendPoints: _buildTrendPoints(
+      scale: scale,
+      seed: product.name.length,
+      baseBookings: detailPerformance.bookings / _periodDivisor(period),
+      baseRevenue: detailPerformance.revenue / _periodDivisor(period),
+      period: period,
+    ),
+    reviewDistribution: _buildReviewDistribution(product),
+    operationalMetrics: _buildOperationalMetrics(product),
+    peerRanking: peerRanking.take(4).toList(),
+    alerts: alerts,
+  );
+}
+
+List<ProductTrendPoint> _buildTrendPoints({
+  required double scale,
+  required int seed,
+  required double baseBookings,
+  required double baseRevenue,
+  DashboardTimePeriod period = DashboardTimePeriod.thisMonth,
+}) {
+  final labels = _periodLabels(period);
+
+  // Separate factor lists so the two lines diverge
+  // visually and feel more realistic.
+  const bookingFactors = [
+    0.72, 0.85, 0.94, 1.08, 0.91, 1.15,
+    1.22, 0.88, 1.03, 0.96, 1.18, 1.30,
+  ];
+  const revenueFactors = [
+    0.80, 0.78, 1.02, 1.12, 0.97, 1.05,
+    1.28, 0.93, 1.10, 1.00, 1.24, 1.35,
+  ];
+
+  return List<ProductTrendPoint>.generate(labels.length, (i) {
+    final bMod = bookingFactors[(i + seed) % bookingFactors.length];
+    final rMod = revenueFactors[(i + seed + 3) % revenueFactors.length];
+    return ProductTrendPoint(
+      label: labels[i],
+      bookings: math.max(4, baseBookings * bMod * scale),
+      revenue: math.max(300, baseRevenue * rMod * scale),
+    );
+  });
+}
+
+/// Returns context-appropriate x-axis labels for each
+/// [DashboardTimePeriod].
+List<String> _periodLabels(DashboardTimePeriod period) {
+  switch (period) {
+    case DashboardTimePeriod.today:
+      return ['9AM', '11AM', '1PM', '3PM', '5PM', '7PM'];
+    case DashboardTimePeriod.thisWeek:
+      return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    case DashboardTimePeriod.thisMonth:
+      return ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'];
+    case DashboardTimePeriod.thisQuarter:
+      return ['Month 1', 'Month 2', 'Month 3'];
+    case DashboardTimePeriod.thisYear:
+      return [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      ];
+  }
+}
+
+List<ProductCategoryPerformance> _buildCategoryPerformance(
+  List<Product> products,
+  double scale,
+) {
+  final buckets = <String, List<Product>>{};
+  for (final product in products) {
+    buckets.putIfAbsent(product.category.name, () => <Product>[]).add(product);
+  }
+
+  return buckets.entries.map((entry) {
+    final services = entry.value;
+    final performances = services
+        .map((product) => _servicePerformance(product, scale))
+        .toList();
+
+    final bookings = performances.fold<int>(
+      0,
+      (sum, item) => sum + item.bookings,
+    );
+    final revenue = performances.fold<double>(
+      0,
+      (sum, item) => sum + item.revenue,
+    );
+    final averageRating =
+        performances.fold<double>(0, (sum, item) => sum + item.averageRating) /
+        math.max(1, performances.length);
+
+    return ProductCategoryPerformance(
+      categoryName: entry.key,
+      bookings: bookings,
+      revenue: revenue,
+      averageRating: averageRating,
+    );
+  }).toList()..sort((left, right) => right.revenue.compareTo(left.revenue));
+}
+
+ProductServicePerformance _servicePerformance(Product product, double scale) {
+  final bookingBase =
+      ((product.duration ?? 60) / 4) +
+      (product.onlineStore ? 18 : 9) +
+      (product.status == 'active' ? 14 : 5) +
+      (product.images.length * 2);
+  final bookings = math.max(12, (bookingBase * scale).round());
+  final revenue = bookings * (product.salePrice ?? product.basePrice);
+
+  return ProductServicePerformance(
+    name: product.name,
+    categoryName: product.category.name,
+    bookings: bookings,
+    revenue: revenue,
+    averageRating: _serviceRating(product),
+  );
+}
+
+List<ProductReviewBucket> _buildReviewDistribution(Product product) {
+  final reviewCount = _serviceReviewCount(product);
+  final fiveStar = (reviewCount * 0.48).round();
+  final fourStar = (reviewCount * 0.29).round();
+  final threeStar = (reviewCount * 0.14).round();
+  final twoStar = (reviewCount * 0.06).round();
+  final oneStar = math.max(
+    1,
+    reviewCount - fiveStar - fourStar - threeStar - twoStar,
+  );
+
+  return [
+    ProductReviewBucket(stars: 5, count: fiveStar),
+    ProductReviewBucket(stars: 4, count: fourStar),
+    ProductReviewBucket(stars: 3, count: threeStar),
+    ProductReviewBucket(stars: 2, count: twoStar),
+    ProductReviewBucket(stars: 1, count: oneStar),
+  ];
+}
+
+List<ProductOperationalMetric> _buildOperationalMetrics(Product product) {
+  final completeness = [
+    product.description.isNotEmpty,
+    product.images.isNotEmpty,
+    product.serviceManual != null,
+  ].where((item) => item).length;
+
+  return [
+    ProductOperationalMetric(
+      label: 'Visibility',
+      value: product.onlineStore ? 'Public' : 'Internal',
+      detail: product.onlineStore
+          ? 'Eligible for online discovery'
+          : 'Hidden from public booking',
+      tone: product.onlineStore
+          ? AnalyticsStatusTone.positive
+          : AnalyticsStatusTone.warning,
+    ),
+    ProductOperationalMetric(
+      label: 'Staff coverage',
+      value: product.staffAllocation == 'specific'
+          ? '${product.staffIds.length} assigned'
+          : 'Flexible',
+      detail: product.staffAllocation == 'specific'
+          ? 'Named staff required for fulfillment'
+          : 'Any qualified employee can deliver',
+      tone: _requiresSpecificStaffWithoutAssignment(product)
+          ? AnalyticsStatusTone.critical
+          : AnalyticsStatusTone.positive,
+    ),
+    ProductOperationalMetric(
+      label: 'Scheduling',
+      value: '${product.duration ?? 0}m / ${product.buffer ?? 0}m buffer',
+      detail:
+          'Capacity ${product.capacity ?? 1}, lead ${product.leadTime ?? 0}h',
+      tone: (product.duration ?? 0) > 0
+          ? AnalyticsStatusTone.neutral
+          : AnalyticsStatusTone.warning,
+    ),
+    ProductOperationalMetric(
+      label: 'Content completeness',
+      value: '$completeness / 3',
+      detail: 'Description, gallery, and service manual readiness',
+      tone: completeness == 3
+          ? AnalyticsStatusTone.positive
+          : completeness == 2
+          ? AnalyticsStatusTone.warning
+          : AnalyticsStatusTone.critical,
+    ),
+  ];
+}
+
+bool _isActiveProduct(Product product) => product.status == 'active';
+
+bool _requiresSpecificStaffWithoutAssignment(Product product) {
+  return product.staffAllocation == 'specific' && product.staffIds.isEmpty;
+}
+
+double _averageRating(List<Product> products) {
+  if (products.isEmpty) {
+    return 0;
+  }
+
+  final total = products.fold<double>(
+    0,
+    (sum, product) => sum + _serviceRating(product),
+  );
+  return total / products.length;
+}
+
+double _serviceRating(Product product) {
+  final seed =
+      product.name.length + product.images.length + (product.duration ?? 0);
+  final base = 3.7 + (seed % 11) / 10;
+  return double.parse(math.min(4.9, base).toStringAsFixed(1));
+}
+
+int _serviceReviewCount(Product product) {
+  return math.max(
+    8,
+    (product.images.length * 9) + (product.name.length % 21) + 22,
+  );
+}
+
+double _periodScale(DashboardTimePeriod period) {
+  switch (period) {
+    case DashboardTimePeriod.today:
+      return 0.32;
+    case DashboardTimePeriod.thisWeek:
+      return 0.72;
+    case DashboardTimePeriod.thisMonth:
+      return 1.0;
+    case DashboardTimePeriod.thisQuarter:
+      return 1.55;
+    case DashboardTimePeriod.thisYear:
+      return 2.35;
+  }
+}
+
+double _periodDivisor(DashboardTimePeriod period) {
+  switch (period) {
+    case DashboardTimePeriod.today:
+      return 6;
+    case DashboardTimePeriod.thisWeek:
+      return 7;
+    case DashboardTimePeriod.thisMonth:
+      return 4;
+    case DashboardTimePeriod.thisQuarter:
+      return 3;
+    case DashboardTimePeriod.thisYear:
+      return 12;
+  }
+}

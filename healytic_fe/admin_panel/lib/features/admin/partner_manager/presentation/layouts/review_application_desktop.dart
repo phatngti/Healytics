@@ -46,9 +46,8 @@ class _ReviewApplicationDesktopState
           title: 'Failed to load partner details',
           error: error,
           stackTrace: stack,
-          onRetry: () => ref.invalidate(
-            partnerDetailProvider(widget.partnerId),
-          ),
+          onRetry: () =>
+              ref.invalidate(partnerDetailProvider(widget.partnerId)),
         ),
       ),
       data: (partnerDetail) => _buildContent(context, partnerDetail),

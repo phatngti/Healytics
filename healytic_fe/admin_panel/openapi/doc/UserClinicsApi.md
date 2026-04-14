@@ -62,7 +62,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userClinicControllerGetClinicProducts**
-> ClinicProductsResponseDto userClinicControllerGetClinicProducts(id, sort, search, page, limit)
+> ClinicProductsResponseDto userClinicControllerGetClinicProducts(id, categoryId, sort, search, page, limit)
 
 Get clinic products/services catalog
 
@@ -78,13 +78,14 @@ import 'package:admin_openapi/api.dart';
 
 final api_instance = UserClinicsApi();
 final id = id_example; // String | 
+final categoryId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Filter products by category ID
 final sort = sort_example; // String | Sort order for products
 final search = search_example; // String | Case-insensitive service name search
 final page = 8.14; // num | 
 final limit = 8.14; // num | 
 
 try {
-    final result = api_instance.userClinicControllerGetClinicProducts(id, sort, search, page, limit);
+    final result = api_instance.userClinicControllerGetClinicProducts(id, categoryId, sort, search, page, limit);
     print(result);
 } catch (e) {
     print('Exception when calling UserClinicsApi->userClinicControllerGetClinicProducts: $e\n');
@@ -96,6 +97,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **id** | **String**|  | 
+ **categoryId** | **String**| Filter products by category ID | [optional] 
  **sort** | **String**| Sort order for products | [optional] [default to 'popular']
  **search** | **String**| Case-insensitive service name search | [optional] 
  **page** | **num**|  | [optional] [default to 1]

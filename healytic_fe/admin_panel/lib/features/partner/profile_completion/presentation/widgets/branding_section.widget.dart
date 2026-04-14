@@ -46,12 +46,9 @@ class BrandingSectionWidget extends StatelessWidget {
           'storefront surfaces.',
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final isWide =
-              constraints.maxWidth >=
-                  _wideBreakpoint;
+          final isWide = constraints.maxWidth >= _wideBreakpoint;
 
-          final coverSurface =
-              ImageUploadSurfaceWidget(
+          final coverSurface = ImageUploadSurfaceWidget(
             title: 'Cover image',
             subtitle:
                 '16:9 recommended. Displayed '
@@ -61,17 +58,12 @@ class BrandingSectionWidget extends StatelessWidget {
             icon: Icons.landscape_rounded,
             aspectRatio: 16 / 9,
             isUploading: isUploadingCover,
-            isRequiredError:
-                showValidationErrors &&
-                    !hasCoverImage,
+            isRequiredError: showValidationErrors && !hasCoverImage,
             onUpload: onUploadCover,
-            onRemove: hasCoverImage
-                ? onRemoveCover
-                : null,
+            onRemove: hasCoverImage ? onRemoveCover : null,
           );
 
-          final logoSurface =
-              ImageUploadSurfaceWidget(
+          final logoSurface = ImageUploadSurfaceWidget(
             title: 'Logo image',
             subtitle:
                 'Square logo used in cards, '
@@ -80,24 +72,16 @@ class BrandingSectionWidget extends StatelessWidget {
             icon: Icons.local_hospital_rounded,
             aspectRatio: 1,
             isUploading: isUploadingLogo,
-            isRequiredError:
-                showValidationErrors &&
-                    !hasLogoImage,
+            isRequiredError: showValidationErrors && !hasLogoImage,
             onUpload: onUploadLogo,
-            onRemove: hasLogoImage
-                ? onRemoveLogo
-                : null,
+            onRemove: hasLogoImage ? onRemoveLogo : null,
           );
 
           if (isWide) {
             return Row(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  flex: 2,
-                  child: coverSurface,
-                ),
+                Expanded(flex: 2, child: coverSurface),
                 AppDimens.horizontalLargeExtra,
                 Expanded(child: logoSurface),
               ],
@@ -105,11 +89,7 @@ class BrandingSectionWidget extends StatelessWidget {
           }
 
           return Column(
-            children: [
-              coverSurface,
-              AppDimens.verticalLargeExtra,
-              logoSurface,
-            ],
+            children: [coverSurface, AppDimens.verticalLargeExtra, logoSurface],
           );
         },
       ),
@@ -119,8 +99,7 @@ class BrandingSectionWidget extends StatelessWidget {
 
 /// Upload surface showing an image preview or
 /// placeholder with upload/remove actions.
-class ImageUploadSurfaceWidget
-    extends StatelessWidget {
+class ImageUploadSurfaceWidget extends StatelessWidget {
   const ImageUploadSurfaceWidget({
     required this.title,
     required this.subtitle,
@@ -146,34 +125,24 @@ class ImageUploadSurfaceWidget
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final hasImage =
-        imageUrl != null && imageUrl!.isNotEmpty;
+    final colorScheme = Theme.of(context).colorScheme;
+    final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
         ),
-        const SizedBox(
-          height: AppDimens.spaceXs + AppDimens.spaceXxs,
-        ),
+        const SizedBox(height: AppDimens.spaceXs + AppDimens.spaceXxs),
         Text(
           subtitle,
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
         const SizedBox(height: AppDimens.spaceMdLg),
         AspectRatio(
@@ -193,10 +162,7 @@ class ImageUploadSurfaceWidget
           AppDimens.verticalSmall,
           Text(
             '$title is required.',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: colorScheme.error,
               fontWeight: FontWeight.w600,
             ),
@@ -207,8 +173,7 @@ class ImageUploadSurfaceWidget
   }
 }
 
-class _ImagePreviewContainer
-    extends StatelessWidget {
+class _ImagePreviewContainer extends StatelessWidget {
   const _ImagePreviewContainer({
     required this.hasImage,
     required this.imageUrl,
@@ -234,30 +199,22 @@ class _ImagePreviewContainer
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
         color: isDark
-            ? colorScheme.surfaceContainerHigh
-                .withValues(alpha: 0.5)
-            : colorScheme.surfaceContainerHighest
-                .withValues(alpha: 0.35),
+            ? colorScheme.surfaceContainerHigh.withValues(alpha: 0.5)
+            : colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
         borderRadius: AppDimens.radiusMediumLarge,
         border: Border.all(
           color: isRequiredError
               ? colorScheme.error
               : isDark
-                  ? colorScheme.outlineVariant
-                      .withValues(alpha: 0.4)
-                  : colorScheme.outlineVariant,
-          width: isRequiredError
-              ? _errorBorderWidth
-              : AppDimens.borderWidth,
+              ? colorScheme.outlineVariant.withValues(alpha: 0.4)
+              : colorScheme.outlineVariant,
+          width: isRequiredError ? _errorBorderWidth : AppDimens.borderWidth,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -268,27 +225,16 @@ class _ImagePreviewContainer
             Image.network(
               imageUrl!,
               fit: BoxFit.cover,
-              errorBuilder:
-                  (context, error, stackTrace) {
-                return _ImagePlaceholder(
-                  icon: icon,
-                  title: title,
-                );
+              errorBuilder: (context, error, stackTrace) {
+                return _ImagePlaceholder(icon: icon, title: title);
               },
             )
           else
-            _ImagePlaceholder(
-              icon: icon,
-              title: title,
-            ),
+            _ImagePlaceholder(icon: icon, title: title),
           if (isUploading)
             Container(
-              color: colorScheme.scrim
-                  .withValues(alpha: 0.32),
-              child: const Center(
-                child:
-                    CircularProgressIndicator(),
-              ),
+              color: colorScheme.scrim.withValues(alpha: 0.32),
+              child: const Center(child: CircularProgressIndicator()),
             ),
           Positioned(
             right: AppDimens.spaceMd,
@@ -297,38 +243,22 @@ class _ImagePreviewContainer
               mainAxisSize: MainAxisSize.min,
               children: [
                 FilledButton.tonal(
-                  onPressed: isUploading
-                      ? null
-                      : onUpload,
+                  onPressed: isUploading ? null : onUpload,
                   child: Row(
-                    mainAxisSize:
-                        MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.upload_rounded,
-                        size: AppDimens.iconSmMd,
-                      ),
+                      Icon(Icons.upload_rounded, size: AppDimens.iconSmMd),
                       AppDimens.horizontalSmall,
-                      Text(
-                        hasImage
-                            ? 'Change'
-                            : 'Upload',
-                      ),
+                      Text(hasImage ? 'Change' : 'Upload'),
                     ],
                   ),
                 ),
-                if (hasImage &&
-                    onRemove != null) ...[
+                if (hasImage && onRemove != null) ...[
                   AppDimens.horizontalSmall,
                   IconButton.filledTonal(
-                    onPressed: isUploading
-                        ? null
-                        : onRemove,
+                    onPressed: isUploading ? null : onRemove,
                     tooltip: 'Remove image',
-                    icon: const Icon(
-                      Icons
-                          .delete_outline_rounded,
-                    ),
+                    icon: const Icon(Icons.delete_outline_rounded),
                   ),
                 ],
               ],
@@ -342,10 +272,7 @@ class _ImagePreviewContainer
 
 /// Placeholder shown when no image is uploaded.
 class _ImagePlaceholder extends StatelessWidget {
-  const _ImagePlaceholder({
-    required this.icon,
-    required this.title,
-  });
+  const _ImagePlaceholder({required this.icon, required this.title});
 
   final IconData icon;
   final String title;
@@ -355,22 +282,16 @@ class _ImagePlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: isDark
           ? BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  colorScheme.surfaceContainerHigh
-                      .withValues(alpha: 0.4),
-                  colorScheme
-                      .surfaceContainerHighest
-                      .withValues(alpha: 0.2),
+                  colorScheme.surfaceContainerHigh.withValues(alpha: 0.4),
+                  colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -379,50 +300,35 @@ class _ImagePlaceholder extends StatelessWidget {
           : null,
       child: Center(
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               padding: AppDimens.paddingAllMedium,
               decoration: BoxDecoration(
-                color: colorScheme.primary
-                    .withValues(alpha: 0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
                 size: _placeholderIconSize,
                 color: isDark
-                    ? colorScheme.primary
-                        .withValues(alpha: 0.7)
-                    : colorScheme
-                        .onSurfaceVariant,
+                    ? colorScheme.primary.withValues(alpha: 0.7)
+                    : colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(
-              height: AppDimens.spaceMdLg,
-            ),
+            const SizedBox(height: AppDimens.spaceMdLg),
             Text(
               'Upload $title',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(
-                color:
-                    colorScheme.onSurfaceVariant,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w700,
               ),
             ),
             AppDimens.verticalExtraSmall,
             Text(
               'Click the upload button above',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(
-                color: colorScheme
-                    .onSurfaceVariant
-                    .withValues(alpha: 0.6),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
               ),
             ),
           ],

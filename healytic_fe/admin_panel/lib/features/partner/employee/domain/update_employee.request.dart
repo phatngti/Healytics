@@ -55,8 +55,7 @@ abstract class UpdateEmployeeRequest with _$UpdateEmployeeRequest {
     required String country,
 
     /// Updated verification documents.
-    @Default([])
-    List<Map<String, dynamic>> verificationDocuments,
+    @Default([]) List<Map<String, dynamic>> verificationDocuments,
   }) = _UpdateEmployeeRequest;
 
   /// Creates an [UpdateEmployeeRequest] from JSON data.

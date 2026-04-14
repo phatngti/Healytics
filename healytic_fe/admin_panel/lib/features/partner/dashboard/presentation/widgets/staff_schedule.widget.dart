@@ -1,8 +1,11 @@
-import 'package:admin_panel/features/partner/dashboard/domain/staff_schedule.entity.dart';
-import 'package:admin_panel/features/partner/dashboard/presentation/widgets/dashboard_panel.widget.dart';
-import 'package:admin_panel/features/partner/dashboard/presentation/widgets/dashboard_section_header.widget.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../../domain/staff_schedule.entity.dart';
+import 'dashboard_constants.dart';
+import 'dashboard_panel.widget.dart';
+import 'dashboard_section_header.widget.dart';
 
 /// Staff schedule calendar grid for today.
 ///
@@ -13,16 +16,9 @@ class StaffScheduleWidget extends StatelessWidget {
 
   final List<StaffScheduleEntry> schedule;
 
-  static const _roleColors = {
-    'Doctor': Color(0xFF4F46E5),
-    'Spa Therapist': Color(0xFF0EA5E9),
-    'Massage Therapist': Color(0xFF10B981),
-  };
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return DashboardPanel(
       child: Column(
@@ -35,17 +31,21 @@ class StaffScheduleWidget extends StatelessWidget {
             onAction: () {},
           ),
           if (schedule.isEmpty)
-            _EmptyPanelState(
+            const _EmptyPanelState(
               icon: Icons.event_busy_rounded,
-              label: 'No appointments scheduled for today.',
+              label:
+                  'No appointments '
+                  'scheduled for today.',
             )
           else
             ...schedule.map(
               (entry) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: AppDimens.spaceMd.paddingBottom,
                 child: _ScheduleItem(
                   entry: entry,
-                  color: _roleColors[entry.role] ?? colorScheme.primary,
+                  color:
+                      DashboardColors.roleColorMap[entry.role] ??
+                      colorScheme.primary,
                 ),
               ),
             ),
@@ -67,90 +67,84 @@ class _ScheduleItem extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final timeFormat = DateFormat('HH:mm');
 
-    return Padding(
-      padding: EdgeInsets.zero,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.45),
-          ),
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.spaceMdLg),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLowest,
+        borderRadius: AppDimens.radiusMediumSmall,
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.45),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 6,
-              height: 64,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(999),
-              ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: DashboardSizes.scheduleBarWidth,
+            height: DashboardSizes.scheduleBarHeight,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: AppDimens.radiusPill,
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              entry.employeeName,
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+          ),
+          AppDimens.horizontalMediumSmall,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            entry.employeeName,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontWeight: AppDimens.fontWeightBold,
                             ),
-                            const SizedBox(height: 6),
-                            _MetaChip(label: entry.role, color: color),
-                          ],
-                        ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          AppDimens.spaceXs.verticalSpace,
+                          _MetaChip(label: entry.role, color: color),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      _TrailingMeta(
-                        primary:
-                            '${timeFormat.format(entry.startTime)} - '
-                            '${timeFormat.format(entry.endTime)}',
-                        secondary: _durationLabel(
-                          entry.startTime,
-                          entry.endTime,
-                        ),
-                      ),
-                    ],
+                    ),
+                    AppDimens.horizontalMediumSmall,
+                    _TrailingMeta(
+                      primary:
+                          '${timeFormat.format(entry.startTime)} - '
+                          '${timeFormat.format(entry.endTime)}',
+                      secondary: _durationLabel(entry.startTime, entry.endTime),
+                    ),
+                  ],
+                ),
+                AppDimens.spaceSmMd.verticalSpace,
+                Text(
+                  entry.serviceName,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: AppDimens.fontWeightSemiBold,
                   ),
-                  const SizedBox(height: 10),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (entry.patientName != null) ...[
+                  AppDimens.verticalExtraSmall,
                   Text(
-                    entry.serviceName,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+                    entry.patientName!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (entry.patientName != null) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      entry.patientName!,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
                 ],
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -163,9 +157,7 @@ class _ScheduleItem extends StatelessWidget {
     if (hours > 0 && minutes > 0) {
       return '${hours}h ${minutes}m';
     }
-    if (hours > 0) {
-      return '${hours}h';
-    }
+    if (hours > 0) return '${hours}h';
     return '${minutes}m';
   }
 }
@@ -181,16 +173,19 @@ class _MetaChip extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimens.spaceSmMd,
+        vertical: AppDimens.spaceXs + 1,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppDimens.radiusPill,
       ),
       child: Text(
         label,
         style: theme.textTheme.labelSmall?.copyWith(
           color: color,
-          fontWeight: FontWeight.w700,
+          fontWeight: AppDimens.fontWeightBold,
         ),
       ),
     );
@@ -214,10 +209,10 @@ class _TrailingMeta extends StatelessWidget {
         Text(
           primary,
           style: theme.textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w700,
+            fontWeight: AppDimens.fontWeightBold,
           ),
         ),
-        const SizedBox(height: 4),
+        AppDimens.verticalExtraSmall,
         Text(
           secondary,
           style: theme.textTheme.labelSmall?.copyWith(
@@ -242,10 +237,10 @@ class _EmptyPanelState extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: AppDimens.paddingAllMediumLarge,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppDimens.radiusMediumSmall,
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.45),
         ),
@@ -253,7 +248,7 @@ class _EmptyPanelState extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, color: colorScheme.onSurfaceVariant),
-          const SizedBox(width: 12),
+          AppDimens.horizontalMediumSmall,
           Expanded(
             child: Text(
               label,

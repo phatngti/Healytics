@@ -19,27 +19,19 @@ enum MedicalEducation {
 
   /// Returns the user-friendly display name.
   String get displayName => switch (this) {
-    MedicalEducation.doctorOfMedicine =>
-      'Doctor of Medicine',
-    MedicalEducation.masterOfMedicine =>
-      'Master of Medicine',
-    MedicalEducation.bachelorOfMedicine =>
-      'Bachelor of Medicine',
-    MedicalEducation.associateDegree =>
-      'Associate Degree',
+    MedicalEducation.doctorOfMedicine => 'Doctor of Medicine',
+    MedicalEducation.masterOfMedicine => 'Master of Medicine',
+    MedicalEducation.bachelorOfMedicine => 'Bachelor of Medicine',
+    MedicalEducation.associateDegree => 'Associate Degree',
     MedicalEducation.other => 'Other',
   };
 
   /// Returns the API value for backend communication.
   String get apiValue => switch (this) {
-    MedicalEducation.doctorOfMedicine =>
-      'Doctor of Medicine',
-    MedicalEducation.masterOfMedicine =>
-      'Master of Medicine',
-    MedicalEducation.bachelorOfMedicine =>
-      'Bachelor of Medicine',
-    MedicalEducation.associateDegree =>
-      'Associate Degree',
+    MedicalEducation.doctorOfMedicine => 'Doctor of Medicine',
+    MedicalEducation.masterOfMedicine => 'Master of Medicine',
+    MedicalEducation.bachelorOfMedicine => 'Bachelor of Medicine',
+    MedicalEducation.associateDegree => 'Associate Degree',
     MedicalEducation.other => 'Other',
   };
 

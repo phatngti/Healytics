@@ -42,17 +42,11 @@ class EmployeeOperationalCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 16,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest
-                  .withAlpha(128),
+              color: colorScheme.surfaceContainerHighest.withAlpha(128),
               border: Border(
-                bottom: BorderSide(
-                  color: colorScheme.outlineVariant,
-                ),
+                bottom: BorderSide(color: colorScheme.outlineVariant),
               ),
             ),
             child: Row(

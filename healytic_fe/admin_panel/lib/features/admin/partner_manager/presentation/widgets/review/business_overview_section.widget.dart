@@ -172,8 +172,7 @@ class BusinessOverviewSection extends StatelessWidget {
                                   ? ReviewableField(
                                       readOnly: readOnly,
                                       title: 'District',
-                                      fieldId:
-                                          address!.district!.fieldKey,
+                                      fieldId: address!.district!.fieldKey,
                                       compactMode: true,
                                       child: _buildAddressField(
                                         context,
@@ -217,9 +216,7 @@ class BusinessOverviewSection extends StatelessWidget {
                                   ? ReviewableField(
                                       readOnly: readOnly,
                                       title: 'Street Address',
-                                      fieldId: address!
-                                          .streetAddress!
-                                          .fieldKey,
+                                      fieldId: address!.streetAddress!.fieldKey,
                                       compactMode: true,
                                       child: _buildAddressField(
                                         context,
@@ -325,10 +322,7 @@ class BusinessOverviewSection extends StatelessWidget {
   }
 
   /// Placeholder for address fields that are null
-  Widget _buildAddressFieldPlaceholder(
-    BuildContext context,
-    String label,
-  ) {
+  Widget _buildAddressFieldPlaceholder(BuildContext context, String label) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -372,9 +366,7 @@ class BusinessOverviewSection extends StatelessWidget {
         Text(
           value,
           style: isLarge
-              ? textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                )
+              ? textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)
               : textTheme.bodyMedium,
         ),
       ],
