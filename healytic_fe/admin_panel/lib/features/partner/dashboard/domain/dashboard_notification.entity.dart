@@ -5,8 +5,7 @@ part 'dashboard_notification.entity.freezed.dart';
 /// A notification item for the dashboard notification
 /// center.
 @freezed
-abstract class DashboardNotification
-    with _$DashboardNotification {
+abstract class DashboardNotification with _$DashboardNotification {
   const factory DashboardNotification({
     required String id,
     required String title,

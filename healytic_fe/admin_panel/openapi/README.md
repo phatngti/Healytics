@@ -241,6 +241,7 @@ Class | Method | HTTP request | Description
  - [ClientKeyResponseDto](doc//ClientKeyResponseDto.md)
  - [ClinicCertificationDto](doc//ClinicCertificationDto.md)
  - [ClinicInfoResponseDto](doc//ClinicInfoResponseDto.md)
+ - [ClinicProductCategoryDto](doc//ClinicProductCategoryDto.md)
  - [ClinicProductDto](doc//ClinicProductDto.md)
  - [ClinicProductsResponseDto](doc//ClinicProductsResponseDto.md)
  - [ClinicReviewDto](doc//ClinicReviewDto.md)

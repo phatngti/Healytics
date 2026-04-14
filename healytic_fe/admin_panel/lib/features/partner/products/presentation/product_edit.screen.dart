@@ -22,30 +22,23 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 class ProductEditScreen extends ConsumerWidget {
   final String productId;
 
-  const ProductEditScreen({
-    super.key,
-    required this.productId,
-  });
+  const ProductEditScreen({super.key, required this.productId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final productAsync = ref.watch(
-      productDetailsProvider(productId),
-    );
+    final productAsync = ref.watch(productDetailsProvider(productId));
 
     return productAsync.when(
       data: (product) => ResponsiveWrapper(
         useLayout: true,
         desktop: _ProductEditContent(product: product),
       ),
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, stack) => Scaffold(
         appBar: AppBar(
           leading: BackButton(
-            onPressed: () =>
-                context.goNamed(ProductHomeRoute.name),
+            onPressed: () => context.goNamed(ProductHomeRoute.name),
           ),
         ),
         body: Center(
@@ -53,9 +46,7 @@ class ProductEditScreen extends ConsumerWidget {
             title: 'Error loading product',
             error: error,
             stackTrace: stack,
-            onRetry: () => ref.invalidate(
-              productDetailsProvider(productId),
-            ),
+            onRetry: () => ref.invalidate(productDetailsProvider(productId)),
           ),
         ),
       ),
@@ -72,19 +63,16 @@ class _ProductEditContent extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(
-      () => GlobalKey<FormBuilderState>(),
-    );
+    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final serviceManualKey = useMemoized(
       () => GlobalKey<ProductServiceManualCardState>(),
     );
     final isSubmitting = useState(false);
 
     /// Build initial values from the loaded product.
-    final initialValues = useMemoized(
-      () => _buildInitialValues(product),
-      [product],
-    );
+    final initialValues = useMemoized(() => _buildInitialValues(product), [
+      product,
+    ]);
 
     Future<void> handleSave() async {
       final state = formKey.currentState;
@@ -97,50 +85,34 @@ class _ProductEditContent extends HookConsumerWidget {
         final request = UpdateProductRequest(
           id: product.id,
           name: data['product_name'] as String?,
-          basePrice: double.tryParse(
-            data['base_price']?.toString() ?? '',
-          ),
-          description:
-              data['product_description'] as String?,
+          basePrice: double.tryParse(data['base_price']?.toString() ?? ''),
+          description: data['product_description'] as String?,
           category: data['category'] as String?,
           images: (data['product_images'] as List?)
               ?.map((e) => e.toString())
               .toList(),
-          staffIds:
-              (data['selected_staff_ids'] as List?)
-                  ?.map((e) => e.toString())
-                  .toList(),
-          serviceManual: _extractServiceManual(
-            serviceManualKey,
-          ),
+          staffIds: (data['selected_staff_ids'] as List?)
+              ?.map((e) => e.toString())
+              .toList(),
+          serviceManual: _extractServiceManual(serviceManualKey),
         );
 
-        await ref
-            .read(productProvider.notifier)
-            .updateProduct(request);
+        await ref.read(productProvider.notifier).updateProduct(request);
 
         // Invalidate cache so details refresh
-        ref.invalidate(
-          productDetailsProvider(product.id.value),
-        );
+        ref.invalidate(productDetailsProvider(product.id.value));
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Product updated successfully!',
-              ),
-            ),
+            const SnackBar(content: Text('Product updated successfully!')),
           );
           context.goNamed(ProductHomeRoute.name);
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to update: $e'),
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to update: $e')));
         }
       } finally {
         isSubmitting.value = false;
@@ -156,15 +128,12 @@ class _ProductEditContent extends HookConsumerWidget {
       initialValue: initialValues,
       child: ProductEditDesktop(
         product: product,
-        onSave:
-            isSubmitting.value ? null : handleSave,
+        onSave: isSubmitting.value ? null : handleSave,
         onCancel: handleCancel,
         serviceManualKey: serviceManualKey,
-        initialGuidelines: product.serviceManual
-                ?.preServiceGuidelines ??
-            [],
-        initialRules: product.serviceManual
-                ?.serviceRules
+        initialGuidelines: product.serviceManual?.preServiceGuidelines ?? [],
+        initialRules:
+            product.serviceManual?.serviceRules
                 .map(
                   (r) => {
                     'iconSlug': r.iconSlug,
@@ -174,14 +143,9 @@ class _ProductEditContent extends HookConsumerWidget {
                 )
                 .toList() ??
             [],
-        initialSteps: product.serviceManual
-                ?.procedureSteps
-                .map(
-                  (s) => {
-                    'title': s.title,
-                    'description': s.description,
-                  },
-                )
+        initialSteps:
+            product.serviceManual?.procedureSteps
+                .map((s) => {'title': s.title, 'description': s.description})
                 .toList() ??
             [],
       ),
@@ -195,35 +159,31 @@ class _ProductEditContent extends HookConsumerWidget {
     final data = key.currentState?.extractFormData();
     if (data == null) return null;
 
-    final guidelines =
-        (data['guidelines'] as List<String>?) ?? [];
+    final guidelines = (data['guidelines'] as List<String>?) ?? [];
     final rules =
         (data['rules'] as List<Map<String, String>>?)
-                ?.map(
-                  (r) => ServiceRuleEntity(
-                    iconSlug: r['iconSlug'] ?? '',
-                    title: r['title'] ?? '',
-                    description:
-                        r['description'] ?? '',
-                  ),
-                )
-                .toList() ??
-            [];
+            ?.map(
+              (r) => ServiceRuleEntity(
+                iconSlug: r['iconSlug'] ?? '',
+                title: r['title'] ?? '',
+                description: r['description'] ?? '',
+              ),
+            )
+            .toList() ??
+        [];
     final steps =
         (data['steps'] as List<Map<String, String>>?)
-                ?.asMap()
-                .entries
-                .map(
-                  (e) => ProcedureStepEntity(
-                    stepNumber: e.key + 1,
-                    title:
-                        e.value['title'] ?? '',
-                    description:
-                        e.value['description'] ?? '',
-                  ),
-                )
-                .toList() ??
-            [];
+            ?.asMap()
+            .entries
+            .map(
+              (e) => ProcedureStepEntity(
+                stepNumber: e.key + 1,
+                title: e.value['title'] ?? '',
+                description: e.value['description'] ?? '',
+              ),
+            )
+            .toList() ??
+        [];
 
     return ServiceManualEntity(
       preServiceGuidelines: guidelines,
@@ -234,9 +194,7 @@ class _ProductEditContent extends HookConsumerWidget {
 
   /// Maps [Product] entity fields to FormBuilder
   /// field keys used by the card widgets.
-  static Map<String, dynamic> _buildInitialValues(
-    Product product,
-  ) {
+  static Map<String, dynamic> _buildInitialValues(Product product) {
     return {
       'product_name': product.name,
       'product_description': product.description,

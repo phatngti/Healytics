@@ -17,10 +17,7 @@ class EmployeeDetailsProfileSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        EmployeeProfileImageCard(
-          avatarUrl: avatarUrl,
-          fullName: fullName,
-        ),
+        EmployeeProfileImageCard(avatarUrl: avatarUrl, fullName: fullName),
         AppDimens.verticalLarge,
         const EmployeeContactInfoCard(),
       ],

@@ -26,8 +26,7 @@ class ProductEditDesktop extends StatelessWidget {
   final VoidCallback onCancel;
 
   /// Key to access the service manual card data.
-  final GlobalKey<ProductServiceManualCardState>?
-      serviceManualKey;
+  final GlobalKey<ProductServiceManualCardState>? serviceManualKey;
 
   /// Pre-populated service manual data.
   final List<String> initialGuidelines;
@@ -62,8 +61,7 @@ class ProductEditDesktop extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Left Column — Main Content
                     Expanded(
@@ -71,8 +69,7 @@ class ProductEditDesktop extends StatelessWidget {
                       child: Column(
                         children: [
                           ProductGeneralInfoCard(
-                            initialDescription:
-                                product.description,
+                            initialDescription: product.description,
                           ),
                           AppDimens.verticalMedium,
                           const ProductOperationsCard(),
@@ -83,8 +80,7 @@ class ProductEditDesktop extends StatelessWidget {
                           AppDimens.verticalMedium,
                           ProductServiceManualCard(
                             key: serviceManualKey,
-                            initialGuidelines:
-                                initialGuidelines,
+                            initialGuidelines: initialGuidelines,
                             initialRules: initialRules,
                             initialSteps: initialSteps,
                           ),
@@ -99,13 +95,11 @@ class ProductEditDesktop extends StatelessWidget {
                         children: [
                           ProductVisibilityCard(
                             initialStatus: product.status,
-                            initialOnlineStore:
-                                product.onlineStore,
+                            initialOnlineStore: product.onlineStore,
                           ),
                           AppDimens.verticalMedium,
                           ProductOrganizationCard(
-                            initialCategory:
-                                product.category.id,
+                            initialCategory: product.category.id,
                             initialTags: product.tags,
                           ),
                         ],
@@ -153,11 +147,7 @@ class _FloatingHeader extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          border: Border(
-            bottom: BorderSide(
-              color: colorScheme.outlineVariant,
-            ),
-          ),
+          border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
           boxShadow: [
             BoxShadow(
               color: colorScheme.shadow.withAlpha(8),
@@ -167,8 +157,7 @@ class _FloatingHeader extends StatelessWidget {
           ],
         ),
         child: Row(
-          mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
@@ -176,23 +165,16 @@ class _FloatingHeader extends StatelessWidget {
                 AppDimens.horizontalMedium,
                 Text(
                   'Edit Product',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 AppDimens.horizontalSmall,
                 Text(
                   '— $productName',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(
-                        color:
-                            colorScheme.onSurfaceVariant,
-                      ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),

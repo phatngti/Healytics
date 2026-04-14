@@ -28,7 +28,6 @@ class HomeHeader extends ConsumerWidget {
         top: hPadding,
         bottom: contentPad,
       ),
-      color: colorScheme.surface.withValues(alpha: 0.8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -64,7 +63,7 @@ class HomeHeader extends ConsumerWidget {
                       ),
                       Text(
                         userName,
-                        style: textTheme.titleLarge?.copyWith(
+                        style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           height: 1.0,
                         ),
@@ -85,7 +84,6 @@ class HomeHeader extends ConsumerWidget {
                   '$cartCount',
                   style: textTheme.labelSmall?.copyWith(
                     color: colorScheme.onError,
-                    fontSize: 10,
                   ),
                 ),
                 backgroundColor: colorScheme.error,
@@ -142,13 +140,13 @@ class _HeaderIconButton extends StatelessWidget {
               BoxShadow(
                 color: colorScheme.shadow.withValues(alpha: 0.05),
                 blurRadius: AppDimens.spaceXxs,
-                offset: const Offset(0, 1),
+                offset: Offset(0, AppDimens.spaceXxs),
               ),
             ],
           ),
           child: Icon(
             icon,
-            size: AppDimens.iconLg,
+            size: AppDimens.iconMd,
             color: colorScheme.onSurface,
           ),
         ),

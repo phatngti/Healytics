@@ -6,13 +6,11 @@ import 'package:admin_panel/features/partner/profile_edit/domain/public_profile.
 /// public profile aggregate.
 abstract class PublicProfileRemoteDataSource {
   /// Loads the full public profile aggregate.
-  Future<PartnerPublicProfileEntity>
-      getPublicProfile();
+  Future<PartnerPublicProfileEntity> getPublicProfile();
 
   /// Persists storefront updates and returns the
   /// refreshed profile aggregate.
-  Future<PartnerPublicProfileEntity>
-      updatePublicProfile(
+  Future<PartnerPublicProfileEntity> updatePublicProfile(
     PublicProfileUpdateRequest request,
   );
 }
@@ -21,45 +19,33 @@ abstract class PublicProfileRemoteDataSource {
 /// [PartnerPartnersApi] methods.
 class PublicProfileRemoteDataSourceImpl
     implements PublicProfileRemoteDataSource {
-  PublicProfileRemoteDataSourceImpl({
-    required this.apiService,
-  });
+  PublicProfileRemoteDataSourceImpl({required this.apiService});
 
   final ApiService apiService;
 
   @override
-  Future<PartnerPublicProfileEntity>
-      getPublicProfile() async {
+  Future<PartnerPublicProfileEntity> getPublicProfile() async {
     final dto = await apiService.partnerPartnersApi
         .partnerSelfControllerGetPublicProfile();
 
     if (dto == null) {
-      throw ApiException(
-        404,
-        'Public profile data not found',
-      );
+      throw ApiException(404, 'Public profile data not found');
     }
 
     return _mapResponseToEntity(dto);
   }
 
   @override
-  Future<PartnerPublicProfileEntity>
-      updatePublicProfile(
+  Future<PartnerPublicProfileEntity> updatePublicProfile(
     PublicProfileUpdateRequest request,
   ) async {
     final updateDto = _mapRequestToDto(request);
 
     final dto = await apiService.partnerPartnersApi
-        .partnerSelfControllerUpdatePublicProfile(
-      updateDto,
-    );
+        .partnerSelfControllerUpdatePublicProfile(updateDto);
 
     if (dto == null) {
-      throw ApiException(
-        500,
-        'Update returned no data',
-      );
+      throw ApiException(500, 'Update returned no data');
     }
 
     return _mapResponseToEntity(dto);
@@ -72,29 +58,18 @@ class PublicProfileRemoteDataSourceImpl
   ) {
     return PartnerPublicProfileEntity(
       id: dto.id,
-      businessInfo: _mapBusinessInfo(
-        dto.businessInfo,
-      ),
+      businessInfo: _mapBusinessInfo(dto.businessInfo),
       address: _mapAddress(dto.address),
       legalSummary: dto.readOnlyLegalSummary != null
-          ? _mapLegalSummary(
-              dto.readOnlyLegalSummary!,
-            )
+          ? _mapLegalSummary(dto.readOnlyLegalSummary!)
           : null,
-      verificationStatus:
-          dto.verificationStatus.value,
-      storefront: _mapStorefront(
-        dto.publicProfile,
-      ),
-      completionSummary: _mapCompletionSummary(
-        dto.completionSummary,
-      ),
+      verificationStatus: dto.verificationStatus.value,
+      storefront: _mapStorefront(dto.publicProfile),
+      completionSummary: _mapCompletionSummary(dto.completionSummary),
     );
   }
 
-  PublicProfileBusinessInfo _mapBusinessInfo(
-    PublicProfileBusinessInfoDto dto,
-  ) {
+  PublicProfileBusinessInfo _mapBusinessInfo(PublicProfileBusinessInfoDto dto) {
     return PublicProfileBusinessInfo(
       brandName: dto.brandName,
       legalName: dto.legalName,
@@ -106,9 +81,7 @@ class PublicProfileRemoteDataSourceImpl
     );
   }
 
-  PublicProfileAddress _mapAddress(
-    PublicProfileAddressDto dto,
-  ) {
+  PublicProfileAddress _mapAddress(PublicProfileAddressDto dto) {
     return PublicProfileAddress(
       streetAddress: dto.streetAddress,
       ward: _parseLocationRef(dto.ward),
@@ -116,8 +89,7 @@ class PublicProfileRemoteDataSourceImpl
       province: _parseLocationRef(dto.province),
       latitude: dto.latitude?.toDouble(),
       longitude: dto.longitude?.toDouble(),
-      formattedAddress:
-          dto.formattedAddress?.toString(),
+      formattedAddress: dto.formattedAddress?.toString(),
     );
   }
 
@@ -137,9 +109,7 @@ class PublicProfileRemoteDataSourceImpl
     return null;
   }
 
-  PublicProfileLegalSummary _mapLegalSummary(
-    PublicProfileLegalSummaryDto dto,
-  ) {
+  PublicProfileLegalSummary _mapLegalSummary(PublicProfileLegalSummaryDto dto) {
     return PublicProfileLegalSummary(
       fullName: dto.fullName,
       position: dto.position,
@@ -148,19 +118,13 @@ class PublicProfileRemoteDataSourceImpl
     );
   }
 
-  PublicProfileStorefront _mapStorefront(
-    PublicProfileStorefrontDto dto,
-  ) {
+  PublicProfileStorefront _mapStorefront(PublicProfileStorefrontDto dto) {
     return PublicProfileStorefront(
-      coverImageUrl:
-          dto.coverImageUrl?.toString(),
-      logoImageUrl:
-          dto.logoImageUrl?.toString(),
+      coverImageUrl: dto.coverImageUrl?.toString(),
+      logoImageUrl: dto.logoImageUrl?.toString(),
       description: dto.description?.toString(),
       gallery: dto.gallery,
-      certifications: dto.certifications
-          .map(_mapCertification)
-          .toList(),
+      certifications: dto.certifications.map(_mapCertification).toList(),
     );
   }
 
@@ -176,16 +140,12 @@ class PublicProfileRemoteDataSourceImpl
     );
   }
 
-  PublicProfileCompletionSummary
-      _mapCompletionSummary(
+  PublicProfileCompletionSummary _mapCompletionSummary(
     PublicProfileCompletionSummaryDto dto,
   ) {
     return PublicProfileCompletionSummary(
-      checklist: dto.checklist
-          .map(_mapChecklistItem)
-          .toList(),
-      completionPercent:
-          dto.completionPercent.toInt(),
+      checklist: dto.checklist.map(_mapChecklistItem).toList(),
+      completionPercent: dto.completionPercent.toInt(),
       isCompleted: dto.isCompleted,
     );
   }
@@ -211,16 +171,13 @@ class PublicProfileRemoteDataSourceImpl
       logoImageUrl: request.logoImageUrl,
       description: request.description,
       gallery: request.gallery ?? const [],
-      certifications:
-          (request.certifications ?? const [])
-              .map(_mapCertToDto)
-              .toList(),
+      certifications: (request.certifications ?? const [])
+          .map(_mapCertToDto)
+          .toList(),
     );
   }
 
-  UpdatePartnerCertificationDto _mapCertToDto(
-    PublicProfileCertification item,
-  ) {
+  UpdatePartnerCertificationDto _mapCertToDto(PublicProfileCertification item) {
     return UpdatePartnerCertificationDto(
       id: item.id,
       title: item.title,
@@ -234,45 +191,29 @@ class PublicProfileRemoteDataSourceImpl
 /// Mock implementation for development and testing.
 class PublicProfileRemoteDataSourceMock
     implements PublicProfileRemoteDataSource {
-  PartnerPublicProfileEntity _entity =
-      PartnerPublicProfileEntity(
+  PartnerPublicProfileEntity _entity = PartnerPublicProfileEntity(
     id: 'mock-partner-id',
     businessInfo: const PublicProfileBusinessInfo(
       brandName: 'Healytics Wellness Center',
-      legalName:
-          'Healytics Wellness Joint Stock Company',
+      legalName: 'Healytics Wellness Joint Stock Company',
       taxCode: '0123456789',
-      businessType: [
-        'SPA_BEAUTY',
-        'MASSAGE_THERAPY',
-      ],
+      businessType: ['SPA_BEAUTY', 'MASSAGE_THERAPY'],
       phoneNumber: '0901234567',
       email: 'clinic@example.com',
       username: 'healytics_clinic',
     ),
     address: const PublicProfileAddress(
-      streetAddress:
-          '123 Nguyen Hue, Ward 1',
-      ward: LocationRef(
-        id: 'ward-1',
-        name: 'Phường 1',
-      ),
-      district: LocationRef(
-        id: 'dist-1',
-        name: 'Quận 1',
-      ),
-      province: LocationRef(
-        id: 'prov-hcm',
-        name: 'TP. Hồ Chí Minh',
-      ),
+      streetAddress: '123 Nguyen Hue, Ward 1',
+      ward: LocationRef(id: 'ward-1', name: 'Phường 1'),
+      district: LocationRef(id: 'dist-1', name: 'Quận 1'),
+      province: LocationRef(id: 'prov-hcm', name: 'TP. Hồ Chí Minh'),
       latitude: 10.7769,
       longitude: 106.7009,
       formattedAddress:
           '123 Nguyen Hue, Phường 1, '
           'Quận 1, TP. Hồ Chí Minh',
     ),
-    legalSummary:
-        const PublicProfileLegalSummary(
+    legalSummary: const PublicProfileLegalSummary(
       fullName: 'Nguyễn Văn A',
       position: 'Giám đốc',
       idType: 'cccd',
@@ -280,10 +221,8 @@ class PublicProfileRemoteDataSourceMock
     ),
     verificationStatus: 'APPROVED',
     storefront: const PublicProfileStorefront(
-      coverImageUrl:
-          'https://cdn.example.com/cover.jpg',
-      logoImageUrl:
-          'https://cdn.example.com/logo.jpg',
+      coverImageUrl: 'https://cdn.example.com/cover.jpg',
+      logoImageUrl: 'https://cdn.example.com/logo.jpg',
       description:
           'A modern wellness clinic focused '
           'on long-term health and recovery. '
@@ -306,8 +245,7 @@ class PublicProfileRemoteDataSourceMock
         ),
       ],
     ),
-    completionSummary:
-        const PublicProfileCompletionSummary(
+    completionSummary: const PublicProfileCompletionSummary(
       checklist: [
         PublicProfileChecklistItem(
           key: 'coverImageUrl',
@@ -346,34 +284,23 @@ class PublicProfileRemoteDataSourceMock
   );
 
   @override
-  Future<PartnerPublicProfileEntity>
-      getPublicProfile() async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<PartnerPublicProfileEntity> getPublicProfile() async {
+    await Future.delayed(const Duration(milliseconds: 500));
     return _entity;
   }
 
   @override
-  Future<PartnerPublicProfileEntity>
-      updatePublicProfile(
+  Future<PartnerPublicProfileEntity> updatePublicProfile(
     PublicProfileUpdateRequest request,
   ) async {
-    await Future.delayed(
-      const Duration(milliseconds: 600),
-    );
+    await Future.delayed(const Duration(milliseconds: 600));
 
     final sf = _entity.storefront;
-    final cover =
-        request.coverImageUrl ?? sf.coverImageUrl;
-    final logo =
-        request.logoImageUrl ?? sf.logoImageUrl;
-    final desc =
-        request.description ?? sf.description;
-    final gallery =
-        request.gallery ?? sf.gallery;
-    final certs =
-        request.certifications ?? sf.certifications;
+    final cover = request.coverImageUrl ?? sf.coverImageUrl;
+    final logo = request.logoImageUrl ?? sf.logoImageUrl;
+    final desc = request.description ?? sf.description;
+    final gallery = request.gallery ?? sf.gallery;
+    final certs = request.certifications ?? sf.certifications;
 
     final checklist = _deriveChecklist(
       cover: cover,
@@ -383,12 +310,8 @@ class PublicProfileRemoteDataSourceMock
       certs: certs,
     );
 
-    final completedCount = checklist
-        .where((i) => i.completed)
-        .length;
-    final percent =
-        ((completedCount / checklist.length) * 100)
-            .round();
+    final completedCount = checklist.where((i) => i.completed).length;
+    final percent = ((completedCount / checklist.length) * 100).round();
     final allRequired = checklist
         .where((i) => i.isRequired)
         .every((i) => i.completed);
@@ -401,8 +324,7 @@ class PublicProfileRemoteDataSourceMock
         gallery: gallery,
         certifications: certs,
       ),
-      completionSummary:
-          PublicProfileCompletionSummary(
+      completionSummary: PublicProfileCompletionSummary(
         checklist: checklist,
         completionPercent: percent,
         isCompleted: allRequired,
@@ -412,8 +334,7 @@ class PublicProfileRemoteDataSourceMock
     return _entity;
   }
 
-  List<PublicProfileChecklistItem>
-      _deriveChecklist({
+  List<PublicProfileChecklistItem> _deriveChecklist({
     String? cover,
     String? logo,
     String? description,
@@ -426,22 +347,19 @@ class PublicProfileRemoteDataSourceMock
         key: 'coverImageUrl',
         label: 'Clinic cover image',
         isRequired: true,
-        completed: cover != null &&
-            cover.isNotEmpty,
+        completed: cover != null && cover.isNotEmpty,
       ),
       PublicProfileChecklistItem(
         key: 'logoImageUrl',
         label: 'Clinic logo image',
         isRequired: true,
-        completed: logo != null &&
-            logo.isNotEmpty,
+        completed: logo != null && logo.isNotEmpty,
       ),
       PublicProfileChecklistItem(
         key: 'description',
         label: 'Clinic description',
         isRequired: true,
-        completed: trimmed.length >= 120 &&
-            trimmed.length <= 1000,
+        completed: trimmed.length >= 120 && trimmed.length <= 1000,
       ),
       PublicProfileChecklistItem(
         key: 'gallery',

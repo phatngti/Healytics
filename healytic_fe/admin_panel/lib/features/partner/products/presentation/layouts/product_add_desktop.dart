@@ -32,8 +32,7 @@ class ProductAddDesktop extends ConsumerStatefulWidget {
   final String? initialDescription;
 
   /// Key to access the service manual card for data extraction.
-  final GlobalKey<ProductServiceManualCardState>?
-      serviceManualKey;
+  final GlobalKey<ProductServiceManualCardState>? serviceManualKey;
 
   @override
   ConsumerState<ProductAddDesktop> createState() => _ProductAddDesktopState();

@@ -7,8 +7,7 @@ part 'upcoming_appointment.entity.freezed.dart';
 /// Used to display the "Upcoming Appointments" table
 /// on the partner dashboard.
 @freezed
-abstract class UpcomingAppointment
-    with _$UpcomingAppointment {
+abstract class UpcomingAppointment with _$UpcomingAppointment {
   const factory UpcomingAppointment({
     required String id,
     required String patientName,

@@ -88,7 +88,6 @@ class ChatScreen extends HookConsumerWidget {
     }, [chatState.messages]);
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: const ChatHeader(),
       body: MediaQuery(
         data: MediaQuery.of(context).copyWith(

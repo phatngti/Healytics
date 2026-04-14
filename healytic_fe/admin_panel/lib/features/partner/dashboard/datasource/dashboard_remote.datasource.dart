@@ -27,40 +27,28 @@ part 'dashboard_remote.datasource.g.dart';
 /// Contract for dashboard remote data operations.
 abstract class DashboardRemoteDataSource {
   /// Fetches aggregated KPI stats for [period].
-  Future<DashboardStats> getDashboardStats({
-    DashboardTimePeriod? period,
-  });
+  Future<DashboardStats> getDashboardStats({DashboardTimePeriod? period});
 
   /// Fetches revenue time-series for [period].
-  Future<List<RevenueDataPoint>> getRevenueData(
-    DashboardTimePeriod period,
-  );
+  Future<List<RevenueDataPoint>> getRevenueData(DashboardTimePeriod period);
 
   /// Fetches upcoming appointments (max [limit]).
-  Future<List<UpcomingAppointment>>
-      getUpcomingAppointments({int limit = 5});
+  Future<List<UpcomingAppointment>> getUpcomingAppointments({int limit = 5});
 
   /// Fetches service performance metrics.
-  Future<List<ServicePerformance>>
-      getServicePerformance();
+  Future<List<ServicePerformance>> getServicePerformance();
 
   /// Fetches employee role/status distribution.
-  Future<List<EmployeeDistribution>>
-      getEmployeeDistribution();
+  Future<List<EmployeeDistribution>> getEmployeeDistribution();
 
   /// Fetches recent customer reviews (max [limit]).
-  Future<List<DashboardReview>> getRecentReviews({
-    int limit = 5,
-  });
+  Future<List<DashboardReview>> getRecentReviews({int limit = 5});
 
   /// Fetches staff schedule for [date].
-  Future<List<StaffScheduleEntry>> getStaffSchedule(
-    DateTime date,
-  );
+  Future<List<StaffScheduleEntry>> getStaffSchedule(DateTime date);
 
   /// Fetches dashboard notifications (max [limit]).
-  Future<List<DashboardNotification>>
-      getNotifications({int limit = 10});
+  Future<List<DashboardNotification>> getNotifications({int limit = 10});
 
   /// Fetches inventory alerts.
   Future<List<InventoryAlert>> getInventoryAlerts();
@@ -72,11 +60,9 @@ abstract class DashboardRemoteDataSource {
 
 /// Real implementation using the generated
 /// [PartnerDashboardApi] OpenAPI client.
-class DashboardRemoteDataSourceImpl
-    implements DashboardRemoteDataSource {
-  DashboardRemoteDataSourceImpl({
-    required ApiService apiService,
-  }) : _api = apiService.partnerDashboardApi;
+class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
+  DashboardRemoteDataSourceImpl({required ApiService apiService})
+    : _api = apiService.partnerDashboardApi;
 
   final PartnerDashboardApi _api;
 
@@ -84,14 +70,11 @@ class DashboardRemoteDataSourceImpl
   Future<DashboardStats> getDashboardStats({
     DashboardTimePeriod? period,
   }) async {
-    final dto =
-        await _api.partnerDashboardControllerGetStats(
+    final dto = await _api.partnerDashboardControllerGetStats(
       period: period?.value,
     );
     if (dto == null) {
-      throw DashboardDataException(
-        'Stats response was null',
-      );
+      throw DashboardDataException('Stats response was null');
     }
     return _mapStatsDto(dto);
   }
@@ -100,105 +83,76 @@ class DashboardRemoteDataSourceImpl
   Future<List<RevenueDataPoint>> getRevenueData(
     DashboardTimePeriod period,
   ) async {
-    final dtos =
-        await _api
-            .partnerDashboardControllerGetRevenue(
+    final dtos = await _api.partnerDashboardControllerGetRevenue(
       period: period.value,
     );
     return dtos?.map(_mapRevenueDto).toList() ?? [];
   }
 
   @override
-  Future<List<UpcomingAppointment>>
-      getUpcomingAppointments({
+  Future<List<UpcomingAppointment>> getUpcomingAppointments({
     int limit = 5,
   }) async {
-    final dtos = await _api
-        .partnerDashboardControllerGetUpcomingAppointments(
+    final dtos = await _api.partnerDashboardControllerGetUpcomingAppointments(
       limit: limit,
     );
-    return dtos?.map(_mapAppointmentDto).toList() ??
-        [];
+    return dtos?.map(_mapAppointmentDto).toList() ?? [];
   }
 
   @override
-  Future<List<ServicePerformance>>
-      getServicePerformance() async {
-    final dtos = await _api
-        .partnerDashboardControllerGetServicePerformance();
+  Future<List<ServicePerformance>> getServicePerformance() async {
+    final dtos = await _api.partnerDashboardControllerGetServicePerformance();
     return dtos?.map(_mapServiceDto).toList() ?? [];
   }
 
   @override
-  Future<List<EmployeeDistribution>>
-      getEmployeeDistribution() async {
-    final dtos = await _api
-        .partnerDashboardControllerGetEmployeeDistribution();
+  Future<List<EmployeeDistribution>> getEmployeeDistribution() async {
+    final dtos = await _api.partnerDashboardControllerGetEmployeeDistribution();
     return dtos?.map(_mapEmployeeDto).toList() ?? [];
   }
 
   @override
-  Future<List<DashboardReview>> getRecentReviews({
-    int limit = 5,
-  }) async {
-    final dtos = await _api
-        .partnerDashboardControllerGetRecentReviews(
+  Future<List<DashboardReview>> getRecentReviews({int limit = 5}) async {
+    final dtos = await _api.partnerDashboardControllerGetRecentReviews(
       limit: limit,
     );
     return dtos?.map(_mapReviewDto).toList() ?? [];
   }
 
   @override
-  Future<List<StaffScheduleEntry>> getStaffSchedule(
-    DateTime date,
-  ) async {
+  Future<List<StaffScheduleEntry>> getStaffSchedule(DateTime date) async {
     final dateStr =
         '${date.year}-'
         '${date.month.toString().padLeft(2, '0')}-'
         '${date.day.toString().padLeft(2, '0')}';
-    final dtos = await _api
-        .partnerDashboardControllerGetStaffSchedule(
-      dateStr,
-    );
+    final dtos = await _api.partnerDashboardControllerGetStaffSchedule(dateStr);
     return dtos?.map(_mapScheduleDto).toList() ?? [];
   }
 
   @override
-  Future<List<DashboardNotification>>
-      getNotifications({int limit = 10}) async {
-    final dtos = await _api
-        .partnerDashboardControllerGetNotifications(
+  Future<List<DashboardNotification>> getNotifications({int limit = 10}) async {
+    final dtos = await _api.partnerDashboardControllerGetNotifications(
       limit: limit,
     );
-    return dtos?.map(_mapNotificationDto).toList() ??
-        [];
+    return dtos?.map(_mapNotificationDto).toList() ?? [];
   }
 
   @override
-  Future<List<InventoryAlert>>
-      getInventoryAlerts() async {
-    final dtos = await _api
-        .partnerDashboardControllerGetInventoryAlerts();
+  Future<List<InventoryAlert>> getInventoryAlerts() async {
+    final dtos = await _api.partnerDashboardControllerGetInventoryAlerts();
     return dtos?.map(_mapInventoryDto).toList() ?? [];
   }
 
   // ── Private DTO → Entity Mappers ──────────────
 
-  DashboardStats _mapStatsDto(
-    DashboardStatsResponseDto dto,
-  ) {
+  DashboardStats _mapStatsDto(DashboardStatsResponseDto dto) {
     return DashboardStats(
-      totalAppointments:
-          dto.totalAppointments.toInt(),
-      completedAppointments:
-          dto.completedAppointments.toInt(),
-      cancelledAppointments:
-          dto.cancelledAppointments.toInt(),
-      pendingAppointments:
-          dto.pendingAppointments.toInt(),
+      totalAppointments: dto.totalAppointments.toInt(),
+      completedAppointments: dto.completedAppointments.toInt(),
+      cancelledAppointments: dto.cancelledAppointments.toInt(),
+      pendingAppointments: dto.pendingAppointments.toInt(),
       totalRevenue: dto.totalRevenue.toDouble(),
-      revenueGrowthPercent:
-          dto.revenueGrowthPercent.toDouble(),
+      revenueGrowthPercent: dto.revenueGrowthPercent.toDouble(),
       totalServices: dto.totalServices.toInt(),
       activeServices: dto.activeServices.toInt(),
       totalEmployees: dto.totalEmployees.toInt(),
@@ -208,34 +162,25 @@ class DashboardRemoteDataSourceImpl
     );
   }
 
-  RevenueDataPoint _mapRevenueDto(
-    RevenueDataPointDto dto,
-  ) {
+  RevenueDataPoint _mapRevenueDto(RevenueDataPointDto dto) {
     return RevenueDataPoint(
-      date: DateTime.tryParse(dto.date) ??
-          DateTime.now(),
+      date: DateTime.tryParse(dto.date) ?? DateTime.now(),
       revenue: dto.revenue.toDouble(),
     );
   }
 
-  UpcomingAppointment _mapAppointmentDto(
-    UpcomingAppointmentDto dto,
-  ) {
+  UpcomingAppointment _mapAppointmentDto(UpcomingAppointmentDto dto) {
     return UpcomingAppointment(
       id: dto.id,
       patientName: dto.patientName,
       serviceName: dto.serviceName,
       employeeName: dto.employeeName,
-      scheduledAt:
-          DateTime.tryParse(dto.scheduledAt) ??
-              DateTime.now(),
+      scheduledAt: DateTime.tryParse(dto.scheduledAt) ?? DateTime.now(),
       status: dto.status.value,
     );
   }
 
-  ServicePerformance _mapServiceDto(
-    ServicePerformanceDto dto,
-  ) {
+  ServicePerformance _mapServiceDto(ServicePerformanceDto dto) {
     return ServicePerformance(
       serviceName: dto.serviceName,
       bookingCount: dto.bookingCount.toInt(),
@@ -244,9 +189,7 @@ class DashboardRemoteDataSourceImpl
     );
   }
 
-  EmployeeDistribution _mapEmployeeDto(
-    EmployeeDistributionDto dto,
-  ) {
+  EmployeeDistribution _mapEmployeeDto(EmployeeDistributionDto dto) {
     return EmployeeDistribution(
       role: _mapRoleLabel(dto.role),
       count: dto.count.toInt(),
@@ -256,80 +199,58 @@ class DashboardRemoteDataSourceImpl
 
   /// Maps UPPERCASE enum value to human-readable
   /// label for chart display.
-  String _mapRoleLabel(
-    String role,
-  ) {
+  String _mapRoleLabel(String role) {
     return switch (role.toUpperCase()) {
-      'DOCTOR' =>
-        'Doctor',
-      'THERAPIST' =>
-        'Therapist',
-      'RECEPTIONIST' =>
-        'Receptionist',
-      'MANAGER' =>
-        'Manager',
+      'DOCTOR' => 'Doctor',
+      'THERAPIST' => 'Therapist',
+      'RECEPTIONIST' => 'Receptionist',
+      'MANAGER' => 'Manager',
       _ => role,
     };
   }
 
-  DashboardReview _mapReviewDto(
-    DashboardReviewDto dto,
-  ) {
+  DashboardReview _mapReviewDto(DashboardReviewDto dto) {
     return DashboardReview(
       reviewerName: dto.reviewerName,
       avatarUrl: dto.avatarUrl,
       rating: dto.rating.toInt(),
       status: dto.status.value,
-      date: DateTime.tryParse(dto.date) ??
-          DateTime.now(),
+      date: DateTime.tryParse(dto.date) ?? DateTime.now(),
       text: dto.text,
       imageUrls: dto.imageUrls,
     );
   }
 
-  StaffScheduleEntry _mapScheduleDto(
-    StaffScheduleEntryDto dto,
-  ) {
+  StaffScheduleEntry _mapScheduleDto(StaffScheduleEntryDto dto) {
     return StaffScheduleEntry(
       employeeId: dto.employeeId,
       employeeName: dto.employeeName,
       role: dto.role,
-      startTime:
-          DateTime.tryParse(dto.startTime) ??
-              DateTime.now(),
-      endTime: DateTime.tryParse(dto.endTime) ??
-          DateTime.now(),
+      startTime: DateTime.tryParse(dto.startTime) ?? DateTime.now(),
+      endTime: DateTime.tryParse(dto.endTime) ?? DateTime.now(),
       serviceName: dto.serviceName,
       patientName: dto.patientName,
     );
   }
 
-  DashboardNotification _mapNotificationDto(
-    DashboardNotificationDto dto,
-  ) {
+  DashboardNotification _mapNotificationDto(DashboardNotificationDto dto) {
     return DashboardNotification(
       id: dto.id,
       title: dto.title,
       message: dto.message,
       type: dto.type.value,
-      createdAt:
-          DateTime.tryParse(dto.createdAt) ??
-              DateTime.now(),
+      createdAt: DateTime.tryParse(dto.createdAt) ?? DateTime.now(),
       isRead: dto.isRead,
     );
   }
 
-  InventoryAlert _mapInventoryDto(
-    InventoryAlertDto dto,
-  ) {
+  InventoryAlert _mapInventoryDto(InventoryAlertDto dto) {
     return InventoryAlert(
       id: dto.id,
       productName: dto.productName,
       alertType: dto.alertType.value,
       message: dto.message,
-      createdAt:
-          DateTime.tryParse(dto.createdAt) ??
-              DateTime.now(),
+      createdAt: DateTime.tryParse(dto.createdAt) ?? DateTime.now(),
       severity: dto.severity.value,
     );
   }
@@ -340,15 +261,12 @@ class DashboardRemoteDataSourceImpl
 // ============================================================
 
 /// Full mock data source for development/testing.
-class DashboardRemoteDataSourceMock
-    implements DashboardRemoteDataSource {
+class DashboardRemoteDataSourceMock implements DashboardRemoteDataSource {
   @override
   Future<DashboardStats> getDashboardStats({
     DashboardTimePeriod? period,
   }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 800),
-    );
+    await Future.delayed(const Duration(milliseconds: 800));
     return mockDashboardStats;
   }
 
@@ -356,89 +274,57 @@ class DashboardRemoteDataSourceMock
   Future<List<RevenueDataPoint>> getRevenueData(
     DashboardTimePeriod period,
   ) async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
     return switch (period) {
-      DashboardTimePeriod.today =>
-        mockTodayRevenueData,
-      DashboardTimePeriod.thisWeek =>
-        mockWeeklyRevenueData,
-      DashboardTimePeriod.thisMonth =>
-        mockMonthlyRevenueData,
-      DashboardTimePeriod.thisQuarter =>
-        mockQuarterlyRevenueData,
-      DashboardTimePeriod.thisYear =>
-        mockYearlyRevenueData,
+      DashboardTimePeriod.today => mockTodayRevenueData,
+      DashboardTimePeriod.thisWeek => mockWeeklyRevenueData,
+      DashboardTimePeriod.thisMonth => mockMonthlyRevenueData,
+      DashboardTimePeriod.thisQuarter => mockQuarterlyRevenueData,
+      DashboardTimePeriod.thisYear => mockYearlyRevenueData,
     };
   }
 
   @override
-  Future<List<UpcomingAppointment>>
-      getUpcomingAppointments({
+  Future<List<UpcomingAppointment>> getUpcomingAppointments({
     int limit = 5,
   }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 600),
-    );
-    return mockUpcomingAppointments
-        .take(limit)
-        .toList();
+    await Future.delayed(const Duration(milliseconds: 600));
+    return mockUpcomingAppointments.take(limit).toList();
   }
 
   @override
-  Future<List<ServicePerformance>>
-      getServicePerformance() async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<List<ServicePerformance>> getServicePerformance() async {
+    await Future.delayed(const Duration(milliseconds: 500));
     return mockServicePerformance;
   }
 
   @override
-  Future<List<EmployeeDistribution>>
-      getEmployeeDistribution() async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<List<EmployeeDistribution>> getEmployeeDistribution() async {
+    await Future.delayed(const Duration(milliseconds: 500));
     return mockEmployeeDistribution;
   }
 
   @override
-  Future<List<DashboardReview>> getRecentReviews({
-    int limit = 5,
-  }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<List<DashboardReview>> getRecentReviews({int limit = 5}) async {
+    await Future.delayed(const Duration(milliseconds: 500));
     return mockRecentReviews.take(limit).toList();
   }
 
   @override
-  Future<List<StaffScheduleEntry>> getStaffSchedule(
-    DateTime date,
-  ) async {
-    await Future.delayed(
-      const Duration(milliseconds: 600),
-    );
+  Future<List<StaffScheduleEntry>> getStaffSchedule(DateTime date) async {
+    await Future.delayed(const Duration(milliseconds: 600));
     return getMockStaffSchedule(date);
   }
 
   @override
-  Future<List<DashboardNotification>>
-      getNotifications({int limit = 10}) async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<List<DashboardNotification>> getNotifications({int limit = 10}) async {
+    await Future.delayed(const Duration(milliseconds: 500));
     return mockNotifications.take(limit).toList();
   }
 
   @override
-  Future<List<InventoryAlert>>
-      getInventoryAlerts() async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<List<InventoryAlert>> getInventoryAlerts() async {
+    await Future.delayed(const Duration(milliseconds: 500));
     return mockInventoryAlerts;
   }
 }
@@ -450,17 +336,13 @@ class DashboardRemoteDataSourceMock
 /// Provides the correct data source based on the
 /// mock flag in persistent storage.
 @riverpod
-DashboardRemoteDataSource dashboardRemoteDataSource(
-  Ref ref,
-) {
+DashboardRemoteDataSource dashboardRemoteDataSource(Ref ref) {
   final isMock = Store.get(StoreKey.mockFlag, false);
   if (isMock) {
     return DashboardRemoteDataSourceMock();
   }
   final apiService = ref.read(apiServiceProvider);
-  return DashboardRemoteDataSourceImpl(
-    apiService: apiService,
-  );
+  return DashboardRemoteDataSourceImpl(apiService: apiService);
 }
 
 // ============================================================
@@ -474,6 +356,5 @@ class DashboardDataException implements Exception {
   final String message;
 
   @override
-  String toString() =>
-      'DashboardDataException: $message';
+  String toString() => 'DashboardDataException: $message';
 }

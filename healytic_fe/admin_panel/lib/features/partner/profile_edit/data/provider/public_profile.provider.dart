@@ -10,10 +10,8 @@ part 'public_profile.provider.g.dart';
 
 /// Provides the datasource with mock-switching.
 @riverpod
-PublicProfileRemoteDataSource
-    publicProfileDataSource(Ref ref) {
-  final isMock =
-      Store.tryGet(StoreKey.mockFlag) ?? false;
+PublicProfileRemoteDataSource publicProfileDataSource(Ref ref) {
+  final isMock = Store.tryGet(StoreKey.mockFlag) ?? false;
   if (isMock) {
     return PublicProfileRemoteDataSourceMock();
   }
@@ -25,12 +23,8 @@ PublicProfileRemoteDataSource
 /// Provides the repository backed by the
 /// datasource.
 @riverpod
-PublicProfileRepository publicProfileRepository(
-  Ref ref,
-) {
+PublicProfileRepository publicProfileRepository(Ref ref) {
   return PublicProfileRepositoryImpl(
-    dataSource: ref.read(
-      publicProfileDataSourceProvider,
-    ),
+    dataSource: ref.read(publicProfileDataSourceProvider),
   );
 }

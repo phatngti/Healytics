@@ -56,9 +56,13 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
     if (formState != null) {
       // Store staff IDs as a list
       final staffIds = _selectedStaff.map((s) => s.id).toList();
-      formState.fields[ProductFormField.selectedStaffIds.key]?.didChange(staffIds);
+      formState.fields[ProductFormField.selectedStaffIds.key]?.didChange(
+        staffIds,
+      );
       // Also store staff allocation type
-      formState.fields[ProductFormField.staffAllocation.key]?.didChange(_staffAllocation);
+      formState.fields[ProductFormField.staffAllocation.key]?.didChange(
+        _staffAllocation,
+      );
     }
   }
 
@@ -140,7 +144,8 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                     _buildStaffAllocationOptions(context),
                     AppDimens.verticalMedium,
                     // Only show staff selector if "Specific Staff" is selected
-                    if (_staffAllocation == StaffAllocation.specific.apiValue) ...[
+                    if (_staffAllocation ==
+                        StaffAllocation.specific.apiValue) ...[
                       _buildStaffRoleSelector(context),
                       AppDimens.verticalMedium,
                       _buildStaffSelector(context),
@@ -217,7 +222,9 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
           subtitle: 'Limit booking to selected employees',
           isSelected: _staffAllocation == StaffAllocation.specific.apiValue,
           onTap: () {
-            setState(() => _staffAllocation = StaffAllocation.specific.apiValue);
+            setState(
+              () => _staffAllocation = StaffAllocation.specific.apiValue,
+            );
             _updateFormBuilderStaff();
           },
         ),

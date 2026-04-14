@@ -264,9 +264,7 @@ class _ProfileCompletionScreenState
 
   // ── Image upload helpers ─────────────────────
 
-  Future<void> _uploadSingleImage({
-    required bool isCover,
-  }) async {
+  Future<void> _uploadSingleImage({required bool isCover}) async {
     setState(() {
       if (isCover) {
         _isUploadingCover = true;
@@ -276,11 +274,8 @@ class _ProfileCompletionScreenState
     });
 
     try {
-      final uploader = ref.read(
-        imageUploadServiceProvider,
-      );
-      final url =
-          await uploader.pickAndUploadSingle();
+      final uploader = ref.read(imageUploadServiceProvider);
+      final url = await uploader.pickAndUploadSingle();
       if (url == null) return;
 
       if (!mounted) return;
@@ -292,10 +287,7 @@ class _ProfileCompletionScreenState
         }
       });
     } catch (e) {
-      _snack(
-        'Image upload failed: $e',
-        isError: true,
-      );
+      _snack('Image upload failed: $e', isError: true);
     } finally {
       if (mounted) {
         setState(() {
@@ -322,15 +314,9 @@ class _ProfileCompletionScreenState
     setState(() => _isUploadingGallery = true);
 
     try {
-      final slots =
-          _maxGalleryImages - _gallery.length;
-      final uploader = ref.read(
-        imageUploadServiceProvider,
-      );
-      final urls =
-          await uploader.pickAndUploadMultiple(
-        maxFiles: slots,
-      );
+      final slots = _maxGalleryImages - _gallery.length;
+      final uploader = ref.read(imageUploadServiceProvider);
+      final urls = await uploader.pickAndUploadMultiple(maxFiles: slots);
       if (urls.isEmpty) return;
 
       if (!mounted) return;
@@ -338,10 +324,7 @@ class _ProfileCompletionScreenState
         _gallery = [..._gallery, ...urls];
       });
     } catch (e) {
-      _snack(
-        'Gallery upload failed: $e',
-        isError: true,
-      );
+      _snack('Gallery upload failed: $e', isError: true);
     } finally {
       if (mounted) {
         setState(() => _isUploadingGallery = false);

@@ -38,9 +38,7 @@ class EmployeeAvatarSection extends StatelessWidget {
               backgroundImage: avatar.isNotEmpty
                   ? CachedNetworkImageProvider(avatar)
                   : null,
-              onBackgroundImageError: avatar.isNotEmpty
-                  ? (_, __) {}
-                  : null,
+              onBackgroundImageError: avatar.isNotEmpty ? (_, __) {} : null,
               child: avatar.isEmpty
                   ? Text(
                       _getInitials(fullName),
@@ -75,53 +73,37 @@ class EmployeeAvatarSection extends StatelessWidget {
             children: [
               Text(
                 fullName,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
                 'Display: "$displayName"',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               AppDimens.verticalExtraSmall,
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color:
-                      colorScheme.surfaceContainerHighest,
+                  color: colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: colorScheme.outlineVariant,
-                  ),
+                  border: Border.all(color: colorScheme.outlineVariant),
                 ),
                 child: Text(
                   employeeCode.isNotEmpty
                       ? employeeCode
                       : 'EMP-${employeeId.value.substring(0, math.min(6, employeeId.value.length)).toUpperCase()}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(
-                        fontFamily: 'monospace',
-                        color:
-                            colorScheme.onSurfaceVariant,
-                      ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    fontFamily: 'monospace',
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ],

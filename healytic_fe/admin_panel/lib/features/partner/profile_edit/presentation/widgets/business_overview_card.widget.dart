@@ -4,12 +4,8 @@ import 'package:flutter/material.dart';
 
 /// Read-only card displaying the partner's verified
 /// business information (brand, legal, tax, type).
-class BusinessOverviewCardWidget
-    extends StatelessWidget {
-  const BusinessOverviewCardWidget({
-    required this.info,
-    super.key,
-  });
+class BusinessOverviewCardWidget extends StatelessWidget {
+  const BusinessOverviewCardWidget({required this.info, super.key});
 
   final PublicProfileBusinessInfo info;
 
@@ -22,8 +18,7 @@ class BusinessOverviewCardWidget
       child: Padding(
         padding: AppDimens.paddingAllLarge,
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
@@ -35,27 +30,16 @@ class BusinessOverviewCardWidget
                 AppDimens.horizontalSmall,
                 Text(
                   'Business Overview',
-                  style: tt.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 _ReadOnlyChip(colorScheme: cs),
               ],
             ),
             AppDimens.verticalMedium,
-            _InfoRow(
-              label: 'Brand Name',
-              value: info.brandName,
-            ),
-            _InfoRow(
-              label: 'Legal Name',
-              value: info.legalName,
-            ),
-            _InfoRow(
-              label: 'Tax Code',
-              value: info.taxCode,
-            ),
+            _InfoRow(label: 'Brand Name', value: info.brandName),
+            _InfoRow(label: 'Legal Name', value: info.legalName),
+            _InfoRow(label: 'Tax Code', value: info.taxCode),
             AppDimens.verticalSmall,
             Wrap(
               spacing: AppDimens.spaceSm,
@@ -67,8 +51,7 @@ class BusinessOverviewCardWidget
                         _formatBusinessType(type),
                         style: tt.labelSmall,
                       ),
-                      visualDensity:
-                          VisualDensity.compact,
+                      visualDensity: VisualDensity.compact,
                     ),
                   )
                   .toList(),
@@ -84,7 +67,8 @@ class BusinessOverviewCardWidget
         .split('_')
         .where((p) => p.isNotEmpty)
         .map(
-          (p) => '${p[0].toUpperCase()}'
+          (p) =>
+              '${p[0].toUpperCase()}'
               '${p.substring(1).toLowerCase()}',
         )
         .join(' ');
@@ -113,19 +97,14 @@ class _ReadOnlyChip extends StatelessWidget {
           Icon(
             Icons.lock_outline_rounded,
             size: AppDimens.iconXs,
-            color:
-                colorScheme.onSurfaceVariant,
+            color: colorScheme.onSurfaceVariant,
           ),
           const SizedBox(width: 4),
           Text(
             'Read-only',
-            style: Theme.of(context)
-                .textTheme
-                .labelSmall
-                ?.copyWith(
-                  color: colorScheme
-                      .onSurfaceVariant,
-                ),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -134,10 +113,7 @@ class _ReadOnlyChip extends StatelessWidget {
 }
 
 class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.label,
-    required this.value,
-  });
+  const _InfoRow({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -148,28 +124,18 @@ class _InfoRow extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.only(
-        bottom: AppDimens.spaceSm,
-      ),
+      padding: const EdgeInsets.only(bottom: AppDimens.spaceSm),
       child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             width: 120,
             child: Text(
               label,
-              style: tt.bodySmall?.copyWith(
-                color: cs.onSurfaceVariant,
-              ),
+              style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: tt.bodyMedium,
-            ),
-          ),
+          Expanded(child: Text(value, style: tt.bodyMedium)),
         ],
       ),
     );

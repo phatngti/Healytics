@@ -77,6 +77,9 @@ class UserClinicsApi {
   ///
   /// * [String] id (required):
   ///
+  /// * [String] categoryId:
+  ///   Filter products by category ID
+  ///
   /// * [String] sort:
   ///   Sort order for products
   ///
@@ -86,7 +89,7 @@ class UserClinicsApi {
   /// * [num] page:
   ///
   /// * [num] limit:
-  Future<Response> userClinicControllerGetClinicProductsWithHttpInfo(String id, { String? sort, String? search, num? page, num? limit, }) async {
+  Future<Response> userClinicControllerGetClinicProductsWithHttpInfo(String id, { String? categoryId, String? sort, String? search, num? page, num? limit, }) async {
     // ignore: prefer_const_declarations
     final path = r'/user/clinics/{id}/products'
       .replaceAll('{id}', id);
@@ -98,6 +101,9 @@ class UserClinicsApi {
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
 
+    if (categoryId != null) {
+      queryParams.addAll(_queryParams('', 'categoryId', categoryId));
+    }
     if (sort != null) {
       queryParams.addAll(_queryParams('', 'sort', sort));
     }
@@ -131,6 +137,9 @@ class UserClinicsApi {
   ///
   /// * [String] id (required):
   ///
+  /// * [String] categoryId:
+  ///   Filter products by category ID
+  ///
   /// * [String] sort:
   ///   Sort order for products
   ///
@@ -140,8 +149,8 @@ class UserClinicsApi {
   /// * [num] page:
   ///
   /// * [num] limit:
-  Future<ClinicProductsResponseDto?> userClinicControllerGetClinicProducts(String id, { String? sort, String? search, num? page, num? limit, }) async {
-    final response = await userClinicControllerGetClinicProductsWithHttpInfo(id,  sort: sort, search: search, page: page, limit: limit, );
+  Future<ClinicProductsResponseDto?> userClinicControllerGetClinicProducts(String id, { String? categoryId, String? sort, String? search, num? page, num? limit, }) async {
+    final response = await userClinicControllerGetClinicProductsWithHttpInfo(id,  categoryId: categoryId, sort: sort, search: search, page: page, limit: limit, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

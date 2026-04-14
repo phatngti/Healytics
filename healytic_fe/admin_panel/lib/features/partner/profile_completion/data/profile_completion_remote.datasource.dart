@@ -10,13 +10,11 @@ import 'package:admin_panel/features/partner/profile_completion/domain/profile_c
 abstract class ProfileCompletionRemoteDataSource {
   /// Loads the current profile completion state
   /// including checklist and clinic identity.
-  Future<PartnerProfileCompletionEntity>
-      getProfileCompletion();
+  Future<PartnerProfileCompletionEntity> getProfileCompletion();
 
   /// Persists updated profile fields and returns
   /// the refreshed completion state.
-  Future<PartnerProfileCompletionEntity>
-      updateProfileCompletion(
+  Future<PartnerProfileCompletionEntity> updateProfileCompletion(
     PartnerProfileCompletionUpdateRequest request,
   );
 
@@ -29,45 +27,33 @@ abstract class ProfileCompletionRemoteDataSource {
 /// [PartnerPartnersApi] methods.
 class ProfileCompletionRemoteDataSourceImpl
     implements ProfileCompletionRemoteDataSource {
-  ProfileCompletionRemoteDataSourceImpl({
-    required this.apiService,
-  });
+  ProfileCompletionRemoteDataSourceImpl({required this.apiService});
 
   final ApiService apiService;
 
   @override
-  Future<PartnerProfileCompletionEntity>
-      getProfileCompletion() async {
+  Future<PartnerProfileCompletionEntity> getProfileCompletion() async {
     final dto = await apiService.partnerPartnersApi
         .partnerSelfControllerGetMyProfileCompletion();
 
     if (dto == null) {
-      throw ApiException(
-        404,
-        'Profile completion data not found',
-      );
+      throw ApiException(404, 'Profile completion data not found');
     }
 
     return _mapResponseToEntity(dto);
   }
 
   @override
-  Future<PartnerProfileCompletionEntity>
-      updateProfileCompletion(
+  Future<PartnerProfileCompletionEntity> updateProfileCompletion(
     PartnerProfileCompletionUpdateRequest request,
   ) async {
     final updateDto = _mapRequestToDto(request);
 
     final dto = await apiService.partnerPartnersApi
-        .partnerSelfControllerUpdateMyProfileCompletion(
-      updateDto,
-    );
+        .partnerSelfControllerUpdateMyProfileCompletion(updateDto);
 
     if (dto == null) {
-      throw ApiException(
-        500,
-        'Update returned no data',
-      );
+      throw ApiException(500, 'Update returned no data');
     }
 
     return _mapResponseToEntity(dto);
@@ -75,17 +61,13 @@ class ProfileCompletionRemoteDataSourceImpl
 
   @override
   Future<AuthTokensDto?> refreshPartnerSession() async {
-    final refreshToken =
-        Store.tryGet(StoreKey.refreshToken);
+    final refreshToken = Store.tryGet(StoreKey.refreshToken);
     if (refreshToken == null || refreshToken.isEmpty) {
       return null;
     }
 
-    return apiService.authenticateApi
-        .authControllerRefreshPartner(
-      RefreshTokenRequestDto(
-        refreshToken: refreshToken,
-      ),
+    return apiService.authenticateApi.authControllerRefreshPartner(
+      RefreshTokenRequestDto(refreshToken: refreshToken),
     );
   }
 
@@ -99,28 +81,19 @@ class ProfileCompletionRemoteDataSourceImpl
   ) {
     return PartnerProfileCompletionEntity(
       id: dto.id,
-      clinicIdentity: _mapIdentityDto(
-        dto.clinicIdentity,
-      ),
+      clinicIdentity: _mapIdentityDto(dto.clinicIdentity),
       coverImageUrl: dto.coverImageUrl?.toString(),
       logoImageUrl: dto.logoImageUrl?.toString(),
       description: dto.description?.toString(),
       gallery: dto.gallery,
-      certifications: dto.certifications
-          .map(_mapCertificationDto)
-          .toList(),
-      checklist: dto.checklist
-          .map(_mapChecklistDto)
-          .toList(),
-      completionPercent:
-          dto.completionPercent.round(),
+      certifications: dto.certifications.map(_mapCertificationDto).toList(),
+      checklist: dto.checklist.map(_mapChecklistDto).toList(),
+      completionPercent: dto.completionPercent.round(),
       isCompleted: dto.isCompleted,
     );
   }
 
-  ClinicIdentity _mapIdentityDto(
-    PartnerProfileCompletionIdentityDto dto,
-  ) {
+  ClinicIdentity _mapIdentityDto(PartnerProfileCompletionIdentityDto dto) {
     return ClinicIdentity(
       brandName: dto.brandName,
       legalName: dto.legalName,
@@ -142,9 +115,7 @@ class ProfileCompletionRemoteDataSourceImpl
     );
   }
 
-  CompletionChecklistItem _mapChecklistDto(
-    CompletionChecklistItemDto dto,
-  ) {
+  CompletionChecklistItem _mapChecklistDto(CompletionChecklistItemDto dto) {
     return CompletionChecklistItem(
       key: dto.key,
       label: dto.label,
@@ -165,15 +136,13 @@ class ProfileCompletionRemoteDataSourceImpl
       logoImageUrl: request.logoImageUrl,
       description: request.description,
       gallery: request.gallery ?? const [],
-      certifications:
-          (request.certifications ?? const [])
-              .map(_mapCertificationToDto)
-              .toList(),
+      certifications: (request.certifications ?? const [])
+          .map(_mapCertificationToDto)
+          .toList(),
     );
   }
 
-  UpdatePartnerCertificationDto
-      _mapCertificationToDto(
+  UpdatePartnerCertificationDto _mapCertificationToDto(
     PartnerCertificationItem item,
   ) {
     return UpdatePartnerCertificationDto(
@@ -190,19 +159,15 @@ class ProfileCompletionRemoteDataSourceImpl
 /// Constructs domain entities directly without DTOs.
 class ProfileCompletionRemoteDataSourceMock
     implements ProfileCompletionRemoteDataSource {
-  PartnerProfileCompletionEntity _entity =
-      PartnerProfileCompletionEntity(
+  PartnerProfileCompletionEntity _entity = PartnerProfileCompletionEntity(
     id: 'mock-partner-id',
     clinicIdentity: const ClinicIdentity(
       brandName: 'Healytics Wellness Center',
-      legalName:
-          'Healytics Wellness Joint Stock Company',
-      businessType: [
-        'SPA_BEAUTY',
-        'MASSAGE_THERAPY',
-      ],
+      legalName: 'Healytics Wellness Joint Stock Company',
+      businessType: ['SPA_BEAUTY', 'MASSAGE_THERAPY'],
       phoneNumber: '0901234567',
-      address: '123 Main Street, District 1, '
+      address:
+          '123 Main Street, District 1, '
           'Ho Chi Minh City',
     ),
     checklist: [
@@ -230,64 +195,48 @@ class ProfileCompletionRemoteDataSourceMock
   );
 
   @override
-  Future<PartnerProfileCompletionEntity>
-      getProfileCompletion() async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<PartnerProfileCompletionEntity> getProfileCompletion() async {
+    await Future.delayed(const Duration(milliseconds: 500));
     return _entity;
   }
 
   @override
-  Future<AuthTokensDto?>
-      refreshPartnerSession() async {
-    await Future.delayed(
-      const Duration(milliseconds: 200),
-    );
+  Future<AuthTokensDto?> refreshPartnerSession() async {
+    await Future.delayed(const Duration(milliseconds: 200));
     return null;
   }
 
   @override
-  Future<PartnerProfileCompletionEntity>
-      updateProfileCompletion(
+  Future<PartnerProfileCompletionEntity> updateProfileCompletion(
     PartnerProfileCompletionUpdateRequest request,
   ) async {
-    await Future.delayed(
-      const Duration(milliseconds: 600),
-    );
+    await Future.delayed(const Duration(milliseconds: 600));
 
-    final gallery =
-        request.gallery ?? _entity.gallery;
-    final description =
-        request.description ?? _entity.description;
-    final coverImageUrl =
-        request.coverImageUrl ?? _entity.coverImageUrl;
-    final logoImageUrl =
-        request.logoImageUrl ?? _entity.logoImageUrl;
-    final certifications =
-        request.certifications ??
-            _entity.certifications;
+    final gallery = request.gallery ?? _entity.gallery;
+    final description = request.description ?? _entity.description;
+    final coverImageUrl = request.coverImageUrl ?? _entity.coverImageUrl;
+    final logoImageUrl = request.logoImageUrl ?? _entity.logoImageUrl;
+    final certifications = request.certifications ?? _entity.certifications;
 
     final checklist = [
       CompletionChecklistItem(
         key: ChecklistKey.coverImageUrl.value,
         label: ChecklistKey.coverImageUrl.label,
         isRequired: true,
-        completed: coverImageUrl != null &&
-            coverImageUrl.isNotEmpty,
+        completed: coverImageUrl != null && coverImageUrl.isNotEmpty,
       ),
       CompletionChecklistItem(
         key: ChecklistKey.logoImageUrl.value,
         label: ChecklistKey.logoImageUrl.label,
         isRequired: true,
-        completed: logoImageUrl != null &&
-            logoImageUrl.isNotEmpty,
+        completed: logoImageUrl != null && logoImageUrl.isNotEmpty,
       ),
       CompletionChecklistItem(
         key: ChecklistKey.description.value,
         label: ChecklistKey.description.label,
         isRequired: true,
-        completed: description != null &&
+        completed:
+            description != null &&
             description.trim().length >= 120 &&
             description.trim().length <= 1000,
       ),
@@ -313,14 +262,11 @@ class ProfileCompletionRemoteDataSourceMock
       gallery: gallery,
       certifications: certifications,
       checklist: checklist,
-      completionPercent: ((checklist
-                      .where(
-                        (item) => item.completed,
-                      )
-                      .length /
-                  checklist.length) *
-              100)
-          .round(),
+      completionPercent:
+          ((checklist.where((item) => item.completed).length /
+                      checklist.length) *
+                  100)
+              .round(),
       isCompleted: checklist
           .where((item) => item.isRequired)
           .every((item) => item.completed),

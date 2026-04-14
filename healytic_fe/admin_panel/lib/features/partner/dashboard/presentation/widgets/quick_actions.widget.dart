@@ -1,6 +1,9 @@
-import 'package:admin_panel/features/partner/dashboard/presentation/widgets/dashboard_section_header.widget.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import 'dashboard_constants.dart';
+import 'dashboard_section_header.widget.dart';
 
 /// Grid of quick action buttons for common tasks.
 ///
@@ -34,45 +37,28 @@ class QuickActionsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMediumSmall,
         side: BorderSide(
           color: colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: AppDimens.paddingAllMediumLarge,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DashboardSectionHeader(
+            const DashboardSectionHeader(
               title: 'Quick Actions',
               icon: Icons.bolt_rounded,
             ),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final useSingleColumn = constraints.maxWidth < 440;
-
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _actions.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: useSingleColumn ? 1 : 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    mainAxisExtent: 56,
-                  ),
-                  itemBuilder: (context, index) {
-                    return _ActionButton(action: _actions[index]);
-                  },
-                );
-              },
+            Column(
+              spacing: AppDimens.spaceSm,
+              children: _actions.map((a) => _ActionButton(action: a)).toList(),
             ),
           ],
         ),
@@ -105,21 +91,28 @@ class _ActionButton extends StatelessWidget {
 
     return Material(
       color: colorScheme.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: AppDimens.radiusSmall,
       child: InkWell(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: AppDimens.radiusSmall,
         onTap: () => context.go(action.route),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.spaceMd,
+            vertical: AppDimens.spaceSmMd,
+          ),
           child: Row(
             children: [
-              Icon(action.icon, size: 20, color: colorScheme.primary),
-              const SizedBox(width: 10),
+              Icon(
+                action.icon,
+                size: AppDimens.iconMd,
+                color: colorScheme.primary,
+              ),
+              AppDimens.horizontalSmall,
               Expanded(
                 child: Text(
                   action.label,
                   style: theme.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
+                    fontWeight: AppDimens.fontWeightMedium,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -127,7 +120,7 @@ class _ActionButton extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_forward_ios_rounded,
-                size: 14,
+                size: AppDimens.iconXs,
                 color: colorScheme.onSurfaceVariant,
               ),
             ],

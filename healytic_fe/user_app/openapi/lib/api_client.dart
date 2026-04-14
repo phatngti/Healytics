@@ -262,6 +262,8 @@ class ApiClient {
           return ClinicCertificationDto.fromJson(value);
         case 'ClinicInfoResponseDto':
           return ClinicInfoResponseDto.fromJson(value);
+        case 'ClinicProductCategoryDto':
+          return ClinicProductCategoryDto.fromJson(value);
         case 'ClinicProductDto':
           return ClinicProductDto.fromJson(value);
         case 'ClinicProductsResponseDto':

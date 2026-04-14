@@ -117,8 +117,7 @@ class ServiceTagRemoteDataSourceImpl implements ServiceTagRemoteDataSource {
     return _mapResponseToEntity(response);
   }
 
-  PartnerServiceTagsApi get _serviceTagsApi =>
-      apiService.serviceTagsApi;
+  PartnerServiceTagsApi get _serviceTagsApi => apiService.serviceTagsApi;
 
   @override
   Future<ServiceTagEntity> createServiceTag(

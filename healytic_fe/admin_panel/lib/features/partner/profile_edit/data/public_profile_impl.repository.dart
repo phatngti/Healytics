@@ -4,24 +4,19 @@ import 'package:admin_panel/features/partner/profile_edit/domain/public_profile.
 
 /// Concrete repository that delegates to
 /// [PublicProfileRemoteDataSource].
-class PublicProfileRepositoryImpl
-    implements PublicProfileRepository {
-  PublicProfileRepositoryImpl({
-    required this.dataSource,
-  });
+class PublicProfileRepositoryImpl implements PublicProfileRepository {
+  PublicProfileRepositoryImpl({required this.dataSource});
 
   /// The underlying remote data source.
   final PublicProfileRemoteDataSource dataSource;
 
   @override
-  Future<PartnerPublicProfileEntity>
-      getPublicProfile() {
+  Future<PartnerPublicProfileEntity> getPublicProfile() {
     return dataSource.getPublicProfile();
   }
 
   @override
-  Future<PartnerPublicProfileEntity>
-      updatePublicProfile(
+  Future<PartnerPublicProfileEntity> updatePublicProfile(
     PublicProfileUpdateRequest request,
   ) {
     return dataSource.updatePublicProfile(request);

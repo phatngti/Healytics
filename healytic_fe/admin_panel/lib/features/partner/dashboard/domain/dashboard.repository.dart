@@ -16,41 +16,29 @@ import 'package:admin_panel/features/partner/dashboard/domain/upcoming_appointme
 /// or real backend APIs based on the mock flag.
 abstract class DashboardRepository {
   /// Aggregated KPI statistics for [period].
-  Future<DashboardStats> getDashboardStats({
-    DashboardTimePeriod? period,
-  });
+  Future<DashboardStats> getDashboardStats({DashboardTimePeriod? period});
 
   /// Revenue time-series data for chart rendering.
-  Future<List<RevenueDataPoint>> getRevenueData(
-    DashboardTimePeriod period,
-  );
+  Future<List<RevenueDataPoint>> getRevenueData(DashboardTimePeriod period);
 
   /// Next upcoming appointments list.
-  Future<List<UpcomingAppointment>>
-      getUpcomingAppointments({int limit = 5});
+  Future<List<UpcomingAppointment>> getUpcomingAppointments({int limit = 5});
 
   /// Service performance metrics for bar chart.
-  Future<List<ServicePerformance>>
-      getServicePerformance();
+  Future<List<ServicePerformance>> getServicePerformance();
 
   /// Employee role/status distribution for donut
   /// chart.
-  Future<List<EmployeeDistribution>>
-      getEmployeeDistribution();
+  Future<List<EmployeeDistribution>> getEmployeeDistribution();
 
   /// Recent customer reviews.
-  Future<List<DashboardReview>> getRecentReviews({
-    int limit = 5,
-  });
+  Future<List<DashboardReview>> getRecentReviews({int limit = 5});
 
   /// Staff schedule entries for calendar grid.
-  Future<List<StaffScheduleEntry>> getStaffSchedule(
-    DateTime date,
-  );
+  Future<List<StaffScheduleEntry>> getStaffSchedule(DateTime date);
 
   /// Dashboard notifications.
-  Future<List<DashboardNotification>>
-      getNotifications({int limit = 10});
+  Future<List<DashboardNotification>> getNotifications({int limit = 10});
 
   /// Active inventory alerts.
   Future<List<InventoryAlert>> getInventoryAlerts();

@@ -203,7 +203,6 @@ class _EmployeeBookingScreenState
     );
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

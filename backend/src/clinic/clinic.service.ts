@@ -1,10 +1,11 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, SelectQueryBuilder } from 'typeorm';
 import { Product } from '@/common/entities/product.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
+import { Category } from '@/common/entities/category.entity';
 import { PartnerCertification } from './entities/partner-certification.entity';
 import { ClinicReviewResponse } from './entities/clinic-review-response.entity';
 import { PartnersService } from '@/partners/partners.service';
@@ -20,6 +21,7 @@ import {
 import {
   ClinicProductsResponseDto,
   ClinicProductDto,
+  ClinicProductCategoryDto,
 } from './dto/clinic-products-response.dto';
 import {
   ClinicReviewsResponseDto,
@@ -55,10 +57,7 @@ export class ClinicService {
   // ═══════════════════════════════════════════════════════════════
 
   async getClinicInfo(partnerId: string): Promise<ClinicInfoResponseDto> {
-    const partner = await this.partnersService.findOneById(partnerId);
-    if (!partner) {
-      throw new NotFoundException(`Clinic with ID ${partnerId} not found`);
-    }
+    const partner = await this.ensureClinicExists(partnerId);
 
     const [employees, products, certifications] = await Promise.all([
       this.employeeRepo.find({
@@ -66,13 +65,7 @@ export class ClinicService {
         relations: ['doctorProfile'],
         take: 5,
       }),
-      this.productRepo.find({
-        where: {
-          partnerId,
-          status: HealthServiceStatus.ACTIVE,
-        },
-        select: ['id'],
-      }),
+      this.getPublicClinicProducts(partnerId),
       this.certificationRepo.find({
         where: { partnerId },
         order: { sortOrder: 'ASC' },
@@ -166,32 +159,27 @@ export class ClinicService {
     partnerId: string,
     options: GetClinicProductsQueryDto,
   ): Promise<ClinicProductsResponseDto> {
-    const partner = await this.partnersService.findOneById(partnerId);
-    if (!partner) {
-      throw new NotFoundException(`Clinic with ID ${partnerId} not found`);
-    }
+    await this.ensureClinicExists(partnerId);
 
-    const { sort = 'popular', search } = options;
+    const { categoryId, sort = 'popular', search } = options;
     const page = options.page ?? 1;
     const limit = Math.min(options.limit ?? 20, 50);
 
-    // Build filtered query
-    let qb = this.productRepo
-      .createQueryBuilder('p')
+    let qb = this.buildPublicClinicProductQuery(partnerId)
       .leftJoinAndSelect('p.category', 'c')
       .leftJoinAndSelect('p.media', 'm')
-      .leftJoinAndSelect('p.productDefinition', 'pd')
-      .where('p.partner_id = :partnerId', { partnerId })
-      .andWhere('p.status = :status', { status: HealthServiceStatus.ACTIVE })
-      .andWhere('p.is_visible_online = true');
+      .leftJoinAndSelect('p.productDefinition', 'pd');
 
     if (search) {
       qb = qb.andWhere('p.name ILIKE :search', { search: `%${search}%` });
     }
+    if (categoryId) {
+      qb = qb.andWhere('p.category_id = :categoryId', { categoryId });
+    }
 
     const totalCount = await qb.getCount();
+    const categories = await this.getPublicClinicProductCategories(partnerId);
 
-    // For popular/top_sales, join sold count subquery for DB-level sorting
     if (sort === 'popular' || sort === 'top_sales') {
       qb = qb
         .addSelect((subQuery) => {
@@ -260,6 +248,7 @@ export class ClinicService {
     });
 
     return {
+      categories,
       products: productDtos,
       totalCount,
       hasMore: page * limit < totalCount,
@@ -276,14 +265,9 @@ export class ClinicService {
   ): Promise<ClinicReviewsResponseDto> {
     const { page = 1, limit = 10, starCount, hasMedia } = query;
 
-    const partner = await this.partnersService.findOneById(partnerId);
-    if (!partner) {
-      throw new NotFoundException(`Clinic with ID ${partnerId} not found`);
-    }
+    await this.ensureClinicExists(partnerId);
 
-    const productIds = await this.productRepo
-      .find({ where: { partnerId }, select: ['id'] })
-      .then((ps) => ps.map((p) => p.id));
+    const productIds = await this.getPublicClinicProductIds(partnerId);
 
     if (productIds.length === 0) {
       return this.emptyReviewsResponse();
@@ -317,7 +301,7 @@ export class ClinicService {
     const clinicResponses =
       reviewIds.length > 0
         ? await this.clinicReviewResponseRepo.find({
-            where: { reviewId: In(reviewIds) },
+            where: { reviewId: In(reviewIds), partnerId },
           })
         : [];
     const responseMap = new Map(clinicResponses.map((cr) => [cr.reviewId, cr]));
@@ -360,6 +344,62 @@ export class ClinicService {
   // ═══════════════════════════════════════════════════════════════
   //  Private Helpers
   // ═══════════════════════════════════════════════════════════════
+
+  private async ensureClinicExists(partnerId: string) {
+    const partner = await this.partnersService.findOneById(partnerId);
+    if (!partner) {
+      throw new NotFoundException(`Clinic with ID ${partnerId} not found`);
+    }
+    return partner;
+  }
+
+  private buildPublicClinicProductQuery(
+    partnerId: string,
+  ): SelectQueryBuilder<Product> {
+    return this.productRepo
+      .createQueryBuilder('p')
+      .where('p.partner_id = :partnerId', { partnerId })
+      .andWhere('p.status = :status', { status: HealthServiceStatus.ACTIVE })
+      .andWhere('p.is_visible_online = true');
+  }
+
+  private async getPublicClinicProducts(partnerId: string): Promise<Product[]> {
+    return this.buildPublicClinicProductQuery(partnerId)
+      .select(['p.id'])
+      .getMany();
+  }
+
+  private async getPublicClinicProductIds(
+    partnerId: string,
+  ): Promise<string[]> {
+    return this.getPublicClinicProducts(partnerId).then((products) =>
+      products.map((product) => product.id),
+    );
+  }
+
+  private async getPublicClinicProductCategories(
+    partnerId: string,
+  ): Promise<ClinicProductCategoryDto[]> {
+    const rows = await this.buildPublicClinicProductQuery(partnerId)
+      .innerJoin(Category, 'c', 'c.id = p.category_id')
+      .select('c.id', 'id')
+      .addSelect('c.name', 'label')
+      .addSelect('c.sort_order', 'sortOrder')
+      .groupBy('c.id')
+      .addGroupBy('c.name')
+      .addGroupBy('c.sort_order')
+      .orderBy('c.sort_order', 'ASC')
+      .addOrderBy('c.name', 'ASC')
+      .getRawMany<{ id: string; label: string }>();
+
+    return [
+      { id: 'all', label: 'All Services' },
+      ...rows.map((row) => ({
+        id: row.id,
+        label: row.label,
+      })),
+    ];
+  }
 
   private async buildRatingsMap(
     productIds: string[],

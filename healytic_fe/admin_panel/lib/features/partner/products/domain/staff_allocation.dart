@@ -16,9 +16,7 @@ enum StaffAllocation {
   };
 
   /// Parse from API value.
-  static StaffAllocation? fromApiValue(
-    String? value,
-  ) {
+  static StaffAllocation? fromApiValue(String? value) {
     if (value == null) return null;
     return switch (value.toLowerCase()) {
       'any' => StaffAllocation.any,

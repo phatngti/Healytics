@@ -11,11 +11,7 @@ class EmployeeProfileImageCard extends ConsumerStatefulWidget {
   final String? avatarUrl;
   final String? fullName;
 
-  const EmployeeProfileImageCard({
-    super.key,
-    this.avatarUrl,
-    this.fullName,
-  });
+  const EmployeeProfileImageCard({super.key, this.avatarUrl, this.fullName});
 
   @override
   ConsumerState<EmployeeProfileImageCard> createState() =>
@@ -172,21 +168,18 @@ class _EmployeeProfileImageCardState
                               ),
                               child: imageProvider == null
                                   ? (widget.fullName != null &&
-                                          widget.fullName!.isNotEmpty
-                                      ? Text(
-                                          _getInitials(
-                                            widget.fullName!,
-                                          ),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineLarge,
-                                        )
-                                      : Icon(
-                                          Icons.add_a_photo_outlined,
-                                          size: 40,
-                                          color: colorScheme
-                                              .onSurfaceVariant,
-                                        ))
+                                            widget.fullName!.isNotEmpty
+                                        ? Text(
+                                            _getInitials(widget.fullName!),
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.headlineLarge,
+                                          )
+                                        : Icon(
+                                            Icons.add_a_photo_outlined,
+                                            size: 40,
+                                            color: colorScheme.onSurfaceVariant,
+                                          ))
                                   : null,
                             ),
                             if (_isUploading)
@@ -262,7 +255,6 @@ class _EmployeeProfileImageCardState
     if (parts.length == 1) {
       return parts[0][0].toUpperCase();
     }
-    return '${parts[0][0]}${parts[parts.length - 1][0]}'
-        .toUpperCase();
+    return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
   }
 }

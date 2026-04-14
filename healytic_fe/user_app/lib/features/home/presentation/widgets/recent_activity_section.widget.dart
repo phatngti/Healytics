@@ -403,6 +403,7 @@ class _LoadingState extends StatelessWidget {
     final theme = Theme.of(context);
     final contentPad = AppDimens.contentPadding(context);
     final cardRad = AppDimens.cardRadius(context);
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     return Column(
       children: List.generate(2, (index) {
@@ -431,7 +432,7 @@ class _LoadingState extends StatelessWidget {
                     children: [
                       Container(
                         height: AppDimens.spaceLg,
-                        width: 120,
+                        width: screenWidth * 0.3,
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surfaceContainerHighest,
                           borderRadius: AppDimens.radiusExtraSmall,
@@ -440,7 +441,7 @@ class _LoadingState extends StatelessWidget {
                       SizedBox(height: AppDimens.spaceXs),
                       Container(
                         height: AppDimens.spaceMd,
-                        width: 80,
+                        width: screenWidth * 0.2,
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surfaceContainerHighest,
                           borderRadius: AppDimens.radiusExtraSmall,
@@ -451,7 +452,7 @@ class _LoadingState extends StatelessWidget {
                 ),
                 Container(
                   height: AppDimens.spaceMdLg,
-                  width: 72,
+                  width: screenWidth * 0.18,
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: AppDimens.radiusPill,

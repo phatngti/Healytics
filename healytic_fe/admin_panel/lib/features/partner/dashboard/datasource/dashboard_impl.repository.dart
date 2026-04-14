@@ -18,62 +18,42 @@ part 'dashboard_impl.repository.g.dart';
 /// Concrete implementation of [DashboardRepository].
 ///
 /// Delegates all operations to the remote data source.
-class DashboardImplRepository
-    implements DashboardRepository {
+class DashboardImplRepository implements DashboardRepository {
   final DashboardRemoteDataSource remoteDataSource;
 
-  DashboardImplRepository({
-    required this.remoteDataSource,
-  });
+  DashboardImplRepository({required this.remoteDataSource});
 
   @override
-  Future<DashboardStats> getDashboardStats({
-    DashboardTimePeriod? period,
-  }) =>
-      remoteDataSource.getDashboardStats(
-        period: period,
-      );
+  Future<DashboardStats> getDashboardStats({DashboardTimePeriod? period}) =>
+      remoteDataSource.getDashboardStats(period: period);
 
   @override
-  Future<List<RevenueDataPoint>> getRevenueData(
-    DashboardTimePeriod period,
-  ) => remoteDataSource.getRevenueData(period);
+  Future<List<RevenueDataPoint>> getRevenueData(DashboardTimePeriod period) =>
+      remoteDataSource.getRevenueData(period);
 
   @override
-  Future<List<UpcomingAppointment>>
-      getUpcomingAppointments({int limit = 5}) =>
-          remoteDataSource.getUpcomingAppointments(
-            limit: limit,
-          );
+  Future<List<UpcomingAppointment>> getUpcomingAppointments({int limit = 5}) =>
+      remoteDataSource.getUpcomingAppointments(limit: limit);
 
   @override
-  Future<List<ServicePerformance>>
-      getServicePerformance() =>
-          remoteDataSource.getServicePerformance();
+  Future<List<ServicePerformance>> getServicePerformance() =>
+      remoteDataSource.getServicePerformance();
 
   @override
-  Future<List<EmployeeDistribution>>
-      getEmployeeDistribution() =>
-          remoteDataSource.getEmployeeDistribution();
+  Future<List<EmployeeDistribution>> getEmployeeDistribution() =>
+      remoteDataSource.getEmployeeDistribution();
 
   @override
-  Future<List<DashboardReview>> getRecentReviews({
-    int limit = 5,
-  }) => remoteDataSource.getRecentReviews(
-    limit: limit,
-  );
+  Future<List<DashboardReview>> getRecentReviews({int limit = 5}) =>
+      remoteDataSource.getRecentReviews(limit: limit);
 
   @override
-  Future<List<StaffScheduleEntry>> getStaffSchedule(
-    DateTime date,
-  ) => remoteDataSource.getStaffSchedule(date);
+  Future<List<StaffScheduleEntry>> getStaffSchedule(DateTime date) =>
+      remoteDataSource.getStaffSchedule(date);
 
   @override
-  Future<List<DashboardNotification>>
-      getNotifications({int limit = 10}) =>
-          remoteDataSource.getNotifications(
-            limit: limit,
-          );
+  Future<List<DashboardNotification>> getNotifications({int limit = 10}) =>
+      remoteDataSource.getNotifications(limit: limit);
 
   @override
   Future<List<InventoryAlert>> getInventoryAlerts() =>
@@ -84,10 +64,6 @@ class DashboardImplRepository
 /// the correct data source.
 @riverpod
 DashboardRepository dashboardRepository(Ref ref) {
-  final remoteDataSource = ref.read(
-    dashboardRemoteDataSourceProvider,
-  );
-  return DashboardImplRepository(
-    remoteDataSource: remoteDataSource,
-  );
+  final remoteDataSource = ref.read(dashboardRemoteDataSourceProvider);
+  return DashboardImplRepository(remoteDataSource: remoteDataSource);
 }
