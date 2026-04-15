@@ -54,6 +54,35 @@ def get_llm(mode: str, model_name: str, base_url: str, api_key: str, temperature
     return get_hf_llm(model_name=model_name, max_new_token=max_new_tokens, temperature=temperature)
 
 
+def get_judge_llm(
+    judge_backend: str,
+    generator_llm,
+    mistral_base_url: str,
+    mistral_api_key: str,
+    judge_model: str,
+    judge_temperature: float,
+    judge_max_tokens: int,
+):
+    """
+    LLM chỉ dùng cho metrics (faithfulness / correctness / context_relevance).
+    Mặc định gọi Mistral qua API (endpoint tương thích OpenAI).
+    """
+    backend = (judge_backend or "mistral").lower()
+    if backend == "same":
+        return generator_llm
+    if not (mistral_api_key or "").strip():
+        raise ValueError(
+            "JUDGE_BACKEND=mistral cần MISTRAL_API_KEY (đặt trong môi trường hoặc .env)."
+        )
+    return OpenAICompatClient(
+        base_url=mistral_base_url,
+        api_key=mistral_api_key.strip(),
+        model=judge_model,
+        temperature=judge_temperature,
+        max_tokens=judge_max_tokens,
+    )
+
+
 def build_rag_chain(mode: str, llm, retriever):
     if mode == "runpod":
         # Keep prompt from src, call OpenAI-compatible endpoint directly.
