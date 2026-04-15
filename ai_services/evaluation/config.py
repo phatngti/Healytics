@@ -31,7 +31,7 @@ EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", "cuda")  # "cuda" | "cpu"
 # =========================
 
 MODE = os.getenv("MODE", "local").lower()  # "local" | "runpod"
-# Generator: giữ Llama 3B (local HF hoặc endpoint tương thích qua MODE=runpod)
+# Generator: Llama 3B local HF (khớp default trong rag_langchain/src/base/llm_model.py) hoặc endpoint qua MODE=runpod
 MODEL_NAME = os.getenv("MODEL_NAME", "meta-llama/Llama-3.2-3B-Instruct")
 
 # OpenAI-compatible endpoint (RunPod / local vLLM / etc.)
@@ -46,7 +46,7 @@ JUDGE_BACKEND = os.getenv("JUDGE_BACKEND", "mistral").lower()  # "mistral" | "sa
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "")
 MISTRAL_BASE_URL = os.getenv("MISTRAL_BASE_URL", "https://api.mistral.ai/v1")
 JUDGE_MODEL = os.getenv("JUDGE_MODEL", "mistral-large-latest")
-JUDGE_TEMPERATURE = float(os.getenv("JUDGE_TEMPERATURE", "0.35"))
+JUDGE_TEMPERATURE = float(os.getenv("JUDGE_TEMPERATURE", "0.45"))
 JUDGE_MAX_TOKENS = int(os.getenv("JUDGE_MAX_TOKENS", "512"))
 
 
