@@ -1,6 +1,7 @@
 # app/orchestrators/recommendation_orchestrator.py
 from datetime import datetime, timezone
 from typing import Any, Dict
+import json
 import logging
 import httpx
 from fastapi import HTTPException
@@ -228,18 +229,45 @@ async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
     ]
 
 
-def _format_services_for_prompt(services: list[dict]) -> str:
+def _format_services_for_prompt(services: list[Any]) -> str:
     """Format thông tin dịch vụ thành text để inject vào prompt chatbot."""
     if not services:
         return ""
     lines = []
     for s in services:
+        if not isinstance(s, dict):
+            # Graceful degradation for unexpected shapes (e.g., list[str]).
+            try:
+                raw = str(s)
+            except Exception:
+                raw = "<unprintable>"
+            lines.append(f"- {raw}")
+            continue
+
         name = s.get("name", "")
         desc = s.get("description", "")
-        price = s.get("price", {}).get("amount", "")
+
+        price_obj = s.get("price")
+        price = None
+        if isinstance(price_obj, dict):
+            price = price_obj.get("amount")
+
         staff = s.get("staff_name", "")
-        rating = s.get("rating", {}).get("average", "")
-        sid = s.get("service_id", "")
+
+        rating_obj = s.get("rating")
+        rating = None
+        if isinstance(rating_obj, dict):
+            rating = rating_obj.get("average")
+
+        sid = s.get("service_id", "") or s.get("id", "")
+
+        # Optional extra debug for bad backend shapes (kept small).
+        if not name and not desc and isinstance(sid, str) and sid and len(s.keys()) <= 3:
+            try:
+                logger.debug("[ENRICH] thin_service_payload=%s", json.dumps(s, ensure_ascii=False)[:300])
+            except Exception:
+                pass
+
         lines.append(
             f"- [{sid}] {name}: {desc} "
             f"(Giá: {price:,} VND, Bác sĩ/HLV: {staff}, Rating: {rating}/5)"
