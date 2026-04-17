@@ -11,14 +11,14 @@ Name | Type | Description | Notes
 **id** | **String** | Unique identifier | 
 **name** | **String** | Name | 
 **slug** | **String** | URL-friendly slug | 
-**description** | [**Object**](.md) | Description | [optional] 
-**type** | **String** | Type | 
+**description** | **String** | Description | [optional] 
+**type** | [**HealthServiceType**](HealthServiceType.md) |  | 
 **basePrice** | **num** | Base price in specified currency | 
-**salePrice** | [**Object**](.md) | Sale price if on discount | [optional] 
+**salePrice** | **num** | Sale price if on discount | [optional] 
 **currency** | **String** | Currency code (ISO 4217) | 
-**status** | **String** | Status | 
+**status** | [**HealthServiceStatus**](HealthServiceStatus.md) |  | 
 **isVisibleOnline** | **bool** | Whether visible online | 
-**vendorName** | [**Object**](.md) | Vendor name | [optional] 
+**vendorName** | **String** | Vendor name | [optional] 
 **createdAt** | [**DateTime**](DateTime.md) | Creation timestamp | 
 **updatedAt** | [**DateTime**](DateTime.md) | Last update timestamp | 
 **category** | [**PartnerCategorySummaryDto**](PartnerCategorySummaryDto.md) | Category | [optional] 

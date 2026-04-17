@@ -20,6 +20,7 @@ class CreateServiceTagDto {
     this.sortOrder,
   });
 
+
   /// Tag name
   String name;
 

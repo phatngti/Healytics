@@ -20,6 +20,7 @@ class PartnerProfileCompletionIdentityDto {
     this.address,
   });
 
+
   String brandName;
 
   String legalName;

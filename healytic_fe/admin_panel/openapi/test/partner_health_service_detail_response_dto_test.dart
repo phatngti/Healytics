@@ -56,7 +56,7 @@ void main() {
       // TODO
     });
 
-    // Object description
+    // String description
     test('to test the property `description`', () async {
       // TODO
     });

@@ -22,9 +22,10 @@ class ConversationResponseDto {
     required this.createdAt,
   });
 
+
   String id;
 
-  ConversationResponseDtoStatusEnum status;
+  ConversationStatus status;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -102,7 +103,7 @@ class ConversationResponseDto {
 
       return ConversationResponseDto(
         id: mapValueOfType<String>(json, r'id')!,
-        status: ConversationResponseDtoStatusEnum.fromJson(json[r'status'])!,
+        status: ConversationStatus.fromJson(json[r'status'])!,
         bookingId: mapValueOfType<String>(json, r'bookingId'),
         otherParticipant: ParticipantInfoDto.fromJson(json[r'otherParticipant'])!,
         lastMessage: LastMessageDto.fromJson(json[r'lastMessage'])!,
@@ -163,81 +164,4 @@ class ConversationResponseDto {
     'createdAt',
   };
 }
-
-
-class ConversationResponseDtoStatusEnum {
-  /// Instantiate a new enum with the provided [value].
-  const ConversationResponseDtoStatusEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const active = ConversationResponseDtoStatusEnum._(r'active');
-  static const archived = ConversationResponseDtoStatusEnum._(r'archived');
-  static const closed = ConversationResponseDtoStatusEnum._(r'closed');
-
-  /// List of all possible values in this [enum][ConversationResponseDtoStatusEnum].
-  static const values = <ConversationResponseDtoStatusEnum>[
-    active,
-    archived,
-    closed,
-  ];
-
-  static ConversationResponseDtoStatusEnum? fromJson(dynamic value) => ConversationResponseDtoStatusEnumTypeTransformer().decode(value);
-
-  static List<ConversationResponseDtoStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <ConversationResponseDtoStatusEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = ConversationResponseDtoStatusEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [ConversationResponseDtoStatusEnum] to String,
-/// and [decode] dynamic data back to [ConversationResponseDtoStatusEnum].
-class ConversationResponseDtoStatusEnumTypeTransformer {
-  factory ConversationResponseDtoStatusEnumTypeTransformer() => _instance ??= const ConversationResponseDtoStatusEnumTypeTransformer._();
-
-  const ConversationResponseDtoStatusEnumTypeTransformer._();
-
-  String encode(ConversationResponseDtoStatusEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a ConversationResponseDtoStatusEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  ConversationResponseDtoStatusEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'active': return ConversationResponseDtoStatusEnum.active;
-        case r'archived': return ConversationResponseDtoStatusEnum.archived;
-        case r'closed': return ConversationResponseDtoStatusEnum.closed;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [ConversationResponseDtoStatusEnumTypeTransformer] instance.
-  static ConversationResponseDtoStatusEnumTypeTransformer? _instance;
-}
-
 

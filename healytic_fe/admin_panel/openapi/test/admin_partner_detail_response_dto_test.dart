@@ -36,12 +36,12 @@ void main() {
       // TODO
     });
 
-    // String status
+    // PartnerVerificationStatus status
     test('to test the property `status`', () async {
       // TODO
     });
 
-    // String priority
+    // PartnerPriority priority
     test('to test the property `priority`', () async {
       // TODO
     });

@@ -22,6 +22,7 @@ class DashboardReviewDto {
     this.imageUrls = const [],
   });
 
+
   String reviewerName;
 
   ///

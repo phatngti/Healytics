@@ -21,6 +21,7 @@ class LegalRepresentativeDto {
     this.idIssueDate,
   });
 
+
   VerifiedField fullName;
 
   ///

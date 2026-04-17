@@ -18,6 +18,7 @@ class ReviewPartnerProfileDto {
     this.items = const [],
   });
 
+
   /// Overall decision on the partner profile
   ReviewPartnerProfileDtoDecisionEnum decision;
 

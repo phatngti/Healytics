@@ -48,7 +48,7 @@ class ProductOverviewAnalyticsSection extends ConsumerWidget {
             AppDimens.verticalLarge,
             _ProductOverviewTopPanels(analytics: state.analytics),
             AppDimens.verticalLarge,
-            _ProductCatalogHealthPanel(analytics: state.analytics),
+            _ProductBookingMetricsPanel(analytics: state.analytics),
           ],
         );
       },
@@ -90,7 +90,9 @@ class _ProductOverviewKpiGrid extends StatelessWidget {
             AnalyticsKpiCard(
               label: 'Active services',
               value: '${analytics.activeProducts}/${analytics.totalProducts}',
-              helper: '${analytics.draftProducts} drafts awaiting activation',
+              helper:
+                  '${analytics.totalProducts - analytics.activeProducts} '
+                  'services still need activation',
               icon: Icons.medical_services_rounded,
               trend: 2.4,
               trendPositive: true,
@@ -205,9 +207,7 @@ class _ProductTrendPanel extends StatelessWidget {
     final maxY = points.fold<double>(
       0,
       (maxValue, point) =>
-          point.revenue / 1000 > maxValue
-              ? point.revenue / 1000
-              : maxValue,
+          point.revenue / 1000 > maxValue ? point.revenue / 1000 : maxValue,
     );
 
     return AnalyticsPanel(
@@ -246,28 +246,19 @@ class _ProductTrendPanel extends StatelessWidget {
                   enabled: true,
                   handleBuiltInTouches: true,
                   touchSpotThreshold: 20,
-                  getTouchedSpotIndicator:
-                      (barData, spotIndexes) {
+                  getTouchedSpotIndicator: (barData, spotIndexes) {
                     return spotIndexes.map((_) {
                       return TouchedSpotIndicatorData(
-                        const FlLine(
-                          color: Colors.transparent,
-                        ),
+                        const FlLine(color: Colors.transparent),
                         FlDotData(
                           show: true,
-                          getDotPainter: (
-                            spot,
-                            percent,
-                            barData,
-                            index,
-                          ) {
+                          getDotPainter: (spot, percent, barData, index) {
                             return FlDotCirclePainter(
                               radius: 6,
                               color: colorScheme.surface,
                               strokeWidth: 2,
                               strokeColor:
-                                  barData.color ??
-                                  colorScheme.secondary,
+                                  barData.color ?? colorScheme.secondary,
                             );
                           },
                         ),
@@ -277,35 +268,26 @@ class _ProductTrendPanel extends StatelessWidget {
                   touchTooltipData: LineTouchTooltipData(
                     fitInsideHorizontally: true,
                     fitInsideVertically: true,
-                    getTooltipColor: (_) =>
-                        colorScheme.surface,
+                    getTooltipColor: (_) => colorScheme.surface,
                     tooltipBorder: BorderSide(
                       color: colorScheme.outlineVariant,
                     ),
                     getTooltipItems: (touchedSpots) {
-                      return touchedSpots
-                          .map((touchedSpot) {
-                        final textStyle = theme
-                            .textTheme.labelMedium
-                            ?.copyWith(
-                              color: touchedSpot.bar.color,
-                              fontWeight:
-                                  AppDimens.fontWeightBold,
-                            );
+                      return touchedSpots.map((touchedSpot) {
+                        final textStyle = theme.textTheme.labelMedium?.copyWith(
+                          color: touchedSpot.bar.color,
+                          fontWeight: AppDimens.fontWeightBold,
+                        );
                         if (touchedSpot.barIndex == 0) {
                           return LineTooltipItem(
                             '${touchedSpot.y.toInt()}'
                             ' Bookings',
-                            textStyle ??
-                                const TextStyle(),
+                            textStyle ?? const TextStyle(),
                           );
                         }
                         return LineTooltipItem(
-                          _currency(
-                            touchedSpot.y * 1000,
-                          ),
-                          textStyle ??
-                              const TextStyle(),
+                          _currency(touchedSpot.y * 1000),
+                          textStyle ?? const TextStyle(),
                         );
                       }).toList();
                     },
@@ -318,8 +300,7 @@ class _ProductTrendPanel extends StatelessWidget {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
-                  getDrawingHorizontalLine: (_) =>
-                      FlLine(
+                  getDrawingHorizontalLine: (_) => FlLine(
                     color: colorScheme.outlineVariant,
                     strokeWidth: 1,
                     dashArray: const [4, 4],
@@ -328,19 +309,13 @@ class _ProductTrendPanel extends StatelessWidget {
                 borderData: FlBorderData(show: false),
                 titlesData: FlTitlesData(
                   topTitles: const AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: false,
-                    ),
+                    sideTitles: SideTitles(showTitles: false),
                   ),
                   rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: false,
-                    ),
+                    sideTitles: SideTitles(showTitles: false),
                   ),
                   leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: false,
-                    ),
+                    sideTitles: SideTitles(showTitles: false),
                   ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
@@ -352,20 +327,15 @@ class _ProductTrendPanel extends StatelessWidget {
                         if (value != index.toDouble() ||
                             index < 0 ||
                             index >= points.length) {
-                          return const SizedBox
-                              .shrink();
+                          return const SizedBox.shrink();
                         }
                         return Padding(
-                          padding:
-                              AppDimens.paddingTopSmall,
+                          padding: AppDimens.paddingTopSmall,
                           child: Text(
                             points[index].label,
-                            style: theme
-                                .textTheme.labelMedium
-                                ?.copyWith(
-                                  color: colorScheme
-                                      .onSurfaceVariant,
-                                ),
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         );
                       },
@@ -375,54 +345,40 @@ class _ProductTrendPanel extends StatelessWidget {
                 lineBarsData: [
                   LineChartBarData(
                     spots: [
-                      for (var i = 0;
-                          i < points.length;
-                          i++)
-                        FlSpot(
-                          i.toDouble(),
-                          points[i].bookings,
-                        ),
+                      for (var i = 0; i < points.length; i++)
+                        FlSpot(i.toDouble(), points[i].bookings),
                     ],
                     isCurved: true,
                     barWidth: 3,
                     color: colorScheme.primary,
                     dotData: FlDotData(
                       show: true,
-                      getDotPainter:
-                          (_, __, ___, ____) {
+                      getDotPainter: (_, __, ___, ____) {
                         return FlDotCirclePainter(
                           radius: 4,
                           color: colorScheme.surface,
                           strokeWidth: 2,
-                          strokeColor:
-                              colorScheme.primary,
+                          strokeColor: colorScheme.primary,
                         );
                       },
                     ),
                   ),
                   LineChartBarData(
                     spots: [
-                      for (var i = 0;
-                          i < points.length;
-                          i++)
-                        FlSpot(
-                          i.toDouble(),
-                          points[i].revenue / 1000,
-                        ),
+                      for (var i = 0; i < points.length; i++)
+                        FlSpot(i.toDouble(), points[i].revenue / 1000),
                     ],
                     isCurved: true,
                     barWidth: 3,
                     color: colorScheme.tertiary,
                     dotData: FlDotData(
                       show: true,
-                      getDotPainter:
-                          (_, __, ___, ____) {
+                      getDotPainter: (_, __, ___, ____) {
                         return FlDotCirclePainter(
                           radius: 4,
                           color: colorScheme.surface,
                           strokeWidth: 2,
-                          strokeColor:
-                              colorScheme.tertiary,
+                          strokeColor: colorScheme.tertiary,
                         );
                       },
                     ),
@@ -542,53 +498,63 @@ class _ProductCategoryStrengthPanel extends StatelessWidget {
   }
 }
 
-class _ProductCatalogHealthPanel extends StatelessWidget {
-  const _ProductCatalogHealthPanel({required this.analytics});
+class _ProductBookingMetricsPanel extends StatelessWidget {
+  const _ProductBookingMetricsPanel({required this.analytics});
 
   final ProductOverviewAnalytics analytics;
 
   @override
   Widget build(BuildContext context) {
+    final bookingMetrics = analytics.bookingMetrics;
     final items = [
-      _HealthItem(
-        label: 'Draft or archived',
-        value: (analytics.draftProducts + analytics.archivedProducts)
-            .toString(),
+      _BookingMetricItem(
+        label: 'Total bookings',
+        value: bookingMetrics.totalBookings.toString(),
+        helper: 'Across the selected period',
+        tone: AnalyticsStatusTone.neutral,
       ),
-      _HealthItem(
-        label: 'Hidden from online',
-        value: analytics.hiddenProducts.toString(),
+      _BookingMetricItem(
+        label: 'Delayed',
+        value: bookingMetrics.delayedBookings.toString(),
+        helper: 'Over ${bookingMetrics.delayThresholdMinutes} min',
+        tone: AnalyticsStatusTone.critical,
       ),
-      _HealthItem(
-        label: 'Missing media/manual',
-        value:
-            '${analytics.missingMediaProducts}/${analytics.missingManualProducts}',
+      _BookingMetricItem(
+        label: 'Pending',
+        value: bookingMetrics.pendingBookings.toString(),
+        helper: 'Waiting for confirmation',
+        tone: AnalyticsStatusTone.warning,
       ),
-      _HealthItem(
-        label: 'Missing staff coverage',
-        value: analytics.missingStaffProducts.toString(),
+      _BookingMetricItem(
+        label: 'Completed',
+        value: bookingMetrics.completedBookings.toString(),
+        helper: 'Finished successfully',
+        tone: AnalyticsStatusTone.positive,
       ),
     ];
+    final statusBreakdown = _visibleBookingStatusBreakdown(
+      bookingMetrics.statusBreakdown,
+    );
 
     return AnalyticsPanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const AnalyticsSectionHeader(
-            title: 'Catalog health',
+            title: 'Booking operations',
             subtitle:
-                'Operational readiness indicators that keep service pages '
-                'bookable and trustworthy.',
-            icon: Icons.health_and_safety_rounded,
+                'Track booking flow, delays, and status distribution for the '
+                'selected period.',
+            icon: Icons.event_note_rounded,
           ),
           AppDimens.verticalLarge,
           LayoutBuilder(
             builder: (context, constraints) {
               final childAspectRatio = constraints.maxWidth >= 960
-                  ? 2.8
+                  ? 1.9
                   : constraints.maxWidth >= 780
-                  ? 2.15
-                  : 1.45;
+                  ? 1.45
+                  : 1.15;
 
               return GridView.extent(
                 maxCrossAxisExtent: 260,
@@ -597,13 +563,26 @@ class _ProductCatalogHealthPanel extends StatelessWidget {
                 crossAxisSpacing: AppDimens.spaceLg,
                 mainAxisSpacing: AppDimens.spaceLg,
                 childAspectRatio: childAspectRatio,
-                children: [for (final item in items) _HealthTile(item: item)],
+                children: [
+                  for (final item in items) _BookingMetricTile(item: item),
+                ],
               );
             },
           ),
-          if (analytics.catalogAlerts.isNotEmpty) ...[
+          if (statusBreakdown.isNotEmpty) ...[
             AppDimens.verticalLarge,
-            for (final alert in analytics.catalogAlerts) ...[
+            Text(
+              'Booking status',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: AppDimens.fontWeightBold,
+              ),
+            ),
+            AppDimens.verticalMedium,
+            _BookingStatusStrip(items: statusBreakdown),
+          ],
+          if (bookingMetrics.alerts.isNotEmpty) ...[
+            AppDimens.verticalLarge,
+            for (final alert in bookingMetrics.alerts) ...[
               _AlertTile(
                 title: alert.title,
                 detail: alert.detail,
@@ -618,10 +597,10 @@ class _ProductCatalogHealthPanel extends StatelessWidget {
   }
 }
 
-class _HealthTile extends StatelessWidget {
-  const _HealthTile({required this.item});
+class _BookingMetricTile extends StatelessWidget {
+  const _BookingMetricTile({required this.item});
 
-  final _HealthItem item;
+  final _BookingMetricItem item;
 
   @override
   Widget build(BuildContext context) {
@@ -636,35 +615,106 @@ class _HealthTile extends StatelessWidget {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final isCompact = constraints.maxHeight < 84;
+          final isCompact = constraints.maxHeight < 128;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
+              AnalyticsStatusBadge(label: item.label, tone: item.tone),
+              AppDimens.verticalSmall,
               Text(
                 item.value,
                 style:
                     (isCompact
-                            ? theme.textTheme.titleLarge
-                            : theme.textTheme.headlineSmall)
+                            ? theme.textTheme.headlineSmall
+                            : theme.textTheme.displaySmall)
                         ?.copyWith(fontWeight: AppDimens.fontWeightBold),
               ),
-              if (!isCompact) AppDimens.verticalExtraSmall,
+              AppDimens.verticalExtraSmall,
               Text(
-                item.label,
+                item.helper,
                 style:
                     (isCompact
                             ? theme.textTheme.bodySmall
                             : theme.textTheme.bodyMedium)
                         ?.copyWith(color: colorScheme.onSurfaceVariant),
-                maxLines: isCompact ? 1 : 2,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _BookingStatusStrip extends StatelessWidget {
+  const _BookingStatusStrip({required this.items});
+
+  final List<ProductBookingStatusMetric> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final spacing = AppDimens.spaceMd;
+        final columns = constraints.maxWidth >= 980
+            ? 4
+            : constraints.maxWidth >= 620
+            ? 2
+            : 1;
+        final itemWidth =
+            (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            for (final item in items)
+              SizedBox(
+                width: itemWidth,
+                child: _BookingStatusTile(item: item),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _BookingStatusTile extends StatelessWidget {
+  const _BookingStatusTile({required this.item});
+
+  final ProductBookingStatusMetric item;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: AppDimens.paddingAllMedium,
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.18),
+        borderRadius: AppDimens.radiusMedium,
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: AnalyticsStatusBadge(label: item.label, tone: item.tone),
+          ),
+          AppDimens.horizontalMedium,
+          Text(
+            item.count.toString(),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: AppDimens.fontWeightBold,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -994,11 +1044,43 @@ class _LegendChip extends StatelessWidget {
   }
 }
 
-class _HealthItem {
-  const _HealthItem({required this.label, required this.value});
+class _BookingMetricItem {
+  const _BookingMetricItem({
+    required this.label,
+    required this.value,
+    required this.helper,
+    required this.tone,
+  });
 
   final String label;
   final String value;
+  final String helper;
+  final AnalyticsStatusTone tone;
+}
+
+List<ProductBookingStatusMetric> _visibleBookingStatusBreakdown(
+  List<ProductBookingStatusMetric> items,
+) {
+  const supportedOrder = <String, int>{
+    'confirmed': 0,
+    'cancelled': 1,
+    'no_show': 2,
+    'rescheduled': 3,
+  };
+
+  final filtered = items
+      .where(
+        (item) => supportedOrder.containsKey(item.statusKey) && item.count > 0,
+      )
+      .toList();
+
+  filtered.sort(
+    (left, right) => supportedOrder[left.statusKey]!.compareTo(
+      supportedOrder[right.statusKey]!,
+    ),
+  );
+
+  return filtered;
 }
 
 String _currency(double value) {

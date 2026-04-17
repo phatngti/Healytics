@@ -18,15 +18,10 @@ class ClinicCertificationDto {
     required this.iconName,
   });
 
+
   String title;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? subtitle;
+  String? subtitle;
 
   String iconName;
 
@@ -78,7 +73,7 @@ class ClinicCertificationDto {
 
       return ClinicCertificationDto(
         title: mapValueOfType<String>(json, r'title')!,
-        subtitle: mapValueOfType<Object>(json, r'subtitle'),
+        subtitle: mapValueOfType<String>(json, r'subtitle'),
         iconName: mapValueOfType<String>(json, r'iconName')!,
       );
     }

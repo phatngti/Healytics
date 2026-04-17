@@ -24,6 +24,7 @@ class CreateCategoryDto {
     this.sortOrder,
   });
 
+
   /// Parent category ID for hierarchical structure
   ///
   /// Please note: This property should have been non-nullable! Since the specification file

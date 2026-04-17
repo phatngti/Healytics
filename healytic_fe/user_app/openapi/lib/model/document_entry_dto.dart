@@ -18,6 +18,7 @@ class DocumentEntryDto {
     this.updatedTime,
   });
 
+
   /// Display name of the document
   String name;
 

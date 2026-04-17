@@ -34,6 +34,7 @@ class PublicClinicInfoResponseDto {
     this.featuredServices = const [],
   });
 
+
   String id;
 
   String name;
@@ -42,21 +43,9 @@ class PublicClinicInfoResponseDto {
 
   bool isVerified;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? coverImageUrl;
+  String? coverImageUrl;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? logoImageUrl;
+  String? logoImageUrl;
 
   List<String> gallery;
 
@@ -66,37 +55,13 @@ class PublicClinicInfoResponseDto {
 
   String followersLabel;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? phone;
+  String? phone;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? coordinates;
+  String? coordinates;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? chatPartnerId;
+  String? chatPartnerId;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? description;
+  String? description;
 
   PublicClinicTrustMetricsDto trustMetrics;
 
@@ -227,18 +192,18 @@ class PublicClinicInfoResponseDto {
         name: mapValueOfType<String>(json, r'name')!,
         address: mapValueOfType<String>(json, r'address')!,
         isVerified: mapValueOfType<bool>(json, r'isVerified')!,
-        coverImageUrl: mapValueOfType<Object>(json, r'coverImageUrl'),
-        logoImageUrl: mapValueOfType<Object>(json, r'logoImageUrl'),
+        coverImageUrl: mapValueOfType<String>(json, r'coverImageUrl'),
+        logoImageUrl: mapValueOfType<String>(json, r'logoImageUrl'),
         gallery: json[r'gallery'] is Iterable
             ? (json[r'gallery'] as Iterable).cast<String>().toList(growable: false)
             : const [],
         rating: num.parse('${json[r'rating']}'),
         reviewCount: num.parse('${json[r'reviewCount']}'),
         followersLabel: mapValueOfType<String>(json, r'followersLabel')!,
-        phone: mapValueOfType<Object>(json, r'phone'),
-        coordinates: mapValueOfType<Object>(json, r'coordinates'),
-        chatPartnerId: mapValueOfType<Object>(json, r'chatPartnerId'),
-        description: mapValueOfType<Object>(json, r'description'),
+        phone: mapValueOfType<String>(json, r'phone'),
+        coordinates: mapValueOfType<String>(json, r'coordinates'),
+        chatPartnerId: mapValueOfType<String>(json, r'chatPartnerId'),
+        description: mapValueOfType<String>(json, r'description'),
         trustMetrics: PublicClinicTrustMetricsDto.fromJson(json[r'trustMetrics'])!,
         certifications: PublicClinicCertificationDto.listFromJson(json[r'certifications']),
         specialists: PublicClinicSpecialistPreviewDto.listFromJson(json[r'specialists']),

@@ -20,6 +20,7 @@ class CreateTreatmentReviewDto {
     this.photoKeys = const [],
   });
 
+
   /// ID of the completed appointment to review
   String appointmentId;
 

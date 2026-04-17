@@ -21,7 +21,7 @@ void main() {
       // TODO
     });
 
-    // String status
+    // ConversationStatus status
     test('to test the property `status`', () async {
       // TODO
     });

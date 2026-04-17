@@ -16,7 +16,7 @@ void main() {
   // final instance = ClinicReviewResponseSubDto();
 
   group('test ClinicReviewResponseSubDto', () {
-    // Object responseText
+    // String responseText
     test('to test the property `responseText`', () async {
       // TODO
     });

@@ -19,6 +19,7 @@ class PublicClinicDto {
     required this.address,
   });
 
+
   String id;
 
   String name;

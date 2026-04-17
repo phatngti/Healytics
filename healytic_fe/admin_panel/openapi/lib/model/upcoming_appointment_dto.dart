@@ -21,6 +21,7 @@ class UpcomingAppointmentDto {
     required this.status,
   });
 
+
   String id;
 
   String patientName;

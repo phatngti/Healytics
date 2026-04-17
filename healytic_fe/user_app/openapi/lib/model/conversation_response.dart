@@ -14,11 +14,12 @@ class ConversationResponse {
   /// Returns a new [ConversationResponse] instance.
   ConversationResponse({
     required this.id,
-    required this.userId,
+    this.userId,
     required this.title,
     required this.createdAt,
     required this.updatedAt,
   });
+
 
   String id;
 
@@ -136,7 +137,6 @@ class ConversationResponse {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'id',
-    'userId',
     'title',
     'createdAt',
     'updatedAt',

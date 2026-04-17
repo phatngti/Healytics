@@ -16,6 +16,7 @@ class FileUrlResponseDto {
     required this.url,
   });
 
+
   /// Public or signed URL for the file
   String url;
 

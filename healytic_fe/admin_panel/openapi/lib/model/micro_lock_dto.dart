@@ -18,6 +18,7 @@ class MicroLockDto {
     this.productId,
   });
 
+
   /// Staff/employee UUID
   String staffId;
 

@@ -17,6 +17,7 @@ class RevenueDataPointDto {
     required this.revenue,
   });
 
+
   String date;
 
   /// Revenue amount in VND

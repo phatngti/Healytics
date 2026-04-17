@@ -19,6 +19,7 @@ class ClinicTrustMetricsDto {
     required this.clientsLabel,
   });
 
+
   num rating;
 
   num reviewCount;

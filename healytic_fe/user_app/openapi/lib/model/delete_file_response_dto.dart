@@ -16,6 +16,7 @@ class DeleteFileResponseDto {
     required this.message,
   });
 
+
   /// Confirmation message
   String message;
 

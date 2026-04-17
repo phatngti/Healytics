@@ -16,6 +16,7 @@ class TotalPartnersResponseDto {
     required this.total,
   });
 
+
   /// Total number of partners
   num total;
 

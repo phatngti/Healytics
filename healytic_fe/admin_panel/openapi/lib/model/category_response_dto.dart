@@ -26,6 +26,7 @@ class CategoryResponseDto {
     this.children = const [],
   });
 
+
   /// Unique category identifier
   String id;
 
@@ -36,22 +37,10 @@ class CategoryResponseDto {
   String slug;
 
   /// Category description
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? description;
+  String? description;
 
   /// Category image URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? imageUrl;
+  String? imageUrl;
 
   /// Whether category is active
   bool isActive;
@@ -159,8 +148,8 @@ class CategoryResponseDto {
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
         slug: mapValueOfType<String>(json, r'slug')!,
-        description: mapValueOfType<Object>(json, r'description'),
-        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
+        description: mapValueOfType<String>(json, r'description'),
+        imageUrl: mapValueOfType<String>(json, r'imageUrl'),
         isActive: mapValueOfType<bool>(json, r'isActive')!,
         categoryType: mapValueOfType<String>(json, r'categoryType') ?? 'primary',
         createdAt: mapDateTime(json, r'createdAt', r'')!,

@@ -1,7 +1,9 @@
 import 'package:admin_panel/features/partner/dashboard/domain/dashboard_time_period.dart';
+import 'package:admin_panel/features/common/widgets/analytics/analytics_status_badge.widget.dart';
 import 'package:admin_panel/features/partner/products/data/product_analytics_impl.repository.dart';
 import 'package:admin_panel/features/partner/products/data/product_analytics_remote.datasource.dart';
 import 'package:admin_panel/features/partner/products/data/data/product_mock_data.dart';
+import 'package:admin_panel/features/partner/products/domain/product_analytics.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product_analytics.provider.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_analytics/product_detail_analytics.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_analytics/product_overview_analytics.widget.dart';
@@ -39,6 +41,17 @@ void main() {
 
       expect(initial, isNotNull);
       expect(initial.analytics.totalProducts, greaterThan(0));
+      expect(initial.analytics.bookingMetrics.totalBookings, greaterThan(0));
+      expect(initial.analytics.bookingMetrics.delayThresholdMinutes, 15);
+      expect(initial.analytics.bookingMetrics.delayedBookings, greaterThan(0));
+      expect(
+        initial.analytics.bookingMetrics.statusBreakdown.map(
+          (item) => item.statusKey,
+        ),
+        everyElement(
+          isIn(<String>['confirmed', 'cancelled', 'no_show', 'rescheduled']),
+        ),
+      );
       expect(initial.selectedPeriod.name, 'thisMonth');
 
       await container
@@ -50,8 +63,49 @@ void main() {
       );
 
       expect(updated, isNotNull);
-      expect(updated!.selectedPeriod, DashboardTimePeriod.thisQuarter);
+      expect(updated.selectedPeriod, DashboardTimePeriod.thisQuarter);
       expect(updated.analytics.revenue, greaterThan(initial.analytics.revenue));
+    });
+
+    test('normalizes booking status metrics into supported order', () {
+      final metrics = normalizeProductBookingStatusMetrics([
+        const ProductBookingStatusMetric(
+          statusKey: 'unknown',
+          label: 'Unknown',
+          count: 7,
+          tone: AnalyticsStatusTone.neutral,
+        ),
+        const ProductBookingStatusMetric(
+          statusKey: 'rescheduled',
+          label: 'Rescheduled',
+          count: 2,
+          tone: AnalyticsStatusTone.warning,
+        ),
+        const ProductBookingStatusMetric(
+          statusKey: 'confirmed',
+          label: 'Confirmed',
+          count: 12,
+          tone: AnalyticsStatusTone.positive,
+        ),
+        const ProductBookingStatusMetric(
+          statusKey: 'cancelled',
+          label: 'Cancelled',
+          count: 1,
+          tone: AnalyticsStatusTone.critical,
+        ),
+        const ProductBookingStatusMetric(
+          statusKey: 'no_show',
+          label: 'No-show',
+          count: 0,
+          tone: AnalyticsStatusTone.critical,
+        ),
+      ]);
+
+      expect(metrics.map((item) => item.statusKey).toList(), <String>[
+        'confirmed',
+        'cancelled',
+        'rescheduled',
+      ]);
     });
   });
 
@@ -79,7 +133,8 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
 
       expect(find.text('Service Performance'), findsOneWidget);
       expect(find.text('Category and service leaders'), findsOneWidget);
@@ -94,8 +149,17 @@ void main() {
       expect(find.text('Hot Stone Therapy'), findsOneWidget);
       expect(find.text('Massage Therapy'), findsWidgets);
       expect(find.text('Skincare'), findsWidgets);
-      expect(find.text('Catalog health'), findsOneWidget);
+      expect(find.text('Booking operations'), findsOneWidget);
+      expect(find.text('Total bookings'), findsOneWidget);
+      expect(find.text('Delayed'), findsOneWidget);
+      expect(find.text('Over 15 min'), findsOneWidget);
+      expect(find.text('Pending'), findsOneWidget);
+      expect(find.text('Completed'), findsOneWidget);
+      expect(find.text('Booking status'), findsOneWidget);
+      expect(find.text('Confirmed'), findsOneWidget);
+      expect(find.text('Cancelled'), findsOneWidget);
       expect(find.text('Product Management'), findsNothing);
+      expect(tester.takeException(), isNull);
 
       final firstCardOffset = tester.getTopLeft(
         find.text('Facial Treatment Deluxe'),
@@ -108,6 +172,7 @@ void main() {
 
       await tester.binding.setSurfaceSize(const Size(1900, 1600));
       await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
 
       final wideFirstCardOffset = tester.getTopLeft(
         find.text('Facial Treatment Deluxe'),

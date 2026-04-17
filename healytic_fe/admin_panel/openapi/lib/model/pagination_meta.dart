@@ -19,6 +19,7 @@ class PaginationMeta {
     required this.totalPages,
   });
 
+
   int page;
 
   int limit;

@@ -18,6 +18,7 @@ class LocationInfo {
     required this.city,
   });
 
+
   String address;
 
   String district;

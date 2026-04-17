@@ -22,6 +22,7 @@ class LegalRepresentativeRequestDto {
     this.documents = const [],
   });
 
+
   /// Full name of legal representative
   String fullName;
 

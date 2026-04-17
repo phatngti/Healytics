@@ -17,6 +17,7 @@ class PriceInfo {
     this.currency = 'VND',
   });
 
+
   int amount;
 
   String currency;

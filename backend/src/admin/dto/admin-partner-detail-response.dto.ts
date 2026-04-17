@@ -23,16 +23,16 @@ export enum PartnerPriority {
 // ============================================================================
 
 export class VerifiedField<T> {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   fieldKey: string;
 
   @ApiProperty()
   value: T;
 
-  @ApiProperty({ example: false })
+  @ApiProperty({ type: Boolean, example: false })
   isVerified: boolean;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   feedback?: string;
 
   constructor(
@@ -62,28 +62,29 @@ export class VerifiedField<T> {
 // ============================================================================
 
 export class KycDocumentDto {
-  @ApiProperty({ example: 'uuid-123' })
+  @ApiProperty({ type: String, example: 'uuid-123' })
   id: string;
 
-  @ApiProperty({ example: 'documents/business-license.pdf' })
+  @ApiProperty({ type: String, example: 'documents/business-license.pdf' })
   documentKey: string;
 
   @ApiPropertyOptional({
+    type: String,
     example: 'https://example.com/doc.pdf',
     nullable: true,
   })
   fileUrl?: string | null;
 
-  @ApiProperty({ example: 'BUSINESS_LICENSE' })
+  @ApiProperty({ type: String, example: 'BUSINESS_LICENSE' })
   type: string;
 
-  @ApiProperty({ example: 'pdf' })
+  @ApiProperty({ type: String, example: 'pdf' })
   fileType: string;
 
-  @ApiProperty({ example: 'pending' })
+  @ApiProperty({ type: String, example: 'pending' })
   status: string;
 
-  @ApiPropertyOptional({ example: 'Additional review notes from admin' })
+  @ApiPropertyOptional({ type: String, example: 'Additional review notes from admin' })
   uploadedAt?: string;
 
   static fromEntity(doc: PartnerDocument): KycDocumentDto {
@@ -214,7 +215,7 @@ export class AddressInfoDto {
   @ApiPropertyOptional({ type: VerifiedField })
   city?: VerifiedField<LocationRef>;
 
-  @ApiPropertyOptional({ example: 'Vietnam' })
+  @ApiPropertyOptional({ type: String, example: 'Vietnam' })
   country?: string;
 
   @ApiPropertyOptional({ example: 21.0285, nullable: true, type: Number })
@@ -391,7 +392,7 @@ export class BusinessInfoDto {
 // ============================================================================
 
 export class AdminPartnerDetailResponseDto {
-  @ApiProperty({ example: 'uuid-123' })
+  @ApiProperty({ type: String, example: 'uuid-123' })
   id: string;
 
   @ApiProperty({ type: BusinessInfoDto })
@@ -400,22 +401,23 @@ export class AdminPartnerDetailResponseDto {
   @ApiPropertyOptional({ type: LegalRepresentativeDto })
   legalRepresentative?: LegalRepresentativeDto;
 
-  @ApiProperty({ type: [VerifiedField<KycDocumentDto>] })
+  @ApiProperty({ type: [VerifiedField] })
   kycDocuments: VerifiedField<KycDocumentDto>[];
 
   @ApiProperty({
     enum: PartnerVerificationStatus,
+    enumName: 'PartnerVerificationStatus',
     example: PartnerVerificationStatus.PENDING,
   })
   status: PartnerVerificationStatus;
 
-  @ApiProperty({ enum: PartnerPriority, example: PartnerPriority.NORMAL })
+  @ApiProperty({ enum: PartnerPriority, enumName: 'PartnerPriority', example: PartnerPriority.NORMAL })
   priority: PartnerPriority;
 
-  @ApiProperty({ example: '2024-01-20T10:00:00Z' })
+  @ApiProperty({ type: Date, example: '2024-01-20T10:00:00Z' })
   submittedAt: Date;
 
-  @ApiPropertyOptional({ example: 'Additional review notes from admin' })
+  @ApiPropertyOptional({ type: String, example: 'Additional review notes from admin' })
   reviewNote?: string;
 
   static fromPartner(

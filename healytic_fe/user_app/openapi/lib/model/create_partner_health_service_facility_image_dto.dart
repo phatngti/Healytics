@@ -18,6 +18,7 @@ class CreatePartnerHealthServiceFacilityImageDto {
     this.sortOrder,
   });
 
+
   String imageUrl;
 
   String label;

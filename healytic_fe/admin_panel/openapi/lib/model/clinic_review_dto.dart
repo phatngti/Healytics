@@ -26,6 +26,7 @@ class ClinicReviewDto {
     this.clinicResponse,
   });
 
+
   String id;
 
   /// Masked name for privacy
@@ -38,42 +39,18 @@ class ClinicReviewDto {
   num starCount;
 
   /// null for MVP
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? memberBadge;
+  String? memberBadge;
 
   String dateLabel;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? serviceName;
+  String? serviceName;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? serviceIcon;
+  String? serviceIcon;
 
   String reviewText;
 
   List<String> mediaUrls;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   ClinicReviewResponseSubDto? clinicResponse;
 
   @override
@@ -163,10 +140,10 @@ class ClinicReviewDto {
         reviewerName: mapValueOfType<String>(json, r'reviewerName')!,
         reviewerInitial: mapValueOfType<String>(json, r'reviewerInitial')!,
         starCount: num.parse('${json[r'starCount']}'),
-        memberBadge: mapValueOfType<Object>(json, r'memberBadge'),
+        memberBadge: mapValueOfType<String>(json, r'memberBadge'),
         dateLabel: mapValueOfType<String>(json, r'dateLabel')!,
-        serviceName: mapValueOfType<Object>(json, r'serviceName'),
-        serviceIcon: mapValueOfType<Object>(json, r'serviceIcon'),
+        serviceName: mapValueOfType<String>(json, r'serviceName'),
+        serviceIcon: mapValueOfType<String>(json, r'serviceIcon'),
         reviewText: mapValueOfType<String>(json, r'reviewText')!,
         mediaUrls: json[r'mediaUrls'] is Iterable
             ? (json[r'mediaUrls'] as Iterable).cast<String>().toList(growable: false)

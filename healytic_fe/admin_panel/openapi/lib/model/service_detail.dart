@@ -25,6 +25,7 @@ class ServiceDetail {
     this.slots = const [],
   });
 
+
   String serviceId;
 
   String name;

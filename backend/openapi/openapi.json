@@ -3504,6 +3504,46 @@
               "example": 106.7009,
               "type": "number"
             }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by appointment status",
+            "schema": {
+              "example": "upcoming",
+              "enum": [
+                "pending_payment",
+                "upcoming",
+                "completed",
+                "canceled"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by category ID",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort by appointment time: newest (default) or oldest first",
+            "schema": {
+              "default": "newest",
+              "enum": [
+                "newest",
+                "oldest"
+              ],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -5607,7 +5647,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-04-14T06:58:19.139Z"
+              "submittedAt": "2026-04-17T15:36:32.060Z"
             }
           }
         },
@@ -5770,6 +5810,16 @@
           "fullName"
         ]
       },
+      "PartnerVerificationStatus": {
+        "type": "string",
+        "enum": [
+          "ONBOARDING",
+          "PENDING",
+          "APPROVED",
+          "REJECTED",
+          "REQUIRED_RESUBMIT"
+        ]
+      },
       "MyProfileResponseDto": {
         "type": "object",
         "properties": {
@@ -5790,20 +5840,14 @@
             }
           },
           "verificationStatus": {
-            "type": "string",
-            "enum": [
-              "ONBOARDING",
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "REQUIRED_RESUBMIT"
-            ],
-            "example": "PENDING"
+            "example": "PENDING",
+            "$ref": "#/components/schemas/PartnerVerificationStatus"
           },
           "verificationCompletedAt": {
-            "type": "object",
-            "example": null,
-            "nullable": true
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "example": null
           },
           "createdAt": {
             "format": "date-time",
@@ -8524,11 +8568,13 @@
             "description": "URL-friendly slug"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Category description"
           },
           "imageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Category image URL"
           },
           "isActive": {
@@ -8625,11 +8671,13 @@
             "description": "URL-friendly slug"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Category description"
           },
           "imageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Category image URL"
           },
           "isActive": {
@@ -8637,11 +8685,13 @@
             "description": "Whether category is active"
           },
           "iconName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Icon identifier for frontend rendering"
           },
           "colorValue": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Hex color value (e.g. #FF6B6B)"
           },
           "sortOrder": {
@@ -8792,6 +8842,22 @@
             "description": "Sort order for display (lower = first)"
           }
         }
+      },
+      "HealthServiceType": {
+        "type": "string",
+        "description": "Type",
+        "enum": [
+          "service"
+        ]
+      },
+      "HealthServiceStatus": {
+        "type": "string",
+        "description": "Status",
+        "enum": [
+          "draft",
+          "active",
+          "archived"
+        ]
       },
       "PartnerCategorySummaryDto": {
         "type": "object",
@@ -8984,22 +9050,20 @@
             "description": "URL-friendly slug"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Description"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "service"
-            ],
-            "description": "Type"
+            "$ref": "#/components/schemas/HealthServiceType"
           },
           "basePrice": {
             "type": "number",
             "description": "Base price in specified currency"
           },
           "salePrice": {
-            "type": "object",
+            "type": "number",
+            "nullable": true,
             "description": "Sale price if on discount"
           },
           "currency": {
@@ -9007,20 +9071,15 @@
             "description": "Currency code (ISO 4217)"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "active",
-              "archived"
-            ],
-            "description": "Status"
+            "$ref": "#/components/schemas/HealthServiceStatus"
           },
           "isVisibleOnline": {
             "type": "boolean",
             "description": "Whether visible online"
           },
           "vendorName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Vendor name"
           },
           "createdAt": {
@@ -9136,13 +9195,16 @@
             "type": "string"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "degrees": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "experience": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "specializations": {
             "type": "array",
@@ -9151,10 +9213,12 @@
             }
           },
           "bio": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "quote": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "languages": {
             "type": "array",
@@ -9235,7 +9299,8 @@
             "type": "string"
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "rating": {
             "type": "number"
@@ -9275,7 +9340,8 @@
             "type": "string"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "rating": {
             "type": "number"
@@ -9393,7 +9459,8 @@
             "type": "boolean"
           },
           "description": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "duration": {
             "type": "number"
@@ -9438,7 +9505,12 @@
             }
           },
           "serviceManual": {
-            "$ref": "#/components/schemas/PartnerDetailServiceManualDto"
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerDetailServiceManualDto"
+              }
+            ]
           }
         },
         "required": [
@@ -9618,6 +9690,7 @@
         "properties": {
           "categoryId": {
             "type": "string",
+            "format": "uuid",
             "example": "uuid-category-id"
           },
           "name": {
@@ -9633,11 +9706,8 @@
             "example": "A relaxing Thai massage service"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "service"
-            ],
-            "example": "service"
+            "example": "service",
+            "$ref": "#/components/schemas/HealthServiceType"
           },
           "basePrice": {
             "type": "number",
@@ -9716,6 +9786,7 @@
         "properties": {
           "categoryId": {
             "type": "string",
+            "format": "uuid",
             "example": "uuid-category-id"
           },
           "name": {
@@ -9731,11 +9802,8 @@
             "example": "A relaxing Thai massage service"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "service"
-            ],
-            "example": "service"
+            "example": "service",
+            "$ref": "#/components/schemas/HealthServiceType"
           },
           "basePrice": {
             "type": "number",
@@ -10108,11 +10176,13 @@
             "example": "Dermatologist"
           },
           "imageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://example.com/avatar.jpg"
           },
           "experienceLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "10 Yrs Exp"
           }
         },
@@ -10151,7 +10221,8 @@
             "example": "Relaxation Massage"
           },
           "imageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://example.com/service.jpg"
           },
           "price": {
@@ -10195,11 +10266,13 @@
             "example": true
           },
           "coverImageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://example.com/cover.jpg"
           },
           "logoImageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://example.com/logo.jpg"
           },
           "gallery": {
@@ -10221,19 +10294,23 @@
             "example": "15k"
           },
           "phone": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "+84 28 1234 5678"
           },
           "coordinates": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "10.7769,106.7009"
           },
           "chatPartnerId": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "a1b2c3d4-..."
           },
           "description": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "trustMetrics": {
             "$ref": "#/components/schemas/PublicClinicTrustMetricsDto"
@@ -10295,7 +10372,8 @@
             "example": "spa-massage"
           },
           "imageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://example.com/category.jpg"
           }
         },
@@ -10381,7 +10459,8 @@
             "example": "#FF4CAF50"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "Pain management and relief services"
           }
         },
@@ -10426,7 +10505,8 @@
             "example": true
           },
           "description": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "featureTags": {
             "type": "array",
@@ -10524,23 +10604,28 @@
             "type": "string"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "isSelected": {
             "type": "boolean",
             "example": false
           },
           "quote": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "degrees": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "languages": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "experience": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "12 years"
           },
           "specializations": {
@@ -10550,7 +10635,8 @@
             }
           },
           "bio": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "daySchedules": {
             "type": "array",
@@ -10635,7 +10721,8 @@
             "type": "string"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "rating": {
             "type": "number",
@@ -10783,22 +10870,20 @@
             "description": "URL-friendly slug"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Description"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "service"
-            ],
-            "description": "Type"
+            "$ref": "#/components/schemas/HealthServiceType"
           },
           "basePrice": {
             "type": "number",
             "description": "Base price in specified currency"
           },
           "salePrice": {
-            "type": "object",
+            "type": "number",
+            "nullable": true,
             "description": "Sale price if on discount"
           },
           "currency": {
@@ -10806,20 +10891,15 @@
             "description": "Currency code (ISO 4217)"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "active",
-              "archived"
-            ],
-            "description": "Status"
+            "$ref": "#/components/schemas/HealthServiceStatus"
           },
           "isVisibleOnline": {
             "type": "boolean",
             "description": "Whether visible online"
           },
           "vendorName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Vendor name"
           },
           "createdAt": {
@@ -11020,16 +11100,6 @@
           "createdAt"
         ]
       },
-      "PartnerVerificationStatus": {
-        "type": "string",
-        "enum": [
-          "ONBOARDING",
-          "PENDING",
-          "APPROVED",
-          "REJECTED",
-          "REQUIRED_RESUBMIT"
-        ]
-      },
       "PartnerItemDto": {
         "type": "object",
         "properties": {
@@ -11125,6 +11195,15 @@
           "total"
         ]
       },
+      "PartnerPriority": {
+        "type": "string",
+        "enum": [
+          "low",
+          "normal",
+          "high",
+          "urgent"
+        ]
+      },
       "AdminPartnerDetailResponseDto": {
         "type": "object",
         "properties": {
@@ -11145,25 +11224,12 @@
             }
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "ONBOARDING",
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "REQUIRED_RESUBMIT"
-            ],
-            "example": "PENDING"
+            "example": "PENDING",
+            "$ref": "#/components/schemas/PartnerVerificationStatus"
           },
           "priority": {
-            "type": "string",
-            "enum": [
-              "low",
-              "normal",
-              "high",
-              "urgent"
-            ],
-            "example": "normal"
+            "example": "normal",
+            "$ref": "#/components/schemas/PartnerPriority"
           },
           "submittedAt": {
             "format": "date-time",
@@ -11314,10 +11380,12 @@
             "example": "TICKET_ABCD123"
           },
           "userId": {
-            "type": "string"
+            "type": "string",
+            "example": "USER_ID_123"
           },
           "staffId": {
-            "type": "string"
+            "type": "string",
+            "example": "STAFF_ID_123"
           },
           "startTime": {
             "format": "date-time",
@@ -11339,20 +11407,22 @@
             "example": "ai_chat_session_888_msg_12"
           },
           "bookingId": {
-            "type": "object",
+            "type": "string",
             "description": "Booking ID when checkout succeeds"
           },
           "errorMessage": {
-            "type": "object",
+            "type": "string",
             "description": "Error message when checkout fails"
           },
           "createdAt": {
             "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "example": "2023-10-25T14:00:00Z"
           },
           "updatedAt": {
             "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "example": "2023-10-25T14:00:00Z"
           }
         },
         "required": [
@@ -11364,6 +11434,16 @@
           "idempotencyKey",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "BookingStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING_PAYMENT",
+          "CONFIRMED",
+          "CANCELLED",
+          "COMPLETED",
+          "NO_SHOW"
         ]
       },
       "BookingResponseDto": {
@@ -11380,7 +11460,8 @@
             "type": "string"
           },
           "productId": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "startTime": {
             "format": "date-time",
@@ -11388,30 +11469,29 @@
             "example": "2023-10-25T14:00:00Z"
           },
           "endTime": {
-            "type": "object",
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
             "example": "2023-10-25T15:00:00Z"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "PENDING_PAYMENT",
-              "CONFIRMED",
-              "CANCELLED",
-              "COMPLETED",
-              "NO_SHOW"
-            ],
-            "example": "PENDING_PAYMENT"
+            "example": "PENDING_PAYMENT",
+            "$ref": "#/components/schemas/BookingStatus"
           },
           "paymentUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://payment.gateway.com/pay/BK_555"
           },
           "paymentExpiresAt": {
-            "type": "object",
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
             "example": "2023-10-25T14:10:00Z"
           },
           "notes": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "createdAt": {
             "format": "date-time",
@@ -11624,6 +11704,15 @@
           "platform"
         ]
       },
+      "AppointmentStatus": {
+        "type": "string",
+        "enum": [
+          "pending_payment",
+          "upcoming",
+          "completed",
+          "canceled"
+        ]
+      },
       "AppointmentResponseDto": {
         "type": "object",
         "properties": {
@@ -11644,13 +11733,8 @@
             "example": "https://example.com/image.jpg"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "upcoming",
-              "completed",
-              "canceled"
-            ],
-            "example": "upcoming"
+            "example": "upcoming",
+            "$ref": "#/components/schemas/AppointmentStatus"
           },
           "category": {
             "type": "string",
@@ -11696,16 +11780,34 @@
             "description": "Distance from user to clinic in kilometers (null if coordinates not provided)"
           },
           "healthPartnerId": {
-            "type": "object",
+            "type": "string",
             "example": "550e8400-e29b-41d4-a716-446655440000",
             "nullable": true,
             "description": "Account ID of the health partner (vendor). Used for chat."
           },
           "serviceId": {
-            "type": "object",
+            "type": "string",
             "example": "550e8400-e29b-41d4-a716-446655440000",
             "nullable": true,
             "description": "Product/service ID for navigation to service details."
+          },
+          "paymentUrl": {
+            "type": "string",
+            "example": "https://test-payment.momo.vn/...",
+            "nullable": true,
+            "description": "Payment gateway checkout URL. Only present when status is pending_payment."
+          },
+          "paymentDeeplink": {
+            "type": "string",
+            "example": "momo://app?action=payWithApp&...",
+            "nullable": true,
+            "description": "Deep link to open payment app directly (mobile). Only present when status is pending_payment."
+          },
+          "paymentExpiresAt": {
+            "type": "string",
+            "example": "2026-04-14T12:10:00.000Z",
+            "nullable": true,
+            "description": "ISO 8601 timestamp when the payment link expires. Only present when status is pending_payment."
           }
         },
         "required": [
@@ -11725,7 +11827,10 @@
           "isReviewed",
           "distanceKm",
           "healthPartnerId",
-          "serviceId"
+          "serviceId",
+          "paymentUrl",
+          "paymentDeeplink",
+          "paymentExpiresAt"
         ]
       },
       "AppointmentCategoryResponseDto": {
@@ -12281,6 +12386,14 @@
         "type": "object",
         "properties": {}
       },
+      "ConversationStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "archived",
+          "closed"
+        ]
+      },
       "ParticipantInfoDto": {
         "type": "object",
         "properties": {
@@ -12325,12 +12438,7 @@
             "type": "string"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "active",
-              "archived",
-              "closed"
-            ]
+            "$ref": "#/components/schemas/ConversationStatus"
           },
           "bookingId": {
             "type": "string"
@@ -12546,7 +12654,8 @@
             "example": "ISO 9001:2015"
           },
           "subtitle": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "Quality Management"
           },
           "iconName": {
@@ -12574,10 +12683,12 @@
             "example": "Senior Therapist"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "experienceLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "5 Yrs Exp"
           }
         },
@@ -12598,10 +12709,12 @@
             "example": "Healytics Wellness Center"
           },
           "coverImageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "logoImageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "gallery": {
             "type": "array",
@@ -12618,7 +12731,8 @@
             "example": "2.5k"
           },
           "description": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "trustMetrics": {
             "$ref": "#/components/schemas/ClinicTrustMetricsDto"
@@ -12642,10 +12756,12 @@
             }
           },
           "address": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "phoneNumber": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -12687,7 +12803,8 @@
             "example": "Premium CO2 Laser"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "price": {
             "type": "string",
@@ -12698,23 +12815,28 @@
             "example": 990000
           },
           "originalPrice": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "1.250.000đ"
           },
           "discountLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "-20%"
           },
           "badgeLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "HOT"
           },
           "durationLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "60 min"
           },
           "specialistLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "Specialist"
           },
           "categoryId": {
@@ -12815,7 +12937,8 @@
             "example": "All (2.5k)"
           },
           "starCount": {
-            "type": "object",
+            "type": "number",
+            "nullable": true,
             "example": 5
           },
           "requiresMedia": {
@@ -12833,7 +12956,8 @@
         "type": "object",
         "properties": {
           "responseText": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -12859,7 +12983,8 @@
             "maximum": 5
           },
           "memberBadge": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "null for MVP"
           },
           "dateLabel": {
@@ -12867,11 +12992,13 @@
             "example": "04-04-2026"
           },
           "serviceName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "Salt Stone Massage (90 min)"
           },
           "serviceIcon": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "spa"
           },
           "reviewText": {
@@ -12884,7 +13011,12 @@
             }
           },
           "clinicResponse": {
-            "$ref": "#/components/schemas/ClinicReviewResponseSubDto"
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClinicReviewResponseSubDto"
+              }
+            ]
           }
         },
         "required": [

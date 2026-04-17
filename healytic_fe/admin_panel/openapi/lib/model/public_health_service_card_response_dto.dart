@@ -27,6 +27,7 @@ class PublicHealthServiceCardResponseDto {
     required this.type,
   });
 
+
   String id;
 
   String name;

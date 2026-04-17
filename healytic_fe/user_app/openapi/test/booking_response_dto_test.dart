@@ -31,7 +31,7 @@ void main() {
       // TODO
     });
 
-    // Object productId
+    // String productId
     test('to test the property `productId`', () async {
       // TODO
     });
@@ -41,27 +41,27 @@ void main() {
       // TODO
     });
 
-    // Object endTime
+    // DateTime endTime
     test('to test the property `endTime`', () async {
       // TODO
     });
 
-    // String status
+    // BookingStatus status
     test('to test the property `status`', () async {
       // TODO
     });
 
-    // Object paymentUrl
+    // String paymentUrl
     test('to test the property `paymentUrl`', () async {
       // TODO
     });
 
-    // Object paymentExpiresAt
+    // DateTime paymentExpiresAt
     test('to test the property `paymentExpiresAt`', () async {
       // TODO
     });
 
-    // Object notes
+    // String notes
     test('to test the property `notes`', () async {
       // TODO
     });

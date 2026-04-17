@@ -20,6 +20,7 @@ class PartnerHealthServiceMediaDto {
     required this.sortOrder,
   });
 
+
   /// Unique media identifier
   String id;
 

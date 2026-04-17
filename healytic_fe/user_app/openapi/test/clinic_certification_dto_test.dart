@@ -21,7 +21,7 @@ void main() {
       // TODO
     });
 
-    // Object subtitle
+    // String subtitle
     test('to test the property `subtitle`', () async {
       // TODO
     });

@@ -19,6 +19,7 @@ class PartnerDocumentVerificationDto {
     this.urls = const [],
   });
 
+
   /// File type of document
   String fileType;
 

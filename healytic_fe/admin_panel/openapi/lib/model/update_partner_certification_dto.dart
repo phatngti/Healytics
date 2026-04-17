@@ -20,6 +20,7 @@ class UpdatePartnerCertificationDto {
     this.sortOrder,
   });
 
+
   /// Existing certification id. Omit to create a new one.
   ///
   /// Please note: This property should have been non-nullable! Since the specification file

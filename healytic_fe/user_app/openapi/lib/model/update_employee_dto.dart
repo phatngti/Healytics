@@ -38,6 +38,7 @@ class UpdateEmployeeDto {
     this.therapistProfile,
   });
 
+
   /// Unique employee code
   ///
   /// Please note: This property should have been non-nullable! Since the specification file

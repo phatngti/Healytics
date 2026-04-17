@@ -21,6 +21,7 @@ class CreateSpecialistReviewDto {
     required this.wouldRecommend,
   });
 
+
   /// ID of the completed appointment
   String appointmentId;
 

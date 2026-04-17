@@ -133,7 +133,16 @@ class UserAppointmentsApi {
   ///
   /// * [num] longitude:
   ///   User longitude (-180 to 180)
-  Future<Response> userAppointmentControllerListAppointmentsWithHttpInfo({ num? latitude, num? longitude, }) async {
+  ///
+  /// * [String] status:
+  ///   Filter by appointment status
+  ///
+  /// * [String] categoryId:
+  ///   Filter by category ID
+  ///
+  /// * [String] sortBy:
+  ///   Sort by appointment time: newest (default) or oldest first
+  Future<Response> userAppointmentControllerListAppointmentsWithHttpInfo({ num? latitude, num? longitude, String? status, String? categoryId, String? sortBy, }) async {
     // ignore: prefer_const_declarations
     final path = r'/user/appointments';
 
@@ -149,6 +158,15 @@ class UserAppointmentsApi {
     }
     if (longitude != null) {
       queryParams.addAll(_queryParams('', 'longitude', longitude));
+    }
+    if (status != null) {
+      queryParams.addAll(_queryParams('', 'status', status));
+    }
+    if (categoryId != null) {
+      queryParams.addAll(_queryParams('', 'categoryId', categoryId));
+    }
+    if (sortBy != null) {
+      queryParams.addAll(_queryParams('', 'sortBy', sortBy));
     }
 
     const contentTypes = <String>[];
@@ -174,8 +192,17 @@ class UserAppointmentsApi {
   ///
   /// * [num] longitude:
   ///   User longitude (-180 to 180)
-  Future<List<AppointmentResponseDto>?> userAppointmentControllerListAppointments({ num? latitude, num? longitude, }) async {
-    final response = await userAppointmentControllerListAppointmentsWithHttpInfo( latitude: latitude, longitude: longitude, );
+  ///
+  /// * [String] status:
+  ///   Filter by appointment status
+  ///
+  /// * [String] categoryId:
+  ///   Filter by category ID
+  ///
+  /// * [String] sortBy:
+  ///   Sort by appointment time: newest (default) or oldest first
+  Future<List<AppointmentResponseDto>?> userAppointmentControllerListAppointments({ num? latitude, num? longitude, String? status, String? categoryId, String? sortBy, }) async {
+    final response = await userAppointmentControllerListAppointmentsWithHttpInfo( latitude: latitude, longitude: longitude, status: status, categoryId: categoryId, sortBy: sortBy, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

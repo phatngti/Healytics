@@ -1,14 +1,25 @@
+import 'dart:async';
+
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:user_app/features/orders/domain/entities/appointment.entity.dart';
 import 'package:user_app/router/routes.dart';
 
 /// Card displaying a single appointment with image,
 /// status badge, provider info, address, and check-in.
 class AppointmentCard extends StatelessWidget {
-  const AppointmentCard({super.key, required this.appointment});
+  const AppointmentCard({
+    super.key,
+    required this.appointment,
+    this.onExpired,
+  });
 
   final AppointmentEntity appointment;
+
+  /// Called when a pending payment countdown
+  /// reaches zero. Parent uses this to refresh.
+  final VoidCallback? onExpired;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +59,14 @@ class AppointmentCard extends StatelessWidget {
                     if (appointment.status == 'completed') ...[
                       AppDimens.verticalMediumSmall,
                       _ReviewAction(appointment: appointment),
+                    ],
+                    if (appointment.status ==
+                        'pending_payment') ...[
+                      AppDimens.verticalMediumSmall,
+                      _PaymentAction(
+                        appointment: appointment,
+                        onExpired: onExpired,
+                      ),
                     ],
                   ],
                 ),
@@ -143,6 +162,11 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final (bgColor, textColor, label) = switch (status) {
+      'pending_payment' => (
+        colors.secondaryContainer,
+        colors.secondary,
+        'Pending Payment',
+      ),
       'upcoming' => (colors.primaryContainer, colors.primary, 'Upcoming'),
       'completed' => (colors.tertiaryContainer, colors.tertiary, 'Completed'),
       'canceled' => (colors.errorContainer, colors.error, 'Canceled'),
@@ -551,6 +575,280 @@ class _ReviewedChip extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Payment CTA banner with countdown timer.
+/// Shown only for `pending_payment` appointments.
+class _PaymentAction extends StatelessWidget {
+  const _PaymentAction({
+    required this.appointment,
+    this.onExpired,
+  });
+
+  final AppointmentEntity appointment;
+
+  /// Called when the countdown reaches zero so the
+  /// parent can trigger a data refresh.
+  final VoidCallback? onExpired;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    // Edge case: paymentUrl not yet generated.
+    if (appointment.paymentUrl == null) {
+      return _PreparingPaymentBanner();
+    }
+
+    return GestureDetector(
+      onTap: () => _openPayment(
+        context,
+        appointment,
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: AppDimens.paddingAllMedium,
+        decoration: BoxDecoration(
+          color: colors.secondaryContainer.withValues(
+            alpha: 0.3,
+          ),
+          borderRadius: AppDimens.radiusMediumSmall,
+          border: Border.all(
+            color: colors.secondaryContainer,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(
+                AppDimens.spaceSm,
+              ),
+              decoration: BoxDecoration(
+                color: colors.secondaryContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.payment_rounded,
+                size: AppDimens.iconSm,
+                color: colors.secondary,
+              ),
+            ),
+            AppDimens.horizontalMedium,
+            Expanded(
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Complete Payment',
+                    style: theme.textTheme.labelLarge
+                        ?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: colors.secondary,
+                    ),
+                  ),
+                  AppDimens.verticalExtraSmall,
+                  _CountdownText(
+                    expiresAt:
+                        appointment.paymentExpiresAt,
+                    onExpired: onExpired,
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: AppDimens.iconXs,
+              color: colors.secondary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Try deep link first (MoMo app), fall back to
+  /// web checkout URL.
+  Future<void> _openPayment(
+    BuildContext context,
+    AppointmentEntity apt,
+  ) async {
+    final deeplink = apt.paymentDeeplink;
+    final webUrl = apt.paymentUrl;
+
+    // Prefer native app via deep link.
+    if (deeplink != null && deeplink.isNotEmpty) {
+      final uri = Uri.tryParse(deeplink);
+      if (uri != null &&
+          await canLaunchUrl(uri)) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+        return;
+      }
+    }
+
+    // Fallback to web checkout.
+    if (webUrl != null && webUrl.isNotEmpty) {
+      final uri = Uri.tryParse(webUrl);
+      if (uri == null) return;
+      await launchUrl(
+        uri,
+        mode: LaunchMode.inAppBrowserView,
+      );
+    }
+  }
+}
+
+/// Shown when `paymentUrl` is null — the checkout
+/// link has not been generated yet.
+class _PreparingPaymentBanner extends StatelessWidget {
+  const _PreparingPaymentBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: AppDimens.paddingAllMedium,
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: AppDimens.radiusMediumSmall,
+        border: Border.all(
+          color: colors.outlineVariant,
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: AppDimens.iconSm,
+            height: AppDimens.iconSm,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+          AppDimens.horizontalMedium,
+          Expanded(
+            child: Text(
+              'Preparing payment...',
+              style: theme.textTheme.labelLarge
+                  ?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Live countdown text that ticks every second.
+/// Falls back to "Payment required" when no
+/// expiration is set.
+class _CountdownText extends StatefulWidget {
+  const _CountdownText({
+    required this.expiresAt,
+    this.onExpired,
+  });
+
+  final DateTime? expiresAt;
+
+  /// Called once when the countdown reaches zero.
+  final VoidCallback? onExpired;
+
+  @override
+  State<_CountdownText> createState() =>
+      _CountdownTextState();
+}
+
+class _CountdownTextState extends State<_CountdownText> {
+  Timer? _timer;
+  Duration _remaining = Duration.zero;
+  bool _hasExpired = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateRemaining();
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _updateRemaining(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _updateRemaining() {
+    if (widget.expiresAt == null) return;
+    final diff =
+        widget.expiresAt!.difference(DateTime.now());
+    final wasPositive = _remaining > Duration.zero;
+    setState(() {
+      _remaining =
+          diff.isNegative ? Duration.zero : diff;
+    });
+
+    // Fire onExpired exactly once.
+    if (wasPositive &&
+        _remaining == Duration.zero &&
+        !_hasExpired) {
+      _hasExpired = true;
+      widget.onExpired?.call();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    if (widget.expiresAt == null) {
+      return Text(
+        'Payment required',
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: colors.onSurfaceVariant,
+        ),
+      );
+    }
+
+    if (_remaining == Duration.zero) {
+      return Text(
+        'Payment expired',
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: colors.error,
+          fontWeight: FontWeight.w600,
+        ),
+      );
+    }
+
+    final minutes = _remaining.inMinutes
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
+    final seconds = _remaining.inSeconds
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
+
+    return Text(
+      'Expires in $minutes:$seconds',
+      style: theme.textTheme.bodySmall?.copyWith(
+        color: colors.secondary,
+        fontWeight: FontWeight.w600,
       ),
     );
   }

@@ -117,47 +117,16 @@ ProductOverviewAnalytics _buildOverviewAnalytics(
     0,
     (sum, item) => sum + item.revenue,
   );
-
-  final alerts = <ProductCatalogAlert>[
-    if (products.any((product) => product.status == 'draft'))
-      const ProductCatalogAlert(
-        title: 'Draft services waiting for launch',
-        detail: 'Review pricing, staffing, and content before publishing.',
-        tone: AnalyticsStatusTone.warning,
-      ),
-    if (products.any((product) => product.images.isEmpty))
-      const ProductCatalogAlert(
-        title: 'Media gaps lower conversion confidence',
-        detail: 'Some services still lack gallery assets or thumbnails.',
-        tone: AnalyticsStatusTone.critical,
-      ),
-    if (products.any(_requiresSpecificStaffWithoutAssignment))
-      const ProductCatalogAlert(
-        title: 'Specific-staff services are understaffed',
-        detail: 'Assign at least one employee to avoid booking friction.',
-        tone: AnalyticsStatusTone.warning,
-      ),
-  ];
+  final bookingMetrics = _buildBookingMetrics(
+    products: products,
+    totalBookings: bookings,
+    scale: scale,
+  );
 
   return ProductOverviewAnalytics(
     totalProducts: products.length,
     activeProducts: activeProducts,
-    draftProducts: products
-        .where((product) => product.status == 'draft')
-        .length,
-    archivedProducts: products
-        .where((product) => product.status == 'archived')
-        .length,
-    hiddenProducts: products.where((product) => !product.onlineStore).length,
-    missingMediaProducts: products
-        .where((product) => product.images.isEmpty)
-        .length,
-    missingManualProducts: products
-        .where((product) => product.serviceManual == null)
-        .length,
-    missingStaffProducts: products
-        .where(_requiresSpecificStaffWithoutAssignment)
-        .length,
+    bookingMetrics: bookingMetrics,
     bookings: bookings,
     bookingsDelta: 6.2 + scale * 1.5,
     revenue: revenue,
@@ -174,7 +143,6 @@ ProductOverviewAnalytics _buildOverviewAnalytics(
     ),
     categoryPerformance: _buildCategoryPerformance(products, scale),
     topServices: topServices.take(5).toList(),
-    catalogAlerts: alerts,
   );
 }
 
@@ -194,21 +162,21 @@ ProductDetailAnalytics _buildDetailAnalytics({
         (left, right) => right.averageRating.compareTo(left.averageRating),
       );
 
-  final alerts = <ProductCatalogAlert>[
+  final alerts = <ProductAnalyticsAlert>[
     if (!product.onlineStore)
-      const ProductCatalogAlert(
+      const ProductAnalyticsAlert(
         title: 'Online visibility disabled',
         detail: 'This service is hidden from the public booking experience.',
         tone: AnalyticsStatusTone.warning,
       ),
     if (product.serviceManual == null)
-      const ProductCatalogAlert(
+      const ProductAnalyticsAlert(
         title: 'Service manual is incomplete',
         detail: 'Document treatment steps and contraindications for staff.',
         tone: AnalyticsStatusTone.critical,
       ),
     if (_requiresSpecificStaffWithoutAssignment(product))
-      const ProductCatalogAlert(
+      const ProductAnalyticsAlert(
         title: 'No assigned staff',
         detail: 'Bookings may fail when a service requires named staff.',
         tone: AnalyticsStatusTone.critical,
@@ -239,6 +207,151 @@ ProductDetailAnalytics _buildDetailAnalytics({
   );
 }
 
+ProductBookingMetricsSummary _buildBookingMetrics({
+  required List<Product> products,
+  required int totalBookings,
+  required double scale,
+}) {
+  final draftCount = products
+      .where((product) => product.status == 'draft')
+      .length;
+  final hiddenCount = products.where((product) => !product.onlineStore).length;
+  final staffingGaps = products
+      .where(_requiresSpecificStaffWithoutAssignment)
+      .length;
+
+  final pendingBookings = math.min(
+    totalBookings,
+    math.max(1, (totalBookings * (0.14 + scale * 0.03)).round()),
+  );
+  final completedBookings = math.min(
+    totalBookings - pendingBookings,
+    math.max(1, (totalBookings * 0.54).round()),
+  );
+  final confirmedBookings = math.min(
+    totalBookings - pendingBookings - completedBookings,
+    math.max(1, (totalBookings * 0.16).round()),
+  );
+  final cancelledBookings = math.min(
+    totalBookings - pendingBookings - completedBookings - confirmedBookings,
+    math.max(draftCount, (totalBookings * 0.06).round()),
+  );
+  final noShowBookings = math.min(
+    totalBookings -
+        pendingBookings -
+        completedBookings -
+        confirmedBookings -
+        cancelledBookings,
+    math.max(hiddenCount ~/ 2, (totalBookings * 0.03).round()),
+  );
+  final rescheduledBookings = math.max(
+    0,
+    totalBookings -
+        pendingBookings -
+        completedBookings -
+        confirmedBookings -
+        cancelledBookings -
+        noShowBookings,
+  );
+  final delayThresholdMinutes = 15;
+  final delayedBookings = math.min<int>(
+    totalBookings,
+    math.max<int>(
+      staffingGaps,
+      (totalBookings * 0.08).round() + math.max(0, pendingBookings ~/ 6),
+    ),
+  );
+
+  final alerts = <ProductAnalyticsAlert>[
+    if (delayedBookings > 0)
+      ProductAnalyticsAlert(
+        title: 'Delayed bookings need intervention',
+        detail:
+            '$delayedBookings bookings are running more than '
+            '$delayThresholdMinutes minutes behind schedule.',
+        tone: AnalyticsStatusTone.critical,
+      ),
+    if (pendingBookings > math.max(6, totalBookings ~/ 8))
+      ProductAnalyticsAlert(
+        title: 'Pending bookings are awaiting confirmation',
+        detail:
+            '$pendingBookings bookings are still in the approval queue for '
+            'this period.',
+        tone: AnalyticsStatusTone.warning,
+      ),
+    if (cancelledBookings + noShowBookings > math.max(4, totalBookings ~/ 12))
+      const ProductAnalyticsAlert(
+        title: 'Cancellation and no-show risk is elevated',
+        detail:
+            'Review reminder flows and staffing handoffs to protect the '
+            'booking pipeline.',
+        tone: AnalyticsStatusTone.warning,
+      ),
+  ];
+
+  final rawStatusBreakdown = <ProductBookingStatusMetric>[
+    ProductBookingStatusMetric(
+      statusKey: 'confirmed',
+      label: 'Confirmed',
+      count: confirmedBookings,
+      tone: AnalyticsStatusTone.positive,
+    ),
+    ProductBookingStatusMetric(
+      statusKey: 'cancelled',
+      label: 'Cancelled',
+      count: cancelledBookings,
+      tone: AnalyticsStatusTone.critical,
+    ),
+    ProductBookingStatusMetric(
+      statusKey: 'no_show',
+      label: 'No-show',
+      count: noShowBookings,
+      tone: AnalyticsStatusTone.critical,
+    ),
+    ProductBookingStatusMetric(
+      statusKey: 'rescheduled',
+      label: 'Rescheduled',
+      count: rescheduledBookings,
+      tone: AnalyticsStatusTone.warning,
+    ),
+  ];
+
+  return ProductBookingMetricsSummary(
+    totalBookings: totalBookings,
+    delayedBookings: delayedBookings,
+    delayThresholdMinutes: delayThresholdMinutes,
+    pendingBookings: pendingBookings,
+    completedBookings: completedBookings,
+    statusBreakdown: normalizeProductBookingStatusMetrics(rawStatusBreakdown),
+    alerts: alerts,
+  );
+}
+
+List<ProductBookingStatusMetric> normalizeProductBookingStatusMetrics(
+  Iterable<ProductBookingStatusMetric> items,
+) {
+  const supportedOrder = <String, int>{
+    'confirmed': 0,
+    'cancelled': 1,
+    'no_show': 2,
+    'rescheduled': 3,
+  };
+
+  final filtered = items
+      .where(
+        (item) => supportedOrder.containsKey(item.statusKey) && item.count > 0,
+      )
+      .toList();
+
+  filtered.sort(
+    (left, right) => supportedOrder[left.statusKey]!.compareTo(
+      supportedOrder[right.statusKey]!,
+    ),
+  );
+
+  return filtered;
+}
+
 List<ProductTrendPoint> _buildTrendPoints({
   required double scale,
   required int seed,
@@ -251,12 +364,32 @@ List<ProductTrendPoint> _buildTrendPoints({
   // Separate factor lists so the two lines diverge
   // visually and feel more realistic.
   const bookingFactors = [
-    0.72, 0.85, 0.94, 1.08, 0.91, 1.15,
-    1.22, 0.88, 1.03, 0.96, 1.18, 1.30,
+    0.72,
+    0.85,
+    0.94,
+    1.08,
+    0.91,
+    1.15,
+    1.22,
+    0.88,
+    1.03,
+    0.96,
+    1.18,
+    1.30,
   ];
   const revenueFactors = [
-    0.80, 0.78, 1.02, 1.12, 0.97, 1.05,
-    1.28, 0.93, 1.10, 1.00, 1.24, 1.35,
+    0.80,
+    0.78,
+    1.02,
+    1.12,
+    0.97,
+    1.05,
+    1.28,
+    0.93,
+    1.10,
+    1.00,
+    1.24,
+    1.35,
   ];
 
   return List<ProductTrendPoint>.generate(labels.length, (i) {
@@ -284,8 +417,18 @@ List<String> _periodLabels(DashboardTimePeriod period) {
       return ['Month 1', 'Month 2', 'Month 3'];
     case DashboardTimePeriod.thisYear:
       return [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
       ];
   }
 }

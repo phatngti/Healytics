@@ -18,6 +18,7 @@ class CreateConversationDto {
     this.initialMessage,
   });
 
+
   /// Account ID of the health partner
   String healthPartnerId;
 

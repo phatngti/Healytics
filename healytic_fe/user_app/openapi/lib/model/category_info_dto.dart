@@ -17,6 +17,7 @@ class CategoryInfoDto {
     required this.name,
   });
 
+
   String id;
 
   String name;

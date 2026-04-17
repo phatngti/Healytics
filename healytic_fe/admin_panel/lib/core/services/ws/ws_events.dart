@@ -60,3 +60,4 @@ abstract final class WsChatNotificationsEvent {
   /// A new chat message was received — show a popup notification
   static const newMessageNotification = 'new_message_notification';
 }
+

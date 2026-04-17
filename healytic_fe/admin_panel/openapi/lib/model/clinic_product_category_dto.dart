@@ -17,6 +17,7 @@ class ClinicProductCategoryDto {
     required this.label,
   });
 
+
   String id;
 
   String label;

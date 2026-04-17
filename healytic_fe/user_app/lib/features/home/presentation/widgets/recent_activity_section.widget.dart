@@ -335,6 +335,17 @@ class _ActivityCard extends StatelessWidget {
   /// properties (icon, colours, label).
   _StatusStyle _resolveStatusStyle(String status, SemanticColors semantic) {
     switch (status) {
+      case 'pending_payment':
+        return _StatusStyle(
+          icon: Symbols.payment,
+          iconColor: semantic.warning!,
+          iconBgColor: semantic.warning!
+              .withValues(alpha: 0.1),
+          statusColor: semantic.warning!,
+          statusBgColor: semantic.warning!
+              .withValues(alpha: 0.1),
+          label: 'Pending Payment',
+        );
       case 'completed':
         return _StatusStyle(
           icon: Symbols.check_circle,

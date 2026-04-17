@@ -210,6 +210,8 @@ class ApiClient {
           return AppointmentCategoryResponseDto.fromJson(value);
         case 'AppointmentResponseDto':
           return AppointmentResponseDto.fromJson(value);
+        case 'AppointmentStatus':
+          return AppointmentStatusTypeTransformer().decode(value);
         case 'AsyncCheckoutDto':
           return AsyncCheckoutDto.fromJson(value);
         case 'AsyncCheckoutResponseDto':
@@ -226,6 +228,8 @@ class ApiClient {
           return BookingServiceResponseDto.fromJson(value);
         case 'BookingSpecialistResponseDto':
           return BookingSpecialistResponseDto.fromJson(value);
+        case 'BookingStatus':
+          return BookingStatusTypeTransformer().decode(value);
         case 'BusinessInfo':
           return BusinessInfo.fromJson(value);
         case 'BusinessInfoDto':
@@ -288,6 +292,8 @@ class ApiClient {
           return ConversationResponse.fromJson(value);
         case 'ConversationResponseDto':
           return ConversationResponseDto.fromJson(value);
+        case 'ConversationStatus':
+          return ConversationStatusTypeTransformer().decode(value);
         case 'ConversationsPageResponse':
           return ConversationsPageResponse.fromJson(value);
         case 'CreateBroadcastDto':
@@ -360,6 +366,10 @@ class ApiClient {
           return GeocodeResponseDto.fromJson(value);
         case 'GeocodeResultDto':
           return GeocodeResultDto.fromJson(value);
+        case 'HealthServiceStatus':
+          return HealthServiceStatusTypeTransformer().decode(value);
+        case 'HealthServiceType':
+          return HealthServiceTypeTypeTransformer().decode(value);
         case 'HomeRecommenderRequest':
           return HomeRecommenderRequest.fromJson(value);
         case 'InventoryAlertDto':
@@ -436,6 +446,8 @@ class ApiClient {
           return PartnerItemDto.fromJson(value);
         case 'PartnerLoginDto':
           return PartnerLoginDto.fromJson(value);
+        case 'PartnerPriority':
+          return PartnerPriorityTypeTransformer().decode(value);
         case 'PartnerProcedureStepDto':
           return PartnerProcedureStepDto.fromJson(value);
         case 'PartnerProfileCompletionCertificationDto':

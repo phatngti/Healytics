@@ -19,6 +19,7 @@ class ChatbotRecommendationResponse {
     required this.timestamp,
   });
 
+
   String conversationId;
 
   List<ServiceDetail> recommendations;
