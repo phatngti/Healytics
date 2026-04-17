@@ -18,6 +18,7 @@ class RecommendationResponse {
     required this.timestamp,
   });
 
+
   List<ServiceDetail> recommendations;
 
   int total;

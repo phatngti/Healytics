@@ -16,6 +16,7 @@ class LogoutResponseDto {
     required this.message,
   });
 
+
   String message;
 
   @override

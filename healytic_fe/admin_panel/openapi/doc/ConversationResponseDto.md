@@ -9,7 +9,7 @@ import 'package:admin_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | 
-**status** | **String** |  | 
+**status** | [**ConversationStatus**](ConversationStatus.md) |  | 
 **bookingId** | **String** |  | [optional] 
 **otherParticipant** | [**ParticipantInfoDto**](ParticipantInfoDto.md) |  | 
 **lastMessage** | [**LastMessageDto**](LastMessageDto.md) |  | 

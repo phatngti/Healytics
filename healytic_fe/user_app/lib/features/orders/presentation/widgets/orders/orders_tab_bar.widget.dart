@@ -8,7 +8,12 @@ import 'package:user_app/features/orders/presentation/providers/appointment.prov
 class OrdersTabBar extends HookConsumerWidget {
   const OrdersTabBar({super.key});
 
-  static const _tabs = ['Upcoming', 'Completed', 'Canceled'];
+  static const _tabs = [
+    'Pending',
+    'Upcoming',
+    'Completed',
+    'Canceled',
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -17,6 +17,7 @@ class ConversationsPageResponse {
     required this.meta,
   });
 
+
   List<ConversationResponse> conversations;
 
   PaginationMeta meta;

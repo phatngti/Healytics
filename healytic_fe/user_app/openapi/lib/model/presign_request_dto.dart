@@ -17,6 +17,7 @@ class PresignRequestDto {
     required this.contentType,
   });
 
+
   /// Original file name
   String fileName;
 

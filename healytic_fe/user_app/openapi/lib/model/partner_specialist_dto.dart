@@ -25,53 +25,24 @@ class PartnerSpecialistDto {
     this.languages = const [],
   });
 
+
   String id;
 
   String name;
 
   String role;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? imageUrl;
+  String? imageUrl;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? degrees;
+  String? degrees;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? experience;
+  String? experience;
 
   List<String> specializations;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? bio;
+  String? bio;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? quote;
+  String? quote;
 
   List<String> languages;
 
@@ -162,14 +133,14 @@ class PartnerSpecialistDto {
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
         role: mapValueOfType<String>(json, r'role')!,
-        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
-        degrees: mapValueOfType<Object>(json, r'degrees'),
-        experience: mapValueOfType<Object>(json, r'experience'),
+        imageUrl: mapValueOfType<String>(json, r'imageUrl'),
+        degrees: mapValueOfType<String>(json, r'degrees'),
+        experience: mapValueOfType<String>(json, r'experience'),
         specializations: json[r'specializations'] is Iterable
             ? (json[r'specializations'] as Iterable).cast<String>().toList(growable: false)
             : const [],
-        bio: mapValueOfType<Object>(json, r'bio'),
-        quote: mapValueOfType<Object>(json, r'quote'),
+        bio: mapValueOfType<String>(json, r'bio'),
+        quote: mapValueOfType<String>(json, r'quote'),
         languages: json[r'languages'] is Iterable
             ? (json[r'languages'] as Iterable).cast<String>().toList(growable: false)
             : const [],

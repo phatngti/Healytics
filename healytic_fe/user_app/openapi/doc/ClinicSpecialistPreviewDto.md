@@ -11,8 +11,8 @@ Name | Type | Description | Notes
 **id** | **String** |  | 
 **name** | **String** |  | 
 **role** | **String** |  | 
-**imageUrl** | [**Object**](.md) |  | [optional] 
-**experienceLabel** | [**Object**](.md) |  | [optional] 
+**imageUrl** | **String** |  | [optional] 
+**experienceLabel** | **String** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -25,6 +25,7 @@ class MyProfileCompletionResponseDto {
     required this.isCompleted,
   });
 
+
   String id;
 
   PartnerProfileCompletionIdentityDto clinicIdentity;

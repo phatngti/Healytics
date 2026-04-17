@@ -18,6 +18,7 @@ class CategorySummaryDto {
     required this.slug,
   });
 
+
   String id;
 
   String name;

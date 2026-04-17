@@ -27,6 +27,7 @@ class AiRecommendationItemDto {
     required this.type,
   });
 
+
   String id;
 
   String name;

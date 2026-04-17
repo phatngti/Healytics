@@ -18,6 +18,7 @@ class ServiceManualInputDto {
     this.procedureSteps = const [],
   });
 
+
   List<String> preServiceGuidelines;
 
   List<ServiceRuleInputDto> serviceRules;

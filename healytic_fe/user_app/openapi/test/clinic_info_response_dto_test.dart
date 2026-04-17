@@ -26,12 +26,12 @@ void main() {
       // TODO
     });
 
-    // Object coverImageUrl
+    // String coverImageUrl
     test('to test the property `coverImageUrl`', () async {
       // TODO
     });
 
-    // Object logoImageUrl
+    // String logoImageUrl
     test('to test the property `logoImageUrl`', () async {
       // TODO
     });
@@ -51,7 +51,7 @@ void main() {
       // TODO
     });
 
-    // Object description
+    // String description
     test('to test the property `description`', () async {
       // TODO
     });
@@ -76,12 +76,12 @@ void main() {
       // TODO
     });
 
-    // Object address
+    // String address
     test('to test the property `address`', () async {
       // TODO
     });
 
-    // Object phoneNumber
+    // String phoneNumber
     test('to test the property `phoneNumber`', () async {
       // TODO
     });

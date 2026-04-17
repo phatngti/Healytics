@@ -76,19 +76,19 @@ class _EmployeeOverviewKpis extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final crossAxisCount = constraints.maxWidth >= 1200
-            ? 4
-            : constraints.maxWidth >= 720
-            ? 2
-            : 1;
+        final childAspectRatio = constraints.maxWidth >= 1320
+            ? 1.22
+            : constraints.maxWidth >= 760
+            ? 1.08
+            : 0.96;
 
-        return GridView.count(
-          crossAxisCount: crossAxisCount,
+        return GridView.extent(
+          maxCrossAxisExtent: 320,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           crossAxisSpacing: AppDimens.spaceLg,
           mainAxisSpacing: AppDimens.spaceLg,
-          childAspectRatio: 1.15,
+          childAspectRatio: childAspectRatio,
           children: [
             AnalyticsKpiCard(
               label: 'Total staff',
@@ -141,20 +141,51 @@ class _EmployeeOverviewPanels extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final crossAxisCount = constraints.maxWidth >= 1200 ? 2 : 1;
+        final isWideDesktop = constraints.maxWidth >= 1180;
 
-        return GridView.count(
-          crossAxisCount: crossAxisCount,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: AppDimens.spaceLg,
-          mainAxisSpacing: AppDimens.spaceLg,
-          childAspectRatio: constraints.maxWidth >= 1200 ? 1.45 : 1.1,
+        if (!isWideDesktop) {
+          return Column(
+            children: [
+              _RoleDistributionPanel(items: analytics.roleDistribution),
+              AppDimens.verticalLarge,
+              _WorkloadTrendPanel(points: analytics.trendPoints),
+              AppDimens.verticalLarge,
+              _TopPerformersPanel(items: analytics.topPerformers),
+              AppDimens.verticalLarge,
+              _CompliancePanel(items: analytics.complianceItems),
+            ],
+          );
+        }
+
+        return Column(
           children: [
-            _RoleDistributionPanel(items: analytics.roleDistribution),
-            _WorkloadTrendPanel(points: analytics.trendPoints),
-            _TopPerformersPanel(items: analytics.topPerformers),
-            _CompliancePanel(items: analytics.complianceItems),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _RoleDistributionPanel(
+                    items: analytics.roleDistribution,
+                  ),
+                ),
+                AppDimens.horizontalLarge,
+                Expanded(
+                  child: _WorkloadTrendPanel(points: analytics.trendPoints),
+                ),
+              ],
+            ),
+            AppDimens.verticalLarge,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _TopPerformersPanel(items: analytics.topPerformers),
+                ),
+                AppDimens.horizontalLarge,
+                Expanded(
+                  child: _CompliancePanel(items: analytics.complianceItems),
+                ),
+              ],
+            ),
           ],
         );
       },
@@ -176,57 +207,78 @@ class _RoleDistributionPanel extends StatelessWidget {
       Theme.of(context).colorScheme.primaryContainer,
     ];
 
+    if (items.isEmpty) {
+      return const AnalyticsAsyncPanel.empty(
+        title: 'No role distribution data',
+        description:
+            'Role distribution will appear once employee records are available.',
+      );
+    }
+
     return AnalyticsPanel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const AnalyticsSectionHeader(
-            title: 'Role distribution',
-            subtitle: 'Balance workforce capacity across care roles.',
-            icon: Icons.pie_chart_rounded,
-          ),
-          AppDimens.verticalLarge,
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: PieChart(
-                    PieChartData(
-                      centerSpaceRadius: 40,
-                      sectionsSpace: 2,
-                      sections: [
-                        for (var i = 0; i < items.length; i++)
-                          PieChartSectionData(
-                            value: items[i].count.toDouble(),
-                            color: colors[i % colors.length],
-                            title: items[i].count.toString(),
-                            radius: 52,
-                          ),
-                      ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth >= 760;
+          final chart = SizedBox(
+            height: isWide ? 220 : 240,
+            child: PieChart(
+              PieChartData(
+                centerSpaceRadius: 40,
+                sectionsSpace: 2,
+                sections: [
+                  for (var i = 0; i < items.length; i++)
+                    PieChartSectionData(
+                      value: items[i].count.toDouble(),
+                      color: colors[i % colors.length],
+                      title: items[i].count.toString(),
+                      radius: 52,
                     ),
-                  ),
-                ),
-                AppDimens.horizontalLarge,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (var i = 0; i < items.length; i++) ...[
-                        _LegendRow(
-                          color: colors[i % colors.length],
-                          label: items[i].role,
-                          value: items[i].count.toString(),
-                        ),
-                        AppDimens.verticalMediumSmall,
-                      ],
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          );
+
+          final legend = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < items.length; i++) ...[
+                _LegendRow(
+                  color: colors[i % colors.length],
+                  label: items[i].role,
+                  value: items[i].count.toString(),
+                ),
+                if (i != items.length - 1) AppDimens.verticalMediumSmall,
+              ],
+            ],
+          );
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const AnalyticsSectionHeader(
+                title: 'Role distribution',
+                subtitle: 'Balance workforce capacity across care roles.',
+                icon: Icons.pie_chart_rounded,
+              ),
+              AppDimens.verticalLarge,
+              if (isWide)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(child: chart),
+                    AppDimens.horizontalLarge,
+                    Expanded(child: legend),
+                  ],
+                )
+              else ...[
+                chart,
+                AppDimens.verticalLarge,
+                legend,
+              ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -242,78 +294,108 @@ class _WorkloadTrendPanel extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    if (points.isEmpty) {
+      return const AnalyticsAsyncPanel.empty(
+        title: 'No workload trend data',
+        description:
+            'Workload trends will appear once bookings and contribution data are available.',
+      );
+    }
+
+    final maxY = points.fold<double>(0, (maxValue, point) {
+      final pointPeak = point.sessions > point.contributionValue / 1000000
+          ? point.sessions
+          : point.contributionValue / 1000000;
+      return pointPeak > maxValue ? pointPeak : maxValue;
+    });
+
     return AnalyticsPanel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const AnalyticsSectionHeader(
-            title: 'Workload trend',
-            subtitle: 'Session volume and contribution move across the period.',
-            icon: Icons.stacked_bar_chart_rounded,
-          ),
-          AppDimens.verticalLarge,
-          Expanded(
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
-                borderData: FlBorderData(show: false),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  getDrawingHorizontalLine: (_) =>
-                      FlLine(color: colorScheme.outlineVariant, strokeWidth: 1),
-                ),
-                titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index < 0 || index >= points.length) {
-                          return const SizedBox.shrink();
-                        }
-                        return Text(
-                          points[index].label,
-                          style: theme.textTheme.labelMedium,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                barGroups: [
-                  for (var i = 0; i < points.length; i++)
-                    BarChartGroupData(
-                      x: i,
-                      barsSpace: AppDimens.spaceXs,
-                      barRods: [
-                        BarChartRodData(
-                          toY: points[i].sessions,
-                          color: colorScheme.primary,
-                          width: 14,
-                          borderRadius: AppDimens.radiusSmall,
-                        ),
-                        BarChartRodData(
-                          toY: points[i].contributionValue / 1000000,
-                          color: colorScheme.tertiary,
-                          width: 14,
-                          borderRadius: AppDimens.radiusSmall,
-                        ),
-                      ],
-                    ),
-                ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final chartHeight = constraints.maxWidth >= 760 ? 260.0 : 220.0;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const AnalyticsSectionHeader(
+                title: 'Workload trend',
+                subtitle:
+                    'Session volume and contribution move across the period.',
+                icon: Icons.stacked_bar_chart_rounded,
               ),
-            ),
-          ),
-        ],
+              AppDimens.verticalLarge,
+              SizedBox(
+                height: chartHeight,
+                child: BarChart(
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    maxY: maxY == 0 ? 1 : maxY * 1.2,
+                    borderData: FlBorderData(show: false),
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine: (_) => FlLine(
+                        color: colorScheme.outlineVariant,
+                        strokeWidth: 1,
+                      ),
+                    ),
+                    titlesData: FlTitlesData(
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 28,
+                          getTitlesWidget: (value, meta) {
+                            final index = value.toInt();
+                            if (index < 0 || index >= points.length) {
+                              return const SizedBox.shrink();
+                            }
+                            return Padding(
+                              padding: AppDimens.paddingTopSmall,
+                              child: Text(
+                                points[index].label,
+                                style: theme.textTheme.labelMedium,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    barGroups: [
+                      for (var i = 0; i < points.length; i++)
+                        BarChartGroupData(
+                          x: i,
+                          barsSpace: AppDimens.spaceXs,
+                          barRods: [
+                            BarChartRodData(
+                              toY: points[i].sessions,
+                              color: colorScheme.primary,
+                              width: 14,
+                              borderRadius: AppDimens.radiusSmall,
+                            ),
+                            BarChartRodData(
+                              toY: points[i].contributionValue / 1000000,
+                              color: colorScheme.tertiary,
+                              width: 14,
+                              borderRadius: AppDimens.radiusSmall,
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -327,6 +409,14 @@ class _TopPerformersPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final topItems = items.take(4).toList();
+
+    if (topItems.isEmpty) {
+      return const AnalyticsAsyncPanel.empty(
+        title: 'No top performers yet',
+        description:
+            'Performance rankings will appear after staff accumulate ratings and bookings.',
+      );
+    }
 
     return AnalyticsPanel(
       child: Column(
@@ -355,6 +445,14 @@ class _CompliancePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (items.isEmpty) {
+      return const AnalyticsAsyncPanel.empty(
+        title: 'No compliance summary yet',
+        description:
+            'Compliance checks will appear after the workforce profile data is evaluated.',
+      );
+    }
+
     return AnalyticsPanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,6 +497,8 @@ class _TopPerformerRow extends StatelessWidget {
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: AppDimens.fontWeightBold,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               AppDimens.verticalExtraSmall,
               Text(
@@ -407,10 +507,13 @@ class _TopPerformerRow extends StatelessWidget {
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
         ),
+        AppDimens.horizontalMedium,
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [

@@ -17,6 +17,7 @@ class PartnerFacilityImageDto {
     required this.label,
   });
 
+
   String imageUrl;
 
   String label;

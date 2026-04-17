@@ -23,6 +23,7 @@ class BusinessInfoDto {
     this.username,
   });
 
+
   VerifiedField brandName;
 
   ///

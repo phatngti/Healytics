@@ -17,6 +17,7 @@ class PublicClinicFacilityImageDto {
     required this.label,
   });
 
+
   String imageUrl;
 
   String label;

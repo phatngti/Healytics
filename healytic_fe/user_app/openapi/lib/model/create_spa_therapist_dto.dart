@@ -39,6 +39,7 @@ class CreateSpaTherapistDto {
     this.partnerId,
   });
 
+
   /// First name
   String firstName;
 

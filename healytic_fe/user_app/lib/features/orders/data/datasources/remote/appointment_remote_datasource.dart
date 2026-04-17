@@ -11,8 +11,13 @@ import 'appointment_mock_data.dart';
 
 /// Contract for fetching appointment data.
 abstract class AppointmentRemoteDatasource {
-  /// Fetches all appointments.
-  Future<List<AppointmentEntity>> getAppointments();
+  /// Fetches appointments with optional server-side
+  /// filters: [status], [categoryId], [sortBy].
+  Future<List<AppointmentEntity>> getAppointments({
+    String? status,
+    String? categoryId,
+    String? sortBy,
+  });
 
   /// Fetches appointment category filters.
   Future<List<AppointmentCategory>> getCategories();
@@ -35,15 +40,32 @@ class AppointmentRemoteDatasourceImpl implements AppointmentRemoteDatasource {
   AppointmentRemoteDatasourceImpl(this._apiService);
 
   @override
-  Future<List<AppointmentEntity>> getAppointments() async {
+  Future<List<AppointmentEntity>> getAppointments({
+    String? status,
+    String? categoryId,
+    String? sortBy,
+  }) async {
     try {
-      final response = await _apiService.userAppointmentsApi
-          .userAppointmentControllerListAppointments();
+      final response = await _apiService
+          .userAppointmentsApi
+          .userAppointmentControllerListAppointments(
+            status: status,
+            categoryId: categoryId,
+            sortBy: sortBy,
+          );
       if (response == null) return [];
-      _log.info('Fetched ${response.length} appointments');
-      return response.map(_mapAppointmentDto).toList();
+      _log.info(
+        'Fetched ${response.length} appointments',
+      );
+      return response
+          .map(_mapAppointmentDto)
+          .toList();
     } catch (e, s) {
-      _log.severe('Error fetching appointments', e, s);
+      _log.severe(
+        'Error fetching appointments',
+        e,
+        s,
+      );
       return [];
     }
   }
@@ -111,6 +133,15 @@ class AppointmentRemoteDatasourceImpl implements AppointmentRemoteDatasource {
       duration: dto.duration,
       distanceKm: _parseDistance(dto.distanceKm),
       isReviewed: dto.isReviewed,
+      paymentUrl: _parseString(dto.paymentUrl),
+      paymentDeeplink: _parseString(
+        dto.paymentDeeplink,
+      ),
+      paymentExpiresAt: dto.paymentExpiresAt != null
+          ? DateTime.tryParse(
+              dto.paymentExpiresAt.toString(),
+            )
+          : null,
     );
   }
 
@@ -158,9 +189,32 @@ class AppointmentRemoteDatasourceImpl implements AppointmentRemoteDatasource {
 /// simulated network delay.
 class AppointmentRemoteDatasourceMock implements AppointmentRemoteDatasource {
   @override
-  Future<List<AppointmentEntity>> getAppointments() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return kMockAppointments;
+  Future<List<AppointmentEntity>> getAppointments({
+    String? status,
+    String? categoryId,
+    String? sortBy,
+  }) async {
+    await Future.delayed(
+      const Duration(milliseconds: 500),
+    );
+    var result = kMockAppointments.toList();
+
+    if (status != null) {
+      result = result
+          .where((a) => a.status == status)
+          .toList();
+    }
+    if (categoryId != null) {
+      result = result
+          .where((a) => a.category == categoryId)
+          .toList();
+    }
+    if (sortBy == 'oldest') {
+      result.sort((a, b) => a.date.compareTo(b.date));
+    } else {
+      result.sort((a, b) => b.date.compareTo(a.date));
+    }
+    return result;
   }
 
   @override

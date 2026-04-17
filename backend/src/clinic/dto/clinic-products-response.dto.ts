@@ -1,51 +1,51 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ClinicProductCategoryDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   id: string;
 
-  @ApiProperty({ example: 'Facial Treatments' })
+  @ApiProperty({ type: String, example: 'Facial Treatments' })
   label: string;
 }
 
 export class ClinicProductDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   id: string;
 
-  @ApiProperty({ example: 'Premium CO2 Laser' })
+  @ApiProperty({ type: String, example: 'Premium CO2 Laser' })
   title: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   imageUrl: string | null;
 
-  @ApiProperty({ example: '990.000đ' })
+  @ApiProperty({ type: String, example: '990.000đ' })
   price: string;
 
-  @ApiProperty({ example: 990000 })
+  @ApiProperty({ type: Number, example: 990000 })
   priceAmount: number;
 
-  @ApiPropertyOptional({ example: '1.250.000đ' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: '1.250.000đ' })
   originalPrice: string | null;
 
-  @ApiPropertyOptional({ example: '-20%' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: '-20%' })
   discountLabel: string | null;
 
-  @ApiPropertyOptional({ example: 'HOT' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'HOT' })
   badgeLabel: string | null;
 
-  @ApiPropertyOptional({ example: '60 min' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: '60 min' })
   durationLabel: string | null;
 
-  @ApiPropertyOptional({ example: 'Specialist' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'Specialist' })
   specialistLabel: string | null;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   categoryId: string;
 
-  @ApiProperty({ example: 320 })
+  @ApiProperty({ type: Number, example: 320 })
   soldCount: number;
 
-  @ApiProperty({ example: 1743465600000 })
+  @ApiProperty({ type: Number, example: 1743465600000 })
   createdAtMs: number;
 }
 
@@ -56,9 +56,9 @@ export class ClinicProductsResponseDto {
   @ApiProperty({ type: [ClinicProductDto] })
   products: ClinicProductDto[];
 
-  @ApiProperty({ example: 45 })
+  @ApiProperty({ type: Number, example: 45 })
   totalCount: number;
 
-  @ApiProperty({ example: true })
+  @ApiProperty({ type: Boolean, example: true })
   hasMore: boolean;
 }

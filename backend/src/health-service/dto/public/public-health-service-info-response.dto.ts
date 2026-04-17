@@ -5,76 +5,76 @@ import { Partner } from '@/common/entities/partner.entity';
 // ─── Nested DTOs ─────────────────────────────────────────────
 
 class PublicFeatureTagDto {
-  @ApiProperty({ example: 'schedule' })
+  @ApiProperty({ type: String, example: 'schedule' })
   iconName: string;
 
-  @ApiProperty({ example: 'Pain Relief' })
+  @ApiProperty({ type: String, example: 'Pain Relief' })
   label: string;
 }
 
 class PublicCategoryDto {
-  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @ApiProperty({ type: String, example: 'a1b2c3d4-...' })
   id: string;
 
-  @ApiProperty({ example: 'Spa & Massage' })
+  @ApiProperty({ type: String, example: 'Spa & Massage' })
   name: string;
 
-  @ApiProperty({ example: 'spa-massage' })
+  @ApiProperty({ type: String, example: 'spa-massage' })
   slug: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/category.jpg' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'https://example.com/category.jpg' })
   imageUrl: string | null;
 }
 
 class PublicClinicDto {
-  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @ApiProperty({ type: String, example: 'a1b2c3d4-...' })
   id: string;
 
-  @ApiProperty({ example: 'Healytics Wellness Center' })
+  @ApiProperty({ type: String, example: 'Healytics Wellness Center' })
   name: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/logo.jpg' })
+  @ApiPropertyOptional({ type: String, example: 'https://example.com/logo.jpg' })
     
   avatarUrl?: string;
 
-  @ApiProperty({ example: '123 Health Street, District 1, HCMC' })
+  @ApiProperty({ type: String, example: '123 Health Street, District 1, HCMC' })
   address: string;
 }
 
 class PublicFacilityImageDto {
-  @ApiProperty({ example: 'https://example.com/facility.jpg' })
+  @ApiProperty({ type: String, example: 'https://example.com/facility.jpg' })
   imageUrl: string;
 
-  @ApiProperty({ example: 'Treatment Room' })
+  @ApiProperty({ type: String, example: 'Treatment Room' })
   label: string;
 }
 
 class PublicServiceTagDto {
-  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @ApiProperty({ type: String, example: 'a1b2c3d4-...' })
   id: string;
 
-  @ApiProperty({ example: 'Pain Relief' })
+  @ApiProperty({ type: String, example: 'Pain Relief' })
   name: string;
 
-  @ApiProperty({ example: '#FF4CAF50' })
+  @ApiProperty({ type: String, example: '#FF4CAF50' })
   colorValue: string;
 
-  @ApiPropertyOptional({ example: 'Pain management and relief services' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'Pain management and relief services' })
   description: string | null;
 }
 
 // ─── Main DTO ────────────────────────────────────────────────
 
 export class PublicHealthServiceInfoResponseDto {
-  @ApiProperty() id: string;
-  @ApiProperty() title: string;
+  @ApiProperty({ type: String }) id: string;
+  @ApiProperty({ type: String }) title: string;
   @ApiProperty({ type: PublicCategoryDto }) category: PublicCategoryDto;
   @ApiProperty({ type: [String] }) images: string[];
-  @ApiProperty({ example: 4.9 }) rating: number;
-  @ApiProperty({ example: 124 }) reviewCount: number;
-  @ApiProperty({ example: '$350.00' }) price: string;
-  @ApiProperty({ example: true }) isVerified: boolean;
-  @ApiPropertyOptional() description: string | null;
+  @ApiProperty({ type: Number, example: 4.9 }) rating: number;
+  @ApiProperty({ type: Number, example: 124 }) reviewCount: number;
+  @ApiProperty({ type: String, example: '$350.00' }) price: string;
+  @ApiProperty({ type: Boolean, example: true }) isVerified: boolean;
+  @ApiPropertyOptional({ type: String, nullable: true }) description: string | null;
   @ApiProperty({ type: [PublicFeatureTagDto] })
   featureTags: PublicFeatureTagDto[];
   @ApiProperty({ type: PublicClinicDto }) clinic: PublicClinicDto;

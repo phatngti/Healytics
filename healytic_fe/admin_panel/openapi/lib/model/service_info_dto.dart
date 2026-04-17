@@ -20,6 +20,7 @@ class ServiceInfoDto {
     this.imageUrl,
   });
 
+
   String id;
 
   String title;

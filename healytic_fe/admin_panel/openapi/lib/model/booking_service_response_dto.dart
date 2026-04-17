@@ -25,6 +25,7 @@ class BookingServiceResponseDto {
     this.priceVnd,
   });
 
+
   /// Service/Product UUID
   String id;
 

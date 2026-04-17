@@ -28,6 +28,7 @@ class PublicHealthServiceEmployeeResponseDto {
     this.daySchedules = const [],
   });
 
+
   /// Employee (specialist) ID
   String id;
 
@@ -38,57 +39,21 @@ class PublicHealthServiceEmployeeResponseDto {
 
   String role;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? imageUrl;
+  String? imageUrl;
 
   bool isSelected;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? quote;
+  String? quote;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? degrees;
+  String? degrees;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? languages;
+  String? languages;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? experience;
+  String? experience;
 
   List<String> specializations;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? bio;
+  String? bio;
 
   List<PublicHealthServiceEmployeeDayScheduleDto> daySchedules;
 
@@ -193,16 +158,16 @@ class PublicHealthServiceEmployeeResponseDto {
         eligibilityId: mapValueOfType<String>(json, r'eligibilityId')!,
         name: mapValueOfType<String>(json, r'name')!,
         role: mapValueOfType<String>(json, r'role')!,
-        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
+        imageUrl: mapValueOfType<String>(json, r'imageUrl'),
         isSelected: mapValueOfType<bool>(json, r'isSelected')!,
-        quote: mapValueOfType<Object>(json, r'quote'),
-        degrees: mapValueOfType<Object>(json, r'degrees'),
-        languages: mapValueOfType<Object>(json, r'languages'),
-        experience: mapValueOfType<Object>(json, r'experience'),
+        quote: mapValueOfType<String>(json, r'quote'),
+        degrees: mapValueOfType<String>(json, r'degrees'),
+        languages: mapValueOfType<String>(json, r'languages'),
+        experience: mapValueOfType<String>(json, r'experience'),
         specializations: json[r'specializations'] is Iterable
             ? (json[r'specializations'] as Iterable).cast<String>().toList(growable: false)
             : const [],
-        bio: mapValueOfType<Object>(json, r'bio'),
+        bio: mapValueOfType<String>(json, r'bio'),
         daySchedules: PublicHealthServiceEmployeeDayScheduleDto.listFromJson(json[r'daySchedules']),
       );
     }

@@ -19,6 +19,7 @@ class PublicProfileLegalSummaryDto {
     required this.idNumber,
   });
 
+
   String fullName;
 
   String position;

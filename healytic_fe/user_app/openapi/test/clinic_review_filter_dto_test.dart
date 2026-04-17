@@ -26,7 +26,7 @@ void main() {
       // TODO
     });
 
-    // Object starCount
+    // num starCount
     test('to test the property `starCount`', () async {
       // TODO
     });

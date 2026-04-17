@@ -18,6 +18,7 @@ class PartnerDayScheduleDto {
     this.slots = const [],
   });
 
+
   String day;
 
   String date;

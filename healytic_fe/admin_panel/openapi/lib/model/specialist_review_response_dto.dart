@@ -23,6 +23,7 @@ class SpecialistReviewResponseDto {
     required this.createdAt,
   });
 
+
   String id;
 
   String appointmentId;

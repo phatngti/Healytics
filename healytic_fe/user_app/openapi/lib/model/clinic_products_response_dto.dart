@@ -19,6 +19,7 @@ class ClinicProductsResponseDto {
     required this.hasMore,
   });
 
+
   List<ClinicProductCategoryDto> categories;
 
   List<ClinicProductDto> products;

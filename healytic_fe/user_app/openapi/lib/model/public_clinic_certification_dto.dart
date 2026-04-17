@@ -18,6 +18,7 @@ class PublicClinicCertificationDto {
     required this.iconName,
   });
 
+
   String title;
 
   String subtitle;

@@ -18,6 +18,7 @@ class PartnerCategorySummaryDto {
     required this.slug,
   });
 
+
   String id;
 
   String name;

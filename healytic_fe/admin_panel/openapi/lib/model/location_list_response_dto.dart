@@ -17,6 +17,7 @@ class LocationListResponseDto {
     required this.total,
   });
 
+
   /// List of locations
   List<LocationResponseDto> data;
 

@@ -22,6 +22,7 @@ class CreateTherapistProfileDto {
     this.deviceProficiency = const [],
   });
 
+
   /// Therapist level
   CreateTherapistProfileDtoLevelEnum? level;
 

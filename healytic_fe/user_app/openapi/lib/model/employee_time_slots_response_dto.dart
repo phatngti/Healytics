@@ -21,6 +21,7 @@ class EmployeeTimeSlotsResponseDto {
     required this.rangeEnd,
   });
 
+
   /// Employee ID
   String employeeId;
 

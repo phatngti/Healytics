@@ -35,13 +35,13 @@ void main() {
     });
 
     // Category description
-    // Object description
+    // String description
     test('to test the property `description`', () async {
       // TODO
     });
 
     // Category image URL
-    // Object imageUrl
+    // String imageUrl
     test('to test the property `imageUrl`', () async {
       // TODO
     });

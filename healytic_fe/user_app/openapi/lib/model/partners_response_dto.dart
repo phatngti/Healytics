@@ -19,6 +19,7 @@ class PartnersResponseDto {
     required this.limit,
   });
 
+
   List<PartnerItemDto> data;
 
   num total;

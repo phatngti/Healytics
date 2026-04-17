@@ -24,6 +24,7 @@ class PartnerRequestDto {
     this.phoneNumber,
   });
 
+
   /// Tax code of the business (unique identifier)
   String taxCode;
 

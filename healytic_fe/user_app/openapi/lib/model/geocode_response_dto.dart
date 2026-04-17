@@ -16,6 +16,7 @@ class GeocodeResponseDto {
     this.results = const [],
   });
 
+
   List<GeocodeResultDto> results;
 
   @override

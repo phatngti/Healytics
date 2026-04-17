@@ -22,6 +22,7 @@ class AddressInfoDto {
     this.longitude,
   });
 
+
   VerifiedField streetAddress;
 
   ///

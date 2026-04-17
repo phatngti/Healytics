@@ -22,6 +22,7 @@ class PublicProfileBusinessInfoDto {
     this.username,
   });
 
+
   String brandName;
 
   String legalName;

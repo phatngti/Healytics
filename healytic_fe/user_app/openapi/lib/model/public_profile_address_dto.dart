@@ -22,6 +22,7 @@ class PublicProfileAddressDto {
     this.formattedAddress,
   });
 
+
   String streetAddress;
 
   Object? ward;

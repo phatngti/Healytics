@@ -24,6 +24,7 @@ class NotificationResponseDto {
     required this.createdAt,
   });
 
+
   /// Notification UUID
   String id;
 

@@ -16,6 +16,7 @@ class DistanceMatrixRowDto {
     this.elements = const [],
   });
 
+
   List<DistanceMatrixElementDto> elements;
 
   @override

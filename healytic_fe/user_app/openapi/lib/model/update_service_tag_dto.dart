@@ -20,6 +20,7 @@ class UpdateServiceTagDto {
     this.sortOrder,
   });
 
+
   /// Tag name
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
