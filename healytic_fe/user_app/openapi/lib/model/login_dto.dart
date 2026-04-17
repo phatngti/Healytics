@@ -17,6 +17,7 @@ class LoginDto {
     required this.password,
   });
 
+
   /// The email of the user
   String email;
 

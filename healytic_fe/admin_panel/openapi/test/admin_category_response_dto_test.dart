@@ -35,13 +35,13 @@ void main() {
     });
 
     // Category description
-    // Object description
+    // String description
     test('to test the property `description`', () async {
       // TODO
     });
 
     // Category image URL
-    // Object imageUrl
+    // String imageUrl
     test('to test the property `imageUrl`', () async {
       // TODO
     });
@@ -53,13 +53,13 @@ void main() {
     });
 
     // Icon identifier for frontend rendering
-    // Object iconName
+    // String iconName
     test('to test the property `iconName`', () async {
       // TODO
     });
 
     // Hex color value (e.g. #FF6B6B)
-    // Object colorValue
+    // String colorValue
     test('to test the property `colorValue`', () async {
       // TODO
     });

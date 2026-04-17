@@ -16,6 +16,7 @@ class AiRecommendationsRequestDto {
     this.serviceIds = const [],
   });
 
+
   /// List of service IDs to retrieve recommendations for
   List<String> serviceIds;
 

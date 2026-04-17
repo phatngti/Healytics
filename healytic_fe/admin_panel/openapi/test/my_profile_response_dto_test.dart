@@ -36,12 +36,12 @@ void main() {
       // TODO
     });
 
-    // String verificationStatus
+    // PartnerVerificationStatus verificationStatus
     test('to test the property `verificationStatus`', () async {
       // TODO
     });
 
-    // Object verificationCompletedAt
+    // DateTime verificationCompletedAt
     test('to test the property `verificationCompletedAt`', () async {
       // TODO
     });

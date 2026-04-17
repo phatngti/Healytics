@@ -16,13 +16,8 @@ class ClinicReviewResponseSubDto {
     this.responseText,
   });
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? responseText;
+
+  String? responseText;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is ClinicReviewResponseSubDto &&
@@ -65,7 +60,7 @@ class ClinicReviewResponseSubDto {
       }());
 
       return ClinicReviewResponseSubDto(
-        responseText: mapValueOfType<Object>(json, r'responseText'),
+        responseText: mapValueOfType<String>(json, r'responseText'),
       );
     }
     return null;

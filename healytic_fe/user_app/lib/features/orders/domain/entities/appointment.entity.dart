@@ -34,6 +34,19 @@ class AppointmentEntity {
   /// a review for this appointment.
   final bool isReviewed;
 
+  /// Payment gateway checkout URL.
+  /// Non-null only when status is `pending_payment`.
+  final String? paymentUrl;
+
+  /// Deep link to open the payment app directly
+  /// (e.g. MoMo). Non-null only when status is
+  /// `pending_payment`.
+  final String? paymentDeeplink;
+
+  /// When the payment link expires.
+  /// Non-null only when status is `pending_payment`.
+  final DateTime? paymentExpiresAt;
+
   const AppointmentEntity({
     required this.id,
     required this.serviceName,
@@ -52,6 +65,9 @@ class AppointmentEntity {
     this.specialistId,
     this.serviceId,
     this.isReviewed = false,
+    this.paymentUrl,
+    this.paymentDeeplink,
+    this.paymentExpiresAt,
   });
 
   @override
@@ -74,10 +90,13 @@ class AppointmentEntity {
           distanceKm == other.distanceKm &&
           specialistId == other.specialistId &&
           serviceId == other.serviceId &&
-          isReviewed == other.isReviewed;
+          isReviewed == other.isReviewed &&
+          paymentUrl == other.paymentUrl &&
+          paymentDeeplink == other.paymentDeeplink &&
+          paymentExpiresAt == other.paymentExpiresAt;
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     serviceName,
     healthPartnerName,
@@ -95,7 +114,10 @@ class AppointmentEntity {
     specialistId,
     serviceId,
     isReviewed,
-  );
+    paymentUrl,
+    paymentDeeplink,
+    paymentExpiresAt,
+  ]);
 }
 
 /// Category filter for appointments.

@@ -21,6 +21,7 @@ class PartnerHealthServiceDefinitionDto {
     this.staffAssignmentType,
   });
 
+
   /// Product ID (primary key)
   String productId;
 

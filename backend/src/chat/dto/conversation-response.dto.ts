@@ -4,33 +4,33 @@ import { ConversationStatus } from '@/chat/enums/conversation-status.enum';
 import { PartnerConversation } from '@/common/entities/partner-conversation.entity';
 
 class ParticipantInfoDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   @Expose()
   avatar?: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   role: string;
 }
 
 class LastMessageDto {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   @Expose()
   text?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: Date })
   @Expose()
   timestamp?: Date;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   @Expose()
   senderId?: string;
 }
@@ -39,15 +39,15 @@ class LastMessageDto {
  * Conversation list item response DTO.
  */
 export class ConversationResponseDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   id: string;
 
-  @ApiProperty({ enum: ConversationStatus })
+  @ApiProperty({ enum: ConversationStatus, enumName: 'ConversationStatus' })
   @Expose()
   status: ConversationStatus;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   @Expose()
   bookingId?: string;
 
@@ -61,11 +61,11 @@ export class ConversationResponseDto {
   @Type(() => LastMessageDto)
   lastMessage: LastMessageDto;
 
-  @ApiProperty()
+  @ApiProperty({ type: Number })
   @Expose()
   unreadCount: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: Date })
   @Expose()
   createdAt: Date;
 

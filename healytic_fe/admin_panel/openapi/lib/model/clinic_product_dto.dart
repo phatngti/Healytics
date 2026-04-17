@@ -28,61 +28,26 @@ class ClinicProductDto {
     required this.createdAtMs,
   });
 
+
   String id;
 
   String title;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? imageUrl;
+  String? imageUrl;
 
   String price;
 
   num priceAmount;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? originalPrice;
+  String? originalPrice;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? discountLabel;
+  String? discountLabel;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? badgeLabel;
+  String? badgeLabel;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? durationLabel;
+  String? durationLabel;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? specialistLabel;
+  String? specialistLabel;
 
   String categoryId;
 
@@ -189,14 +154,14 @@ class ClinicProductDto {
       return ClinicProductDto(
         id: mapValueOfType<String>(json, r'id')!,
         title: mapValueOfType<String>(json, r'title')!,
-        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
+        imageUrl: mapValueOfType<String>(json, r'imageUrl'),
         price: mapValueOfType<String>(json, r'price')!,
         priceAmount: num.parse('${json[r'priceAmount']}'),
-        originalPrice: mapValueOfType<Object>(json, r'originalPrice'),
-        discountLabel: mapValueOfType<Object>(json, r'discountLabel'),
-        badgeLabel: mapValueOfType<Object>(json, r'badgeLabel'),
-        durationLabel: mapValueOfType<Object>(json, r'durationLabel'),
-        specialistLabel: mapValueOfType<Object>(json, r'specialistLabel'),
+        originalPrice: mapValueOfType<String>(json, r'originalPrice'),
+        discountLabel: mapValueOfType<String>(json, r'discountLabel'),
+        badgeLabel: mapValueOfType<String>(json, r'badgeLabel'),
+        durationLabel: mapValueOfType<String>(json, r'durationLabel'),
+        specialistLabel: mapValueOfType<String>(json, r'specialistLabel'),
         categoryId: mapValueOfType<String>(json, r'categoryId')!,
         soldCount: num.parse('${json[r'soldCount']}'),
         createdAtMs: num.parse('${json[r'createdAtMs']}'),

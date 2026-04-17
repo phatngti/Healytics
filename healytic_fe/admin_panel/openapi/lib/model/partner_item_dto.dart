@@ -23,6 +23,7 @@ class PartnerItemDto {
     required this.createdAt,
   });
 
+
   String id;
 
   String taxCode;

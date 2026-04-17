@@ -17,6 +17,7 @@ class RegisterDeviceDto {
     required this.platform,
   });
 
+
   /// FCM or APNs device token
   String token;
 

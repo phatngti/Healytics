@@ -26,7 +26,7 @@ void main() {
       // TODO
     });
 
-    // Object imageUrl
+    // String imageUrl
     test('to test the property `imageUrl`', () async {
       // TODO
     });

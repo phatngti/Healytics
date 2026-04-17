@@ -1,8 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
+
+part 'auth_session.provider.g.dart';
 
 class AuthSessionStore {
   bool get isMockMode => AppEnvironment.current.useMock;
@@ -75,9 +78,10 @@ class AuthSessionStore {
   void forceLogout() => _clearSession();
 }
 
-final authSessionStoreProvider = Provider<AuthSessionStore>((ref) {
+@Riverpod(keepAlive: true)
+AuthSessionStore authSessionStore(Ref ref) {
   return AuthSessionStore();
-});
+}
 
 final currentUserDisplayNameProvider = Provider<String?>((ref) {
   return ref.watch(authSessionStoreProvider).currentUserDisplayName;

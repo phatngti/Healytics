@@ -23,17 +23,12 @@ class PartnerReviewDto {
     this.imageUrls = const [],
   });
 
+
   String id;
 
   String reviewerName;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? avatarUrl;
+  String? avatarUrl;
 
   num rating;
 
@@ -109,7 +104,7 @@ class PartnerReviewDto {
       return PartnerReviewDto(
         id: mapValueOfType<String>(json, r'id')!,
         reviewerName: mapValueOfType<String>(json, r'reviewerName')!,
-        avatarUrl: mapValueOfType<Object>(json, r'avatarUrl'),
+        avatarUrl: mapValueOfType<String>(json, r'avatarUrl'),
         rating: num.parse('${json[r'rating']}'),
         status: mapValueOfType<String>(json, r'status')!,
         date: mapValueOfType<String>(json, r'date')!,

@@ -19,6 +19,7 @@ class SpecialistInfoDto {
     this.avatarUrl,
   });
 
+
   String id;
 
   String name;

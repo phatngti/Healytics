@@ -12,16 +12,16 @@ Name | Type | Description | Notes
 **name** | **String** |  | 
 **address** | **String** |  | 
 **isVerified** | **bool** |  | 
-**coverImageUrl** | [**Object**](.md) |  | [optional] 
-**logoImageUrl** | [**Object**](.md) |  | [optional] 
+**coverImageUrl** | **String** |  | [optional] 
+**logoImageUrl** | **String** |  | [optional] 
 **gallery** | **List<String>** |  | [default to const []]
 **rating** | **num** |  | 
 **reviewCount** | **num** |  | 
 **followersLabel** | **String** |  | 
-**phone** | [**Object**](.md) |  | [optional] 
-**coordinates** | [**Object**](.md) |  | [optional] 
-**chatPartnerId** | [**Object**](.md) |  | [optional] 
-**description** | [**Object**](.md) |  | [optional] 
+**phone** | **String** |  | [optional] 
+**coordinates** | **String** |  | [optional] 
+**chatPartnerId** | **String** |  | [optional] 
+**description** | **String** |  | [optional] 
 **trustMetrics** | [**PublicClinicTrustMetricsDto**](PublicClinicTrustMetricsDto.md) |  | 
 **certifications** | [**List<PublicClinicCertificationDto>**](PublicClinicCertificationDto.md) |  | [default to const []]
 **specialists** | [**List<PublicClinicSpecialistPreviewDto>**](PublicClinicSpecialistPreviewDto.md) |  | [default to const []]

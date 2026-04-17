@@ -17,6 +17,7 @@ class PartnerFeatureTagDto {
     required this.label,
   });
 
+
   String iconName;
 
   String label;

@@ -19,6 +19,7 @@ class PriceBreakdownDto {
     required this.currency,
   });
 
+
   num subTotal;
 
   num discount;

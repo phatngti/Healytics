@@ -18,6 +18,7 @@ class PublicHealthServiceEmployeeEligibilityDto {
     required this.isPrimary,
   });
 
+
   /// Product ID
   String productId;
 

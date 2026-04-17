@@ -14,8 +14,8 @@ Name | Type | Description | Notes
 **startTime** | [**DateTime**](DateTime.md) |  | 
 **status** | **String** |  | 
 **idempotencyKey** | **String** |  | 
-**bookingId** | [**Object**](.md) | Booking ID when checkout succeeds | [optional] 
-**errorMessage** | [**Object**](.md) | Error message when checkout fails | [optional] 
+**bookingId** | **String** | Booking ID when checkout succeeds | [optional] 
+**errorMessage** | **String** | Error message when checkout fails | [optional] 
 **createdAt** | [**DateTime**](DateTime.md) |  | 
 **updatedAt** | [**DateTime**](DateTime.md) |  | 
 

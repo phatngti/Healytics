@@ -6,7 +6,7 @@ import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/checkout/domain/entities/booking.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/momo_payment.entity.dart';
-import 'package:user_openapi/api.dart';
+import 'package:user_openapi/api.dart' hide BookingStatus;
 import 'checkout_mock_data.dart';
 
 // ────────────────────────────────────────────────────
@@ -239,17 +239,15 @@ class CheckoutRemoteDatasourceImpl
       id: dto.id,
       userId: dto.userId,
       staffId: dto.staffId,
-      productId: dto.productId?.toString(),
+      productId: dto.productId,
       startTime: dto.startTime,
-      endTime: dto.endTime is DateTime
-          ? dto.endTime! as DateTime
-          : null,
-      status: BookingStatus.fromString(dto.status.value),
-      paymentUrl: dto.paymentUrl?.toString(),
-      paymentExpiresAt: dto.paymentExpiresAt is DateTime
-          ? dto.paymentExpiresAt! as DateTime
-          : null,
-      notes: dto.notes?.toString(),
+      endTime: dto.endTime,
+      status: BookingStatus.fromString(
+        dto.status.value,
+      ),
+      paymentUrl: dto.paymentUrl,
+      paymentExpiresAt: dto.paymentExpiresAt,
+      notes: dto.notes,
       createdAt: dto.createdAt,
       updatedAt: dto.updatedAt,
     );

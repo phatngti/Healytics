@@ -18,6 +18,7 @@ class PartnerDetailServiceManualDto {
     this.procedureSteps = const [],
   });
 
+
   List<String> preServiceGuidelines;
 
   List<PartnerDetailServiceRuleDto> serviceRules;

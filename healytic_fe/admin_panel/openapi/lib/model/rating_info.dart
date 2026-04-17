@@ -17,6 +17,7 @@ class RatingInfo {
     required this.totalReviews,
   });
 
+
   num average;
 
   int totalReviews;

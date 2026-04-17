@@ -16,6 +16,7 @@ class ClientKeyResponseDto {
     required this.apiKey,
   });
 
+
   /// Mapbox public access token for frontend/mobile SDKs
   String apiKey;
 

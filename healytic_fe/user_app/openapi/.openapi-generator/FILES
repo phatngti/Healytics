@@ -22,6 +22,7 @@ doc/AiRecommendationsRequestDto.md
 doc/AiRecommendationsResponseDto.md
 doc/AppointmentCategoryResponseDto.md
 doc/AppointmentResponseDto.md
+doc/AppointmentStatus.md
 doc/AsyncCheckoutDto.md
 doc/AsyncCheckoutResponseDto.md
 doc/AttachTagResponseDto.md
@@ -31,6 +32,7 @@ doc/BookingResponseDto.md
 doc/BookingScheduleDto.md
 doc/BookingServiceResponseDto.md
 doc/BookingSpecialistResponseDto.md
+doc/BookingStatus.md
 doc/BusinessInfo.md
 doc/BusinessInfoDto.md
 doc/BusinessServiceDto.md
@@ -65,6 +67,7 @@ doc/ClinicTrustMetricsDto.md
 doc/CompletionChecklistItemDto.md
 doc/ConversationResponse.md
 doc/ConversationResponseDto.md
+doc/ConversationStatus.md
 doc/ConversationsPageResponse.md
 doc/CreateBroadcastDto.md
 doc/CreateCategoryDto.md
@@ -102,6 +105,8 @@ doc/FileUrlResponseDto.md
 doc/GeocodeResponseDto.md
 doc/GeocodeResultDto.md
 doc/HealthApi.md
+doc/HealthServiceStatus.md
+doc/HealthServiceType.md
 doc/HomeRecommenderRequest.md
 doc/InventoryAlertDto.md
 doc/KycDocumentDto.md
@@ -148,6 +153,7 @@ doc/PartnerHealthServicesApi.md
 doc/PartnerItemDto.md
 doc/PartnerLoginDto.md
 doc/PartnerPartnersApi.md
+doc/PartnerPriority.md
 doc/PartnerProcedureStepDto.md
 doc/PartnerProfileCompletionCertificationDto.md
 doc/PartnerProfileCompletionIdentityDto.md
@@ -317,6 +323,7 @@ lib/model/ai_recommendations_request_dto.dart
 lib/model/ai_recommendations_response_dto.dart
 lib/model/appointment_category_response_dto.dart
 lib/model/appointment_response_dto.dart
+lib/model/appointment_status.dart
 lib/model/async_checkout_dto.dart
 lib/model/async_checkout_response_dto.dart
 lib/model/attach_tag_response_dto.dart
@@ -325,6 +332,7 @@ lib/model/booking_response_dto.dart
 lib/model/booking_schedule_dto.dart
 lib/model/booking_service_response_dto.dart
 lib/model/booking_specialist_response_dto.dart
+lib/model/booking_status.dart
 lib/model/business_info.dart
 lib/model/business_info_dto.dart
 lib/model/business_service_dto.dart
@@ -356,6 +364,7 @@ lib/model/clinic_trust_metrics_dto.dart
 lib/model/completion_checklist_item_dto.dart
 lib/model/conversation_response.dart
 lib/model/conversation_response_dto.dart
+lib/model/conversation_status.dart
 lib/model/conversations_page_response.dart
 lib/model/create_broadcast_dto.dart
 lib/model/create_category_dto.dart
@@ -392,6 +401,8 @@ lib/model/featured_specialist_response_dto.dart
 lib/model/file_url_response_dto.dart
 lib/model/geocode_response_dto.dart
 lib/model/geocode_result_dto.dart
+lib/model/health_service_status.dart
+lib/model/health_service_type.dart
 lib/model/home_recommender_request.dart
 lib/model/inventory_alert_dto.dart
 lib/model/kyc_document_dto.dart
@@ -430,6 +441,7 @@ lib/model/partner_health_service_media_dto.dart
 lib/model/partner_health_service_response_dto.dart
 lib/model/partner_item_dto.dart
 lib/model/partner_login_dto.dart
+lib/model/partner_priority.dart
 lib/model/partner_procedure_step_dto.dart
 lib/model/partner_profile_completion_certification_dto.dart
 lib/model/partner_profile_completion_identity_dto.dart
@@ -545,6 +557,7 @@ test/ai_recommendations_request_dto_test.dart
 test/ai_recommendations_response_dto_test.dart
 test/appointment_category_response_dto_test.dart
 test/appointment_response_dto_test.dart
+test/appointment_status_test.dart
 test/async_checkout_dto_test.dart
 test/async_checkout_response_dto_test.dart
 test/attach_tag_response_dto_test.dart
@@ -554,6 +567,7 @@ test/booking_response_dto_test.dart
 test/booking_schedule_dto_test.dart
 test/booking_service_response_dto_test.dart
 test/booking_specialist_response_dto_test.dart
+test/booking_status_test.dart
 test/business_info_dto_test.dart
 test/business_info_test.dart
 test/business_service_dto_test.dart
@@ -588,6 +602,7 @@ test/clinic_trust_metrics_dto_test.dart
 test/completion_checklist_item_dto_test.dart
 test/conversation_response_dto_test.dart
 test/conversation_response_test.dart
+test/conversation_status_test.dart
 test/conversations_page_response_test.dart
 test/create_broadcast_dto_test.dart
 test/create_category_dto_test.dart
@@ -625,6 +640,8 @@ test/file_url_response_dto_test.dart
 test/geocode_response_dto_test.dart
 test/geocode_result_dto_test.dart
 test/health_api_test.dart
+test/health_service_status_test.dart
+test/health_service_type_test.dart
 test/home_recommender_request_test.dart
 test/inventory_alert_dto_test.dart
 test/kyc_document_dto_test.dart
@@ -671,6 +688,7 @@ test/partner_health_services_api_test.dart
 test/partner_item_dto_test.dart
 test/partner_login_dto_test.dart
 test/partner_partners_api_test.dart
+test/partner_priority_test.dart
 test/partner_procedure_step_dto_test.dart
 test/partner_profile_completion_certification_dto_test.dart
 test/partner_profile_completion_identity_dto_test.dart

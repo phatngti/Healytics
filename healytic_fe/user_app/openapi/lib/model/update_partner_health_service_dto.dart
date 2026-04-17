@@ -30,6 +30,7 @@ class UpdatePartnerHealthServiceDto {
     this.serviceManual,
   });
 
+
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -62,7 +63,13 @@ class UpdatePartnerHealthServiceDto {
   ///
   String? description;
 
-  UpdatePartnerHealthServiceDtoTypeEnum? type;
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  HealthServiceType? type;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -255,7 +262,7 @@ class UpdatePartnerHealthServiceDto {
         name: mapValueOfType<String>(json, r'name'),
         slug: mapValueOfType<String>(json, r'slug'),
         description: mapValueOfType<String>(json, r'description'),
-        type: UpdatePartnerHealthServiceDtoTypeEnum.fromJson(json[r'type']),
+        type: HealthServiceType.fromJson(json[r'type']),
         basePrice: num.parse('${json[r'basePrice']}'),
         salePrice: num.parse('${json[r'salePrice']}'),
         currency: mapValueOfType<String>(json, r'currency'),
@@ -317,77 +324,6 @@ class UpdatePartnerHealthServiceDto {
   static const requiredKeys = <String>{
   };
 }
-
-
-class UpdatePartnerHealthServiceDtoTypeEnum {
-  /// Instantiate a new enum with the provided [value].
-  const UpdatePartnerHealthServiceDtoTypeEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const service = UpdatePartnerHealthServiceDtoTypeEnum._(r'service');
-
-  /// List of all possible values in this [enum][UpdatePartnerHealthServiceDtoTypeEnum].
-  static const values = <UpdatePartnerHealthServiceDtoTypeEnum>[
-    service,
-  ];
-
-  static UpdatePartnerHealthServiceDtoTypeEnum? fromJson(dynamic value) => UpdatePartnerHealthServiceDtoTypeEnumTypeTransformer().decode(value);
-
-  static List<UpdatePartnerHealthServiceDtoTypeEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <UpdatePartnerHealthServiceDtoTypeEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = UpdatePartnerHealthServiceDtoTypeEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [UpdatePartnerHealthServiceDtoTypeEnum] to String,
-/// and [decode] dynamic data back to [UpdatePartnerHealthServiceDtoTypeEnum].
-class UpdatePartnerHealthServiceDtoTypeEnumTypeTransformer {
-  factory UpdatePartnerHealthServiceDtoTypeEnumTypeTransformer() => _instance ??= const UpdatePartnerHealthServiceDtoTypeEnumTypeTransformer._();
-
-  const UpdatePartnerHealthServiceDtoTypeEnumTypeTransformer._();
-
-  String encode(UpdatePartnerHealthServiceDtoTypeEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a UpdatePartnerHealthServiceDtoTypeEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  UpdatePartnerHealthServiceDtoTypeEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'service': return UpdatePartnerHealthServiceDtoTypeEnum.service;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [UpdatePartnerHealthServiceDtoTypeEnumTypeTransformer] instance.
-  static UpdatePartnerHealthServiceDtoTypeEnumTypeTransformer? _instance;
-}
-
 
 
 class UpdatePartnerHealthServiceDtoStatusEnum {

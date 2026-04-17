@@ -17,6 +17,7 @@ class PartnerTimeSlotDto {
     required this.available,
   });
 
+
   String time;
 
   bool available;

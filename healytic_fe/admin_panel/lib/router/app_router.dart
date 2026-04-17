@@ -21,7 +21,7 @@ final List<Map<String, dynamic>> providerSlideMenuItems = [
   },
   {
     "icon": Icons.production_quantity_limits_outlined,
-    "label": 'Products',
+    "label": 'Services',
     "route": partner.ProductHomeRoute().location,
   },
   {

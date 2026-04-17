@@ -55,8 +55,26 @@ String parameterToString(dynamic value) {
   if (value is DateTime) {
     return value.toUtc().toIso8601String();
   }
+  if (value is AppointmentStatus) {
+    return AppointmentStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is BookingStatus) {
+    return BookingStatusTypeTransformer().encode(value).toString();
+  }
   if (value is BusinessType) {
     return BusinessTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is ConversationStatus) {
+    return ConversationStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is HealthServiceStatus) {
+    return HealthServiceStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is HealthServiceType) {
+    return HealthServiceTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is PartnerPriority) {
+    return PartnerPriorityTypeTransformer().encode(value).toString();
   }
   if (value is PartnerVerificationStatus) {
     return PartnerVerificationStatusTypeTransformer().encode(value).toString();

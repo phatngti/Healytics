@@ -22,6 +22,7 @@ class StaffScheduleEntryDto {
     this.patientName,
   });
 
+
   String employeeId;
 
   String employeeName;

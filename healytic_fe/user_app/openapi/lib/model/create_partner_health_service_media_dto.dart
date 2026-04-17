@@ -19,6 +19,7 @@ class CreatePartnerHealthServiceMediaDto {
     this.sortOrder,
   });
 
+
   String url;
 
   CreatePartnerHealthServiceMediaDtoMediaTypeEnum? mediaType;

@@ -4,61 +4,61 @@ import { MessageType } from '@/chat/enums/message-type.enum';
 import { PartnerChatMessage } from '@/common/entities/partner-chat-message.entity';
 
 export class ChatAttachmentResponseDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   fileUrl: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   fileName: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   fileType: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: Number })
   @Expose()
   fileSize: number;
 }
 
 export class ChatMessageResponseDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   conversationId: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   senderId: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   receiverId: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   @Expose()
   senderName?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   @Expose()
   senderAvatar?: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   content: string;
 
-  @ApiProperty({ enum: MessageType })
+  @ApiProperty({ enum: MessageType, enumName: 'MessageType' })
   @Expose()
   messageType: MessageType;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   @Expose()
   clientMessageId?: string;
 
@@ -67,7 +67,7 @@ export class ChatMessageResponseDto {
   @Type(() => ChatAttachmentResponseDto)
   attachments?: ChatAttachmentResponseDto[];
 
-  @ApiProperty()
+  @ApiProperty({ type: Date })
   @Expose()
   createdAt: Date;
 

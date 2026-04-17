@@ -17,6 +17,7 @@ class AiRecommendationsResponseDto {
     this.recommendations = const [],
   });
 
+
   num total;
 
   List<AiRecommendationItemDto> recommendations;

@@ -19,6 +19,7 @@ class DayScheduleDto {
     this.slots = const [],
   });
 
+
   /// Date in YYYY-MM-DD format
   String date;
 

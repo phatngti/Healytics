@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
+import { ScheduleModule } from '@nestjs/schedule';
 import { Booking } from '@/common/entities/booking.entity';
 import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
 import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
@@ -20,6 +21,7 @@ import { GetBookingHandler } from './application/handlers/get-booking.handler';
 import { GetCheckoutTicketHandler } from './application/handlers/get-checkout-ticket.handler';
 import { ListUserBookingsHandler } from './application/handlers/list-user-bookings.handler';
 import { WebhookService } from './services/webhook.service';
+import { PaymentExpiryService } from './services/payment-expiry.service';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { WebhookService } from './services/webhook.service';
     ]),
     HttpModule.register({ timeout: 5000 }),
     NotificationModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [BookingController, SlotsController, ProcessCheckoutHandler],
   providers: [
@@ -46,6 +49,7 @@ import { WebhookService } from './services/webhook.service';
     GetCheckoutTicketHandler,
     ListUserBookingsHandler,
     WebhookService,
+    PaymentExpiryService,
   ],
   exports: [BookingService],
 })

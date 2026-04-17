@@ -22,6 +22,7 @@ class UserProfileDto {
     required this.profileCompleted,
   });
 
+
   /// Profile ID
   String id;
 

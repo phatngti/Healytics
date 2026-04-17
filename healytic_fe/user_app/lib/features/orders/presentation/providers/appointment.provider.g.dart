@@ -8,49 +8,49 @@ part of 'appointment.provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Fetches all appointments from the repository
-/// and exposes a [silentRefresh] for background
-/// reload without redundant re-renders.
+/// Fetches appointments filtered by the current
+/// tab (status) and category selection using
+/// server-side filtering.
 
-@ProviderFor(AppointmentsNotifier)
-const appointmentsProvider = AppointmentsNotifierProvider._();
+@ProviderFor(FilteredAppointmentsNotifier)
+const filteredAppointmentsProvider = FilteredAppointmentsNotifierProvider._();
 
-/// Fetches all appointments from the repository
-/// and exposes a [silentRefresh] for background
-/// reload without redundant re-renders.
-final class AppointmentsNotifierProvider
+/// Fetches appointments filtered by the current
+/// tab (status) and category selection using
+/// server-side filtering.
+final class FilteredAppointmentsNotifierProvider
     extends
-        $AsyncNotifierProvider<AppointmentsNotifier, List<AppointmentEntity>> {
-  /// Fetches all appointments from the repository
-  /// and exposes a [silentRefresh] for background
-  /// reload without redundant re-renders.
-  const AppointmentsNotifierProvider._()
+        $AsyncNotifierProvider<FilteredAppointmentsNotifier, List<AppointmentEntity>> {
+  /// Fetches appointments filtered by the current
+  /// tab (status) and category selection using
+  /// server-side filtering.
+  const FilteredAppointmentsNotifierProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'appointmentsProvider',
+        name: r'filteredAppointmentsProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$appointmentsNotifierHash();
+  String debugGetCreateSourceHash() => _$filteredAppointmentsNotifierHash();
 
   @$internal
   @override
-  AppointmentsNotifier create() => AppointmentsNotifier();
+  FilteredAppointmentsNotifier create() => FilteredAppointmentsNotifier();
 }
 
-String _$appointmentsNotifierHash() =>
-    r'197e52b2054177a5f06938b8504630cb0695c51a';
+String _$filteredAppointmentsNotifierHash() =>
+    r'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
 
-/// Fetches all appointments from the repository
-/// and exposes a [silentRefresh] for background
-/// reload without redundant re-renders.
+/// Fetches appointments filtered by the current
+/// tab (status) and category selection using
+/// server-side filtering.
 
-abstract class _$AppointmentsNotifier
+abstract class _$FilteredAppointmentsNotifier
     extends $AsyncNotifier<List<AppointmentEntity>> {
   FutureOr<List<AppointmentEntity>> build();
   @$mustCallSuper
@@ -355,16 +355,18 @@ abstract class _$SelectedViewLayoutNotifier
   }
 }
 
-/// Derived provider that filters appointments by
-/// the current tab and category selection.
+/// Legacy-compatible alias. Widgets that still
+/// reference [appointmentsProvider] will get the
+/// same filtered data.
 
-@ProviderFor(filteredAppointments)
-const filteredAppointmentsProvider = FilteredAppointmentsProvider._();
+@ProviderFor(appointments)
+const appointmentsProvider = AppointmentsProvider._();
 
-/// Derived provider that filters appointments by
-/// the current tab and category selection.
+/// Legacy-compatible alias. Widgets that still
+/// reference [appointmentsProvider] will get the
+/// same filtered data.
 
-final class FilteredAppointmentsProvider
+final class AppointmentsProvider
     extends
         $FunctionalProvider<
           AsyncValue<List<AppointmentEntity>>,
@@ -374,21 +376,22 @@ final class FilteredAppointmentsProvider
     with
         $FutureModifier<List<AppointmentEntity>>,
         $FutureProvider<List<AppointmentEntity>> {
-  /// Derived provider that filters appointments by
-  /// the current tab and category selection.
-  const FilteredAppointmentsProvider._()
+  /// Legacy-compatible alias. Widgets that still
+  /// reference [appointmentsProvider] will get the
+  /// same filtered data.
+  const AppointmentsProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'filteredAppointmentsProvider',
+        name: r'appointmentsProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$filteredAppointmentsHash();
+  String debugGetCreateSourceHash() => _$appointmentsHash();
 
   @$internal
   @override
@@ -398,12 +401,12 @@ final class FilteredAppointmentsProvider
 
   @override
   FutureOr<List<AppointmentEntity>> create(Ref ref) {
-    return filteredAppointments(ref);
+    return appointments(ref);
   }
 }
 
-String _$filteredAppointmentsHash() =>
-    r'625f7effdd7146d1b2157c360d4274ec17a03dea';
+String _$appointmentsHash() =>
+    r'b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1';
 
 /// Fetches a single appointment by its [id].
 

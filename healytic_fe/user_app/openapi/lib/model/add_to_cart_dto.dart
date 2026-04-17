@@ -18,6 +18,7 @@ class AddToCartDto {
     required this.timeSlot,
   });
 
+
   /// UUID of the health service
   String serviceId;
 

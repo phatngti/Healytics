@@ -9,12 +9,7 @@ abstract class ProductOverviewAnalytics with _$ProductOverviewAnalytics {
   const factory ProductOverviewAnalytics({
     required int totalProducts,
     required int activeProducts,
-    required int draftProducts,
-    required int archivedProducts,
-    required int hiddenProducts,
-    required int missingMediaProducts,
-    required int missingManualProducts,
-    required int missingStaffProducts,
+    required ProductBookingMetricsSummary bookingMetrics,
     required int bookings,
     required double bookingsDelta,
     required double revenue,
@@ -25,8 +20,31 @@ abstract class ProductOverviewAnalytics with _$ProductOverviewAnalytics {
     required List<ProductTrendPoint> trendPoints,
     required List<ProductCategoryPerformance> categoryPerformance,
     required List<ProductServicePerformance> topServices,
-    required List<ProductCatalogAlert> catalogAlerts,
   }) = _ProductOverviewAnalytics;
+}
+
+@freezed
+abstract class ProductBookingMetricsSummary
+    with _$ProductBookingMetricsSummary {
+  const factory ProductBookingMetricsSummary({
+    required int totalBookings,
+    required int delayedBookings,
+    required int delayThresholdMinutes,
+    required int pendingBookings,
+    required int completedBookings,
+    required List<ProductBookingStatusMetric> statusBreakdown,
+    required List<ProductAnalyticsAlert> alerts,
+  }) = _ProductBookingMetricsSummary;
+}
+
+@freezed
+abstract class ProductBookingStatusMetric with _$ProductBookingStatusMetric {
+  const factory ProductBookingStatusMetric({
+    required String statusKey,
+    required String label,
+    required int count,
+    required AnalyticsStatusTone tone,
+  }) = _ProductBookingStatusMetric;
 }
 
 @freezed
@@ -45,7 +63,7 @@ abstract class ProductDetailAnalytics with _$ProductDetailAnalytics {
     required List<ProductReviewBucket> reviewDistribution,
     required List<ProductOperationalMetric> operationalMetrics,
     required List<ProductServicePerformance> peerRanking,
-    required List<ProductCatalogAlert> alerts,
+    required List<ProductAnalyticsAlert> alerts,
   }) = _ProductDetailAnalytics;
 }
 
@@ -96,10 +114,10 @@ abstract class ProductReviewBucket with _$ProductReviewBucket {
 }
 
 @freezed
-abstract class ProductCatalogAlert with _$ProductCatalogAlert {
-  const factory ProductCatalogAlert({
+abstract class ProductAnalyticsAlert with _$ProductAnalyticsAlert {
+  const factory ProductAnalyticsAlert({
     required String title,
     required String detail,
     required AnalyticsStatusTone tone,
-  }) = _ProductCatalogAlert;
+  }) = _ProductAnalyticsAlert;
 }

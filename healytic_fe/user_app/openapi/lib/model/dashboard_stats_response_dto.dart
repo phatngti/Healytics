@@ -27,6 +27,7 @@ class DashboardStatsResponseDto {
     required this.totalReviews,
   });
 
+
   num totalAppointments;
 
   num completedAppointments;

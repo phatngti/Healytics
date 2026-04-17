@@ -43,6 +43,7 @@ class EmployeeResponseDto {
     this.therapistProfile,
   });
 
+
   /// Unique employee identifier
   String id;
 

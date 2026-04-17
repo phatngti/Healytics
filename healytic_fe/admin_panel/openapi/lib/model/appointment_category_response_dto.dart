@@ -18,6 +18,7 @@ class AppointmentCategoryResponseDto {
     required this.iconSlug,
   });
 
+
   String id;
 
   String name;

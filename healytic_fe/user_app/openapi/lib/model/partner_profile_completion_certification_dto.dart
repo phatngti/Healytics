@@ -20,6 +20,7 @@ class PartnerProfileCompletionCertificationDto {
     required this.sortOrder,
   });
 
+
   String id;
 
   String title;

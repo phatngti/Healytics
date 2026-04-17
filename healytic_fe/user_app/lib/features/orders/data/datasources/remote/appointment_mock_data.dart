@@ -3,6 +3,64 @@ import 'package:user_app/features/orders/domain/entities/appointment.entity.dart
 /// Mock appointments matching the HTML reference design.
 final List<AppointmentEntity> kMockAppointments = [
   AppointmentEntity(
+    id: 'apt-pending-1',
+    serviceName: 'Hot Stone Therapy',
+    healthPartnerName: 'Glow Saigon Spa Retreat',
+    healthPartnerId: 'vendor-spa-1',
+    imageUrl:
+        'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2'
+        '?w=800&h=400&fit=crop',
+    status: 'pending_payment',
+    category: 'spa',
+    specialistName: 'Dr Alexander Linda',
+    address:
+        '311 Vo Van Tan, Ward 14\n'
+        'District 1, HCM City, VN',
+    date: DateTime.now().add(const Duration(days: 2)),
+    checkInTime: '9:00 AM',
+    checkOutTime: '10:00 AM',
+    duration: 'About 1 hour',
+    distanceKm: 2.5,
+    specialistId: 'emp-doctor-1',
+    serviceId: 'svc-hot-stone',
+    paymentUrl:
+        'https://checkout.stripe.com/c/pay/cs_mock_123',
+    paymentDeeplink: 'momo://app?action=payWithApp'
+        '&amount=500000&isScanQR=false',
+    paymentExpiresAt: DateTime.now().add(
+      const Duration(minutes: 10),
+    ),
+  ),
+  AppointmentEntity(
+    id: 'apt-pending-2',
+    serviceName: 'Hydrating Facial',
+    healthPartnerName: 'Beauty Lab Saigon',
+    healthPartnerId: 'vendor-beauty-1',
+    imageUrl:
+        'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881'
+        '?w=800&h=400&fit=crop',
+    status: 'pending_payment',
+    category: 'beauty',
+    specialistName: 'Dr Sofia Tran',
+    address:
+        '88 Le Thanh Ton, Ben Nghe\n'
+        'District 1, HCM City, VN',
+    date: DateTime.now().add(const Duration(days: 5)),
+    checkInTime: '2:00 PM',
+    checkOutTime: '3:00 PM',
+    duration: 'About 1 hour',
+    distanceKm: 4.2,
+    specialistId: 'emp-doctor-1',
+    serviceId: 'svc-hydrating-facial',
+    paymentUrl:
+        'https://checkout.stripe.com/c/pay/cs_mock_456',
+    paymentDeeplink: 'momo://app?action=payWithApp'
+        '&amount=350000&isScanQR=false',
+    paymentExpiresAt: DateTime.now().add(
+      const Duration(minutes: 7),
+    ),
+  ),
+  AppointmentEntity(
     id: 'apt-1',
     serviceName: 'Swedish Relax',
     healthPartnerName: 'Glow Saigon Spa Retreat',

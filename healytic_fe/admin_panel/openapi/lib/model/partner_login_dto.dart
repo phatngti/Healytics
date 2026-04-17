@@ -17,6 +17,7 @@ class PartnerLoginDto {
     required this.password,
   });
 
+
   /// The email of the partner
   String email;
 
