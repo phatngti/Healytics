@@ -135,3 +135,63 @@ Phụ lục này trình bày chi tiết thiết kế giao diện cho các nhóm 
     \vspace{1em}
     \caption{Giao diện Checkout}
 \end{figure}
+
+\chapter{Phụ lục kết quả đánh giá Recommender}
+\label{appendix:recommender_eval}
+
+Phụ lục này tổng hợp đầy đủ các hình trực quan từ hai baseline \texttt{chatbot\_baseline\_v1} và \texttt{home\_baseline\_v1} trong thí nghiệm đánh giá hệ thống gợi ý dịch vụ.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{Images/evaluation/recommender/run_comparison.png}
+    \caption{Biểu đồ so sánh hai baseline \texttt{chatbot\_baseline\_v1} và \texttt{home\_baseline\_v1} theo Hit@3, Recall@3, MRR@3, NDCG@3}
+    \label{fig:appendix_rec_run_compare}
+\end{figure}
+
+\subsection{Baseline Chatbot: phân rã theo chủ đề và nhiễu}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{Images/evaluation/recommender/category_breakdown_chatbot_baseline_v1.png}
+    \caption{Phân rã chất lượng theo nhóm chủ đề của \texttt{chatbot\_baseline\_v1}}
+    \label{fig:appendix_chatbot_category_breakdown}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{Images/evaluation/recommender/hnr_breakdown_chatbot_baseline_v1.png}
+    \caption{Hard Negative Rate theo chủ đề của \texttt{chatbot\_baseline\_v1}}
+    \label{fig:appendix_chatbot_hnr_breakdown}
+\end{figure}
+
+\subsection{Phân bố score retrieval}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{Images/evaluation/recommender/cosine_dist_chatbot_chatbot_baseline_v1.png}
+    \caption{Phân bố score retrieval của \texttt{chatbot\_baseline\_v1}}
+    \label{fig:appendix_chatbot_score_dist}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{Images/evaluation/recommender/cosine_dist_home_home_baseline_v1.png}
+    \caption{Phân bố score retrieval của \texttt{home\_baseline\_v1}}
+    \label{fig:appendix_home_score_dist}
+\end{figure}
+
+\subsection{Phân bố độ trễ}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{Images/evaluation/recommender/latency_dist_chatbot_baseline_v1.png}
+    \caption{Phân bố độ trễ truy xuất của \texttt{chatbot\_baseline\_v1}}
+    \label{fig:appendix_chatbot_latency_dist}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.92\textwidth]{Images/evaluation/recommender/latency_dist_home_baseline_v1.png}
+    \caption{Phân bố độ trễ truy xuất của \texttt{home\_baseline\_v1}}
+    \label{fig:appendix_home_latency_dist}
+\end{figure}

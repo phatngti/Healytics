@@ -7,7 +7,7 @@ from config.settings import SERVICE_JSON_PATH
 
 class Service_Loader:
     def load_services(self):
-        with open(SERVICE_JSON_PATH, 'r') as file:
+        with open(SERVICE_JSON_PATH, 'r', encoding='utf-8') as file:
             data = json.load(file)
         return data
     

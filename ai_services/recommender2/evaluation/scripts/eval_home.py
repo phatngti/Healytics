@@ -10,36 +10,43 @@ Usage (from the recommender2/ root):
 """
 
 from __future__ import annotations
-
 import argparse
 import json
 import os
-import re
 import sys
 import time
 from datetime import datetime
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any
+from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # Path setup
 # ---------------------------------------------------------------------------
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-sys.path.insert(0, ROOT_DIR)
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(ROOT_DIR))
 
-from config import settings
-from src.recommender.home_recommender import Home_Recommender
-from src.recommender.embedding_model import Embedding_Model
-from src.recommender.vector_store import Vector_Database
 from evaluation.metrics import compute_all_metrics
+from src.recommender.vector_store import Vector_Database
+from src.recommender.embedding_model import Embedding_Model
+from src.recommender.home_recommender import Home_Recommender
+from evaluation.scripts.eval_utils import (
+    load_dataset,
+    get_distance_type,
+    resolve_score_mode,
+    align_scores_and_rank,
+    ensure_eval_collection,
+    print_eval_summary
+)
+from config import settings
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-EVAL_DIR = os.path.join(ROOT_DIR, "evaluation")
-DATASET_PATH = os.path.join(EVAL_DIR, "datasets", "home_eval.json")
-RESULTS_DIR = os.path.join(EVAL_DIR, "results")
-RUNS_DIR = os.path.join(RESULTS_DIR, "runs")
-EVAL_COLLECTION_NAME = "healytics_eval_collection"
+EVAL_DIR = Path(ROOT_DIR) / "evaluation"
+DATASET_PATH = EVAL_DIR / "datasets" / "home_eval.json"
+RESULTS_DIR = EVAL_DIR / "results"
+RUNS_DIR = RESULTS_DIR / "runs"
+EVAL_COLLECTION_NAME = "healytics_eval_home"
 
 
 def _clean_text(text: str) -> str:
@@ -50,22 +57,6 @@ def _clean_text(text: str) -> str:
 def _stable_unique(values: List[str]) -> List[str]:
     """Preserve insertion order while removing duplicates."""
     return list(dict.fromkeys(values))
-
-
-def _description_snippet(description: str, max_chars: int = 180) -> str:
-    """Extract a short natural-language context snippet from profile description."""
-    text = _clean_text(description)
-    if not text:
-        return ""
-
-    sentences = [s.strip() for s in re.split(r"[.!?;]+", text) if s.strip()]
-    if not sentences:
-        return text[:max_chars]
-
-    snippet = sentences[0]
-    if len(sentences) > 1 and len(snippet) < 80:
-        snippet = f"{snippet}. {sentences[1]}"
-    return snippet[:max_chars]
 
 
 def _build_profile_inputs(item: Dict, query_mode: str) -> Tuple[List[str], List[str], List[str], List[str]]:
@@ -96,124 +87,6 @@ def _build_profile_inputs(item: Dict, query_mode: str) -> Tuple[List[str], List[
     return health_conditions, interests, goals, service_history_ids
 
 
-def _resolve_score_mode(raw_scores: List[float], requested_mode: str) -> str:
-    """Resolve score mode for a query.
-
-    - distance: lower score is better
-    - similarity: higher score is better
-    - auto: heuristic fallback based on value ranges
-    """
-    if requested_mode in {"distance", "similarity"}:
-        return requested_mode
-
-    if not raw_scores:
-        return "similarity"
-
-    min_s = min(raw_scores)
-    max_s = max(raw_scores)
-
-    # Common cosine-distance output from vector DBs is typically around [0, 2].
-    if min_s >= 0.0 and max_s <= 2.0:
-        return "distance"
-
-    # Negative values are often raw similarity / inner-product-like scores.
-    return "similarity"
-
-
-def _align_scores_and_rank(
-    retrieved_ids: List[str],
-    raw_scores: List[float],
-    resolved_score_mode: str,
-) -> Tuple[List[str], List[float]]:
-    """Return re-ranked ids and analysis scores where higher is better."""
-    pairs = list(zip(retrieved_ids, raw_scores))
-    if not pairs:
-        return [], []
-
-    if resolved_score_mode == "distance":
-        # Lower distance is better; re-rank ascending distance.
-        pairs.sort(key=lambda x: x[1], reverse=False)
-        ids = [pid for pid, _ in pairs]
-        # Store aligned score where higher is better for analysis/plots.
-        aligned_scores = [1.0 - float(raw) for _, raw in pairs]
-        return ids, aligned_scores
-
-    # Similarity mode: higher is better.
-    pairs.sort(key=lambda x: x[1], reverse=True)
-    ids = [pid for pid, _ in pairs]
-    aligned_scores = [float(raw) for _, raw in pairs]
-    return ids, aligned_scores
-
-
-def load_dataset(path: str) -> List[Dict]:
-    """Load the home evaluation dataset (JSON array)."""
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def _load_services_catalog() -> List[Dict]:
-    """Load services catalog used for synthetic evaluation datasets."""
-    services_path = os.path.join(ROOT_DIR, "data", "raw", "services.json")
-    with open(services_path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def _ensure_eval_collection(db_name: str, dataset: List[Dict]) -> str:
-    """Ensure evaluation collection exists and IDs are compatible with dataset.
-
-    The synthetic eval datasets use service IDs from data/raw/services.json
-    (e.g. SV001). If the configured collection has no overlap with these IDs,
-    metrics collapse to 0.0. In that case, auto-build a dedicated collection.
-    """
-    expected_ids = {
-        rid
-        for item in dataset
-        for rid in item.get("relevant_ids", [])
-    }
-
-    vector_db = Vector_Database(db_name=db_name)
-    count = vector_db.collection.count()
-
-    ids_in_collection = set()
-    if count > 0:
-        sample = vector_db.collection.peek(limit=min(2000, count))
-        ids_in_collection.update(sample.get("ids", []))
-        for meta in sample.get("metadatas", []):
-            if isinstance(meta, dict):
-                sid = meta.get("service_id")
-                if sid:
-                    ids_in_collection.add(sid)
-
-    overlap = len(expected_ids & ids_in_collection)
-    if count > 0 and overlap > 0:
-        return db_name
-
-    eval_db = Vector_Database(db_name=EVAL_COLLECTION_NAME)
-    eval_count = eval_db.collection.count()
-    if eval_count > 0:
-        return EVAL_COLLECTION_NAME
-
-    print(
-        "⚠️  Collection is empty or incompatible with eval dataset IDs. "
-        f"Building '{EVAL_COLLECTION_NAME}' from data/raw/services.json..."
-    )
-
-    services = _load_services_catalog()
-    embedder = Embedding_Model()
-    for service in services:
-        service_document = f"{service.get('name', '')} {service.get('description', '')}"
-        embedding = embedder.encode(service_document)
-        eval_db.upsert_service(
-            service_id=str(service["id"]),
-            name=service.get("name", ""),
-            description=service.get("description", ""),
-            category=service.get("category", ""),
-            embedding=embedding,
-        )
-
-    print(f"✅ Built '{EVAL_COLLECTION_NAME}' with {len(services)} services")
-    return EVAL_COLLECTION_NAME
-
 
 def _get_embeddings_for_ids(
     recommender: Home_Recommender,
@@ -241,7 +114,7 @@ def run_evaluation(
     top_k: int = 5,
     k_values: List[int] | None = None,
     run_name: str | None = None,
-    dataset_path: str = DATASET_PATH,
+    dataset_path: str = str(DATASET_PATH),
     db_name: str = EVAL_COLLECTION_NAME,
     score_mode: str = "auto",
     query_mode: str = "profile",
@@ -277,20 +150,28 @@ def run_evaluation(
         k_values = [1, 3, 5, 10]
 
     # 1. Load dataset
+    dataset_path = Path(dataset_path)
+    if not dataset_path.exists():
+        print(f"Error: dataset not found at {dataset_path}")
+        return {}
     dataset = load_dataset(dataset_path)
     print(f"📂 Loaded {len(dataset)} home evaluation profiles")
     print(f"🧭 Query mode: {query_mode} | Score mode: {score_mode}")
 
     # Ensure the collection is compatible with evaluation IDs.
-    db_name = _ensure_eval_collection(db_name, dataset)
+    db_name = ensure_eval_collection(db_name, EVAL_COLLECTION_NAME, dataset)
 
     # 2. Initialise recommender
     print(f"🔧 Initialising Home_Recommender (collection={db_name})")
     recommender = Home_Recommender(db_name)
-    resolved_modes: List[str] = []
 
-    # 3. Run predictions
-    predictions: List[Dict] = []
+    # 3. Handle score direction via dist_type
+    dist_type = get_distance_type(recommender.vector_database.collection)
+    print(f"📐 Distance metric: {dist_type}")
+
+    # 4. Run predictions
+    resolved_modes: List[str] = []
+    predictions: List[Dict[str, Any]] = []
     for i, item in enumerate(dataset):
         profile_id = item["id"]
         health_conditions, interests, goals, service_history_ids = _build_profile_inputs(
@@ -310,13 +191,19 @@ def run_evaluation(
         )
         retrieved_ids = raw["ids"][0] if raw["ids"] else []
         raw_scores = raw["distances"][0] if raw["distances"] else []
-        resolved_mode = _resolve_score_mode(raw_scores, requested_mode=score_mode)
-        retrieved_ids, aligned_scores = _align_scores_and_rank(
+        t_end = time.perf_counter()
+        
+        if not retrieved_ids:
+            print(f"  ⚠️  Warning: empty results for profile {profile_id}")
+
+        resolved_mode = resolve_score_mode(
+            requested_mode=score_mode, dist_type=dist_type)
+        retrieved_ids, aligned_scores = align_scores_and_rank(
             retrieved_ids,
             raw_scores,
             resolved_score_mode=resolved_mode,
+            dist_type=dist_type,
         )
-        t_end = time.perf_counter()
         latency_ms = (t_end - t_start) * 1000.0
         resolved_modes.append(resolved_mode)
 
@@ -367,9 +254,10 @@ def run_evaluation(
         "config": {
             "top_k": top_k,
             "k_values": k_values,
-            "dataset": os.path.basename(dataset_path),
+            "dataset": dataset_path.name,
             "collection": db_name,
             "embedding_model": settings.EMBEDDING_MODEL_NAME,
+            "distance_metric": dist_type,
             "query_mode": query_mode,
             "score_mode_requested": score_mode,
             "score_mode_resolved": (
@@ -391,8 +279,8 @@ def run_evaluation(
 
     # 7. Save results
     if save:
-        os.makedirs(RUNS_DIR, exist_ok=True)
-        out_path = os.path.join(RUNS_DIR, f"{run_label}.json")
+        out_path = RUNS_DIR / f"{run_label}.json"
+        out_path.parent.mkdir(parents=True, exist_ok=True)
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(run_output, f, ensure_ascii=False, indent=2)
         print(f"\n💾 Results saved to: {out_path}")
@@ -400,69 +288,18 @@ def run_evaluation(
     return run_output
 
 
-def _print_summary(run_output: Dict) -> None:
+def _print_summary(run_output: Dict[str, Any]) -> None:
     """Pretty-print the aggregate metrics."""
     agg = run_output["aggregate"]
     config = run_output["config"]
-
-    print("=" * 60)
-    print(f"  HOME EVALUATION RESULTS — {run_output['run_name']}")
-    print("=" * 60)
-    print(f"  Model      : {config['embedding_model']}")
-    print(f"  Collection : {config['collection']}")
-    print(f"  Top-K      : {config['top_k']}")
-    print(f"  Profiles   : {agg['num_queries']}")
-    print("-" * 60)
-
-    # Group metrics by type
-    metric_names = ["Hit", "Prec", "Recall", "MRR", "NDCG"]
     k_values = config["k_values"]
 
-    # Header row
-    header = f"{'Metric':<12}" + "".join(f"{'@' + str(k):>10}" for k in k_values)
-    print(header)
-    print("-" * len(header))
-
-    for metric in metric_names:
-        row = f"{metric:<12}"
-        for k in k_values:
-            key = f"{metric}@{k}"
-            val = agg.get(key, 0.0)
-            row += f"{val:>10.4f}"
-        print(row)
-
-    # --- Graded NDCG (if available) ---
-    if any(f"NDCG_G@{k}" in agg for k in k_values):
-        row = f"{'NDCG_G':<12}"
-        for k in k_values:
-            key = f"NDCG_G@{k}"
-            val = agg.get(key, 0.0)
-            row += f"{val:>10.4f}"
-        print(row)
-
-    # --- Hard Negative Rate (if available) ---
-    if any(f"HNR@{k}" in agg for k in k_values):
-        row = f"{'HNR ↓':<12}"
-        for k in k_values:
-            key = f"HNR@{k}"
-            val = agg.get(key, 0.0)
-            row += f"{val:>10.4f}"
-        print(row)
-
-    # --- Diversity (if available) ---
-    if any(f"Diversity@{k}" in agg for k in k_values):
-        row = f"{'Diversity':<12}"
-        for k in k_values:
-            key = f"Diversity@{k}"
-            val = agg.get(key, 0.0)
-            row += f"{val:>10.4f}"
-        print(row)
-
-    print("=" * 60)
+    # Print baseline summary from utils
+    print_eval_summary(run_output, "HOME EVALUATION RESULTS", "Profiles")
 
     # --- Latency stats ---
     if "Latency_avg_ms" in agg:
-        print(f"\n  ⏱️  Latency:")
+        print("\n  ⏱️  Latency:")
         print(f"    Avg: {agg['Latency_avg_ms']:.2f}ms  |  "
               f"P50: {agg.get('Latency_p50_ms', 0):.2f}ms  |  "
               f"P95: {agg.get('Latency_p95_ms', 0):.2f}ms  |  "
@@ -480,20 +317,22 @@ def _print_summary(run_output: Dict) -> None:
             avg_score = sum(all_scores) / len(all_scores)
             min_score = min(all_scores)
             max_score = max(all_scores)
-            print(f"\n  Search Score Distribution (higher is better):")
+            print("\n  Search Score Distribution (higher is better):")
             print(f"    Min: {min_score:.4f}  |  Avg: {avg_score:.4f}  |  Max: {max_score:.4f}")
 
     # Worst performing profiles
     per_query = run_output["per_query"]
     if per_query:
-        sorted_pq = sorted(per_query, key=lambda x: x.get("Recall@5", 0))
-        print(f"\n  Worst Recall@5 profiles:")
+        display_k = 5 if 5 in k_values else (k_values[0] if k_values else 5)
+        
+        sorted_pq = sorted(per_query, key=lambda x: x.get(f"Recall@{display_k}", 0))
+        print(f"\n  Worst Recall@{display_k} profiles:")
         for pq in sorted_pq[:5]:
             pid = pq["id"]
             desc = next(
                 (p["description"] for p in predictions if p["id"] == pid), ""
             )
-            print(f"    {pid}: Recall@5={pq.get('Recall@5', 0):.4f} — {desc}")
+            print(f"    {pid}: Recall@{display_k}={pq.get(f'Recall@{display_k}', 0):.4f} — {desc}")
 
 
 # ---------------------------------------------------------------------------

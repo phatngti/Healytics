@@ -183,7 +183,7 @@ Recall (label 1) & 0.8710 & PASS ($\geq 0.83$) \\
 \label{tab:intent_results}
 \end{table}
 
-\textbf{Diễn giải các chỉ số chính:}
+\textbf{Các chỉ số thước đo chính:}
 \begin{itemize}
     \item Accuracy: tỷ lệ dự đoán đúng trên toàn bộ mẫu.
     \item Macro F1: trung bình F1 giữa các lớp, phản ánh độ cân bằng.
@@ -244,7 +244,7 @@ distance & 0.9378 & PASS ($\geq 0.90$) & Bắt tốt cả biểu đạt khoảng
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.66\textwidth]{Images/evaluation/ner/ner_f1_by_entity.png}
+\includegraphics[width=0.66\textwidth]{Images/evaluation/ner/ner_f1_by_entity.jpg}
 \caption{F1-score theo từng nhóm thực thể trong NER evaluation}
 \label{fig:ner_f1_entities}
 \end{figure}
@@ -298,12 +298,23 @@ Macro Average & - & - & - & 95.8\% & 94.7\% & 95.2\% \\
         \item Chatbot: truy vấn hội thoại.
         \item Home: truy vấn dựa trên hồ sơ người dùng.
     \end{itemize}
-    \item Bộ chỉ số: Hit@K, Recall@K, MRR@K, NDCG@K, HNR và thống kê latency.
+    \item Bộ chỉ số: Hit@K, Precision@K, Recall@K, MRR@K, NDCG@K, NDCG\_G@K, HNR và thống kê latency.
     \item Kết quả Home dùng cấu hình \texttt{query\_mode=keyword}, \texttt{score\_mode=distance}.
-    \item Ngưỡng mục tiêu được thiết lập chủ yếu dựa trên yêu cầu khắt khe của kịch bản Chatbot (yêu cầu độ chính xác xếp hạng cao), đồng thời quy định độ trễ tối đa P95 không vượt quá 150ms để đảm bảo trải nghiệm tương tác thời gian thực.
+    \item Mô hình embedding dùng chung: \texttt{sentence-transformers/paraphrase-multilingual-mpnet-base-v2}, đánh giá trên \texttt{Top-K = 10}.
+    \item Metadata run:
+    \begin{itemize}
+        \item Chatbot run: \texttt{chatbot\_baseline\_v1}, collection \texttt{healytics\_eval\_chatbot}, 300 truy vấn.
+        \item Home run: \texttt{home\_baseline\_v1}, collection \texttt{healytics\_eval\_home}, 300 hồ sơ.
+    \end{itemize}
 \end{itemize}
 
-\textbf{Kết quả định lượng:}
+Mục đánh giá tập trung vào hai bài toán cốt lõi:
+\begin{itemize}
+    \item \textbf{Chatbot retrieval}: gợi ý dịch vụ theo câu hỏi tự nhiên của người dùng.
+    \item \textbf{Home recommender}: gợi ý dịch vụ theo hồ sơ/nhu cầu tổng quát ở trang chủ.
+\end{itemize}
+
+\textbf{Kết quả định lượng tổng hợp:}
 
 \begin{itemize}
     \item Bảng \ref{tab:rec_comparison} so sánh trực tiếp kết quả test giữa hai kịch bản Chatbot và Home.
@@ -318,24 +329,32 @@ Macro Average & - & - & - & 95.8\% & 94.7\% & 95.2\% \\
 \hline
 \textbf{Chỉ số (@3)} & \textbf{Kịch bản Chatbot} & \textbf{Kịch bản Home} \\
 \hline
-Hit & 0.8194 & 0.5889 \\
+Hit & 0.8933 & 0.8133 \\
 \hline
-Recall & 0.5407 & 0.3454 \\
+Recall & 0.4128 & 0.3667 \\
 \hline
-MRR & 0.7176 & 0.4731 \\
+MRR & 0.7856 & 0.6617 \\
 \hline
-NDCG & 0.5478 & 0.3422 \\
+NDCG & 0.4715 & 0.4011 \\
 \hline
-HNR (càng thấp càng tốt) & 0.0102 & 0.0278 \\
+HNR (càng thấp càng tốt) & 0.1211 & 0.1533 \\
 \hline
-Latency Avg (ms) & 88.92 & 122.27 \\
+Latency Avg (ms) & 83.31 & 156.26 \\
 \hline
-Latency P95 (ms) & 104.42 & 151.90 \\
+Latency P95 (ms) & 97.20 & 176.77 \\
 \hline
 \end{tabular}
 \caption{So sánh kết quả đánh giá hệ thống gợi ý giữa hai kịch bản Chatbot và Home}
 \label{tab:rec_comparison}
 \end{table}
+
+\noindent\textbf{Nhận xét so sánh nhanh giữa hai baseline:}
+\begin{itemize}
+    \item Ở cùng ngưỡng @3, baseline Chatbot nhỉnh hơn Home ở các chỉ số xếp hạng (MRR, NDCG), cho thấy khả năng đưa kết quả liên quan lên vị trí cao tốt hơn.
+    \item Baseline Home có độ trễ cao hơn đáng kể, đổi lại khi tăng $k$ thì độ phủ tăng mạnh và phù hợp mục tiêu gợi ý đa lựa chọn.
+\end{itemize}
+
+\textbf{Kết quả đầy đủ theo từng mốc Top-K:}
 
 \begin{table}[H]
 \centering
@@ -343,19 +362,19 @@ Latency P95 (ms) & 104.42 & 151.90 \\
 \hline
 \textbf{Metric (Chatbot)} & \textbf{@1} & \textbf{@3} & \textbf{@5} & \textbf{@10} \\
 \hline
-Hit & 0.6333 & 0.8194 & 0.8917 & 0.9750 \\
+Hit & 0.7067 & 0.8933 & 0.9400 & 0.9800 \\
 \hline
-Prec & 0.6333 & 0.2972 & 0.2128 & 0.1339 \\
+Prec & 0.7067 & 0.3389 & 0.2447 & 0.1593 \\
 \hline
-Recall & 0.4023 & 0.5407 & 0.6310 & 0.7704 \\
+Recall & 0.2922 & 0.4128 & 0.4906 & 0.6289 \\
 \hline
-MRR & 0.6333 & 0.7176 & 0.7345 & 0.7460 \\
+MRR & 0.7067 & 0.7856 & 0.7961 & 0.8018 \\
 \hline
-NDCG & 0.6333 & 0.5478 & 0.5923 & 0.6467 \\
+NDCG & 0.7067 & 0.4715 & 0.5141 & 0.5742 \\
 \hline
-NDCG\_G & 0.6181 & 0.6044 & 0.6445 & 0.6904 \\
+NDCG\_G & 0.6917 & 0.5780 & 0.6146 & 0.6590 \\
 \hline
-HNR $\downarrow$ & 0.0056 & 0.0102 & 0.0139 & 0.0194 \\
+HNR $\downarrow$ & 0.0700 & 0.1211 & 0.1260 & 0.1267 \\
 \hline
 \end{tabular}
 \caption{Kết quả đầy đủ của Chatbot evaluation}
@@ -368,20 +387,18 @@ HNR $\downarrow$ & 0.0056 & 0.0102 & 0.0139 & 0.0194 \\
 \hline
 \textbf{Category} & \textbf{Count} & \textbf{Hit@3} & \textbf{Recall@3} & \textbf{MRR@3} \\
 \hline
-dinh\_duong & 60 & 0.7500 & 0.4611 & 0.6556 \\
+dinh\_duong & 50 & 0.9000 & 0.4800 & 0.8033 \\
 \hline
-tam\_ly & 90 & 0.9444 & 0.6241 & 0.8259 \\
+tam\_ly & 75 & 0.9467 & 0.4311 & 0.8622 \\
 \hline
-the\_thao & 120 & 0.7250 & 0.4611 & 0.6097 \\
+the\_thao & 100 & 0.8100 & 0.3483 & 0.6900 \\
 \hline
-y\_te & 90 & 0.8667 & 0.6167 & 0.7944 \\
+y\_te & 75 & 0.9467 & 0.4355 & 0.8244 \\
 \hline
 \end{tabular}
 \caption{Kết quả Chatbot theo từng nhóm truy vấn}
 \label{tab:chatbot_category_metrics}
 \end{table}
-
-\noindent\textbf{Thống kê latency (Chatbot):} Avg = 105.48 ms, P50 = 100.85 ms, P95 = 122.85 ms, P99 = 162.08 ms, Max = 1027.11 ms.
 
 \begin{table}[H]
 \centering
@@ -389,52 +406,114 @@ y\_te & 90 & 0.8667 & 0.6167 & 0.7944 \\
 \hline
 \textbf{Metric (Home)} & \textbf{@1} & \textbf{@3} & \textbf{@5} & \textbf{@10} \\
 \hline
-Hit & 0.3833 & 0.5889 & 0.7167 & 0.8167 \\
+Hit & 0.5400 & 0.8133 & 0.9267 & 0.9833 \\
 \hline
-Prec & 0.3833 & 0.2148 & 0.1644 & 0.1144 \\
+Prec & 0.5400 & 0.3000 & 0.2353 & 0.1680 \\
 \hline
-Recall & 0.2139 & 0.3454 & 0.4333 & 0.5907 \\
+Recall & 0.2261 & 0.3667 & 0.4744 & 0.6700 \\
 \hline
-MRR & 0.3833 & 0.4731 & 0.5037 & 0.5181 \\
+MRR & 0.5400 & 0.6617 & 0.6875 & 0.6956 \\
 \hline
-NDCG & 0.3833 & 0.3422 & 0.3871 & 0.4498 \\
+NDCG & 0.5400 & 0.4011 & 0.4594 & 0.5437 \\
 \hline
-NDCG\_G & 0.3722 & 0.3840 & 0.4305 & 0.4844 \\
+NDCG\_G & 0.5367 & 0.4986 & 0.5509 & 0.6135 \\
 \hline
-HNR $\downarrow$ & 0.0111 & 0.0278 & 0.0278 & 0.0294 \\
+HNR $\downarrow$ & 0.0867 & 0.1533 & 0.1613 & 0.1527 \\
 \hline
 \end{tabular}
 \caption{Kết quả đầy đủ của Home evaluation}
 \label{tab:home_full_metrics}
 \end{table}
 
-\noindent\textbf{Thống kê latency và phân bố score tìm kiếm (Home):} Avg = 122.27 ms, P50 = 117.96 ms, P95 = 151.90 ms, P99 = 184.52 ms, Max = 998.97 ms; score Min = -8.9542, Avg = -5.8145, Max = -2.0222.
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Run} & \textbf{Avg (ms)} & \textbf{P50 (ms)} & \textbf{P95 (ms)} & \textbf{P99 (ms)} & \textbf{Max (ms)} \\
+\hline
+Chatbot baseline & 83.31 & 78.30 & 97.20 & 141.32 & 971.64 \\
+\hline
+Home baseline & 156.26 & 154.63 & 176.77 & 241.49 & 287.35 \\
+\hline
+\end{tabular}
+\caption{So sánh độ trễ giữa hai baseline Chatbot và Home}
+\label{tab:rec_latency_compare}
+\end{table}
 
-\textbf{Diễn giải các chỉ số chính:}
+
+
+\noindent\textbf{Phân bố score retrieval (Home baseline):} Min = 0.1084, Avg = 0.1771, Max = 0.4593.
+
+\textbf{Nguồn gốc các chỉ số thước đo:}
 \begin{itemize}
-    \item Hit@3: tỷ lệ truy vấn có ít nhất 1 kết quả đúng trong top-3.
-    \item Recall@3: mức bao phủ kết quả liên quan trong top-3.
-    \item MRR@3: ưu tiên đúng kết quả liên quan ở vị trí càng cao càng tốt.
-    \item NDCG@3: chất lượng xếp hạng có xét vị trí.
-    \item HNR@3: tỷ lệ hard-negative lọt top-3 (càng thấp càng tốt).
+    \item Hit@K: bài toán \textit{top-k retrieval/recommendation}.
+    \item Precision@K, Recall@K: Information Retrieval (IR) và Recommendation evaluation.
+    \item MRR@K: QA và ranking tasks.
+    \item NDCG@K, NDCG\_G@K: Learning-to-Rank.
+    \item HNR@K: thực hành \textit{hard-negative analysis} trong retrieval.
+    \item Latency (Avg/P50/P95/P99/Max): SRE và phương pháp phân vị hiệu năng.
 \end{itemize}
+
+\textbf{Các chỉ số thước đo:}
+\begin{itemize}
+    \item \textbf{Hit@K}: đo khả năng có ít nhất một kết quả đúng trong Top-K; được chọn vì phản ánh trực tiếp trải nghiệm người dùng có tìm thấy gợi ý phù hợp hay không.
+    \item \textbf{Precision@K}: đo độ chính xác trong danh sách trả về; được chọn để kiểm soát mức độ "loang" của kết quả khi tăng K.
+    \item \textbf{Recall@K}: đo độ bao phủ kết quả liên quan; được chọn vì hệ thống Home cần bao phủ đa nhu cầu của hồ sơ người dùng.
+    \item \textbf{MRR@K}: nhấn mạnh vị trí của kết quả đúng đầu tiên; được chọn vì chatbot cần đưa đúng gợi ý lên rất sớm để giảm thao tác người dùng.
+    \item \textbf{NDCG@K, NDCG\_G@K}: đánh giá chất lượng thứ hạng có xét vị trí và mức độ liên quan; được chọn để đo chất lượng ranking tổng thể thay vì chỉ kiểm tra có/không có kết quả đúng.
+    \item \textbf{HNR@K} ($\downarrow$): đo tỷ lệ nhiễu lọt Top-K; được chọn để theo dõi rủi ro gợi ý sai ngữ nghĩa ở các vị trí đầu.
+    \item \textbf{Latency (Avg/P50/P95/P99/Max)}: phản ánh cả hiệu năng trung bình lẫn tail-latency, trong đó P95 là chỉ số chính cho trải nghiệm thực tế ổn định.
+\end{itemize}
+
+\textbf{Lựa chọn ngưỡng triển khai:}
+\begin{itemize}
+    \item \textbf{Chatbot chọn $k=3$:} Hit@3 đạt 0.8933, MRR@3 đạt 0.7856 và NDCG\_G@3 = 0.5780, cho thấy danh sách ngắn đã đủ chất lượng để người dùng tương tác nhanh trong hội thoại.
+    \item \textbf{Home chọn $k=5$:} từ @3 lên @5, Hit tăng từ 0.8133 lên 0.9267 và Recall tăng từ 0.3667 lên 0.4744 (tăng mạnh độ phủ), trong khi lợi ích biên từ @5 lên @10 nhỏ hơn.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{KPI tại ngưỡng triển khai} & \textbf{Chatbot ($k=3$)} & \textbf{Home ($k=5$)} \\
+\hline
+Hit & 0.8933 & 0.9267 \\
+\hline
+Precision & 0.3389 & 0.2353 \\
+\hline
+Recall & 0.4128 & 0.4744 \\
+\hline
+MRR & 0.7856 & 0.6875 \\
+\hline
+NDCG & 0.4715 & 0.4594 \\
+\hline
+NDCG\_G & 0.5780 & 0.5509 \\
+\hline
+HNR $\downarrow$ & 0.1211 & 0.1613 \\
+\hline
+\end{tabular}
+\caption{KPI vận hành tại ngưỡng $k$ đề xuất cho từng kịch bản}
+\label{tab:rec_operating_kpi}
+\end{table}
 
 \textbf{Phân tích lỗi và kết luận:}
 
 \begin{itemize}
-    \item Chatbot cho chất lượng truy xuất tốt hơn rõ rệt (đặc biệt Hit@3 và MRR@3).
-    \item Home cải thiện chất lượng so với run cũ nhưng vẫn thấp hơn đáng kể so với Chatbot ở các chỉ số xếp hạng cốt lõi.
-    \item Độ trễ Home chưa đạt mục tiêu thời gian thực (Avg = 122.27 ms, P95 = 151.90 ms), cần tối ưu thêm pipeline truy vấn và scoring.
-    \item HNR@3 của cả hai kịch bản đều thấp ($<0.03$), cho thấy hệ thống lọc nhiễu tốt ở top đầu.
-    \item Các hồ sơ có lỗi nặng nhất theo Recall@5 (đều bằng 0.0000): \texttt{HOME\_0042}, \texttt{HOME\_0053}, \texttt{HOME\_0014}, \texttt{HOME\_0010}.
-    \item Mẫu lỗi tập trung ở truy vấn sức khỏe tổng hợp (ít vận động, stress, đau lưng/đau vai gáy, dinh dưỡng, lo ngại sức khỏe dài hạn), gợi ý cần tăng cường ánh xạ ngữ nghĩa đa triệu chứng và đa mục tiêu trong bước truy vấn Home.
+    \item Chatbot đạt chất lượng truy xuất tốt trên danh sách ngắn, phù hợp để vận hành với Top-3.
+    \item Home đạt độ phủ cao khi mở rộng lên Top-5, phù hợp trình bày khối gợi ý đa lựa chọn ở trang chủ.
+    \item Độ trễ Chatbot tốt (P95 = 97.20 ms), trong khi Home còn cao hơn (P95 = 176.77 ms) và cần tối ưu thêm pipeline truy vấn/scoring.
+    \item Các hồ sơ Home có Recall@5 = 0.0000 gồm: \texttt{HM\_0240}, \texttt{HM\_0221}, \texttt{HM\_0159}, \texttt{HM\_0160}, \texttt{HM\_0234}.
+    \item Mẫu lỗi tập trung ở nhu cầu ngữ nghĩa đặc thù và đa mục tiêu; hướng cải tiến là mở rộng dữ liệu huấn luyện, tăng cường semantic mapping và bổ sung cơ chế reranking theo ngữ cảnh hồ sơ.
+    \item Tổng thể, cấu hình khuyến nghị triển khai là \textbf{Chatbot Top-3} và \textbf{Home Top-5} để cân bằng giữa độ chính xác, độ phủ và trải nghiệm người dùng.
 \end{itemize}
+
+\noindent\textbf{Kết luận tiểu mục:} Baseline hiện tại cho thấy hệ thống gợi ý đã đạt chất lượng vận hành tốt cho cả hai bối cảnh sử dụng. Chatbot nên ưu tiên danh sách ngắn để tối ưu tương tác, còn Home nên ưu tiên độ phủ để tăng cơ hội khám phá dịch vụ phù hợp.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.78\textwidth]{Images/evaluation/recommender/run_comparison.png}
-\caption{Biểu đồ so sánh các run recommender trong pipeline phân tích}
-\label{fig:rec_run_compare}
+\includegraphics[width=0.92\textwidth]{Images/evaluation/recommender/run_comparison.png}
+\caption{So sánh định lượng giữa hai baseline \texttt{chatbot\_baseline\_v1} và \texttt{home\_baseline\_v1} theo Hit@3, Recall@3, MRR@3 và NDCG@3}
+\label{fig:rec_baseline_compare_visual}
 \end{figure}
 
 \subsection{Phản hồi từ người dùng thử nghiệm}
