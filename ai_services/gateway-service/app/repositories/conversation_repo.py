@@ -86,9 +86,20 @@ async def get_or_create_conversation(
             return await create_conversation(
                 session, conversation_id, user_id, title
             )
-    except IntegrityError:
+    except IntegrityError as exc:
         # Lost the race — another request inserted first; fetch it.
-        return await get_conversation_by_id(session, conversation_id)
+        # Under REPEATABLE READ / SERIALIZABLE, the row may exist but still be
+        # invisible to this snapshot after savepoint rollback; refetch after a
+        # full rollback gets a fresh snapshot (READ COMMITTED default also
+        # benefits from clearing a session left "inactive" after the error).
+        existing = await get_conversation_by_id(session, conversation_id)
+        if existing is not None:
+            return existing
+        await session.rollback()
+        existing = await get_conversation_by_id(session, conversation_id)
+        if existing is not None:
+            return existing
+        raise exc
 
 
 async def delete_conversation(
