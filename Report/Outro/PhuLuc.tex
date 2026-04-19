@@ -56,6 +56,7 @@ Phụ lục này trình bày chi tiết thiết kế giao diện cho các nhóm 
 \end{figure}
 
 \subsection{Provider Service - Chi tiết dịch vụ}
+\captionsetup{skip=8pt}
 \begin{figure}[H]
     \centering
     
@@ -195,3 +196,210 @@ Phụ lục này tổng hợp đầy đủ các hình trực quan từ hai basel
     \caption{Phân bố độ trễ truy xuất của \texttt{home\_baseline\_v1}}
     \label{fig:appendix_home_latency_dist}
 \end{figure}
+
+\chapter{Phụ lục: API và Schema tích hợp MoMo}
+\label{appendix:momo_api}
+
+Phụ lục này trình bày chi tiết các API đã tích hợp với cổng thanh toán MoMo và giải thích từng trường dữ liệu (schema) sử dụng trong hệ thống Healytics.
+
+\section*{1. Danh sách API MoMo đã tích hợp}
+\begin{table}[H]
+    \centering
+    \caption{Các API MoMo đã tích hợp}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{4.2cm}|>{\raggedright\arraybackslash}p{1.7cm}|>{\raggedright\arraybackslash}p{4.2cm}|}
+        \hline
+        \textbf{Chức năng} & \textbf{Endpoint} & \textbf{Phương thức} & \textbf{Mô tả} \\
+        \hline
+        Tạo yêu cầu thanh toán & {\small\ttfamily /momo/payment/request} & POST & Tạo giao dịch thanh toán mới, trả về URL/mã QR để người dùng thanh toán qua MoMo app. \\
+        \hline
+        Xác thực giao dịch & {\small\ttfamily /momo/payment/confirm} & POST & Nhận callback từ MoMo xác nhận giao dịch thành công/thất bại, cập nhật trạng thái booking. \\
+        \hline
+        Truy vấn trạng thái giao dịch & {\small\ttfamily /momo/payment/status} & GET & Kiểm tra trạng thái thanh toán của một giao dịch dựa trên transactionId/orderId. \\
+        \hline
+    \end{tabular}
+    \renewcommand{\arraystretch}{1}
+\end{table}
+
+\section*{2. Giải thích schema dữ liệu MoMo}
+
+\subsection*{2.3. Format request/response JSON của các API MoMo tích hợp}
+
+% --- Tạo yêu cầu thanh toán ---
+\textbf{a) API: Tạo yêu cầu thanh toán}
+
+\textit{Request gửi lên MoMo:}
+\begin{table}[H]
+    \centering
+    \caption{Request JSON gửi lên /momo/payment/request}
+    \begin{tabular}{|p{4cm}|p{2.5cm}|p{7cm}|}
+        \hline
+        \textbf{Trường} & \textbf{Kiểu dữ liệu} & \textbf{Ý nghĩa} \\
+        \hline
+        partnerCode & String & Mã định danh đối tác do MoMo cấp. \\
+        \hline
+        orderId & String & Mã đơn hàng duy nhất trong hệ thống. \\
+        \hline
+        amount & Number & Số tiền thanh toán (VNĐ). \\
+        \hline
+        orderInfo & String & Thông tin mô tả đơn hàng. \\
+        \hline
+        redirectUrl & String & URL chuyển hướng sau khi thanh toán thành công. \\
+        \hline
+        ipnUrl & String & URL nhận thông báo trạng thái giao dịch từ MoMo (IPN). \\
+        \hline
+        requestType & String & Loại yêu cầu (thường là "captureWallet"). \\
+        \hline
+        signature & String & Chữ ký số xác thực dữ liệu. \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textit{Response trả về từ MoMo:}
+\begin{table}[H]
+    \centering
+    \caption{Response JSON trả về từ /momo/payment/request}
+    \begin{tabular}{|p{4cm}|p{2.5cm}|p{7cm}|}
+        \hline
+        \textbf{Trường} & \textbf{Kiểu dữ liệu} & \textbf{Ý nghĩa} \\
+        \hline
+        partnerCode & String & Mã đối tác MoMo cấp. \\
+        \hline
+        orderId & String & Mã đơn hàng gửi lên. \\
+        \hline
+        requestId & String & Mã request gửi lên MoMo. \\
+        \hline
+        payUrl & String & URL chuyển hướng thanh toán trên web. \\
+        \hline
+        deeplink & String & Link mở app MoMo để thanh toán. \\
+        \hline
+        qrCodeUrl & String & Link ảnh QR code để thanh toán. \\
+        \hline
+        errorCode & Number & 0: thành công, khác 0: lỗi. \\
+        \hline
+        message & String & Thông báo kết quả giao dịch. \\
+        \hline
+        localMessage & String & Thông báo kết quả giao dịch (bản địa hoá). \\
+        \hline
+        requestType & String & Loại yêu cầu. \\
+        \hline
+        signature & String & Chữ ký số xác thực dữ liệu. \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% --- Xác thực giao dịch ---
+\textbf{b) API: Xác thực giao dịch (Callback từ MoMo về hệ thống)}
+
+\textit{Request (MoMo gửi về hệ thống):}
+\begin{table}[H]
+    \centering
+    \caption{Request JSON MoMo gửi về /momo/payment/confirm}
+    \begin{tabular}{|p{4cm}|p{2.5cm}|p{7cm}|}
+        \hline
+        \textbf{Trường} & \textbf{Kiểu dữ liệu} & \textbf{Ý nghĩa} \\
+        \hline
+        partnerCode & String & Mã đối tác MoMo cấp. \\
+        \hline
+        orderId & String & Mã đơn hàng. \\
+        \hline
+        requestId & String & Mã request gửi lên MoMo. \\
+        \hline
+        amount & Number & Số tiền thanh toán. \\
+        \hline
+        orderInfo & String & Thông tin đơn hàng. \\
+        \hline
+        orderType & String & Loại đơn hàng (ví dụ: \texttt{momo\_wallet}). \\
+        \hline
+        transId & Number & Mã giao dịch MoMo sinh ra. \\
+        \hline
+        resultCode & Number & 0: thành công, khác 0: lỗi. \\
+        \hline
+        message & String & Thông báo kết quả. \\
+        \hline
+        payType & String & Hình thức thanh toán. \\
+        \hline
+        responseTime & Number & Thời gian phản hồi (timestamp). \\
+        \hline
+        extraData & String & Dữ liệu bổ sung (nếu có). \\
+        \hline
+        signature & String & Chữ ký số xác thực dữ liệu. \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textit{Response (hệ thống trả về MoMo):}
+\begin{table}[H]
+    \centering
+    \caption{Response JSON trả về MoMo sau khi xác thực}
+    \begin{tabular}{|p{4cm}|p{2.5cm}|p{7cm}|}
+        \hline
+        \textbf{Trường} & \textbf{Kiểu dữ liệu} & \textbf{Ý nghĩa} \\
+        \hline
+        resultCode & Number & 0: xác nhận thành công, khác 0: lỗi. \\
+        \hline
+        message & String & Thông báo xác nhận. \\
+        \hline
+        signature & String & Chữ ký số xác thực dữ liệu. \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% --- Truy vấn trạng thái giao dịch ---
+\textbf{c) API: Truy vấn trạng thái giao dịch}
+
+\textit{Request gửi lên MoMo:}
+\begin{table}[H]
+    \centering
+    \caption{Request JSON gửi lên /momo/payment/status}
+    \begin{tabular}{|p{4cm}|p{2.5cm}|p{7cm}|}
+        \hline
+        \textbf{Trường} & \textbf{Kiểu dữ liệu} & \textbf{Ý nghĩa} \\
+        \hline
+        partnerCode & String & Mã đối tác MoMo cấp. \\
+        \hline
+        orderId & String & Mã đơn hàng cần truy vấn. \\
+        \hline
+        requestId & String & Mã request gửi lên MoMo. \\
+        \hline
+        signature & String & Chữ ký số xác thực dữ liệu. \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textit{Response trả về từ MoMo:}
+\begin{table}[H]
+    \centering
+    \caption{Response JSON trả về từ /momo/payment/status}
+    \begin{tabular}{|p{4cm}|p{2.5cm}|p{7cm}|}
+        \hline
+        \textbf{Trường} & \textbf{Kiểu dữ liệu} & \textbf{Ý nghĩa} \\
+        \hline
+        partnerCode & String & Mã đối tác MoMo cấp. \\
+        \hline
+        orderId & String & Mã đơn hàng truy vấn. \\
+        \hline
+        requestId & String & Mã request gửi lên MoMo. \\
+        \hline
+        amount & Number & Số tiền giao dịch. \\
+        \hline
+        transId & Number & Mã giao dịch MoMo sinh ra. \\
+        \hline
+        resultCode & Number & 0: thành công, khác 0: lỗi. \\
+        \hline
+        message & String & Thông báo kết quả. \\
+        \hline
+        payType & String & Hình thức thanh toán. \\
+        \hline
+        responseTime & Number & Thời gian phản hồi (timestamp). \\
+        \hline
+        extraData & String & Dữ liệu bổ sung (nếu có). \\
+        \hline
+        signature & String & Chữ ký số xác thực dữ liệu. \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{Lưu ý:} Các trường có thể thay đổi tuỳ theo tài liệu chính thức của MoMo từng thời điểm. Nên đối chiếu tài liệu mới nhất khi tích hợp.
+
+\textbf{Lưu ý:} Các API đều có kiểm tra chữ ký số (signature) để đảm bảo an toàn giao dịch. Thông tin chi tiết về các trường dữ liệu, mã lỗi và quy trình xác thực tham khảo tài liệu chính thức của MoMo hoặc phần tài liệu kỹ thuật dự án.
