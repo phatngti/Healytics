@@ -10,105 +10,43 @@ Usage (from the recommender2/ root):
 """
 
 from __future__ import annotations
-
 import argparse
 import json
 import os
 import sys
 import time
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Any
+from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # Path setup — ensure recommender2/ is on sys.path
 # ---------------------------------------------------------------------------
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-sys.path.insert(0, ROOT_DIR)
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(ROOT_DIR))
 
-from config import settings
-from src.recommender.chatbot_recommender import Chatbot_Recommender
-from src.recommender.embedding_model import Embedding_Model
-from src.recommender.vector_store import Vector_Database
 from evaluation.metrics import compute_all_metrics
+from src.recommender.vector_store import Vector_Database
+from src.recommender.embedding_model import Embedding_Model
+from src.recommender.chatbot_recommender import Chatbot_Recommender
+from evaluation.scripts.eval_utils import (
+    load_dataset,
+    get_distance_type,
+    convert_distances_to_scores,
+    ensure_eval_collection,
+    print_eval_summary
+)
+from config import settings
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-EVAL_DIR = os.path.join(ROOT_DIR, "evaluation")
-DATASET_PATH = os.path.join(EVAL_DIR, "datasets", "chatbot_eval.json")
-RESULTS_DIR = os.path.join(EVAL_DIR, "results")
-RUNS_DIR = os.path.join(RESULTS_DIR, "runs")
-EVAL_COLLECTION_NAME = "healytics_eval_collection"
+EVAL_DIR = Path(ROOT_DIR) / "evaluation"
+DATASET_PATH = EVAL_DIR / "datasets" / "chatbot_eval.json"
+RESULTS_DIR = EVAL_DIR / "results"
+RUNS_DIR = RESULTS_DIR / "runs"
+EVAL_COLLECTION_NAME = "healytics_eval_chatbot"
 
-
-def load_dataset(path: str) -> List[Dict]:
-    """Load the chatbot evaluation dataset (JSON array)."""
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def _load_services_catalog() -> List[Dict]:
-    """Load services catalog used for synthetic evaluation datasets."""
-    services_path = os.path.join(ROOT_DIR, "data", "raw", "services.json")
-    with open(services_path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def _ensure_eval_collection(db_name: str, dataset: List[Dict]) -> str:
-    """Ensure evaluation collection exists and IDs are compatible with dataset.
-
-    The synthetic eval datasets use service IDs from data/raw/services.json
-    (e.g. SV001). If the configured collection has no overlap with these IDs,
-    metrics collapse to 0.0. In that case, auto-build a dedicated collection.
-    """
-    expected_ids = {
-        rid
-        for item in dataset
-        for rid in item.get("relevant_ids", [])
-    }
-
-    vector_db = Vector_Database(db_name=db_name)
-    count = vector_db.collection.count()
-
-    ids_in_collection = set()
-    if count > 0:
-        sample = vector_db.collection.peek(limit=min(2000, count))
-        ids_in_collection.update(sample.get("ids", []))
-        for meta in sample.get("metadatas", []):
-            if isinstance(meta, dict):
-                sid = meta.get("service_id")
-                if sid:
-                    ids_in_collection.add(sid)
-
-    overlap = len(expected_ids & ids_in_collection)
-    if count > 0 and overlap > 0:
-        return db_name
-
-    eval_db = Vector_Database(db_name=EVAL_COLLECTION_NAME)
-    eval_count = eval_db.collection.count()
-    if eval_count > 0:
-        return EVAL_COLLECTION_NAME
-
-    print(
-        "⚠️  Collection is empty or incompatible with eval dataset IDs. "
-        f"Building '{EVAL_COLLECTION_NAME}' from data/raw/services.json..."
-    )
-
-    services = _load_services_catalog()
-    embedder = Embedding_Model()
-    for service in services:
-        service_document = f"{service.get('name', '')} {service.get('description', '')}"
-        embedding = embedder.encode(service_document)
-        eval_db.upsert_service(
-            service_id=str(service["id"]),
-            name=service.get("name", ""),
-            description=service.get("description", ""),
-            category=service.get("category", ""),
-            embedding=embedding,
-        )
-
-    print(f"✅ Built '{EVAL_COLLECTION_NAME}' with {len(services)} services")
-    return EVAL_COLLECTION_NAME
 
 
 def _get_embeddings_for_ids(
@@ -172,14 +110,18 @@ def run_evaluation(
     print(f"📂 Loaded {len(dataset)} chatbot evaluation queries")
 
     # Ensure the collection is compatible with evaluation IDs.
-    db_name = _ensure_eval_collection(db_name, dataset)
+    db_name = ensure_eval_collection(db_name, EVAL_COLLECTION_NAME, dataset)
 
     # 2. Initialise recommender
     print(f"🔧 Initialising Chatbot_Recommender (collection={db_name})")
     recommender = Chatbot_Recommender(db_name)
 
+    # Detect distance type for score conversion
+    dist_type = get_distance_type(recommender.vector_database.collection)
+    print(f"📐 Distance metric: {dist_type}")
+
     # 3. Run predictions
-    predictions: List[Dict] = []
+    predictions: List[Dict[str, Any]] = []
     for i, item in enumerate(dataset):
         query_id = item["id"]
         query = item["query"]
@@ -192,7 +134,10 @@ def run_evaluation(
         latency_ms = (t_end - t_start) * 1000.0
 
         retrieved_ids = raw["ids"][0] if raw["ids"] else []
-        scores = raw["distances"][0] if raw["distances"] else []
+        raw_distances = raw["distances"][0] if raw["distances"] else []
+
+        if not retrieved_ids:
+            print(f"  ⚠️  Warning: empty results for query {query_id}")
 
         pred: Dict = {
             "id": query_id,
@@ -200,9 +145,9 @@ def run_evaluation(
             "category": item.get("category", ""),
             "relevant_ids": relevant_ids,
             "retrieved_ids": retrieved_ids,
-            # ChromaDB returns cosine distance (1 - similarity).
-            # Convert to similarity so higher = more similar.
-            "scores": [(1.0 - float(s)) for s in scores],
+            # Convert distance to similarity (higher = more similar),
+            # adapting to the collection's configured distance metric.
+            "scores": convert_distances_to_scores(raw_distances, dist_type),
             "latency_ms": round(latency_ms, 2),
         }
 
@@ -239,9 +184,10 @@ def run_evaluation(
         "config": {
             "top_k": top_k,
             "k_values": k_values,
-            "dataset": os.path.basename(dataset_path),
+            "dataset": Path(dataset_path).name,
             "collection": db_name,
             "embedding_model": settings.EMBEDDING_MODEL_NAME,
+            "distance_metric": dist_type,
         },
         "aggregate": results["aggregate"],
         "per_query": results["per_query"],
@@ -257,8 +203,8 @@ def run_evaluation(
 
     # 7. Save results
     if save:
-        os.makedirs(RUNS_DIR, exist_ok=True)
-        out_path = os.path.join(RUNS_DIR, f"{run_label}.json")
+        out_path = RUNS_DIR / f"{run_label}.json"
+        out_path.parent.mkdir(parents=True, exist_ok=True)
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(run_output, f, ensure_ascii=False, indent=2)
         print(f"\n💾 Results saved to: {out_path}")
@@ -266,91 +212,63 @@ def run_evaluation(
     return run_output
 
 
-def _print_summary(run_output: Dict) -> None:
-    """Pretty-print the aggregate metrics."""
+def _print_summary(run_output: Dict[str, Any]) -> None:
+    """Pretty-print aggregate metrics, latency, and category breakdown."""
     agg = run_output["aggregate"]
-    config = run_output["config"]
 
-    print("=" * 60)
-    print(f"  CHATBOT EVALUATION RESULTS — {run_output['run_name']}")
-    print("=" * 60)
-    print(f"  Model      : {config['embedding_model']}")
-    print(f"  Collection : {config['collection']}")
-    print(f"  Top-K      : {config['top_k']}")
-    print(f"  Queries    : {agg['num_queries']}")
-    print("-" * 60)
-
-    # Group metrics by type
-    metric_names = ["Hit", "Prec", "Recall", "MRR", "NDCG"]
-    k_values = config["k_values"]
-
-    # Header row
-    header = f"{'Metric':<12}" + "".join(f"{'@' + str(k):>10}" for k in k_values)
-    print(header)
-    print("-" * len(header))
-
-    for metric in metric_names:
-        row = f"{metric:<12}"
-        for k in k_values:
-            key = f"{metric}@{k}"
-            val = agg.get(key, 0.0)
-            row += f"{val:>10.4f}"
-        print(row)
-
-    # --- Graded NDCG (if available) ---
-    if any(f"NDCG_G@{k}" in agg for k in k_values):
-        row = f"{'NDCG_G':<12}"
-        for k in k_values:
-            key = f"NDCG_G@{k}"
-            val = agg.get(key, 0.0)
-            row += f"{val:>10.4f}"
-        print(row)
-
-    # --- Hard Negative Rate (if available) ---
-    if any(f"HNR@{k}" in agg for k in k_values):
-        row = f"{'HNR ↓':<12}"
-        for k in k_values:
-            key = f"HNR@{k}"
-            val = agg.get(key, 0.0)
-            row += f"{val:>10.4f}"
-        print(row)
-
-    # --- Diversity (if available) ---
-    if any(f"Diversity@{k}" in agg for k in k_values):
-        row = f"{'Diversity':<12}"
-        for k in k_values:
-            key = f"Diversity@{k}"
-            val = agg.get(key, 0.0)
-            row += f"{val:>10.4f}"
-        print(row)
-
-    print("=" * 60)
+    # Print baseline summary from utils
+    print_eval_summary(run_output, "CHATBOT EVALUATION RESULTS", "Queries")
 
     # --- Latency stats ---
     if "Latency_avg_ms" in agg:
-        print(f"\n  ⏱️  Latency:")
-        print(f"    Avg: {agg['Latency_avg_ms']:.2f}ms  |  "
-              f"P50: {agg.get('Latency_p50_ms', 0):.2f}ms  |  "
-              f"P95: {agg.get('Latency_p95_ms', 0):.2f}ms  |  "
-              f"P99: {agg.get('Latency_p99_ms', 0):.2f}ms  |  "
-              f"Max: {agg.get('Latency_max_ms', 0):.2f}ms")
+        print("\n  ⏱️  Latency:")
+        print(
+            f"    Avg: {agg['Latency_avg_ms']:.2f}ms  |  "
+            f"P50: {agg.get('Latency_p50_ms', 0):.2f}ms  |  "
+            f"P95: {agg.get('Latency_p95_ms', 0):.2f}ms  |  "
+            f"P99: {agg.get('Latency_p99_ms', 0):.2f}ms  |  "
+            f"Max: {agg.get('Latency_max_ms', 0):.2f}ms"
+        )
 
-    # Category breakdown
+    # --- Category breakdown ---
     preds = run_output["predictions"]
-    categories = sorted(set(p.get("category", "") for p in preds if p.get("category")))
-    if categories:
-        print(f"\n{'Category':<16}{'Count':>8}{'Hit@3':>10}{'Recall@3':>10}{'MRR@3':>10}")
-        print("-" * 54)
-        per_query = run_output["per_query"]
-        pq_by_id = {pq["id"]: pq for pq in per_query}
+    categories = sorted({p.get("category", "") for p in preds if p.get("category")})
+    if not categories:
+        return
 
-        for cat in categories:
-            cat_preds = [p for p in preds if p.get("category") == cat]
-            n = len(cat_preds)
-            hit_sum = sum(pq_by_id[p["id"]].get("Hit@3", 0) for p in cat_preds)
-            recall_sum = sum(pq_by_id[p["id"]].get("Recall@3", 0) for p in cat_preds)
-            mrr_sum = sum(pq_by_id[p["id"]].get("MRR@3", 0) for p in cat_preds)
-            print(f"{cat:<16}{n:>8}{hit_sum/n:>10.4f}{recall_sum/n:>10.4f}{mrr_sum/n:>10.4f}")
+    config = run_output.get("config", {})
+    k_values = config.get("k_values", [1, 3, 5, 10])
+    display_k = 3 if 3 in k_values else (k_values[0] if k_values else 3)
+
+    print(
+        f"\n{'Category':<16}{'Count':>8}{f'Hit@{display_k}':>10}"
+        f"{f'Recall@{display_k}':>12}{f'MRR@{display_k}':>10}"
+    )
+    print("-" * 56)
+
+    per_query = run_output["per_query"]
+    pq_by_id = {pq.get("id", ""): pq for pq in per_query}
+
+    for cat in categories:
+        cat_preds = [p for p in preds if p.get("category") == cat]
+        n = len(cat_preds)
+        if n == 0:
+            continue
+        hit_sum = sum(
+            pq_by_id.get(p.get("id", ""), {}).get(f"Hit@{display_k}", 0)
+            for p in cat_preds
+        )
+        recall_sum = sum(
+            pq_by_id.get(p.get("id", ""), {}).get(f"Recall@{display_k}", 0)
+            for p in cat_preds
+        )
+        mrr_sum = sum(
+            pq_by_id.get(p.get("id", ""), {}).get(f"MRR@{display_k}", 0)
+            for p in cat_preds
+        )
+        print(
+            f"{cat:<16}{n:>8}{(hit_sum / n):>10.4f}{(recall_sum / n):>12.4f}{(mrr_sum / n):>10.4f}"
+        )
 
 
 # ---------------------------------------------------------------------------
