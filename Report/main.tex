@@ -28,7 +28,7 @@
 \usepackage{alltt}
 \usepackage[framemethod=tikz]{mdframed}% For highlighting paragraph backgrounds
 \usepackage{caption,subcaption}
-
+\captionsetup{skip=16pt} % Increase space between figure and caption globally
 
 \usepackage[lined,boxed,commentsnumbered]{algorithm2e}
 \usepackage{enumerate}
@@ -189,13 +189,15 @@ morekeywords={}
                                      {\normalfont\normalsize\bfseries}}
 \newcommand*\l@subsubsubsection{\@dottedtocline{3}{10.0em}{4.1em}}
 \newcommand*{\subsubsubsectionmark}[1]{}
+\@addtoreset{paragraph}{subsubsection}
+\renewcommand\theparagraph{\arabic{paragraph}}
 \makeatother
 \newcommand\tab[1][1cm]{\hspace*{#1}}
 \newcommand\blank[1]{\rule[-.2ex]{#1}{.4pt}}
 \everymath{\color{black}}%make in-line maths symbols blue to read/check easily
 
 \sloppy
-\captionsetup[figure]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=-9pt}
+\captionsetup[figure]{labelfont={small,bf},textfont={small,it},belowskip=0pt,aboveskip=-5pt}
 %space remove between caption, figure, and text
 \captionsetup[table]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=7pt}
 \setlength{\floatsep}{5pt plus 2pt minus 2pt}
@@ -204,6 +206,16 @@ morekeywords={}
 
 \titleformat{\chapter}[display]
 {\normalfont\huge\bfseries}{\chaptertitlename{} \thechapter}{15pt}{\Huge}
+
+% Number paragraph headings in a local simple format (1,2,3,...) and avoid run-in sticking.
+\titleformat{\paragraph}[block]
+{\normalfont\normalsize\bfseries}{\theparagraph.}{0.6em}{}
+\titlespacing*{\paragraph}{0pt}{1.2ex plus .2ex minus .1ex}{0.6ex}
+
+\titleformat{\subparagraph}[runin]
+{\normalfont\normalsize\bfseries}{}{0pt}{}[\ ]
+\titlespacing*{\subparagraph}{0pt}{1ex plus .2ex minus .1ex}{1em}
+
 \thesislayout
 
 % Redefine plain style for chapters and lists to have the footer
