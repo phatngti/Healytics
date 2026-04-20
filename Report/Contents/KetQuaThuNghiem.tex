@@ -113,9 +113,12 @@ Sao lưu \& phục hồi dữ liệu & \textit{(chưa kiểm tra)} & -- \\
 
 Phần này trình bày phương pháp, tiêu chí và kết quả đánh giá cho các thành phần cốt lõi của hệ thống AI:
 \begin{itemize}
+    \item Hệ thống RAG (Retrieval-Augmented Generation).
+    \item Mô hình LLM (Llama-3.1-8B-Instruct).
     \item Mô hình phân loại ý định (Intent Classifier).
     \item Dịch vụ trích xuất thực thể (NER Service).
     \item Hệ thống gợi ý (Recommender Service).
+    \item Đánh giá tổng thể module AI trong hệ thống. (End to End).
 \end{itemize}
 
 \subsubsection{Cơ sở lựa chọn ngưỡng đánh giá}
@@ -130,6 +133,164 @@ Các ngưỡng định lượng trong chương này không được chọn ngẫ
 \end{itemize}
 
 Vì vậy, khi giải trình trước hội đồng, có thể nêu rằng các ngưỡng trong báo cáo được tổng hợp từ \textbf{yêu cầu hệ thống}, \textbf{chuẩn trải nghiệm người dùng}, \textbf{kết quả baseline}, và \textbf{kinh nghiệm thực nghiệm} trên dữ liệu của đề tài, thay vì dựa vào một con số cứng duy nhất cho mọi bài toán.
+
+\noindent\textbf{Lựa chọn ngưỡng cho RAG và LLM trong module evaluation:}
+\begin{itemize}
+    \item \textbf{Đối với RAG (retrieval):} mục tiêu kỹ thuật của pha truy xuất là bảo đảm \textit{đưa ít nhất một bằng chứng đúng vào Top-$K$} và đồng thời \textit{phủ đủ các tài liệu liên quan} để phục vụ trả lời. Vì vậy nhóm dùng các chỉ số chuẩn trong Information Retrieval:
+    \begin{itemize}
+        \item \textbf{Hit@K}: đo khả năng ``có ít nhất một tài liệu đúng'' trong Top-$K$; phù hợp với tình huống hội thoại vì chỉ cần một bằng chứng tốt đã có thể hỗ trợ trả lời.
+        \item \textbf{Recall@K}: đo tỷ lệ tài liệu liên quan được truy xuất; phản ánh mức độ bao phủ ngữ cảnh khi một câu hỏi có nhiều bằng chứng.
+        \item \textbf{MRR}: nhấn mạnh vị trí xuất hiện đầu tiên của tài liệu đúng; trực tiếp liên quan đến chất lượng trải nghiệm vì bằng chứng đúng càng nằm sớm thì prompt càng ``sạch'' và giảm nhiễu cho LLM.
+    \end{itemize}
+    Trong pipeline đánh giá, $K$ được cố định theo tham số cấu hình \texttt{TOP\_K} (mặc định 10). Việc chọn $K$ theo hướng cân bằng giữa \textit{độ phủ} (tăng $K$) và \textit{giảm nhiễu/ngữ cảnh thừa} (giảm $K$), đồng thời nhất quán với cấu hình vận hành để số liệu phản ánh đúng điều kiện triển khai.
+
+    \item \textbf{Đối với LLM (generation + grounding):} chất lượng câu trả lời được đánh giá theo thang điểm liên tục trong đoạn $[0,1]$ trên ba trục:
+    \begin{itemize}
+        \item \textbf{Faithfulness}: mức độ câu trả lời được \textit{ngữ cảnh truy xuất} hỗ trợ, nhằm kiểm soát rủi ro ``ảo giác'' (hallucination).
+        \item \textbf{Correctness}: mức độ phù hợp về \textit{nghĩa} so với đáp án chuẩn (\textit{ground truth}), không yêu cầu khớp từng chữ.
+        \item \textbf{Context Relevance}: mức độ ngữ cảnh truy xuất \textit{thực sự hữu ích} cho câu hỏi; chỉ số này giúp tách bạch lỗi do truy xuất (context kém liên quan) khỏi lỗi do sinh (answer kém).
+    \end{itemize}
+    Vì các điểm số này được chuẩn hóa về $[0,1]$, ngưỡng nghiệm thu (nếu đặt) có thể được diễn giải minh bạch theo ``mức đạt tối thiểu'' và ``mức kỳ vọng''; đồng thời việc dùng thang liên tục cho phép so sánh các biến thể mô hình/cấu hình mà không phụ thuộc vào một ranh giới cứng duy nhất. Trong luận văn này, cách đặt ngưỡng cho nhóm chỉ số LLM được ưu tiên theo hướng \textit{đảm bảo tính đúng và bám ngữ cảnh} (faithfulness/correctness) hơn là tối ưu văn phong.
+\end{itemize}
+
+\subsubsection{Hệ thống RAG (Retrieval-Augmented Generation)}
+
+\textbf{Mục tiêu đánh giá.} Hệ thống RAG được đánh giá theo đúng hai thành phần chức năng cốt lõi của RAG: 
+\begin{itemize}
+    \item \textit{khả năng truy xuất} đưa đúng bằng chứng vào Top-$K$ (retrieval quality), 
+    \item \textit{chất lượng ngữ cảnh} sau truy xuất khi được dùng làm đầu vào cho mô hình sinh. 
+\end{itemize}
+Trong phần này tập trung vào "khả năng truy xuất" thông qua các chỉ số chuẩn của IR; phần "chất lượng ngữ cảnh" được phản ánh gián tiếp thông qua \textit{Context Relevance} ở mục đánh giá LLM.
+
+\textbf{Chuẩn bị dữ liệu đánh giá.} Bộ dữ liệu được đóng gói trong một tệp JSON theo cấu trúc thống nhất:
+\begin{itemize}
+    \item \texttt{documents}: danh sách tài liệu nguồn dùng để xây dựng VectorDB, mỗi phần tử có dạng \{\texttt{doc\_id}, \texttt{content}\}.
+    \item \texttt{eval\_dataset}: danh sách mẫu đánh giá, mỗi mẫu gồm:
+    \begin{itemize}
+        \item \texttt{id}: định danh câu hỏi.
+        \item \texttt{query}: câu hỏi/nhu cầu thông tin của người dùng.
+        \item \texttt{ground\_truth}: đáp án chuẩn (dùng cho đánh giá chất lượng sinh ở mục LLM).
+        \item \texttt{relevant\_doc\_ids}: tập \texttt{doc\_id} liên quan (gold evidence) dùng làm nhãn cho bài toán truy xuất.
+        \item \texttt{difficulty}: nhãn độ khó (easy/medium/hard) phục vụ phân tích theo nhóm (không ảnh hưởng trực tiếp đến công thức metric).
+    \end{itemize}
+\end{itemize}
+Để bảo toàn tính tái lập (reproducibility), toàn bộ pipeline đọc dữ liệu nạp trực tiếp từ tệp JSON; đồng thời tạo ánh xạ \texttt{doc\_id $\rightarrow$ content} để tái dựng ngữ cảnh theo đúng văn bản gốc khi cần.
+
+\textbf{Xây dựng bộ truy xuất (Retriever).} Từ danh sách \texttt{documents}, mỗi tài liệu được chuyển sang định dạng \texttt{LangChain Document} với:
+\begin{itemize}
+    \item \texttt{page\_content} = nội dung văn bản \texttt{content}.
+    \item \texttt{metadata["doc\_id"]} = định danh \texttt{doc\_id} để truy vết và tính metric.
+\end{itemize}
+Embeddings sử dụng \texttt{HuggingFaceEmbeddings} với tham số thiết bị \texttt{EMBEDDING\_DEVICE} (CPU/GPU). Vector store có thể chọn \texttt{Chroma} hoặc \texttt{FAISS} theo \texttt{VECTORSTORE\_BACKEND}. Khi khả dụng, pipeline ưu tiên dùng wrapper \texttt{VectorDB} trong \texttt{src.rag.vectorstore} để đồng nhất với hiện thực hệ thống; nếu không, sẽ fallback sang backend vector store trực tiếp. Retriever được cấu hình \texttt{search\_kwargs=\{"k": TOP\_K\}} để bảo đảm số lượng tài liệu truy xuất đúng với tham số đánh giá.
+
+\textbf{Luồng đánh giá truy xuất.} Với mỗi mẫu \texttt{eval\_dataset}, pipeline thực hiện:
+\begin{itemize}
+    \item Nhận \texttt{query} và tập nhãn \texttt{relevant\_doc\_ids}.
+    \item Gọi retriever để lấy danh sách tài liệu liên quan. 
+    \item Cắt Top-$K$ kết quả đầu và trích \texttt{doc\_id} từ \texttt{metadata} để tạo chuỗi \texttt{retrieved\_doc\_ids}.
+    \item Tính các metric IR và cộng dồn theo mẫu; cuối cùng lấy trung bình theo số mẫu.
+\end{itemize}
+
+\textbf{Chỉ số đánh giá và định nghĩa.} Gọi \(R_K\) là danh sách \texttt{doc\_id} truy xuất trong Top-$K$ và \(G\) là tập \texttt{relevant\_doc\_ids}:
+\begin{itemize}
+    \item \textbf{Hit@K}: \(=1\) nếu tồn tại \(d \in R_K\) sao cho \(d \in G\); ngược lại \(=0\).
+    \item \textbf{Recall@K}: \(=\frac{|R_K \cap G|}{|G|}\) (nếu \(G=\varnothing\) thì quy ước \(=0\)).
+    \item \textbf{MRR}: nếu tài liệu đúng đầu tiên xuất hiện ở vị trí \(i\) trong danh sách truy xuất thì \(MRR=\frac{1}{i}\); nếu không có tài liệu đúng thì \(=0\).
+\end{itemize}
+Các chỉ số trên phản ánh trực tiếp chất lượng truy xuất trong bối cảnh RAG: Hit@K đảm bảo ``có bằng chứng'', Recall@K đảm bảo ``đủ bằng chứng'', và MRR đảm bảo ``bằng chứng ưu tiên nằm sớm'' để tối ưu prompt và giảm nhiễu cho mô hình sinh.
+
+\textbf{Kết quả đánh giá (theo log chạy thực nghiệm).} Bảng \ref{tab:rag_eval_results} tổng hợp kết quả trung bình trên tập đánh giá với cấu hình Top-$K$ cố định.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Chỉ số} & \textbf{Giá trị trung bình} \\
+\hline
+Hit@10 & 0.8900 \\
+\hline
+Recall@10 & 0.8438 \\
+\hline
+MRR & 0.8101 \\
+\hline
+\end{tabular}
+\caption{Kết quả đánh giá chất lượng truy xuất của hệ thống RAG (Top-$K=10$)}
+\label{tab:rag_eval_results}
+\end{table}
+
+\subsubsection{Mô hình LLM (Llama-3.1-8B-Instruct)}
+
+\textbf{Mục tiêu đánh giá.} Mô hình LLM được đánh giá theo vai trò \textit{generator} trong pipeline RAG (sinh câu trả lời dựa trên truy vấn và ngữ cảnh truy xuất), đồng thời kiểm soát hai rủi ro chính: 
+\begin{itemize}
+    \item trả lời đúng nội dung so với đáp án chuẩn, 
+    \item bám sát ngữ cảnh để hạn chế rủi ro hallucination. 
+\end{itemize}
+Vì đánh giá tự động theo luật/regex không phản ánh tốt các biến thể diễn đạt, pipeline sử dụng một \textit{LLM-as-a-judge} để chấm điểm mềm (continuous scoring) trên thang \( [0,1] \). Ở bước sinh, mỗi mẫu chỉ truyền payload tối thiểu gồm \texttt{question=query}, và để rỗng \texttt{history} cùng \texttt{services} nhằm cô lập tác động của truy xuất và mô hình sinh trong thí nghiệm.
+
+\textbf{Chuẩn bị ngữ cảnh đưa vào Judge.} Sau khi retriever trả về Top-$K$ tài liệu, pipeline tái dựng văn bản ngữ cảnh theo thứ tự truy xuất và ghép bằng \texttt{"\textbackslash n\textbackslash n"}. Để tránh sai lệch do cơ chế lưu/truy hồi của vector store, pipeline ưu tiên lấy \texttt{content} theo ánh xạ \texttt{doc\_id $\rightarrow$ content} từ dataset gốc; chỉ khi không ánh xạ được mới dùng \texttt{page\_content} của đối tượng \texttt{Document}.
+
+\textbf{Đánh giá tự động bằng Judge LLM (LLM-as-a-judge).} Một mô hình Judge độc lập được dùng để chấm ba tiêu chí:
+\begin{itemize}
+    \item \textbf{Faithfulness}: mức độ câu trả lời được ngữ cảnh hỗ trợ.
+    \item \textbf{Correctness}: mức độ đúng về nghĩa so với \texttt{ground\_truth}.
+    \item \textbf{Context Relevance}: mức độ ngữ cảnh liên quan và hữu ích cho câu hỏi.
+\end{itemize}
+Judge hoạt động theo hai chế độ:
+\begin{itemize}
+    \item \texttt{JUDGE\_BACKEND=mistral} (mặc định): gọi endpoint \texttt{https://api.mistral.ai/v1} theo chuẩn OpenAI-compatible với \texttt{JUDGE\_MODEL} (mặc định \texttt{mistral-large-latest}).
+    \item \texttt{JUDGE\_BACKEND=same}: tái sử dụng chính generator LLM để làm judge (phục vụ thử nghiệm ablation).
+\end{itemize}
+Prompt chấm điểm yêu cầu Judge trả về \textbf{JSON} thuần với ba khóa \texttt{faithfulness}, \texttt{correctness}, \texttt{context\_relevance}. Để tăng độ bền khi LLM trả về thừa văn bản, pipeline trích xuất đối tượng JSON bằng regex, sau đó ép kiểu về số thực và \textit{clip} về đoạn \([0,1]\). Cuối cùng, các điểm số được \textbf{lấy trung bình theo số mẫu} để báo cáo \texttt{avg\_faithfulness}, \texttt{avg\_correctness}, \texttt{avg\_context\_relevance} cùng metadata của lần chạy (mode, model, backend, v.v.).
+
+\textbf{Prompt đánh giá (nguyên văn).} Dưới đây là prompt được dùng để gọi Judge (Mistral) chấm điểm cho từng mẫu; prompt này được format theo các biến \texttt{\{question\}}, \texttt{\{context\}}, \texttt{\{answer\}}, \texttt{\{ground\_truth\}}:
+
+\begin{verbatim}
+You are a fair, lenient evaluator. Prefer partial credit: nếu câu trả lời nhìn chung đúng hoặc hợp lý so với ground truth thì cho điểm cao; khác từ ngữ nhỏ, thiếu chi tiết phụ, hoặc diễn đạt khác nhưng không sai nghĩa thì không trừ mạnh.
+
+Given:
+- Question
+- Context
+- Answer
+- Ground truth
+
+Score each metric in [0, 1]:
+- Faithfulness: answer được context hỗ trợ; nếu có thêm suy luận nhẹ nhưng không mâu thuẫn context thì vẫn có thể cao.
+- Correctness: answer phù hợp nghĩa với ground truth (không cần khớp từng chữ).
+- Context Relevance: context có giúp trả lời câu hỏi (dù không hoàn hảo vẫn có thể điểm khá).
+
+Return JSON only with keys: faithfulness, correctness, context_relevance.
+
+Question:
+{question}
+
+Context:
+{context}
+
+Answer:
+{answer}
+
+Ground truth:
+{ground_truth}
+\end{verbatim}
+
+\textbf{Kết quả đánh giá (theo log chạy thực nghiệm).} Bảng \ref{tab:llm_eval_results} tổng hợp điểm trung bình theo ba tiêu chí chấm bởi Judge LLM.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Chỉ số} & \textbf{Giá trị trung bình} \\
+\hline
+Faithfulness & 0.8320 \\
+\hline
+Correctness & 0.8380 \\
+\hline
+Context Relevance & 0.8710 \\
+\hline
+\end{tabular}
+\caption{Kết quả đánh giá chất lượng câu trả lời LLM theo Judge LLM (thang điểm [0,1])}
+\label{tab:llm_eval_results}
+\end{table}
 
 \subsubsection{Mô hình phân loại ý định (Intent Classifier)}
 
