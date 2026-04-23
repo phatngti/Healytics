@@ -1,0 +1,1026 @@
+/home/giahung21112004/Projects/Healytics/ai_services/rag_langchain/src/rag/vectorstore.py:9: LangChainDeprecationWarning: The class `HuggingFaceEmbeddings` was deprecated in LangChain 0.2.2 and will be removed in 1.0. An updated version of the class exists in the `langchain-huggingface package and should be used instead. To use it run `pip install -U `langchain-huggingface` and import as `from `langchain_huggingface import HuggingFaceEmbeddings``.
+  def __init__(self, documents = None, vector_db: Union[Chroma, FAISS] = Chroma, embedding = HuggingFaceEmbeddings(model_kwargs={'device': 'cuda'})) -> None:
+/home/giahung21112004/Projects/Healytics/ai_services/rag_langchain/src/rag/vectorstore.py:9: LangChainDeprecationWarning: Default values for HuggingFaceEmbeddings.model_name were deprecated in LangChain 0.2.16 and will be removed in 0.4.0. Explicitly pass a model_name to the HuggingFaceEmbeddings constructor instead.
+  def __init__(self, documents = None, vector_db: Union[Chroma, FAISS] = Chroma, embedding = HuggingFaceEmbeddings(model_kwargs={'device': 'cuda'})) -> None:
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights:  50%|█████     | 100/199 [00:00<00:00, 989.38it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 1197.44it/s]
+[1mMPNetModel LOAD REPORT[0m from: sentence-transformers/all-mpnet-base-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights:   0%|          | 1/254 [00:01<04:26,  1.05s/it]Loading weights:   1%|          | 3/254 [00:06<09:42,  2.32s/it]Loading weights:   2%|▏         | 4/254 [00:11<12:48,  3.07s/it]Loading weights:   2%|▏         | 5/254 [00:15<14:49,  3.57s/it]Loading weights:   3%|▎         | 7/254 [00:21<13:25,  3.26s/it]Loading weights:   3%|▎         | 8/254 [00:27<16:39,  4.06s/it]Loading weights:   4%|▎         | 9/254 [00:31<16:16,  3.98s/it]Loading weights:   4%|▍         | 10/254 [00:36<17:28,  4.30s/it]Loading weights:   5%|▍         | 12/254 [00:38<11:31,  2.86s/it]Loading weights:  13%|█▎        | 32/254 [00:38<01:27,  2.53it/s]Loading weights:  24%|██▍       | 62/254 [00:39<00:26,  7.11it/s]Loading weights:  35%|███▌      | 89/254 [00:39<00:12, 12.76it/s]Loading weights:  48%|████▊     | 121/254 [00:39<00:06, 21.89it/s]Loading weights:  56%|█████▋    | 143/254 [00:39<00:03, 28.45it/s]Loading weights:  63%|██████▎   | 161/254 [00:39<00:02, 34.60it/s]Loading weights:  70%|██████▉   | 177/254 [00:39<00:01, 40.50it/s]Loading weights:  75%|███████▌  | 191/254 [00:40<00:01, 47.97it/s]Loading weights:  80%|████████  | 204/254 [00:40<00:00, 52.12it/s]Loading weights:  85%|████████▌ | 216/254 [00:40<00:00, 58.94it/s]Loading weights:  89%|████████▉ | 227/254 [00:40<00:00, 65.75it/s]Loading weights:  94%|█████████▎| 238/254 [00:40<00:00, 66.16it/s]Loading weights:  98%|█████████▊| 248/254 [00:40<00:00, 69.03it/s]Loading weights: 100%|██████████| 254/254 [00:40<00:00,  6.24it/s]
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Passing `generation_config` together with generation-related arguments=({'max_new_tokens', 'num_return_sequences', 'do_sample', 'pad_token_id'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+CUDA available: True
+GPU name: NVIDIA GeForce RTX 3050 Laptop GPU
+Model is on device: cuda:0
+🚀 Loading model: meta-llama/Llama-3.2-3B-Instruct
+Loading PDFs:   0%|          | 0/8 [00:00<?, ?file/s]Loading PDFs:  12%|█▎        | 1/8 [00:03<00:25,  3.70s/file]Loading PDFs:  25%|██▌       | 2/8 [00:07<00:21,  3.56s/file]Loading PDFs:  38%|███▊      | 3/8 [00:07<00:11,  2.22s/file]Loading PDFs:  50%|█████     | 4/8 [00:08<00:06,  1.71s/file]Loading PDFs:  62%|██████▎   | 5/8 [00:11<00:06,  2.26s/file]Loading PDFs:  75%|███████▌  | 6/8 [00:14<00:04,  2.46s/file]Loading PDFs:  88%|████████▊ | 7/8 [00:18<00:02,  2.92s/file]Loading PDFs: 100%|██████████| 8/8 [00:18<00:00,  2.34s/file]
+INFO:     Started server process [47190]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:43650 - "GET /health HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:53304 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:60384 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
+Both `max_new_tokens` (=256) and `max_length`(=20) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+INFO:     127.0.0.1:44014 - "POST /chat/stream HTTP/1.1" 200 OK
