@@ -1,0 +1,54 @@
+# ── Python bytecode / caches ──────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Virtual environments ──────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Secrets / env files ───────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Git / IDE / OS ────────────────────────────────────────────────
+.git/
+.gitignore
+.gitattributes
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ── Tests & dev-only files ────────────────────────────────────────
+tests/
+pytest.ini
+seed.py
+
+# ── Intent classification — training-only artifacts (runtime KHÔNG cần) ──
+# Giữ lại app/intent_classification/models/intent_encoder/ vì code load từ đó.
+app/intent_classification/evaluation.ipynb
+app/intent_classification/intent_binary_dataset.csv
+app/intent_classification/intent_binary_testset.csv
+app/intent_classification/train.py
+
+# ── Local DB / notebooks ──────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+*.ipynb
+.ipynb_checkpoints/
+
+# ── Docs / misc ───────────────────────────────────────────────────
+*.md
+!README.md
+Dockerfile
+.dockerignore

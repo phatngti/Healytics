@@ -678,3 +678,318 @@ HNR $\downarrow$ & 0.1211 & 0.1613 \\
 \end{figure}
 
 % \subsection{Phản hồi từ người dùng thử nghiệm}
+
+\subsubsection{Đánh giá End-to-End toàn bộ luồng AI (LLM-as-a-Judge)}
+
+\textbf{Mục tiêu đánh giá.}
+Các phần trước đã đánh giá từng thành phần độc lập: truy xuất của \texttt{RAG}, chất lượng sinh của \texttt{LLM} và hệ thống gợi ý (\texttt{Recommender}).
+Mục này đánh giá \textbf{toàn bộ luồng AI ở mức end-to-end}: từ khi người dùng gửi truy vấn tới khi nhận được câu trả lời cuối cùng, bao gồm tất cả các bước điều phối (intent, NER, retrieval, prompt enrichment, LLM generation, streaming).
+Khác với đánh giá từng thành phần, mục tiêu ở đây là trả lời câu hỏi: \emph{câu trả lời mà hệ thống đưa tới tay người dùng cuối có thực sự đúng, hữu ích và bám sát câu hỏi hay không}.
+Do không có nhãn gold chuẩn cho câu trả lời sinh tự do, chúng tôi áp dụng phương pháp \textbf{LLM-as-a-Judge} (Zheng et al., 2023) với \texttt{Mistral} làm mô hình chấm điểm độc lập (không trùng với \texttt{LLM} đang sinh trong hệ thống, nhằm giảm thiên lệch tự chấm).
+
+\textbf{Bộ dữ liệu đánh giá.}
+Chúng tôi xây dựng bộ dữ liệu tiếng Việt gồm \textbf{500 mẫu}, phân tầng theo 6 nhóm câu hỏi đặc trưng mà người dùng thường gửi tới một chatbot y tế. Mỗi mẫu gồm: truy vấn (\texttt{user\_query}), câu trả lời kỳ vọng (\texttt{ground\_truth}), nhãn nhóm (\texttt{category}), cờ kỳ vọng có cần gợi ý dịch vụ hay không (\texttt{needs\_recommendation}) và cờ có chứa vị trí địa lý (\texttt{has\_location}). Phân bố nhóm được cố định như Bảng~\ref{tab:e2e_dataset_dist} để đảm bảo bộ dữ liệu bao phủ các kịch bản thực tế quan trọng.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Nhóm câu hỏi} & \textbf{Số mẫu} & \textbf{Tỉ lệ (\%)} & \textbf{Đặc điểm} \\
+\hline
+general\_medical\_qa            & 130 & 26.0 & Hỏi đáp y khoa tổng quát \\
+\hline
+service\_seeking\_with\_location & 120 & 24.0 & Tìm dịch vụ theo địa điểm \\
+\hline
+service\_seeking\_general        & 120 & 24.0 & Tìm dịch vụ không địa điểm \\
+\hline
+symptom\_advice                  & 80  & 16.0 & Tư vấn triệu chứng \\
+\hline
+greeting\_smalltalk              & 30  & 6.0  & Chào hỏi/xã giao \\
+\hline
+follow\_up\_questions            & 20  & 4.0  & Câu hỏi theo ngữ cảnh \\
+\hline
+\textbf{Tổng cộng}               & \textbf{500} & \textbf{100.0} & \\
+\hline
+\end{tabular}
+\caption{Phân bố bộ dữ liệu đánh giá end-to-end}
+\label{tab:e2e_dataset_dist}
+\end{table}
+
+\textbf{Mô hình sinh được đánh giá.}
+Hệ thống hiện đang triển khai \texttt{meta-llama/Llama-3.2-3B-Instruct} làm mô hình sinh, chạy cục bộ với lượng tử hóa 4-bit (\texttt{bitsandbytes} nf4, double-quantization, compute dtype \texttt{float16}); \texttt{max\_new\_tokens} đặt ở mức 256 token để cân bằng giữa độ dài câu trả lời và thời gian sinh. Thành phần truy xuất dùng \texttt{Chroma} với embedding \texttt{sentence-transformers/all-mpnet-base-v2} trên tập tài liệu tham chiếu y tế (WHO) gồm 8 tài liệu.
+\textit{Ghi chú:} khi triển khai phiên bản production trên \texttt{Llama-3.1-8B-Instruct}, số liệu sẽ được đo lại với cấu hình tương ứng.
+
+\textbf{Judge LLM và prompt đánh giá.}
+Chúng tôi dùng \texttt{mistral-small-latest} (API Mistral) với \texttt{temperature=0} để đảm bảo tính tái lập. Với mỗi mẫu, Judge nhận 3 thành phần (\textit{Question}, \textit{Ground truth}, \textit{Model answer}) và chấm điểm đồng thời 3 tiêu chí trên thang \textbf{1--5}, kèm giải thích bằng tiếng Việt. Prompt được dùng như sau:
+
+\begin{verbatim}
+You are an evaluator for a healthcare chatbot.
+
+Given:
+- User query
+- Ground truth answer
+- Model answer
+
+Evaluate the model answer based on:
+
+1. Correctness (Is the answer factually correct?)
+2. Helpfulness (Is the answer useful to the user?)
+3. Relevance (Does the answer address the query?)
+
+Score each from 1 to 5.
+
+Also provide a brief explanation.
+
+Return JSON only, exactly in this schema:
+{
+  "correctness": <int 1-5>,
+  "helpfulness": <int 1-5>,
+  "relevance":   <int 1-5>,
+  "explanation": "<short explanation in Vietnamese>"
+}
+\end{verbatim}
+
+\textbf{Cơ sở lựa chọn ngưỡng.}
+Mỗi tiêu chí được chấm theo thang rời rạc 1--5, trong đó $\ge 4$ được coi là \textit{đạt chất lượng cao} (câu trả lời đúng, hữu ích, bám sát câu hỏi), $=3$ là \textit{chấp nhận được} (không sai nhưng chưa tối ưu), $\le 2$ là \textit{chưa đạt}. Vì vậy ngoài điểm trung bình chúng tôi báo cáo thêm \textbf{phân phối điểm 1--5} và \textbf{pass rate} (tỉ lệ mẫu đạt $\ge 4$). Các mục tiêu ngưỡng ban đầu cho phiên bản cơ sở: \texttt{Correctness\_mean} $\ge 3.0$, \texttt{Helpfulness\_mean} $\ge 3.0$, \texttt{Relevance\_mean} $\ge 3.5$ và \texttt{Relevance pass rate} $\ge 50\%$.
+
+\textbf{Kết quả định lượng tổng hợp.}
+Trên toàn bộ 500 mẫu, hệ thống trả về 500/500 phản hồi hợp lệ (\texttt{success rate = 100\%}); Judge LLM phân tích thành công 496/500 mẫu (\texttt{parse rate = 99.2\%}, 4 mẫu bị lỗi JSON parse phía Judge và được loại khỏi thống kê điểm). Bảng~\ref{tab:e2e_overall} tóm tắt các điểm trung bình và thống kê tập trung của 3 tiêu chí.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{N} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{Min} & \textbf{Max} \\
+\hline
+Correctness & 496 & 3.129 & 3.0 & 1.208 & 1.0 & 5.0 \\
+\hline
+Helpfulness & 496 & 3.188 & 3.0 & 1.127 & 1.0 & 5.0 \\
+\hline
+Relevance   & 496 & 3.544 & 4.0 & 1.268 & 1.0 & 5.0 \\
+\hline
+\end{tabular}
+\caption{Kết quả tổng hợp đánh giá End-to-End (thang 1--5, Judge = mistral-small)}
+\label{tab:e2e_overall}
+\end{table}
+
+\noindent\textbf{Phân phối điểm.}
+Bảng~\ref{tab:e2e_score_dist} cho thấy cấu trúc điểm của 3 tiêu chí. \textit{Relevance} có phân phối lệch phải rõ rệt: gần 54\% mẫu đạt $\ge 4$, trong đó riêng điểm 5 chiếm 29.8\%. Ngược lại, \textit{Correctness} có nhiều mẫu ở mức 3 (37.1\%) và tỉ lệ mẫu đạt điểm 1--2 vẫn ở mức 26.6\%, phản ánh đúng hạn chế của mô hình sinh 3B đối với kiến thức y tế chuyên sâu tiếng Việt.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Điểm 1} & \textbf{Điểm 2} & \textbf{Điểm 3} & \textbf{Điểm 4} & \textbf{Điểm 5} \\
+\hline
+Correctness & 62 (12.5\%) & 70 (14.1\%) & 184 (37.1\%) & 102 (20.6\%) & 78 (15.7\%) \\
+\hline
+Helpfulness & 39 (7.9\%)  & 105 (21.2\%)& 131 (26.4\%) & 166 (33.5\%) & 55 (11.1\%) \\
+\hline
+Relevance   & 43 (8.7\%)  & 60 (12.1\%) & 125 (25.2\%) & 120 (24.2\%) & 148 (29.8\%)\\
+\hline
+\end{tabular}
+\caption{Phân phối điểm theo 3 tiêu chí (n = 496 mẫu có Judge thành công)}
+\label{tab:e2e_score_dist}
+\end{table}
+
+\noindent\textbf{Pass rate (tỉ lệ mẫu đạt điểm $\ge 4$).}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Số mẫu đạt} & \textbf{Pass rate} & \textbf{Ngưỡng mục tiêu} \\
+\hline
+Correctness & 180 / 496 & 36.29\% & $\ge 40\%$ (chưa đạt) \\
+\hline
+Helpfulness & 221 / 496 & 44.56\% & $\ge 45\%$ (gần đạt) \\
+\hline
+Relevance   & 268 / 496 & 54.03\% & $\ge 50\%$ (đạt) \\
+\hline
+\end{tabular}
+\caption{Pass rate với ngưỡng chất lượng cao}
+\label{tab:e2e_pass_rate}
+\end{table}
+
+\noindent\textbf{Kết quả phân theo nhóm câu hỏi.}
+Bảng~\ref{tab:e2e_by_category} cho thấy sự phân tầng điểm số rất khác nhau giữa các nhóm, giúp xác định vị trí mà mô hình đang mạnh và yếu để tối ưu hóa tiếp theo.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Nhóm câu hỏi} & \textbf{N} & \textbf{Correctness} & \textbf{Helpfulness} & \textbf{Relevance} \\
+\hline
+greeting\_smalltalk              & 30  & 4.13 & 4.13 & 4.33 \\
+\hline
+service\_seeking\_with\_location & 117 & 3.26 & 3.29 & 3.99 \\
+\hline
+service\_seeking\_general        & 120 & 3.42 & 3.43 & 3.74 \\
+\hline
+general\_medical\_qa             & 129 & 2.88 & 3.00 & 3.16 \\
+\hline
+symptom\_advice                  & 80  & 2.69 & 2.69 & 3.11 \\
+\hline
+follow\_up\_questions            & 20  & 2.50 & 2.90 & 2.75 \\
+\hline
+\textbf{Trung bình toàn bộ}      & \textbf{496} & \textbf{3.13} & \textbf{3.19} & \textbf{3.54} \\
+\hline
+\end{tabular}
+\caption{Điểm trung bình theo nhóm câu hỏi (Judge LLM, thang 1--5)}
+\label{tab:e2e_by_category}
+\end{table}
+
+\noindent\textbf{Nhận xét từ kết quả end-to-end:}
+\begin{itemize}
+    \item \textbf{Relevance cao hơn Correctness và Helpfulness một cách hệ thống} (3.54 vs.\ 3.13/3.19). Điều này cho thấy mô hình sinh \emph{bám đúng chủ đề} câu hỏi, nhưng \emph{độ chính xác thông tin} chưa cao — đúng với đặc tính của mô hình 3B được huấn luyện chủ yếu tiếng Anh; với tiếng Việt y khoa, mô hình vẫn có xu hướng ``chém gió'' (hallucinate) một số chi tiết.
+    \item \textbf{Nhóm \texttt{greeting\_smalltalk}} đạt điểm cao nhất (4.13 / 4.13 / 4.33). Đây là những câu ngắn, không cần kiến thức chuyên sâu; mô hình trả lời thành thạo và thân thiện.
+    \item \textbf{Nhóm \texttt{service\_seeking}} (cả với và không có vị trí) có \texttt{Relevance} tốt (3.74--3.99) do mô hình luôn nhận diện đúng ý định ``tìm dịch vụ'', trong khi \texttt{Correctness} chỉ ở mức trung bình (3.26--3.42) — phần nhiều vì luồng chạy ở chế độ chatbot-direct (không có payload gợi ý thực từ Recommender đi kèm), dẫn tới câu trả lời có thể thiếu tên dịch vụ cụ thể.
+    \item \textbf{Nhóm \texttt{symptom\_advice} và \texttt{follow\_up\_questions}} điểm thấp nhất. Với \texttt{symptom\_advice}, mô hình cần liên kết nhiều mảnh kiến thức (triệu chứng $\rightarrow$ chuyên khoa $\rightarrow$ lời khuyên), điều mà mô hình 3B xử lý chưa ổn định. Với \texttt{follow\_up\_questions}, câu hỏi ngắn phụ thuộc ngữ cảnh trước nhưng chạy đánh giá stateless nên mô hình thường không đủ thông tin để trả lời chính xác — đúng như kỳ vọng lý thuyết, và là điểm cần cải thiện ở module quản lý hội thoại của Gateway.
+    \item \textbf{Tỉ lệ lỗi Judge} chỉ 0.8\% (4/500) — rất thấp, cho thấy format trả về JSON của Mistral ổn định với prompt đang dùng.
+\end{itemize}
+
+\textbf{Kết luận cho mục đánh giá end-to-end.}
+Với cấu hình hiện tại (Llama-3.2-3B 4-bit + RAG Chroma + WHO docs), hệ thống đạt được mức điểm trung bình $\approx 3.3$ trên thang 5 (\emph{chấp nhận được, nghiêng về khá}), đạt \emph{Relevance} pass rate > 50\%, nhưng \emph{Correctness} pass rate mới ở 36\%. Các hướng tối ưu tiếp theo đã được xác định rõ từ kết quả phân nhóm: (i) nâng cấp mô hình sinh lên Llama-3.1-8B-Instruct để cải thiện kiến thức y khoa; (ii) mở rộng corpus RAG tiếng Việt; (iii) đưa payload Recommender thực vào prompt để nâng \textit{Correctness} của nhóm service-seeking; (iv) bật quản lý hội thoại có trạng thái cho \texttt{follow\_up\_questions}.
+
+% -----------------------------------------------------------------------
+\subsubsection{System Metrics (Latency, Throughput, Cost)}
+
+\textbf{Mục tiêu.}
+Ngoài chất lượng sinh, khả năng phục vụ thực tế của hệ thống còn phụ thuộc vào hiệu năng (độ trễ), khả năng thông lượng (throughput) và chi phí vận hành (cost). Mục này đo ba nhóm chỉ số này trên cùng bộ 500 truy vấn end-to-end đã dùng ở mục trước, để có một cái nhìn thống nhất giữa \emph{chất lượng} và \emph{hiệu năng--chi phí}.
+
+\textbf{Các chỉ số được đo.}
+\begin{itemize}
+    \item \textbf{First Token Latency (TTFT)}: khoảng thời gian từ lúc client gửi request tới lúc nhận được token đầu tiên. Đây là chỉ số quan trọng nhất đối với trải nghiệm ``phản hồi cảm nhận được'' của người dùng.
+    \item \textbf{Total Latency}: thời gian từ lúc gửi request tới lúc nhận xong toàn bộ câu trả lời (stream đóng).
+    \item \textbf{Streaming Time}: thời gian giữa first-token và last-token, biểu diễn thời lượng mà client thực sự nhận được các chunk token.
+    \item \textbf{Throughput}: số từ trả về trung bình mỗi giây trong pha streaming (\texttt{answer\_word\_count / streaming\_time}).
+    \item \textbf{Cost per Request}: ước lượng chi phí mỗi yêu cầu dựa trên thời gian chiếm GPU. Do \texttt{Llama} hiện đang chạy cục bộ (chi phí biên = 0), chúng tôi báo cáo chi phí như khi triển khai production trên GPU \textbf{NVIDIA RTX A5000} theo đơn giá tham chiếu \textbf{\$0.27/giờ} (RunPod Community Cloud), tính theo công thức:
+    \[
+    \text{Cost}_{\text{USD}} = \frac{\text{TotalLatency}_{\text{giây}}}{3600} \times 0.27
+    \]
+\end{itemize}
+
+\textbf{Cấu hình đo đạc.}
+Mọi request được đo tuần tự (concurrency = 1) để phản ánh độ trễ cold-path của một người dùng, không gồm chi phí khởi tạo mô hình (warm state). Hệ thống đo đạc dùng client HTTP/SSE bất đồng bộ (\texttt{httpx.AsyncClient}) ghi lại mốc thời gian ở mỗi sự kiện SSE (\texttt{token}, \texttt{recommendation}, \texttt{done}). Mô hình sinh: \texttt{Llama-3.2-3B-Instruct} 4-bit, streaming chunk\_size = 3 từ, delay 50ms (giả lập streaming mượt phía client).
+
+\textbf{Kết quả tổng hợp độ trễ.}
+Bảng~\ref{tab:sys_latency_overall} tổng hợp phân phối đầy đủ 3 thành phần độ trễ trên 500 mẫu. Có thể thấy TTFT gần bằng Total Latency (85.08s so với 87.82s), phản ánh đúng kiến trúc hiện tại: chatbot-service sinh đầy đủ câu trả lời rồi mới phát stream (``fake streaming'' ở tầng Gateway) để đảm bảo tính nhất quán của chuỗi RAG; thời gian stream phát các chunk chỉ chiếm trung bình $\sim$2.68 giây.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
+\hline
+\textbf{Chỉ số (giây)} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{p50} & \textbf{p90} & \textbf{p95} & \textbf{p99} \\
+\hline
+Total Latency    & 87.82 & 72.44 & 46.91 & 72.44 & 143.42 & 188.75 & 211.31 \\
+\hline
+TTFT             & 85.08 & 68.79 & 46.34 & 68.79 & 139.67 & 184.82 & 207.60 \\
+\hline
+Streaming Time   & 2.68  & 3.05  & 1.00  & 3.05  & 3.70   & 3.90   & 4.16   \\
+\hline
+\end{tabular}
+\caption{Phân phối độ trễ end-to-end (n = 500)}
+\label{tab:sys_latency_overall}
+\end{table}
+
+\textbf{Throughput.}
+Throughput phát chunk sau first-token khá ổn định: trung bình 59.6 từ/giây, độ lệch chuẩn chỉ 3.66 — nghĩa là một khi đã bắt đầu stream, tốc độ truyền tới client rất đều (chủ yếu bị ràng buộc bởi delay 50ms/chunk ở tầng chatbot-service). Chi tiết phân phối trong Bảng~\ref{tab:sys_throughput}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Throughput (từ/giây)} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{p50} & \textbf{p95} & \textbf{p99} \\
+\hline
+Giá trị & 59.59 & 60.75 & 3.66 & 60.75 & 63.61 & 65.38 \\
+\hline
+\end{tabular}
+\caption{Throughput giai đoạn streaming (n = 500)}
+\label{tab:sys_throughput}
+\end{table}
+
+\textbf{Chi phí vận hành trên GPU A5000.}
+Bảng~\ref{tab:sys_cost_overall} trình bày phân phối chi phí. Trung bình mỗi request tiêu tốn khoảng \textbf{\$0.0066} (\textasciitilde{}155 đồng Việt Nam); ngay cả ở P99 chỉ là \$0.0158. Tổng chi phí chạy 500 mẫu đánh giá là \textbf{\$3.29}. Con số này là cận trên vì đã tính cả thời gian chờ giữa các bước streaming.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
+\hline
+\textbf{Cost/Request (USD)} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{p50} & \textbf{p90} & \textbf{p95} & \textbf{p99} \\
+\hline
+Giá trị  & 0.00659 & 0.00543 & 0.00352 & 0.00543 & 0.01076 & 0.01416 & 0.01585 \\
+\hline
+\end{tabular}
+\caption{Chi phí mỗi request quy đổi theo GPU A5000 @ \$0.27/h (n = 500)}
+\label{tab:sys_cost_overall}
+\end{table}
+
+\noindent\textbf{Ghi chú về cost model.}
+Hệ thống hiện triển khai \texttt{Llama} cục bộ nên chi phí biên thực tế $\approx$ 0. Tuy nhiên, khi triển khai production trên \texttt{RunPod} với GPU A5000 Community @ \$0.27/giờ (tương đương \$7.5 \times 10^{-5}/giây), mức chi phí dự kiến cho mỗi request đạt các giá trị nêu trong Bảng~\ref{tab:sys_cost_overall}. Do đó \textit{chi phí cao nhất xảy ra đúng vào các request có latency cao (câu trả lời dài, bộ hỏi phức tạp)}, mối quan hệ này cho thấy mọi biện pháp giảm \texttt{max\_new\_tokens} hoặc tối ưu pipeline đều trực tiếp hạ chi phí.
+
+\textbf{Phân tích theo nhóm câu hỏi.}
+Độ trễ và chi phí phụ thuộc nhiều vào độ dài câu trả lời do mô hình sinh thêm token; các nhóm yêu cầu câu trả lời dài có mean latency cao nhất, như cho thấy ở Bảng~\ref{tab:sys_by_category}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Nhóm} & \textbf{N} & \textbf{TTFT Mean} & \textbf{Total Mean} & \textbf{Total p95} & \textbf{Cost Mean} & \textbf{Throughput} \\
+                  &        & \textbf{(giây)} & \textbf{(giây)} & \textbf{(giây)} & \textbf{(USD)} & \textbf{(từ/s)} \\
+\hline
+greeting\_smalltalk              & 30  & 33.19 & 34.10 & 78.79  & 0.00256 & 62.59 \\
+\hline
+service\_seeking\_general        & 120 & 84.80 & 87.46 & 188.22 & 0.00656 & 59.85 \\
+\hline
+symptom\_advice                  & 80  & 83.75 & 86.40 & 193.51 & 0.00648 & 58.99 \\
+\hline
+service\_seeking\_with\_location & 120 & 86.12 & 88.94 & 191.69 & 0.00667 & 58.81 \\
+\hline
+general\_medical\_qa             & 130 & 94.94 & 98.16 & 188.98 & 0.00736 & 59.37 \\
+\hline
+follow\_up\_questions            & 20  & 99.57 & 102.23& 174.85 & 0.00767 & 61.94 \\
+\hline
+\textbf{Trung bình toàn bộ}      & \textbf{500} & \textbf{85.08} & \textbf{87.82} & \textbf{188.75} & \textbf{0.00659} & \textbf{59.59} \\
+\hline
+\end{tabular}
+\caption{Hệ số hiệu năng theo nhóm câu hỏi}
+\label{tab:sys_by_category}
+\end{table}
+
+\textbf{Quan hệ giữa chất lượng và hiệu năng.}
+Đối chiếu Bảng~\ref{tab:e2e_by_category} và Bảng~\ref{tab:sys_by_category}:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Nhóm} & \textbf{Điểm trung bình C/H/R} & \textbf{Total Latency (s)} & \textbf{Cost/Req (USD)} \\
+\hline
+greeting\_smalltalk              & 4.20 & 34.10 & 0.00256 \\
+\hline
+service\_seeking\_with\_location & 3.51 & 88.94 & 0.00667 \\
+\hline
+service\_seeking\_general        & 3.53 & 87.46 & 0.00656 \\
+\hline
+general\_medical\_qa             & 3.01 & 98.16 & 0.00736 \\
+\hline
+symptom\_advice                  & 2.83 & 86.40 & 0.00648 \\
+\hline
+follow\_up\_questions            & 2.72 & 102.23& 0.00767 \\
+\hline
+\end{tabular}
+\caption{Đối chiếu chất lượng $\leftrightarrow$ hiệu năng theo nhóm câu hỏi}
+\label{tab:e2e_qa_vs_sys}
+\end{table}
+
+\noindent\textbf{Nhận xét về hiệu năng và chi phí:}
+\begin{itemize}
+    \item \textbf{Các nhóm trả lời dài} (general\_medical\_qa, follow\_up\_questions) \emph{vừa đắt vừa tốn thời gian nhất}, đồng thời có điểm chất lượng thấp nhất. Đây là các nhóm cần ưu tiên tối ưu: (i) cắt ngắn câu trả lời bằng chỉ thị prompt ``trả lời trong 4--6 câu''; (ii) dùng \texttt{max\_new\_tokens} thích ứng theo ý định.
+    \item \textbf{Nhóm \texttt{greeting\_smalltalk}} cost chỉ bằng $\sim$1/3 các nhóm còn lại (\$0.0026 vs.\ \$0.0066), cho thấy việc \emph{phân luồng sớm theo intent} (không đi qua pipeline RAG đầy đủ với các câu chào hỏi) là một hướng tối ưu hóa chi phí đáng làm.
+    \item \textbf{Streaming Time chiếm < 4\% Total Latency} ($\sim$2.7s trên trung bình 87.8s) do kiến trúc hiện đang ``fake-stream'' sau khi LLM sinh xong. Nếu bật true-streaming ở tầng LLM (ví dụ chuyển sang \texttt{vLLM} hoặc \texttt{text-generation-inference}), TTFT có thể giảm tới $\sim$1.5--3s, cải thiện mạnh UX mà không cần đổi mô hình.
+    \item \textbf{Throughput streaming rất đều} (std = 3.66 từ/s), khẳng định nghẽn cổ chai không nằm ở tầng truyền SSE mà nằm ở thời gian sinh của LLM.
+    \item \textbf{P95 Total Latency = 188.75s} là mức cao so với tiêu chuẩn chatbot sản xuất ($<$10s). Nguyên nhân chính là GPU cục bộ hiện tại (RTX 3050 Laptop 4GB) có băng thông bộ nhớ thấp; khi triển khai lên A5000 (24GB GDDR6, băng thông 768 GB/s) tốc độ sinh kỳ vọng tăng $\approx$4--5 lần, đưa P95 về dưới 45--50s, và khi kết hợp true-streaming thì TTFT có thể đạt mục tiêu dưới 3s.
+\end{itemize}
+
+\textbf{Kết luận hiệu năng--chi phí.}
+Hệ thống hoạt động ổn định về mặt hạ tầng (success rate 100\%, throughput đều), nhưng độ trễ trên cấu hình đo hiện tại chưa đạt chuẩn production do hạn chế GPU của máy phát triển. Chi phí vận hành theo ước lượng A5000 ở mức \textbf{\$0.0066/request} là rất cạnh tranh — một hệ thống 100.000 request/ngày sẽ tốn $\approx$\$660 GPU/ngày, dễ dàng mở rộng theo nhu cầu người dùng khi deploy thực tế.

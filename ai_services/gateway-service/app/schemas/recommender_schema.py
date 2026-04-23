@@ -1,6 +1,6 @@
 # app/schemas/recommender_schema.py
-from pydantic import BaseModel, Field
-from typing import List, Optional, Any, Dict
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from typing import List, Optional, Any
 from uuid import UUID
 
 
@@ -21,36 +21,36 @@ class ChatbotRecommenderRequest(BaseModel):
 
 
 # ==============================
-# SERVICE DETAIL SCHEMA
+# AI RECOMMENDATION ITEM DTO
 # ==============================
 
-class PriceInfo(BaseModel):
-    amount: int
-    currency: str = "VND"
+class AiRecommendationItemDto(BaseModel):
+    """
+    Pass-through DTO, match 1:1 với backend `/backend/ai/recommendations`.
 
+    - Chấp nhận cả "service_id" và "id" ở input (backend hiện trả "id",
+      mock fallback trả "service_id").
+    - Output luôn dùng tên field Python (service_id, imageUrl, vendorName, staffAvatars)
+      để khớp spec frontend.
+    - `extra="allow"` để backend thêm field mới không cần update DTO.
+    """
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
 
-class RatingInfo(BaseModel):
-    average: float
-    total_reviews: int
-
-
-class LocationInfo(BaseModel):
-    address: str
-    district: str
-    city: str
-
-
-class ServiceDetail(BaseModel):
-    service_id: str
-    name: str
-    image_url: Optional[str] = None
-    badge: Optional[str] = None
-    booked_count: Optional[int] = None
-    price: Optional[PriceInfo] = None
-    staff_name: Optional[str] = None
-    rating: Optional[RatingInfo] = None
-    location: Optional[LocationInfo] = None
-    slots: Optional[List[str]] = None
+    service_id: Optional[str] = Field(
+        default=None,
+        validation_alias=AliasChoices("service_id", "id"),
+    )
+    name: Optional[str] = None
+    slug: Optional[str] = None
+    imageUrl: Optional[str] = None
+    category: Optional[str] = None
+    duration: Optional[str] = None
+    price: Optional[str] = None
+    rating: Optional[str] = None
+    vendorName: Optional[str] = None
+    location: Optional[str] = None
+    staffAvatars: Optional[List[str]] = None
+    type: Optional[str] = None
 
 
 # ==============================
@@ -58,13 +58,13 @@ class ServiceDetail(BaseModel):
 # ==============================
 
 class RecommendationResponse(BaseModel):
-    recommendations: List[ServiceDetail]
+    recommendations: List[AiRecommendationItemDto]
     total: int
     timestamp: str
 
 
 class ChatbotRecommendationResponse(BaseModel):
     conversation_id: str
-    recommendations: List[ServiceDetail]
+    recommendations: List[AiRecommendationItemDto]
     total: int
     timestamp: str
