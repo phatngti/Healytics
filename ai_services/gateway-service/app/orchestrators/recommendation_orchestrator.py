@@ -296,11 +296,11 @@ class RecommendationOrchestrator:
 
         service_ids = result["recommendations"][0]["service_ids"] if result.get("recommendations") else []
 
-        # Enrich service_ids → ServiceDetail
+        # Enrich service_ids → AiRecommendationItemDto (pass-through từ backend AI)
         services = await _enrich_with_service_info(service_ids)
 
         return {
-            "recommendations": services,   # ← list ServiceDetail, không phải list RecommendationItem
+            "recommendations": services,
             "total": len(services),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
@@ -328,7 +328,7 @@ class RecommendationOrchestrator:
 
         return {
             "conversation_id": str(request.conversation_id),
-            "recommendations": services,   # ← list ServiceDetail
+            "recommendations": services,
             "total": len(services),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
