@@ -1,0 +1,4502 @@
+[
+  {
+    "id": "e2e_sym_0048",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em bị nổi mề đay liên tục mấy tuần nay.",
+    "ground_truth": "Mề đay kéo dài trên 6 tuần là mạn tính, có thể do dị ứng thức ăn, thuốc, tự miễn. Nên khám dị ứng miễn dịch để tìm nguyên nhân.",
+    "order": 0
+  },
+  {
+    "id": "e2e_med_0110",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh sốt xuất huyết có nguy hiểm không?",
+    "ground_truth": "Sốt xuất huyết có thể diễn tiến nặng gây sốc, chảy máu, suy đa tạng. Cần theo dõi sát và nhập viện khi có dấu hiệu cảnh báo.",
+    "order": 1
+  },
+  {
+    "id": "e2e_loc_0057",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ tai mũi họng khu vực quận 1.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tai mũi họng ở khu vực quận 1. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 2
+  },
+  {
+    "id": "e2e_gen_0079",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở ung bướu chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ung bướu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa ung bướu tầm soát, chẩn đoán và điều trị các loại ung thư.",
+    "order": 3
+  },
+  {
+    "id": "e2e_gen_0115",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch hô hấp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ hô hấp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa hô hấp điều trị hen, viêm phổi, COPD và các bệnh phổi khác.",
+    "order": 4
+  },
+  {
+    "id": "e2e_med_0090",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh gout có điều trị được không?",
+    "ground_truth": "Gout không chữa khỏi hoàn toàn nhưng kiểm soát tốt bằng thuốc hạ acid uric, giảm đau đợt cấp, chế độ ăn ít purin và hạn chế rượu.",
+    "order": 5
+  },
+  {
+    "id": "e2e_sym_0002",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em bị ngứa da toàn thân về đêm, nên kiểm tra gì?",
+    "ground_truth": "Ngứa về đêm có thể do dị ứng, ghẻ, gan mật, đái tháo đường. Bạn nên khám da liễu hoặc nội tổng quát để tìm nguyên nhân.",
+    "order": 6
+  },
+  {
+    "id": "e2e_gen_0087",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ da liễu nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ da liễu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa da liễu xử lý các bệnh về da, tóc, móng như mụn, nấm, viêm da.",
+    "order": 7
+  },
+  {
+    "id": "e2e_gen_0070",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cho mình xin một vài phòng khám mắt.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ mắt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa mắt khám, đo thị lực và điều trị các bệnh về mắt như cận thị, đục thủy tinh thể.",
+    "order": 8
+  },
+  {
+    "id": "e2e_sym_0004",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Chân tôi phù vào cuối ngày, có bình thường không?",
+    "ground_truth": "Phù chân cuối ngày có thể do suy tĩnh mạch, đứng nhiều; nếu kèm khó thở, tiểu ít cần loại trừ bệnh tim, thận, gan.",
+    "order": 9
+  },
+  {
+    "id": "e2e_gen_0010",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám huyết học, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ huyết học phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa huyết học điều trị thiếu máu, rối loạn đông máu, các bệnh máu ác tính.",
+    "order": 10
+  },
+  {
+    "id": "e2e_med_0102",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hội chứng ruột kích thích nhận biết?",
+    "ground_truth": "Hội chứng ruột kích thích có đau bụng tái diễn, thay đổi thói quen đi ngoài (tiêu chảy/táo bón), liên quan stress, thức ăn.",
+    "order": 11
+  },
+  {
+    "id": "e2e_loc_0099",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám dị ứng miễn dịch tại Huế càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám dị ứng miễn dịch ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 12
+  },
+  {
+    "id": "e2e_sym_0030",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em bị ngứa da toàn thân về đêm, nên kiểm tra gì?",
+    "ground_truth": "Ngứa về đêm có thể do dị ứng, ghẻ, gan mật, đái tháo đường. Bạn nên khám da liễu hoặc nội tổng quát để tìm nguyên nhân.",
+    "order": 13
+  },
+  {
+    "id": "e2e_fu_0009",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Chi phí khám khoảng bao nhiêu?",
+    "ground_truth": "Chi phí khám tùy cơ sở và chuyên khoa, thường dao động 150.000-500.000 đồng cho khám thường, cao hơn nếu có xét nghiệm.",
+    "order": 14
+  },
+  {
+    "id": "e2e_loc_0107",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám ung bướu tại quận Tân Bình càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám ung bướu ở khu vực quận Tân Bình. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 15
+  },
+  {
+    "id": "e2e_gen_0107",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám tai mũi họng nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tai mũi họng phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tai mũi họng chẩn đoán các bệnh về tai, mũi, xoang, họng, thanh quản.",
+    "order": 16
+  },
+  {
+    "id": "e2e_grt_0014",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn là ai?",
+    "ground_truth": "Tôi là trợ lý ảo Healytics, chuyên hỗ trợ bạn tìm kiếm dịch vụ y tế và cung cấp thông tin sức khỏe tham khảo.",
+    "order": 17
+  },
+  {
+    "id": "e2e_loc_0103",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi đang ở Nha Trang, cần tư vấn khám thần kinh.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám thần kinh ở khu vực Nha Trang. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 18
+  },
+  {
+    "id": "e2e_fu_0008",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Có cần nhịn ăn trước khi khám không?",
+    "ground_truth": "Nếu làm xét nghiệm máu như đường huyết, mỡ máu thì cần nhịn ăn 8-12 tiếng. Các khám khác thường không cần.",
+    "order": 19
+  },
+  {
+    "id": "e2e_loc_0114",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám tim mạch tại quận 7?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tim mạch ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 20
+  },
+  {
+    "id": "e2e_med_0039",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh gan nhiễm mỡ có đáng lo không?",
+    "ground_truth": "Gan nhiễm mỡ nhẹ có thể hồi phục bằng giảm cân, ăn uống và vận động; gan nhiễm mỡ không cồn có thể tiến triển viêm gan, xơ gan.",
+    "order": 21
+  },
+  {
+    "id": "e2e_loc_0085",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gần quận 1 có chuyên khoa tiết niệu không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiết niệu ở khu vực quận 1. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 22
+  },
+  {
+    "id": "e2e_loc_0066",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về tiêu hóa, ở Hà Nội nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Hà Nội. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 23
+  },
+  {
+    "id": "e2e_gen_0083",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám tai mũi họng, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tai mũi họng phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tai mũi họng chẩn đoán các bệnh về tai, mũi, xoang, họng, thanh quản.",
+    "order": 24
+  },
+  {
+    "id": "e2e_med_0056",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Cường giáp khác suy giáp thế nào?",
+    "ground_truth": "Cường giáp là tăng hormone tuyến giáp gây sụt cân, tim đập nhanh, run tay, sợ nóng, tiêu chảy; ngược với suy giáp.",
+    "order": 25
+  },
+  {
+    "id": "e2e_fu_0006",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi nên chuẩn bị gì?",
+    "ground_truth": "Bạn nên mang theo giấy tờ tùy thân, hồ sơ khám cũ, danh sách thuốc đang dùng và ghi lại triệu chứng, thời gian xuất hiện.",
+    "order": 26
+  },
+  {
+    "id": "e2e_med_0004",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Đi tiểu nhiều lần ban đêm là bệnh gì?",
+    "ground_truth": "Tiểu đêm nhiều lần có thể do phì đại tuyến tiền liệt, tiểu đường, suy tim, uống nhiều nước tối, nhiễm trùng đường tiểu.",
+    "order": 27
+  },
+  {
+    "id": "e2e_sym_0050",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Kinh nguyệt của tôi thất thường mấy tháng nay.",
+    "ground_truth": "Rối loạn kinh nguyệt có thể do nội tiết, buồng trứng đa nang, stress, tuyến giáp. Nên khám sản phụ khoa và xét nghiệm hormone.",
+    "order": 28
+  },
+  {
+    "id": "e2e_loc_0087",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám mắt ở Cầu Giấy, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám mắt ở khu vực Cầu Giấy. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 29
+  },
+  {
+    "id": "e2e_gen_0028",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám tiêu hóa nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiêu hóa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiêu hóa chẩn đoán bệnh dạ dày, đại tràng, gan, mật, tụy.",
+    "order": 30
+  },
+  {
+    "id": "e2e_loc_0055",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gần Đà Nẵng có chuyên khoa nhi khoa không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nhi khoa ở khu vực Đà Nẵng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 31
+  },
+  {
+    "id": "e2e_sym_0012",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi khó thở khi leo cầu thang.",
+    "ground_truth": "Khó thở khi gắng sức có thể do thiếu máu, bệnh tim, bệnh phổi, thừa cân. Nên khám tim mạch hoặc hô hấp để đánh giá.",
+    "order": 32
+  },
+  {
+    "id": "e2e_loc_0109",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám nội tiết tại quận 3?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tiết ở khu vực quận 3. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 33
+  },
+  {
+    "id": "e2e_gen_0023",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi đang tìm nơi khám mắt, bạn hỗ trợ.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ mắt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa mắt khám, đo thị lực và điều trị các bệnh về mắt như cận thị, đục thủy tinh thể.",
+    "order": 34
+  },
+  {
+    "id": "e2e_gen_0025",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ thần kinh.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ thần kinh phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa thần kinh điều trị đau đầu, động kinh, đột quỵ, rối loạn vận động.",
+    "order": 35
+  },
+  {
+    "id": "e2e_loc_0102",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi đang ở quận 3, cần tư vấn khám dị ứng miễn dịch.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám dị ứng miễn dịch ở khu vực quận 3. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 36
+  },
+  {
+    "id": "e2e_sym_0039",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi tiểu rát và đi nhiều lần.",
+    "ground_truth": "Triệu chứng gợi ý nhiễm trùng đường tiểu, cần xét nghiệm nước tiểu và khám tiết niệu, uống nhiều nước và dùng kháng sinh theo chỉ định.",
+    "order": 37
+  },
+  {
+    "id": "e2e_loc_0049",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi đang ở Cần Thơ, cần tư vấn khám nội tiết.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tiết ở khu vực Cần Thơ. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 38
+  },
+  {
+    "id": "e2e_med_0014",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Trẻ em bị sốt bao nhiêu là cao?",
+    "ground_truth": "Trẻ sốt trên 38.5°C là sốt cao, trên 39.5°C là sốt rất cao. Cần hạ sốt bằng paracetamol theo cân nặng và đưa đi khám nếu sốt kéo dài hoặc co giật.",
+    "order": 39
+  },
+  {
+    "id": "e2e_gen_0005",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ thần kinh.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ thần kinh phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa thần kinh điều trị đau đầu, động kinh, đột quỵ, rối loạn vận động.",
+    "order": 40
+  },
+  {
+    "id": "e2e_gen_0020",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám tai mũi họng nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tai mũi họng phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tai mũi họng chẩn đoán các bệnh về tai, mũi, xoang, họng, thanh quản.",
+    "order": 41
+  },
+  {
+    "id": "e2e_med_0109",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh gan nhiễm mỡ có đáng lo không?",
+    "ground_truth": "Gan nhiễm mỡ nhẹ có thể hồi phục bằng giảm cân, ăn uống và vận động; gan nhiễm mỡ không cồn có thể tiến triển viêm gan, xơ gan.",
+    "order": 42
+  },
+  {
+    "id": "e2e_med_0031",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh thận mạn tính có dấu hiệu gì?",
+    "ground_truth": "Bệnh thận mạn giai đoạn đầu thường không triệu chứng, giai đoạn sau có phù, tiểu ít, mệt mỏi, thiếu máu, tăng huyết áp.",
+    "order": 43
+  },
+  {
+    "id": "e2e_med_0049",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Làm sao để phòng tránh đột quỵ?",
+    "ground_truth": "Phòng đột quỵ bằng cách kiểm soát huyết áp, đường huyết, mỡ máu; không hút thuốc, hạn chế rượu bia; tập thể dục, ăn uống lành mạnh; tầm soát định kỳ.",
+    "order": 44
+  },
+  {
+    "id": "e2e_med_0089",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm loét dạ dày có cần nội soi?",
+    "ground_truth": "Nội soi dạ dày giúp chẩn đoán chính xác viêm loét, sinh thiết tìm H.pylori, loại trừ ung thư; được khuyến cáo cho triệu chứng dai dẳng.",
+    "order": 45
+  },
+  {
+    "id": "e2e_loc_0054",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám da liễu tại Huế càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám da liễu ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 46
+  },
+  {
+    "id": "e2e_gen_0061",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Nên khám dị ứng miễn dịch ở đâu cho uy tín?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ dị ứng miễn dịch phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa dị ứng miễn dịch điều trị viêm mũi dị ứng, mày đay, hen dị ứng.",
+    "order": 47
+  },
+  {
+    "id": "e2e_gen_0059",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở tiết niệu chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 48
+  },
+  {
+    "id": "e2e_gen_0118",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ tiết niệu nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 49
+  },
+  {
+    "id": "e2e_grt_0018",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn là ai?",
+    "ground_truth": "Tôi là trợ lý ảo Healytics, chuyên hỗ trợ bạn tìm kiếm dịch vụ y tế và cung cấp thông tin sức khỏe tham khảo.",
+    "order": 50
+  },
+  {
+    "id": "e2e_fu_0002",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi nên đi khám lúc nào?",
+    "ground_truth": "Bạn nên đi khám sớm khi có triệu chứng bất thường kéo dài, không cải thiện hoặc nặng lên; đặc biệt nếu có dấu hiệu cảnh báo.",
+    "order": 51
+  },
+  {
+    "id": "e2e_med_0107",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm khớp dạng thấp nhận biết thế nào?",
+    "ground_truth": "Viêm khớp dạng thấp gây sưng đau đối xứng các khớp nhỏ bàn tay, cứng khớp buổi sáng trên 30 phút, kéo dài nhiều tuần.",
+    "order": 52
+  },
+  {
+    "id": "e2e_med_0122",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm phế quản khác viêm phổi ở điểm nào?",
+    "ground_truth": "Viêm phế quản là viêm ống dẫn khí lớn, chủ yếu ho đờm; viêm phổi là viêm nhu mô phổi, thường sốt cao, khó thở, nguy hiểm hơn.",
+    "order": 53
+  },
+  {
+    "id": "e2e_gen_0066",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi đang tìm nơi khám phục hồi chức năng, bạn hỗ trợ.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ phục hồi chức năng phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Phục hồi chức năng giúp bệnh nhân sau chấn thương, đột quỵ lấy lại khả năng vận động.",
+    "order": 54
+  },
+  {
+    "id": "e2e_med_0120",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm đại tràng có triệu chứng gì?",
+    "ground_truth": "Viêm đại tràng gây đau bụng, rối loạn tiêu hóa, tiêu chảy hoặc táo bón xen kẽ, phân có thể nhầy hoặc máu, mệt mỏi.",
+    "order": 55
+  },
+  {
+    "id": "e2e_loc_0006",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Ở quận 7 có bệnh viện nào khám tim mạch tốt không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tim mạch ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 56
+  },
+  {
+    "id": "e2e_med_0022",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Huyết áp cao có nguy hiểm không?",
+    "ground_truth": "Huyết áp cao là yếu tố nguy cơ chính gây đột quỵ, nhồi máu cơ tim, suy thận. Cần theo dõi và điều trị kịp thời để tránh biến chứng.",
+    "order": 57
+  },
+  {
+    "id": "e2e_loc_0031",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Bạn tôi ở quận 1 muốn khám nội tiết, nên chọn đâu?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tiết ở khu vực quận 1. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 58
+  },
+  {
+    "id": "e2e_med_0127",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Đi tiểu nhiều lần ban đêm là bệnh gì?",
+    "ground_truth": "Tiểu đêm nhiều lần có thể do phì đại tuyến tiền liệt, tiểu đường, suy tim, uống nhiều nước tối, nhiễm trùng đường tiểu.",
+    "order": 59
+  },
+  {
+    "id": "e2e_gen_0068",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám ung bướu nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ung bướu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa ung bướu tầm soát, chẩn đoán và điều trị các loại ung thư.",
+    "order": 60
+  },
+  {
+    "id": "e2e_gen_0105",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ tai mũi họng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tai mũi họng phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tai mũi họng chẩn đoán các bệnh về tai, mũi, xoang, họng, thanh quản.",
+    "order": 61
+  },
+  {
+    "id": "e2e_gen_0084",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở sản phụ khoa chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ sản phụ khoa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa sản phụ khoa chăm sóc sức khỏe phụ nữ, thai kỳ và các bệnh phụ khoa.",
+    "order": 62
+  },
+  {
+    "id": "e2e_gen_0095",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ ung bướu.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ung bướu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa ung bướu tầm soát, chẩn đoán và điều trị các loại ung thư.",
+    "order": 63
+  },
+  {
+    "id": "e2e_fu_0017",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Cần làm xét nghiệm gì?",
+    "ground_truth": "Tùy triệu chứng bác sĩ sẽ chỉ định xét nghiệm máu, nước tiểu, siêu âm hoặc hình ảnh học phù hợp để chẩn đoán chính xác.",
+    "order": 64
+  },
+  {
+    "id": "e2e_loc_0052",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về nội tổng quát, ở Hà Nội nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tổng quát ở khu vực Hà Nội. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 65
+  },
+  {
+    "id": "e2e_grt_0004",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn là ai?",
+    "ground_truth": "Tôi là trợ lý ảo Healytics, chuyên hỗ trợ bạn tìm kiếm dịch vụ y tế và cung cấp thông tin sức khỏe tham khảo.",
+    "order": 66
+  },
+  {
+    "id": "e2e_gen_0026",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở sản phụ khoa chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ sản phụ khoa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa sản phụ khoa chăm sóc sức khỏe phụ nữ, thai kỳ và các bệnh phụ khoa.",
+    "order": 67
+  },
+  {
+    "id": "e2e_loc_0008",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám ung bướu tại quận 10?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám ung bướu ở khu vực quận 10. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 68
+  },
+  {
+    "id": "e2e_loc_0094",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ dị ứng miễn dịch khu vực quận 1.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám dị ứng miễn dịch ở khu vực quận 1. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 69
+  },
+  {
+    "id": "e2e_sym_0055",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi tiểu rát và đi nhiều lần.",
+    "ground_truth": "Triệu chứng gợi ý nhiễm trùng đường tiểu, cần xét nghiệm nước tiểu và khám tiết niệu, uống nhiều nước và dùng kháng sinh theo chỉ định.",
+    "order": 70
+  },
+  {
+    "id": "e2e_sym_0009",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi đau nhức răng khi ăn đồ lạnh.",
+    "ground_truth": "Ê buốt răng khi ăn lạnh có thể do mòn men răng, sâu răng, viêm tủy. Nên khám răng hàm mặt để xử lý kịp thời.",
+    "order": 71
+  },
+  {
+    "id": "e2e_med_0100",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Làm sao biết mình cận thị?",
+    "ground_truth": "Dấu hiệu cận thị gồm nhìn xa mờ, phải nheo mắt, mỏi mắt khi đọc, hay nhức đầu. Nên đo thị lực tại cơ sở chuyên khoa.",
+    "order": 72
+  },
+  {
+    "id": "e2e_med_0084",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh lao phổi điều trị bao lâu?",
+    "ground_truth": "Phác đồ lao phổi chuẩn kéo dài 6 tháng (2 tháng tấn công + 4 tháng duy trì), cần tuân thủ uống thuốc đầy đủ để tránh kháng thuốc.",
+    "order": 73
+  },
+  {
+    "id": "e2e_loc_0029",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về hô hấp, ở Vũng Tàu nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám hô hấp ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 74
+  },
+  {
+    "id": "e2e_grt_0028",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn hoạt động thế nào?",
+    "ground_truth": "Tôi sử dụng AI để hiểu câu hỏi, tra cứu thông tin y tế và gợi ý dịch vụ từ cơ sở dữ liệu của Healytics.",
+    "order": 75
+  },
+  {
+    "id": "e2e_grt_0003",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tạm biệt",
+    "ground_truth": "Tạm biệt bạn, chúc bạn nhiều sức khỏe! Hẹn gặp lại.",
+    "order": 76
+  },
+  {
+    "id": "e2e_gen_0012",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ huyết học.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ huyết học phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa huyết học điều trị thiếu máu, rối loạn đông máu, các bệnh máu ác tính.",
+    "order": 77
+  },
+  {
+    "id": "e2e_gen_0053",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cho mình xin một vài phòng khám răng hàm mặt.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ răng hàm mặt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa răng hàm mặt khám nha khoa, chỉnh nha, phẫu thuật hàm mặt.",
+    "order": 78
+  },
+  {
+    "id": "e2e_gen_0109",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi đang tìm nơi khám tiết niệu, bạn hỗ trợ.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 79
+  },
+  {
+    "id": "e2e_med_0079",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh cận thị ở trẻ xử lý thế nào?",
+    "ground_truth": "Trẻ cận thị cần đo kính chính xác, cho học trong đủ sáng, hạn chế thiết bị điện tử, ra ngoài trời nhiều và khám mắt định kỳ 6 tháng.",
+    "order": 80
+  },
+  {
+    "id": "e2e_gen_0067",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch ung bướu.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ung bướu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa ung bướu tầm soát, chẩn đoán và điều trị các loại ung thư.",
+    "order": 81
+  },
+  {
+    "id": "e2e_loc_0015",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Bạn tôi ở Hải Phòng muốn khám huyết học, nên chọn đâu?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám huyết học ở khu vực Hải Phòng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 82
+  },
+  {
+    "id": "e2e_loc_0068",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về da liễu, ở Thủ Đức nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám da liễu ở khu vực Thủ Đức. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 83
+  },
+  {
+    "id": "e2e_loc_0033",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ tai mũi họng khu vực Huế.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tai mũi họng ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 84
+  },
+  {
+    "id": "e2e_med_0044",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Làm sao biết mình cận thị?",
+    "ground_truth": "Dấu hiệu cận thị gồm nhìn xa mờ, phải nheo mắt, mỏi mắt khi đọc, hay nhức đầu. Nên đo thị lực tại cơ sở chuyên khoa.",
+    "order": 85
+  },
+  {
+    "id": "e2e_med_0086",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Làm sao để phòng tránh đột quỵ?",
+    "ground_truth": "Phòng đột quỵ bằng cách kiểm soát huyết áp, đường huyết, mỡ máu; không hút thuốc, hạn chế rượu bia; tập thể dục, ăn uống lành mạnh; tầm soát định kỳ.",
+    "order": 86
+  },
+  {
+    "id": "e2e_med_0032",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Đau đầu migraine là gì?",
+    "ground_truth": "Migraine là đau đầu mạn tính theo cơn, thường đau nửa đầu, kèm buồn nôn, sợ ánh sáng/tiếng ồn, có thể có tiền triệu.",
+    "order": 87
+  },
+  {
+    "id": "e2e_sym_0036",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em hay bị tê bì tay chân.",
+    "ground_truth": "Tê bì tay chân có thể do thoát vị đĩa đệm, thiếu vitamin B, tiểu đường, hội chứng ống cổ tay. Nên khám thần kinh.",
+    "order": 88
+  },
+  {
+    "id": "e2e_loc_0071",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám tai mũi họng tại quận 10 càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tai mũi họng ở khu vực quận 10. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 89
+  },
+  {
+    "id": "e2e_gen_0031",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám tiêu hóa, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiêu hóa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiêu hóa chẩn đoán bệnh dạ dày, đại tràng, gan, mật, tụy.",
+    "order": 90
+  },
+  {
+    "id": "e2e_gen_0001",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cho mình xin một vài phòng khám da liễu.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ da liễu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa da liễu xử lý các bệnh về da, tóc, móng như mụn, nấm, viêm da.",
+    "order": 91
+  },
+  {
+    "id": "e2e_sym_0003",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi ngáy to khi ngủ, có cần khám không?",
+    "ground_truth": "Ngáy to kèm ngừng thở khi ngủ, buồn ngủ ban ngày có thể là hội chứng ngưng thở khi ngủ, nên khám hô hấp và đo đa ký giấc ngủ.",
+    "order": 92
+  },
+  {
+    "id": "e2e_med_0068",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Thế nào là tăng acid uric máu?",
+    "ground_truth": "Tăng acid uric máu là khi nồng độ acid uric vượt ngưỡng bình thường, có thể gây gout, sỏi thận nếu không kiểm soát.",
+    "order": 93
+  },
+  {
+    "id": "e2e_loc_0028",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi đang ở Hồ Chí Minh, cần tư vấn khám tiêu hóa.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Hồ Chí Minh. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 94
+  },
+  {
+    "id": "e2e_med_0003",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm phế quản khác viêm phổi ở điểm nào?",
+    "ground_truth": "Viêm phế quản là viêm ống dẫn khí lớn, chủ yếu ho đờm; viêm phổi là viêm nhu mô phổi, thường sốt cao, khó thở, nguy hiểm hơn.",
+    "order": 95
+  },
+  {
+    "id": "e2e_sym_0057",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị rụng tóc nhiều bất thường.",
+    "ground_truth": "Rụng tóc nhiều có thể do stress, thiếu sắt, rối loạn tuyến giáp, nội tiết, di truyền. Nên khám da liễu hoặc nội tiết.",
+    "order": 96
+  },
+  {
+    "id": "e2e_gen_0051",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cho mình xin một vài phòng khám tiết niệu.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 97
+  },
+  {
+    "id": "e2e_med_0113",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Thế nào là tăng acid uric máu?",
+    "ground_truth": "Tăng acid uric máu là khi nồng độ acid uric vượt ngưỡng bình thường, có thể gây gout, sỏi thận nếu không kiểm soát.",
+    "order": 98
+  },
+  {
+    "id": "e2e_gen_0062",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ hô hấp nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ hô hấp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa hô hấp điều trị hen, viêm phổi, COPD và các bệnh phổi khác.",
+    "order": 99
+  },
+  {
+    "id": "e2e_fu_0007",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi nên chuẩn bị gì?",
+    "ground_truth": "Bạn nên mang theo giấy tờ tùy thân, hồ sơ khám cũ, danh sách thuốc đang dùng và ghi lại triệu chứng, thời gian xuất hiện.",
+    "order": 100
+  },
+  {
+    "id": "e2e_med_0024",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh vảy nến là gì?",
+    "ground_truth": "Vảy nến là bệnh tự miễn mạn tính, gây mảng da đỏ có vảy trắng, ngứa; điều trị bằng thuốc bôi, uống, ánh sáng trị liệu.",
+    "order": 101
+  },
+  {
+    "id": "e2e_fu_0016",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi nên chuẩn bị gì?",
+    "ground_truth": "Bạn nên mang theo giấy tờ tùy thân, hồ sơ khám cũ, danh sách thuốc đang dùng và ghi lại triệu chứng, thời gian xuất hiện.",
+    "order": 102
+  },
+  {
+    "id": "e2e_loc_0032",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám ung bướu tại Cần Thơ?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám ung bướu ở khu vực Cần Thơ. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 103
+  },
+  {
+    "id": "e2e_loc_0021",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi đang ở Thanh Xuân, cần tư vấn khám thần kinh.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám thần kinh ở khu vực Thanh Xuân. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 104
+  },
+  {
+    "id": "e2e_loc_0034",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám huyết học tại Vũng Tàu càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám huyết học ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 105
+  },
+  {
+    "id": "e2e_gen_0011",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám tâm thần, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tâm thần phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tâm thần điều trị rối loạn lo âu, trầm cảm, mất ngủ, stress.",
+    "order": 106
+  },
+  {
+    "id": "e2e_gen_0117",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở cơ xương khớp chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ cơ xương khớp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa cơ xương khớp xử lý thoái hóa khớp, thoát vị đĩa đệm, loãng xương.",
+    "order": 107
+  },
+  {
+    "id": "e2e_med_0030",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Ung thư cổ tử cung có phòng được không?",
+    "ground_truth": "Ung thư cổ tử cung có thể phòng ngừa hiệu quả bằng tiêm vaccine HPV, tầm soát PAP smear định kỳ và quan hệ tình dục an toàn.",
+    "order": 108
+  },
+  {
+    "id": "e2e_sym_0042",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi tiểu rát và đi nhiều lần.",
+    "ground_truth": "Triệu chứng gợi ý nhiễm trùng đường tiểu, cần xét nghiệm nước tiểu và khám tiết niệu, uống nhiều nước và dùng kháng sinh theo chỉ định.",
+    "order": 109
+  },
+  {
+    "id": "e2e_gen_0006",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ ung bướu nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ung bướu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa ung bướu tầm soát, chẩn đoán và điều trị các loại ung thư.",
+    "order": 110
+  },
+  {
+    "id": "e2e_sym_0038",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị nóng rát vùng thượng vị sau ăn.",
+    "ground_truth": "Nóng rát thượng vị gợi ý trào ngược, viêm dạ dày. Nên giảm ăn cay, dầu mỡ, cà phê; khám tiêu hóa nếu kéo dài.",
+    "order": 111
+  },
+  {
+    "id": "e2e_gen_0082",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám hô hấp nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ hô hấp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa hô hấp điều trị hen, viêm phổi, COPD và các bệnh phổi khác.",
+    "order": 112
+  },
+  {
+    "id": "e2e_med_0026",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Trẻ em bị sốt bao nhiêu là cao?",
+    "ground_truth": "Trẻ sốt trên 38.5°C là sốt cao, trên 39.5°C là sốt rất cao. Cần hạ sốt bằng paracetamol theo cân nặng và đưa đi khám nếu sốt kéo dài hoặc co giật.",
+    "order": 113
+  },
+  {
+    "id": "e2e_sym_0072",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi hay quên, làm sao cải thiện?",
+    "ground_truth": "Hay quên có thể do stress, thiếu ngủ, thiếu B12, suy giáp, sa sút trí tuệ sớm. Nên khám thần kinh và xét nghiệm nếu kéo dài.",
+    "order": 114
+  },
+  {
+    "id": "e2e_med_0125",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Khi nào cần mổ ruột thừa?",
+    "ground_truth": "Ruột thừa viêm cấp cần mổ sớm trong vòng 24-48 giờ từ khi có triệu chứng để tránh vỡ ruột thừa gây viêm phúc mạc.",
+    "order": 115
+  },
+  {
+    "id": "e2e_sym_0028",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị rụng tóc nhiều bất thường.",
+    "ground_truth": "Rụng tóc nhiều có thể do stress, thiếu sắt, rối loạn tuyến giáp, nội tiết, di truyền. Nên khám da liễu hoặc nội tiết.",
+    "order": 116
+  },
+  {
+    "id": "e2e_gen_0069",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch ngoại tổng quát.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ngoại tổng quát phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Khám ngoại tổng quát xử lý các vấn đề cần can thiệp phẫu thuật thông thường.",
+    "order": 117
+  },
+  {
+    "id": "e2e_gen_0033",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Nên khám răng hàm mặt ở đâu cho uy tín?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ răng hàm mặt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa răng hàm mặt khám nha khoa, chỉnh nha, phẫu thuật hàm mặt.",
+    "order": 118
+  },
+  {
+    "id": "e2e_med_0029",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Nguyên nhân gây đau dạ dày?",
+    "ground_truth": "Đau dạ dày thường do vi khuẩn H.pylori, stress, ăn uống không điều độ, lạm dụng thuốc giảm đau, rượu bia, hút thuốc.",
+    "order": 119
+  },
+  {
+    "id": "e2e_sym_0075",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị đau khớp gối khi lên xuống cầu thang.",
+    "ground_truth": "Đau khớp gối khi vận động có thể do thoái hóa, tổn thương sụn chêm. Nên khám cơ xương khớp và có thể chụp MRI.",
+    "order": 120
+  },
+  {
+    "id": "e2e_loc_0093",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám răng hàm mặt ở Hồ Chí Minh, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám răng hàm mặt ở khu vực Hồ Chí Minh. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 121
+  },
+  {
+    "id": "e2e_sym_0025",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi ngáy to khi ngủ, có cần khám không?",
+    "ground_truth": "Ngáy to kèm ngừng thở khi ngủ, buồn ngủ ban ngày có thể là hội chứng ngưng thở khi ngủ, nên khám hô hấp và đo đa ký giấc ngủ.",
+    "order": 122
+  },
+  {
+    "id": "e2e_sym_0011",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em bị nổi mề đay liên tục mấy tuần nay.",
+    "ground_truth": "Mề đay kéo dài trên 6 tuần là mạn tính, có thể do dị ứng thức ăn, thuốc, tự miễn. Nên khám dị ứng miễn dịch để tìm nguyên nhân.",
+    "order": 123
+  },
+  {
+    "id": "e2e_loc_0004",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Ở Đà Nẵng có bệnh viện nào khám tim mạch tốt không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tim mạch ở khu vực Đà Nẵng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 124
+  },
+  {
+    "id": "e2e_gen_0013",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ tiết niệu.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 125
+  },
+  {
+    "id": "e2e_loc_0100",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám phục hồi chức năng tại Hồ Chí Minh càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám phục hồi chức năng ở khu vực Hồ Chí Minh. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 126
+  },
+  {
+    "id": "e2e_loc_0079",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gợi ý giúp mình phòng khám huyết học gần Thanh Xuân với.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám huyết học ở khu vực Thanh Xuân. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 127
+  },
+  {
+    "id": "e2e_sym_0014",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi tiểu rát và đi nhiều lần.",
+    "ground_truth": "Triệu chứng gợi ý nhiễm trùng đường tiểu, cần xét nghiệm nước tiểu và khám tiết niệu, uống nhiều nước và dùng kháng sinh theo chỉ định.",
+    "order": 128
+  },
+  {
+    "id": "e2e_loc_0024",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ phục hồi chức năng khu vực Biên Hòa.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám phục hồi chức năng ở khu vực Biên Hòa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 129
+  },
+  {
+    "id": "e2e_med_0050",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh vảy nến là gì?",
+    "ground_truth": "Vảy nến là bệnh tự miễn mạn tính, gây mảng da đỏ có vảy trắng, ngứa; điều trị bằng thuốc bôi, uống, ánh sáng trị liệu.",
+    "order": 130
+  },
+  {
+    "id": "e2e_gen_0034",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Nên khám nhi khoa ở đâu cho uy tín?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nhi khoa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa nhi khám và điều trị bệnh ở trẻ em dưới 16 tuổi.",
+    "order": 131
+  },
+  {
+    "id": "e2e_loc_0048",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám cơ xương khớp tại quận 3 càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám cơ xương khớp ở khu vực quận 3. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 132
+  },
+  {
+    "id": "e2e_loc_0056",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gợi ý giúp mình phòng khám nhi khoa gần quận 7 với.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nhi khoa ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 133
+  },
+  {
+    "id": "e2e_loc_0090",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Ở Cần Thơ có bệnh viện nào khám nội tổng quát tốt không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tổng quát ở khu vực Cần Thơ. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 134
+  },
+  {
+    "id": "e2e_fu_0001",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Cần làm xét nghiệm gì?",
+    "ground_truth": "Tùy triệu chứng bác sĩ sẽ chỉ định xét nghiệm máu, nước tiểu, siêu âm hoặc hình ảnh học phù hợp để chẩn đoán chính xác.",
+    "order": 135
+  },
+  {
+    "id": "e2e_sym_0032",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị đau khớp gối khi lên xuống cầu thang.",
+    "ground_truth": "Đau khớp gối khi vận động có thể do thoái hóa, tổn thương sụn chêm. Nên khám cơ xương khớp và có thể chụp MRI.",
+    "order": 136
+  },
+  {
+    "id": "e2e_sym_0031",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Kinh nguyệt của tôi thất thường mấy tháng nay.",
+    "ground_truth": "Rối loạn kinh nguyệt có thể do nội tiết, buồng trứng đa nang, stress, tuyến giáp. Nên khám sản phụ khoa và xét nghiệm hormone.",
+    "order": 137
+  },
+  {
+    "id": "e2e_loc_0012",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về nhi khoa, ở Cầu Giấy nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nhi khoa ở khu vực Cầu Giấy. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 138
+  },
+  {
+    "id": "e2e_med_0106",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh vảy nến là gì?",
+    "ground_truth": "Vảy nến là bệnh tự miễn mạn tính, gây mảng da đỏ có vảy trắng, ngứa; điều trị bằng thuốc bôi, uống, ánh sáng trị liệu.",
+    "order": 139
+  },
+  {
+    "id": "e2e_loc_0070",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ nội tổng quát khu vực Nha Trang.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tổng quát ở khu vực Nha Trang. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 140
+  },
+  {
+    "id": "e2e_med_0009",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hội chứng ruột kích thích nhận biết?",
+    "ground_truth": "Hội chứng ruột kích thích có đau bụng tái diễn, thay đổi thói quen đi ngoài (tiêu chảy/táo bón), liên quan stress, thức ăn.",
+    "order": 141
+  },
+  {
+    "id": "e2e_loc_0005",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám tiêu hóa tại quận 3 càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực quận 3. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 142
+  },
+  {
+    "id": "e2e_med_0094",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh động kinh có chữa được không?",
+    "ground_truth": "Động kinh kiểm soát tốt bằng thuốc chống động kinh; khoảng 70% bệnh nhân hết cơn. Một số ca cần phẫu thuật hoặc kích thích thần kinh phế vị.",
+    "order": 143
+  },
+  {
+    "id": "e2e_med_0034",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh zona thần kinh lây không?",
+    "ground_truth": "Zona có thể lây virus thủy đậu cho người chưa nhiễm qua tiếp xúc dịch mụn nước, nhưng không lây bệnh zona trực tiếp.",
+    "order": 144
+  },
+  {
+    "id": "e2e_gen_0072",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi đang tìm nơi khám phục hồi chức năng, bạn hỗ trợ.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ phục hồi chức năng phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Phục hồi chức năng giúp bệnh nhân sau chấn thương, đột quỵ lấy lại khả năng vận động.",
+    "order": 145
+  },
+  {
+    "id": "e2e_med_0126",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh zona thần kinh lây không?",
+    "ground_truth": "Zona có thể lây virus thủy đậu cho người chưa nhiễm qua tiếp xúc dịch mụn nước, nhưng không lây bệnh zona trực tiếp.",
+    "order": 146
+  },
+  {
+    "id": "e2e_gen_0094",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ tiết niệu nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 147
+  },
+  {
+    "id": "e2e_med_0097",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dấu hiệu đột quỵ cần nhận biết?",
+    "ground_truth": "Dấu hiệu F.A.S.T: méo mặt, yếu tay, nói khó; kèm đau đầu dữ dội đột ngột, mất thị lực, mất thăng bằng. Cần đến cấp cứu ngay.",
+    "order": 148
+  },
+  {
+    "id": "e2e_gen_0003",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám da liễu, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ da liễu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa da liễu xử lý các bệnh về da, tóc, móng như mụn, nấm, viêm da.",
+    "order": 149
+  },
+  {
+    "id": "e2e_loc_0098",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về tiêu hóa, ở Cầu Giấy nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Cầu Giấy. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 150
+  },
+  {
+    "id": "e2e_grt_0016",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn làm được gì?",
+    "ground_truth": "Tôi có thể giới thiệu phòng khám, bệnh viện phù hợp theo chuyên khoa, trả lời câu hỏi sức khỏe phổ thông và hỗ trợ đặt lịch.",
+    "order": 151
+  },
+  {
+    "id": "e2e_med_0021",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hội chứng ruột kích thích nhận biết?",
+    "ground_truth": "Hội chứng ruột kích thích có đau bụng tái diễn, thay đổi thói quen đi ngoài (tiêu chảy/táo bón), liên quan stress, thức ăn.",
+    "order": 152
+  },
+  {
+    "id": "e2e_med_0082",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh thận mạn tính có dấu hiệu gì?",
+    "ground_truth": "Bệnh thận mạn giai đoạn đầu thường không triệu chứng, giai đoạn sau có phù, tiểu ít, mệt mỏi, thiếu máu, tăng huyết áp.",
+    "order": 153
+  },
+  {
+    "id": "e2e_med_0018",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Nấm candida âm đạo điều trị ra sao?",
+    "ground_truth": "Nấm candida âm đạo điều trị bằng thuốc kháng nấm đặt âm đạo hoặc uống theo chỉ định, vệ sinh đúng cách và hạn chế đồ ngọt.",
+    "order": 154
+  },
+  {
+    "id": "e2e_grt_0012",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bot gì vậy?",
+    "ground_truth": "Tôi là trợ lý y tế Healytics, hỗ trợ tư vấn sức khỏe và gợi ý dịch vụ khám chữa bệnh.",
+    "order": 155
+  },
+  {
+    "id": "e2e_gen_0078",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cho mình xin một vài phòng khám phục hồi chức năng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ phục hồi chức năng phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Phục hồi chức năng giúp bệnh nhân sau chấn thương, đột quỵ lấy lại khả năng vận động.",
+    "order": 156
+  },
+  {
+    "id": "e2e_gen_0030",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám cơ xương khớp nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ cơ xương khớp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa cơ xương khớp xử lý thoái hóa khớp, thoát vị đĩa đệm, loãng xương.",
+    "order": 157
+  },
+  {
+    "id": "e2e_grt_0006",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Ok thanks",
+    "ground_truth": "Không có gì, rất vui được hỗ trợ bạn.",
+    "order": 158
+  },
+  {
+    "id": "e2e_gen_0081",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch hô hấp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ hô hấp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa hô hấp điều trị hen, viêm phổi, COPD và các bệnh phổi khác.",
+    "order": 159
+  },
+  {
+    "id": "e2e_med_0046",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Trẻ tiêm chủng đầy đủ gồm những mũi nào?",
+    "ground_truth": "Trẻ cần tiêm đủ các vaccine trong chương trình mở rộng: lao, bạch hầu, ho gà, uốn ván, bại liệt, viêm gan B, sởi, rubella, viêm não Nhật Bản.",
+    "order": 160
+  },
+  {
+    "id": "e2e_loc_0040",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Bạn tôi ở Cầu Giấy muốn khám nhi khoa, nên chọn đâu?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nhi khoa ở khu vực Cầu Giấy. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 161
+  },
+  {
+    "id": "e2e_med_0062",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Khi nào cần đi khám mắt?",
+    "ground_truth": "Nên khám mắt định kỳ 1 năm/lần; đi khám ngay khi thấy mờ, nhức, chảy nước mắt nhiều, nhìn đôi, đau mắt đỏ, chớp sáng hoặc ruồi bay bất thường.",
+    "order": 162
+  },
+  {
+    "id": "e2e_sym_0060",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị đau khớp gối khi lên xuống cầu thang.",
+    "ground_truth": "Đau khớp gối khi vận động có thể do thoái hóa, tổn thương sụn chêm. Nên khám cơ xương khớp và có thể chụp MRI.",
+    "order": 163
+  },
+  {
+    "id": "e2e_med_0028",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Ho kéo dài trên 3 tuần có sao không?",
+    "ground_truth": "Ho kéo dài trên 3 tuần được coi là ho mạn tính, có thể do viêm xoang sau, trào ngược, hen, COPD hoặc lao. Nên đi khám chuyên khoa hô hấp.",
+    "order": 164
+  },
+  {
+    "id": "e2e_loc_0002",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về sản phụ khoa, ở quận 7 nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám sản phụ khoa ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 165
+  },
+  {
+    "id": "e2e_grt_0025",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Xin chào",
+    "ground_truth": "Xin chào! Tôi là trợ lý Healytics. Tôi có thể giúp bạn tìm dịch vụ y tế và tư vấn sức khỏe. Bạn cần hỗ trợ gì ạ?",
+    "order": 166
+  },
+  {
+    "id": "e2e_sym_0018",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi hay quên, làm sao cải thiện?",
+    "ground_truth": "Hay quên có thể do stress, thiếu ngủ, thiếu B12, suy giáp, sa sút trí tuệ sớm. Nên khám thần kinh và xét nghiệm nếu kéo dài.",
+    "order": 167
+  },
+  {
+    "id": "e2e_loc_0065",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám huyết học tại Huế càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám huyết học ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 168
+  },
+  {
+    "id": "e2e_gen_0043",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở răng hàm mặt chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ răng hàm mặt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa răng hàm mặt khám nha khoa, chỉnh nha, phẫu thuật hàm mặt.",
+    "order": 169
+  },
+  {
+    "id": "e2e_sym_0074",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Thỉnh thoảng tôi hồi hộp tim đập nhanh không rõ lý do.",
+    "ground_truth": "Triệu chứng hồi hộp có thể là rối loạn nhịp tim, cường giáp, lo âu. Nên đo điện tim và khám tim mạch để đánh giá.",
+    "order": 170
+  },
+  {
+    "id": "e2e_sym_0017",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi tiểu rát và đi nhiều lần.",
+    "ground_truth": "Triệu chứng gợi ý nhiễm trùng đường tiểu, cần xét nghiệm nước tiểu và khám tiết niệu, uống nhiều nước và dùng kháng sinh theo chỉ định.",
+    "order": 171
+  },
+  {
+    "id": "e2e_med_0005",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh sốt xuất huyết có nguy hiểm không?",
+    "ground_truth": "Sốt xuất huyết có thể diễn tiến nặng gây sốc, chảy máu, suy đa tạng. Cần theo dõi sát và nhập viện khi có dấu hiệu cảnh báo.",
+    "order": 172
+  },
+  {
+    "id": "e2e_sym_0044",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi hay bị chóng mặt khi đứng dậy, nên làm gì?",
+    "ground_truth": "Chóng mặt khi đứng dậy có thể do hạ huyết áp tư thế, thiếu máu, tiền đình. Nên uống đủ nước, đứng dậy từ từ, đi khám nội hoặc tim mạch.",
+    "order": 173
+  },
+  {
+    "id": "e2e_fu_0012",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi nên chuẩn bị gì?",
+    "ground_truth": "Bạn nên mang theo giấy tờ tùy thân, hồ sơ khám cũ, danh sách thuốc đang dùng và ghi lại triệu chứng, thời gian xuất hiện.",
+    "order": 174
+  },
+  {
+    "id": "e2e_loc_0061",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gần Bình Thạnh có chuyên khoa hô hấp không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám hô hấp ở khu vực Bình Thạnh. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 175
+  },
+  {
+    "id": "e2e_med_0006",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Huyết áp cao có nguy hiểm không?",
+    "ground_truth": "Huyết áp cao là yếu tố nguy cơ chính gây đột quỵ, nhồi máu cơ tim, suy thận. Cần theo dõi và điều trị kịp thời để tránh biến chứng.",
+    "order": 176
+  },
+  {
+    "id": "e2e_med_0052",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Huyết áp cao có nguy hiểm không?",
+    "ground_truth": "Huyết áp cao là yếu tố nguy cơ chính gây đột quỵ, nhồi máu cơ tim, suy thận. Cần theo dõi và điều trị kịp thời để tránh biến chứng.",
+    "order": 177
+  },
+  {
+    "id": "e2e_med_0083",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Nấm candida âm đạo điều trị ra sao?",
+    "ground_truth": "Nấm candida âm đạo điều trị bằng thuốc kháng nấm đặt âm đạo hoặc uống theo chỉ định, vệ sinh đúng cách và hạn chế đồ ngọt.",
+    "order": 178
+  },
+  {
+    "id": "e2e_grt_0022",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hi",
+    "ground_truth": "Chào bạn! Mình là trợ lý ảo y tế Healytics, sẵn sàng hỗ trợ bạn tìm dịch vụ hoặc trả lời câu hỏi sức khỏe.",
+    "order": 179
+  },
+  {
+    "id": "e2e_gen_0111",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám tiết niệu, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 180
+  },
+  {
+    "id": "e2e_loc_0044",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám răng hàm mặt tại Hải Phòng?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám răng hàm mặt ở khu vực Hải Phòng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 181
+  },
+  {
+    "id": "e2e_fu_0013",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Cần làm xét nghiệm gì?",
+    "ground_truth": "Tùy triệu chứng bác sĩ sẽ chỉ định xét nghiệm máu, nước tiểu, siêu âm hoặc hình ảnh học phù hợp để chẩn đoán chính xác.",
+    "order": 182
+  },
+  {
+    "id": "e2e_med_0128",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh Parkinson có chữa được không?",
+    "ground_truth": "Parkinson không chữa khỏi nhưng kiểm soát bằng thuốc (levodopa), vật lý trị liệu, phẫu thuật kích thích não sâu trong ca phù hợp.",
+    "order": 183
+  },
+  {
+    "id": "e2e_med_0047",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Rối loạn tiền đình là gì?",
+    "ground_truth": "Rối loạn tiền đình là tình trạng mất thăng bằng, chóng mặt, buồn nôn do hệ thống tiền đình ở tai trong hoặc thần kinh bị ảnh hưởng.",
+    "order": 184
+  },
+  {
+    "id": "e2e_med_0043",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Huyết áp cao có nguy hiểm không?",
+    "ground_truth": "Huyết áp cao là yếu tố nguy cơ chính gây đột quỵ, nhồi máu cơ tim, suy thận. Cần theo dõi và điều trị kịp thời để tránh biến chứng.",
+    "order": 185
+  },
+  {
+    "id": "e2e_loc_0105",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gần Quy Nhơn có chuyên khoa tai mũi họng không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tai mũi họng ở khu vực Quy Nhơn. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 186
+  },
+  {
+    "id": "e2e_sym_0065",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Chân tôi phù vào cuối ngày, có bình thường không?",
+    "ground_truth": "Phù chân cuối ngày có thể do suy tĩnh mạch, đứng nhiều; nếu kèm khó thở, tiểu ít cần loại trừ bệnh tim, thận, gan.",
+    "order": 187
+  },
+  {
+    "id": "e2e_med_0081",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh động kinh có chữa được không?",
+    "ground_truth": "Động kinh kiểm soát tốt bằng thuốc chống động kinh; khoảng 70% bệnh nhân hết cơn. Một số ca cần phẫu thuật hoặc kích thích thần kinh phế vị.",
+    "order": 188
+  },
+  {
+    "id": "e2e_loc_0037",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về ngoại tổng quát, ở quận 1 nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám ngoại tổng quát ở khu vực quận 1. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 189
+  },
+  {
+    "id": "e2e_loc_0110",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về tai mũi họng, ở Bình Thạnh nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tai mũi họng ở khu vực Bình Thạnh. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 190
+  },
+  {
+    "id": "e2e_loc_0095",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám ngoại tổng quát ở Biên Hòa, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám ngoại tổng quát ở khu vực Biên Hòa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 191
+  },
+  {
+    "id": "e2e_loc_0091",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám cơ xương khớp ở Nha Trang, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám cơ xương khớp ở khu vực Nha Trang. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 192
+  },
+  {
+    "id": "e2e_loc_0075",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gần Đống Đa có chuyên khoa tiết niệu không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiết niệu ở khu vực Đống Đa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 193
+  },
+  {
+    "id": "e2e_sym_0053",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị ngứa vùng kín, cần làm gì?",
+    "ground_truth": "Ngứa vùng kín có thể do nấm, vi khuẩn, trùng roi. Nên khám sản phụ khoa hoặc tiết niệu, tránh tự mua thuốc dùng.",
+    "order": 194
+  },
+  {
+    "id": "e2e_loc_0083",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám da liễu ở quận 7, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám da liễu ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 195
+  },
+  {
+    "id": "e2e_loc_0011",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về nội tiết, ở Thủ Đức nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tiết ở khu vực Thủ Đức. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 196
+  },
+  {
+    "id": "e2e_med_0074",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh trĩ nên điều trị như nào?",
+    "ground_truth": "Trĩ nhẹ có thể điều chỉnh chế độ ăn nhiều chất xơ, uống đủ nước, dùng thuốc bôi/uống; trĩ nặng cần thủ thuật hoặc phẫu thuật theo chỉ định.",
+    "order": 197
+  },
+  {
+    "id": "e2e_med_0040",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Ung thư cổ tử cung có phòng được không?",
+    "ground_truth": "Ung thư cổ tử cung có thể phòng ngừa hiệu quả bằng tiêm vaccine HPV, tầm soát PAP smear định kỳ và quan hệ tình dục an toàn.",
+    "order": 198
+  },
+  {
+    "id": "e2e_gen_0114",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám tim mạch, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tim mạch phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tim mạch chẩn đoán và điều trị các bệnh về tim, huyết áp, mạch máu.",
+    "order": 199
+  },
+  {
+    "id": "e2e_loc_0042",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám thần kinh ở quận 7, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám thần kinh ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 200
+  },
+  {
+    "id": "e2e_loc_0113",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ cơ xương khớp khu vực quận Tân Bình.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám cơ xương khớp ở khu vực quận Tân Bình. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 201
+  },
+  {
+    "id": "e2e_sym_0043",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Chân tôi phù vào cuối ngày, có bình thường không?",
+    "ground_truth": "Phù chân cuối ngày có thể do suy tĩnh mạch, đứng nhiều; nếu kèm khó thở, tiểu ít cần loại trừ bệnh tim, thận, gan.",
+    "order": 202
+  },
+  {
+    "id": "e2e_gen_0060",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám mắt, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ mắt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa mắt khám, đo thị lực và điều trị các bệnh về mắt như cận thị, đục thủy tinh thể.",
+    "order": 203
+  },
+  {
+    "id": "e2e_med_0095",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Suy giáp có triệu chứng gì?",
+    "ground_truth": "Suy giáp gây mệt mỏi, tăng cân, sợ lạnh, da khô, tóc rụng, trầm cảm, chậm nhịp tim. Cần xét nghiệm TSH để chẩn đoán.",
+    "order": 204
+  },
+  {
+    "id": "e2e_gen_0100",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch thần kinh.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ thần kinh phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa thần kinh điều trị đau đầu, động kinh, đột quỵ, rối loạn vận động.",
+    "order": 205
+  },
+  {
+    "id": "e2e_med_0129",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm phế quản khác viêm phổi ở điểm nào?",
+    "ground_truth": "Viêm phế quản là viêm ống dẫn khí lớn, chủ yếu ho đờm; viêm phổi là viêm nhu mô phổi, thường sốt cao, khó thở, nguy hiểm hơn.",
+    "order": 206
+  },
+  {
+    "id": "e2e_loc_0111",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám tiêu hóa tại Bình Thạnh?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Bình Thạnh. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 207
+  },
+  {
+    "id": "e2e_loc_0023",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về nội tiết, ở Vũng Tàu nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tiết ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 208
+  },
+  {
+    "id": "e2e_gen_0071",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ cơ xương khớp nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ cơ xương khớp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa cơ xương khớp xử lý thoái hóa khớp, thoát vị đĩa đệm, loãng xương.",
+    "order": 209
+  },
+  {
+    "id": "e2e_sym_0022",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi ngáy to khi ngủ, có cần khám không?",
+    "ground_truth": "Ngáy to kèm ngừng thở khi ngủ, buồn ngủ ban ngày có thể là hội chứng ngưng thở khi ngủ, nên khám hô hấp và đo đa ký giấc ngủ.",
+    "order": 210
+  },
+  {
+    "id": "e2e_loc_0073",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về tiết niệu, ở Nha Trang nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiết niệu ở khu vực Nha Trang. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 211
+  },
+  {
+    "id": "e2e_gen_0055",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở cơ xương khớp chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ cơ xương khớp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa cơ xương khớp xử lý thoái hóa khớp, thoát vị đĩa đệm, loãng xương.",
+    "order": 212
+  },
+  {
+    "id": "e2e_med_0108",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Triệu chứng thường gặp của cảm cúm là gì?",
+    "ground_truth": "Cảm cúm thường có các triệu chứng như sốt, đau đầu, đau cơ, ho, đau họng, nghẹt mũi, mệt mỏi. Triệu chứng thường kéo dài 5-7 ngày.",
+    "order": 213
+  },
+  {
+    "id": "e2e_med_0067",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Ung thư cổ tử cung có phòng được không?",
+    "ground_truth": "Ung thư cổ tử cung có thể phòng ngừa hiệu quả bằng tiêm vaccine HPV, tầm soát PAP smear định kỳ và quan hệ tình dục an toàn.",
+    "order": 214
+  },
+  {
+    "id": "e2e_loc_0017",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám phục hồi chức năng tại Bình Thạnh càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám phục hồi chức năng ở khu vực Bình Thạnh. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 215
+  },
+  {
+    "id": "e2e_gen_0038",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Nên khám sản phụ khoa ở đâu cho uy tín?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ sản phụ khoa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa sản phụ khoa chăm sóc sức khỏe phụ nữ, thai kỳ và các bệnh phụ khoa.",
+    "order": 216
+  },
+  {
+    "id": "e2e_loc_0009",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Bạn tôi ở Biên Hòa muốn khám tim mạch, nên chọn đâu?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tim mạch ở khu vực Biên Hòa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 217
+  },
+  {
+    "id": "e2e_gen_0018",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ tâm thần nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tâm thần phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tâm thần điều trị rối loạn lo âu, trầm cảm, mất ngủ, stress.",
+    "order": 218
+  },
+  {
+    "id": "e2e_med_0058",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh gout có điều trị được không?",
+    "ground_truth": "Gout không chữa khỏi hoàn toàn nhưng kiểm soát tốt bằng thuốc hạ acid uric, giảm đau đợt cấp, chế độ ăn ít purin và hạn chế rượu.",
+    "order": 219
+  },
+  {
+    "id": "e2e_fu_0000",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi nên chuẩn bị gì?",
+    "ground_truth": "Bạn nên mang theo giấy tờ tùy thân, hồ sơ khám cũ, danh sách thuốc đang dùng và ghi lại triệu chứng, thời gian xuất hiện.",
+    "order": 220
+  },
+  {
+    "id": "e2e_gen_0063",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Nên khám tim mạch ở đâu cho uy tín?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tim mạch phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tim mạch chẩn đoán và điều trị các bệnh về tim, huyết áp, mạch máu.",
+    "order": 221
+  },
+  {
+    "id": "e2e_gen_0040",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám thần kinh, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ thần kinh phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa thần kinh điều trị đau đầu, động kinh, đột quỵ, rối loạn vận động.",
+    "order": 222
+  },
+  {
+    "id": "e2e_grt_0020",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn hoạt động thế nào?",
+    "ground_truth": "Tôi sử dụng AI để hiểu câu hỏi, tra cứu thông tin y tế và gợi ý dịch vụ từ cơ sở dữ liệu của Healytics.",
+    "order": 223
+  },
+  {
+    "id": "e2e_med_0053",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh gout có điều trị được không?",
+    "ground_truth": "Gout không chữa khỏi hoàn toàn nhưng kiểm soát tốt bằng thuốc hạ acid uric, giảm đau đợt cấp, chế độ ăn ít purin và hạn chế rượu.",
+    "order": 224
+  },
+  {
+    "id": "e2e_fu_0010",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi nên đi khám lúc nào?",
+    "ground_truth": "Bạn nên đi khám sớm khi có triệu chứng bất thường kéo dài, không cải thiện hoặc nặng lên; đặc biệt nếu có dấu hiệu cảnh báo.",
+    "order": 225
+  },
+  {
+    "id": "e2e_grt_0023",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn là ai?",
+    "ground_truth": "Tôi là trợ lý ảo Healytics, chuyên hỗ trợ bạn tìm kiếm dịch vụ y tế và cung cấp thông tin sức khỏe tham khảo.",
+    "order": 226
+  },
+  {
+    "id": "e2e_gen_0052",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám răng hàm mặt, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ răng hàm mặt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa răng hàm mặt khám nha khoa, chỉnh nha, phẫu thuật hàm mặt.",
+    "order": 227
+  },
+  {
+    "id": "e2e_grt_0000",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hello",
+    "ground_truth": "Xin chào bạn! Tôi có thể giúp tư vấn sức khỏe hoặc gợi ý phòng khám phù hợp. Bạn cần gì ạ?",
+    "order": 228
+  },
+  {
+    "id": "e2e_sym_0047",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Kinh nguyệt của tôi thất thường mấy tháng nay.",
+    "ground_truth": "Rối loạn kinh nguyệt có thể do nội tiết, buồng trứng đa nang, stress, tuyến giáp. Nên khám sản phụ khoa và xét nghiệm hormone.",
+    "order": 229
+  },
+  {
+    "id": "e2e_gen_0098",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ thần kinh nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ thần kinh phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa thần kinh điều trị đau đầu, động kinh, đột quỵ, rối loạn vận động.",
+    "order": 230
+  },
+  {
+    "id": "e2e_sym_0010",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi ăn nhiều nhưng vẫn sụt cân.",
+    "ground_truth": "Ăn nhiều nhưng sụt cân có thể do cường giáp, tiểu đường, nhiễm trùng mạn, ung thư. Cần khám nội và làm xét nghiệm toàn diện.",
+    "order": 231
+  },
+  {
+    "id": "e2e_gen_0046",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám dị ứng miễn dịch nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ dị ứng miễn dịch phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa dị ứng miễn dịch điều trị viêm mũi dị ứng, mày đay, hen dị ứng.",
+    "order": 232
+  },
+  {
+    "id": "e2e_sym_0058",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi đau mỏi vai gáy do ngồi máy tính nhiều.",
+    "ground_truth": "Đau mỏi vai gáy do ngồi lâu có thể được cải thiện bằng điều chỉnh tư thế, giãn cơ, massage; nếu kéo dài nên khám cơ xương khớp.",
+    "order": 233
+  },
+  {
+    "id": "e2e_gen_0057",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ cơ xương khớp nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ cơ xương khớp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa cơ xương khớp xử lý thoái hóa khớp, thoát vị đĩa đệm, loãng xương.",
+    "order": 234
+  },
+  {
+    "id": "e2e_fu_0004",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Có thể khám tại nhà không?",
+    "ground_truth": "Một số dịch vụ hỗ trợ khám tại nhà, bạn có thể tìm trong danh sách dịch vụ của Healytics hoặc hỏi cụ thể cơ sở.",
+    "order": 235
+  },
+  {
+    "id": "e2e_loc_0086",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám nội tiết ở Cầu Giấy, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tiết ở khu vực Cầu Giấy. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 236
+  },
+  {
+    "id": "e2e_sym_0000",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi khó thở khi leo cầu thang.",
+    "ground_truth": "Khó thở khi gắng sức có thể do thiếu máu, bệnh tim, bệnh phổi, thừa cân. Nên khám tim mạch hoặc hô hấp để đánh giá.",
+    "order": 237
+  },
+  {
+    "id": "e2e_gen_0080",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám dị ứng miễn dịch nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ dị ứng miễn dịch phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa dị ứng miễn dịch điều trị viêm mũi dị ứng, mày đay, hen dị ứng.",
+    "order": 238
+  },
+  {
+    "id": "e2e_gen_0000",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Nên khám nội tổng quát ở đâu cho uy tín?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nội tổng quát phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Khám nội tổng quát giúp đánh giá tổng thể sức khỏe và phát hiện bệnh lý sớm.",
+    "order": 239
+  },
+  {
+    "id": "e2e_loc_0019",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về tiêu hóa, ở Quy Nhơn nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Quy Nhơn. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 240
+  },
+  {
+    "id": "e2e_loc_0039",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám mắt tại Đống Đa càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám mắt ở khu vực Đống Đa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 241
+  },
+  {
+    "id": "e2e_gen_0047",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám thần kinh, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ thần kinh phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa thần kinh điều trị đau đầu, động kinh, đột quỵ, rối loạn vận động.",
+    "order": 242
+  },
+  {
+    "id": "e2e_gen_0102",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Nên khám tiêu hóa ở đâu cho uy tín?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiêu hóa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiêu hóa chẩn đoán bệnh dạ dày, đại tràng, gan, mật, tụy.",
+    "order": 243
+  },
+  {
+    "id": "e2e_med_0088",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Phình động mạch chủ là gì?",
+    "ground_truth": "Phình động mạch chủ là tình trạng giãn bất thường thành động mạch chủ, nguy cơ vỡ gây tử vong; cần theo dõi và can thiệp kịp thời.",
+    "order": 244
+  },
+  {
+    "id": "e2e_sym_0049",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị nóng rát vùng thượng vị sau ăn.",
+    "ground_truth": "Nóng rát thượng vị gợi ý trào ngược, viêm dạ dày. Nên giảm ăn cay, dầu mỡ, cà phê; khám tiêu hóa nếu kéo dài.",
+    "order": 245
+  },
+  {
+    "id": "e2e_gen_0064",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám cơ xương khớp nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ cơ xương khớp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa cơ xương khớp xử lý thoái hóa khớp, thoát vị đĩa đệm, loãng xương.",
+    "order": 246
+  },
+  {
+    "id": "e2e_loc_0003",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám dị ứng miễn dịch ở Đống Đa, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám dị ứng miễn dịch ở khu vực Đống Đa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 247
+  },
+  {
+    "id": "e2e_loc_0116",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ sản phụ khoa khu vực Hải Phòng.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám sản phụ khoa ở khu vực Hải Phòng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 248
+  },
+  {
+    "id": "e2e_med_0033",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Phụ nữ mang thai cần khám những gì?",
+    "ground_truth": "Thai phụ cần khám thai định kỳ, siêu âm hình thái, sàng lọc dị tật, xét nghiệm máu, nước tiểu, tiểu đường thai kỳ, đo huyết áp.",
+    "order": 249
+  },
+  {
+    "id": "e2e_gen_0014",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Nên khám da liễu ở đâu cho uy tín?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ da liễu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa da liễu xử lý các bệnh về da, tóc, móng như mụn, nấm, viêm da.",
+    "order": 250
+  },
+  {
+    "id": "e2e_loc_0025",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gần Biên Hòa có chuyên khoa tiêu hóa không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Biên Hòa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 251
+  },
+  {
+    "id": "e2e_loc_0112",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ mắt khu vực Thanh Xuân.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám mắt ở khu vực Thanh Xuân. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 252
+  },
+  {
+    "id": "e2e_gen_0096",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch nội tổng quát.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nội tổng quát phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Khám nội tổng quát giúp đánh giá tổng thể sức khỏe và phát hiện bệnh lý sớm.",
+    "order": 253
+  },
+  {
+    "id": "e2e_sym_0001",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Kinh nguyệt của tôi thất thường mấy tháng nay.",
+    "ground_truth": "Rối loạn kinh nguyệt có thể do nội tiết, buồng trứng đa nang, stress, tuyến giáp. Nên khám sản phụ khoa và xét nghiệm hormone.",
+    "order": 254
+  },
+  {
+    "id": "e2e_loc_0051",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi đang ở quận Tân Bình, cần tư vấn khám tim mạch.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tim mạch ở khu vực quận Tân Bình. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 255
+  },
+  {
+    "id": "e2e_gen_0049",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ ngoại tổng quát nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ngoại tổng quát phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Khám ngoại tổng quát xử lý các vấn đề cần can thiệp phẫu thuật thông thường.",
+    "order": 256
+  },
+  {
+    "id": "e2e_med_0017",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Huyết áp cao có nguy hiểm không?",
+    "ground_truth": "Huyết áp cao là yếu tố nguy cơ chính gây đột quỵ, nhồi máu cơ tim, suy thận. Cần theo dõi và điều trị kịp thời để tránh biến chứng.",
+    "order": 257
+  },
+  {
+    "id": "e2e_loc_0064",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám răng hàm mặt tại Hà Nội càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám răng hàm mặt ở khu vực Hà Nội. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 258
+  },
+  {
+    "id": "e2e_sym_0067",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Mỗi lần ăn xong tôi đau bụng âm ỉ.",
+    "ground_truth": "Đau bụng sau ăn có thể do viêm dạ dày, trào ngược, hội chứng ruột kích thích, sỏi mật. Nên khám tiêu hóa và có thể cần nội soi.",
+    "order": 259
+  },
+  {
+    "id": "e2e_med_0116",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh lao phổi điều trị bao lâu?",
+    "ground_truth": "Phác đồ lao phổi chuẩn kéo dài 6 tháng (2 tháng tấn công + 4 tháng duy trì), cần tuân thủ uống thuốc đầy đủ để tránh kháng thuốc.",
+    "order": 260
+  },
+  {
+    "id": "e2e_fu_0019",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi nên đi khám lúc nào?",
+    "ground_truth": "Bạn nên đi khám sớm khi có triệu chứng bất thường kéo dài, không cải thiện hoặc nặng lên; đặc biệt nếu có dấu hiệu cảnh báo.",
+    "order": 261
+  },
+  {
+    "id": "e2e_gen_0077",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch tiêu hóa.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiêu hóa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiêu hóa chẩn đoán bệnh dạ dày, đại tràng, gan, mật, tụy.",
+    "order": 262
+  },
+  {
+    "id": "e2e_gen_0075",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ nội tiết.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nội tiết phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa nội tiết điều trị bệnh tiểu đường, tuyến giáp, rối loạn hormone.",
+    "order": 263
+  },
+  {
+    "id": "e2e_med_0002",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Rối loạn tiền đình là gì?",
+    "ground_truth": "Rối loạn tiền đình là tình trạng mất thăng bằng, chóng mặt, buồn nôn do hệ thống tiền đình ở tai trong hoặc thần kinh bị ảnh hưởng.",
+    "order": 264
+  },
+  {
+    "id": "e2e_gen_0042",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi đang tìm nơi khám tiết niệu, bạn hỗ trợ.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 265
+  },
+  {
+    "id": "e2e_loc_0022",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi đang ở Bình Thạnh, cần tư vấn khám mắt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám mắt ở khu vực Bình Thạnh. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 266
+  },
+  {
+    "id": "e2e_sym_0046",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Mỗi lần ăn xong tôi đau bụng âm ỉ.",
+    "ground_truth": "Đau bụng sau ăn có thể do viêm dạ dày, trào ngược, hội chứng ruột kích thích, sỏi mật. Nên khám tiêu hóa và có thể cần nội soi.",
+    "order": 267
+  },
+  {
+    "id": "e2e_sym_0066",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi ngáy to khi ngủ, có cần khám không?",
+    "ground_truth": "Ngáy to kèm ngừng thở khi ngủ, buồn ngủ ban ngày có thể là hội chứng ngưng thở khi ngủ, nên khám hô hấp và đo đa ký giấc ngủ.",
+    "order": 268
+  },
+  {
+    "id": "e2e_sym_0016",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em bị đau bụng dưới bên phải khi vận động.",
+    "ground_truth": "Đau bụng dưới phải có thể do ruột thừa, buồng trứng, cơ bụng. Nếu kèm sốt hoặc đau tăng nên đến cấp cứu hoặc khám ngoại khoa.",
+    "order": 269
+  },
+  {
+    "id": "e2e_sym_0024",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị nóng rát vùng thượng vị sau ăn.",
+    "ground_truth": "Nóng rát thượng vị gợi ý trào ngược, viêm dạ dày. Nên giảm ăn cay, dầu mỡ, cà phê; khám tiêu hóa nếu kéo dài.",
+    "order": 270
+  },
+  {
+    "id": "e2e_med_0101",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Đi tiểu nhiều lần ban đêm là bệnh gì?",
+    "ground_truth": "Tiểu đêm nhiều lần có thể do phì đại tuyến tiền liệt, tiểu đường, suy tim, uống nhiều nước tối, nhiễm trùng đường tiểu.",
+    "order": 271
+  },
+  {
+    "id": "e2e_med_0123",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Cường giáp khác suy giáp thế nào?",
+    "ground_truth": "Cường giáp là tăng hormone tuyến giáp gây sụt cân, tim đập nhanh, run tay, sợ nóng, tiêu chảy; ngược với suy giáp.",
+    "order": 272
+  },
+  {
+    "id": "e2e_med_0057",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Mất ngủ kéo dài ảnh hưởng thế nào?",
+    "ground_truth": "Mất ngủ kéo dài gây suy giảm trí nhớ, tăng huyết áp, rối loạn nội tiết, suy giảm miễn dịch, tăng nguy cơ trầm cảm và bệnh tim mạch.",
+    "order": 273
+  },
+  {
+    "id": "e2e_gen_0073",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám nhi khoa nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nhi khoa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa nhi khám và điều trị bệnh ở trẻ em dưới 16 tuổi.",
+    "order": 274
+  },
+  {
+    "id": "e2e_med_0124",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Làm sao biết mình cận thị?",
+    "ground_truth": "Dấu hiệu cận thị gồm nhìn xa mờ, phải nheo mắt, mỏi mắt khi đọc, hay nhức đầu. Nên đo thị lực tại cơ sở chuyên khoa.",
+    "order": 275
+  },
+  {
+    "id": "e2e_gen_0056",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở răng hàm mặt chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ răng hàm mặt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa răng hàm mặt khám nha khoa, chỉnh nha, phẫu thuật hàm mặt.",
+    "order": 276
+  },
+  {
+    "id": "e2e_sym_0015",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi khó thở khi leo cầu thang.",
+    "ground_truth": "Khó thở khi gắng sức có thể do thiếu máu, bệnh tim, bệnh phổi, thừa cân. Nên khám tim mạch hoặc hô hấp để đánh giá.",
+    "order": 277
+  },
+  {
+    "id": "e2e_med_0035",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Đau đầu migraine là gì?",
+    "ground_truth": "Migraine là đau đầu mạn tính theo cơn, thường đau nửa đầu, kèm buồn nôn, sợ ánh sáng/tiếng ồn, có thể có tiền triệu.",
+    "order": 278
+  },
+  {
+    "id": "e2e_gen_0108",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở nhi khoa chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nhi khoa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa nhi khám và điều trị bệnh ở trẻ em dưới 16 tuổi.",
+    "order": 279
+  },
+  {
+    "id": "e2e_sym_0052",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi ăn nhiều nhưng vẫn sụt cân.",
+    "ground_truth": "Ăn nhiều nhưng sụt cân có thể do cường giáp, tiểu đường, nhiễm trùng mạn, ung thư. Cần khám nội và làm xét nghiệm toàn diện.",
+    "order": 280
+  },
+  {
+    "id": "e2e_med_0010",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh động kinh có chữa được không?",
+    "ground_truth": "Động kinh kiểm soát tốt bằng thuốc chống động kinh; khoảng 70% bệnh nhân hết cơn. Một số ca cần phẫu thuật hoặc kích thích thần kinh phế vị.",
+    "order": 281
+  },
+  {
+    "id": "e2e_grt_0026",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn có thể giúp tôi không?",
+    "ground_truth": "Chắc chắn rồi, bạn cần tư vấn về sức khỏe hay tìm dịch vụ y tế nào ạ?",
+    "order": 282
+  },
+  {
+    "id": "e2e_sym_0071",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị đau khớp gối khi lên xuống cầu thang.",
+    "ground_truth": "Đau khớp gối khi vận động có thể do thoái hóa, tổn thương sụn chêm. Nên khám cơ xương khớp và có thể chụp MRI.",
+    "order": 283
+  },
+  {
+    "id": "e2e_grt_0002",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn hoạt động thế nào?",
+    "ground_truth": "Tôi sử dụng AI để hiểu câu hỏi, tra cứu thông tin y tế và gợi ý dịch vụ từ cơ sở dữ liệu của Healytics.",
+    "order": 284
+  },
+  {
+    "id": "e2e_med_0087",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh Parkinson có chữa được không?",
+    "ground_truth": "Parkinson không chữa khỏi nhưng kiểm soát bằng thuốc (levodopa), vật lý trị liệu, phẫu thuật kích thích não sâu trong ca phù hợp.",
+    "order": 285
+  },
+  {
+    "id": "e2e_med_0019",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh Parkinson có chữa được không?",
+    "ground_truth": "Parkinson không chữa khỏi nhưng kiểm soát bằng thuốc (levodopa), vật lý trị liệu, phẫu thuật kích thích não sâu trong ca phù hợp.",
+    "order": 286
+  },
+  {
+    "id": "e2e_gen_0054",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ cơ xương khớp nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ cơ xương khớp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa cơ xương khớp xử lý thoái hóa khớp, thoát vị đĩa đệm, loãng xương.",
+    "order": 287
+  },
+  {
+    "id": "e2e_sym_0061",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em thấy mình hay cáu gắt và buồn không lý do.",
+    "ground_truth": "Triệu chứng có thể liên quan rối loạn lo âu, trầm cảm hoặc nội tiết. Nên khám tâm thần hoặc nội tiết để được đánh giá.",
+    "order": 288
+  },
+  {
+    "id": "e2e_gen_0021",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ mắt.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ mắt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa mắt khám, đo thị lực và điều trị các bệnh về mắt như cận thị, đục thủy tinh thể.",
+    "order": 289
+  },
+  {
+    "id": "e2e_loc_0035",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Bạn tôi ở quận 10 muốn khám tiết niệu, nên chọn đâu?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiết niệu ở khu vực quận 10. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 290
+  },
+  {
+    "id": "e2e_loc_0069",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám ngoại tổng quát tại Huế?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám ngoại tổng quát ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 291
+  },
+  {
+    "id": "e2e_med_0063",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dấu hiệu đột quỵ cần nhận biết?",
+    "ground_truth": "Dấu hiệu F.A.S.T: méo mặt, yếu tay, nói khó; kèm đau đầu dữ dội đột ngột, mất thị lực, mất thăng bằng. Cần đến cấp cứu ngay.",
+    "order": 292
+  },
+  {
+    "id": "e2e_loc_0097",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về nhi khoa, ở quận Tân Bình nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nhi khoa ở khu vực quận Tân Bình. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 293
+  },
+  {
+    "id": "e2e_gen_0076",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám tim mạch, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tim mạch phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tim mạch chẩn đoán và điều trị các bệnh về tim, huyết áp, mạch máu.",
+    "order": 294
+  },
+  {
+    "id": "e2e_loc_0074",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi đang ở Đống Đa, cần tư vấn khám sản phụ khoa.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám sản phụ khoa ở khu vực Đống Đa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 295
+  },
+  {
+    "id": "e2e_med_0073",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Khi nào cần đi khám mắt?",
+    "ground_truth": "Nên khám mắt định kỳ 1 năm/lần; đi khám ngay khi thấy mờ, nhức, chảy nước mắt nhiều, nhìn đôi, đau mắt đỏ, chớp sáng hoặc ruồi bay bất thường.",
+    "order": 296
+  },
+  {
+    "id": "e2e_gen_0113",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám hô hấp, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ hô hấp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa hô hấp điều trị hen, viêm phổi, COPD và các bệnh phổi khác.",
+    "order": 297
+  },
+  {
+    "id": "e2e_gen_0004",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ răng hàm mặt.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ răng hàm mặt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa răng hàm mặt khám nha khoa, chỉnh nha, phẫu thuật hàm mặt.",
+    "order": 298
+  },
+  {
+    "id": "e2e_med_0001",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh sốt xuất huyết có nguy hiểm không?",
+    "ground_truth": "Sốt xuất huyết có thể diễn tiến nặng gây sốc, chảy máu, suy đa tạng. Cần theo dõi sát và nhập viện khi có dấu hiệu cảnh báo.",
+    "order": 299
+  },
+  {
+    "id": "e2e_med_0007",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh thận mạn tính có dấu hiệu gì?",
+    "ground_truth": "Bệnh thận mạn giai đoạn đầu thường không triệu chứng, giai đoạn sau có phù, tiểu ít, mệt mỏi, thiếu máu, tăng huyết áp.",
+    "order": 300
+  },
+  {
+    "id": "e2e_gen_0092",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch răng hàm mặt.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ răng hàm mặt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa răng hàm mặt khám nha khoa, chỉnh nha, phẫu thuật hàm mặt.",
+    "order": 301
+  },
+  {
+    "id": "e2e_sym_0064",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị nóng rát vùng thượng vị sau ăn.",
+    "ground_truth": "Nóng rát thượng vị gợi ý trào ngược, viêm dạ dày. Nên giảm ăn cay, dầu mỡ, cà phê; khám tiêu hóa nếu kéo dài.",
+    "order": 302
+  },
+  {
+    "id": "e2e_med_0020",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dấu hiệu đột quỵ cần nhận biết?",
+    "ground_truth": "Dấu hiệu F.A.S.T: méo mặt, yếu tay, nói khó; kèm đau đầu dữ dội đột ngột, mất thị lực, mất thăng bằng. Cần đến cấp cứu ngay.",
+    "order": 303
+  },
+  {
+    "id": "e2e_sym_0076",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em thấy mình hay cáu gắt và buồn không lý do.",
+    "ground_truth": "Triệu chứng có thể liên quan rối loạn lo âu, trầm cảm hoặc nội tiết. Nên khám tâm thần hoặc nội tiết để được đánh giá.",
+    "order": 304
+  },
+  {
+    "id": "e2e_med_0092",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Phình động mạch chủ là gì?",
+    "ground_truth": "Phình động mạch chủ là tình trạng giãn bất thường thành động mạch chủ, nguy cơ vỡ gây tử vong; cần theo dõi và can thiệp kịp thời.",
+    "order": 305
+  },
+  {
+    "id": "e2e_loc_0078",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Ở Nha Trang có bệnh viện nào khám tiêu hóa tốt không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Nha Trang. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 306
+  },
+  {
+    "id": "e2e_fu_0011",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Có thể khám tại nhà không?",
+    "ground_truth": "Một số dịch vụ hỗ trợ khám tại nhà, bạn có thể tìm trong danh sách dịch vụ của Healytics hoặc hỏi cụ thể cơ sở.",
+    "order": 307
+  },
+  {
+    "id": "e2e_med_0114",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm loét dạ dày có cần nội soi?",
+    "ground_truth": "Nội soi dạ dày giúp chẩn đoán chính xác viêm loét, sinh thiết tìm H.pylori, loại trừ ung thư; được khuyến cáo cho triệu chứng dai dẳng.",
+    "order": 308
+  },
+  {
+    "id": "e2e_sym_0056",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em thấy mình hay cáu gắt và buồn không lý do.",
+    "ground_truth": "Triệu chứng có thể liên quan rối loạn lo âu, trầm cảm hoặc nội tiết. Nên khám tâm thần hoặc nội tiết để được đánh giá.",
+    "order": 309
+  },
+  {
+    "id": "e2e_sym_0054",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi đau mỏi vai gáy do ngồi máy tính nhiều.",
+    "ground_truth": "Đau mỏi vai gáy do ngồi lâu có thể được cải thiện bằng điều chỉnh tư thế, giãn cơ, massage; nếu kéo dài nên khám cơ xương khớp.",
+    "order": 310
+  },
+  {
+    "id": "e2e_loc_0047",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về mắt, ở quận 3 nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám mắt ở khu vực quận 3. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 311
+  },
+  {
+    "id": "e2e_gen_0088",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cho mình xin một vài phòng khám tiêu hóa.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiêu hóa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiêu hóa chẩn đoán bệnh dạ dày, đại tràng, gan, mật, tụy.",
+    "order": 312
+  },
+  {
+    "id": "e2e_med_0075",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh cận thị ở trẻ xử lý thế nào?",
+    "ground_truth": "Trẻ cận thị cần đo kính chính xác, cho học trong đủ sáng, hạn chế thiết bị điện tử, ra ngoài trời nhiều và khám mắt định kỳ 6 tháng.",
+    "order": 313
+  },
+  {
+    "id": "e2e_loc_0007",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Ở Đống Đa có bệnh viện nào khám huyết học tốt không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám huyết học ở khu vực Đống Đa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 314
+  },
+  {
+    "id": "e2e_grt_0005",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn hoạt động thế nào?",
+    "ground_truth": "Tôi sử dụng AI để hiểu câu hỏi, tra cứu thông tin y tế và gợi ý dịch vụ từ cơ sở dữ liệu của Healytics.",
+    "order": 315
+  },
+  {
+    "id": "e2e_gen_0039",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám mắt, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ mắt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa mắt khám, đo thị lực và điều trị các bệnh về mắt như cận thị, đục thủy tinh thể.",
+    "order": 316
+  },
+  {
+    "id": "e2e_loc_0081",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về ung bướu, ở Huế nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám ung bướu ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 317
+  },
+  {
+    "id": "e2e_grt_0007",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hôm nay bạn có khỏe không?",
+    "ground_truth": "Tôi là trợ lý AI nên luôn sẵn sàng giúp bạn ạ. Bạn cần hỗ trợ gì về sức khỏe không?",
+    "order": 318
+  },
+  {
+    "id": "e2e_med_0071",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Suy giáp có triệu chứng gì?",
+    "ground_truth": "Suy giáp gây mệt mỏi, tăng cân, sợ lạnh, da khô, tóc rụng, trầm cảm, chậm nhịp tim. Cần xét nghiệm TSH để chẩn đoán.",
+    "order": 319
+  },
+  {
+    "id": "e2e_loc_0014",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gần Hồ Chí Minh có chuyên khoa thần kinh không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám thần kinh ở khu vực Hồ Chí Minh. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 320
+  },
+  {
+    "id": "e2e_loc_0062",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về ngoại tổng quát, ở Thanh Xuân nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám ngoại tổng quát ở khu vực Thanh Xuân. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 321
+  },
+  {
+    "id": "e2e_med_0008",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm khớp dạng thấp nhận biết thế nào?",
+    "ground_truth": "Viêm khớp dạng thấp gây sưng đau đối xứng các khớp nhỏ bàn tay, cứng khớp buổi sáng trên 30 phút, kéo dài nhiều tuần.",
+    "order": 322
+  },
+  {
+    "id": "e2e_sym_0029",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi hay quên, làm sao cải thiện?",
+    "ground_truth": "Hay quên có thể do stress, thiếu ngủ, thiếu B12, suy giáp, sa sút trí tuệ sớm. Nên khám thần kinh và xét nghiệm nếu kéo dài.",
+    "order": 323
+  },
+  {
+    "id": "e2e_med_0117",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Mất ngủ kéo dài ảnh hưởng thế nào?",
+    "ground_truth": "Mất ngủ kéo dài gây suy giảm trí nhớ, tăng huyết áp, rối loạn nội tiết, suy giảm miễn dịch, tăng nguy cơ trầm cảm và bệnh tim mạch.",
+    "order": 324
+  },
+  {
+    "id": "e2e_loc_0067",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về da liễu, ở Huế nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám da liễu ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 325
+  },
+  {
+    "id": "e2e_sym_0037",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Kinh nguyệt của tôi thất thường mấy tháng nay.",
+    "ground_truth": "Rối loạn kinh nguyệt có thể do nội tiết, buồng trứng đa nang, stress, tuyến giáp. Nên khám sản phụ khoa và xét nghiệm hormone.",
+    "order": 326
+  },
+  {
+    "id": "e2e_sym_0051",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Mỗi lần ăn xong tôi đau bụng âm ỉ.",
+    "ground_truth": "Đau bụng sau ăn có thể do viêm dạ dày, trào ngược, hội chứng ruột kích thích, sỏi mật. Nên khám tiêu hóa và có thể cần nội soi.",
+    "order": 327
+  },
+  {
+    "id": "e2e_loc_0104",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Bạn tôi ở Vũng Tàu muốn khám tiêu hóa, nên chọn đâu?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 328
+  },
+  {
+    "id": "e2e_loc_0026",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ hô hấp khu vực Vũng Tàu.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám hô hấp ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 329
+  },
+  {
+    "id": "e2e_sym_0005",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Kinh nguyệt của tôi thất thường mấy tháng nay.",
+    "ground_truth": "Rối loạn kinh nguyệt có thể do nội tiết, buồng trứng đa nang, stress, tuyến giáp. Nên khám sản phụ khoa và xét nghiệm hormone.",
+    "order": 330
+  },
+  {
+    "id": "e2e_sym_0062",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi khó thở khi leo cầu thang.",
+    "ground_truth": "Khó thở khi gắng sức có thể do thiếu máu, bệnh tim, bệnh phổi, thừa cân. Nên khám tim mạch hoặc hô hấp để đánh giá.",
+    "order": 331
+  },
+  {
+    "id": "e2e_med_0015",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Cường giáp khác suy giáp thế nào?",
+    "ground_truth": "Cường giáp là tăng hormone tuyến giáp gây sụt cân, tim đập nhanh, run tay, sợ nóng, tiêu chảy; ngược với suy giáp.",
+    "order": 332
+  },
+  {
+    "id": "e2e_med_0078",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Huyết áp cao có nguy hiểm không?",
+    "ground_truth": "Huyết áp cao là yếu tố nguy cơ chính gây đột quỵ, nhồi máu cơ tim, suy thận. Cần theo dõi và điều trị kịp thời để tránh biến chứng.",
+    "order": 333
+  },
+  {
+    "id": "e2e_gen_0065",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám tiết niệu, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 334
+  },
+  {
+    "id": "e2e_sym_0007",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Chân tôi phù vào cuối ngày, có bình thường không?",
+    "ground_truth": "Phù chân cuối ngày có thể do suy tĩnh mạch, đứng nhiều; nếu kèm khó thở, tiểu ít cần loại trừ bệnh tim, thận, gan.",
+    "order": 335
+  },
+  {
+    "id": "e2e_loc_0096",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gợi ý giúp mình phòng khám ngoại tổng quát gần Đà Nẵng với.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám ngoại tổng quát ở khu vực Đà Nẵng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 336
+  },
+  {
+    "id": "e2e_loc_0027",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám tiêu hóa ở Thủ Đức, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Thủ Đức. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 337
+  },
+  {
+    "id": "e2e_gen_0091",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám huyết học, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ huyết học phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa huyết học điều trị thiếu máu, rối loạn đông máu, các bệnh máu ác tính.",
+    "order": 338
+  },
+  {
+    "id": "e2e_gen_0116",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi đang tìm nơi khám tim mạch, bạn hỗ trợ.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tim mạch phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tim mạch chẩn đoán và điều trị các bệnh về tim, huyết áp, mạch máu.",
+    "order": 339
+  },
+  {
+    "id": "e2e_med_0037",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh thận mạn tính có dấu hiệu gì?",
+    "ground_truth": "Bệnh thận mạn giai đoạn đầu thường không triệu chứng, giai đoạn sau có phù, tiểu ít, mệt mỏi, thiếu máu, tăng huyết áp.",
+    "order": 340
+  },
+  {
+    "id": "e2e_med_0096",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Khi nào cần đi khám mắt?",
+    "ground_truth": "Nên khám mắt định kỳ 1 năm/lần; đi khám ngay khi thấy mờ, nhức, chảy nước mắt nhiều, nhìn đôi, đau mắt đỏ, chớp sáng hoặc ruồi bay bất thường.",
+    "order": 341
+  },
+  {
+    "id": "e2e_loc_0000",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám sản phụ khoa tại Hà Nội?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám sản phụ khoa ở khu vực Hà Nội. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 342
+  },
+  {
+    "id": "e2e_med_0023",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh viêm gan B lây qua đường nào?",
+    "ground_truth": "Viêm gan B lây qua đường máu, quan hệ tình dục không an toàn, từ mẹ sang con. Không lây qua ăn uống hay tiếp xúc thông thường.",
+    "order": 343
+  },
+  {
+    "id": "e2e_fu_0015",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Khám tổng quát bao gồm những gì?",
+    "ground_truth": "Khám tổng quát thường gồm khám lâm sàng, đo huyết áp, xét nghiệm máu, nước tiểu, siêu âm ổ bụng, chụp X-quang ngực, điện tim.",
+    "order": 344
+  },
+  {
+    "id": "e2e_loc_0059",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Ở Đống Đa có bệnh viện nào khám phục hồi chức năng tốt không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám phục hồi chức năng ở khu vực Đống Đa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 345
+  },
+  {
+    "id": "e2e_sym_0023",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi đau nhức răng khi ăn đồ lạnh.",
+    "ground_truth": "Ê buốt răng khi ăn lạnh có thể do mòn men răng, sâu răng, viêm tủy. Nên khám răng hàm mặt để xử lý kịp thời.",
+    "order": 346
+  },
+  {
+    "id": "e2e_gen_0009",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ nhi khoa.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nhi khoa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa nhi khám và điều trị bệnh ở trẻ em dưới 16 tuổi.",
+    "order": 347
+  },
+  {
+    "id": "e2e_gen_0041",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám sản phụ khoa, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ sản phụ khoa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa sản phụ khoa chăm sóc sức khỏe phụ nữ, thai kỳ và các bệnh phụ khoa.",
+    "order": 348
+  },
+  {
+    "id": "e2e_loc_0045",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gần Biên Hòa có chuyên khoa tiết niệu không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiết niệu ở khu vực Biên Hòa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 349
+  },
+  {
+    "id": "e2e_sym_0069",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Kinh nguyệt của tôi thất thường mấy tháng nay.",
+    "ground_truth": "Rối loạn kinh nguyệt có thể do nội tiết, buồng trứng đa nang, stress, tuyến giáp. Nên khám sản phụ khoa và xét nghiệm hormone.",
+    "order": 350
+  },
+  {
+    "id": "e2e_loc_0018",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám nội tiết ở Đà Nẵng, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tiết ở khu vực Đà Nẵng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 351
+  },
+  {
+    "id": "e2e_med_0041",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh viêm gan B lây qua đường nào?",
+    "ground_truth": "Viêm gan B lây qua đường máu, quan hệ tình dục không an toàn, từ mẹ sang con. Không lây qua ăn uống hay tiếp xúc thông thường.",
+    "order": 352
+  },
+  {
+    "id": "e2e_gen_0085",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ tiêu hóa.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiêu hóa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiêu hóa chẩn đoán bệnh dạ dày, đại tràng, gan, mật, tụy.",
+    "order": 353
+  },
+  {
+    "id": "e2e_med_0099",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Trẻ tiêm chủng đầy đủ gồm những mũi nào?",
+    "ground_truth": "Trẻ cần tiêm đủ các vaccine trong chương trình mở rộng: lao, bạch hầu, ho gà, uốn ván, bại liệt, viêm gan B, sởi, rubella, viêm não Nhật Bản.",
+    "order": 354
+  },
+  {
+    "id": "e2e_sym_0059",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi hay bị trào ngược dạ dày thực quản.",
+    "ground_truth": "Trào ngược cần thay đổi lối sống (giảm cân, bỏ thuốc lá, nâng đầu giường), dùng thuốc ức chế acid; khám tiêu hóa nếu kéo dài.",
+    "order": 355
+  },
+  {
+    "id": "e2e_med_0013",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh zona thần kinh lây không?",
+    "ground_truth": "Zona có thể lây virus thủy đậu cho người chưa nhiễm qua tiếp xúc dịch mụn nước, nhưng không lây bệnh zona trực tiếp.",
+    "order": 356
+  },
+  {
+    "id": "e2e_med_0115",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh zona thần kinh lây không?",
+    "ground_truth": "Zona có thể lây virus thủy đậu cho người chưa nhiễm qua tiếp xúc dịch mụn nước, nhưng không lây bệnh zona trực tiếp.",
+    "order": 357
+  },
+  {
+    "id": "e2e_gen_0090",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ ung bướu nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ung bướu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa ung bướu tầm soát, chẩn đoán và điều trị các loại ung thư.",
+    "order": 358
+  },
+  {
+    "id": "e2e_gen_0048",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám tiết niệu, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 359
+  },
+  {
+    "id": "e2e_loc_0082",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về ung bướu, ở quận 7 nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám ung bướu ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 360
+  },
+  {
+    "id": "e2e_loc_0053",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Ở Quy Nhơn có bệnh viện nào khám tâm thần tốt không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tâm thần ở khu vực Quy Nhơn. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 361
+  },
+  {
+    "id": "e2e_med_0103",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Thế nào là tăng acid uric máu?",
+    "ground_truth": "Tăng acid uric máu là khi nồng độ acid uric vượt ngưỡng bình thường, có thể gây gout, sỏi thận nếu không kiểm soát.",
+    "order": 362
+  },
+  {
+    "id": "e2e_gen_0044",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ phục hồi chức năng nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ phục hồi chức năng phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Phục hồi chức năng giúp bệnh nhân sau chấn thương, đột quỵ lấy lại khả năng vận động.",
+    "order": 363
+  },
+  {
+    "id": "e2e_gen_0050",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi đang tìm nơi khám nội tiết, bạn hỗ trợ.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nội tiết phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa nội tiết điều trị bệnh tiểu đường, tuyến giáp, rối loạn hormone.",
+    "order": 364
+  },
+  {
+    "id": "e2e_grt_0001",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hello",
+    "ground_truth": "Xin chào bạn! Tôi có thể giúp tư vấn sức khỏe hoặc gợi ý phòng khám phù hợp. Bạn cần gì ạ?",
+    "order": 365
+  },
+  {
+    "id": "e2e_gen_0058",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám tai mũi họng nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tai mũi họng phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tai mũi họng chẩn đoán các bệnh về tai, mũi, xoang, họng, thanh quản.",
+    "order": 366
+  },
+  {
+    "id": "e2e_grt_0017",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hi",
+    "ground_truth": "Chào bạn! Mình là trợ lý ảo y tế Healytics, sẵn sàng hỗ trợ bạn tìm dịch vụ hoặc trả lời câu hỏi sức khỏe.",
+    "order": 367
+  },
+  {
+    "id": "e2e_sym_0019",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi đau mỏi vai gáy do ngồi máy tính nhiều.",
+    "ground_truth": "Đau mỏi vai gáy do ngồi lâu có thể được cải thiện bằng điều chỉnh tư thế, giãn cơ, massage; nếu kéo dài nên khám cơ xương khớp.",
+    "order": 368
+  },
+  {
+    "id": "e2e_med_0011",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Nấm candida âm đạo điều trị ra sao?",
+    "ground_truth": "Nấm candida âm đạo điều trị bằng thuốc kháng nấm đặt âm đạo hoặc uống theo chỉ định, vệ sinh đúng cách và hạn chế đồ ngọt.",
+    "order": 369
+  },
+  {
+    "id": "e2e_med_0085",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Đau lưng dưới thường do nguyên nhân gì?",
+    "ground_truth": "Đau lưng dưới phổ biến do căng cơ, thoái hóa cột sống, thoát vị đĩa đệm, tư thế sai, ít vận động. Một số trường hợp do bệnh thận hoặc viêm.",
+    "order": 370
+  },
+  {
+    "id": "e2e_gen_0103",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi đang tìm nơi khám răng hàm mặt, bạn hỗ trợ.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ răng hàm mặt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa răng hàm mặt khám nha khoa, chỉnh nha, phẫu thuật hàm mặt.",
+    "order": 371
+  },
+  {
+    "id": "e2e_med_0059",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Trẻ em bị sốt bao nhiêu là cao?",
+    "ground_truth": "Trẻ sốt trên 38.5°C là sốt cao, trên 39.5°C là sốt rất cao. Cần hạ sốt bằng paracetamol theo cân nặng và đưa đi khám nếu sốt kéo dài hoặc co giật.",
+    "order": 372
+  },
+  {
+    "id": "e2e_loc_0092",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám dị ứng miễn dịch ở quận 7, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám dị ứng miễn dịch ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 373
+  },
+  {
+    "id": "e2e_gen_0022",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám tiết niệu, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 374
+  },
+  {
+    "id": "e2e_grt_0027",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn là ai?",
+    "ground_truth": "Tôi là trợ lý ảo Healytics, chuyên hỗ trợ bạn tìm kiếm dịch vụ y tế và cung cấp thông tin sức khỏe tham khảo.",
+    "order": 375
+  },
+  {
+    "id": "e2e_med_0093",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh cận thị ở trẻ xử lý thế nào?",
+    "ground_truth": "Trẻ cận thị cần đo kính chính xác, cho học trong đủ sáng, hạn chế thiết bị điện tử, ra ngoài trời nhiều và khám mắt định kỳ 6 tháng.",
+    "order": 376
+  },
+  {
+    "id": "e2e_med_0025",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Đi tiểu nhiều lần ban đêm là bệnh gì?",
+    "ground_truth": "Tiểu đêm nhiều lần có thể do phì đại tuyến tiền liệt, tiểu đường, suy tim, uống nhiều nước tối, nhiễm trùng đường tiểu.",
+    "order": 377
+  },
+  {
+    "id": "e2e_sym_0077",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em hay bị tê bì tay chân.",
+    "ground_truth": "Tê bì tay chân có thể do thoát vị đĩa đệm, thiếu vitamin B, tiểu đường, hội chứng ống cổ tay. Nên khám thần kinh.",
+    "order": 378
+  },
+  {
+    "id": "e2e_loc_0089",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ cơ xương khớp khu vực Đống Đa.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám cơ xương khớp ở khu vực Đống Đa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 379
+  },
+  {
+    "id": "e2e_sym_0026",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em thấy mình hay cáu gắt và buồn không lý do.",
+    "ground_truth": "Triệu chứng có thể liên quan rối loạn lo âu, trầm cảm hoặc nội tiết. Nên khám tâm thần hoặc nội tiết để được đánh giá.",
+    "order": 380
+  },
+  {
+    "id": "e2e_med_0055",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Huyết áp cao có nguy hiểm không?",
+    "ground_truth": "Huyết áp cao là yếu tố nguy cơ chính gây đột quỵ, nhồi máu cơ tim, suy thận. Cần theo dõi và điều trị kịp thời để tránh biến chứng.",
+    "order": 381
+  },
+  {
+    "id": "e2e_gen_0017",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cho mình xin một vài phòng khám tiêu hóa.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiêu hóa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiêu hóa chẩn đoán bệnh dạ dày, đại tràng, gan, mật, tụy.",
+    "order": 382
+  },
+  {
+    "id": "e2e_med_0104",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Làm sao để phòng tránh đột quỵ?",
+    "ground_truth": "Phòng đột quỵ bằng cách kiểm soát huyết áp, đường huyết, mỡ máu; không hút thuốc, hạn chế rượu bia; tập thể dục, ăn uống lành mạnh; tầm soát định kỳ.",
+    "order": 383
+  },
+  {
+    "id": "e2e_loc_0010",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gợi ý giúp mình phòng khám răng hàm mặt gần Vũng Tàu với.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám răng hàm mặt ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 384
+  },
+  {
+    "id": "e2e_med_0060",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Khi nào cần mổ ruột thừa?",
+    "ground_truth": "Ruột thừa viêm cấp cần mổ sớm trong vòng 24-48 giờ từ khi có triệu chứng để tránh vỡ ruột thừa gây viêm phúc mạc.",
+    "order": 385
+  },
+  {
+    "id": "e2e_med_0054",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Đau lưng dưới thường do nguyên nhân gì?",
+    "ground_truth": "Đau lưng dưới phổ biến do căng cơ, thoái hóa cột sống, thoát vị đĩa đệm, tư thế sai, ít vận động. Một số trường hợp do bệnh thận hoặc viêm.",
+    "order": 386
+  },
+  {
+    "id": "e2e_med_0105",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Thiếu máu do thiếu sắt điều trị thế nào?",
+    "ground_truth": "Bổ sung sắt đường uống hoặc truyền theo chỉ định, kết hợp ăn thực phẩm giàu sắt như thịt đỏ, gan, rau xanh đậm, đậu.",
+    "order": 387
+  },
+  {
+    "id": "e2e_loc_0117",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám tai mũi họng tại Vũng Tàu?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tai mũi họng ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 388
+  },
+  {
+    "id": "e2e_loc_0046",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ tim mạch khu vực Vũng Tàu.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tim mạch ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 389
+  },
+  {
+    "id": "e2e_loc_0013",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám tâm thần tại Bình Thạnh càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tâm thần ở khu vực Bình Thạnh. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 390
+  },
+  {
+    "id": "e2e_gen_0008",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cho mình xin một vài phòng khám tim mạch.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tim mạch phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tim mạch chẩn đoán và điều trị các bệnh về tim, huyết áp, mạch máu.",
+    "order": 391
+  },
+  {
+    "id": "e2e_med_0069",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh trĩ nên điều trị như nào?",
+    "ground_truth": "Trĩ nhẹ có thể điều chỉnh chế độ ăn nhiều chất xơ, uống đủ nước, dùng thuốc bôi/uống; trĩ nặng cần thủ thuật hoặc phẫu thuật theo chỉ định.",
+    "order": 392
+  },
+  {
+    "id": "e2e_gen_0045",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở sản phụ khoa chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ sản phụ khoa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa sản phụ khoa chăm sóc sức khỏe phụ nữ, thai kỳ và các bệnh phụ khoa.",
+    "order": 393
+  },
+  {
+    "id": "e2e_sym_0006",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em hay bị tê bì tay chân.",
+    "ground_truth": "Tê bì tay chân có thể do thoát vị đĩa đệm, thiếu vitamin B, tiểu đường, hội chứng ống cổ tay. Nên khám thần kinh.",
+    "order": 394
+  },
+  {
+    "id": "e2e_gen_0101",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Nên khám nhi khoa ở đâu cho uy tín?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nhi khoa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa nhi khám và điều trị bệnh ở trẻ em dưới 16 tuổi.",
+    "order": 395
+  },
+  {
+    "id": "e2e_loc_0020",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Bạn tôi ở Hải Phòng muốn khám tiêu hóa, nên chọn đâu?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Hải Phòng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 396
+  },
+  {
+    "id": "e2e_med_0066",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Phình động mạch chủ là gì?",
+    "ground_truth": "Phình động mạch chủ là tình trạng giãn bất thường thành động mạch chủ, nguy cơ vỡ gây tử vong; cần theo dõi và can thiệp kịp thời.",
+    "order": 397
+  },
+  {
+    "id": "e2e_grt_0009",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Ok thanks",
+    "ground_truth": "Không có gì, rất vui được hỗ trợ bạn.",
+    "order": 398
+  },
+  {
+    "id": "e2e_sym_0040",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em bị mất ngủ kéo dài 1 tháng rồi.",
+    "ground_truth": "Mất ngủ mạn cần đánh giá nguyên nhân (stress, lo âu, bệnh lý), vệ sinh giấc ngủ tốt; có thể cần khám tâm thần để hỗ trợ.",
+    "order": 399
+  },
+  {
+    "id": "e2e_med_0012",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh trĩ nên điều trị như nào?",
+    "ground_truth": "Trĩ nhẹ có thể điều chỉnh chế độ ăn nhiều chất xơ, uống đủ nước, dùng thuốc bôi/uống; trĩ nặng cần thủ thuật hoặc phẫu thuật theo chỉ định.",
+    "order": 400
+  },
+  {
+    "id": "e2e_med_0036",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm khớp dạng thấp nhận biết thế nào?",
+    "ground_truth": "Viêm khớp dạng thấp gây sưng đau đối xứng các khớp nhỏ bàn tay, cứng khớp buổi sáng trên 30 phút, kéo dài nhiều tuần.",
+    "order": 401
+  },
+  {
+    "id": "e2e_med_0016",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Làm sao biết mình cận thị?",
+    "ground_truth": "Dấu hiệu cận thị gồm nhìn xa mờ, phải nheo mắt, mỏi mắt khi đọc, hay nhức đầu. Nên đo thị lực tại cơ sở chuyên khoa.",
+    "order": 402
+  },
+  {
+    "id": "e2e_gen_0019",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám tiết niệu, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 403
+  },
+  {
+    "id": "e2e_gen_0086",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch ngoại tổng quát.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ngoại tổng quát phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Khám ngoại tổng quát xử lý các vấn đề cần can thiệp phẫu thuật thông thường.",
+    "order": 404
+  },
+  {
+    "id": "e2e_med_0118",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Đi tiểu nhiều lần ban đêm là bệnh gì?",
+    "ground_truth": "Tiểu đêm nhiều lần có thể do phì đại tuyến tiền liệt, tiểu đường, suy tim, uống nhiều nước tối, nhiễm trùng đường tiểu.",
+    "order": 405
+  },
+  {
+    "id": "e2e_fu_0014",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Cần làm xét nghiệm gì?",
+    "ground_truth": "Tùy triệu chứng bác sĩ sẽ chỉ định xét nghiệm máu, nước tiểu, siêu âm hoặc hình ảnh học phù hợp để chẩn đoán chính xác.",
+    "order": 406
+  },
+  {
+    "id": "e2e_sym_0079",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em bị đau bụng dưới bên phải khi vận động.",
+    "ground_truth": "Đau bụng dưới phải có thể do ruột thừa, buồng trứng, cơ bụng. Nếu kèm sốt hoặc đau tăng nên đến cấp cứu hoặc khám ngoại khoa.",
+    "order": 407
+  },
+  {
+    "id": "e2e_gen_0119",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cần khám huyết học, tư vấn giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ huyết học phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa huyết học điều trị thiếu máu, rối loạn đông máu, các bệnh máu ác tính.",
+    "order": 408
+  },
+  {
+    "id": "e2e_loc_0063",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về tiêu hóa, ở Huế nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 409
+  },
+  {
+    "id": "e2e_gen_0104",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Cho mình xin một vài phòng khám huyết học.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ huyết học phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa huyết học điều trị thiếu máu, rối loạn đông máu, các bệnh máu ác tính.",
+    "order": 410
+  },
+  {
+    "id": "e2e_sym_0073",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi khó thở khi leo cầu thang.",
+    "ground_truth": "Khó thở khi gắng sức có thể do thiếu máu, bệnh tim, bệnh phổi, thừa cân. Nên khám tim mạch hoặc hô hấp để đánh giá.",
+    "order": 411
+  },
+  {
+    "id": "e2e_grt_0021",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn có thể giúp tôi không?",
+    "ground_truth": "Chắc chắn rồi, bạn cần tư vấn về sức khỏe hay tìm dịch vụ y tế nào ạ?",
+    "order": 412
+  },
+  {
+    "id": "e2e_sym_0013",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi hay bị chóng mặt khi đứng dậy, nên làm gì?",
+    "ground_truth": "Chóng mặt khi đứng dậy có thể do hạ huyết áp tư thế, thiếu máu, tiền đình. Nên uống đủ nước, đứng dậy từ từ, đi khám nội hoặc tim mạch.",
+    "order": 413
+  },
+  {
+    "id": "e2e_sym_0078",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị nóng rát vùng thượng vị sau ăn.",
+    "ground_truth": "Nóng rát thượng vị gợi ý trào ngược, viêm dạ dày. Nên giảm ăn cay, dầu mỡ, cà phê; khám tiêu hóa nếu kéo dài.",
+    "order": 414
+  },
+  {
+    "id": "e2e_gen_0037",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám răng hàm mặt, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ răng hàm mặt phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa răng hàm mặt khám nha khoa, chỉnh nha, phẫu thuật hàm mặt.",
+    "order": 415
+  },
+  {
+    "id": "e2e_sym_0063",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi đau mỏi vai gáy do ngồi máy tính nhiều.",
+    "ground_truth": "Đau mỏi vai gáy do ngồi lâu có thể được cải thiện bằng điều chỉnh tư thế, giãn cơ, massage; nếu kéo dài nên khám cơ xương khớp.",
+    "order": 416
+  },
+  {
+    "id": "e2e_loc_0084",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gợi ý giúp mình phòng khám nhi khoa gần Huế với.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nhi khoa ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 417
+  },
+  {
+    "id": "e2e_grt_0019",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Xin chào",
+    "ground_truth": "Xin chào! Tôi là trợ lý Healytics. Tôi có thể giúp bạn tìm dịch vụ y tế và tư vấn sức khỏe. Bạn cần hỗ trợ gì ạ?",
+    "order": 418
+  },
+  {
+    "id": "e2e_sym_0068",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi ngáy to khi ngủ, có cần khám không?",
+    "ground_truth": "Ngáy to kèm ngừng thở khi ngủ, buồn ngủ ban ngày có thể là hội chứng ngưng thở khi ngủ, nên khám hô hấp và đo đa ký giấc ngủ.",
+    "order": 419
+  },
+  {
+    "id": "e2e_loc_0072",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gần Huế có chuyên khoa nội tổng quát không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tổng quát ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 420
+  },
+  {
+    "id": "e2e_gen_0016",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám tâm thần nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tâm thần phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tâm thần điều trị rối loạn lo âu, trầm cảm, mất ngủ, stress.",
+    "order": 421
+  },
+  {
+    "id": "e2e_fu_0018",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bác sĩ nào giỏi?",
+    "ground_truth": "Bạn có thể tham khảo đánh giá của bệnh nhân khác, bằng cấp, kinh nghiệm của bác sĩ trên thông tin dịch vụ được gợi ý.",
+    "order": 422
+  },
+  {
+    "id": "e2e_med_0091",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm xoang có chữa khỏi không?",
+    "ground_truth": "Viêm xoang có thể điều trị khỏi hoặc kiểm soát tốt bằng thuốc, rửa mũi, tránh dị nguyên; trường hợp mạn tính nặng có thể cần phẫu thuật nội soi.",
+    "order": 423
+  },
+  {
+    "id": "e2e_fu_0003",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bác sĩ nào giỏi?",
+    "ground_truth": "Bạn có thể tham khảo đánh giá của bệnh nhân khác, bằng cấp, kinh nghiệm của bác sĩ trên thông tin dịch vụ được gợi ý.",
+    "order": 424
+  },
+  {
+    "id": "e2e_med_0038",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm phế quản khác viêm phổi ở điểm nào?",
+    "ground_truth": "Viêm phế quản là viêm ống dẫn khí lớn, chủ yếu ho đờm; viêm phổi là viêm nhu mô phổi, thường sốt cao, khó thở, nguy hiểm hơn.",
+    "order": 425
+  },
+  {
+    "id": "e2e_loc_0058",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ mắt khu vực Vũng Tàu.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám mắt ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 426
+  },
+  {
+    "id": "e2e_gen_0097",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám thần kinh nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ thần kinh phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa thần kinh điều trị đau đầu, động kinh, đột quỵ, rối loạn vận động.",
+    "order": 427
+  },
+  {
+    "id": "e2e_loc_0101",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi cần đặt lịch khám nhi khoa tại Đống Đa càng sớm càng tốt.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nhi khoa ở khu vực Đống Đa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 428
+  },
+  {
+    "id": "e2e_sym_0041",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị nóng rát vùng thượng vị sau ăn.",
+    "ground_truth": "Nóng rát thượng vị gợi ý trào ngược, viêm dạ dày. Nên giảm ăn cay, dầu mỡ, cà phê; khám tiêu hóa nếu kéo dài.",
+    "order": 429
+  },
+  {
+    "id": "e2e_grt_0010",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn là ai?",
+    "ground_truth": "Tôi là trợ lý ảo Healytics, chuyên hỗ trợ bạn tìm kiếm dịch vụ y tế và cung cấp thông tin sức khỏe tham khảo.",
+    "order": 430
+  },
+  {
+    "id": "e2e_grt_0024",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Xin chào",
+    "ground_truth": "Xin chào! Tôi là trợ lý Healytics. Tôi có thể giúp bạn tìm dịch vụ y tế và tư vấn sức khỏe. Bạn cần hỗ trợ gì ạ?",
+    "order": 431
+  },
+  {
+    "id": "e2e_grt_0013",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hello",
+    "ground_truth": "Xin chào bạn! Tôi có thể giúp tư vấn sức khỏe hoặc gợi ý phòng khám phù hợp. Bạn cần gì ạ?",
+    "order": 432
+  },
+  {
+    "id": "e2e_sym_0035",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em thấy mình hay cáu gắt và buồn không lý do.",
+    "ground_truth": "Triệu chứng có thể liên quan rối loạn lo âu, trầm cảm hoặc nội tiết. Nên khám tâm thần hoặc nội tiết để được đánh giá.",
+    "order": 433
+  },
+  {
+    "id": "e2e_sym_0033",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi hay bị trào ngược dạ dày thực quản.",
+    "ground_truth": "Trào ngược cần thay đổi lối sống (giảm cân, bỏ thuốc lá, nâng đầu giường), dùng thuốc ức chế acid; khám tiêu hóa nếu kéo dài.",
+    "order": 434
+  },
+  {
+    "id": "e2e_grt_0011",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Chào bạn",
+    "ground_truth": "Chào bạn! Bạn đang có vấn đề sức khỏe gì hoặc muốn tìm cơ sở khám chữa bệnh nào không?",
+    "order": 435
+  },
+  {
+    "id": "e2e_loc_0119",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ nội tiết khu vực Vũng Tàu.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tiết ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 436
+  },
+  {
+    "id": "e2e_med_0111",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm xoang có chữa khỏi không?",
+    "ground_truth": "Viêm xoang có thể điều trị khỏi hoặc kiểm soát tốt bằng thuốc, rửa mũi, tránh dị nguyên; trường hợp mạn tính nặng có thể cần phẫu thuật nội soi.",
+    "order": 437
+  },
+  {
+    "id": "e2e_loc_0036",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gợi ý giúp mình phòng khám tâm thần gần Huế với.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tâm thần ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 438
+  },
+  {
+    "id": "e2e_gen_0112",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở nội tiết chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nội tiết phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa nội tiết điều trị bệnh tiểu đường, tuyến giáp, rối loạn hormone.",
+    "order": 439
+  },
+  {
+    "id": "e2e_med_0119",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Ho kéo dài trên 3 tuần có sao không?",
+    "ground_truth": "Ho kéo dài trên 3 tuần được coi là ho mạn tính, có thể do viêm xoang sau, trào ngược, hen, COPD hoặc lao. Nên đi khám chuyên khoa hô hấp.",
+    "order": 440
+  },
+  {
+    "id": "e2e_gen_0024",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám tiết niệu nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 441
+  },
+  {
+    "id": "e2e_med_0121",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh vảy nến là gì?",
+    "ground_truth": "Vảy nến là bệnh tự miễn mạn tính, gây mảng da đỏ có vảy trắng, ngứa; điều trị bằng thuốc bôi, uống, ánh sáng trị liệu.",
+    "order": 442
+  },
+  {
+    "id": "e2e_gen_0027",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch da liễu.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ da liễu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa da liễu xử lý các bệnh về da, tóc, móng như mụn, nấm, viêm da.",
+    "order": 443
+  },
+  {
+    "id": "e2e_loc_0118",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi đang ở Nha Trang, cần tư vấn khám phục hồi chức năng.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám phục hồi chức năng ở khu vực Nha Trang. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 444
+  },
+  {
+    "id": "e2e_loc_0016",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám nhi khoa tại quận 7?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nhi khoa ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 445
+  },
+  {
+    "id": "e2e_gen_0029",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi đang tìm nơi khám ung bướu, bạn hỗ trợ.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ung bướu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa ung bướu tầm soát, chẩn đoán và điều trị các loại ung thư.",
+    "order": 446
+  },
+  {
+    "id": "e2e_med_0000",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Rối loạn tiền đình là gì?",
+    "ground_truth": "Rối loạn tiền đình là tình trạng mất thăng bằng, chóng mặt, buồn nôn do hệ thống tiền đình ở tai trong hoặc thần kinh bị ảnh hưởng.",
+    "order": 447
+  },
+  {
+    "id": "e2e_med_0064",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Phụ nữ mang thai cần khám những gì?",
+    "ground_truth": "Thai phụ cần khám thai định kỳ, siêu âm hình thái, sàng lọc dị tật, xét nghiệm máu, nước tiểu, tiểu đường thai kỳ, đo huyết áp.",
+    "order": 448
+  },
+  {
+    "id": "e2e_med_0112",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Đi tiểu nhiều lần ban đêm là bệnh gì?",
+    "ground_truth": "Tiểu đêm nhiều lần có thể do phì đại tuyến tiền liệt, tiểu đường, suy tim, uống nhiều nước tối, nhiễm trùng đường tiểu.",
+    "order": 449
+  },
+  {
+    "id": "e2e_grt_0029",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hi",
+    "ground_truth": "Chào bạn! Mình là trợ lý ảo y tế Healytics, sẵn sàng hỗ trợ bạn tìm dịch vụ hoặc trả lời câu hỏi sức khỏe.",
+    "order": 450
+  },
+  {
+    "id": "e2e_gen_0089",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi cần tư vấn chọn dịch vụ ung bướu.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ ung bướu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa ung bướu tầm soát, chẩn đoán và điều trị các loại ung thư.",
+    "order": 451
+  },
+  {
+    "id": "e2e_loc_0001",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gợi ý giúp mình phòng khám tiêu hóa gần Huế với.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiêu hóa ở khu vực Huế. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 452
+  },
+  {
+    "id": "e2e_grt_0008",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bạn có thể giúp tôi không?",
+    "ground_truth": "Chắc chắn rồi, bạn cần tư vấn về sức khỏe hay tìm dịch vụ y tế nào ạ?",
+    "order": 453
+  },
+  {
+    "id": "e2e_loc_0038",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gợi ý giúp mình phòng khám da liễu gần Hải Phòng với.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám da liễu ở khu vực Hải Phòng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 454
+  },
+  {
+    "id": "e2e_med_0042",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Khi nào cần mổ ruột thừa?",
+    "ground_truth": "Ruột thừa viêm cấp cần mổ sớm trong vòng 24-48 giờ từ khi có triệu chứng để tránh vỡ ruột thừa gây viêm phúc mạc.",
+    "order": 455
+  },
+  {
+    "id": "e2e_loc_0088",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Gần Vũng Tàu có chuyên khoa hô hấp không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám hô hấp ở khu vực Vũng Tàu. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 456
+  },
+  {
+    "id": "e2e_gen_0002",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Nên khám tiết niệu ở đâu cho uy tín?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 457
+  },
+  {
+    "id": "e2e_loc_0080",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám tiết niệu tại Biên Hòa?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám tiết niệu ở khu vực Biên Hòa. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 458
+  },
+  {
+    "id": "e2e_loc_0041",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ phục hồi chức năng khu vực Thanh Xuân.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám phục hồi chức năng ở khu vực Thanh Xuân. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 459
+  },
+  {
+    "id": "e2e_med_0098",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh tiểu đường loại 2 là gì?",
+    "ground_truth": "Tiểu đường loại 2 là rối loạn chuyển hóa gây tăng đường huyết kéo dài do kháng insulin hoặc tiết insulin không đủ, thường gặp ở người trưởng thành.",
+    "order": 460
+  },
+  {
+    "id": "e2e_gen_0015",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đi khám tâm thần, bạn gợi ý giúp.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tâm thần phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tâm thần điều trị rối loạn lo âu, trầm cảm, mất ngủ, stress.",
+    "order": 461
+  },
+  {
+    "id": "e2e_loc_0108",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ sản phụ khoa khu vực Đà Nẵng.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám sản phụ khoa ở khu vực Đà Nẵng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 462
+  },
+  {
+    "id": "e2e_med_0080",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dấu hiệu đột quỵ cần nhận biết?",
+    "ground_truth": "Dấu hiệu F.A.S.T: méo mặt, yếu tay, nói khó; kèm đau đầu dữ dội đột ngột, mất thị lực, mất thăng bằng. Cần đến cấp cứu ngay.",
+    "order": 463
+  },
+  {
+    "id": "e2e_loc_0106",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám răng hàm mặt ở Đà Nẵng, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám răng hàm mặt ở khu vực Đà Nẵng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 464
+  },
+  {
+    "id": "e2e_sym_0020",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi ngáy to khi ngủ, có cần khám không?",
+    "ground_truth": "Ngáy to kèm ngừng thở khi ngủ, buồn ngủ ban ngày có thể là hội chứng ngưng thở khi ngủ, nên khám hô hấp và đo đa ký giấc ngủ.",
+    "order": 465
+  },
+  {
+    "id": "e2e_loc_0050",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Hãy giới thiệu vài dịch vụ mắt khu vực quận 7.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám mắt ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 466
+  },
+  {
+    "id": "e2e_sym_0008",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi bị ngứa vùng kín, cần làm gì?",
+    "ground_truth": "Ngứa vùng kín có thể do nấm, vi khuẩn, trùng roi. Nên khám sản phụ khoa hoặc tiết niệu, tránh tự mua thuốc dùng.",
+    "order": 467
+  },
+  {
+    "id": "e2e_med_0072",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh lao phổi điều trị bao lâu?",
+    "ground_truth": "Phác đồ lao phổi chuẩn kéo dài 6 tháng (2 tháng tấn công + 4 tháng duy trì), cần tuân thủ uống thuốc đầy đủ để tránh kháng thuốc.",
+    "order": 468
+  },
+  {
+    "id": "e2e_loc_0030",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi đang ở quận 10, cần tư vấn khám nội tiết.",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám nội tiết ở khu vực quận 10. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 469
+  },
+  {
+    "id": "e2e_med_0077",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh Parkinson có chữa được không?",
+    "ground_truth": "Parkinson không chữa khỏi nhưng kiểm soát bằng thuốc (levodopa), vật lý trị liệu, phẫu thuật kích thích não sâu trong ca phù hợp.",
+    "order": 470
+  },
+  {
+    "id": "e2e_med_0051",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh tiểu đường loại 2 là gì?",
+    "ground_truth": "Tiểu đường loại 2 là rối loạn chuyển hóa gây tăng đường huyết kéo dài do kháng insulin hoặc tiết insulin không đủ, thường gặp ở người trưởng thành.",
+    "order": 471
+  },
+  {
+    "id": "e2e_gen_0036",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ hô hấp nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ hô hấp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa hô hấp điều trị hen, viêm phổi, COPD và các bệnh phổi khác.",
+    "order": 472
+  },
+  {
+    "id": "e2e_gen_0099",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám nội tổng quát nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nội tổng quát phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Khám nội tổng quát giúp đánh giá tổng thể sức khỏe và phát hiện bệnh lý sớm.",
+    "order": 473
+  },
+  {
+    "id": "e2e_med_0061",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hội chứng ruột kích thích nhận biết?",
+    "ground_truth": "Hội chứng ruột kích thích có đau bụng tái diễn, thay đổi thói quen đi ngoài (tiêu chảy/táo bón), liên quan stress, thức ăn.",
+    "order": 474
+  },
+  {
+    "id": "e2e_sym_0070",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Thỉnh thoảng tôi hồi hộp tim đập nhanh không rõ lý do.",
+    "ground_truth": "Triệu chứng hồi hộp có thể là rối loạn nhịp tim, cường giáp, lo âu. Nên đo điện tim và khám tim mạch để đánh giá.",
+    "order": 475
+  },
+  {
+    "id": "e2e_gen_0032",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở nội tiết chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ nội tiết phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa nội tiết điều trị bệnh tiểu đường, tuyến giáp, rối loạn hormone.",
+    "order": 476
+  },
+  {
+    "id": "e2e_gen_0106",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Gợi ý cho tôi cơ sở tiêu hóa chất lượng.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiêu hóa phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiêu hóa chẩn đoán bệnh dạ dày, đại tràng, gan, mật, tụy.",
+    "order": 477
+  },
+  {
+    "id": "e2e_grt_0015",
+    "category": "greeting_smalltalk",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Hello",
+    "ground_truth": "Xin chào bạn! Tôi có thể giúp tư vấn sức khỏe hoặc gợi ý phòng khám phù hợp. Bạn cần gì ạ?",
+    "order": 478
+  },
+  {
+    "id": "e2e_gen_0110",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Tôi muốn đặt lịch huyết học.",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ huyết học phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa huyết học điều trị thiếu máu, rối loạn đông máu, các bệnh máu ác tính.",
+    "order": 479
+  },
+  {
+    "id": "e2e_gen_0074",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Bạn biết phòng khám cơ xương khớp nào không?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ cơ xương khớp phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa cơ xương khớp xử lý thoái hóa khớp, thoát vị đĩa đệm, loãng xương.",
+    "order": 480
+  },
+  {
+    "id": "e2e_med_0027",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh zona thần kinh lây không?",
+    "ground_truth": "Zona có thể lây virus thủy đậu cho người chưa nhiễm qua tiếp xúc dịch mụn nước, nhưng không lây bệnh zona trực tiếp.",
+    "order": 481
+  },
+  {
+    "id": "e2e_sym_0027",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi hay bị chóng mặt khi đứng dậy, nên làm gì?",
+    "ground_truth": "Chóng mặt khi đứng dậy có thể do hạ huyết áp tư thế, thiếu máu, tiền đình. Nên uống đủ nước, đứng dậy từ từ, đi khám nội hoặc tim mạch.",
+    "order": 482
+  },
+  {
+    "id": "e2e_loc_0115",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám sản phụ khoa tại Cần Thơ?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám sản phụ khoa ở khu vực Cần Thơ. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 483
+  },
+  {
+    "id": "e2e_med_0076",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Viêm xoang có chữa khỏi không?",
+    "ground_truth": "Viêm xoang có thể điều trị khỏi hoặc kiểm soát tốt bằng thuốc, rửa mũi, tránh dị nguyên; trường hợp mạn tính nặng có thể cần phẫu thuật nội soi.",
+    "order": 484
+  },
+  {
+    "id": "e2e_sym_0034",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi tiểu rát và đi nhiều lần.",
+    "ground_truth": "Triệu chứng gợi ý nhiễm trùng đường tiểu, cần xét nghiệm nước tiểu và khám tiết niệu, uống nhiều nước và dùng kháng sinh theo chỉ định.",
+    "order": 485
+  },
+  {
+    "id": "e2e_med_0065",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh zona thần kinh lây không?",
+    "ground_truth": "Zona có thể lây virus thủy đậu cho người chưa nhiễm qua tiếp xúc dịch mụn nước, nhưng không lây bệnh zona trực tiếp.",
+    "order": 486
+  },
+  {
+    "id": "e2e_med_0070",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Suy giáp có triệu chứng gì?",
+    "ground_truth": "Suy giáp gây mệt mỏi, tăng cân, sợ lạnh, da khô, tóc rụng, trầm cảm, chậm nhịp tim. Cần xét nghiệm TSH để chẩn đoán.",
+    "order": 487
+  },
+  {
+    "id": "e2e_gen_0093",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ phục hồi chức năng nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ phục hồi chức năng phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Phục hồi chức năng giúp bệnh nhân sau chấn thương, đột quỵ lấy lại khả năng vận động.",
+    "order": 488
+  },
+  {
+    "id": "e2e_sym_0021",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Dạo này tôi khó thở khi leo cầu thang.",
+    "ground_truth": "Khó thở khi gắng sức có thể do thiếu máu, bệnh tim, bệnh phổi, thừa cân. Nên khám tim mạch hoặc hô hấp để đánh giá.",
+    "order": 489
+  },
+  {
+    "id": "e2e_med_0045",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Nguyên nhân gây đau dạ dày?",
+    "ground_truth": "Đau dạ dày thường do vi khuẩn H.pylori, stress, ăn uống không điều độ, lạm dụng thuốc giảm đau, rượu bia, hút thuốc.",
+    "order": 490
+  },
+  {
+    "id": "e2e_loc_0060",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám huyết học tại Nha Trang?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám huyết học ở khu vực Nha Trang. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 491
+  },
+  {
+    "id": "e2e_gen_0007",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ tiết niệu nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tiết niệu phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tiết niệu chẩn đoán các bệnh thận, bàng quang, tuyến tiền liệt.",
+    "order": 492
+  },
+  {
+    "id": "e2e_loc_0043",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Cho hỏi địa chỉ khám sản phụ khoa tại quận 7?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám sản phụ khoa ở khu vực quận 7. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 493
+  },
+  {
+    "id": "e2e_gen_0035",
+    "category": "service_seeking_general",
+    "needs_recommendation": true,
+    "has_location": false,
+    "user_query": "Dịch vụ tâm thần nào đang được đánh giá cao?",
+    "ground_truth": "Hệ thống đã tổng hợp vài dịch vụ tâm thần phù hợp dựa trên nhu cầu của bạn. Vui lòng xem các gợi ý đi kèm để chọn nơi phù hợp; Chuyên khoa tâm thần điều trị rối loạn lo âu, trầm cảm, mất ngủ, stress.",
+    "order": 494
+  },
+  {
+    "id": "e2e_fu_0005",
+    "category": "follow_up_questions",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Tôi nên chuẩn bị gì?",
+    "ground_truth": "Bạn nên mang theo giấy tờ tùy thân, hồ sơ khám cũ, danh sách thuốc đang dùng và ghi lại triệu chứng, thời gian xuất hiện.",
+    "order": 495
+  },
+  {
+    "id": "e2e_med_0048",
+    "category": "general_medical_qa",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Bệnh vảy nến là gì?",
+    "ground_truth": "Vảy nến là bệnh tự miễn mạn tính, gây mảng da đỏ có vảy trắng, ngứa; điều trị bằng thuốc bôi, uống, ánh sáng trị liệu.",
+    "order": 496
+  },
+  {
+    "id": "e2e_sym_0045",
+    "category": "symptom_advice",
+    "needs_recommendation": false,
+    "has_location": false,
+    "user_query": "Em bị ngứa da toàn thân về đêm, nên kiểm tra gì?",
+    "ground_truth": "Ngứa về đêm có thể do dị ứng, ghẻ, gan mật, đái tháo đường. Bạn nên khám da liễu hoặc nội tổng quát để tìm nguyên nhân.",
+    "order": 497
+  },
+  {
+    "id": "e2e_loc_0076",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Tôi muốn khám da liễu ở Hải Phòng, có phòng khám nào uy tín không?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám da liễu ở khu vực Hải Phòng. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 498
+  },
+  {
+    "id": "e2e_loc_0077",
+    "category": "service_seeking_with_location",
+    "needs_recommendation": true,
+    "has_location": true,
+    "user_query": "Mình bị vấn đề về hô hấp, ở Thủ Đức nên đến đâu khám?",
+    "ground_truth": "Dựa trên thông tin bạn cung cấp, hệ thống gợi ý một số cơ sở khám hô hấp ở khu vực Thủ Đức. Bạn nên xem chi tiết các dịch vụ được hiển thị và liên hệ đặt lịch.",
+    "order": 499
+  }
+]
