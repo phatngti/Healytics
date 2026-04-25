@@ -3,7 +3,6 @@
 .travis.yml
 README.md
 analysis_options.yaml
-doc/AIRecommendationsApi.md
 doc/AccountApi.md
 doc/AccountMeResponseDto.md
 doc/AccountRequestDto.md
@@ -18,8 +17,13 @@ doc/AdminNotificationsApi.md
 doc/AdminPartnerDetailResponseDto.md
 doc/AdminPartnersApi.md
 doc/AiRecommendationItemDto.md
-doc/AiRecommendationsRequestDto.md
-doc/AiRecommendationsResponseDto.md
+doc/AnalyticsAlertDto.md
+doc/AnalyticsBookingMetricsDto.md
+doc/AnalyticsCategoryPerformanceDto.md
+doc/AnalyticsOperationalMetricDto.md
+doc/AnalyticsReviewBucketDto.md
+doc/AnalyticsServicePerformanceDto.md
+doc/AnalyticsTrendPointDto.md
 doc/AppointmentCategoryResponseDto.md
 doc/AppointmentResponseDto.md
 doc/AppointmentStatus.md
@@ -33,6 +37,7 @@ doc/BookingScheduleDto.md
 doc/BookingServiceResponseDto.md
 doc/BookingSpecialistResponseDto.md
 doc/BookingStatus.md
+doc/BookingStatusBreakdownDto.md
 doc/BusinessInfo.md
 doc/BusinessInfoDto.md
 doc/BusinessServiceDto.md
@@ -91,6 +96,7 @@ doc/DashboardReviewDto.md
 doc/DashboardStatsResponseDto.md
 doc/DayScheduleDto.md
 doc/DeleteFileResponseDto.md
+doc/DevicePlatform.md
 doc/DistanceMatrixElementDto.md
 doc/DistanceMatrixResponseDto.md
 doc/DistanceMatrixRowDto.md
@@ -105,6 +111,8 @@ doc/FileUrlResponseDto.md
 doc/GeocodeResponseDto.md
 doc/GeocodeResultDto.md
 doc/HealthApi.md
+doc/HealthServiceDetailAnalyticsResponseDto.md
+doc/HealthServiceOverviewAnalyticsResponseDto.md
 doc/HealthServiceStatus.md
 doc/HealthServiceType.md
 doc/HomeRecommenderRequest.md
@@ -232,6 +240,9 @@ doc/ServiceTagResponseDto.md
 doc/SpecialistInfoDto.md
 doc/SpecialistReviewResponseDto.md
 doc/StaffScheduleEntryDto.md
+doc/StripeApi.md
+doc/StripePaymentResponseDto.md
+doc/StripeRefundResponseDto.md
 doc/SurveyDto.md
 doc/SurveyResponseDto.md
 doc/TherapistProfileResponseDto.md
@@ -272,7 +283,6 @@ lib/api/admin_audit_logs_api.dart
 lib/api/admin_categories_api.dart
 lib/api/admin_notifications_api.dart
 lib/api/admin_partners_api.dart
-lib/api/ai_recommendations_api.dart
 lib/api/authentication_api.dart
 lib/api/cart_api.dart
 lib/api/categories_api.dart
@@ -290,6 +300,7 @@ lib/api/partner_service_tags_api.dart
 lib/api/partners_api.dart
 lib/api/recommender_api.dart
 lib/api/s3_api.dart
+lib/api/stripe_api.dart
 lib/api/user_appointments_api.dart
 lib/api/user_bookings_api.dart
 lib/api/user_categories_api.dart
@@ -319,8 +330,13 @@ lib/model/admin_category_response_dto.dart
 lib/model/admin_login_dto.dart
 lib/model/admin_partner_detail_response_dto.dart
 lib/model/ai_recommendation_item_dto.dart
-lib/model/ai_recommendations_request_dto.dart
-lib/model/ai_recommendations_response_dto.dart
+lib/model/analytics_alert_dto.dart
+lib/model/analytics_booking_metrics_dto.dart
+lib/model/analytics_category_performance_dto.dart
+lib/model/analytics_operational_metric_dto.dart
+lib/model/analytics_review_bucket_dto.dart
+lib/model/analytics_service_performance_dto.dart
+lib/model/analytics_trend_point_dto.dart
 lib/model/appointment_category_response_dto.dart
 lib/model/appointment_response_dto.dart
 lib/model/appointment_status.dart
@@ -333,6 +349,7 @@ lib/model/booking_schedule_dto.dart
 lib/model/booking_service_response_dto.dart
 lib/model/booking_specialist_response_dto.dart
 lib/model/booking_status.dart
+lib/model/booking_status_breakdown_dto.dart
 lib/model/business_info.dart
 lib/model/business_info_dto.dart
 lib/model/business_service_dto.dart
@@ -388,6 +405,7 @@ lib/model/dashboard_review_dto.dart
 lib/model/dashboard_stats_response_dto.dart
 lib/model/day_schedule_dto.dart
 lib/model/delete_file_response_dto.dart
+lib/model/device_platform.dart
 lib/model/distance_matrix_element_dto.dart
 lib/model/distance_matrix_response_dto.dart
 lib/model/distance_matrix_row_dto.dart
@@ -401,6 +419,8 @@ lib/model/featured_specialist_response_dto.dart
 lib/model/file_url_response_dto.dart
 lib/model/geocode_response_dto.dart
 lib/model/geocode_result_dto.dart
+lib/model/health_service_detail_analytics_response_dto.dart
+lib/model/health_service_overview_analytics_response_dto.dart
 lib/model/health_service_status.dart
 lib/model/health_service_type.dart
 lib/model/home_recommender_request.dart
@@ -516,6 +536,8 @@ lib/model/service_tag_response_dto.dart
 lib/model/specialist_info_dto.dart
 lib/model/specialist_review_response_dto.dart
 lib/model/staff_schedule_entry_dto.dart
+lib/model/stripe_payment_response_dto.dart
+lib/model/stripe_refund_response_dto.dart
 lib/model/survey_dto.dart
 lib/model/survey_response_dto.dart
 lib/model/therapist_profile_response_dto.dart
@@ -552,9 +574,13 @@ test/admin_notifications_api_test.dart
 test/admin_partner_detail_response_dto_test.dart
 test/admin_partners_api_test.dart
 test/ai_recommendation_item_dto_test.dart
-test/ai_recommendations_api_test.dart
-test/ai_recommendations_request_dto_test.dart
-test/ai_recommendations_response_dto_test.dart
+test/analytics_alert_dto_test.dart
+test/analytics_booking_metrics_dto_test.dart
+test/analytics_category_performance_dto_test.dart
+test/analytics_operational_metric_dto_test.dart
+test/analytics_review_bucket_dto_test.dart
+test/analytics_service_performance_dto_test.dart
+test/analytics_trend_point_dto_test.dart
 test/appointment_category_response_dto_test.dart
 test/appointment_response_dto_test.dart
 test/appointment_status_test.dart
@@ -567,6 +593,7 @@ test/booking_response_dto_test.dart
 test/booking_schedule_dto_test.dart
 test/booking_service_response_dto_test.dart
 test/booking_specialist_response_dto_test.dart
+test/booking_status_breakdown_dto_test.dart
 test/booking_status_test.dart
 test/business_info_dto_test.dart
 test/business_info_test.dart
@@ -626,6 +653,7 @@ test/dashboard_review_dto_test.dart
 test/dashboard_stats_response_dto_test.dart
 test/day_schedule_dto_test.dart
 test/delete_file_response_dto_test.dart
+test/device_platform_test.dart
 test/distance_matrix_element_dto_test.dart
 test/distance_matrix_response_dto_test.dart
 test/distance_matrix_row_dto_test.dart
@@ -640,6 +668,8 @@ test/file_url_response_dto_test.dart
 test/geocode_response_dto_test.dart
 test/geocode_result_dto_test.dart
 test/health_api_test.dart
+test/health_service_detail_analytics_response_dto_test.dart
+test/health_service_overview_analytics_response_dto_test.dart
 test/health_service_status_test.dart
 test/health_service_type_test.dart
 test/home_recommender_request_test.dart
@@ -767,6 +797,9 @@ test/service_tag_response_dto_test.dart
 test/specialist_info_dto_test.dart
 test/specialist_review_response_dto_test.dart
 test/staff_schedule_entry_dto_test.dart
+test/stripe_api_test.dart
+test/stripe_payment_response_dto_test.dart
+test/stripe_refund_response_dto_test.dart
 test/survey_dto_test.dart
 test/survey_response_dto_test.dart
 test/therapist_profile_response_dto_test.dart

@@ -19,7 +19,7 @@ class RecommendationResponse {
   });
 
 
-  List<ServiceDetail> recommendations;
+  List<AiRecommendationItemDto> recommendations;
 
   int total;
 
@@ -68,7 +68,7 @@ class RecommendationResponse {
       }());
 
       return RecommendationResponse(
-        recommendations: ServiceDetail.listFromJson(json[r'recommendations']),
+        recommendations: AiRecommendationItemDto.listFromJson(json[r'recommendations']),
         total: mapValueOfType<int>(json, r'total')!,
         timestamp: mapValueOfType<String>(json, r'timestamp')!,
       );

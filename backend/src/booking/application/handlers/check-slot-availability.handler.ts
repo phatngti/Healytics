@@ -4,6 +4,7 @@ import { Repository, Not, In } from 'typeorm';
 import { Booking } from '@/common/entities/booking.entity';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { RedisService } from '@/redis/redis.service';
+import { formatSlotKey } from '../../utils/slot-key.util';
 
 @Injectable()
 export class CheckSlotAvailabilityHandler {
@@ -26,7 +27,7 @@ export class CheckSlotAvailabilityHandler {
         where: {
           staffId,
           startTime,
-          status: Not(In([BookingStatus.CANCELLED])),
+          status: Not(In([BookingStatus.CANCELLED, BookingStatus.COMPLETED])),
         },
       });
 
@@ -45,7 +46,7 @@ export class CheckSlotAvailabilityHandler {
     }
 
     // 2. Check Redis for active checkout lock
-    const dateStr = this.formatSlotKey(startTime);
+    const dateStr = formatSlotKey(startTime);
     const key = `lock:checkout:${staffId}_${dateStr}`;
 
     try {
@@ -69,14 +70,5 @@ export class CheckSlotAvailabilityHandler {
       `Slot available: staff=${staffId}, time=${startTime.toISOString()}`,
     );
     return true;
-  }
-
-  private formatSlotKey(date: Date): string {
-    const yyyy = date.getUTCFullYear();
-    const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const dd = String(date.getUTCDate()).padStart(2, '0');
-    const hh = String(date.getUTCHours()).padStart(2, '0');
-    const min = String(date.getUTCMinutes()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}_${hh}${min}`;
   }
 }

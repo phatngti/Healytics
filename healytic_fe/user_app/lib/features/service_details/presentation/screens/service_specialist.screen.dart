@@ -295,6 +295,7 @@ class _ServiceSpecialistBody
                 employeeId: specialists[
                         selectedSpecialistIdx]
                     .id,
+                currentServiceId: serviceId,
                 selectedDate: DateTime.now().add(
                   Duration(days: selectedDateIdx),
                 ),

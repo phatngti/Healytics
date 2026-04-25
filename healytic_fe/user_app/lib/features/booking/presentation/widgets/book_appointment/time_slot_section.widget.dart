@@ -2,10 +2,15 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
+import 'package:user_app/features/orders/domain/'
+    'entities/appointment.entity.dart';
+import 'package:user_app/features/orders/'
+    'presentation/providers/appointment.provider.dart';
 import '../../../domain/entities/time_slot.entity.dart';
 import '../../providers/booking.provider.dart';
 
@@ -22,6 +27,7 @@ class TimeSlotSection extends ConsumerWidget {
   const TimeSlotSection({
     super.key,
     required this.employeeId,
+    required this.currentServiceId,
     required this.selectedDate,
     required this.selectedIndex,
     required this.onSelected,
@@ -29,6 +35,11 @@ class TimeSlotSection extends ConsumerWidget {
 
   /// Employee whose schedule to fetch.
   final String employeeId;
+
+  /// Service selected in Step 1.
+  /// Used for conflict detection against
+  /// existing bookings.
+  final String? currentServiceId;
 
   /// Date selected in the date picker row.
   final DateTime selectedDate;
@@ -47,6 +58,11 @@ class TimeSlotSection extends ConsumerWidget {
     final timeSlotsAsync = ref.watch(
       employeeTimeSlotsProvider(employeeId, date: dateStr),
     );
+
+    // Load upcoming appointments for conflict
+    // detection (fire-and-forget — does not
+    // block the slot grid from rendering).
+    final upcomingAppointments = ref.watch(appointmentsProvider);
 
     return timeSlotsAsync.when(
       loading: () => _buildLoading(context),
@@ -71,6 +87,20 @@ class TimeSlotSection extends ConsumerWidget {
           }
         }
 
+        // Resolved upcoming list (empty when
+        // still loading or on error).
+        final existing = upcomingAppointments.value ?? [];
+
+        void handleSlotTap(int index, String label) {
+          _onSlotTapped(
+            context: context,
+            slotTime: daySlots[index].time,
+            slotLabel: label,
+            slotIndex: index,
+            existingAppointments: existing,
+          );
+        }
+
         return Column(
           children: [
             if (morning.isNotEmpty)
@@ -79,7 +109,7 @@ class TimeSlotSection extends ConsumerWidget {
                 label: 'Morning',
                 slots: morning,
                 selectedIndex: selectedIndex,
-                onSlotSelected: onSelected,
+                onSlotSelected: handleSlotTap,
               ),
             if (morning.isNotEmpty && afternoon.isNotEmpty)
               SizedBox(height: AppDimens.spaceXxl),
@@ -89,7 +119,7 @@ class TimeSlotSection extends ConsumerWidget {
                 label: 'Afternoon',
                 slots: afternoon,
                 selectedIndex: selectedIndex,
-                onSlotSelected: onSelected,
+                onSlotSelected: handleSlotTap,
               ),
           ],
         );
@@ -118,6 +148,178 @@ class TimeSlotSection extends ConsumerWidget {
   bool _isMorning(String time24) {
     final hour = int.tryParse(time24.split(':').first) ?? 0;
     return hour < 12;
+  }
+
+  // ─── Conflict detection ───────────────────────
+
+  /// Handles a slot tap. Checks for scheduling
+  /// conflicts before forwarding to [onSelected].
+  void _onSlotTapped({
+    required BuildContext context,
+    required String slotTime,
+    required String slotLabel,
+    required int slotIndex,
+    required List<AppointmentEntity> existingAppointments,
+  }) {
+    final conflict = _findConflict(
+      slotTime: slotTime,
+      appointments: existingAppointments,
+    );
+
+    if (conflict != null) {
+      _showConflictDialog(
+        context: context,
+        conflict: conflict,
+        onContinue: () => onSelected(slotIndex, slotLabel),
+      );
+    } else {
+      onSelected(slotIndex, slotLabel);
+    }
+  }
+
+  /// Returns the first conflicting appointment
+  /// (same date + check-in time, but different
+  /// specialist or service), or null.
+  AppointmentEntity? _findConflict({
+    required String slotTime,
+    required List<AppointmentEntity> appointments,
+  }) {
+    final dateStr = DateFormat('yyyy-MM-dd').format(selectedDate);
+
+    for (final apt in appointments) {
+      // Only active bookings conflict.
+      final status = apt.status.toLowerCase();
+      if (status != 'upcoming' && status != 'pending_payment') {
+        continue;
+      }
+
+      // Match by date.
+      final aptDate = DateFormat('yyyy-MM-dd').format(apt.date);
+      if (aptDate != dateStr) continue;
+
+      // Match by check-in time (HH:mm).
+      if (!_timeMatches(apt.checkInTime, slotTime)) {
+        continue;
+      }
+
+      // Conflict only when specialist or
+      // service differs.
+      final sameSpecialist = apt.specialistId == employeeId;
+      final sameService = apt.serviceId == currentServiceId;
+      if (!sameSpecialist || !sameService) {
+        return apt;
+      }
+    }
+    return null;
+  }
+
+  /// Compares two time strings that may be in
+  /// HH:mm (24h) or h:mm AM/PM (12h) format.
+  bool _timeMatches(String checkInTime, String slotTime24) {
+    // Normalize check-in to HH:mm.
+    final normalized = _normalizeTo24h(checkInTime);
+    return normalized == slotTime24;
+  }
+
+  /// Best-effort conversion of 12h or 24h
+  /// time string to HH:mm.
+  String _normalizeTo24h(String raw) {
+    final trimmed = raw.trim().toUpperCase();
+
+    // Already HH:mm 24h format?
+    if (!trimmed.contains('AM') && !trimmed.contains('PM')) {
+      return trimmed.substring(0, 5);
+    }
+
+    // Parse 12h → 24h.
+    try {
+      final parsed = DateFormat('h:mm a').parse(trimmed);
+      return DateFormat('HH:mm').format(parsed);
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  /// Shows a warning dialog informing the user
+  /// about the scheduling conflict.
+  void _showConflictDialog({
+    required BuildContext context,
+    required AppointmentEntity conflict,
+    required VoidCallback onContinue,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: AppDimens.radiusMedium),
+        icon: Icon(
+          Symbols.warning_rounded,
+          color: colorScheme.error,
+          size: AppDimens.avatarSm,
+        ),
+        title: Text(
+          'Schedule Conflict',
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'You already have a booking at '
+              'this time:',
+              style: textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: AppDimens.spaceMd),
+            _ConflictInfoCard(conflict: conflict),
+          ],
+        ),
+        actionsPadding: EdgeInsets.fromLTRB(
+          AppDimens.spaceLg,
+          0,
+          AppDimens.spaceLg,
+          AppDimens.spaceLg,
+        ),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => context.pop(),
+                  child: Text(
+                    'Cancel',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              SizedBox(width: AppDimens.spaceMd),
+              Expanded(
+                child: FilledButton(
+                  onPressed: () {
+                    context.pop();
+                    onContinue();
+                  },
+                  child: Text(
+                    'Continue Anyway',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildLoading(BuildContext context) {
@@ -181,6 +383,86 @@ class TimeSlotSection extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Compact card displaying the conflicting
+/// appointment's details inside the warning
+/// dialog.
+class _ConflictInfoCard extends StatelessWidget {
+  const _ConflictInfoCard({required this.conflict});
+
+  final AppointmentEntity conflict;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(AppDimens.spaceMd),
+      decoration: BoxDecoration(
+        color: colorScheme.errorContainer.withValues(alpha: 0.3),
+        borderRadius: AppDimens.radiusMediumSmall,
+        border: Border.all(color: colorScheme.error.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Service name
+          Text(
+            conflict.serviceName,
+            style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(height: AppDimens.spaceXxs),
+
+          // Specialist
+          Row(
+            children: [
+              Icon(
+                Symbols.person,
+                size: AppDimens.iconSm,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              SizedBox(width: AppDimens.spaceXxs),
+              Expanded(
+                child: Text(
+                  conflict.specialistName,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: AppDimens.spaceXxs),
+
+          // Time
+          Row(
+            children: [
+              Icon(
+                Symbols.schedule,
+                size: AppDimens.iconSm,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              SizedBox(width: AppDimens.spaceXxs),
+              Text(
+                '${conflict.checkInTime}'
+                ' – ${conflict.checkOutTime}',
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -251,10 +533,8 @@ class _PeriodGroup extends StatelessWidget {
                     isSelected: indexed.index == selectedIndex,
                     isDisabled: !indexed.slot.isAvailable,
                     onTap: indexed.slot.isAvailable
-                        ? () => onSlotSelected(
-                              indexed.index,
-                              indexed.slot.label,
-                            )
+                        ? () =>
+                              onSlotSelected(indexed.index, indexed.slot.label)
                         : null,
                   ),
                 );

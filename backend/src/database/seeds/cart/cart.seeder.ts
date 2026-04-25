@@ -22,19 +22,19 @@ const SEED_CART_ITEMS: SeedCartItem[] = [
   {
     userEmail: 'user@healytics.vn',
     serviceSlug: 'full-body-massage-60-min',
-    employeeEmail: 'doctor.a@healytics.com',
+    employeeEmail: 'therapist.mitchell@healytics.vn', // EMP-002 (primary)
     timeSlot: '2026-04-10T09:00:00.000Z',
   },
   {
     userEmail: 'user@healytics.vn',
     serviceSlug: 'neck-shoulder-therapy',
-    employeeEmail: 'doctor.a@healytics.com',
+    employeeEmail: 'doctor.anderson@healytics.vn', // EMP-001 (primary)
     timeSlot: '2026-04-10T10:00:00.000Z',
   },
   {
     userEmail: 'user@healytics.vn',
     serviceSlug: 'basic-facial-care-package',
-    employeeEmail: 'doctor.a@healytics.com',
+    employeeEmail: 'therapist.mitchell@healytics.vn', // EMP-002 (primary)
     timeSlot: '2026-04-11T09:00:00.000Z',
   },
 ];

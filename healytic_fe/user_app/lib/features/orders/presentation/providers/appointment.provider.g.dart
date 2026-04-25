@@ -20,7 +20,10 @@ const filteredAppointmentsProvider = FilteredAppointmentsNotifierProvider._();
 /// server-side filtering.
 final class FilteredAppointmentsNotifierProvider
     extends
-        $AsyncNotifierProvider<FilteredAppointmentsNotifier, List<AppointmentEntity>> {
+        $AsyncNotifierProvider<
+          FilteredAppointmentsNotifier,
+          List<AppointmentEntity>
+        > {
   /// Fetches appointments filtered by the current
   /// tab (status) and category selection using
   /// server-side filtering.
@@ -44,7 +47,7 @@ final class FilteredAppointmentsNotifierProvider
 }
 
 String _$filteredAppointmentsNotifierHash() =>
-    r'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
+    r'd6579a03251cdb39d23a021a90dec3b88c98025d';
 
 /// Fetches appointments filtered by the current
 /// tab (status) and category selection using
@@ -77,6 +80,58 @@ abstract class _$FilteredAppointmentsNotifier
     element.handleValue(ref, created);
   }
 }
+
+/// Legacy-compatible alias. Widgets that still
+/// reference [appointmentsProvider] will get the
+/// same filtered data.
+
+@ProviderFor(appointments)
+const appointmentsProvider = AppointmentsProvider._();
+
+/// Legacy-compatible alias. Widgets that still
+/// reference [appointmentsProvider] will get the
+/// same filtered data.
+
+final class AppointmentsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<AppointmentEntity>>,
+          List<AppointmentEntity>,
+          FutureOr<List<AppointmentEntity>>
+        >
+    with
+        $FutureModifier<List<AppointmentEntity>>,
+        $FutureProvider<List<AppointmentEntity>> {
+  /// Legacy-compatible alias. Widgets that still
+  /// reference [appointmentsProvider] will get the
+  /// same filtered data.
+  const AppointmentsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'appointmentsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$appointmentsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<AppointmentEntity>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<AppointmentEntity>> create(Ref ref) {
+    return appointments(ref);
+  }
+}
+
+String _$appointmentsHash() => r'772751a7e9f12b167c6e6dfad2a13550db603b0d';
 
 /// Fetches appointment category filters.
 
@@ -354,59 +409,6 @@ abstract class _$SelectedViewLayoutNotifier
     element.handleValue(ref, created);
   }
 }
-
-/// Legacy-compatible alias. Widgets that still
-/// reference [appointmentsProvider] will get the
-/// same filtered data.
-
-@ProviderFor(appointments)
-const appointmentsProvider = AppointmentsProvider._();
-
-/// Legacy-compatible alias. Widgets that still
-/// reference [appointmentsProvider] will get the
-/// same filtered data.
-
-final class AppointmentsProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<List<AppointmentEntity>>,
-          List<AppointmentEntity>,
-          FutureOr<List<AppointmentEntity>>
-        >
-    with
-        $FutureModifier<List<AppointmentEntity>>,
-        $FutureProvider<List<AppointmentEntity>> {
-  /// Legacy-compatible alias. Widgets that still
-  /// reference [appointmentsProvider] will get the
-  /// same filtered data.
-  const AppointmentsProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'appointmentsProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$appointmentsHash();
-
-  @$internal
-  @override
-  $FutureProviderElement<List<AppointmentEntity>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<AppointmentEntity>> create(Ref ref) {
-    return appointments(ref);
-  }
-}
-
-String _$appointmentsHash() =>
-    r'b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1';
 
 /// Fetches a single appointment by its [id].
 

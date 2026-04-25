@@ -251,11 +251,9 @@ class AppTheme {
       cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
     );
     return base.copyWith(
-      scaffoldBackgroundColor: base.colorScheme.surfaceBright.withValues(
-        alpha: 0.8,
-      ),
+      scaffoldBackgroundColor: base.colorScheme.surface,
       appBarTheme: AppBarTheme(
-        backgroundColor: base.colorScheme.surfaceBright.withValues(alpha: 0.8),
+        backgroundColor: base.colorScheme.surface,
         surfaceTintColor: Colors.transparent,
       ),
       extensions: <ThemeExtension<dynamic>>[

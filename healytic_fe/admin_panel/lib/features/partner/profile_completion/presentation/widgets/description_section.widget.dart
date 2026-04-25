@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:admin_panel/features/partner/profile_completion/presentation/widgets/clinic_identity_card.widget.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
-/// Description section with a multi-line text field,
-/// summary card and an explicit edit action.
-class DescriptionSectionWidget extends StatelessWidget {
+/// Description section with a rich-text Quill
+/// viewer, summary card and an explicit edit action.
+///
+/// The [description] value may be Quill Delta JSON
+/// (a serialized list of ops) or legacy plain text.
+class DescriptionSectionWidget extends StatefulWidget {
   const DescriptionSectionWidget({
     required this.description,
     required this.showValidationErrors,
@@ -25,12 +31,86 @@ class DescriptionSectionWidget extends StatelessWidget {
   final VoidCallback onEdit;
 
   @override
+  State<DescriptionSectionWidget> createState() =>
+      _DescriptionSectionWidgetState();
+}
+
+class _DescriptionSectionWidgetState
+    extends State<DescriptionSectionWidget> {
+  QuillController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _initController();
+  }
+
+  @override
+  void didUpdateWidget(DescriptionSectionWidget old) {
+    super.didUpdateWidget(old);
+    if (widget.description != old.description) {
+      _controller?.dispose();
+      _initController();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  // ── Helpers ─────────────────────────────────
+
+  void _initController() {
+    final content =
+        _tryParseQuillContent(widget.description);
+    if (content != null) {
+      _controller = QuillController(
+        document: Document.fromJson(content),
+        selection:
+            const TextSelection.collapsed(offset: 0),
+      );
+      _controller!.readOnly = true;
+    } else {
+      _controller = null;
+    }
+  }
+
+  /// Parses a raw string into Quill Delta ops.
+  ///
+  /// Returns `null` when empty. Non-JSON strings are
+  /// wrapped in a minimal Delta for plain-text display.
+  static List<Map<String, dynamic>>?
+      _tryParseQuillContent(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return null;
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List && decoded.isNotEmpty) {
+        return decoded
+            .map(
+              (e) =>
+                  Map<String, dynamic>.from(e as Map),
+            )
+            .toList();
+      }
+      return null;
+    } on FormatException {
+      return <Map<String, dynamic>>[
+        {'insert': '$raw\n'},
+      ];
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final hasDescription = description.isNotEmpty;
-    final isTooShort = trimmedLength < minLength;
+    final hasDescription = widget.description.isNotEmpty;
+    final isTooShort = widget.trimmedLength < widget.minLength;
     final isInvalid =
-        showValidationErrors && (trimmedLength == 0 || isTooShort);
+        widget.showValidationErrors &&
+        (widget.trimmedLength == 0 || isTooShort);
 
     return SectionCardWidget(
       title: 'About clinic',
@@ -40,9 +120,17 @@ class DescriptionSectionWidget extends StatelessWidget {
           'positioning, specialties, and care '
           'experience.',
       trailing: FilledButton.tonalIcon(
-        onPressed: onEdit,
-        icon: Icon(hasDescription ? Icons.edit_outlined : Icons.add_rounded),
-        label: Text(hasDescription ? 'Edit description' : 'Add description'),
+        onPressed: widget.onEdit,
+        icon: Icon(
+          hasDescription
+              ? Icons.edit_outlined
+              : Icons.add_rounded,
+        ),
+        label: Text(
+          hasDescription
+              ? 'Edit description'
+              : 'Add description',
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,13 +153,27 @@ class DescriptionSectionWidget extends StatelessWidget {
                     : colorScheme.outlineVariant,
               ),
             ),
-            child: hasDescription
+            child: hasDescription && _controller != null
+                ? QuillEditor(
+                    controller: _controller!,
+                    focusNode:
+                        FocusNode(canRequestFocus: false),
+                    scrollController: ScrollController(),
+                    config: const QuillEditorConfig(
+                      showCursor: false,
+                      autoFocus: false,
+                      expands: false,
+                      padding: EdgeInsets.zero,
+                    ),
+                  )
+                : hasDescription
                 ? Text(
-                    description,
+                    widget.description,
                     style: Theme.of(context).textTheme.bodyLarge,
                   )
                 : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
                       Icon(
                         Icons.notes_rounded,
@@ -81,20 +183,30 @@ class DescriptionSectionWidget extends StatelessWidget {
                       Text(
                         'No clinic description '
                         'added yet.',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
                       const SizedBox(
-                        height: AppDimens.spaceXs + AppDimens.spaceXxs,
+                        height:
+                            AppDimens.spaceXs +
+                            AppDimens.spaceXxs,
                       ),
                       Text(
                         'Add a short profile summary '
                         'to explain specialties, '
                         'patient experience, and '
                         'care approach.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(
+                              color:
+                                  colorScheme.onSurfaceVariant,
+                            ),
                       ),
                     ],
                   ),
@@ -103,27 +215,30 @@ class DescriptionSectionWidget extends StatelessWidget {
           Row(
             children: [
               Icon(
-                isDescriptionValid
+                widget.isDescriptionValid
                     ? Icons.check_circle_rounded
                     : Icons.edit_note_rounded,
                 size: AppDimens.iconSmMd,
-                color: isDescriptionValid
+                color: widget.isDescriptionValid
                     ? colorScheme.primary
                     : colorScheme.onSurfaceVariant,
               ),
               AppDimens.horizontalSmall,
               Text(
-                isDescriptionValid
+                widget.isDescriptionValid
                     ? 'Description is ready '
                           'for publishing.'
-                    : trimmedLength == 0
+                    : widget.trimmedLength == 0
                     ? 'Description required. '
-                          'Target $minLength-'
-                          '$maxLength characters.'
-                    : '$trimmedLength/$minLength '
+                          'Target ${widget.minLength}-'
+                          '${widget.maxLength} characters.'
+                    : '${widget.trimmedLength}/${widget.minLength} '
                           'minimum characters',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isDescriptionValid
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(
+                  color: widget.isDescriptionValid
                       ? colorScheme.primary
                       : colorScheme.onSurfaceVariant,
                 ),
@@ -134,8 +249,11 @@ class DescriptionSectionWidget extends StatelessWidget {
             AppDimens.verticalSmall,
             Text(
               'Description must be at least '
-              '$minLength characters.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              '${widget.minLength} characters.',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(
                 color: colorScheme.error,
                 fontWeight: FontWeight.w600,
               ),

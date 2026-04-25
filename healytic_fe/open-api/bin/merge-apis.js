@@ -32,9 +32,10 @@ function mergeInto(sourceArg, targetArg) {
     const target = JSON.parse(fs.readFileSync(targetPath, 'utf8'));
 
     let addedPaths = 0;
-    let skippedPaths = 0;
+    let replacedPaths = 0;
     let addedSchemas = 0;
-    let skippedSchemas = 0;
+    let replacedSchemas = 0;
+    let identicalSchemas = 0;
 
     // --- Merge paths ---
     if (!target.paths) target.paths = {};
@@ -44,8 +45,9 @@ function mergeInto(sourceArg, targetArg) {
             console.log('  + path:', pathKey);
             addedPaths++;
         } else {
-            console.log('  ~ skipped path (duplicate):', pathKey);
-            skippedPaths++;
+            target.paths[pathKey] = methods;
+            console.log('  ⟳ replaced path:', pathKey);
+            replacedPaths++;
         }
     }
 
@@ -57,9 +59,13 @@ function mergeInto(sourceArg, targetArg) {
             target.components.schemas[name] = schema;
             console.log('  + schema:', name);
             addedSchemas++;
+        } else if (JSON.stringify(target.components.schemas[name]) === JSON.stringify(schema)) {
+            console.log('  = schema (identical):', name);
+            identicalSchemas++;
         } else {
-            console.log('  ~ skipped schema (duplicate):', name);
-            skippedSchemas++;
+            target.components.schemas[name] = schema;
+            console.log('  ⟳ replaced schema:', name);
+            replacedSchemas++;
         }
     }
 
@@ -94,8 +100,8 @@ function mergeInto(sourceArg, targetArg) {
 
     console.log('');
     console.log(`Merge complete: ${sourceArg} → ${targetArg}`);
-    console.log(`  Paths:   ${addedPaths} added, ${skippedPaths} skipped`);
-    console.log(`  Schemas: ${addedSchemas} added, ${skippedSchemas} skipped`);
+    console.log(`  Paths:   ${addedPaths} added, ${replacedPaths} replaced`);
+    console.log(`  Schemas: ${addedSchemas} added, ${replacedSchemas} replaced, ${identicalSchemas} identical`);
 }
 
 function main() {

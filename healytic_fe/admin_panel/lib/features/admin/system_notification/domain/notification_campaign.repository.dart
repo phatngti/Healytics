@@ -25,6 +25,11 @@ abstract class NotificationCampaignRepository {
     NotificationSchedule schedule,
   );
 
+  Future<NotificationCampaign> sendBroadcast({
+    required String title,
+    required String body,
+  });
+
   Future<List<NotificationSegment>> listSegments();
 
   Future<int?> estimateAudience(NotificationAudience audience);

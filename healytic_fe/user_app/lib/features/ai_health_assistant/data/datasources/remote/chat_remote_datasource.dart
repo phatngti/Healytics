@@ -35,8 +35,10 @@ abstract class ChatRemoteDatasource {
   /// conversation.
   Stream<ChatSseEvent> sendMessageAndStream(
     String? conversationId,
-    String text,
-  );
+    String text, {
+    double? currentLat,
+    double? currentLng,
+  });
 }
 
 /// Real implementation backed by [ChatbotApi]
@@ -152,14 +154,26 @@ class ChatRemoteDatasourceImpl
   @override
   Stream<ChatSseEvent> sendMessageAndStream(
     String? conversationId,
-    String text,
-  ) async* {
+    String text, {
+    double? currentLat,
+    double? currentLng,
+  }) async* {
     final userId = _extractUserId();
 
     final body = ChatbotRequest(
       conversationId: conversationId,
       userId: userId,
       message: text,
+      currentLat: currentLat != null
+          ? num.parse(
+              currentLat.toStringAsFixed(6),
+            )
+          : null,
+      currentLng: currentLng != null
+          ? num.parse(
+              currentLng.toStringAsFixed(6),
+            )
+          : null,
     ).toJson();
 
     _log.info(
@@ -253,8 +267,10 @@ class ChatRemoteDatasourceMock
   @override
   Stream<ChatSseEvent> sendMessageAndStream(
     String? conversationId,
-    String text,
-  ) async* {
+    String text, {
+    double? currentLat,
+    double? currentLng,
+  }) async* {
     final mockConvId = conversationId ?? 'mock-conv-1';
 
     // 1. First text segment (token-by-token).

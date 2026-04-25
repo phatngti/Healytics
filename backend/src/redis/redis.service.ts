@@ -52,6 +52,19 @@ export class RedisService implements OnModuleDestroy {
     return this.redis.ttl(key);
   }
 
+  /**
+   * Validate that a lock is still held with the expected token.
+   * Returns true if the key exists and its value matches the given token.
+   */
+  async validateLock(key: string, expectedToken: string): Promise<boolean> {
+    const currentValue = await this.redis.get(key);
+    const valid = currentValue === expectedToken;
+    this.logger.debug(
+      `Lock validation ${valid ? 'OK' : 'FAILED'}: ${key} (expected=${expectedToken}, actual=${currentValue ?? 'null'})`,
+    );
+    return valid;
+  }
+
   // ── Generic Redis operations ────────────────────────────────
 
   async get(key: string): Promise<string | null> {

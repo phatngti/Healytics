@@ -1,13 +1,14 @@
 import 'dart:math' as math;
 
+import 'package:admin_openapi/api.dart';
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/providers/api.provider.dart';
+import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/common/widgets/analytics/analytics_status_badge.widget.dart';
 import 'package:admin_panel/features/partner/dashboard/domain/dashboard_time_period.dart';
 import 'package:admin_panel/features/partner/products/data/data/product_mock_data.dart';
-import 'package:admin_panel/features/partner/products/data/product_impl.repository.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
-import 'package:admin_panel/features/partner/products/domain/product.repository.dart';
 import 'package:admin_panel/features/partner/products/domain/product_analytics.entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -24,19 +25,35 @@ abstract class ProductAnalyticsRemoteDataSource {
   });
 }
 
+/// Real implementation using the Partner Health
+/// Services Analytics API.
 class ProductAnalyticsRemoteDataSourceImpl
     implements ProductAnalyticsRemoteDataSource {
-  ProductAnalyticsRemoteDataSourceImpl({required ProductRepository repository})
-    : _repository = repository;
+  ProductAnalyticsRemoteDataSourceImpl({
+    required this.apiService,
+  });
 
-  final ProductRepository _repository;
+  final ApiService apiService;
+
+  PartnerHealthServicesApi get _api =>
+      apiService.partnerHealthServicesApi;
 
   @override
   Future<ProductOverviewAnalytics> getOverviewAnalytics({
     required DashboardTimePeriod period,
   }) async {
-    final products = await _loadProducts();
-    return _buildOverviewAnalytics(products, period);
+    final response = await _api
+        .partnerHealthServiceControllerGetOverviewAnalytics(
+      period: period.value,
+    );
+
+    if (response == null) {
+      throw Exception(
+        'Failed to load overview analytics',
+      );
+    }
+
+    return _mapOverviewResponse(response);
   }
 
   @override
@@ -44,19 +61,19 @@ class ProductAnalyticsRemoteDataSourceImpl
     required ProductId productId,
     required DashboardTimePeriod period,
   }) async {
-    final product = await _repository.getProductById(productId);
-    final products = await _loadProducts();
-    return _buildDetailAnalytics(
-      product: product,
-      products: products,
-      period: period,
+    final response = await _api
+        .partnerHealthServiceControllerGetDetailAnalytics(
+      productId.value.toString(),
+      period: period.value,
     );
-  }
 
-  Future<List<Product>> _loadProducts() async {
-    final totalRows = await _repository.getTotalRows();
-    final count = totalRows == 0 ? 1 : totalRows;
-    return _repository.getProducts(0, count, null, null);
+    if (response == null) {
+      throw Exception(
+        'Failed to load detail analytics',
+      );
+    }
+
+    return _mapDetailResponse(response);
   }
 }
 
@@ -87,15 +104,197 @@ class ProductAnalyticsRemoteDataSourceMock
 }
 
 @riverpod
-ProductAnalyticsRemoteDataSource productAnalyticsRemoteDataSource(Ref ref) {
+ProductAnalyticsRemoteDataSource
+    productAnalyticsRemoteDataSource(Ref ref) {
   final isMock = Store.get(StoreKey.mockFlag, false);
   if (isMock) {
     return ProductAnalyticsRemoteDataSourceMock();
   }
-
-  final repository = ref.read(productRepositoryProvider);
-  return ProductAnalyticsRemoteDataSourceImpl(repository: repository);
+  final apiService = ref.read(apiServiceProvider);
+  return ProductAnalyticsRemoteDataSourceImpl(
+    apiService: apiService,
+  );
 }
+
+// ── DTO → Entity Mappers ────────────────────────
+
+ProductOverviewAnalytics _mapOverviewResponse(
+  HealthServiceOverviewAnalyticsResponseDto dto,
+) {
+  return ProductOverviewAnalytics(
+    totalProducts: dto.totalProducts.toInt(),
+    activeProducts: dto.activeProducts.toInt(),
+    bookings: dto.bookings.toInt(),
+    bookingsDelta: dto.bookingsDelta.toDouble(),
+    revenue: dto.revenue.toDouble(),
+    revenueDelta: dto.revenueDelta.toDouble(),
+    averageRating: dto.averageRating.toDouble(),
+    ratingDelta: dto.ratingDelta.toDouble(),
+    reviewCount: dto.reviewCount.toInt(),
+    bookingMetrics: _mapBookingMetricsDto(
+      dto.bookingMetrics,
+    ),
+    trendPoints: dto.trendPoints
+        .map(_mapTrendPointDto)
+        .toList(),
+    categoryPerformance: dto.categoryPerformance
+        .map(_mapCategoryPerformanceDto)
+        .toList(),
+    topServices: dto.topServices
+        .map(_mapServicePerformanceDto)
+        .toList(),
+  );
+}
+
+ProductDetailAnalytics _mapDetailResponse(
+  HealthServiceDetailAnalyticsResponseDto dto,
+) {
+  return ProductDetailAnalytics(
+    productId: ProductId(dto.productId),
+    bookings: dto.bookings.toInt(),
+    bookingsDelta: dto.bookingsDelta.toDouble(),
+    revenue: dto.revenue.toDouble(),
+    revenueDelta: dto.revenueDelta.toDouble(),
+    completionRate: dto.completionRate.toDouble(),
+    completionRateDelta:
+        dto.completionRateDelta.toDouble(),
+    averageRating: dto.averageRating.toDouble(),
+    reviewCount: dto.reviewCount.toInt(),
+    trendPoints: dto.trendPoints
+        .map(_mapTrendPointDto)
+        .toList(),
+    reviewDistribution: dto.reviewDistribution
+        .map(_mapReviewBucketDto)
+        .toList(),
+    operationalMetrics: dto.operationalMetrics
+        .map(_mapOperationalMetricDto)
+        .toList(),
+    peerRanking: dto.peerRanking
+        .map(_mapServicePerformanceDto)
+        .toList(),
+    alerts: dto.alerts
+        .map(_mapAlertDto)
+        .toList(),
+  );
+}
+
+ProductBookingMetricsSummary _mapBookingMetricsDto(
+  AnalyticsBookingMetricsDto dto,
+) {
+  return ProductBookingMetricsSummary(
+    totalBookings: dto.totalBookings.toInt(),
+    delayedBookings: dto.delayedBookings.toInt(),
+    delayThresholdMinutes:
+        dto.delayThresholdMinutes.toInt(),
+    pendingBookings: dto.pendingBookings.toInt(),
+    completedBookings: dto.completedBookings.toInt(),
+    statusBreakdown: dto.statusBreakdown
+        .map(_mapStatusBreakdownDto)
+        .toList(),
+    alerts: dto.alerts.map(_mapAlertDto).toList(),
+  );
+}
+
+ProductBookingStatusMetric _mapStatusBreakdownDto(
+  BookingStatusBreakdownDto dto,
+) {
+  return ProductBookingStatusMetric(
+    statusKey: dto.statusKey,
+    label: dto.label,
+    count: dto.count.toInt(),
+    tone: _parseStatusTone(dto.statusKey),
+  );
+}
+
+ProductTrendPoint _mapTrendPointDto(
+  AnalyticsTrendPointDto dto,
+) {
+  return ProductTrendPoint(
+    label: dto.label,
+    bookings: dto.bookings.toDouble(),
+    revenue: dto.revenue.toDouble(),
+  );
+}
+
+ProductCategoryPerformance _mapCategoryPerformanceDto(
+  AnalyticsCategoryPerformanceDto dto,
+) {
+  return ProductCategoryPerformance(
+    categoryName: dto.categoryName,
+    bookings: dto.bookings.toInt(),
+    revenue: dto.revenue.toDouble(),
+    averageRating: dto.averageRating.toDouble(),
+  );
+}
+
+ProductServicePerformance _mapServicePerformanceDto(
+  AnalyticsServicePerformanceDto dto,
+) {
+  return ProductServicePerformance(
+    name: dto.name,
+    categoryName: dto.categoryName,
+    bookings: dto.bookings.toInt(),
+    revenue: dto.revenue.toDouble(),
+    averageRating: dto.averageRating.toDouble(),
+  );
+}
+
+ProductReviewBucket _mapReviewBucketDto(
+  AnalyticsReviewBucketDto dto,
+) {
+  return ProductReviewBucket(
+    stars: dto.stars.toInt(),
+    count: dto.count.toInt(),
+  );
+}
+
+ProductOperationalMetric _mapOperationalMetricDto(
+  AnalyticsOperationalMetricDto dto,
+) {
+  return ProductOperationalMetric(
+    label: dto.label,
+    value: dto.value,
+    detail: dto.detail,
+    tone: _parseToneEnum(dto.tone.value),
+  );
+}
+
+ProductAnalyticsAlert _mapAlertDto(
+  AnalyticsAlertDto dto,
+) {
+  return ProductAnalyticsAlert(
+    title: dto.title,
+    detail: dto.detail,
+    tone: _parseToneEnum(dto.tone.value),
+  );
+}
+
+/// Converts the generated enum's .value string
+/// to the domain [AnalyticsStatusTone].
+AnalyticsStatusTone _parseToneEnum(String value) {
+  return switch (value) {
+    'positive' => AnalyticsStatusTone.positive,
+    'warning' => AnalyticsStatusTone.warning,
+    'critical' => AnalyticsStatusTone.critical,
+    _ => AnalyticsStatusTone.neutral,
+  };
+}
+
+/// Derives tone from booking status key.
+/// [BookingStatusBreakdownDto] has no tone field.
+AnalyticsStatusTone _parseStatusTone(
+  String statusKey,
+) {
+  return switch (statusKey) {
+    'completed' => AnalyticsStatusTone.positive,
+    'confirmed' => AnalyticsStatusTone.positive,
+    'cancelled' => AnalyticsStatusTone.critical,
+    'no_show' => AnalyticsStatusTone.warning,
+    _ => AnalyticsStatusTone.neutral,
+  };
+}
+
+// ── Synthetic helpers (used by Mock) ────────────
 
 ProductOverviewAnalytics _buildOverviewAnalytics(
   List<Product> products,

@@ -40,19 +40,20 @@ Please follow the [installation procedure](#installation--usage) and then run th
 ```dart
 import 'package:admin_openapi/api.dart';
 
-// TODO Configure API key authorization: X-AI-API-Key
-//defaultApiClient.getAuthentication<ApiKeyAuth>('X-AI-API-Key').apiKey = 'YOUR_API_KEY';
-// uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-//defaultApiClient.getAuthentication<ApiKeyAuth>('X-AI-API-Key').apiKeyPrefix = 'Bearer';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
-final api_instance = AIRecommendationsApi();
-final aiRecommendationsRequestDto = AiRecommendationsRequestDto(); // AiRecommendationsRequestDto | 
+final api_instance = AccountApi();
 
 try {
-    final result = api_instance.aiServiceControllerGetRecommendations(aiRecommendationsRequestDto);
+    final result = api_instance.accountControllerGetMe();
     print(result);
 } catch (e) {
-    print('Exception when calling AIRecommendationsApi->aiServiceControllerGetRecommendations: $e\n');
+    print('Exception when calling AccountApi->accountControllerGetMe: $e\n');
 }
 
 ```
@@ -63,7 +64,6 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*AIRecommendationsApi* | [**aiServiceControllerGetRecommendations**](doc//AIRecommendationsApi.md#aiservicecontrollergetrecommendations) | **POST** /ai/recommendations | Get service recommendations by IDs
 *AccountApi* | [**accountControllerGetMe**](doc//AccountApi.md#accountcontrollergetme) | **GET** /account/me | Get current user account details
 *AccountApi* | [**accountControllerGetSurvey**](doc//AccountApi.md#accountcontrollergetsurvey) | **GET** /account/survey | Get current user survey
 *AccountApi* | [**accountControllerPostSurvey**](doc//AccountApi.md#accountcontrollerpostsurvey) | **POST** /account/survey | Create one-shot survey for current user
@@ -129,7 +129,9 @@ Class | Method | HTTP request | Description
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerCreate**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollercreate) | **POST** /partner/health-services | Create a new health service
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerFindAll**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollerfindall) | **GET** /partner/health-services | Get all health services
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerFindBySlug**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollerfindbyslug) | **GET** /partner/health-services/slug/{slug} | Get a health service by slug
+*PartnerHealthServicesApi* | [**partnerHealthServiceControllerGetDetailAnalytics**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollergetdetailanalytics) | **GET** /partner/health-services/analytics/{productId} | Get per-service detail analytics
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerGetDetails**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollergetdetails) | **GET** /partner/health-services/slug/{slug}/details | Get full health service details by slug
+*PartnerHealthServicesApi* | [**partnerHealthServiceControllerGetOverviewAnalytics**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollergetoverviewanalytics) | **GET** /partner/health-services/analytics/overview | Get health service overview analytics
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerRemove**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollerremove) | **DELETE** /partner/health-services/{id} | Delete a health service
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerUpdate**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollerupdate) | **PATCH** /partner/health-services/{id} | Update a health service
 *PartnerPartnersApi* | [**partnerSelfControllerGetMyProfile**](doc//PartnerPartnersApi.md#partnerselfcontrollergetmyprofile) | **GET** /partner/partners/me | Get own business profile
@@ -153,6 +155,7 @@ Class | Method | HTTP request | Description
 *S3Api* | [**s3ControllerDeleteFile**](doc//S3Api.md#s3controllerdeletefile) | **DELETE** /s3/{key} | Delete file
 *S3Api* | [**s3ControllerGetFileUrl**](doc//S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file URL
 *S3Api* | [**s3ControllerPreSign**](doc//S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload URL
+*StripeApi* | [**stripeWebhookControllerHandleStripeWebhook**](doc//StripeApi.md#stripewebhookcontrollerhandlestripewebhook) | **POST** /stripe/webhook | Stripe webhook callback (server-to-server)
 *UserAppointmentsApi* | [**userAppointmentControllerGetAppointment**](doc//UserAppointmentsApi.md#userappointmentcontrollergetappointment) | **GET** /user/appointments/{id} | Get appointment details by ID
 *UserAppointmentsApi* | [**userAppointmentControllerGetServiceManual**](doc//UserAppointmentsApi.md#userappointmentcontrollergetservicemanual) | **GET** /user/appointments/{appointmentId}/manual | Get service manual for an appointment
 *UserAppointmentsApi* | [**userAppointmentControllerListAppointments**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistappointments) | **GET** /user/appointments | List all user appointments with optional distance calculation
@@ -193,7 +196,9 @@ Class | Method | HTTP request | Description
 *UserNotificationsApi* | [**userNotificationControllerMarkAllRead**](doc//UserNotificationsApi.md#usernotificationcontrollermarkallread) | **PATCH** /user/notifications/read-all | Mark all notifications as read
 *UserNotificationsApi* | [**userNotificationControllerMarkRead**](doc//UserNotificationsApi.md#usernotificationcontrollermarkread) | **PATCH** /user/notifications/{id}/read | Mark a specific notification as read
 *UserPaymentsApi* | [**userPaymentControllerCreateMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollercreatemomopayment) | **POST** /user/payments/momo/{bookingId} | Create MoMo payment for booking
+*UserPaymentsApi* | [**userPaymentControllerCreateStripePayment**](doc//UserPaymentsApi.md#userpaymentcontrollercreatestripepayment) | **POST** /user/payments/stripe/{bookingId} | Create Stripe payment for booking (card)
 *UserPaymentsApi* | [**userPaymentControllerRefundMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundmomopayment) | **POST** /user/payments/momo/{bookingId}/refund | Request MoMo refund for booking
+*UserPaymentsApi* | [**userPaymentControllerRefundStripePayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundstripepayment) | **POST** /user/payments/stripe/{bookingId}/refund | Request Stripe refund for booking
 *UserReviewsApi* | [**userReviewControllerSubmitSpecialistReview**](doc//UserReviewsApi.md#userreviewcontrollersubmitspecialistreview) | **POST** /user/reviews/specialist | Submit a specialist review for a completed appointment
 *UserReviewsApi* | [**userReviewControllerSubmitTreatmentReview**](doc//UserReviewsApi.md#userreviewcontrollersubmittreatmentreview) | **POST** /user/reviews/treatment | Submit a treatment review for a completed appointment
 *UserSlotsApi* | [**slotsControllerCheckDuplicateSlot**](doc//UserSlotsApi.md#slotscontrollercheckduplicateslot) | **POST** /user/slots/check-duplicate | Check if the user already has a booking at the same datetime
@@ -211,8 +216,13 @@ Class | Method | HTTP request | Description
  - [AdminLoginDto](doc//AdminLoginDto.md)
  - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
  - [AiRecommendationItemDto](doc//AiRecommendationItemDto.md)
- - [AiRecommendationsRequestDto](doc//AiRecommendationsRequestDto.md)
- - [AiRecommendationsResponseDto](doc//AiRecommendationsResponseDto.md)
+ - [AnalyticsAlertDto](doc//AnalyticsAlertDto.md)
+ - [AnalyticsBookingMetricsDto](doc//AnalyticsBookingMetricsDto.md)
+ - [AnalyticsCategoryPerformanceDto](doc//AnalyticsCategoryPerformanceDto.md)
+ - [AnalyticsOperationalMetricDto](doc//AnalyticsOperationalMetricDto.md)
+ - [AnalyticsReviewBucketDto](doc//AnalyticsReviewBucketDto.md)
+ - [AnalyticsServicePerformanceDto](doc//AnalyticsServicePerformanceDto.md)
+ - [AnalyticsTrendPointDto](doc//AnalyticsTrendPointDto.md)
  - [AppointmentCategoryResponseDto](doc//AppointmentCategoryResponseDto.md)
  - [AppointmentResponseDto](doc//AppointmentResponseDto.md)
  - [AppointmentStatus](doc//AppointmentStatus.md)
@@ -225,6 +235,7 @@ Class | Method | HTTP request | Description
  - [BookingServiceResponseDto](doc//BookingServiceResponseDto.md)
  - [BookingSpecialistResponseDto](doc//BookingSpecialistResponseDto.md)
  - [BookingStatus](doc//BookingStatus.md)
+ - [BookingStatusBreakdownDto](doc//BookingStatusBreakdownDto.md)
  - [BusinessInfo](doc//BusinessInfo.md)
  - [BusinessInfoDto](doc//BusinessInfoDto.md)
  - [BusinessServiceDto](doc//BusinessServiceDto.md)
@@ -280,6 +291,7 @@ Class | Method | HTTP request | Description
  - [DashboardStatsResponseDto](doc//DashboardStatsResponseDto.md)
  - [DayScheduleDto](doc//DayScheduleDto.md)
  - [DeleteFileResponseDto](doc//DeleteFileResponseDto.md)
+ - [DevicePlatform](doc//DevicePlatform.md)
  - [DistanceMatrixElementDto](doc//DistanceMatrixElementDto.md)
  - [DistanceMatrixResponseDto](doc//DistanceMatrixResponseDto.md)
  - [DistanceMatrixRowDto](doc//DistanceMatrixRowDto.md)
@@ -293,6 +305,8 @@ Class | Method | HTTP request | Description
  - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
  - [GeocodeResponseDto](doc//GeocodeResponseDto.md)
  - [GeocodeResultDto](doc//GeocodeResultDto.md)
+ - [HealthServiceDetailAnalyticsResponseDto](doc//HealthServiceDetailAnalyticsResponseDto.md)
+ - [HealthServiceOverviewAnalyticsResponseDto](doc//HealthServiceOverviewAnalyticsResponseDto.md)
  - [HealthServiceStatus](doc//HealthServiceStatus.md)
  - [HealthServiceType](doc//HealthServiceType.md)
  - [HomeRecommenderRequest](doc//HomeRecommenderRequest.md)
@@ -408,6 +422,8 @@ Class | Method | HTTP request | Description
  - [SpecialistInfoDto](doc//SpecialistInfoDto.md)
  - [SpecialistReviewResponseDto](doc//SpecialistReviewResponseDto.md)
  - [StaffScheduleEntryDto](doc//StaffScheduleEntryDto.md)
+ - [StripePaymentResponseDto](doc//StripePaymentResponseDto.md)
+ - [StripeRefundResponseDto](doc//StripeRefundResponseDto.md)
  - [SurveyDto](doc//SurveyDto.md)
  - [SurveyResponseDto](doc//SurveyResponseDto.md)
  - [TherapistProfileResponseDto](doc//TherapistProfileResponseDto.md)

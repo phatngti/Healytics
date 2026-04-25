@@ -77,6 +77,19 @@ class NetworkImageAuto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Guard against empty or whitespace-only URLs to
+    // prevent CachedNetworkImage from throwing
+    // "No host specified in URI".
+    if (imageUrl.trim().isEmpty) {
+      if (errorWidget != null) {
+        return errorWidget!(context);
+      }
+      return SizedBox(
+        width: width,
+        height: height,
+      );
+    }
+
     if (isSvgUrl(imageUrl)) {
       return SvgPicture(
         _CleanSvgNetworkLoader(imageUrl),

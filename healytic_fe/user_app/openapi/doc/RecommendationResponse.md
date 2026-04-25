@@ -8,7 +8,7 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**recommendations** | [**List<ServiceDetail>**](ServiceDetail.md) |  | [default to const []]
+**recommendations** | [**List<AiRecommendationItemDto>**](AiRecommendationItemDto.md) |  | [default to const []]
 **total** | **int** |  | 
 **timestamp** | **String** |  | 
 

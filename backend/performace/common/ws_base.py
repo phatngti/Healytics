@@ -27,6 +27,7 @@ from locust import task, between
 from locust.contrib.socketio import SocketIOUser
 
 from common.config import BASE_URL, MIN_WAIT, MAX_WAIT
+from models.auth_controller import AdminLoginDto, LoginDto, PartnerLoginDto
 
 logger = logging.getLogger(__name__)
 
@@ -111,11 +112,22 @@ class HealyticsSocketIOUser(SocketIOUser):
         if self.ws_login_fn is None:
             return None
 
-        # Use a simple requests session for the login call
+        # Build typed login payload per function name
+        from common import config
+
         login_map = {
-            "login_user": ("/auth/user/login", "common.config", "USER_EMAIL", "USER_PASSWORD"),
-            "login_partner": ("/auth/partner/login", "common.config", "PARTNER_EMAIL", "PARTNER_PASSWORD"),
-            "login_admin": ("/auth/admin/login", "common.config", "ADMIN_EMAIL", "ADMIN_PASSWORD"),
+            "login_user": (
+                "/auth/user/login",
+                lambda: LoginDto(email=config.USER_EMAIL, password=config.USER_PASSWORD),
+            ),
+            "login_partner": (
+                "/auth/partner/login",
+                lambda: PartnerLoginDto(email=config.PARTNER_EMAIL, password=config.PARTNER_PASSWORD),
+            ),
+            "login_admin": (
+                "/auth/admin/login",
+                lambda: AdminLoginDto(email=config.ADMIN_EMAIL, password=config.ADMIN_PASSWORD),
+            ),
         }
 
         fn_name = self.ws_login_fn.__name__
@@ -123,15 +135,13 @@ class HealyticsSocketIOUser(SocketIOUser):
             logger.error("Unknown login function: %s", fn_name)
             return None
 
-        path, module, email_var, pass_var = login_map[fn_name]
-        from common import config
-        email = getattr(config, email_var)
-        password = getattr(config, pass_var)
+        path, build_dto = login_map[fn_name]
+        payload = build_dto()
 
         try:
             resp = requests.post(
                 f"{BASE_URL}{path}",
-                json={"email": email, "password": password},
+                json=payload.to_dict(),
                 timeout=10,
             )
             if resp.status_code in (200, 201):

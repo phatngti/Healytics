@@ -67,6 +67,9 @@ String parameterToString(dynamic value) {
   if (value is ConversationStatus) {
     return ConversationStatusTypeTransformer().encode(value).toString();
   }
+  if (value is DevicePlatform) {
+    return DevicePlatformTypeTransformer().encode(value).toString();
+  }
   if (value is HealthServiceStatus) {
     return HealthServiceStatusTypeTransformer().encode(value).toString();
   }

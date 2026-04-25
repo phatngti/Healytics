@@ -225,6 +225,7 @@ class _EmployeeBookingScreenState
             hPad: hPad,
             sectionGap: sectionGap,
             specialists: specialists,
+            serviceId: widget.serviceId,
             selectedSpecialistIdx:
                 _selectedSpecialistIdx,
             selectedDateIdx: _selectedDateIdx,
@@ -256,6 +257,7 @@ class _EmployeeBookingBody
     required this.hPad,
     required this.sectionGap,
     required this.specialists,
+    required this.serviceId,
     required this.selectedSpecialistIdx,
     required this.selectedDateIdx,
     required this.selectedTimeSlotIdx,
@@ -269,6 +271,7 @@ class _EmployeeBookingBody
   final double hPad;
   final double sectionGap;
   final List<BookingSpecialist> specialists;
+  final String serviceId;
   final int selectedSpecialistIdx;
   final int selectedDateIdx;
   final int selectedTimeSlotIdx;
@@ -340,6 +343,7 @@ class _EmployeeBookingBody
                 employeeId: specialists[
                         selectedSpecialistIdx]
                     .id,
+                currentServiceId: serviceId,
                 selectedDate: DateTime.now().add(
                   Duration(
                     days: selectedDateIdx,

@@ -47,8 +47,13 @@ enum CheckoutSubmissionStatus {
   /// to complete payment in the MoMo app.
   awaitingMoMoPayment,
 
+  /// Stripe PaymentIntent created; the screen should
+  /// call `Stripe.instance.confirmPayment()` with the
+  /// client secret.
+  awaitingStripePayment,
+
   /// Re-fetching the booking to confirm the payment
-  /// was captured by the backend IPN.
+  /// was captured by the backend webhook/IPN.
   verifyingPayment,
 }
 
@@ -68,6 +73,10 @@ class CheckoutState {
   /// MoMo web redirect URL (fallback).
   final String? moMoPayUrl;
 
+  /// Ephemeral Stripe client secret for on-device
+  /// confirmation — never persist this value.
+  final String? stripeClientSecret;
+
   const CheckoutState({
     required this.checkoutData,
     this.selectedPayment = PaymentMethodType.card,
@@ -78,6 +87,7 @@ class CheckoutState {
     this.booking,
     this.moMoDeeplink,
     this.moMoPayUrl,
+    this.stripeClientSecret,
   });
 
   /// Recomputed total considering coin toggle.
@@ -101,7 +111,8 @@ class CheckoutState {
   bool get isSubmitting =>
       submissionStatus == CheckoutSubmissionStatus.submitting ||
       submissionStatus == CheckoutSubmissionStatus.polling ||
-      submissionStatus == CheckoutSubmissionStatus.verifyingPayment;
+      submissionStatus == CheckoutSubmissionStatus.verifyingPayment ||
+      submissionStatus == CheckoutSubmissionStatus.awaitingStripePayment;
 
   CheckoutState copyWith({
     CheckoutData? checkoutData,
@@ -113,6 +124,7 @@ class CheckoutState {
     BookingEntity? booking,
     String? moMoDeeplink,
     String? moMoPayUrl,
+    String? stripeClientSecret,
   }) {
     return CheckoutState(
       checkoutData: checkoutData ?? this.checkoutData,
@@ -124,6 +136,8 @@ class CheckoutState {
       booking: booking ?? this.booking,
       moMoDeeplink: moMoDeeplink ?? this.moMoDeeplink,
       moMoPayUrl: moMoPayUrl ?? this.moMoPayUrl,
+      stripeClientSecret:
+          stripeClientSecret ?? this.stripeClientSecret,
     );
   }
 }
@@ -279,10 +293,20 @@ class CheckoutNotifier extends _$CheckoutNotifier {
         // ── Step 3: Fetch booking details ─────
         final booking = await repo.getBookingById(ticket.bookingId!);
 
-        // ── Step 4: MoMo payment if applicable ─
-        final isMoMo = current.selectedPayment == PaymentMethodType.eWallet;
-        if (isMoMo && booking.status == BookingStatus.pendingPayment) {
-          await _initiateMoMoPayment(booking);
+        // ── Step 4: Payment if applicable ────────
+        final isCard =
+            current.selectedPayment == PaymentMethodType.card;
+        final isMoMo =
+            current.selectedPayment == PaymentMethodType.eWallet;
+
+        if (booking.status == BookingStatus.pendingPayment) {
+          if (isCard) {
+            await _initiateStripePayment(booking);
+          } else if (isMoMo) {
+            await _initiateMoMoPayment(booking);
+          } else {
+            _setSuccess(booking);
+          }
         } else {
           _setSuccess(booking);
         }
@@ -326,6 +350,96 @@ class CheckoutNotifier extends _$CheckoutNotifier {
       _log.severe('MoMo payment initiation error', e, st);
       _setError('$e');
     }
+  }
+
+  /// Creates a Stripe PaymentIntent for the booking
+  /// and transitions to [awaitingStripePayment].
+  Future<void> _initiateStripePayment(
+    BookingEntity booking,
+  ) async {
+    final repo = ref.read(checkoutRepositoryProvider);
+    try {
+      final result =
+          await repo.createStripePayment(booking.id);
+
+      final current = state.value;
+      if (current == null) return;
+
+      state = AsyncValue.data(
+        current.copyWith(
+          submissionStatus:
+              CheckoutSubmissionStatus.awaitingStripePayment,
+          booking: booking,
+          stripeClientSecret: result.clientSecret,
+        ),
+      );
+    } catch (e, st) {
+      _log.severe(
+        'Stripe payment initiation error',
+        e,
+        st,
+      );
+      _setError('$e');
+    }
+  }
+
+  /// Called after [Stripe.confirmPayment()] succeeds
+  /// on-device. Polls the booking to verify the
+  /// webhook has updated the status.
+  Future<void> verifyStripePayment(
+    String bookingId,
+  ) async {
+    final current = state.value;
+    if (current == null) return;
+
+    _setStatus(CheckoutSubmissionStatus.verifyingPayment);
+
+    final repo = ref.read(checkoutRepositoryProvider);
+    try {
+      final booking =
+          await repo.getBookingById(bookingId);
+
+      if (booking.status == BookingStatus.confirmed) {
+        _setSuccess(booking);
+      } else {
+        // Webhook may not have arrived yet — poll.
+        await _pollBookingConfirmation(
+          repo,
+          bookingId,
+        );
+      }
+    } catch (e, st) {
+      _log.severe('Stripe verify error', e, st);
+      _setError('$e');
+    }
+  }
+
+  /// Polls the booking status until CONFIRMED or
+  /// max attempts reached.
+  Future<void> _pollBookingConfirmation(
+    dynamic repo,
+    String bookingId,
+  ) async {
+    const maxAttempts = 10;
+    const interval = Duration(seconds: 2);
+
+    for (var i = 0; i < maxAttempts; i++) {
+      await Future.delayed(interval);
+      final booking =
+          await repo.getBookingById(bookingId);
+
+      if (booking.status == BookingStatus.confirmed) {
+        _setSuccess(booking);
+        return;
+      }
+    }
+
+    // Timeout — optimistic success; webhook will
+    // update later.
+    _setError(
+      'Payment is being processed. '
+      'Please check your bookings shortly.',
+    );
   }
 
   /// Called when the user returns to the app after

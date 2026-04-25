@@ -1,6 +1,8 @@
 .PHONY: perf-ui perf-headless \
 	perf-test-auth perf-test-admin perf-test-products \
 	perf-test-locations perf-test-ws perf-test-chat \
+	perf-test-booking-race perf-test-booking-race-spike \
+	generate-dtos \
 	_setup _teardown
 
 VENV       = .venv
@@ -43,17 +45,19 @@ _teardown:
 	@echo "══════════════════════════════════════════"
 
 # Helper: runs setup → locust with given args → teardown
+# Traps SIGINT/SIGTERM/SIGHUP/EXIT so _teardown always runs,
+# even on Ctrl+C, kill, or terminal close.
 # Usage: $(call run_locust,<extra-args>)
 define run_locust
 	@$(MAKE) --no-print-directory _setup
 	@echo "══════════════════════════════════════════"
 	@echo "  Running tests..."
 	@echo "══════════════════════════════════════════"
+	@cleanup() { $(MAKE) --no-print-directory _teardown; }; \
+	trap cleanup EXIT; \
 	$(VENV_BIN)/locust --headless $(1) \
 		--html $(REPORT_DIR)/report_$(TIMESTAMP).html; \
-	status=$$?; \
-	$(MAKE) --no-print-directory _teardown; \
-	exit $$status
+	exit $$?
 endef
 
 # ──────────────────────────────────────────────
@@ -65,10 +69,10 @@ perf-ui:
 	@echo "══════════════════════════════════════════"
 	@echo "  Locust Web UI → http://localhost:8089"
 	@echo "══════════════════════════════════════════"
+	@cleanup() { $(MAKE) --no-print-directory _teardown; }; \
+	trap cleanup EXIT; \
 	$(VENV_BIN)/locust; \
-	status=$$?; \
-	$(MAKE) --no-print-directory _teardown; \
-	exit $$status
+	exit $$?
 
 # ──────────────────────────────────────────────
 # Headless full suite
@@ -94,6 +98,16 @@ perf-test-locations:
 	$(call run_locust,--tags locations -u 10 -r 2 --run-time 60s)
 
 # ──────────────────────────────────────────────
+# Booking race condition test runners
+# ──────────────────────────────────────────────
+
+perf-test-booking-race:
+	$(call run_locust,-f locustfiles/booking_race_condition.py -u 50 -r 10 --run-time 180s)
+
+perf-test-booking-race-spike:
+	$(call run_locust,-f locustfiles/booking_race_condition.py -u 200 -r 30 --run-time 180s)
+
+# ──────────────────────────────────────────────
 # WebSocket test runners
 # ──────────────────────────────────────────────
 
@@ -102,3 +116,13 @@ perf-test-ws:
 
 perf-test-chat:
 	$(call run_locust,--tags chat -u 10 -r 2 --run-time 60s)
+
+# ──────────────────────────────────────────────
+# DTO generation
+# ──────────────────────────────────────────────
+
+generate-dtos:
+	@echo "══════════════════════════════════════════"
+	@echo "  Generating OpenAPI DTOs..."
+	@echo "══════════════════════════════════════════"
+	@$(PYTHON) scripts/generate_dtos.py --input api_docs/openapi.json --output models
