@@ -18,6 +18,9 @@ Add imports here as test modules are implemented in locustfiles/.
 # ── User domain ───────────────────────────────────────────────────────────────
 # from locustfiles.account_user import AccountUser
 
+# ── Booking Race Condition ────────────────────────────────────────────────────
+# from locustfiles.booking_race_condition import BookingRaceUser, BookingVerifier
+
 # ── Partner domain ────────────────────────────────────────────────────────────
 # from locustfiles.partner_profile import PartnerProfileUser
 # from locustfiles.employees import EmployeeManager

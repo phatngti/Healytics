@@ -55,4 +55,9 @@ class AiRecommendation {
     this.staffName,
     this.slots = const [],
   });
+
+  @override
+  String toString() {
+    return 'AiRecommendation{serviceId: $serviceId, name: $name, imageUrl: $imageUrl, badge: $badge, bookedCount: $bookedCount, price: $price, priceAmount: $priceAmount, currency: $currency, rating: $rating, totalReviews: $totalReviews, location: $location, staffName: $staffName, slots: $slots}';
+  }
 }

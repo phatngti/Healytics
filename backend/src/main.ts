@@ -12,6 +12,7 @@ import { RedisIoAdapter } from '@/common/adapters/redis-io.adapter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+    rawBody: true, // Required for Stripe webhook signature verification
   });
 
   // app.use(

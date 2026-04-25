@@ -282,7 +282,7 @@ export class PartnersService {
       Boolean(partner.coverImageUrl) &&
       Boolean(partner.logoImageUrl) &&
       descriptionLength >= 120 &&
-      descriptionLength <= 1000 &&
+      descriptionLength <= 1000_000_000 &&
       (partner.gallery?.length ?? 0) >= 3
     );
   }

@@ -202,10 +202,20 @@ class ApiClient {
           return AdminPartnerDetailResponseDto.fromJson(value);
         case 'AiRecommendationItemDto':
           return AiRecommendationItemDto.fromJson(value);
-        case 'AiRecommendationsRequestDto':
-          return AiRecommendationsRequestDto.fromJson(value);
-        case 'AiRecommendationsResponseDto':
-          return AiRecommendationsResponseDto.fromJson(value);
+        case 'AnalyticsAlertDto':
+          return AnalyticsAlertDto.fromJson(value);
+        case 'AnalyticsBookingMetricsDto':
+          return AnalyticsBookingMetricsDto.fromJson(value);
+        case 'AnalyticsCategoryPerformanceDto':
+          return AnalyticsCategoryPerformanceDto.fromJson(value);
+        case 'AnalyticsOperationalMetricDto':
+          return AnalyticsOperationalMetricDto.fromJson(value);
+        case 'AnalyticsReviewBucketDto':
+          return AnalyticsReviewBucketDto.fromJson(value);
+        case 'AnalyticsServicePerformanceDto':
+          return AnalyticsServicePerformanceDto.fromJson(value);
+        case 'AnalyticsTrendPointDto':
+          return AnalyticsTrendPointDto.fromJson(value);
         case 'AppointmentCategoryResponseDto':
           return AppointmentCategoryResponseDto.fromJson(value);
         case 'AppointmentResponseDto':
@@ -230,6 +240,8 @@ class ApiClient {
           return BookingSpecialistResponseDto.fromJson(value);
         case 'BookingStatus':
           return BookingStatusTypeTransformer().decode(value);
+        case 'BookingStatusBreakdownDto':
+          return BookingStatusBreakdownDto.fromJson(value);
         case 'BusinessInfo':
           return BusinessInfo.fromJson(value);
         case 'BusinessInfoDto':
@@ -340,6 +352,8 @@ class ApiClient {
           return DayScheduleDto.fromJson(value);
         case 'DeleteFileResponseDto':
           return DeleteFileResponseDto.fromJson(value);
+        case 'DevicePlatform':
+          return DevicePlatformTypeTransformer().decode(value);
         case 'DistanceMatrixElementDto':
           return DistanceMatrixElementDto.fromJson(value);
         case 'DistanceMatrixResponseDto':
@@ -366,6 +380,10 @@ class ApiClient {
           return GeocodeResponseDto.fromJson(value);
         case 'GeocodeResultDto':
           return GeocodeResultDto.fromJson(value);
+        case 'HealthServiceDetailAnalyticsResponseDto':
+          return HealthServiceDetailAnalyticsResponseDto.fromJson(value);
+        case 'HealthServiceOverviewAnalyticsResponseDto':
+          return HealthServiceOverviewAnalyticsResponseDto.fromJson(value);
         case 'HealthServiceStatus':
           return HealthServiceStatusTypeTransformer().decode(value);
         case 'HealthServiceType':
@@ -596,6 +614,10 @@ class ApiClient {
           return SpecialistReviewResponseDto.fromJson(value);
         case 'StaffScheduleEntryDto':
           return StaffScheduleEntryDto.fromJson(value);
+        case 'StripePaymentResponseDto':
+          return StripePaymentResponseDto.fromJson(value);
+        case 'StripeRefundResponseDto':
+          return StripeRefundResponseDto.fromJson(value);
         case 'SurveyDto':
           return SurveyDto.fromJson(value);
         case 'SurveyResponseDto':

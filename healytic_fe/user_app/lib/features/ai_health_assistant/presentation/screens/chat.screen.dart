@@ -119,8 +119,15 @@ class ChatScreen extends HookConsumerWidget {
                 padding: EdgeInsets.only(
                   top: AppDimens.spaceXs,
                 ),
-                child:
-                    const ChatSuggestionChips(),
+                child: ChatSuggestionChips(
+                  onChipTapped: (label) => ref
+                      .read(
+                        chatProvider(
+                          conversationId,
+                        ).notifier,
+                      )
+                      .sendMessage(label),
+                ),
               ),
 
             // Input bar

@@ -22,8 +22,14 @@ abstract class ChatRepository {
   ///
   /// [conversationId] may be null for new
   /// conversations.
+  ///
+  /// [currentLat] and [currentLng] provide the
+  /// user's current location for proximity-aware
+  /// recommendations.
   Stream<ChatSseEvent> sendMessageAndStream(
     String? conversationId,
-    String text,
-  );
+    String text, {
+    double? currentLat,
+    double? currentLng,
+  });
 }

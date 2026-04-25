@@ -55,6 +55,14 @@ class NotificationCampaignImplRepository
   }
 
   @override
+  Future<NotificationCampaign> sendBroadcast({
+    required String title,
+    required String body,
+  }) {
+    return dataSource.sendBroadcast(title: title, body: body);
+  }
+
+  @override
   Future<List<NotificationSegment>> listSegments() {
     return dataSource.listSegments();
   }

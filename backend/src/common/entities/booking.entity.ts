@@ -21,7 +21,8 @@ import { Payment } from './payment.entity';
 @Entity('bookings')
 @Index('IDX_BOOKING_STAFF_START_TIME', ['staffId', 'startTime'], {
   unique: true,
-  where: '"deleted_at" IS NULL',
+  where:
+    '"deleted_at" IS NULL AND "status" IN (\'PENDING_PAYMENT\', \'CONFIRMED\')',
 })
 export class Booking {
   @PrimaryGeneratedColumn('uuid')

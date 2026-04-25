@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Get,
+  Query,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import {
@@ -23,6 +24,11 @@ import { UpdatePartnerHealthServiceDto } from './dto/partner/update-partner-heal
 import { PartnerHealthServiceResponseDto } from './dto/partner/partner-health-service-response.dto';
 import { PartnerApi } from '@/common/decorators/api/partner-api.decorator';
 import { PartnerHealthServiceDetailResponseDto } from './dto/partner/partner-health-service-detail-response.dto';
+import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
+import { HealthServiceAnalyticsQueryDto } from './dto/partner/health-service-analytics-query.dto';
+import { HealthServiceOverviewAnalyticsResponseDto } from './dto/partner/analytics/health-service-overview-analytics.dto';
+import { HealthServiceDetailAnalyticsResponseDto } from './dto/partner/analytics/health-service-detail-analytics.dto';
+import { DashboardTimePeriod } from '@/dashboard-partner/dto/query/dashboard-period-query.dto';
 
 /**
  * Partner controller for health service management.
@@ -32,6 +38,54 @@ import { PartnerHealthServiceDetailResponseDto } from './dto/partner/partner-hea
 @PartnerApi('health-services')
 export class PartnerHealthServiceController {
   constructor(private readonly healthServiceService: HealthServiceService) {}
+
+  // ─── Analytics Endpoints (must precede :slug routes) ─────
+
+  /**
+   * Returns overview analytics for all partner services.
+   */
+  @Get('analytics/overview')
+  @ApiOperation({
+    summary: 'Get health service overview analytics',
+  })
+  @ApiOkResponse({
+    type: HealthServiceOverviewAnalyticsResponseDto,
+  })
+  getOverviewAnalytics(
+    @CurrentUser('id') userId: string,
+    @Query() query: HealthServiceAnalyticsQueryDto,
+  ): Promise<HealthServiceOverviewAnalyticsResponseDto> {
+    return this.healthServiceService.getOverviewAnalytics(
+      userId,
+      query.period ?? DashboardTimePeriod.THIS_MONTH,
+    );
+  }
+
+  /**
+   * Returns per-service detail analytics for a product.
+   */
+  @Get('analytics/:productId')
+  @ApiOperation({
+    summary: 'Get per-service detail analytics',
+  })
+  @ApiOkResponse({
+    type: HealthServiceDetailAnalyticsResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'Product not found.' })
+  getDetailAnalytics(
+    @CurrentUser('id') userId: string,
+    @Param('productId', ParseUUIDPipe) productId: string,
+    @Query() query: HealthServiceAnalyticsQueryDto,
+  ): Promise<HealthServiceDetailAnalyticsResponseDto> {
+    return this.healthServiceService.getDetailAnalytics(
+      userId,
+      productId,
+      query.period ?? DashboardTimePeriod.THIS_MONTH,
+    );
+  }
+
+  // ─── CRUD Endpoints ──────────────────────────────────────
+
   /**
    * Retrieves all health services.
    */

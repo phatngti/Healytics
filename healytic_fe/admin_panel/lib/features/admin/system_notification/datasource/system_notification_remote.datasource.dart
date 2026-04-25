@@ -33,6 +33,11 @@ abstract class NotificationCampaignRemoteDataSource {
     NotificationSchedule schedule,
   );
 
+  Future<NotificationCampaign> sendBroadcast({
+    required String title,
+    required String body,
+  });
+
   Future<List<NotificationSegment>> listSegments();
 
   Future<int?> estimateAudience(NotificationAudience audience);
@@ -206,6 +211,25 @@ class NotificationCampaignRemoteDataSourceImpl
     NotificationSchedule schedule,
   ) async {
     throw UnsupportedError('Scheduling is not available in the current API.');
+  }
+
+  @override
+  Future<NotificationCampaign> sendBroadcast({
+    required String title,
+    required String body,
+  }) async {
+    final response = await _notificationsApi
+        .adminNotificationControllerCreateBroadcast(
+          CreateBroadcastDto(title: title.trim(), body: body.trim()),
+        );
+
+    if (response == null) {
+      throw Exception('Failed to send system notification');
+    }
+
+    final sent = _mapResponseToCampaign(response);
+    _localSent[sent.id.value] = sent;
+    return sent;
   }
 
   @override
@@ -418,6 +442,22 @@ class NotificationCampaignRemoteDataSourceMock
     );
     _campaigns[id.value] = updated;
     return updated;
+  }
+
+  @override
+  Future<NotificationCampaign> sendBroadcast({
+    required String title,
+    required String body,
+  }) async {
+    final trimmedTitle = title.trim();
+    final draft = NotificationCampaignDraft(
+      campaignName: trimmedTitle.isEmpty
+          ? 'Untitled notification'
+          : trimmedTitle,
+      content: NotificationContent(title: trimmedTitle, body: body.trim()),
+    );
+    final campaign = await createDraft(draft);
+    return sendNow(campaign.id);
   }
 
   @override

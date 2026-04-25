@@ -2,6 +2,7 @@ import 'package:user_app/features/checkout/data/datasources/remote/checkout_remo
 import 'package:user_app/features/checkout/domain/entities/booking.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/momo_payment.entity.dart';
+import 'package:user_app/features/checkout/domain/entities/stripe_payment.entity.dart';
 import 'package:user_app/features/checkout/domain/repositories/checkout.repository.dart';
 
 /// Concrete [CheckoutRepository] backed by a remote
@@ -75,6 +76,24 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
     return remoteDatasource.refundMoMoPayment(
       bookingId: bookingId,
       transId: transId,
+    );
+  }
+
+  @override
+  Future<StripePaymentResult> createStripePayment(
+    String bookingId,
+  ) {
+    return remoteDatasource.createStripePayment(
+      bookingId,
+    );
+  }
+
+  @override
+  Future<StripeRefundResult> refundStripePayment(
+    String bookingId,
+  ) {
+    return remoteDatasource.refundStripePayment(
+      bookingId,
     );
   }
 }

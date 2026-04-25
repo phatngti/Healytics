@@ -9,7 +9,9 @@ import { Payment } from '@/common/entities/payment.entity';
 import { PaymentTransactionLog } from '@/common/entities/payment-transaction-log.entity';
 import { BookingPaymentService } from './booking-payment.service';
 import { MoMoPaymentService } from './momo-payment.service';
+import { StripePaymentService } from './stripe-payment.service';
 import { MoMoController } from './momo.controller';
+import { StripeWebhookController } from './stripe-webhook.controller';
 import { UserPaymentController } from './user-payment.controller';
 
 @Module({
@@ -24,8 +26,9 @@ import { UserPaymentController } from './user-payment.controller';
     ]),
     ConfigModule,
   ],
-  controllers: [MoMoController, UserPaymentController],
-  providers: [BookingPaymentService, MoMoPaymentService],
+  controllers: [MoMoController, StripeWebhookController, UserPaymentController],
+  providers: [BookingPaymentService, MoMoPaymentService, StripePaymentService],
   exports: [BookingPaymentService],
 })
 export class PaymentGatewayModule {}
+

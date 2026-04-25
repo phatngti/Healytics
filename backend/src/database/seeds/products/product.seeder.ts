@@ -413,6 +413,11 @@ const SEED_PRODUCTS = [
         isThumbnail: false,
         sortOrder: 2,
       },
+      {
+        url: 'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800',
+        isThumbnail: false,
+        sortOrder: 3,
+      },
     ],
     serviceDefinition: {
       durationMinutes: 120,
@@ -483,8 +488,11 @@ const SEED_PRODUCTS = [
         },
       ],
     },
-    tagNames: ['Beauty'],
-    eligibleEmployees: [{ code: 'EMP-001', isPrimary: true }],
+    tagNames: ['Beauty', 'Dental Care'],
+    eligibleEmployees: [
+      { code: 'EMP-001', isPrimary: true },
+      { code: 'EMP-002', isPrimary: false },
+    ],
     facilityImages: [
       {
         imageUrl:
@@ -503,6 +511,12 @@ const SEED_PRODUCTS = [
           'https://images.unsplash.com/photo-1629909615957-be38d48fbbe4?w=600',
         label: 'Equipment Station',
         sortOrder: 2,
+      },
+      {
+        imageUrl:
+          'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=600',
+        label: 'Waiting Lounge',
+        sortOrder: 3,
       },
     ],
   },

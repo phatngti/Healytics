@@ -1,6 +1,7 @@
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/checkout/presentation/providers/checkout.provider.dart';
 import 'package:user_app/features/checkout/presentation/providers/momo_launcher.dart';
@@ -108,6 +109,9 @@ class _CheckoutScreenState
       case CheckoutSubmissionStatus.awaitingMoMoPayment:
         _launchMoMoAndListen(context, ref, next);
 
+      case CheckoutSubmissionStatus.awaitingStripePayment:
+        _confirmStripePayment(context, ref, next);
+
       default:
         break;
     }
@@ -141,6 +145,56 @@ class _CheckoutScreenState
             .verifyMoMoPayment(bookingId);
       },
     );
+  }
+
+  /// Confirms a Stripe payment on-device using the
+  /// client secret from the PaymentIntent.
+  Future<void> _confirmStripePayment(
+    BuildContext context,
+    WidgetRef ref,
+    CheckoutState state,
+  ) async {
+    final clientSecret = state.stripeClientSecret;
+    final bookingId = state.booking?.id;
+
+    if (clientSecret == null || bookingId == null) {
+      ref.read(checkoutProvider.notifier).resetSubmission();
+      return;
+    }
+
+    try {
+      await Stripe.instance.confirmPayment(
+        paymentIntentClientSecret: clientSecret,
+        data: const PaymentMethodParams.card(
+          paymentMethodData: PaymentMethodData(),
+        ),
+      );
+
+      // On-device confirmation succeeded — verify
+      // via webhook polling.
+      if (!context.mounted) return;
+      ref
+          .read(checkoutProvider.notifier)
+          .verifyStripePayment(bookingId);
+    } on StripeException catch (e) {
+      if (e.error.code == FailureCode.Canceled) {
+        // User dismissed the payment sheet.
+        ref
+            .read(checkoutProvider.notifier)
+            .resetSubmission();
+        return;
+      }
+
+      if (!context.mounted) return;
+      ToastContext.showToast(
+        context,
+        ToastType.error,
+        e.error.localizedMessage ?? 'Payment failed',
+      );
+      ref
+          .read(checkoutProvider.notifier)
+          .resetSubmission();
+    }
   }
 
   void _disposeLifecycleListener() {
@@ -268,7 +322,9 @@ class _CheckoutBody extends ConsumerWidget {
         ),
         if (state.isSubmitting ||
             state.submissionStatus ==
-                CheckoutSubmissionStatus.awaitingMoMoPayment)
+                CheckoutSubmissionStatus.awaitingMoMoPayment ||
+            state.submissionStatus ==
+                CheckoutSubmissionStatus.awaitingStripePayment)
           Positioned.fill(
             child: CheckoutSubmissionOverlay(state: state),
           ),

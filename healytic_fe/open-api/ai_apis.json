@@ -78,9 +78,11 @@
                         "required": true,
                         "schema": {
                             "type": "string",
-                            "minLength": 1,
+                            "format": "uuid",
+                            "description": "Account / user UUID",
                             "title": "User Id"
-                        }
+                        },
+                        "description": "Account / user UUID"
                     },
                     {
                         "name": "page",
@@ -155,14 +157,16 @@
                             "anyOf": [
                                 {
                                     "type": "string",
-                                    "minLength": 1
+                                    "format": "uuid"
                                 },
                                 {
                                     "type": "null"
                                 }
                             ],
+                            "description": "Must match conversation owner",
                             "title": "User Id"
-                        }
+                        },
+                        "description": "Must match conversation owner"
                     },
                     {
                         "name": "page",
@@ -298,6 +302,149 @@
     },
     "components": {
         "schemas": {
+            "AiRecommendationItemDto": {
+                "properties": {
+                    "service_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Service Id"
+                    },
+                    "name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Name"
+                    },
+                    "slug": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Slug"
+                    },
+                    "imageUrl": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Imageurl"
+                    },
+                    "category": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Category"
+                    },
+                    "duration": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Duration"
+                    },
+                    "price": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Price"
+                    },
+                    "rating": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Rating"
+                    },
+                    "vendorName": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Vendorname"
+                    },
+                    "location": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Location"
+                    },
+                    "staffAvatars": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Staffavatars"
+                    },
+                    "type": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Type"
+                    }
+                },
+                "additionalProperties": true,
+                "type": "object",
+                "title": "AiRecommendationItemDto",
+                "description": "Pass-through DTO, match 1:1 với backend `/backend/ai/recommendations`.\n\n- Chấp nhận cả \"service_id\" và \"id\" ở input (backend hiện trả \"id\",\n  mock fallback trả \"service_id\").\n- Output luôn dùng tên field Python (service_id, imageUrl, vendorName, staffAvatars)\n  để khớp spec frontend.\n- `extra=\"allow\"` để backend thêm field mới không cần update DTO."
+            },
             "ChatbotRecommendationResponse": {
                 "properties": {
                     "conversation_id": {
@@ -306,7 +453,7 @@
                     },
                     "recommendations": {
                         "items": {
-                            "$ref": "#/components/schemas/ServiceDetail"
+                            "$ref": "#/components/schemas/AiRecommendationItemDto"
                         },
                         "type": "array",
                         "title": "Recommendations"
@@ -385,12 +532,41 @@
                     },
                     "user_id": {
                         "type": "string",
+                        "format": "uuid",
                         "title": "User Id"
                     },
                     "message": {
                         "type": "string",
                         "minLength": 1,
                         "title": "Message"
+                    },
+                    "current_lat": {
+                        "anyOf": [
+                            {
+                                "type": "number",
+                                "maximum": 90.0,
+                                "minimum": -90.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Current Lat",
+                        "description": "User's current latitude"
+                    },
+                    "current_lng": {
+                        "anyOf": [
+                            {
+                                "type": "number",
+                                "maximum": 180.0,
+                                "minimum": -180.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Current Lng",
+                        "description": "User's current longitude"
                     },
                     "top_k": {
                         "type": "integer",
@@ -418,7 +594,8 @@
                     "userId": {
                         "anyOf": [
                             {
-                                "type": "string"
+                                "type": "string",
+                                "format": "uuid"
                             },
                             {
                                 "type": "null"
@@ -505,29 +682,6 @@
                 ],
                 "title": "HomeRecommenderRequest"
             },
-            "LocationInfo": {
-                "properties": {
-                    "address": {
-                        "type": "string",
-                        "title": "Address"
-                    },
-                    "district": {
-                        "type": "string",
-                        "title": "District"
-                    },
-                    "city": {
-                        "type": "string",
-                        "title": "City"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "address",
-                    "district",
-                    "city"
-                ],
-                "title": "LocationInfo"
-            },
             "MessageResponse": {
                 "properties": {
                     "id": {
@@ -612,47 +766,11 @@
                 ],
                 "title": "PaginationMeta"
             },
-            "PriceInfo": {
-                "properties": {
-                    "amount": {
-                        "type": "integer",
-                        "title": "Amount"
-                    },
-                    "currency": {
-                        "type": "string",
-                        "title": "Currency",
-                        "default": "VND"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "amount"
-                ],
-                "title": "PriceInfo"
-            },
-            "RatingInfo": {
-                "properties": {
-                    "average": {
-                        "type": "number",
-                        "title": "Average"
-                    },
-                    "total_reviews": {
-                        "type": "integer",
-                        "title": "Total Reviews"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "average",
-                    "total_reviews"
-                ],
-                "title": "RatingInfo"
-            },
             "RecommendationResponse": {
                 "properties": {
                     "recommendations": {
                         "items": {
-                            "$ref": "#/components/schemas/ServiceDetail"
+                            "$ref": "#/components/schemas/AiRecommendationItemDto"
                         },
                         "type": "array",
                         "title": "Recommendations"
@@ -673,112 +791,6 @@
                     "timestamp"
                 ],
                 "title": "RecommendationResponse"
-            },
-            "ServiceDetail": {
-                "properties": {
-                    "service_id": {
-                        "type": "string",
-                        "title": "Service Id"
-                    },
-                    "name": {
-                        "type": "string",
-                        "title": "Name"
-                    },
-                    "image_url": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Image Url"
-                    },
-                    "badge": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Badge"
-                    },
-                    "booked_count": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Booked Count"
-                    },
-                    "price": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/components/schemas/PriceInfo"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "staff_name": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Staff Name"
-                    },
-                    "rating": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/components/schemas/RatingInfo"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "location": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/components/schemas/LocationInfo"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "slots": {
-                        "anyOf": [
-                            {
-                                "items": {
-                                    "type": "string"
-                                },
-                                "type": "array"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Slots"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "service_id",
-                    "name"
-                ],
-                "title": "ServiceDetail"
             },
             "ValidationError": {
                 "properties": {
@@ -803,6 +815,13 @@
                     "type": {
                         "type": "string",
                         "title": "Error Type"
+                    },
+                    "input": {
+                        "title": "Input"
+                    },
+                    "ctx": {
+                        "type": "object",
+                        "title": "Context"
                     }
                 },
                 "type": "object",

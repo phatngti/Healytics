@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
@@ -28,6 +29,13 @@ void main() async {
 Future<void> initApp() async {
   // await EasyLocalization.ensureInitialized();
   await initializeDateFormatting('vi');
+
+  // ── Stripe SDK initialisation ──────────────────
+  const stripePk = String.fromEnvironment('STRIPE_PK');
+  if (stripePk.isNotEmpty) {
+    Stripe.publishableKey = stripePk;
+    await Stripe.instance.applySettings();
+  }
 
   if (kReleaseMode && Platform.isAndroid) {
     try {

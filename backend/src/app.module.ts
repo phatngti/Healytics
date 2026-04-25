@@ -3,6 +3,8 @@ import { APP_INTERCEPTOR, DiscoveryModule } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerRedisStorage } from './common/storage/throttler-redis.storage';
+import { REDIS_CLIENT } from './redis/redis.service';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
 import { EmployeesModule } from './employees/employees.module';
@@ -45,12 +47,19 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
       load: [databaseConfig, redisConfig, rabbitmqConfig, mapboxConfig],
     }),
     // Rate limiting: 100 requests per 60 seconds for public routes
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 100,
-      },
-    ]),
+    // Uses Redis storage for distributed state across instances
+    ThrottlerModule.forRootAsync({
+      useFactory: (redisClient) => ({
+        throttlers: [
+          {
+            ttl: 60000,
+            limit: 100,
+          },
+        ],
+        storage: new ThrottlerRedisStorage(redisClient),
+      }),
+      inject: [REDIS_CLIENT],
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -64,8 +73,8 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
           password: db.password,
           database: db.database,
           entities: db.entities,
-          synchronize: db.synchronize || process.env.NODE_ENV === 'development',
-          ssl: db.ssl,
+          synchronize: db.synchronize || false,
+          ssl: db.ssl ? { rejectUnauthorized: false } : false,
         } as const;
       },
     }),

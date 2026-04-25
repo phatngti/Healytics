@@ -54,24 +54,27 @@ final class CategoriesProvider
 
 String _$categoriesHash() => r'ccdbbc2a859dcec6c5184d26a13f99dd1a95991e';
 
-/// Provider for fetching home-recommend products.
+/// Provider for fetching home-recommend products
+/// via the Recommender AI microservice.
 
 @ProviderFor(recommendedProducts)
 const recommendedProductsProvider = RecommendedProductsProvider._();
 
-/// Provider for fetching home-recommend products.
+/// Provider for fetching home-recommend products
+/// via the Recommender AI microservice.
 
 final class RecommendedProductsProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<HomeProduct>>,
-          List<HomeProduct>,
-          FutureOr<List<HomeProduct>>
+          AsyncValue<List<AiRecommendation>>,
+          List<AiRecommendation>,
+          FutureOr<List<AiRecommendation>>
         >
     with
-        $FutureModifier<List<HomeProduct>>,
-        $FutureProvider<List<HomeProduct>> {
-  /// Provider for fetching home-recommend products.
+        $FutureModifier<List<AiRecommendation>>,
+        $FutureProvider<List<AiRecommendation>> {
+  /// Provider for fetching home-recommend products
+  /// via the Recommender AI microservice.
   const RecommendedProductsProvider._()
     : super(
         from: null,
@@ -88,18 +91,18 @@ final class RecommendedProductsProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<HomeProduct>> $createElement(
+  $FutureProviderElement<List<AiRecommendation>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<HomeProduct>> create(Ref ref) {
+  FutureOr<List<AiRecommendation>> create(Ref ref) {
     return recommendedProducts(ref);
   }
 }
 
 String _$recommendedProductsHash() =>
-    r'f216d32cb730fe3b9512239c6406e8f2f9e3efe1';
+    r'be68c8441806e0e65890decbc7030f05a4b2c37e';
 
 /// Provider for fetching premium treatments.
 
@@ -237,101 +240,6 @@ final class FeaturedSpecialistsProvider
 
 String _$featuredSpecialistsHash() =>
     r'eb47f7a9ea9f6ba9ad949354715b6d89f699fd5b';
-
-/// Provider for fetching AI-powered service
-/// recommendations based on a list of service IDs.
-
-@ProviderFor(aiRecommendations)
-const aiRecommendationsProvider = AiRecommendationsFamily._();
-
-/// Provider for fetching AI-powered service
-/// recommendations based on a list of service IDs.
-
-final class AiRecommendationsProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<List<AiRecommendation>>,
-          List<AiRecommendation>,
-          FutureOr<List<AiRecommendation>>
-        >
-    with
-        $FutureModifier<List<AiRecommendation>>,
-        $FutureProvider<List<AiRecommendation>> {
-  /// Provider for fetching AI-powered service
-  /// recommendations based on a list of service IDs.
-  const AiRecommendationsProvider._({
-    required AiRecommendationsFamily super.from,
-    required List<String> super.argument,
-  }) : super(
-         retry: null,
-         name: r'aiRecommendationsProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         $allTransitiveDependencies: null,
-       );
-
-  @override
-  String debugGetCreateSourceHash() => _$aiRecommendationsHash();
-
-  @override
-  String toString() {
-    return r'aiRecommendationsProvider'
-        ''
-        '($argument)';
-  }
-
-  @$internal
-  @override
-  $FutureProviderElement<List<AiRecommendation>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<AiRecommendation>> create(Ref ref) {
-    final argument = this.argument as List<String>;
-    return aiRecommendations(ref, argument);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is AiRecommendationsProvider && other.argument == argument;
-  }
-
-  @override
-  int get hashCode {
-    return argument.hashCode;
-  }
-}
-
-String _$aiRecommendationsHash() => r'6785c90ae51df4bdf14fd2dacb56864fa5f47717';
-
-/// Provider for fetching AI-powered service
-/// recommendations based on a list of service IDs.
-
-final class AiRecommendationsFamily extends $Family
-    with
-        $FunctionalFamilyOverride<
-          FutureOr<List<AiRecommendation>>,
-          List<String>
-        > {
-  const AiRecommendationsFamily._()
-    : super(
-        retry: null,
-        name: r'aiRecommendationsProvider',
-        dependencies: null,
-        $allTransitiveDependencies: null,
-        isAutoDispose: true,
-      );
-
-  /// Provider for fetching AI-powered service
-  /// recommendations based on a list of service IDs.
-
-  AiRecommendationsProvider call(List<String> serviceIds) =>
-      AiRecommendationsProvider._(argument: serviceIds, from: this);
-
-  @override
-  String toString() => r'aiRecommendationsProvider';
-}
 
 /// Provider for fetching recent appointment activity
 /// shown on the home dashboard.
