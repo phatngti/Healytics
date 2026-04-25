@@ -85,7 +85,7 @@ export class UpdatePartnerProfileCompletionDto {
   })
   @IsOptional()
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(1000_000_000)
   description?: string;
 
   @ApiPropertyOptional({

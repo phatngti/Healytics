@@ -28,7 +28,6 @@ export class UserAppointmentController {
    * List all appointments for the current user.
    */
   @Get()
-    @LogResponse()
   @ApiOperation({
     summary: 'List all user appointments with optional distance calculation',
   })

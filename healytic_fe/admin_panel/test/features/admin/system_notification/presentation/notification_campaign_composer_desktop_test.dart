@@ -23,7 +23,7 @@ void main() {
     );
   }
 
-  testWidgets('renders capability-gated composer sections', (tester) async {
+  testWidgets('renders simple send-now composer', (tester) async {
     tester.view.physicalSize = const Size(1800, 1400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -31,19 +31,16 @@ void main() {
     await tester.pumpWidget(createWidgetUnderTest());
     await tester.pumpAndSettle();
 
-    expect(find.text('Create Notification Campaign'), findsOneWidget);
-    expect(
-      find.textContaining('disabled by backend capabilities'),
-      findsNWidgets(2),
-    );
-    expect(
-      find.textContaining('whole-platform broadcast delivery'),
-      findsOneWidget,
-    );
-    expect(
-      find.textContaining('Scheduling is intentionally visible'),
-      findsOneWidget,
-    );
+    expect(find.text('Create System Notification'), findsOneWidget);
+    expect(find.text('Message'), findsOneWidget);
+    expect(find.text('Title'), findsOneWidget);
+    expect(find.text('Body'), findsOneWidget);
+    expect(find.text('Preview'), findsOneWidget);
     expect(find.text('Send Now'), findsOneWidget);
+    expect(find.text('Audience'), findsNothing);
+    expect(find.text('Channels'), findsNothing);
+    expect(find.text('Delivery'), findsNothing);
+    expect(find.text('Schedule'), findsNothing);
+    expect(find.text('Save Draft'), findsNothing);
   });
 }

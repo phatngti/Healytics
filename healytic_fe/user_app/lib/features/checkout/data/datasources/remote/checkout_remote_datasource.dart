@@ -6,6 +6,7 @@ import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/checkout/domain/entities/booking.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/momo_payment.entity.dart';
+import 'package:user_app/features/checkout/domain/entities/stripe_payment.entity.dart';
 import 'package:user_openapi/api.dart' hide BookingStatus;
 import 'checkout_mock_data.dart';
 
@@ -54,6 +55,18 @@ abstract class CheckoutRemoteDatasource {
     required String bookingId,
     required int transId,
   });
+
+  /// Creates a Stripe PaymentIntent and returns the
+  /// client secret for on-device confirmation.
+  Future<StripePaymentResult> createStripePayment(
+    String bookingId,
+  );
+
+  /// Requests a full Stripe refund for a paid
+  /// booking.
+  Future<StripeRefundResult> refundStripePayment(
+    String bookingId,
+  );
 }
 
 // ────────────────────────────────────────────────────
@@ -86,6 +99,12 @@ class CheckoutRemoteDatasourceImpl
     String? productId,
     required String idempotencyKey,
   }) async {
+    if (productId == null) {
+      throw ArgumentError(
+        'productId is required for async checkout',
+      );
+    }
+
     final dto = AsyncCheckoutDto(
       userId: userId,
       staffId: staffId,
@@ -252,6 +271,55 @@ class CheckoutRemoteDatasourceImpl
       updatedAt: dto.updatedAt,
     );
   }
+
+  @override
+  Future<StripePaymentResult> createStripePayment(
+    String bookingId,
+  ) async {
+    final dto = await _apiService.userPaymentsApi
+        .userPaymentControllerCreateStripePayment(
+          bookingId,
+          <String, dynamic>{},
+        );
+
+    if (dto == null) {
+      throw Exception(
+        'Empty Stripe payment response',
+      );
+    }
+
+    return StripePaymentResult(
+      paymentIntentId: dto.paymentIntentId,
+      clientSecret: dto.clientSecret,
+      amount: dto.amount.toInt(),
+      currency: dto.currency,
+      status: dto.status,
+    );
+  }
+
+  @override
+  Future<StripeRefundResult> refundStripePayment(
+    String bookingId,
+  ) async {
+    final dto = await _apiService.userPaymentsApi
+        .userPaymentControllerRefundStripePayment(
+          bookingId,
+        );
+
+    if (dto == null) {
+      throw Exception(
+        'Empty Stripe refund response',
+      );
+    }
+
+    return StripeRefundResult(
+      refundId: dto.refundId,
+      amount: dto.amount.toInt(),
+      currency: dto.currency,
+      status: dto.status,
+      paymentIntentId: dto.paymentIntentId,
+    );
+  }
 }
 
 // ────────────────────────────────────────────────────
@@ -358,6 +426,38 @@ class CheckoutRemoteDatasourceMock
       const Duration(milliseconds: 300),
     );
     // No-op in mock.
+  }
+
+  @override
+  Future<StripePaymentResult> createStripePayment(
+    String bookingId,
+  ) async {
+    await Future.delayed(
+      const Duration(milliseconds: 500),
+    );
+    return const StripePaymentResult(
+      paymentIntentId: 'pi_mock_001',
+      clientSecret: 'pi_mock_001_secret_mock',
+      amount: 500000,
+      currency: 'vnd',
+      status: 'requires_payment_method',
+    );
+  }
+
+  @override
+  Future<StripeRefundResult> refundStripePayment(
+    String bookingId,
+  ) async {
+    await Future.delayed(
+      const Duration(milliseconds: 400),
+    );
+    return const StripeRefundResult(
+      refundId: 're_mock_001',
+      amount: 500000,
+      currency: 'vnd',
+      status: 'succeeded',
+      paymentIntentId: 'pi_mock_001',
+    );
   }
 }
 

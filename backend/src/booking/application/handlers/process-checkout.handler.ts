@@ -13,6 +13,7 @@ import { NotificationType } from '@/notification/enums/notification-type.enum';
 import { NotificationEventService } from '@/notification/services/notification-event.service';
 import { RedisService } from '@/redis/redis.service';
 import { WebhookService, WebhookPayload } from '../../services/webhook.service';
+import { formatSlotKey } from '../../utils/slot-key.util';
 
 const CHECKOUT_LOCK_TTL_SECONDS = 600; // 10 minutes
 
@@ -23,6 +24,8 @@ interface CheckoutMessage {
   userId: string;
   productId?: string;
   webhookUrl?: string;
+  /** Pre-acquired lock token from CreateCheckoutTicketHandler (may be null for old messages) */
+  lockToken?: string;
 }
 
 @Controller()
@@ -62,26 +65,69 @@ export class ProcessCheckoutHandler {
         throw dbError;
       }
 
-      // 2. Attempt checkout lock
+      // 2. Validate or acquire checkout lock
       const startDate = new Date(data.startTime);
-      const dateStr = this.formatSlotKey(startDate);
+      const dateStr = formatSlotKey(startDate);
       const lockKey = `lock:checkout:${data.staffId}_${dateStr}`;
 
-      let lockToken: string | null;
-      try {
-        lockToken = await this.redisService.acquireLock(
-          lockKey,
-          CHECKOUT_LOCK_TTL_SECONDS,
+      let effectiveLockToken: string | null = data.lockToken ?? null;
+
+      if (effectiveLockToken) {
+        // Pre-lock exists — validate it's still ours
+        try {
+          const isValid = await this.redisService.validateLock(
+            lockKey,
+            effectiveLockToken,
+          );
+          if (!isValid) {
+            // Lock expired or was stolen — try to re-acquire
+            this.logger.warn(
+              `Pre-lock expired or invalid — key=${lockKey}, ${msgContext}, attempting re-acquire`,
+            );
+            effectiveLockToken = await this.redisService.acquireLock(
+              lockKey,
+              CHECKOUT_LOCK_TTL_SECONDS,
+            );
+          }
+        } catch (redisError) {
+          this.logger.error(
+            `Redis lock validation failed — key=${lockKey}, ${msgContext}`,
+            redisError.stack,
+          );
+          // Try to re-acquire as fallback
+          try {
+            effectiveLockToken = await this.redisService.acquireLock(
+              lockKey,
+              CHECKOUT_LOCK_TTL_SECONDS,
+            );
+          } catch (acquireError) {
+            this.logger.error(
+              `Redis lock re-acquire also failed — key=${lockKey}, ${msgContext}`,
+              acquireError.stack,
+            );
+            throw acquireError;
+          }
+        }
+      } else {
+        // No pre-lock (backwards compat / Redis was down at creation time)
+        this.logger.debug(
+          `No pre-lock token — falling back to acquireLock: ${lockKey}`,
         );
-      } catch (redisError) {
-        this.logger.error(
-          `Redis lock acquisition failed — key=${lockKey}, ${msgContext}`,
-          redisError.stack,
-        );
-        throw redisError;
+        try {
+          effectiveLockToken = await this.redisService.acquireLock(
+            lockKey,
+            CHECKOUT_LOCK_TTL_SECONDS,
+          );
+        } catch (redisError) {
+          this.logger.error(
+            `Redis lock acquisition failed — key=${lockKey}, ${msgContext}`,
+            redisError.stack,
+          );
+          throw redisError;
+        }
       }
 
-      if (lockToken) {
+      if (effectiveLockToken) {
         // ── SUCCESS PATH ───────────────────────────
         await this.handleSuccess(data, startDate, lockKey);
       } else {
@@ -250,14 +296,5 @@ export class ProcessCheckoutHandler {
       error: errorMessage,
     };
     await this.webhookService.notify(data.webhookUrl ?? null, webhookPayload);
-  }
-
-  private formatSlotKey(date: Date): string {
-    const yyyy = date.getUTCFullYear();
-    const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const dd = String(date.getUTCDate()).padStart(2, '0');
-    const hh = String(date.getUTCHours()).padStart(2, '0');
-    const min = String(date.getUTCMinutes()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}_${hh}${min}`;
   }
 }

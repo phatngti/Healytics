@@ -28,7 +28,7 @@ const SEED_PARTNER_REVIEW_LOGS: SeedPartnerReviewLog[] = [
   {
     code: '002',
     partnerTaxCode: '5566778899',
-    verdict: PartnerVerificationStatus.REQUIRED_RESUBMIT,
+    verdict: PartnerVerificationStatus.APPROVED,
     reviewerEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
     generalComment: seedKey(SEED_MARKERS.partnerReviewComment, 'RESUBMIT_001'),
   },

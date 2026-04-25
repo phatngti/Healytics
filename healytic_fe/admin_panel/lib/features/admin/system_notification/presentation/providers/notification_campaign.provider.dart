@@ -191,57 +191,39 @@ final notificationCampaignStatsProvider = FutureProvider<NotificationStats>((
 
 class NotificationCampaignComposerState {
   const NotificationCampaignComposerState({
-    this.draft = const NotificationCampaignDraft(),
-    this.draftId,
+    this.title = '',
+    this.body = '',
     this.isSubmitting = false,
     this.errorMessage,
   });
 
-  final NotificationCampaignDraft draft;
-  final NotificationCampaignId? draftId;
+  final String title;
+  final String body;
   final bool isSubmitting;
   final String? errorMessage;
 
   NotificationCampaignComposerState copyWith({
-    NotificationCampaignDraft? draft,
-    NotificationCampaignId? draftId,
-    bool clearDraftId = false,
+    String? title,
+    String? body,
     bool? isSubmitting,
     String? errorMessage,
     bool clearError = false,
   }) {
     return NotificationCampaignComposerState(
-      draft: draft ?? this.draft,
-      draftId: clearDraftId ? null : draftId ?? this.draftId,
+      title: title ?? this.title,
+      body: body ?? this.body,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
     );
   }
 
-  List<String> validationIssues(NotificationCapability capability) {
+  List<String> validationIssues() {
     final issues = <String>[];
-    if (draft.campaignName.trim().isEmpty) {
-      issues.add('Campaign name is required.');
-    }
-    if (draft.content.title.trim().isEmpty) {
+    if (title.trim().isEmpty) {
       issues.add('Notification title is required.');
     }
-    if (draft.content.body.trim().isEmpty) {
+    if (body.trim().isEmpty) {
       issues.add('Notification body is required.');
-    }
-    if (draft.channels.isEmpty) {
-      issues.add('At least one channel must be selected.');
-    }
-    final unsupportedChannels = draft.channels
-        .where((channel) => !capability.supportsChannel(channel))
-        .toList();
-    if (unsupportedChannels.isNotEmpty) {
-      issues.add(
-        'Selected channels are not available in the current backend capability set.',
-      );
-    }
-    if (!draft.schedule.sendNow && draft.schedule.scheduledAt == null) {
-      issues.add('Choose a scheduled send time or switch back to Send now.');
     }
     return issues;
   }
@@ -254,195 +236,31 @@ class NotificationCampaignComposerNotifier
     return const NotificationCampaignComposerState();
   }
 
-  void updateCampaignName(String value) {
-    state = state.copyWith(
-      draft: state.draft.copyWith(campaignName: value),
-      clearError: true,
-    );
-  }
-
-  void updateInternalNote(String value) {
-    state = state.copyWith(
-      draft: state.draft.copyWith(internalNote: value),
-      clearError: true,
-    );
-  }
-
   void updateTitle(String value) {
-    state = state.copyWith(
-      draft: state.draft.copyWith(
-        content: state.draft.content.copyWith(title: value),
-      ),
-      clearError: true,
-    );
+    state = state.copyWith(title: value, clearError: true);
   }
 
   void updateBody(String value) {
-    state = state.copyWith(
-      draft: state.draft.copyWith(
-        content: state.draft.content.copyWith(body: value),
-      ),
-      clearError: true,
-    );
+    state = state.copyWith(body: value, clearError: true);
   }
 
-  void updatePreviewText(String value) {
-    state = state.copyWith(
-      draft: state.draft.copyWith(
-        content: state.draft.content.copyWith(previewText: value),
-      ),
-      clearError: true,
-    );
-  }
-
-  void updateCtaLabel(String value) {
-    state = state.copyWith(
-      draft: state.draft.copyWith(
-        content: state.draft.content.copyWith(ctaLabel: value),
-      ),
-      clearError: true,
-    );
-  }
-
-  void updateDeepLinkTarget(String value) {
-    state = state.copyWith(
-      draft: state.draft.copyWith(
-        content: state.draft.content.copyWith(deepLinkTarget: value),
-      ),
-      clearError: true,
-    );
-  }
-
-  void toggleChannel(NotificationChannel channel, bool selected) {
-    final nextChannels = [...state.draft.channels];
-    if (selected) {
-      if (!nextChannels.contains(channel)) nextChannels.add(channel);
-    } else {
-      nextChannels.remove(channel);
-    }
-    state = state.copyWith(
-      draft: state.draft.copyWith(channels: nextChannels),
-      clearError: true,
-    );
-  }
-
-  void updateAudience({
-    String? presetLabel,
-    List<NotificationRecipientRole>? roles,
-    List<NotificationSegmentId>? includeSegments,
-    List<NotificationSegmentId>? excludeSegments,
-    int? estimatedReach,
-  }) {
-    state = state.copyWith(
-      draft: state.draft.copyWith(
-        audience: state.draft.audience.copyWith(
-          presetLabel: presetLabel,
-          roles: roles,
-          includeSegmentIds: includeSegments,
-          excludeSegmentIds: excludeSegments,
-          estimatedReach: estimatedReach,
-          clearEstimate: estimatedReach == null,
-        ),
-      ),
-      clearError: true,
-    );
-  }
-
-  void updateScheduleMode(bool sendNow) {
-    state = state.copyWith(
-      draft: state.draft.copyWith(
-        schedule: state.draft.schedule.copyWith(
-          sendNow: sendNow,
-          clearScheduledAt: sendNow,
-        ),
-      ),
-      clearError: true,
-    );
-  }
-
-  void updateScheduledAt(DateTime? value) {
-    state = state.copyWith(
-      draft: state.draft.copyWith(
-        schedule: state.draft.schedule.copyWith(
-          sendNow: value == null,
-          scheduledAt: value,
-        ),
-      ),
-      clearError: true,
-    );
-  }
-
-  Future<NotificationCampaign> saveDraft() async {
-    final repo = ref.read(notificationCampaignRepositoryProvider);
-    state = state.copyWith(isSubmitting: true, clearError: true);
-    try {
-      final saved = state.draftId == null
-          ? await repo.createDraft(state.draft)
-          : await repo.updateDraft(state.draftId!, state.draft);
-      state = state.copyWith(
-        draftId: saved.id,
-        draft: saved.toDraft(),
-        isSubmitting: false,
-        clearError: true,
-      );
-      return saved;
-    } catch (error) {
-      state = state.copyWith(
-        isSubmitting: false,
-        errorMessage: error.toString(),
-      );
-      rethrow;
-    }
-  }
-
-  Future<NotificationCampaign> sendNow(
-    NotificationCapability capability,
-  ) async {
-    final issues = state.validationIssues(capability);
+  Future<NotificationCampaign> sendBroadcast() async {
+    final issues = state.validationIssues();
     if (issues.isNotEmpty) {
       final message = issues.join('\n');
       state = state.copyWith(errorMessage: message);
       throw Exception(message);
     }
 
-    final saved = await saveDraft();
     final repo = ref.read(notificationCampaignRepositoryProvider);
     state = state.copyWith(isSubmitting: true, clearError: true);
     try {
-      final sent = await repo.sendNow(saved.id);
+      final sent = await repo.sendBroadcast(
+        title: state.title,
+        body: state.body,
+      );
       state = state.copyWith(isSubmitting: false, clearError: true);
       return sent;
-    } catch (error) {
-      state = state.copyWith(
-        isSubmitting: false,
-        errorMessage: error.toString(),
-      );
-      rethrow;
-    }
-  }
-
-  Future<NotificationCampaign> scheduleDraft(
-    NotificationCapability capability,
-  ) async {
-    final issues = state.validationIssues(capability);
-    if (issues.isNotEmpty) {
-      final message = issues.join('\n');
-      state = state.copyWith(errorMessage: message);
-      throw Exception(message);
-    }
-
-    final saved = await saveDraft();
-    final repo = ref.read(notificationCampaignRepositoryProvider);
-    state = state.copyWith(isSubmitting: true, clearError: true);
-    try {
-      final scheduled = await repo.schedule(saved.id, state.draft.schedule);
-      state = state.copyWith(
-        draftId: scheduled.id,
-        draft: scheduled.toDraft(),
-        isSubmitting: false,
-        clearError: true,
-      );
-      return scheduled;
     } catch (error) {
       state = state.copyWith(
         isSubmitting: false,

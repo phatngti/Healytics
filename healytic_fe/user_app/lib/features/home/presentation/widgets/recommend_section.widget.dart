@@ -11,22 +11,14 @@ import 'package:user_app/features/home/presentation/'
 
 /// Displays a horizontally-scrollable list of
 /// AI-recommended services fetched via
-/// [aiRecommendationsProvider].
+/// [recommendedProductsProvider].
 class RecommendSection extends ConsumerWidget {
   const RecommendSection({super.key});
-
-  /// Default service IDs to seed the AI engine.
-  ///
-  /// In production these would come from the user's
-  /// profile, browsing history, or a parent provider.
-  static const _defaultServiceIds = <String>[];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final aiAsync = ref.watch(
-      aiRecommendationsProvider(_defaultServiceIds),
-    );
+    final aiAsync = ref.watch(recommendedProductsProvider);
     final titleGap = AppDimens.titleGap(context);
 
     // Proportional card width: ~65 % of screen so
@@ -34,10 +26,7 @@ class RecommendSection extends ConsumerWidget {
     final cardWidth = AppDimens.widthFraction(context);
 
     // Proportional list height scales with card width.
-    final listHeight = AppDimens.heightRatio(
-      cardWidth,
-      ratio: 1.08,
-    );
+    final listHeight = AppDimens.heightRatio(cardWidth, ratio: 1.08);
 
     return Column(
       children: [
@@ -72,18 +61,13 @@ class RecommendSection extends ConsumerWidget {
         SizedBox(
           height: listHeight,
           child: aiAsync.when(
-            loading: () => _LoadingList(
-              cardWidth: cardWidth,
-            ),
+            loading: () => _LoadingList(cardWidth: cardWidth),
             error: (_, __) => const _EmptyState(),
             data: (items) {
               if (items.isEmpty) {
                 return const _EmptyState();
               }
-              return _RecommendList(
-                items: items,
-                cardWidth: cardWidth,
-              );
+              return _RecommendList(items: items, cardWidth: cardWidth);
             },
           ),
         ),
@@ -100,10 +84,7 @@ class _RecommendList extends StatelessWidget {
   final List<AiRecommendation> items;
   final double cardWidth;
 
-  const _RecommendList({
-    required this.items,
-    required this.cardWidth,
-  });
+  const _RecommendList({required this.items, required this.cardWidth});
 
   @override
   Widget build(BuildContext context) {
@@ -111,14 +92,9 @@ class _RecommendList extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.none,
       itemCount: items.length,
-      separatorBuilder: (_, __) => SizedBox(
-        width: AppDimens.spaceLg,
-      ),
+      separatorBuilder: (_, __) => SizedBox(width: AppDimens.spaceLg),
       itemBuilder: (_, index) {
-        return _RecommendCard(
-          width: cardWidth,
-          item: items[index],
-        );
+        return _RecommendCard(width: cardWidth, item: items[index]);
       },
     );
   }
@@ -143,9 +119,7 @@ class _LoadingList extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.none,
       itemCount: 2,
-      separatorBuilder: (_, __) => SizedBox(
-        width: AppDimens.spaceLg,
-      ),
+      separatorBuilder: (_, __) => SizedBox(width: AppDimens.spaceLg),
       itemBuilder: (_, __) => Container(
         width: cardWidth,
         padding: EdgeInsets.all(AppDimens.spaceMd),
@@ -159,8 +133,7 @@ class _LoadingList extends StatelessWidget {
             Container(
               height: imageHeight,
               decoration: BoxDecoration(
-                color: theme
-                    .colorScheme.surfaceContainerHighest,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(
                   cardRad - AppDimens.spaceXs,
                 ),
@@ -168,21 +141,16 @@ class _LoadingList extends StatelessWidget {
             ),
             SizedBox(height: AppDimens.spaceMd),
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppDimens.spaceXs,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     height: AppDimens.spaceLg,
                     width: cardWidth * 0.6,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme
-                          .surfaceContainerHighest,
-                      borderRadius:
-                          AppDimens.radiusExtraSmall,
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusExtraSmall,
                     ),
                   ),
                   SizedBox(height: AppDimens.spaceSm),
@@ -190,10 +158,8 @@ class _LoadingList extends StatelessWidget {
                     height: AppDimens.spaceMd,
                     width: cardWidth * 0.45,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme
-                          .surfaceContainerHighest,
-                      borderRadius:
-                          AppDimens.radiusExtraSmall,
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusExtraSmall,
                     ),
                   ),
                   SizedBox(height: AppDimens.spaceMd),
@@ -201,10 +167,8 @@ class _LoadingList extends StatelessWidget {
                     height: AppDimens.spaceMdLg,
                     width: cardWidth * 0.38,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme
-                          .surfaceContainerHighest,
-                      borderRadius:
-                          AppDimens.radiusExtraSmall,
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusExtraSmall,
                     ),
                   ),
                 ],
@@ -258,10 +222,7 @@ class _RecommendCard extends StatelessWidget {
   final double width;
   final AiRecommendation item;
 
-  const _RecommendCard({
-    required this.width,
-    required this.item,
-  });
+  const _RecommendCard({required this.width, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -278,9 +239,7 @@ class _RecommendCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(cardRad),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.shadow.withValues(
-              alpha: 0.05,
-            ),
+            color: theme.colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: AppDimens.spaceXl,
             offset: Offset(0, AppDimens.spaceXs),
           ),
@@ -292,30 +251,29 @@ class _RecommendCard extends StatelessWidget {
           _CardImage(
             imageUrl: item.imageUrl,
             rating: item.rating,
+            totalReviews: item.totalReviews,
             badge: item.badge,
             height: imageHeight,
             cardRadius: cardRad,
           ),
           SizedBox(height: AppDimens.spaceMd),
           Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppDimens.spaceXs,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _CardTitle(
-                  name: item.name,
-                  width: width,
-                ),
+                _CardTitle(name: item.name, width: width),
+                if (item.staffName != null) ...[
+                  SizedBox(height: AppDimens.spaceXxs),
+                  _CardStaff(staffName: item.staffName!),
+                ],
                 SizedBox(height: AppDimens.spaceXs),
                 _CardMeta(
                   location: item.location,
                   bookedCount: item.bookedCount,
                 ),
                 SizedBox(height: AppDimens.spaceMd),
-                _CardFooter(price: item.price),
+                _CardFooter(price: item.price, currency: item.currency),
               ],
             ),
           ),
@@ -332,6 +290,7 @@ class _RecommendCard extends StatelessWidget {
 class _CardImage extends StatelessWidget {
   final String imageUrl;
   final double rating;
+  final int totalReviews;
   final String? badge;
   final double height;
   final double cardRadius;
@@ -339,6 +298,7 @@ class _CardImage extends StatelessWidget {
   const _CardImage({
     required this.imageUrl,
     required this.rating,
+    required this.totalReviews,
     this.badge,
     required this.height,
     required this.cardRadius,
@@ -352,19 +312,14 @@ class _CardImage extends StatelessWidget {
     return Stack(
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(
-            innerRadius,
-          ),
+          borderRadius: BorderRadius.circular(innerRadius),
           child: SizedBox(
             height: height,
             width: double.infinity,
-            child: NetworkImageAuto(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-            ),
+            child: NetworkImageAuto(imageUrl: imageUrl, fit: BoxFit.cover),
           ),
         ),
-        // Rating badge
+        // Rating badge with review count
         Positioned(
           top: AppDimens.spaceMd,
           right: AppDimens.spaceMd,
@@ -374,9 +329,7 @@ class _CardImage extends StatelessWidget {
               vertical: AppDimens.spaceXs,
             ),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surface.withValues(
-                alpha: 0.9,
-              ),
+              color: theme.colorScheme.surface.withValues(alpha: 0.9),
               borderRadius: AppDimens.radiusPill,
             ),
             child: Row(
@@ -389,11 +342,19 @@ class _CardImage extends StatelessWidget {
                 SizedBox(width: AppDimens.spaceXs),
                 Text(
                   rating.toStringAsFixed(1),
-                  style:
-                      theme.textTheme.bodySmall?.copyWith(
+                  style: theme.textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                if (totalReviews > 0) ...[
+                  SizedBox(width: AppDimens.spaceXxs),
+                  Text(
+                    '($totalReviews)',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -414,8 +375,7 @@ class _CardImage extends StatelessWidget {
               ),
               child: Text(
                 badge!,
-                style:
-                    theme.textTheme.labelSmall?.copyWith(
+                style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onPrimary,
                   fontWeight: FontWeight.w600,
                 ),
@@ -431,10 +391,7 @@ class _CardTitle extends StatelessWidget {
   final String name;
   final double width;
 
-  const _CardTitle({
-    required this.name,
-    required this.width,
-  });
+  const _CardTitle({required this.name, required this.width});
 
   @override
   Widget build(BuildContext context) {
@@ -457,14 +414,46 @@ class _CardTitle extends StatelessWidget {
   }
 }
 
+/// Shows the staff/specialist name when the DTO
+/// provides it via [ServiceDetail.staffName].
+class _CardStaff extends StatelessWidget {
+  final String staffName;
+
+  const _CardStaff({required this.staffName});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      children: [
+        Icon(
+          Symbols.person,
+          size: AppDimens.iconXs,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        SizedBox(width: AppDimens.spaceXs),
+        Flexible(
+          child: Text(
+            staffName,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontStyle: FontStyle.italic,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _CardMeta extends StatelessWidget {
   final String location;
   final int bookedCount;
 
-  const _CardMeta({
-    required this.location,
-    required this.bookedCount,
-  });
+  const _CardMeta({required this.location, required this.bookedCount});
 
   @override
   Widget build(BuildContext context) {
@@ -491,15 +480,10 @@ class _CardMeta extends StatelessWidget {
         ),
         if (bookedCount > 0) ...[
           Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppDimens.spaceXs,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
             child: Text('•', style: metaStyle),
           ),
-          Text(
-            '$bookedCount booked',
-            style: metaStyle,
-          ),
+          Text('$bookedCount booked', style: metaStyle),
         ],
       ],
     );
@@ -508,8 +492,9 @@ class _CardMeta extends StatelessWidget {
 
 class _CardFooter extends StatelessWidget {
   final String price;
+  final String currency;
 
-  const _CardFooter({required this.price});
+  const _CardFooter({required this.price, required this.currency});
 
   @override
   Widget build(BuildContext context) {
@@ -535,10 +520,7 @@ class _CardFooter extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color:
-                    theme.colorScheme.secondary.withValues(
-                  alpha: 0.3,
-                ),
+                color: theme.colorScheme.secondary.withValues(alpha: 0.3),
                 blurRadius: AppDimens.spaceMdLg,
               ),
             ],

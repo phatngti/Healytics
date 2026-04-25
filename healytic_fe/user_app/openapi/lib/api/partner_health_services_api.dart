@@ -168,6 +168,69 @@ class PartnerHealthServicesApi {
     return null;
   }
 
+  /// Get per-service detail analytics
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] productId (required):
+  ///
+  /// * [String] period:
+  ///   Time period for analytics aggregation
+  Future<Response> partnerHealthServiceControllerGetDetailAnalyticsWithHttpInfo(String productId, { String? period, }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/partner/health-services/analytics/{productId}'
+      .replaceAll('{productId}', productId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (period != null) {
+      queryParams.addAll(_queryParams('', 'period', period));
+    }
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get per-service detail analytics
+  ///
+  /// Parameters:
+  ///
+  /// * [String] productId (required):
+  ///
+  /// * [String] period:
+  ///   Time period for analytics aggregation
+  Future<HealthServiceDetailAnalyticsResponseDto?> partnerHealthServiceControllerGetDetailAnalytics(String productId, { String? period, }) async {
+    final response = await partnerHealthServiceControllerGetDetailAnalyticsWithHttpInfo(productId,  period: period, );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'HealthServiceDetailAnalyticsResponseDto',) as HealthServiceDetailAnalyticsResponseDto;
+    
+    }
+    return null;
+  }
+
   /// Get full health service details by slug
   ///
   /// Note: This method returns the HTTP [Response].
@@ -216,6 +279,64 @@ class PartnerHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerHealthServiceDetailResponseDto',) as PartnerHealthServiceDetailResponseDto;
+    
+    }
+    return null;
+  }
+
+  /// Get health service overview analytics
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] period:
+  ///   Time period for analytics aggregation
+  Future<Response> partnerHealthServiceControllerGetOverviewAnalyticsWithHttpInfo({ String? period, }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/partner/health-services/analytics/overview';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (period != null) {
+      queryParams.addAll(_queryParams('', 'period', period));
+    }
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get health service overview analytics
+  ///
+  /// Parameters:
+  ///
+  /// * [String] period:
+  ///   Time period for analytics aggregation
+  Future<HealthServiceOverviewAnalyticsResponseDto?> partnerHealthServiceControllerGetOverviewAnalytics({ String? period, }) async {
+    final response = await partnerHealthServiceControllerGetOverviewAnalyticsWithHttpInfo( period: period, );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'HealthServiceOverviewAnalyticsResponseDto',) as HealthServiceOverviewAnalyticsResponseDto;
     
     }
     return null;

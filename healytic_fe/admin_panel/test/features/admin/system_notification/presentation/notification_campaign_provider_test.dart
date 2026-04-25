@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/test_notification_repository.dart';
 
 void main() {
-  test('composer sends campaign and list state refreshes', () async {
+  test('composer reports title and body validation errors', () async {
     final container = ProviderContainer(
       overrides: [
         notificationCampaignRepositoryProvider.overrideWithValue(
@@ -20,16 +20,34 @@ void main() {
     final composer = container.read(
       notificationCampaignComposerProvider.notifier,
     );
-    composer.updateCampaignName('Critical maintenance notice');
+
+    await expectLater(composer.sendBroadcast(), throwsException);
+
+    final state = container.read(notificationCampaignComposerProvider);
+    expect(state.errorMessage, contains('Notification title is required.'));
+    expect(state.errorMessage, contains('Notification body is required.'));
+    expect(state.isSubmitting, isFalse);
+  });
+
+  test('composer sends broadcast and list state refreshes', () async {
+    final container = ProviderContainer(
+      overrides: [
+        notificationCampaignRepositoryProvider.overrideWithValue(
+          buildTestNotificationRepository(),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final composer = container.read(
+      notificationCampaignComposerProvider.notifier,
+    );
     composer.updateTitle('Maintenance starts at 01:00 ICT');
     composer.updateBody(
       'The platform will enter maintenance mode for approximately 60 minutes.',
     );
 
-    final capability = await container.read(
-      notificationCapabilitiesProvider.future,
-    );
-    final sentCampaign = await composer.sendNow(capability);
+    final sentCampaign = await composer.sendBroadcast();
 
     expect(sentCampaign.status, NotificationCampaignStatus.sent);
     expect(sentCampaign.content.title, 'Maintenance starts at 01:00 ICT');

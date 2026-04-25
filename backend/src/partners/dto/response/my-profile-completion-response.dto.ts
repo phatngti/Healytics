@@ -145,7 +145,7 @@ export class MyProfileCompletionResponseDto {
         required: true,
         completed:
           (partner.description?.trim().length ?? 0) >= 120 &&
-          (partner.description?.trim().length ?? 0) <= 1000,
+          (partner.description?.trim().length ?? 0) <= 100000000,
       },
       {
         key: 'gallery',

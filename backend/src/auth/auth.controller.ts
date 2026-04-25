@@ -79,7 +79,6 @@ export class AuthController {
   @Post('user/login')
   @Public()
   @UseGuards(LocalAuthGuard)
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login as a user' })
   @ApiBody({ type: LoginDto })

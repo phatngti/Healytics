@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:logging/logging.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:user_app/core/providers/location.provider.dart';
+import 'package:user_app/core/services/location.service.dart';
 import 'package:user_app/features/ai_health_assistant/domain/repositories/chat.repository.dart';
 import 'package:user_app/features/ai_health_assistant/data/repositories/chat_impl.repository.dart';
 import 'package:user_app/features/ai_health_assistant/domain/entities/chat_message.entity.dart';
@@ -65,6 +67,7 @@ final _sentenceEndRegex = RegExp(r'[.!?](?:\s|$)');
 class Chat extends _$Chat {
   static final _log = Logger('Chat');
   late final ChatRepository _repository;
+  late final LocationService _locationService;
   StreamSubscription<ChatSseEvent>? _sseSubscription;
 
   // ── Sentence-splitting state ──────────────────
@@ -83,6 +86,8 @@ class Chat extends _$Chat {
   @override
   ChatState build(String? conversationId) {
     _repository = ref.read(chatRepositoryProvider);
+    _locationService =
+        ref.read(locationServiceProvider);
 
     // Cancel SSE subscription when provider is
     // disposed.
@@ -163,10 +168,26 @@ class Chat extends _$Chat {
     );
 
     try {
+      // Best-effort location resolution.
+      double? lat;
+      double? lng;
+      try {
+        final coord = await _locationService
+            .getCurrentCoordinate();
+        lat = coord.latitude;
+        lng = coord.longitude;
+      } on LocationServiceException catch (e) {
+        _log.warning(
+          'Location unavailable: $e',
+        );
+      }
+
       final stream =
           _repository.sendMessageAndStream(
             convId,
             text,
+            currentLat: lat,
+            currentLng: lng,
           );
 
       // Initialise sentence-splitting state.

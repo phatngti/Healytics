@@ -1,9 +1,10 @@
 import { Body, Post } from '@nestjs/common';
-import { ApiOperation, ApiOkResponse } from '@nestjs/swagger';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { AiApi } from '@/common/decorators/api/ai-api.decorator';
 import { AiServiceService } from './ai-service.service';
 import { AiRecommendationsRequestDto } from './dto/ai-recommendations-request.dto';
 import { AiRecommendationsResponseDto } from './dto/ai-recommendation-response.dto';
+import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 /**
  * Controller for AI service endpoints.
@@ -16,12 +17,8 @@ export class AiServiceController {
   constructor(private readonly aiServiceService: AiServiceService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Get service recommendations by IDs' })
-  @ApiOkResponse({
-    description:
-      'Returns enriched recommendation data for the requested services.',
-    type: AiRecommendationsResponseDto,
-  })
+    @LogResponse()
+  @ApiExcludeEndpoint()
   getRecommendations(
     @Body() dto: AiRecommendationsRequestDto,
   ): Promise<AiRecommendationsResponseDto> {

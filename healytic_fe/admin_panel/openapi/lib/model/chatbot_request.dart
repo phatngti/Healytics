@@ -16,6 +16,8 @@ class ChatbotRequest {
     this.conversationId,
     required this.userId,
     required this.message,
+    this.currentLat,
+    this.currentLng,
     this.topK = 3,
   });
 
@@ -26,6 +28,14 @@ class ChatbotRequest {
 
   String message;
 
+  /// Minimum value: -90
+  /// Maximum value: 90
+  num? currentLat;
+
+  /// Minimum value: -180
+  /// Maximum value: 180
+  num? currentLng;
+
   /// Minimum value: 1
   /// Maximum value: 20
   int topK;
@@ -35,6 +45,8 @@ class ChatbotRequest {
     other.conversationId == conversationId &&
     other.userId == userId &&
     other.message == message &&
+    other.currentLat == currentLat &&
+    other.currentLng == currentLng &&
     other.topK == topK;
 
   @override
@@ -43,10 +55,12 @@ class ChatbotRequest {
     (conversationId == null ? 0 : conversationId!.hashCode) +
     (userId.hashCode) +
     (message.hashCode) +
+    (currentLat == null ? 0 : currentLat!.hashCode) +
+    (currentLng == null ? 0 : currentLng!.hashCode) +
     (topK.hashCode);
 
   @override
-  String toString() => 'ChatbotRequest[conversationId=$conversationId, userId=$userId, message=$message, topK=$topK]';
+  String toString() => 'ChatbotRequest[conversationId=$conversationId, userId=$userId, message=$message, currentLat=$currentLat, currentLng=$currentLng, topK=$topK]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -57,6 +71,16 @@ class ChatbotRequest {
     }
       json[r'user_id'] = this.userId;
       json[r'message'] = this.message;
+    if (this.currentLat != null) {
+      json[r'current_lat'] = this.currentLat;
+    } else {
+      json[r'current_lat'] = null;
+    }
+    if (this.currentLng != null) {
+      json[r'current_lng'] = this.currentLng;
+    } else {
+      json[r'current_lng'] = null;
+    }
       json[r'top_k'] = this.topK;
     return json;
   }
@@ -83,6 +107,12 @@ class ChatbotRequest {
         conversationId: mapValueOfType<String>(json, r'conversation_id'),
         userId: mapValueOfType<String>(json, r'user_id')!,
         message: mapValueOfType<String>(json, r'message')!,
+        currentLat: json[r'current_lat'] == null
+            ? null
+            : num.parse('${json[r'current_lat']}'),
+        currentLng: json[r'current_lng'] == null
+            ? null
+            : num.parse('${json[r'current_lng']}'),
         topK: mapValueOfType<int>(json, r'top_k') ?? 3,
       );
     }

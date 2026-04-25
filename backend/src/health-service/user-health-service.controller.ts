@@ -108,7 +108,6 @@ export class UserHealthServiceController {
    * Retrieves service info by ID.
    */
   @Get(':id/info')
-  @LogResponse()
   @ApiOperation({ summary: 'Get service info by ID' })
   @ApiOkResponse({
     description: 'Return service info for the detail screen.',

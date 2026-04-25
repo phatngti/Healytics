@@ -57,6 +57,14 @@ class TestNotificationRemoteDataSource
   }
 
   @override
+  Future<NotificationCampaign> sendBroadcast({
+    required String title,
+    required String body,
+  }) {
+    return _delegate.sendBroadcast(title: title, body: body);
+  }
+
+  @override
   Future<NotificationCampaign> sendNow(NotificationCampaignId id) {
     return _delegate.sendNow(id);
   }

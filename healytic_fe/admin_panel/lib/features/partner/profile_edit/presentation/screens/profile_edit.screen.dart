@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:admin_panel/core/providers/image_upload.provider.dart';
 import 'package:admin_panel/features/partner/profile_completion/presentation/widgets/branding_section.widget.dart';
 import 'package:admin_panel/features/partner/profile_completion/presentation/widgets/certifications_section.widget.dart';
@@ -15,7 +17,9 @@ import 'package:admin_panel/features/partner/profile_edit/presentation/widgets/v
 import 'package:admin_panel/features/partner/profile_completion/domain/profile_completion.entity.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/card/error_card.dart';
+import 'package:common/widgets/quill.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Partner public profile edit screen.
@@ -40,6 +44,8 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   static const double _kDialogWidth = 420;
 
   /// Dialog width for description editor.
+  ///
+  /// Made wider to accommodate the Quill toolbar.
   static const double _kDescDialogWidth = 560;
 
   /// Bottom bar height for scroll padding.
@@ -54,7 +60,11 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   /// Right rail width.
   static const double _kRailWidth = 340;
 
-  final _descCtrl = TextEditingController();
+  /// Raw description stored as Quill Delta JSON string.
+  ///
+  /// Falls back to plain text when the stored value
+  /// is not valid JSON.
+  String _descRaw = '';
 
   bool _didHydrate = false;
   bool _isSaving = false;
@@ -71,13 +81,14 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
 
   @override
   void dispose() {
-    _descCtrl.dispose();
     super.dispose();
   }
 
   // ── Computed properties ──────────────────────
 
-  String get _trimmedDesc => _descCtrl.text.trim();
+  /// Extracts plain text from the stored Quill Delta
+  /// JSON for length validation and display.
+  String get _trimmedDesc => _getPlainTextFromDesc(_descRaw);
 
   bool get _hasCover =>
       _coverImageUrl != null && _coverImageUrl!.trim().isNotEmpty;
@@ -102,7 +113,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     _logoImageUrl = sf.logoImageUrl;
     _gallery = List<String>.from(sf.gallery);
     _certifications = List.from(sf.certifications);
-    _descCtrl.text = sf.description ?? '';
+    _descRaw = sf.description ?? '';
     _didHydrate = true;
   }
 
@@ -114,7 +125,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       PublicProfileStorefront(
         coverImageUrl: _coverImageUrl?.trim(),
         logoImageUrl: _logoImageUrl?.trim(),
-        description: _trimmedDesc,
+        description: _descRaw,
         gallery: List<String>.from(_gallery),
         certifications: _normalize(_certifications),
       ),
@@ -423,17 +434,19 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   }
 
   Future<void> _editDescription() async {
-    final controller = TextEditingController(text: _descCtrl.text);
+    final initialContent = _tryParseQuillContent(_descRaw);
+    // Tracks the latest Delta JSON from the editor.
+    String? latestDeltaJson;
+    int latestPlainLength = _trimmedDesc.length;
 
     final result = await showDialog<String>(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            final trimmedLength = controller.text.trim().length;
             final isValid =
-                trimmedLength >= _minDescLength &&
-                trimmedLength <= _maxDescLength;
+                latestPlainLength >= _minDescLength &&
+                latestPlainLength <= _maxDescLength;
 
             return AlertDialog(
               title: const Text('Clinic description'),
@@ -453,31 +466,40 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                       ),
                     ),
                     AppDimens.verticalMedium,
-                    TextField(
-                      controller: controller,
-                      onChanged: (_) => setState(() {}),
-                      minLines: 6,
-                      maxLines: 10,
-                      maxLength: _maxDescLength,
-                      decoration: InputDecoration(
-                        hintText: 'Describe the clinic…',
-                        border: OutlineInputBorder(
-                          borderRadius: AppDimens.radiusMedium,
-                        ),
-                        errorText: controller.text.trim().isEmpty || isValid
-                            ? null
-                            : 'At least '
-                                  '$_minDescLength '
-                                  'characters.',
-                      ),
+                    FlutterQuillEditor(
+                      initialContent: initialContent,
+                      height: 300,
+                      onChanged: (delta) {
+                        final encoded = jsonEncode(delta);
+                        final plain = _getPlainTextFromDesc(encoded);
+                        setState(() {
+                          latestDeltaJson = encoded;
+                          latestPlainLength = plain.length;
+                        });
+                      },
+
                     ),
+                    AppDimens.verticalSmall,
                     Text(
-                      '$trimmedLength/'
+                      '$latestPlainLength/'
                       '$_minDescLength min',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
+                    if (latestPlainLength > 0 && !isValid)
+                      Padding(
+                        padding: const EdgeInsets.only(top: AppDimens.spaceXxs),
+                        child: Text(
+                          'At least '
+                          '$_minDescLength '
+                          'characters.',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -489,7 +511,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                 FilledButton(
                   onPressed: !isValid
                       ? null
-                      : () => Navigator.of(context).pop(controller.text.trim()),
+                      : () => Navigator.of(context).pop(latestDeltaJson),
                   child: const Text('Save'),
                 ),
               ],
@@ -499,11 +521,9 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       },
     );
 
-    controller.dispose();
-
     if (result == null || !mounted) return;
     setState(() {
-      _descCtrl.text = result;
+      _descRaw = result;
     });
     _syncDraft();
   }
@@ -531,6 +551,52 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
               '${p.substring(1).toLowerCase()}',
         )
         .join(' ');
+  }
+
+  /// Parses a raw description (Quill Delta JSON or
+  /// plain text) into a Delta ops list suitable for
+  /// [FlutterQuillEditor.initialContent].
+  ///
+  /// Returns `null` when the value is empty.
+  /// Non-JSON strings are wrapped as plain-text Delta.
+  static List<Map<String, Object>>? _tryParseQuillContent(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return null;
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List && decoded.isNotEmpty) {
+        return decoded.map((e) => Map<String, Object>.from(e as Map)).toList();
+      }
+      return null;
+    } on FormatException {
+      // Not JSON — wrap as plain-text Delta.
+      return <Map<String, Object>>[
+        {'insert': '$raw\n'},
+      ];
+    }
+  }
+
+  /// Extracts trimmed plain text from a raw
+  /// description that may be Quill Delta JSON or
+  /// a legacy plain-text string.
+  static String _getPlainTextFromDesc(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return '';
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List && decoded.isNotEmpty) {
+        final buf = StringBuffer();
+        for (final op in decoded) {
+          if (op is Map && op['insert'] is String) {
+            buf.write(op['insert'] as String);
+          }
+        }
+        return buf.toString().trim();
+      }
+      return raw.trim();
+    } on FormatException {
+      return raw.trim();
+    }
   }
 
   /// Bridges from [PublicProfileCertification]

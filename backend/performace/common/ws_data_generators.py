@@ -1,6 +1,10 @@
 """
 Faker-based data generators for WebSocket payloads.
 Produces payloads matching the ws-contract.json models.
+
+All generators use typed model classes from `models/ws_models` and return
+serialized dicts via `.to_dict()` — guaranteeing payloads always match
+the WS contract schema.
 """
 
 from __future__ import annotations
@@ -9,6 +13,14 @@ import os
 import uuid
 import random
 from faker import Faker
+
+from models.ws_models import (
+    WsJoinConversationPayload,
+    WsMarkReadPayload,
+    WsMessageType,
+    WsSendMessagePayload,
+    WsTypingPayload,
+)
 
 fake = Faker("vi_VN")
 
@@ -42,7 +54,7 @@ def _pick_receiver_id() -> str:
 
 # ── WsSendMessagePayload ─────────────────────────────────────────────────────
 
-MESSAGE_TYPES = ["text", "image", "file", "system"]
+MESSAGE_TYPES = list(WsMessageType)
 
 
 def generate_send_message(
@@ -59,15 +71,15 @@ def generate_send_message(
       - messageType (optional, default "text")
       - clientMessageId (optional, UUID for idempotent delivery)
     """
-    return {
-        "conversationId": conversation_id or _pick_conversation_id(),
-        "receiverId": receiver_id or _pick_receiver_id(),
-        "content": fake.paragraph(nb_sentences=random.randint(1, 3))[:500],
-        "messageType": random.choices(
+    return WsSendMessagePayload(
+        conversationId=conversation_id or _pick_conversation_id(),
+        receiverId=receiver_id or _pick_receiver_id(),
+        content=fake.paragraph(nb_sentences=random.randint(1, 3))[:500],
+        messageType=random.choices(
             MESSAGE_TYPES, weights=[80, 10, 8, 2], k=1
         )[0],
-        "clientMessageId": str(uuid.uuid4()),
-    }
+        clientMessageId=str(uuid.uuid4()),
+    ).to_dict()
 
 
 # ── WsTypingPayload ──────────────────────────────────────────────────────────
@@ -83,10 +95,10 @@ def generate_typing(
       - conversationId (required)
       - receiverId (required)
     """
-    return {
-        "conversationId": conversation_id or _pick_conversation_id(),
-        "receiverId": receiver_id or _pick_receiver_id(),
-    }
+    return WsTypingPayload(
+        conversationId=conversation_id or _pick_conversation_id(),
+        receiverId=receiver_id or _pick_receiver_id(),
+    ).to_dict()
 
 
 # ── WsMarkReadPayload ────────────────────────────────────────────────────────
@@ -102,10 +114,10 @@ def generate_mark_read(
       - conversationId (required)
       - receiverId (required)
     """
-    return {
-        "conversationId": conversation_id or _pick_conversation_id(),
-        "receiverId": receiver_id or _pick_receiver_id(),
-    }
+    return WsMarkReadPayload(
+        conversationId=conversation_id or _pick_conversation_id(),
+        receiverId=receiver_id or _pick_receiver_id(),
+    ).to_dict()
 
 
 # ── WsJoinConversationPayload ────────────────────────────────────────────────
@@ -119,6 +131,6 @@ def generate_join_conversation(
     Matches ws-contract.json:
       - conversationId (required)
     """
-    return {
-        "conversationId": conversation_id or _pick_conversation_id(),
-    }
+    return WsJoinConversationPayload(
+        conversationId=conversation_id or _pick_conversation_id(),
+    ).to_dict()

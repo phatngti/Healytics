@@ -24,6 +24,7 @@ export class CheckoutTicket {
   @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
+  @Index()
   @Column({ name: 'staff_id', type: 'uuid' })
   staffId: string;
 
@@ -49,6 +50,10 @@ export class CheckoutTicket {
 
   @Column({ name: 'error_message', type: 'text', nullable: true })
   errorMessage: string | null;
+
+  /** Redis pre-lock token acquired at ticket creation (closes TOCTOU gap) */
+  @Column({ name: 'lock_token', type: 'varchar', length: 36, nullable: true })
+  lockToken: string | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
