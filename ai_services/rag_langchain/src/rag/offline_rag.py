@@ -85,8 +85,11 @@ rag_prompt = PromptTemplate(
 
         RELEVANT SERVICES:
         - Services are provided by Healytics' recommender system when relevant
-        - If services are listed → naturally weave 1 to 3 most relevant ones into your answer, briefly explain why each fits the user's concern
-        - If services list is empty → do NOT mention, suggest, or hint at any services whatsoever
+        - If services are listed → recommend ONLY services from the provided list; naturally weave 1 to 3 most relevant ones into your answer, briefly explain why each fits the user's concern
+        - Never invent service names, provider names, addresses, prices, ratings, time slots, or availability that are not present in the provided services list
+        - If the user asks for service recommendations but the services list is empty → clearly say that Healytics has not found matching/nearby services for the user's request right now; do NOT suggest fake or generic specific services
+        - When no services are available, give brief practical advice instead: suggest broad next steps such as adjusting location, trying another keyword, expanding distance, or consulting a suitable healthcare professional
+        - If the services list is empty and the user is not asking for services → simply answer the health question normally without mentioning services
 
         ============================
         ANSWERING RULES
