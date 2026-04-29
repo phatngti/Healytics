@@ -129,7 +129,11 @@ async def generative_ai(inputs: InputQA):
     Endpoint gốc — giữ nguyên, không đụng vào.
     Dùng để test trực tiếp qua Swagger docs.
     """
-    result = genai_chain.invoke(inputs.question)
+    result = genai_chain.invoke({
+        "history": "",
+        "services": "",
+        "question": inputs.question,
+    })
     answer = parse_llm_output(result)
     return {"answer": answer}
 
