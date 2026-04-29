@@ -879,13 +879,11 @@ Bảng~\ref{tab:sys_latency_overall} tổng hợp phân phối đầy đủ 3 th
 \centering
 \begin{tabular}{|l|c|c|c|c|c|c|c|}
 \hline
-\textbf{Chỉ số (giây)} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{p50} & \textbf{p90} & \textbf{p95} & \textbf{p99} \\
+\textbf{Chỉ số (giây)} & \textbf{Mean} & \textbf{Median}  & \textbf{p50} & \textbf{p90} & \textbf{p95} & \textbf{p99} \\
 \hline
-Total Latency    & 87.82 & 72.44 & 46.91 & 72.44 & 143.42 & 188.75 & 211.31 \\
+Total Latency    & 87.82 & 72.44  & 72.44 & 143.42 & 188.75 & 211.31 \\
 \hline
-TTFT             & 85.08 & 68.79 & 46.34 & 68.79 & 139.67 & 184.82 & 207.60 \\
-\hline
-Streaming Time   & 2.68  & 3.05  & 1.00  & 3.05  & 3.70   & 3.90   & 4.16   \\
+Streaming Time   & 2.68  & 3.05    & 3.05  & 3.70   & 3.90   & 4.16   \\
 \hline
 \end{tabular}
 \caption{Phân phối độ trễ end-to-end (n = 500)}
@@ -899,9 +897,9 @@ Throughput phát chunk sau first-token khá ổn định: trung bình 59.6 từ/
 \centering
 \begin{tabular}{|l|c|c|c|c|c|c|}
 \hline
-\textbf{Throughput (từ/giây)} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{p50} & \textbf{p95} & \textbf{p99} \\
+\textbf{Throughput (từ/giây)} & \textbf{Mean} & \textbf{Median}  & \textbf{p50} & \textbf{p95} & \textbf{p99} \\
 \hline
-Giá trị & 59.59 & 60.75 & 3.66 & 60.75 & 63.61 & 65.38 \\
+Giá trị & 59.59 & 60.75  & 60.75 & 63.61 & 65.38 \\
 \hline
 \end{tabular}
 \caption{Throughput giai đoạn streaming (n = 500)}
@@ -925,7 +923,7 @@ Giá trị  & 0.00659 & 0.00543 & 0.00352 & 0.00543 & 0.01076 & 0.01416 & 0.0158
 \end{table}
 
 \noindent\textbf{Ghi chú về cost model.}
-Hệ thống hiện triển khai \texttt{Llama} cục bộ nên chi phí biên thực tế $\approx$ 0. Tuy nhiên, khi triển khai production trên \texttt{RunPod} với GPU A5000 Community @ \$0.27/giờ (tương đương \$7.5 \times 10^{-5}/giây), mức chi phí dự kiến cho mỗi request đạt các giá trị nêu trong Bảng~\ref{tab:sys_cost_overall}. Do đó \textit{chi phí cao nhất xảy ra đúng vào các request có latency cao (câu trả lời dài, bộ hỏi phức tạp)}, mối quan hệ này cho thấy mọi biện pháp giảm \texttt{max\_new\_tokens} hoặc tối ưu pipeline đều trực tiếp hạ chi phí.
+Hệ thống hiện triển khai \texttt{Llama} cục bộ nên chi phí biên thực tế $\approx 0$. Tuy nhiên, khi triển khai production trên \texttt{RunPod} với GPU A5000 Community @ \$0.27/giờ (tương đương $\$7.5 \times 10^{-5}$/giây), mức chi phí dự kiến cho mỗi request đạt các giá trị nêu trong Bảng~\ref{tab:sys_cost_overall}. Do đó \textit{chi phí cao nhất xảy ra đúng vào các request có latency cao (câu trả lời dài, bộ hỏi phức tạp)}, mối quan hệ này cho thấy mọi biện pháp giảm \texttt{max\_new\_tokens} hoặc tối ưu pipeline đều trực tiếp hạ chi phí.
 
 \textbf{Phân tích theo nhóm câu hỏi.}
 Độ trễ và chi phí phụ thuộc nhiều vào độ dài câu trả lời do mô hình sinh thêm token; các nhóm yêu cầu câu trả lời dài có mean latency cao nhất, như cho thấy ở Bảng~\ref{tab:sys_by_category}.
