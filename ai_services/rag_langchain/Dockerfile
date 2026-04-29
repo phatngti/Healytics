@@ -53,6 +53,8 @@ RUN pip install --no-cache-dir \
     sentence-transformers \
     pypdf \
     huggingface_hub \
+    httpx \
+    python-dotenv \
     sse-starlette
 
 # 5. Copy source code
