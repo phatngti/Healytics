@@ -177,10 +177,10 @@ class UpdatePartnerDto(DtoModel):
 
 @dataclass(slots=True)
 class UpdatePartnerProfileCompletionDto(DtoModel):
-    coverImageUrl: str | None = None
-    logoImageUrl: str | None = None
-    description: str | None = None
-    gallery: list[str] | None = None
+    coverImageUrl: str
+    logoImageUrl: str
+    description: str
+    gallery: list[str]
     certifications: list[UpdatePartnerCertificationDto] | None = None
 
 

@@ -1,4 +1,9 @@
 import 'package:admin_panel/features/admin/category/presentation/category_add.dart';
+import 'package:admin_panel/features/admin/finance_manager/presentation/admin_finance_manager_screen.dart';
+import 'package:admin_panel/features/admin/finance_manager/presentation/admin_finance_transaction_detail.screen.dart';
+import 'package:admin_panel/features/admin/finance_manager/presentation/admin_finance_payout_detail.screen.dart';
+import 'package:admin_panel/features/admin/finance_manager/presentation/admin_finance_refund_case_detail.screen.dart';
+import 'package:admin_panel/features/admin/finance_manager/presentation/admin_finance_reconciliation_detail.screen.dart';
 import 'package:admin_panel/features/admin/category/presentation/category_home.dart';
 import 'package:admin_panel/features/admin/dashboard/presentation/admin_dashboard_screen.dart';
 import 'package:admin_panel/features/admin/system_notification/presentation/notification_campaign_composer.screen.dart';
@@ -154,6 +159,26 @@ class SuccessRegistrationRoute extends GoRouteData
       path: '/admin/notifications/:id',
       name: AdminNotificationCampaignDetailRoute.name,
     ),
+    TypedGoRoute<AdminFinanceManagerRoute>(
+      path: '/admin/finance',
+      name: AdminFinanceManagerRoute.name,
+    ),
+    TypedGoRoute<AdminFinanceTransactionDetailRoute>(
+      path: '/admin/finance/transactions/:transactionId',
+      name: AdminFinanceTransactionDetailRoute.name,
+    ),
+    TypedGoRoute<AdminFinancePayoutDetailRoute>(
+      path: '/admin/finance/payouts/:payoutId',
+      name: AdminFinancePayoutDetailRoute.name,
+    ),
+    TypedGoRoute<AdminFinanceRefundCaseDetailRoute>(
+      path: '/admin/finance/refund-cases/:caseId',
+      name: AdminFinanceRefundCaseDetailRoute.name,
+    ),
+    TypedGoRoute<AdminFinanceReconciliationDetailRoute>(
+      path: '/admin/finance/reconciliation/:exceptionId',
+      name: AdminFinanceReconciliationDetailRoute.name,
+    ),
   ],
 )
 class AdminShellRouteData extends ShellRouteData {
@@ -298,6 +323,98 @@ class AdminNotificationCampaignDetailRoute extends GoRouteData
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: NotificationCampaignDetailScreen(campaignId: id),
+    );
+  }
+}
+
+// ── ADMIN FINANCE ROUTES ──────────────────────────
+
+class AdminFinanceManagerRoute extends GoRouteData
+    with $AdminFinanceManagerRoute {
+  const AdminFinanceManagerRoute();
+  static const name = 'admin-finance';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const AdminFinanceManagerScreen(),
+    );
+  }
+}
+
+class AdminFinanceTransactionDetailRoute extends GoRouteData
+    with $AdminFinanceTransactionDetailRoute {
+  const AdminFinanceTransactionDetailRoute({
+    required this.transactionId,
+  });
+  static const name = 'admin-finance-transaction-detail';
+  final String transactionId;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: AdminFinanceTransactionDetailScreen(
+        transactionId: transactionId,
+      ),
+    );
+  }
+}
+
+class AdminFinancePayoutDetailRoute extends GoRouteData
+    with $AdminFinancePayoutDetailRoute {
+  const AdminFinancePayoutDetailRoute({
+    required this.payoutId,
+  });
+  static const name = 'admin-finance-payout-detail';
+  final String payoutId;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: AdminFinancePayoutDetailScreen(
+        payoutId: payoutId,
+      ),
+    );
+  }
+}
+
+class AdminFinanceRefundCaseDetailRoute extends GoRouteData
+    with $AdminFinanceRefundCaseDetailRoute {
+  const AdminFinanceRefundCaseDetailRoute({
+    required this.caseId,
+  });
+  static const name = 'admin-finance-refund-case-detail';
+  final String caseId;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: AdminFinanceRefundCaseDetailScreen(
+        caseId: caseId,
+      ),
+    );
+  }
+}
+
+class AdminFinanceReconciliationDetailRoute extends GoRouteData
+    with $AdminFinanceReconciliationDetailRoute {
+  const AdminFinanceReconciliationDetailRoute({
+    required this.exceptionId,
+  });
+  static const name = 'admin-finance-reconciliation-detail';
+  final String exceptionId;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: AdminFinanceReconciliationDetailScreen(
+        exceptionId: exceptionId,
+      ),
     );
   }
 }

@@ -15,7 +15,7 @@ import 'package:admin_panel/features/partner/dashboard/domain/revenue_data_point
 import 'package:admin_panel/features/partner/dashboard/domain/service_performance.entity.dart';
 import 'package:admin_panel/features/partner/dashboard/domain/staff_schedule.entity.dart';
 import 'package:admin_panel/features/partner/dashboard/domain/upcoming_appointment.entity.dart';
-import 'package:admin_openapi/api.dart';
+import 'package:admin_openapi/api.dart' hide DashboardTimePeriod;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'dashboard_remote.datasource.g.dart';

@@ -27,6 +27,8 @@ Add imports here as test modules are implemented in locustfiles/.
 # from locustfiles.categories import CategoryManager
 # from locustfiles.products import ProductManager
 # from locustfiles.service_tags import ServiceTagManager
+from locustfiles.partner_employee_analytics import PartnerEmployeeAnalyticsUser
+from locustfiles.partner_finance import PartnerFinanceStressUser, PartnerFinanceMutationUser
 
 # ── Public ────────────────────────────────────────────────────────────────────
 # from locustfiles.locations import LocationBrowser

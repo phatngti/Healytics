@@ -110,7 +110,12 @@ export class MyProfileCompletionResponseDto {
   @ApiProperty({ example: 50 })
   completionPercent: number;
 
-  @ApiProperty({ example: false })
+  @ApiProperty({
+    example: true,
+    description:
+      'Always true when returned from a successful profile-completion update, ' +
+      'because the request DTO enforces all required checklist constraints.',
+  })
   isCompleted: boolean;
 
   static fromPartner(

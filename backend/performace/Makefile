@@ -1,6 +1,8 @@
 .PHONY: perf-ui perf-headless \
 	perf-test-auth perf-test-admin perf-test-products \
 	perf-test-locations perf-test-ws perf-test-chat \
+	perf-test-updated-stress perf-test-partner-finance-stress \
+	perf-test-employee-analytics-stress perf-test-updated-mutations \
 	perf-test-booking-race perf-test-booking-race-spike \
 	generate-dtos \
 	_setup _teardown
@@ -96,6 +98,23 @@ perf-test-products:
 
 perf-test-locations:
 	$(call run_locust,--tags locations -u 10 -r 2 --run-time 60s)
+
+# ──────────────────────────────────────────────
+# Updated-module stress test runners
+# ──────────────────────────────────────────────
+
+perf-test-updated-stress:
+	$(call run_locust,--tags updated -u 50 -r 10 --run-time 300s)
+
+perf-test-partner-finance-stress:
+	$(call run_locust,--tags partner-finance -u 50 -r 10 --run-time 300s)
+
+perf-test-employee-analytics-stress:
+	$(call run_locust,--tags employee-analytics -u 30 -r 6 --run-time 300s)
+
+perf-test-updated-mutations:
+	@test "$(PERF_ENABLE_MUTATIONS)" = "1" || { echo "ERROR: Set PERF_ENABLE_MUTATIONS=1 to run finance mutation tests."; exit 1; }
+	$(call run_locust,--tags finance-mutation -u 2 -r 1 --run-time 60s)
 
 # ──────────────────────────────────────────────
 # Booking race condition test runners

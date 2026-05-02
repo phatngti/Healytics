@@ -102,7 +102,7 @@ final class RecommendedProductsProvider
 }
 
 String _$recommendedProductsHash() =>
-    r'be68c8441806e0e65890decbc7030f05a4b2c37e';
+    r'4dd8a35b6af9b8c7a1523324df05055fcd9d8dcd';
 
 /// Provider for fetching premium treatments.
 

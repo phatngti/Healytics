@@ -107,14 +107,10 @@ export class AuthService {
     const refresh_token = this.jwtService.sign(payload, {
       expiresIn: refreshExpires as any,
     });
-    console.time('createHash');
     // SHA-256 for refresh tokens: they are high-entropy JWTs, not user passwords.
     // bcrypt cost-10 blocked the event loop ~300ms per call — SHA-256 is ~0.01ms.
     const refreshHash = createHash('sha256').update(refresh_token).digest('hex');
-    console.timeEnd('createHash');
-    console.time('setRefreshTokenHash');
     await this.accountService.setRefreshTokenHash(userId, refreshHash);
-    console.timeEnd('setRefreshTokenHash');
     return {
       access_token,
       access_expires_in: accessExpires,
@@ -167,14 +163,10 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<ValidatedUser | null> {
-    console.time('validateUser');
     const user = await this.accountService.findByEmail(email);
-    console.timeEnd('validateUser');
     if (!user) return null;
 
-    console.time('comparePassword');
     const isMatch = await bcrypt.compare(password, user.passwordHash || '');
-    console.timeEnd('comparePassword');
     if (!isMatch) return null;
     const { passwordHash, ...rest } = user as Account & {
       passwordHash?: string;

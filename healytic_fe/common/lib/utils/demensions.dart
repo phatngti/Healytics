@@ -32,6 +32,9 @@ class AppDimens {
   /// SizedBox with a height of 4.0
   static const verticalExtraSmall = SizedBox(height: 4.0);
 
+  /// Alias for [verticalExtraSmall].
+  static const verticalXs = verticalExtraSmall;
+
   /// SizedBox with a height of 8.0
   static const verticalSmall = SizedBox(height: 8.0);
 
@@ -53,6 +56,9 @@ class AppDimens {
   // --- Horizontal Spacing ---
   /// SizedBox with a width of 4.0
   static const horizontalExtraSmall = SizedBox(width: 4.0);
+
+  /// Alias for [horizontalExtraSmall].
+  static const horizontalXs = horizontalExtraSmall;
 
   /// SizedBox with a width of 8.0
   static const horizontalSmall = SizedBox(width: 8.0);
@@ -103,6 +109,9 @@ class AppDimens {
 
   /// EdgeInsets.all(12.0)
   static const paddingAllMediumSmall = EdgeInsets.all(12.0);
+
+  /// Alias for [paddingAllMediumSmall].
+  static const paddingAllSmMd = paddingAllMediumSmall;
 
   /// EdgeInsets.all(16.0)
   static const paddingAllMedium = EdgeInsets.all(16.0);
@@ -162,11 +171,17 @@ class AppDimens {
   /// BorderRadius.circular(8.0)
   static const radiusSmall = BorderRadius.all(Radius.circular(8.0));
 
+  /// Alias for [radiusSmall].
+  static const radiusSm = radiusSmall;
+
   /// BorderRadius.circular(12.0)
   static const radiusMediumSmall = BorderRadius.all(Radius.circular(12.0));
 
   /// BorderRadius.circular(16.0)
   static const radiusMedium = BorderRadius.all(Radius.circular(16.0));
+
+  /// Alias for [radiusMedium].
+  static const radiusMd = radiusMedium;
 
   /// BorderRadius.circular(20.0)
   static const radiusMediumLarge = BorderRadius.all(Radius.circular(20.0));

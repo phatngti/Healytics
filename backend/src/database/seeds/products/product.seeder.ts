@@ -490,8 +490,8 @@ const SEED_PRODUCTS = [
     },
     tagNames: ['Beauty', 'Dental Care'],
     eligibleEmployees: [
-      { code: 'EMP-001', isPrimary: true },
-      { code: 'EMP-002', isPrimary: false },
+      { code: 'EMP-005', isPrimary: true },
+      { code: 'EMP-006', isPrimary: false },
     ],
     facilityImages: [
       {
@@ -517,6 +517,423 @@ const SEED_PRODUCTS = [
           'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=600',
         label: 'Waiting Lounge',
         sortOrder: 3,
+      },
+    ],
+  },
+  {
+    name: 'Dental Checkup & Cleaning',
+    slug: 'dental-checkup-cleaning',
+    description:
+      'Comprehensive dental checkup with ultrasonic cleaning, plaque removal, gum screening and personalized oral-care guidance.',
+    type: HealthServiceType.SERVICE,
+    basePrice: 650000,
+    salePrice: 590000,
+    categorySlug: 'dental',
+    partnerTaxCode: '0987654321',
+    media: [
+      {
+        url: 'https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=800',
+        isThumbnail: true,
+        sortOrder: 0,
+      },
+      {
+        url: 'https://images.unsplash.com/photo-1629909615957-be38d48fbbe4?w=800',
+        isThumbnail: false,
+        sortOrder: 1,
+      },
+    ],
+    serviceDefinition: {
+      durationMinutes: 60,
+      bufferMinutes: 15,
+      maxCapacity: 1,
+      minLeadTimeHours: 12,
+      staffAssignmentType: StaffAssignmentType.SPECIFIC,
+    },
+    resourceRequirements: [
+      { resourceTypeName: 'Dental Chair', quantityRequired: 1 },
+      { resourceTypeName: 'Ultrasonic Scaler', quantityRequired: 1 },
+    ],
+    serviceManual: {
+      preServiceGuidelines: [
+        'Brush your teeth before arrival',
+        'Bring recent dental records if available',
+      ],
+      serviceRules: [
+        {
+          iconSlug: 'arrive-early',
+          title: 'Arrive Early',
+          description: 'Arrive 10 minutes early for dental intake',
+        },
+      ],
+      procedureSteps: [
+        {
+          stepNumber: 1,
+          title: 'Oral Examination',
+          description: 'Dentist checks teeth, gums and sensitivity history',
+        },
+        {
+          stepNumber: 2,
+          title: 'Cleaning',
+          description: 'Ultrasonic scaling, polishing and oral-care guidance',
+        },
+      ],
+    },
+    tagNames: ['Dental Care'],
+    eligibleEmployees: [
+      { code: 'EMP-005', isPrimary: true },
+      { code: 'EMP-006', isPrimary: false },
+    ],
+    facilityImages: [
+      {
+        imageUrl:
+          'https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=600',
+        label: 'Dental Cleaning Room',
+        sortOrder: 0,
+      },
+    ],
+  },
+  {
+    name: 'Sports Recovery Yoga Session',
+    slug: 'sports-recovery-yoga-session',
+    description:
+      'Guided mobility and recovery yoga session for athletes, office workers and active clients with tight hips, shoulders or lower back.',
+    type: HealthServiceType.SERVICE,
+    basePrice: 220000,
+    salePrice: 180000,
+    categorySlug: 'yoga-recovery',
+    partnerTaxCode: '1122334455',
+    media: [
+      {
+        url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
+        isThumbnail: true,
+        sortOrder: 0,
+      },
+      {
+        url: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800',
+        isThumbnail: false,
+        sortOrder: 1,
+      },
+    ],
+    serviceDefinition: {
+      durationMinutes: 75,
+      bufferMinutes: 15,
+      maxCapacity: 6,
+      minLeadTimeHours: 3,
+      staffAssignmentType: StaffAssignmentType.SPECIFIC,
+    },
+    resourceRequirements: [
+      { resourceTypeName: 'Yoga Mat', quantityRequired: 1 },
+      { resourceTypeName: 'Stretch Strap', quantityRequired: 1 },
+    ],
+    serviceManual: {
+      preServiceGuidelines: [
+        'Wear flexible training clothes',
+        'Avoid intense training immediately before the session',
+      ],
+      serviceRules: [
+        {
+          iconSlug: 'comfortable-clothes',
+          title: 'Flexible Clothing',
+          description: 'Wear clothing that supports stretching and mobility',
+        },
+      ],
+      procedureSteps: [
+        {
+          stepNumber: 1,
+          title: 'Mobility Screening',
+          description: 'Coach reviews tight areas and recent training load',
+        },
+        {
+          stepNumber: 2,
+          title: 'Recovery Flow',
+          description: 'Guided yoga flow with assisted mobility drills',
+        },
+      ],
+    },
+    tagNames: ['Fitness', 'Rehabilitation'],
+    eligibleEmployees: [{ code: 'EMP-007', isPrimary: true }],
+    facilityImages: [
+      {
+        imageUrl:
+          'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600',
+        label: 'Recovery Studio',
+        sortOrder: 0,
+      },
+    ],
+  },
+  {
+    name: 'Nutrition Consultation & Meal Plan',
+    slug: 'nutrition-consultation-meal-plan',
+    description:
+      'One-on-one nutrition consultation with dietary assessment, supplement review and a practical seven-day meal plan.',
+    type: HealthServiceType.SERVICE,
+    basePrice: 700000,
+    salePrice: 650000,
+    categorySlug: 'nutrition-counseling',
+    partnerTaxCode: '5566778899',
+    media: [
+      {
+        url: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800',
+        isThumbnail: true,
+        sortOrder: 0,
+      },
+      {
+        url: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800',
+        isThumbnail: false,
+        sortOrder: 1,
+      },
+    ],
+    serviceDefinition: {
+      durationMinutes: 60,
+      bufferMinutes: 10,
+      maxCapacity: 1,
+      minLeadTimeHours: 6,
+      staffAssignmentType: StaffAssignmentType.SPECIFIC,
+    },
+    resourceRequirements: [
+      { resourceTypeName: 'Consultation Room', quantityRequired: 1 },
+    ],
+    serviceManual: {
+      preServiceGuidelines: [
+        'Prepare a three-day food diary',
+        'Bring medication and supplement names',
+      ],
+      serviceRules: [
+        {
+          iconSlug: 'food-diary',
+          title: 'Food Diary',
+          description: 'Bring recent meals for a more accurate plan',
+        },
+      ],
+      procedureSteps: [
+        {
+          stepNumber: 1,
+          title: 'Nutrition Assessment',
+          description: 'Review goals, health background and current diet',
+        },
+        {
+          stepNumber: 2,
+          title: 'Meal Plan',
+          description: 'Create a practical meal plan and supplement guidance',
+        },
+      ],
+    },
+    tagNames: ['Nutrition'],
+    eligibleEmployees: [{ code: 'EMP-009', isPrimary: true }],
+    facilityImages: [
+      {
+        imageUrl:
+          'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600',
+        label: 'Nutrition Consultation Room',
+        sortOrder: 0,
+      },
+    ],
+  },
+  {
+    name: 'Herbal Acupuncture Therapy',
+    slug: 'herbal-acupuncture-therapy',
+    description:
+      'Traditional acupuncture session with herbal care guidance for chronic tension, sleep quality and recovery support.',
+    type: HealthServiceType.SERVICE,
+    basePrice: 560000,
+    salePrice: 520000,
+    categorySlug: 'acupuncture',
+    partnerTaxCode: '6677889900',
+    media: [
+      {
+        url: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800',
+        isThumbnail: true,
+        sortOrder: 0,
+      },
+      {
+        url: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=800',
+        isThumbnail: false,
+        sortOrder: 1,
+      },
+    ],
+    serviceDefinition: {
+      durationMinutes: 75,
+      bufferMinutes: 20,
+      maxCapacity: 1,
+      minLeadTimeHours: 8,
+      staffAssignmentType: StaffAssignmentType.SPECIFIC,
+    },
+    resourceRequirements: [
+      { resourceTypeName: 'Acupuncture Room', quantityRequired: 1 },
+      { resourceTypeName: 'Sterile Needle Kit', quantityRequired: 1 },
+    ],
+    serviceManual: {
+      preServiceGuidelines: [
+        'Eat a light meal before treatment',
+        'Tell the doctor about blood thinners or pregnancy',
+      ],
+      serviceRules: [
+        {
+          iconSlug: 'light-meal',
+          title: 'Light Meal',
+          description:
+            'Avoid arriving hungry or immediately after a heavy meal',
+        },
+      ],
+      procedureSteps: [
+        {
+          stepNumber: 1,
+          title: 'Pulse & Symptom Review',
+          description: 'Doctor reviews symptoms and treatment goals',
+        },
+        {
+          stepNumber: 2,
+          title: 'Acupuncture Treatment',
+          description: 'Sterile acupuncture with post-care herbal guidance',
+        },
+      ],
+    },
+    tagNames: ['Traditional Medicine', 'Pain Relief'],
+    eligibleEmployees: [
+      { code: 'EMP-010', isPrimary: true },
+      { code: 'EMP-011', isPrimary: false },
+    ],
+    facilityImages: [
+      {
+        imageUrl:
+          'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=600',
+        label: 'Acupuncture Suite',
+        sortOrder: 0,
+      },
+    ],
+  },
+  {
+    name: 'Dermatology Acne Consultation',
+    slug: 'dermatology-acne-consultation',
+    description:
+      'Dermatologist-led acne consultation covering skin history, product review, treatment options and follow-up planning.',
+    type: HealthServiceType.SERVICE,
+    basePrice: 750000,
+    categorySlug: 'dermatology',
+    partnerTaxCode: '7788990011',
+    media: [
+      {
+        url: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=800',
+        isThumbnail: true,
+        sortOrder: 0,
+      },
+      {
+        url: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800',
+        isThumbnail: false,
+        sortOrder: 1,
+      },
+    ],
+    serviceDefinition: {
+      durationMinutes: 45,
+      bufferMinutes: 15,
+      maxCapacity: 1,
+      minLeadTimeHours: 12,
+      staffAssignmentType: StaffAssignmentType.SPECIFIC,
+    },
+    resourceRequirements: [
+      { resourceTypeName: 'Dermatology Room', quantityRequired: 1 },
+    ],
+    serviceManual: {
+      preServiceGuidelines: [
+        'Bring current skincare products or photos',
+        'Avoid new active ingredients 48 hours before consultation',
+      ],
+      serviceRules: [
+        {
+          iconSlug: 'product-list',
+          title: 'Bring Product List',
+          description: 'Current skincare products help treatment planning',
+        },
+      ],
+      procedureSteps: [
+        {
+          stepNumber: 1,
+          title: 'Skin History',
+          description:
+            'Dermatologist reviews skin history and current products',
+        },
+        {
+          stepNumber: 2,
+          title: 'Treatment Plan',
+          description: 'Receive an acne care plan and follow-up schedule',
+        },
+      ],
+    },
+    tagNames: ['Dermatology', 'Skincare'],
+    eligibleEmployees: [{ code: 'EMP-012', isPrimary: true }],
+    facilityImages: [
+      {
+        imageUrl:
+          'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600',
+        label: 'Dermatology Consultation Room',
+        sortOrder: 0,
+      },
+    ],
+  },
+  {
+    name: 'Stress & Anxiety Counseling',
+    slug: 'stress-anxiety-counseling',
+    description:
+      'Private counseling session focused on stress triggers, coping strategies, sleep routines and short-term care planning.',
+    type: HealthServiceType.SERVICE,
+    basePrice: 900000,
+    categorySlug: 'psychology-therapy',
+    partnerTaxCode: '7788990011',
+    media: [
+      {
+        url: 'https://images.unsplash.com/photo-1493836512294-502baa1986e2?w=800',
+        isThumbnail: true,
+        sortOrder: 0,
+      },
+      {
+        url: 'https://images.unsplash.com/photo-1551847677-dc82d764e1eb?w=800',
+        isThumbnail: false,
+        sortOrder: 1,
+      },
+    ],
+    serviceDefinition: {
+      durationMinutes: 60,
+      bufferMinutes: 15,
+      maxCapacity: 1,
+      minLeadTimeHours: 24,
+      staffAssignmentType: StaffAssignmentType.SPECIFIC,
+    },
+    resourceRequirements: [
+      { resourceTypeName: 'Private Counseling Room', quantityRequired: 1 },
+    ],
+    serviceManual: {
+      preServiceGuidelines: [
+        'Arrive a few minutes early to settle in',
+        'Bring notes about sleep, stressors or current concerns',
+      ],
+      serviceRules: [
+        {
+          iconSlug: 'privacy',
+          title: 'Private Session',
+          description: 'Sessions are confidential and one-on-one',
+        },
+      ],
+      procedureSteps: [
+        {
+          stepNumber: 1,
+          title: 'Intake Discussion',
+          description: 'Psychologist reviews goals and immediate concerns',
+        },
+        {
+          stepNumber: 2,
+          title: 'Coping Plan',
+          description: 'Build practical stress-management next steps',
+        },
+      ],
+    },
+    tagNames: ['Mental Wellness'],
+    eligibleEmployees: [{ code: 'EMP-013', isPrimary: true }],
+    facilityImages: [
+      {
+        imageUrl:
+          'https://images.unsplash.com/photo-1551847677-dc82d764e1eb?w=600',
+        label: 'Quiet Counseling Room',
+        sortOrder: 0,
       },
     ],
   },
@@ -588,9 +1005,13 @@ export class ProductSeeder implements ISeeder {
     const partnerMap = new Map(partners.map((p) => [p.taxCode, p.id]));
 
     // Find health partner user for service tag lookup (tags are seeded under HEALTH_PARTNER)
-    const tagOwner = await this.accountRepo.findOne({
-      where: { role: Role.HEALTH_PARTNER },
-    });
+    const tagOwner =
+      (await this.accountRepo.findOne({
+        where: { email: 'partner@healytics.vn', role: Role.HEALTH_PARTNER },
+      })) ??
+      (await this.accountRepo.findOne({
+        where: { role: Role.HEALTH_PARTNER },
+      }));
 
     for (const prodData of SEED_PRODUCTS) {
       const exists = await this.productRepo.findOne({

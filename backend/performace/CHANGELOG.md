@@ -7,6 +7,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+### Added
+- **Updated-module stress tests** for the current backend OpenAPI contract
+  - Refreshed `api_docs/openapi.json` from the root `openapi/openapi.json`
+  - Regenerated Python DTOs for current modules, including Partner Finance and Partner Employee Analytics
+  - `common/discovery.py` — seeded runtime discovery for partner employee, transaction, payout, and refund-case IDs
+  - `locustfiles/partner_employee_analytics.py` — read-heavy stress tests for partner employee analytics
+  - `locustfiles/partner_finance.py` — read-heavy finance stress tests plus guarded low-rate mutation tasks
+  - New tags: `updated`, `partner-finance`, `employee-analytics`, `finance-mutation`, `stress`
+  - New Make targets: `perf-test-updated-stress`, `perf-test-partner-finance-stress`, `perf-test-employee-analytics-stress`, `perf-test-updated-mutations`
+
+### Changed
+- Removed stale generated DTO coverage for the old `/ai/recommendations` endpoint.
+
 ### Planned
 - [ ] Implement Auth test scenarios (User / Partner / Admin)
 - [ ] Implement Account & Survey test flows
@@ -78,6 +91,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 | Partner Profile | ⬜ Not started | — |
 | Locations | ⬜ Not started | — |
 | Employees | ⬜ Not started | — |
+| Partner Employee Analytics | ✅ Complete | 2026-05-01 |
 | Categories | ⬜ Not started | — |
 | Health Services | ⬜ Not started | — |
 | Service Tags | ⬜ Not started | — |
@@ -91,6 +105,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 | Clinic | ⬜ Not started | — |
 | Review | ⬜ Not started | — |
 | Dashboard Partner | ⬜ Not started | — |
+| Partner Finance | ✅ Complete | 2026-05-01 |
 | **WS: Notifications** | ✅ Complete | 2026-04-13 |
 | **WS: User Chat** | ✅ Complete | 2026-04-13 |
 | **WS: Partner Chat** | ✅ Complete | 2026-04-13 |

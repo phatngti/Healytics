@@ -124,6 +124,8 @@ Class | Method | HTTP request | Description
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateSpaTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
 *PartnerEmployeesApi* | [**partnerEmployeesControllerFindAll**](doc//PartnerEmployeesApi.md#partneremployeescontrollerfindall) | **GET** /partner/employees | Get all employees for this partner
 *PartnerEmployeesApi* | [**partnerEmployeesControllerFindOne**](doc//PartnerEmployeesApi.md#partneremployeescontrollerfindone) | **GET** /partner/employees/{id} | Get an employee by id
+*PartnerEmployeesApi* | [**partnerEmployeesControllerGetDetailAnalytics**](doc//PartnerEmployeesApi.md#partneremployeescontrollergetdetailanalytics) | **GET** /partner/employees/analytics/{employeeId} | Get per-employee detail analytics
+*PartnerEmployeesApi* | [**partnerEmployeesControllerGetOverviewAnalytics**](doc//PartnerEmployeesApi.md#partneremployeescontrollergetoverviewanalytics) | **GET** /partner/employees/analytics/overview | Get employee overview analytics
 *PartnerEmployeesApi* | [**partnerEmployeesControllerRemove**](doc//PartnerEmployeesApi.md#partneremployeescontrollerremove) | **DELETE** /partner/employees/{id} | Delete an employee
 *PartnerEmployeesApi* | [**partnerEmployeesControllerUpdate**](doc//PartnerEmployeesApi.md#partneremployeescontrollerupdate) | **PATCH** /partner/employees/{id} | Update an employee
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerCreate**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollercreate) | **POST** /partner/health-services | Create a new health service
@@ -140,6 +142,11 @@ Class | Method | HTTP request | Description
 *PartnerPartnersApi* | [**partnerSelfControllerUpdateMyProfile**](doc//PartnerPartnersApi.md#partnerselfcontrollerupdatemyprofile) | **PUT** /partner/partners/me | Update own business profile
 *PartnerPartnersApi* | [**partnerSelfControllerUpdateMyProfileCompletion**](doc//PartnerPartnersApi.md#partnerselfcontrollerupdatemyprofilecompletion) | **PUT** /partner/partners/me/completion | Update partner clinic profile completion data
 *PartnerPartnersApi* | [**partnerSelfControllerUpdatePublicProfile**](doc//PartnerPartnersApi.md#partnerselfcontrollerupdatepublicprofile) | **PUT** /partner/partners/public-profile | Update partner public profile (storefront only)
+*PartnerPayoutsApi* | [**partnerPayoutsControllerGetPayouts**](doc//PartnerPayoutsApi.md#partnerpayoutscontrollergetpayouts) | **GET** /partner/payouts | List partner payouts with filters and pagination
+*PartnerPayoutsApi* | [**partnerPayoutsControllerRetryPayout**](doc//PartnerPayoutsApi.md#partnerpayoutscontrollerretrypayout) | **POST** /partner/payouts/{payoutId}/retry | Retry a failed payout
+*PartnerRefundCasesApi* | [**partnerRefundCasesControllerApprove**](doc//PartnerRefundCasesApi.md#partnerrefundcasescontrollerapprove) | **POST** /partner/refund-cases/{caseId}/approve | Approve a refund or dispute case
+*PartnerRefundCasesApi* | [**partnerRefundCasesControllerGetRefundCases**](doc//PartnerRefundCasesApi.md#partnerrefundcasescontrollergetrefundcases) | **GET** /partner/refund-cases | List refund and dispute cases
+*PartnerRefundCasesApi* | [**partnerRefundCasesControllerReject**](doc//PartnerRefundCasesApi.md#partnerrefundcasescontrollerreject) | **POST** /partner/refund-cases/{caseId}/reject | Reject a refund or dispute case
 *PartnerServiceTagsApi* | [**serviceTagsControllerAttachToProduct**](doc//PartnerServiceTagsApi.md#servicetagscontrollerattachtoproduct) | **POST** /partner/service-tags/{id}/products/{productId} | Attach a tag to a product
 *PartnerServiceTagsApi* | [**serviceTagsControllerCreate**](doc//PartnerServiceTagsApi.md#servicetagscontrollercreate) | **POST** /partner/service-tags | Create a new service tag
 *PartnerServiceTagsApi* | [**serviceTagsControllerDetachFromProduct**](doc//PartnerServiceTagsApi.md#servicetagscontrollerdetachfromproduct) | **DELETE** /partner/service-tags/{id}/products/{productId} | Detach a tag from a product
@@ -149,6 +156,12 @@ Class | Method | HTTP request | Description
 *PartnerServiceTagsApi* | [**serviceTagsControllerGetTagsForProduct**](doc//PartnerServiceTagsApi.md#servicetagscontrollergettagsforproduct) | **GET** /partner/service-tags/products/{productId} | Get all tags attached to a product
 *PartnerServiceTagsApi* | [**serviceTagsControllerRemove**](doc//PartnerServiceTagsApi.md#servicetagscontrollerremove) | **DELETE** /partner/service-tags/{id} | Delete a service tag
 *PartnerServiceTagsApi* | [**serviceTagsControllerUpdate**](doc//PartnerServiceTagsApi.md#servicetagscontrollerupdate) | **PATCH** /partner/service-tags/{id} | Update a service tag
+*PartnerTransactionsApi* | [**partnerTransactionsControllerFlagForReview**](doc//PartnerTransactionsApi.md#partnertransactionscontrollerflagforreview) | **PATCH** /partner/transactions/{transactionId}/review-flag | Flag or unflag transaction for review
+*PartnerTransactionsApi* | [**partnerTransactionsControllerGetSummary**](doc//PartnerTransactionsApi.md#partnertransactionscontrollergetsummary) | **GET** /partner/transactions/finance/summary | Get aggregated finance summary metrics
+*PartnerTransactionsApi* | [**partnerTransactionsControllerGetTransactionDetail**](doc//PartnerTransactionsApi.md#partnertransactionscontrollergettransactiondetail) | **GET** /partner/transactions/{transactionId} | Get transaction detail with payout and refund cases
+*PartnerTransactionsApi* | [**partnerTransactionsControllerGetTransactions**](doc//PartnerTransactionsApi.md#partnertransactionscontrollergettransactions) | **GET** /partner/transactions | List partner transactions with filters and pagination
+*PartnerTransactionsApi* | [**partnerTransactionsControllerGetTrend**](doc//PartnerTransactionsApi.md#partnertransactionscontrollergettrend) | **GET** /partner/transactions/finance/trend | Get finance trend data (daily buckets)
+*PartnerTransactionsApi* | [**partnerTransactionsControllerMarkSettled**](doc//PartnerTransactionsApi.md#partnertransactionscontrollermarksettled) | **PATCH** /partner/transactions/{transactionId}/settlement | Mark transaction settlement status
 *PartnersApi* | [**partnersControllerGetBusinessServices**](doc//PartnersApi.md#partnerscontrollergetbusinessservices) | **GET** /partners/business-services | Get all business services
 *RecommenderApi* | [**recommendChatbotRecommenderChatbotPost**](doc//RecommenderApi.md#recommendchatbotrecommenderchatbotpost) | **POST** /recommender/chatbot | Recommend Chatbot
 *RecommenderApi* | [**recommendHomeRecommenderHomePost**](doc//RecommenderApi.md#recommendhomerecommenderhomepost) | **POST** /recommender/home | Recommend Home
@@ -289,6 +302,7 @@ Class | Method | HTTP request | Description
  - [DashboardNotificationDto](doc//DashboardNotificationDto.md)
  - [DashboardReviewDto](doc//DashboardReviewDto.md)
  - [DashboardStatsResponseDto](doc//DashboardStatsResponseDto.md)
+ - [DashboardTimePeriod](doc//DashboardTimePeriod.md)
  - [DayScheduleDto](doc//DayScheduleDto.md)
  - [DeleteFileResponseDto](doc//DeleteFileResponseDto.md)
  - [DevicePlatform](doc//DevicePlatform.md)
@@ -297,12 +311,22 @@ Class | Method | HTTP request | Description
  - [DistanceMatrixRowDto](doc//DistanceMatrixRowDto.md)
  - [DoctorProfileResponseDto](doc//DoctorProfileResponseDto.md)
  - [DocumentEntryDto](doc//DocumentEntryDto.md)
+ - [EmployeeComplianceItemDto](doc//EmployeeComplianceItemDto.md)
+ - [EmployeeDetailAnalyticsResponseDto](doc//EmployeeDetailAnalyticsResponseDto.md)
  - [EmployeeDistributionDto](doc//EmployeeDistributionDto.md)
+ - [EmployeeMixMetricDto](doc//EmployeeMixMetricDto.md)
+ - [EmployeeOverviewAnalyticsResponseDto](doc//EmployeeOverviewAnalyticsResponseDto.md)
+ - [EmployeePerformanceSummaryDto](doc//EmployeePerformanceSummaryDto.md)
+ - [EmployeeQualityMetricDto](doc//EmployeeQualityMetricDto.md)
  - [EmployeeResponseDto](doc//EmployeeResponseDto.md)
+ - [EmployeeRoleDistributionDto](doc//EmployeeRoleDistributionDto.md)
+ - [EmployeeScheduleLoadDto](doc//EmployeeScheduleLoadDto.md)
  - [EmployeeTimeSlotsResponseDto](doc//EmployeeTimeSlotsResponseDto.md)
+ - [EmployeeTrendPointDto](doc//EmployeeTrendPointDto.md)
  - [FacilityDto](doc//FacilityDto.md)
  - [FeaturedSpecialistResponseDto](doc//FeaturedSpecialistResponseDto.md)
  - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
+ - [FlagReviewDto](doc//FlagReviewDto.md)
  - [GeocodeResponseDto](doc//GeocodeResponseDto.md)
  - [GeocodeResultDto](doc//GeocodeResultDto.md)
  - [HealthServiceDetailAnalyticsResponseDto](doc//HealthServiceDetailAnalyticsResponseDto.md)
@@ -315,12 +339,12 @@ Class | Method | HTTP request | Description
  - [LastMessageDto](doc//LastMessageDto.md)
  - [LegalRepresentativeDto](doc//LegalRepresentativeDto.md)
  - [LegalRepresentativeRequestDto](doc//LegalRepresentativeRequestDto.md)
- - [LocationInfo](doc//LocationInfo.md)
  - [LocationInfoDto](doc//LocationInfoDto.md)
  - [LocationListResponseDto](doc//LocationListResponseDto.md)
  - [LocationResponseDto](doc//LocationResponseDto.md)
  - [LoginDto](doc//LoginDto.md)
  - [LogoutResponseDto](doc//LogoutResponseDto.md)
+ - [MarkSettlementDto](doc//MarkSettlementDto.md)
  - [MedicalCredentialResponseDto](doc//MedicalCredentialResponseDto.md)
  - [MessageResponse](doc//MessageResponse.md)
  - [MessagesPageResponse](doc//MessagesPageResponse.md)
@@ -333,6 +357,7 @@ Class | Method | HTTP request | Description
  - [ParticipantInfoDto](doc//ParticipantInfoDto.md)
  - [PartnerCategorySummaryDto](doc//PartnerCategorySummaryDto.md)
  - [PartnerClinicDto](doc//PartnerClinicDto.md)
+ - [PartnerCommerceSourceType](doc//PartnerCommerceSourceType.md)
  - [PartnerDayScheduleDto](doc//PartnerDayScheduleDto.md)
  - [PartnerDetailProcedureStepDto](doc//PartnerDetailProcedureStepDto.md)
  - [PartnerDetailServiceManualDto](doc//PartnerDetailServiceManualDto.md)
@@ -340,6 +365,9 @@ Class | Method | HTTP request | Description
  - [PartnerDocumentVerificationDto](doc//PartnerDocumentVerificationDto.md)
  - [PartnerFacilityImageDto](doc//PartnerFacilityImageDto.md)
  - [PartnerFeatureTagDto](doc//PartnerFeatureTagDto.md)
+ - [PartnerFinancePeriod](doc//PartnerFinancePeriod.md)
+ - [PartnerFinanceSummaryDto](doc//PartnerFinanceSummaryDto.md)
+ - [PartnerFinanceTrendPointDto](doc//PartnerFinanceTrendPointDto.md)
  - [PartnerHealthServiceDefinitionDto](doc//PartnerHealthServiceDefinitionDto.md)
  - [PartnerHealthServiceDetailResponseDto](doc//PartnerHealthServiceDetailResponseDto.md)
  - [PartnerHealthServiceEmployeeEligibilityDto](doc//PartnerHealthServiceEmployeeEligibilityDto.md)
@@ -347,24 +375,34 @@ Class | Method | HTTP request | Description
  - [PartnerHealthServiceResponseDto](doc//PartnerHealthServiceResponseDto.md)
  - [PartnerItemDto](doc//PartnerItemDto.md)
  - [PartnerLoginDto](doc//PartnerLoginDto.md)
+ - [PartnerPayoutRecordDto](doc//PartnerPayoutRecordDto.md)
+ - [PartnerPayoutStatus](doc//PartnerPayoutStatus.md)
  - [PartnerPriority](doc//PartnerPriority.md)
  - [PartnerProcedureStepDto](doc//PartnerProcedureStepDto.md)
  - [PartnerProfileCompletionCertificationDto](doc//PartnerProfileCompletionCertificationDto.md)
  - [PartnerProfileCompletionIdentityDto](doc//PartnerProfileCompletionIdentityDto.md)
  - [PartnerPublicProfileResponseDto](doc//PartnerPublicProfileResponseDto.md)
  - [PartnerRecommendedServiceDto](doc//PartnerRecommendedServiceDto.md)
+ - [PartnerRefundCaseRecordDto](doc//PartnerRefundCaseRecordDto.md)
+ - [PartnerRefundCaseStatus](doc//PartnerRefundCaseStatus.md)
+ - [PartnerRefundCaseType](doc//PartnerRefundCaseType.md)
  - [PartnerRequestDto](doc//PartnerRequestDto.md)
  - [PartnerReviewDto](doc//PartnerReviewDto.md)
  - [PartnerServiceManualDto](doc//PartnerServiceManualDto.md)
  - [PartnerServiceRuleDto](doc//PartnerServiceRuleDto.md)
+ - [PartnerSettlementStatus](doc//PartnerSettlementStatus.md)
  - [PartnerSpecialistDto](doc//PartnerSpecialistDto.md)
  - [PartnerTimeSlotDto](doc//PartnerTimeSlotDto.md)
+ - [PartnerTransactionDetailDto](doc//PartnerTransactionDetailDto.md)
+ - [PartnerTransactionRecordDto](doc//PartnerTransactionRecordDto.md)
+ - [PartnerTransactionStatus](doc//PartnerTransactionStatus.md)
+ - [PartnerTransactionTimelineEventDto](doc//PartnerTransactionTimelineEventDto.md)
+ - [PartnerTransactionType](doc//PartnerTransactionType.md)
  - [PartnerVerificationStatus](doc//PartnerVerificationStatus.md)
  - [PartnersResponseDto](doc//PartnersResponseDto.md)
  - [PresignRequestDto](doc//PresignRequestDto.md)
  - [PresignResponseDto](doc//PresignResponseDto.md)
  - [PriceBreakdownDto](doc//PriceBreakdownDto.md)
- - [PriceInfo](doc//PriceInfo.md)
  - [ProcedureStepDto](doc//ProcedureStepDto.md)
  - [ProcedureStepInputDto](doc//ProcedureStepInputDto.md)
  - [PublicCategoryDto](doc//PublicCategoryDto.md)
@@ -397,21 +435,21 @@ Class | Method | HTTP request | Description
  - [PublicProfileLegalSummaryDto](doc//PublicProfileLegalSummaryDto.md)
  - [PublicProfileStorefrontDto](doc//PublicProfileStorefrontDto.md)
  - [PublicServiceTagDto](doc//PublicServiceTagDto.md)
- - [RatingInfo](doc//RatingInfo.md)
  - [RecommendationResponse](doc//RecommendationResponse.md)
  - [RecommendedServiceResponseDto](doc//RecommendedServiceResponseDto.md)
  - [RefreshTokenRequestDto](doc//RefreshTokenRequestDto.md)
+ - [RefundCaseActionDto](doc//RefundCaseActionDto.md)
  - [RegisterDeviceDto](doc//RegisterDeviceDto.md)
  - [RegisterDto](doc//RegisterDto.md)
  - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
  - [RegisterPartnerResponseDto](doc//RegisterPartnerResponseDto.md)
  - [RegisterProfileDto](doc//RegisterProfileDto.md)
+ - [RetryPayoutDto](doc//RetryPayoutDto.md)
  - [RevenueDataPointDto](doc//RevenueDataPointDto.md)
  - [ReviewItemDto](doc//ReviewItemDto.md)
  - [ReviewPartnerProfileDto](doc//ReviewPartnerProfileDto.md)
  - [ReviewPartnerResponseDto](doc//ReviewPartnerResponseDto.md)
  - [ReviewSummaryDto](doc//ReviewSummaryDto.md)
- - [ServiceDetail](doc//ServiceDetail.md)
  - [ServiceInfoDto](doc//ServiceInfoDto.md)
  - [ServiceManualInputDto](doc//ServiceManualInputDto.md)
  - [ServiceManualResponseDto](doc//ServiceManualResponseDto.md)

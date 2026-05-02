@@ -1,19 +1,38 @@
+# Dependencies & build output (rebuilt in Docker)
 node_modules
 dist
-coverage
+
+# Environment & secrets
 .env*
+
+# Version control
 .git
 .gitignore
+
+# IDE & tooling config
 .vscode
 .agent
+.prettierrc
+eslint.config.mjs
+
+# Documentation & non-runtime assets
 docs
 todos
 openapi
-test
-performace
-scripts
 *.md
 !README.md
-.prettierrc
-eslint.config.mjs
-nest-cli.json
+
+# Tests & reports
+test
+test-report
+jest-html-reporters-attach
+coverage
+
+# Scripts & migrations (not needed for runtime build)
+scripts
+performace
+migrations
+
+# Misc caches
+.yarn
+.cache

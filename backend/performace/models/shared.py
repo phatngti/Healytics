@@ -39,6 +39,25 @@ class HealthServiceType(str, Enum):
     SERVICE = 'service'
 
 
+class PartnerPayoutStatus(str, Enum):
+    NOTASSIGNED = 'notAssigned'
+    INPAYOUT = 'inPayout'
+    PAIDOUT = 'paidOut'
+    FAILED = 'failed'
+
+
+class PartnerRefundCaseStatus(str, Enum):
+    PENDING = 'pending'
+    UNDERREVIEW = 'underReview'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
+
+
+class PartnerRefundCaseType(str, Enum):
+    REFUND = 'refund'
+    DISPUTE = 'dispute'
+
+
 class PartnerVerificationStatus(str, Enum):
     ONBOARDING = 'ONBOARDING'
     PENDING = 'PENDING'
@@ -191,6 +210,34 @@ class ParticipantInfoDto(DtoModel):
 
 
 @dataclass(slots=True)
+class PartnerPayoutRecordDto(DtoModel):
+    id: str
+    periodLabel: str
+    includedVolume: float
+    feesAdjustments: float
+    netPayout: float
+    scheduledDate: str
+    method: str
+    status: PartnerPayoutStatus
+    currency: str
+    includedTransactionIds: list[str]
+
+
+@dataclass(slots=True)
+class PartnerRefundCaseRecordDto(DtoModel):
+    id: str
+    transactionId: str
+    caseType: PartnerRefundCaseType
+    requestedAt: str
+    amount: float
+    currency: str
+    reason: str
+    owner: str
+    status: PartnerRefundCaseStatus
+    slaHours: float
+
+
+@dataclass(slots=True)
 class TherapistProfileResponseDto(DtoModel):
     employeeId: str | None = None
     level: str | None = None
@@ -237,6 +284,9 @@ __all__ = [
     "ConversationStatus",
     "HealthServiceStatus",
     "HealthServiceType",
+    "PartnerPayoutStatus",
+    "PartnerRefundCaseStatus",
+    "PartnerRefundCaseType",
     "PartnerVerificationStatus",
     "AddressInfoDto",
     "BookingServiceResponseDto",
@@ -251,6 +301,8 @@ __all__ = [
     "LegalRepresentativeDto",
     "MedicalCredentialResponseDto",
     "ParticipantInfoDto",
+    "PartnerPayoutRecordDto",
+    "PartnerRefundCaseRecordDto",
     "TherapistProfileResponseDto",
     "VerificationDocumentEntryDto",
     "VerifiedField",

@@ -937,6 +937,91 @@
         ]
       }
     },
+    "/partner/employees/analytics/overview": {
+      "get": {
+        "operationId": "PartnerEmployeesController_getOverviewAnalytics",
+        "summary": "Get employee overview analytics",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for employee analytics aggregation",
+            "schema": {
+              "$ref": "#/components/schemas/DashboardTimePeriod"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeOverviewAnalyticsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/employees/analytics/{employeeId}": {
+      "get": {
+        "operationId": "PartnerEmployeesController_getDetailAnalytics",
+        "summary": "Get per-employee detail analytics",
+        "parameters": [
+          {
+            "name": "employeeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for employee analytics aggregation",
+            "schema": {
+              "$ref": "#/components/schemas/DashboardTimePeriod"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDetailAnalyticsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found."
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/partner/employees/doctors": {
       "post": {
         "operationId": "PartnerEmployeesController_createDoctor",
@@ -5167,6 +5252,951 @@
           }
         ]
       }
+    },
+    "/partner/transactions/finance/summary": {
+      "get": {
+        "operationId": "PartnerTransactionsController_getSummary",
+        "summary": "Get aggregated finance summary metrics",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search (max 120 chars)",
+            "schema": {
+              "example": "BK-240408",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Relative time window (ignored when both startDate and endDate are set)",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerFinancePeriod"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by commerce source",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by settlement status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "ISO 4217 currency code",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerFinanceSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/transactions/finance/trend": {
+      "get": {
+        "operationId": "PartnerTransactionsController_getTrend",
+        "summary": "Get finance trend data (daily buckets)",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search (max 120 chars)",
+            "schema": {
+              "example": "BK-240408",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Relative time window (ignored when both startDate and endDate are set)",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerFinancePeriod"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by commerce source",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by settlement status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "ISO 4217 currency code",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartnerFinanceTrendPointDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/transactions": {
+      "get": {
+        "operationId": "PartnerTransactionsController_getTransactions",
+        "summary": "List partner transactions with filters and pagination",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search (max 120 chars)",
+            "schema": {
+              "example": "BK-240408",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Relative time window (ignored when both startDate and endDate are set)",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerFinancePeriod"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by commerce source",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by settlement status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "ISO 4217 currency code",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (1-100)",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated transaction list"
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/transactions/{transactionId}": {
+      "get": {
+        "operationId": "PartnerTransactionsController_getTransactionDetail",
+        "summary": "Get transaction detail with payout and refund cases",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerTransactionDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/transactions/{transactionId}/settlement": {
+      "patch": {
+        "operationId": "PartnerTransactionsController_markSettled",
+        "summary": "Mark transaction settlement status",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkSettlementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerTransactionRecordDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid settlement transition"
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/transactions/{transactionId}/review-flag": {
+      "patch": {
+        "operationId": "PartnerTransactionsController_flagForReview",
+        "summary": "Flag or unflag transaction for review",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlagReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerTransactionRecordDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/payouts": {
+      "get": {
+        "operationId": "PartnerPayoutsController_getPayouts",
+        "summary": "List partner payouts with filters and pagination",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search (max 120 chars)",
+            "schema": {
+              "example": "BK-240408",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Relative time window (ignored when both startDate and endDate are set)",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerFinancePeriod"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by commerce source",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by settlement status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "ISO 4217 currency code",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (1-100)",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated payout list"
+          }
+        },
+        "tags": [
+          "Partner Payouts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/payouts/{payoutId}/retry": {
+      "post": {
+        "operationId": "PartnerPayoutsController_retryPayout",
+        "summary": "Retry a failed payout",
+        "parameters": [
+          {
+            "name": "payoutId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryPayoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerPayoutRecordDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payout not found"
+          }
+        },
+        "tags": [
+          "Partner Payouts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/refund-cases": {
+      "get": {
+        "operationId": "PartnerRefundCasesController_getRefundCases",
+        "summary": "List refund and dispute cases",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search (max 120 chars)",
+            "schema": {
+              "example": "BK-240408",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Relative time window (ignored when both startDate and endDate are set)",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerFinancePeriod"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by commerce source",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by settlement status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "ISO 4217 currency code",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (1-100)",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated refund case list"
+          }
+        },
+        "tags": [
+          "Partner Refund-cases"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/refund-cases/{caseId}/approve": {
+      "post": {
+        "operationId": "PartnerRefundCasesController_approve",
+        "summary": "Approve a refund or dispute case",
+        "parameters": [
+          {
+            "name": "caseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundCaseActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerRefundCaseRecordDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Case not found"
+          }
+        },
+        "tags": [
+          "Partner Refund-cases"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/refund-cases/{caseId}/reject": {
+      "post": {
+        "operationId": "PartnerRefundCasesController_reject",
+        "summary": "Reject a refund or dispute case",
+        "parameters": [
+          {
+            "name": "caseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundCaseActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerRefundCaseRecordDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Case not found"
+          }
+        },
+        "tags": [
+          "Partner Refund-cases"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -5826,7 +6856,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-04-23T07:37:26.136Z"
+              "submittedAt": "2026-05-01T15:47:58.377Z"
             }
           }
         },
@@ -6505,7 +7535,8 @@
           },
           "isCompleted": {
             "type": "boolean",
-            "example": false
+            "example": true,
+            "description": "Always true when returned from a successful profile-completion update, because the request DTO enforces all required checklist constraints."
           }
         },
         "required": [
@@ -6553,24 +7584,29 @@
         "properties": {
           "coverImageUrl": {
             "type": "string",
-            "description": "Public clinic cover image URL",
+            "description": "Public clinic cover image URL (required to complete your profile)",
             "example": "https://cdn.example.com/clinic-cover.jpg"
           },
           "logoImageUrl": {
             "type": "string",
-            "description": "Public clinic logo image URL",
+            "description": "Public clinic logo image URL (required to complete your profile)",
             "example": "https://cdn.example.com/clinic-logo.jpg"
           },
           "description": {
             "type": "string",
-            "description": "Public clinic profile description",
-            "example": "A modern wellness clinic focused on long-term care."
+            "description": "Public clinic profile description (min 120 characters, required to complete your profile)",
+            "example": "A modern wellness clinic focused on long-term care.",
+            "minLength": 120,
+            "maxLength": 1000000000
           },
           "gallery": {
-            "description": "Gallery image URLs shown on the clinic profile",
+            "description": "Gallery image URLs shown on the clinic profile (min 3, required to complete your profile)",
+            "minItems": 3,
+            "maxItems": 8,
             "example": [
               "https://cdn.example.com/gallery-1.jpg",
-              "https://cdn.example.com/gallery-2.jpg"
+              "https://cdn.example.com/gallery-2.jpg",
+              "https://cdn.example.com/gallery-3.jpg"
             ],
             "type": "array",
             "items": {
@@ -6584,7 +7620,13 @@
               "$ref": "#/components/schemas/UpdatePartnerCertificationDto"
             }
           }
-        }
+        },
+        "required": [
+          "coverImageUrl",
+          "logoImageUrl",
+          "description",
+          "gallery"
+        ]
       },
       "PublicProfileBusinessInfoDto": {
         "type": "object",
@@ -7174,6 +8216,386 @@
         },
         "required": [
           "apiKey"
+        ]
+      },
+      "DashboardTimePeriod": {
+        "type": "string",
+        "enum": [
+          "today",
+          "this_week",
+          "this_month",
+          "this_quarter",
+          "this_year"
+        ]
+      },
+      "EmployeeTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "Wk 1",
+            "description": "Human-readable x-axis label"
+          },
+          "sessions": {
+            "type": "number",
+            "example": 18,
+            "description": "Completed sessions in this time bucket"
+          },
+          "contributionValue": {
+            "type": "number",
+            "example": 9200000,
+            "description": "Contribution value in VND for this time bucket"
+          }
+        },
+        "required": [
+          "label",
+          "sessions",
+          "contributionValue"
+        ]
+      },
+      "EmployeeRoleDistributionDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "example": "Doctor",
+            "description": "Human-readable role label"
+          },
+          "count": {
+            "type": "number",
+            "example": 4,
+            "description": "Number of employees with this role"
+          }
+        },
+        "required": [
+          "role",
+          "count"
+        ]
+      },
+      "EmployeePerformanceSummaryDto": {
+        "type": "object",
+        "properties": {
+          "employeeName": {
+            "type": "string",
+            "example": "Nguyen An",
+            "description": "Employee full name"
+          },
+          "roleLabel": {
+            "type": "string",
+            "example": "Doctor",
+            "description": "Human-readable role label"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.9,
+            "description": "Average rating (0-5)"
+          },
+          "utilizationRate": {
+            "type": "number",
+            "example": 82.1,
+            "description": "Utilization rate percentage"
+          },
+          "contributionValue": {
+            "type": "number",
+            "example": 14800000,
+            "description": "Contribution value in VND"
+          }
+        },
+        "required": [
+          "employeeName",
+          "roleLabel",
+          "rating",
+          "utilizationRate",
+          "contributionValue"
+        ]
+      },
+      "EmployeeComplianceItemDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Verification coverage",
+            "description": "Compliance check headline"
+          },
+          "detail": {
+            "type": "string",
+            "example": "All visible profiles have supporting documents.",
+            "description": "Detailed explanation of the compliance status"
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "neutral",
+              "positive",
+              "warning",
+              "critical"
+            ],
+            "example": "positive",
+            "description": "Severity tone for UI styling"
+          }
+        },
+        "required": [
+          "title",
+          "detail",
+          "tone"
+        ]
+      },
+      "EmployeeOverviewAnalyticsResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalEmployees": {
+            "type": "number",
+            "example": 12
+          },
+          "activeEmployees": {
+            "type": "number",
+            "example": 10
+          },
+          "onLeaveEmployees": {
+            "type": "number",
+            "example": 1
+          },
+          "inactiveEmployees": {
+            "type": "number",
+            "example": 1
+          },
+          "utilizationRate": {
+            "type": "number",
+            "example": 74.5,
+            "description": "Aggregate utilization rate percentage"
+          },
+          "utilizationDelta": {
+            "type": "number",
+            "example": 6.2,
+            "description": "% change vs previous period"
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.7
+          },
+          "ratingDelta": {
+            "type": "number",
+            "example": 1.4
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 86
+          },
+          "trendPoints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeTrendPointDto"
+            }
+          },
+          "roleDistribution": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeRoleDistributionDto"
+            }
+          },
+          "topPerformers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeePerformanceSummaryDto"
+            }
+          },
+          "complianceItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeComplianceItemDto"
+            }
+          }
+        },
+        "required": [
+          "totalEmployees",
+          "activeEmployees",
+          "onLeaveEmployees",
+          "inactiveEmployees",
+          "utilizationRate",
+          "utilizationDelta",
+          "averageRating",
+          "ratingDelta",
+          "reviewCount",
+          "trendPoints",
+          "roleDistribution",
+          "topPerformers",
+          "complianceItems"
+        ]
+      },
+      "EmployeeMixMetricDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "Skin Consultation",
+            "description": "Service category or product name"
+          },
+          "value": {
+            "type": "number",
+            "example": 11,
+            "description": "Number of completed sessions for this category"
+          },
+          "share": {
+            "type": "number",
+            "example": 0.42,
+            "description": "Proportion share (0-1) relative to total sessions"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "share"
+        ]
+      },
+      "EmployeeScheduleLoadDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "Mon",
+            "description": "Weekday abbreviation"
+          },
+          "availableHours": {
+            "type": "number",
+            "example": 8,
+            "description": "Total available hours from schedule for this weekday"
+          },
+          "bookedHours": {
+            "type": "number",
+            "example": 6.5,
+            "description": "Total booked hours for this weekday"
+          }
+        },
+        "required": [
+          "label",
+          "availableHours",
+          "bookedHours"
+        ]
+      },
+      "EmployeeQualityMetricDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "Client sentiment",
+            "description": "Quality metric name"
+          },
+          "value": {
+            "type": "string",
+            "example": "4.8",
+            "description": "Display value (intentionally a string for flexible formatting)"
+          },
+          "detail": {
+            "type": "string",
+            "example": "18 reviews across recent services",
+            "description": "Detailed context for the metric"
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "neutral",
+              "positive",
+              "warning",
+              "critical"
+            ],
+            "example": "positive",
+            "description": "Severity tone for UI styling"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "detail",
+          "tone"
+        ]
+      },
+      "EmployeeDetailAnalyticsResponseDto": {
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "example": "8ad71f50-2f44-4c12-a57d-b1c4c92f5a7d"
+          },
+          "completedSessions": {
+            "type": "number",
+            "example": 26
+          },
+          "sessionsDelta": {
+            "type": "number",
+            "example": 8.3,
+            "description": "% change vs previous period"
+          },
+          "contributionValue": {
+            "type": "number",
+            "example": 15600000,
+            "description": "Contribution value in VND"
+          },
+          "contributionDelta": {
+            "type": "number",
+            "example": 10.1
+          },
+          "utilizationRate": {
+            "type": "number",
+            "example": 77.4
+          },
+          "utilizationDelta": {
+            "type": "number",
+            "example": 4.8
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.8
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 18
+          },
+          "trendPoints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeTrendPointDto"
+            }
+          },
+          "mixMetrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeMixMetricDto"
+            }
+          },
+          "scheduleLoad": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeScheduleLoadDto"
+            }
+          },
+          "qualityMetrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeQualityMetricDto"
+            }
+          },
+          "complianceItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeComplianceItemDto"
+            }
+          }
+        },
+        "required": [
+          "employeeId",
+          "completedSessions",
+          "sessionsDelta",
+          "contributionValue",
+          "contributionDelta",
+          "utilizationRate",
+          "utilizationDelta",
+          "averageRating",
+          "reviewCount",
+          "trendPoints",
+          "mixMetrics",
+          "scheduleLoad",
+          "qualityMetrics",
+          "complianceItems"
         ]
       },
       "WorkScheduleEntryDto": {
@@ -12193,12 +13615,14 @@
           "title": {
             "type": "string",
             "description": "Broadcast title",
-            "example": "System Maintenance Notice"
+            "example": "System Maintenance Notice",
+            "maxLength": 255
           },
           "body": {
             "type": "string",
             "description": "Broadcast body text",
-            "example": "The platform will undergo scheduled maintenance on April 5th from 2:00 AM to 4:00 AM."
+            "example": "The platform will undergo scheduled maintenance on April 5th from 2:00 AM to 4:00 AM.",
+            "maxLength": 5000
           },
           "data": {
             "type": "object",
@@ -13984,6 +15408,484 @@
           "createdAt",
           "severity"
         ]
+      },
+      "PartnerFinancePeriod": {
+        "type": "string",
+        "enum": [
+          "sevenDays",
+          "thirtyDays",
+          "ninetyDays"
+        ]
+      },
+      "PartnerCommerceSourceType": {
+        "type": "string",
+        "enum": [
+          "serviceBooking",
+          "productOrder"
+        ]
+      },
+      "PartnerTransactionType": {
+        "type": "string",
+        "enum": [
+          "charge",
+          "refund",
+          "adjustment",
+          "payout",
+          "fee"
+        ]
+      },
+      "PartnerTransactionStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "paid",
+          "refunded",
+          "failed",
+          "canceled"
+        ]
+      },
+      "PartnerSettlementStatus": {
+        "type": "string",
+        "enum": [
+          "unsettled",
+          "scheduled",
+          "settled",
+          "held"
+        ]
+      },
+      "PartnerPayoutStatus": {
+        "type": "string",
+        "enum": [
+          "notAssigned",
+          "inPayout",
+          "paidOut",
+          "failed"
+        ]
+      },
+      "PartnerFinanceSummaryDto": {
+        "type": "object",
+        "properties": {
+          "grossVolume": {
+            "type": "number",
+            "example": 2700000
+          },
+          "netSettled": {
+            "type": "number",
+            "example": 950600
+          },
+          "pendingPayout": {
+            "type": "number",
+            "example": 2619000
+          },
+          "refundExposure": {
+            "type": "number",
+            "example": 700000
+          },
+          "availableBalance": {
+            "type": "number",
+            "example": 250600
+          },
+          "pendingBalance": {
+            "type": "number",
+            "example": 2619000
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          },
+          "nextPayoutAt": {
+            "type": "string",
+            "nullable": true,
+            "example": "2026-04-10T03:00:00.000Z"
+          },
+          "payoutMethod": {
+            "type": "string",
+            "nullable": true,
+            "example": "Vietcombank ending 1122"
+          },
+          "payoutStatus": {
+            "nullable": true,
+            "example": "inPayout",
+            "$ref": "#/components/schemas/PartnerPayoutStatus"
+          }
+        },
+        "required": [
+          "grossVolume",
+          "netSettled",
+          "pendingPayout",
+          "refundExposure",
+          "availableBalance",
+          "pendingBalance",
+          "currency"
+        ]
+      },
+      "PartnerFinanceTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-04-08"
+          },
+          "grossAmount": {
+            "type": "number",
+            "example": 1200000
+          },
+          "netAmount": {
+            "type": "number",
+            "example": 1164000
+          },
+          "refundAmount": {
+            "type": "number",
+            "example": 0
+          }
+        },
+        "required": [
+          "date",
+          "grossAmount",
+          "netAmount",
+          "refundAmount"
+        ]
+      },
+      "PartnerTransactionTimelineEventDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Payment captured"
+          },
+          "description": {
+            "type": "string",
+            "example": "Customer successfully paid through MoMo."
+          },
+          "occurredAt": {
+            "type": "string",
+            "example": "2026-04-08T02:16:00.000Z"
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "occurredAt"
+        ]
+      },
+      "PartnerTransactionRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-04-08T02:15:00.000Z"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PartnerTransactionType"
+          },
+          "sourceType": {
+            "$ref": "#/components/schemas/PartnerCommerceSourceType"
+          },
+          "reference": {
+            "type": "string",
+            "example": "BK-240408-001"
+          },
+          "customerName": {
+            "type": "string",
+            "example": "Nguyen Minh Anh"
+          },
+          "grossAmount": {
+            "type": "number",
+            "example": 1200000
+          },
+          "feeAmount": {
+            "type": "number",
+            "example": 36000
+          },
+          "netAmount": {
+            "type": "number",
+            "example": 1164000
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerTransactionStatus"
+          },
+          "settlementStatus": {
+            "$ref": "#/components/schemas/PartnerSettlementStatus"
+          },
+          "payoutStatus": {
+            "$ref": "#/components/schemas/PartnerPayoutStatus"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "example": "MoMo Wallet"
+          },
+          "sourceTitle": {
+            "type": "string",
+            "example": "Dermatology consultation package"
+          },
+          "sourceSubtitle": {
+            "type": "string",
+            "example": "Confirmed service booking"
+          },
+          "timeline": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerTransactionTimelineEventDto"
+            }
+          },
+          "flaggedForReview": {
+            "type": "boolean",
+            "example": false
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "payoutId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "type",
+          "sourceType",
+          "reference",
+          "customerName",
+          "grossAmount",
+          "feeAmount",
+          "netAmount",
+          "currency",
+          "status",
+          "settlementStatus",
+          "payoutStatus",
+          "paymentMethod",
+          "sourceTitle",
+          "sourceSubtitle",
+          "timeline",
+          "flaggedForReview"
+        ]
+      },
+      "PartnerPayoutRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "periodLabel": {
+            "type": "string",
+            "example": "Apr 01 – Apr 08"
+          },
+          "includedVolume": {
+            "type": "number",
+            "example": 5400000
+          },
+          "feesAdjustments": {
+            "type": "number",
+            "example": 162000
+          },
+          "netPayout": {
+            "type": "number",
+            "example": 5238000
+          },
+          "scheduledDate": {
+            "type": "string",
+            "example": "2026-04-10T03:00:00.000Z"
+          },
+          "method": {
+            "type": "string",
+            "example": "Vietcombank ending 1122"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerPayoutStatus"
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          },
+          "includedTransactionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "periodLabel",
+          "includedVolume",
+          "feesAdjustments",
+          "netPayout",
+          "scheduledDate",
+          "method",
+          "status",
+          "currency",
+          "includedTransactionIds"
+        ]
+      },
+      "PartnerRefundCaseType": {
+        "type": "string",
+        "enum": [
+          "refund",
+          "dispute"
+        ]
+      },
+      "PartnerRefundCaseStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "underReview",
+          "approved",
+          "rejected"
+        ]
+      },
+      "PartnerRefundCaseRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "transactionId": {
+            "type": "string"
+          },
+          "caseType": {
+            "$ref": "#/components/schemas/PartnerRefundCaseType"
+          },
+          "requestedAt": {
+            "type": "string",
+            "example": "2026-04-06T10:00:00.000Z"
+          },
+          "amount": {
+            "type": "number",
+            "example": 350000
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Service not as described"
+          },
+          "owner": {
+            "type": "string",
+            "example": "Customer Support"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+          },
+          "slaHours": {
+            "type": "number",
+            "example": 48,
+            "description": "Remaining SLA hours (0 for resolved cases)"
+          }
+        },
+        "required": [
+          "id",
+          "transactionId",
+          "caseType",
+          "requestedAt",
+          "amount",
+          "currency",
+          "reason",
+          "owner",
+          "status",
+          "slaHours"
+        ]
+      },
+      "PartnerTransactionDetailDto": {
+        "type": "object",
+        "properties": {
+          "record": {
+            "$ref": "#/components/schemas/PartnerTransactionRecordDto"
+          },
+          "payoutRecord": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerPayoutRecordDto"
+              }
+            ]
+          },
+          "relatedRefundCases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerRefundCaseRecordDto"
+            }
+          },
+          "sourceSummaryTitle": {
+            "type": "string",
+            "example": "Dermatology consultation package"
+          },
+          "sourceSummarySubtitle": {
+            "type": "string",
+            "example": "Confirmed service booking"
+          }
+        },
+        "required": [
+          "record",
+          "relatedRefundCases",
+          "sourceSummaryTitle",
+          "sourceSummarySubtitle"
+        ]
+      },
+      "MarkSettlementDto": {
+        "type": "object",
+        "properties": {
+          "settlementStatus": {
+            "example": "settled",
+            "$ref": "#/components/schemas/PartnerSettlementStatus"
+          },
+          "note": {
+            "type": "string",
+            "description": "Audit note",
+            "example": "Finance manager confirmed manual settlement."
+          }
+        },
+        "required": [
+          "settlementStatus"
+        ]
+      },
+      "FlagReviewDto": {
+        "type": "object",
+        "properties": {
+          "flaggedForReview": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether to flag the transaction for review"
+          },
+          "note": {
+            "type": "string",
+            "description": "Audit note",
+            "example": "Partner requested finance review."
+          }
+        },
+        "required": [
+          "flaggedForReview"
+        ]
+      },
+      "RetryPayoutDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Audit note",
+            "example": "Retry requested from partner transaction manager."
+          }
+        }
+      },
+      "RefundCaseActionDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Audit note",
+            "example": "Approved from partner transaction manager."
+          }
+        }
       }
     }
   }

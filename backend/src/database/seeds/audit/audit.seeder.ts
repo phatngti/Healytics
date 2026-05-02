@@ -53,6 +53,55 @@ const SEED_AUDIT_LOGS: SeedAuditLog[] = [
     userAgent: 'seed-script/user-action',
     metadata: { seedKey: 'AUDIT_003', scope: 'booking-tracking' },
   },
+  {
+    code: '004',
+    actorEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
+    action: seedKey(SEED_MARKERS.auditAction, 'PARTNER_PENDING_REVIEW'),
+    targetEntity: 'health_partner_profile',
+    target: { type: 'partner_tax_code', value: '0987654321' },
+    ipAddress: '10.10.10.4',
+    userAgent: 'seed-script/admin-review',
+    metadata: { seedKey: 'AUDIT_004', reason: 'documents queued for review' },
+  },
+  {
+    code: '005',
+    actorEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
+    action: seedKey(SEED_MARKERS.auditAction, 'PARTNER_APPROVED_MINDSKIN'),
+    targetEntity: 'health_partner_profile',
+    target: { type: 'partner_tax_code', value: '7788990011' },
+    ipAddress: '10.10.10.5',
+    userAgent: 'seed-script/admin-review',
+    metadata: {
+      seedKey: 'AUDIT_005',
+      reason: 'multi-specialty verification approved',
+    },
+  },
+  {
+    code: '006',
+    actorEmail: 'nguyenvana@healytics.vn',
+    action: seedKey(SEED_MARKERS.auditAction, 'DENTAL_BOOKING_VIEWED'),
+    targetEntity: 'bookings',
+    target: {
+      type: 'booking_notes',
+      value: 'Routine dental cleaning before travel',
+    },
+    ipAddress: '10.10.10.6',
+    userAgent: 'seed-script/user-action',
+    metadata: { seedKey: 'AUDIT_006', scope: 'dental-booking' },
+  },
+  {
+    code: '007',
+    actorEmail: 'vuthif@healytics.vn',
+    action: seedKey(SEED_MARKERS.auditAction, 'COUNSELING_NOTE_UPDATED'),
+    targetEntity: 'bookings',
+    target: {
+      type: 'booking_notes',
+      value: 'Requests quiet room for first counseling session',
+    },
+    ipAddress: '10.10.10.7',
+    userAgent: 'seed-script/user-action',
+    metadata: { seedKey: 'AUDIT_007', scope: 'mental-wellness-booking' },
+  },
 ];
 
 @Injectable()
@@ -73,25 +122,33 @@ export class AuditSeeder implements ISeeder {
   async seed(): Promise<void> {
     this.logger.log('Seeding audit logs...');
 
-    const actorEmails = [...new Set(SEED_AUDIT_LOGS.map((item) => item.actorEmail))];
+    const actorEmails = [
+      ...new Set(SEED_AUDIT_LOGS.map((item) => item.actorEmail)),
+    ];
     const actors = await this.accountRepo.find({
       where: { email: In(actorEmails) },
       select: ['id', 'email'],
     });
-    const actorMap = new Map(actors.map((account) => [account.email, account.id]));
+    const actorMap = new Map(
+      actors.map((account) => [account.email, account.id]),
+    );
 
     for (const entry of SEED_AUDIT_LOGS) {
       const existing = await this.auditRepo.findOne({
         where: { action: entry.action },
       });
       if (existing) {
-        this.logger.log(`  ⏭ Audit action "${entry.action}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ Audit action "${entry.action}" already exists, skipping`,
+        );
         continue;
       }
 
       const actorId = actorMap.get(entry.actorEmail);
       if (!actorId) {
-        this.logger.warn(`  ⚠ Actor "${entry.actorEmail}" not found — skipping`);
+        this.logger.warn(
+          `  ⚠ Actor "${entry.actorEmail}" not found — skipping`,
+        );
         continue;
       }
 

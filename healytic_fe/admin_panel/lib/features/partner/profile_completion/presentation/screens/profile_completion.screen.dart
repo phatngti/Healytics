@@ -19,6 +19,7 @@ import 'package:common/widgets/card/error_card.dart';
 import 'package:common/widgets/quill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:admin_panel/router/partner_routes.dart';
 import 'package:go_router/go_router.dart';
 
 /// Partner profile completion screen orchestrator.
@@ -252,8 +253,12 @@ class _ProfileCompletionScreenState
       if (!mounted) return;
       setState(() => _hydrateFrom(result, overwrite: true));
 
-      if (result.isCompleted && UserRoleHelper.isProviderProfileCompleted()) {
-        context.go('/provider/dashboard');
+      if (result.isCompleted) {
+        // Sync local flag before checking so the
+        // guard reflects the latest API response.
+        UserRoleHelper.setPartnerProfileCompleted(result.isCompleted);
+
+        const DashboardRoute().go(context);
         return;
       }
 
@@ -694,7 +699,7 @@ class _ProfileCompletionScreenState
       final entity = next.asData?.value;
       if (entity == null || !mounted) return;
       if (entity.isCompleted && UserRoleHelper.isProviderProfileCompleted()) {
-        context.go('/provider/dashboard');
+        const DashboardRoute().go(context);
       }
     });
 

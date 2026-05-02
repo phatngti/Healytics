@@ -302,26 +302,70 @@ class _WorkloadTrendPanel extends StatelessWidget {
       );
     }
 
-    final maxY = points.fold<double>(0, (maxValue, point) {
-      final pointPeak = point.sessions > point.contributionValue / 1000000
-          ? point.sessions
-          : point.contributionValue / 1000000;
-      return pointPeak > maxValue ? pointPeak : maxValue;
-    });
+    final totalSessions = points.fold<double>(
+      0,
+      (value, point) => value + point.sessions,
+    );
+    final totalContribution = points.fold<double>(
+      0,
+      (value, point) => value + point.contributionValue,
+    );
+    final averageValuePerSession = totalSessions == 0
+        ? 0.0
+        : totalContribution / totalSessions;
+    final bestValuePoint = points.reduce(
+      (current, next) =>
+          _valuePerSession(next) > _valuePerSession(current) ? next : current,
+    );
+    final maxSessions = points.fold<double>(
+      0,
+      (maxValue, point) =>
+          point.sessions > maxValue ? point.sessions : maxValue,
+    );
 
     return AnalyticsPanel(
       child: LayoutBuilder(
         builder: (context, constraints) {
           final chartHeight = constraints.maxWidth >= 760 ? 260.0 : 220.0;
+          final titleStyle = theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          );
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const AnalyticsSectionHeader(
-                title: 'Workload trend',
+                title: 'Workload efficiency',
                 subtitle:
-                    'Session volume and contribution move across the period.',
+                    'Sessions, revenue yield, and peak workload by month.',
                 icon: Icons.stacked_bar_chart_rounded,
+              ),
+              AppDimens.verticalMedium,
+              Wrap(
+                spacing: AppDimens.spaceSm,
+                runSpacing: AppDimens.spaceSm,
+                children: [
+                  _WorkloadMetricChip(
+                    label: 'Sessions',
+                    value: totalSessions.toStringAsFixed(0),
+                    icon: Icons.event_available_rounded,
+                  ),
+                  _WorkloadMetricChip(
+                    label: 'Contribution',
+                    value: _currency(totalContribution),
+                    icon: Icons.payments_rounded,
+                  ),
+                  _WorkloadMetricChip(
+                    label: 'Value / session',
+                    value: _currency(averageValuePerSession),
+                    icon: Icons.trending_up_rounded,
+                  ),
+                  _WorkloadMetricChip(
+                    label: 'Best yield',
+                    value: bestValuePoint.label,
+                    icon: Icons.insights_rounded,
+                  ),
+                ],
               ),
               AppDimens.verticalLarge,
               SizedBox(
@@ -329,7 +373,7 @@ class _WorkloadTrendPanel extends StatelessWidget {
                 child: BarChart(
                   BarChartData(
                     alignment: BarChartAlignment.spaceAround,
-                    maxY: maxY == 0 ? 1 : maxY * 1.2,
+                    maxY: maxSessions == 0 ? 1 : maxSessions * 1.25,
                     borderData: FlBorderData(show: false),
                     gridData: FlGridData(
                       show: true,
@@ -346,8 +390,19 @@ class _WorkloadTrendPanel extends StatelessWidget {
                       rightTitles: const AxisTitles(
                         sideTitles: SideTitles(showTitles: false),
                       ),
-                      leftTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 40,
+                          interval: _chartInterval(maxSessions),
+                          getTitlesWidget: (value, meta) {
+                            if (value == 0) return const SizedBox.shrink();
+                            return Text(
+                              value.toInt().toString(),
+                              style: titleStyle,
+                            );
+                          },
+                        ),
                       ),
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
@@ -373,18 +428,15 @@ class _WorkloadTrendPanel extends StatelessWidget {
                       for (var i = 0; i < points.length; i++)
                         BarChartGroupData(
                           x: i,
-                          barsSpace: AppDimens.spaceXs,
                           barRods: [
                             BarChartRodData(
                               toY: points[i].sessions,
-                              color: colorScheme.primary,
-                              width: 14,
-                              borderRadius: AppDimens.radiusSmall,
-                            ),
-                            BarChartRodData(
-                              toY: points[i].contributionValue / 1000000,
-                              color: colorScheme.tertiary,
-                              width: 14,
+                              color: _workloadColor(
+                                context,
+                                _valuePerSession(points[i]),
+                                averageValuePerSession,
+                              ),
+                              width: 20,
                               borderRadius: AppDimens.radiusSmall,
                             ),
                           ],
@@ -393,10 +445,111 @@ class _WorkloadTrendPanel extends StatelessWidget {
                   ),
                 ),
               ),
+              AppDimens.verticalMedium,
+              const _WorkloadLegend(),
             ],
           );
         },
       ),
+    );
+  }
+}
+
+class _WorkloadMetricChip extends StatelessWidget {
+  const _WorkloadMetricChip({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: AppDimens.paddingHorizontalSmall.add(
+        AppDimens.paddingVerticalExtraSmall,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withAlpha(90),
+        borderRadius: AppDimens.radiusMediumSmall,
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: colorScheme.primary),
+          AppDimens.horizontalExtraSmall,
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          AppDimens.horizontalExtraSmall,
+          Text(
+            value,
+            style: theme.textTheme.labelMedium?.copyWith(
+              fontWeight: AppDimens.fontWeightBold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WorkloadLegend extends StatelessWidget {
+  const _WorkloadLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Wrap(
+      spacing: AppDimens.spaceMd,
+      runSpacing: AppDimens.spaceXs,
+      children: [
+        _LegendPill(color: colorScheme.tertiary, label: 'Above avg yield'),
+        _LegendPill(color: colorScheme.primary, label: 'Near avg yield'),
+        _LegendPill(color: colorScheme.error, label: 'Below avg yield'),
+      ],
+    );
+  }
+}
+
+class _LegendPill extends StatelessWidget {
+  const _LegendPill({required this.color, required this.label});
+
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: AppDimens.spaceSm,
+          height: AppDimens.spaceSm,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        AppDimens.horizontalExtraSmall,
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -408,6 +561,8 @@ class _TopPerformersPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final topItems = items.take(4).toList();
 
     if (topItems.isEmpty) {
@@ -419,19 +574,111 @@ class _TopPerformersPanel extends StatelessWidget {
     }
 
     return AnalyticsPanel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < 640;
+          final maxUtilization = topItems.fold<double>(
+            0,
+            (maxValue, item) => item.utilizationRate > maxValue
+                ? item.utilizationRate
+                : maxValue,
+          );
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnalyticsSectionHeader(
+                title: 'Top performers',
+                subtitle: 'Ranked by quality, utilization, and contribution.',
+                icon: Icons.workspace_premium_rounded,
+                trailing: Container(
+                  padding: AppDimens.paddingHorizontalSmall.add(
+                    AppDimens.paddingVerticalExtraSmall,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.4),
+                    borderRadius: AppDimens.radiusPill,
+                  ),
+                  child: Text(
+                    'Top ${topItems.length}',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: AppDimens.fontWeightBold,
+                    ),
+                  ),
+                ),
+              ),
+              AppDimens.verticalLarge,
+              if (!isCompact) const _TopPerformerTableHeader(),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(color: colorScheme.outlineVariant),
+                  borderRadius: AppDimens.radiusMediumSmall,
+                ),
+                child: Column(
+                  children: [
+                    for (var index = 0; index < topItems.length; index++) ...[
+                      _TopPerformerRow(
+                        item: topItems[index],
+                        rank: index + 1,
+                        maxUtilization: maxUtilization,
+                        isCompact: isCompact,
+                      ),
+                      if (index != topItems.length - 1)
+                        Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: colorScheme.outlineVariant,
+                        ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TopPerformerTableHeader extends StatelessWidget {
+  const _TopPerformerTableHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final style = theme.textTheme.labelSmall?.copyWith(
+      color: colorScheme.onSurfaceVariant,
+      fontWeight: AppDimens.fontWeightBold,
+    );
+
+    return Container(
+      padding: AppDimens.paddingHorizontalMedium.add(
+        AppDimens.paddingVerticalSmall,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.42),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Row(
         children: [
-          const AnalyticsSectionHeader(
-            title: 'Top performers',
-            subtitle: 'High-rating team members with strong utilization.',
-            icon: Icons.workspace_premium_rounded,
+          Expanded(flex: 5, child: Text('Staff member', style: style)),
+          Expanded(flex: 3, child: Text('Utilization', style: style)),
+          SizedBox(
+            width: 84,
+            child: Text('Rating', style: style, textAlign: TextAlign.right),
           ),
-          AppDimens.verticalLarge,
-          for (final item in topItems) ...[
-            _TopPerformerRow(item: item),
-            AppDimens.verticalMediumSmall,
-          ],
+          SizedBox(
+            width: 112,
+            child: Text(
+              'Contribution',
+              style: style,
+              textAlign: TextAlign.right,
+            ),
+          ),
         ],
       ),
     );
@@ -476,9 +723,78 @@ class _CompliancePanel extends StatelessWidget {
 }
 
 class _TopPerformerRow extends StatelessWidget {
-  const _TopPerformerRow({required this.item});
+  const _TopPerformerRow({
+    required this.item,
+    required this.rank,
+    required this.maxUtilization,
+    required this.isCompact,
+  });
 
   final EmployeePerformanceSummary item;
+  final int rank;
+  final double maxUtilization;
+  final bool isCompact;
+
+  @override
+  Widget build(BuildContext context) {
+    final utilizationShare = maxUtilization <= 0
+        ? 0.0
+        : (item.utilizationRate / maxUtilization).clamp(0.0, 1.0);
+    final details = _TopPerformerIdentity(item: item, rank: rank);
+    final utilization = _UtilizationMetric(
+      value: item.utilizationRate,
+      share: utilizationShare,
+    );
+    final rating = _RatingMetric(value: item.rating);
+    final contribution = _ContributionMetric(value: item.contributionValue);
+
+    if (isCompact) {
+      return Padding(
+        padding: AppDimens.paddingAllMedium,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            details,
+            AppDimens.verticalMedium,
+            utilization,
+            AppDimens.verticalMediumSmall,
+            Row(
+              children: [
+                Expanded(child: rating),
+                AppDimens.horizontalMedium,
+                contribution,
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: AppDimens.paddingHorizontalMedium.add(
+        AppDimens.paddingVerticalMediumSmall,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(flex: 5, child: details),
+          AppDimens.horizontalMedium,
+          Expanded(flex: 3, child: utilization),
+          AppDimens.horizontalMedium,
+          SizedBox(width: 84, child: rating),
+          AppDimens.horizontalMedium,
+          SizedBox(width: 112, child: contribution),
+        ],
+      ),
+    );
+  }
+}
+
+class _TopPerformerIdentity extends StatelessWidget {
+  const _TopPerformerIdentity({required this.item, required this.rank});
+
+  final EmployeePerformanceSummary item;
+  final int rank;
 
   @override
   Widget build(BuildContext context) {
@@ -486,8 +802,28 @@ class _TopPerformerRow extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: rank == 1
+                ? colorScheme.primary
+                : colorScheme.surfaceContainerHighest,
+            borderRadius: AppDimens.radiusPill,
+          ),
+          child: Text(
+            '#$rank',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: rank == 1
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
+              fontWeight: AppDimens.fontWeightBold,
+            ),
+          ),
+        ),
+        AppDimens.horizontalMedium,
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -502,25 +838,131 @@ class _TopPerformerRow extends StatelessWidget {
               ),
               AppDimens.verticalExtraSmall,
               Text(
-                '${item.roleLabel} • '
-                '${item.utilizationRate.toStringAsFixed(1)}% utilization',
+                item.roleLabel,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
         ),
-        AppDimens.horizontalMedium,
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+      ],
+    );
+  }
+}
+
+class _UtilizationMetric extends StatelessWidget {
+  const _UtilizationMetric({required this.value, required this.share});
+
+  final double value;
+  final double share;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Text('${item.rating.toStringAsFixed(1)}/5'),
-            AppDimens.verticalExtraSmall,
-            Text(_currency(item.contributionValue)),
+            Text(
+              '${value.toStringAsFixed(1)}%',
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: AppDimens.fontWeightBold,
+              ),
+            ),
+            AppDimens.horizontalSmall,
+            Expanded(
+              child: Text(
+                'capacity',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
+        ),
+        AppDimens.verticalExtraSmall,
+        ClipRRect(
+          borderRadius: AppDimens.radiusPill,
+          child: LinearProgressIndicator(
+            value: share,
+            minHeight: 6,
+            color: colorScheme.primary,
+            backgroundColor: colorScheme.surfaceContainerHighest,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RatingMetric extends StatelessWidget {
+  const _RatingMetric({required this.value});
+
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.star_rounded, size: 18, color: colorScheme.tertiary),
+        AppDimens.horizontalExtraSmall,
+        Text(
+          value.toStringAsFixed(1),
+          style: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: AppDimens.fontWeightBold,
+          ),
+        ),
+        Text(
+          '/5',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ContributionMetric extends StatelessWidget {
+  const _ContributionMetric({required this.value});
+
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          _currency(value),
+          style: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: AppDimens.fontWeightBold,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        AppDimens.verticalExtraSmall,
+        Text(
+          'Revenue',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -556,6 +998,34 @@ class _LegendRow extends StatelessWidget {
       ],
     );
   }
+}
+
+Color _workloadColor(
+  BuildContext context,
+  double valuePerSession,
+  double averageValuePerSession,
+) {
+  final colorScheme = Theme.of(context).colorScheme;
+  if (averageValuePerSession == 0) return colorScheme.primary;
+  if (valuePerSession >= averageValuePerSession * 1.08) {
+    return colorScheme.tertiary;
+  }
+  if (valuePerSession <= averageValuePerSession * 0.92) {
+    return colorScheme.error;
+  }
+  return colorScheme.primary;
+}
+
+double _valuePerSession(EmployeeTrendPoint point) {
+  if (point.sessions == 0) return 0;
+  return point.contributionValue / point.sessions;
+}
+
+double _chartInterval(double maxValue) {
+  if (maxValue <= 5) return 1;
+  if (maxValue <= 20) return 5;
+  if (maxValue <= 50) return 10;
+  return 25;
 }
 
 String _currency(double value) {

@@ -39,6 +39,30 @@ const SEED_PARTNER_REVIEW_LOGS: SeedPartnerReviewLog[] = [
     reviewerEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
     generalComment: seedKey(SEED_MARKERS.partnerReviewComment, 'REJECTED_001'),
   },
+  {
+    code: '004',
+    partnerTaxCode: '0987654321',
+    verdict: PartnerVerificationStatus.PENDING,
+    reviewerEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
+    generalComment: seedKey(SEED_MARKERS.partnerReviewComment, 'PENDING_001'),
+  },
+  {
+    code: '005',
+    partnerTaxCode: '7788990011',
+    verdict: PartnerVerificationStatus.APPROVED,
+    reviewerEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
+    generalComment: seedKey(SEED_MARKERS.partnerReviewComment, 'APPROVED_002'),
+  },
+  {
+    code: '006',
+    partnerTaxCode: '6677889900',
+    verdict: PartnerVerificationStatus.PENDING,
+    reviewerEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
+    generalComment: seedKey(
+      SEED_MARKERS.partnerReviewComment,
+      'ONBOARDING_001',
+    ),
+  },
 ];
 
 @Injectable()
@@ -61,33 +85,49 @@ export class PartnerReviewLogSeeder implements ISeeder {
 
     const [partners, reviewers] = await Promise.all([
       this.partnerRepo.find({
-        where: { taxCode: In(SEED_PARTNER_REVIEW_LOGS.map((item) => item.partnerTaxCode)) },
+        where: {
+          taxCode: In(
+            SEED_PARTNER_REVIEW_LOGS.map((item) => item.partnerTaxCode),
+          ),
+        },
         select: ['id', 'taxCode'],
       }),
       this.accountRepo.find({
         where: {
-          email: In([...new Set(SEED_PARTNER_REVIEW_LOGS.map((item) => item.reviewerEmail))]),
+          email: In([
+            ...new Set(
+              SEED_PARTNER_REVIEW_LOGS.map((item) => item.reviewerEmail),
+            ),
+          ]),
         },
         select: ['id', 'email'],
       }),
     ]);
 
-    const partnerMap = new Map(partners.map((partner) => [partner.taxCode, partner]));
-    const reviewerMap = new Map(reviewers.map((reviewer) => [reviewer.email, reviewer]));
+    const partnerMap = new Map(
+      partners.map((partner) => [partner.taxCode, partner]),
+    );
+    const reviewerMap = new Map(
+      reviewers.map((reviewer) => [reviewer.email, reviewer]),
+    );
 
     for (const seed of SEED_PARTNER_REVIEW_LOGS) {
       const existing = await this.reviewLogRepo.findOne({
         where: { generalComment: seed.generalComment },
       });
       if (existing) {
-        this.logger.log(`  ⏭ Review log "${seed.generalComment}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ Review log "${seed.generalComment}" already exists, skipping`,
+        );
         continue;
       }
 
       const partner = partnerMap.get(seed.partnerTaxCode);
       const reviewer = reviewerMap.get(seed.reviewerEmail);
       if (!partner || !reviewer) {
-        this.logger.warn(`  ⚠ Missing FK for review log "${seed.code}" — skipping`);
+        this.logger.warn(
+          `  ⚠ Missing FK for review log "${seed.code}" — skipping`,
+        );
         continue;
       }
 
@@ -96,16 +136,20 @@ export class PartnerReviewLogSeeder implements ISeeder {
         select: ['documentKey', 'type', 'fileUrl'],
       });
 
-      const isApproved = seed.verdict === PartnerVerificationStatus.APPROVED;
-      const documentReviews: NonNullable<PartnerReviewLog['documentReviews']> = {};
+      const hasRejectionFeedback = [
+        PartnerVerificationStatus.REJECTED,
+        PartnerVerificationStatus.REQUIRED_RESUBMIT,
+      ].includes(seed.verdict);
+      const documentReviews: NonNullable<PartnerReviewLog['documentReviews']> =
+        {};
       for (const document of documents.slice(0, 2)) {
         documentReviews[document.documentKey] = {
           documentType: document.type,
           url:
             document.fileUrl ??
             `https://cdn.healytics.vn/seed/${document.documentKey}`,
-          isValid: isApproved,
-          feedback: isApproved
+          isValid: !hasRejectionFeedback,
+          feedback: !hasRejectionFeedback
             ? undefined
             : 'Please upload clearer document scans',
         };
@@ -114,15 +158,15 @@ export class PartnerReviewLogSeeder implements ISeeder {
       const fieldReviews: NonNullable<PartnerReviewLog['fieldReviews']> = {
         taxCode: {
           value: seed.partnerTaxCode,
-          isValid: isApproved,
-          feedback: isApproved
+          isValid: !hasRejectionFeedback,
+          feedback: !hasRejectionFeedback
             ? undefined
             : 'Tax code verification requires correction',
         },
         legalName: {
           value: partner.legalName,
-          isValid: isApproved,
-          feedback: isApproved
+          isValid: !hasRejectionFeedback,
+          feedback: !hasRejectionFeedback
             ? undefined
             : 'Legal name mismatch against registration document',
         },
@@ -140,7 +184,9 @@ export class PartnerReviewLogSeeder implements ISeeder {
           generalComment: seed.generalComment,
         }),
       );
-      this.logger.log(`  ✅ Created partner review log "${seed.generalComment}"`);
+      this.logger.log(
+        `  ✅ Created partner review log "${seed.generalComment}"`,
+      );
     }
 
     this.logger.log('Partner review log seeding completed');
