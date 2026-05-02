@@ -11,6 +11,9 @@ import { AnalyticsTrendPointDto } from '../../dto/partner/analytics/analytics-tr
 import { AnalyticsCategoryPerformanceDto } from '../../dto/partner/analytics/analytics-category-performance.dto';
 import { AnalyticsServicePerformanceDto } from '../../dto/partner/analytics/analytics-service-performance.dto';
 import { AnalyticsAlertDto } from '../../dto/partner/analytics/analytics-alert.dto';
+import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { PaymentStatus } from '@/payment-gateway/enums/payment-status.enum';
+import { HealthServiceStatus } from '../../enums/health-service-status.enum';
 
 /** Subquery that selects product IDs for a given partner. */
 const PARTNER_PRODUCTS_SUBQUERY =
@@ -111,7 +114,7 @@ export class GetOverviewAnalyticsHandler {
     const result = await this.dataSource.query(
       `SELECT
         COUNT(*)                                    AS total,
-        COUNT(*) FILTER (WHERE status = 'active')   AS active
+        COUNT(*) FILTER (WHERE status = '${HealthServiceStatus.ACTIVE}')   AS active
       FROM products
       WHERE partner_id = $1
         AND deleted_at IS NULL`,
@@ -140,16 +143,16 @@ export class GetOverviewAnalyticsHandler {
       `SELECT
         COUNT(*)                                      AS total,
         COUNT(*) FILTER (
-          WHERE b.status = 'COMPLETED')               AS completed,
+          WHERE b.status = '${BookingStatus.COMPLETED}')               AS completed,
         COUNT(*) FILTER (
           WHERE b.status IN (
-            'PENDING_PAYMENT', 'CONFIRMED'))           AS pending,
+            '${BookingStatus.PENDING_PAYMENT}', '${BookingStatus.CONFIRMED}'))           AS pending,
         COUNT(*) FILTER (
-          WHERE b.status = 'CONFIRMED')                AS confirmed,
+          WHERE b.status = '${BookingStatus.CONFIRMED}')                AS confirmed,
         COUNT(*) FILTER (
-          WHERE b.status = 'CANCELLED')                AS cancelled,
+          WHERE b.status = '${BookingStatus.CANCELLED}')                AS cancelled,
         COUNT(*) FILTER (
-          WHERE b.status = 'NO_SHOW')                  AS no_show
+          WHERE b.status = '${BookingStatus.NO_SHOW}')                  AS no_show
       FROM bookings b
       WHERE b.product_id IN ${PARTNER_PRODUCTS_SUBQUERY}
         AND b.start_time BETWEEN $2 AND $3
@@ -177,7 +180,7 @@ export class GetOverviewAnalyticsHandler {
       FROM payments pay
       JOIN bookings b ON pay.booking_id = b.id
       WHERE b.product_id IN ${PARTNER_PRODUCTS_SUBQUERY}
-        AND pay.payment_status IN ('PAID', 'DEPOSITED')
+        AND pay.payment_status IN ('${PaymentStatus.PAID}', '${PaymentStatus.DEPOSITED}')
         AND pay.paid_at BETWEEN $2 AND $3`,
       [partnerId, start, end],
     );
@@ -219,7 +222,7 @@ export class GetOverviewAnalyticsHandler {
         ON pd.product_id = b.product_id
       WHERE b.product_id IN ${PARTNER_PRODUCTS_SUBQUERY}
         AND b.start_time BETWEEN $2 AND $3
-        AND b.status = 'COMPLETED'
+        AND b.status = '${BookingStatus.COMPLETED}'
         AND b.end_time IS NOT NULL
         AND b.end_time > (
           b.start_time
@@ -245,10 +248,10 @@ export class GetOverviewAnalyticsHandler {
         `SELECT
           date_trunc($1, b.start_time)             AS bucket,
           COUNT(*) FILTER (
-            WHERE b.status = 'COMPLETED')          AS bookings,
+            WHERE b.status IN ('${BookingStatus.COMPLETED}', '${BookingStatus.PENDING_PAYMENT}'))          AS bookings,
           COALESCE(SUM(
             CASE WHEN pay.payment_status
-              IN ('PAID', 'DEPOSITED')
+              IN ('${PaymentStatus.PAID}', '${PaymentStatus.DEPOSITED}')
               THEN pay.amount ELSE 0 END
           ), 0)                                    AS revenue
         FROM bookings b
@@ -261,13 +264,63 @@ export class GetOverviewAnalyticsHandler {
         [granularity, partnerId, start, end],
       );
 
+    if (period === DashboardTimePeriod.THIS_MONTH) {
+      const aggregated = [
+        { label: 'Wk 1', bookings: 0, revenue: 0 },
+        { label: 'Wk 2', bookings: 0, revenue: 0 },
+        { label: 'Wk 3', bookings: 0, revenue: 0 },
+        { label: 'Wk 4', bookings: 0, revenue: 0 },
+      ];
+      for (const row of rows) {
+        const d = new Date(row.bucket);
+        const dayOfMonth = d.getDate();
+        const weekIndex = Math.min(Math.ceil(dayOfMonth / 7) - 1, 3);
+        aggregated[weekIndex].bookings += parseInt(row.bookings) || 0;
+        aggregated[weekIndex].revenue += parseFloat(row.revenue) || 0;
+      }
+      return aggregated.map((a) => {
+        const dto = new AnalyticsTrendPointDto();
+        dto.label = a.label;
+        dto.bookings = a.bookings;
+        dto.revenue = a.revenue;
+        return dto;
+      });
+    }
+
+    // Build a granularity-aware key that avoids timezone mismatches
+    // between PostgreSQL date_trunc (UTC) and JavaScript Date (local TZ).
+    const bucketKey = (d: Date): string => {
+      if (granularity === 'month') {
+        // Use year-month to avoid UTC vs local midnight drift
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      }
+      if (granularity === 'day' || granularity === 'week') {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      }
+      // hour or fallback
+      return d.toISOString();
+    };
+
+    // For SQL rows, parse the bucket and derive the key using local parts
+    const sqlBucketKey = (bucket: Date): string => {
+      const d = new Date(bucket);
+      if (granularity === 'month') {
+        // PostgreSQL returns UTC dates; extract UTC year-month
+        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+      }
+      if (granularity === 'day' || granularity === 'week') {
+        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+      }
+      return d.toISOString();
+    };
+
     // Build map of existing buckets
     const revenueMap = new Map<string, {
       bookings: number;
       revenue: number;
     }>();
     for (const row of rows) {
-      const key = new Date(row.bucket).toISOString();
+      const key = sqlBucketKey(row.bucket);
       revenueMap.set(key, {
         bookings: parseInt(row.bookings) || 0,
         revenue: parseFloat(row.revenue) || 0,
@@ -280,7 +333,7 @@ export class GetOverviewAnalyticsHandler {
     );
 
     return allBuckets.map((bucketDate) => {
-      const key = bucketDate.toISOString();
+      const key = bucketKey(bucketDate);
       const data = revenueMap.get(key);
       const dto = new AnalyticsTrendPointDto();
       dto.label = this.formatBucketLabel(bucketDate, period);
@@ -299,10 +352,10 @@ export class GetOverviewAnalyticsHandler {
       `SELECT
         c.name                                    AS category_name,
         COUNT(*) FILTER (
-          WHERE b.status = 'COMPLETED')           AS bookings,
+          WHERE b.status = '${BookingStatus.COMPLETED}')           AS bookings,
         COALESCE(SUM(
           CASE WHEN pay.payment_status
-            IN ('PAID', 'DEPOSITED')
+            IN ('${PaymentStatus.PAID}', '${PaymentStatus.DEPOSITED}')
             THEN pay.amount ELSE 0 END
         ), 0)                                     AS revenue,
         COALESCE(AVG(tr.rating), 0)               AS avg_rating
@@ -342,10 +395,10 @@ export class GetOverviewAnalyticsHandler {
         p.name                                    AS service_name,
         COALESCE(c.name, 'Uncategorized')         AS category_name,
         COUNT(*) FILTER (
-          WHERE b.status = 'COMPLETED')           AS bookings,
+          WHERE b.status = '${BookingStatus.COMPLETED}')           AS bookings,
         COALESCE(SUM(
           CASE WHEN pay.payment_status
-            IN ('PAID', 'DEPOSITED')
+            IN ('${PaymentStatus.PAID}', '${PaymentStatus.DEPOSITED}')
             THEN pay.amount ELSE 0 END
         ), 0)                                     AS revenue,
         COALESCE(AVG(tr.rating), 0)               AS avg_rating
@@ -359,7 +412,7 @@ export class GetOverviewAnalyticsHandler {
           ON tr.appointment_id = b.id
       WHERE p.partner_id = $1
         AND p.deleted_at IS NULL
-        AND p.status = 'active'
+        AND p.status = '${HealthServiceStatus.ACTIVE}'
       GROUP BY p.id, p.name, c.name
       ORDER BY revenue DESC
       LIMIT 5`,
@@ -507,6 +560,11 @@ export class GetOverviewAnalyticsHandler {
     date: Date,
     period: DashboardTimePeriod,
   ): string {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+
     switch (period) {
       case DashboardTimePeriod.TODAY: {
         const hours = date.getHours();
@@ -515,28 +573,13 @@ export class GetOverviewAnalyticsHandler {
         return `${display}${suffix}`;
       }
       case DashboardTimePeriod.THIS_WEEK: {
-        const days = [
-          'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
-        ];
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         return days[date.getDay()];
       }
-      case DashboardTimePeriod.THIS_MONTH: {
-        const dayOfMonth = date.getDate();
-        const weekNum = Math.ceil(dayOfMonth / 7);
-        return `Wk ${weekNum}`;
-      }
-      case DashboardTimePeriod.THIS_QUARTER: {
-        const months = [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-        ];
-        return months[date.getMonth()];
-      }
+      case DashboardTimePeriod.THIS_MONTH:
+        return ''; // Handled manually in getTrendData
+      case DashboardTimePeriod.THIS_QUARTER:
       case DashboardTimePeriod.THIS_YEAR: {
-        const months = [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-        ];
         return months[date.getMonth()];
       }
     }

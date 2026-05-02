@@ -8,7 +8,12 @@ import { DeviceToken } from '@/common/entities/device-token.entity';
 import { NotificationType } from '@/notification/enums/notification-type.enum';
 import { DevicePlatform } from '@/notification/enums/device-platform.enum';
 import { ISeeder } from '../seeder.interface';
-import { SEED_MARKERS, buildMapBy, likePrefix, seedKey } from '../utils/seed.utils';
+import {
+  SEED_MARKERS,
+  buildMapBy,
+  likePrefix,
+  seedKey,
+} from '../utils/seed.utils';
 
 interface SeedNotification {
   code: string;
@@ -79,6 +84,85 @@ const SEED_NOTIFICATIONS: SeedNotification[] = [
     isBroadcast: true,
     isRead: false,
   },
+  {
+    code: 'PAYMENT_SUCCESS_DENTAL_001',
+    type: NotificationType.PAYMENT_SUCCESS,
+    title: seedKey(
+      SEED_MARKERS.notificationTitle,
+      'PAYMENT_SUCCESS_DENTAL_001',
+    ),
+    body: 'Payment received for your dental cleaning appointment.',
+    recipientEmail: 'nguyenvana@healytics.vn',
+    senderEmail: null,
+    isBroadcast: false,
+    isRead: true,
+  },
+  {
+    code: 'BOOKING_COMPLETED_ACU_001',
+    type: NotificationType.BOOKING_COMPLETED,
+    title: seedKey(SEED_MARKERS.notificationTitle, 'BOOKING_COMPLETED_ACU_001'),
+    body: 'Your acupuncture appointment is complete. You can leave a review.',
+    recipientEmail: 'phamthid@healytics.vn',
+    senderEmail: null,
+    isBroadcast: false,
+    isRead: false,
+  },
+  {
+    code: 'BOOKING_CANCELLED_DENTAL_001',
+    type: NotificationType.BOOKING_CANCELLED,
+    title: seedKey(
+      SEED_MARKERS.notificationTitle,
+      'BOOKING_CANCELLED_DENTAL_001',
+    ),
+    body: 'Your dental whitening booking was cancelled and refunded.',
+    recipientEmail: 'buithih@healytics.vn',
+    senderEmail: null,
+    isBroadcast: false,
+    isRead: false,
+  },
+  {
+    code: 'PARTNER_VERIFIED_001',
+    type: NotificationType.PARTNER_VERIFIED,
+    title: seedKey(SEED_MARKERS.notificationTitle, 'PARTNER_VERIFIED_001'),
+    body: 'MindSkin Clinic verification was approved.',
+    recipientEmail: 'partner6@healytics.vn',
+    senderEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
+    isBroadcast: false,
+    isRead: false,
+  },
+  {
+    code: 'PAYMENT_FAILED_DERM_001',
+    type: NotificationType.PAYMENT_FAILED,
+    title: seedKey(SEED_MARKERS.notificationTitle, 'PAYMENT_FAILED_DERM_001'),
+    body: 'Payment authorization is still pending for your dermatology consultation.',
+    recipientEmail: 'hoangvane@healytics.vn',
+    senderEmail: null,
+    isBroadcast: false,
+    isRead: false,
+  },
+  {
+    code: 'APPOINTMENT_UPDATED_COUNSELING_001',
+    type: NotificationType.APPOINTMENT_UPDATED,
+    title: seedKey(
+      SEED_MARKERS.notificationTitle,
+      'APPOINTMENT_UPDATED_COUNSELING_001',
+    ),
+    body: 'Your counseling room preference has been added to the appointment.',
+    recipientEmail: 'vuthif@healytics.vn',
+    senderEmail: 'partner6@healytics.vn',
+    isBroadcast: false,
+    isRead: true,
+  },
+  {
+    code: 'BROADCAST_003',
+    type: NotificationType.SYSTEM_BROADCAST,
+    title: seedKey(SEED_MARKERS.notificationTitle, 'BROADCAST_003'),
+    body: 'New wellness programs are available across dental, nutrition and mental health partners.',
+    recipientEmail: null,
+    senderEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
+    isBroadcast: true,
+    isRead: false,
+  },
 ];
 
 const SEED_DEVICE_TOKENS: SeedDeviceToken[] = [
@@ -98,6 +182,24 @@ const SEED_DEVICE_TOKENS: SeedDeviceToken[] = [
     code: 'PARTNER_ANDROID_ACTIVE',
     userEmail: 'partner@healytics.vn',
     platform: DevicePlatform.ANDROID,
+    isActive: true,
+  },
+  {
+    code: 'DENTAL_USER_IOS_ACTIVE',
+    userEmail: 'nguyenvana@healytics.vn',
+    platform: DevicePlatform.IOS,
+    isActive: true,
+  },
+  {
+    code: 'MENTAL_USER_ANDROID_ACTIVE',
+    userEmail: 'vuthif@healytics.vn',
+    platform: DevicePlatform.ANDROID,
+    isActive: true,
+  },
+  {
+    code: 'MINDSKIN_PARTNER_IOS_ACTIVE',
+    userEmail: 'partner6@healytics.vn',
+    platform: DevicePlatform.IOS,
     isActive: true,
   },
 ];
@@ -142,29 +244,37 @@ export class NotificationSeeder implements ISeeder {
     this.logger.log('Notification seeding completed');
   }
 
-  private async seedNotifications(accountMap: Map<string, Account>): Promise<void> {
+  private async seedNotifications(
+    accountMap: Map<string, Account>,
+  ): Promise<void> {
     for (const seed of SEED_NOTIFICATIONS) {
       const existing = await this.notificationRepo.findOne({
         where: { title: seed.title },
       });
       if (existing) {
-        this.logger.log(`  ⏭ Notification "${seed.title}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ Notification "${seed.title}" already exists, skipping`,
+        );
         continue;
       }
 
       const recipientId = seed.recipientEmail
-        ? accountMap.get(seed.recipientEmail)?.id ?? null
+        ? (accountMap.get(seed.recipientEmail)?.id ?? null)
         : null;
       const senderId = seed.senderEmail
-        ? accountMap.get(seed.senderEmail)?.id ?? null
+        ? (accountMap.get(seed.senderEmail)?.id ?? null)
         : null;
 
       if (seed.recipientEmail && !recipientId) {
-        this.logger.warn(`  ⚠ Recipient "${seed.recipientEmail}" not found — skipping`);
+        this.logger.warn(
+          `  ⚠ Recipient "${seed.recipientEmail}" not found — skipping`,
+        );
         continue;
       }
       if (seed.senderEmail && !senderId) {
-        this.logger.warn(`  ⚠ Sender "${seed.senderEmail}" not found — skipping`);
+        this.logger.warn(
+          `  ⚠ Sender "${seed.senderEmail}" not found — skipping`,
+        );
         continue;
       }
 
@@ -185,14 +295,31 @@ export class NotificationSeeder implements ISeeder {
     }
   }
 
-  private async seedNotificationReads(accountMap: Map<string, Account>): Promise<void> {
-    const readTargets: Array<{ notificationCode: string; userEmail: string }> = [
-      { notificationCode: 'BROADCAST_002', userEmail: 'user@healytics.vn' },
-      { notificationCode: 'BROADCAST_001', userEmail: 'partner@healytics.vn' },
-    ];
+  private async seedNotificationReads(
+    accountMap: Map<string, Account>,
+  ): Promise<void> {
+    const readTargets: Array<{ notificationCode: string; userEmail: string }> =
+      [
+        { notificationCode: 'BROADCAST_002', userEmail: 'user@healytics.vn' },
+        {
+          notificationCode: 'BROADCAST_001',
+          userEmail: 'partner@healytics.vn',
+        },
+        {
+          notificationCode: 'BROADCAST_003',
+          userEmail: 'nguyenvana@healytics.vn',
+        },
+        {
+          notificationCode: 'BROADCAST_003',
+          userEmail: 'partner6@healytics.vn',
+        },
+      ];
 
     for (const target of readTargets) {
-      const title = seedKey(SEED_MARKERS.notificationTitle, target.notificationCode);
+      const title = seedKey(
+        SEED_MARKERS.notificationTitle,
+        target.notificationCode,
+      );
       const [notification, user] = await Promise.all([
         this.notificationRepo.findOne({
           where: { title },
@@ -225,11 +352,15 @@ export class NotificationSeeder implements ISeeder {
     }
   }
 
-  private async seedDeviceTokens(accountMap: Map<string, Account>): Promise<void> {
+  private async seedDeviceTokens(
+    accountMap: Map<string, Account>,
+  ): Promise<void> {
     for (const seed of SEED_DEVICE_TOKENS) {
       const user = accountMap.get(seed.userEmail);
       if (!user) {
-        this.logger.warn(`  ⚠ User "${seed.userEmail}" not found — skipping device token`);
+        this.logger.warn(
+          `  ⚠ User "${seed.userEmail}" not found — skipping device token`,
+        );
         continue;
       }
 
@@ -264,19 +395,28 @@ export class NotificationSeeder implements ISeeder {
       select: ['id'],
     });
 
-    const notificationIds = seededNotifications.map((notification) => notification.id);
+    const notificationIds = seededNotifications.map(
+      (notification) => notification.id,
+    );
     if (notificationIds.length) {
-      const { affected: readAffected } = await this.notificationReadRepo.delete({
-        notificationId: In(notificationIds),
-      });
+      const { affected: readAffected } = await this.notificationReadRepo.delete(
+        {
+          notificationId: In(notificationIds),
+        },
+      );
       if (readAffected) {
-        this.logger.log(`🗑️ Hard-deleted ${readAffected} seed notification read row(s)`);
+        this.logger.log(
+          `🗑️ Hard-deleted ${readAffected} seed notification read row(s)`,
+        );
       }
 
-      const { affected: notificationAffected } = await this.notificationRepo.delete({
-        id: In(notificationIds),
-      });
-      this.logger.log(`🗑️ Hard-deleted ${notificationAffected ?? 0} seed notification(s)`);
+      const { affected: notificationAffected } =
+        await this.notificationRepo.delete({
+          id: In(notificationIds),
+        });
+      this.logger.log(
+        `🗑️ Hard-deleted ${notificationAffected ?? 0} seed notification(s)`,
+      );
     }
 
     const { affected: tokenAffected } = await this.deviceTokenRepo.delete({

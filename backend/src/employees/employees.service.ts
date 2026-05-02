@@ -33,6 +33,11 @@ import { CreateDoctorHandler } from './application/handlers/create-doctor.handle
 import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
 import { UpdateEmployeeHandler } from './application/handlers/update-employee.handler';
 import { RemoveEmployeeHandler } from './application/handlers/remove-employee.handler';
+import { GetEmployeeOverviewAnalyticsHandler } from './application/handlers/get-employee-overview-analytics.handler';
+import { GetEmployeeDetailAnalyticsHandler } from './application/handlers/get-employee-detail-analytics.handler';
+import { DashboardTimePeriod } from '@/dashboard-partner/dto/query/dashboard-period-query.dto';
+import { EmployeeOverviewAnalyticsResponseDto } from './dto/analytics/employee-overview-analytics.dto';
+import { EmployeeDetailAnalyticsResponseDto } from './dto/analytics/employee-detail-analytics.dto';
 
 /**
  * Service facade for managing employees (doctors, therapists, staff).
@@ -72,6 +77,8 @@ export class EmployeesService {
     private readonly createTherapistHandler: CreateTherapistHandler,
     private readonly updateEmployeeHandler: UpdateEmployeeHandler,
     private readonly removeEmployeeHandler: RemoveEmployeeHandler,
+    private readonly getEmployeeOverviewAnalyticsHandler: GetEmployeeOverviewAnalyticsHandler,
+    private readonly getEmployeeDetailAnalyticsHandler: GetEmployeeDetailAnalyticsHandler,
   ) {}
 
   // ──────────────────────────────────────────────────────────────
@@ -231,6 +238,37 @@ export class EmployeesService {
   async removeForPartner(id: string, partnerId: string): Promise<void> {
     await this.findOneForPartner(id, partnerId);
     return this.removeEmployeeHandler.execute(id);
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // Analytics operations
+  // ──────────────────────────────────────────────────────────────
+
+  /**
+   * Returns overview analytics for all employees of the authenticated partner.
+   */
+  async getOverviewAnalytics(
+    accountId: string,
+    period: DashboardTimePeriod,
+  ): Promise<EmployeeOverviewAnalyticsResponseDto> {
+    const partnerId = await this.getPartnerIdByAccountId(accountId);
+    return this.getEmployeeOverviewAnalyticsHandler.execute(partnerId, period);
+  }
+
+  /**
+   * Returns per-employee detail analytics for a specific employee.
+   */
+  async getDetailAnalytics(
+    accountId: string,
+    employeeId: string,
+    period: DashboardTimePeriod,
+  ): Promise<EmployeeDetailAnalyticsResponseDto> {
+    const partnerId = await this.getPartnerIdByAccountId(accountId);
+    return this.getEmployeeDetailAnalyticsHandler.execute(
+      partnerId,
+      employeeId,
+      period,
+    );
   }
 
   // ──────────────────────────────────────────────────────────────

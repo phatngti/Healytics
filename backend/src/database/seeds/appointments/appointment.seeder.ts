@@ -379,6 +379,362 @@ const SEED_APPOINTMENTS: {
       },
     ],
   },
+  {
+    idempotencyKey: 'SEED-APT-009',
+    userEmail: 'nguyenvana@healytics.vn',
+    staffCode: 'EMP-005',
+    productSlug: 'dental-checkup-cleaning',
+    startTime: daysAgo(10, 9, 0),
+    endTime: daysAgo(10, 10, 0),
+    status: BookingStatus.COMPLETED,
+    isReviewed: true,
+    notes: 'Routine dental cleaning before travel',
+    payment: {
+      method: PaymentMethod.VNPAY,
+      status: PaymentStatus.PAID,
+      amount: 590000,
+      paidAt: daysAgo(10, 8, 45),
+    },
+    statusLogs: [
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.COMPLETED,
+        changedBy: 'staff:EMP-005',
+      },
+    ],
+    treatmentReview: {
+      rating: 5,
+      comment:
+        'The dental cleaning was careful and clear. Dr. Olivia explained the sensitivity risk before starting.',
+      tags: ['Professional', 'Clean', 'Gentle'],
+      photoUrls: [],
+    },
+    specialistReview: {
+      rating: 5,
+      comment:
+        'Very gentle and detailed. I felt comfortable throughout the appointment.',
+      tags: ['Gentle', 'Detailed'],
+      wouldRecommend: true,
+    },
+  },
+  {
+    idempotencyKey: 'SEED-APT-010',
+    userEmail: 'tranthib@healytics.vn',
+    staffCode: 'EMP-007',
+    productSlug: 'sports-recovery-yoga-session',
+    startTime: daysFromNow(4, 10, 0),
+    endTime: daysFromNow(4, 11, 15),
+    status: BookingStatus.CONFIRMED,
+    isReviewed: false,
+    notes: 'Needs hip mobility work after marathon training',
+    payment: {
+      method: PaymentMethod.MOMO,
+      status: PaymentStatus.PAID,
+      amount: 180000,
+      paidAt: daysAgo(1, 12, 0),
+    },
+    statusLogs: [
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+    ],
+  },
+  {
+    idempotencyKey: 'SEED-APT-011',
+    userEmail: 'levanc@healytics.vn',
+    staffCode: 'EMP-009',
+    productSlug: 'nutrition-consultation-meal-plan',
+    startTime: daysAgo(12, 13, 0),
+    endTime: daysAgo(12, 14, 0),
+    status: BookingStatus.COMPLETED,
+    isReviewed: false,
+    notes: null,
+    payment: {
+      method: PaymentMethod.STRIPE,
+      status: PaymentStatus.PAID,
+      amount: 650000,
+      paidAt: daysAgo(12, 12, 45),
+    },
+    statusLogs: [
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.COMPLETED,
+        changedBy: 'staff:EMP-009',
+      },
+    ],
+  },
+  {
+    idempotencyKey: 'SEED-APT-012',
+    userEmail: 'phamthid@healytics.vn',
+    staffCode: 'EMP-010',
+    productSlug: 'herbal-acupuncture-therapy',
+    startTime: daysAgo(18, 15, 0),
+    endTime: daysAgo(18, 16, 15),
+    status: BookingStatus.COMPLETED,
+    isReviewed: true,
+    notes: 'Prefers morning acupuncture appointment',
+    payment: {
+      method: PaymentMethod.CASH,
+      status: PaymentStatus.PAID,
+      amount: 520000,
+      paidAt: daysAgo(18, 16, 20),
+    },
+    statusLogs: [
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'staff:EMP-010',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.COMPLETED,
+        changedBy: 'staff:EMP-010',
+      },
+    ],
+    treatmentReview: {
+      rating: 5,
+      comment:
+        'The acupuncture session was calm and effective. The aftercare guidance was easy to follow.',
+      tags: ['Calm', 'Effective', 'Clear Advice'],
+      photoUrls: [],
+    },
+    specialistReview: {
+      rating: 5,
+      comment:
+        'Dr. Mai asked detailed questions and adjusted the treatment to my shoulder tension.',
+      tags: ['Experienced', 'Thoughtful'],
+      wouldRecommend: true,
+    },
+  },
+  {
+    idempotencyKey: 'SEED-APT-013',
+    userEmail: 'hoangvane@healytics.vn',
+    staffCode: 'EMP-012',
+    productSlug: 'dermatology-acne-consultation',
+    startTime: daysFromNow(6, 11, 0),
+    endTime: daysFromNow(6, 11, 45),
+    status: BookingStatus.PENDING_PAYMENT,
+    isReviewed: false,
+    notes: null,
+    payment: {
+      method: PaymentMethod.MOMO,
+      status: PaymentStatus.UNPAID,
+      amount: 750000,
+      paidAt: null,
+    },
+    statusLogs: [
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+    ],
+  },
+  {
+    idempotencyKey: 'SEED-APT-014',
+    userEmail: 'vuthif@healytics.vn',
+    staffCode: 'EMP-013',
+    productSlug: 'stress-anxiety-counseling',
+    startTime: daysFromNow(5, 16, 0),
+    endTime: daysFromNow(5, 17, 0),
+    status: BookingStatus.CONFIRMED,
+    isReviewed: false,
+    notes: 'Requests quiet room for first counseling session',
+    payment: {
+      method: PaymentMethod.STRIPE,
+      status: PaymentStatus.PAID,
+      amount: 900000,
+      paidAt: daysAgo(2, 16, 10),
+    },
+    statusLogs: [
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+    ],
+  },
+  {
+    idempotencyKey: 'SEED-APT-015',
+    userEmail: 'dangvang@healytics.vn',
+    staffCode: 'EMP-011',
+    productSlug: 'herbal-acupuncture-therapy',
+    startTime: daysAgo(3, 10, 0),
+    endTime: daysAgo(3, 11, 15),
+    status: BookingStatus.NO_SHOW,
+    isReviewed: false,
+    notes: 'Missed due to traffic, wants to rebook',
+    payment: {
+      method: PaymentMethod.MOMO,
+      status: PaymentStatus.DEPOSITED,
+      amount: 200000,
+      paidAt: daysAgo(4, 9, 15),
+    },
+    statusLogs: [
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.NO_SHOW,
+        changedBy: 'staff:EMP-011',
+      },
+    ],
+  },
+  {
+    idempotencyKey: 'SEED-APT-016',
+    userEmail: 'buithih@healytics.vn',
+    staffCode: 'EMP-006',
+    productSlug: 'professional-teeth-whitening',
+    startTime: daysAgo(9, 14, 0),
+    endTime: daysAgo(9, 16, 0),
+    status: BookingStatus.CANCELLED,
+    isReviewed: false,
+    notes: 'Sensitive teeth, cancelled after rescheduling',
+    payment: {
+      method: PaymentMethod.VNPAY,
+      status: PaymentStatus.REFUND,
+      amount: 1200000,
+      paidAt: daysAgo(10, 10, 0),
+    },
+    statusLogs: [
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.CANCELLED,
+        changedBy: 'user',
+      },
+    ],
+  },
+  {
+    idempotencyKey: 'SEED-APT-017',
+    userEmail: 'nguyenminh@healytics.vn',
+    staffCode: 'EMP-002',
+    productSlug: 'full-body-massage-60-min',
+    startTime: daysAgo(30, 10, 0),
+    endTime: daysAgo(30, 11, 10),
+    status: BookingStatus.COMPLETED,
+    isReviewed: true,
+    notes: 'Second massage visit with medium pressure',
+    payment: {
+      method: PaymentMethod.MOMO,
+      status: PaymentStatus.PAID,
+      amount: 299000,
+      paidAt: daysAgo(30, 9, 40),
+    },
+    statusLogs: [
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.CONFIRMED,
+        toStatus: BookingStatus.COMPLETED,
+        changedBy: 'staff:EMP-002',
+      },
+    ],
+    treatmentReview: {
+      rating: 4,
+      comment:
+        'Great second visit. The medium pressure was right and the room was very clean.',
+      tags: ['Clean', 'Relaxing'],
+      photoUrls: [],
+    },
+    specialistReview: {
+      rating: 4,
+      comment: 'Sarah remembered my preferences and checked pressure often.',
+      tags: ['Attentive', 'Friendly'],
+      wouldRecommend: true,
+    },
+  },
+  {
+    idempotencyKey: 'SEED-APT-018',
+    userEmail: 'lehoanglinh@healytics.vn',
+    staffCode: 'EMP-009',
+    productSlug: 'nutrition-consultation-meal-plan',
+    startTime: daysFromNow(8, 9, 0),
+    endTime: daysFromNow(8, 10, 0),
+    status: BookingStatus.CONFIRMED,
+    isReviewed: false,
+    notes: 'Follow-up nutrition plan review',
+    payment: {
+      method: PaymentMethod.STRIPE,
+      status: PaymentStatus.DEPOSITED,
+      amount: 300000,
+      paidAt: daysAgo(1, 8, 30),
+    },
+    statusLogs: [
+      {
+        fromStatus: null,
+        toStatus: BookingStatus.PENDING_PAYMENT,
+        changedBy: 'system',
+      },
+      {
+        fromStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: BookingStatus.CONFIRMED,
+        changedBy: 'system',
+      },
+    ],
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -417,13 +773,20 @@ export class AppointmentSeeder implements ISeeder {
     this.logger.log('Seeding appointments...');
 
     // ── Pre-load lookup maps ──────────────────────────────────────────────────
-    const userAccount = await this.accountRepo.findOne({
-      where: { email: 'user@healytics.vn', role: Role.USER },
+    const userEmails = [
+      ...new Set(SEED_APPOINTMENTS.map((apt) => apt.userEmail)),
+    ];
+    const userAccounts = await this.accountRepo.find({
+      where: { email: In(userEmails), role: Role.USER },
+      select: ['id', 'email'],
     });
+    const userMap = new Map(
+      userAccounts.map((account) => [account.email, account]),
+    );
 
-    if (!userAccount) {
+    if (!userMap.size) {
       this.logger.warn(
-        '  ⚠ Test user "user@healytics.vn" not found — skipping appointment seeding. Run UserSeeder first.',
+        '  ⚠ Seed users not found — skipping appointment seeding. Run UserSeeder first.',
       );
       return;
     }
@@ -439,6 +802,14 @@ export class AppointmentSeeder implements ISeeder {
       // Use notes + startTime as a logical idempotency check via idempotencyKey
       // We store idempotencyKey in the `notes` field is NOT correct — instead
       // we query bookings by userId + staffId + startTime (composite unique index)
+      const userAccount = userMap.get(apt.userEmail);
+      if (!userAccount) {
+        this.logger.warn(
+          `  ⚠ User "${apt.userEmail}" not found — skipping ${apt.idempotencyKey}`,
+        );
+        continue;
+      }
+
       const employee = employeeMap.get(apt.staffCode);
       if (!employee) {
         this.logger.warn(
@@ -567,14 +938,19 @@ export class AppointmentSeeder implements ISeeder {
 
     // We identify seed bookings by the user + known staff codes + product slugs
     // Strategy: find all bookings where userId = testUser + staffId in seedEmployee IDs
-    const userAccount = await this.accountRepo.findOne({
-      where: { email: 'user@healytics.vn', role: Role.USER },
+    const userAccounts = await this.accountRepo.find({
+      where: {
+        email: In([...new Set(SEED_APPOINTMENTS.map((a) => a.userEmail))]),
+        role: Role.USER,
+      },
+      select: ['id'],
     });
 
-    if (!userAccount) {
-      this.logger.warn('  ⚠ Test user not found — nothing to clear');
+    if (!userAccounts.length) {
+      this.logger.warn('  ⚠ Seed users not found — nothing to clear');
       return;
     }
+    const userIds = userAccounts.map((account) => account.id);
 
     const seedStaffCodes = [
       ...new Set(SEED_APPOINTMENTS.map((a) => a.staffCode)),
@@ -590,7 +966,7 @@ export class AppointmentSeeder implements ISeeder {
     }
 
     const seedBookings = await this.bookingRepo.find({
-      where: { userId: userAccount.id, staffId: In(staffIds) },
+      where: { userId: In(userIds), staffId: In(staffIds) },
       select: ['id'],
       withDeleted: true,
     });

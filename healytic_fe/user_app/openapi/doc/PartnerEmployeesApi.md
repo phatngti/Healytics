@@ -14,6 +14,8 @@ Method | HTTP request | Description
 [**partnerEmployeesControllerCreateSpaTherapist**](PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
 [**partnerEmployeesControllerFindAll**](PartnerEmployeesApi.md#partneremployeescontrollerfindall) | **GET** /partner/employees | Get all employees for this partner
 [**partnerEmployeesControllerFindOne**](PartnerEmployeesApi.md#partneremployeescontrollerfindone) | **GET** /partner/employees/{id} | Get an employee by id
+[**partnerEmployeesControllerGetDetailAnalytics**](PartnerEmployeesApi.md#partneremployeescontrollergetdetailanalytics) | **GET** /partner/employees/analytics/{employeeId} | Get per-employee detail analytics
+[**partnerEmployeesControllerGetOverviewAnalytics**](PartnerEmployeesApi.md#partneremployeescontrollergetoverviewanalytics) | **GET** /partner/employees/analytics/overview | Get employee overview analytics
 [**partnerEmployeesControllerRemove**](PartnerEmployeesApi.md#partneremployeescontrollerremove) | **DELETE** /partner/employees/{id} | Delete an employee
 [**partnerEmployeesControllerUpdate**](PartnerEmployeesApi.md#partneremployeescontrollerupdate) | **PATCH** /partner/employees/{id} | Update an employee
 
@@ -241,6 +243,102 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**EmployeeResponseDto**](EmployeeResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **partnerEmployeesControllerGetDetailAnalytics**
+> EmployeeDetailAnalyticsResponseDto partnerEmployeesControllerGetDetailAnalytics(employeeId, period)
+
+Get per-employee detail analytics
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = PartnerEmployeesApi();
+final employeeId = employeeId_example; // String | 
+final period = ; // DashboardTimePeriod | Time period for employee analytics aggregation
+
+try {
+    final result = api_instance.partnerEmployeesControllerGetDetailAnalytics(employeeId, period);
+    print(result);
+} catch (e) {
+    print('Exception when calling PartnerEmployeesApi->partnerEmployeesControllerGetDetailAnalytics: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **employeeId** | **String**|  | 
+ **period** | [**DashboardTimePeriod**](.md)| Time period for employee analytics aggregation | [optional] 
+
+### Return type
+
+[**EmployeeDetailAnalyticsResponseDto**](EmployeeDetailAnalyticsResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **partnerEmployeesControllerGetOverviewAnalytics**
+> EmployeeOverviewAnalyticsResponseDto partnerEmployeesControllerGetOverviewAnalytics(period)
+
+Get employee overview analytics
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = PartnerEmployeesApi();
+final period = ; // DashboardTimePeriod | Time period for employee analytics aggregation
+
+try {
+    final result = api_instance.partnerEmployeesControllerGetOverviewAnalytics(period);
+    print(result);
+} catch (e) {
+    print('Exception when calling PartnerEmployeesApi->partnerEmployeesControllerGetOverviewAnalytics: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **period** | [**DashboardTimePeriod**](.md)| Time period for employee analytics aggregation | [optional] 
+
+### Return type
+
+[**EmployeeOverviewAnalyticsResponseDto**](EmployeeOverviewAnalyticsResponseDto.md)
 
 ### Authorization
 

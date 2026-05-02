@@ -12,9 +12,25 @@ import { TherapistLevel } from '@/employees/enum/therapist-level.enum';
 import { StrengthLevel } from '@/employees/enum/strength-level.enum';
 import { ISeeder } from '../seeder.interface';
 
+const schedule = (
+  weekdayStart = '08:00',
+  weekdayEnd = '17:00',
+  saturdayStart = '09:00',
+  saturdayEnd = '13:00',
+) => [
+  { day: 'Monday', start: weekdayStart, end: weekdayEnd, isWorking: true },
+  { day: 'Tuesday', start: weekdayStart, end: weekdayEnd, isWorking: true },
+  { day: 'Wednesday', start: weekdayStart, end: weekdayEnd, isWorking: true },
+  { day: 'Thursday', start: weekdayStart, end: weekdayEnd, isWorking: true },
+  { day: 'Friday', start: weekdayStart, end: weekdayEnd, isWorking: true },
+  { day: 'Saturday', start: saturdayStart, end: saturdayEnd, isWorking: true },
+  { day: 'Sunday', start: '00:00', end: '00:00', isWorking: false },
+];
+
 const SEED_EMPLOYEES = [
   {
     employeeCode: 'EMP-001',
+    partnerTaxCode: '0123456789',
     firstName: 'James',
     lastName: 'Anderson',
 
@@ -55,6 +71,7 @@ const SEED_EMPLOYEES = [
   },
   {
     employeeCode: 'EMP-002',
+    partnerTaxCode: '0123456789',
     firstName: 'Sarah',
     lastName: 'Mitchell',
 
@@ -95,6 +112,7 @@ const SEED_EMPLOYEES = [
   },
   {
     employeeCode: 'EMP-003',
+    partnerTaxCode: '0123456789',
     firstName: 'David',
     lastName: 'Nguyen',
 
@@ -121,6 +139,7 @@ const SEED_EMPLOYEES = [
   },
   {
     employeeCode: 'EMP-004',
+    partnerTaxCode: '0123456789',
     firstName: 'Emily',
     lastName: 'Parker',
 
@@ -144,6 +163,208 @@ const SEED_EMPLOYEES = [
       { day: 'Saturday', start: '00:00', end: '00:00', isWorking: false },
       { day: 'Sunday', start: '00:00', end: '00:00', isWorking: false },
     ],
+  },
+  {
+    employeeCode: 'EMP-005',
+    partnerTaxCode: '0987654321',
+    firstName: 'Olivia',
+    lastName: 'Tran',
+    email: 'dentist.tran@healytics.vn',
+    phone: '0902000005',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Olivia',
+    jobTitle: 'Cosmetic Dentist',
+    role: EmployeeRole.DOCTOR,
+    gender: Gender.FEMALE,
+    dob: new Date('1986-09-18'),
+    startDate: new Date('2018-04-02'),
+    employmentType: 'Full-time',
+    description:
+      'Dr. Olivia Tran specializes in preventive dentistry, whitening and cosmetic treatment planning with a conservative, patient-first approach.',
+    schedule: schedule('08:30', '17:30', '08:30', '12:30'),
+    workHistory: [
+      {
+        facility: 'Healytics Dental',
+        position: 'Lead Dentist',
+        period: '2018–Present',
+        isCurrent: true,
+      },
+      {
+        facility: 'HCMC Odonto-Stomatology Hospital',
+        position: 'Dentist',
+        period: '2012–2018',
+        isCurrent: false,
+      },
+    ],
+  },
+  {
+    employeeCode: 'EMP-006',
+    partnerTaxCode: '0987654321',
+    firstName: 'Mia',
+    lastName: 'Le',
+    email: 'hygienist.le@healytics.vn',
+    phone: '0902000006',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Mia',
+    jobTitle: 'Dental Hygienist',
+    role: EmployeeRole.THERAPIST,
+    gender: Gender.FEMALE,
+    dob: new Date('1992-04-11'),
+    startDate: new Date('2020-05-12'),
+    employmentType: 'Full-time',
+    description:
+      'Mia Le supports preventive dental care, chair-side preparation and sensitivity management for whitening treatments.',
+    schedule: schedule('09:00', '18:00', '09:00', '13:00'),
+  },
+  {
+    employeeCode: 'EMP-007',
+    partnerTaxCode: '1122334455',
+    firstName: 'Marcus',
+    lastName: 'Le',
+    email: 'coach.le@healytics.vn',
+    phone: '0902000007',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Marcus',
+    jobTitle: 'Recovery Yoga Coach',
+    role: EmployeeRole.THERAPIST,
+    gender: Gender.MALE,
+    dob: new Date('1989-12-03'),
+    startDate: new Date('2021-10-01'),
+    employmentType: 'Contract',
+    description:
+      'Marcus Le combines guided mobility work, assisted stretching and breathing drills for post-training recovery.',
+    schedule: schedule('10:00', '19:00', '08:00', '14:00'),
+  },
+  {
+    employeeCode: 'EMP-008',
+    partnerTaxCode: '1122334455',
+    firstName: 'Hannah',
+    lastName: 'Vo',
+    email: 'manager.vo@healytics.vn',
+    phone: '0902000008',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Hannah',
+    jobTitle: 'Fitness Operations Manager',
+    role: EmployeeRole.MANAGER,
+    gender: Gender.FEMALE,
+    dob: new Date('1987-02-20'),
+    startDate: new Date('2019-06-18'),
+    employmentType: 'Full-time',
+    description:
+      'Hannah Vo manages class capacity, coach scheduling and safety compliance for gym and yoga programs.',
+    schedule: schedule('08:00', '17:00', '08:00', '12:00'),
+  },
+  {
+    employeeCode: 'EMP-009',
+    partnerTaxCode: '5566778899',
+    firstName: 'Quang',
+    lastName: 'Pham',
+    email: 'nutrition.pham@healytics.vn',
+    phone: '0902000009',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Quang',
+    jobTitle: 'Clinical Nutritionist',
+    role: EmployeeRole.DOCTOR,
+    gender: Gender.MALE,
+    dob: new Date('1984-08-25'),
+    startDate: new Date('2017-03-06'),
+    employmentType: 'Full-time',
+    description:
+      'Quang Pham provides nutrition screening, supplement counseling and practical meal planning for metabolic health.',
+    schedule: schedule('08:00', '16:30', '08:00', '11:30'),
+    workHistory: [
+      {
+        facility: 'Saigon Pharma',
+        position: 'Clinical Nutritionist',
+        period: '2017–Present',
+        isCurrent: true,
+      },
+    ],
+  },
+  {
+    employeeCode: 'EMP-010',
+    partnerTaxCode: '6677889900',
+    firstName: 'Mai',
+    lastName: 'Nguyen',
+    email: 'traditional.nguyen@healytics.vn',
+    phone: '0902000010',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Mai',
+    jobTitle: 'Traditional Medicine Doctor',
+    role: EmployeeRole.DOCTOR,
+    gender: Gender.FEMALE,
+    dob: new Date('1979-01-14'),
+    startDate: new Date('2015-08-21'),
+    employmentType: 'Full-time',
+    description:
+      'Dr. Mai Nguyen practices traditional medicine consultation, herbal protocols and pain-management care plans.',
+    schedule: schedule('08:00', '17:00', '08:00', '12:00'),
+  },
+  {
+    employeeCode: 'EMP-011',
+    partnerTaxCode: '6677889900',
+    firstName: 'Bao',
+    lastName: 'Tran',
+    email: 'acupuncture.tran@healytics.vn',
+    phone: '0902000011',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Bao',
+    jobTitle: 'Acupuncture Therapist',
+    role: EmployeeRole.THERAPIST,
+    gender: Gender.MALE,
+    dob: new Date('1991-10-09'),
+    startDate: new Date('2019-01-15'),
+    employmentType: 'Full-time',
+    description:
+      'Bao Tran supports acupuncture sessions, cupping preparation and post-treatment mobility guidance.',
+    schedule: schedule('09:00', '18:00', '09:00', '13:00'),
+  },
+  {
+    employeeCode: 'EMP-012',
+    partnerTaxCode: '7788990011',
+    firstName: 'Lan',
+    lastName: 'Huynh',
+    email: 'dermatology.huynh@healytics.vn',
+    phone: '0902000012',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Lan',
+    jobTitle: 'Dermatologist',
+    role: EmployeeRole.DOCTOR,
+    gender: Gender.FEMALE,
+    dob: new Date('1983-06-27'),
+    startDate: new Date('2016-11-01'),
+    employmentType: 'Full-time',
+    description:
+      'Dr. Lan Huynh specializes in acne care, pigmentation consultation and practical dermatology treatment plans.',
+    schedule: schedule('08:30', '17:30', '08:30', '12:30'),
+  },
+  {
+    employeeCode: 'EMP-013',
+    partnerTaxCode: '7788990011',
+    firstName: 'Nhi',
+    lastName: 'Do',
+    email: 'psychology.do@healytics.vn',
+    phone: '0902000013',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Nhi',
+    jobTitle: 'Clinical Psychologist',
+    role: EmployeeRole.DOCTOR,
+    gender: Gender.FEMALE,
+    dob: new Date('1988-03-05'),
+    startDate: new Date('2020-09-07'),
+    employmentType: 'Full-time',
+    description:
+      'Nhi Do provides structured counseling sessions for stress, anxiety and sleep-related concerns.',
+    schedule: schedule('10:00', '19:00', '10:00', '14:00'),
+  },
+  {
+    employeeCode: 'EMP-014',
+    partnerTaxCode: '7788990011',
+    firstName: 'Karen',
+    lastName: 'Pham',
+    email: 'coordinator.pham@healytics.vn',
+    phone: '0902000014',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Karen',
+    jobTitle: 'Care Coordinator',
+    role: EmployeeRole.RECEPTIONIST,
+    gender: Gender.FEMALE,
+    dob: new Date('1996-07-17'),
+    startDate: new Date('2022-04-04'),
+    employmentType: 'Full-time',
+    description:
+      'Karen Pham coordinates intake forms, appointment reminders and follow-up scheduling for MindSkin patients.',
+    schedule: schedule('08:00', '17:00', '08:00', '12:00'),
   },
 ];
 
@@ -171,6 +392,75 @@ const SEED_DOCTOR_PROFILES: Record<
       'Advanced Cardiac Life Support - AHA (2023)',
     ],
   },
+  'EMP-005': {
+    title: 'D.D.S.',
+    medicalCredentials: [{ title: 'D.D.S.', license: 'DENT-2018-204' }],
+    experienceYears: 14,
+    consultationFee: 500000,
+    specializations: ['Cosmetic Dentistry', 'Preventive Dentistry'],
+    education: [
+      'Doctor of Dental Surgery - University of Medicine HCMC (2010)',
+      'Cosmetic Dentistry Fellowship - Seoul Dental Institute (2016)',
+    ],
+    certifications: [
+      'Laser Dentistry Certificate - Vietnam Dental Association (2022)',
+    ],
+  },
+  'EMP-009': {
+    title: 'M.Sc.',
+    medicalCredentials: [
+      { title: 'Clinical Nutritionist', license: 'NUT-2017-088' },
+    ],
+    experienceYears: 9,
+    consultationFee: 420000,
+    specializations: ['Clinical Nutrition', 'Metabolic Health'],
+    education: [
+      'Master of Clinical Nutrition - HCMC University of Medicine (2016)',
+    ],
+    certifications: ['Diabetes Nutrition Care - VDD (2023)'],
+  },
+  'EMP-010': {
+    title: 'Dr.',
+    medicalCredentials: [
+      { title: 'Traditional Medicine Doctor', license: 'YHCT-2015-317' },
+    ],
+    experienceYears: 18,
+    consultationFee: 380000,
+    specializations: ['Traditional Medicine', 'Herbal Protocols', 'Pain Care'],
+    education: [
+      'Traditional Medicine Doctor - Vietnam University of Traditional Medicine (2008)',
+    ],
+    certifications: ['Acupuncture Practice Certificate - HCMC DOH (2020)'],
+  },
+  'EMP-012': {
+    title: 'M.D.',
+    medicalCredentials: [{ title: 'Dermatologist', license: 'DERM-2016-512' }],
+    experienceYears: 11,
+    consultationFee: 650000,
+    specializations: ['Acne Treatment', 'Pigmentation', 'Clinical Dermatology'],
+    education: [
+      'Doctor of Medicine - University of Medicine HCMC (2010)',
+      'Dermatology Residency - HCMC Dermatology Hospital (2015)',
+    ],
+    certifications: ['Clinical Dermatology Board Certification (2017)'],
+  },
+  'EMP-013': {
+    title: 'Ph.D.',
+    medicalCredentials: [
+      { title: 'Clinical Psychologist', license: 'PSY-2020-044' },
+    ],
+    experienceYears: 8,
+    consultationFee: 900000,
+    specializations: [
+      'Stress Management',
+      'Anxiety Counseling',
+      'Sleep Health',
+    ],
+    education: [
+      'Ph.D. Clinical Psychology - Vietnam National University (2018)',
+    ],
+    certifications: ['Cognitive Behavioral Therapy Certificate (2021)'],
+  },
 };
 
 /** Therapist profile seed data keyed by employee code */
@@ -196,6 +486,37 @@ const SEED_THERAPIST_PROFILES: Record<
       'Laser Therapy Device',
     ],
   },
+  'EMP-006': {
+    level: TherapistLevel.SENIOR,
+    type: 'Dental Hygiene',
+    strengthLevel: StrengthLevel.SOFT,
+    commissionRate: 12,
+    healthCheckDate: new Date('2026-01-10'),
+    skills: ['Dental Cleaning', 'Sensitivity Screening', 'Chair-side Support'],
+    deviceProficiency: ['Ultrasonic Scaler', 'Whitening LED Lamp'],
+  },
+  'EMP-007': {
+    level: TherapistLevel.MASTER,
+    type: 'Recovery Yoga',
+    strengthLevel: StrengthLevel.MEDIUM,
+    commissionRate: 18,
+    healthCheckDate: new Date('2026-02-05'),
+    skills: ['Assisted Stretching', 'Mobility Training', 'Breathwork'],
+    deviceProficiency: ['Reformer Station', 'Mobility Assessment Kit'],
+  },
+  'EMP-011': {
+    level: TherapistLevel.SENIOR,
+    type: 'Acupuncture Support',
+    strengthLevel: StrengthLevel.SOFT,
+    commissionRate: 14,
+    healthCheckDate: new Date('2026-01-20'),
+    skills: [
+      'Acupuncture Preparation',
+      'Cupping Support',
+      'Aftercare Guidance',
+    ],
+    deviceProficiency: ['Infrared Therapy Lamp', 'Sterilization Cabinet'],
+  },
 };
 
 @Injectable()
@@ -216,31 +537,43 @@ export class EmployeeSeeder implements ISeeder {
   async seed(): Promise<void> {
     this.logger.log('Seeding employees...');
 
-    // Resolve partner FK — assign all seed employees to the first APPROVED partner
-    const partner = await this.partnerRepo.findOne({
-      where: { taxCode: '0123456789' }, // "Healytics Spa & Wellness"
+    const partnerTaxCodes = [
+      ...new Set(
+        SEED_EMPLOYEES.map(
+          (employee) => employee.partnerTaxCode ?? '0123456789',
+        ),
+      ),
+    ];
+    const partners = await this.partnerRepo.find({
+      where: { taxCode: In(partnerTaxCodes) },
     });
+    const partnerMap = new Map(
+      partners.map((partner) => [partner.taxCode, partner]),
+    );
 
-    if (!partner) {
+    if (!partnerMap.size) {
       this.logger.warn(
-        '  ⚠ No partner found with taxCode "0123456789" — employees will have no partner. Run PartnerSeeder first.',
+        '  ⚠ No seed partners found — employees will have no partner. Run PartnerSeeder first.',
       );
     }
 
     for (const empData of SEED_EMPLOYEES) {
+      const { partnerTaxCode, ...employeeData } = empData;
+      const partner = partnerMap.get(partnerTaxCode ?? '0123456789') ?? null;
       const exists = await this.employeeRepo.findOne({
-        where: { employeeCode: empData.employeeCode },
+        where: { employeeCode: employeeData.employeeCode },
       });
 
       if (exists) {
         // Update fields that may have been added after initial seeding
         const fieldsToUpdate: Partial<Employee> = {};
-        if (empData.avatarUrl && !exists.avatarUrl)
-          fieldsToUpdate.avatarUrl = empData.avatarUrl;
-        if (empData.description && !exists.description)
-          fieldsToUpdate.description = empData.description;
-        if (empData.schedule && !exists.schedule)
-          fieldsToUpdate.schedule = empData.schedule;
+        if (employeeData.avatarUrl && !exists.avatarUrl)
+          fieldsToUpdate.avatarUrl = employeeData.avatarUrl;
+        if (employeeData.description && !exists.description)
+          fieldsToUpdate.description = employeeData.description;
+        if (employeeData.schedule && !exists.schedule)
+          fieldsToUpdate.schedule = employeeData.schedule;
+        if (partner && !exists.partnerId) fieldsToUpdate.partnerId = partner.id;
 
         if (Object.keys(fieldsToUpdate).length > 0) {
           await this.employeeRepo.update(exists.id, fieldsToUpdate);
@@ -249,7 +582,7 @@ export class EmployeeSeeder implements ISeeder {
           );
         } else {
           this.logger.log(
-            `  ⏭ Employee "${empData.employeeCode}" already exists, skipping`,
+            `  ⏭ Employee "${employeeData.employeeCode}" already exists, skipping`,
           );
         }
         await this.seedProfiles(exists);
@@ -257,7 +590,7 @@ export class EmployeeSeeder implements ISeeder {
       }
 
       const employee = this.employeeRepo.create({
-        ...empData,
+        ...employeeData,
         status: EmployeeStatus.ACTIVE,
         rating: 0,
         reviewCount: 0,

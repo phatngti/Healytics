@@ -16,6 +16,7 @@ import { PartnerChatSeeder } from './partner-chat/partner-chat.seeder';
 import { NotificationSeeder } from './notifications/notification.seeder';
 import { PaymentTransactionLogSeeder } from './payment-transaction-logs/payment-transaction-log.seeder';
 import { AiConversationSeeder } from './ai-conversations/ai-conversation.seeder';
+import { PartnerFinanceSeeder } from './partner-finance/partner-finance.seeder';
 import { AuditSeeder } from './audit/audit.seeder';
 import { ISeeder } from './seeder.interface';
 
@@ -54,6 +55,11 @@ const REQUIRED_SEED_TABLES = [
   'booking_status_logs',
   'payments',
   'payment_transaction_logs',
+  'partner_payouts',
+  'partner_ledger_transactions',
+  'partner_payout_transactions',
+  'partner_refund_cases',
+  'partner_transaction_timeline_events',
   'product_facility_images',
   'product_media',
   'product_treatment_reviews',
@@ -94,6 +100,7 @@ const REQUIRED_SEED_TABLES = [
  *   PartnerChatSeeder           ← depends on Account + Booking
  *   NotificationSeeder          ← depends on Account
  *   PaymentTransactionLogSeeder ← depends on Payment
+ *   PartnerFinanceSeeder        ← depends on Partner + Booking + Payment
  *   AiConversationSeeder        ← depends on Account
  *   AuditSeeder                 ← depends on Account + Booking + Partner
  */
@@ -119,6 +126,7 @@ export class SeederService {
     private readonly partnerChatSeeder: PartnerChatSeeder,
     private readonly notificationSeeder: NotificationSeeder,
     private readonly paymentTransactionLogSeeder: PaymentTransactionLogSeeder,
+    private readonly partnerFinanceSeeder: PartnerFinanceSeeder,
     private readonly aiConversationSeeder: AiConversationSeeder,
     private readonly auditSeeder: AuditSeeder,
   ) {
@@ -139,8 +147,9 @@ export class SeederService {
       this.partnerChatSeeder, // 13. depends on accounts + bookings
       this.notificationSeeder, // 14. depends on accounts
       this.paymentTransactionLogSeeder, // 15. depends on payments
-      this.aiConversationSeeder, // 16. depends on accounts
-      this.auditSeeder, // 17. depends on accounts + bookings + partners
+      this.partnerFinanceSeeder, // 16. depends on partners + bookings + payments
+      this.aiConversationSeeder, // 17. depends on accounts
+      this.auditSeeder, // 18. depends on accounts + bookings + partners
     ];
   }
 
@@ -227,16 +236,30 @@ export class SeederService {
       return;
     }
 
-    const requiresNotificationMigration = ['notifications', 'notification_reads', 'device_tokens'].some((name) =>
-      missing.includes(name as any),
-    );
+    const requiresNotificationMigration = [
+      'notifications',
+      'notification_reads',
+      'device_tokens',
+    ].some((name) => missing.includes(name as any));
+    const requiresPartnerFinanceMigration = [
+      'partner_payouts',
+      'partner_ledger_transactions',
+      'partner_payout_transactions',
+      'partner_refund_cases',
+      'partner_transaction_timeline_events',
+    ].some((name) => missing.includes(name as any));
 
-    const hint = requiresNotificationMigration
-      ? ' Missing notification tables detected; run migrations including 1776100000000-CreateNotificationTables.'
-      : '';
+    const hints = [
+      requiresNotificationMigration
+        ? 'Missing notification tables detected; run migrations including 1776100000000-CreateNotificationTables.'
+        : null,
+      requiresPartnerFinanceMigration
+        ? 'Missing partner finance tables detected; run migrations including 1776600000000-CreatePartnerFinanceTables.'
+        : null,
+    ].filter((hint): hint is string => Boolean(hint));
 
     throw new Error(
-      `Schema preflight failed. Missing table(s): ${missing.join(', ')}.${hint}`,
+      `Schema preflight failed. Missing table(s): ${missing.join(', ')}.${hints.length ? ` ${hints.join(' ')}` : ''}`,
     );
   }
 
@@ -328,6 +351,116 @@ export class SeederService {
           FROM payment_transaction_logs ptl
           LEFT JOIN payments p ON p.id = ptl.payment_id
           WHERE p.id IS NULL
+        `,
+      },
+      {
+        name: 'partner_payouts.partner_id -> health_partner_profile.id',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_payouts pp
+          LEFT JOIN health_partner_profile hp ON hp.id = pp.partner_id
+          WHERE hp.id IS NULL
+        `,
+      },
+      {
+        name: 'partner_ledger_transactions.partner_id -> health_partner_profile.id',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_ledger_transactions plt
+          LEFT JOIN health_partner_profile hp ON hp.id = plt.partner_id
+          WHERE hp.id IS NULL
+        `,
+      },
+      {
+        name: 'partner_ledger_transactions.payout_id -> partner_payouts.id',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_ledger_transactions plt
+          LEFT JOIN partner_payouts pp ON pp.id = plt.payout_id
+          WHERE plt.payout_id IS NOT NULL
+            AND pp.id IS NULL
+        `,
+      },
+      {
+        name: 'partner_payout_transactions.payout_id -> partner_payouts.id',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_payout_transactions ppt
+          LEFT JOIN partner_payouts pp ON pp.id = ppt.payout_id
+          WHERE pp.id IS NULL
+        `,
+      },
+      {
+        name: 'partner_payout_transactions.transaction_id -> partner_ledger_transactions.id',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_payout_transactions ppt
+          LEFT JOIN partner_ledger_transactions plt ON plt.id = ppt.transaction_id
+          WHERE plt.id IS NULL
+        `,
+      },
+      {
+        name: 'partner_refund_cases.transaction_id -> partner_ledger_transactions.id',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_refund_cases prc
+          LEFT JOIN partner_ledger_transactions plt ON plt.id = prc.transaction_id
+          WHERE plt.id IS NULL
+        `,
+      },
+      {
+        name: 'partner_transaction_timeline_events.transaction_id -> partner_ledger_transactions.id',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_transaction_timeline_events ptte
+          LEFT JOIN partner_ledger_transactions plt ON plt.id = ptte.transaction_id
+          WHERE plt.id IS NULL
+        `,
+      },
+      {
+        name: 'partner finance payout ownership consistency',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_payout_transactions ppt
+          INNER JOIN partner_payouts pp ON pp.id = ppt.payout_id
+          INNER JOIN partner_ledger_transactions plt ON plt.id = ppt.transaction_id
+          WHERE ppt.partner_id IS DISTINCT FROM pp.partner_id
+            OR ppt.partner_id IS DISTINCT FROM plt.partner_id
+            OR plt.payout_id IS DISTINCT FROM pp.id
+        `,
+      },
+      {
+        name: 'partner finance refund ownership consistency',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_refund_cases prc
+          INNER JOIN partner_ledger_transactions plt ON plt.id = prc.transaction_id
+          WHERE prc.partner_id IS DISTINCT FROM plt.partner_id
+        `,
+      },
+      {
+        name: 'partner finance timeline ownership consistency',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_transaction_timeline_events ptte
+          INNER JOIN partner_ledger_transactions plt ON plt.id = ptte.transaction_id
+          WHERE ptte.partner_id IS DISTINCT FROM plt.partner_id
+        `,
+      },
+      {
+        name: 'partner finance service booking source ownership consistency',
+        sql: `
+          SELECT COUNT(*)::int AS count
+          FROM partner_ledger_transactions plt
+          LEFT JOIN bookings b ON b.id = plt.source_id
+          LEFT JOIN products p ON p.id = b.product_id
+          WHERE plt.source_type = 'serviceBooking'
+            AND plt.source_id IS NOT NULL
+            AND (
+              b.id IS NULL
+              OR p.id IS NULL
+              OR p.partner_id IS DISTINCT FROM plt.partner_id
+            )
         `,
       },
       {
@@ -543,7 +676,9 @@ export class SeederService {
     }
 
     if (hasViolation) {
-      throw new Error('Relational verification failed. See logs for violated constraints.');
+      throw new Error(
+        'Relational verification failed. See logs for violated constraints.',
+      );
     }
 
     this.logger.log('✅ Relational verification passed');

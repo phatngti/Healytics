@@ -58,10 +58,11 @@ export function resolveGranularity(
     case DashboardTimePeriod.TODAY:
       return 'hour';
     case DashboardTimePeriod.THIS_WEEK:
-    case DashboardTimePeriod.THIS_MONTH:
       return 'day';
-    case DashboardTimePeriod.THIS_QUARTER:
+    case DashboardTimePeriod.THIS_MONTH:
       return 'week';
+    case DashboardTimePeriod.THIS_QUARTER:
+      return 'month';
     case DashboardTimePeriod.THIS_YEAR:
       return 'month';
   }

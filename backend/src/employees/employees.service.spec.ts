@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
+import { Booking } from '@/common/entities/booking.entity';
 import { NotFoundException } from '@nestjs/common';
 import { EmployeeRole } from './enum/employee-role.enum';
 import { PartnersService } from '@/partners/partners.service';
@@ -11,6 +12,8 @@ import { CreateDoctorHandler } from './application/handlers/create-doctor.handle
 import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
 import { UpdateEmployeeHandler } from './application/handlers/update-employee.handler';
 import { RemoveEmployeeHandler } from './application/handlers/remove-employee.handler';
+import { GetEmployeeOverviewAnalyticsHandler } from './application/handlers/get-employee-overview-analytics.handler';
+import { GetEmployeeDetailAnalyticsHandler } from './application/handlers/get-employee-detail-analytics.handler';
 
 describe('EmployeesService', () => {
   let service: EmployeesService;
@@ -46,7 +49,19 @@ describe('EmployeesService', () => {
     execute: jest.fn(),
   };
 
+  const mockGetOverviewAnalyticsHandler = {
+    execute: jest.fn(),
+  };
+
+  const mockGetDetailAnalyticsHandler = {
+    execute: jest.fn(),
+  };
+
   const mockEligibilityRepository = {
+    find: jest.fn(),
+  };
+
+  const mockBookingRepository = {
     find: jest.fn(),
   };
 
@@ -71,6 +86,10 @@ describe('EmployeesService', () => {
           useValue: mockEligibilityRepository,
         },
         {
+          provide: getRepositoryToken(Booking),
+          useValue: mockBookingRepository,
+        },
+        {
           provide: PartnersService,
           useValue: mockPartnersService,
         },
@@ -89,6 +108,14 @@ describe('EmployeesService', () => {
         {
           provide: RemoveEmployeeHandler,
           useValue: mockRemoveEmployeeHandler,
+        },
+        {
+          provide: GetEmployeeOverviewAnalyticsHandler,
+          useValue: mockGetOverviewAnalyticsHandler,
+        },
+        {
+          provide: GetEmployeeDetailAnalyticsHandler,
+          useValue: mockGetDetailAnalyticsHandler,
         },
       ],
     }).compile();

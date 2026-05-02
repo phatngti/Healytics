@@ -43,21 +43,21 @@ class TransactionsManagerNotifier extends Notifier<TransactionsManagerState> {
   Future<int> getTransactionsTotalRows() async {
     final items = await ref
         .read(transactionsRepositoryProvider)
-        .getTransactions(startingAt: 0, count: 1000, filter: state.filter);
+        .getTransactions(startingAt: 0, count: 100, filter: state.filter);
     return items.length;
   }
 
   Future<int> getPayoutsTotalRows() async {
     final items = await ref
         .read(transactionsRepositoryProvider)
-        .getPayouts(startingAt: 0, count: 1000, filter: state.filter);
+        .getPayouts(startingAt: 0, count: 100, filter: state.filter);
     return items.length;
   }
 
   Future<int> getRefundCasesTotalRows() async {
     final items = await ref
         .read(transactionsRepositoryProvider)
-        .getRefundCases(startingAt: 0, count: 1000, filter: state.filter);
+        .getRefundCases(startingAt: 0, count: 100, filter: state.filter);
     return items.length;
   }
 
@@ -154,7 +154,7 @@ class TransactionsManagerNotifier extends Notifier<TransactionsManagerState> {
   Future<String> buildTransactionsCsv() async {
     final records = await ref
         .read(transactionsRepositoryProvider)
-        .getTransactions(startingAt: 0, count: 1000, filter: state.filter);
+        .getTransactions(startingAt: 0, count: 100, filter: state.filter);
     final buffer = StringBuffer(
       'id,created_at,type,source,reference,customer,gross,fee,net,status,settlement\n',
     );
@@ -181,7 +181,7 @@ class TransactionsManagerNotifier extends Notifier<TransactionsManagerState> {
   Future<String> buildPayoutsCsv() async {
     final records = await ref
         .read(transactionsRepositoryProvider)
-        .getPayouts(startingAt: 0, count: 1000, filter: state.filter);
+        .getPayouts(startingAt: 0, count: 100, filter: state.filter);
     final buffer = StringBuffer(
       'id,period,volume,fees_adjustments,net_payout,scheduled_date,method,status\n',
     );
@@ -205,7 +205,7 @@ class TransactionsManagerNotifier extends Notifier<TransactionsManagerState> {
   Future<String> buildRefundCasesCsv() async {
     final records = await ref
         .read(transactionsRepositoryProvider)
-        .getRefundCases(startingAt: 0, count: 1000, filter: state.filter);
+        .getRefundCases(startingAt: 0, count: 100, filter: state.filter);
     final buffer = StringBuffer(
       'id,transaction_id,type,requested_at,amount,owner,status,sla_hours\n',
     );

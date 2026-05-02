@@ -116,6 +116,92 @@ class CreateTherapistProfileDto(DtoModel):
 
 
 @dataclass(slots=True)
+class EmployeeComplianceItemDto(DtoModel):
+    title: str
+    detail: str
+    tone: str
+
+
+@dataclass(slots=True)
+class EmployeeDetailAnalyticsResponseDto(DtoModel):
+    employeeId: str
+    completedSessions: float
+    sessionsDelta: float
+    contributionValue: float
+    contributionDelta: float
+    utilizationRate: float
+    utilizationDelta: float
+    averageRating: float
+    reviewCount: float
+    trendPoints: list[EmployeeTrendPointDto]
+    mixMetrics: list[EmployeeMixMetricDto]
+    scheduleLoad: list[EmployeeScheduleLoadDto]
+    qualityMetrics: list[EmployeeQualityMetricDto]
+    complianceItems: list[EmployeeComplianceItemDto]
+
+
+@dataclass(slots=True)
+class EmployeeMixMetricDto(DtoModel):
+    label: str
+    value: float
+    share: float
+
+
+@dataclass(slots=True)
+class EmployeeOverviewAnalyticsResponseDto(DtoModel):
+    totalEmployees: float
+    activeEmployees: float
+    onLeaveEmployees: float
+    inactiveEmployees: float
+    utilizationRate: float
+    utilizationDelta: float
+    averageRating: float
+    ratingDelta: float
+    reviewCount: float
+    trendPoints: list[EmployeeTrendPointDto]
+    roleDistribution: list[EmployeeRoleDistributionDto]
+    topPerformers: list[EmployeePerformanceSummaryDto]
+    complianceItems: list[EmployeeComplianceItemDto]
+
+
+@dataclass(slots=True)
+class EmployeePerformanceSummaryDto(DtoModel):
+    employeeName: str
+    roleLabel: str
+    rating: float
+    utilizationRate: float
+    contributionValue: float
+
+
+@dataclass(slots=True)
+class EmployeeQualityMetricDto(DtoModel):
+    label: str
+    value: str
+    detail: str
+    tone: str
+
+
+@dataclass(slots=True)
+class EmployeeRoleDistributionDto(DtoModel):
+    role: str
+    count: float
+
+
+@dataclass(slots=True)
+class EmployeeScheduleLoadDto(DtoModel):
+    label: str
+    availableHours: float
+    bookedHours: float
+
+
+@dataclass(slots=True)
+class EmployeeTrendPointDto(DtoModel):
+    label: str
+    sessions: float
+    contributionValue: float
+
+
+@dataclass(slots=True)
 class UpdateEmployeeDto(DtoModel):
     employeeCode: str | None = None
     firstName: str | None = None
@@ -151,6 +237,15 @@ __all__ = [
     "CreateMassageTherapistDto",
     "CreateSpaTherapistDto",
     "CreateTherapistProfileDto",
+    "EmployeeComplianceItemDto",
+    "EmployeeDetailAnalyticsResponseDto",
+    "EmployeeMixMetricDto",
+    "EmployeeOverviewAnalyticsResponseDto",
+    "EmployeePerformanceSummaryDto",
+    "EmployeeQualityMetricDto",
+    "EmployeeRoleDistributionDto",
+    "EmployeeScheduleLoadDto",
+    "EmployeeTrendPointDto",
     "UpdateEmployeeDto",
     "PartnerEmployeesControllerFindAllResponseDto",
 ]

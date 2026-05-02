@@ -29,7 +29,35 @@ export interface MockRepository<T = any> {
   softRemove: jest.Mock;
   increment: jest.Mock;
   decrement: jest.Mock;
+  createQueryBuilder: jest.Mock;
 }
+
+/**
+ * Creates a chainable query builder mock that resolves all
+ * terminal methods (getMany, getRawMany, getRawOne, getOne, getCount)
+ * to sensible defaults.
+ */
+const createMockQueryBuilder = () => {
+  const qb: Record<string, jest.Mock> = {};
+  const chainMethods = [
+    'select', 'addSelect', 'innerJoin', 'leftJoin',
+    'innerJoinAndSelect', 'leftJoinAndSelect',
+    'where', 'andWhere', 'orWhere',
+    'groupBy', 'addGroupBy', 'orderBy', 'addOrderBy',
+    'limit', 'offset', 'take', 'skip',
+    'having', 'addHaving',
+    'setParameter', 'setParameters',
+  ];
+  for (const method of chainMethods) {
+    qb[method] = jest.fn().mockReturnThis();
+  }
+  qb.getMany = jest.fn().mockResolvedValue([]);
+  qb.getRawMany = jest.fn().mockResolvedValue([]);
+  qb.getRawOne = jest.fn().mockResolvedValue(null);
+  qb.getOne = jest.fn().mockResolvedValue(null);
+  qb.getCount = jest.fn().mockResolvedValue(0);
+  return qb;
+};
 
 /**
  * Creates a mock repository with all common methods.
@@ -48,6 +76,7 @@ export const createMockRepository = <T = any>(): MockRepository<T> => ({
   softRemove: jest.fn(),
   increment: jest.fn(),
   decrement: jest.fn(),
+  createQueryBuilder: jest.fn().mockReturnValue(createMockQueryBuilder()),
 });
 
 /**

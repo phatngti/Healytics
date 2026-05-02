@@ -348,6 +348,8 @@ class ApiClient {
           return DashboardReviewDto.fromJson(value);
         case 'DashboardStatsResponseDto':
           return DashboardStatsResponseDto.fromJson(value);
+        case 'DashboardTimePeriod':
+          return DashboardTimePeriodTypeTransformer().decode(value);
         case 'DayScheduleDto':
           return DayScheduleDto.fromJson(value);
         case 'DeleteFileResponseDto':
@@ -364,18 +366,38 @@ class ApiClient {
           return DoctorProfileResponseDto.fromJson(value);
         case 'DocumentEntryDto':
           return DocumentEntryDto.fromJson(value);
+        case 'EmployeeComplianceItemDto':
+          return EmployeeComplianceItemDto.fromJson(value);
+        case 'EmployeeDetailAnalyticsResponseDto':
+          return EmployeeDetailAnalyticsResponseDto.fromJson(value);
         case 'EmployeeDistributionDto':
           return EmployeeDistributionDto.fromJson(value);
+        case 'EmployeeMixMetricDto':
+          return EmployeeMixMetricDto.fromJson(value);
+        case 'EmployeeOverviewAnalyticsResponseDto':
+          return EmployeeOverviewAnalyticsResponseDto.fromJson(value);
+        case 'EmployeePerformanceSummaryDto':
+          return EmployeePerformanceSummaryDto.fromJson(value);
+        case 'EmployeeQualityMetricDto':
+          return EmployeeQualityMetricDto.fromJson(value);
         case 'EmployeeResponseDto':
           return EmployeeResponseDto.fromJson(value);
+        case 'EmployeeRoleDistributionDto':
+          return EmployeeRoleDistributionDto.fromJson(value);
+        case 'EmployeeScheduleLoadDto':
+          return EmployeeScheduleLoadDto.fromJson(value);
         case 'EmployeeTimeSlotsResponseDto':
           return EmployeeTimeSlotsResponseDto.fromJson(value);
+        case 'EmployeeTrendPointDto':
+          return EmployeeTrendPointDto.fromJson(value);
         case 'FacilityDto':
           return FacilityDto.fromJson(value);
         case 'FeaturedSpecialistResponseDto':
           return FeaturedSpecialistResponseDto.fromJson(value);
         case 'FileUrlResponseDto':
           return FileUrlResponseDto.fromJson(value);
+        case 'FlagReviewDto':
+          return FlagReviewDto.fromJson(value);
         case 'GeocodeResponseDto':
           return GeocodeResponseDto.fromJson(value);
         case 'GeocodeResultDto':
@@ -400,8 +422,6 @@ class ApiClient {
           return LegalRepresentativeDto.fromJson(value);
         case 'LegalRepresentativeRequestDto':
           return LegalRepresentativeRequestDto.fromJson(value);
-        case 'LocationInfo':
-          return LocationInfo.fromJson(value);
         case 'LocationInfoDto':
           return LocationInfoDto.fromJson(value);
         case 'LocationListResponseDto':
@@ -412,6 +432,8 @@ class ApiClient {
           return LoginDto.fromJson(value);
         case 'LogoutResponseDto':
           return LogoutResponseDto.fromJson(value);
+        case 'MarkSettlementDto':
+          return MarkSettlementDto.fromJson(value);
         case 'MedicalCredentialResponseDto':
           return MedicalCredentialResponseDto.fromJson(value);
         case 'MessageResponse':
@@ -436,6 +458,8 @@ class ApiClient {
           return PartnerCategorySummaryDto.fromJson(value);
         case 'PartnerClinicDto':
           return PartnerClinicDto.fromJson(value);
+        case 'PartnerCommerceSourceType':
+          return PartnerCommerceSourceTypeTypeTransformer().decode(value);
         case 'PartnerDayScheduleDto':
           return PartnerDayScheduleDto.fromJson(value);
         case 'PartnerDetailProcedureStepDto':
@@ -450,6 +474,12 @@ class ApiClient {
           return PartnerFacilityImageDto.fromJson(value);
         case 'PartnerFeatureTagDto':
           return PartnerFeatureTagDto.fromJson(value);
+        case 'PartnerFinancePeriod':
+          return PartnerFinancePeriodTypeTransformer().decode(value);
+        case 'PartnerFinanceSummaryDto':
+          return PartnerFinanceSummaryDto.fromJson(value);
+        case 'PartnerFinanceTrendPointDto':
+          return PartnerFinanceTrendPointDto.fromJson(value);
         case 'PartnerHealthServiceDefinitionDto':
           return PartnerHealthServiceDefinitionDto.fromJson(value);
         case 'PartnerHealthServiceDetailResponseDto':
@@ -464,6 +494,10 @@ class ApiClient {
           return PartnerItemDto.fromJson(value);
         case 'PartnerLoginDto':
           return PartnerLoginDto.fromJson(value);
+        case 'PartnerPayoutRecordDto':
+          return PartnerPayoutRecordDto.fromJson(value);
+        case 'PartnerPayoutStatus':
+          return PartnerPayoutStatusTypeTransformer().decode(value);
         case 'PartnerPriority':
           return PartnerPriorityTypeTransformer().decode(value);
         case 'PartnerProcedureStepDto':
@@ -476,6 +510,12 @@ class ApiClient {
           return PartnerPublicProfileResponseDto.fromJson(value);
         case 'PartnerRecommendedServiceDto':
           return PartnerRecommendedServiceDto.fromJson(value);
+        case 'PartnerRefundCaseRecordDto':
+          return PartnerRefundCaseRecordDto.fromJson(value);
+        case 'PartnerRefundCaseStatus':
+          return PartnerRefundCaseStatusTypeTransformer().decode(value);
+        case 'PartnerRefundCaseType':
+          return PartnerRefundCaseTypeTypeTransformer().decode(value);
         case 'PartnerRequestDto':
           return PartnerRequestDto.fromJson(value);
         case 'PartnerReviewDto':
@@ -484,10 +524,22 @@ class ApiClient {
           return PartnerServiceManualDto.fromJson(value);
         case 'PartnerServiceRuleDto':
           return PartnerServiceRuleDto.fromJson(value);
+        case 'PartnerSettlementStatus':
+          return PartnerSettlementStatusTypeTransformer().decode(value);
         case 'PartnerSpecialistDto':
           return PartnerSpecialistDto.fromJson(value);
         case 'PartnerTimeSlotDto':
           return PartnerTimeSlotDto.fromJson(value);
+        case 'PartnerTransactionDetailDto':
+          return PartnerTransactionDetailDto.fromJson(value);
+        case 'PartnerTransactionRecordDto':
+          return PartnerTransactionRecordDto.fromJson(value);
+        case 'PartnerTransactionStatus':
+          return PartnerTransactionStatusTypeTransformer().decode(value);
+        case 'PartnerTransactionTimelineEventDto':
+          return PartnerTransactionTimelineEventDto.fromJson(value);
+        case 'PartnerTransactionType':
+          return PartnerTransactionTypeTypeTransformer().decode(value);
         case 'PartnerVerificationStatus':
           return PartnerVerificationStatusTypeTransformer().decode(value);
         case 'PartnersResponseDto':
@@ -498,8 +550,6 @@ class ApiClient {
           return PresignResponseDto.fromJson(value);
         case 'PriceBreakdownDto':
           return PriceBreakdownDto.fromJson(value);
-        case 'PriceInfo':
-          return PriceInfo.fromJson(value);
         case 'ProcedureStepDto':
           return ProcedureStepDto.fromJson(value);
         case 'ProcedureStepInputDto':
@@ -564,14 +614,14 @@ class ApiClient {
           return PublicProfileStorefrontDto.fromJson(value);
         case 'PublicServiceTagDto':
           return PublicServiceTagDto.fromJson(value);
-        case 'RatingInfo':
-          return RatingInfo.fromJson(value);
         case 'RecommendationResponse':
           return RecommendationResponse.fromJson(value);
         case 'RecommendedServiceResponseDto':
           return RecommendedServiceResponseDto.fromJson(value);
         case 'RefreshTokenRequestDto':
           return RefreshTokenRequestDto.fromJson(value);
+        case 'RefundCaseActionDto':
+          return RefundCaseActionDto.fromJson(value);
         case 'RegisterDeviceDto':
           return RegisterDeviceDto.fromJson(value);
         case 'RegisterDto':
@@ -582,6 +632,8 @@ class ApiClient {
           return RegisterPartnerResponseDto.fromJson(value);
         case 'RegisterProfileDto':
           return RegisterProfileDto.fromJson(value);
+        case 'RetryPayoutDto':
+          return RetryPayoutDto.fromJson(value);
         case 'RevenueDataPointDto':
           return RevenueDataPointDto.fromJson(value);
         case 'ReviewItemDto':
@@ -592,8 +644,6 @@ class ApiClient {
           return ReviewPartnerResponseDto.fromJson(value);
         case 'ReviewSummaryDto':
           return ReviewSummaryDto.fromJson(value);
-        case 'ServiceDetail':
-          return ServiceDetail.fromJson(value);
         case 'ServiceInfoDto':
           return ServiceInfoDto.fromJson(value);
         case 'ServiceManualInputDto':

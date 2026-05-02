@@ -141,46 +141,16 @@ class _ProductOverviewTopPanels extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 1024;
-
-        if (!isWide) {
-          return Column(
-            children: [
-              _ProductTrendPanel(points: analytics.trendPoints),
-              AppDimens.verticalLarge,
-              _ProductRankingPanel(
-                items: analytics.topServices,
-                categories: analytics.categoryPerformance,
-              ),
-            ],
-          );
-        }
-
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child: Column(
-                children: [
-                  _ProductTrendPanel(points: analytics.trendPoints),
-                  AppDimens.verticalLarge,
-                  _ProductCategoryStrengthPanel(
-                    categories: analytics.categoryPerformance,
-                  ),
-                ],
-              ),
-            ),
-            AppDimens.horizontalLarge,
-            Expanded(
-              flex: 2,
-              child: _ProductTopServicesPanel(items: analytics.topServices),
-            ),
-          ],
-        );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _ProductTrendPanel(points: analytics.trendPoints),
+        AppDimens.verticalLarge,
+        _ProductRankingPanel(
+          items: analytics.topServices,
+          categories: analytics.categoryPerformance,
+        ),
+      ],
     );
   }
 }
@@ -297,6 +267,7 @@ class _ProductTrendPanel extends StatelessWidget {
                 maxX: (points.length - 1).toDouble(),
                 minY: 0,
                 maxY: maxY * 1.25,
+                clipData: const FlClipData.all(),
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
@@ -324,9 +295,11 @@ class _ProductTrendPanel extends StatelessWidget {
                       interval: 1,
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
-                        if (value != index.toDouble() ||
-                            index < 0 ||
-                            index >= points.length) {
+                        if (!_shouldShowTrendAxisLabel(
+                          value: value,
+                          index: index,
+                          points: points,
+                        )) {
                           return const SizedBox.shrink();
                         }
                         return Padding(
@@ -349,6 +322,7 @@ class _ProductTrendPanel extends StatelessWidget {
                         FlSpot(i.toDouble(), points[i].bookings),
                     ],
                     isCurved: true,
+                    preventCurveOverShooting: true,
                     barWidth: 3,
                     color: colorScheme.primary,
                     dotData: FlDotData(
@@ -369,6 +343,7 @@ class _ProductTrendPanel extends StatelessWidget {
                         FlSpot(i.toDouble(), points[i].revenue / 1000),
                     ],
                     isCurved: true,
+                    preventCurveOverShooting: true,
                     barWidth: 3,
                     color: colorScheme.tertiary,
                     dotData: FlDotData(
@@ -393,6 +368,17 @@ class _ProductTrendPanel extends StatelessWidget {
   }
 }
 
+bool _shouldShowTrendAxisLabel({
+  required double value,
+  required int index,
+  required List<ProductTrendPoint> points,
+}) {
+  if (value != index.toDouble() || index < 0 || index >= points.length) {
+    return false;
+  }
+  return index == 0 || points[index].label != points[index - 1].label;
+}
+
 class _ProductRankingPanel extends StatelessWidget {
   const _ProductRankingPanel({required this.items, required this.categories});
 
@@ -405,95 +391,77 @@ class _ProductRankingPanel extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return AnalyticsPanel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const AnalyticsSectionHeader(
-            title: 'Category and service leaders',
-            subtitle: 'See which categories and hero services drive demand.',
-            icon: Icons.leaderboard_rounded,
-          ),
-          AppDimens.verticalMedium,
-          Text(
-            'Top services',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: AppDimens.fontWeightBold,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final useSideBySide = constraints.maxWidth >= 980;
+          final sections = [
+            _RankingSectionBlock(
+              title: 'Top services',
+              child: _TopServicesGrid(items: items),
             ),
-          ),
-          AppDimens.verticalMedium,
-          _TopServicesGrid(items: items),
-          Divider(color: colorScheme.outlineVariant),
-          AppDimens.verticalMedium,
-          Text(
-            'Category strength',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: AppDimens.fontWeightBold,
+            _RankingSectionBlock(
+              title: 'Category strength',
+              child: _CategoryStrengthGrid(categories: categories),
             ),
-          ),
-          AppDimens.verticalMedium,
-          _CategoryStrengthGrid(categories: categories),
-        ],
+          ];
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const AnalyticsSectionHeader(
+                title: 'Category and service leaders',
+                subtitle:
+                    'See which categories and hero services drive demand.',
+                icon: Icons.leaderboard_rounded,
+              ),
+              AppDimens.verticalLarge,
+              if (useSideBySide)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 3, child: sections.first),
+                    AppDimens.horizontalLarge,
+                    Expanded(flex: 2, child: sections.last),
+                  ],
+                )
+              else ...[
+                sections.first,
+                Padding(
+                  padding: AppDimens.paddingVerticalMedium,
+                  child: Divider(color: colorScheme.outlineVariant),
+                ),
+                sections.last,
+              ],
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _ProductTopServicesPanel extends StatelessWidget {
-  const _ProductTopServicesPanel({required this.items});
+class _RankingSectionBlock extends StatelessWidget {
+  const _RankingSectionBlock({required this.title, required this.child});
 
-  final List<ProductServicePerformance> items;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return AnalyticsPanel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const AnalyticsSectionHeader(
-            title: 'Category and service leaders',
-            subtitle: 'See which categories and hero services drive demand.',
-            icon: Icons.leaderboard_rounded,
-          ),
-          AppDimens.verticalMedium,
-          Text(
-            'Top services',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: AppDimens.fontWeightBold,
-            ),
-          ),
-          AppDimens.verticalMedium,
-          _TopServicesGrid(items: items),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProductCategoryStrengthPanel extends StatelessWidget {
-  const _ProductCategoryStrengthPanel({required this.categories});
-
-  final List<ProductCategoryPerformance> categories;
+  final String title;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return AnalyticsPanel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Category strength',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: AppDimens.fontWeightBold,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: AppDimens.fontWeightBold,
           ),
-          AppDimens.verticalMedium,
-          _CategoryStrengthGrid(categories: categories),
-        ],
-      ),
+        ),
+        AppDimens.verticalMedium,
+        child,
+      ],
     );
   }
 }
@@ -532,7 +500,7 @@ class _ProductBookingMetricsPanel extends StatelessWidget {
         tone: AnalyticsStatusTone.positive,
       ),
     ];
-    final statusBreakdown = _visibleBookingStatusBreakdown(
+    final statusBreakdown = normalizeProductBookingStatusMetrics(
       bookingMetrics.statusBreakdown,
     );
 
@@ -548,49 +516,192 @@ class _ProductBookingMetricsPanel extends StatelessWidget {
             icon: Icons.event_note_rounded,
           ),
           AppDimens.verticalLarge,
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final childAspectRatio = constraints.maxWidth >= 960
-                  ? 1.9
-                  : constraints.maxWidth >= 780
-                  ? 1.45
-                  : 1.15;
-
-              return GridView.extent(
-                maxCrossAxisExtent: 260,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: AppDimens.spaceLg,
-                mainAxisSpacing: AppDimens.spaceLg,
-                childAspectRatio: childAspectRatio,
-                children: [
-                  for (final item in items) _BookingMetricTile(item: item),
-                ],
-              );
-            },
+          _BookingOperationsLayout(
+            summary: items.first,
+            operations: items.skip(1).toList(),
+            statusBreakdown: statusBreakdown,
+            alerts: bookingMetrics.alerts,
           ),
-          if (statusBreakdown.isNotEmpty) ...[
-            AppDimens.verticalLarge,
-            Text(
-              'Booking status',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: AppDimens.fontWeightBold,
-              ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BookingOperationsLayout extends StatelessWidget {
+  const _BookingOperationsLayout({
+    required this.summary,
+    required this.operations,
+    required this.statusBreakdown,
+    required this.alerts,
+  });
+
+  final _BookingMetricItem summary;
+  final List<_BookingMetricItem> operations;
+  final List<ProductBookingStatusMetric> statusBreakdown;
+  final List<ProductAnalyticsAlert> alerts;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 1040;
+        final summaryColumn = _BookingSummaryColumn(
+          summary: summary,
+          alerts: alerts,
+        );
+        final detailsColumn = _BookingDetailsColumn(
+          operations: operations,
+          statusBreakdown: statusBreakdown,
+        );
+
+        if (!isWide) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [summaryColumn, AppDimens.verticalLarge, detailsColumn],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(flex: 3, child: summaryColumn),
+            AppDimens.horizontalLarge,
+            Expanded(flex: 5, child: detailsColumn),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _BookingSummaryColumn extends StatelessWidget {
+  const _BookingSummaryColumn({required this.summary, required this.alerts});
+
+  final _BookingMetricItem summary;
+  final List<ProductAnalyticsAlert> alerts;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _BookingSummaryTile(item: summary),
+        if (alerts.isNotEmpty) ...[
+          AppDimens.verticalMedium,
+          for (final alert in alerts) ...[
+            _AlertTile(
+              title: alert.title,
+              detail: alert.detail,
+              tone: alert.tone,
             ),
-            AppDimens.verticalMedium,
-            _BookingStatusStrip(items: statusBreakdown),
+            AppDimens.verticalMediumSmall,
           ],
-          if (bookingMetrics.alerts.isNotEmpty) ...[
-            AppDimens.verticalLarge,
-            for (final alert in bookingMetrics.alerts) ...[
-              _AlertTile(
-                title: alert.title,
-                detail: alert.detail,
-                tone: alert.tone,
-              ),
-              AppDimens.verticalMediumSmall,
-            ],
-          ],
+        ],
+      ],
+    );
+  }
+}
+
+class _BookingDetailsColumn extends StatelessWidget {
+  const _BookingDetailsColumn({
+    required this.operations,
+    required this.statusBreakdown,
+  });
+
+  final List<_BookingMetricItem> operations;
+  final List<ProductBookingStatusMetric> statusBreakdown;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _BookingMetricGrid(items: operations),
+        if (statusBreakdown.isNotEmpty) ...[
+          AppDimens.verticalLarge,
+          Text(
+            'Booking status',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: AppDimens.fontWeightBold,
+            ),
+          ),
+          AppDimens.verticalMedium,
+          _BookingStatusStrip(items: statusBreakdown),
+        ],
+      ],
+    );
+  }
+}
+
+class _BookingMetricGrid extends StatelessWidget {
+  const _BookingMetricGrid({required this.items});
+
+  final List<_BookingMetricItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final childAspectRatio = constraints.maxWidth >= 820
+            ? 1.35
+            : constraints.maxWidth >= 560
+            ? 1.25
+            : 1.05;
+
+        return GridView.extent(
+          maxCrossAxisExtent: 240,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: AppDimens.spaceLg,
+          mainAxisSpacing: AppDimens.spaceLg,
+          childAspectRatio: childAspectRatio,
+          children: [for (final item in items) _BookingMetricTile(item: item)],
+        );
+      },
+    );
+  }
+}
+
+class _BookingSummaryTile extends StatelessWidget {
+  const _BookingSummaryTile({required this.item});
+
+  final _BookingMetricItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: AppDimens.paddingAllLarge,
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withValues(alpha: 0.18),
+        borderRadius: AppDimens.radiusMedium,
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.22)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AnalyticsStatusBadge(label: item.label, tone: item.tone),
+          AppDimens.verticalMedium,
+          Text(
+            item.value,
+            style: theme.textTheme.displaySmall?.copyWith(
+              fontWeight: AppDimens.fontWeightBold,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          AppDimens.verticalExtraSmall,
+          Text(
+            item.helper,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -736,27 +847,41 @@ class _AlertTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Container(
-      padding: AppDimens.paddingAllMedium,
-      decoration: BoxDecoration(
-        borderRadius: AppDimens.radiusMedium,
-        border: Border.all(color: colorScheme.outlineVariant),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AnalyticsStatusBadge(label: title, tone: tone),
-          AppDimens.horizontalMedium,
-          Expanded(
-            child: Text(
-              detail,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final shouldStack = constraints.maxWidth < 520;
+        final detailText = Text(
+          detail,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
-        ],
-      ),
+        );
+
+        return Container(
+          padding: AppDimens.paddingAllMedium,
+          decoration: BoxDecoration(
+            borderRadius: AppDimens.radiusMedium,
+            border: Border.all(color: colorScheme.outlineVariant),
+          ),
+          child: shouldStack
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AnalyticsStatusBadge(label: title, tone: tone),
+                    AppDimens.verticalSmall,
+                    detailText,
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AnalyticsStatusBadge(label: title, tone: tone),
+                    AppDimens.horizontalMedium,
+                    Expanded(child: detailText),
+                  ],
+                ),
+        );
+      },
     );
   }
 }
@@ -1058,7 +1183,7 @@ class _BookingMetricItem {
   final AnalyticsStatusTone tone;
 }
 
-List<ProductBookingStatusMetric> _visibleBookingStatusBreakdown(
+List<ProductBookingStatusMetric> normalizeProductBookingStatusMetrics(
   List<ProductBookingStatusMetric> items,
 ) {
   const supportedOrder = <String, int>{

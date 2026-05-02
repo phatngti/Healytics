@@ -208,6 +208,15 @@ describe('Race Condition: CreateCheckoutTicketHandler — Slot pre-check race wi
         { provide: getRepositoryToken(Product), useValue: productRepo },
         { provide: 'RABBITMQ_CLIENT', useValue: rmqClient },
         { provide: CheckSlotAvailabilityHandler, useValue: slotChecker },
+        {
+          provide: RedisService,
+          useValue: {
+            get: jest.fn().mockResolvedValue(null),
+            set: jest.fn().mockResolvedValue(undefined),
+            acquireLock: jest.fn().mockResolvedValue('mock-lock-token'),
+            releaseLock: jest.fn().mockResolvedValue(undefined),
+          },
+        },
       ],
     }).compile();
 
@@ -357,6 +366,15 @@ describe('Race Condition: Idempotency — duplicate request handling', () => {
         { provide: getRepositoryToken(Product), useValue: productRepo },
         { provide: 'RABBITMQ_CLIENT', useValue: rmqClient },
         { provide: CheckSlotAvailabilityHandler, useValue: slotChecker },
+        {
+          provide: RedisService,
+          useValue: {
+            get: jest.fn().mockResolvedValue(null),
+            set: jest.fn().mockResolvedValue(undefined),
+            acquireLock: jest.fn().mockResolvedValue('mock-lock-token'),
+            releaseLock: jest.fn().mockResolvedValue(undefined),
+          },
+        },
       ],
     }).compile();
 

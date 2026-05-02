@@ -16,6 +16,8 @@ import { CreateDoctorHandler } from './application/handlers/create-doctor.handle
 import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
 import { UpdateEmployeeHandler } from './application/handlers/update-employee.handler';
 import { RemoveEmployeeHandler } from './application/handlers/remove-employee.handler';
+import { GetEmployeeOverviewAnalyticsHandler } from './application/handlers/get-employee-overview-analytics.handler';
+import { GetEmployeeDetailAnalyticsHandler } from './application/handlers/get-employee-detail-analytics.handler';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { RemoveEmployeeHandler } from './application/handlers/remove-employee.ha
     CreateTherapistHandler,
     UpdateEmployeeHandler,
     RemoveEmployeeHandler,
+    GetEmployeeOverviewAnalyticsHandler,
+    GetEmployeeDetailAnalyticsHandler,
   ],
   exports: [EmployeesService],
 })
