@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeesService } from './employees.service';
 import { PartnerEmployeesController } from './partner-employees.controller';
 import { UserEmployeesController } from './user-employees.controller';
+import { EmployeeProfileController } from './employee-profile.controller';
+import { EmployeeRevenueController } from './employee-revenue.controller';
 import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
@@ -18,6 +20,11 @@ import { UpdateEmployeeHandler } from './application/handlers/update-employee.ha
 import { RemoveEmployeeHandler } from './application/handlers/remove-employee.handler';
 import { GetEmployeeOverviewAnalyticsHandler } from './application/handlers/get-employee-overview-analytics.handler';
 import { GetEmployeeDetailAnalyticsHandler } from './application/handlers/get-employee-detail-analytics.handler';
+import { GetEmployeeProfileHandler } from './application/handlers/get-employee-profile.handler';
+import { UpdateEmployeeProfileHandler } from './application/handlers/update-employee-profile.handler';
+import { GetEmployeeRevenueSummaryHandler } from './application/handlers/get-employee-revenue-summary.handler';
+import { GetEmployeeRevenueTrendHandler } from './application/handlers/get-employee-revenue-trend.handler';
+import { GetEmployeeRevenueBreakdownHandler } from './application/handlers/get-employee-revenue-breakdown.handler';
 
 @Module({
   imports: [
@@ -33,7 +40,12 @@ import { GetEmployeeDetailAnalyticsHandler } from './application/handlers/get-em
     ]),
     PartnersModule,
   ],
-  controllers: [PartnerEmployeesController, UserEmployeesController],
+  controllers: [
+    PartnerEmployeesController,
+    UserEmployeesController,
+    EmployeeProfileController,
+    EmployeeRevenueController,
+  ],
   providers: [
     EmployeesService,
     CreateDoctorHandler,
@@ -42,6 +54,13 @@ import { GetEmployeeDetailAnalyticsHandler } from './application/handlers/get-em
     RemoveEmployeeHandler,
     GetEmployeeOverviewAnalyticsHandler,
     GetEmployeeDetailAnalyticsHandler,
+    // Employee self-service handlers
+    GetEmployeeProfileHandler,
+    UpdateEmployeeProfileHandler,
+    // Employee revenue handlers
+    GetEmployeeRevenueSummaryHandler,
+    GetEmployeeRevenueTrendHandler,
+    GetEmployeeRevenueBreakdownHandler,
   ],
   exports: [EmployeesService],
 })
