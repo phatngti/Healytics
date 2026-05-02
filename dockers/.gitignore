@@ -1,0 +1,5 @@
+.env
+backend.env
+deploy.env
+jenkins-agent.env
+jenkins_home/

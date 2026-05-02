@@ -1,0 +1,115 @@
+pipeline {
+  agent { label 'local-docker-builder' }
+
+  options {
+    skipDefaultCheckout(true)
+    disableConcurrentBuilds()
+    timestamps()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+  }
+
+  triggers {
+    githubPush()
+  }
+
+  environment {
+    BACKEND_IMAGE = 'nonameaaaa/healytics_backend'
+    BACKEND_MIGRATION_IMAGE = 'nonameaaaa/healytics_backend-migrate'
+    // VPS_DEPLOY_SCRIPT = '/opt/healytics/dockers/scripts/deploy-backend.sh'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+        script {
+          env.ACTIVE_BRANCH = env.BRANCH_NAME ?: sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
+          env.GIT_COMMIT_SHORT = sh(returnStdout: true, script: 'git rev-parse --short=12 HEAD').trim()
+          env.IMAGE_TAG = env.GIT_COMMIT_SHORT
+
+          if (!(env.ACTIVE_BRANCH in ['main', 'master'])) {
+            error("Refusing to build/deploy branch '${env.ACTIVE_BRANCH}'. Only main/master are trusted for production.")
+          }
+        }
+      }
+    }
+
+    stage('Resolve Deploy Target') {
+      steps {
+        script {
+          env.VPS_SSH_HOST = sh(returnStdout: true, script: 'printf "%s" "${HEALYTICS_VPS_HOST:-}"').trim()
+          env.VPS_SSH_USER = sh(returnStdout: true, script: 'printf "%s" "${HEALYTICS_VPS_SSH_USER:-deploy}"').trim()
+
+          if (!env.VPS_SSH_HOST) {
+            error('Set HEALYTICS_VPS_HOST in the local Jenkins agent environment before deploying.')
+          }
+        }
+      }
+    }
+
+    stage('Test') {
+      steps {
+        dir('backend') {
+          sh '''
+            set -eu
+            corepack enable || true
+            yarn install --frozen-lockfile
+            yarn test --runInBand
+          '''
+        }
+      }
+    }
+
+    stage('Build') {
+      steps {
+        dir('backend') {
+          sh '''
+            set -eu
+            yarn build
+            docker build --target runtime -t "${BACKEND_IMAGE}:${IMAGE_TAG}" .
+            docker build --target migrate -t "${BACKEND_MIGRATION_IMAGE}:${IMAGE_TAG}" .
+          '''
+        }
+      }
+    }
+
+    stage('Push') {
+      steps {
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub-creds',
+          usernameVariable: 'nonameaaaa',
+          passwordVariable: 'dckr_pat_U_zxjxXG8g71apCSgAMqxnKyWjw'
+        )]) {
+          sh '''
+            set -eu
+            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+
+            for img in "${BACKEND_IMAGE}" "${BACKEND_MIGRATION_IMAGE}"; do
+              docker push "${img}:${IMAGE_TAG}"
+              docker tag  "${img}:${IMAGE_TAG}" "${img}:main-latest"
+              docker push "${img}:main-latest"
+            done
+
+            docker logout
+          '''
+        }
+      }
+    }
+
+    // stage('Deploy VPS') {
+    //   steps {
+    //     sh '''
+    //       set -eu
+    //       ssh -o BatchMode=yes "${VPS_SSH_USER}@${VPS_SSH_HOST}" \
+    //         "BACKEND_IMAGE='${BACKEND_IMAGE}' BACKEND_MIGRATION_IMAGE='${BACKEND_MIGRATION_IMAGE}' '${VPS_DEPLOY_SCRIPT}' '${IMAGE_TAG}'"
+    //     '''
+    //   }
+    // }
+  }
+
+  post {
+    success {
+      echo "Deployed ${BACKEND_IMAGE}:${IMAGE_TAG}"
+    }
+  }
+}

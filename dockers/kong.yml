@@ -3,7 +3,7 @@ _transform: true
 
 services:
   - name: backend-service
-    url: http://host.docker.internal:8080
+    url: http://backend:8080
     routes:
       - name: my-backend-route
         paths:
@@ -14,7 +14,7 @@ services:
   # Namespaces are negotiated in the Socket.IO protocol handshake,
   # NOT via URL path. All share a single /socket.io HTTP endpoint.
   - name: chat-ws-service
-    url: http://host.docker.internal:8080
+    url: http://backend:8080
     connect_timeout: 60000
     write_timeout: 3600000   # 1 hour — keep WS connections alive
     read_timeout: 3600000

@@ -14,9 +14,20 @@ RUN yarn install --frozen-lockfile
 # Copy source files needed for compilation
 COPY tsconfig.json tsconfig.build.json nest-cli.json ./
 COPY src/ src/
+COPY migrations/ migrations/
 
 # Build → produces dist/
 RUN yarn build
+
+FROM build AS migrate
+
+RUN apk add --no-cache dumb-init
+
+ENV NODE_ENV=production
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["yarn", "migration:run"]
+
+FROM build AS prod-deps
 
 # Prune to production deps only (removes devDependencies in-place)
 RUN yarn install --production --frozen-lockfile \
@@ -54,10 +65,10 @@ USER node
 WORKDIR /app
 
 # Production deps only (pruned in build stage)
-COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 
 # Compiled JS only
-COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=prod-deps --chown=node:node /app/dist ./dist
 
 # Needed at runtime for package metadata
 COPY --chown=node:node package.json ./

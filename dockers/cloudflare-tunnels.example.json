@@ -6,6 +6,10 @@
         {
           "hostname": "api.example.com",
           "origin": "http://kong-cp:8000"
+        },
+        {
+          "hostname": "ci.example.com",
+          "origin": "http://jenkins:8080"
         }
       ]
     }

@@ -13,6 +13,14 @@
             "keepAliveTimeout": 3600,
             "keepAliveConnections": 100
           }
+        },
+        {
+          "hostname": "jenkins-webhook.healytics.me",
+          "origin": "http://jenkins-controller:8080",
+          "originRequest": {
+            "noTLSVerify": true,
+            "connectTimeout": 10
+          }
         }
       ]
     }
