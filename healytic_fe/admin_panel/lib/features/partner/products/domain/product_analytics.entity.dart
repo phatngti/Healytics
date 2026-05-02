@@ -1,4 +1,4 @@
-import 'package:admin_panel/features/common/widgets/analytics/analytics_status_badge.widget.dart';
+import 'package:admin_panel/core/entities/analytics_status_tone.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

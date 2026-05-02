@@ -29,6 +29,7 @@ import { HealthServiceAnalyticsQueryDto } from './dto/partner/health-service-ana
 import { HealthServiceOverviewAnalyticsResponseDto } from './dto/partner/analytics/health-service-overview-analytics.dto';
 import { HealthServiceDetailAnalyticsResponseDto } from './dto/partner/analytics/health-service-detail-analytics.dto';
 import { DashboardTimePeriod } from '@/dashboard-partner/dto/query/dashboard-period-query.dto';
+import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 /**
  * Partner controller for health service management.
@@ -45,6 +46,7 @@ export class PartnerHealthServiceController {
    * Returns overview analytics for all partner services.
    */
   @Get('analytics/overview')
+    @LogResponse()
   @ApiOperation({
     summary: 'Get health service overview analytics',
   })

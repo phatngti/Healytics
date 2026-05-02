@@ -51,6 +51,23 @@ USER_POOL = [
 MIN_WAIT = float(os.getenv("MIN_WAIT", "1"))
 MAX_WAIT = float(os.getenv("MAX_WAIT", "3"))
 
+# ── Updated-module stress settings ───────────────────────────────────────────
+PERF_ENABLE_MUTATIONS = os.getenv("PERF_ENABLE_MUTATIONS", "0").strip().lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
+DISCOVERY_PAGE_LIMIT = int(os.getenv("DISCOVERY_PAGE_LIMIT", "100"))
+FINANCE_STRESS_PERIODS = [
+    period.strip()
+    for period in os.getenv(
+        "FINANCE_STRESS_PERIODS",
+        "sevenDays,thirtyDays,ninetyDays",
+    ).split(",")
+    if period.strip()
+]
+
 # ── Report Settings ──────────────────────────────────────────────────────────
 REPORT_HTML = str(REPORTS_DIR / "report.html")
 REPORT_CSV_PREFIX = str(REPORTS_DIR / "stats")

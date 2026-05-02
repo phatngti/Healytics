@@ -100,13 +100,13 @@ describe('AiServiceService', () => {
 
       // First recommendation — flat card-style fields
       const rec0 = result.recommendations[0];
-      expect(rec0.id).toBe('uuid-1');
+      expect(rec0.service_id).toBe('uuid-1');
       expect(rec0.name).toBe('Service A');
       expect(rec0.slug).toBe('service-a');
       expect(rec0.imageUrl).toBe('https://example.com/img.jpg');
       expect(rec0.category).toBe('Massage');
       expect(rec0.duration).toBe('60 min');
-      expect(rec0.price).toBe('₫500.000');
+      expect(rec0.price).toBe(new Intl.NumberFormat('vi-VN').format(500000));
       expect(rec0.rating).toBe('0');
       expect(rec0.vendorName).toBe('Healytics Spa');
       expect(rec0.location).toBe('Quận 1, Hồ Chí Minh');
@@ -115,7 +115,7 @@ describe('AiServiceService', () => {
 
       // Second recommendation — uses salePrice, no category/duration
       const rec1 = result.recommendations[1];
-      expect(rec1.price).toBe('₫250.000');
+      expect(rec1.price).toBe(new Intl.NumberFormat('vi-VN').format(250000));
       expect(rec1.imageUrl).toBeNull();
       expect(rec1.category).toBe('Uncategorized');
       expect(rec1.duration).toBe('');

@@ -69,6 +69,11 @@ class ApiService implements Authentication {
   late PartnerChatApi partnerChatApi;
   late PartnerDashboardApi partnerDashboardApi;
 
+  // ── Partner Finance ───────────────────────────────
+  late PartnerTransactionsApi partnerTransactionsApi;
+  late PartnerPayoutsApi partnerPayoutsApi;
+  late PartnerRefundCasesApi partnerRefundCasesApi;
+
   // ── Health Services & Categories ──────────────────
   late UserHealthServicesApi healthServicesApi;
   late CategoriesApi categoriesApi;
@@ -157,6 +162,13 @@ class ApiService implements Authentication {
     locationsApi = LocationsApi(backend);
     partnerChatApi = PartnerChatApi(backend);
     partnerDashboardApi = PartnerDashboardApi(backend);
+
+    // ── Partner Finance APIs ──────────────────────────
+    partnerTransactionsApi =
+        PartnerTransactionsApi(backend);
+    partnerPayoutsApi = PartnerPayoutsApi(backend);
+    partnerRefundCasesApi =
+        PartnerRefundCasesApi(backend);
   }
 
   /// Applies the User-Agent header to every client.

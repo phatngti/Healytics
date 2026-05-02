@@ -27,6 +27,7 @@ import { MyProfileCompletionResponseDto } from './dto/response/my-profile-comple
 import { UpdatePartnerProfileCompletionDto } from './dto/request/update-partner-profile-completion.dto';
 import { PartnerPublicProfileResponseDto } from './dto/response/partner-public-profile-response.dto';
 import { UpdatePartnerPublicProfileDto } from './dto/request/update-partner-public-profile.dto';
+import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 // ============================================================================
 // Public Controller — no auth required
@@ -115,6 +116,7 @@ export class PartnerSelfController {
   }
 
   @Put('me/completion')
+  @LogResponse()
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({

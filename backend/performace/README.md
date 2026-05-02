@@ -39,6 +39,9 @@ locust --headless -u 10 -r 2 --run-time 60s
 | `TEST_ADMIN_PASSWORD` | `s3cureP@ssw0rd` | Admin login password |
 | `MIN_WAIT` | `1` | Min wait between tasks (seconds) |
 | `MAX_WAIT` | `3` | Max wait between tasks (seconds) |
+| `PERF_ENABLE_MUTATIONS` | `0` | Enables controlled finance mutation tasks when set to `1` |
+| `DISCOVERY_PAGE_LIMIT` | `100` | Max rows fetched during seeded runtime discovery |
+| `FINANCE_STRESS_PERIODS` | `sevenDays,thirtyDays,ninetyDays` | Comma-separated partner finance periods used by stress tasks |
 
 #### WebSocket-specific
 
@@ -148,10 +151,13 @@ performace/
 │   ├── config.py              # Environment-based configuration + report paths
 │   ├── auth.py                # Login / token helpers
 │   ├── data_generators.py     # Faker-based payload generators (HTTP)
+│   ├── discovery.py           # Seeded runtime ID discovery for stress tests
 │   ├── ws_base.py             # HealyticsSocketIOUser base class
 │   └── ws_data_generators.py  # Faker-based payload generators (WebSocket)
 ├── locustfiles/               # Test cases (added incrementally)
 │   ├── __init__.py
+│   ├── partner_employee_analytics.py # Partner employee analytics stress tests
+│   ├── partner_finance.py            # Partner finance stress + guarded mutations
 │   ├── ws_notification_user.py     # /notifications namespace
 │   ├── ws_user_chat.py             # /user-chat namespace
 │   ├── ws_partner_chat.py          # /partner-chat namespace
@@ -171,13 +177,46 @@ locust --tags auth             # Only auth flows
 locust --tags admin            # Only admin operations
 locust --tags products         # Only product CRUD
 locust --tags locations        # Only location browsing
+locust --tags updated          # Updated-module stress tests
+locust --tags stress           # All stress-tagged scenarios
+locust --tags partner-finance  # Partner finance read-heavy stress
+locust --tags employee-analytics  # Partner employee analytics stress
+
+# Controlled finance mutations (disabled unless explicitly enabled)
+PERF_ENABLE_MUTATIONS=1 locust --tags finance-mutation -u 2 -r 1 --run-time 60s
 
 # WebSocket tests
 locust --tags ws               # All WebSocket tests
 locust --tags notifications    # Only notification listener
 locust --tags chat             # Chat (user + partner)
-locust --tags chat,partner     # Only partner chat
+locust --tags partner          # Only partner chat
 locust --tags chat-notifications  # Only chat notification listener
+```
+
+### Updated-module stress tests
+
+The `updated` stress suite targets the backend modules added or changed after
+the original performance contract snapshot:
+
+| Module | Endpoints |
+|---|---|
+| Partner Employee Analytics | `/partner/employees/analytics/overview`, `/partner/employees/analytics/:employeeId` |
+| Partner Transactions | `/partner/transactions/finance/summary`, `/partner/transactions/finance/trend`, `/partner/transactions`, `/partner/transactions/:transactionId` |
+| Partner Payouts | `/partner/payouts` |
+| Partner Refund Cases | `/partner/refund-cases` |
+
+The suite logs in as the configured partner account, discovers seeded employee,
+transaction, payout, and refund-case IDs at runtime, then reuses those IDs for
+read-heavy stress requests. Mutation endpoints are isolated behind the
+`finance-mutation` tag and `PERF_ENABLE_MUTATIONS=1`.
+
+Make helpers:
+
+```bash
+make perf-test-updated-stress
+make perf-test-partner-finance-stress
+make perf-test-employee-analytics-stress
+PERF_ENABLE_MUTATIONS=1 make perf-test-updated-mutations
 ```
 
 ## WebSocket Testing
@@ -211,4 +250,3 @@ locust --tags ws,chat -u 20 -r 5 --run-time 2m
 ## Progress
 
 See [CHANGELOG.md](./CHANGELOG.md) for detailed implementation progress and module coverage.
-

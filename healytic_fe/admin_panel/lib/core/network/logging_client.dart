@@ -3,6 +3,8 @@ import 'dart:developer';
 
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/utils/browser_storage.dart';
+import 'package:admin_panel/core/utils/user_role_helper.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
 
@@ -158,16 +160,33 @@ class LoggingClient extends BaseClient {
     _log.severe(message.toString(), error, stackTrace);
   }
 
-  /// Clears the stored access token so
+  /// Clears the entire auth session so
   /// [RouterListenable] triggers a GoRouter refresh,
   /// which redirects the user to the login page.
+  ///
+  /// Clears:
+  /// - Drift store access token (triggers watch)
+  /// - Browser localStorage fallback token (web)
+  /// - Partner verification & profile flags
   void _handleUnauthorized(BaseRequest request) {
     log(
       '401 Unauthorized — clearing session: '
       '${request.url}',
       name: 'HTTP',
     );
+
+    // Clear the primary Drift store token.
+    // This triggers Store.watch → RouterListenable
+    // → GoRouter redirect to login.
     Store.delete(StoreKey.accessToken);
+
+    // Clear the browser localStorage fallback so
+    // getRequestHeaders() stops sending stale tokens.
+    removeBrowserItem('access_token');
+
+    // Reset partner-specific flags to prevent stale
+    // redirect state on next login.
+    UserRoleHelper.clearPartnerFlags();
   }
 
   /// Attempts to parse a human-readable error message

@@ -1,29 +1,15 @@
 # ─────────────────────────────────────────────────────────────
-# Stage 1 — Install production dependencies
+# Stage 1 — Build the TypeScript application
 # ─────────────────────────────────────────────────────────────
-FROM node:22-alpine AS deps
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
 # Copy only manifests for maximum layer caching
 COPY package.json yarn.lock ./
 
-# Install production deps only (no devDependencies)
-RUN yarn install --production --frozen-lockfile \
-    && yarn cache clean
-
-# ─────────────────────────────────────────────────────────────
-# Stage 2 — Build the TypeScript application
-# ─────────────────────────────────────────────────────────────
-FROM node:22-alpine AS build
-
-WORKDIR /app
-
-COPY package.json yarn.lock ./
-
 # Install ALL deps (need devDeps for @nestjs/cli, typescript, etc.)
-RUN yarn install --frozen-lockfile \
-    && yarn cache clean
+RUN yarn install --frozen-lockfile
 
 # Copy source files needed for compilation
 COPY tsconfig.json tsconfig.build.json nest-cli.json ./
@@ -32,8 +18,31 @@ COPY src/ src/
 # Build → produces dist/
 RUN yarn build
 
+# Prune to production deps only (removes devDependencies in-place)
+RUN yarn install --production --frozen-lockfile \
+    && yarn cache clean
+
+# Strip non-essential files from node_modules to shrink size
+# (docs, tests, type declarations, source maps, markdown, etc.)
+RUN find node_modules \( \
+        -name '*.md' -o -name '*.markdown' \
+        -o -name '*.ts' ! -name '*.d.ts' \
+        -o -name '*.map' \
+        -o -name 'CHANGELOG*' -o -name 'CHANGES*' \
+        -o -name 'LICENSE*' -o -name 'LICENCE*' \
+        -o -name 'AUTHORS*' -o -name 'CONTRIBUTORS*' \
+        -o -name '.npmignore' -o -name '.eslintrc*' \
+        -o -name '.prettierrc*' -o -name '.editorconfig' \
+        -o -name 'tsconfig.json' -o -name '.travis.yml' \
+        -o -name 'Makefile' -o -name 'Gruntfile.js' \
+        -o -name 'Gulpfile.js' -o -name '.github' \
+        -o -name 'example' -o -name 'examples' \
+        -o -name 'test' -o -name 'tests' -o -name '__tests__' \
+        -o -name 'coverage' -o -name '.nyc_output' \
+    \) -prune -exec rm -rf {} + 2>/dev/null; true
+
 # ─────────────────────────────────────────────────────────────
-# Stage 3 — Production runtime (minimal)
+# Stage 2 — Production runtime (minimal)
 # ─────────────────────────────────────────────────────────────
 FROM node:22-alpine AS runtime
 
@@ -44,10 +53,10 @@ RUN apk add --no-cache dumb-init
 USER node
 WORKDIR /app
 
-# Production deps from Stage 1 (no devDependencies)
-COPY --from=deps --chown=node:node /app/node_modules ./node_modules
+# Production deps only (pruned in build stage)
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
 
-# Compiled JS from Stage 2
+# Compiled JS only
 COPY --from=build --chown=node:node /app/dist ./dist
 
 # Needed at runtime for package metadata

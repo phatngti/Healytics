@@ -1,8 +1,9 @@
+import 'package:admin_panel/core/entities/analytics_status_tone.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
-enum AnalyticsStatusTone { neutral, positive, warning, critical }
+export 'package:admin_panel/core/entities/analytics_status_tone.dart';
 
 /// Compact badge for status and risk messaging.
 class AnalyticsStatusBadge extends StatelessWidget {

@@ -16,3 +16,4 @@ workspace:
  - user_app
  - admin_panel
  - common
+ - employee_app

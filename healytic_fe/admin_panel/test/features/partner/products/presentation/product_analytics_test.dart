@@ -3,6 +3,7 @@ import 'package:admin_panel/features/common/widgets/analytics/analytics_status_b
 import 'package:admin_panel/features/partner/products/data/product_analytics_impl.repository.dart';
 import 'package:admin_panel/features/partner/products/data/product_analytics_remote.datasource.dart';
 import 'package:admin_panel/features/partner/products/data/data/product_mock_data.dart';
+import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/product_analytics.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product_analytics.provider.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_analytics/product_detail_analytics.widget.dart';
@@ -188,6 +189,37 @@ void main() {
       expect(wideSecondCardOffset.dx, greaterThan(wideFirstCardOffset.dx));
     });
 
+    testWidgets('renders repeated trend week labels once', (tester) async {
+      final repository = ProductAnalyticsRepositoryImpl(
+        remoteDataSource: _RepeatedTrendLabelsDataSource(),
+      );
+
+      await tester.binding.setSurfaceSize(const Size(1900, 1600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            productAnalyticsRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: ProductOverviewAnalyticsSection(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Wk 1'), findsOneWidget);
+      expect(find.text('Wk 2'), findsOneWidget);
+      expect(find.text('Wk 3'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('renders detail analytics without blocking product content', (
       tester,
     ) async {
@@ -218,4 +250,78 @@ void main() {
       expect(find.text('Operational readiness'), findsOneWidget);
     });
   });
+}
+
+class _RepeatedTrendLabelsDataSource
+    implements ProductAnalyticsRemoteDataSource {
+  @override
+  Future<ProductOverviewAnalytics> getOverviewAnalytics({
+    required DashboardTimePeriod period,
+  }) async {
+    return const ProductOverviewAnalytics(
+      totalProducts: 3,
+      activeProducts: 3,
+      bookingMetrics: ProductBookingMetricsSummary(
+        totalBookings: 12,
+        delayedBookings: 1,
+        delayThresholdMinutes: 15,
+        pendingBookings: 2,
+        completedBookings: 10,
+        statusBreakdown: [
+          ProductBookingStatusMetric(
+            statusKey: 'confirmed',
+            label: 'Confirmed',
+            count: 8,
+            tone: AnalyticsStatusTone.positive,
+          ),
+          ProductBookingStatusMetric(
+            statusKey: 'cancelled',
+            label: 'Cancelled',
+            count: 1,
+            tone: AnalyticsStatusTone.critical,
+          ),
+        ],
+        alerts: [],
+      ),
+      bookings: 12,
+      bookingsDelta: 0,
+      revenue: 1200000,
+      revenueDelta: 0,
+      averageRating: 4.8,
+      ratingDelta: 0,
+      reviewCount: 12,
+      trendPoints: [
+        ProductTrendPoint(label: 'Wk 1', bookings: 2, revenue: 200000),
+        ProductTrendPoint(label: 'Wk 1', bookings: 3, revenue: 300000),
+        ProductTrendPoint(label: 'Wk 2', bookings: 1, revenue: 100000),
+        ProductTrendPoint(label: 'Wk 2', bookings: 4, revenue: 400000),
+        ProductTrendPoint(label: 'Wk 3', bookings: 2, revenue: 200000),
+      ],
+      categoryPerformance: [
+        ProductCategoryPerformance(
+          categoryName: 'Massage',
+          bookings: 8,
+          revenue: 800000,
+          averageRating: 4.8,
+        ),
+      ],
+      topServices: [
+        ProductServicePerformance(
+          name: 'Recovery Massage',
+          categoryName: 'Massage',
+          bookings: 8,
+          revenue: 800000,
+          averageRating: 4.8,
+        ),
+      ],
+    );
+  }
+
+  @override
+  Future<ProductDetailAnalytics> getDetailAnalytics({
+    required ProductId productId,
+    required DashboardTimePeriod period,
+  }) {
+    throw UnimplementedError();
+  }
 }

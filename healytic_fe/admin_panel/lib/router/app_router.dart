@@ -53,6 +53,11 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
     "route": admin.AdminDashboardRoute().location,
   },
   {
+    "icon": Icons.account_balance_outlined,
+    "label": 'Finance',
+    "route": admin.AdminFinanceManagerRoute().location,
+  },
+  {
     "icon": Icons.production_quantity_limits_outlined,
     "label": 'Category',
     "route": admin.CategoryHomeRoute().location,
