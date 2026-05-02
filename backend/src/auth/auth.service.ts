@@ -257,6 +257,32 @@ export class AuthService {
   }
 
   /**
+   * Logs in an employee user (EMPLOYEE role only).
+   * @param user - The validated user
+   * @returns Authentication tokens
+   */
+  async loginEmployee(user: ValidatedUser): Promise<AuthTokensDto> {
+    const userId = user.id;
+    const userEmail = user.email;
+    const userRole = user.role;
+    if (!userId) {
+      throw new UnauthorizedException('Employee ID is missing');
+    }
+    if (user.roleNotAllowed || userRole !== Role.EMPLOYEE) {
+      throw new ForbiddenException(
+        'This account is not authorized for employee login.',
+      );
+    }
+    this.logger.log(`Employee login: ${userId}`);
+    return this.createTokensForUser(
+      userId,
+      userEmail,
+      userRole,
+      user.userProfile,
+    );
+  }
+
+  /**
    * Logs in a partner user (HEALTH_PARTNER role only).
    * @param user - The validated user
    * @returns Authentication tokens

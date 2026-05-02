@@ -29,6 +29,7 @@ import { CartModule } from './cart/cart.module';
 import { ClinicModule } from './clinic/clinic.module';
 import { DashboardPartnerModule } from './dashboard-partner/dashboard-partner.module';
 import { PartnerFinanceModule } from './partner-finance/partner-finance.module';
+import { HealthModule } from './health/health.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 import rabbitmqConfig from './config/rabbitmq.config';
@@ -103,6 +104,7 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
     ClinicModule,
     DashboardPartnerModule,
     PartnerFinanceModule,
+    HealthModule,
   ],
   providers: [
     {
