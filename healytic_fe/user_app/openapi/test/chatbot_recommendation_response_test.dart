@@ -21,7 +21,7 @@ void main() {
       // TODO
     });
 
-    // List<ServiceDetail> recommendations (default value: const [])
+    // List<AiRecommendationItemDto> recommendations (default value: const [])
     test('to test the property `recommendations`', () async {
       // TODO
     });

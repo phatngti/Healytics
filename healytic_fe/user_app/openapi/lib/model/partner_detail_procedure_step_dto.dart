@@ -18,6 +18,7 @@ class PartnerDetailProcedureStepDto {
     required this.description,
   });
 
+
   num stepNumber;
 
   String title;

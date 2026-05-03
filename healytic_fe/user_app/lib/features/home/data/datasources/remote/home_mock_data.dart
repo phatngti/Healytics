@@ -343,6 +343,21 @@ final List<AiRecommendation> kMockAiRecommendations =
 /// Mock recent activities for the home dashboard.
 final List<AppointmentEntity> kMockRecentActivities = [
   AppointmentEntity(
+    id: 'appt-pending-1',
+    serviceName: 'Hot Stone Therapy',
+    healthPartnerName: 'Glow Saigon Spa Retreat',
+    healthPartnerId: 'hp-3',
+    imageUrl: '',
+    status: 'pending_payment',
+    category: 'Spa',
+    specialistName: 'Dr. Anna Nguyen',
+    address: 'District 1, HCMC',
+    date: DateTime.now(),
+    checkInTime: '14:00',
+    checkOutTime: '15:00',
+    duration: '60 min',
+  ),
+  AppointmentEntity(
     id: 'appt-1',
     serviceName: 'Aromatherapy',
     healthPartnerName: 'Spa Harmony',

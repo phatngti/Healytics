@@ -5,59 +5,60 @@ import { AppointmentStatus } from '../enums/appointment-status.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 
 export class AppointmentResponseDto {
-  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiProperty({ type: String, example: '550e8400-e29b-41d4-a716-446655440000' })
   @Expose()
   id: string;
 
-  @ApiProperty({ example: 'Thai Massage' })
+  @ApiProperty({ type: String, example: 'Thai Massage' })
   @Expose()
   serviceName: string;
 
-  @ApiProperty({ example: 'Healytics Spa Center' })
+  @ApiProperty({ type: String, example: 'Healytics Spa Center' })
   @Expose()
   healthPartnerName: string;
 
-  @ApiProperty({ example: 'https://example.com/image.jpg' })
+  @ApiProperty({ type: String, example: 'https://example.com/image.jpg' })
   @Expose()
   imageUrl: string;
 
-  @ApiProperty({ enum: AppointmentStatus, example: AppointmentStatus.UPCOMING })
+  @ApiProperty({ enum: AppointmentStatus, enumName: 'AppointmentStatus', example: AppointmentStatus.UPCOMING })
   @Expose()
   status: AppointmentStatus;
 
-  @ApiProperty({ example: 'Spa & Wellness' })
+  @ApiProperty({ type: String, example: 'Spa & Wellness' })
   @Expose()
   category: string;
 
-  @ApiProperty({ example: 'Dr. Jane Smith' })
+  @ApiProperty({ type: String, example: 'Dr. Jane Smith' })
   @Expose()
   specialistName: string;
 
-  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiProperty({ type: String, example: '550e8400-e29b-41d4-a716-446655440000' })
   @Expose()
   specialistId: string;
 
-  @ApiProperty({ example: '123 Main Street, District 1' })
+  @ApiProperty({ type: String, example: '123 Main Street, District 1' })
   @Expose()
   address: string;
 
-  @ApiProperty({ example: '2025-10-25T00:00:00.000Z' })
+  @ApiProperty({ type: String, example: '2025-10-25T00:00:00.000Z' })
   @Expose()
   date: string;
 
-  @ApiProperty({ example: '09:00 AM' })
+  @ApiProperty({ type: String, example: '09:00 AM' })
   @Expose()
   checkInTime: string;
 
-  @ApiProperty({ example: '10:30 AM' })
+  @ApiProperty({ type: String, example: '10:30 AM' })
   @Expose()
   checkOutTime: string;
 
-  @ApiProperty({ example: '90 min' })
+  @ApiProperty({ type: String, example: '90 min' })
   @Expose()
   duration: string;
 
   @ApiProperty({
+    type: Boolean,
     example: false,
     description: 'Whether the user has reviewed this appointment',
   })
@@ -65,6 +66,7 @@ export class AppointmentResponseDto {
   isReviewed: boolean;
 
   @ApiProperty({
+    type: Number,
     example: 2.5,
     nullable: true,
     description:
@@ -75,6 +77,7 @@ export class AppointmentResponseDto {
   distanceKm!: number;
 
   @ApiProperty({
+    type: String,
     example: '550e8400-e29b-41d4-a716-446655440000',
     nullable: true,
     description: 'Account ID of the health partner (vendor). Used for chat.',
@@ -83,6 +86,7 @@ export class AppointmentResponseDto {
   healthPartnerId!: string | null;
 
   @ApiProperty({
+    type: String,
     example: '550e8400-e29b-41d4-a716-446655440000',
     nullable: true,
     description: 'Product/service ID for navigation to service details.',
@@ -90,13 +94,44 @@ export class AppointmentResponseDto {
   @Expose()
   serviceId!: string | null;
 
+  @ApiProperty({
+    type: String,
+    example: 'https://test-payment.momo.vn/...',
+    nullable: true,
+    description:
+      'Payment gateway checkout URL. Only present when status is pending_payment.',
+  })
+  @Expose()
+  paymentUrl!: string | null;
+
+  @ApiProperty({
+    type: String,
+    example: 'momo://app?action=payWithApp&...',
+    nullable: true,
+    description:
+      'Deep link to open payment app directly (mobile). Only present when status is pending_payment.',
+  })
+  @Expose()
+  paymentDeeplink!: string | null;
+
+  @ApiProperty({
+    type: String,
+    example: '2026-04-14T12:10:00.000Z',
+    nullable: true,
+    description:
+      'ISO 8601 timestamp when the payment link expires. Only present when status is pending_payment.',
+  })
+  @Expose()
+  paymentExpiresAt!: string | null;
+
   /**
    * Maps a BookingStatus to the frontend's AppointmentStatus.
    */
   private static mapStatus(status: BookingStatus): AppointmentStatus {
     switch (status) {
-      case BookingStatus.CONFIRMED:
       case BookingStatus.PENDING_PAYMENT:
+        return AppointmentStatus.PENDING_PAYMENT;
+      case BookingStatus.CONFIRMED:
         return AppointmentStatus.UPCOMING;
       case BookingStatus.COMPLETED:
         return AppointmentStatus.COMPLETED;
@@ -169,6 +204,21 @@ export class AppointmentResponseDto {
         ? Math.round((options.distanceMeters / 1000) * 10) / 10
         : -1;
     dto.serviceId = booking.productId ?? null;
+
+    // Payment fields — only populated for pending_payment status
+    dto.paymentUrl =
+      dto.status === AppointmentStatus.PENDING_PAYMENT
+        ? booking.paymentUrl
+        : null;
+    dto.paymentDeeplink =
+      dto.status === AppointmentStatus.PENDING_PAYMENT
+        ? booking.paymentDeeplink
+        : null;
+    dto.paymentExpiresAt =
+      dto.status === AppointmentStatus.PENDING_PAYMENT
+        ? (booking.paymentExpiresAt?.toISOString() ?? null)
+        : null;
+
     return dto;
   }
 

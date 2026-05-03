@@ -32,9 +32,7 @@ class ProductDetailsScreen extends ConsumerWidget {
       error: (error, stack) => Scaffold(
         appBar: AppBar(
           leading: BackButton(
-            onPressed: () => context.goNamed(
-              ProductHomeRoute.name,
-            ),
+            onPressed: () => context.goNamed(ProductHomeRoute.name),
           ),
         ),
         body: Center(
@@ -42,9 +40,7 @@ class ProductDetailsScreen extends ConsumerWidget {
             title: 'Error loading product',
             error: error,
             stackTrace: stack,
-            onRetry: () => ref.invalidate(
-              productDetailsProvider(productId),
-            ),
+            onRetry: () => ref.invalidate(productDetailsProvider(productId)),
           ),
         ),
       ),

@@ -20,6 +20,7 @@ class PublicProfileStorefrontDto {
     this.certifications = const [],
   });
 
+
   Object? coverImageUrl;
 
   Object? logoImageUrl;

@@ -71,8 +71,7 @@ enum ServicePrefix {
   /// ServicePrefix.backend.httpUrl(gateway)
   /// // → 'https://api.healytics.vn/backend'
   /// ```
-  String httpUrl(String gatewayUrl) =>
-      '$gatewayUrl$path';
+  String httpUrl(String gatewayUrl) => '$gatewayUrl$path';
 
   /// Builds a WebSocket URL from a gateway base by
   /// replacing http(s) with ws(s).
@@ -124,17 +123,20 @@ class ApiService implements Authentication {
   // ── Reviews ───────────────────────────────────────
   late UserReviewsApi userReviewsApi;
 
+  // ── Recommender (AI service) ──────────────────
+  late RecommenderApi recommenderApi;
+
   // ── Notifications ─────────────────────────────────
   late UserNotificationsApi userNotificationsApi;
+
+  // ── Devices ────────────────────────────────────────
+  late UserDevicesApi userDevicesApi;
 
   // ── Chat ───────────────────────────────────────────
   late UserChatApi userChatApi;
 
   // ── Chatbot (AI service) ──────────────────────────
   late ChatbotApi chatbotApi;
-
-  // ── AI Recommendations ────────────────────────────
-  late AIRecommendationsApi aiRecommendationsApi;
 
   // ── Employees ─────────────────────────────────────
   late UserEmployeesApi userEmployeesApi;
@@ -229,11 +231,12 @@ class ApiService implements Authentication {
     userHealthServicesApi = UserHealthServicesApi(backend);
     userReviewsApi = UserReviewsApi(backend);
     userNotificationsApi = UserNotificationsApi(backend);
+    userDevicesApi = UserDevicesApi(backend);
     userChatApi = UserChatApi(backend);
 
     // ── AI APIs ─────────────────────────────────────
     chatbotApi = ChatbotApi(ai);
-    aiRecommendationsApi = AIRecommendationsApi(ai);
+    recommenderApi = RecommenderApi(ai);
   }
 
   /// Applies the User-Agent header to every client.
@@ -387,14 +390,11 @@ class ApiService implements Authentication {
 
     return switch (method.toUpperCase()) {
       'POST' => SseClient.instance.post(
-          url,
-          headers: headers,
-          body: body ?? {},
-        ),
-      _ => SseClient.instance.get(
-          url,
-          headers: headers,
-        ),
+        url,
+        headers: headers,
+        body: body ?? {},
+      ),
+      _ => SseClient.instance.get(url, headers: headers),
     };
   }
 }

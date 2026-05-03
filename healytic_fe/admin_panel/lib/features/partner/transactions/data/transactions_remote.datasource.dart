@@ -1,6 +1,10 @@
 import 'dart:collection';
 
+import 'package:admin_panel/core/entities/store.entity.dart';
+import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/features/partner/transactions/data/data/transaction_mock_data.dart';
+import 'package:admin_panel/features/partner/transactions/data/transactions_real.datasource.dart';
 import 'package:admin_panel/features/partner/transactions/domain/finance_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -46,8 +50,16 @@ abstract class TransactionsRemoteDataSource {
   Future<void> retryPayout(String payoutId);
 }
 
-class TransactionsRemoteDataSourceImpl implements TransactionsRemoteDataSource {
-  TransactionsRemoteDataSourceImpl();
+// ============================================================
+// 3. MOCK IMPLEMENTATION
+// ============================================================
+
+/// Mock data source for development and testing.
+/// Uses synthetic data built from
+/// [TransactionMockData].
+class TransactionsRemoteDataSourceMock
+    implements TransactionsRemoteDataSource {
+  TransactionsRemoteDataSourceMock();
 
   final List<TransactionRecord> _transactions =
       TransactionMockData.buildTransactions();
@@ -432,7 +444,22 @@ class TransactionsRemoteDataSourceImpl implements TransactionsRemoteDataSource {
       DateTime(value.year, value.month, value.day, 23, 59, 59);
 }
 
+// ============================================================
+// 4. PROVIDER WITH MOCK SWITCHING
+// ============================================================
+
+/// Provides the correct data source based on the
+/// mock flag in persistent storage.
 final transactionsRemoteDataSourceProvider =
-    Provider<TransactionsRemoteDataSource>(
-      (ref) => TransactionsRemoteDataSourceImpl(),
-    );
+    Provider<TransactionsRemoteDataSource>((ref) {
+  final isMock =
+      Store.get(StoreKey.mockFlag, false);
+  if (isMock) {
+    return TransactionsRemoteDataSourceMock();
+  }
+  final apiService =
+      ref.read(apiServiceProvider);
+  return TransactionsRemoteDataSourceImpl(
+    apiService: apiService,
+  );
+});

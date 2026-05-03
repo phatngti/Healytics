@@ -220,20 +220,21 @@ src/<module>/dto/
 ### Request DTO Rules
 
 1. Use `class-validator` decorators for ALL fields
-2. Use `@ApiProperty()` / `@ApiPropertyOptional()` for Swagger
+2. **Every `@ApiProperty()` / `@ApiPropertyOptional()` MUST have explicit `type`** — see `dto-type-expert` skill
 3. Use `@ValidateNested()` + `@Type(() => NestedClass)` for nested objects
 4. Use `@IsArray()` + `@ValidateNested({ each: true })` + `@Type()` for arrays
+5. Enum fields must have both `enum` and `enumName` to avoid inline anonymous enums
 
 ```typescript
 export class CreateEntityDto {
-  @ApiProperty({ example: 'Thai Massage' })
+  @ApiProperty({ type: String, example: 'Thai Massage' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
   name: string;
 
   // Nested object — @Type() is MANDATORY
-  @ApiPropertyOptional({ type: DefinitionDto })
+  @ApiPropertyOptional({ type: () => DefinitionDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => DefinitionDto)
@@ -249,26 +250,35 @@ export class CreateEntityDto {
 }
 ```
 
+> ⚠️ **NEVER use bare `@ApiProperty()` or `@ApiPropertyOptional()` without `type`.** This causes Swagger to generate `"type": "object"` for primitive fields, breaking client SDK generation.
+
 ### Response DTO Rules
 
 1. Use `@Expose()` for included fields, `@Exclude()` for hidden fields
-2. Use static `fromEntity()` factory method for entity-to-DTO conversion
-3. Never expose internal fields like `deletedAt`, `password`, etc.
+2. **Every `@ApiProperty` must have explicit `type`** (String, Number, Boolean, Date, enum, or DTO class)
+3. Use static `fromEntity()` factory method for entity-to-DTO conversion
+4. Never expose internal fields like `deletedAt`, `password`, etc.
+5. Nullable fields must include `nullable: true`
 
 ```typescript
 export class EntityResponseDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   name: string;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  @Expose()
+  description!: string | null;
 
   static fromEntity(entity: SomeEntity): EntityResponseDto {
     const dto = new EntityResponseDto();
     dto.id = entity.id;
     dto.name = entity.name;
+    dto.description = entity.description ?? null;
     return dto;
   }
 
@@ -634,6 +644,9 @@ import { Employee } from '@/common/entities/employee.entity';
 - [ ] Controller uses composite decorator OR manual guards (never no auth by accident)
 - [ ] Controller has `@ApiOperation()` + response type on every endpoint
 - [ ] DTOs use `class-validator` decorators on ALL fields
+- [ ] **Every `@ApiProperty` has explicit `type`** (no bare decorators) — see `dto-type-expert` skill
+- [ ] **Every nullable field has `nullable: true`** in `@ApiProperty`
+- [ ] **Every enum field has both `enum` and `enumName`**
 - [ ] Nested DTOs have `@Type(() => ClassName)` decorator
 - [ ] Response DTOs are used (never raw entities)
 - [ ] Handlers own transaction lifecycle with proper `finally { release }`

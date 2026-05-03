@@ -15,8 +15,7 @@ part 'public_profile_edit.provider.g.dart';
 /// - save → PUT → ready_clean
 /// - discard → reset draft to snapshot
 @riverpod
-class PublicProfileEditNotifier
-    extends _$PublicProfileEditNotifier {
+class PublicProfileEditNotifier extends _$PublicProfileEditNotifier {
   /// Server-confirmed storefront state.
   PublicProfileStorefront? _serverSnapshot;
 
@@ -24,11 +23,8 @@ class PublicProfileEditNotifier
   PublicProfileStorefront? _draft;
 
   @override
-  FutureOr<PartnerPublicProfileEntity>
-      build() async {
-    final repo = ref.watch(
-      publicProfileRepositoryProvider,
-    );
+  FutureOr<PartnerPublicProfileEntity> build() async {
+    final repo = ref.watch(publicProfileRepositoryProvider);
     final entity = await repo.getPublicProfile();
     _serverSnapshot = entity.storefront;
     _draft = entity.storefront;
@@ -37,9 +33,7 @@ class PublicProfileEditNotifier
 
   /// Whether the user has unsaved changes.
   bool get isDirty =>
-      _serverSnapshot != null &&
-      _draft != null &&
-      _serverSnapshot != _draft;
+      _serverSnapshot != null && _draft != null && _serverSnapshot != _draft;
 
   /// Current draft storefront state.
   PublicProfileStorefront? get draft => _draft;
@@ -49,9 +43,7 @@ class PublicProfileEditNotifier
     _draft = next;
     final current = state.asData?.value;
     if (current == null) return;
-    state = AsyncValue.data(
-      current.copyWith(storefront: next),
-    );
+    state = AsyncValue.data(current.copyWith(storefront: next));
   }
 
   /// Discards user edits by resetting draft
@@ -61,22 +53,15 @@ class PublicProfileEditNotifier
     _draft = _serverSnapshot;
     final current = state.asData?.value;
     if (current == null) return;
-    state = AsyncValue.data(
-      current.copyWith(
-        storefront: _serverSnapshot!,
-      ),
-    );
+    state = AsyncValue.data(current.copyWith(storefront: _serverSnapshot!));
   }
 
   /// Saves only the changed fields.
   Future<PartnerPublicProfileEntity> save() async {
-    final repo = ref.read(
-      publicProfileRepositoryProvider,
-    );
+    final repo = ref.read(publicProfileRepositoryProvider);
 
     final request = _buildPartialRequest();
-    final result =
-        await repo.updatePublicProfile(request);
+    final result = await repo.updatePublicProfile(request);
 
     if (!ref.mounted) return result;
     _serverSnapshot = result.storefront;
@@ -88,15 +73,10 @@ class PublicProfileEditNotifier
   /// Force-refetches from the API.
   Future<void> refreshData() async {
     state = const AsyncValue.loading();
-    final repo = ref.read(
-      publicProfileRepositoryProvider,
-    );
-    final result = await AsyncValue.guard(
-      repo.getPublicProfile,
-    );
+    final repo = ref.read(publicProfileRepositoryProvider);
+    final result = await AsyncValue.guard(repo.getPublicProfile);
     if (!ref.mounted) return;
-    if (result is AsyncData<
-        PartnerPublicProfileEntity>) {
+    if (result is AsyncData<PartnerPublicProfileEntity>) {
       _serverSnapshot = result.value.storefront;
       _draft = result.value.storefront;
     }
@@ -105,8 +85,7 @@ class PublicProfileEditNotifier
 
   /// Builds a request containing only the fields
   /// that differ from the server snapshot.
-  PublicProfileUpdateRequest
-      _buildPartialRequest() {
+  PublicProfileUpdateRequest _buildPartialRequest() {
     final snap = _serverSnapshot;
     final d = _draft;
     if (snap == null || d == null) {
@@ -114,33 +93,19 @@ class PublicProfileEditNotifier
     }
 
     return PublicProfileUpdateRequest(
-      coverImageUrl:
-          d.coverImageUrl != snap.coverImageUrl
-              ? d.coverImageUrl
-              : null,
-      logoImageUrl:
-          d.logoImageUrl != snap.logoImageUrl
-              ? d.logoImageUrl
-              : null,
-      description:
-          d.description != snap.description
-              ? d.description
-              : null,
-      gallery: _listsDiffer(d.gallery, snap.gallery)
-          ? d.gallery
+      coverImageUrl: d.coverImageUrl != snap.coverImageUrl
+          ? d.coverImageUrl
           : null,
-      certifications:
-          _certsDiffer(d.certifications,
-                  snap.certifications)
-              ? d.certifications
-              : null,
+      logoImageUrl: d.logoImageUrl != snap.logoImageUrl ? d.logoImageUrl : null,
+      description: d.description != snap.description ? d.description : null,
+      gallery: _listsDiffer(d.gallery, snap.gallery) ? d.gallery : null,
+      certifications: _certsDiffer(d.certifications, snap.certifications)
+          ? d.certifications
+          : null,
     );
   }
 
-  bool _listsDiffer(
-    List<String> a,
-    List<String> b,
-  ) {
+  bool _listsDiffer(List<String> a, List<String> b) {
     if (a.length != b.length) return true;
     for (var i = 0; i < a.length; i++) {
       if (a[i] != b[i]) return true;

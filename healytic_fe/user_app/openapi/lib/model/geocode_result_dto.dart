@@ -19,6 +19,7 @@ class GeocodeResultDto {
     this.placeId,
   });
 
+
   num lat;
 
   num lng;

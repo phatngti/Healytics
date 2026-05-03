@@ -23,7 +23,7 @@ class OrdersPage extends HookConsumerWidget {
     // screen access; only re-renders when data
     // has actually changed.
     useEffect(() {
-      ref.read(appointmentsProvider.notifier).silentRefresh();
+      ref.read(filteredAppointmentsProvider.notifier).silentRefresh();
       return null;
     }, const []);
 

@@ -166,8 +166,7 @@ abstract class DoctorEntity with _$DoctorEntity implements EmployeeEntity {
     int? experienceYears,
     double? consultationFee,
     String? description,
-    @Default([])
-    List<VerificationDocumentEntry> verificationDocuments,
+    @Default([]) List<VerificationDocumentEntry> verificationDocuments,
     @Default([]) List<EmployeeSchedule> workSchedule,
     @Default([]) List<WorkHistoryEntry> workHistory,
     String? dateOfBirth,
@@ -216,8 +215,7 @@ abstract class SpaTherapistEntity
     String? therapistLevel,
     String? healthCheckDate,
     String? description,
-    @Default([])
-    List<VerificationDocumentEntry> verificationDocuments,
+    @Default([]) List<VerificationDocumentEntry> verificationDocuments,
     @Default([]) List<EmployeeSchedule> workSchedule,
     @Default([]) List<WorkHistoryEntry> workHistory,
     String? dateOfBirth,
@@ -266,8 +264,7 @@ abstract class MassageTherapistEntity
     String? therapistLevel,
     String? healthCheckDate,
     String? description,
-    @Default([])
-    List<VerificationDocumentEntry> verificationDocuments,
+    @Default([]) List<VerificationDocumentEntry> verificationDocuments,
     @Default([]) List<EmployeeSchedule> workSchedule,
     @Default([]) List<WorkHistoryEntry> workHistory,
     String? dateOfBirth,
@@ -310,8 +307,7 @@ abstract class BasicEmployeeEntity
     required String state,
     required String country,
     String? description,
-    @Default([])
-    List<VerificationDocumentEntry> verificationDocuments,
+    @Default([]) List<VerificationDocumentEntry> verificationDocuments,
     @Default([]) List<EmployeeSchedule> workSchedule,
     @Default([]) List<WorkHistoryEntry> workHistory,
     String? dateOfBirth,

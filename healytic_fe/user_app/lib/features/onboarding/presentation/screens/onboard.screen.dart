@@ -18,7 +18,6 @@ class OnboardScreen extends HookConsumerWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,

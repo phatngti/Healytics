@@ -12,6 +12,7 @@ import { RedisIoAdapter } from '@/common/adapters/redis-io.adapter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+    rawBody: true, // Required for Stripe webhook signature verification
   });
 
   // app.use(
@@ -30,6 +31,7 @@ async function bootstrap() {
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
     password: process.env.REDIS_PASSWORD || undefined,
     username: process.env.REDIS_USERNAME || undefined,
+    tls: process.env.REDIS_TLS === 'true',
   });
   app.useWebSocketAdapter(redisIoAdapter);
 

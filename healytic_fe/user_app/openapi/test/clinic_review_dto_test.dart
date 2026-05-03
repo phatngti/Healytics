@@ -38,7 +38,7 @@ void main() {
     });
 
     // null for MVP
-    // Object memberBadge
+    // String memberBadge
     test('to test the property `memberBadge`', () async {
       // TODO
     });
@@ -48,12 +48,12 @@ void main() {
       // TODO
     });
 
-    // Object serviceName
+    // String serviceName
     test('to test the property `serviceName`', () async {
       // TODO
     });
 
-    // Object serviceIcon
+    // String serviceIcon
     test('to test the property `serviceIcon`', () async {
       // TODO
     });

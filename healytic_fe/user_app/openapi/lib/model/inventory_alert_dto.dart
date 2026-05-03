@@ -21,6 +21,7 @@ class InventoryAlertDto {
     this.severity = const InventoryAlertDtoSeverityEnum._('warning'),
   });
 
+
   String id;
 
   String productName;

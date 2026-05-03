@@ -19,6 +19,7 @@ class WorkScheduleEntryDto {
     required this.isWorking,
   });
 
+
   /// Day of the week
   WorkScheduleEntryDtoDayEnum day;
 

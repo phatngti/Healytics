@@ -21,6 +21,7 @@ class RecommendedServiceResponseDto {
     required this.duration,
   });
 
+
   String id;
 
   String name;

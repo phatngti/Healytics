@@ -23,6 +23,7 @@ class RegisterPartnerResponseDto {
     required this.refreshExpiresIn,
   });
 
+
   /// ID of the created partner account
   String accountId;
 

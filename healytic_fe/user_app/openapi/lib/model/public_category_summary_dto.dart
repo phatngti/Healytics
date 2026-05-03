@@ -18,6 +18,7 @@ class PublicCategorySummaryDto {
     required this.slug,
   });
 
+
   String id;
 
   String name;

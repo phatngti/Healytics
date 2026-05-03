@@ -25,6 +25,7 @@ class CheckoutTicketResponseDto {
     required this.updatedAt,
   });
 
+
   /// Ticket ID (same as ticket_id in webhook)
   String id;
 
@@ -45,7 +46,7 @@ class CheckoutTicketResponseDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  Object? bookingId;
+  String? bookingId;
 
   /// Error message when checkout fails
   ///
@@ -54,7 +55,7 @@ class CheckoutTicketResponseDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  Object? errorMessage;
+  String? errorMessage;
 
   DateTime createdAt;
 
@@ -138,8 +139,8 @@ class CheckoutTicketResponseDto {
         startTime: mapDateTime(json, r'startTime', r'')!,
         status: CheckoutTicketResponseDtoStatusEnum.fromJson(json[r'status'])!,
         idempotencyKey: mapValueOfType<String>(json, r'idempotencyKey')!,
-        bookingId: mapValueOfType<Object>(json, r'bookingId'),
-        errorMessage: mapValueOfType<Object>(json, r'errorMessage'),
+        bookingId: mapValueOfType<String>(json, r'bookingId'),
+        errorMessage: mapValueOfType<String>(json, r'errorMessage'),
         createdAt: mapDateTime(json, r'createdAt', r'')!,
         updatedAt: mapDateTime(json, r'updatedAt', r'')!,
       );

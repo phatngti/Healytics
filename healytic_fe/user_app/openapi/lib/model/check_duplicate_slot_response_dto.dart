@@ -18,6 +18,7 @@ class CheckDuplicateSlotResponseDto {
     this.conflictingBookingId,
   });
 
+
   /// Whether a conflicting booking exists at this datetime
   bool isDuplicate;
 

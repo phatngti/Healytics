@@ -22,6 +22,7 @@ class UserEligibilityDetailResponseDto {
     required this.priceBreakdown,
   });
 
+
   bool isCompletedStep;
 
   ///

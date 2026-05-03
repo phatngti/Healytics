@@ -65,7 +65,7 @@ Get Conversations
 import 'package:admin_openapi/api.dart';
 
 final api_instance = ChatbotApi();
-final userId = userId_example; // String | 
+final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Account / user UUID
 final page = 56; // int | 
 final limit = 56; // int | 
 
@@ -81,7 +81,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **userId** | **String**|  | 
+ **userId** | **String**| Account / user UUID | 
  **page** | **int**|  | [optional] [default to 1]
  **limit** | **int**|  | [optional] [default to 10]
 
@@ -111,7 +111,7 @@ import 'package:admin_openapi/api.dart';
 
 final api_instance = ChatbotApi();
 final conversationId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final userId = userId_example; // String | 
+final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Must match conversation owner
 final page = 56; // int | 
 final limit = 56; // int | 
 
@@ -128,7 +128,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **conversationId** | **String**|  | 
- **userId** | **String**|  | [optional] 
+ **userId** | **String**| Must match conversation owner | [optional] 
  **page** | **int**|  | [optional] [default to 1]
  **limit** | **int**|  | [optional] [default to 20]
 

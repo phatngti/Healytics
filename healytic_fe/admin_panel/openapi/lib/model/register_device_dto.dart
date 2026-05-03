@@ -17,11 +17,11 @@ class RegisterDeviceDto {
     required this.platform,
   });
 
+
   /// FCM or APNs device token
   String token;
 
-  /// Device platform
-  RegisterDeviceDtoPlatformEnum platform;
+  DevicePlatform platform;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is RegisterDeviceDto &&
@@ -64,7 +64,7 @@ class RegisterDeviceDto {
 
       return RegisterDeviceDto(
         token: mapValueOfType<String>(json, r'token')!,
-        platform: RegisterDeviceDtoPlatformEnum.fromJson(json[r'platform'])!,
+        platform: DevicePlatform.fromJson(json[r'platform'])!,
       );
     }
     return null;
@@ -116,78 +116,4 @@ class RegisterDeviceDto {
     'platform',
   };
 }
-
-/// Device platform
-class RegisterDeviceDtoPlatformEnum {
-  /// Instantiate a new enum with the provided [value].
-  const RegisterDeviceDtoPlatformEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const ios = RegisterDeviceDtoPlatformEnum._(r'ios');
-  static const android = RegisterDeviceDtoPlatformEnum._(r'android');
-
-  /// List of all possible values in this [enum][RegisterDeviceDtoPlatformEnum].
-  static const values = <RegisterDeviceDtoPlatformEnum>[
-    ios,
-    android,
-  ];
-
-  static RegisterDeviceDtoPlatformEnum? fromJson(dynamic value) => RegisterDeviceDtoPlatformEnumTypeTransformer().decode(value);
-
-  static List<RegisterDeviceDtoPlatformEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <RegisterDeviceDtoPlatformEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = RegisterDeviceDtoPlatformEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [RegisterDeviceDtoPlatformEnum] to String,
-/// and [decode] dynamic data back to [RegisterDeviceDtoPlatformEnum].
-class RegisterDeviceDtoPlatformEnumTypeTransformer {
-  factory RegisterDeviceDtoPlatformEnumTypeTransformer() => _instance ??= const RegisterDeviceDtoPlatformEnumTypeTransformer._();
-
-  const RegisterDeviceDtoPlatformEnumTypeTransformer._();
-
-  String encode(RegisterDeviceDtoPlatformEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a RegisterDeviceDtoPlatformEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  RegisterDeviceDtoPlatformEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'ios': return RegisterDeviceDtoPlatformEnum.ios;
-        case r'android': return RegisterDeviceDtoPlatformEnum.android;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [RegisterDeviceDtoPlatformEnumTypeTransformer] instance.
-  static RegisterDeviceDtoPlatformEnumTypeTransformer? _instance;
-}
-
 

@@ -25,54 +25,112 @@ enum AppointmentViewLayout {
 }
 
 // ─── Tab indices ───────────────────────────────────
-/// 0 = Upcoming, 1 = Completed, 2 = Canceled
-const kTabUpcoming = 0;
-const kTabCompleted = 1;
-const kTabCanceled = 2;
+/// 0 = Pending Payment, 1 = Upcoming,
+/// 2 = Completed, 3 = Canceled
+const kTabPendingPayment = 0;
+const kTabUpcoming = 1;
+const kTabCompleted = 2;
+const kTabCanceled = 3;
 
-const _statusByTab = ['upcoming', 'completed', 'canceled'];
+const _statusByTab = [
+  'pending_payment',
+  'upcoming',
+  'completed',
+  'canceled',
+];
 
 // ─── Data providers ────────────────────────────────
 
-/// Fetches all appointments from the repository
-/// and exposes a [silentRefresh] for background
-/// reload without redundant re-renders.
+/// Fetches appointments filtered by the current
+/// tab (status) and category selection using
+/// server-side filtering.
 @riverpod
-class AppointmentsNotifier extends _$AppointmentsNotifier {
-  static const _eq = ListEquality<AppointmentEntity>();
-
+class FilteredAppointmentsNotifier
+    extends _$FilteredAppointmentsNotifier {
   @override
   Future<List<AppointmentEntity>> build() async {
-    final repo = ref.watch(appointmentRepositoryProvider);
-    return repo.getAppointments();
+    final repo = ref.watch(
+      appointmentRepositoryProvider,
+    );
+    final tab = ref.watch(selectedTabProvider);
+    final categoryId = ref.watch(
+      selectedCategoryProvider,
+    );
+
+    final status = _statusByTab[tab];
+    final resolvedCategory =
+        categoryId == 'cat-all'
+            ? null
+            : categoryId.replaceFirst('cat-', '');
+
+    return repo.getAppointments(
+      status: status,
+      categoryId: resolvedCategory,
+    );
   }
 
   /// Re-fetches from the API and updates state
   /// only when the data has actually changed.
   Future<void> silentRefresh() async {
-    final repo = ref.read(appointmentRepositoryProvider);
-    final fresh = await repo.getAppointments();
+    final repo = ref.read(
+      appointmentRepositoryProvider,
+    );
+    final tab = ref.read(selectedTabProvider);
+    final categoryId = ref.read(
+      selectedCategoryProvider,
+    );
+
+    final status = _statusByTab[tab];
+    final resolvedCategory =
+        categoryId == 'cat-all'
+            ? null
+            : categoryId.replaceFirst('cat-', '');
+
+    final fresh = await repo.getAppointments(
+      status: status,
+      categoryId: resolvedCategory,
+    );
     final current = state.value;
 
-    if (current == null || !_eq.equals(current, fresh)) {
+    if (current == null ||
+        !_eq.equals(current, fresh)) {
       state = AsyncData(fresh);
     }
   }
+
+  static const _eq =
+      ListEquality<AppointmentEntity>();
+}
+
+/// Legacy-compatible alias. Widgets that still
+/// reference [appointmentsProvider] will get the
+/// same filtered data.
+@riverpod
+Future<List<AppointmentEntity>> appointments(
+  Ref ref,
+) {
+  return ref.watch(
+    filteredAppointmentsProvider.future,
+  );
 }
 
 /// Fetches appointment category filters.
 @riverpod
-Future<List<AppointmentCategory>> appointmentCategories(Ref ref) async {
-  final repo = ref.watch(appointmentRepositoryProvider);
+Future<List<AppointmentCategory>>
+    appointmentCategories(Ref ref) async {
+  final repo = ref.watch(
+    appointmentRepositoryProvider,
+  );
   return repo.getCategories();
 }
 
 /// Fetches recommended services.
 @riverpod
-Future<List<RecommendedServiceEntity>> appointmentRecommendations(
-  Ref ref,
-) async {
-  final repo = ref.watch(appointmentRepositoryProvider);
+Future<List<RecommendedServiceEntity>>
+    appointmentRecommendations(Ref ref) async {
+  final repo = ref.watch(
+    appointmentRepositoryProvider,
+  );
   return repo.getRecommendations();
 }
 
@@ -90,41 +148,27 @@ class SelectedTabNotifier extends _$SelectedTabNotifier {
 
 /// Holds the currently selected category id.
 @riverpod
-class SelectedCategoryNotifier extends _$SelectedCategoryNotifier {
+class SelectedCategoryNotifier
+    extends _$SelectedCategoryNotifier {
   @override
   String build() => 'cat-all';
 
   /// Updates the active category.
-  void select(String categoryId) => state = categoryId;
+  void select(String categoryId) =>
+      state = categoryId;
 }
 
 /// Holds the currently selected layout view mode.
 @riverpod
-class SelectedViewLayoutNotifier extends _$SelectedViewLayoutNotifier {
+class SelectedViewLayoutNotifier
+    extends _$SelectedViewLayoutNotifier {
   @override
-  AppointmentViewLayout build() => AppointmentViewLayout.card;
+  AppointmentViewLayout build() =>
+      AppointmentViewLayout.card;
 
   /// Switches the appointment list layout.
-  void select(AppointmentViewLayout layout) => state = layout;
-}
-
-/// Derived provider that filters appointments by
-/// the current tab and category selection.
-@riverpod
-Future<List<AppointmentEntity>> filteredAppointments(Ref ref) async {
-  final all = await ref.watch(appointmentsProvider.future);
-  final tab = ref.watch(selectedTabProvider);
-  final categoryId = ref.watch(selectedCategoryProvider);
-
-  final statusFilter = _statusByTab[tab];
-
-  return all.where((apt) {
-    final matchesStatus = apt.status.toLowerCase() == statusFilter;
-    final matchesCategory =
-        categoryId == 'cat-all' ||
-        apt.category == categoryId.replaceFirst('cat-', '');
-    return matchesStatus && matchesCategory;
-  }).toList();
+  void select(AppointmentViewLayout layout) =>
+      state = layout;
 }
 
 /// Fetches a single appointment by its [id].

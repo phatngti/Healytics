@@ -123,7 +123,6 @@ class _ClinicInfoBodyState extends State<_ClinicInfoBody>
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       body: Stack(
         children: [
           // ── Main scrollable content ──

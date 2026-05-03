@@ -28,6 +28,7 @@ class PublicHealthServiceInfoResponseDto {
     this.serviceTags = const [],
   });
 
+
   String id;
 
   String title;
@@ -44,13 +45,7 @@ class PublicHealthServiceInfoResponseDto {
 
   bool isVerified;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? description;
+  String? description;
 
   List<PublicFeatureTagDto> featureTags;
 
@@ -147,7 +142,7 @@ class PublicHealthServiceInfoResponseDto {
         reviewCount: num.parse('${json[r'reviewCount']}'),
         price: mapValueOfType<String>(json, r'price')!,
         isVerified: mapValueOfType<bool>(json, r'isVerified')!,
-        description: mapValueOfType<Object>(json, r'description'),
+        description: mapValueOfType<String>(json, r'description'),
         featureTags: PublicFeatureTagDto.listFromJson(json[r'featureTags']),
         clinic: PublicClinicDto.fromJson(json[r'clinic'])!,
         facilityImages: PublicFacilityImageDto.listFromJson(json[r'facilityImages']),

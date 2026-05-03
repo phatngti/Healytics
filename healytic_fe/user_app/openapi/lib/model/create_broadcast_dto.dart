@@ -18,6 +18,7 @@ class CreateBroadcastDto {
     this.data,
   });
 
+
   /// Broadcast title
   String title;
 

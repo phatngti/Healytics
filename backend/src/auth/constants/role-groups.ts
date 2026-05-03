@@ -17,3 +17,6 @@ export const ALL_ROLES: Role[] = [
 
 // User-only roles - mobile app users
 export const USER_ROLES: Role[] = [Role.USER];
+
+// Employee-only roles - employee app users
+export const EMPLOYEE_ROLES: Role[] = [Role.EMPLOYEE];

@@ -22,64 +22,69 @@ export class PaymentTransactionLogSeeder implements ISeeder {
   async seed(): Promise<void> {
     this.logger.log('Seeding payment transaction logs...');
 
-    const [paidPayment, unpaidPayment, refundPayment] = await Promise.all([
-      this.paymentRepo.findOne({
-        where: { paymentStatus: PaymentStatus.PAID },
-        order: { createdAt: 'ASC' },
-      }),
-      this.paymentRepo.findOne({
-        where: { paymentStatus: PaymentStatus.UNPAID },
-        order: { createdAt: 'ASC' },
-      }),
-      this.paymentRepo.findOne({
-        where: { paymentStatus: PaymentStatus.REFUND },
-        order: { createdAt: 'ASC' },
-      }),
-    ]);
+    const payments = await this.paymentRepo.find({
+      order: { createdAt: 'ASC' },
+      take: 40,
+    });
 
-    if (unpaidPayment) {
-      await this.createLogIfMissing({
-        paymentId: unpaidPayment.id,
-        action: TransactionAction.CREATE_PAYMENT,
-        actor: seedKey(SEED_MARKERS.paymentLogActor, 'UNPAID_CREATE'),
-        message: 'Seeded unpaid payment creation event',
-      });
+    if (!payments.length) {
+      this.logger.warn('  ⚠ No payments found — skipping transaction logs');
+      return;
     }
 
-    if (paidPayment) {
+    for (const payment of payments) {
+      const suffix = `${payment.paymentStatus}_${payment.id.slice(0, 8)}`;
       await this.createLogIfMissing({
-        paymentId: paidPayment.id,
+        paymentId: payment.id,
         action: TransactionAction.CREATE_PAYMENT,
-        actor: seedKey(SEED_MARKERS.paymentLogActor, 'PAID_CREATE'),
-        message: 'Seeded paid payment creation event',
+        actor: seedKey(SEED_MARKERS.paymentLogActor, `${suffix}_CREATE`),
+        message: `Seeded ${payment.paymentStatus} payment creation event`,
       });
-      await this.createLogIfMissing({
-        paymentId: paidPayment.id,
-        action: TransactionAction.IPN_RECEIVED,
-        actor: seedKey(SEED_MARKERS.paymentLogActor, 'PAID_IPN_RECEIVED'),
-        message: 'Seeded IPN callback received',
-      });
-      await this.createLogIfMissing({
-        paymentId: paidPayment.id,
-        action: TransactionAction.IPN_VERIFIED,
-        actor: seedKey(SEED_MARKERS.paymentLogActor, 'PAID_IPN_VERIFIED'),
-        message: 'Seeded IPN signature verified',
-      });
-    }
 
-    if (refundPayment) {
-      await this.createLogIfMissing({
-        paymentId: refundPayment.id,
-        action: TransactionAction.REFUND_REQUESTED,
-        actor: seedKey(SEED_MARKERS.paymentLogActor, 'REFUND_REQUESTED'),
-        message: 'Seeded refund request',
-      });
-      await this.createLogIfMissing({
-        paymentId: refundPayment.id,
-        action: TransactionAction.REFUND_CONFIRMED,
-        actor: seedKey(SEED_MARKERS.paymentLogActor, 'REFUND_CONFIRMED'),
-        message: 'Seeded refund confirmation',
-      });
+      if (
+        payment.paymentStatus === PaymentStatus.PAID ||
+        payment.paymentStatus === PaymentStatus.DEPOSITED
+      ) {
+        await this.createLogIfMissing({
+          paymentId: payment.id,
+          action: TransactionAction.IPN_RECEIVED,
+          actor: seedKey(
+            SEED_MARKERS.paymentLogActor,
+            `${suffix}_IPN_RECEIVED`,
+          ),
+          message: 'Seeded payment confirmation callback received',
+        });
+        await this.createLogIfMissing({
+          paymentId: payment.id,
+          action: TransactionAction.IPN_VERIFIED,
+          actor: seedKey(
+            SEED_MARKERS.paymentLogActor,
+            `${suffix}_IPN_VERIFIED`,
+          ),
+          message: 'Seeded payment confirmation signature verified',
+        });
+      }
+
+      if (payment.paymentStatus === PaymentStatus.REFUND) {
+        await this.createLogIfMissing({
+          paymentId: payment.id,
+          action: TransactionAction.REFUND_REQUESTED,
+          actor: seedKey(
+            SEED_MARKERS.paymentLogActor,
+            `${suffix}_REFUND_REQUESTED`,
+          ),
+          message: 'Seeded refund request',
+        });
+        await this.createLogIfMissing({
+          paymentId: payment.id,
+          action: TransactionAction.REFUND_CONFIRMED,
+          actor: seedKey(
+            SEED_MARKERS.paymentLogActor,
+            `${suffix}_REFUND_CONFIRMED`,
+          ),
+          message: 'Seeded refund confirmation',
+        });
+      }
     }
 
     this.logger.log('Payment transaction log seeding completed');
@@ -133,6 +138,8 @@ export class PaymentTransactionLogSeeder implements ISeeder {
       return;
     }
 
-    this.logger.log(`🗑️ Hard-deleted ${affected} seed payment transaction log(s)`);
+    this.logger.log(
+      `🗑️ Hard-deleted ${affected} seed payment transaction log(s)`,
+    );
   }
 }

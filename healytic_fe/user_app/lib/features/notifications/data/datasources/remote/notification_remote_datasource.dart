@@ -52,21 +52,16 @@ abstract class NotificationRemoteDatasource {
 /// - PATCH  /v1/user/notifications/:id/read
 /// - PATCH  /v1/user/notifications/read-all
 ///
-/// Device token registration (POST /v1/user/devices
-/// and DELETE /v1/user/devices/:token) falls back to
-/// direct HTTP calls because they live under a
-/// separate controller not yet in the OpenAPI spec.
+/// Device registration uses [UserDevicesApi]:
+/// - POST   /v1/user/devices
+/// - DELETE /v1/user/devices/:token
 class NotificationRemoteDatasourceImpl implements NotificationRemoteDatasource {
   NotificationRemoteDatasourceImpl(this._apiService);
   final ApiService _apiService;
 
   UserNotificationsApi get _api => _apiService.userNotificationsApi;
 
-  // ── Helpers ──────────────────────────────────────
-
-  String get _basePath => _apiService.clientFor(ServicePrefix.backend).basePath;
-
-  Map<String, String> get _headers => ApiService.getRequestHeaders();
+  UserDevicesApi get _devicesApi => _apiService.userDevicesApi;
 
   // ── Methods ──────────────────────────────────────
 
@@ -127,9 +122,18 @@ class NotificationRemoteDatasourceImpl implements NotificationRemoteDatasource {
   @override
   Future<void> markRead(String notificationId) async {
     try {
-      await _api.userNotificationControllerMarkRead(notificationId);
+      final response = await _api
+          .userNotificationControllerMarkReadWithHttpInfo(notificationId);
+
+      if (response.statusCode != 204 && response.statusCode != 200) {
+        throw ApiException(
+          response.statusCode,
+          'markRead failed: ${response.body}',
+        );
+      }
     } catch (e, s) {
       _log.warning('markRead error', e, s);
+      rethrow;
     }
   }
 
@@ -140,11 +144,10 @@ class NotificationRemoteDatasourceImpl implements NotificationRemoteDatasource {
           .userNotificationControllerMarkAllReadWithHttpInfo();
 
       if (response.statusCode != 200) {
-        _log.warning(
-          'markAllRead failed: '
-          '${response.statusCode}',
+        throw ApiException(
+          response.statusCode,
+          'markAllRead failed: ${response.body}',
         );
-        return 0;
       }
 
       final json = jsonDecode(response.body) as Map<String, dynamic>;
@@ -153,7 +156,7 @@ class NotificationRemoteDatasourceImpl implements NotificationRemoteDatasource {
       return 0;
     } catch (e, s) {
       _log.severe('markAllRead error', e, s);
-      return 0;
+      rethrow;
     }
   }
 
@@ -162,27 +165,12 @@ class NotificationRemoteDatasourceImpl implements NotificationRemoteDatasource {
     required String token,
     required String platform,
   }) async {
-    // Device registration lives in a separate
-    // controller not exposed via UserNotificationsApi.
-    // Falls back to a direct HTTP call.
-    final uri = Uri.parse('$_basePath/v1/user/devices');
-
     try {
-      final response = await _apiService
-          .clientFor(ServicePrefix.backend)
-          .client
-          .post(
-            uri,
-            headers: {..._headers, 'Content-Type': 'application/json'},
-            body: jsonEncode({'token': token, 'platform': platform}),
-          );
-
-      if (response.statusCode != 201) {
-        _log.warning(
-          'registerDevice failed: '
-          '${response.statusCode}',
-        );
-      }
+      final dto = RegisterDeviceDto(
+        token: token,
+        platform: _mapPlatform(platform),
+      );
+      await _devicesApi.userDeviceControllerRegisterDevice(dto);
     } catch (e, s) {
       _log.severe('registerDevice error', e, s);
     }
@@ -190,26 +178,24 @@ class NotificationRemoteDatasourceImpl implements NotificationRemoteDatasource {
 
   @override
   Future<void> unregisterDevice(String token) async {
-    final uri = Uri.parse('$_basePath/v1/user/devices/$token');
-
     try {
-      final response = await _apiService
-          .clientFor(ServicePrefix.backend)
-          .client
-          .delete(uri, headers: _headers);
-
-      if (response.statusCode != 204) {
-        _log.warning(
-          'unregisterDevice failed: '
-          '${response.statusCode}',
-        );
-      }
+      await _devicesApi.userDeviceControllerUnregisterDevice(token);
     } catch (e, s) {
       _log.severe('unregisterDevice error', e, s);
     }
   }
 
   // ── DTO → Entity mappers ──────────────────────────
+
+  /// Maps a platform string to the OpenAPI
+  /// [DevicePlatform] enum.
+  DevicePlatform _mapPlatform(String platform) {
+    return switch (platform.toLowerCase()) {
+      'ios' => DevicePlatform.ios,
+      'android' => DevicePlatform.android,
+      _ => DevicePlatform.android,
+    };
+  }
 
   NotificationPage _mapNotificationPage(Map<String, dynamic> json) {
     final list =

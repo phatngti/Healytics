@@ -33,7 +33,7 @@ void main() {
 
     // List all user appointments with optional distance calculation
     //
-    //Future<List<AppointmentResponseDto>> userAppointmentControllerListAppointments({ num latitude, num longitude }) async
+    //Future<List<AppointmentResponseDto>> userAppointmentControllerListAppointments({ num latitude, num longitude, String status, String categoryId, String sortBy }) async
     test('test userAppointmentControllerListAppointments', () async {
       // TODO
     });

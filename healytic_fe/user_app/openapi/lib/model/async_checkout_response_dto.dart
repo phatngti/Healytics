@@ -18,6 +18,7 @@ class AsyncCheckoutResponseDto {
     required this.message,
   });
 
+
   /// Unique ticket ID for tracking
   String ticketId;
 

@@ -12,44 +12,44 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
  * | clientsLabel     | unique booking users across products             | ClinicTrustMetrics.clientsLabel    |
  */
 export class ClinicTrustMetricsDto {
-  @ApiProperty({ example: 4.9 })
+  @ApiProperty({ type: Number, example: 4.9 })
   rating: number;
 
-  @ApiProperty({ example: 2500 })
+  @ApiProperty({ type: Number, example: 2500 })
   reviewCount: number;
 
-  @ApiProperty({ example: '5+ Yrs' })
+  @ApiProperty({ type: String, example: '5+ Yrs' })
   experienceLabel: string;
 
-  @ApiProperty({ example: '15k' })
+  @ApiProperty({ type: String, example: '15k' })
   clientsLabel: string;
 }
 
 export class ClinicCertificationDto {
-  @ApiProperty({ example: 'ISO 9001:2015' })
+  @ApiProperty({ type: String, example: 'ISO 9001:2015' })
   title: string;
 
-  @ApiPropertyOptional({ example: 'Quality Management' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'Quality Management' })
   subtitle: string | null;
 
-  @ApiProperty({ example: 'workspace_premium' })
+  @ApiProperty({ type: String, example: 'workspace_premium' })
   iconName: string;
 }
 
 export class ClinicSpecialistPreviewDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   id: string;
 
-  @ApiProperty({ example: 'Dr. Sarah' })
+  @ApiProperty({ type: String, example: 'Dr. Sarah' })
   name: string;
 
-  @ApiProperty({ example: 'Senior Therapist' })
+  @ApiProperty({ type: String, example: 'Senior Therapist' })
   role: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   imageUrl: string | null;
 
-  @ApiPropertyOptional({ example: '5 Yrs Exp' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: '5 Yrs Exp' })
   experienceLabel: string | null;
 }
 
@@ -75,28 +75,28 @@ export class ClinicSpecialistPreviewDto {
  * | phoneNumber    | Partner.phoneNumber                     | clinic_phone (dedicated field)|
  */
 export class ClinicInfoResponseDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   id: string;
 
-  @ApiProperty({ example: 'Healytics Wellness Center' })
+  @ApiProperty({ type: String, example: 'Healytics Wellness Center' })
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   coverImageUrl: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   logoImageUrl: string | null;
 
   @ApiProperty({ type: [String] })
   gallery: string[];
 
-  @ApiProperty({ example: '15k' })
+  @ApiProperty({ type: String, example: '15k' })
   followersLabel: string;
 
-  @ApiProperty({ example: '2.5k' })
+  @ApiProperty({ type: String, example: '2.5k' })
   reviewsLabel: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   description: string | null;
 
   @ApiProperty({ type: ClinicTrustMetricsDto })
@@ -111,9 +111,9 @@ export class ClinicInfoResponseDto {
   @ApiProperty({ type: [String] })
   businessTypes: string[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   address: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   phoneNumber: string | null;
 }

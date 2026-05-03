@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 /// Read-only card showing contact and visibility
 /// info (phone, email, username).
 class ContactCardWidget extends StatelessWidget {
-  const ContactCardWidget({
-    required this.info,
-    super.key,
-  });
+  const ContactCardWidget({required this.info, super.key});
 
   final PublicProfileBusinessInfo info;
 
@@ -17,9 +14,8 @@ class ContactCardWidget extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    final hasContact = info.phoneNumber != null ||
-        info.email != null ||
-        info.username != null;
+    final hasContact =
+        info.phoneNumber != null || info.email != null || info.username != null;
 
     if (!hasContact) return const SizedBox.shrink();
 
@@ -27,8 +23,7 @@ class ContactCardWidget extends StatelessWidget {
       child: Padding(
         padding: AppDimens.paddingAllLarge,
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
@@ -40,41 +35,31 @@ class ContactCardWidget extends StatelessWidget {
                 AppDimens.horizontalSmall,
                 Text(
                   'Contact & Visibility',
-                  style: tt.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: tt.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: AppDimens.spaceSm,
                     vertical: AppDimens.spaceXxs,
                   ),
                   decoration: BoxDecoration(
-                    color: cs
-                        .surfaceContainerHighest,
-                    borderRadius:
-                        AppDimens.radiusSmall,
+                    color: cs.surfaceContainerHighest,
+                    borderRadius: AppDimens.radiusSmall,
                   ),
                   child: Row(
-                    mainAxisSize:
-                        MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons
-                            .lock_outline_rounded,
+                        Icons.lock_outline_rounded,
                         size: AppDimens.iconXs,
-                        color: cs
-                            .onSurfaceVariant,
+                        color: cs.onSurfaceVariant,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         'Read-only',
-                        style: tt.labelSmall
-                            ?.copyWith(
-                          color: cs
-                              .onSurfaceVariant,
+                        style: tt.labelSmall?.copyWith(
+                          color: cs.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -97,8 +82,7 @@ class ContactCardWidget extends StatelessWidget {
               ),
             if (info.username != null)
               _ContactRow(
-                icon: Icons
-                    .alternate_email_rounded,
+                icon: Icons.alternate_email_rounded,
                 label: 'Username',
                 value: '@${info.username!}',
               ),
@@ -126,26 +110,17 @@ class _ContactRow extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.only(
-        bottom: AppDimens.spaceSm,
-      ),
+      padding: const EdgeInsets.only(bottom: AppDimens.spaceSm),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: AppDimens.iconSmMd,
-            color: cs.onSurfaceVariant,
-          ),
+          Icon(icon, size: AppDimens.iconSmMd, color: cs.onSurfaceVariant),
           AppDimens.horizontalSmall,
           Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: tt.labelSmall?.copyWith(
-                  color: cs.onSurfaceVariant,
-                ),
+                style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant),
               ),
               Text(value, style: tt.bodyMedium),
             ],

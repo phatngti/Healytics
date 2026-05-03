@@ -9,7 +9,7 @@ import 'package:admin_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **title** | **String** |  | 
-**subtitle** | [**Object**](.md) |  | [optional] 
+**subtitle** | **String** |  | [optional] 
 **iconName** | **String** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -1,3 +1,4 @@
+import 'package:common/common.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
@@ -14,10 +15,12 @@ class ClinicCard extends StatelessWidget {
     this.onTap,
     this.onVisit,
     this.onFavorite,
+    this.avatar,
   });
 
   final String clinicName;
   final String address;
+  final String? avatar;
   final VoidCallback? onTap;
   final VoidCallback? onVisit;
   final VoidCallback? onFavorite;
@@ -67,13 +70,10 @@ class ClinicCard extends StatelessWidget {
                       width: AppDimens.touchTarget,
                       height: AppDimens.touchTarget,
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withValues(alpha: 0.4),
+                        color: colorScheme.surface,
                         borderRadius: AppDimens.radiusSmall,
                       ),
-                      child: Icon(
-                        Icons.local_hospital,
-                        color: colorScheme.primary,
-                      ),
+                      child: NetworkImageAuto(imageUrl: avatar!),
                     ),
                     AppDimens.horizontalSmall,
                     // Name + address

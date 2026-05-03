@@ -1,8 +1,11 @@
-import 'package:admin_panel/features/partner/dashboard/domain/dashboard_notification.entity.dart';
-import 'package:admin_panel/features/partner/dashboard/presentation/widgets/dashboard_panel.widget.dart';
-import 'package:admin_panel/features/partner/dashboard/presentation/widgets/dashboard_section_header.widget.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../../domain/dashboard_notification.entity.dart';
+import 'dashboard_constants.dart';
+import 'dashboard_panel.widget.dart';
+import 'dashboard_section_header.widget.dart';
 
 /// Notification center panel for the dashboard.
 class NotificationCenterWidget extends StatelessWidget {
@@ -27,7 +30,7 @@ class NotificationCenterWidget extends StatelessWidget {
           else
             ...notifications.map(
               (n) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: AppDimens.spaceMd.paddingBottom,
                 child: _NotificationItem(notification: n),
               ),
             ),
@@ -52,9 +55,9 @@ class _NotificationItem extends StatelessWidget {
 
   Color _iconColor(ColorScheme colorScheme) => switch (notification.type) {
     'appointment' => colorScheme.primary,
-    'review' => const Color(0xFFFBBF24),
+    'review' => DashboardColors.starRating,
     'alert' => colorScheme.error,
-    'system' => const Color(0xFF0EA5E9),
+    'system' => DashboardColors.infoBlue,
     _ => colorScheme.onSurfaceVariant,
   };
 
@@ -76,27 +79,27 @@ class _NotificationItem extends StatelessWidget {
         : highlightColor.withValues(alpha: 0.30);
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppDimens.spaceMdLg),
       decoration: BoxDecoration(
         color: notification.isRead
             ? colorScheme.surfaceContainerLowest
             : highlightColor.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppDimens.radiusMediumSmall,
         border: Border.all(color: borderColor),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: DashboardSizes.iconContainer,
+            height: DashboardSizes.iconContainer,
             decoration: BoxDecoration(
               color: highlightColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppDimens.radiusMediumSmall,
             ),
-            child: Icon(_icon, size: 20, color: highlightColor),
+            child: Icon(_icon, size: AppDimens.iconMd, color: highlightColor),
           ),
-          const SizedBox(width: 12),
+          AppDimens.horizontalMediumSmall,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,14 +112,14 @@ class _NotificationItem extends StatelessWidget {
                         notification.title,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: notification.isRead
-                              ? FontWeight.w600
-                              : FontWeight.w700,
+                              ? AppDimens.fontWeightSemiBold
+                              : AppDimens.fontWeightBold,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    AppDimens.horizontalMediumSmall,
                     Text(
                       _formatTime(notification.createdAt),
                       style: theme.textTheme.labelMedium?.copyWith(
@@ -125,7 +128,7 @@ class _NotificationItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                AppDimens.verticalSmall,
                 Text(
                   notification.message,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -135,31 +138,31 @@ class _NotificationItem extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 10),
+                AppDimens.spaceSmMd.verticalSpace,
                 Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
+                        horizontal: AppDimens.spaceSmMd,
+                        vertical: AppDimens.spaceXs + 1,
                       ),
                       decoration: BoxDecoration(
                         color: highlightColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: AppDimens.radiusPill,
                       ),
                       child: Text(
                         _typeLabel,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: highlightColor,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: AppDimens.fontWeightBold,
                         ),
                       ),
                     ),
                     if (!notification.isRead) ...[
-                      const SizedBox(width: 8),
+                      AppDimens.horizontalSmall,
                       Container(
-                        width: 8,
-                        height: 8,
+                        width: DashboardSizes.unreadDotSize,
+                        height: DashboardSizes.unreadDotSize,
                         decoration: BoxDecoration(
                           color: highlightColor,
                           shape: BoxShape.circle,
@@ -198,10 +201,10 @@ class _NotificationEmptyState extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: AppDimens.paddingAllMediumLarge,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppDimens.radiusMediumSmall,
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.45),
         ),

@@ -16,6 +16,7 @@ class RefreshTokenRequestDto {
     required this.refreshToken,
   });
 
+
   /// Refresh token obtained from login or previous refresh
   String refreshToken;
 

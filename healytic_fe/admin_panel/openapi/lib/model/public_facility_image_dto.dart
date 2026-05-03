@@ -17,6 +17,7 @@ class PublicFacilityImageDto {
     required this.label,
   });
 
+
   String imageUrl;
 
   String label;

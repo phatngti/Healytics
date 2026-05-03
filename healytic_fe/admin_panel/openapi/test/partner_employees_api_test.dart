@@ -52,6 +52,20 @@ void main() {
       // TODO
     });
 
+    // Get per-employee detail analytics
+    //
+    //Future<EmployeeDetailAnalyticsResponseDto> partnerEmployeesControllerGetDetailAnalytics(String employeeId, { DashboardTimePeriod period }) async
+    test('test partnerEmployeesControllerGetDetailAnalytics', () async {
+      // TODO
+    });
+
+    // Get employee overview analytics
+    //
+    //Future<EmployeeOverviewAnalyticsResponseDto> partnerEmployeesControllerGetOverviewAnalytics({ DashboardTimePeriod period }) async
+    test('test partnerEmployeesControllerGetOverviewAnalytics', () async {
+      // TODO
+    });
+
     // Delete an employee
     //
     //Future partnerEmployeesControllerRemove(String id) async

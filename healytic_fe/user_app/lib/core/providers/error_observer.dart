@@ -40,11 +40,7 @@ base class ErrorObserver extends ProviderObserver {
     final name =
         context.provider.name ?? context.provider.runtimeType.toString();
 
-    _log.severe(
-      'Provider "$name" failed',
-      error,
-      // stackTrace,
-    );
+    _log.severe('Provider "$name" failed', error, stackTrace);
 
     context.container.read(globalErrorStreamProvider.notifier).emit(appError);
   }

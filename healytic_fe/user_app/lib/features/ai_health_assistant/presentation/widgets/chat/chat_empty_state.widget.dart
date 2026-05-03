@@ -64,7 +64,9 @@ class ChatEmptyState extends StatelessWidget {
             ),
             SizedBox(height: AppDimens.spaceXl),
 
-            const ChatSuggestionChips(),
+            ChatSuggestionChips(
+              onChipTapped: onSend,
+            ),
           ],
         ),
       ),

@@ -20,8 +20,14 @@ class HomeImplementRepository implements HomeRepository {
   }
 
   @override
-  Future<List<HomeProduct>> getRecommendedProducts() async {
-    return await remoteDatasource.getRecommendedProducts();
+  Future<List<AiRecommendation>> getRecommendedProducts({
+    required String userId,
+    int topK = 5,
+  }) async {
+    return await remoteDatasource.getRecommendedProducts(
+      userId: userId,
+      topK: topK,
+    );
   }
 
   @override
@@ -40,20 +46,7 @@ class HomeImplementRepository implements HomeRepository {
   }
 
   @override
-  Future<List<AiRecommendation>> getAiRecommendations(
-    List<String> serviceIds,
-  ) async {
-    return await remoteDatasource.getAiRecommendations(
-      serviceIds,
-    );
-  }
-
-  @override
-  Future<List<AppointmentEntity>> getRecentActivity({
-    int limit = 5,
-  }) async {
-    return await remoteDatasource.getRecentActivity(
-      limit: limit,
-    );
+  Future<List<AppointmentEntity>> getRecentActivity({int limit = 5}) async {
+    return await remoteDatasource.getRecentActivity(limit: limit);
   }
 }

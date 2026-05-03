@@ -17,6 +17,7 @@ class PresignResponseDto {
     required this.key,
   });
 
+
   /// Presigned URL for uploading the file
   String uploadUrl;
 

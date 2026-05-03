@@ -17,6 +17,7 @@ class FacilityDto {
     required this.name,
   });
 
+
   String imageUrl;
 
   String name;

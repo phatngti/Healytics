@@ -16,6 +16,7 @@ class BusinessServicesResponseDto {
     this.data = const [],
   });
 
+
   /// List of all available business types
   List<BusinessServiceDto> data;
 

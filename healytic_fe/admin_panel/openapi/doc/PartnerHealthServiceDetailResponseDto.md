@@ -16,7 +16,7 @@ Name | Type | Description | Notes
 **reviewCount** | **num** |  | 
 **price** | **String** |  | 
 **isVerified** | **bool** |  | 
-**description** | [**Object**](.md) |  | [optional] 
+**description** | **String** |  | [optional] 
 **duration** | **num** |  | 
 **featureTags** | [**List<PartnerFeatureTagDto>**](PartnerFeatureTagDto.md) |  | [default to const []]
 **clinic** | [**PartnerClinicDto**](PartnerClinicDto.md) |  | 

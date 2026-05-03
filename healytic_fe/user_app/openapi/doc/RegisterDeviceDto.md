@@ -9,7 +9,7 @@ import 'package:user_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **token** | **String** | FCM or APNs device token | 
-**platform** | **String** | Device platform | 
+**platform** | [**DevicePlatform**](DevicePlatform.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

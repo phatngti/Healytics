@@ -18,6 +18,7 @@ class TimeSlotDto {
     required this.isBusy,
   });
 
+
   /// Human-readable label in 12h format
   String label;
 

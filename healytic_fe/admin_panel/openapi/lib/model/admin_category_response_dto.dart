@@ -29,6 +29,7 @@ class AdminCategoryResponseDto {
     this.children = const [],
   });
 
+
   /// Unique category identifier
   String id;
 
@@ -39,43 +40,19 @@ class AdminCategoryResponseDto {
   String slug;
 
   /// Category description
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? description;
+  String? description;
 
   /// Category image URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? imageUrl;
+  String? imageUrl;
 
   /// Whether category is active
   bool isActive;
 
   /// Icon identifier for frontend rendering
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? iconName;
+  String? iconName;
 
   /// Hex color value (e.g. #FF6B6B)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? colorValue;
+  String? colorValue;
 
   /// Sort order for display (lower = first)
   num sortOrder;
@@ -200,11 +177,11 @@ class AdminCategoryResponseDto {
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
         slug: mapValueOfType<String>(json, r'slug')!,
-        description: mapValueOfType<Object>(json, r'description'),
-        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
+        description: mapValueOfType<String>(json, r'description'),
+        imageUrl: mapValueOfType<String>(json, r'imageUrl'),
         isActive: mapValueOfType<bool>(json, r'isActive')!,
-        iconName: mapValueOfType<Object>(json, r'iconName'),
-        colorValue: mapValueOfType<Object>(json, r'colorValue'),
+        iconName: mapValueOfType<String>(json, r'iconName'),
+        colorValue: mapValueOfType<String>(json, r'colorValue'),
         sortOrder: num.parse('${json[r'sortOrder']}'),
         serviceCount: num.parse('${json[r'serviceCount']}'),
         createdAt: mapDateTime(json, r'createdAt', r'')!,

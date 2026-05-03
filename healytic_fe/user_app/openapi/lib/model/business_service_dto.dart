@@ -18,6 +18,7 @@ class BusinessServiceDto {
     this.description,
   });
 
+
   /// Business type enum value
   String value;
 

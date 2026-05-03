@@ -1,6 +1,7 @@
 import 'package:user_app/features/checkout/domain/entities/booking.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/momo_payment.entity.dart';
+import 'package:user_app/features/checkout/domain/entities/stripe_payment.entity.dart';
 
 /// Abstract repository contract for the checkout feature.
 abstract class CheckoutRepository {
@@ -43,4 +44,17 @@ abstract class CheckoutRepository {
     required String bookingId,
     required int transId,
   });
+
+  /// Creates a Stripe PaymentIntent for the booking
+  /// and returns the client secret for on-device
+  /// confirmation.
+  Future<StripePaymentResult> createStripePayment(
+    String bookingId,
+  );
+
+  /// Requests a full Stripe refund for a paid
+  /// booking.
+  Future<StripeRefundResult> refundStripePayment(
+    String bookingId,
+  );
 }

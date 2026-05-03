@@ -26,8 +26,7 @@ class GallerySectionWidget extends StatelessWidget {
   final int maxImages;
   final VoidCallback onAddImages;
   final void Function(int index) onRemoveImage;
-  final void Function(int index, int direction)
-      onMoveImage;
+  final void Function(int index, int direction) onMoveImage;
 
   /// Spinner size for the uploading state.
   static const double _spinnerSize = 16;
@@ -40,10 +39,8 @@ class GallerySectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final galleryError =
-        showValidationErrors && !isGalleryValid;
+    final colorScheme = Theme.of(context).colorScheme;
+    final galleryError = showValidationErrors && !isGalleryValid;
 
     return SectionCardWidget(
       title: 'Clinic gallery',
@@ -53,72 +50,47 @@ class GallerySectionWidget extends StatelessWidget {
           'treatment rooms, equipment, and '
           'patient-facing environment.',
       trailing: FilledButton.icon(
-        onPressed: isUploadingGallery
-            ? null
-            : onAddImages,
+        onPressed: isUploadingGallery ? null : onAddImages,
         icon: isUploadingGallery
             ? SizedBox(
                 width: _spinnerSize,
                 height: _spinnerSize,
-                child:
-                    CircularProgressIndicator(
+                child: CircularProgressIndicator(
                   strokeWidth: _spinnerStroke,
                   color: colorScheme.onPrimary,
                 ),
               )
-            : const Icon(
-                Icons
-                    .add_photo_alternate_rounded,
-              ),
-        label: Text(
-          isUploadingGallery
-              ? 'Uploading...'
-              : 'Add images',
-        ),
+            : const Icon(Icons.add_photo_alternate_rounded),
+        label: Text(isUploadingGallery ? 'Uploading...' : 'Add images'),
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Wrap(
             spacing: AppDimens.spaceLg,
             runSpacing: AppDimens.spaceLg,
             children: [
-              for (var i = 0;
-                  i < gallery.length;
-                  i++)
+              for (var i = 0; i < gallery.length; i++)
                 _GalleryTile(
                   imageUrl: gallery[i],
                   index: i,
                   total: gallery.length,
-                  onMoveLeft: i == 0
+                  onMoveLeft: i == 0 ? null : () => onMoveImage(i, -1),
+                  onMoveRight: i == gallery.length - 1
                       ? null
-                      : () => onMoveImage(i, -1),
-                  onMoveRight:
-                      i == gallery.length - 1
-                          ? null
-                          : () =>
-                              onMoveImage(i, 1),
-                  onRemove: () =>
-                      onRemoveImage(i),
+                      : () => onMoveImage(i, 1),
+                  onRemove: () => onRemoveImage(i),
                 ),
-              if (gallery.isEmpty)
-                _EmptyGalleryPlaceholder(),
+              if (gallery.isEmpty) _EmptyGalleryPlaceholder(),
             ],
           ),
-          const SizedBox(
-            height: AppDimens.spaceMdLg,
-          ),
+          const SizedBox(height: AppDimens.spaceMdLg),
           Text(
             '$minImages minimum, $maxImages '
             'maximum. Use the arrow buttons to '
             'choose the display order.',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(
-              color:
-                  colorScheme.onSurfaceVariant,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           if (galleryError) ...[
@@ -126,10 +98,7 @@ class GallerySectionWidget extends StatelessWidget {
             Text(
               'Upload at least $minImages images '
               'before completing the profile.',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.error,
                 fontWeight: FontWeight.w600,
               ),
@@ -141,32 +110,25 @@ class GallerySectionWidget extends StatelessWidget {
   }
 }
 
-class _EmptyGalleryPlaceholder
-    extends StatelessWidget {
+class _EmptyGalleryPlaceholder extends StatelessWidget {
   /// Large placeholder icon size.
   static const double _placeholderIconSize = 40;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       width: double.infinity,
       padding: AppDimens.paddingAllMediumLarge,
       decoration: BoxDecoration(
         color: isDark
-            ? colorScheme.surfaceContainerHigh
-                .withValues(alpha: 0.5)
-            : colorScheme.surfaceContainerHighest
-                .withValues(alpha: 0.4),
+            ? colorScheme.surfaceContainerHigh.withValues(alpha: 0.5)
+            : colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: AppDimens.radiusMedium,
         border: Border.all(
-          color: colorScheme.outlineVariant
-              .withValues(alpha: 0.4),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
       ),
       child: Column(
@@ -179,12 +141,9 @@ class _EmptyGalleryPlaceholder
           AppDimens.verticalMediumSmall,
           Text(
             'No gallery images uploaded yet',
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -211,48 +170,32 @@ class _GalleryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return SizedBox(
       width: GallerySectionWidget._tileWidth,
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AspectRatio(
             aspectRatio: 1,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius
-                    .all(
-                  Radius.circular(
-                    AppDimens.spaceLg +
-                        AppDimens.spaceXxs,
-                  ),
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(AppDimens.spaceLg + AppDimens.spaceXxs),
                 ),
-                border: Border.all(
-                  color:
-                      colorScheme.outlineVariant,
-                ),
+                border: Border.all(color: colorScheme.outlineVariant),
               ),
               clipBehavior: Clip.antiAlias,
               child: Image.network(
                 imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (
-                  context,
-                  error,
-                  stackTrace,
-                ) {
+                errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    color: colorScheme
-                        .surfaceContainerHighest,
+                    color: colorScheme.surfaceContainerHighest,
                     child: Icon(
-                      Icons
-                          .broken_image_outlined,
-                      color: colorScheme
-                          .onSurfaceVariant,
+                      Icons.broken_image_outlined,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   );
                 },
@@ -262,12 +205,9 @@ class _GalleryTile extends StatelessWidget {
           AppDimens.verticalMediumSmall,
           Text(
             'Image ${index + 1} of $total',
-            style: Theme.of(context)
-                .textTheme
-                .labelLarge
-                ?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           AppDimens.verticalSmall,
           Wrap(
@@ -277,23 +217,17 @@ class _GalleryTile extends StatelessWidget {
               IconButton.outlined(
                 onPressed: onMoveLeft,
                 tooltip: 'Move left',
-                icon: const Icon(
-                  Icons.arrow_back_rounded,
-                ),
+                icon: const Icon(Icons.arrow_back_rounded),
               ),
               IconButton.outlined(
                 onPressed: onMoveRight,
                 tooltip: 'Move right',
-                icon: const Icon(
-                  Icons.arrow_forward_rounded,
-                ),
+                icon: const Icon(Icons.arrow_forward_rounded),
               ),
               IconButton.filledTonal(
                 onPressed: onRemove,
                 tooltip: 'Remove image',
-                icon: const Icon(
-                  Icons.delete_outline_rounded,
-                ),
+                icon: const Icon(Icons.delete_outline_rounded),
               ),
             ],
           ),

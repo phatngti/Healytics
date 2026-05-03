@@ -26,8 +26,7 @@ class EmployeeScheduleSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>()!;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     final days = _buildDayList();
     final weeklyHours = _computeWeeklyHours();
@@ -46,12 +45,9 @@ class EmployeeScheduleSection extends StatelessWidget {
         AppDimens.verticalMedium,
         Container(
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest
-                .withAlpha(128),
+            color: colorScheme.surfaceContainerHighest.withAlpha(128),
             borderRadius: AppDimens.radiusSmall,
-            border: Border.all(
-              color: colorScheme.outlineVariant,
-            ),
+            border: Border.all(color: colorScheme.outlineVariant),
           ),
           child: Column(
             children: [
@@ -62,8 +58,7 @@ class EmployeeScheduleSection extends StatelessWidget {
               Padding(
                 padding: AppDimens.paddingAllMedium,
                 child: Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: days.map((day) {
                     final isActive = day.isWorking;
                     return Opacity(
@@ -72,10 +67,8 @@ class EmployeeScheduleSection extends StatelessWidget {
                         children: [
                           Text(
                             day.dayAbbr,
-                            style: textTheme.labelSmall
-                                ?.copyWith(
-                              color: colorScheme
-                                  .onSurfaceVariant,
+                            style: textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -86,21 +79,17 @@ class EmployeeScheduleSection extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: isActive
                                   ? semanticColors.success
-                                  : colorScheme
-                                      .outlineVariant,
-                              borderRadius:
-                                  AppDimens.radiusExtraSmall,
+                                  : colorScheme.outlineVariant,
+                              borderRadius: AppDimens.radiusExtraSmall,
                             ),
                           ),
                           AppDimens.verticalExtraSmall,
                           Text(
                             day.timeLabel,
-                            style: textTheme.labelSmall
-                                ?.copyWith(
+                            style: textTheme.labelSmall?.copyWith(
                               color: isActive
                                   ? null
-                                  : colorScheme
-                                      .onSurfaceVariant,
+                                  : colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -151,9 +140,7 @@ class EmployeeScheduleSection extends StatelessWidget {
     final parts = time.split(':');
     if (parts.isEmpty) return 0;
     final h = double.tryParse(parts[0]) ?? 0;
-    final m = parts.length > 1
-        ? (double.tryParse(parts[1]) ?? 0) / 60
-        : 0.0;
+    final m = parts.length > 1 ? (double.tryParse(parts[1]) ?? 0) / 60 : 0.0;
     return h + m;
   }
 
@@ -208,26 +195,18 @@ class _ShiftHeader extends StatelessWidget {
   final String? employmentType;
   final int weeklyHours;
 
-  const _ShiftHeader({
-    required this.employmentType,
-    required this.weeklyHours,
-  });
+  const _ShiftHeader({required this.employmentType, required this.weeklyHours});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>()!;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Container(
       padding: AppDimens.paddingAllMedium,
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: colorScheme.outlineVariant,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -244,11 +223,7 @@ class _ShiftHeader extends StatelessWidget {
               AppDimens.verticalExtraSmall,
               Row(
                 children: [
-                  Icon(
-                    Icons.wb_sunny,
-                    size: 18,
-                    color: semanticColors.warning,
-                  ),
+                  Icon(Icons.wb_sunny, size: 18, color: semanticColors.warning),
                   AppDimens.horizontalSmall,
                   Text(
                     employmentType ?? 'Not specified',

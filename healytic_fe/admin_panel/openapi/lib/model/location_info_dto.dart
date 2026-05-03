@@ -18,6 +18,7 @@ class LocationInfoDto {
     this.mapUrl,
   });
 
+
   String name;
 
   String address;

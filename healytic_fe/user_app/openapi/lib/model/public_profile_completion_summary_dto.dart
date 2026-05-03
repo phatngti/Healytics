@@ -18,6 +18,7 @@ class PublicProfileCompletionSummaryDto {
     required this.isCompleted,
   });
 
+
   List<PublicProfileChecklistItemDto> checklist;
 
   num completionPercent;

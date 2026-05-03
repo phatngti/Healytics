@@ -19,6 +19,7 @@ class CompletionChecklistItemDto {
     required this.completed,
   });
 
+
   String key;
 
   String label;

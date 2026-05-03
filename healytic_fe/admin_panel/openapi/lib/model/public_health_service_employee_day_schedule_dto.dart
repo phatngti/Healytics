@@ -18,6 +18,7 @@ class PublicHealthServiceEmployeeDayScheduleDto {
     this.timeSlots = const [],
   });
 
+
   String date;
 
   bool isAvailable;

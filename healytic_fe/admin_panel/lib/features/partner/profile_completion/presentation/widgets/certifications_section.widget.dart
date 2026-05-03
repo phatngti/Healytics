@@ -137,9 +137,7 @@ class _CertificationTile extends StatelessWidget {
             ? colorScheme.surfaceContainerHigh.withValues(alpha: 0.5)
             : colorScheme.surfaceContainerHighest.withValues(alpha: 0.28),
         borderRadius: const BorderRadius.all(
-          Radius.circular(
-            AppDimens.spaceLg + AppDimens.spaceXxs,
-          ),
+          Radius.circular(AppDimens.spaceLg + AppDimens.spaceXxs),
         ),
         border: Border.all(
           color: isDark
@@ -155,15 +153,11 @@ class _CertificationTile extends StatelessWidget {
             height: _iconContainerSize,
             decoration: BoxDecoration(
               color: colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(
-                _iconContainerRadius,
-              ),
+              borderRadius: BorderRadius.circular(_iconContainerRadius),
             ),
             child: Icon(icon, color: colorScheme.primary),
           ),
-          const SizedBox(
-            width: AppDimens.spaceMdLg,
-          ),
+          const SizedBox(width: AppDimens.spaceMdLg),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

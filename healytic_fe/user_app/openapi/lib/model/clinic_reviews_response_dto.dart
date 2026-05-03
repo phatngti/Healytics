@@ -20,6 +20,7 @@ class ClinicReviewsResponseDto {
     required this.hasMore,
   });
 
+
   ClinicReviewSummaryDto summary;
 
   List<ClinicReviewFilterDto> filters;

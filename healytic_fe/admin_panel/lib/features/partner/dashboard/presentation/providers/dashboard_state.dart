@@ -21,19 +21,14 @@ abstract class DashboardState with _$DashboardState {
   const factory DashboardState({
     required DashboardStats stats,
     required List<RevenueDataPoint> revenueData,
-    required List<UpcomingAppointment>
-        upcomingAppointments,
-    required List<ServicePerformance>
-        servicePerformance,
-    required List<EmployeeDistribution>
-        employeeDistribution,
+    required List<UpcomingAppointment> upcomingAppointments,
+    required List<ServicePerformance> servicePerformance,
+    required List<EmployeeDistribution> employeeDistribution,
     required List<DashboardReview> recentReviews,
     required List<StaffScheduleEntry> staffSchedule,
-    required List<DashboardNotification>
-        notifications,
+    required List<DashboardNotification> notifications,
     required List<InventoryAlert> inventoryAlerts,
-    @Default(DashboardTimePeriod.thisMonth)
-    DashboardTimePeriod selectedPeriod,
+    @Default(DashboardTimePeriod.thisMonth) DashboardTimePeriod selectedPeriod,
     @Default(false) bool isRefreshing,
   }) = _DashboardState;
 }

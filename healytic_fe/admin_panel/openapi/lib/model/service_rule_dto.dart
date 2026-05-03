@@ -18,6 +18,7 @@ class ServiceRuleDto {
     required this.description,
   });
 
+
   String iconSlug;
 
   String title;

@@ -88,7 +88,6 @@ class ChatScreen extends HookConsumerWidget {
     }, [chatState.messages]);
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: const ChatHeader(),
       body: MediaQuery(
         data: MediaQuery.of(context).copyWith(
@@ -120,8 +119,15 @@ class ChatScreen extends HookConsumerWidget {
                 padding: EdgeInsets.only(
                   top: AppDimens.spaceXs,
                 ),
-                child:
-                    const ChatSuggestionChips(),
+                child: ChatSuggestionChips(
+                  onChipTapped: (label) => ref
+                      .read(
+                        chatProvider(
+                          conversationId,
+                        ).notifier,
+                      )
+                      .sendMessage(label),
+                ),
               ),
 
             // Input bar

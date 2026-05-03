@@ -15,22 +15,25 @@ import 'dart:convert';
 
 abstract class HomeRemoteDatasource {
   Future<List<HomeCategory>> getCategories();
-  Future<List<HomeProduct>> getRecommendedProducts();
+
+  /// Fetches AI-powered home recommendations via
+  /// the Recommender microservice.
+  Future<List<AiRecommendation>> getRecommendedProducts({
+    required String userId,
+    int topK,
+  });
+
   Future<List<HomeProduct>> getPremiumTreatments();
   Future<List<ServiceTag>> getServiceTags();
   Future<List<HomeSpecialist>> getFeaturedSpecialists();
 
   /// Fetches AI-powered recommendations for
   /// the given [serviceIds].
-  Future<List<AiRecommendation>> getAiRecommendations(
-    List<String> serviceIds,
-  );
+  Future<List<AiRecommendation>> getAiRecommendations(List<String> serviceIds);
 
   /// Fetches recent appointment activity for the
   /// home dashboard.
-  Future<List<AppointmentEntity>> getRecentActivity({
-    int limit,
-  });
+  Future<List<AppointmentEntity>> getRecentActivity({int limit});
 }
 
 class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
@@ -65,17 +68,47 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   }
 
   @override
-  Future<List<HomeProduct>> getRecommendedProducts() async {
+  Future<List<AiRecommendation>> getRecommendedProducts({
+    required String userId,
+    int topK = 5,
+  }) async {
     try {
-      final response = await _apiService.userHealthServicesApi
-          .userHealthServiceControllerGetHomeRecommend();
-
+      final request = HomeRecommenderRequest(
+        userId: userId,
+        topK: topK,
+      );
+      final response = await _apiService.recommenderApi
+          .recommendHomeRecommenderHomePost(request);
       if (response == null) return [];
-      return response.map(_mapDtoToProduct).toList();
+      return response.recommendations
+          .map(_mapDtoToEntity)
+          .toList();
     } catch (e) {
-      debugPrint('Error fetching recommended products: $e');
+      debugPrint(
+        'Error fetching recommended products: $e',
+      );
       return [];
     }
+  }
+
+  /// Maps an [AiRecommendationItemDto] from the
+  /// Recommender API to [AiRecommendation].
+  AiRecommendation _mapDtoToEntity(
+    AiRecommendationItemDto dto,
+  ) {
+    final priceAmount =
+        double.tryParse(dto.price ?? '') ?? 0;
+
+    return AiRecommendation(
+      serviceId: dto.serviceId ?? '',
+      name: dto.name ?? '',
+      imageUrl: dto.imageUrl ?? '',
+      price: dto.price ?? '',
+      priceAmount: priceAmount,
+      rating:
+          double.tryParse(dto.rating ?? '') ?? 0,
+      location: dto.location ?? '',
+    );
   }
 
   @override
@@ -94,9 +127,7 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
 
   /// Maps a [PublicHealthServiceCardResponseDto] to a
   /// domain [HomeProduct] entity.
-  HomeProduct _mapDtoToProduct(
-    PublicHealthServiceCardResponseDto dto,
-  ) {
+  HomeProduct _mapDtoToProduct(PublicHealthServiceCardResponseDto dto) {
     return HomeProduct(
       id: dto.id,
       name: dto.name,
@@ -140,8 +171,7 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   @override
   Future<List<ServiceTag>> getServiceTags() async {
     try {
-      final response = await _apiService
-          .partnerServiceTagsApi
+      final response = await _apiService.partnerServiceTagsApi
           .serviceTagsControllerFindActive();
       if (response == null || response.isEmpty) return [];
 
@@ -168,11 +198,8 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   @override
   Future<List<HomeSpecialist>> getFeaturedSpecialists() async {
     try {
-      final response = await _apiService
-          .userEmployeesApi
-          .userEmployeesControllerGetFeaturedSpecialists(
-            limit: 10,
-          );
+      final response = await _apiService.userEmployeesApi
+          .userEmployeesControllerGetFeaturedSpecialists(limit: 10);
       if (response == null) return [];
       return response
           .map(
@@ -188,9 +215,7 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
           )
           .toList();
     } catch (e) {
-      debugPrint(
-        'Error fetching featured specialists: $e',
-      );
+      debugPrint('Error fetching featured specialists: $e');
       return [];
     }
   }
@@ -200,67 +225,29 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
     List<String> serviceIds,
   ) async {
     try {
-      final request = AiRecommendationsRequestDto(
-        serviceIds: serviceIds,
+      final request = ChatbotRecommenderRequest(
+        conversationId: '',
+        query: 'recommend',
+        filteredIds: serviceIds,
       );
-      final response = await _apiService
-          .aiRecommendationsApi
-          .aiServiceControllerGetRecommendations(
-            request,
-          );
+      final response = await _apiService.recommenderApi
+          .recommendChatbotRecommenderChatbotPost(
+        request,
+      );
       if (response == null) return [];
       return response.recommendations
-          .map(_mapAiItemToEntity)
+          .map(_mapDtoToEntity)
           .toList();
     } catch (e) {
-      debugPrint(
-        'Error fetching AI recommendations: $e',
-      );
+      debugPrint('Error fetching AI recommendations: $e');
       return [];
     }
   }
 
-  /// Maps an [AiRecommendationItemDto] to the domain
-  /// [AiRecommendation] entity defensively.
-  AiRecommendation _mapAiItemToEntity(
-    AiRecommendationItemDto dto,
-  ) {
-    double parsedAmount = 0.0;
-    String parsedCurrency = 'VND';
-    
-    final priceParts = dto.price.split(' ');
-    if (priceParts.isNotEmpty) {
-      final digits = priceParts.first.replaceAll(',', '').replaceAll('.', '');
-      parsedAmount = double.tryParse(digits) ?? 0.0;
-      if (priceParts.length > 1) {
-        parsedCurrency = priceParts.sublist(1).join(' ');
-      }
-    }
-
-    return AiRecommendation(
-      serviceId: dto.id,
-      name: dto.name,
-      imageUrl: dto.imageUrl?.toString() ?? '',
-      badge: null,
-      bookedCount: 0,
-      price: dto.price,
-      priceAmount: parsedAmount,
-      currency: parsedCurrency,
-      rating: double.tryParse(dto.rating) ?? 0.0,
-      totalReviews: 0,
-      location: dto.location,
-      staffName: dto.vendorName,
-      slots: const [],
-    );
-  }
-
   @override
-  Future<List<AppointmentEntity>> getRecentActivity({
-    int limit = 5,
-  }) async {
+  Future<List<AppointmentEntity>> getRecentActivity({int limit = 5}) async {
     try {
-      final response = await _apiService
-          .userAppointmentsApi
+      final response = await _apiService.userAppointmentsApi
           .userAppointmentControllerListRecentActivityWithHttpInfo(
             limit: limit,
           );
@@ -272,8 +259,7 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
         // The API returns a paginated envelope:
         // { "data": [...], "meta": {...} }
         final List<dynamic> items;
-        if (decoded is Map<String, dynamic> &&
-            decoded['data'] is List) {
+        if (decoded is Map<String, dynamic> && decoded['data'] is List) {
           items = decoded['data'] as List<dynamic>;
         } else if (decoded is List) {
           items = decoded;
@@ -282,18 +268,12 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
         }
 
         return items
-            .map(
-              (item) => _mapRawToAppointment(
-                item as Map<String, dynamic>,
-              ),
-            )
+            .map((item) => _mapRawToAppointment(item as Map<String, dynamic>))
             .toList();
       }
       return [];
     } catch (e) {
-      debugPrint(
-        'Error fetching recent activity: $e',
-      );
+      debugPrint('Error fetching recent activity: $e');
       return [];
     }
   }
@@ -304,59 +284,36 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   /// API fields (snake_case):
   /// `id`, `title`, `scheduled_at`, `status`,
   /// `service_type_code`.
-  AppointmentEntity _mapRawToAppointment(
-    Map<String, dynamic> json,
-  ) {
-    final scheduledAt = DateTime.tryParse(
-          json['scheduled_at']?.toString() ?? '',
-        ) ??
+  AppointmentEntity _mapRawToAppointment(Map<String, dynamic> json) {
+    final scheduledAt =
+        DateTime.tryParse(json['scheduled_at']?.toString() ?? '') ??
         DateTime.now();
     final localTime = scheduledAt.toLocal();
 
     // Format HH:mm from the parsed timestamp.
-    final hour =
-        localTime.hour.toString().padLeft(2, '0');
-    final minute =
-        localTime.minute.toString().padLeft(2, '0');
+    final hour = localTime.hour.toString().padLeft(2, '0');
+    final minute = localTime.minute.toString().padLeft(2, '0');
     final timeStr = '$hour:$minute';
 
-    final status = json['status']
-            ?.toString()
-            .toLowerCase() ??
-        'scheduled';
+    final status = json['status']?.toString().toLowerCase() ?? 'scheduled';
 
     return AppointmentEntity(
       id: json['id']?.toString() ?? '',
-      serviceName:
-          json['title']?.toString() ?? '',
-      healthPartnerName:
-          json['vendor_name']?.toString() ?? '',
-      healthPartnerId:
-          json['health_partner_id']?.toString() ??
-              '',
-      imageUrl:
-          json['image_url']?.toString() ?? '',
+      serviceName: json['title']?.toString() ?? '',
+      healthPartnerName: json['vendor_name']?.toString() ?? '',
+      healthPartnerId: json['health_partner_id']?.toString() ?? '',
+      imageUrl: json['image_url']?.toString() ?? '',
       status: status,
-      category:
-          json['service_type_code']?.toString() ??
-              '',
-      specialistName:
-          json['provider_name']?.toString() ?? '',
-      specialistId:
-          json['provider_id']?.toString(),
-      serviceId:
-          json['service_id']?.toString(),
-      address:
-          json['address']?.toString() ?? '',
+      category: json['service_type_code']?.toString() ?? '',
+      specialistName: json['provider_name']?.toString() ?? '',
+      specialistId: json['provider_id']?.toString(),
+      serviceId: json['service_id']?.toString(),
+      address: json['address']?.toString() ?? '',
       date: localTime,
       checkInTime: timeStr,
-      checkOutTime:
-          json['check_out_time']?.toString() ?? '',
-      duration:
-          json['duration']?.toString() ?? '',
-      distanceKm: _parseDistanceRaw(
-        json['distance_km'],
-      ),
+      checkOutTime: json['check_out_time']?.toString() ?? '',
+      duration: json['duration']?.toString() ?? '',
+      distanceKm: _parseDistanceRaw(json['distance_km']),
     );
   }
 
@@ -380,9 +337,12 @@ class HomeRemoteDatasourceMock implements HomeRemoteDatasource {
   }
 
   @override
-  Future<List<HomeProduct>> getRecommendedProducts() async {
+  Future<List<AiRecommendation>> getRecommendedProducts({
+    required String userId,
+    int topK = 5,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return kMockRecommendedProducts;
+    return kMockAiRecommendations;
   }
 
   @override
@@ -399,9 +359,7 @@ class HomeRemoteDatasourceMock implements HomeRemoteDatasource {
 
   @override
   Future<List<HomeSpecialist>> getFeaturedSpecialists() async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
     return kMockFeaturedSpecialists;
   }
 
@@ -409,19 +367,13 @@ class HomeRemoteDatasourceMock implements HomeRemoteDatasource {
   Future<List<AiRecommendation>> getAiRecommendations(
     List<String> serviceIds,
   ) async {
-    await Future.delayed(
-      const Duration(milliseconds: 600),
-    );
+    await Future.delayed(const Duration(milliseconds: 600));
     return kMockAiRecommendations;
   }
 
   @override
-  Future<List<AppointmentEntity>> getRecentActivity({
-    int limit = 5,
-  }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<List<AppointmentEntity>> getRecentActivity({int limit = 5}) async {
+    await Future.delayed(const Duration(milliseconds: 500));
     return kMockRecentActivities;
   }
 }

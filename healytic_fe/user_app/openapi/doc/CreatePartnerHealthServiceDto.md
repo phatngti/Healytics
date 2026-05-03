@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **name** | **String** |  | 
 **slug** | **String** |  | 
 **description** | **String** |  | [optional] 
-**type** | **String** |  | 
+**type** | [**HealthServiceType**](HealthServiceType.md) |  | 
 **basePrice** | **num** |  | [optional] 
 **salePrice** | **num** |  | [optional] 
 **currency** | **String** |  | [optional] 

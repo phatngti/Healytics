@@ -18,6 +18,7 @@ class DistanceMatrixResponseDto {
     this.rows = const [],
   });
 
+
   List<String> originAddresses;
 
   List<String> destinationAddresses;

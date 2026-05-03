@@ -21,35 +21,24 @@ class ProgressHeroWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>();
-    final successColor =
-        semanticColors?.success ??
-            colorScheme.primary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final semanticColors = Theme.of(context).extension<SemanticColors>();
+    final successColor = semanticColors?.success ?? colorScheme.primary;
 
     return Container(
-      padding: const EdgeInsets.all(
-        AppDimens.spaceXxl + AppDimens.spaceXs,
-      ),
+      padding: const EdgeInsets.all(AppDimens.spaceXxl + AppDimens.spaceXs),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
               ? [
-                  colorScheme.primary
-                      .withValues(alpha: 0.18),
-                  colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.6),
+                  colorScheme.primary.withValues(alpha: 0.18),
+                  colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                 ]
               : [
                   colorScheme.primaryContainer,
-                  colorScheme
-                      .surfaceContainerHighest,
+                  colorScheme.surfaceContainerHighest,
                 ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -57,34 +46,26 @@ class ProgressHeroWidget extends StatelessWidget {
         borderRadius: AppDimens.radiusLarge,
         border: Border.all(
           color: isDark
-              ? colorScheme.primary
-                  .withValues(alpha: 0.25)
+              ? colorScheme.primary.withValues(alpha: 0.25)
               : colorScheme.outlineVariant,
         ),
         boxShadow: [
           if (isDark)
             BoxShadow(
-              color: colorScheme.primary
-                  .withValues(alpha: 0.08),
+              color: colorScheme.primary.withValues(alpha: 0.08),
               blurRadius: AppDimens.spaceXxl,
-              offset: const Offset(
-                0,
-                AppDimens.spaceSm,
-              ),
+              offset: const Offset(0, AppDimens.spaceSm),
             ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _VerifiedBadge(
-            successColor: successColor,
-          ),
+          _VerifiedBadge(successColor: successColor),
           AppDimens.verticalLargeExtra,
           Text(
             'Profile $completionPercent% complete',
-            style:
-                textTheme.headlineMedium?.copyWith(
+            style: textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -94,8 +75,7 @@ class ProgressHeroWidget extends StatelessWidget {
             'Add the final public profile details '
             'before entering the provider dashboard.',
             style: textTheme.bodyLarge?.copyWith(
-              color:
-                  colorScheme.onSurfaceVariant,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           AppDimens.verticalLargeExtra,
@@ -105,8 +85,7 @@ class ProgressHeroWidget extends StatelessWidget {
               value: completionPercent / 100,
               minHeight: AppDimens.spaceSmMd,
               backgroundColor: isDark
-                  ? colorScheme
-                      .surfaceContainerHighest
+                  ? colorScheme.surfaceContainerHighest
                   : colorScheme.surface,
             ),
           ),
@@ -114,22 +93,14 @@ class ProgressHeroWidget extends StatelessWidget {
           Text(
             '$requiredCompletedCount of 4 '
             'required sections completed',
-            style:
-                textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
           AppDimens.verticalMedium,
           Wrap(
             spacing: AppDimens.spaceMd,
             runSpacing: AppDimens.spaceMd,
             children: checklist
-                .map(
-                  (item) =>
-                      ChecklistChipWidget(
-                    item: item,
-                  ),
-                )
+                .map((item) => ChecklistChipWidget(item: item))
                 .toList(),
           ),
           if (entity.isCompleted) ...[
@@ -139,10 +110,8 @@ class ProgressHeroWidget extends StatelessWidget {
               'profile complete. Press '
               '"Complete profile" to refresh your '
               'session and enter the dashboard.',
-              style:
-                  textTheme.bodyMedium?.copyWith(
-                color:
-                    colorScheme.onSurfaceVariant,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -154,9 +123,7 @@ class ProgressHeroWidget extends StatelessWidget {
 
 /// Small "Verification approved" pill badge.
 class _VerifiedBadge extends StatelessWidget {
-  const _VerifiedBadge({
-    required this.successColor,
-  });
+  const _VerifiedBadge({required this.successColor});
 
   final Color successColor;
 
@@ -170,13 +137,9 @@ class _VerifiedBadge extends StatelessWidget {
         vertical: AppDimens.spaceSm,
       ),
       decoration: BoxDecoration(
-        color:
-            successColor.withValues(alpha: 0.16),
+        color: successColor.withValues(alpha: 0.16),
         borderRadius: AppDimens.radiusPill,
-        border: Border.all(
-          color:
-              successColor.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: successColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -203,32 +166,23 @@ class _VerifiedBadge extends StatelessWidget {
 /// A single checklist chip showing completion
 /// status for a profile section.
 class ChecklistChipWidget extends StatelessWidget {
-  const ChecklistChipWidget({
-    required this.item,
-    super.key,
-  });
+  const ChecklistChipWidget({required this.item, super.key});
 
   final CompletionChecklistItem item;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>();
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+    final semanticColors = Theme.of(context).extension<SemanticColors>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isDone = item.completed;
-    final successClr =
-        semanticColors?.success ??
-            colorScheme.primary;
+    final successClr = semanticColors?.success ?? colorScheme.primary;
 
     final backgroundColor = isDone
         ? successClr.withValues(alpha: 0.15)
         : isDark
-            ? colorScheme.surfaceContainerHigh
-            : colorScheme.surface;
+        ? colorScheme.surfaceContainerHigh
+        : colorScheme.surface;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -242,43 +196,31 @@ class ChecklistChipWidget extends StatelessWidget {
           color: isDone
               ? successClr.withValues(alpha: 0.4)
               : isDark
-                  ? colorScheme.outlineVariant
-                      .withValues(alpha: 0.5)
-                  : colorScheme.outlineVariant,
+              ? colorScheme.outlineVariant.withValues(alpha: 0.5)
+              : colorScheme.outlineVariant,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            isDone
-                ? Icons.check_circle_rounded
-                : Icons.radio_button_unchecked,
+            isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
             size: AppDimens.iconSmMd,
-            color: isDone
-                ? successClr
-                : colorScheme.onSurfaceVariant,
+            color: isDone ? successClr : colorScheme.onSurfaceVariant,
           ),
           AppDimens.horizontalSmall,
           Text(
             item.label,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           if (!item.isRequired) ...[
             AppDimens.horizontalSmall,
             Text(
               'Optional',
-              style: Theme.of(context)
-                  .textTheme
-                  .labelSmall
-                  ?.copyWith(
-                color:
-                    colorScheme.onSurfaceVariant,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],

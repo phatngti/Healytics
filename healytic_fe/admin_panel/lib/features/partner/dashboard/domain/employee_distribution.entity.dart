@@ -7,8 +7,7 @@ part 'employee_distribution.entity.freezed.dart';
 /// Each instance represents one role category and its
 /// employee count for the donut chart.
 @freezed
-abstract class EmployeeDistribution
-    with _$EmployeeDistribution {
+abstract class EmployeeDistribution with _$EmployeeDistribution {
   const factory EmployeeDistribution({
     required String role,
     required int count,

@@ -19,6 +19,7 @@ class ServicePerformanceDto {
     required this.averageRating,
   });
 
+
   String serviceName;
 
   num bookingCount;

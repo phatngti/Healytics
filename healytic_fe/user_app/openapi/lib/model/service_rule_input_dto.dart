@@ -18,6 +18,7 @@ class ServiceRuleInputDto {
     required this.description,
   });
 
+
   String iconSlug;
 
   String title;

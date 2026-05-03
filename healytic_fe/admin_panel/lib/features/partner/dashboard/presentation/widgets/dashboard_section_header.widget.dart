@@ -1,4 +1,7 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+
+import 'dashboard_constants.dart';
 
 /// Reusable section header for dashboard panels.
 ///
@@ -24,7 +27,7 @@ class DashboardSectionHeader extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: AppDimens.spaceLg.paddingBottom,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -33,21 +36,25 @@ class DashboardSectionHeader extends StatelessWidget {
               children: [
                 if (icon != null) ...[
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: DashboardSizes.sectionIconContainer,
+                    height: DashboardSizes.sectionIconContainer,
                     decoration: BoxDecoration(
                       color: colorScheme.primary.withValues(alpha: 0.10),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppDimens.radiusMediumSmall,
                     ),
-                    child: Icon(icon, size: 18, color: colorScheme.primary),
+                    child: Icon(
+                      icon,
+                      size: AppDimens.iconSmMd,
+                      color: colorScheme.primary,
+                    ),
                   ),
-                  const SizedBox(width: 12),
+                  AppDimens.horizontalMediumSmall,
                 ],
                 Flexible(
                   child: Text(
                     title,
                     style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: AppDimens.fontWeightBold,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -60,19 +67,19 @@ class DashboardSectionHeader extends StatelessWidget {
               style: TextButton.styleFrom(
                 foregroundColor: colorScheme.primary,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                  horizontal: AppDimens.spaceMd,
+                  vertical: AppDimens.spaceSm,
                 ),
                 visualDensity: VisualDensity.compact,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppDimens.radiusMediumSmall,
                 ),
               ),
               onPressed: onAction,
               child: Text(
                 actionLabel!,
                 style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+                  fontWeight: AppDimens.fontWeightSemiBold,
                 ),
               ),
             ),

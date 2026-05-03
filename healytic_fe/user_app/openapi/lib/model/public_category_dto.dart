@@ -19,19 +19,14 @@ class PublicCategoryDto {
     this.imageUrl,
   });
 
+
   String id;
 
   String name;
 
   String slug;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? imageUrl;
+  String? imageUrl;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is PublicCategoryDto &&
@@ -86,7 +81,7 @@ class PublicCategoryDto {
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
         slug: mapValueOfType<String>(json, r'slug')!,
-        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
+        imageUrl: mapValueOfType<String>(json, r'imageUrl'),
       );
     }
     return null;

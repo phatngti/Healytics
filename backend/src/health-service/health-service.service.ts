@@ -11,6 +11,11 @@ import { ProductEmployeeEligibility } from '@/common/entities/product-employee-e
 import { CreateHealthServiceHandler } from './application/handlers/create-health-service.handler';
 import { UpdateHealthServiceHandler } from './application/handlers/update-health-service.handler';
 import { RemoveHealthServiceHandler } from './application/handlers/remove-health-service.handler';
+import { GetOverviewAnalyticsHandler } from './application/handlers/get-overview-analytics.handler';
+import { GetDetailAnalyticsHandler } from './application/handlers/get-detail-analytics.handler';
+import { HealthServiceOverviewAnalyticsResponseDto } from './dto/partner/analytics/health-service-overview-analytics.dto';
+import { HealthServiceDetailAnalyticsResponseDto } from './dto/partner/analytics/health-service-detail-analytics.dto';
+import { DashboardTimePeriod } from '@/dashboard-partner/dto/query/dashboard-period-query.dto';
 import { PartnerHealthServiceDetailResponseDto } from './dto/partner/partner-health-service-detail-response.dto';
 import { PublicHealthServiceInfoResponseDto } from './dto/public/public-health-service-info-response.dto';
 import {
@@ -49,8 +54,57 @@ export class HealthServiceService {
     private readonly createHealthServiceHandler: CreateHealthServiceHandler,
     private readonly updateHealthServiceHandler: UpdateHealthServiceHandler,
     private readonly removeHealthServiceHandler: RemoveHealthServiceHandler,
+    private readonly getOverviewAnalyticsHandler: GetOverviewAnalyticsHandler,
+    private readonly getDetailAnalyticsHandler: GetDetailAnalyticsHandler,
     private readonly partnersService: PartnersService,
   ) {}
+
+  // ─── Analytics Facades ────────────────────────────────────
+
+  /**
+   * Returns overview analytics for all services owned by
+   * the authenticated partner.
+   */
+  async getOverviewAnalytics(
+    accountId: string,
+    period: DashboardTimePeriod,
+  ): Promise<HealthServiceOverviewAnalyticsResponseDto> {
+    const partnerId =
+      await this.resolvePartnerId(accountId);
+    return this.getOverviewAnalyticsHandler.execute(
+      partnerId,
+      period,
+    );
+  }
+
+  /**
+   * Returns per-service detail analytics for a specific
+   * product owned by the authenticated partner.
+   */
+  async getDetailAnalytics(
+    accountId: string,
+    productId: string,
+    period: DashboardTimePeriod,
+  ): Promise<HealthServiceDetailAnalyticsResponseDto> {
+    const partnerId =
+      await this.resolvePartnerId(accountId);
+    return this.getDetailAnalyticsHandler.execute(
+      partnerId,
+      productId,
+      period,
+    );
+  }
+
+  /** Resolves partner ID from the JWT account ID. */
+  private async resolvePartnerId(
+    accountId: string,
+  ): Promise<string> {
+    const partner = await this.partnersService
+      .getPartnerProfile(accountId);
+    return partner.id;
+  }
+
+  // ─── CRUD Facades ─────────────────────────────────────────
 
   /**
    * Facade: Delegates to CreateHealthServiceHandler

@@ -7,6 +7,7 @@ import { BookingStatus } from '@/booking/enums/booking-status.enum';
  * Status values expected by the frontend's RecentActivitySection.
  */
 export enum RecentActivityStatus {
+  PENDING_PAYMENT = 'PENDING_PAYMENT',
   COMPLETED = 'COMPLETED',
   SCHEDULED = 'SCHEDULED',
   CANCELED = 'CANCELED',
@@ -46,8 +47,9 @@ export class RecentActivityResponseDto {
 
   private static mapStatus(bookingStatus: BookingStatus): RecentActivityStatus {
     switch (bookingStatus) {
-      case BookingStatus.CONFIRMED:
       case BookingStatus.PENDING_PAYMENT:
+        return RecentActivityStatus.PENDING_PAYMENT;
+      case BookingStatus.CONFIRMED:
         return RecentActivityStatus.SCHEDULED;
       case BookingStatus.COMPLETED:
         return RecentActivityStatus.COMPLETED;

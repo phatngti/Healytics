@@ -1,2 +1,4 @@
-locust>=2.20
+# Requires Python >=3.10 (locust.contrib.socketio was added in 2.39)
+locust>=2.39
 faker>=22.0
+python-socketio[client]>=5.10

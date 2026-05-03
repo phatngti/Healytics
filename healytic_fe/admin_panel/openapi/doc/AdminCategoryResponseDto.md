@@ -11,11 +11,11 @@ Name | Type | Description | Notes
 **id** | **String** | Unique category identifier | 
 **name** | **String** | Category name | 
 **slug** | **String** | URL-friendly slug | 
-**description** | [**Object**](.md) | Category description | [optional] 
-**imageUrl** | [**Object**](.md) | Category image URL | [optional] 
+**description** | **String** | Category description | [optional] 
+**imageUrl** | **String** | Category image URL | [optional] 
 **isActive** | **bool** | Whether category is active | 
-**iconName** | [**Object**](.md) | Icon identifier for frontend rendering | [optional] 
-**colorValue** | [**Object**](.md) | Hex color value (e.g. #FF6B6B) | [optional] 
+**iconName** | **String** | Icon identifier for frontend rendering | [optional] 
+**colorValue** | **String** | Hex color value (e.g. #FF6B6B) | [optional] 
 **sortOrder** | **num** | Sort order for display (lower = first) | 
 **serviceCount** | **num** | Number of health services in this category | 
 **createdAt** | [**DateTime**](DateTime.md) | Creation timestamp | 

@@ -41,34 +41,23 @@ class SaveDiscardBarWidget extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: cs.surfaceContainer,
-        border: Border(
-          top: BorderSide(
-            color: cs.outlineVariant,
-            width: 0.5,
-          ),
-        ),
+        border: Border(top: BorderSide(color: cs.outlineVariant, width: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: cs.shadow
-                .withValues(alpha: 0.08),
+            color: cs.shadow.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
         ],
       ),
       child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           if (isDirty) ...[
             OutlinedButton.icon(
-              onPressed:
-                  isSaving ? null : onDiscard,
-              icon:
-                  const Icon(Icons.undo_rounded),
-              label: const Text(
-                'Discard Changes',
-              ),
+              onPressed: isSaving ? null : onDiscard,
+              icon: const Icon(Icons.undo_rounded),
+              label: const Text('Discard Changes'),
             ),
             AppDimens.horizontalMedium,
           ],
@@ -78,17 +67,10 @@ class SaveDiscardBarWidget extends StatelessWidget {
                 ? const SizedBox(
                     width: AppDimens.iconSm,
                     height: AppDimens.iconSm,
-                    child:
-                        CircularProgressIndicator(
-                      strokeWidth: 2,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(
-                    Icons.save_rounded,
-                  ),
-            label: Text(
-              isSaving ? 'Saving…' : 'Save',
-            ),
+                : const Icon(Icons.save_rounded),
+            label: Text(isSaving ? 'Saving…' : 'Save'),
           ),
         ],
       ),

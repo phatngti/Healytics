@@ -8,7 +8,12 @@ import { TreatmentReview } from '@/common/entities/treatment-review.entity';
 import { PartnerCertification } from '@/clinic/entities/partner-certification.entity';
 import { ClinicReviewResponse } from '@/clinic/entities/clinic-review-response.entity';
 import { ISeeder } from '../seeder.interface';
-import { SEED_MARKERS, buildMapBy, likePrefix, seedKey } from '../utils/seed.utils';
+import {
+  SEED_MARKERS,
+  buildMapBy,
+  likePrefix,
+  seedKey,
+} from '../utils/seed.utils';
 
 interface SeedCertification {
   partnerTaxCode: string;
@@ -38,6 +43,34 @@ const SEED_CERTIFICATIONS: SeedCertification[] = [
     title: seedKey(SEED_MARKERS.clinicCertificationTitle, 'DENTAL_SAFETY'),
     subtitle: 'Sterilization and dental safety compliance',
     iconName: 'health_and_safety',
+    sortOrder: 1,
+  },
+  {
+    partnerTaxCode: '1122334455',
+    title: seedKey(SEED_MARKERS.clinicCertificationTitle, 'RECOVERY_COACHES'),
+    subtitle: 'Certified mobility and recovery coaches',
+    iconName: 'fitness_center',
+    sortOrder: 1,
+  },
+  {
+    partnerTaxCode: '5566778899',
+    title: seedKey(SEED_MARKERS.clinicCertificationTitle, 'GPP_READY'),
+    subtitle: 'Good pharmacy practice resubmission package',
+    iconName: 'local_pharmacy',
+    sortOrder: 1,
+  },
+  {
+    partnerTaxCode: '6677889900',
+    title: seedKey(SEED_MARKERS.clinicCertificationTitle, 'YHCT_LICENSED'),
+    subtitle: 'Traditional medicine treatment license',
+    iconName: 'eco',
+    sortOrder: 1,
+  },
+  {
+    partnerTaxCode: '7788990011',
+    title: seedKey(SEED_MARKERS.clinicCertificationTitle, 'MULTI_SPECIALTY'),
+    subtitle: 'Dermatology and psychology care teams',
+    iconName: 'psychology',
     sortOrder: 1,
   },
 ];
@@ -71,7 +104,9 @@ export class ClinicSeeder implements ISeeder {
   private async seedCertifications(): Promise<void> {
     const partners = await this.partnerRepo.find({
       where: {
-        taxCode: In([...new Set(SEED_CERTIFICATIONS.map((item) => item.partnerTaxCode))]),
+        taxCode: In([
+          ...new Set(SEED_CERTIFICATIONS.map((item) => item.partnerTaxCode)),
+        ]),
       },
       select: ['id', 'taxCode'],
     });
@@ -80,7 +115,9 @@ export class ClinicSeeder implements ISeeder {
     for (const seed of SEED_CERTIFICATIONS) {
       const partner = partnerMap.get(seed.partnerTaxCode);
       if (!partner) {
-        this.logger.warn(`  ⚠ Partner "${seed.partnerTaxCode}" not found — skipping certification`);
+        this.logger.warn(
+          `  ⚠ Partner "${seed.partnerTaxCode}" not found — skipping certification`,
+        );
         continue;
       }
 
@@ -113,7 +150,7 @@ export class ClinicSeeder implements ISeeder {
     const reviews = await this.treatmentReviewRepo.find({
       relations: ['booking'],
       order: { createdAt: 'ASC' },
-      take: 5,
+      take: 12,
     });
 
     for (const review of reviews) {
@@ -125,7 +162,9 @@ export class ClinicSeeder implements ISeeder {
       }
 
       if (!review.booking?.productId) {
-        this.logger.warn(`  ⚠ Review "${review.id}" has no product booking context — skipping`);
+        this.logger.warn(
+          `  ⚠ Review "${review.id}" has no product booking context — skipping`,
+        );
         continue;
       }
 
@@ -134,7 +173,9 @@ export class ClinicSeeder implements ISeeder {
         select: ['id', 'partnerId'],
       });
       if (!product?.partnerId) {
-        this.logger.warn(`  ⚠ Product "${review.booking.productId}" has no partner — skipping`);
+        this.logger.warn(
+          `  ⚠ Product "${review.booking.productId}" has no partner — skipping`,
+        );
         continue;
       }
 
@@ -154,11 +195,15 @@ export class ClinicSeeder implements ISeeder {
   }
 
   async clear(): Promise<void> {
-    const { affected: responseAffected } = await this.clinicResponseRepo.delete({
-      responseText: Like(likePrefix(SEED_MARKERS.clinicResponseText)),
-    });
+    const { affected: responseAffected } = await this.clinicResponseRepo.delete(
+      {
+        responseText: Like(likePrefix(SEED_MARKERS.clinicResponseText)),
+      },
+    );
     if (responseAffected) {
-      this.logger.log(`🗑️ Hard-deleted ${responseAffected} seed clinic response(s)`);
+      this.logger.log(
+        `🗑️ Hard-deleted ${responseAffected} seed clinic response(s)`,
+      );
     }
 
     const { affected: certAffected } = await this.certificationRepo.delete({

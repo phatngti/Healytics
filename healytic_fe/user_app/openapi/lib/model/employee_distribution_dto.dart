@@ -18,6 +18,7 @@ class EmployeeDistributionDto {
     required this.status,
   });
 
+
   String role;
 
   num count;

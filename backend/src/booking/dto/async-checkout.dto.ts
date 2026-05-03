@@ -24,10 +24,9 @@ export class AsyncCheckoutDto {
   @IsDateString()
   startTime: string;
 
-  @ApiPropertyOptional({ description: 'Product/service UUID' })
+  @ApiProperty({ description: 'Product/service UUID' })
   @IsUUID()
-  @IsOptional()
-  productId?: string;
+  productId: string;
 
   @ApiProperty({
     description: 'Idempotency key to prevent duplicate requests from AI retry',

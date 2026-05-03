@@ -20,27 +20,16 @@ class PublicClinicSpecialistPreviewDto {
     this.experienceLabel,
   });
 
+
   String id;
 
   String name;
 
   String role;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? imageUrl;
+  String? imageUrl;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? experienceLabel;
+  String? experienceLabel;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is PublicClinicSpecialistPreviewDto &&
@@ -102,8 +91,8 @@ class PublicClinicSpecialistPreviewDto {
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
         role: mapValueOfType<String>(json, r'role')!,
-        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
-        experienceLabel: mapValueOfType<Object>(json, r'experienceLabel'),
+        imageUrl: mapValueOfType<String>(json, r'imageUrl'),
+        experienceLabel: mapValueOfType<String>(json, r'experienceLabel'),
       );
     }
     return null;

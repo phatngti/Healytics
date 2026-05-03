@@ -29,6 +29,10 @@ import {
 import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { EmployeeResponseDto } from './dto/employee-response.dto';
+import { EmployeeAnalyticsQueryDto } from './dto/analytics/employee-analytics-query.dto';
+import { EmployeeOverviewAnalyticsResponseDto } from './dto/analytics/employee-overview-analytics.dto';
+import { EmployeeDetailAnalyticsResponseDto } from './dto/analytics/employee-detail-analytics.dto';
+import { DashboardTimePeriod } from '@/dashboard-partner/dto/query/dashboard-period-query.dto';
 import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 /**
@@ -40,6 +44,45 @@ import { LogResponse } from '@/common/interceptors/response.interceptor';
 @PartnerApi('employees')
 export class PartnerEmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}
+
+  // ─── Analytics Endpoints (must precede :id routes) ────────
+
+  /**
+   * Returns overview analytics for all partner employees.
+   */
+  @Get('analytics/overview')
+  @ApiOperation({ summary: 'Get employee overview analytics' })
+  @ApiOkResponse({ type: EmployeeOverviewAnalyticsResponseDto })
+  getOverviewAnalytics(
+    @CurrentUser('id') userId: string,
+    @Query() query: EmployeeAnalyticsQueryDto,
+  ): Promise<EmployeeOverviewAnalyticsResponseDto> {
+    return this.employeesService.getOverviewAnalytics(
+      userId,
+      query.period ?? DashboardTimePeriod.THIS_MONTH,
+    );
+  }
+
+  /**
+   * Returns per-employee detail analytics.
+   */
+  @Get('analytics/:employeeId')
+  @ApiOperation({ summary: 'Get per-employee detail analytics' })
+  @ApiOkResponse({ type: EmployeeDetailAnalyticsResponseDto })
+  @ApiNotFoundResponse({ description: 'Employee not found.' })
+  getDetailAnalytics(
+    @CurrentUser('id') userId: string,
+    @Param('employeeId', ParseUUIDPipe) employeeId: string,
+    @Query() query: EmployeeAnalyticsQueryDto,
+  ): Promise<EmployeeDetailAnalyticsResponseDto> {
+    return this.employeesService.getDetailAnalytics(
+      userId,
+      employeeId,
+      query.period ?? DashboardTimePeriod.THIS_MONTH,
+    );
+  }
+
+  // ─── CRUD Endpoints ──────────────────────────────────────
 
   /**
    * Creates a new doctor employee for the authenticated partner.

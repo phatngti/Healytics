@@ -23,6 +23,7 @@ class ServiceManualResponseDto {
     this.review,
   });
 
+
   String serviceName;
 
   String vendorName;

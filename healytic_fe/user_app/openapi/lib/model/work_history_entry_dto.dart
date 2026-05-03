@@ -19,6 +19,7 @@ class WorkHistoryEntryDto {
     required this.isCurrent,
   });
 
+
   /// Facility or organization name
   String facility;
 

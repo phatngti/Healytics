@@ -6,20 +6,19 @@ import 'package:user_app/features/orders/domain/entities/'
 
 abstract class HomeRepository {
   Future<List<HomeCategory>> getCategories();
-  Future<List<HomeProduct>> getRecommendedProducts();
+
+  /// Fetches AI-powered home recommendations via
+  /// the Recommender microservice.
+  Future<List<AiRecommendation>> getRecommendedProducts({
+    required String userId,
+    int topK,
+  });
+
   Future<List<HomeProduct>> getPremiumTreatments();
   Future<List<ServiceTag>> getServiceTags();
   Future<List<HomeSpecialist>> getFeaturedSpecialists();
 
-  /// Fetches AI-powered service recommendations
-  /// for the given [serviceIds].
-  Future<List<AiRecommendation>> getAiRecommendations(
-    List<String> serviceIds,
-  );
-
   /// Fetches recent appointment activity for the
   /// home dashboard (limited to a small subset).
-  Future<List<AppointmentEntity>> getRecentActivity({
-    int limit,
-  });
+  Future<List<AppointmentEntity>> getRecentActivity({int limit});
 }

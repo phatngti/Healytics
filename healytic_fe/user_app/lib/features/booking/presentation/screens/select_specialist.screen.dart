@@ -107,8 +107,13 @@ class _SelectSpecialistScreenState
       specialistsByCategoryProvider(widget.categoryId),
     );
 
+    // Read selected service from flow state
+    // for conflict detection.
+    final flowState = ref.watch(bookingFlowProvider);
+    final currentServiceId =
+        flowState.selectedService?.id;
+
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -118,8 +123,10 @@ class _SelectSpecialistScreenState
         title: const Text('Book Appointment'),
       ),
       body: specialistsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () =>
+            const Center(child: CircularProgressIndicator()),
+        error: (e, _) =>
+            Center(child: Text('Error: $e')),
         data: (specialists) {
           _specialists = specialists;
           return _Step2Body(
@@ -130,6 +137,7 @@ class _SelectSpecialistScreenState
             selectedSpecialistIdx: _selectedSpecialistIdx,
             selectedDateIdx: _selectedDateIdx,
             selectedTimeSlotIdx: _selectedTimeSlotIdx,
+            currentServiceId: currentServiceId,
             onSpecialistSelected: _onSpecialistSelected,
             onDateSelected: _onDateSelected,
             onTimeSlotSelected: _onTimeSlotSelected,
@@ -154,6 +162,7 @@ class _Step2Body extends StatelessWidget {
     required this.selectedSpecialistIdx,
     required this.selectedDateIdx,
     required this.selectedTimeSlotIdx,
+    required this.currentServiceId,
     required this.onSpecialistSelected,
     required this.onDateSelected,
     required this.onTimeSlotSelected,
@@ -166,6 +175,11 @@ class _Step2Body extends StatelessWidget {
   final int selectedSpecialistIdx;
   final int selectedDateIdx;
   final int selectedTimeSlotIdx;
+
+  /// Service ID from Step 1, passed to
+  /// [TimeSlotSection] for conflict detection.
+  final String? currentServiceId;
+
   final ValueChanged<int> onSpecialistSelected;
   final ValueChanged<int> onDateSelected;
   final void Function(int, String) onTimeSlotSelected;
@@ -221,6 +235,8 @@ class _Step2Body extends StatelessWidget {
                 employeeId: specialists[
                         selectedSpecialistIdx]
                     .id,
+                currentServiceId:
+                    currentServiceId,
                 selectedDate: DateTime.now().add(
                   Duration(days: selectedDateIdx),
                 ),

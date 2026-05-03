@@ -4,11 +4,15 @@ import { NotFoundException } from '@nestjs/common';
 import { HealthServiceService } from './health-service.service';
 import { Product } from '@/common/entities/product.entity';
 import { Booking } from '@/common/entities/booking.entity';
+import { TreatmentReview } from '@/common/entities/treatment-review.entity';
+import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { CreatePartnerHealthServiceDto } from './dto/partner/create-partner-health-service.dto';
 import { UpdatePartnerHealthServiceDto } from './dto/partner/update-partner-health-service.dto';
 import { CreateHealthServiceHandler } from './application/handlers/create-health-service.handler';
 import { UpdateHealthServiceHandler } from './application/handlers/update-health-service.handler';
 import { RemoveHealthServiceHandler } from './application/handlers/remove-health-service.handler';
+import { GetOverviewAnalyticsHandler } from './application/handlers/get-overview-analytics.handler';
+import { GetDetailAnalyticsHandler } from './application/handlers/get-detail-analytics.handler';
 import { PartnersService } from '@/partners/partners.service';
 import {
   MockRepository,
@@ -21,17 +25,25 @@ describe('HealthServiceService', () => {
   let service: HealthServiceService;
   let productRepository: MockRepository<Product>;
   let bookingRepository: MockRepository<Booking>;
+  let treatmentReviewRepository: MockRepository<TreatmentReview>;
+  let eligibilityRepository: MockRepository<ProductEmployeeEligibility>;
   let createHandler: MockHandler;
   let updateHandler: MockHandler;
   let removeHandler: MockHandler;
+  let overviewAnalyticsHandler: MockHandler;
+  let detailAnalyticsHandler: MockHandler;
 
   beforeEach(async () => {
     // Arrange - Create fresh mocks for each test
     productRepository = createMockRepository<Product>();
     bookingRepository = createMockRepository<Booking>();
+    treatmentReviewRepository = createMockRepository<TreatmentReview>();
+    eligibilityRepository = createMockRepository<ProductEmployeeEligibility>();
     createHandler = createMockHandler();
     updateHandler = createMockHandler();
     removeHandler = createMockHandler();
+    overviewAnalyticsHandler = createMockHandler();
+    detailAnalyticsHandler = createMockHandler();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -45,6 +57,14 @@ describe('HealthServiceService', () => {
           useValue: bookingRepository,
         },
         {
+          provide: getRepositoryToken(TreatmentReview),
+          useValue: treatmentReviewRepository,
+        },
+        {
+          provide: getRepositoryToken(ProductEmployeeEligibility),
+          useValue: eligibilityRepository,
+        },
+        {
           provide: CreateHealthServiceHandler,
           useValue: createHandler,
         },
@@ -55,6 +75,14 @@ describe('HealthServiceService', () => {
         {
           provide: RemoveHealthServiceHandler,
           useValue: removeHandler,
+        },
+        {
+          provide: GetOverviewAnalyticsHandler,
+          useValue: overviewAnalyticsHandler,
+        },
+        {
+          provide: GetDetailAnalyticsHandler,
+          useValue: detailAnalyticsHandler,
         },
         {
           provide: PartnersService,

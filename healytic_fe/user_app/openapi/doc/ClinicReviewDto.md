@@ -12,10 +12,10 @@ Name | Type | Description | Notes
 **reviewerName** | **String** | Masked name for privacy | 
 **reviewerInitial** | **String** |  | 
 **starCount** | **num** |  | 
-**memberBadge** | [**Object**](.md) | null for MVP | [optional] 
+**memberBadge** | **String** | null for MVP | [optional] 
 **dateLabel** | **String** |  | 
-**serviceName** | [**Object**](.md) |  | [optional] 
-**serviceIcon** | [**Object**](.md) |  | [optional] 
+**serviceName** | **String** |  | [optional] 
+**serviceIcon** | **String** |  | [optional] 
 **reviewText** | **String** |  | 
 **mediaUrls** | **List<String>** |  | [default to const []]
 **clinicResponse** | [**ClinicReviewResponseSubDto**](ClinicReviewResponseSubDto.md) |  | [optional] 

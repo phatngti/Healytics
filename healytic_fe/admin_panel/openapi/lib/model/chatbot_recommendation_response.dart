@@ -19,9 +19,10 @@ class ChatbotRecommendationResponse {
     required this.timestamp,
   });
 
+
   String conversationId;
 
-  List<ServiceDetail> recommendations;
+  List<AiRecommendationItemDto> recommendations;
 
   int total;
 
@@ -74,7 +75,7 @@ class ChatbotRecommendationResponse {
 
       return ChatbotRecommendationResponse(
         conversationId: mapValueOfType<String>(json, r'conversation_id')!,
-        recommendations: ServiceDetail.listFromJson(json[r'recommendations']),
+        recommendations: AiRecommendationItemDto.listFromJson(json[r'recommendations']),
         total: mapValueOfType<int>(json, r'total')!,
         timestamp: mapValueOfType<String>(json, r'timestamp')!,
       );

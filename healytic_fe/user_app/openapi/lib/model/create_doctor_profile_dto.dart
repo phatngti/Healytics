@@ -22,6 +22,7 @@ class CreateDoctorProfileDto {
     this.certifications = const [],
   });
 
+
   /// Title of the doctor
   ///
   /// Please note: This property should have been non-nullable! Since the specification file

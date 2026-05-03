@@ -29,25 +29,14 @@ class ClinicInfoResponseDto {
     this.phoneNumber,
   });
 
+
   String id;
 
   String name;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? coverImageUrl;
+  String? coverImageUrl;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? logoImageUrl;
+  String? logoImageUrl;
 
   List<String> gallery;
 
@@ -55,13 +44,7 @@ class ClinicInfoResponseDto {
 
   String reviewsLabel;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? description;
+  String? description;
 
   ClinicTrustMetricsDto trustMetrics;
 
@@ -71,21 +54,9 @@ class ClinicInfoResponseDto {
 
   List<String> businessTypes;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? address;
+  String? address;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? phoneNumber;
+  String? phoneNumber;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is ClinicInfoResponseDto &&
@@ -185,22 +156,22 @@ class ClinicInfoResponseDto {
       return ClinicInfoResponseDto(
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
-        coverImageUrl: mapValueOfType<Object>(json, r'coverImageUrl'),
-        logoImageUrl: mapValueOfType<Object>(json, r'logoImageUrl'),
+        coverImageUrl: mapValueOfType<String>(json, r'coverImageUrl'),
+        logoImageUrl: mapValueOfType<String>(json, r'logoImageUrl'),
         gallery: json[r'gallery'] is Iterable
             ? (json[r'gallery'] as Iterable).cast<String>().toList(growable: false)
             : const [],
         followersLabel: mapValueOfType<String>(json, r'followersLabel')!,
         reviewsLabel: mapValueOfType<String>(json, r'reviewsLabel')!,
-        description: mapValueOfType<Object>(json, r'description'),
+        description: mapValueOfType<String>(json, r'description'),
         trustMetrics: ClinicTrustMetricsDto.fromJson(json[r'trustMetrics'])!,
         certifications: ClinicCertificationDto.listFromJson(json[r'certifications']),
         specialists: ClinicSpecialistPreviewDto.listFromJson(json[r'specialists']),
         businessTypes: json[r'businessTypes'] is Iterable
             ? (json[r'businessTypes'] as Iterable).cast<String>().toList(growable: false)
             : const [],
-        address: mapValueOfType<Object>(json, r'address'),
-        phoneNumber: mapValueOfType<Object>(json, r'phoneNumber'),
+        address: mapValueOfType<String>(json, r'address'),
+        phoneNumber: mapValueOfType<String>(json, r'phoneNumber'),
       );
     }
     return null;

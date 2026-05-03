@@ -19,6 +19,7 @@ class PublicClinicDto {
     required this.address,
   });
 
+
   String id;
 
   String name;
@@ -29,7 +30,7 @@ class PublicClinicDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  Object? avatarUrl;
+  String? avatarUrl;
 
   String address;
 
@@ -85,7 +86,7 @@ class PublicClinicDto {
       return PublicClinicDto(
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
-        avatarUrl: mapValueOfType<Object>(json, r'avatarUrl'),
+        avatarUrl: mapValueOfType<String>(json, r'avatarUrl'),
         address: mapValueOfType<String>(json, r'address')!,
       );
     }

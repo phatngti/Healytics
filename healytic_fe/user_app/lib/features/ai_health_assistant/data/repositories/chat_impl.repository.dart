@@ -34,11 +34,15 @@ class ChatImplementRepository
   @override
   Stream<ChatSseEvent> sendMessageAndStream(
     String? conversationId,
-    String text,
-  ) {
+    String text, {
+    double? currentLat,
+    double? currentLng,
+  }) {
     return _remoteDatasource.sendMessageAndStream(
       conversationId,
       text,
+      currentLat: currentLat,
+      currentLng: currentLng,
     );
   }
 }

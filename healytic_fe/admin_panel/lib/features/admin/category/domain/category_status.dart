@@ -16,9 +16,7 @@ enum CategoryStatus {
   };
 
   /// Parse from API value.
-  static CategoryStatus? fromApiValue(
-    String? value,
-  ) {
+  static CategoryStatus? fromApiValue(String? value) {
     if (value == null) return null;
     return switch (value.toLowerCase()) {
       'active' => CategoryStatus.active,
