@@ -18,6 +18,7 @@ class PartnerServiceRuleDto {
     required this.description,
   });
 
+
   String iconSlug;
 
   String title;

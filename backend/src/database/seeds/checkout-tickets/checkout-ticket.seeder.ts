@@ -8,7 +8,12 @@ import { Booking } from '@/common/entities/booking.entity';
 import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
 import { CheckoutTicketStatus } from '@/booking/enums/checkout-ticket-status.enum';
 import { ISeeder } from '../seeder.interface';
-import { SEED_MARKERS, buildMapBy, likePrefix, seedKey } from '../utils/seed.utils';
+import {
+  SEED_MARKERS,
+  buildMapBy,
+  likePrefix,
+  seedKey,
+} from '../utils/seed.utils';
 
 type SeedTicketStatus = keyof typeof CheckoutTicketStatus;
 
@@ -48,6 +53,31 @@ const SEED_TICKETS: SeedTicket[] = [
     offsetMinutes: 240,
     errorMessage: 'Slot is no longer available.',
   },
+  {
+    code: 'QUEUED_002',
+    userEmail: 'nguyenvana@healytics.vn',
+    staffCode: 'EMP-005',
+    productSlug: 'dental-checkup-cleaning',
+    status: 'QUEUED',
+    offsetMinutes: 300,
+  },
+  {
+    code: 'PROCESSING_002',
+    userEmail: 'tranthib@healytics.vn',
+    staffCode: 'EMP-007',
+    productSlug: 'sports-recovery-yoga-session',
+    status: 'PROCESSING',
+    offsetMinutes: 360,
+  },
+  {
+    code: 'FAILED_002',
+    userEmail: 'hoangvane@healytics.vn',
+    staffCode: 'EMP-012',
+    productSlug: 'dermatology-acne-consultation',
+    status: 'FAILED',
+    offsetMinutes: 420,
+    errorMessage: 'Payment authorization expired before checkout.',
+  },
 ];
 
 @Injectable()
@@ -72,11 +102,17 @@ export class CheckoutTicketSeeder implements ISeeder {
 
     const [accounts, employees, products] = await Promise.all([
       this.accountRepo.find({
-        where: { email: In([...new Set(SEED_TICKETS.map((item) => item.userEmail))]) },
+        where: {
+          email: In([...new Set(SEED_TICKETS.map((item) => item.userEmail))]),
+        },
         select: ['id', 'email'],
       }),
       this.employeeRepo.find({
-        where: { employeeCode: In([...new Set(SEED_TICKETS.map((item) => item.staffCode))]) },
+        where: {
+          employeeCode: In([
+            ...new Set(SEED_TICKETS.map((item) => item.staffCode)),
+          ]),
+        },
         select: ['id', 'employeeCode'],
       }),
       this.productRepo.find({
@@ -103,20 +139,26 @@ export class CheckoutTicketSeeder implements ISeeder {
         where: { idempotencyKey },
       });
       if (existing) {
-        this.logger.log(`  ⏭ Checkout ticket "${idempotencyKey}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ Checkout ticket "${idempotencyKey}" already exists, skipping`,
+        );
         continue;
       }
 
       const user = accountMap.get(seed.userEmail);
       const staff = employeeMap.get(seed.staffCode);
-      const product = seed.productSlug ? productMap.get(seed.productSlug) : null;
+      const product = seed.productSlug
+        ? productMap.get(seed.productSlug)
+        : null;
 
       if (!user || !staff) {
         this.logger.warn(`  ⚠ Missing FK for ticket "${seed.code}" — skipping`);
         continue;
       }
       if (seed.productSlug && !product) {
-        this.logger.warn(`  ⚠ Product "${seed.productSlug}" not found — skipping`);
+        this.logger.warn(
+          `  ⚠ Product "${seed.productSlug}" not found — skipping`,
+        );
         continue;
       }
 
@@ -150,7 +192,9 @@ export class CheckoutTicketSeeder implements ISeeder {
       where: { idempotencyKey: successKey },
     });
     if (existing) {
-      this.logger.log(`  ⏭ Checkout ticket "${successKey}" already exists, skipping`);
+      this.logger.log(
+        `  ⏭ Checkout ticket "${successKey}" already exists, skipping`,
+      );
       return;
     }
 

@@ -17,6 +17,7 @@ class VerificationDocumentEntryDto {
     this.documents = const [],
   });
 
+
   /// Unique key identifying the document field (e.g. \"id_card\", \"other_documents\")
   String fieldKey;
 

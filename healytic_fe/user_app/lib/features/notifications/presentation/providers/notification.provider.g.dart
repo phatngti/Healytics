@@ -115,7 +115,7 @@ final class NotificationNotifierProvider
 }
 
 String _$notificationNotifierHash() =>
-    r'2d285af9a61192dbc99044b409c440ce88e0e7c5';
+    r'2e4c99149c5ba7bbba77acf8e388ae0c59e74587';
 
 /// Stateful async notifier managing the paginated
 /// notification list.
@@ -191,7 +191,7 @@ final class UnreadCountProvider
   UnreadCount create() => UnreadCount();
 }
 
-String _$unreadCountHash() => r'3916e6b9532bf1375bf641d4ed3b4d4b2501ac40';
+String _$unreadCountHash() => r'b8df5f50a74c47df1d05b9ed30a9ddf21ae12d66';
 
 /// Manages the unread notification badge count.
 ///

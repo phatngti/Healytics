@@ -8,17 +8,13 @@ part 'profile_completion.provider.g.dart';
 /// presentation layer. Delegates all data operations
 /// to the [ProfileCompletionRepository].
 @riverpod
-class ProfileCompletionNotifier
-    extends _$ProfileCompletionNotifier {
+class ProfileCompletionNotifier extends _$ProfileCompletionNotifier {
   @override
-  FutureOr<PartnerProfileCompletionEntity>
-      build() async {
+  FutureOr<PartnerProfileCompletionEntity> build() async {
     // Use ref.watch so this notifier properly
     // depends on the repository provider and
     // rebuilds when it changes.
-    final repo = ref.watch(
-      profileCompletionRepositoryProvider,
-    );
+    final repo = ref.watch(profileCompletionRepositoryProvider);
     return repo.getProfileCompletion();
   }
 
@@ -28,11 +24,8 @@ class ProfileCompletionNotifier
   ) async {
     // Cache repo before the async gap to avoid
     // accessing ref after potential disposal.
-    final repo = ref.read(
-      profileCompletionRepositoryProvider,
-    );
-    final result =
-        await repo.updateProfileCompletion(request);
+    final repo = ref.read(profileCompletionRepositoryProvider);
+    final result = await repo.updateProfileCompletion(request);
     if (!ref.mounted) return result;
     state = AsyncValue.data(result);
     return result;
@@ -40,17 +33,13 @@ class ProfileCompletionNotifier
 
   /// Validates and completes the profile, triggering
   /// a session refresh to update partner flags.
-  Future<PartnerProfileCompletionEntity>
-      completeProfile(
+  Future<PartnerProfileCompletionEntity> completeProfile(
     PartnerProfileCompletionUpdateRequest request,
   ) async {
     // Cache repo before the async gap to avoid
     // accessing ref after potential disposal.
-    final repo = ref.read(
-      profileCompletionRepositoryProvider,
-    );
-    final result =
-        await repo.completeProfile(request);
+    final repo = ref.read(profileCompletionRepositoryProvider);
+    final result = await repo.completeProfile(request);
     if (!ref.mounted) return result;
     state = AsyncValue.data(result);
     return result;
@@ -59,11 +48,7 @@ class ProfileCompletionNotifier
   /// Force-refetches completion data from the API.
   Future<void> refreshData() async {
     state = const AsyncValue.loading();
-    final repo = ref.read(
-      profileCompletionRepositoryProvider,
-    );
-    state = await AsyncValue.guard(
-      repo.getProfileCompletion,
-    );
+    final repo = ref.read(profileCompletionRepositoryProvider);
+    state = await AsyncValue.guard(repo.getProfileCompletion);
   }
 }

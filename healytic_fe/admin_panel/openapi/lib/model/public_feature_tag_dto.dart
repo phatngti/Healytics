@@ -17,6 +17,7 @@ class PublicFeatureTagDto {
     required this.label,
   });
 
+
   String iconName;
 
   String label;

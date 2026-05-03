@@ -10,6 +10,7 @@ import { BusinessType } from './enum/business-type.enum';
 import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
 import { RegisterPartnerHandler } from './application/handlers/register-partner.handler';
 import { UpdatePartnerProfileHandler } from './application/handlers/update-partner-profile.handler';
+import { UpdatePartnerPublicProfileHandler } from './application/handlers/update-partner-public-profile.handler';
 import { Role } from '@/account/enum/role.enum';
 import { BadRequestException } from '@nestjs/common';
 
@@ -41,6 +42,10 @@ describe('PartnersService', () => {
   };
 
   const mockUpdatePartnerProfileHandler = {
+    execute: jest.fn(),
+  };
+
+  const mockUpdatePartnerPublicProfileHandler = {
     execute: jest.fn(),
   };
 
@@ -120,6 +125,10 @@ describe('PartnersService', () => {
         {
           provide: UpdatePartnerProfileHandler,
           useValue: mockUpdatePartnerProfileHandler,
+        },
+        {
+          provide: UpdatePartnerPublicProfileHandler,
+          useValue: mockUpdatePartnerPublicProfileHandler,
         },
       ],
     }).compile();

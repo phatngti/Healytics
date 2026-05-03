@@ -18,6 +18,7 @@ class AccountRequestDto {
     required this.email,
   });
 
+
   /// Username
   String username;
 

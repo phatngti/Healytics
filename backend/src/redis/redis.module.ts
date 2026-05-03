@@ -17,16 +17,17 @@ import { RedisService, REDIS_CLIENT } from './redis.service';
           port: number;
           password?: string;
           username?: string;
+          tls: boolean;
         };
 
-        const isLocal = cfg.host === 'localhost' || cfg.host === '127.0.0.1';
+        const useTls = cfg.tls === true;
 
         const client = new Redis({
           host: cfg.host,
           port: cfg.port,
           password: cfg.password,
           username: cfg.username,
-          ...(isLocal ? {} : { tls: {} }),
+          ...(useTls ? { tls: {} } : {}),
           retryStrategy: (times) => {
             if (times > 5) {
               logger.error(

@@ -19,6 +19,7 @@ class ProcedureStepDto {
     required this.isActive,
   });
 
+
   num stepNumber;
 
   String title;

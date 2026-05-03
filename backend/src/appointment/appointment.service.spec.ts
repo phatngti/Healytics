@@ -5,6 +5,7 @@ import { GetAppointmentHandler } from './application/handlers/get-appointment.ha
 import { ListAppointmentCategoriesHandler } from './application/handlers/list-appointment-categories.handler';
 import { ListRecommendedServicesHandler } from './application/handlers/list-recommended-services.handler';
 import { GetServiceManualHandler } from './application/handlers/get-service-manual.handler';
+import { ListRecentActivityHandler } from './application/handlers/list-recent-activity.handler';
 import { ListAppointmentsQueryDto } from './dto/list-appointments-query.dto';
 import { MockHandler, createMockHandler } from '../../test/mocks/mock-types';
 
@@ -15,6 +16,7 @@ describe('AppointmentService', () => {
   let listAppointmentCategoriesHandler: MockHandler;
   let listRecommendedServicesHandler: MockHandler;
   let getServiceManualHandler: MockHandler;
+  let listRecentActivityHandler: MockHandler;
 
   beforeEach(async () => {
     listAppointmentsHandler = createMockHandler();
@@ -22,6 +24,7 @@ describe('AppointmentService', () => {
     listAppointmentCategoriesHandler = createMockHandler();
     listRecommendedServicesHandler = createMockHandler();
     getServiceManualHandler = createMockHandler();
+    listRecentActivityHandler = createMockHandler();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -37,6 +40,10 @@ describe('AppointmentService', () => {
           useValue: listRecommendedServicesHandler,
         },
         { provide: GetServiceManualHandler, useValue: getServiceManualHandler },
+        {
+          provide: ListRecentActivityHandler,
+          useValue: listRecentActivityHandler,
+        },
       ],
     }).compile();
 

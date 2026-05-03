@@ -6,13 +6,11 @@ import 'package:admin_panel/features/partner/profile_completion/domain/profile_c
 abstract class ProfileCompletionRepository {
   /// Loads the current profile completion state
   /// including checklist and clinic identity.
-  Future<PartnerProfileCompletionEntity>
-      getProfileCompletion();
+  Future<PartnerProfileCompletionEntity> getProfileCompletion();
 
   /// Persists updated profile fields and returns
   /// the refreshed completion state.
-  Future<PartnerProfileCompletionEntity>
-      updateProfileCompletion(
+  Future<PartnerProfileCompletionEntity> updateProfileCompletion(
     PartnerProfileCompletionUpdateRequest request,
   );
 
@@ -20,8 +18,7 @@ abstract class ProfileCompletionRepository {
   /// partner JWT session, and returns the updated
   /// completion state. Sets session flags so the
   /// router recognises a completed profile.
-  Future<PartnerProfileCompletionEntity>
-      completeProfile(
+  Future<PartnerProfileCompletionEntity> completeProfile(
     PartnerProfileCompletionUpdateRequest request,
   );
 }

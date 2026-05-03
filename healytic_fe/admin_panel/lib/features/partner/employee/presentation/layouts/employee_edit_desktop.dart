@@ -227,9 +227,7 @@ class _RightColumn extends StatelessWidget {
           },
         ),
         AppDimens.verticalMedium,
-        EmployeeWorkHistoryCard(
-          initialEntries: employee.workHistory,
-        ),
+        EmployeeWorkHistoryCard(initialEntries: employee.workHistory),
         AppDimens.verticalMedium,
         EmployeeDetailsDocumentsCard(isEditing: isEditing),
         AppDimens.verticalMedium,

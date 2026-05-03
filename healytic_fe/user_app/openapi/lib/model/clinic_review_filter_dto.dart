@@ -19,17 +19,12 @@ class ClinicReviewFilterDto {
     required this.requiresMedia,
   });
 
+
   String id;
 
   String label;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? starCount;
+  num? starCount;
 
   bool requiresMedia;
 
@@ -85,7 +80,9 @@ class ClinicReviewFilterDto {
       return ClinicReviewFilterDto(
         id: mapValueOfType<String>(json, r'id')!,
         label: mapValueOfType<String>(json, r'label')!,
-        starCount: mapValueOfType<Object>(json, r'starCount'),
+        starCount: json[r'starCount'] == null
+            ? null
+            : num.parse('${json[r'starCount']}'),
         requiresMedia: mapValueOfType<bool>(json, r'requiresMedia')!,
       );
     }

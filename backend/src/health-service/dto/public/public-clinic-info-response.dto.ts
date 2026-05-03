@@ -7,118 +7,118 @@ import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-
 // ─── Nested DTOs ─────────────────────────────────────────────
 
 class PublicClinicCertificationDto {
-  @ApiProperty({ example: 'Medical License #124' })
+  @ApiProperty({ type: String, example: 'Medical License #124' })
   title: string;
 
-  @ApiProperty({ example: 'Ministry of Health' })
+  @ApiProperty({ type: String, example: 'Ministry of Health' })
   subtitle: string;
 
-  @ApiProperty({ example: 'workspace_premium' })
+  @ApiProperty({ type: String, example: 'workspace_premium' })
   iconName: string;
 }
 
 class PublicClinicSpecialistPreviewDto {
-  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @ApiProperty({ type: String, example: 'a1b2c3d4-...' })
   id: string;
 
-  @ApiProperty({ example: 'Dr. Sarah Lin' })
+  @ApiProperty({ type: String, example: 'Dr. Sarah Lin' })
   name: string;
 
-  @ApiProperty({ example: 'Dermatologist' })
+  @ApiProperty({ type: String, example: 'Dermatologist' })
   role: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'https://example.com/avatar.jpg' })
   imageUrl: string | null;
 
-  @ApiPropertyOptional({ example: '10 Yrs Exp' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: '10 Yrs Exp' })
   experienceLabel: string | null;
 }
 
 class PublicClinicFacilityImageDto {
-  @ApiProperty({ example: 'https://example.com/facility.jpg' })
+  @ApiProperty({ type: String, example: 'https://example.com/facility.jpg' })
   imageUrl: string;
 
-  @ApiProperty({ example: 'Main Hall' })
+  @ApiProperty({ type: String, example: 'Main Hall' })
   label: string;
 }
 
 class PublicClinicFeaturedServiceDto {
-  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @ApiProperty({ type: String, example: 'a1b2c3d4-...' })
   id: string;
 
-  @ApiProperty({ example: 'Relaxation Massage' })
+  @ApiProperty({ type: String, example: 'Relaxation Massage' })
   title: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/service.jpg' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'https://example.com/service.jpg' })
   imageUrl: string | null;
 
-  @ApiProperty({ example: '890,000₫' })
+  @ApiProperty({ type: String, example: '890,000₫' })
   price: string;
 
-  @ApiProperty({ example: 4.9 })
+  @ApiProperty({ type: Number, example: 4.9 })
   rating: number;
 
-  @ApiProperty({ example: '1.2k booked' })
+  @ApiProperty({ type: String, example: '1.2k booked' })
   bookedLabel: string;
 }
 
 export class PublicClinicTrustMetricsDto {
-  @ApiProperty({ example: '10+ Yrs' })
+  @ApiProperty({ type: String, example: '10+ Yrs' })
   experienceLabel: string;
 
-  @ApiProperty({ example: 15 })
+  @ApiProperty({ type: Number, example: 15 })
   specialistsCount: number;
 
-  @ApiProperty({ example: '100%' })
+  @ApiProperty({ type: String, example: '100%' })
   certifiedLabel: string;
 
-  @ApiProperty({ example: '30k+' })
+  @ApiProperty({ type: String, example: '30k+' })
   clientsLabel: string;
 }
 
 // ─── Main DTO ────────────────────────────────────────────────
 
 export class PublicClinicInfoResponseDto {
-  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @ApiProperty({ type: String, example: 'a1b2c3d4-...' })
   id: string;
 
-  @ApiProperty({ example: 'An Mien Spa & Clinic' })
+  @ApiProperty({ type: String, example: 'An Mien Spa & Clinic' })
   name: string;
 
-  @ApiProperty({ example: '42 West St., District 1, HCM' })
+  @ApiProperty({ type: String, example: '42 West St., District 1, HCM' })
   address: string;
 
-  @ApiProperty({ example: true })
+  @ApiProperty({ type: Boolean, example: true })
   isVerified: boolean;
 
-  @ApiPropertyOptional({ example: 'https://example.com/cover.jpg' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'https://example.com/cover.jpg' })
   coverImageUrl: string | null;
 
-  @ApiPropertyOptional({ example: 'https://example.com/logo.jpg' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'https://example.com/logo.jpg' })
   logoImageUrl: string | null;
 
   @ApiProperty({ type: [String] })
   gallery: string[];
 
-  @ApiProperty({ example: 4.9 })
+  @ApiProperty({ type: Number, example: 4.9 })
   rating: number;
 
-  @ApiProperty({ example: 2500 })
+  @ApiProperty({ type: Number, example: 2500 })
   reviewCount: number;
 
-  @ApiProperty({ example: '15k' })
+  @ApiProperty({ type: String, example: '15k' })
   followersLabel: string;
 
-  @ApiPropertyOptional({ example: '+84 28 1234 5678' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: '+84 28 1234 5678' })
   phone: string | null;
 
-  @ApiPropertyOptional({ example: '10.7769,106.7009' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: '10.7769,106.7009' })
   coordinates: string | null;
 
-  @ApiPropertyOptional({ example: 'a1b2c3d4-...' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'a1b2c3d4-...' })
   chatPartnerId: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   description: string | null;
 
   @ApiProperty({ type: PublicClinicTrustMetricsDto })

@@ -24,10 +24,24 @@ void main() {
       // TODO
     });
 
+    // Create Stripe payment for booking (card)
+    //
+    //Future<StripePaymentResponseDto> userPaymentControllerCreateStripePayment(String bookingId, Object body) async
+    test('test userPaymentControllerCreateStripePayment', () async {
+      // TODO
+    });
+
     // Request MoMo refund for booking
     //
     //Future<Object> userPaymentControllerRefundMoMoPayment(String bookingId, CreateMoMoRefundDto createMoMoRefundDto) async
     test('test userPaymentControllerRefundMoMoPayment', () async {
+      // TODO
+    });
+
+    // Request Stripe refund for booking
+    //
+    //Future<StripeRefundResponseDto> userPaymentControllerRefundStripePayment(String bookingId) async
+    test('test userPaymentControllerRefundStripePayment', () async {
       // TODO
     });
 

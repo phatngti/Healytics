@@ -16,8 +16,8 @@ void main() {
   // final instance = AiRecommendationItemDto();
 
   group('test AiRecommendationItemDto', () {
-    // String id
-    test('to test the property `id`', () async {
+    // String serviceId
+    test('to test the property `serviceId`', () async {
       // TODO
     });
 
@@ -31,7 +31,7 @@ void main() {
       // TODO
     });
 
-    // Object imageUrl
+    // String imageUrl
     test('to test the property `imageUrl`', () async {
       // TODO
     });

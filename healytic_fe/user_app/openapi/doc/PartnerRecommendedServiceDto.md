@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | 
 **title** | **String** |  | 
-**imageUrl** | [**Object**](.md) |  | [optional] 
+**imageUrl** | **String** |  | [optional] 
 **rating** | **num** |  | 
 **reviewCount** | **num** |  | 
 **price** | **String** |  | 

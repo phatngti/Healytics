@@ -35,14 +35,11 @@ class QuickActionsSection extends StatelessWidget {
               child: _QuickActionCard(
                 icon: Symbols.calendar_add_on,
                 iconColor: theme.colorScheme.primary,
-                backgroundColor: theme.colorScheme.primaryContainer.withValues(
-                  alpha: 0.5,
-                ),
+                backgroundColor: theme.colorScheme.primaryContainer,
                 title: 'Book Appointment',
                 subtitle: 'Quick booking with AI suggestions',
                 onTap: () {
-                  const BookAppointmentRoute()
-                      .push(context);
+                  const BookAppointmentRoute().push(context);
                 },
               ),
             ),
@@ -50,15 +47,12 @@ class QuickActionsSection extends StatelessWidget {
             Expanded(
               child: _QuickActionCard(
                 icon: Symbols.smart_toy,
-                iconColor: theme.colorScheme.tertiary,
-                backgroundColor: theme.colorScheme.tertiaryContainer.withValues(
-                  alpha: 0.5,
-                ),
+                iconColor: theme.colorScheme.secondary,
+                backgroundColor: theme.colorScheme.secondaryContainer,
                 title: 'AI Health Assistant',
                 subtitle: 'Get instant health guidance',
                 onTap: () {
-                  const AiHealthAssistantRoute()
-                      .push(context);
+                  const AiHealthAssistantRoute().push(context);
                 },
               ),
             ),

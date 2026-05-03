@@ -117,7 +117,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     final typeEnum = _mapProductType(request.productType);
 
     CreatePartnerHealthServiceDefinitionDto? productDefinition;
-    if (typeEnum == CreatePartnerHealthServiceDtoTypeEnum.service) {
+    if (typeEnum == HealthServiceType.service) {
       productDefinition = CreatePartnerHealthServiceDefinitionDto(
         durationMinutes: request.duration ?? 60,
         bufferMinutes: request.buffer,
@@ -243,11 +243,11 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     );
   }
 
-  CreatePartnerHealthServiceDtoTypeEnum _mapProductType(String type) {
+  HealthServiceType _mapProductType(String type) {
     switch (type.toLowerCase()) {
       case 'service':
       default:
-        return CreatePartnerHealthServiceDtoTypeEnum.service;
+        return HealthServiceType.service;
     }
   }
 

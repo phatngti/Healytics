@@ -20,7 +20,7 @@ import { StaffAssignmentType } from '@/health-service/enums/staff-assignment-typ
 
 // Nested DTOs
 export class CreatePartnerHealthServiceMediaDto {
-  @ApiProperty({ example: 'https://example.com/product.jpg' })
+  @ApiProperty({ type: String, example: 'https://example.com/product.jpg' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(500)
@@ -31,37 +31,37 @@ export class CreatePartnerHealthServiceMediaDto {
   @IsOptional()
   mediaType?: MediaType;
 
-  @ApiPropertyOptional({ example: true })
+  @ApiPropertyOptional({ type: Boolean, example: true })
   @IsBoolean()
   @IsOptional()
   isThumbnail?: boolean;
 
-  @ApiPropertyOptional({ example: 0 })
+  @ApiPropertyOptional({ type: Number, example: 0 })
   @IsNumber()
   @IsOptional()
   sortOrder?: number;
 }
 
 export class CreatePartnerHealthServiceDefinitionDto {
-  @ApiProperty({ example: 60, description: 'Duration in minutes' })
+  @ApiProperty({ type: Number, example: 60, description: 'Duration in minutes' })
   @IsNumber()
   @IsNotEmpty()
   @Min(1)
   durationMinutes: number;
 
-  @ApiPropertyOptional({ example: 15 })
+  @ApiPropertyOptional({ type: Number, example: 15 })
   @IsNumber()
   @IsOptional()
   @Min(0)
   bufferMinutes?: number;
 
-  @ApiPropertyOptional({ example: 1 })
+  @ApiPropertyOptional({ type: Number, example: 1 })
   @IsNumber()
   @IsOptional()
   @Min(1)
   maxCapacity?: number;
 
-  @ApiPropertyOptional({ example: 2 })
+  @ApiPropertyOptional({ type: Number, example: 2 })
   @IsNumber()
   @IsOptional()
   @Min(0)
@@ -77,52 +77,52 @@ export class CreatePartnerHealthServiceDefinitionDto {
 }
 
 export class CreatePartnerHealthServiceFacilityImageDto {
-  @ApiProperty({ example: 'https://example.com/facility.jpg' })
+  @ApiProperty({ type: String, example: 'https://example.com/facility.jpg' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(500)
   imageUrl: string;
 
-  @ApiProperty({ example: 'Treatment Room A' })
+  @ApiProperty({ type: String, example: 'Treatment Room A' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
   label: string;
 
-  @ApiPropertyOptional({ example: 0 })
+  @ApiPropertyOptional({ type: Number, example: 0 })
   @IsNumber()
   @IsOptional()
   sortOrder?: number;
 }
 
 export class ServiceRuleInputDto {
-  @ApiProperty({ example: 'no-eating' })
+  @ApiProperty({ type: String, example: 'no-eating' })
   @IsString()
   @IsNotEmpty()
   iconSlug: string;
 
-  @ApiProperty({ example: 'No Eating Before' })
+  @ApiProperty({ type: String, example: 'No Eating Before' })
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'Avoid eating 2 hours before the service' })
+  @ApiProperty({ type: String, example: 'Avoid eating 2 hours before the service' })
   @IsString()
   @IsNotEmpty()
   description: string;
 }
 
 export class ProcedureStepInputDto {
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ type: Number, example: 1 })
   @IsNumber()
   stepNumber: number;
 
-  @ApiProperty({ example: 'Check-in & Registration' })
+  @ApiProperty({ type: String, example: 'Check-in & Registration' })
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'Arrive at the reception and complete registration' })
+  @ApiProperty({ type: String, example: 'Arrive at the reception and complete registration' })
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -155,46 +155,46 @@ export class ServiceManualInputDto {
 
 // Main DTO
 export class CreatePartnerHealthServiceDto {
-  @ApiPropertyOptional({ example: 'uuid-category-id' })
+  @ApiPropertyOptional({ type: String, format: 'uuid', example: 'uuid-category-id' })
   @IsUUID()
   @IsOptional()
   categoryId?: string;
 
-  @ApiProperty({ example: 'Thai Massage' })
+  @ApiProperty({ type: String, example: 'Thai Massage' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
   name: string;
 
-  @ApiProperty({ example: 'thai-massage' })
+  @ApiProperty({ type: String, example: 'thai-massage' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
   slug: string;
 
-  @ApiPropertyOptional({ example: 'A relaxing Thai massage service' })
+  @ApiPropertyOptional({ type: String, example: 'A relaxing Thai massage service' })
   @IsString()
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ enum: HealthServiceType, example: HealthServiceType.SERVICE })
+  @ApiProperty({ enum: HealthServiceType, enumName: 'HealthServiceType', example: HealthServiceType.SERVICE })
   @IsEnum(HealthServiceType)
   @IsNotEmpty()
   type: HealthServiceType;
 
-  @ApiPropertyOptional({ example: 500000 })
+  @ApiPropertyOptional({ type: Number, example: 500000 })
   @IsNumber()
   @IsOptional()
   @Min(0)
   basePrice?: number;
 
-  @ApiPropertyOptional({ example: 450000 })
+  @ApiPropertyOptional({ type: Number, example: 450000 })
   @IsNumber()
   @IsOptional()
   @Min(0)
   salePrice?: number;
 
-  @ApiPropertyOptional({ example: 'VND' })
+  @ApiPropertyOptional({ type: String, example: 'VND' })
   @IsString()
   @IsOptional()
   @MaxLength(3)
@@ -208,12 +208,12 @@ export class CreatePartnerHealthServiceDto {
   @IsOptional()
   status?: HealthServiceStatus;
 
-  @ApiPropertyOptional({ example: false })
+  @ApiPropertyOptional({ type: Boolean, example: false })
   @IsBoolean()
   @IsOptional()
   isVisibleOnline?: boolean;
 
-  @ApiPropertyOptional({ example: ['uuid-1', 'uuid-2'] })
+  @ApiPropertyOptional({ type: [String], example: ['uuid-1', 'uuid-2'] })
   @IsArray()
   @IsUUID(undefined, { each: true })
   @IsOptional()

@@ -24,6 +24,8 @@ class CheckoutSubmissionOverlay extends StatelessWidget {
         'Processing your booking...',
       CheckoutSubmissionStatus.awaitingMoMoPayment =>
         'Opening MoMo. Complete payment in the app...',
+      CheckoutSubmissionStatus.awaitingStripePayment =>
+        'Processing card payment...',
       CheckoutSubmissionStatus.verifyingPayment =>
         'Verifying your payment...',
       _ => 'Submitting...',

@@ -314,9 +314,8 @@ class TransactionDetailsDesktop extends ConsumerWidget {
           title: 'Failed to load transaction',
           error: error,
           stackTrace: stack,
-          onRetry: () => ref.invalidate(
-            transactionDetailsProvider(transactionId),
-          ),
+          onRetry: () =>
+              ref.invalidate(transactionDetailsProvider(transactionId)),
         ),
       ),
     );

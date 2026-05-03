@@ -6,30 +6,23 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// Read-only card displaying verification documents
 /// grouped by field key (license, id_card, etc.).
-class EmployeeVerificationDocumentsCard
-    extends StatelessWidget {
+class EmployeeVerificationDocumentsCard extends StatelessWidget {
   /// Grouped verification document entries.
   final List<VerificationDocumentEntry> documents;
 
-  const EmployeeVerificationDocumentsCard({
-    super.key,
-    required this.documents,
-  });
+  const EmployeeVerificationDocumentsCard({super.key, required this.documents});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>()!;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: AppDimens.radiusMedium,
-        border: Border.all(
-          color: colorScheme.outlineVariant,
-        ),
+        border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withAlpha(10),
@@ -52,25 +45,16 @@ class EmployeeVerificationDocumentsCard
             Padding(
               padding: AppDimens.paddingAllLarge,
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (int i = 0;
-                      i < documents.length;
-                      i++) ...[
-                    _DocumentGroup(
-                      entry: documents[i],
-                    ),
+                  for (int i = 0; i < documents.length; i++) ...[
+                    _DocumentGroup(entry: documents[i]),
                     if (i < documents.length - 1)
                       Padding(
-                        padding:
-                            const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Divider(
                           height: 1,
-                          color:
-                              colorScheme.outlineVariant,
+                          color: colorScheme.outlineVariant,
                         ),
                       ),
                   ],
@@ -88,36 +72,23 @@ class EmployeeVerificationDocumentsCard
     required SemanticColors semanticColors,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: 16,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            colorScheme.surfaceContainerHighest
-                .withAlpha(100),
+            colorScheme.surfaceContainerHighest.withAlpha(100),
             colorScheme.surface,
           ],
         ),
-        border: Border(
-          bottom: BorderSide(
-            color: colorScheme.outlineVariant,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.verified_user,
-            color: semanticColors.info,
-          ),
+          Icon(Icons.verified_user, color: semanticColors.info),
           AppDimens.horizontalSmall,
           Text(
             'Verification Documents',
-            style: textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -166,9 +137,7 @@ class _DocumentGroup extends StatelessWidget {
             ),
           )
         else
-          ...entry.documents.map(
-            (doc) => _DocumentTile(document: doc),
-          ),
+          ...entry.documents.map((doc) => _DocumentTile(document: doc)),
       ],
     );
   }
@@ -188,8 +157,7 @@ class _DocumentGroup extends StatelessWidget {
     return switch (key) {
       'license' => Icons.badge_outlined,
       'id_card' => Icons.perm_identity,
-      'other_documents' =>
-        Icons.folder_copy_outlined,
+      'other_documents' => Icons.folder_copy_outlined,
       _ => Icons.description_outlined,
     };
   }
@@ -211,12 +179,9 @@ class _DocumentTile extends StatelessWidget {
       child: Container(
         padding: AppDimens.paddingAllMedium,
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest
-              .withAlpha(80),
+          color: colorScheme.surfaceContainerHighest.withAlpha(80),
           borderRadius: AppDimens.radiusMedium,
-          border: Border.all(
-            color: colorScheme.outlineVariant,
-          ),
+          border: Border.all(color: colorScheme.outlineVariant),
         ),
         child: Row(
           children: [
@@ -226,9 +191,7 @@ class _DocumentTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: colorScheme.surface,
                 borderRadius: AppDimens.radiusSmall,
-                border: Border.all(
-                  color: colorScheme.outlineVariant,
-                ),
+                border: Border.all(color: colorScheme.outlineVariant),
               ),
               child: Icon(
                 _fileIcon(document.name),
@@ -239,13 +202,11 @@ class _DocumentTile extends StatelessWidget {
             AppDimens.horizontalMedium,
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     document.name,
-                    style:
-                        textTheme.bodyMedium?.copyWith(
+                    style: textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                     maxLines: 1,
@@ -254,10 +215,8 @@ class _DocumentTile extends StatelessWidget {
                   if (document.updatedTime != null)
                     Text(
                       'Updated: ${document.updatedTime}',
-                      style:
-                          textTheme.bodySmall?.copyWith(
-                        color:
-                            colorScheme.onSurfaceVariant,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                 ],
@@ -265,8 +224,7 @@ class _DocumentTile extends StatelessWidget {
             ),
             AppDimens.horizontalSmall,
             TextButton.icon(
-              onPressed: () =>
-                  _openDocument(context, document.url),
+              onPressed: () => _openDocument(context, document.url),
               icon: Icon(
                 Icons.open_in_new,
                 size: 16,
@@ -287,21 +245,14 @@ class _DocumentTile extends StatelessWidget {
   }
 
   /// Opens the document URL in the browser.
-  Future<void> _openDocument(
-    BuildContext context,
-    String url,
-  ) async {
+  Future<void> _openDocument(BuildContext context, String url) async {
     final uri = Uri.tryParse(url);
     if (uri != null && await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Could not open document: $url',
-            ),
-          ),
+          SnackBar(content: Text('Could not open document: $url')),
         );
       }
     }

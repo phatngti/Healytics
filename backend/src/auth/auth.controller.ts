@@ -32,6 +32,7 @@ import { Public } from '../common/decorators/auth/public.decorator';
 import { LoginDto } from './dto/request/login.dto';
 import { AdminLoginDto } from './dto/request/admin-login.dto';
 import { PartnerLoginDto } from './dto/request/partner-login.dto';
+import { EmployeeLoginDto } from './dto/request/employee-login.dto';
 import { PartnersService } from '@/partners/partners.service';
 import { RegisterPartnerDto } from '@/partners/dto/request/register-partner.dto';
 import { RegisterPartnerResponseDto } from '@/partners/dto/response/register-partner-response.dto';
@@ -79,7 +80,6 @@ export class AuthController {
   @Post('user/login')
   @Public()
   @UseGuards(LocalAuthGuard)
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login as a user' })
   @ApiBody({ type: LoginDto })
@@ -185,6 +185,50 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginAdmin(@Req() req): Promise<AuthTokensDto> {
     return this.authService.loginAdmin(req.user);
+  }
+
+  // ============================================================================
+  // Employee Authentication (Employee App)
+  // ============================================================================
+
+  /**
+   * Logs in an employee and returns authentication tokens.
+   */
+  @Post('employee/login')
+  @Public()
+  @UseGuards(LocalAuthGuard)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login as an employee' })
+  @ApiBody({ type: EmployeeLoginDto })
+  @ApiOkResponse({
+    description: 'Employee login returns access and refresh tokens.',
+    type: AuthTokensDto,
+  })
+  @ApiForbiddenResponse({
+    description: 'Account not authorized for employee login.',
+  })
+  @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
+  async loginEmployee(@Req() req): Promise<AuthTokensDto> {
+    return this.authService.loginEmployee(req.user);
+  }
+
+  /**
+   * Refreshes authentication tokens for an employee.
+   */
+  @Post('employee/refresh')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh employee tokens' })
+  @ApiOkResponse({
+    description: 'New pair of tokens.',
+    type: AuthTokensDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token.' })
+  async refreshEmployee(
+    @Body() dto: RefreshTokenRequestDto,
+  ): Promise<AuthTokensDto> {
+    return this.authService.refresh(dto.refresh_token);
   }
 
   // ============================================================================

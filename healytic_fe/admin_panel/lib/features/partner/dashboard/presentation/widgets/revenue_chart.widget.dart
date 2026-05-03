@@ -1,8 +1,11 @@
-import 'package:admin_panel/features/partner/dashboard/domain/dashboard_time_period.dart';
-import 'package:admin_panel/features/partner/dashboard/domain/revenue_data_point.entity.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../../domain/dashboard_time_period.dart';
+import '../../domain/revenue_data_point.entity.dart';
+import 'dashboard_constants.dart';
 
 /// Revenue area + line chart with time period selector.
 ///
@@ -18,8 +21,7 @@ class RevenueChart extends StatelessWidget {
 
   final List<RevenueDataPoint> data;
   final DashboardTimePeriod selectedPeriod;
-  final ValueChanged<DashboardTimePeriod>
-      onPeriodChanged;
+  final ValueChanged<DashboardTimePeriod> onPeriodChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -29,31 +31,28 @@ class RevenueChart extends StatelessWidget {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMediumSmall,
         side: BorderSide(
-          color: colorScheme.outlineVariant
-              .withValues(alpha: 0.5),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: AppDimens.paddingAllMediumLarge,
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _ChartHeader(
               selectedPeriod: selectedPeriod,
               onPeriodChanged: onPeriodChanged,
             ),
-            const SizedBox(height: 24),
+            AppDimens.verticalLarge,
             SizedBox(
-              height: 250,
+              height: DashboardSizes.chartHeight,
               child: data.isEmpty
                   ? Center(
                       child: Text(
                         'No data available',
-                        style: theme
-                            .textTheme.bodyMedium,
+                        style: theme.textTheme.bodyMedium,
                       ),
                     )
                   : _RevenueLineChart(
@@ -76,8 +75,7 @@ class _ChartHeader extends StatelessWidget {
   });
 
   final DashboardTimePeriod selectedPeriod;
-  final ValueChanged<DashboardTimePeriod>
-      onPeriodChanged;
+  final ValueChanged<DashboardTimePeriod> onPeriodChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -86,24 +84,23 @@ class _ChartHeader extends StatelessWidget {
     return Wrap(
       alignment: WrapAlignment.spaceBetween,
       crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 12,
-      runSpacing: 12,
+      spacing: AppDimens.spaceMd,
+      runSpacing: AppDimens.spaceMd,
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.show_chart_rounded,
-              size: 20,
+              size: AppDimens.iconMd,
               color: theme.colorScheme.primary,
             ),
-            const SizedBox(width: 8),
+            AppDimens.horizontalSmall,
             Text(
               'Revenue Overview',
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: AppDimens.fontWeightSemiBold,
+              ),
             ),
           ],
         ),
@@ -112,11 +109,7 @@ class _ChartHeader extends StatelessWidget {
               .map(
                 (p) => ButtonSegment(
                   value: p,
-                  label: Text(
-                    p.displayName,
-                    style:
-                        theme.textTheme.labelSmall,
-                  ),
+                  label: Text(p.displayName, style: theme.textTheme.labelSmall),
                 ),
               )
               .toList(),
@@ -124,10 +117,9 @@ class _ChartHeader extends StatelessWidget {
           onSelectionChanged: (selected) {
             onPeriodChanged(selected.first);
           },
-          style: ButtonStyle(
+          style: const ButtonStyle(
             visualDensity: VisualDensity.compact,
-            tapTargetSize:
-                MaterialTapTargetSize.shrinkWrap,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ),
       ],
@@ -149,10 +141,7 @@ class _RevenueLineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spots = data.asMap().entries.map((entry) {
-      return FlSpot(
-        entry.key.toDouble(),
-        entry.value.revenue,
-      );
+      return FlSpot(entry.key.toDouble(), entry.value.revenue);
     }).toList();
 
     final rawMaxY = data.fold<double>(
@@ -169,12 +158,10 @@ class _RevenueLineChart extends StatelessWidget {
           show: true,
           drawVerticalLine: false,
           horizontalInterval: maxY / 5,
-          getDrawingHorizontalLine: (value) =>
-              FlLine(
-                color: colorScheme.outlineVariant
-                    .withValues(alpha: 0.3),
-                strokeWidth: 1,
-              ),
+          getDrawingHorizontalLine: (value) => FlLine(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+            strokeWidth: AppDimens.borderWidth,
+          ),
         ),
         titlesData: FlTitlesData(
           rightTitles: const AxisTitles(),
@@ -187,9 +174,8 @@ class _RevenueLineChart extends StatelessWidget {
                 return Text(
                   _formatYAxis(value),
                   style: TextStyle(
-                    fontSize: 10,
-                    color:
-                        colorScheme.onSurfaceVariant,
+                    fontSize: AppDimens.fontSizeSmall - 2,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 );
               },
@@ -202,19 +188,16 @@ class _RevenueLineChart extends StatelessWidget {
               interval: _xInterval,
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                if (index < 0 ||
-                    index >= data.length) {
+                if (index < 0 || index >= data.length) {
                   return const SizedBox.shrink();
                 }
                 return Padding(
-                  padding:
-                      const EdgeInsets.only(top: 8),
+                  padding: AppDimens.spaceSm.paddingTop,
                   child: Text(
                     _formatXAxis(data[index].date),
                     style: TextStyle(
-                      fontSize: 10,
-                      color: colorScheme
-                          .onSurfaceVariant,
+                      fontSize: AppDimens.fontSizeSmall - 2,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 );
@@ -238,8 +221,7 @@ class _RevenueLineChart extends StatelessWidget {
                   radius: 3,
                   color: colorScheme.primary,
                   strokeWidth: 1.5,
-                  strokeColor:
-                      colorScheme.surface,
+                  strokeColor: colorScheme.surface,
                 );
               },
             ),
@@ -249,10 +231,8 @@ class _RevenueLineChart extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  colorScheme.primary
-                      .withValues(alpha: 0.3),
-                  colorScheme.primary
-                      .withValues(alpha: 0.0),
+                  colorScheme.primary.withValues(alpha: 0.3),
+                  colorScheme.primary.withValues(alpha: 0.0),
                 ],
               ),
             ),
@@ -260,31 +240,21 @@ class _RevenueLineChart extends StatelessWidget {
         ],
         lineTouchData: LineTouchData(
           touchTooltipData: LineTouchTooltipData(
-            getTooltipColor: (_) =>
-                colorScheme.inverseSurface,
+            getTooltipColor: (_) => colorScheme.inverseSurface,
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
                 final idx = spot.x.toInt();
                 final point = data[idx];
-                final dateStr =
-                    DateFormat('MMM d')
-                        .format(point.date);
+                final dateStr = DateFormat('MMM d').format(point.date);
                 return LineTooltipItem(
                   '$dateStr\n',
-                  TextStyle(
-                    color:
-                        colorScheme.onInverseSurface,
-                    fontSize: 11,
-                  ),
+                  TextStyle(color: colorScheme.onInverseSurface, fontSize: 11),
                   children: [
                     TextSpan(
-                      text: _formatRevenue(
-                        point.revenue,
-                      ),
+                      text: _formatRevenue(point.revenue),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: colorScheme
-                            .onInverseSurface,
+                        color: colorScheme.onInverseSurface,
                         fontSize: 13,
                       ),
                     ),
@@ -310,16 +280,11 @@ class _RevenueLineChart extends StatelessWidget {
 
   String _formatXAxis(DateTime date) {
     return switch (period) {
-      DashboardTimePeriod.today =>
-        DateFormat('HH:mm').format(date),
-      DashboardTimePeriod.thisWeek =>
-        DateFormat('EEE').format(date),
-      DashboardTimePeriod.thisMonth =>
-        DateFormat('d').format(date),
-      DashboardTimePeriod.thisQuarter =>
-        DateFormat('MMM d').format(date),
-      DashboardTimePeriod.thisYear =>
-        DateFormat('MMM').format(date),
+      DashboardTimePeriod.today => DateFormat('HH:mm').format(date),
+      DashboardTimePeriod.thisWeek => DateFormat('EEE').format(date),
+      DashboardTimePeriod.thisMonth => DateFormat('d').format(date),
+      DashboardTimePeriod.thisQuarter => DateFormat('MMM d').format(date),
+      DashboardTimePeriod.thisYear => DateFormat('MMM').format(date),
     };
   }
 

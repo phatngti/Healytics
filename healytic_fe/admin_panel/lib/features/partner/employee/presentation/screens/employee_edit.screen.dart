@@ -7,7 +7,6 @@ import 'package:admin_panel/features/partner/employee/presentation/layouts/emplo
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee_details.provider.dart';
 import 'package:common/widgets/card/error_card.dart';
-import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -50,18 +49,12 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
       'phone_number': employee.phone,
       'avatar_url': employee.avatar,
       'employee_role': _selectedRole,
-      'verification_documents': employee
-          .verificationDocuments
+      'verification_documents': employee.verificationDocuments
           .map(
             (d) => {
               'fieldKey': d.fieldKey,
               'documents': d.documents
-                  .map(
-                    (doc) => {
-                      'name': doc.name,
-                      'url': doc.url,
-                    },
-                  )
+                  .map((doc) => {'name': doc.name, 'url': doc.url})
                   .toList(),
             },
           )
@@ -168,8 +161,7 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
           city: employee.city,
           state: employee.state,
           country: employee.country,
-          verificationDocuments:
-              _collectVerificationDocs(values),
+          verificationDocuments: _collectVerificationDocs(values),
         );
 
         await ref.read(employeeProvider.notifier).updateEmployee(request);
@@ -208,15 +200,12 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
 
   /// Collects verification documents from
   /// form values.
-  List<Map<String, dynamic>>
-      _collectVerificationDocs(
+  List<Map<String, dynamic>> _collectVerificationDocs(
     Map<String, dynamic> values,
   ) {
     final raw = values['verification_documents'];
     if (raw is List) {
-      return raw
-          .whereType<Map<String, dynamic>>()
-          .toList();
+      return raw.whereType<Map<String, dynamic>>().toList();
     }
     return [];
   }
@@ -258,9 +247,7 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
           error: error,
           stackTrace: stack,
           onRetry: () => ref.refresh(
-            employeeDetailsProvider(
-              EmployeeId(widget.employeeId),
-            ),
+            employeeDetailsProvider(EmployeeId(widget.employeeId)),
           ),
         ),
       ),

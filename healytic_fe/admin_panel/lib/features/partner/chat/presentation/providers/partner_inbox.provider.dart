@@ -19,27 +19,19 @@ part 'partner_inbox.provider.g.dart';
 // ── DI Providers ─────────────────────────────────────
 
 @riverpod
-PartnerInboxRemoteDatasource
-    partnerInboxRemoteDatasource(Ref ref) {
-  final isMock =
-      Store.get(StoreKey.mockFlag, false);
+PartnerInboxRemoteDatasource partnerInboxRemoteDatasource(Ref ref) {
+  final isMock = Store.get(StoreKey.mockFlag, false);
   if (isMock) {
     return PartnerInboxRemoteDatasourceMock();
   }
   final apiService = ref.read(apiServiceProvider);
-  return PartnerInboxRemoteDatasourceImpl(
-    apiService: apiService,
-  );
+  return PartnerInboxRemoteDatasourceImpl(apiService: apiService);
 }
 
 @riverpod
-PartnerInboxChatRepository
-    partnerInboxChatRepository(Ref ref) {
-  final ds =
-      ref.read(partnerInboxRemoteDatasourceProvider);
-  return PartnerInboxChatRepositoryImpl(
-    datasource: ds,
-  );
+PartnerInboxChatRepository partnerInboxChatRepository(Ref ref) {
+  final ds = ref.read(partnerInboxRemoteDatasourceProvider);
+  return PartnerInboxChatRepositoryImpl(datasource: ds);
 }
 
 // ── Inbox State ──────────────────────────────────────
@@ -64,12 +56,10 @@ class PartnerInboxState {
     String? activeConversationId,
   }) {
     return PartnerInboxState(
-      conversations:
-          conversations ?? this.conversations,
+      conversations: conversations ?? this.conversations,
       isLoading: isLoading ?? this.isLoading,
       error: error,
-      activeConversationId: activeConversationId ??
-          this.activeConversationId,
+      activeConversationId: activeConversationId ?? this.activeConversationId,
     );
   }
 }
@@ -88,8 +78,7 @@ class PartnerInbox extends _$PartnerInbox {
 
   @override
   PartnerInboxState build() {
-    _repository =
-        ref.read(partnerInboxChatRepositoryProvider);
+    _repository = ref.read(partnerInboxChatRepositoryProvider);
 
     final wsService = ref.read(wsServiceProvider);
     wsService.connectPartnerChat();
@@ -106,13 +95,9 @@ class PartnerInbox extends _$PartnerInbox {
 
   Future<void> _loadConversations() async {
     try {
-      final conversations =
-          await _repository.getConversations();
+      final conversations = await _repository.getConversations();
       if (!ref.mounted) return;
-      state = state.copyWith(
-        conversations: conversations,
-        isLoading: false,
-      );
+      state = state.copyWith(conversations: conversations, isLoading: false);
     } catch (e, st) {
       _log.severe('Load conversations failed', e, st);
       if (!ref.mounted) return;
@@ -124,27 +109,20 @@ class PartnerInbox extends _$PartnerInbox {
   }
 
   void _setupWsListeners() {
-    _subscriptions.add(
-      _socket.onNewMessage.listen(_handleNewMessage),
-    );
+    _subscriptions.add(_socket.onNewMessage.listen(_handleNewMessage));
 
-    _subscriptions.add(
-      _socket.onMessagesRead.listen(_handleMessagesRead),
-    );
+    _subscriptions.add(_socket.onMessagesRead.listen(_handleMessagesRead));
   }
 
   void _handleNewMessage(WsNewMessageEvent event) {
     if (!ref.mounted) return;
 
     final conversations = [...state.conversations];
-    final index = conversations.indexWhere(
-      (c) => c.id == event.conversationId,
-    );
+    final index = conversations.indexWhere((c) => c.id == event.conversationId);
     if (index < 0) return;
 
     final conv = conversations[index];
-    final isActive =
-        state.activeConversationId == conv.id;
+    final isActive = state.activeConversationId == conv.id;
 
     final updated = conv.copyWith(
       lastMessage: LastMessagePreview(
@@ -152,17 +130,14 @@ class PartnerInbox extends _$PartnerInbox {
         timestamp: event.createdAt,
         senderId: event.senderId,
       ),
-      unreadCount:
-          isActive ? 0 : conv.unreadCount + 1,
+      unreadCount: isActive ? 0 : conv.unreadCount + 1,
     );
 
     conversations
       ..removeAt(index)
       ..insert(0, updated);
 
-    state = state.copyWith(
-      conversations: conversations,
-    );
+    state = state.copyWith(conversations: conversations);
   }
 
   void _handleMessagesRead(WsMessagesReadEvent event) {
@@ -175,9 +150,7 @@ class PartnerInbox extends _$PartnerInbox {
       return c;
     }).toList();
 
-    state = state.copyWith(
-      conversations: conversations,
-    );
+    state = state.copyWith(conversations: conversations);
   }
 
   void selectConversation(String conversationId) {
@@ -246,19 +219,14 @@ class ChatDetailState {
     return ChatDetailState(
       messages: messages ?? this.messages,
       isLoading: isLoading ?? this.isLoading,
-      isLoadingMore:
-          isLoadingMore ?? this.isLoadingMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       isSending: isSending ?? this.isSending,
       pendingClientMessageIds:
-          pendingClientMessageIds ??
-              this.pendingClientMessageIds,
-      userIsTyping:
-          userIsTyping ?? this.userIsTyping,
-      typingUserName:
-          typingUserName ?? this.typingUserName,
+          pendingClientMessageIds ?? this.pendingClientMessageIds,
+      userIsTyping: userIsTyping ?? this.userIsTyping,
+      typingUserName: typingUserName ?? this.typingUserName,
       error: error,
-      hasMoreMessages:
-          hasMoreMessages ?? this.hasMoreMessages,
+      hasMoreMessages: hasMoreMessages ?? this.hasMoreMessages,
     );
   }
 }
@@ -274,8 +242,7 @@ class PartnerChatDetail extends _$PartnerChatDetail {
 
   @override
   ChatDetailState build(String conversationId) {
-    _repository =
-        ref.read(partnerInboxChatRepositoryProvider);
+    _repository = ref.read(partnerInboxChatRepositoryProvider);
     final wsService = ref.read(wsServiceProvider);
     wsService.connectPartnerChat();
     _socket = wsService.partnerChat;
@@ -288,9 +255,7 @@ class PartnerChatDetail extends _$PartnerChatDetail {
 
   Future<void> _loadMessages() async {
     try {
-      final result = await _repository.getMessages(
-        conversationId,
-      );
+      final result = await _repository.getMessages(conversationId);
       if (!ref.mounted) return;
 
       state = state.copyWith(
@@ -334,10 +299,7 @@ class PartnerChatDetail extends _$PartnerChatDetail {
       if (!ref.mounted) return;
 
       state = state.copyWith(
-        messages: [
-          ...result.messages,
-          ...state.messages,
-        ],
+        messages: [...result.messages, ...state.messages],
         isLoadingMore: false,
         hasMoreMessages: result.hasMore,
       );
@@ -408,9 +370,7 @@ class PartnerChatDetail extends _$PartnerChatDetail {
           return;
         }
         if (!ref.mounted) return;
-        state = state.copyWith(
-          userIsTyping: false,
-        );
+        state = state.copyWith(userIsTyping: false);
       }),
     );
 
@@ -421,8 +381,7 @@ class PartnerChatDetail extends _$PartnerChatDetail {
         }
         if (!ref.mounted) return;
         final updated = state.messages.map((m) {
-          if (m.senderId != event.readerId &&
-              !m.isRead) {
+          if (m.senderId != event.readerId && !m.isRead) {
             return m.copyWith(isRead: true);
           }
           return m;
@@ -442,8 +401,7 @@ class PartnerChatDetail extends _$PartnerChatDetail {
       return;
     }
 
-    final clientId =
-        'client-${DateTime.now().millisecondsSinceEpoch}';
+    final clientId = 'client-${DateTime.now().millisecondsSinceEpoch}';
 
     final optimistic = PartnerChatMessage(
       id: clientId,
@@ -457,10 +415,7 @@ class PartnerChatDetail extends _$PartnerChatDetail {
     state = state.copyWith(
       messages: [...state.messages, optimistic],
       isSending: true,
-      pendingClientMessageIds: {
-        ...state.pendingClientMessageIds,
-        clientId,
-      },
+      pendingClientMessageIds: {...state.pendingClientMessageIds, clientId},
     );
 
     _socket.sendMessage(
@@ -473,8 +428,7 @@ class PartnerChatDetail extends _$PartnerChatDetail {
       onAck: (ack) {
         if (!ref.mounted) return;
         final updated = state.messages.map((m) {
-          if (m.clientMessageId ==
-              ack.clientMessageId) {
+          if (m.clientMessageId == ack.clientMessageId) {
             return m.copyWith(id: ack.id);
           }
           return m;
@@ -483,40 +437,30 @@ class PartnerChatDetail extends _$PartnerChatDetail {
           messages: updated,
           // Keep status as "sending" until the
           // corresponding new-message echo arrives.
-          isSending:
-              state.pendingClientMessageIds.isNotEmpty,
+          isSending: state.pendingClientMessageIds.isNotEmpty,
         );
       },
     );
 
-    Future.delayed(
-      const Duration(seconds: 5),
-      () {
-        if (!ref.mounted) return;
-        if (!state.pendingClientMessageIds.contains(
-          clientId,
-        )) {
-          return;
-        }
-        final pendingClientIds = Set<String>.from(
-          state.pendingClientMessageIds,
-        )..remove(clientId);
-        state = state.copyWith(
-          pendingClientMessageIds: pendingClientIds,
-          isSending: pendingClientIds.isNotEmpty,
-        );
-      },
-    );
+    Future.delayed(const Duration(seconds: 5), () {
+      if (!ref.mounted) return;
+      if (!state.pendingClientMessageIds.contains(clientId)) {
+        return;
+      }
+      final pendingClientIds = Set<String>.from(state.pendingClientMessageIds)
+        ..remove(clientId);
+      state = state.copyWith(
+        pendingClientMessageIds: pendingClientIds,
+        isSending: pendingClientIds.isNotEmpty,
+      );
+    });
   }
 
   void notifyTyping() {
     final receiverId = _resolveReceiverId();
     if (receiverId == null) return;
     _socket.typing(
-      WsTypingPayload(
-        conversationId: conversationId,
-        receiverId: receiverId,
-      ),
+      WsTypingPayload(conversationId: conversationId, receiverId: receiverId),
     );
   }
 
@@ -524,10 +468,7 @@ class PartnerChatDetail extends _$PartnerChatDetail {
     final receiverId = _resolveReceiverId();
     if (receiverId == null) return;
     _socket.stopTyping(
-      WsTypingPayload(
-        conversationId: conversationId,
-        receiverId: receiverId,
-      ),
+      WsTypingPayload(conversationId: conversationId, receiverId: receiverId),
     );
   }
 
@@ -540,9 +481,7 @@ class PartnerChatDetail extends _$PartnerChatDetail {
 
   /// Maps the generated [WsNewMessageEvent] to a
   /// domain [PartnerChatMessage] entity.
-  PartnerChatMessage _mapWsMessage(
-    WsNewMessageEvent event,
-  ) {
+  PartnerChatMessage _mapWsMessage(WsNewMessageEvent event) {
     return PartnerChatMessage(
       id: event.id,
       conversationId: event.conversationId,
@@ -562,16 +501,12 @@ class PartnerChatDetail extends _$PartnerChatDetail {
     final receiverId = _resolveReceiverId();
     if (receiverId == null) return;
     _socket.markRead(
-      WsMarkReadPayload(
-        conversationId: conversationId,
-        receiverId: receiverId,
-      ),
+      WsMarkReadPayload(conversationId: conversationId, receiverId: receiverId),
     );
   }
 
   String? _resolveReceiverId() {
-    final conversations =
-        ref.read(partnerInboxProvider).conversations;
+    final conversations = ref.read(partnerInboxProvider).conversations;
     for (final conversation in conversations) {
       if (conversation.id == conversationId) {
         return conversation.otherParticipant.id;

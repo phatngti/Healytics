@@ -18,6 +18,7 @@ class AttachTagResponseDto {
     required this.createdAt,
   });
 
+
   /// Service tag ID
   String tagId;
 

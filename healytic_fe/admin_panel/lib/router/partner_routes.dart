@@ -298,10 +298,7 @@ class ProfileEditRoute extends GoRouteData with $ProfileEditRoute {
   static const name = 'provider-profile-edit';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const ProfileEditScreen(),

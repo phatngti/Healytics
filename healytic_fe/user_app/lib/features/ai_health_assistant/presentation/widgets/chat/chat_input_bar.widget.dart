@@ -71,14 +71,6 @@ class _ChatInputBarState extends State<ChatInputBar> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              // Attachment
-              _CircleIconButton(
-                icon: Icons.attach_file_rounded,
-                color: colorScheme.onSurfaceVariant,
-                onTap: () {},
-              ),
-              SizedBox(width: AppDimens.spaceXs),
-
               // Text field
               Expanded(
                 child: Container(
@@ -113,27 +105,34 @@ class _ChatInputBarState extends State<ChatInputBar> {
                 ),
               ),
               SizedBox(width: AppDimens.spaceXs),
-
-              // Send / Mic toggle
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                transitionBuilder: (child, anim) =>
-                    ScaleTransition(scale: anim, child: child),
-                child: _hasText
-                    ? _CircleIconButton(
-                        key: keys.chatScreen.sendButton,
-                        icon: Icons.send_rounded,
-                        color: colorScheme.onPrimary,
-                        backgroundColor: colorScheme.primary,
-                        onTap: _handleSend,
-                      )
-                    : _CircleIconButton(
-                        key: const ValueKey('mic'),
-                        icon: Icons.mic_rounded,
-                        color: colorScheme.onSurfaceVariant,
-                        onTap: () {},
-                      ),
+              _CircleIconButton(
+                key: keys.chatScreen.sendButton,
+                icon: Icons.send_rounded,
+                color: colorScheme.onPrimary,
+                backgroundColor: colorScheme.primary,
+                onTap: _handleSend,
               ),
+
+              // // Send / Mic toggle
+              // AnimatedSwitcher(
+              //   duration: const Duration(milliseconds: 200),
+              //   transitionBuilder: (child, anim) =>
+              //       ScaleTransition(scale: anim, child: child),
+              //   child: _hasText
+              //       ? _CircleIconButton(
+              //           key: keys.chatScreen.sendButton,
+              //           icon: Icons.send_rounded,
+              //           color: colorScheme.onPrimary,
+              //           backgroundColor: colorScheme.primary,
+              //           onTap: _handleSend,
+              //         )
+              //       : _CircleIconButton(
+              //           key: const ValueKey('mic'),
+              //           icon: Icons.mic_rounded,
+              //           color: colorScheme.onSurfaceVariant,
+              //           onTap: () {},
+              //         ),
+              // ),
             ],
           ),
         ),

@@ -22,8 +22,7 @@ void main() {
       // TODO
     });
 
-    // Device platform
-    // String platform
+    // DevicePlatform platform
     test('to test the property `platform`', () async {
       // TODO
     });

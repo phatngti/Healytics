@@ -49,9 +49,7 @@ class EmployeeRepositoryImpl implements EmployeeRepository {
   }
 
   @override
-  Future<EmployeeEntity> createSpaTherapist(
-    CreateSpaTherapistRequest request,
-  ) {
+  Future<EmployeeEntity> createSpaTherapist(CreateSpaTherapistRequest request) {
     return remoteDataSource.createSpaTherapist(request);
   }
 

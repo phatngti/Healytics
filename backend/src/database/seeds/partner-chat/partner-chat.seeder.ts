@@ -9,7 +9,12 @@ import { PartnerChatAttachment } from '@/common/entities/partner-chat-attachment
 import { MessageType } from '@/chat/enums/message-type.enum';
 import { ConversationStatus } from '@/chat/enums/conversation-status.enum';
 import { ISeeder } from '../seeder.interface';
-import { SEED_MARKERS, buildMapBy, likePrefix, seedKey } from '../utils/seed.utils';
+import {
+  SEED_MARKERS,
+  buildMapBy,
+  likePrefix,
+  seedKey,
+} from '../utils/seed.utils';
 
 interface SeedConversation {
   code: string;
@@ -44,6 +49,30 @@ const SEED_CONVERSATIONS: SeedConversation[] = [
     userEmail: 'user@healytics.vn',
     partnerEmail: 'partner2@healytics.vn',
     bookingNotes: null,
+  },
+  {
+    code: 'CONV_003',
+    userEmail: 'nguyenvana@healytics.vn',
+    partnerEmail: 'partner2@healytics.vn',
+    bookingNotes: 'Routine dental cleaning before travel',
+  },
+  {
+    code: 'CONV_004',
+    userEmail: 'tranthib@healytics.vn',
+    partnerEmail: 'partner3@healytics.vn',
+    bookingNotes: 'Needs hip mobility work after marathon training',
+  },
+  {
+    code: 'CONV_005',
+    userEmail: 'phamthid@healytics.vn',
+    partnerEmail: 'partner5@healytics.vn',
+    bookingNotes: 'Prefers morning acupuncture appointment',
+  },
+  {
+    code: 'CONV_006',
+    userEmail: 'vuthif@healytics.vn',
+    partnerEmail: 'partner6@healytics.vn',
+    bookingNotes: 'Requests quiet room for first counseling session',
   },
 ];
 
@@ -120,6 +149,73 @@ const SEED_MESSAGES: SeedMessage[] = [
     messageType: MessageType.TEXT,
     content: 'Great, thank you. I will book a slot this weekend.',
   },
+  {
+    conversationCode: 'CONV_003',
+    code: '009',
+    sender: 'user',
+    messageType: MessageType.TEXT,
+    content: 'Can I eat normally after the dental cleaning?',
+  },
+  {
+    conversationCode: 'CONV_003',
+    code: '010',
+    sender: 'partner',
+    messageType: MessageType.TEXT,
+    content: 'Yes, but avoid very hot drinks for the first hour.',
+  },
+  {
+    conversationCode: 'CONV_004',
+    code: '011',
+    sender: 'user',
+    messageType: MessageType.TEXT,
+    content: 'I finished a marathon last week and my hips are tight.',
+  },
+  {
+    conversationCode: 'CONV_004',
+    code: '012',
+    sender: 'partner',
+    messageType: MessageType.TEXT,
+    content:
+      'We will keep the session recovery-focused and avoid intense holds.',
+  },
+  {
+    conversationCode: 'CONV_005',
+    code: '013',
+    sender: 'partner',
+    messageType: MessageType.FILE,
+    content: 'Please review the acupuncture aftercare sheet before your visit.',
+    attachments: [
+      {
+        fileUrl:
+          'https://storage.healytics.vn/chat/seed/acupuncture-aftercare.pdf',
+        fileName: 'seed_acupuncture_aftercare.pdf',
+        fileType: 'application/pdf',
+        fileSize: 188000,
+      },
+    ],
+  },
+  {
+    conversationCode: 'CONV_005',
+    code: '014',
+    sender: 'user',
+    messageType: MessageType.TEXT,
+    content: 'Received, thank you. I will eat a light meal before coming.',
+  },
+  {
+    conversationCode: 'CONV_006',
+    code: '015',
+    sender: 'user',
+    messageType: MessageType.TEXT,
+    content: 'This is my first counseling session. Can the room be quiet?',
+  },
+  {
+    conversationCode: 'CONV_006',
+    code: '016',
+    sender: 'partner',
+    messageType: MessageType.TEXT,
+    content:
+      'Yes, we reserved the private counseling room and added a note for reception.',
+  },
 ];
 
 @Injectable()
@@ -162,7 +258,9 @@ export class PartnerChatSeeder implements ISeeder {
       const user = accountMap.get(seed.userEmail);
       const partner = accountMap.get(seed.partnerEmail);
       if (!user || !partner) {
-        this.logger.warn(`  ⚠ Missing accounts for conversation "${seed.code}" — skipping`);
+        this.logger.warn(
+          `  ⚠ Missing accounts for conversation "${seed.code}" — skipping`,
+        );
         continue;
       }
 
@@ -192,7 +290,9 @@ export class PartnerChatSeeder implements ISeeder {
         );
         this.logger.log(`  ✅ Created conversation "${seed.code}"`);
       } else {
-        this.logger.log(`  ⏭ Conversation "${seed.code}" already exists, reusing`);
+        this.logger.log(
+          `  ⏭ Conversation "${seed.code}" already exists, reusing`,
+        );
       }
 
       conversationMap.set(seed.code, conversation);
@@ -203,14 +303,21 @@ export class PartnerChatSeeder implements ISeeder {
       if (!conversation) continue;
 
       const senderId =
-        seed.sender === 'user' ? conversation.userId : conversation.partnerAccountId;
-      const clientMessageId = seedKey(SEED_MARKERS.chatClientMessageId, seed.code);
+        seed.sender === 'user'
+          ? conversation.userId
+          : conversation.partnerAccountId;
+      const clientMessageId = seedKey(
+        SEED_MARKERS.chatClientMessageId,
+        seed.code,
+      );
 
       const existing = await this.messageRepo.findOne({
         where: { conversationId: conversation.id, clientMessageId },
       });
       if (existing) {
-        this.logger.log(`  ⏭ Message "${clientMessageId}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ Message "${clientMessageId}" already exists, skipping`,
+        );
         continue;
       }
 
@@ -254,7 +361,9 @@ export class PartnerChatSeeder implements ISeeder {
 
   async clear(): Promise<void> {
     const seededMessages = await this.messageRepo.find({
-      where: { clientMessageId: Like(likePrefix(SEED_MARKERS.chatClientMessageId)) },
+      where: {
+        clientMessageId: Like(likePrefix(SEED_MARKERS.chatClientMessageId)),
+      },
       select: ['id'],
     });
 
@@ -268,13 +377,17 @@ export class PartnerChatSeeder implements ISeeder {
       messageId: In(messageIds),
     });
     if (attachmentAffected) {
-      this.logger.log(`🗑️ Hard-deleted ${attachmentAffected} seed chat attachment(s)`);
+      this.logger.log(
+        `🗑️ Hard-deleted ${attachmentAffected} seed chat attachment(s)`,
+      );
     }
 
     const { affected: messageAffected } = await this.messageRepo.delete({
       id: In(messageIds),
     });
-    this.logger.log(`🗑️ Hard-deleted ${messageAffected ?? 0} seed chat message(s)`);
+    this.logger.log(
+      `🗑️ Hard-deleted ${messageAffected ?? 0} seed chat message(s)`,
+    );
 
     const accountEmails = [
       ...new Set(

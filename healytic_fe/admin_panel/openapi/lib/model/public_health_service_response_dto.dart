@@ -32,6 +32,7 @@ class PublicHealthServiceResponseDto {
     this.productEmployeeEligibilities = const [],
   });
 
+
   /// Unique identifier
   String id;
 
@@ -42,46 +43,26 @@ class PublicHealthServiceResponseDto {
   String slug;
 
   /// Description
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? description;
+  String? description;
 
-  /// Type
-  PublicHealthServiceResponseDtoTypeEnum type;
+  HealthServiceType type;
 
   /// Base price in specified currency
   num basePrice;
 
   /// Sale price if on discount
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? salePrice;
+  num? salePrice;
 
   /// Currency code (ISO 4217)
   String currency;
 
-  /// Status
-  PublicHealthServiceResponseDtoStatusEnum status;
+  HealthServiceStatus status;
 
   /// Whether visible online
   bool isVisibleOnline;
 
   /// Vendor name
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? vendorName;
+  String? vendorName;
 
   /// Creation timestamp
   DateTime createdAt;
@@ -221,14 +202,16 @@ class PublicHealthServiceResponseDto {
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
         slug: mapValueOfType<String>(json, r'slug')!,
-        description: mapValueOfType<Object>(json, r'description'),
-        type: PublicHealthServiceResponseDtoTypeEnum.fromJson(json[r'type'])!,
+        description: mapValueOfType<String>(json, r'description'),
+        type: HealthServiceType.fromJson(json[r'type'])!,
         basePrice: num.parse('${json[r'basePrice']}'),
-        salePrice: mapValueOfType<Object>(json, r'salePrice'),
+        salePrice: json[r'salePrice'] == null
+            ? null
+            : num.parse('${json[r'salePrice']}'),
         currency: mapValueOfType<String>(json, r'currency')!,
-        status: PublicHealthServiceResponseDtoStatusEnum.fromJson(json[r'status'])!,
+        status: HealthServiceStatus.fromJson(json[r'status'])!,
         isVisibleOnline: mapValueOfType<bool>(json, r'isVisibleOnline')!,
-        vendorName: mapValueOfType<Object>(json, r'vendorName'),
+        vendorName: mapValueOfType<String>(json, r'vendorName'),
         createdAt: mapDateTime(json, r'createdAt', r'')!,
         updatedAt: mapDateTime(json, r'updatedAt', r'')!,
         category: PublicCategorySummaryDto.fromJson(json[r'category']),
@@ -294,152 +277,4 @@ class PublicHealthServiceResponseDto {
     'updatedAt',
   };
 }
-
-/// Type
-class PublicHealthServiceResponseDtoTypeEnum {
-  /// Instantiate a new enum with the provided [value].
-  const PublicHealthServiceResponseDtoTypeEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const service = PublicHealthServiceResponseDtoTypeEnum._(r'service');
-
-  /// List of all possible values in this [enum][PublicHealthServiceResponseDtoTypeEnum].
-  static const values = <PublicHealthServiceResponseDtoTypeEnum>[
-    service,
-  ];
-
-  static PublicHealthServiceResponseDtoTypeEnum? fromJson(dynamic value) => PublicHealthServiceResponseDtoTypeEnumTypeTransformer().decode(value);
-
-  static List<PublicHealthServiceResponseDtoTypeEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <PublicHealthServiceResponseDtoTypeEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = PublicHealthServiceResponseDtoTypeEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [PublicHealthServiceResponseDtoTypeEnum] to String,
-/// and [decode] dynamic data back to [PublicHealthServiceResponseDtoTypeEnum].
-class PublicHealthServiceResponseDtoTypeEnumTypeTransformer {
-  factory PublicHealthServiceResponseDtoTypeEnumTypeTransformer() => _instance ??= const PublicHealthServiceResponseDtoTypeEnumTypeTransformer._();
-
-  const PublicHealthServiceResponseDtoTypeEnumTypeTransformer._();
-
-  String encode(PublicHealthServiceResponseDtoTypeEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a PublicHealthServiceResponseDtoTypeEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  PublicHealthServiceResponseDtoTypeEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'service': return PublicHealthServiceResponseDtoTypeEnum.service;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [PublicHealthServiceResponseDtoTypeEnumTypeTransformer] instance.
-  static PublicHealthServiceResponseDtoTypeEnumTypeTransformer? _instance;
-}
-
-
-/// Status
-class PublicHealthServiceResponseDtoStatusEnum {
-  /// Instantiate a new enum with the provided [value].
-  const PublicHealthServiceResponseDtoStatusEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const draft = PublicHealthServiceResponseDtoStatusEnum._(r'draft');
-  static const active = PublicHealthServiceResponseDtoStatusEnum._(r'active');
-  static const archived = PublicHealthServiceResponseDtoStatusEnum._(r'archived');
-
-  /// List of all possible values in this [enum][PublicHealthServiceResponseDtoStatusEnum].
-  static const values = <PublicHealthServiceResponseDtoStatusEnum>[
-    draft,
-    active,
-    archived,
-  ];
-
-  static PublicHealthServiceResponseDtoStatusEnum? fromJson(dynamic value) => PublicHealthServiceResponseDtoStatusEnumTypeTransformer().decode(value);
-
-  static List<PublicHealthServiceResponseDtoStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <PublicHealthServiceResponseDtoStatusEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = PublicHealthServiceResponseDtoStatusEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [PublicHealthServiceResponseDtoStatusEnum] to String,
-/// and [decode] dynamic data back to [PublicHealthServiceResponseDtoStatusEnum].
-class PublicHealthServiceResponseDtoStatusEnumTypeTransformer {
-  factory PublicHealthServiceResponseDtoStatusEnumTypeTransformer() => _instance ??= const PublicHealthServiceResponseDtoStatusEnumTypeTransformer._();
-
-  const PublicHealthServiceResponseDtoStatusEnumTypeTransformer._();
-
-  String encode(PublicHealthServiceResponseDtoStatusEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a PublicHealthServiceResponseDtoStatusEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  PublicHealthServiceResponseDtoStatusEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'draft': return PublicHealthServiceResponseDtoStatusEnum.draft;
-        case r'active': return PublicHealthServiceResponseDtoStatusEnum.active;
-        case r'archived': return PublicHealthServiceResponseDtoStatusEnum.archived;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [PublicHealthServiceResponseDtoStatusEnumTypeTransformer] instance.
-  static PublicHealthServiceResponseDtoStatusEnumTypeTransformer? _instance;
-}
-
 

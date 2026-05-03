@@ -5,7 +5,12 @@ import { Account } from '@/common/entities/account.entity';
 import { AiConversation } from '@/common/entities/conversation.entity';
 import { AiChatMessage } from '@/common/entities/chat-message.entity';
 import { ISeeder } from '../seeder.interface';
-import { SEED_MARKERS, buildMapBy, likePrefix, seedKey } from '../utils/seed.utils';
+import {
+  SEED_MARKERS,
+  buildMapBy,
+  likePrefix,
+  seedKey,
+} from '../utils/seed.utils';
 
 interface SeedConversationData {
   code: string;
@@ -32,8 +37,7 @@ const SEED_AI_CONVERSATIONS: SeedConversationData[] = [
       },
       {
         role: 'user',
-        content:
-          'Can I combine this with a relaxation massage on weekends?',
+        content: 'Can I combine this with a relaxation massage on weekends?',
       },
       {
         role: 'assistant',
@@ -59,6 +63,57 @@ const SEED_AI_CONVERSATIONS: SeedConversationData[] = [
       },
     ],
   },
+  {
+    code: '003',
+    userEmail: 'nguyenvana@healytics.vn',
+    title: seedKey(SEED_MARKERS.aiConversationTitle, 'ORAL_CARE'),
+    messages: [
+      {
+        role: 'user',
+        content:
+          'How often should I book professional dental cleaning if I drink coffee daily?',
+      },
+      {
+        role: 'assistant',
+        content:
+          'Many people benefit from cleaning every 6 months, but ask the dentist to adjust based on stain buildup and gum condition.',
+      },
+    ],
+  },
+  {
+    code: '004',
+    userEmail: 'levanc@healytics.vn',
+    title: seedKey(SEED_MARKERS.aiConversationTitle, 'NUTRITION'),
+    messages: [
+      {
+        role: 'user',
+        content:
+          'I want a meal plan for better afternoon energy without too much caffeine.',
+      },
+      {
+        role: 'assistant',
+        content:
+          'A nutrition consultation can review breakfast protein, lunch portions, hydration and snack timing.',
+      },
+    ],
+  },
+  {
+    code: '005',
+    userEmail: 'vuthif@healytics.vn',
+    title: seedKey(SEED_MARKERS.aiConversationTitle, 'MENTAL_WELLNESS'),
+    messages: [
+      {
+        role: 'user',
+        content:
+          'I feel stressed before sleep and want to know whether counseling is appropriate.',
+      },
+      {
+        role: 'assistant',
+        content:
+          'Counseling can help map triggers and create practical sleep routines. Consider booking an intake session.',
+      },
+    ],
+  },
 ];
 
 @Injectable()
@@ -79,7 +134,9 @@ export class AiConversationSeeder implements ISeeder {
 
     const accounts = await this.accountRepo.find({
       where: {
-        email: In([...new Set(SEED_AI_CONVERSATIONS.map((item) => item.userEmail))]),
+        email: In([
+          ...new Set(SEED_AI_CONVERSATIONS.map((item) => item.userEmail)),
+        ]),
       },
       select: ['id', 'email'],
     });
@@ -88,7 +145,9 @@ export class AiConversationSeeder implements ISeeder {
     for (const seed of SEED_AI_CONVERSATIONS) {
       const account = accountMap.get(seed.userEmail);
       if (!account) {
-        this.logger.warn(`  ⚠ User "${seed.userEmail}" not found — skipping AI conversation`);
+        this.logger.warn(
+          `  ⚠ User "${seed.userEmail}" not found — skipping AI conversation`,
+        );
         continue;
       }
 
@@ -104,7 +163,9 @@ export class AiConversationSeeder implements ISeeder {
         );
         this.logger.log(`  ✅ Created AI conversation "${seed.title}"`);
       } else {
-        this.logger.log(`  ⏭ AI conversation "${seed.title}" already exists, reusing`);
+        this.logger.log(
+          `  ⏭ AI conversation "${seed.title}" already exists, reusing`,
+        );
       }
 
       const existingMessages = await this.messageRepo.find({
@@ -113,11 +174,17 @@ export class AiConversationSeeder implements ISeeder {
         select: ['id', 'role', 'content'],
       });
       if (existingMessages.length >= seed.messages.length) {
-        this.logger.log(`  ⏭ AI messages already present for "${seed.title}", skipping`);
+        this.logger.log(
+          `  ⏭ AI messages already present for "${seed.title}", skipping`,
+        );
         continue;
       }
 
-      for (let index = existingMessages.length; index < seed.messages.length; index += 1) {
+      for (
+        let index = existingMessages.length;
+        index < seed.messages.length;
+        index += 1
+      ) {
         const messageSeed = seed.messages[index];
         await this.messageRepo.save(
           this.messageRepo.create({
@@ -146,7 +213,9 @@ export class AiConversationSeeder implements ISeeder {
       return;
     }
 
-    const conversationIds = conversations.map((conversation) => conversation.id);
+    const conversationIds = conversations.map(
+      (conversation) => conversation.id,
+    );
     const { affected: messageAffected } = await this.messageRepo.delete({
       conversationId: In(conversationIds),
     });
@@ -154,9 +223,12 @@ export class AiConversationSeeder implements ISeeder {
       this.logger.log(`🗑️ Hard-deleted ${messageAffected} seed AI message(s)`);
     }
 
-    const { affected: conversationAffected } = await this.conversationRepo.delete({
-      id: In(conversationIds),
-    });
-    this.logger.log(`🗑️ Hard-deleted ${conversationAffected ?? 0} seed AI conversation(s)`);
+    const { affected: conversationAffected } =
+      await this.conversationRepo.delete({
+        id: In(conversationIds),
+      });
+    this.logger.log(
+      `🗑️ Hard-deleted ${conversationAffected ?? 0} seed AI conversation(s)`,
+    );
   }
 }

@@ -22,6 +22,7 @@ class MyProfileResponseDto {
     required this.createdAt,
   });
 
+
   String id;
 
   BusinessInfoDto businessInfo;
@@ -36,9 +37,9 @@ class MyProfileResponseDto {
 
   List<VerifiedField> kycDocuments;
 
-  MyProfileResponseDtoVerificationStatusEnum verificationStatus;
+  PartnerVerificationStatus verificationStatus;
 
-  Object? verificationCompletedAt;
+  DateTime? verificationCompletedAt;
 
   DateTime createdAt;
 
@@ -78,7 +79,7 @@ class MyProfileResponseDto {
       json[r'kycDocuments'] = this.kycDocuments;
       json[r'verificationStatus'] = this.verificationStatus;
     if (this.verificationCompletedAt != null) {
-      json[r'verificationCompletedAt'] = this.verificationCompletedAt;
+      json[r'verificationCompletedAt'] = this.verificationCompletedAt!.toUtc().toIso8601String();
     } else {
       json[r'verificationCompletedAt'] = null;
     }
@@ -109,8 +110,8 @@ class MyProfileResponseDto {
         businessInfo: BusinessInfoDto.fromJson(json[r'businessInfo'])!,
         legalRepresentative: LegalRepresentativeDto.fromJson(json[r'legalRepresentative']),
         kycDocuments: VerifiedField.listFromJson(json[r'kycDocuments']),
-        verificationStatus: MyProfileResponseDtoVerificationStatusEnum.fromJson(json[r'verificationStatus'])!,
-        verificationCompletedAt: mapValueOfType<Object>(json, r'verificationCompletedAt'),
+        verificationStatus: PartnerVerificationStatus.fromJson(json[r'verificationStatus'])!,
+        verificationCompletedAt: mapDateTime(json, r'verificationCompletedAt', r''),
         createdAt: mapDateTime(json, r'createdAt', r'')!,
       );
     }
@@ -166,87 +167,4 @@ class MyProfileResponseDto {
     'createdAt',
   };
 }
-
-
-class MyProfileResponseDtoVerificationStatusEnum {
-  /// Instantiate a new enum with the provided [value].
-  const MyProfileResponseDtoVerificationStatusEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const ONBOARDING = MyProfileResponseDtoVerificationStatusEnum._(r'ONBOARDING');
-  static const PENDING = MyProfileResponseDtoVerificationStatusEnum._(r'PENDING');
-  static const APPROVED = MyProfileResponseDtoVerificationStatusEnum._(r'APPROVED');
-  static const REJECTED = MyProfileResponseDtoVerificationStatusEnum._(r'REJECTED');
-  static const REQUIRED_RESUBMIT = MyProfileResponseDtoVerificationStatusEnum._(r'REQUIRED_RESUBMIT');
-
-  /// List of all possible values in this [enum][MyProfileResponseDtoVerificationStatusEnum].
-  static const values = <MyProfileResponseDtoVerificationStatusEnum>[
-    ONBOARDING,
-    PENDING,
-    APPROVED,
-    REJECTED,
-    REQUIRED_RESUBMIT,
-  ];
-
-  static MyProfileResponseDtoVerificationStatusEnum? fromJson(dynamic value) => MyProfileResponseDtoVerificationStatusEnumTypeTransformer().decode(value);
-
-  static List<MyProfileResponseDtoVerificationStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <MyProfileResponseDtoVerificationStatusEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = MyProfileResponseDtoVerificationStatusEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [MyProfileResponseDtoVerificationStatusEnum] to String,
-/// and [decode] dynamic data back to [MyProfileResponseDtoVerificationStatusEnum].
-class MyProfileResponseDtoVerificationStatusEnumTypeTransformer {
-  factory MyProfileResponseDtoVerificationStatusEnumTypeTransformer() => _instance ??= const MyProfileResponseDtoVerificationStatusEnumTypeTransformer._();
-
-  const MyProfileResponseDtoVerificationStatusEnumTypeTransformer._();
-
-  String encode(MyProfileResponseDtoVerificationStatusEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a MyProfileResponseDtoVerificationStatusEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  MyProfileResponseDtoVerificationStatusEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'ONBOARDING': return MyProfileResponseDtoVerificationStatusEnum.ONBOARDING;
-        case r'PENDING': return MyProfileResponseDtoVerificationStatusEnum.PENDING;
-        case r'APPROVED': return MyProfileResponseDtoVerificationStatusEnum.APPROVED;
-        case r'REJECTED': return MyProfileResponseDtoVerificationStatusEnum.REJECTED;
-        case r'REQUIRED_RESUBMIT': return MyProfileResponseDtoVerificationStatusEnum.REQUIRED_RESUBMIT;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [MyProfileResponseDtoVerificationStatusEnumTypeTransformer] instance.
-  static MyProfileResponseDtoVerificationStatusEnumTypeTransformer? _instance;
-}
-
 

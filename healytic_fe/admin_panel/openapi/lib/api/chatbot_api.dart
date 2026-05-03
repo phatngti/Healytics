@@ -75,6 +75,7 @@ class ChatbotApi {
   /// Parameters:
   ///
   /// * [String] userId (required):
+  ///   Account / user UUID
   ///
   /// * [int] page:
   ///
@@ -117,6 +118,7 @@ class ChatbotApi {
   /// Parameters:
   ///
   /// * [String] userId (required):
+  ///   Account / user UUID
   ///
   /// * [int] page:
   ///
@@ -145,6 +147,7 @@ class ChatbotApi {
   /// * [String] conversationId (required):
   ///
   /// * [String] userId:
+  ///   Must match conversation owner
   ///
   /// * [int] page:
   ///
@@ -192,6 +195,7 @@ class ChatbotApi {
   /// * [String] conversationId (required):
   ///
   /// * [String] userId:
+  ///   Must match conversation owner
   ///
   /// * [int] page:
   ///

@@ -17,6 +17,7 @@ class MicroLockResponseDto {
     required this.expiresIn,
   });
 
+
   /// Whether the lock was acquired
   bool locked;
 

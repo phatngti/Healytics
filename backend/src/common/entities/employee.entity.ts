@@ -15,6 +15,7 @@ import {
 import { EmployeeRole } from '@/employees/enum/employee-role.enum';
 import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
 import { Gender } from '@/employees/enum/gender.enum';
+import { Account } from './account.entity';
 import { DoctorProfile } from './doctor-profile.entity';
 import { TherapistProfile } from './therapist-profile.entity';
 import { Partner } from './partner.entity';
@@ -117,6 +118,14 @@ export class Employee {
   })
   @JoinColumn({ name: 'partner_id' })
   partner: Partner | null;
+
+  @Index()
+  @Column({ name: 'account_id', type: 'uuid', nullable: true, unique: true })
+  accountId: string | null;
+
+  @OneToOne(() => Account, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'account_id' })
+  account: Account | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

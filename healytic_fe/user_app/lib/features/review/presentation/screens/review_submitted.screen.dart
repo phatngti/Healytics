@@ -36,8 +36,6 @@ class ReviewSubmittedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(context),
       body: _buildBody(context),

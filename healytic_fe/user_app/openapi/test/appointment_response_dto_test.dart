@@ -36,7 +36,7 @@ void main() {
       // TODO
     });
 
-    // String status
+    // AppointmentStatus status
     test('to test the property `status`', () async {
       // TODO
     });
@@ -94,14 +94,32 @@ void main() {
     });
 
     // Account ID of the health partner (vendor). Used for chat.
-    // Object healthPartnerId
+    // String healthPartnerId
     test('to test the property `healthPartnerId`', () async {
       // TODO
     });
 
     // Product/service ID for navigation to service details.
-    // Object serviceId
+    // String serviceId
     test('to test the property `serviceId`', () async {
+      // TODO
+    });
+
+    // Payment gateway checkout URL. Only present when status is pending_payment.
+    // String paymentUrl
+    test('to test the property `paymentUrl`', () async {
+      // TODO
+    });
+
+    // Deep link to open payment app directly (mobile). Only present when status is pending_payment.
+    // String paymentDeeplink
+    test('to test the property `paymentDeeplink`', () async {
+      // TODO
+    });
+
+    // ISO 8601 timestamp when the payment link expires. Only present when status is pending_payment.
+    // String paymentExpiresAt
+    test('to test the property `paymentExpiresAt`', () async {
       // TODO
     });
 

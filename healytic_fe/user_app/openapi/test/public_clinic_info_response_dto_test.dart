@@ -36,12 +36,12 @@ void main() {
       // TODO
     });
 
-    // Object coverImageUrl
+    // String coverImageUrl
     test('to test the property `coverImageUrl`', () async {
       // TODO
     });
 
-    // Object logoImageUrl
+    // String logoImageUrl
     test('to test the property `logoImageUrl`', () async {
       // TODO
     });
@@ -66,22 +66,22 @@ void main() {
       // TODO
     });
 
-    // Object phone
+    // String phone
     test('to test the property `phone`', () async {
       // TODO
     });
 
-    // Object coordinates
+    // String coordinates
     test('to test the property `coordinates`', () async {
       // TODO
     });
 
-    // Object chatPartnerId
+    // String chatPartnerId
     test('to test the property `chatPartnerId`', () async {
       // TODO
     });
 
-    // Object description
+    // String description
     test('to test the property `description`', () async {
       // TODO
     });

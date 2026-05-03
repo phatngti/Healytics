@@ -50,9 +50,7 @@ class EmployeeTableSource {
               child: employee.avatar.isEmpty
                   ? Text(
                       _getInitials(employee.fullName),
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelMedium,
+                      style: Theme.of(context).textTheme.labelMedium,
                     )
                   : null,
             ),
@@ -131,7 +129,6 @@ class EmployeeTableSource {
     if (parts.length == 1) {
       return parts[0][0].toUpperCase();
     }
-    return '${parts[0][0]}${parts[parts.length - 1][0]}'
-        .toUpperCase();
+    return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
   }
 }

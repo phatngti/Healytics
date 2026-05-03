@@ -7,9 +7,9 @@ class EmployeeHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveWrapper(
+    return const ResponsiveWrapper(
       useLayout: true,
-      desktop: const EmployeeHomeDesktop(),
+      desktop: EmployeeHomeDesktop(),
     );
   }
 }

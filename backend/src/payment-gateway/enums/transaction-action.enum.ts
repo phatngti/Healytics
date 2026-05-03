@@ -22,4 +22,13 @@ export enum TransactionAction {
 
   /** Refund confirmed by gateway */
   REFUND_CONFIRMED = 'REFUND_CONFIRMED',
+
+  /** Webhook event received from gateway (e.g., Stripe) */
+  WEBHOOK_RECEIVED = 'WEBHOOK_RECEIVED',
+
+  /** Webhook signature verified successfully */
+  WEBHOOK_VERIFIED = 'WEBHOOK_VERIFIED',
+
+  /** Webhook signature verification failed */
+  WEBHOOK_REJECTED = 'WEBHOOK_REJECTED',
 }

@@ -1,12 +1,33 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { Booking } from '@/common/entities/booking.entity';
+import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { AppointmentResponseDto } from '../../dto/appointment-response.dto';
-import { ListAppointmentsQueryDto } from '../../dto/list-appointments-query.dto';
+import {
+  ListAppointmentsQueryDto,
+  AppointmentSortOrder,
+} from '../../dto/list-appointments-query.dto';
+import { AppointmentStatus } from '../../enums/appointment-status.enum';
 
 @Injectable()
 export class ListAppointmentsHandler {
   private readonly logger = new Logger(ListAppointmentsHandler.name);
+
+  /**
+   * Maps a frontend AppointmentStatus back to the DB-level BookingStatus values.
+   */
+  private mapToBookingStatuses(status: AppointmentStatus): BookingStatus[] {
+    switch (status) {
+      case AppointmentStatus.PENDING_PAYMENT:
+        return [BookingStatus.PENDING_PAYMENT];
+      case AppointmentStatus.UPCOMING:
+        return [BookingStatus.CONFIRMED];
+      case AppointmentStatus.COMPLETED:
+        return [BookingStatus.COMPLETED];
+      case AppointmentStatus.CANCELED:
+        return [BookingStatus.CANCELLED, BookingStatus.NO_SHOW];
+    }
+  }
 
   constructor(private readonly dataSource: DataSource) {}
 
@@ -31,8 +52,27 @@ export class ListAppointmentsHandler {
       .leftJoinAndSelect('partner.ward', 'ward')
       .leftJoinAndSelect('partner.district', 'district')
       .leftJoinAndSelect('partner.province', 'province')
-      .where('booking.user_id = :userId', { userId })
-      .orderBy('booking.start_time', 'DESC');
+      .where('booking.user_id = :userId', { userId });
+
+    // ── Filter by status ────────────────────────────────────────
+    if (query?.status) {
+      const bookingStatuses = this.mapToBookingStatuses(query.status);
+      qb.andWhere('booking.status IN (:...bookingStatuses)', {
+        bookingStatuses,
+      });
+    }
+
+    // ── Filter by category ──────────────────────────────────────
+    if (query?.categoryId) {
+      qb.andWhere('product.category_id = :categoryId', {
+        categoryId: query.categoryId,
+      });
+    }
+
+    // ── Sort by time ────────────────────────────────────────────
+    const sortDirection =
+      query?.sortBy === AppointmentSortOrder.OLDEST ? 'ASC' : 'DESC';
+    qb.orderBy('booking.start_time', sortDirection);
 
     if (hasCoordinates) {
       qb.addSelect(

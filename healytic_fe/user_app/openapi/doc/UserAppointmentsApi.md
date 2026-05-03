@@ -112,7 +112,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userAppointmentControllerListAppointments**
-> List<AppointmentResponseDto> userAppointmentControllerListAppointments(latitude, longitude)
+> List<AppointmentResponseDto> userAppointmentControllerListAppointments(latitude, longitude, status, categoryId, sortBy)
 
 List all user appointments with optional distance calculation
 
@@ -129,9 +129,12 @@ import 'package:user_openapi/api.dart';
 final api_instance = UserAppointmentsApi();
 final latitude = 10.7769; // num | User latitude (-90 to 90)
 final longitude = 106.7009; // num | User longitude (-180 to 180)
+final status = upcoming; // String | Filter by appointment status
+final categoryId = 550e8400-e29b-41d4-a716-446655440000; // String | Filter by category ID
+final sortBy = sortBy_example; // String | Sort by appointment time: newest (default) or oldest first
 
 try {
-    final result = api_instance.userAppointmentControllerListAppointments(latitude, longitude);
+    final result = api_instance.userAppointmentControllerListAppointments(latitude, longitude, status, categoryId, sortBy);
     print(result);
 } catch (e) {
     print('Exception when calling UserAppointmentsApi->userAppointmentControllerListAppointments: $e\n');
@@ -144,6 +147,9 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **latitude** | **num**| User latitude (-90 to 90) | [optional] 
  **longitude** | **num**| User longitude (-180 to 180) | [optional] 
+ **status** | **String**| Filter by appointment status | [optional] 
+ **categoryId** | **String**| Filter by category ID | [optional] 
+ **sortBy** | **String**| Sort by appointment time: newest (default) or oldest first | [optional] [default to 'newest']
 
 ### Return type
 

@@ -59,8 +59,7 @@ abstract final class ProductAddAutofill {
 
   /// Facility image entries (URL + label)
   /// for autofill.
-  static const facilityImages =
-      <Map<String, String>>[
+  static const facilityImages = <Map<String, String>>[
     {
       FacilityImageKey.imageUrl:
           'https://pub-58a545087a6b4221b1b0dab10d8d3517'

@@ -31,21 +31,15 @@ abstract final class EmployeeAddAutofill {
   /// `DOCTOR`.
   /// For therapist, supported types:
   /// `SPA`, `MASSAGE` (default).
-  static Map<String, dynamic> forRole([
-    String? role,
-    String? therapistType,
-  ]) {
-    final effectiveRole = role?.toUpperCase() ??
-        EmployeeRole.therapist.apiValue;
-    if (effectiveRole ==
-        EmployeeRole.doctor.apiValue) {
+  static Map<String, dynamic> forRole([String? role, String? therapistType]) {
+    final effectiveRole =
+        role?.toUpperCase() ?? EmployeeRole.therapist.apiValue;
+    if (effectiveRole == EmployeeRole.doctor.apiValue) {
       return _doctorValues();
     }
     final effectiveType =
-        therapistType?.toUpperCase() ??
-            TherapistType.massage.apiValue;
-    if (effectiveType ==
-        TherapistType.spa.apiValue) {
+        therapistType?.toUpperCase() ?? TherapistType.massage.apiValue;
+    if (effectiveType == TherapistType.spa.apiValue) {
       return _spaTherapistValues();
     }
     return _massageTherapistValues();
@@ -55,36 +49,24 @@ abstract final class EmployeeAddAutofill {
   // Therapist (Spa) defaults
   // ────────────────────────────────────────────
 
-  static Map<String, dynamic>
-      _spaTherapistValues() => {
-    EmployeeFormField.employeeRole.key:
-        EmployeeRole.therapist.apiValue,
-    EmployeeFormField.therapistType.key:
-        TherapistType.spa.apiValue,
+  static Map<String, dynamic> _spaTherapistValues() => {
+    EmployeeFormField.employeeRole.key: EmployeeRole.therapist.apiValue,
+    EmployeeFormField.therapistType.key: TherapistType.spa.apiValue,
     // Personal Info
     EmployeeFormField.firstName.key: 'Nguyen',
     EmployeeFormField.lastName.key: 'Thi Lan',
-    EmployeeFormField.emailAddress.key:
-        'lan.therapist@healytics.dev',
-    EmployeeFormField.phoneNumber.key:
-        '0901234567',
-    EmployeeFormField.dateOfBirth.key:
-        DateTime(1995, 6, 15),
-    EmployeeFormField.gender.key:
-        EmployeeGender.female.displayName,
+    EmployeeFormField.emailAddress.key: 'lan.therapist@healytics.dev',
+    EmployeeFormField.phoneNumber.key: '0901234567',
+    EmployeeFormField.dateOfBirth.key: DateTime(1995, 6, 15),
+    EmployeeFormField.gender.key: EmployeeGender.female.displayName,
     EmployeeFormField.avatarUrl.key: avatarUrl,
     // Emergency Contact
-    EmployeeFormField.emergencyContactName.key:
-        'Nguyen Van An',
-    EmployeeFormField.emergencyContactPhone.key:
-        '0912345678',
+    EmployeeFormField.emergencyContactName.key: 'Nguyen Van An',
+    EmployeeFormField.emergencyContactPhone.key: '0912345678',
     // Professional
-    EmployeeFormField.employmentType.key:
-        EmploymentType.fullTime.displayName,
-    EmployeeFormField.startDate.key:
-        DateTime(2024),
-    EmployeeFormField.jobTitle.key:
-        'Senior Spa Therapist',
+    EmployeeFormField.employmentType.key: EmploymentType.fullTime.displayName,
+    EmployeeFormField.startDate.key: DateTime(2024),
+    EmployeeFormField.jobTitle.key: 'Senior Spa Therapist',
     EmployeeFormField.description.key:
         '[{"insert":"Spa Therapist Profile"}'
         ',{"insert":"\\n"'
@@ -109,27 +91,20 @@ abstract final class EmployeeAddAutofill {
         ',{"insert":"\\n"'
         ',"attributes":{"list":"bullet"}}]',
     // Therapist-specific
-    EmployeeFormField.therapistLevel.key:
-        TherapistLevel.senior.displayName,
+    EmployeeFormField.therapistLevel.key: TherapistLevel.senior.displayName,
     EmployeeFormField.commissionRate.key: '15',
-    EmployeeFormField.healthCheckDate.key:
-        DateTime(2025, 1, 10),
-    EmployeeFormField.spaSkills.key:
-        'Aromatherapy, Hot Stone, Deep Tissue',
+    EmployeeFormField.healthCheckDate.key: DateTime(2025, 1, 10),
+    EmployeeFormField.spaSkills.key: 'Aromatherapy, Hot Stone, Deep Tissue',
     EmployeeFormField.workHistory.key: [
       {
-        WorkHistoryKey.facility:
-            'Glow Saigon Spa Retreat',
-        WorkHistoryKey.position:
-            'Senior Spa Therapist',
+        WorkHistoryKey.facility: 'Glow Saigon Spa Retreat',
+        WorkHistoryKey.position: 'Senior Spa Therapist',
         WorkHistoryKey.period: '2022–Present',
         WorkHistoryKey.isCurrent: true,
       },
       {
-        WorkHistoryKey.facility:
-            'Lotus Wellness Center',
-        WorkHistoryKey.position:
-            'Junior Therapist',
+        WorkHistoryKey.facility: 'Lotus Wellness Center',
+        WorkHistoryKey.position: 'Junior Therapist',
         WorkHistoryKey.period: '2019–2022',
         WorkHistoryKey.isCurrent: false,
       },
@@ -140,36 +115,24 @@ abstract final class EmployeeAddAutofill {
   // Therapist (Massage) defaults
   // ────────────────────────────────────────────
 
-  static Map<String, dynamic>
-      _massageTherapistValues() => {
-    EmployeeFormField.employeeRole.key:
-        EmployeeRole.therapist.apiValue,
-    EmployeeFormField.therapistType.key:
-        TherapistType.massage.apiValue,
+  static Map<String, dynamic> _massageTherapistValues() => {
+    EmployeeFormField.employeeRole.key: EmployeeRole.therapist.apiValue,
+    EmployeeFormField.therapistType.key: TherapistType.massage.apiValue,
     // Personal Info
     EmployeeFormField.firstName.key: 'Le',
     EmployeeFormField.lastName.key: 'Van Huy',
-    EmployeeFormField.emailAddress.key:
-        'huy.massage@healytics.dev',
-    EmployeeFormField.phoneNumber.key:
-        '0908765432',
-    EmployeeFormField.dateOfBirth.key:
-        DateTime(1993, 9, 5),
-    EmployeeFormField.gender.key:
-        EmployeeGender.male.displayName,
+    EmployeeFormField.emailAddress.key: 'huy.massage@healytics.dev',
+    EmployeeFormField.phoneNumber.key: '0908765432',
+    EmployeeFormField.dateOfBirth.key: DateTime(1993, 9, 5),
+    EmployeeFormField.gender.key: EmployeeGender.male.displayName,
     EmployeeFormField.avatarUrl.key: avatarUrl,
     // Emergency Contact
-    EmployeeFormField.emergencyContactName.key:
-        'Le Thi Mai',
-    EmployeeFormField.emergencyContactPhone.key:
-        '0923456789',
+    EmployeeFormField.emergencyContactName.key: 'Le Thi Mai',
+    EmployeeFormField.emergencyContactPhone.key: '0923456789',
     // Professional
-    EmployeeFormField.employmentType.key:
-        EmploymentType.fullTime.displayName,
-    EmployeeFormField.startDate.key:
-        DateTime(2023, 3),
-    EmployeeFormField.jobTitle.key:
-        'Senior Massage Therapist',
+    EmployeeFormField.employmentType.key: EmploymentType.fullTime.displayName,
+    EmployeeFormField.startDate.key: DateTime(2023, 3),
+    EmployeeFormField.jobTitle.key: 'Senior Massage Therapist',
     EmployeeFormField.description.key:
         '[{"insert":"Massage Therapist Profile"}'
         ',{"insert":"\\n"'
@@ -195,30 +158,23 @@ abstract final class EmployeeAddAutofill {
         ',{"insert":"\\n"'
         ',"attributes":{"list":"bullet"}}]',
     // Therapist-specific
-    EmployeeFormField.therapistLevel.key:
-        TherapistLevel.senior.displayName,
+    EmployeeFormField.therapistLevel.key: TherapistLevel.senior.displayName,
     EmployeeFormField.commissionRate.key: '18',
-    EmployeeFormField.healthCheckDate.key:
-        DateTime(2025, 2, 15),
+    EmployeeFormField.healthCheckDate.key: DateTime(2025, 2, 15),
     EmployeeFormField.massageSkills.key:
         'Thai Massage, Deep Tissue, '
         'Sports Massage',
-    EmployeeFormField.strengthLevel.key:
-        'Strong',
+    EmployeeFormField.strengthLevel.key: 'Strong',
     EmployeeFormField.workHistory.key: [
       {
-        WorkHistoryKey.facility:
-            'Healing Hands Spa',
-        WorkHistoryKey.position:
-            'Senior Massage Therapist',
+        WorkHistoryKey.facility: 'Healing Hands Spa',
+        WorkHistoryKey.position: 'Senior Massage Therapist',
         WorkHistoryKey.period: '2021–Present',
         WorkHistoryKey.isCurrent: true,
       },
       {
-        WorkHistoryKey.facility:
-            'Zen Body Massage Center',
-        WorkHistoryKey.position:
-            'Massage Therapist',
+        WorkHistoryKey.facility: 'Zen Body Massage Center',
+        WorkHistoryKey.position: 'Massage Therapist',
         WorkHistoryKey.period: '2018–2021',
         WorkHistoryKey.isCurrent: false,
       },
@@ -229,34 +185,23 @@ abstract final class EmployeeAddAutofill {
   // Doctor defaults
   // ────────────────────────────────────────────
 
-  static Map<String, dynamic>
-      _doctorValues() => {
-    EmployeeFormField.employeeRole.key:
-        EmployeeRole.doctor.apiValue,
+  static Map<String, dynamic> _doctorValues() => {
+    EmployeeFormField.employeeRole.key: EmployeeRole.doctor.apiValue,
     // Personal Info
     EmployeeFormField.firstName.key: 'Tran',
     EmployeeFormField.lastName.key: 'Minh Duc',
-    EmployeeFormField.emailAddress.key:
-        'duc.doctor@healytics.dev',
-    EmployeeFormField.phoneNumber.key:
-        '0987654321',
-    EmployeeFormField.dateOfBirth.key:
-        DateTime(1988, 3, 22),
-    EmployeeFormField.gender.key:
-        EmployeeGender.male.displayName,
+    EmployeeFormField.emailAddress.key: 'duc.doctor@healytics.dev',
+    EmployeeFormField.phoneNumber.key: '0987654321',
+    EmployeeFormField.dateOfBirth.key: DateTime(1988, 3, 22),
+    EmployeeFormField.gender.key: EmployeeGender.male.displayName,
     EmployeeFormField.avatarUrl.key: avatarUrl,
     // Emergency Contact
-    EmployeeFormField.emergencyContactName.key:
-        'Tran Thi Hoa',
-    EmployeeFormField.emergencyContactPhone.key:
-        '0934567890',
+    EmployeeFormField.emergencyContactName.key: 'Tran Thi Hoa',
+    EmployeeFormField.emergencyContactPhone.key: '0934567890',
     // Professional
-    EmployeeFormField.employmentType.key:
-        EmploymentType.fullTime.displayName,
-    EmployeeFormField.startDate.key:
-        DateTime(2023, 6, 1),
-    EmployeeFormField.jobTitle.key:
-        'Dermatologist',
+    EmployeeFormField.employmentType.key: EmploymentType.fullTime.displayName,
+    EmployeeFormField.startDate.key: DateTime(2023, 6, 1),
+    EmployeeFormField.jobTitle.key: 'Dermatologist',
     EmployeeFormField.description.key:
         '[{"insert":"Dermatologist Profile"}'
         ',{"insert":"\\n"'
@@ -282,41 +227,27 @@ abstract final class EmployeeAddAutofill {
         ',{"insert":"\\n"'
         ',"attributes":{"list":"bullet"}}]',
     // Doctor-specific (indexed credentials)
-    '${EmployeeFormField.medicalTitlePrefix.key}0':
-        'BS CKI',
-    '${EmployeeFormField.medicalLicensePrefix.key}0':
-        'CCHN-00456',
-    '${EmployeeFormField.medicalTitlePrefix.key}1':
-        'Thạc sĩ Y khoa',
-    '${EmployeeFormField.medicalLicensePrefix.key}1':
-        'CCHN-00789',
+    '${EmployeeFormField.medicalTitlePrefix.key}0': 'BS CKI',
+    '${EmployeeFormField.medicalLicensePrefix.key}0': 'CCHN-00456',
+    '${EmployeeFormField.medicalTitlePrefix.key}1': 'Thạc sĩ Y khoa',
+    '${EmployeeFormField.medicalLicensePrefix.key}1': 'CCHN-00789',
     EmployeeFormField.experienceYears.key: '10',
     EmployeeFormField.consultationFee.key: '20',
-    EmployeeFormField.specializations.key: [
-      'dermatology',
-    ],
+    EmployeeFormField.specializations.key: ['dermatology'],
     EmployeeFormField.education.key: [
-      MedicalEducation
-          .doctorOfMedicine
-          .displayName,
+      MedicalEducation.doctorOfMedicine.displayName,
     ],
-    EmployeeFormField.certifications.key: [
-      'BLS',
-    ],
+    EmployeeFormField.certifications.key: ['BLS'],
     EmployeeFormField.workHistory.key: [
       {
-        WorkHistoryKey.facility:
-            'SkinCare International',
-        WorkHistoryKey.position:
-            'Head of Dermatology',
+        WorkHistoryKey.facility: 'SkinCare International',
+        WorkHistoryKey.position: 'Head of Dermatology',
         WorkHistoryKey.period: '2021–Present',
         WorkHistoryKey.isCurrent: true,
       },
       {
-        WorkHistoryKey.facility:
-            'City General Hospital',
-        WorkHistoryKey.position:
-            'Resident Dermatologist',
+        WorkHistoryKey.facility: 'City General Hospital',
+        WorkHistoryKey.position: 'Resident Dermatologist',
         WorkHistoryKey.period: '2018–2021',
         WorkHistoryKey.isCurrent: false,
       },

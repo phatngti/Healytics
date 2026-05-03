@@ -24,36 +24,46 @@ export class RedisIoAdapter extends IoAdapter {
     port: number;
     password?: string;
     username?: string;
+    tls?: boolean;
   }): Promise<void> {
-    const isLocal =
-      redisConfig.host === 'localhost' || redisConfig.host === '127.0.0.1';
+    try {
+      const baseOptions = {
+        host: redisConfig.host,
+        port: redisConfig.port,
+        password: redisConfig.password,
+        username: redisConfig.username,
+        ...(redisConfig.tls ? { tls: {} } : {}),
+        retryStrategy: (times: number) => {
+          if (times > 5) return null;
+          return Math.min(times * 1000, 5000);
+        },
+        lazyConnect: true,
+      };
 
-    const baseOptions = {
-      host: redisConfig.host,
-      port: redisConfig.port,
-      password: redisConfig.password,
-      username: redisConfig.username,
-      ...(isLocal ? {} : { tls: {} }),
-      retryStrategy: (times: number) => {
-        if (times > 5) return null;
-        return Math.min(times * 1000, 5000);
-      },
-    };
+      const pubClient = new Redis(baseOptions);
+      const subClient = new Redis(baseOptions);
 
-    const pubClient = new Redis(baseOptions);
-    const subClient = new Redis(baseOptions);
+      pubClient.on('error', (err) =>
+        this.logger.error(`Redis adapter PUB error: ${err.message}`),
+      );
+      subClient.on('error', (err) =>
+        this.logger.error(`Redis adapter SUB error: ${err.message}`),
+      );
 
-    pubClient.on('error', (err) =>
-      this.logger.error(`Redis adapter PUB error: ${err.message}`),
-    );
-    subClient.on('error', (err) =>
-      this.logger.error(`Redis adapter SUB error: ${err.message}`),
-    );
+      // Attempt connection — if it fails, fall back to single-instance mode
+      await Promise.all([pubClient.connect(), subClient.connect()]);
 
-    this.adapterConstructor = createAdapter(pubClient, subClient);
-    this.logger.log(
-      `Redis IO Adapter connected to ${redisConfig.host}:${redisConfig.port}`,
-    );
+      this.adapterConstructor = createAdapter(pubClient, subClient);
+      this.logger.log(
+        `Redis IO Adapter connected to ${redisConfig.host}:${redisConfig.port}`,
+      );
+    } catch (err) {
+      this.logger.error(
+        `Redis IO Adapter failed to connect: ${(err as Error).message}. ` +
+          `WebSocket will run in single-instance mode.`,
+      );
+      // adapterConstructor stays null → createIOServer uses default adapter
+    }
   }
 
   createIOServer(port: number, options?: Partial<ServerOptions>): any {

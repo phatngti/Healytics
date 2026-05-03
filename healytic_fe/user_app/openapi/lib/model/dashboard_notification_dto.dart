@@ -21,6 +21,7 @@ class DashboardNotificationDto {
     required this.isRead,
   });
 
+
   String id;
 
   String title;

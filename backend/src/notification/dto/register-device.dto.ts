@@ -7,6 +7,7 @@ import { DevicePlatform } from '@/notification/enums/device-platform.enum';
  */
 export class RegisterDeviceDto {
   @ApiProperty({
+    type: String,
     description: 'FCM or APNs device token',
     example: 'fMv7B4Yp...long_token_string',
   })
@@ -15,8 +16,9 @@ export class RegisterDeviceDto {
   token: string;
 
   @ApiProperty({
-    description: 'Device platform',
     enum: DevicePlatform,
+    enumName: 'DevicePlatform',
+    description: 'Device platform',
     example: DevicePlatform.ANDROID,
   })
   @IsEnum(DevicePlatform)

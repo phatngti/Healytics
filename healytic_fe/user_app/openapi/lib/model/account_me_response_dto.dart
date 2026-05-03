@@ -23,6 +23,7 @@ class AccountMeResponseDto {
     this.userProfile,
   });
 
+
   /// Account ID
   String id;
 

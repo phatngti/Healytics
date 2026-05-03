@@ -1,13 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ClinicReviewSummaryDto {
-  @ApiProperty({ example: 4.9 })
+  @ApiProperty({ type: Number, example: 4.9 })
   averageRating: number;
 
-  @ApiProperty({ example: 2500 })
+  @ApiProperty({ type: Number, example: 2500 })
   totalReviewCount: number;
 
-  @ApiProperty({ example: 'Excellent' })
+  @ApiProperty({ type: String, example: 'Excellent' })
   ratingLabel: string;
 
   @ApiProperty({
@@ -17,59 +17,60 @@ export class ClinicReviewSummaryDto {
 }
 
 export class ClinicReviewFilterDto {
-  @ApiProperty({ example: 'all' })
+  @ApiProperty({ type: String, example: 'all' })
   id: string;
 
-  @ApiProperty({ example: 'All (2.5k)' })
+  @ApiProperty({ type: String, example: 'All (2.5k)' })
   label: string;
 
-  @ApiPropertyOptional({ example: 5 })
+  @ApiPropertyOptional({ type: Number, nullable: true, example: 5 })
   starCount: number | null;
 
-  @ApiProperty({ example: false })
+  @ApiProperty({ type: Boolean, example: false })
   requiresMedia: boolean;
 }
 
 export class ClinicReviewResponseSubDto {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   responseText: string | null;
 }
 
 export class ClinicReviewDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   id: string;
 
   @ApiProperty({
+    type: String,
     example: 'n***a',
     description: 'Masked name for privacy',
   })
   reviewerName: string;
 
-  @ApiProperty({ example: 'N' })
+  @ApiProperty({ type: String, example: 'N' })
   reviewerInitial: string;
 
-  @ApiProperty({ example: 5, minimum: 1, maximum: 5 })
+  @ApiProperty({ type: Number, example: 5, minimum: 1, maximum: 5 })
   starCount: number;
 
-  @ApiPropertyOptional({ description: 'null for MVP' })
+  @ApiPropertyOptional({ type: String, nullable: true, description: 'null for MVP' })
   memberBadge: string | null;
 
-  @ApiProperty({ example: '04-04-2026' })
+  @ApiProperty({ type: String, example: '04-04-2026' })
   dateLabel: string;
 
-  @ApiPropertyOptional({ example: 'Salt Stone Massage (90 min)' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'Salt Stone Massage (90 min)' })
   serviceName: string | null;
 
-  @ApiPropertyOptional({ example: 'spa' })
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'spa' })
   serviceIcon: string | null;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   reviewText: string;
 
   @ApiProperty({ type: [String] })
   mediaUrls: string[];
 
-  @ApiPropertyOptional({ type: ClinicReviewResponseSubDto })
+  @ApiPropertyOptional({ type: ClinicReviewResponseSubDto, nullable: true })
   clinicResponse: ClinicReviewResponseSubDto | null;
 }
 
@@ -83,9 +84,9 @@ export class ClinicReviewsResponseDto {
   @ApiProperty({ type: [ClinicReviewDto] })
   reviews: ClinicReviewDto[];
 
-  @ApiProperty({ example: 150 })
+  @ApiProperty({ type: Number, example: 150 })
   totalCount: number;
 
-  @ApiProperty({ example: true })
+  @ApiProperty({ type: Boolean, example: true })
   hasMore: boolean;
 }

@@ -30,6 +30,7 @@ class CreatePartnerHealthServiceDto {
     this.serviceManual,
   });
 
+
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
@@ -50,7 +51,7 @@ class CreatePartnerHealthServiceDto {
   ///
   String? description;
 
-  CreatePartnerHealthServiceDtoTypeEnum type;
+  HealthServiceType type;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -231,7 +232,7 @@ class CreatePartnerHealthServiceDto {
         name: mapValueOfType<String>(json, r'name')!,
         slug: mapValueOfType<String>(json, r'slug')!,
         description: mapValueOfType<String>(json, r'description'),
-        type: CreatePartnerHealthServiceDtoTypeEnum.fromJson(json[r'type'])!,
+        type: HealthServiceType.fromJson(json[r'type'])!,
         basePrice: num.parse('${json[r'basePrice']}'),
         salePrice: num.parse('${json[r'salePrice']}'),
         currency: mapValueOfType<String>(json, r'currency'),
@@ -296,77 +297,6 @@ class CreatePartnerHealthServiceDto {
     'type',
   };
 }
-
-
-class CreatePartnerHealthServiceDtoTypeEnum {
-  /// Instantiate a new enum with the provided [value].
-  const CreatePartnerHealthServiceDtoTypeEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const service = CreatePartnerHealthServiceDtoTypeEnum._(r'service');
-
-  /// List of all possible values in this [enum][CreatePartnerHealthServiceDtoTypeEnum].
-  static const values = <CreatePartnerHealthServiceDtoTypeEnum>[
-    service,
-  ];
-
-  static CreatePartnerHealthServiceDtoTypeEnum? fromJson(dynamic value) => CreatePartnerHealthServiceDtoTypeEnumTypeTransformer().decode(value);
-
-  static List<CreatePartnerHealthServiceDtoTypeEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <CreatePartnerHealthServiceDtoTypeEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = CreatePartnerHealthServiceDtoTypeEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [CreatePartnerHealthServiceDtoTypeEnum] to String,
-/// and [decode] dynamic data back to [CreatePartnerHealthServiceDtoTypeEnum].
-class CreatePartnerHealthServiceDtoTypeEnumTypeTransformer {
-  factory CreatePartnerHealthServiceDtoTypeEnumTypeTransformer() => _instance ??= const CreatePartnerHealthServiceDtoTypeEnumTypeTransformer._();
-
-  const CreatePartnerHealthServiceDtoTypeEnumTypeTransformer._();
-
-  String encode(CreatePartnerHealthServiceDtoTypeEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a CreatePartnerHealthServiceDtoTypeEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  CreatePartnerHealthServiceDtoTypeEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'service': return CreatePartnerHealthServiceDtoTypeEnum.service;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [CreatePartnerHealthServiceDtoTypeEnumTypeTransformer] instance.
-  static CreatePartnerHealthServiceDtoTypeEnumTypeTransformer? _instance;
-}
-
 
 
 class CreatePartnerHealthServiceDtoStatusEnum {

@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **userId** | **String** | User account UUID | 
 **staffId** | **String** | Staff/employee UUID | 
 **startTime** | **String** | Desired slot start time (ISO 8601) | 
-**productId** | **String** | Product/service UUID | [optional] 
+**productId** | **String** | Product/service UUID | 
 **idempotencyKey** | **String** | Idempotency key to prevent duplicate requests from AI retry | 
 **webhookUrl** | **String** | Webhook URL to receive checkout result | [optional] 
 

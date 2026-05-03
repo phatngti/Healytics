@@ -16,10 +16,11 @@ class AsyncCheckoutDto {
     required this.userId,
     required this.staffId,
     required this.startTime,
-    this.productId,
+    required this.productId,
     required this.idempotencyKey,
     this.webhookUrl,
   });
+
 
   /// User account UUID
   String userId;
@@ -31,13 +32,7 @@ class AsyncCheckoutDto {
   String startTime;
 
   /// Product/service UUID
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? productId;
+  String productId;
 
   /// Idempotency key to prevent duplicate requests from AI retry
   String idempotencyKey;
@@ -66,7 +61,7 @@ class AsyncCheckoutDto {
     (userId.hashCode) +
     (staffId.hashCode) +
     (startTime.hashCode) +
-    (productId == null ? 0 : productId!.hashCode) +
+    (productId.hashCode) +
     (idempotencyKey.hashCode) +
     (webhookUrl == null ? 0 : webhookUrl!.hashCode);
 
@@ -78,11 +73,7 @@ class AsyncCheckoutDto {
       json[r'userId'] = this.userId;
       json[r'staffId'] = this.staffId;
       json[r'startTime'] = this.startTime;
-    if (this.productId != null) {
       json[r'productId'] = this.productId;
-    } else {
-      json[r'productId'] = null;
-    }
       json[r'idempotencyKey'] = this.idempotencyKey;
     if (this.webhookUrl != null) {
       json[r'webhookUrl'] = this.webhookUrl;
@@ -114,7 +105,7 @@ class AsyncCheckoutDto {
         userId: mapValueOfType<String>(json, r'userId')!,
         staffId: mapValueOfType<String>(json, r'staffId')!,
         startTime: mapValueOfType<String>(json, r'startTime')!,
-        productId: mapValueOfType<String>(json, r'productId'),
+        productId: mapValueOfType<String>(json, r'productId')!,
         idempotencyKey: mapValueOfType<String>(json, r'idempotencyKey')!,
         webhookUrl: mapValueOfType<String>(json, r'webhookUrl'),
       );
@@ -167,6 +158,7 @@ class AsyncCheckoutDto {
     'userId',
     'staffId',
     'startTime',
+    'productId',
     'idempotencyKey',
   };
 }

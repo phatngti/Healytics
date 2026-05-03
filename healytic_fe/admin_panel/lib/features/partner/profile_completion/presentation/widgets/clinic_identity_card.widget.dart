@@ -44,9 +44,7 @@ class ClinicIdentityCardWidget extends StatelessWidget {
               'Business type',
               style: Theme.of(
                 context,
-              ).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
             AppDimens.verticalSmall,
             Wrap(
@@ -55,9 +53,7 @@ class ClinicIdentityCardWidget extends StatelessWidget {
               children: identity.businessType
                   .map(
                     (item) => Chip(
-                      label: Text(
-                        _formatBusinessType(item),
-                      ),
+                      label: Text(_formatBusinessType(item)),
                       avatar: Icon(
                         Icons.local_hospital_rounded,
                         size: AppDimens.iconSmMd,
@@ -122,13 +118,8 @@ class SectionCardWidget extends StatelessWidget {
             color: isDark
                 ? colorScheme.shadow.withValues(alpha: 0.2)
                 : colorScheme.shadow.withValues(alpha: 0.06),
-            blurRadius: isDark
-                ? AppDimens.spaceXl
-                : AppDimens.spaceMd,
-            offset: const Offset(
-              0,
-              AppDimens.spaceXs,
-            ),
+            blurRadius: isDark ? AppDimens.spaceXl : AppDimens.spaceMd,
+            offset: const Offset(0, AppDimens.spaceXs),
           ),
         ],
       ),
@@ -157,10 +148,7 @@ class SectionCardWidget extends StatelessWidget {
                   ],
                 ),
               ),
-              if (trailing != null) ...[
-                AppDimens.horizontalMedium,
-                trailing!,
-              ],
+              if (trailing != null) ...[AppDimens.horizontalMedium, trailing!],
             ],
           ),
           AppDimens.verticalLargeExtra,
@@ -185,10 +173,7 @@ class InfoTileWidget extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      constraints: const BoxConstraints(
-        minWidth: 240,
-        maxWidth: 360,
-      ),
+      constraints: const BoxConstraints(minWidth: 240, maxWidth: 360),
       padding: AppDimens.paddingAllMedium,
       decoration: BoxDecoration(
         color: isDark

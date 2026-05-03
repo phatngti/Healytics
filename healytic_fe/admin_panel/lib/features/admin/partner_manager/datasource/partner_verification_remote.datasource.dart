@@ -1,4 +1,5 @@
-import 'package:admin_openapi/api.dart' hide PartnerVerificationStatus;
+import 'package:admin_openapi/api.dart'
+    hide PartnerVerificationStatus, PartnerPriority;
 import 'package:admin_openapi/api.dart' as openapi;
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
@@ -285,32 +286,29 @@ class PartnerVerificationRemoteDataSourceImpl
 
   /// Maps verification status enum
   PartnerVerificationStatus _mapVerificationStatus(
-    AdminPartnerDetailResponseDtoStatusEnum status,
+    openapi.PartnerVerificationStatus status,
   ) {
-    return switch (status) {
-      AdminPartnerDetailResponseDtoStatusEnum.PENDING ||
-      AdminPartnerDetailResponseDtoStatusEnum.REQUIRED_RESUBMIT =>
-        PartnerVerificationStatus.pending,
-      AdminPartnerDetailResponseDtoStatusEnum.APPROVED =>
-        PartnerVerificationStatus.approved,
-      AdminPartnerDetailResponseDtoStatusEnum.REJECTED =>
-        PartnerVerificationStatus.rejected,
-      _ => PartnerVerificationStatus.pending,
-    };
+    if (status == openapi.PartnerVerificationStatus.APPROVED) {
+      return PartnerVerificationStatus.approved;
+    } else if (status ==
+        openapi.PartnerVerificationStatus.REJECTED) {
+      return PartnerVerificationStatus.rejected;
+    }
+    return PartnerVerificationStatus.pending;
   }
 
   /// Maps priority enum - maps API values to domain values
-  /// Note: Domain only has 'normal' and 'high', so 'low' maps to 'normal'
+  /// Note: Domain only has 'normal' and 'high',
+  /// so 'low' maps to 'normal'
   /// and 'urgent' maps to 'high'
-  PartnerPriority _mapPriority(AdminPartnerDetailResponseDtoPriorityEnum p) {
-    return switch (p) {
-      AdminPartnerDetailResponseDtoPriorityEnum.low ||
-      AdminPartnerDetailResponseDtoPriorityEnum.normal =>
-        PartnerPriority.normal,
-      AdminPartnerDetailResponseDtoPriorityEnum.high ||
-      AdminPartnerDetailResponseDtoPriorityEnum.urgent => PartnerPriority.high,
-      _ => PartnerPriority.normal,
-    };
+  PartnerPriority _mapPriority(
+    openapi.PartnerPriority p,
+  ) {
+    if (p == openapi.PartnerPriority.high ||
+        p == openapi.PartnerPriority.urgent) {
+      return PartnerPriority.high;
+    }
+    return PartnerPriority.normal;
   }
 
   /// Maps [PartnerItemDto] to [PartnerVerificationEntity] for list responses
@@ -332,16 +330,13 @@ class PartnerVerificationRemoteDataSourceImpl
   PartnerVerificationStatus _mapItemVerificationStatus(
     openapi.PartnerVerificationStatus status,
   ) {
-    return switch (status) {
-      openapi.PartnerVerificationStatus.PENDING ||
-      openapi.PartnerVerificationStatus.REQUIRED_RESUBMIT =>
-        PartnerVerificationStatus.pending,
-      openapi.PartnerVerificationStatus.APPROVED =>
-        PartnerVerificationStatus.approved,
-      openapi.PartnerVerificationStatus.REJECTED =>
-        PartnerVerificationStatus.rejected,
-      _ => PartnerVerificationStatus.pending,
-    };
+    if (status == openapi.PartnerVerificationStatus.APPROVED) {
+      return PartnerVerificationStatus.approved;
+    } else if (status ==
+        openapi.PartnerVerificationStatus.REJECTED) {
+      return PartnerVerificationStatus.rejected;
+    }
+    return PartnerVerificationStatus.pending;
   }
 
   /// Converts domain status enum to API query parameter string

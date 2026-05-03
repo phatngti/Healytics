@@ -10,6 +10,7 @@ import { RegisterDto } from './dto/request/register.dto';
 import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
 import * as bcrypt from 'bcryptjs';
+import { createHash } from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@/account/enum/role.enum';
 import { UserProfile } from '@/common/entities/user-profile.entity';
@@ -106,7 +107,9 @@ export class AuthService {
     const refresh_token = this.jwtService.sign(payload, {
       expiresIn: refreshExpires as any,
     });
-    const refreshHash = await bcrypt.hash(refresh_token, 10);
+    // SHA-256 for refresh tokens: they are high-entropy JWTs, not user passwords.
+    // bcrypt cost-10 blocked the event loop ~300ms per call — SHA-256 is ~0.01ms.
+    const refreshHash = createHash('sha256').update(refresh_token).digest('hex');
     await this.accountService.setRefreshTokenHash(userId, refreshHash);
     return {
       access_token,
@@ -162,6 +165,7 @@ export class AuthService {
   ): Promise<ValidatedUser | null> {
     const user = await this.accountService.findByEmail(email);
     if (!user) return null;
+
     const isMatch = await bcrypt.compare(password, user.passwordHash || '');
     if (!isMatch) return null;
     const { passwordHash, ...rest } = user as Account & {
@@ -253,6 +257,32 @@ export class AuthService {
   }
 
   /**
+   * Logs in an employee user (EMPLOYEE role only).
+   * @param user - The validated user
+   * @returns Authentication tokens
+   */
+  async loginEmployee(user: ValidatedUser): Promise<AuthTokensDto> {
+    const userId = user.id;
+    const userEmail = user.email;
+    const userRole = user.role;
+    if (!userId) {
+      throw new UnauthorizedException('Employee ID is missing');
+    }
+    if (user.roleNotAllowed || userRole !== Role.EMPLOYEE) {
+      throw new ForbiddenException(
+        'This account is not authorized for employee login.',
+      );
+    }
+    this.logger.log(`Employee login: ${userId}`);
+    return this.createTokensForUser(
+      userId,
+      userEmail,
+      userRole,
+      user.userProfile,
+    );
+  }
+
+  /**
    * Logs in a partner user (HEALTH_PARTNER role only).
    * @param user - The validated user
    * @returns Authentication tokens
@@ -317,10 +347,9 @@ export class AuthService {
     if (!user || !user.refreshTokenHash) {
       throw new UnauthorizedException('Refresh token revoked');
     }
-    const match = await bcrypt.compare(
-      refreshToken,
-      user.refreshTokenHash || '',
-    );
+    const match =
+      createHash('sha256').update(refreshToken).digest('hex') ===
+      user.refreshTokenHash;
     if (!match) {
       await this.accountService.removeRefreshToken(userId).catch(() => {});
       throw new UnauthorizedException('Refresh token does not match');
@@ -381,10 +410,9 @@ export class AuthService {
     if (!user || !user.refreshTokenHash) {
       throw new UnauthorizedException('Refresh token revoked');
     }
-    const match = await bcrypt.compare(
-      refreshToken,
-      user.refreshTokenHash || '',
-    );
+    const match =
+      createHash('sha256').update(refreshToken).digest('hex') ===
+      user.refreshTokenHash;
     if (!match) {
       await this.accountService.removeRefreshToken(userId).catch(() => {});
       throw new UnauthorizedException('Refresh token does not match');

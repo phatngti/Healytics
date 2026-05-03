@@ -17,6 +17,7 @@ class AdminLoginDto {
     required this.password,
   });
 
+
   /// The email of the admin/partner user
   String email;
 

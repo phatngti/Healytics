@@ -7,6 +7,7 @@ import 'package:admin_panel/core/utils/user_role_helper.dart';
 import 'package:common/widgets/images/avatar.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
+import 'package:admin_panel/router/admin_routes.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -50,7 +51,11 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
         actions: [
           // Notification
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              if (UserRoleHelper.isAdmin()) {
+                const AdminNotificationCampaignIndexRoute().go(context);
+              }
+            },
             icon: const Icon(Icons.notifications, size: 16),
           ),
           AppDimens.horizontalSmall,
@@ -79,10 +84,7 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
                         color: colorScheme.onSurface,
                       ),
                       AppDimens.horizontalSmall,
-                      Text(
-                        'Edit Profile',
-                        style: textTheme.bodyMedium,
-                      ),
+                      Text('Edit Profile', style: textTheme.bodyMedium),
                     ],
                   ),
                 ),
@@ -90,11 +92,7 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
                 value: 'logout',
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.logout,
-                      size: 18,
-                      color: colorScheme.error,
-                    ),
+                    Icon(Icons.logout, size: 18, color: colorScheme.error),
                     AppDimens.horizontalSmall,
                     Text(
                       'Logout',
@@ -161,7 +159,7 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
   /// Maps the role enum value to a user-friendly label.
   String _buildRoleName(AccountMeResponseDto? account) {
     if (account == null) return '';
-    final role = account.role.value as String;
+    final role = account.role.value;
     return role
         .split('_')
         .map(

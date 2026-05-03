@@ -20,6 +20,7 @@ class PublicHealthServiceMediaDto {
     required this.sortOrder,
   });
 
+
   /// Unique media identifier
   String id;
 

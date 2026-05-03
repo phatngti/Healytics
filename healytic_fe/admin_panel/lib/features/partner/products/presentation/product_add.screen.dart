@@ -24,10 +24,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProductAddScreen extends HookConsumerWidget {
-  const ProductAddScreen({
-    super.key,
-    this.autofill = false,
-  });
+  const ProductAddScreen({super.key, this.autofill = false});
 
   /// When `true` (and in debug builds only), the
   /// form is pre-populated with sample data.
@@ -36,9 +33,7 @@ class ProductAddScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(
-      () => GlobalKey<FormBuilderState>(),
-    );
+    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final serviceManualKey = useMemoized(
       () => GlobalKey<ProductServiceManualCardState>(),
     );
@@ -46,21 +41,15 @@ class ProductAddScreen extends HookConsumerWidget {
 
     // Build initial values in debug mode only.
     // Triggered by URL param OR store config flag.
-    final shouldAutofill = kDebugMode &&
-        (autofill ||
-            (Store.tryGet(StoreKey.autoFill) ??
-                false));
+    final shouldAutofill =
+        kDebugMode && (autofill || (Store.tryGet(StoreKey.autoFill) ?? false));
     final initialValue = useMemoized(
-      () => shouldAutofill
-          ? _buildAutofillValues()
-          : const <String, dynamic>{},
+      () => shouldAutofill ? _buildAutofillValues() : const <String, dynamic>{},
     );
 
     Future<void> handleSubmit() async {
-      if (formKey.currentState?.saveAndValidate() ??
-          false) {
-        final formData =
-            formKey.currentState!.value;
+      if (formKey.currentState?.saveAndValidate() ?? false) {
+        final formData = formKey.currentState!.value;
         debugPrint('Form Data: $formData');
 
         isSubmitting.value = true;
@@ -73,13 +62,10 @@ class ProductAddScreen extends HookConsumerWidget {
           );
 
           if (context.mounted) {
-            final semantic = Theme.of(context)
-                .extension<SemanticColors>()!;
+            final semantic = Theme.of(context).extension<SemanticColors>()!;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text(
-                  'Product created successfully!',
-                ),
+                content: const Text('Product created successfully!'),
                 backgroundColor: semantic.success,
               ),
             );
@@ -87,13 +73,10 @@ class ProductAddScreen extends HookConsumerWidget {
           }
         } catch (e) {
           if (context.mounted) {
-            final semantic = Theme.of(context)
-                .extension<SemanticColors>()!;
+            final semantic = Theme.of(context).extension<SemanticColors>()!;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                  'Failed to create product: $e',
-                ),
+                content: Text('Failed to create product: $e'),
                 backgroundColor: semantic.error,
               ),
             );
@@ -117,9 +100,7 @@ class ProductAddScreen extends HookConsumerWidget {
         useLayout: true,
         desktop: ProductAddDesktop(
           onCancel: handleCancel,
-          onSubmit: isSubmitting.value
-              ? null
-              : () => handleSubmit(),
+          onSubmit: isSubmitting.value ? null : () => handleSubmit(),
           initialStatus: shouldAutofill
               ? ProductAddAutofill.status
               : ProductStatus.draft.apiValue,
@@ -139,88 +120,61 @@ class ProductAddScreen extends HookConsumerWidget {
   static Future<void> _submitForm({
     required WidgetRef ref,
     required Map<String, dynamic> formData,
-    required GlobalKey<ProductServiceManualCardState>
-        serviceManualKey,
+    required GlobalKey<ProductServiceManualCardState> serviceManualKey,
   }) async {
     // General Information
-    final name = formData[
-            ProductFormField.productName.key]
-        as String? ??
-        '';
-    final description = formData[
-            ProductFormField.productDescription.key]
-        as String? ??
-        '';
-    final productType = formData[
-            ProductFormField.productType.key]
-        as String? ??
+    final name = formData[ProductFormField.productName.key] as String? ?? '';
+    final description =
+        formData[ProductFormField.productDescription.key] as String? ?? '';
+    final productType =
+        formData[ProductFormField.productType.key] as String? ??
         ProductType.service.apiValue;
 
     // Pricing & Inventory
-    final basePrice = double.tryParse(
-          formData[ProductFormField.basePrice.key]
-                  ?.toString() ??
-              '0',
+    final basePrice =
+        double.tryParse(
+          formData[ProductFormField.basePrice.key]?.toString() ?? '0',
         ) ??
         0.0;
     final salePrice = double.tryParse(
-      formData[ProductFormField.salePrice.key]
-              ?.toString() ??
-          '',
+      formData[ProductFormField.salePrice.key]?.toString() ?? '',
     );
 
     // Visibility
-    final status = formData[
-            ProductFormField.visibilityStatus.key]
-        as String? ??
+    final status =
+        formData[ProductFormField.visibilityStatus.key] as String? ??
         ProductStatus.draft.apiValue;
-    final onlineStore = formData[
-            ProductFormField.onlineStore.key]
-        as bool? ??
-        true;
+    final onlineStore =
+        formData[ProductFormField.onlineStore.key] as bool? ?? true;
 
     // Organization
-    final category =
-        formData[ProductFormField.category.key]
-            as String? ??
-        '';
+    final category = formData[ProductFormField.category.key] as String? ?? '';
 
     // Operations & Scheduling
     final duration = int.tryParse(
-      formData[ProductFormField.duration.key]
-              ?.toString() ??
-          '',
+      formData[ProductFormField.duration.key]?.toString() ?? '',
     );
     final buffer = int.tryParse(
-      formData[ProductFormField.buffer.key]
-              ?.toString() ??
-          '',
+      formData[ProductFormField.buffer.key]?.toString() ?? '',
     );
     final capacity = int.tryParse(
-      formData[ProductFormField.capacity.key]
-              ?.toString() ??
-          '',
+      formData[ProductFormField.capacity.key]?.toString() ?? '',
     );
     final leadTime = int.tryParse(
-      formData[ProductFormField.leadTime.key]
-              ?.toString() ??
-          '',
+      formData[ProductFormField.leadTime.key]?.toString() ?? '',
     );
-    final staffAllocation = formData[
-            ProductFormField.staffAllocation.key]
-        as String? ??
+    final staffAllocation =
+        formData[ProductFormField.staffAllocation.key] as String? ??
         StaffAllocation.any.apiValue;
-    final selectedStaffIds = (formData[
-                ProductFormField.selectedStaffIds.key]
-            as List<dynamic>?)
+    final selectedStaffIds =
+        (formData[ProductFormField.selectedStaffIds.key] as List<dynamic>?)
             ?.map((e) => e.toString())
             .toList() ??
         [];
 
     // Media
-    final productImages = (formData[
-                ProductFormField.productImages.key]
-            as List<dynamic>?)
+    final productImages =
+        (formData[ProductFormField.productImages.key] as List<dynamic>?)
             ?.map((e) => e.toString())
             .toList() ??
         [];
@@ -247,114 +201,73 @@ class ProductAddScreen extends HookConsumerWidget {
       staffIds: selectedStaffIds,
       images: productImages,
       facilityImages: facilityImages,
-      serviceManual: _extractServiceManual(
-        serviceManualKey,
-      ),
+      serviceManual: _extractServiceManual(serviceManualKey),
     );
 
-    await ref
-        .read(productProvider.notifier)
-        .addProduct(request);
+    await ref.read(productProvider.notifier).addProduct(request);
   }
 
   /// Sample data map for all `FormBuilder` fields.
   /// Only used when autofill is active.
-  static Map<String, dynamic>
-      _buildAutofillValues() => {
-    ProductFormField.productName.key:
-        ProductAddAutofill.name,
-    ProductFormField.productType.key:
-        ProductAddAutofill.productType,
-    ProductFormField.basePrice.key:
-        ProductAddAutofill.basePrice,
-    ProductFormField.salePrice.key:
-        ProductAddAutofill.salePrice,
-    ProductFormField.duration.key:
-        ProductAddAutofill.duration,
-    ProductFormField.buffer.key:
-        ProductAddAutofill.buffer,
-    ProductFormField.capacity.key:
-        ProductAddAutofill.capacity,
-    ProductFormField.leadTime.key:
-        ProductAddAutofill.leadTime,
-    ProductFormField.productImages.key:
-        ProductAddAutofill.productImages,
-    ProductFormField.facilityImages.key:
-        ProductAddAutofill.facilityImages,
+  static Map<String, dynamic> _buildAutofillValues() => {
+    ProductFormField.productName.key: ProductAddAutofill.name,
+    ProductFormField.productType.key: ProductAddAutofill.productType,
+    ProductFormField.basePrice.key: ProductAddAutofill.basePrice,
+    ProductFormField.salePrice.key: ProductAddAutofill.salePrice,
+    ProductFormField.duration.key: ProductAddAutofill.duration,
+    ProductFormField.buffer.key: ProductAddAutofill.buffer,
+    ProductFormField.capacity.key: ProductAddAutofill.capacity,
+    ProductFormField.leadTime.key: ProductAddAutofill.leadTime,
+    ProductFormField.productImages.key: ProductAddAutofill.productImages,
+    ProductFormField.facilityImages.key: ProductAddAutofill.facilityImages,
   };
 
   /// Extract facility images from form data.
-  static List<FacilityImageEntity>
-      _extractFacilityImages(dynamic raw) {
+  static List<FacilityImageEntity> _extractFacilityImages(dynamic raw) {
     if (raw is! List) return [];
     return raw
         .whereType<Map<String, dynamic>>()
         .where(
-          (m) =>
-              (m[FacilityImageKey.imageUrl]
-                      as String?)
-                  ?.isNotEmpty ==
-              true,
+          (m) => (m[FacilityImageKey.imageUrl] as String?)?.isNotEmpty == true,
         )
         .map(
           (m) => FacilityImageEntity(
-            imageUrl:
-                m[FacilityImageKey.imageUrl]
-                    as String? ??
-                '',
-            label: m[FacilityImageKey.label]
-                as String? ??
-                '',
+            imageUrl: m[FacilityImageKey.imageUrl] as String? ?? '',
+            label: m[FacilityImageKey.label] as String? ?? '',
           ),
         )
         .toList();
   }
 
   /// Extracts [ServiceManualEntity] from the card.
-  static ServiceManualEntity?
-      _extractServiceManual(
+  static ServiceManualEntity? _extractServiceManual(
     GlobalKey<ProductServiceManualCardState> key,
   ) {
-    final data =
-        key.currentState?.extractFormData();
+    final data = key.currentState?.extractFormData();
     if (data == null) return null;
 
     final guidelines =
-        (data[ServiceManualKey.guidelines]
-            as List<String>?) ??
-        [];
-    final rules = (data[ServiceManualKey.rules]
-                as List<Map<String, String>>?)
+        (data[ServiceManualKey.guidelines] as List<String>?) ?? [];
+    final rules =
+        (data[ServiceManualKey.rules] as List<Map<String, String>>?)
             ?.map(
               (r) => ServiceRuleEntity(
-                iconSlug:
-                    r[ServiceManualKey.iconSlug] ??
-                    '',
-                title:
-                    r[ServiceManualKey.title] ??
-                    '',
-                description: r[ServiceManualKey
-                        .description] ??
-                    '',
+                iconSlug: r[ServiceManualKey.iconSlug] ?? '',
+                title: r[ServiceManualKey.title] ?? '',
+                description: r[ServiceManualKey.description] ?? '',
               ),
             )
             .toList() ??
         [];
-    final steps = (data[ServiceManualKey.steps]
-                as List<Map<String, String>>?)
+    final steps =
+        (data[ServiceManualKey.steps] as List<Map<String, String>>?)
             ?.asMap()
             .entries
             .map(
               (e) => ProcedureStepEntity(
                 stepNumber: e.key + 1,
-                title:
-                    e.value[
-                        ServiceManualKey.title] ??
-                    '',
-                description: e.value[
-                        ServiceManualKey
-                            .description] ??
-                    '',
+                title: e.value[ServiceManualKey.title] ?? '',
+                description: e.value[ServiceManualKey.description] ?? '',
               ),
             )
             .toList() ??

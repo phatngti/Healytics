@@ -22,6 +22,7 @@ class FeaturedSpecialistResponseDto {
     required this.clinicName,
   });
 
+
   /// UUID of the specialist
   String id;
 

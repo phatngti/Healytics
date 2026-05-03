@@ -16,6 +16,7 @@ class ReviewPartnerResponseDto {
     required this.message,
   });
 
+
   /// Success message
   String message;
 

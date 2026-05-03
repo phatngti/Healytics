@@ -50,16 +50,12 @@ abstract class CategoryRemoteDataSource {
 // ============================================================================
 
 /// Real implementation using API service
-class CategoryRemoteDataSourceImpl
-    implements CategoryRemoteDataSource {
+class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
   final ApiService apiService;
 
-  CategoryRemoteDataSourceImpl({
-    required this.apiService,
-  });
+  CategoryRemoteDataSourceImpl({required this.apiService});
 
-  AdminCategoriesApi get _api =>
-      apiService.adminCategoriesApi;
+  AdminCategoriesApi get _api => apiService.adminCategoriesApi;
 
   @override
   Future<List<CategoryEntity>> getCategories({
@@ -68,35 +64,24 @@ class CategoryRemoteDataSourceImpl
     String? sortedBy,
     bool? sortedAsc,
   }) async {
-    final dtos =
-        await _api.adminCategoriesControllerFindAll();
+    final dtos = await _api.adminCategoriesControllerFindAll();
     if (dtos == null) return [];
 
     final all = dtos.map(_mapDtoToEntity).toList();
 
-    final end = (startingAt + count).clamp(
-      0,
-      all.length,
-    );
-    return all.sublist(
-      startingAt.clamp(0, all.length),
-      end,
-    );
+    final end = (startingAt + count).clamp(0, all.length);
+    return all.sublist(startingAt.clamp(0, all.length), end);
   }
 
   @override
   Future<int> getTotalRows() async {
-    final dtos =
-        await _api.adminCategoriesControllerFindAll();
+    final dtos = await _api.adminCategoriesControllerFindAll();
     return dtos?.length ?? 0;
   }
 
   @override
-  Future<CategoryEntity> getCategoryById(
-    CategoryId id,
-  ) async {
-    final dto =
-        await _api.adminCategoriesControllerFindOne(id);
+  Future<CategoryEntity> getCategoryById(CategoryId id) async {
+    final dto = await _api.adminCategoriesControllerFindOne(id);
     if (dto == null) {
       throw Exception('Category not found: $id');
     }
@@ -104,11 +89,8 @@ class CategoryRemoteDataSourceImpl
   }
 
   @override
-  Future<CategoryEntity> createCategory(
-    CreateCategoryRequest request,
-  ) async {
-    final dto =
-        await _api.adminCategoriesControllerCreate(
+  Future<CategoryEntity> createCategory(CreateCategoryRequest request) async {
+    final dto = await _api.adminCategoriesControllerCreate(
       CreateCategoryDto(
         name: request.name,
         slug: _slugify(request.name),
@@ -158,23 +140,17 @@ class CategoryRemoteDataSourceImpl
 
   @override
   Future<List<CategoryEntity>> getVisibleCategories() async {
-    final dtos =
-        await _api.adminCategoriesControllerFindAll();
+    final dtos = await _api.adminCategoriesControllerFindAll();
     if (dtos == null) return [];
 
-    return dtos
-        .where((dto) => dto.isActive)
-        .map(_mapDtoToEntity)
-        .toList();
+    return dtos.where((dto) => dto.isActive).map(_mapDtoToEntity).toList();
   }
 }
 
 // ── Mapping helpers ─────────────────────────────────
 
 /// Maps [AdminCategoryResponseDto] → [CategoryEntity]
-CategoryEntity _mapDtoToEntity(
-  AdminCategoryResponseDto dto,
-) {
+CategoryEntity _mapDtoToEntity(AdminCategoryResponseDto dto) {
   return CategoryEntity(
     id: CategoryId(dto.id),
     name: dto.name,

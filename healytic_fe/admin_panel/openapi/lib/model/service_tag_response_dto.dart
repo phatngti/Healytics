@@ -25,6 +25,7 @@ class ServiceTagResponseDto {
     required this.updatedAt,
   });
 
+
   String id;
 
   String userId;

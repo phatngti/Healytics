@@ -1,11 +1,14 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+
+import 'dashboard_constants.dart';
 
 /// Standard panel shell used across dashboard sections.
 class DashboardPanel extends StatelessWidget {
   const DashboardPanel({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(20),
+    this.padding = AppDimens.paddingAllMediumLarge,
   });
 
   final Widget child;
@@ -13,21 +16,20 @@ class DashboardPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimens.radiusMedium,
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.45),
         ),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            blurRadius: DashboardSizes.panelBlurRadius,
+            offset: DashboardSizes.panelShadowOffset,
           ),
         ],
       ),

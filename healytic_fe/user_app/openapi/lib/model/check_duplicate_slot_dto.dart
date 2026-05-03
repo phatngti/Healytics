@@ -16,6 +16,7 @@ class CheckDuplicateSlotDto {
     required this.startTime,
   });
 
+
   /// Desired slot start time (ISO 8601)
   String startTime;
 

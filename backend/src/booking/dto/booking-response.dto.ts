@@ -3,42 +3,44 @@ import { Booking } from '@/common/entities/booking.entity';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 
 export class BookingResponseDto {
-  @ApiProperty({ example: 'BK_555' })
+  @ApiProperty({ type: String, example: 'BK_555' })
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   userId: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   staffId: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   productId: string | null;
 
-  @ApiProperty({ example: '2023-10-25T14:00:00Z' })
+  @ApiProperty({ type: Date, example: '2023-10-25T14:00:00Z' })
   startTime: Date;
 
-  @ApiPropertyOptional({ example: '2023-10-25T15:00:00Z' })
+  @ApiPropertyOptional({ type: Date, nullable: true, example: '2023-10-25T15:00:00Z' })
   endTime: Date | null;
 
-  @ApiProperty({ enum: BookingStatus, example: BookingStatus.PENDING_PAYMENT })
+  @ApiProperty({ enum: BookingStatus, enumName: 'BookingStatus', example: BookingStatus.PENDING_PAYMENT })
   status: BookingStatus;
 
   @ApiPropertyOptional({
+    type: String,
+    nullable: true,
     example: 'https://payment.gateway.com/pay/BK_555',
   })
   paymentUrl: string | null;
 
-  @ApiPropertyOptional({ example: '2023-10-25T14:10:00Z' })
+  @ApiPropertyOptional({ type: Date, nullable: true, example: '2023-10-25T14:10:00Z' })
   paymentExpiresAt: Date | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   notes: string | null;
 
-  @ApiProperty()
+  @ApiProperty({ type: Date })
   createdAt: Date;
 
-  @ApiProperty()
+  @ApiProperty({ type: Date })
   updatedAt: Date;
 
   static fromEntity(booking: Booking): BookingResponseDto {

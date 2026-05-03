@@ -7,15 +7,15 @@ import { Category } from '@/common/entities/category.entity';
  */
 class CategorySummaryDto {
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ type: String })
   id: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ type: String })
   name: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ type: String })
   slug: string;
 
   static fromEntity(entity: Category): CategorySummaryDto {
@@ -34,53 +34,55 @@ class CategorySummaryDto {
  */
 export class AdminCategoryResponseDto {
   @Expose()
-  @ApiProperty({ description: 'Unique category identifier' })
+  @ApiProperty({ type: String, description: 'Unique category identifier' })
   id: string;
 
   @Expose()
-  @ApiProperty({ description: 'Category name' })
+  @ApiProperty({ type: String, description: 'Category name' })
   name: string;
 
   @Expose()
-  @ApiProperty({ description: 'URL-friendly slug' })
+  @ApiProperty({ type: String, description: 'URL-friendly slug' })
   slug: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Category description' })
+  @ApiPropertyOptional({ type: String, nullable: true, description: 'Category description' })
   description: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Category image URL' })
+  @ApiPropertyOptional({ type: String, nullable: true, description: 'Category image URL' })
   imageUrl: string | null;
 
   @Expose()
-  @ApiProperty({ description: 'Whether category is active' })
+  @ApiProperty({ type: Boolean, description: 'Whether category is active' })
   isActive: boolean;
 
   @Expose()
   @ApiPropertyOptional({
+    type: String,
+    nullable: true,
     description: 'Icon identifier for frontend rendering',
   })
   iconName: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Hex color value (e.g. #FF6B6B)' })
+  @ApiPropertyOptional({ type: String, nullable: true, description: 'Hex color value (e.g. #FF6B6B)' })
   colorValue: string | null;
 
   @Expose()
-  @ApiProperty({ description: 'Sort order for display (lower = first)' })
+  @ApiProperty({ type: Number, description: 'Sort order for display (lower = first)' })
   sortOrder: number;
 
   @Expose()
-  @ApiProperty({ description: 'Number of health services in this category' })
+  @ApiProperty({ type: Number, description: 'Number of health services in this category' })
   serviceCount: number;
 
   @Expose()
-  @ApiProperty({ description: 'Creation timestamp' })
+  @ApiProperty({ type: Date, description: 'Creation timestamp' })
   createdAt: Date;
 
   @Expose()
-  @ApiProperty({ description: 'Last update timestamp' })
+  @ApiProperty({ type: Date, description: 'Last update timestamp' })
   updatedAt: Date;
 
   @Expose()

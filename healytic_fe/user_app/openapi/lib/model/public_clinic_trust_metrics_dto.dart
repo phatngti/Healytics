@@ -19,6 +19,7 @@ class PublicClinicTrustMetricsDto {
     required this.clientsLabel,
   });
 
+
   String experienceLabel;
 
   num specialistsCount;

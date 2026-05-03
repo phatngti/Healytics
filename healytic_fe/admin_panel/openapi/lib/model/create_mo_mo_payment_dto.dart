@@ -16,6 +16,7 @@ class CreateMoMoPaymentDto {
     this.requestType,
   });
 
+
   /// MoMo request type: captureWallet | payWithATM | payWithCC
   ///
   /// Please note: This property should have been non-nullable! Since the specification file

@@ -47,15 +47,13 @@ abstract class CreateDoctorRequest with _$CreateDoctorRequest {
     @Default([]) List<Map<String, dynamic>> schedule,
 
     /// Work history entries.
-    @Default([])
-    List<Map<String, dynamic>> workHistory,
+    @Default([]) List<Map<String, dynamic>> workHistory,
 
     /// URL to avatar image.
     String? avatar,
 
     /// Verification documents (ID card, licenses, etc.).
-    @Default([])
-    List<Map<String, dynamic>> verificationDocuments,
+    @Default([]) List<Map<String, dynamic>> verificationDocuments,
 
     /// Employment status (defaults to 'Active').
     @Default('Active') String status,
@@ -145,15 +143,13 @@ abstract class CreateSpaTherapistRequest with _$CreateSpaTherapistRequest {
     @Default([]) List<Map<String, dynamic>> schedule,
 
     /// Work history entries.
-    @Default([])
-    List<Map<String, dynamic>> workHistory,
+    @Default([]) List<Map<String, dynamic>> workHistory,
 
     /// URL to avatar image.
     String? avatar,
 
     /// Verification documents (ID card, licenses, etc.).
-    @Default([])
-    List<Map<String, dynamic>> verificationDocuments,
+    @Default([]) List<Map<String, dynamic>> verificationDocuments,
 
     /// Employment status (defaults to 'Active').
     @Default('Active') String status,
@@ -239,15 +235,13 @@ abstract class CreateMassageTherapistRequest
     @Default([]) List<Map<String, dynamic>> schedule,
 
     /// Work history entries.
-    @Default([])
-    List<Map<String, dynamic>> workHistory,
+    @Default([]) List<Map<String, dynamic>> workHistory,
 
     /// URL to avatar image.
     String? avatar,
 
     /// Verification documents (ID card, licenses, etc.).
-    @Default([])
-    List<Map<String, dynamic>> verificationDocuments,
+    @Default([]) List<Map<String, dynamic>> verificationDocuments,
 
     /// Employment status (defaults to 'Active').
     @Default('Active') String status,

@@ -20,6 +20,7 @@ class CreatePartnerHealthServiceDefinitionDto {
     this.staffAssignmentType,
   });
 
+
   /// Duration in minutes
   num durationMinutes;
 

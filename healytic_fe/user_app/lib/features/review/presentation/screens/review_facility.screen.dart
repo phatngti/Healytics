@@ -98,8 +98,6 @@ class ReviewFacilityScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(context),
       body: Stack(

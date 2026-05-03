@@ -19,6 +19,7 @@ class ClinicReviewSummaryDto {
     required this.starDistribution,
   });
 
+
   num averageRating;
 
   num totalReviewCount;

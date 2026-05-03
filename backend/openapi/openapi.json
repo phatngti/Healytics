@@ -224,6 +224,79 @@
         ]
       }
     },
+    "/auth/employee/login": {
+      "post": {
+        "operationId": "AuthController_loginEmployee",
+        "summary": "Login as an employee",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Employee login returns access and refresh tokens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials."
+          },
+          "403": {
+            "description": "Account not authorized for employee login."
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/employee/refresh": {
+      "post": {
+        "operationId": "AuthController_refreshEmployee",
+        "summary": "Refresh employee tokens",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "New pair of tokens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token."
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
@@ -937,6 +1010,91 @@
         ]
       }
     },
+    "/partner/employees/analytics/overview": {
+      "get": {
+        "operationId": "PartnerEmployeesController_getOverviewAnalytics",
+        "summary": "Get employee overview analytics",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for employee analytics aggregation",
+            "schema": {
+              "$ref": "#/components/schemas/DashboardTimePeriod"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeOverviewAnalyticsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/employees/analytics/{employeeId}": {
+      "get": {
+        "operationId": "PartnerEmployeesController_getDetailAnalytics",
+        "summary": "Get per-employee detail analytics",
+        "parameters": [
+          {
+            "name": "employeeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for employee analytics aggregation",
+            "schema": {
+              "$ref": "#/components/schemas/DashboardTimePeriod"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDetailAnalyticsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found."
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/partner/employees/doctors": {
       "post": {
         "operationId": "PartnerEmployeesController_createDoctor",
@@ -1434,6 +1592,230 @@
         ]
       }
     },
+    "/employee/profile": {
+      "get": {
+        "operationId": "EmployeeProfileController_getMyProfile",
+        "summary": "Get my employee profile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return the authenticated employee profile.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee profile linked to this account."
+          }
+        },
+        "tags": [
+          "Employee Profile"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "EmployeeProfileController_updateMyProfile",
+        "summary": "Update my employee profile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmployeeProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The profile has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee profile linked to this account."
+          }
+        },
+        "tags": [
+          "Employee Profile"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/revenue/summary": {
+      "get": {
+        "operationId": "EmployeeRevenueController_getSummary",
+        "summary": "Get revenue summary",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for revenue aggregation",
+            "schema": {
+              "$ref": "#/components/schemas/EmployeeRevenuePeriod"
+            }
+          },
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Reference date for the period (defaults to today)",
+            "schema": {
+              "example": "2026-05-01",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Revenue summary for the period.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeRevenueSummaryResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee profile linked to this account."
+          }
+        },
+        "tags": [
+          "Employee Revenue"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/revenue/trend": {
+      "get": {
+        "operationId": "EmployeeRevenueController_getTrend",
+        "summary": "Get revenue trend data",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for revenue aggregation",
+            "schema": {
+              "$ref": "#/components/schemas/EmployeeRevenuePeriod"
+            }
+          },
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Reference date for the period (defaults to today)",
+            "schema": {
+              "example": "2026-05-01",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of trend data points.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmployeeRevenueTrendPointDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee profile linked to this account."
+          }
+        },
+        "tags": [
+          "Employee Revenue"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/revenue/breakdown": {
+      "get": {
+        "operationId": "EmployeeRevenueController_getBreakdown",
+        "summary": "Get revenue breakdown by service",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for revenue aggregation",
+            "schema": {
+              "$ref": "#/components/schemas/EmployeeRevenuePeriod"
+            }
+          },
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Reference date for the period (defaults to today)",
+            "schema": {
+              "example": "2026-05-01",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of breakdown items.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmployeeRevenueBreakdownItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee profile linked to this account."
+          }
+        },
+        "tags": [
+          "Employee Revenue"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/categories": {
       "get": {
         "operationId": "CategoriesController_findAll",
@@ -1813,6 +2195,107 @@
         },
         "tags": [
           "Admin Categories"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/health-services/analytics/overview": {
+      "get": {
+        "operationId": "PartnerHealthServiceController_getOverviewAnalytics",
+        "summary": "Get health service overview analytics",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for analytics aggregation",
+            "schema": {
+              "default": "this_month",
+              "enum": [
+                "today",
+                "this_week",
+                "this_month",
+                "this_quarter",
+                "this_year"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthServiceOverviewAnalyticsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Health-services"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/health-services/analytics/{productId}": {
+      "get": {
+        "operationId": "PartnerHealthServiceController_getDetailAnalytics",
+        "summary": "Get per-service detail analytics",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for analytics aggregation",
+            "schema": {
+              "default": "this_month",
+              "enum": [
+                "today",
+                "this_week",
+                "this_month",
+                "this_quarter",
+                "this_year"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthServiceDetailAnalyticsResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found."
+          }
+        },
+        "tags": [
+          "Partner Health-services"
         ],
         "security": [
           {
@@ -3211,6 +3694,231 @@
         ]
       }
     },
+    "/employee/appointments": {
+      "get": {
+        "operationId": "EmployeeAppointmentsController_listMyAppointments",
+        "summary": "List my appointments",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter appointments by status",
+            "schema": {
+              "$ref": "#/components/schemas/EmployeeBookingStatusFilter"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return paginated list of employee appointments."
+          }
+        },
+        "tags": [
+          "Employee Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/appointments/{id}": {
+      "get": {
+        "operationId": "EmployeeAppointmentsController_getAppointment",
+        "summary": "Get appointment detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return appointment details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeAppointmentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found."
+          }
+        },
+        "tags": [
+          "Employee Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/appointments/{id}/start": {
+      "patch": {
+        "operationId": "EmployeeAppointmentsController_startService",
+        "summary": "Start service for an appointment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service started, booking moved to IN_PROGRESS.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeAppointmentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found."
+          },
+          "409": {
+            "description": "Invalid status transition."
+          }
+        },
+        "tags": [
+          "Employee Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/appointments/{id}/complete": {
+      "patch": {
+        "operationId": "EmployeeAppointmentsController_completeService",
+        "summary": "Complete service for an appointment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeAppointmentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found."
+          },
+          "409": {
+            "description": "Invalid status transition."
+          }
+        },
+        "tags": [
+          "Employee Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/appointments/{id}/cancel": {
+      "patch": {
+        "operationId": "EmployeeAppointmentsController_cancelAppointment",
+        "summary": "Cancel an appointment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelEmployeeAppointmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Appointment cancelled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeAppointmentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found."
+          },
+          "409": {
+            "description": "Invalid status transition."
+          }
+        },
+        "tags": [
+          "Employee Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/user/notifications": {
       "get": {
         "operationId": "UserNotificationController_getNotifications",
@@ -3504,6 +4212,46 @@
               "example": 106.7009,
               "type": "number"
             }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by appointment status",
+            "schema": {
+              "example": "upcoming",
+              "enum": [
+                "pending_payment",
+                "upcoming",
+                "completed",
+                "canceled"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by category ID",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort by appointment time: newest (default) or oldest first",
+            "schema": {
+              "default": "newest",
+              "enum": [
+                "newest",
+                "oldest"
+              ],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -3712,43 +4460,6 @@
         ]
       }
     },
-    "/ai/recommendations": {
-      "post": {
-        "operationId": "AiServiceController_getRecommendations",
-        "summary": "Get service recommendations by IDs",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AiRecommendationsRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Returns enriched recommendation data for the requested services.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AiRecommendationsResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "AI Recommendations"
-        ],
-        "security": [
-          {
-            "X-AI-API-Key": []
-          }
-        ]
-      }
-    },
     "/user/reviews/treatment": {
       "post": {
         "operationId": "UserReviewController_submitTreatmentReview",
@@ -3866,6 +4577,30 @@
         ]
       }
     },
+    "/stripe/webhook": {
+      "post": {
+        "operationId": "StripeWebhookController_handleStripeWebhook",
+        "summary": "Stripe webhook callback (server-to-server)",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Webhook acknowledged"
+          }
+        },
+        "tags": [
+          "Stripe"
+        ]
+      }
+    },
     "/user/payments/momo/{bookingId}": {
       "post": {
         "operationId": "UserPaymentController_createMoMoPayment",
@@ -3958,6 +4693,97 @@
           },
           "404": {
             "description": "Booking not found"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/stripe/{bookingId}": {
+      "post": {
+        "operationId": "UserPaymentController_createStripePayment",
+        "summary": "Create Stripe payment for booking (card)",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStripePaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StripePaymentResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Booking not in PENDING_PAYMENT status or invalid amount"
+          },
+          "404": {
+            "description": "Booking not found"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/stripe/{bookingId}/refund": {
+      "post": {
+        "operationId": "UserPaymentController_refundStripePayment",
+        "summary": "Request Stripe refund for booking",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StripeRefundResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found or no paid Stripe payment"
           }
         },
         "tags": [
@@ -4430,6 +5256,16 @@
             "required": true,
             "in": "path",
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "description": "Filter products by category ID",
+            "schema": {
+              "format": "uuid",
               "type": "string"
             }
           },
@@ -4938,6 +5774,965 @@
           }
         ]
       }
+    },
+    "/partner/transactions/finance/summary": {
+      "get": {
+        "operationId": "PartnerTransactionsController_getSummary",
+        "summary": "Get aggregated finance summary metrics",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search (max 120 chars)",
+            "schema": {
+              "example": "BK-240408",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Relative time window (ignored when both startDate and endDate are set)",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerFinancePeriod"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by commerce source",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by settlement status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "ISO 4217 currency code",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerFinanceSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/transactions/finance/trend": {
+      "get": {
+        "operationId": "PartnerTransactionsController_getTrend",
+        "summary": "Get finance trend data (daily buckets)",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search (max 120 chars)",
+            "schema": {
+              "example": "BK-240408",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Relative time window (ignored when both startDate and endDate are set)",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerFinancePeriod"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by commerce source",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by settlement status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "ISO 4217 currency code",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartnerFinanceTrendPointDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/transactions": {
+      "get": {
+        "operationId": "PartnerTransactionsController_getTransactions",
+        "summary": "List partner transactions with filters and pagination",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search (max 120 chars)",
+            "schema": {
+              "example": "BK-240408",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Relative time window (ignored when both startDate and endDate are set)",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerFinancePeriod"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by commerce source",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by settlement status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "ISO 4217 currency code",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (1-100)",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated transaction list"
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/transactions/{transactionId}": {
+      "get": {
+        "operationId": "PartnerTransactionsController_getTransactionDetail",
+        "summary": "Get transaction detail with payout and refund cases",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerTransactionDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/transactions/{transactionId}/settlement": {
+      "patch": {
+        "operationId": "PartnerTransactionsController_markSettled",
+        "summary": "Mark transaction settlement status",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkSettlementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerTransactionRecordDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid settlement transition"
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/transactions/{transactionId}/review-flag": {
+      "patch": {
+        "operationId": "PartnerTransactionsController_flagForReview",
+        "summary": "Flag or unflag transaction for review",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlagReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerTransactionRecordDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Partner Transactions"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/payouts": {
+      "get": {
+        "operationId": "PartnerPayoutsController_getPayouts",
+        "summary": "List partner payouts with filters and pagination",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search (max 120 chars)",
+            "schema": {
+              "example": "BK-240408",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Relative time window (ignored when both startDate and endDate are set)",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerFinancePeriod"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by commerce source",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by settlement status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "ISO 4217 currency code",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (1-100)",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated payout list"
+          }
+        },
+        "tags": [
+          "Partner Payouts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/payouts/{payoutId}/retry": {
+      "post": {
+        "operationId": "PartnerPayoutsController_retryPayout",
+        "summary": "Retry a failed payout",
+        "parameters": [
+          {
+            "name": "payoutId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryPayoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerPayoutRecordDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payout not found"
+          }
+        },
+        "tags": [
+          "Partner Payouts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/refund-cases": {
+      "get": {
+        "operationId": "PartnerRefundCasesController_getRefundCases",
+        "summary": "List refund and dispute cases",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Free-text search (max 120 chars)",
+            "schema": {
+              "example": "BK-240408",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (ISO 8601)",
+            "schema": {
+              "example": "2026-04-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Relative time window (ignored when both startDate and endDate are set)",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerFinancePeriod"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by commerce source",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by settlement status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout status",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "ISO 4217 currency code",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (1-100)",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated refund case list"
+          }
+        },
+        "tags": [
+          "Partner Refund-cases"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/refund-cases/{caseId}/approve": {
+      "post": {
+        "operationId": "PartnerRefundCasesController_approve",
+        "summary": "Approve a refund or dispute case",
+        "parameters": [
+          {
+            "name": "caseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundCaseActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerRefundCaseRecordDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Case not found"
+          }
+        },
+        "tags": [
+          "Partner Refund-cases"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/refund-cases/{caseId}/reject": {
+      "post": {
+        "operationId": "PartnerRefundCasesController_reject",
+        "summary": "Reject a refund or dispute case",
+        "parameters": [
+          {
+            "name": "caseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundCaseActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerRefundCaseRecordDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Case not found"
+          }
+        },
+        "tags": [
+          "Partner Refund-cases"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Backend liveness check."
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
     }
   },
   "info": {
@@ -5410,6 +7205,23 @@
           "password"
         ]
       },
+      "EmployeeLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "employee@clinic.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
       "LogoutResponseDto": {
         "type": "object",
         "properties": {
@@ -5597,7 +7409,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-04-10T17:04:22.733Z"
+              "submittedAt": "2026-05-03T07:43:59.130Z"
             }
           }
         },
@@ -5760,6 +7572,16 @@
           "fullName"
         ]
       },
+      "PartnerVerificationStatus": {
+        "type": "string",
+        "enum": [
+          "ONBOARDING",
+          "PENDING",
+          "APPROVED",
+          "REJECTED",
+          "REQUIRED_RESUBMIT"
+        ]
+      },
       "MyProfileResponseDto": {
         "type": "object",
         "properties": {
@@ -5780,20 +7602,14 @@
             }
           },
           "verificationStatus": {
-            "type": "string",
-            "enum": [
-              "ONBOARDING",
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "REQUIRED_RESUBMIT"
-            ],
-            "example": "PENDING"
+            "example": "PENDING",
+            "$ref": "#/components/schemas/PartnerVerificationStatus"
           },
           "verificationCompletedAt": {
-            "type": "object",
-            "example": null,
-            "nullable": true
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "example": null
           },
           "createdAt": {
             "format": "date-time",
@@ -6272,7 +8088,8 @@
           },
           "isCompleted": {
             "type": "boolean",
-            "example": false
+            "example": true,
+            "description": "Always true when returned from a successful profile-completion update, because the request DTO enforces all required checklist constraints."
           }
         },
         "required": [
@@ -6320,24 +8137,29 @@
         "properties": {
           "coverImageUrl": {
             "type": "string",
-            "description": "Public clinic cover image URL",
+            "description": "Public clinic cover image URL (required to complete your profile)",
             "example": "https://cdn.example.com/clinic-cover.jpg"
           },
           "logoImageUrl": {
             "type": "string",
-            "description": "Public clinic logo image URL",
+            "description": "Public clinic logo image URL (required to complete your profile)",
             "example": "https://cdn.example.com/clinic-logo.jpg"
           },
           "description": {
             "type": "string",
-            "description": "Public clinic profile description",
-            "example": "A modern wellness clinic focused on long-term care."
+            "description": "Public clinic profile description (min 120 characters, required to complete your profile)",
+            "example": "A modern wellness clinic focused on long-term care.",
+            "minLength": 120,
+            "maxLength": 1000000000
           },
           "gallery": {
-            "description": "Gallery image URLs shown on the clinic profile",
+            "description": "Gallery image URLs shown on the clinic profile (min 3, required to complete your profile)",
+            "minItems": 3,
+            "maxItems": 8,
             "example": [
               "https://cdn.example.com/gallery-1.jpg",
-              "https://cdn.example.com/gallery-2.jpg"
+              "https://cdn.example.com/gallery-2.jpg",
+              "https://cdn.example.com/gallery-3.jpg"
             ],
             "type": "array",
             "items": {
@@ -6351,7 +8173,13 @@
               "$ref": "#/components/schemas/UpdatePartnerCertificationDto"
             }
           }
-        }
+        },
+        "required": [
+          "coverImageUrl",
+          "logoImageUrl",
+          "description",
+          "gallery"
+        ]
       },
       "PublicProfileBusinessInfoDto": {
         "type": "object",
@@ -6941,6 +8769,386 @@
         },
         "required": [
           "apiKey"
+        ]
+      },
+      "DashboardTimePeriod": {
+        "type": "string",
+        "enum": [
+          "today",
+          "this_week",
+          "this_month",
+          "this_quarter",
+          "this_year"
+        ]
+      },
+      "EmployeeTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "Wk 1",
+            "description": "Human-readable x-axis label"
+          },
+          "sessions": {
+            "type": "number",
+            "example": 18,
+            "description": "Completed sessions in this time bucket"
+          },
+          "contributionValue": {
+            "type": "number",
+            "example": 9200000,
+            "description": "Contribution value in VND for this time bucket"
+          }
+        },
+        "required": [
+          "label",
+          "sessions",
+          "contributionValue"
+        ]
+      },
+      "EmployeeRoleDistributionDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "example": "Doctor",
+            "description": "Human-readable role label"
+          },
+          "count": {
+            "type": "number",
+            "example": 4,
+            "description": "Number of employees with this role"
+          }
+        },
+        "required": [
+          "role",
+          "count"
+        ]
+      },
+      "EmployeePerformanceSummaryDto": {
+        "type": "object",
+        "properties": {
+          "employeeName": {
+            "type": "string",
+            "example": "Nguyen An",
+            "description": "Employee full name"
+          },
+          "roleLabel": {
+            "type": "string",
+            "example": "Doctor",
+            "description": "Human-readable role label"
+          },
+          "rating": {
+            "type": "number",
+            "example": 4.9,
+            "description": "Average rating (0-5)"
+          },
+          "utilizationRate": {
+            "type": "number",
+            "example": 82.1,
+            "description": "Utilization rate percentage"
+          },
+          "contributionValue": {
+            "type": "number",
+            "example": 14800000,
+            "description": "Contribution value in VND"
+          }
+        },
+        "required": [
+          "employeeName",
+          "roleLabel",
+          "rating",
+          "utilizationRate",
+          "contributionValue"
+        ]
+      },
+      "EmployeeComplianceItemDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Verification coverage",
+            "description": "Compliance check headline"
+          },
+          "detail": {
+            "type": "string",
+            "example": "All visible profiles have supporting documents.",
+            "description": "Detailed explanation of the compliance status"
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "neutral",
+              "positive",
+              "warning",
+              "critical"
+            ],
+            "example": "positive",
+            "description": "Severity tone for UI styling"
+          }
+        },
+        "required": [
+          "title",
+          "detail",
+          "tone"
+        ]
+      },
+      "EmployeeOverviewAnalyticsResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalEmployees": {
+            "type": "number",
+            "example": 12
+          },
+          "activeEmployees": {
+            "type": "number",
+            "example": 10
+          },
+          "onLeaveEmployees": {
+            "type": "number",
+            "example": 1
+          },
+          "inactiveEmployees": {
+            "type": "number",
+            "example": 1
+          },
+          "utilizationRate": {
+            "type": "number",
+            "example": 74.5,
+            "description": "Aggregate utilization rate percentage"
+          },
+          "utilizationDelta": {
+            "type": "number",
+            "example": 6.2,
+            "description": "% change vs previous period"
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.7
+          },
+          "ratingDelta": {
+            "type": "number",
+            "example": 1.4
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 86
+          },
+          "trendPoints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeTrendPointDto"
+            }
+          },
+          "roleDistribution": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeRoleDistributionDto"
+            }
+          },
+          "topPerformers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeePerformanceSummaryDto"
+            }
+          },
+          "complianceItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeComplianceItemDto"
+            }
+          }
+        },
+        "required": [
+          "totalEmployees",
+          "activeEmployees",
+          "onLeaveEmployees",
+          "inactiveEmployees",
+          "utilizationRate",
+          "utilizationDelta",
+          "averageRating",
+          "ratingDelta",
+          "reviewCount",
+          "trendPoints",
+          "roleDistribution",
+          "topPerformers",
+          "complianceItems"
+        ]
+      },
+      "EmployeeMixMetricDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "Skin Consultation",
+            "description": "Service category or product name"
+          },
+          "value": {
+            "type": "number",
+            "example": 11,
+            "description": "Number of completed sessions for this category"
+          },
+          "share": {
+            "type": "number",
+            "example": 0.42,
+            "description": "Proportion share (0-1) relative to total sessions"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "share"
+        ]
+      },
+      "EmployeeScheduleLoadDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "Mon",
+            "description": "Weekday abbreviation"
+          },
+          "availableHours": {
+            "type": "number",
+            "example": 8,
+            "description": "Total available hours from schedule for this weekday"
+          },
+          "bookedHours": {
+            "type": "number",
+            "example": 6.5,
+            "description": "Total booked hours for this weekday"
+          }
+        },
+        "required": [
+          "label",
+          "availableHours",
+          "bookedHours"
+        ]
+      },
+      "EmployeeQualityMetricDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "Client sentiment",
+            "description": "Quality metric name"
+          },
+          "value": {
+            "type": "string",
+            "example": "4.8",
+            "description": "Display value (intentionally a string for flexible formatting)"
+          },
+          "detail": {
+            "type": "string",
+            "example": "18 reviews across recent services",
+            "description": "Detailed context for the metric"
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "neutral",
+              "positive",
+              "warning",
+              "critical"
+            ],
+            "example": "positive",
+            "description": "Severity tone for UI styling"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "detail",
+          "tone"
+        ]
+      },
+      "EmployeeDetailAnalyticsResponseDto": {
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "example": "8ad71f50-2f44-4c12-a57d-b1c4c92f5a7d"
+          },
+          "completedSessions": {
+            "type": "number",
+            "example": 26
+          },
+          "sessionsDelta": {
+            "type": "number",
+            "example": 8.3,
+            "description": "% change vs previous period"
+          },
+          "contributionValue": {
+            "type": "number",
+            "example": 15600000,
+            "description": "Contribution value in VND"
+          },
+          "contributionDelta": {
+            "type": "number",
+            "example": 10.1
+          },
+          "utilizationRate": {
+            "type": "number",
+            "example": 77.4
+          },
+          "utilizationDelta": {
+            "type": "number",
+            "example": 4.8
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.8
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 18
+          },
+          "trendPoints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeTrendPointDto"
+            }
+          },
+          "mixMetrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeMixMetricDto"
+            }
+          },
+          "scheduleLoad": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeScheduleLoadDto"
+            }
+          },
+          "qualityMetrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeQualityMetricDto"
+            }
+          },
+          "complianceItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeComplianceItemDto"
+            }
+          }
+        },
+        "required": [
+          "employeeId",
+          "completedSessions",
+          "sessionsDelta",
+          "contributionValue",
+          "contributionDelta",
+          "utilizationRate",
+          "utilizationDelta",
+          "averageRating",
+          "reviewCount",
+          "trendPoints",
+          "mixMetrics",
+          "scheduleLoad",
+          "qualityMetrics",
+          "complianceItems"
         ]
       },
       "WorkScheduleEntryDto": {
@@ -8479,6 +10687,134 @@
           "price"
         ]
       },
+      "UpdateEmployeeProfileDto": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "example": "0901234567"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "example": "https://cdn.example.com/avatar.jpg"
+          },
+          "description": {
+            "type": "string",
+            "example": "Experienced massage therapist with 5+ years..."
+          },
+          "emergencyContactName": {
+            "type": "string",
+            "example": "Jane Doe"
+          },
+          "emergencyContactPhone": {
+            "type": "string",
+            "example": "0987654321"
+          },
+          "schedule": {
+            "description": "Weekly work schedule",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
+          }
+        }
+      },
+      "EmployeeRevenuePeriod": {
+        "type": "string",
+        "description": "Period used for aggregation",
+        "enum": [
+          "day",
+          "month",
+          "year"
+        ]
+      },
+      "EmployeeRevenueSummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalRevenue": {
+            "type": "number",
+            "description": "Total revenue from completed appointments"
+          },
+          "totalCommission": {
+            "type": "number",
+            "description": "Total commission deducted"
+          },
+          "netEarnings": {
+            "type": "number",
+            "description": "Net earnings after commission"
+          },
+          "completedAppointments": {
+            "type": "number",
+            "description": "Number of completed appointments"
+          },
+          "canceledAppointments": {
+            "type": "number",
+            "description": "Number of canceled appointments"
+          },
+          "period": {
+            "$ref": "#/components/schemas/EmployeeRevenuePeriod"
+          },
+          "periodStart": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Start of the aggregation period"
+          },
+          "periodEnd": {
+            "format": "date-time",
+            "type": "string",
+            "description": "End of the aggregation period"
+          }
+        },
+        "required": [
+          "totalRevenue",
+          "totalCommission",
+          "netEarnings",
+          "completedAppointments",
+          "canceledAppointments",
+          "period",
+          "periodStart",
+          "periodEnd"
+        ]
+      },
+      "EmployeeRevenueTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "amount",
+          "label"
+        ]
+      },
+      "EmployeeRevenueBreakdownItemDto": {
+        "type": "object",
+        "properties": {
+          "serviceName": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          },
+          "totalAmount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "serviceName",
+          "count",
+          "totalAmount"
+        ]
+      },
       "CategorySummaryDto": {
         "type": "object",
         "properties": {
@@ -8514,11 +10850,13 @@
             "description": "URL-friendly slug"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Category description"
           },
           "imageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Category image URL"
           },
           "isActive": {
@@ -8615,11 +10953,13 @@
             "description": "URL-friendly slug"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Category description"
           },
           "imageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Category image URL"
           },
           "isActive": {
@@ -8627,11 +10967,13 @@
             "description": "Whether category is active"
           },
           "iconName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Icon identifier for frontend rendering"
           },
           "colorValue": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Hex color value (e.g. #FF6B6B)"
           },
           "sortOrder": {
@@ -8782,6 +11124,439 @@
             "description": "Sort order for display (lower = first)"
           }
         }
+      },
+      "BookingStatusBreakdownDto": {
+        "type": "object",
+        "properties": {
+          "statusKey": {
+            "type": "string",
+            "example": "confirmed",
+            "description": "Machine-readable status key: confirmed, cancelled, no_show"
+          },
+          "label": {
+            "type": "string",
+            "example": "Confirmed",
+            "description": "Human-readable label"
+          },
+          "count": {
+            "type": "number",
+            "example": 18
+          }
+        },
+        "required": [
+          "statusKey",
+          "label",
+          "count"
+        ]
+      },
+      "AnalyticsAlertDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Delayed bookings need intervention",
+            "description": "Alert headline"
+          },
+          "detail": {
+            "type": "string",
+            "example": "3 bookings are running more than 15 minutes behind schedule.",
+            "description": "Detailed explanation of the alert"
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "warning",
+              "positive",
+              "neutral"
+            ],
+            "example": "critical",
+            "description": "Severity tone for UI styling"
+          }
+        },
+        "required": [
+          "title",
+          "detail",
+          "tone"
+        ]
+      },
+      "AnalyticsBookingMetricsDto": {
+        "type": "object",
+        "properties": {
+          "totalBookings": {
+            "type": "number",
+            "example": 120
+          },
+          "delayedBookings": {
+            "type": "number",
+            "example": 5,
+            "description": "Bookings exceeding delay threshold"
+          },
+          "delayThresholdMinutes": {
+            "type": "number",
+            "example": 15,
+            "description": "Delay threshold in minutes"
+          },
+          "pendingBookings": {
+            "type": "number",
+            "example": 14,
+            "description": "PENDING_PAYMENT + CONFIRMED bookings"
+          },
+          "completedBookings": {
+            "type": "number",
+            "example": 85
+          },
+          "statusBreakdown": {
+            "description": "Per-status counts",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookingStatusBreakdownDto"
+            }
+          },
+          "alerts": {
+            "description": "Operational alerts for booking health",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsAlertDto"
+            }
+          }
+        },
+        "required": [
+          "totalBookings",
+          "delayedBookings",
+          "delayThresholdMinutes",
+          "pendingBookings",
+          "completedBookings",
+          "statusBreakdown",
+          "alerts"
+        ]
+      },
+      "AnalyticsTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "Wk 1",
+            "description": "Human-readable x-axis label"
+          },
+          "bookings": {
+            "type": "number",
+            "example": 24,
+            "description": "Completed bookings in this time bucket"
+          },
+          "revenue": {
+            "type": "number",
+            "example": 4500000,
+            "description": "Revenue in VND for this time bucket"
+          }
+        },
+        "required": [
+          "label",
+          "bookings",
+          "revenue"
+        ]
+      },
+      "AnalyticsCategoryPerformanceDto": {
+        "type": "object",
+        "properties": {
+          "categoryName": {
+            "type": "string",
+            "example": "Spa & Wellness"
+          },
+          "bookings": {
+            "type": "number",
+            "example": 45
+          },
+          "revenue": {
+            "type": "number",
+            "example": 12750000,
+            "description": "Revenue in VND"
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.6
+          }
+        },
+        "required": [
+          "categoryName",
+          "bookings",
+          "revenue",
+          "averageRating"
+        ]
+      },
+      "AnalyticsServicePerformanceDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Full Body Massage"
+          },
+          "categoryName": {
+            "type": "string",
+            "example": "Spa & Wellness"
+          },
+          "bookings": {
+            "type": "number",
+            "example": 85
+          },
+          "revenue": {
+            "type": "number",
+            "example": 12750000,
+            "description": "Revenue in VND"
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.8
+          }
+        },
+        "required": [
+          "name",
+          "categoryName",
+          "bookings",
+          "revenue",
+          "averageRating"
+        ]
+      },
+      "HealthServiceOverviewAnalyticsResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalProducts": {
+            "type": "number",
+            "example": 12
+          },
+          "activeProducts": {
+            "type": "number",
+            "example": 8
+          },
+          "bookings": {
+            "type": "number",
+            "example": 142,
+            "description": "Completed bookings in the selected period"
+          },
+          "bookingsDelta": {
+            "type": "number",
+            "example": 6.2,
+            "description": "% change vs previous period"
+          },
+          "revenue": {
+            "type": "number",
+            "example": 42500000,
+            "description": "Revenue in VND"
+          },
+          "revenueDelta": {
+            "type": "number",
+            "example": 4.8
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.5
+          },
+          "ratingDelta": {
+            "type": "number",
+            "example": 1.3
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 89
+          },
+          "bookingMetrics": {
+            "$ref": "#/components/schemas/AnalyticsBookingMetricsDto"
+          },
+          "trendPoints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsTrendPointDto"
+            }
+          },
+          "categoryPerformance": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsCategoryPerformanceDto"
+            }
+          },
+          "topServices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsServicePerformanceDto"
+            }
+          }
+        },
+        "required": [
+          "totalProducts",
+          "activeProducts",
+          "bookings",
+          "bookingsDelta",
+          "revenue",
+          "revenueDelta",
+          "averageRating",
+          "ratingDelta",
+          "reviewCount",
+          "bookingMetrics",
+          "trendPoints",
+          "categoryPerformance",
+          "topServices"
+        ]
+      },
+      "AnalyticsReviewBucketDto": {
+        "type": "object",
+        "properties": {
+          "stars": {
+            "type": "number",
+            "example": 5,
+            "description": "Star rating (1-5)"
+          },
+          "count": {
+            "type": "number",
+            "example": 48,
+            "description": "Number of reviews with this rating"
+          }
+        },
+        "required": [
+          "stars",
+          "count"
+        ]
+      },
+      "AnalyticsOperationalMetricDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "example": "Visibility",
+            "description": "Metric label"
+          },
+          "value": {
+            "type": "string",
+            "example": "Public",
+            "description": "Current metric value"
+          },
+          "detail": {
+            "type": "string",
+            "example": "Eligible for online discovery",
+            "description": "Contextual explanation"
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "warning",
+              "positive",
+              "neutral"
+            ],
+            "example": "positive",
+            "description": "Severity tone for UI styling"
+          }
+        },
+        "required": [
+          "label",
+          "value",
+          "detail",
+          "tone"
+        ]
+      },
+      "HealthServiceDetailAnalyticsResponseDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "bookings": {
+            "type": "number",
+            "example": 42
+          },
+          "bookingsDelta": {
+            "type": "number",
+            "example": 5.4
+          },
+          "revenue": {
+            "type": "number",
+            "example": 12600000,
+            "description": "Revenue in VND"
+          },
+          "revenueDelta": {
+            "type": "number",
+            "example": 4.2
+          },
+          "completionRate": {
+            "type": "number",
+            "example": 91.5,
+            "description": "% of bookings that completed"
+          },
+          "completionRateDelta": {
+            "type": "number",
+            "example": 1.1
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.6
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 38
+          },
+          "trendPoints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsTrendPointDto"
+            }
+          },
+          "reviewDistribution": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsReviewBucketDto"
+            }
+          },
+          "operationalMetrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsOperationalMetricDto"
+            }
+          },
+          "peerRanking": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsServicePerformanceDto"
+            }
+          },
+          "alerts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsAlertDto"
+            }
+          }
+        },
+        "required": [
+          "productId",
+          "bookings",
+          "bookingsDelta",
+          "revenue",
+          "revenueDelta",
+          "completionRate",
+          "completionRateDelta",
+          "averageRating",
+          "reviewCount",
+          "trendPoints",
+          "reviewDistribution",
+          "operationalMetrics",
+          "peerRanking",
+          "alerts"
+        ]
+      },
+      "HealthServiceType": {
+        "type": "string",
+        "description": "Type",
+        "enum": [
+          "service"
+        ]
+      },
+      "HealthServiceStatus": {
+        "type": "string",
+        "description": "Status",
+        "enum": [
+          "draft",
+          "active",
+          "archived"
+        ]
       },
       "PartnerCategorySummaryDto": {
         "type": "object",
@@ -8974,22 +11749,20 @@
             "description": "URL-friendly slug"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Description"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "service"
-            ],
-            "description": "Type"
+            "$ref": "#/components/schemas/HealthServiceType"
           },
           "basePrice": {
             "type": "number",
             "description": "Base price in specified currency"
           },
           "salePrice": {
-            "type": "object",
+            "type": "number",
+            "nullable": true,
             "description": "Sale price if on discount"
           },
           "currency": {
@@ -8997,20 +11770,15 @@
             "description": "Currency code (ISO 4217)"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "active",
-              "archived"
-            ],
-            "description": "Status"
+            "$ref": "#/components/schemas/HealthServiceStatus"
           },
           "isVisibleOnline": {
             "type": "boolean",
             "description": "Whether visible online"
           },
           "vendorName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Vendor name"
           },
           "createdAt": {
@@ -9126,13 +11894,16 @@
             "type": "string"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "degrees": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "experience": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "specializations": {
             "type": "array",
@@ -9141,10 +11912,12 @@
             }
           },
           "bio": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "quote": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "languages": {
             "type": "array",
@@ -9225,7 +11998,8 @@
             "type": "string"
           },
           "avatarUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "rating": {
             "type": "number"
@@ -9265,7 +12039,8 @@
             "type": "string"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "rating": {
             "type": "number"
@@ -9383,7 +12158,8 @@
             "type": "boolean"
           },
           "description": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "duration": {
             "type": "number"
@@ -9428,7 +12204,12 @@
             }
           },
           "serviceManual": {
-            "$ref": "#/components/schemas/PartnerDetailServiceManualDto"
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerDetailServiceManualDto"
+              }
+            ]
           }
         },
         "required": [
@@ -9608,6 +12389,7 @@
         "properties": {
           "categoryId": {
             "type": "string",
+            "format": "uuid",
             "example": "uuid-category-id"
           },
           "name": {
@@ -9623,11 +12405,8 @@
             "example": "A relaxing Thai massage service"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "service"
-            ],
-            "example": "service"
+            "example": "service",
+            "$ref": "#/components/schemas/HealthServiceType"
           },
           "basePrice": {
             "type": "number",
@@ -9706,6 +12485,7 @@
         "properties": {
           "categoryId": {
             "type": "string",
+            "format": "uuid",
             "example": "uuid-category-id"
           },
           "name": {
@@ -9721,11 +12501,8 @@
             "example": "A relaxing Thai massage service"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "service"
-            ],
-            "example": "service"
+            "example": "service",
+            "$ref": "#/components/schemas/HealthServiceType"
           },
           "basePrice": {
             "type": "number",
@@ -10098,11 +12875,13 @@
             "example": "Dermatologist"
           },
           "imageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://example.com/avatar.jpg"
           },
           "experienceLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "10 Yrs Exp"
           }
         },
@@ -10141,7 +12920,8 @@
             "example": "Relaxation Massage"
           },
           "imageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://example.com/service.jpg"
           },
           "price": {
@@ -10185,11 +12965,13 @@
             "example": true
           },
           "coverImageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://example.com/cover.jpg"
           },
           "logoImageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://example.com/logo.jpg"
           },
           "gallery": {
@@ -10211,19 +12993,23 @@
             "example": "15k"
           },
           "phone": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "+84 28 1234 5678"
           },
           "coordinates": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "10.7769,106.7009"
           },
           "chatPartnerId": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "a1b2c3d4-..."
           },
           "description": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "trustMetrics": {
             "$ref": "#/components/schemas/PublicClinicTrustMetricsDto"
@@ -10285,7 +13071,8 @@
             "example": "spa-massage"
           },
           "imageUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://example.com/category.jpg"
           }
         },
@@ -10324,7 +13111,7 @@
             "example": "Healytics Wellness Center"
           },
           "avatarUrl": {
-            "type": "object",
+            "type": "string",
             "example": "https://example.com/logo.jpg"
           },
           "address": {
@@ -10371,7 +13158,8 @@
             "example": "#FF4CAF50"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "Pain management and relief services"
           }
         },
@@ -10416,7 +13204,8 @@
             "example": true
           },
           "description": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "featureTags": {
             "type": "array",
@@ -10514,23 +13303,28 @@
             "type": "string"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "isSelected": {
             "type": "boolean",
             "example": false
           },
           "quote": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "degrees": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "languages": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "experience": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "12 years"
           },
           "specializations": {
@@ -10540,7 +13334,8 @@
             }
           },
           "bio": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "daySchedules": {
             "type": "array",
@@ -10625,7 +13420,8 @@
             "type": "string"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "rating": {
             "type": "number",
@@ -10773,22 +13569,20 @@
             "description": "URL-friendly slug"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Description"
           },
           "type": {
-            "type": "string",
-            "enum": [
-              "service"
-            ],
-            "description": "Type"
+            "$ref": "#/components/schemas/HealthServiceType"
           },
           "basePrice": {
             "type": "number",
             "description": "Base price in specified currency"
           },
           "salePrice": {
-            "type": "object",
+            "type": "number",
+            "nullable": true,
             "description": "Sale price if on discount"
           },
           "currency": {
@@ -10796,20 +13590,15 @@
             "description": "Currency code (ISO 4217)"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "active",
-              "archived"
-            ],
-            "description": "Status"
+            "$ref": "#/components/schemas/HealthServiceStatus"
           },
           "isVisibleOnline": {
             "type": "boolean",
             "description": "Whether visible online"
           },
           "vendorName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Vendor name"
           },
           "createdAt": {
@@ -11010,16 +13799,6 @@
           "createdAt"
         ]
       },
-      "PartnerVerificationStatus": {
-        "type": "string",
-        "enum": [
-          "ONBOARDING",
-          "PENDING",
-          "APPROVED",
-          "REJECTED",
-          "REQUIRED_RESUBMIT"
-        ]
-      },
       "PartnerItemDto": {
         "type": "object",
         "properties": {
@@ -11115,6 +13894,15 @@
           "total"
         ]
       },
+      "PartnerPriority": {
+        "type": "string",
+        "enum": [
+          "low",
+          "normal",
+          "high",
+          "urgent"
+        ]
+      },
       "AdminPartnerDetailResponseDto": {
         "type": "object",
         "properties": {
@@ -11135,25 +13923,12 @@
             }
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "ONBOARDING",
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "REQUIRED_RESUBMIT"
-            ],
-            "example": "PENDING"
+            "example": "PENDING",
+            "$ref": "#/components/schemas/PartnerVerificationStatus"
           },
           "priority": {
-            "type": "string",
-            "enum": [
-              "low",
-              "normal",
-              "high",
-              "urgent"
-            ],
-            "example": "normal"
+            "example": "normal",
+            "$ref": "#/components/schemas/PartnerPriority"
           },
           "submittedAt": {
             "format": "date-time",
@@ -11267,6 +14042,7 @@
           "userId",
           "staffId",
           "startTime",
+          "productId",
           "idempotencyKey"
         ]
       },
@@ -11304,10 +14080,12 @@
             "example": "TICKET_ABCD123"
           },
           "userId": {
-            "type": "string"
+            "type": "string",
+            "example": "USER_ID_123"
           },
           "staffId": {
-            "type": "string"
+            "type": "string",
+            "example": "STAFF_ID_123"
           },
           "startTime": {
             "format": "date-time",
@@ -11329,20 +14107,22 @@
             "example": "ai_chat_session_888_msg_12"
           },
           "bookingId": {
-            "type": "object",
+            "type": "string",
             "description": "Booking ID when checkout succeeds"
           },
           "errorMessage": {
-            "type": "object",
+            "type": "string",
             "description": "Error message when checkout fails"
           },
           "createdAt": {
             "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "example": "2023-10-25T14:00:00Z"
           },
           "updatedAt": {
             "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "example": "2023-10-25T14:00:00Z"
           }
         },
         "required": [
@@ -11354,6 +14134,17 @@
           "idempotencyKey",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "BookingStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING_PAYMENT",
+          "CONFIRMED",
+          "IN_PROGRESS",
+          "CANCELLED",
+          "COMPLETED",
+          "NO_SHOW"
         ]
       },
       "BookingResponseDto": {
@@ -11370,7 +14161,8 @@
             "type": "string"
           },
           "productId": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "startTime": {
             "format": "date-time",
@@ -11378,30 +14170,29 @@
             "example": "2023-10-25T14:00:00Z"
           },
           "endTime": {
-            "type": "object",
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
             "example": "2023-10-25T15:00:00Z"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "PENDING_PAYMENT",
-              "CONFIRMED",
-              "CANCELLED",
-              "COMPLETED",
-              "NO_SHOW"
-            ],
-            "example": "PENDING_PAYMENT"
+            "example": "PENDING_PAYMENT",
+            "$ref": "#/components/schemas/BookingStatus"
           },
           "paymentUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "https://payment.gateway.com/pay/BK_555"
           },
           "paymentExpiresAt": {
-            "type": "object",
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
             "example": "2023-10-25T14:10:00Z"
           },
           "notes": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "createdAt": {
             "format": "date-time",
@@ -11500,18 +14291,109 @@
           "isDuplicate"
         ]
       },
+      "EmployeeBookingStatusFilter": {
+        "type": "string",
+        "enum": [
+          "upcoming",
+          "inProgress",
+          "completed",
+          "canceled"
+        ]
+      },
+      "EmployeeAppointmentResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "serviceName": {
+            "type": "string"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/EmployeeBookingStatusFilter"
+          },
+          "category": {
+            "type": "string"
+          },
+          "clinicName": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "checkInTime": {
+            "type": "string",
+            "example": "09:00 AM"
+          },
+          "checkOutTime": {
+            "type": "string",
+            "example": "10:00 AM"
+          },
+          "duration": {
+            "type": "string",
+            "example": "60 mins"
+          },
+          "price": {
+            "type": "number",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "serviceName",
+          "customerName",
+          "customerId",
+          "status",
+          "category",
+          "clinicName",
+          "address",
+          "date",
+          "checkInTime",
+          "checkOutTime",
+          "duration"
+        ]
+      },
+      "CancelEmployeeAppointmentDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "example": "Patient requested cancellation"
+          }
+        }
+      },
       "CreateBroadcastDto": {
         "type": "object",
         "properties": {
           "title": {
             "type": "string",
             "description": "Broadcast title",
-            "example": "System Maintenance Notice"
+            "example": "System Maintenance Notice",
+            "maxLength": 255
           },
           "body": {
             "type": "string",
             "description": "Broadcast body text",
-            "example": "The platform will undergo scheduled maintenance on April 5th from 2:00 AM to 4:00 AM."
+            "example": "The platform will undergo scheduled maintenance on April 5th from 2:00 AM to 4:00 AM.",
+            "maxLength": 5000
           },
           "data": {
             "type": "object",
@@ -11591,6 +14473,14 @@
           "createdAt"
         ]
       },
+      "DevicePlatform": {
+        "type": "string",
+        "description": "Device platform",
+        "enum": [
+          "ios",
+          "android"
+        ]
+      },
       "RegisterDeviceDto": {
         "type": "object",
         "properties": {
@@ -11600,18 +14490,22 @@
             "example": "fMv7B4Yp...long_token_string"
           },
           "platform": {
-            "type": "string",
-            "description": "Device platform",
-            "enum": [
-              "ios",
-              "android"
-            ],
-            "example": "android"
+            "example": "android",
+            "$ref": "#/components/schemas/DevicePlatform"
           }
         },
         "required": [
           "token",
           "platform"
+        ]
+      },
+      "AppointmentStatus": {
+        "type": "string",
+        "enum": [
+          "pending_payment",
+          "upcoming",
+          "completed",
+          "canceled"
         ]
       },
       "AppointmentResponseDto": {
@@ -11634,13 +14528,8 @@
             "example": "https://example.com/image.jpg"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "upcoming",
-              "completed",
-              "canceled"
-            ],
-            "example": "upcoming"
+            "example": "upcoming",
+            "$ref": "#/components/schemas/AppointmentStatus"
           },
           "category": {
             "type": "string",
@@ -11686,16 +14575,34 @@
             "description": "Distance from user to clinic in kilometers (null if coordinates not provided)"
           },
           "healthPartnerId": {
-            "type": "object",
+            "type": "string",
             "example": "550e8400-e29b-41d4-a716-446655440000",
             "nullable": true,
             "description": "Account ID of the health partner (vendor). Used for chat."
           },
           "serviceId": {
-            "type": "object",
+            "type": "string",
             "example": "550e8400-e29b-41d4-a716-446655440000",
             "nullable": true,
             "description": "Product/service ID for navigation to service details."
+          },
+          "paymentUrl": {
+            "type": "string",
+            "example": "https://test-payment.momo.vn/...",
+            "nullable": true,
+            "description": "Payment gateway checkout URL. Only present when status is pending_payment."
+          },
+          "paymentDeeplink": {
+            "type": "string",
+            "example": "momo://app?action=payWithApp&...",
+            "nullable": true,
+            "description": "Deep link to open payment app directly (mobile). Only present when status is pending_payment."
+          },
+          "paymentExpiresAt": {
+            "type": "string",
+            "example": "2026-04-14T12:10:00.000Z",
+            "nullable": true,
+            "description": "ISO 8601 timestamp when the payment link expires. Only present when status is pending_payment."
           }
         },
         "required": [
@@ -11715,7 +14622,10 @@
           "isReviewed",
           "distanceKm",
           "healthPartnerId",
-          "serviceId"
+          "serviceId",
+          "paymentUrl",
+          "paymentDeeplink",
+          "paymentExpiresAt"
         ]
       },
       "AppointmentCategoryResponseDto": {
@@ -11925,115 +14835,6 @@
           "serviceRules",
           "procedureSteps",
           "facilities"
-        ]
-      },
-      "AiRecommendationsRequestDto": {
-        "type": "object",
-        "properties": {
-          "serviceIds": {
-            "description": "List of service IDs to retrieve recommendations for",
-            "example": [
-              "SV002",
-              "SV005"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "serviceIds"
-        ]
-      },
-      "AiRecommendationItemDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "a1b2c3d4-..."
-          },
-          "name": {
-            "type": "string",
-            "example": "Phục hồi cột sống chuyên sâu"
-          },
-          "slug": {
-            "type": "string",
-            "example": "phuc-hoi-cot-song-chuyen-sau"
-          },
-          "imageUrl": {
-            "type": "object",
-            "example": "https://images.unsplash.com/photo-..."
-          },
-          "category": {
-            "type": "string",
-            "example": "Massage"
-          },
-          "duration": {
-            "type": "string",
-            "example": "60 min"
-          },
-          "price": {
-            "type": "string",
-            "example": "₫800,000"
-          },
-          "rating": {
-            "type": "string",
-            "example": "4.8"
-          },
-          "vendorName": {
-            "type": "string",
-            "example": "Healytics Spa"
-          },
-          "location": {
-            "type": "string",
-            "example": "Quận 1, Hồ Chí Minh"
-          },
-          "staffAvatars": {
-            "example": [
-              "https://example.com/avatar1.jpg"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "type": {
-            "type": "string",
-            "example": "service"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "slug",
-          "category",
-          "duration",
-          "price",
-          "rating",
-          "vendorName",
-          "location",
-          "staffAvatars",
-          "type"
-        ]
-      },
-      "AiRecommendationsResponseDto": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "number",
-            "example": 2
-          },
-          "recommendations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AiRecommendationItemDto"
-            }
-          }
-        },
-        "required": [
-          "total",
-          "recommendations"
         ]
       },
       "CreateTreatmentReviewDto": {
@@ -12271,6 +15072,84 @@
         "type": "object",
         "properties": {}
       },
+      "CreateStripePaymentDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "StripePaymentResponseDto": {
+        "type": "object",
+        "properties": {
+          "paymentIntentId": {
+            "type": "string",
+            "description": "Stripe PaymentIntent ID"
+          },
+          "clientSecret": {
+            "type": "string",
+            "description": "Client secret for on-device payment confirmation"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Payment amount in smallest currency unit (VND)"
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO currency code (e.g., vnd)"
+          },
+          "status": {
+            "type": "string",
+            "description": "Stripe PaymentIntent status",
+            "example": "requires_payment_method"
+          }
+        },
+        "required": [
+          "paymentIntentId",
+          "clientSecret",
+          "amount",
+          "currency",
+          "status"
+        ]
+      },
+      "StripeRefundResponseDto": {
+        "type": "object",
+        "properties": {
+          "refundId": {
+            "type": "string",
+            "description": "Stripe Refund ID"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Refunded amount (VND)"
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO currency code"
+          },
+          "status": {
+            "type": "string",
+            "description": "Refund status",
+            "example": "succeeded"
+          },
+          "paymentIntentId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Stripe PaymentIntent ID that was refunded"
+          }
+        },
+        "required": [
+          "refundId",
+          "amount",
+          "currency",
+          "status"
+        ]
+      },
+      "ConversationStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "archived",
+          "closed"
+        ]
+      },
       "ParticipantInfoDto": {
         "type": "object",
         "properties": {
@@ -12315,12 +15194,7 @@
             "type": "string"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "active",
-              "archived",
-              "closed"
-            ]
+            "$ref": "#/components/schemas/ConversationStatus"
           },
           "bookingId": {
             "type": "string"
@@ -12536,7 +15410,8 @@
             "example": "ISO 9001:2015"
           },
           "subtitle": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "Quality Management"
           },
           "iconName": {
@@ -12564,10 +15439,12 @@
             "example": "Senior Therapist"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "experienceLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "5 Yrs Exp"
           }
         },
@@ -12588,10 +15465,12 @@
             "example": "Healytics Wellness Center"
           },
           "coverImageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "logoImageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "gallery": {
             "type": "array",
@@ -12608,7 +15487,8 @@
             "example": "2.5k"
           },
           "description": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "trustMetrics": {
             "$ref": "#/components/schemas/ClinicTrustMetricsDto"
@@ -12632,10 +15512,12 @@
             }
           },
           "address": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "phoneNumber": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -12650,6 +15532,22 @@
           "businessTypes"
         ]
       },
+      "ClinicProductCategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string",
+            "example": "Facial Treatments"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ]
+      },
       "ClinicProductDto": {
         "type": "object",
         "properties": {
@@ -12661,7 +15559,8 @@
             "example": "Premium CO2 Laser"
           },
           "imageUrl": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "price": {
             "type": "string",
@@ -12672,23 +15571,28 @@
             "example": 990000
           },
           "originalPrice": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "1.250.000đ"
           },
           "discountLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "-20%"
           },
           "badgeLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "HOT"
           },
           "durationLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "60 min"
           },
           "specialistLabel": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "Specialist"
           },
           "categoryId": {
@@ -12716,6 +15620,12 @@
       "ClinicProductsResponseDto": {
         "type": "object",
         "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicProductCategoryDto"
+            }
+          },
           "products": {
             "type": "array",
             "items": {
@@ -12732,6 +15642,7 @@
           }
         },
         "required": [
+          "categories",
           "products",
           "totalCount",
           "hasMore"
@@ -12782,7 +15693,8 @@
             "example": "All (2.5k)"
           },
           "starCount": {
-            "type": "object",
+            "type": "number",
+            "nullable": true,
             "example": 5
           },
           "requiresMedia": {
@@ -12800,7 +15712,8 @@
         "type": "object",
         "properties": {
           "responseText": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -12826,7 +15739,8 @@
             "maximum": 5
           },
           "memberBadge": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "null for MVP"
           },
           "dateLabel": {
@@ -12834,11 +15748,13 @@
             "example": "04-04-2026"
           },
           "serviceName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "Salt Stone Massage (90 min)"
           },
           "serviceIcon": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "example": "spa"
           },
           "reviewText": {
@@ -12851,7 +15767,12 @@
             }
           },
           "clinicResponse": {
-            "$ref": "#/components/schemas/ClinicReviewResponseSubDto"
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClinicReviewResponseSubDto"
+              }
+            ]
           }
         },
         "required": [
@@ -13258,6 +16179,484 @@
           "createdAt",
           "severity"
         ]
+      },
+      "PartnerFinancePeriod": {
+        "type": "string",
+        "enum": [
+          "sevenDays",
+          "thirtyDays",
+          "ninetyDays"
+        ]
+      },
+      "PartnerCommerceSourceType": {
+        "type": "string",
+        "enum": [
+          "serviceBooking",
+          "productOrder"
+        ]
+      },
+      "PartnerTransactionType": {
+        "type": "string",
+        "enum": [
+          "charge",
+          "refund",
+          "adjustment",
+          "payout",
+          "fee"
+        ]
+      },
+      "PartnerTransactionStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "paid",
+          "refunded",
+          "failed",
+          "canceled"
+        ]
+      },
+      "PartnerSettlementStatus": {
+        "type": "string",
+        "enum": [
+          "unsettled",
+          "scheduled",
+          "settled",
+          "held"
+        ]
+      },
+      "PartnerPayoutStatus": {
+        "type": "string",
+        "enum": [
+          "notAssigned",
+          "inPayout",
+          "paidOut",
+          "failed"
+        ]
+      },
+      "PartnerFinanceSummaryDto": {
+        "type": "object",
+        "properties": {
+          "grossVolume": {
+            "type": "number",
+            "example": 2700000
+          },
+          "netSettled": {
+            "type": "number",
+            "example": 950600
+          },
+          "pendingPayout": {
+            "type": "number",
+            "example": 2619000
+          },
+          "refundExposure": {
+            "type": "number",
+            "example": 700000
+          },
+          "availableBalance": {
+            "type": "number",
+            "example": 250600
+          },
+          "pendingBalance": {
+            "type": "number",
+            "example": 2619000
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          },
+          "nextPayoutAt": {
+            "type": "string",
+            "nullable": true,
+            "example": "2026-04-10T03:00:00.000Z"
+          },
+          "payoutMethod": {
+            "type": "string",
+            "nullable": true,
+            "example": "Vietcombank ending 1122"
+          },
+          "payoutStatus": {
+            "nullable": true,
+            "example": "inPayout",
+            "$ref": "#/components/schemas/PartnerPayoutStatus"
+          }
+        },
+        "required": [
+          "grossVolume",
+          "netSettled",
+          "pendingPayout",
+          "refundExposure",
+          "availableBalance",
+          "pendingBalance",
+          "currency"
+        ]
+      },
+      "PartnerFinanceTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-04-08"
+          },
+          "grossAmount": {
+            "type": "number",
+            "example": 1200000
+          },
+          "netAmount": {
+            "type": "number",
+            "example": 1164000
+          },
+          "refundAmount": {
+            "type": "number",
+            "example": 0
+          }
+        },
+        "required": [
+          "date",
+          "grossAmount",
+          "netAmount",
+          "refundAmount"
+        ]
+      },
+      "PartnerTransactionTimelineEventDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Payment captured"
+          },
+          "description": {
+            "type": "string",
+            "example": "Customer successfully paid through MoMo."
+          },
+          "occurredAt": {
+            "type": "string",
+            "example": "2026-04-08T02:16:00.000Z"
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "occurredAt"
+        ]
+      },
+      "PartnerTransactionRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-04-08T02:15:00.000Z"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PartnerTransactionType"
+          },
+          "sourceType": {
+            "$ref": "#/components/schemas/PartnerCommerceSourceType"
+          },
+          "reference": {
+            "type": "string",
+            "example": "BK-240408-001"
+          },
+          "customerName": {
+            "type": "string",
+            "example": "Nguyen Minh Anh"
+          },
+          "grossAmount": {
+            "type": "number",
+            "example": 1200000
+          },
+          "feeAmount": {
+            "type": "number",
+            "example": 36000
+          },
+          "netAmount": {
+            "type": "number",
+            "example": 1164000
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerTransactionStatus"
+          },
+          "settlementStatus": {
+            "$ref": "#/components/schemas/PartnerSettlementStatus"
+          },
+          "payoutStatus": {
+            "$ref": "#/components/schemas/PartnerPayoutStatus"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "example": "MoMo Wallet"
+          },
+          "sourceTitle": {
+            "type": "string",
+            "example": "Dermatology consultation package"
+          },
+          "sourceSubtitle": {
+            "type": "string",
+            "example": "Confirmed service booking"
+          },
+          "timeline": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerTransactionTimelineEventDto"
+            }
+          },
+          "flaggedForReview": {
+            "type": "boolean",
+            "example": false
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "payoutId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "type",
+          "sourceType",
+          "reference",
+          "customerName",
+          "grossAmount",
+          "feeAmount",
+          "netAmount",
+          "currency",
+          "status",
+          "settlementStatus",
+          "payoutStatus",
+          "paymentMethod",
+          "sourceTitle",
+          "sourceSubtitle",
+          "timeline",
+          "flaggedForReview"
+        ]
+      },
+      "PartnerPayoutRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "periodLabel": {
+            "type": "string",
+            "example": "Apr 01 – Apr 08"
+          },
+          "includedVolume": {
+            "type": "number",
+            "example": 5400000
+          },
+          "feesAdjustments": {
+            "type": "number",
+            "example": 162000
+          },
+          "netPayout": {
+            "type": "number",
+            "example": 5238000
+          },
+          "scheduledDate": {
+            "type": "string",
+            "example": "2026-04-10T03:00:00.000Z"
+          },
+          "method": {
+            "type": "string",
+            "example": "Vietcombank ending 1122"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerPayoutStatus"
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          },
+          "includedTransactionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "periodLabel",
+          "includedVolume",
+          "feesAdjustments",
+          "netPayout",
+          "scheduledDate",
+          "method",
+          "status",
+          "currency",
+          "includedTransactionIds"
+        ]
+      },
+      "PartnerRefundCaseType": {
+        "type": "string",
+        "enum": [
+          "refund",
+          "dispute"
+        ]
+      },
+      "PartnerRefundCaseStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "underReview",
+          "approved",
+          "rejected"
+        ]
+      },
+      "PartnerRefundCaseRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "transactionId": {
+            "type": "string"
+          },
+          "caseType": {
+            "$ref": "#/components/schemas/PartnerRefundCaseType"
+          },
+          "requestedAt": {
+            "type": "string",
+            "example": "2026-04-06T10:00:00.000Z"
+          },
+          "amount": {
+            "type": "number",
+            "example": 350000
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Service not as described"
+          },
+          "owner": {
+            "type": "string",
+            "example": "Customer Support"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+          },
+          "slaHours": {
+            "type": "number",
+            "example": 48,
+            "description": "Remaining SLA hours (0 for resolved cases)"
+          }
+        },
+        "required": [
+          "id",
+          "transactionId",
+          "caseType",
+          "requestedAt",
+          "amount",
+          "currency",
+          "reason",
+          "owner",
+          "status",
+          "slaHours"
+        ]
+      },
+      "PartnerTransactionDetailDto": {
+        "type": "object",
+        "properties": {
+          "record": {
+            "$ref": "#/components/schemas/PartnerTransactionRecordDto"
+          },
+          "payoutRecord": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerPayoutRecordDto"
+              }
+            ]
+          },
+          "relatedRefundCases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerRefundCaseRecordDto"
+            }
+          },
+          "sourceSummaryTitle": {
+            "type": "string",
+            "example": "Dermatology consultation package"
+          },
+          "sourceSummarySubtitle": {
+            "type": "string",
+            "example": "Confirmed service booking"
+          }
+        },
+        "required": [
+          "record",
+          "relatedRefundCases",
+          "sourceSummaryTitle",
+          "sourceSummarySubtitle"
+        ]
+      },
+      "MarkSettlementDto": {
+        "type": "object",
+        "properties": {
+          "settlementStatus": {
+            "example": "settled",
+            "$ref": "#/components/schemas/PartnerSettlementStatus"
+          },
+          "note": {
+            "type": "string",
+            "description": "Audit note",
+            "example": "Finance manager confirmed manual settlement."
+          }
+        },
+        "required": [
+          "settlementStatus"
+        ]
+      },
+      "FlagReviewDto": {
+        "type": "object",
+        "properties": {
+          "flaggedForReview": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether to flag the transaction for review"
+          },
+          "note": {
+            "type": "string",
+            "description": "Audit note",
+            "example": "Partner requested finance review."
+          }
+        },
+        "required": [
+          "flaggedForReview"
+        ]
+      },
+      "RetryPayoutDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Audit note",
+            "example": "Retry requested from partner transaction manager."
+          }
+        }
+      },
+      "RefundCaseActionDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Audit note",
+            "example": "Approved from partner transaction manager."
+          }
+        }
       }
     }
   }

@@ -22,6 +22,7 @@ class LocationResponseDto {
     required this.level,
   });
 
+
   /// Location UUID
   String id;
 

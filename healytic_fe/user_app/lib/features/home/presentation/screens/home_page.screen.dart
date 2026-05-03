@@ -24,7 +24,6 @@ class HomeUpdatePage extends HookConsumerWidget {
     final sectionGap = AppDimens.sectionSpacing(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         // Clamp text scale to prevent layout breaks on extreme
         // system font sizes (0.8× – 1.3×).

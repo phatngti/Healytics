@@ -137,8 +137,7 @@ class _BusinessLocationSectionState
 
             if (isWide) {
               return Row(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     flex: 2,
@@ -146,10 +145,8 @@ class _BusinessLocationSectionState
                       context,
                       label: 'Street Address',
                       fieldKey: 'street_address',
-                      hintText:
-                          'e.g. 123 Nguyen Hue Street',
-                      initialValue:
-                          widget.initialStreetAddress,
+                      hintText: 'e.g. 123 Nguyen Hue Street',
+                      initialValue: widget.initialStreetAddress,
                     ),
                   ),
                   AppDimens.horizontalMedium,
@@ -159,8 +156,7 @@ class _BusinessLocationSectionState
                       fieldKey: 'clinic_phone',
                       label: 'Clinic Phone',
                       hintText: '028 1234 5678',
-                      keyboardType:
-                          TextInputType.phone,
+                      keyboardType: TextInputType.phone,
                     ),
                   ),
                 ],
@@ -173,10 +169,8 @@ class _BusinessLocationSectionState
                   context,
                   label: 'Street Address',
                   fieldKey: 'street_address',
-                  hintText:
-                      'e.g. 123 Nguyen Hue Street',
-                  initialValue:
-                      widget.initialStreetAddress,
+                  hintText: 'e.g. 123 Nguyen Hue Street',
+                  initialValue: widget.initialStreetAddress,
                 ),
                 AppDimens.verticalMedium,
                 FormFieldBuilders.buildTextField(

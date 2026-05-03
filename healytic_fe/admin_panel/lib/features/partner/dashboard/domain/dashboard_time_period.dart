@@ -39,15 +39,12 @@ enum DashboardTimePeriod {
   /// Parses an API value string back to enum.
   ///
   /// Falls back to [thisMonth] for unknown values.
-  static DashboardTimePeriod fromValue(
-    String v,
-  ) =>
-      switch (v) {
-        'today' => today,
-        'this_week' => thisWeek,
-        'this_month' => thisMonth,
-        'this_quarter' => thisQuarter,
-        'this_year' => thisYear,
-        _ => thisMonth,
-      };
+  static DashboardTimePeriod fromValue(String v) => switch (v) {
+    'today' => today,
+    'this_week' => thisWeek,
+    'this_month' => thisMonth,
+    'this_quarter' => thisQuarter,
+    'this_year' => thisYear,
+    _ => thisMonth,
+  };
 }

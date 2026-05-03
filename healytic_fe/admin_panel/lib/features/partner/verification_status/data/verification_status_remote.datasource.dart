@@ -420,19 +420,19 @@ class VerificationStatusRemoteDataSourceImpl
   }
 
   VerificationRevisionStatus _mapVerificationStatus(
-    api.MyProfileResponseDtoVerificationStatusEnum status,
+    api.PartnerVerificationStatus status,
   ) {
-    switch (status) {
-      case api.MyProfileResponseDtoVerificationStatusEnum.ONBOARDING:
-        return VerificationRevisionStatus.onboarding;
-      case api.MyProfileResponseDtoVerificationStatusEnum.PENDING:
-        return VerificationRevisionStatus.pending;
-      case api.MyProfileResponseDtoVerificationStatusEnum.APPROVED:
-        return VerificationRevisionStatus.approved;
-      case api.MyProfileResponseDtoVerificationStatusEnum.REJECTED:
-        return VerificationRevisionStatus.rejected;
-      case api.MyProfileResponseDtoVerificationStatusEnum.REQUIRED_RESUBMIT:
-        return VerificationRevisionStatus.requiredResubmit;
+    if (status == api.PartnerVerificationStatus.ONBOARDING) {
+      return VerificationRevisionStatus.onboarding;
+    } else if (status == api.PartnerVerificationStatus.PENDING) {
+      return VerificationRevisionStatus.pending;
+    } else if (status == api.PartnerVerificationStatus.APPROVED) {
+      return VerificationRevisionStatus.approved;
+    } else if (status == api.PartnerVerificationStatus.REJECTED) {
+      return VerificationRevisionStatus.rejected;
+    } else if (status ==
+        api.PartnerVerificationStatus.REQUIRED_RESUBMIT) {
+      return VerificationRevisionStatus.requiredResubmit;
     }
     return VerificationRevisionStatus.onboarding;
   }
@@ -522,7 +522,7 @@ class VerificationStatusRemoteDataSourceImpl
     required BusinessInfo businessInfo,
     required LegalRepresentativeInfo? legalRepresentative,
     required List<VerifiedField> kycDocuments,
-    required api.MyProfileResponseDtoVerificationStatusEnum verificationStatus,
+    required api.PartnerVerificationStatus verificationStatus,
   }) {
     return [
       VerificationSectionEntity(
@@ -570,19 +570,23 @@ class VerificationStatusRemoteDataSourceImpl
 
   SectionStatus _determineSectionStatus({
     required bool hasUpdates,
-    required api.MyProfileResponseDtoVerificationStatusEnum verificationStatus,
+    required api.PartnerVerificationStatus verificationStatus,
   }) {
     if (hasUpdates) return SectionStatus.revisionRequired;
 
-    switch (verificationStatus) {
-      case api.MyProfileResponseDtoVerificationStatusEnum.APPROVED:
-        return SectionStatus.completed;
-      case api.MyProfileResponseDtoVerificationStatusEnum.ONBOARDING:
-      case api.MyProfileResponseDtoVerificationStatusEnum.PENDING:
-        return SectionStatus.inProgress;
-      case api.MyProfileResponseDtoVerificationStatusEnum.REJECTED:
-      case api.MyProfileResponseDtoVerificationStatusEnum.REQUIRED_RESUBMIT:
-        return SectionStatus.revisionRequired;
+    if (verificationStatus ==
+        api.PartnerVerificationStatus.APPROVED) {
+      return SectionStatus.completed;
+    } else if (verificationStatus ==
+            api.PartnerVerificationStatus.ONBOARDING ||
+        verificationStatus ==
+            api.PartnerVerificationStatus.PENDING) {
+      return SectionStatus.inProgress;
+    } else if (verificationStatus ==
+            api.PartnerVerificationStatus.REJECTED ||
+        verificationStatus ==
+            api.PartnerVerificationStatus.REQUIRED_RESUBMIT) {
+      return SectionStatus.revisionRequired;
     }
     return SectionStatus.completed;
   }

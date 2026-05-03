@@ -55,8 +55,56 @@ String parameterToString(dynamic value) {
   if (value is DateTime) {
     return value.toUtc().toIso8601String();
   }
+  if (value is AppointmentStatus) {
+    return AppointmentStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is BookingStatus) {
+    return BookingStatusTypeTransformer().encode(value).toString();
+  }
   if (value is BusinessType) {
     return BusinessTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is ConversationStatus) {
+    return ConversationStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is DashboardTimePeriod) {
+    return DashboardTimePeriodTypeTransformer().encode(value).toString();
+  }
+  if (value is DevicePlatform) {
+    return DevicePlatformTypeTransformer().encode(value).toString();
+  }
+  if (value is HealthServiceStatus) {
+    return HealthServiceStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is HealthServiceType) {
+    return HealthServiceTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is PartnerCommerceSourceType) {
+    return PartnerCommerceSourceTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is PartnerFinancePeriod) {
+    return PartnerFinancePeriodTypeTransformer().encode(value).toString();
+  }
+  if (value is PartnerPayoutStatus) {
+    return PartnerPayoutStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is PartnerPriority) {
+    return PartnerPriorityTypeTransformer().encode(value).toString();
+  }
+  if (value is PartnerRefundCaseStatus) {
+    return PartnerRefundCaseStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is PartnerRefundCaseType) {
+    return PartnerRefundCaseTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is PartnerSettlementStatus) {
+    return PartnerSettlementStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is PartnerTransactionStatus) {
+    return PartnerTransactionStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is PartnerTransactionType) {
+    return PartnerTransactionTypeTypeTransformer().encode(value).toString();
   }
   if (value is PartnerVerificationStatus) {
     return PartnerVerificationStatusTypeTransformer().encode(value).toString();

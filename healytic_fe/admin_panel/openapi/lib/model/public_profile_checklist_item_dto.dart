@@ -19,6 +19,7 @@ class PublicProfileChecklistItemDto {
     required this.completed,
   });
 
+
   String key;
 
   String label;

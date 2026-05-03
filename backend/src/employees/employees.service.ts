@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, Not, In } from 'typeorm';
+import { Repository, FindOptionsWhere, Not, In, Between } from 'typeorm';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import {
   CreateSpaTherapistDto,
@@ -33,6 +33,11 @@ import { CreateDoctorHandler } from './application/handlers/create-doctor.handle
 import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
 import { UpdateEmployeeHandler } from './application/handlers/update-employee.handler';
 import { RemoveEmployeeHandler } from './application/handlers/remove-employee.handler';
+import { GetEmployeeOverviewAnalyticsHandler } from './application/handlers/get-employee-overview-analytics.handler';
+import { GetEmployeeDetailAnalyticsHandler } from './application/handlers/get-employee-detail-analytics.handler';
+import { DashboardTimePeriod } from '@/dashboard-partner/dto/query/dashboard-period-query.dto';
+import { EmployeeOverviewAnalyticsResponseDto } from './dto/analytics/employee-overview-analytics.dto';
+import { EmployeeDetailAnalyticsResponseDto } from './dto/analytics/employee-detail-analytics.dto';
 
 /**
  * Service facade for managing employees (doctors, therapists, staff).
@@ -72,6 +77,8 @@ export class EmployeesService {
     private readonly createTherapistHandler: CreateTherapistHandler,
     private readonly updateEmployeeHandler: UpdateEmployeeHandler,
     private readonly removeEmployeeHandler: RemoveEmployeeHandler,
+    private readonly getEmployeeOverviewAnalyticsHandler: GetEmployeeOverviewAnalyticsHandler,
+    private readonly getEmployeeDetailAnalyticsHandler: GetEmployeeDetailAnalyticsHandler,
   ) {}
 
   // ──────────────────────────────────────────────────────────────
@@ -234,43 +241,92 @@ export class EmployeesService {
   }
 
   // ──────────────────────────────────────────────────────────────
+  // Analytics operations
+  // ──────────────────────────────────────────────────────────────
+
+  /**
+   * Returns overview analytics for all employees of the authenticated partner.
+   */
+  async getOverviewAnalytics(
+    accountId: string,
+    period: DashboardTimePeriod,
+  ): Promise<EmployeeOverviewAnalyticsResponseDto> {
+    const partnerId = await this.getPartnerIdByAccountId(accountId);
+    return this.getEmployeeOverviewAnalyticsHandler.execute(partnerId, period);
+  }
+
+  /**
+   * Returns per-employee detail analytics for a specific employee.
+   */
+  async getDetailAnalytics(
+    accountId: string,
+    employeeId: string,
+    period: DashboardTimePeriod,
+  ): Promise<EmployeeDetailAnalyticsResponseDto> {
+    const partnerId = await this.getPartnerIdByAccountId(accountId);
+    return this.getEmployeeDetailAnalyticsHandler.execute(
+      partnerId,
+      employeeId,
+      period,
+    );
+  }
+
+  // ──────────────────────────────────────────────────────────────
   // Booking flow operations
   // ──────────────────────────────────────────────────────────────
+
+  /** Cached first health partner (changes extremely rarely). */
+  private cachedFirstPartner: Partner | null = null;
+  private cachedFirstPartnerTime = 0;
+  /** Cache TTL for the first health partner — 5 minutes */
+  private static readonly PARTNER_CACHE_TTL_MS = 5 * 60 * 1000;
 
   /**
    * Returns all services (products) that a specialist can perform.
    * Query path: ProductEmployeeEligibility → Product (with definition + media).
    * Includes clinic info from the health partner profile.
+   *
+   * Optimized: removed redundant employee existence check (the eligibility
+   * query result already indicates whether the specialist exists), and
+   * cached getFirstHealthPartner() to avoid 2 DB queries per request.
    */
   async findServicesBySpecialist(
     specialistId: string,
   ): Promise<BookingServiceResponseDto[]> {
-    // Verify employee exists
-    const employee = await this.employeeRepository.findOne({
-      where: { id: specialistId },
-    });
-    if (!employee) {
-      this.logger.warn(`Specialist not found: ${specialistId}`);
-      throw new NotFoundException(
-        `Specialist with ID ${specialistId} not found`,
-      );
-    }
-
     // Query eligible products with their definitions and media
     const eligibilities = await this.eligibilityRepository.find({
       where: { employeeId: specialistId },
       relations: ['product', 'product.productDefinition', 'product.media'],
     });
 
+    // If no eligibilities, specialist either doesn't exist or has no services
+    if (eligibilities.length === 0) {
+      this.logger.warn(`No services found for specialist: ${specialistId}`);
+      throw new NotFoundException(
+        `Specialist with ID ${specialistId} not found`,
+      );
+    }
+
     // Filter to active products only
     const activeProducts = eligibilities
       .map((e) => e.product)
       .filter((p) => p && p.status === HealthServiceStatus.ACTIVE);
 
-    // Load partner for clinic info
-    const partner = await this.partnersService.getFirstHealthPartner();
+    // Load partner for clinic info — cached for 5 minutes
+    const now = Date.now();
+    if (
+      !this.cachedFirstPartner ||
+      now - this.cachedFirstPartnerTime > EmployeesService.PARTNER_CACHE_TTL_MS
+    ) {
+      this.cachedFirstPartner =
+        await this.partnersService.getFirstHealthPartner();
+      this.cachedFirstPartnerTime = now;
+    }
 
-    return BookingServiceResponseDto.fromEntities(activeProducts, partner);
+    return BookingServiceResponseDto.fromEntities(
+      activeProducts,
+      this.cachedFirstPartner,
+    );
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -310,7 +366,8 @@ export class EmployeesService {
     const bookings = await this.bookingRepository.find({
       where: {
         staffId: employeeId,
-        status: Not(In([BookingStatus.CANCELLED])),
+        status: Not(In([BookingStatus.CANCELLED, BookingStatus.COMPLETED])),
+        startTime: Between(rangeStart, rangeEnd),
       },
     });
 

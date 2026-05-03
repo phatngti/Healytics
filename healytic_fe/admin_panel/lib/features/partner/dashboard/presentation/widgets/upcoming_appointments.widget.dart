@@ -1,5 +1,4 @@
-import 'package:admin_panel/features/partner/dashboard/domain/upcoming_appointment.entity.dart';
-import 'package:admin_panel/features/partner/dashboard/presentation/widgets/dashboard_section_header.widget.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/button/button.dart';
 import 'package:common/widgets/table/helper.dart';
 import 'package:common/widgets/table/table.dart';
@@ -7,7 +6,12 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-/// Data table displaying the next upcoming appointments.
+import '../../domain/upcoming_appointment.entity.dart';
+import 'dashboard_constants.dart';
+import 'dashboard_section_header.widget.dart';
+
+/// Data table displaying the next upcoming
+/// appointments.
 class UpcomingAppointmentsWidget extends StatelessWidget {
   const UpcomingAppointmentsWidget({super.key, required this.appointments});
 
@@ -21,7 +25,7 @@ class UpcomingAppointmentsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        DashboardSectionHeader(
+        const DashboardSectionHeader(
           title: 'Upcoming Appointments',
           icon: Icons.calendar_today_rounded,
         ),
@@ -29,18 +33,12 @@ class UpcomingAppointmentsWidget extends StatelessWidget {
           child: SizedBox(
             height: _tableHeight(rowsPerPage),
             child: AppTable(
-              columns: _UpcomingAppointmentsTableColumns
-                  .columns
-                  .dataColumns(context),
-              getTotalRows: () async =>
-                  appointments.length,
-              getData: (
-                setRowSelection,
-                startingAt,
-                count,
-              ) =>
-                  _UpcomingAppointmentsTableSource
-                      .getData(
+              columns: _UpcomingAppointmentsTableColumns.columns.dataColumns(
+                context,
+              ),
+              getTotalRows: () async => appointments.length,
+              getData: (setRowSelection, startingAt, count) =>
+                  _UpcomingAppointmentsTableSource.getData(
                     theme,
                     appointments,
                     startingAt,
@@ -62,16 +60,12 @@ class UpcomingAppointmentsWidget extends StatelessWidget {
   }
 
   /// Calculates table height based on row count.
-  ///
-  /// DataTable2 needs ~200px for header + paginator,
-  /// plus ~56px per data row.
   double _tableHeight(int rowsPerPage) {
-    if (appointments.isEmpty) return 320;
-    // header(~70) + table-header-row(~56) +
-    // rows(~56 each) + paginator(~56) + padding
-    const overhead = 240.0;
-    const rowHeight = 56.0;
-    return overhead + (rowsPerPage * rowHeight);
+    if (appointments.isEmpty) {
+      return DashboardSizes.tableMinHeight;
+    }
+    return DashboardSizes.tableOverhead +
+        (rowsPerPage * DashboardSizes.tableRowHeight);
   }
 }
 
@@ -110,7 +104,7 @@ class _UpcomingAppointmentsTableSource {
             Text(
               appointment.serviceName,
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
+                fontWeight: AppDimens.fontWeightSemiBold,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -146,9 +140,7 @@ class _UpcomingAppointmentsTableSource {
     final today = DateTime(now.year, now.month, now.day);
     final date = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
-    if (date == today) {
-      return 'Today';
-    }
+    if (date == today) return 'Today';
     if (date == today.add(const Duration(days: 1))) {
       return 'Tomorrow';
     }
@@ -174,12 +166,12 @@ class _TablePrimaryCell extends StatelessWidget {
         Text(
           title,
           style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
+            fontWeight: AppDimens.fontWeightSemiBold,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 2),
+        AppDimens.spaceXxs.verticalSpace,
         Text(
           subtitle,
           style: theme.textTheme.labelSmall?.copyWith(
@@ -203,12 +195,12 @@ class _StatusChip extends StatelessWidget {
     final theme = Theme.of(context);
     final (color, bgColor) = switch (status) {
       'confirmed' => (
-        const Color(0xFF16A34A),
-        const Color(0xFF16A34A).withValues(alpha: 0.1),
+        DashboardColors.confirmed,
+        DashboardColors.confirmed.withValues(alpha: 0.1),
       ),
       'pending' => (
-        const Color(0xFFEA8C00),
-        const Color(0xFFEA8C00).withValues(alpha: 0.1),
+        DashboardColors.pending,
+        DashboardColors.pending.withValues(alpha: 0.1),
       ),
       _ => (
         theme.colorScheme.onSurfaceVariant,
@@ -217,16 +209,19 @@ class _StatusChip extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimens.spaceMd,
+        vertical: AppDimens.spaceXs + 2,
+      ),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppDimens.radiusPill,
       ),
       child: Text(
         status[0].toUpperCase() + status.substring(1),
         style: theme.textTheme.labelSmall?.copyWith(
           color: color,
-          fontWeight: FontWeight.w600,
+          fontWeight: AppDimens.fontWeightSemiBold,
         ),
       ),
     );

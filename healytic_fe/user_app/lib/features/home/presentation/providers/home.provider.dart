@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:user_app/core/providers/auth_session.provider.dart';
 import 'package:user_app/features/home/data/provider/home.provider.dart';
 import 'package:user_app/features/home/domain/entities/'
     'ai_recommendation.entity.dart';
@@ -15,11 +16,15 @@ Future<List<HomeCategory>> categories(Ref ref) async {
   return repository.getCategories();
 }
 
-/// Provider for fetching home-recommend products.
+/// Provider for fetching home-recommend products
+/// via the Recommender AI microservice.
 @riverpod
-Future<List<HomeProduct>> recommendedProducts(Ref ref) async {
+Future<List<AiRecommendation>> recommendedProducts(Ref ref) async {
   final repository = ref.read(homeRepositoryProvider);
-  return repository.getRecommendedProducts();
+  final userId = ref.read(currentUserIdProvider);
+  if (userId == null) return [];
+  final list = await repository.getRecommendedProducts(userId: userId);
+  return list;
 }
 
 /// Provider for fetching premium treatments.
@@ -38,30 +43,15 @@ Future<List<ServiceTag>> serviceTags(Ref ref) async {
 
 /// Provider for fetching featured specialists.
 @riverpod
-Future<List<HomeSpecialist>> featuredSpecialists(
-  Ref ref,
-) async {
+Future<List<HomeSpecialist>> featuredSpecialists(Ref ref) async {
   final repository = ref.read(homeRepositoryProvider);
   return repository.getFeaturedSpecialists();
-}
-
-/// Provider for fetching AI-powered service
-/// recommendations based on a list of service IDs.
-@riverpod
-Future<List<AiRecommendation>> aiRecommendations(
-  Ref ref,
-  List<String> serviceIds,
-) async {
-  final repository = ref.read(homeRepositoryProvider);
-  return repository.getAiRecommendations(serviceIds);
 }
 
 /// Provider for fetching recent appointment activity
 /// shown on the home dashboard.
 @riverpod
-Future<List<AppointmentEntity>> recentActivity(
-  Ref ref,
-) async {
+Future<List<AppointmentEntity>> recentActivity(Ref ref) async {
   final repository = ref.read(homeRepositoryProvider);
   return repository.getRecentActivity(limit: 5);
 }

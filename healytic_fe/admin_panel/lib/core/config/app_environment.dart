@@ -31,10 +31,7 @@ enum AppEnvironment {
   /// Defaults to [dev] when the define is unset
   /// or contains an unrecognised value.
   static AppEnvironment fromDartDefine() {
-    const envStr = String.fromEnvironment(
-      'ENV',
-      defaultValue: 'dev',
-    );
+    const envStr = String.fromEnvironment('ENV', defaultValue: 'dev');
     return AppEnvironment.values.firstWhere(
       (e) => e.name == envStr,
       orElse: () => AppEnvironment.dev,

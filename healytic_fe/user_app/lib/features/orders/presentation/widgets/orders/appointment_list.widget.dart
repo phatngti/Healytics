@@ -35,8 +35,21 @@ class AppointmentList extends ConsumerWidget {
                   _VendorHeader(appointments: value),
                   ...value.map(
                     (apt) => Padding(
-                      padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
-                      child: AppointmentCard(appointment: apt),
+                      padding: EdgeInsets.only(
+                        bottom: AppDimens.spaceLg,
+                      ),
+                      child: AppointmentCard(
+                        appointment: apt,
+                        onExpired: apt.status ==
+                                'pending_payment'
+                            ? () => ref
+                                .read(
+                                  filteredAppointmentsProvider
+                                      .notifier,
+                                )
+                                .silentRefresh()
+                            : null,
+                      ),
                     ),
                   ),
                   AppDimens.verticalSmall,
@@ -51,27 +64,45 @@ class AppointmentList extends ConsumerWidget {
 
 // ─── Empty state ───────────────────────────────────
 
-class _EmptyState extends StatelessWidget {
+class _EmptyState extends ConsumerWidget {
   const _EmptyState();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final tab = ref.watch(selectedTabProvider);
+
+    final (icon, message) = switch (tab) {
+      kTabPendingPayment => (
+        Icons.check_circle_outline_rounded,
+        'No pending payments\n'
+            'All your bookings are confirmed!',
+      ),
+      _ => (
+        Icons.event_busy_rounded,
+        'No appointments found',
+      ),
+    };
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            Icons.event_busy_rounded,
+            icon,
             // 64dp — one-off illustration-size icon
             size: 64,
-            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+            color: theme.colorScheme.onSurfaceVariant
+                .withValues(alpha: 0.4),
           ),
           AppDimens.verticalMedium,
           Text(
-            'No appointments found',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+            message,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium
+                ?.copyWith(
+              color:
+                  theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],

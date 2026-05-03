@@ -26,12 +26,10 @@ class EmployeeNotesCard extends StatefulWidget {
   });
 
   @override
-  State<EmployeeNotesCard> createState() =>
-      _EmployeeNotesCardState();
+  State<EmployeeNotesCard> createState() => _EmployeeNotesCardState();
 }
 
-class _EmployeeNotesCardState
-    extends State<EmployeeNotesCard> {
+class _EmployeeNotesCardState extends State<EmployeeNotesCard> {
   QuillController? _controller;
 
   @override
@@ -58,13 +56,11 @@ class _EmployeeNotesCardState
   // ── Helpers ───────────────────────────────────
 
   void _initController() {
-    final content =
-        _tryParseQuillContent(widget.description);
+    final content = _tryParseQuillContent(widget.description);
     if (content != null) {
       _controller = QuillController(
         document: Document.fromJson(content),
-        selection:
-            const TextSelection.collapsed(offset: 0),
+        selection: const TextSelection.collapsed(offset: 0),
       );
       _controller!.readOnly = true;
     } else {
@@ -78,20 +74,13 @@ class _EmployeeNotesCardState
   /// or contains only a bare newline Delta.
   /// If the string is not valid JSON it is wrapped in
   /// a minimal Delta so plain text still renders.
-  static List<Map<String, dynamic>>?
-      _tryParseQuillContent(String? raw) {
+  static List<Map<String, dynamic>>? _tryParseQuillContent(String? raw) {
     if (raw == null || raw.trim().isEmpty) return null;
 
     try {
       final decoded = jsonDecode(raw);
       if (decoded is List && decoded.isNotEmpty) {
-        return decoded
-            .map(
-              (e) => Map<String, dynamic>.from(
-                e as Map,
-              ),
-            )
-            .toList();
+        return decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
       }
       return null;
     } on FormatException {
@@ -108,8 +97,7 @@ class _EmployeeNotesCardState
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>()!;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -117,7 +105,8 @@ class _EmployeeNotesCardState
         color: semanticColors.warning?.withAlpha(25),
         borderRadius: AppDimens.radiusMedium,
         border: Border.all(
-          color: semanticColors.warning?.withAlpha(50) ??
+          color:
+              semanticColors.warning?.withAlpha(50) ??
               colorScheme.outlineVariant,
         ),
       ),
@@ -167,4 +156,3 @@ class _EmployeeNotesCardState
     );
   }
 }
-

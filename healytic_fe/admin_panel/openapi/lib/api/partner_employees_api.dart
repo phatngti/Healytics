@@ -284,6 +284,127 @@ class PartnerEmployeesApi {
     return null;
   }
 
+  /// Get per-employee detail analytics
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] employeeId (required):
+  ///
+  /// * [DashboardTimePeriod] period:
+  ///   Time period for employee analytics aggregation
+  Future<Response> partnerEmployeesControllerGetDetailAnalyticsWithHttpInfo(String employeeId, { DashboardTimePeriod? period, }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/partner/employees/analytics/{employeeId}'
+      .replaceAll('{employeeId}', employeeId);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (period != null) {
+      queryParams.addAll(_queryParams('', 'period', period));
+    }
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get per-employee detail analytics
+  ///
+  /// Parameters:
+  ///
+  /// * [String] employeeId (required):
+  ///
+  /// * [DashboardTimePeriod] period:
+  ///   Time period for employee analytics aggregation
+  Future<EmployeeDetailAnalyticsResponseDto?> partnerEmployeesControllerGetDetailAnalytics(String employeeId, { DashboardTimePeriod? period, }) async {
+    final response = await partnerEmployeesControllerGetDetailAnalyticsWithHttpInfo(employeeId,  period: period, );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeDetailAnalyticsResponseDto',) as EmployeeDetailAnalyticsResponseDto;
+    
+    }
+    return null;
+  }
+
+  /// Get employee overview analytics
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [DashboardTimePeriod] period:
+  ///   Time period for employee analytics aggregation
+  Future<Response> partnerEmployeesControllerGetOverviewAnalyticsWithHttpInfo({ DashboardTimePeriod? period, }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/partner/employees/analytics/overview';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (period != null) {
+      queryParams.addAll(_queryParams('', 'period', period));
+    }
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get employee overview analytics
+  ///
+  /// Parameters:
+  ///
+  /// * [DashboardTimePeriod] period:
+  ///   Time period for employee analytics aggregation
+  Future<EmployeeOverviewAnalyticsResponseDto?> partnerEmployeesControllerGetOverviewAnalytics({ DashboardTimePeriod? period, }) async {
+    final response = await partnerEmployeesControllerGetOverviewAnalyticsWithHttpInfo( period: period, );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeOverviewAnalyticsResponseDto',) as EmployeeOverviewAnalyticsResponseDto;
+    
+    }
+    return null;
+  }
+
   /// Delete an employee
   ///
   /// Note: This method returns the HTTP [Response].

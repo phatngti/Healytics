@@ -119,12 +119,9 @@ class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
                           context,
                           label: 'Status',
                           items: CategoryStatus.values
-                              .map(
-                                (s) => s.displayName,
-                              )
+                              .map((s) => s.displayName)
                               .toList(),
-                          initialValue:
-                              CategoryStatus.active.displayName,
+                          initialValue: CategoryStatus.active.displayName,
                           hintText: 'Select status',
                         ),
                         AppDimens.verticalMedium,
@@ -160,8 +157,7 @@ class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
                         FormFieldBuilders.buildTextField(
                           context,
                           label: 'Color (Hex)',
-                          fieldKey:
-                              CategoryFormField.colorHex.key,
+                          fieldKey: CategoryFormField.colorHex.key,
                           hintText: 'Enter hex color (e.g., #1A7B99)',
                           prefixIcon: Icons.color_lens_outlined,
                           validator: (value) {

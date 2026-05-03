@@ -19,6 +19,7 @@ class ParticipantInfoDto {
     required this.role,
   });
 
+
   String id;
 
   String name;
