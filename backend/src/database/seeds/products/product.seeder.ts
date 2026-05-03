@@ -21,6 +21,7 @@ import { HealthServiceType } from '@/health-service/enums/health-service-type.en
 import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
 import { StaffAssignmentType } from '@/health-service/enums/staff-assignment-type.enum';
 import { MediaType } from '@/health-service/enums/media-type.enum';
+import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { ISeeder } from '../seeder.interface';
 
 /**
@@ -1206,9 +1207,6 @@ export class ProductSeeder implements ISeeder {
    * is always backed by real appointment + user records.
    */
   private async seedTreatmentReviews(productId: string): Promise<void> {
-    const { BookingStatus } =
-      await import('@/booking/enums/booking-status.enum');
-
     // Find up to 5 completed bookings for this product
     const completedBookings = await this.bookingRepo.find({
       where: { productId, status: BookingStatus.COMPLETED },

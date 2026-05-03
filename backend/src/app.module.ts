@@ -67,6 +67,7 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const db = configService.get('database') as Record<string, any>;
+        console.log('DB Config', db);
         return {
           type: 'postgres',
           host: db.host,

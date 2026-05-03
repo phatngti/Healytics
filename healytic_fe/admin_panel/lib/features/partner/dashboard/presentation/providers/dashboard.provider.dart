@@ -101,7 +101,11 @@ class DashboardNotifier extends _$DashboardNotifier {
     final previous = state.value;
     final period = previous?.selectedPeriod ?? DashboardTimePeriod.thisMonth;
 
-    state = const AsyncLoading<DashboardState>().copyWithPrevious(state);
+    if (previous != null) {
+      state = AsyncData(previous.copyWith(isRefreshing: true));
+    } else {
+      state = const AsyncLoading();
+    }
 
     state = await AsyncValue.guard(() => _fetchAll(period));
   }

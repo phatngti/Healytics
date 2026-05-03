@@ -136,6 +136,8 @@ run_migrations() {
     "${BACKEND_MIGRATION_IMAGE}:${BACKEND_MIGRATION_TAG}"
 }
 
+
+
 rollback() {
   local previous_tag="$1"
 
@@ -198,6 +200,8 @@ if ! wait_for_backend || ! apply_kong_config || ! verify_kong_route; then
   rollback "${PREVIOUS_TAG}"
   exit 1
 fi
+
+
 
 # --- Remove old image if it differs from the new one ----------------------
 if [[ -n "${OLD_IMAGE_ID}" ]]; then

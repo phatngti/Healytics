@@ -51,7 +51,7 @@ void main() {
       );
 
       expect(updated, isNotNull);
-      expect(updated!.selectedPeriod, DashboardTimePeriod.thisYear);
+      expect(updated.selectedPeriod, DashboardTimePeriod.thisYear);
       expect(
         updated.analytics.utilizationRate,
         greaterThanOrEqualTo(initial.analytics.utilizationRate),
