@@ -28,10 +28,9 @@ test-report
 jest-html-reporters-attach
 coverage
 
-# Scripts & migrations (not needed for runtime build)
+# Scripts (not needed for runtime build)
 scripts
 performace
-migrations
 
 # Misc caches
 .yarn

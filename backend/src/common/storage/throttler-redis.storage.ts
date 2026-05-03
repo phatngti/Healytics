@@ -39,6 +39,37 @@ export class ThrottlerRedisStorage implements ThrottlerStorage {
     blockDuration: number,
     throttlerName: string,
   ): Promise<ThrottlerStorageRecord> {
+    try {
+      return await this._doIncrement(
+        key,
+        ttl,
+        limit,
+        blockDuration,
+        throttlerName,
+      );
+    } catch (err) {
+      // Graceful degradation: if Redis is down, allow the request through
+      // instead of crashing with a 500. Rate limiting is temporarily disabled.
+      this.logger.warn(
+        `Redis unavailable — rate limiting bypassed: ${(err as Error).message}`,
+      );
+      return {
+        totalHits: 0,
+        timeToExpire: ttl,
+        isBlocked: false,
+        timeToBlockExpire: 0,
+      };
+    }
+  }
+
+  /** Internal increment logic — separated so the public method can wrap it with error handling. */
+  private async _doIncrement(
+    key: string,
+    ttl: number,
+    limit: number,
+    blockDuration: number,
+    throttlerName: string,
+  ): Promise<ThrottlerStorageRecord> {
     const redisKey = `throttle:${throttlerName}:${key}`;
     const blockedKey = `${redisKey}:blocked`;
 
