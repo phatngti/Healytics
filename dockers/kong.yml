@@ -10,6 +10,14 @@ services:
           - /backend
         strip_path: true
 
+  - name: panel-service
+    url: http://healytics-panel:80
+    routes:
+      - name: admin-panel-route
+        paths:
+          - /admin
+        strip_path: true
+
   # ── WebSocket: all Socket.IO namespaces (user-chat, partner-chat) ──
   # Namespaces are negotiated in the Socket.IO protocol handshake,
   # NOT via URL path. All share a single /socket.io HTTP endpoint.

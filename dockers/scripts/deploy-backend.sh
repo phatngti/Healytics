@@ -17,8 +17,29 @@ if [[ "${TAG}" == "latest" ]]; then
   exit 2
 fi
 
-BACKEND_IMAGE="${BACKEND_IMAGE:-giahung2111/healytics_backend}"
-BACKEND_MIGRATION_IMAGE="${BACKEND_MIGRATION_IMAGE:-giahung2111/healytics_backend-migrate}"
+# --- Load .env (only sets vars that are NOT already exported) ---------------
+# Mirrors the pattern in backend/scripts/docker-push.sh so SSH-injected vars
+# (BACKEND_IMAGE, BACKEND_MIGRATION_IMAGE) always take priority.
+load_env_file() {
+  local file="$1"
+  [[ -f "${file}" ]] || return 0
+  while IFS='=' read -r key value; do
+    # skip blank lines and comments
+    [[ -z "${key}" || "${key}" =~ ^# ]] && continue
+    # strip surrounding quotes from value
+    value="${value%\"}"
+    value="${value#\"}"
+    # only set if not already in the environment
+    if [[ -z "${!key+x}" ]]; then
+      export "${key}=${value}"
+    fi
+  done < "${file}"
+}
+
+load_env_file ".env"
+
+BACKEND_IMAGE="${BACKEND_IMAGE:-nonameaaaa/healytics_backend}"
+BACKEND_MIGRATION_IMAGE="${BACKEND_MIGRATION_IMAGE:-nonameaaaa/healytics_backend-migrate}"
 BACKEND_MIGRATION_TAG="${BACKEND_MIGRATION_TAG:-${TAG}}"
 BACKEND_RUN_MIGRATIONS="${BACKEND_RUN_MIGRATIONS:-true}"
 COMPOSE_NETWORK_NAME="${COMPOSE_NETWORK_NAME:-healytics_services}"
@@ -40,17 +61,6 @@ compose() {
   docker compose --env-file .env --env-file "${DEPLOY_ENV}" "$@"
 }
 
-read_env_value() {
-  local file="$1"
-  local key="$2"
-
-  if [[ ! -f "${file}" ]]; then
-    return 1
-  fi
-
-  awk -F= -v key="${key}" '$1 == key { print substr($0, length(key) + 2); found = 1 } END { exit found ? 0 : 1 }' "${file}"
-}
-
 write_deploy_env() {
   local tag="$1"
   local migration_tag="${2:-${tag}}"
@@ -64,6 +74,8 @@ BACKEND_RUN_MIGRATIONS=${BACKEND_RUN_MIGRATIONS}
 COMPOSE_NETWORK_NAME=${COMPOSE_NETWORK_NAME}
 BACKEND_DEPLOYED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 EOF
+
+  echo "Wrote ${DEPLOY_ENV}: BACKEND_IMAGE=${BACKEND_IMAGE} BACKEND_TAG=${tag}"
 }
 
 wait_for_backend() {
@@ -108,14 +120,6 @@ run_migrations() {
     return 0
   fi
 
-  local postgres_user
-  local postgres_password
-  local postgres_db
-
-  postgres_user="${POSTGRES_USER:-$(read_env_value .env POSTGRES_USER)}"
-  postgres_password="${POSTGRES_PASSWORD:-$(read_env_value .env POSTGRES_PASSWORD)}"
-  postgres_db="${POSTGRES_DB:-$(read_env_value .env POSTGRES_DB)}"
-
   echo "Pulling migration image ${BACKEND_MIGRATION_IMAGE}:${BACKEND_MIGRATION_TAG}..."
   docker pull "${BACKEND_MIGRATION_IMAGE}:${BACKEND_MIGRATION_TAG}"
 
@@ -126,9 +130,9 @@ run_migrations() {
     -e NODE_ENV=production \
     -e POSTGRES_HOST=postgres \
     -e POSTGRES_PORT=5432 \
-    -e POSTGRES_USER="${postgres_user:?POSTGRES_USER is required}" \
-    -e POSTGRES_PASSWORD="${postgres_password:?POSTGRES_PASSWORD is required}" \
-    -e POSTGRES_DB="${postgres_db:?POSTGRES_DB is required}" \
+    -e POSTGRES_USER="${POSTGRES_USER:?POSTGRES_USER is required}" \
+    -e POSTGRES_PASSWORD="${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}" \
+    -e POSTGRES_DB="${POSTGRES_DB:?POSTGRES_DB is required}" \
     "${BACKEND_MIGRATION_IMAGE}:${BACKEND_MIGRATION_TAG}"
 }
 
@@ -142,14 +146,18 @@ rollback() {
 
   echo "Rolling back backend to ${previous_tag}..."
   write_deploy_env "${previous_tag}" "${previous_tag}"
-  compose --profile prod pull backend
-  compose --profile prod up -d --no-deps backend
+  compose --profile backend-prod pull backend
+  compose --profile backend-prod up -d --no-deps backend
   wait_for_backend
   apply_kong_config
   verify_kong_route
 }
 
-PREVIOUS_TAG="$(read_env_value "${DEPLOY_ENV}" BACKEND_TAG || true)"
+# --- Load previous tag from deploy.env (if it exists) ----------------------
+load_env_file "${DEPLOY_ENV}"
+PREVIOUS_TAG="${BACKEND_TAG:-}"
+# Reset BACKEND_TAG so it doesn't shadow the new tag we're deploying
+unset BACKEND_TAG 2>/dev/null || true
 
 echo "Deploying ${BACKEND_IMAGE}:${TAG}"
 [[ -n "${PREVIOUS_TAG}" ]] && echo "Previous backend tag: ${PREVIOUS_TAG}"
@@ -157,7 +165,7 @@ echo "Deploying ${BACKEND_IMAGE}:${TAG}"
 write_deploy_env "${TAG}" "${BACKEND_MIGRATION_TAG}"
 
 echo "Pulling backend image..."
-if ! compose --profile prod pull backend; then
+if ! compose --profile backend-prod pull backend; then
   [[ -n "${PREVIOUS_TAG}" ]] && write_deploy_env "${PREVIOUS_TAG}" "${PREVIOUS_TAG}"
   exit 1
 fi
@@ -168,8 +176,19 @@ if ! run_migrations; then
   exit 1
 fi
 
+# --- Capture old image ID for cleanup later --------------------------------
+OLD_IMAGE_ID=""
+if docker inspect healytics-backend >/dev/null 2>&1; then
+  OLD_IMAGE_ID="$(docker inspect --format '{{.Image}}' healytics-backend 2>/dev/null || true)"
+fi
+
+# --- Kill and remove old container before starting new one -----------------
+echo "Stopping old backend container..."
+compose --profile backend-prod stop backend 2>/dev/null || true
+compose --profile backend-prod rm -f backend 2>/dev/null || true
+
 echo "Starting backend..."
-if ! compose --profile prod up -d --no-deps backend; then
+if ! compose --profile backend-prod up -d --no-deps backend; then
   rollback "${PREVIOUS_TAG}"
   exit 1
 fi
@@ -179,5 +198,17 @@ if ! wait_for_backend || ! apply_kong_config || ! verify_kong_route; then
   rollback "${PREVIOUS_TAG}"
   exit 1
 fi
+
+# --- Remove old image if it differs from the new one ----------------------
+if [[ -n "${OLD_IMAGE_ID}" ]]; then
+  NEW_IMAGE_ID="$(docker inspect --format '{{.Image}}' healytics-backend 2>/dev/null || true)"
+  if [[ "${OLD_IMAGE_ID}" != "${NEW_IMAGE_ID}" ]]; then
+    echo "Removing old backend image ${OLD_IMAGE_ID}..."
+    docker rmi "${OLD_IMAGE_ID}" 2>/dev/null || true
+  fi
+fi
+
+# Clean up dangling images left from the old build
+docker image prune -f --filter "label=com.docker.compose.project" 2>/dev/null || true
 
 echo "Deploy complete: ${BACKEND_IMAGE}:${TAG}"

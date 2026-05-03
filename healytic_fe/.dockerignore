@@ -1,0 +1,26 @@
+# Ignore everything by default, then whitelist only what's needed for the build.
+# This keeps the Docker build context small and fast.
+
+# --- Ignore all ---
+*
+
+# --- Whitelist workspace pubspec ---
+!pubspec.yaml
+!pubspec.lock
+
+# --- Whitelist admin_panel ---
+!admin_panel/pubspec.yaml
+!admin_panel/lib/
+!admin_panel/web/
+!admin_panel/assets/
+!admin_panel/build.yaml
+!admin_panel/analysis_options.yaml
+!admin_panel/Dockerfile
+!admin_panel/nginx.conf
+
+# --- Whitelist common package ---
+!common/pubspec.yaml
+!common/lib/
+
+# --- Whitelist openapi package ---
+!admin_panel/openapi/

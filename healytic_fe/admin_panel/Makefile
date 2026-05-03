@@ -48,3 +48,21 @@ i-test:
 # Run unit/widget tests (not integration tests)
 test:
 	flutter test
+
+# =============================================================================
+# Docker targets
+# =============================================================================
+
+# Build Docker image for admin panel web
+# Usage: make docker-build TAG=abc123 [IMAGE=nonameaaaa/healytics_panel] [ENV=prod] [BASE_HREF=/]
+docker-build:
+	@if [ -z "$(TAG)" ]; then echo "ERROR: TAG is required. Usage: make docker-build TAG=abc123"; exit 1; fi
+	bash scripts/docker-build.sh "$(TAG)" "$(or $(IMAGE),nonameaaaa/healytics_panel)" \
+		--env "$(or $(ENV),prod)" \
+		--base-href "$(or $(BASE_HREF),/)"
+
+# Push Docker image to Docker Hub
+# Usage: make docker-push TAG=abc123 [IMAGE=nonameaaaa/healytics_panel]
+docker-push:
+	@if [ -z "$(TAG)" ]; then echo "ERROR: TAG is required. Usage: make docker-push TAG=abc123"; exit 1; fi
+	bash scripts/docker-push.sh "$(TAG)" "$(or $(IMAGE),nonameaaaa/healytics_panel)"
