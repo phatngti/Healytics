@@ -1,5 +1,4 @@
 import 'package:admin_panel/features/partner/chat/data/datasources/remote/partner_inbox_remote_datasource.dart';
-import 'package:admin_panel/features/partner/chat/domain/entities/partner_chat_message.entity.dart';
 import 'package:admin_panel/features/partner/chat/domain/entities/partner_conversation.entity.dart';
 
 /// Repository interface for the partner chat inbox.

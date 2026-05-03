@@ -1,6 +1,5 @@
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_analytics/product_overview_analytics.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/table/table.widget.dart';
-import 'package:admin_panel/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:common/utils/demensions.dart';
 

@@ -53,7 +53,7 @@ test:
 # Docker targets
 # =============================================================================
 
-# Build Docker image for admin panel web
+# Build Docker image for admin panel web (local only - use docker-release for cross-arch)
 # Usage: make docker-build TAG=abc123 [IMAGE=nonameaaaa/healytics_panel] [ENV=prod] [BASE_HREF=/]
 docker-build:
 	@if [ -z "$(TAG)" ]; then echo "ERROR: TAG is required. Usage: make docker-build TAG=abc123"; exit 1; fi
@@ -61,7 +61,18 @@ docker-build:
 		--env "$(or $(ENV),prod)" \
 		--base-href "$(or $(BASE_HREF),/)"
 
-# Push Docker image to Docker Hub
+# Build AND push Docker image in one step (REQUIRED for cross-arch builds on Apple Silicon)
+# This ensures correct platform metadata is preserved when building for AMD64 on ARM64.
+# Usage: make docker-release TAG=abc123 [IMAGE=nonameaaaa/healytics_panel] [ENV=prod] [BASE_HREF=/]
+docker-release:
+	@if [ -z "$(TAG)" ]; then echo "ERROR: TAG is required. Usage: make docker-release TAG=abc123"; exit 1; fi
+	bash scripts/docker-build.sh "$(TAG)" "$(or $(IMAGE),nonameaaaa/healytics_panel)" \
+		--env "$(or $(ENV),prod)" \
+		--base-href "$(or $(BASE_HREF),/)" \
+		--push
+
+# Push Docker image to Docker Hub (only use if image was built on matching architecture)
+# For cross-arch builds, use docker-release instead.
 # Usage: make docker-push TAG=abc123 [IMAGE=nonameaaaa/healytics_panel]
 docker-push:
 	@if [ -z "$(TAG)" ]; then echo "ERROR: TAG is required. Usage: make docker-push TAG=abc123"; exit 1; fi

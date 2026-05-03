@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# docker-build.sh — Build Docker images for linux/arm64.
+# docker-build.sh — Build Docker images for linux/amd64.
 #
 # Usage:
 #   docker-build.sh <image_tag> <image_name> [--target <stage>]

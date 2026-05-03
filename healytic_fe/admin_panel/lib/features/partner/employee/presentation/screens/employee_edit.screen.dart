@@ -7,7 +7,6 @@ import 'package:admin_panel/features/partner/employee/presentation/layouts/emplo
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee_details.provider.dart';
 import 'package:common/widgets/card/error_card.dart';
-import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
