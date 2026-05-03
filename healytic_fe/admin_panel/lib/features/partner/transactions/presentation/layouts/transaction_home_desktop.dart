@@ -76,11 +76,11 @@ class _FinanceSummarySection extends ConsumerWidget {
       data: (summary) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                StatisticCard(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: StatisticCard(
                   label: 'Gross Volume',
                   value: formatFinanceCurrency(
                     summary.grossVolume,
@@ -88,8 +88,10 @@ class _FinanceSummarySection extends ConsumerWidget {
                   ),
                   change: 14.8,
                 ),
-                AppDimens.horizontalMedium,
-                StatisticCard(
+              ),
+              AppDimens.horizontalMedium,
+              Expanded(
+                child: StatisticCard(
                   label: 'Net Settled',
                   value: formatFinanceCurrency(
                     summary.netSettled,
@@ -97,8 +99,10 @@ class _FinanceSummarySection extends ConsumerWidget {
                   ),
                   change: 9.6,
                 ),
-                AppDimens.horizontalMedium,
-                StatisticCard(
+              ),
+              AppDimens.horizontalMedium,
+              Expanded(
+                child: StatisticCard(
                   label: 'Pending Payout',
                   value: formatFinanceCurrency(
                     summary.pendingPayout,
@@ -106,8 +110,10 @@ class _FinanceSummarySection extends ConsumerWidget {
                   ),
                   change: 5.1,
                 ),
-                AppDimens.horizontalMedium,
-                StatisticCard(
+              ),
+              AppDimens.horizontalMedium,
+              Expanded(
+                child: StatisticCard(
                   label: 'Refund / Dispute Exposure',
                   value: formatFinanceCurrency(
                     summary.refundExposure,
@@ -115,8 +121,8 @@ class _FinanceSummarySection extends ConsumerWidget {
                   ),
                   change: -2.4,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           AppDimens.verticalLarge,
           FinanceOverviewCard(summary: summary),
@@ -129,9 +135,7 @@ class _FinanceSummarySection extends ConsumerWidget {
         title: 'Failed to load finance summary',
         error: error,
         stackTrace: stack,
-        onRetry: () => ref.invalidate(
-          financeSummaryProvider,
-        ),
+        onRetry: () => ref.invalidate(financeSummaryProvider),
       ),
     );
   }
@@ -163,9 +167,7 @@ class _FinanceTrendSection extends ConsumerWidget {
         title: 'Failed to load trend data',
         error: error,
         stackTrace: stack,
-        onRetry: () => ref.invalidate(
-          financeTrendProvider,
-        ),
+        onRetry: () => ref.invalidate(financeTrendProvider),
       ),
     );
   }

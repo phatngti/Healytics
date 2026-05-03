@@ -25,8 +25,7 @@ sealed class LastMessagePreview with _$LastMessagePreview {
 
 /// Conversation entity for the partner's inbox.
 @freezed
-sealed class PartnerConversation
-    with _$PartnerConversation {
+sealed class PartnerConversation with _$PartnerConversation {
   const factory PartnerConversation({
     required String id,
     required String status,

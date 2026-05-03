@@ -342,17 +342,13 @@ class _VerificationStatusScreenState
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (error, stack) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Verification Status'),
-        ),
+        appBar: AppBar(title: const Text('Verification Status')),
         body: Center(
           child: ErrorCard(
             title: 'Failed to load verification status',
             error: error,
             stackTrace: stack,
-            onRetry: () => ref.invalidate(
-              verificationStatusProvider,
-            ),
+            onRetry: () => ref.invalidate(verificationStatusProvider),
           ),
         ),
       ),

@@ -27,55 +27,26 @@ class BookingResponseDto {
     required this.updatedAt,
   });
 
+
   String id;
 
   String userId;
 
   String staffId;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? productId;
+  String? productId;
 
   DateTime startTime;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? endTime;
+  DateTime? endTime;
 
-  BookingResponseDtoStatusEnum status;
+  BookingStatus status;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? paymentUrl;
+  String? paymentUrl;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? paymentExpiresAt;
+  DateTime? paymentExpiresAt;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? notes;
+  String? notes;
 
   DateTime createdAt;
 
@@ -127,7 +98,7 @@ class BookingResponseDto {
     }
       json[r'startTime'] = this.startTime.toUtc().toIso8601String();
     if (this.endTime != null) {
-      json[r'endTime'] = this.endTime;
+      json[r'endTime'] = this.endTime!.toUtc().toIso8601String();
     } else {
       json[r'endTime'] = null;
     }
@@ -138,7 +109,7 @@ class BookingResponseDto {
       json[r'paymentUrl'] = null;
     }
     if (this.paymentExpiresAt != null) {
-      json[r'paymentExpiresAt'] = this.paymentExpiresAt;
+      json[r'paymentExpiresAt'] = this.paymentExpiresAt!.toUtc().toIso8601String();
     } else {
       json[r'paymentExpiresAt'] = null;
     }
@@ -174,13 +145,13 @@ class BookingResponseDto {
         id: mapValueOfType<String>(json, r'id')!,
         userId: mapValueOfType<String>(json, r'userId')!,
         staffId: mapValueOfType<String>(json, r'staffId')!,
-        productId: mapValueOfType<Object>(json, r'productId'),
+        productId: mapValueOfType<String>(json, r'productId'),
         startTime: mapDateTime(json, r'startTime', r'')!,
-        endTime: mapValueOfType<Object>(json, r'endTime'),
-        status: BookingResponseDtoStatusEnum.fromJson(json[r'status'])!,
-        paymentUrl: mapValueOfType<Object>(json, r'paymentUrl'),
-        paymentExpiresAt: mapValueOfType<Object>(json, r'paymentExpiresAt'),
-        notes: mapValueOfType<Object>(json, r'notes'),
+        endTime: mapDateTime(json, r'endTime', r''),
+        status: BookingStatus.fromJson(json[r'status'])!,
+        paymentUrl: mapValueOfType<String>(json, r'paymentUrl'),
+        paymentExpiresAt: mapDateTime(json, r'paymentExpiresAt', r''),
+        notes: mapValueOfType<String>(json, r'notes'),
         createdAt: mapDateTime(json, r'createdAt', r'')!,
         updatedAt: mapDateTime(json, r'updatedAt', r'')!,
       );
@@ -239,87 +210,4 @@ class BookingResponseDto {
     'updatedAt',
   };
 }
-
-
-class BookingResponseDtoStatusEnum {
-  /// Instantiate a new enum with the provided [value].
-  const BookingResponseDtoStatusEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const PENDING_PAYMENT = BookingResponseDtoStatusEnum._(r'PENDING_PAYMENT');
-  static const CONFIRMED = BookingResponseDtoStatusEnum._(r'CONFIRMED');
-  static const CANCELLED = BookingResponseDtoStatusEnum._(r'CANCELLED');
-  static const COMPLETED = BookingResponseDtoStatusEnum._(r'COMPLETED');
-  static const NO_SHOW = BookingResponseDtoStatusEnum._(r'NO_SHOW');
-
-  /// List of all possible values in this [enum][BookingResponseDtoStatusEnum].
-  static const values = <BookingResponseDtoStatusEnum>[
-    PENDING_PAYMENT,
-    CONFIRMED,
-    CANCELLED,
-    COMPLETED,
-    NO_SHOW,
-  ];
-
-  static BookingResponseDtoStatusEnum? fromJson(dynamic value) => BookingResponseDtoStatusEnumTypeTransformer().decode(value);
-
-  static List<BookingResponseDtoStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <BookingResponseDtoStatusEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = BookingResponseDtoStatusEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [BookingResponseDtoStatusEnum] to String,
-/// and [decode] dynamic data back to [BookingResponseDtoStatusEnum].
-class BookingResponseDtoStatusEnumTypeTransformer {
-  factory BookingResponseDtoStatusEnumTypeTransformer() => _instance ??= const BookingResponseDtoStatusEnumTypeTransformer._();
-
-  const BookingResponseDtoStatusEnumTypeTransformer._();
-
-  String encode(BookingResponseDtoStatusEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a BookingResponseDtoStatusEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  BookingResponseDtoStatusEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'PENDING_PAYMENT': return BookingResponseDtoStatusEnum.PENDING_PAYMENT;
-        case r'CONFIRMED': return BookingResponseDtoStatusEnum.CONFIRMED;
-        case r'CANCELLED': return BookingResponseDtoStatusEnum.CANCELLED;
-        case r'COMPLETED': return BookingResponseDtoStatusEnum.COMPLETED;
-        case r'NO_SHOW': return BookingResponseDtoStatusEnum.NO_SHOW;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [BookingResponseDtoStatusEnumTypeTransformer] instance.
-  static BookingResponseDtoStatusEnumTypeTransformer? _instance;
-}
-
 

@@ -10,7 +10,7 @@ import { Partner } from '@/common/entities/partner.entity';
  */
 export class AiRecommendationItemDto {
   @ApiProperty({ example: 'a1b2c3d4-...' })
-  id: string;
+  service_id: string;
 
   @ApiProperty({ example: 'Phục hồi cột sống chuyên sâu' })
   name: string;
@@ -27,7 +27,7 @@ export class AiRecommendationItemDto {
   @ApiProperty({ example: '60 min' })
   duration: string;
 
-  @ApiProperty({ example: '₫800,000' })
+  @ApiProperty({ example: '800,000' })
   price: string;
 
   @ApiProperty({ example: '4.8' })
@@ -60,7 +60,7 @@ export class AiRecommendationItemDto {
   ): AiRecommendationItemDto {
     const dto = new AiRecommendationItemDto();
 
-    dto.id = product.id;
+    dto.service_id = product.id;
     dto.name = product.name;
     dto.slug = product.slug;
 
@@ -79,7 +79,7 @@ export class AiRecommendationItemDto {
 
     // Price formatting (Vietnamese đồng)
     const price = product.salePrice ?? product.basePrice;
-    dto.price = '₫' + new Intl.NumberFormat('vi-VN').format(Number(price));
+    dto.price = new Intl.NumberFormat('vi-VN').format(Number(price));
 
     // Average rating — defaults to 0 until computed from TreatmentReview aggregate
     dto.rating = '0';

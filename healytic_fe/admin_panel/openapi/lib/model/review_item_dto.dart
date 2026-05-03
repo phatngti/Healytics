@@ -17,6 +17,7 @@ class ReviewItemDto {
     this.feedback,
   });
 
+
   /// Key of the field being reviewed
   ///
   /// Please note: This property should have been non-nullable! Since the specification file

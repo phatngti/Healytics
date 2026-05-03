@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 
 /// Sticky bottom bar with save draft / complete
 /// profile actions and a responsive layout.
-class CompletionBottomBarWidget
-    extends StatelessWidget {
+class CompletionBottomBarWidget extends StatelessWidget {
   const CompletionBottomBarWidget({
     required this.isBusy,
     required this.isSavingDraft,
@@ -43,21 +42,15 @@ class CompletionBottomBarWidget
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final isDark =
-        Theme.of(context).brightness ==
-            Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Align(
       alignment: Alignment.bottomCenter,
       child: ClipRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: _blurSigma,
-            sigmaY: _blurSigma,
-          ),
+          filter: ImageFilter.blur(sigmaX: _blurSigma, sigmaY: _blurSigma),
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: AppDimens.spaceXxl,
@@ -65,31 +58,20 @@ class CompletionBottomBarWidget
             ),
             decoration: BoxDecoration(
               color: isDark
-                  ? colorScheme
-                      .surfaceContainerLow
-                      .withValues(alpha: 0.92)
-                  : colorScheme.surface
-                      .withValues(alpha: 0.88),
+                  ? colorScheme.surfaceContainerLow.withValues(alpha: 0.92)
+                  : colorScheme.surface.withValues(alpha: 0.88),
               border: Border(
                 top: BorderSide(
                   color: isDark
-                      ? colorScheme
-                          .outlineVariant
-                          .withValues(alpha: 0.4)
-                      : colorScheme
-                          .outlineVariant
-                          .withValues(alpha: 0.6),
+                      ? colorScheme.outlineVariant.withValues(alpha: 0.4)
+                      : colorScheme.outlineVariant.withValues(alpha: 0.6),
                 ),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: colorScheme.shadow
-                      .withValues(alpha: 0.12),
+                  color: colorScheme.shadow.withValues(alpha: 0.12),
                   blurRadius: _blurSigma,
-                  offset: const Offset(
-                    0,
-                    -AppDimens.spaceXs,
-                  ),
+                  offset: const Offset(0, -AppDimens.spaceXs),
                 ),
               ],
             ),
@@ -97,100 +79,69 @@ class CompletionBottomBarWidget
               top: false,
               child: Center(
                 child: ConstrainedBox(
-                  constraints:
-                      const BoxConstraints(
-                    maxWidth: _maxContentWidth,
-                  ),
+                  constraints: const BoxConstraints(maxWidth: _maxContentWidth),
                   child: LayoutBuilder(
-                    builder:
-                        (context, constraints) {
+                    builder: (context, constraints) {
                       final isCompact =
-                          constraints.maxWidth <
-                              _compactBreakpoint;
+                          constraints.maxWidth < _compactBreakpoint;
                       final actionButtons = Row(
-                        mainAxisSize:
-                            MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           OutlinedButton(
-                            onPressed: isBusy
-                                ? null
-                                : onSaveDraft,
+                            onPressed: isBusy ? null : onSaveDraft,
                             child: Text(
-                              isSavingDraft
-                                  ? 'Saving...'
-                                  : 'Save draft',
+                              isSavingDraft ? 'Saving...' : 'Save draft',
                             ),
                           ),
-                          AppDimens
-                              .horizontalMediumSmall,
+                          AppDimens.horizontalMediumSmall,
                           FilledButton.icon(
-                            onPressed: isBusy
-                                ? null
-                                : onCompleteProfile,
+                            onPressed: isBusy ? null : onCompleteProfile,
                             icon: isCompletingProfile
                                 ? SizedBox(
-                                    width:
-                                        _spinnerSize,
-                                    height:
-                                        _spinnerSize,
-                                    child:
-                                        CircularProgressIndicator(
-                                      strokeWidth:
-                                          _spinnerStroke,
-                                      color: colorScheme
-                                          .onPrimary,
+                                    width: _spinnerSize,
+                                    height: _spinnerSize,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: _spinnerStroke,
+                                      color: colorScheme.onPrimary,
                                     ),
                                   )
-                                : const Icon(
-                                    Icons
-                                        .arrow_forward_rounded,
-                                  ),
+                                : const Icon(Icons.arrow_forward_rounded),
                             label: Text(
                               isCompletingProfile
                                   ? 'Completing...'
                                   : 'Complete '
-                                      'profile',
+                                        'profile',
                             ),
                           ),
                         ],
                       );
 
                       final summary = Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-                        mainAxisSize:
-                            MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             isReadyToComplete
                                 ? 'All required '
-                                    'sections '
-                                    'are ready.'
+                                      'sections '
+                                      'are ready.'
                                 : 'Complete the '
-                                    'required '
-                                    'fields to '
-                                    'unlock the '
-                                    'dashboard.',
-                            style: textTheme
-                                .titleSmall
-                                ?.copyWith(
-                              fontWeight:
-                                  FontWeight.w700,
+                                      'required '
+                                      'fields to '
+                                      'unlock the '
+                                      'dashboard.',
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          AppDimens
-                              .verticalExtraSmall,
+                          AppDimens.verticalExtraSmall,
                           Text(
                             'Required '
                             'completion: '
                             '$requiredCompletedCount'
                             '/4',
-                            style: textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                              color: colorScheme
-                                  .onSurfaceVariant,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -198,20 +149,13 @@ class CompletionBottomBarWidget
 
                       if (isCompact) {
                         return Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment
-                                  .stretch,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             summary,
-                            const SizedBox(
-                              height: AppDimens
-                                  .spaceMdLg,
-                            ),
+                            const SizedBox(height: AppDimens.spaceMdLg),
                             SizedBox(
-                              width:
-                                  double.infinity,
-                              child:
-                                  actionButtons,
+                              width: double.infinity,
+                              child: actionButtons,
                             ),
                           ],
                         );
@@ -219,9 +163,7 @@ class CompletionBottomBarWidget
 
                       return Row(
                         children: [
-                          Expanded(
-                            child: summary,
-                          ),
+                          Expanded(child: summary),
                           actionButtons,
                         ],
                       );

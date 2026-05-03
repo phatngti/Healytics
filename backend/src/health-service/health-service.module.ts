@@ -4,6 +4,8 @@ import { HealthServiceService } from './health-service.service';
 import { CreateHealthServiceHandler } from './application/handlers/create-health-service.handler';
 import { UpdateHealthServiceHandler } from './application/handlers/update-health-service.handler';
 import { RemoveHealthServiceHandler } from './application/handlers/remove-health-service.handler';
+import { GetOverviewAnalyticsHandler } from './application/handlers/get-overview-analytics.handler';
+import { GetDetailAnalyticsHandler } from './application/handlers/get-detail-analytics.handler';
 import { PartnerHealthServiceController } from './partner-health-service.controller';
 import { UserHealthServiceController } from './user-health-service.controller';
 import { Product } from '@/common/entities/product.entity';
@@ -16,6 +18,8 @@ import { ProductResourceRequirement } from '@/common/entities/product-resource-r
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { Booking } from '@/common/entities/booking.entity';
+import { Payment } from '@/common/entities/payment.entity';
+import { Category } from '@/common/entities/category.entity';
 import { PartnersModule } from '@/partners/partners.module';
 
 @Module({
@@ -31,6 +35,8 @@ import { PartnersModule } from '@/partners/partners.module';
       ProductEmployeeEligibility,
       Employee,
       Booking,
+      Payment,
+      Category,
     ]),
     PartnersModule,
   ],
@@ -40,6 +46,8 @@ import { PartnersModule } from '@/partners/partners.module';
     CreateHealthServiceHandler,
     UpdateHealthServiceHandler,
     RemoveHealthServiceHandler,
+    GetOverviewAnalyticsHandler,
+    GetDetailAnalyticsHandler,
   ],
   exports: [HealthServiceService],
 })

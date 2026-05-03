@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from '@/common/entities/notification.entity';
@@ -68,9 +68,10 @@ export class NotificationService {
         body: params.body,
         data: params.data,
       })
-      .catch((err) =>
-        this.logger.error(`Push send failed: ${err.message}`),
-      );
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : String(err);
+        this.logger.error(`Push send failed: ${message}`);
+      });
 
     return dto;
   }
@@ -84,23 +85,49 @@ export class NotificationService {
     data?: Record<string, any>;
     senderId: string;
   }): Promise<NotificationResponseDto> {
-    const dto = await this.createBroadcastHandler.execute(params);
+    const title = this.normalizeBroadcastText(params.title, 'title');
+    const body = this.normalizeBroadcastText(params.body, 'body');
+
+    const dto = await this.createBroadcastHandler.execute({
+      ...params,
+      title,
+      body,
+    });
 
     // Real-time push via WebSocket to all connected users
     this.notificationGateway.pushBroadcast(dto);
 
-    // Push notification to all devices
-    this.pushService
-      .sendBroadcast({
-        title: params.title,
-        body: params.body,
-        data: params.data,
-      })
-      .catch((err) =>
-        this.logger.error(`Broadcast push failed: ${err.message}`),
-      );
+    // Push notification to all devices. Provider errors are logged only.
+    void Promise.resolve()
+      .then(() =>
+        this.pushService.sendBroadcast({
+          title,
+          body,
+          data: params.data,
+        }),
+      )
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : String(err);
+        this.logger.error(`Broadcast push failed: ${message}`);
+      });
 
     return dto;
+  }
+
+  private normalizeBroadcastText(
+    value: string,
+    fieldName: 'title' | 'body',
+  ): string {
+    if (typeof value !== 'string') {
+      throw new BadRequestException(`${fieldName} must be a string`);
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed) {
+      throw new BadRequestException(`${fieldName} should not be empty`);
+    }
+
+    return trimmed;
   }
 
   // ── Queries ──────────────────────────────────────────────────
@@ -160,8 +187,14 @@ export class NotificationService {
 
     // Execute both queries
     const [targeted, broadcasts] = await Promise.all([
-      targetedQb.orderBy('n.createdAt', 'DESC').take(limit + 1).getMany(),
-      broadcastQb.orderBy('n.createdAt', 'DESC').take(limit + 1).getMany(),
+      targetedQb
+        .orderBy('n.createdAt', 'DESC')
+        .take(limit + 1)
+        .getMany(),
+      broadcastQb
+        .orderBy('n.createdAt', 'DESC')
+        .take(limit + 1)
+        .getMany(),
     ]);
 
     // For broadcasts, check read status
@@ -206,9 +239,7 @@ export class NotificationService {
     const hasMore = merged.length > limit;
     const result = hasMore ? merged.slice(0, limit) : merged;
     const nextCursor =
-      hasMore && result.length > 0
-        ? result[result.length - 1].id
-        : null;
+      hasMore && result.length > 0 ? result[result.length - 1].id : null;
 
     return { notifications: result, hasMore, nextCursor };
   }

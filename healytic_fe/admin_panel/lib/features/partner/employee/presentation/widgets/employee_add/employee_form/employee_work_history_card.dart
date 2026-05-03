@@ -183,19 +183,13 @@ class _EmployeeWorkHistoryCardState extends State<EmployeeWorkHistoryCard> {
     Map<String, dynamic>? existing,
   }) {
     final facilityCtrl = TextEditingController(
-      text: existing?[WorkHistoryKey.facility]
-          as String? ??
-          '',
+      text: existing?[WorkHistoryKey.facility] as String? ?? '',
     );
     final positionCtrl = TextEditingController(
-      text: existing?[WorkHistoryKey.position]
-          as String? ??
-          '',
+      text: existing?[WorkHistoryKey.position] as String? ?? '',
     );
     final periodCtrl = TextEditingController(
-      text: existing?[WorkHistoryKey.period]
-          as String? ??
-          '',
+      text: existing?[WorkHistoryKey.period] as String? ?? '',
     );
 
     return showDialog<Map<String, dynamic>>(
@@ -251,14 +245,10 @@ class _EmployeeWorkHistoryCardState extends State<EmployeeWorkHistoryCard> {
                     return;
                   }
                   Navigator.pop(ctx, {
-                    WorkHistoryKey.facility:
-                        facilityCtrl.text,
-                    WorkHistoryKey.position:
-                        positionCtrl.text,
-                    WorkHistoryKey.period:
-                        periodCtrl.text,
-                    WorkHistoryKey.isCurrent:
-                        false,
+                    WorkHistoryKey.facility: facilityCtrl.text,
+                    WorkHistoryKey.position: positionCtrl.text,
+                    WorkHistoryKey.period: periodCtrl.text,
+                    WorkHistoryKey.isCurrent: false,
                   });
                 },
                 child: Text(existing != null ? 'Update' : 'Add'),
@@ -309,9 +299,7 @@ class _WorkHistoryEntryTile extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        entry[WorkHistoryKey.facility]
-                                as String? ??
-                            '',
+                        entry[WorkHistoryKey.facility] as String? ?? '',
                         style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -323,9 +311,7 @@ class _WorkHistoryEntryTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  entry[WorkHistoryKey.position]
-                          as String? ??
-                      '',
+                  entry[WorkHistoryKey.position] as String? ?? '',
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -334,9 +320,7 @@ class _WorkHistoryEntryTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  entry[WorkHistoryKey.period]
-                          as String? ??
-                      '',
+                  entry[WorkHistoryKey.period] as String? ?? '',
                   style: textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

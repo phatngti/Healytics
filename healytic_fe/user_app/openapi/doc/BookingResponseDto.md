@@ -11,13 +11,13 @@ Name | Type | Description | Notes
 **id** | **String** |  | 
 **userId** | **String** |  | 
 **staffId** | **String** |  | 
-**productId** | [**Object**](.md) |  | [optional] 
+**productId** | **String** |  | [optional] 
 **startTime** | [**DateTime**](DateTime.md) |  | 
-**endTime** | [**Object**](.md) |  | [optional] 
-**status** | **String** |  | 
-**paymentUrl** | [**Object**](.md) |  | [optional] 
-**paymentExpiresAt** | [**Object**](.md) |  | [optional] 
-**notes** | [**Object**](.md) |  | [optional] 
+**endTime** | [**DateTime**](DateTime.md) |  | [optional] 
+**status** | [**BookingStatus**](BookingStatus.md) |  | 
+**paymentUrl** | **String** |  | [optional] 
+**paymentExpiresAt** | [**DateTime**](DateTime.md) |  | [optional] 
+**notes** | **String** |  | [optional] 
 **createdAt** | [**DateTime**](DateTime.md) |  | 
 **updatedAt** | [**DateTime**](DateTime.md) |  | 
 

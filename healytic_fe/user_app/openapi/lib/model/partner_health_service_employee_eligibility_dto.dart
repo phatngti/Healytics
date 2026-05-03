@@ -18,6 +18,7 @@ class PartnerHealthServiceEmployeeEligibilityDto {
     required this.isPrimary,
   });
 
+
   /// Product ID
   String productId;
 

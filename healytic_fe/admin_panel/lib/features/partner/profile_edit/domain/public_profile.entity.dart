@@ -6,8 +6,7 @@ part 'public_profile.entity.freezed.dart';
 /// Contains both read-only business context and
 /// the editable storefront section.
 @freezed
-abstract class PartnerPublicProfileEntity
-    with _$PartnerPublicProfileEntity {
+abstract class PartnerPublicProfileEntity with _$PartnerPublicProfileEntity {
   const factory PartnerPublicProfileEntity({
     required String id,
     required PublicProfileBusinessInfo businessInfo,
@@ -15,15 +14,13 @@ abstract class PartnerPublicProfileEntity
     PublicProfileLegalSummary? legalSummary,
     required String verificationStatus,
     required PublicProfileStorefront storefront,
-    required PublicProfileCompletionSummary
-        completionSummary,
+    required PublicProfileCompletionSummary completionSummary,
   }) = _PartnerPublicProfileEntity;
 }
 
 /// Read-only verified business identity data.
 @freezed
-abstract class PublicProfileBusinessInfo
-    with _$PublicProfileBusinessInfo {
+abstract class PublicProfileBusinessInfo with _$PublicProfileBusinessInfo {
   const factory PublicProfileBusinessInfo({
     required String brandName,
     required String legalName,
@@ -39,16 +36,13 @@ abstract class PublicProfileBusinessInfo
 /// province) with id and display name.
 @freezed
 abstract class LocationRef with _$LocationRef {
-  const factory LocationRef({
-    required String id,
-    required String name,
-  }) = _LocationRef;
+  const factory LocationRef({required String id, required String name}) =
+      _LocationRef;
 }
 
 /// Read-only partner address information.
 @freezed
-abstract class PublicProfileAddress
-    with _$PublicProfileAddress {
+abstract class PublicProfileAddress with _$PublicProfileAddress {
   const factory PublicProfileAddress({
     required String streetAddress,
     LocationRef? ward,
@@ -62,8 +56,7 @@ abstract class PublicProfileAddress
 
 /// Read-only legal representative summary.
 @freezed
-abstract class PublicProfileLegalSummary
-    with _$PublicProfileLegalSummary {
+abstract class PublicProfileLegalSummary with _$PublicProfileLegalSummary {
   const factory PublicProfileLegalSummary({
     required String fullName,
     required String position,
@@ -75,22 +68,19 @@ abstract class PublicProfileLegalSummary
 /// Editable storefront fields shown on the
 /// partner's public clinic page.
 @freezed
-abstract class PublicProfileStorefront
-    with _$PublicProfileStorefront {
+abstract class PublicProfileStorefront with _$PublicProfileStorefront {
   const factory PublicProfileStorefront({
     String? coverImageUrl,
     String? logoImageUrl,
     String? description,
     @Default([]) List<String> gallery,
-    @Default([])
-    List<PublicProfileCertification> certifications,
+    @Default([]) List<PublicProfileCertification> certifications,
   }) = _PublicProfileStorefront;
 }
 
 /// A single trust badge or certification.
 @freezed
-abstract class PublicProfileCertification
-    with _$PublicProfileCertification {
+abstract class PublicProfileCertification with _$PublicProfileCertification {
   const factory PublicProfileCertification({
     String? id,
     required String title,
@@ -102,8 +92,7 @@ abstract class PublicProfileCertification
 
 /// Single item in the server-derived checklist.
 @freezed
-abstract class PublicProfileChecklistItem
-    with _$PublicProfileChecklistItem {
+abstract class PublicProfileChecklistItem with _$PublicProfileChecklistItem {
   const factory PublicProfileChecklistItem({
     required String key,
     required String label,
@@ -117,8 +106,7 @@ abstract class PublicProfileChecklistItem
 abstract class PublicProfileCompletionSummary
     with _$PublicProfileCompletionSummary {
   const factory PublicProfileCompletionSummary({
-    @Default([])
-    List<PublicProfileChecklistItem> checklist,
+    @Default([]) List<PublicProfileChecklistItem> checklist,
     @Default(0) int completionPercent,
     @Default(false) bool isCompleted,
   }) = _PublicProfileCompletionSummary;
@@ -127,8 +115,7 @@ abstract class PublicProfileCompletionSummary
 /// Request payload for `PUT /public-profile`.
 /// Null fields mean "don't change".
 @freezed
-abstract class PublicProfileUpdateRequest
-    with _$PublicProfileUpdateRequest {
+abstract class PublicProfileUpdateRequest with _$PublicProfileUpdateRequest {
   const factory PublicProfileUpdateRequest({
     String? coverImageUrl,
     String? logoImageUrl,

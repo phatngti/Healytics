@@ -19,6 +19,7 @@ class ChatbotRecommenderRequest {
     this.filteredIds = const [],
   });
 
+
   String conversationId;
 
   String query;

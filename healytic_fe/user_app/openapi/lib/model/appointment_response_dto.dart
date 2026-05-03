@@ -27,10 +27,14 @@ class AppointmentResponseDto {
     required this.checkOutTime,
     required this.duration,
     required this.isReviewed,
-    required this.distanceKm,
-    required this.healthPartnerId,
-    required this.serviceId,
+    this.distanceKm,
+    this.healthPartnerId,
+    this.serviceId,
+    this.paymentUrl,
+    this.paymentDeeplink,
+    this.paymentExpiresAt,
   });
+
 
   String id;
 
@@ -40,7 +44,7 @@ class AppointmentResponseDto {
 
   String imageUrl;
 
-  AppointmentResponseDtoStatusEnum status;
+  AppointmentStatus status;
 
   String category;
 
@@ -65,10 +69,19 @@ class AppointmentResponseDto {
   num? distanceKm;
 
   /// Account ID of the health partner (vendor). Used for chat.
-  Object? healthPartnerId;
+  String? healthPartnerId;
 
   /// Product/service ID for navigation to service details.
-  Object? serviceId;
+  String? serviceId;
+
+  /// Payment gateway checkout URL. Only present when status is pending_payment.
+  String? paymentUrl;
+
+  /// Deep link to open payment app directly (mobile). Only present when status is pending_payment.
+  String? paymentDeeplink;
+
+  /// ISO 8601 timestamp when the payment link expires. Only present when status is pending_payment.
+  String? paymentExpiresAt;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is AppointmentResponseDto &&
@@ -88,7 +101,10 @@ class AppointmentResponseDto {
     other.isReviewed == isReviewed &&
     other.distanceKm == distanceKm &&
     other.healthPartnerId == healthPartnerId &&
-    other.serviceId == serviceId;
+    other.serviceId == serviceId &&
+    other.paymentUrl == paymentUrl &&
+    other.paymentDeeplink == paymentDeeplink &&
+    other.paymentExpiresAt == paymentExpiresAt;
 
   @override
   int get hashCode =>
@@ -109,10 +125,13 @@ class AppointmentResponseDto {
     (isReviewed.hashCode) +
     (distanceKm == null ? 0 : distanceKm!.hashCode) +
     (healthPartnerId == null ? 0 : healthPartnerId!.hashCode) +
-    (serviceId == null ? 0 : serviceId!.hashCode);
+    (serviceId == null ? 0 : serviceId!.hashCode) +
+    (paymentUrl == null ? 0 : paymentUrl!.hashCode) +
+    (paymentDeeplink == null ? 0 : paymentDeeplink!.hashCode) +
+    (paymentExpiresAt == null ? 0 : paymentExpiresAt!.hashCode);
 
   @override
-  String toString() => 'AppointmentResponseDto[id=$id, serviceName=$serviceName, healthPartnerName=$healthPartnerName, imageUrl=$imageUrl, status=$status, category=$category, specialistName=$specialistName, specialistId=$specialistId, address=$address, date=$date, checkInTime=$checkInTime, checkOutTime=$checkOutTime, duration=$duration, isReviewed=$isReviewed, distanceKm=$distanceKm, healthPartnerId=$healthPartnerId, serviceId=$serviceId]';
+  String toString() => 'AppointmentResponseDto[id=$id, serviceName=$serviceName, healthPartnerName=$healthPartnerName, imageUrl=$imageUrl, status=$status, category=$category, specialistName=$specialistName, specialistId=$specialistId, address=$address, date=$date, checkInTime=$checkInTime, checkOutTime=$checkOutTime, duration=$duration, isReviewed=$isReviewed, distanceKm=$distanceKm, healthPartnerId=$healthPartnerId, serviceId=$serviceId, paymentUrl=$paymentUrl, paymentDeeplink=$paymentDeeplink, paymentExpiresAt=$paymentExpiresAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -145,6 +164,21 @@ class AppointmentResponseDto {
     } else {
       json[r'serviceId'] = null;
     }
+    if (this.paymentUrl != null) {
+      json[r'paymentUrl'] = this.paymentUrl;
+    } else {
+      json[r'paymentUrl'] = null;
+    }
+    if (this.paymentDeeplink != null) {
+      json[r'paymentDeeplink'] = this.paymentDeeplink;
+    } else {
+      json[r'paymentDeeplink'] = null;
+    }
+    if (this.paymentExpiresAt != null) {
+      json[r'paymentExpiresAt'] = this.paymentExpiresAt;
+    } else {
+      json[r'paymentExpiresAt'] = null;
+    }
     return json;
   }
 
@@ -171,7 +205,7 @@ class AppointmentResponseDto {
         serviceName: mapValueOfType<String>(json, r'serviceName')!,
         healthPartnerName: mapValueOfType<String>(json, r'healthPartnerName')!,
         imageUrl: mapValueOfType<String>(json, r'imageUrl')!,
-        status: AppointmentResponseDtoStatusEnum.fromJson(json[r'status'])!,
+        status: AppointmentStatus.fromJson(json[r'status'])!,
         category: mapValueOfType<String>(json, r'category')!,
         specialistName: mapValueOfType<String>(json, r'specialistName')!,
         specialistId: mapValueOfType<String>(json, r'specialistId')!,
@@ -184,8 +218,11 @@ class AppointmentResponseDto {
         distanceKm: json[r'distanceKm'] == null
             ? null
             : num.parse('${json[r'distanceKm']}'),
-        healthPartnerId: mapValueOfType<Object>(json, r'healthPartnerId'),
-        serviceId: mapValueOfType<Object>(json, r'serviceId'),
+        healthPartnerId: mapValueOfType<String>(json, r'healthPartnerId'),
+        serviceId: mapValueOfType<String>(json, r'serviceId'),
+        paymentUrl: mapValueOfType<String>(json, r'paymentUrl'),
+        paymentDeeplink: mapValueOfType<String>(json, r'paymentDeeplink'),
+        paymentExpiresAt: mapValueOfType<String>(json, r'paymentExpiresAt'),
       );
     }
     return null;
@@ -247,86 +284,6 @@ class AppointmentResponseDto {
     'checkOutTime',
     'duration',
     'isReviewed',
-    'distanceKm',
-    'healthPartnerId',
-    'serviceId',
   };
 }
-
-
-class AppointmentResponseDtoStatusEnum {
-  /// Instantiate a new enum with the provided [value].
-  const AppointmentResponseDtoStatusEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const upcoming = AppointmentResponseDtoStatusEnum._(r'upcoming');
-  static const completed = AppointmentResponseDtoStatusEnum._(r'completed');
-  static const canceled = AppointmentResponseDtoStatusEnum._(r'canceled');
-
-  /// List of all possible values in this [enum][AppointmentResponseDtoStatusEnum].
-  static const values = <AppointmentResponseDtoStatusEnum>[
-    upcoming,
-    completed,
-    canceled,
-  ];
-
-  static AppointmentResponseDtoStatusEnum? fromJson(dynamic value) => AppointmentResponseDtoStatusEnumTypeTransformer().decode(value);
-
-  static List<AppointmentResponseDtoStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <AppointmentResponseDtoStatusEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = AppointmentResponseDtoStatusEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [AppointmentResponseDtoStatusEnum] to String,
-/// and [decode] dynamic data back to [AppointmentResponseDtoStatusEnum].
-class AppointmentResponseDtoStatusEnumTypeTransformer {
-  factory AppointmentResponseDtoStatusEnumTypeTransformer() => _instance ??= const AppointmentResponseDtoStatusEnumTypeTransformer._();
-
-  const AppointmentResponseDtoStatusEnumTypeTransformer._();
-
-  String encode(AppointmentResponseDtoStatusEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a AppointmentResponseDtoStatusEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  AppointmentResponseDtoStatusEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'upcoming': return AppointmentResponseDtoStatusEnum.upcoming;
-        case r'completed': return AppointmentResponseDtoStatusEnum.completed;
-        case r'canceled': return AppointmentResponseDtoStatusEnum.canceled;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [AppointmentResponseDtoStatusEnumTypeTransformer] instance.
-  static AppointmentResponseDtoStatusEnumTypeTransformer? _instance;
-}
-
 

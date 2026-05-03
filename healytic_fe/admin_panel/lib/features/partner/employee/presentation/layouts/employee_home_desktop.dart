@@ -1,4 +1,4 @@
-import 'package:common/widgets/card/statistic_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_analytics/employee_overview_analytics.widget.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_home/employee_management_table.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -15,56 +15,7 @@ class EmployeeHomeDesktop extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Summary',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                AppDimens.verticalSmall,
-                Text(
-                  'Overview of your employees',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                AppDimens.verticalSmall,
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      StatisticCard(
-                        label: 'Total Employees',
-                        value: '100',
-                        change: 10,
-                      ),
-                      AppDimens.horizontalMedium,
-                      const StatisticCard(
-                        label: 'Active Employees',
-                        value: '100',
-                        change: 10,
-                      ),
-                      AppDimens.horizontalMedium,
-                      const StatisticCard(
-                        label: 'Inactive Employees',
-                        value: '100',
-                        change: 10,
-                      ),
-                      AppDimens.horizontalMedium,
-                      const StatisticCard(
-                        label: 'Deleted Employees',
-                        value: '100',
-                        change: 10,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            const EmployeeOverviewAnalyticsSection(),
             AppDimens.verticalLarge,
             Text(
               'Employee Management',

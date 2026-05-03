@@ -22,6 +22,7 @@ class PartnerPublicProfileResponseDto {
     required this.completionSummary,
   });
 
+
   String id;
 
   PublicProfileBusinessInfoDto businessInfo;

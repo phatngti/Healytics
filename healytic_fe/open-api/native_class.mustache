@@ -289,7 +289,9 @@ class {{{classname}}} {
   static const requiredKeys = <String>{
 {{#vars}}
   {{#required}}
+    {{^isNullable}}
     '{{{baseName}}}',
+    {{/isNullable}}
   {{/required}}
 {{/vars}}
   };

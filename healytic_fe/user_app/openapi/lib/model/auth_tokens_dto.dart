@@ -19,6 +19,7 @@ class AuthTokensDto {
     required this.refreshExpiresIn,
   });
 
+
   String accessToken;
 
   String refreshToken;

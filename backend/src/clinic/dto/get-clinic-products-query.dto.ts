@@ -22,7 +22,13 @@ export enum ClinicProductSortOption {
  * Query DTO for paginated & filtered clinic products listing.
  */
 export class GetClinicProductsQueryDto {
-
+  @ApiPropertyOptional({
+    description: 'Filter products by category ID',
+    format: 'uuid',
+  })
+  @IsOptional()
+  @IsUUID()
+  categoryId?: string;
 
   @ApiPropertyOptional({
     description: 'Sort order for products',

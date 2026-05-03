@@ -7,14 +7,12 @@ abstract class PublicProfileRepository {
   /// Loads the full public profile aggregate
   /// including read-only context and editable
   /// storefront fields.
-  Future<PartnerPublicProfileEntity>
-      getPublicProfile();
+  Future<PartnerPublicProfileEntity> getPublicProfile();
 
   /// Persists updated storefront fields and
   /// returns the refreshed profile aggregate
   /// with recalculated completion summary.
-  Future<PartnerPublicProfileEntity>
-      updatePublicProfile(
+  Future<PartnerPublicProfileEntity> updatePublicProfile(
     PublicProfileUpdateRequest request,
   );
 }

@@ -20,6 +20,7 @@ class UpdatePartnerProfileCompletionDto {
     this.certifications = const [],
   });
 
+
   /// Public clinic cover image URL
   ///
   /// Please note: This property should have been non-nullable! Since the specification file

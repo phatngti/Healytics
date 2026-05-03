@@ -83,6 +83,7 @@ class ServiceDetailsRemoteDatasourceImpl
         id: dto.clinic.id,
         name: dto.clinic.name,
         address: dto.clinic.address,
+        imageUrl: dto.clinic.avatarUrl?.toString() ?? '',
       ),
       facilityImages: dto.facilityImages
           .map((f) => FacilityImageEntity(imageUrl: f.imageUrl, label: f.label))

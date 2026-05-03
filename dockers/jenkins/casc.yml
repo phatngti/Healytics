@@ -1,0 +1,172 @@
+# Jenkins Configuration as Code (JCasC)
+# Docs: https://plugins.jenkins.io/configuration-as-code/
+#
+# This file is mounted into the Jenkins controller and auto-applied at startup.
+# It pre-creates the admin user, security settings, and the "local-docker-builder"
+# inbound agent — no manual UI setup needed.
+#
+# SECURITY: Zero GitHub credentials on the VPS.
+#   - The controller receives GitHub webhooks and dispatches builds.
+#   - The agent (local machine) clones the repo via SSH using its mounted keys.
+#   - No PAT, no GitHub token — nothing to leak.
+
+jenkins:
+  # The controller only schedules work. CI/build/deploy stages run on the
+  # trusted local inbound agent so deploy credentials stay off the VPS.
+  numExecutors: 0
+  labelString: "controller"
+
+  # --- Admin Authentication ---
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: admin
+          password: "${JENKINS_ADMIN_PASSWORD:-admin}"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  nodes:
+    - permanent:
+        name: "local-docker-builder"
+        remoteFS: "/home/jenkins/agent"
+        numExecutors: 2
+        mode: EXCLUSIVE
+        labelString: "local-docker-builder"
+        retentionStrategy: "always"
+        launcher:
+          jnlp:
+            webSocket: true
+            workDirSettings:
+              disabled: false
+              failIfWorkDirIsMissing: false
+
+  # Agents connect via WebSocket (primary) or TCP/50000 (fallback).
+  slaveAgentPort: 50000
+
+# --- Pipeline Job (webhook-triggered, pipeline from dedicated jenkinfiles repo) ---
+#
+# How it works:
+#   1. Developer pushes to phatngti/Healytics on GitHub
+#   2. GitHub webhook → Cloudflare Tunnel → Jenkins controller (VPS)
+#   3. Generic Webhook Trigger extracts branch/ref from the payload
+#   4. Jenkins fetches the Jenkinsfile from phatngti/jenkinfiles (lightweight checkout)
+#   5. Build runs on the "local-docker-builder" agent (local machine)
+#   6. Agent clones the Healytics repo via SSH (using ~/.ssh mounted from host)
+#
+# Webhook URL:
+#   POST <JENKINS_URL>/generic-webhook-trigger/invoke?token=<WEBHOOK_TOKEN>
+#
+jobs:
+  - script: |
+      pipelineJob('healytics-backend') {
+        displayName('Healytics Backend')
+        description('CI/CD pipeline for backend — webhook-triggered, pipeline from jenkinfiles repo')
+
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/phatngti/jenkinfiles.git')
+                }
+                branches('*/main')
+              }
+            }
+            scriptPath('backend/Jenkinsfile')
+            lightweight(true)
+          }
+        }
+
+        // --- Webhook Trigger ---
+        // GitHub sends a POST with the push payload; the Generic Webhook Trigger
+        // plugin extracts the branch name from $.ref.
+        triggers {
+          genericTrigger {
+            genericVariables {
+              genericVariable {
+                key('GIT_REF')
+                value('\$.ref')
+              }
+            }
+
+            // Only trigger for pushes to this repo
+            regexpFilterText('\$GIT_REF')
+            regexpFilterExpression('refs/heads/.*')
+
+            // Shared secret token — authenticates that the webhook is from GitHub
+            token("${WEBHOOK_TOKEN}")
+
+            causeString('Webhook push to \$GIT_REF')
+            printContributedVariables(false)
+            printPostContent(false)
+          }
+        }
+
+        parameters {
+          stringParam('BRANCH_TO_BUILD', 'main', 'Branch to build (auto-set by webhook)')
+          stringParam('GIT_REF', '', 'Raw git ref from webhook payload (e.g. refs/heads/main)')
+        }
+
+        properties {
+          disableConcurrentBuilds()
+        }
+      }
+
+  - script: |
+      pipelineJob('healytics-panel') {
+        displayName('Healytics Admin Panel')
+        description('CI/CD pipeline for admin panel (Flutter web) — webhook-triggered, pipeline from jenkinfiles repo')
+
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/phatngti/jenkinfiles.git')
+                }
+                branches('*/main')
+              }
+            }
+            scriptPath('panel/Jenkinsfile')
+            lightweight(true)
+          }
+        }
+
+        triggers {
+          genericTrigger {
+            genericVariables {
+              genericVariable {
+                key('GIT_REF')
+                value('\$.ref')
+              }
+            }
+
+            regexpFilterText('\$GIT_REF')
+            regexpFilterExpression('refs/heads/.*')
+
+            // Use a separate token so the panel pipeline is independently triggerable.
+            // Webhook URL: POST <JENKINS_URL>/generic-webhook-trigger/invoke?token=<WEBHOOK_TOKEN_PANEL>
+            token("${WEBHOOK_TOKEN_PANEL}")
+
+            causeString('Webhook push to \$GIT_REF')
+            printContributedVariables(false)
+            printPostContent(false)
+          }
+        }
+
+        parameters {
+          stringParam('BRANCH_TO_BUILD', 'main', 'Branch to build (auto-set by webhook)')
+          stringParam('GIT_REF', '', 'Raw git ref from webhook payload (e.g. refs/heads/main)')
+        }
+
+        properties {
+          disableConcurrentBuilds()
+        }
+      }
+
+unclassified:
+  location:
+    url: "${JENKINS_URL}"

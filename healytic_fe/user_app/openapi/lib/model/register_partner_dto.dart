@@ -18,6 +18,7 @@ class RegisterPartnerDto {
     required this.legalRepresentative,
   });
 
+
   /// Account credentials for login
   AccountRequestDto account;
 

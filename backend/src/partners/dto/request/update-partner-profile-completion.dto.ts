@@ -1,6 +1,7 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsInt,
   IsOptional,
@@ -63,44 +64,51 @@ export class UpdatePartnerCertificationDto {
 }
 
 export class UpdatePartnerProfileCompletionDto {
-  @ApiPropertyOptional({
-    description: 'Public clinic cover image URL',
+  @ApiProperty({
+    description:
+      'Public clinic cover image URL (required to complete your profile)',
     example: 'https://cdn.example.com/clinic-cover.jpg',
   })
-  @IsOptional()
   @IsUrl()
-  coverImageUrl?: string;
+  coverImageUrl: string;
 
-  @ApiPropertyOptional({
-    description: 'Public clinic logo image URL',
+  @ApiProperty({
+    description:
+      'Public clinic logo image URL (required to complete your profile)',
     example: 'https://cdn.example.com/clinic-logo.jpg',
   })
-  @IsOptional()
   @IsUrl()
-  logoImageUrl?: string;
+  logoImageUrl: string;
 
-  @ApiPropertyOptional({
-    description: 'Public clinic profile description',
+  @ApiProperty({
+    description:
+      'Public clinic profile description (min 120 characters, required to complete your profile)',
     example: 'A modern wellness clinic focused on long-term care.',
+    minLength: 120,
+    maxLength: 1_000_000_000,
   })
-  @IsOptional()
   @IsString()
-  @MaxLength(1000)
-  description?: string;
+  @MinLength(120)
+  @MaxLength(1_000_000_000)
+  description: string;
 
-  @ApiPropertyOptional({
-    description: 'Gallery image URLs shown on the clinic profile',
+  @ApiProperty({
+    description:
+      'Gallery image URLs shown on the clinic profile (min 3, required to complete your profile)',
     type: [String],
+    minItems: 3,
+    maxItems: 8,
     example: [
       'https://cdn.example.com/gallery-1.jpg',
       'https://cdn.example.com/gallery-2.jpg',
+      'https://cdn.example.com/gallery-3.jpg',
     ],
   })
-  @IsOptional()
   @IsArray()
+  @ArrayMinSize(3)
   @ArrayMaxSize(8)
   @IsUrl({}, { each: true })
-  gallery?: string[];
+  gallery: string[];
 
   @ApiPropertyOptional({
     description: 'Optional trust badges/certifications shown on the clinic',

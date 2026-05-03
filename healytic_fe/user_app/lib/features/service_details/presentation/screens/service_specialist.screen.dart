@@ -172,7 +172,6 @@ class _ServiceSpecialistScreenState
     );
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -296,6 +295,7 @@ class _ServiceSpecialistBody
                 employeeId: specialists[
                         selectedSpecialistIdx]
                     .id,
+                currentServiceId: serviceId,
                 selectedDate: DateTime.now().add(
                   Duration(days: selectedDateIdx),
                 ),

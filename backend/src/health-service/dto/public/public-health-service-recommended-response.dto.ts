@@ -2,13 +2,13 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Product } from '@/common/entities/product.entity';
 
 export class PublicHealthServiceRecommendedResponseDto {
-  @ApiProperty() id: string;
-  @ApiProperty() title: string;
-  @ApiPropertyOptional() imageUrl: string | null;
-  @ApiProperty({ example: 4.9 }) rating: number;
-  @ApiProperty({ example: '(500+ Reviews)' }) reviewLabel: string;
-  @ApiProperty({ example: '1.2k+ Booked' }) bookedLabel: string;
-  @ApiProperty({ example: '350.000₫' }) price: string;
+  @ApiProperty({ type: String }) id: string;
+  @ApiProperty({ type: String }) title: string;
+  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl: string | null;
+  @ApiProperty({ type: Number, example: 4.9 }) rating: number;
+  @ApiProperty({ type: String, example: '(500+ Reviews)' }) reviewLabel: string;
+  @ApiProperty({ type: String, example: '1.2k+ Booked' }) bookedLabel: string;
+  @ApiProperty({ type: String, example: '350.000₫' }) price: string;
 
   static fromEntity(
     product: Product,

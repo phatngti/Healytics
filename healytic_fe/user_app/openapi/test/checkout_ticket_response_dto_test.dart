@@ -48,13 +48,13 @@ void main() {
     });
 
     // Booking ID when checkout succeeds
-    // Object bookingId
+    // String bookingId
     test('to test the property `bookingId`', () async {
       // TODO
     });
 
     // Error message when checkout fails
-    // Object errorMessage
+    // String errorMessage
     test('to test the property `errorMessage`', () async {
       // TODO
     });

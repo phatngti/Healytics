@@ -40,6 +40,7 @@ class CreateDoctorDto {
     this.partnerId,
   });
 
+
   /// First name
   String firstName;
 

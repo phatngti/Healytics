@@ -25,9 +25,8 @@ class _CategoryAddScreenState extends ConsumerState<CategoryAddScreen> {
   Future<void> _handleSubmit(Map<String, dynamic> values) async {
     try {
       // TODO: Implement actual category creation via provider
-      final categoryName = values[
-        CategoryFormField.categoryName.key
-      ]?.toString().trim() ?? '';
+      final categoryName =
+          values[CategoryFormField.categoryName.key]?.toString().trim() ?? '';
 
       // Simulate API call
       await Future.delayed(const Duration(milliseconds: 500));
@@ -89,17 +88,11 @@ class _CategoryAddScreenState extends ConsumerState<CategoryAddScreen> {
   }
 
   static Map<String, dynamic> _buildAutofillValues() => {
-    CategoryFormField.categoryName.key:
-        CategoryAddAutofill.name,
-    CategoryFormField.description.key:
-        CategoryAddAutofill.description,
-    CategoryFormField.status.key:
-        CategoryAddAutofill.status,
-    CategoryFormField.sortOrder.key:
-        CategoryAddAutofill.sortOrder,
-    CategoryFormField.iconName.key:
-        CategoryAddAutofill.iconName,
-    CategoryFormField.colorHex.key:
-        CategoryAddAutofill.colorHex,
+    CategoryFormField.categoryName.key: CategoryAddAutofill.name,
+    CategoryFormField.description.key: CategoryAddAutofill.description,
+    CategoryFormField.status.key: CategoryAddAutofill.status,
+    CategoryFormField.sortOrder.key: CategoryAddAutofill.sortOrder,
+    CategoryFormField.iconName.key: CategoryAddAutofill.iconName,
+    CategoryFormField.colorHex.key: CategoryAddAutofill.colorHex,
   };
 }

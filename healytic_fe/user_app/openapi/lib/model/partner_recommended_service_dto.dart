@@ -21,17 +21,12 @@ class PartnerRecommendedServiceDto {
     required this.price,
   });
 
+
   String id;
 
   String title;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? imageUrl;
+  String? imageUrl;
 
   num rating;
 
@@ -97,7 +92,7 @@ class PartnerRecommendedServiceDto {
       return PartnerRecommendedServiceDto(
         id: mapValueOfType<String>(json, r'id')!,
         title: mapValueOfType<String>(json, r'title')!,
-        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
+        imageUrl: mapValueOfType<String>(json, r'imageUrl'),
         rating: num.parse('${json[r'rating']}'),
         reviewCount: num.parse('${json[r'reviewCount']}'),
         price: mapValueOfType<String>(json, r'price')!,

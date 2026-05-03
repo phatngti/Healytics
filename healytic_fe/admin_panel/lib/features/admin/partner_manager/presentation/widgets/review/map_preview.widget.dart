@@ -1,5 +1,4 @@
-import 'package:admin_panel/core/entities/store.entity.dart'
-    show Store;
+import 'package:admin_panel/core/entities/store.entity.dart' show Store;
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -26,8 +25,7 @@ class MapPreviewWidget extends StatelessWidget {
   /// Height of the map container
   final double height;
 
-  bool get _hasCoordinates =>
-      latitude != null && longitude != null;
+  bool get _hasCoordinates => latitude != null && longitude != null;
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +36,7 @@ class MapPreviewWidget extends StatelessWidget {
     final center = LatLng(latitude!, longitude!);
 
     return ClipRRect(
-      borderRadius: const BorderRadius.all(
-        Radius.circular(8),
-      ),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
       child: SizedBox(
         height: height,
         child: IgnorePointer(
@@ -55,8 +51,7 @@ class MapPreviewWidget extends StatelessWidget {
             children: [
               TileLayer(
                 urlTemplate: _tileUrlTemplate,
-                userAgentPackageName:
-                    'com.healytics.admin',
+                userAgentPackageName: 'com.healytics.admin',
                 maxZoom: 18,
               ),
               MarkerLayer(
@@ -79,9 +74,7 @@ class MapPreviewWidget extends StatelessWidget {
   /// Returns Mapbox raster tile URL when a token
   /// is configured, otherwise falls back to OSM.
   String get _tileUrlTemplate {
-    final token = Store.tryGet<String>(
-      StoreKey.mapboxAccessToken,
-    );
+    final token = Store.tryGet<String>(StoreKey.mapboxAccessToken);
     if (token != null && token.isNotEmpty) {
       return 'https://api.mapbox.com/styles/v1/'
           'mapbox/streets-v12/tiles/{z}/{x}/{y}'
@@ -100,11 +93,7 @@ class _LocationPin extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Icon(
-      Icons.location_on,
-      color: colorScheme.error,
-      size: 32,
-    );
+    return Icon(Icons.location_on, color: colorScheme.error, size: 32);
   }
 }
 

@@ -32,6 +32,36 @@ const SEED_FEATURE_TAGS = [
     description: 'Skincare and dermatology services',
     colorValue: '#FF9C27B0',
   },
+  {
+    name: 'Dental Care',
+    description: 'Dental treatments, cleaning and cosmetic dentistry',
+    colorValue: '#FF00BCD4',
+  },
+  {
+    name: 'Fitness',
+    description: 'Fitness, yoga and recovery-focused services',
+    colorValue: '#FF009688',
+  },
+  {
+    name: 'Nutrition',
+    description: 'Nutrition consultation and meal planning services',
+    colorValue: '#FF8BC34A',
+  },
+  {
+    name: 'Traditional Medicine',
+    description: 'Traditional medicine and acupuncture services',
+    colorValue: '#FF795548',
+  },
+  {
+    name: 'Mental Wellness',
+    description: 'Psychology, counseling and stress management services',
+    colorValue: '#FF607D8B',
+  },
+  {
+    name: 'Dermatology',
+    description: 'Dermatology consultation and skin treatment services',
+    colorValue: '#FF673AB7',
+  },
 ];
 
 @Injectable()
@@ -49,10 +79,14 @@ export class ServiceTagSeeder implements ISeeder {
   async seed(): Promise<void> {
     this.logger.log('Seeding product feature tags...');
 
-    // Requires an admin user to attach tags to
-    const adminUser = await this.accountRepo.findOne({
-      where: { role: Role.HEALTH_PARTNER },
-    });
+    // Tags are owned by the primary seed partner account for deterministic lookup.
+    const adminUser =
+      (await this.accountRepo.findOne({
+        where: { email: 'partner@healytics.vn', role: Role.HEALTH_PARTNER },
+      })) ??
+      (await this.accountRepo.findOne({
+        where: { role: Role.HEALTH_PARTNER },
+      }));
 
     if (!adminUser) {
       this.logger.warn(

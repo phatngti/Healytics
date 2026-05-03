@@ -1,8 +1,11 @@
-import 'package:admin_panel/features/partner/dashboard/domain/inventory_alert.entity.dart';
-import 'package:admin_panel/features/partner/dashboard/presentation/widgets/dashboard_panel.widget.dart';
-import 'package:admin_panel/features/partner/dashboard/presentation/widgets/dashboard_section_header.widget.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../../domain/inventory_alert.entity.dart';
+import 'dashboard_constants.dart';
+import 'dashboard_panel.widget.dart';
+import 'dashboard_section_header.widget.dart';
 
 /// Inventory alert cards showing low-stock items.
 class InventoryAlertsWidget extends StatelessWidget {
@@ -16,7 +19,7 @@ class InventoryAlertsWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DashboardSectionHeader(
+          const DashboardSectionHeader(
             title: 'Inventory Alerts',
             icon: Icons.inventory_rounded,
           ),
@@ -25,7 +28,7 @@ class InventoryAlertsWidget extends StatelessWidget {
           else
             ...alerts.map(
               (a) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: AppDimens.spaceMd.paddingBottom,
                 child: _AlertItem(alert: a),
               ),
             ),
@@ -42,7 +45,7 @@ class _AlertItem extends StatelessWidget {
 
   Color _severityColor(ColorScheme cs) => switch (alert.severity) {
     'critical' => cs.error,
-    'warning' => const Color(0xFFEA8C00),
+    'warning' => DashboardColors.pending,
     _ => cs.primary,
   };
 
@@ -73,25 +76,25 @@ class _AlertItem extends StatelessWidget {
     final color = _severityColor(colorScheme);
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(AppDimens.spaceMdLg),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppDimens.radiusMediumSmall,
         border: Border.all(color: color.withValues(alpha: 0.24)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: DashboardSizes.iconContainer,
+            height: DashboardSizes.iconContainer,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppDimens.radiusMediumSmall,
             ),
-            child: Icon(_icon, size: 20, color: color),
+            child: Icon(_icon, size: AppDimens.iconMd, color: color),
           ),
-          const SizedBox(width: 12),
+          AppDimens.horizontalMediumSmall,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,33 +106,33 @@ class _AlertItem extends StatelessWidget {
                       child: Text(
                         alert.productName,
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: AppDimens.fontWeightBold,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    AppDimens.horizontalMediumSmall,
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
+                        horizontal: AppDimens.spaceSmMd,
+                        vertical: AppDimens.spaceXs + 1,
                       ),
                       decoration: BoxDecoration(
                         color: color.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: AppDimens.radiusPill,
                       ),
                       child: Text(
                         _severityLabel,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: color,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: AppDimens.fontWeightBold,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                AppDimens.verticalSmall,
                 Text(
                   alert.message,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -139,10 +142,10 @@ class _AlertItem extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 10),
+                AppDimens.spaceSmMd.verticalSpace,
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: AppDimens.spaceSm,
+                  runSpacing: AppDimens.spaceSm,
                   children: [
                     _MetaPill(
                       label: _alertTypeLabel,
@@ -192,16 +195,19 @@ class _MetaPill extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimens.spaceSmMd,
+        vertical: AppDimens.spaceXs + 1,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppDimens.radiusPill,
       ),
       child: Text(
         label,
         style: theme.textTheme.labelSmall?.copyWith(
           color: color,
-          fontWeight: FontWeight.w600,
+          fontWeight: AppDimens.fontWeightSemiBold,
         ),
       ),
     );
@@ -218,16 +224,17 @@ class _InventoryEmptyState extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: AppDimens.paddingAllMediumLarge,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppDimens.radiusMediumSmall,
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.45),
         ),
       ),
       child: Text(
-        'Inventory is currently within safe stock thresholds.',
+        'Inventory is currently within '
+        'safe stock thresholds.',
         style: theme.textTheme.bodyMedium?.copyWith(
           color: colorScheme.onSurfaceVariant,
         ),

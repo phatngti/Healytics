@@ -3,7 +3,6 @@ import 'package:admin_panel/features/partner/employee/domain/employee.entity.dar
 import 'package:admin_panel/features/partner/employee/presentation/layouts/employee_details_desktop.dart';
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee_details.provider.dart';
 import 'package:common/widgets/card/error_card.dart';
-import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -41,9 +40,8 @@ class EmployeeDetailsScreen extends ConsumerWidget {
           title: 'Failed to load employee details',
           error: error,
           stackTrace: stack,
-          onRetry: () => ref.refresh(
-            employeeDetailsProvider(EmployeeId(employeeId)),
-          ),
+          onRetry: () =>
+              ref.refresh(employeeDetailsProvider(EmployeeId(employeeId))),
         ),
       ),
     );

@@ -16,6 +16,11 @@ void main() {
   // final instance = ClinicProductsResponseDto();
 
   group('test ClinicProductsResponseDto', () {
+    // List<ClinicProductCategoryDto> categories (default value: const [])
+    test('to test the property `categories`', () async {
+      // TODO
+    });
+
     // List<ClinicProductDto> products (default value: const [])
     test('to test the property `products`', () async {
       // TODO

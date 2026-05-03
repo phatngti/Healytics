@@ -16,6 +16,7 @@ class SurveyDto {
     required this.survey,
   });
 
+
   /// Arbitrary survey payload. Example structure below.
   Object survey;
 

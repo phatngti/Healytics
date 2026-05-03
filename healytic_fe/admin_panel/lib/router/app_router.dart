@@ -21,7 +21,7 @@ final List<Map<String, dynamic>> providerSlideMenuItems = [
   },
   {
     "icon": Icons.production_quantity_limits_outlined,
-    "label": 'Products',
+    "label": 'Services',
     "route": partner.ProductHomeRoute().location,
   },
   {
@@ -53,6 +53,11 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
     "route": admin.AdminDashboardRoute().location,
   },
   {
+    "icon": Icons.account_balance_outlined,
+    "label": 'Finance',
+    "route": admin.AdminFinanceManagerRoute().location,
+  },
+  {
     "icon": Icons.production_quantity_limits_outlined,
     "label": 'Category',
     "route": admin.CategoryHomeRoute().location,
@@ -61,6 +66,11 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
     "icon": Icons.production_quantity_limits_outlined,
     "label": 'Provider',
     "route": admin.PartnerManagerRoute().location,
+  },
+  {
+    "icon": Icons.notifications_active_outlined,
+    "label": 'Notifications',
+    "route": admin.AdminNotificationCampaignIndexRoute().location,
   },
 ];
 
@@ -130,8 +140,7 @@ GoRouter router(Ref ref) {
           if (!isProfileCompletionRoute) {
             return '/provider/profile-completion';
           }
-        } else if (
-            isProviderVerified &&
+        } else if (isProviderVerified &&
             isProviderProfileCompleted &&
             (isVerificationRoute || isProfileCompletionRoute)) {
           return '/provider/dashboard';

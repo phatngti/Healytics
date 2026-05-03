@@ -10,29 +10,36 @@ import 'package:universal_io/io.dart' as io;
 
 /// A rich-text editor widget powered by Flutter Quill.
 ///
-/// Provides a configurable WYSIWYG editing experience with a toolbar
-/// (hidden in read-only mode), image paste/embed support (web and native),
-/// and Delta-based content serialization.
+/// Provides a configurable WYSIWYG editing experience with a
+/// toolbar, image paste/embed support (web and native), and
+/// Delta-based content serialization.
 ///
-/// Content is stored as a list of Delta JSON objects and can be round-tripped
-/// via [initialContent] and [onChanged].
+/// Toolbar visibility is controlled by [showToolbar] (defaults
+/// to `true`). When [readOnly] is `true`, the toolbar is always
+/// hidden regardless of [showToolbar]. Pass a custom
+/// [toolbarConfig] to override the default toolbar layout.
+///
+/// Content is stored as a list of Delta JSON objects and can be
+/// round-tripped via [initialContent] and [onChanged].
 ///
 /// ```dart
 /// FlutterQuillEditor(
 ///   initialContent: [{'insert': 'Hello World\n'}],
 ///   onChanged: (delta) => setState(() => _content = delta),
 ///   height: 300,
-///   readOnly: false,
+///   showToolbar: true,
 /// )
 /// ```
 class FlutterQuillEditor extends StatefulWidget {
   /// Creates a [FlutterQuillEditor].
   ///
-  /// - [initialContent] — Pre-populated Delta JSON content. Defaults to empty.
-  /// - [onChanged] — Called with the full Delta JSON whenever the document changes.
+  /// - [initialContent] — Pre-populated Delta JSON content.
+  /// - [onChanged] — Called with the full Delta JSON on change.
   /// - [height] / [width] — Dimensions of the editor container.
-  /// - [readOnly] — When `true`, hides the toolbar and disables editing.
-  /// - [borderColor] / [borderWidth] / [borderRadius] — Container styling.
+  /// - [readOnly] — When `true`, disables editing.
+  /// - [showToolbar] — When `false`, hides the toolbar.
+  /// - [toolbarConfig] — Custom toolbar configuration.
+  /// - [borderColor] / [borderWidth] / [borderRadius] — Styling.
   const FlutterQuillEditor({
     super.key,
     this.initialContent,
@@ -43,6 +50,8 @@ class FlutterQuillEditor extends StatefulWidget {
     this.borderWidth = 1.0,
     this.borderRadius = 8.0,
     this.readOnly = false,
+    this.showToolbar = true,
+    this.toolbarConfig,
   });
 
   /// Initial content as a list of Quill Delta JSON maps.
@@ -66,8 +75,21 @@ class FlutterQuillEditor extends StatefulWidget {
   /// Border radius in logical pixels (defaults to 8.0).
   final double borderRadius;
 
-  /// When `true`, hides the toolbar and disables editing.
+  /// When `true`, disables editing and hides the toolbar.
   final bool readOnly;
+
+  /// Whether to display the formatting toolbar.
+  ///
+  /// Defaults to `true`. Has no effect when [readOnly] is
+  /// `true` (the toolbar is always hidden in read-only mode).
+  final bool showToolbar;
+
+  /// Custom toolbar configuration.
+  ///
+  /// When `null`, a sensible default configuration is used
+  /// with embed buttons, clipboard paste, small button, and
+  /// single-row display.
+  final QuillSimpleToolbarConfig? toolbarConfig;
 
   @override
   State<FlutterQuillEditor> createState() => _FlutterQuillEditorState();
@@ -170,15 +192,17 @@ class _FlutterQuillEditorState extends State<FlutterQuillEditor> {
         borderRadius: BorderRadius.circular(widget.borderRadius),
         child: Column(
           children: [
-            if (!widget.readOnly)
+            if (!widget.readOnly && widget.showToolbar)
               QuillSimpleToolbar(
                 controller: _controller,
-                config: QuillSimpleToolbarConfig(
-                  embedButtons: FlutterQuillEmbeds.toolbarButtons(),
-                  showClipboardPaste: true,
-                  showSmallButton: true,
-                  multiRowsDisplay: false,
-                ),
+                config: widget.toolbarConfig ??
+                    QuillSimpleToolbarConfig(
+                      embedButtons:
+                          FlutterQuillEmbeds.toolbarButtons(),
+                      showClipboardPaste: true,
+                      showSmallButton: true,
+                      multiRowsDisplay: false,
+                    ),
               ),
             Expanded(
               child: QuillEditor(

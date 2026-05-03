@@ -37,6 +37,11 @@ import { DeviceToken } from '@/common/entities/device-token.entity';
 import { AuditLog } from '@/common/entities/audit-log.entity';
 import { AiConversation } from '@/common/entities/conversation.entity';
 import { AiChatMessage } from '@/common/entities/chat-message.entity';
+import { PartnerLedgerTransaction } from '@/common/entities/partner-ledger-transaction.entity';
+import { PartnerPayout } from '@/common/entities/partner-payout.entity';
+import { PartnerPayoutTransaction } from '@/common/entities/partner-payout-transaction.entity';
+import { PartnerRefundCase } from '@/common/entities/partner-refund-case.entity';
+import { PartnerTransactionTimeline } from '@/common/entities/partner-transaction-timeline.entity';
 import { CartItem } from '@/cart/entities/cart-item.entity';
 import { Coupon } from '@/cart/entities/coupon.entity';
 import { PartnerCertification } from '@/clinic/entities/partner-certification.entity';
@@ -58,6 +63,7 @@ import { PartnerChatSeeder } from './partner-chat/partner-chat.seeder';
 import { NotificationSeeder } from './notifications/notification.seeder';
 import { PaymentTransactionLogSeeder } from './payment-transaction-logs/payment-transaction-log.seeder';
 import { AiConversationSeeder } from './ai-conversations/ai-conversation.seeder';
+import { PartnerFinanceSeeder } from './partner-finance/partner-finance.seeder';
 import { SeederService } from './seeder.service';
 
 @Module({
@@ -100,6 +106,11 @@ import { SeederService } from './seeder.service';
       AuditLog,
       AiConversation,
       AiChatMessage,
+      PartnerLedgerTransaction,
+      PartnerPayout,
+      PartnerPayoutTransaction,
+      PartnerRefundCase,
+      PartnerTransactionTimeline,
       CartItem,
       Coupon,
       PartnerCertification,
@@ -122,6 +133,7 @@ import { SeederService } from './seeder.service';
     PartnerChatSeeder,
     NotificationSeeder,
     PaymentTransactionLogSeeder,
+    PartnerFinanceSeeder,
     AiConversationSeeder,
     AuditSeeder,
     SeederService,

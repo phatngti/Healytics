@@ -21,6 +21,7 @@ class PublicHealthServiceDefinitionDto {
     this.staffAssignmentType,
   });
 
+
   /// Product ID (primary key)
   String productId;
 

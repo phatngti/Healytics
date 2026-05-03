@@ -1,14 +1,14 @@
-import 'package:admin_panel/features/partner/dashboard/domain/service_performance.entity.dart';
-import 'package:admin_panel/features/partner/dashboard/presentation/widgets/dashboard_section_header.widget.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../domain/service_performance.entity.dart';
+import 'dashboard_constants.dart';
+import 'dashboard_section_header.widget.dart';
+
 /// Horizontal bar chart comparing service bookings.
 class ServicePerformanceChart extends StatelessWidget {
-  const ServicePerformanceChart({
-    super.key,
-    required this.services,
-  });
+  const ServicePerformanceChart({super.key, required this.services});
 
   final List<ServicePerformance> services;
 
@@ -20,68 +20,52 @@ class ServicePerformanceChart extends StatelessWidget {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppDimens.radiusMediumSmall,
         side: BorderSide(
-          color: colorScheme.outlineVariant
-              .withValues(alpha: 0.5),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: AppDimens.paddingAllMediumLarge,
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DashboardSectionHeader(
+            const DashboardSectionHeader(
               title: 'Service Performance',
               icon: Icons.bar_chart_rounded,
             ),
             SizedBox(
-              height: 220,
+              height: DashboardSizes.barChartHeight,
               child: BarChart(
                 BarChartData(
-                  alignment:
-                      BarChartAlignment.spaceAround,
+                  alignment: BarChartAlignment.spaceAround,
                   maxY: _maxBookings * 1.2,
                   barTouchData: BarTouchData(
-                    touchTooltipData:
-                        BarTouchTooltipData(
-                          getTooltipColor: (_) =>
-                              colorScheme
-                                  .inverseSurface,
-                          getTooltipItem: (
-                            group,
-                            groupIdx,
-                            rod,
-                            rodIdx,
-                          ) {
-                            final svc =
-                                services[group.x];
-                            return BarTooltipItem(
-                              '${svc.serviceName}\n',
-                              TextStyle(
-                                color: colorScheme
-                                    .onInverseSurface,
-                                fontSize: 11,
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipColor: (_) => colorScheme.inverseSurface,
+                      getTooltipItem: (group, groupIdx, rod, rodIdx) {
+                        final svc = services[group.x];
+                        return BarTooltipItem(
+                          '${svc.serviceName}\n',
+                          TextStyle(
+                            color: colorScheme.onInverseSurface,
+                            fontSize: 11,
+                          ),
+                          children: [
+                            TextSpan(
+                              text:
+                                  '${svc.bookingCount}'
+                                  ' bookings',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onInverseSurface,
+                                fontSize: 13,
                               ),
-                              children: [
-                                TextSpan(
-                                  text:
-                                      '${svc.bookingCount}'
-                                      ' bookings',
-                                  style: TextStyle(
-                                    fontWeight:
-                                        FontWeight
-                                            .bold,
-                                    color: colorScheme
-                                        .onInverseSurface,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                   titlesData: FlTitlesData(
                     rightTitles: const AxisTitles(),
@@ -90,111 +74,71 @@ class ServicePerformanceChart extends StatelessWidget {
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 32,
-                        getTitlesWidget:
-                            (value, meta) {
-                              return Text(
-                                value.toInt()
-                                    .toString(),
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                              );
-                            },
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            value.toInt().toString(),
+                            style: TextStyle(
+                              fontSize: AppDimens.fontSizeSmall - 2,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          );
+                        },
                       ),
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 36,
-                        getTitlesWidget:
-                            (value, meta) {
-                              final idx =
-                                  value.toInt();
-                              if (idx < 0 ||
-                                  idx >=
-                                      services
-                                          .length) {
-                                return const SizedBox
-                                    .shrink();
-                              }
-                              final name =
-                                  services[idx]
-                                      .serviceName;
-                              return Padding(
-                                padding:
-                                    const EdgeInsets
-                                        .only(
-                                          top: 8,
-                                        ),
-                                child: Text(
-                                  name.length > 10
-                                      ? '${name.substring(0, 10)}…'
-                                      : name,
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    color: colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                                  textAlign:
-                                      TextAlign
-                                          .center,
-                                ),
-                              );
-                            },
+                        getTitlesWidget: (value, meta) {
+                          final idx = value.toInt();
+                          if (idx < 0 || idx >= services.length) {
+                            return const SizedBox.shrink();
+                          }
+                          final name = services[idx].serviceName;
+                          return Padding(
+                            padding: AppDimens.spaceSm.paddingTop,
+                            child: Text(
+                              name.length > 10
+                                  ? '${name.substring(0, 10)}…'
+                                  : name,
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    getDrawingHorizontalLine:
-                        (value) => FlLine(
-                          color: colorScheme
-                              .outlineVariant
-                              .withValues(
-                                alpha: 0.3,
-                              ),
-                          strokeWidth: 1,
-                        ),
+                    getDrawingHorizontalLine: (value) => FlLine(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                      strokeWidth: AppDimens.borderWidth,
+                    ),
                   ),
-                  borderData:
-                      FlBorderData(show: false),
-                  barGroups: services
-                      .asMap()
-                      .entries
-                      .map((entry) {
-                        final idx = entry.key;
-                        final svc = entry.value;
-                        return BarChartGroupData(
-                          x: idx,
-                          barRods: [
-                            BarChartRodData(
-                              toY: svc.bookingCount
-                                  .toDouble(),
-                              color:
-                                  colorScheme.primary,
-                              width: 20,
-                              borderRadius:
-                                  const BorderRadius
-                                      .only(
-                                    topLeft:
-                                        Radius
-                                            .circular(
-                                              4,
-                                            ),
-                                    topRight:
-                                        Radius
-                                            .circular(
-                                              4,
-                                            ),
-                                  ),
-                            ),
-                          ],
-                        );
-                      })
-                      .toList(),
+                  borderData: FlBorderData(show: false),
+                  barGroups: services.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final svc = entry.value;
+                    return BarChartGroupData(
+                      x: idx,
+                      barRods: [
+                        BarChartRodData(
+                          toY: svc.bookingCount.toDouble(),
+                          color: colorScheme.primary,
+                          width: DashboardSizes.barRodWidth,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(AppDimens.spaceXs),
+                            topRight: Radius.circular(AppDimens.spaceXs),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
                 ),
               ),
             ),
@@ -207,9 +151,7 @@ class ServicePerformanceChart extends StatelessWidget {
   double get _maxBookings {
     final raw = services.fold<double>(
       0,
-      (max, s) => s.bookingCount > max
-          ? s.bookingCount.toDouble()
-          : max,
+      (max, s) => s.bookingCount > max ? s.bookingCount.toDouble() : max,
     );
     // Prevent zero maxY in BarChartData.
     return raw > 0 ? raw : 1.0;

@@ -9,6 +9,6 @@
     "mockRole": "health_partner",
     "autoFill": "true",
     "partnerVerified": "true",
-    "partnerProfileCompleted": "false",
+    "partnerProfileCompleted": "true",
     "mapboxAccessToken": "pk.eyJ1IjoicGhhdG50Z2l0aHViIiwiYSI6ImNtbW9mYWRubTBkeDgycnBzNXM3ZjFhdnYifQ.khGgUZkf8agneDlgCQV0Xg"
 }

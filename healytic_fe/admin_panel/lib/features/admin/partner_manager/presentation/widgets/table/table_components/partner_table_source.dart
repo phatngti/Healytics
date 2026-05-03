@@ -290,13 +290,9 @@ class PartnerTableSource {
     return IconButton(
       onPressed: () {
         if (isPending) {
-          ReviewApplicationRoute(
-            partnerId: partner.id.value,
-          ).go(context);
+          ReviewApplicationRoute(partnerId: partner.id.value).go(context);
         } else {
-          ViewPartnerDetailRoute(
-            partnerId: partner.id.value,
-          ).go(context);
+          ViewPartnerDetailRoute(partnerId: partner.id.value).go(context);
         }
       },
       icon: Icon(isPending ? Icons.edit_document : Icons.visibility, size: 20),

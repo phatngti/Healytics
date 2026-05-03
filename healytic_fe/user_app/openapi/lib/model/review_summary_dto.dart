@@ -19,6 +19,7 @@ class ReviewSummaryDto {
     required this.starCount,
   });
 
+
   num averageRating;
 
   String reviewerName;

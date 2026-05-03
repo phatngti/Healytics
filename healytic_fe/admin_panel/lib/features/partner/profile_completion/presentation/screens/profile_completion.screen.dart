@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/providers/image_upload.provider.dart';
@@ -14,8 +16,10 @@ import 'package:admin_panel/features/partner/profile_completion/presentation/wid
 import 'package:admin_panel/features/partner/profile_completion/presentation/widgets/progress_hero.widget.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/card/error_card.dart';
+import 'package:common/widgets/quill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:admin_panel/router/partner_routes.dart';
 import 'package:go_router/go_router.dart';
 
 /// Partner profile completion screen orchestrator.
@@ -33,7 +37,7 @@ class ProfileCompletionScreen extends ConsumerStatefulWidget {
 class _ProfileCompletionScreenState
     extends ConsumerState<ProfileCompletionScreen> {
   static const int _minDescLength = 120;
-  static const int _maxDescLength = 1000;
+  static const int _maxDescLength = 100000000;
   static const int _minGalleryImages = 3;
   static const int _maxGalleryImages = 8;
 
@@ -41,6 +45,8 @@ class _ProfileCompletionScreenState
   static const double _kDialogWidth = 420;
 
   /// Dialog width for description editor.
+  ///
+  /// Made wider to accommodate the Quill toolbar.
   static const double _kDescDialogWidth = 560;
 
   /// Bottom bar height for scroll padding.
@@ -49,7 +55,11 @@ class _ProfileCompletionScreenState
   /// Max content width for the main content area.
   static const double _kMaxContentWidth = 1100;
 
-  final _descCtrl = TextEditingController();
+  /// Raw description stored as Quill Delta JSON string.
+  ///
+  /// Falls back to plain text when the stored value
+  /// is not valid JSON.
+  String _descRaw = '';
 
   bool _didHydrate = false;
   bool _showValidation = false;
@@ -78,13 +88,14 @@ class _ProfileCompletionScreenState
 
   @override
   void dispose() {
-    _descCtrl.dispose();
     super.dispose();
   }
 
   // ── Computed properties ──────────────────────
 
-  String get _trimmedDesc => _descCtrl.text.trim();
+  /// Extracts plain text from the stored Quill Delta
+  /// JSON for length validation and display.
+  String get _trimmedDesc => _getPlainTextFromDesc(_descRaw);
 
   bool get _hasCover =>
       _coverImageUrl != null && _coverImageUrl!.trim().isNotEmpty;
@@ -159,7 +170,7 @@ class _ProfileCompletionScreenState
     _logoImageUrl = entity.logoImageUrl;
     _gallery = List<String>.from(entity.gallery);
     _certifications = _normalize(entity.certifications);
-    _descCtrl.text = entity.description ?? '';
+    _descRaw = entity.description ?? '';
     _didHydrate = true;
   }
 
@@ -177,7 +188,7 @@ class _ProfileCompletionScreenState
     return PartnerProfileCompletionUpdateRequest(
       coverImageUrl: _coverImageUrl?.trim(),
       logoImageUrl: _logoImageUrl?.trim(),
-      description: _trimmedDesc,
+      description: _descRaw,
       gallery: List<String>.from(_gallery),
       certifications: _normalize(_certifications),
     );
@@ -242,8 +253,12 @@ class _ProfileCompletionScreenState
       if (!mounted) return;
       setState(() => _hydrateFrom(result, overwrite: true));
 
-      if (result.isCompleted && UserRoleHelper.isProviderProfileCompleted()) {
-        context.go('/provider/dashboard');
+      if (result.isCompleted) {
+        // Sync local flag before checking so the
+        // guard reflects the latest API response.
+        UserRoleHelper.setPartnerProfileCompleted(result.isCompleted);
+
+        const DashboardRoute().go(context);
         return;
       }
 
@@ -264,9 +279,7 @@ class _ProfileCompletionScreenState
 
   // ── Image upload helpers ─────────────────────
 
-  Future<void> _uploadSingleImage({
-    required bool isCover,
-  }) async {
+  Future<void> _uploadSingleImage({required bool isCover}) async {
     setState(() {
       if (isCover) {
         _isUploadingCover = true;
@@ -276,11 +289,8 @@ class _ProfileCompletionScreenState
     });
 
     try {
-      final uploader = ref.read(
-        imageUploadServiceProvider,
-      );
-      final url =
-          await uploader.pickAndUploadSingle();
+      final uploader = ref.read(imageUploadServiceProvider);
+      final url = await uploader.pickAndUploadSingle();
       if (url == null) return;
 
       if (!mounted) return;
@@ -292,10 +302,7 @@ class _ProfileCompletionScreenState
         }
       });
     } catch (e) {
-      _snack(
-        'Image upload failed: $e',
-        isError: true,
-      );
+      _snack('Image upload failed: $e', isError: true);
     } finally {
       if (mounted) {
         setState(() {
@@ -322,15 +329,9 @@ class _ProfileCompletionScreenState
     setState(() => _isUploadingGallery = true);
 
     try {
-      final slots =
-          _maxGalleryImages - _gallery.length;
-      final uploader = ref.read(
-        imageUploadServiceProvider,
-      );
-      final urls =
-          await uploader.pickAndUploadMultiple(
-        maxFiles: slots,
-      );
+      final slots = _maxGalleryImages - _gallery.length;
+      final uploader = ref.read(imageUploadServiceProvider);
+      final urls = await uploader.pickAndUploadMultiple(maxFiles: slots);
       if (urls.isEmpty) return;
 
       if (!mounted) return;
@@ -338,10 +339,7 @@ class _ProfileCompletionScreenState
         _gallery = [..._gallery, ...urls];
       });
     } catch (e) {
-      _snack(
-        'Gallery upload failed: $e',
-        isError: true,
-      );
+      _snack('Gallery upload failed: $e', isError: true);
     } finally {
       if (mounted) {
         setState(() => _isUploadingGallery = false);
@@ -527,17 +525,19 @@ class _ProfileCompletionScreenState
   }
 
   Future<void> _editDescription() async {
-    final controller = TextEditingController(text: _descCtrl.text);
+    final initialContent = _tryParseQuillContent(_descRaw);
+    // Tracks the latest Delta JSON from the editor.
+    String? latestDeltaJson;
+    int latestPlainLength = _trimmedDesc.length;
 
     final result = await showDialog<String>(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            final trimmedLength = controller.text.trim().length;
             final isValid =
-                trimmedLength >= _minDescLength &&
-                trimmedLength <= _maxDescLength;
+                latestPlainLength >= _minDescLength &&
+                latestPlainLength <= _maxDescLength;
 
             return AlertDialog(
               title: const Text('Clinic description'),
@@ -548,35 +548,48 @@ class _ProfileCompletionScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Write a concise, patient-friendly description covering specialties, experience, and what patients can expect.',
+                      'Write a concise, '
+                      'patient-friendly '
+                      'description covering '
+                      'specialties and care.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                     AppDimens.verticalMedium,
-                    TextField(
-                      controller: controller,
-                      onChanged: (_) => setState(() {}),
-                      minLines: 6,
-                      maxLines: 10,
-                      maxLength: _maxDescLength,
-                      decoration: InputDecoration(
-                        hintText:
-                            'Describe the clinic, specialties, environment, and treatment approach.',
-                        border: OutlineInputBorder(
-                          borderRadius: AppDimens.radiusMedium,
-                        ),
-                        errorText: controller.text.trim().isEmpty || isValid
-                            ? null
-                            : 'Description must be at least $_minDescLength characters.',
-                      ),
+                    FlutterQuillEditor(
+                      initialContent: initialContent,
+                      height: 300,
+                      onChanged: (delta) {
+                        final encoded = jsonEncode(delta);
+                        final plain = _getPlainTextFromDesc(encoded);
+                        setState(() {
+                          latestDeltaJson = encoded;
+                          latestPlainLength = plain.length;
+                        });
+                      },
                     ),
+                    AppDimens.verticalSmall,
                     Text(
-                      '$trimmedLength/$_minDescLength minimum characters',
+                      '$latestPlainLength/'
+                      '$_minDescLength min',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
+                    if (latestPlainLength > 0 && !isValid)
+                      Padding(
+                        padding: const EdgeInsets.only(top: AppDimens.spaceXxs),
+                        child: Text(
+                          'At least '
+                          '$_minDescLength '
+                          'characters.',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -588,7 +601,7 @@ class _ProfileCompletionScreenState
                 FilledButton(
                   onPressed: !isValid
                       ? null
-                      : () => Navigator.of(context).pop(controller.text.trim()),
+                      : () => Navigator.of(context).pop(latestDeltaJson),
                   child: const Text('Save'),
                 ),
               ],
@@ -598,11 +611,9 @@ class _ProfileCompletionScreenState
       },
     );
 
-    controller.dispose();
-
     if (result == null || !mounted) return;
     setState(() {
-      _descCtrl.text = result;
+      _descRaw = result;
     });
   }
 
@@ -631,6 +642,52 @@ class _ProfileCompletionScreenState
         .join(' ');
   }
 
+  /// Parses a raw description (Quill Delta JSON or
+  /// plain text) into a Delta ops list suitable for
+  /// [FlutterQuillEditor.initialContent].
+  ///
+  /// Returns `null` when the value is empty.
+  /// Non-JSON strings are wrapped as plain-text Delta.
+  static List<Map<String, Object>>? _tryParseQuillContent(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return null;
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List && decoded.isNotEmpty) {
+        return decoded.map((e) => Map<String, Object>.from(e as Map)).toList();
+      }
+      return null;
+    } on FormatException {
+      // Not JSON — wrap as plain-text Delta.
+      return <Map<String, Object>>[
+        {'insert': '$raw\n'},
+      ];
+    }
+  }
+
+  /// Extracts trimmed plain text from a raw
+  /// description that may be Quill Delta JSON or
+  /// a legacy plain-text string.
+  static String _getPlainTextFromDesc(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return '';
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List && decoded.isNotEmpty) {
+        final buf = StringBuffer();
+        for (final op in decoded) {
+          if (op is Map && op['insert'] is String) {
+            buf.write(op['insert'] as String);
+          }
+        }
+        return buf.toString().trim();
+      }
+      return raw.trim();
+    } on FormatException {
+      return raw.trim();
+    }
+  }
+
   // ── Build ────────────────────────────────────
 
   @override
@@ -642,7 +699,7 @@ class _ProfileCompletionScreenState
       final entity = next.asData?.value;
       if (entity == null || !mounted) return;
       if (entity.isCompleted && UserRoleHelper.isProviderProfileCompleted()) {
-        context.go('/provider/dashboard');
+        const DashboardRoute().go(context);
       }
     });
 

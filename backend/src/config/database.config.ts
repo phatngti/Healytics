@@ -9,7 +9,5 @@ export default registerAs('database', () => ({
   database: process.env.POSTGRES_DB,
   synchronize: false,
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: process.env.POSTGRES_SSL === 'true',
 }));

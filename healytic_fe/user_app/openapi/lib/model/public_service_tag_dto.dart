@@ -19,19 +19,14 @@ class PublicServiceTagDto {
     this.description,
   });
 
+
   String id;
 
   String name;
 
   String colorValue;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? description;
+  String? description;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is PublicServiceTagDto &&
@@ -86,7 +81,7 @@ class PublicServiceTagDto {
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
         colorValue: mapValueOfType<String>(json, r'colorValue')!,
-        description: mapValueOfType<Object>(json, r'description'),
+        description: mapValueOfType<String>(json, r'description'),
       );
     }
     return null;

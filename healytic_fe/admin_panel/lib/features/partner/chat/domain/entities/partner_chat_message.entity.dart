@@ -22,8 +22,7 @@ sealed class PartnerChatMessage with _$PartnerChatMessage {
     String? senderName,
     String? senderAvatar,
     required String content,
-    @Default(PartnerMessageType.text)
-    PartnerMessageType messageType,
+    @Default(PartnerMessageType.text) PartnerMessageType messageType,
     String? clientMessageId,
     required DateTime createdAt,
     @Default(false) bool isRead,

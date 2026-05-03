@@ -20,6 +20,7 @@ class DistanceMatrixElementDto {
     required this.status,
   });
 
+
   String distanceText;
 
   num distanceValue;

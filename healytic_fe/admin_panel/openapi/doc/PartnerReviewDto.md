@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | 
 **reviewerName** | **String** |  | 
-**avatarUrl** | [**Object**](.md) |  | [optional] 
+**avatarUrl** | **String** |  | [optional] 
 **rating** | **num** |  | 
 **status** | **String** |  | 
 **date** | **String** |  | 

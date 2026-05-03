@@ -22,6 +22,7 @@ class TreatmentReviewResponseDto {
     required this.createdAt,
   });
 
+
   String id;
 
   String appointmentId;

@@ -2,6 +2,7 @@ import 'package:admin_panel/features/partner/transactions/domain/finance_models.
 import 'package:admin_panel/features/partner/transactions/presentation/widgets/finance_ui_helpers.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class FinanceTrendPanel extends StatelessWidget {
   const FinanceTrendPanel({
@@ -131,23 +132,29 @@ class _FinanceLineChart extends StatelessWidget {
       0,
       (max, item) => item.y > max ? item.y : max,
     );
+    final effectiveMaxY = maxY == 0 ? 1.0 : maxY * 1.25;
 
     return LineChart(
       LineChartData(
+        minX: 0,
+        maxX: (data.length - 1).toDouble(),
         minY: 0,
+        maxY: effectiveMaxY,
+        clipData: const FlClipData.all(),
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
-          horizontalInterval: maxY == 0 ? 1 : maxY / 4,
-          getDrawingHorizontalLine: (value) => FlLine(
+          getDrawingHorizontalLine: (_) => FlLine(
             color: colorScheme.outlineVariant.withValues(alpha: 0.25),
             strokeWidth: 1,
+            dashArray: const [4, 4],
           ),
         ),
         lineBarsData: [
           LineChartBarData(
             spots: values,
             isCurved: true,
+            preventCurveOverShooting: true,
             barWidth: 3,
             color: colorScheme.primary,
             belowBarData: BarAreaData(
@@ -161,41 +168,51 @@ class _FinanceLineChart extends StatelessWidget {
                 ],
               ),
             ),
-            dotData: FlDotData(show: true),
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (_, __, ___, ____) {
+                return FlDotCirclePainter(
+                  radius: 4,
+                  color: colorScheme.surface,
+                  strokeWidth: 2,
+                  strokeColor: colorScheme.primary,
+                );
+              },
+            ),
           ),
         ],
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
-          topTitles: const AxisTitles(),
-          rightTitles: const AxisTitles(),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 72,
-              getTitlesWidget: (value, meta) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Text(
-                  formatFinanceCurrency(value, currency),
-                  style: Theme.of(context).textTheme.labelSmall,
-                  textAlign: TextAlign.right,
-                ),
-              ),
-            ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
           ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 32,
+              interval: 1,
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                if (index < 0 || index >= data.length) {
+                if (!_shouldShowFinanceAxisLabel(
+                  value: value,
+                  index: index,
+                  points: data,
+                )) {
                   return const SizedBox.shrink();
                 }
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    formatFinanceDate(data[index].date),
-                    style: Theme.of(context).textTheme.labelSmall,
+                    _formatAxisDate(data[index].date),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 );
               },
@@ -203,15 +220,40 @@ class _FinanceLineChart extends StatelessWidget {
           ),
         ),
         lineTouchData: LineTouchData(
+          enabled: true,
+          handleBuiltInTouches: true,
+          touchSpotThreshold: 20,
+          getTouchedSpotIndicator: (barData, spotIndexes) {
+            return spotIndexes.map((_) {
+              return TouchedSpotIndicatorData(
+                const FlLine(color: Colors.transparent),
+                FlDotData(
+                  show: true,
+                  getDotPainter: (spot, percent, barData, index) {
+                    return FlDotCirclePainter(
+                      radius: 6,
+                      color: colorScheme.surface,
+                      strokeWidth: 2,
+                      strokeColor: barData.color ?? colorScheme.primary,
+                    );
+                  },
+                ),
+              );
+            }).toList();
+          },
           touchTooltipData: LineTouchTooltipData(
-            getTooltipColor: (_) => colorScheme.inverseSurface,
+            fitInsideHorizontally: true,
+            fitInsideVertically: true,
+            getTooltipColor: (_) => colorScheme.surface,
+            tooltipBorder: BorderSide(color: colorScheme.outlineVariant),
             getTooltipItems: (spots) {
               return spots
                   .map(
                     (spot) => LineTooltipItem(
                       '${formatFinanceDate(data[spot.x.toInt()].date)}\n${formatFinanceCurrency(spot.y, currency)}',
-                      Theme.of(context).textTheme.bodySmall!.copyWith(
-                        color: colorScheme.onInverseSurface,
+                      Theme.of(context).textTheme.labelMedium!.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   )
@@ -229,3 +271,22 @@ class _FinanceLineChart extends StatelessWidget {
     FinanceMetric.refunds => point.refundAmount,
   };
 }
+
+bool _shouldShowFinanceAxisLabel({
+  required double value,
+  required int index,
+  required List<FinanceTrendPoint> points,
+}) {
+  if (value != index.toDouble() || index < 0 || index >= points.length) {
+    return false;
+  }
+
+  if (points.length <= 8) {
+    return true;
+  }
+
+  final step = ((points.length - 1) / 6).ceil();
+  return index == 0 || index == points.length - 1 || index % step == 0;
+}
+
+String _formatAxisDate(DateTime value) => DateFormat('dd MMM').format(value);

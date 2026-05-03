@@ -66,7 +66,6 @@ class PartnerChatScreen extends HookConsumerWidget {
         .currentUserId;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       appBar: PartnerChatHeader(
         partnerName: partnerName,
         partnerAvatar: partnerAvatar,

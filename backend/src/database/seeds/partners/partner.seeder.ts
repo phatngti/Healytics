@@ -57,6 +57,11 @@ interface SeedPartner {
   phoneNumber: string;
   verificationStatus: PartnerVerificationStatus;
   coordinates: string | null;
+  coverImageUrl: string;
+  logoImageUrl: string;
+  gallery: string[];
+  description: string;
+  followerCount: number;
   address: SeedAddress;
   legalRepresentative: SeedLegalRepresentative;
   documents: SeedDocument[];
@@ -84,6 +89,18 @@ const SEED_PARTNERS: SeedPartner[] = [
     phoneNumber: '0281234567',
     verificationStatus: PartnerVerificationStatus.APPROVED,
     coordinates: '10.7769,106.7009',
+    coverImageUrl:
+      'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200',
+    logoImageUrl:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Healytics%20Spa',
+    gallery: [
+      'https://images.unsplash.com/photo-1540555700478-4be289fbec6e?w=900',
+      'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=900',
+      'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=900',
+    ],
+    description:
+      'A central District 1 wellness clinic focused on massage therapy, facial care and recovery programs with licensed specialists.',
+    followerCount: 328,
     address: { provinceCode: '79', districtCode: '760', wardCode: '26740' }, // HCMC > Quận 1 > Bến Nghé
     legalRepresentative: {
       fullName: 'Nguyen Van An',
@@ -131,6 +148,18 @@ const SEED_PARTNERS: SeedPartner[] = [
     phoneNumber: '0289876543',
     verificationStatus: PartnerVerificationStatus.PENDING,
     coordinates: '10.7831,106.6916',
+    coverImageUrl:
+      'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=1200',
+    logoImageUrl:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Healytics%20Dental',
+    gallery: [
+      'https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=900',
+      'https://images.unsplash.com/photo-1629909615957-be38d48fbbe4?w=900',
+      'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=900',
+    ],
+    description:
+      'A dental clinic offering preventive care, whitening and cosmetic dentistry with sterilized treatment rooms.',
+    followerCount: 147,
     address: { provinceCode: '79', districtCode: '770', wardCode: '27139' }, // HCMC > Quận 3 > Phường Võ Thị Sáu
     legalRepresentative: {
       fullName: 'Tran Thi Bich',
@@ -179,6 +208,17 @@ const SEED_PARTNERS: SeedPartner[] = [
     phoneNumber: '0283456789',
     verificationStatus: PartnerVerificationStatus.REJECTED,
     coordinates: '10.7756,106.6893',
+    coverImageUrl:
+      'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1200',
+    logoImageUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=FitLife',
+    gallery: [
+      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=900',
+      'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=900',
+      'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=900',
+    ],
+    description:
+      'A gym and yoga center preparing updated compliance documents for rehabilitation and mobility programs.',
+    followerCount: 96,
     address: { provinceCode: '79', districtCode: '770', wardCode: '27142' }, // HCMC > Quận 3 > Phường 9
     legalRepresentative: {
       fullName: 'Le Minh Duc',
@@ -219,6 +259,18 @@ const SEED_PARTNERS: SeedPartner[] = [
     phoneNumber: '0284567890',
     verificationStatus: PartnerVerificationStatus.REQUIRED_RESUBMIT,
     coordinates: '10.7741,106.7030',
+    coverImageUrl:
+      'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=1200',
+    logoImageUrl:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Saigon%20Pharma',
+    gallery: [
+      'https://images.unsplash.com/photo-1576671081837-49000212a370?w=900',
+      'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=900',
+      'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=900',
+    ],
+    description:
+      'A pharmacy and nutrition practice focused on supplement counseling, medication adherence and wellness plans.',
+    followerCount: 211,
     address: { provinceCode: '79', districtCode: '760', wardCode: '26743' }, // HCMC > Quận 1 > Bến Thành
     legalRepresentative: {
       fullName: 'Pham Hoang Long',
@@ -273,6 +325,18 @@ const SEED_PARTNERS: SeedPartner[] = [
     phoneNumber: '0285678901',
     verificationStatus: PartnerVerificationStatus.ONBOARDING,
     coordinates: '10.7800,106.6870',
+    coverImageUrl:
+      'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=1200',
+    logoImageUrl:
+      'https://api.dicebear.com/9.x/initials/svg?seed=Heritage%20Medicine',
+    gallery: [
+      'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=900',
+      'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=900',
+      'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=900',
+    ],
+    description:
+      'Traditional medicine clinic offering herbal care, acupuncture and recovery-focused consultation pathways.',
+    followerCount: 73,
     address: { provinceCode: '79', districtCode: '770', wardCode: '27130' }, // HCMC > Quận 3 > Phường 12
     legalRepresentative: {
       fullName: 'Vo Thi Lan',
@@ -316,6 +380,17 @@ const SEED_PARTNERS: SeedPartner[] = [
     phoneNumber: '0286789012',
     verificationStatus: PartnerVerificationStatus.APPROVED,
     coordinates: '10.7810,106.6940',
+    coverImageUrl:
+      'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=1200',
+    logoImageUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=MindSkin',
+    gallery: [
+      'https://images.unsplash.com/photo-1551847677-dc82d764e1eb?w=900',
+      'https://images.unsplash.com/photo-1493836512294-502baa1986e2?w=900',
+      'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=900',
+    ],
+    description:
+      'A multi-specialty center combining dermatology, mental wellness and psychiatry services in a quiet clinical setting.',
+    followerCount: 402,
     address: { provinceCode: '79', districtCode: '770', wardCode: '27151' }, // HCMC > Quận 3 > Phường 5
     legalRepresentative: {
       fullName: 'Hoang Quoc Viet',
@@ -423,9 +498,33 @@ export class PartnerSeeder implements ISeeder {
       });
 
       if (exists) {
-        this.logger.log(
-          `  ⏭ Partner "${partnerData.taxCode}" already exists, skipping`,
-        );
+        const fieldsToUpdate: Partial<Partner> = {};
+        if (!exists.coverImageUrl) {
+          fieldsToUpdate.coverImageUrl = partnerData.coverImageUrl;
+        }
+        if (!exists.logoImageUrl) {
+          fieldsToUpdate.logoImageUrl = partnerData.logoImageUrl;
+        }
+        if (!exists.gallery?.length) {
+          fieldsToUpdate.gallery = partnerData.gallery;
+        }
+        if (!exists.description) {
+          fieldsToUpdate.description = partnerData.description;
+        }
+        if (!exists.followerCount) {
+          fieldsToUpdate.followerCount = partnerData.followerCount;
+        }
+
+        if (Object.keys(fieldsToUpdate).length) {
+          await this.partnerRepo.update(exists.id, fieldsToUpdate);
+          this.logger.log(
+            `  🔄 Updated partner "${partnerData.taxCode}" with clinic profile seed fields`,
+          );
+        } else {
+          this.logger.log(
+            `  ⏭ Partner "${partnerData.taxCode}" already exists, skipping`,
+          );
+        }
         continue;
       }
 
@@ -476,6 +575,11 @@ export class PartnerSeeder implements ISeeder {
             : null,
         accountId: account.id,
         coordinates: partnerData.coordinates ?? null,
+        coverImageUrl: partnerData.coverImageUrl,
+        logoImageUrl: partnerData.logoImageUrl,
+        gallery: partnerData.gallery,
+        description: partnerData.description,
+        followerCount: partnerData.followerCount,
         provinceId,
         districtId,
         wardId,

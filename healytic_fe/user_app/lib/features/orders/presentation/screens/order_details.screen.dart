@@ -117,15 +117,12 @@ class _SliverHeader extends StatelessWidget {
     return SliverAppBar(
       pinned: true,
       centerTitle: true,
-      backgroundColor: colors.surface.withValues(
-        alpha: 0.8,
-      ),
+
       surfaceTintColor: Colors.transparent,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         tooltip: 'Back',
-        onPressed: () =>
-            Navigator.of(context).maybePop(),
+        onPressed: () => Navigator.of(context).maybePop(),
       ),
       title: Text(
         'Appointment Details',
@@ -135,23 +132,16 @@ class _SliverHeader extends StatelessWidget {
       ),
       flexibleSpace: ClipRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 12,
-            sigmaY: 12,
-          ),
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: const SizedBox.expand(),
         ),
       ),
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(
-          AppDimens.borderWidth,
-        ),
+        preferredSize: const Size.fromHeight(AppDimens.borderWidth),
         child: Divider(
           height: AppDimens.borderWidth,
           thickness: AppDimens.borderWidth,
-          color: colors.outlineVariant.withValues(
-            alpha: 0.3,
-          ),
+          color: colors.outlineVariant.withValues(alpha: 0.3),
         ),
       ),
     );

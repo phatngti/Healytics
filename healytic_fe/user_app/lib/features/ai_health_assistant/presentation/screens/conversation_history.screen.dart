@@ -29,24 +29,19 @@ import '../widgets/history/partner_date_section.widget.dart';
 ///
 /// All dimensions use [AppDimens]; all colours from
 /// the active [ColorScheme].
-class ConversationHistoryScreen
-    extends ConsumerStatefulWidget {
+class ConversationHistoryScreen extends ConsumerStatefulWidget {
   const ConversationHistoryScreen({super.key});
 
   @override
-  ConsumerState<ConversationHistoryScreen>
-      createState() =>
-          _ConversationHistoryScreenState();
+  ConsumerState<ConversationHistoryScreen> createState() =>
+      _ConversationHistoryScreenState();
 }
 
 class _ConversationHistoryScreenState
-    extends
-        ConsumerState<ConversationHistoryScreen> {
-  final _searchController =
-      TextEditingController();
+    extends ConsumerState<ConversationHistoryScreen> {
+  final _searchController = TextEditingController();
   bool _isSearching = false;
-  ChatType _selectedChatType =
-      ChatType.aiSession;
+  ChatType _selectedChatType = ChatType.aiSession;
 
   @override
   void dispose() {
@@ -59,25 +54,16 @@ class _ConversationHistoryScreenState
       _isSearching = !_isSearching;
       if (!_isSearching) {
         _searchController.clear();
-        ref
-            .read(
-              conversationHistoryProvider
-                  .notifier,
-            )
-            .updateSearchQuery('');
+        ref.read(conversationHistoryProvider.notifier).updateSearchQuery('');
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final textTheme =
-        Theme.of(context).textTheme;
-    final historyState = ref.watch(
-      conversationHistoryProvider,
-    );
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final historyState = ref.watch(conversationHistoryProvider);
 
     return MainScreenLayout(
       appBar: AppBar(
@@ -85,7 +71,6 @@ class _ConversationHistoryScreenState
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         title: _isSearching
             ? _SearchField(
@@ -94,33 +79,24 @@ class _ConversationHistoryScreenState
                 colorScheme: colorScheme,
                 onChanged: (value) {
                   ref
-                      .read(
-                        conversationHistoryProvider
-                            .notifier,
-                      )
+                      .read(conversationHistoryProvider.notifier)
                       .updateSearchQuery(value);
                 },
               )
             : Text(
                 'Chat History',
-                style: textTheme.titleMedium
-                    ?.copyWith(
-                  fontWeight: AppDimens
-                      .fontWeightSemiBold,
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: AppDimens.fontWeightSemiBold,
                   color: colorScheme.onSurface,
                 ),
               ),
         actions: [
           IconButton(
             icon: Icon(
-              _isSearching
-                  ? Icons.close
-                  : Icons.search,
+              _isSearching ? Icons.close : Icons.search,
               color: colorScheme.primary,
             ),
-            tooltip: _isSearching
-                ? 'Close search'
-                : 'Search',
+            tooltip: _isSearching ? 'Close search' : 'Search',
             onPressed: _toggleSearch,
           ),
         ],
@@ -136,18 +112,9 @@ class _ConversationHistoryScreenState
             },
           ),
           Expanded(
-            child: _selectedChatType ==
-                    ChatType.aiSession
-                ? _buildAiBody(
-                    context,
-                    historyState,
-                    colorScheme,
-                  )
-                : _buildPartnerBody(
-                    context,
-                    historyState,
-                    colorScheme,
-                  ),
+            child: _selectedChatType == ChatType.aiSession
+                ? _buildAiBody(context, historyState, colorScheme)
+                : _buildPartnerBody(context, historyState, colorScheme),
           ),
         ],
       ),
@@ -167,15 +134,11 @@ class _ConversationHistoryScreenState
     ConversationHistoryState historyState,
     ColorScheme colorScheme,
   ) {
-    if (historyState.isLoading &&
-        historyState.conversations.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+    if (historyState.isLoading && historyState.conversations.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
     }
 
-    if (historyState.error != null &&
-        historyState.conversations.isEmpty) {
+    if (historyState.error != null && historyState.conversations.isEmpty) {
       return _ErrorMessage(
         message: historyState.error!,
         colorScheme: colorScheme,
@@ -183,8 +146,7 @@ class _ConversationHistoryScreenState
     }
 
     final filtered = historyState.filtered;
-    final grouped =
-        groupConversationsByDate(filtered);
+    final grouped = groupConversationsByDate(filtered);
 
     if (grouped.isEmpty) {
       return const HistoryEmptyState();
@@ -197,8 +159,7 @@ class _ConversationHistoryScreenState
         final section = grouped[index];
         return DateSection(
           label: section.label,
-          conversations:
-              section.conversations,
+          conversations: section.conversations,
           isOlder: section.isOlder,
         );
       },
@@ -213,30 +174,20 @@ class _ConversationHistoryScreenState
     ColorScheme colorScheme,
   ) {
     if (historyState.isLoadingPartner &&
-        historyState
-            .partnerConversations
-            .isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+        historyState.partnerConversations.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (historyState.partnerError != null &&
-        historyState
-            .partnerConversations
-            .isEmpty) {
+        historyState.partnerConversations.isEmpty) {
       return _ErrorMessage(
         message: historyState.partnerError!,
         colorScheme: colorScheme,
       );
     }
 
-    final filtered =
-        historyState.filteredPartner;
-    final grouped =
-        groupPartnerConversationsByDate(
-      filtered,
-    );
+    final filtered = historyState.filteredPartner;
+    final grouped = groupPartnerConversationsByDate(filtered);
 
     if (grouped.isEmpty) {
       return const HistoryEmptyState();
@@ -249,8 +200,7 @@ class _ConversationHistoryScreenState
         final section = grouped[index];
         return PartnerDateSection(
           label: section.label,
-          conversations:
-              section.conversations,
+          conversations: section.conversations,
           isOlder: section.isOlder,
         );
       },
@@ -259,18 +209,13 @@ class _ConversationHistoryScreenState
 
   // ── Shared helpers ────────────────────────────
 
-  EdgeInsets _listPadding(
-    BuildContext context,
-  ) {
+  EdgeInsets _listPadding(BuildContext context) {
     return EdgeInsets.only(
       left: AppDimens.horizontalPadding(context),
-      right:
-          AppDimens.horizontalPadding(context),
+      right: AppDimens.horizontalPadding(context),
       top: AppDimens.spaceLg,
       // FAB clearance
-      bottom:
-          AppDimens.bottomScrollPadding(context) +
-          80,
+      bottom: AppDimens.bottomScrollPadding(context) + 80,
     );
   }
 }
@@ -299,21 +244,15 @@ class _SearchField extends StatelessWidget {
       controller: controller,
       autofocus: true,
       onChanged: onChanged,
-      style: textTheme.bodyMedium?.copyWith(
-        color: colorScheme.onSurface,
-      ),
+      style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: 'Search conversations...',
-        hintStyle:
-            textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurface
-              .withValues(alpha: 0.4),
+        hintStyle: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurface.withValues(alpha: 0.4),
         ),
         border: InputBorder.none,
         isDense: true,
-        contentPadding: EdgeInsets.symmetric(
-          vertical: AppDimens.spaceSm,
-        ),
+        contentPadding: EdgeInsets.symmetric(vertical: AppDimens.spaceSm),
       ),
     );
   }
@@ -325,26 +264,18 @@ class _ErrorMessage extends StatelessWidget {
   final String message;
   final ColorScheme colorScheme;
 
-  const _ErrorMessage({
-    required this.message,
-    required this.colorScheme,
-  });
+  const _ErrorMessage({required this.message, required this.colorScheme});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(
-          AppDimens.horizontalPadding(context),
-        ),
+        padding: EdgeInsets.all(AppDimens.horizontalPadding(context)),
         child: Text(
           message,
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(
-                color: colorScheme.error,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: colorScheme.error),
           textAlign: TextAlign.center,
         ),
       ),

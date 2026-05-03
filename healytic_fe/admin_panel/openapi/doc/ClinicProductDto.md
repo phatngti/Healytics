@@ -10,14 +10,14 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | 
 **title** | **String** |  | 
-**imageUrl** | [**Object**](.md) |  | [optional] 
+**imageUrl** | **String** |  | [optional] 
 **price** | **String** |  | 
 **priceAmount** | **num** |  | 
-**originalPrice** | [**Object**](.md) |  | [optional] 
-**discountLabel** | [**Object**](.md) |  | [optional] 
-**badgeLabel** | [**Object**](.md) |  | [optional] 
-**durationLabel** | [**Object**](.md) |  | [optional] 
-**specialistLabel** | [**Object**](.md) |  | [optional] 
+**originalPrice** | **String** |  | [optional] 
+**discountLabel** | **String** |  | [optional] 
+**badgeLabel** | **String** |  | [optional] 
+**durationLabel** | **String** |  | [optional] 
+**specialistLabel** | **String** |  | [optional] 
 **categoryId** | **String** |  | 
 **soldCount** | **num** |  | 
 **createdAtMs** | **num** |  | 

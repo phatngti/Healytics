@@ -26,7 +26,7 @@ void main() {
       // TODO
     });
 
-    // Object imageUrl
+    // String imageUrl
     test('to test the property `imageUrl`', () async {
       // TODO
     });
@@ -41,27 +41,27 @@ void main() {
       // TODO
     });
 
-    // Object originalPrice
+    // String originalPrice
     test('to test the property `originalPrice`', () async {
       // TODO
     });
 
-    // Object discountLabel
+    // String discountLabel
     test('to test the property `discountLabel`', () async {
       // TODO
     });
 
-    // Object badgeLabel
+    // String badgeLabel
     test('to test the property `badgeLabel`', () async {
       // TODO
     });
 
-    // Object durationLabel
+    // String durationLabel
     test('to test the property `durationLabel`', () async {
       // TODO
     });
 
-    // Object specialistLabel
+    // String specialistLabel
     test('to test the property `specialistLabel`', () async {
       // TODO
     });

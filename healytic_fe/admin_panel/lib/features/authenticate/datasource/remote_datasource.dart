@@ -222,9 +222,7 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
     'PSYCHIATRY': BusinessType.PSYCHIATRY,
   };
 
-  List<BusinessType> _mapBusinessTypes(
-    List<String> businessTypes,
-  ) {
+  List<BusinessType> _mapBusinessTypes(List<String> businessTypes) {
     return businessTypes.map((type) {
       final key = type.toUpperCase();
       final mapped = _businessTypeMap[key];
@@ -241,16 +239,11 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
     }).toList();
   }
 
-  LegalRepresentativeRequestDtoIdTypeEnum _mapIdType(
-    String idType,
-  ) {
+  LegalRepresentativeRequestDtoIdTypeEnum _mapIdType(String idType) {
     return switch (idType.toUpperCase()) {
-      'CITIZEN_ID' =>
-        LegalRepresentativeRequestDtoIdTypeEnum.CITIZEN_ID,
-      'PASSPORT' =>
-        LegalRepresentativeRequestDtoIdTypeEnum.PASSPORT,
-      'MILITARY_ID' =>
-        LegalRepresentativeRequestDtoIdTypeEnum.MILITARY_ID,
+      'CITIZEN_ID' => LegalRepresentativeRequestDtoIdTypeEnum.CITIZEN_ID,
+      'PASSPORT' => LegalRepresentativeRequestDtoIdTypeEnum.PASSPORT,
+      'MILITARY_ID' => LegalRepresentativeRequestDtoIdTypeEnum.MILITARY_ID,
       _ => LegalRepresentativeRequestDtoIdTypeEnum.CITIZEN_ID,
     };
   }

@@ -20,6 +20,7 @@ class BookingSpecialistResponseDto {
     this.avatarUrl,
   });
 
+
   /// Unique specialist/employee ID
   String id;
 

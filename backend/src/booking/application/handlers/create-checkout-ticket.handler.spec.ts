@@ -14,6 +14,7 @@ import {
 } from '../../../../test/mocks/mock-types';
 import { createCheckoutTicketEntity } from '../../../../test/fixtures/test-data.factory';
 import { BadRequestException } from '@nestjs/common';
+import { RedisService } from '@/redis/redis.service';
 
 describe('CreateCheckoutTicketHandler', () => {
   let handler: CreateCheckoutTicketHandler;
@@ -23,6 +24,7 @@ describe('CreateCheckoutTicketHandler', () => {
   let productRepo: MockRepository<Product>;
   let slotChecker: { execute: jest.Mock };
   let rmqClient: { emit: jest.Mock };
+  let redisService: { [key: string]: jest.Mock };
 
   beforeEach(async () => {
     ticketRepo = createMockRepository<CheckoutTicket>();
@@ -31,6 +33,12 @@ describe('CreateCheckoutTicketHandler', () => {
     productRepo = createMockRepository<Product>();
     slotChecker = { execute: jest.fn() };
     rmqClient = { emit: jest.fn() };
+    redisService = {
+      get: jest.fn().mockResolvedValue(null),
+      set: jest.fn().mockResolvedValue(undefined),
+      acquireLock: jest.fn().mockResolvedValue('mock-lock-token'),
+      releaseLock: jest.fn().mockResolvedValue(undefined),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -58,6 +66,10 @@ describe('CreateCheckoutTicketHandler', () => {
         {
           provide: CheckSlotAvailabilityHandler,
           useValue: slotChecker,
+        },
+        {
+          provide: RedisService,
+          useValue: redisService,
         },
       ],
     }).compile();
@@ -222,6 +234,7 @@ describe('CreateCheckoutTicketHandler', () => {
         userId: dto.userId,
         productId: dto.productId,
         webhookUrl: dto.webhookUrl,
+        lockToken: 'mock-lock-token',
       });
     });
   });
