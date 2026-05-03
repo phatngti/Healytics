@@ -91,14 +91,17 @@ backend.env
 deploy.env
 jenkins-agent.env
 
+# ── Production env files (pushed separately with rename) ──
+.env.prod
+backend.env.prod
+deploy.env.prod
+
 # ── Private keys and certificates ──
 rabbitmq/certs/ca_key.pem
 rabbitmq/certs/server_localhost_key.pem
 rabbitmq/certs/client_localhost_key.pem
 rabbitmq/certs/*.p12
 
-# ── Cloudflare tunnels (contains live tunnel config with tokens) ──
-cloudflare-tunnels.json
 
 # ── Jenkins runtime data ──
 jenkins_home/
@@ -127,7 +130,7 @@ SSH_OPTS="-i ${SSH_KEY} -p ${VPS_PORT} -o StrictHostKeyChecking=accept-new -o Co
 # ─── Detect existing deployment ──────────────────────────────────────────────
 # Check if the project already exists on the VPS by looking for docker-compose.yml.
 # If it exists, we use "update mode" (non-destructive) to preserve VPS-only files
-# like .env, cloudflare-tunnels.json, certs, etc.
+# like .env, certs, etc.
 # If it doesn't exist, we do a full "initial deploy" with --delete flags.
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -187,8 +190,8 @@ if [[ "${REMOTE_EXISTS}" == "false" ]]; then
   )
 else
   # Update mode: only push changed/new files, never delete remote-only files.
-  # This preserves .env, cloudflare-tunnels.json, certs, and any other
-  # VPS-specific files that were manually configured after initial deploy.
+  # This preserves .env, certs, and any other VPS-specific files that were
+  # manually configured after initial deploy.
   RSYNC_FLAGS+=(
     --update                    # skip files that are newer on the receiver
   )
@@ -209,6 +212,62 @@ rsync "${RSYNC_FLAGS[@]}" \
   "${PROJECT_DIR}/" \
   "${VPS_USER}@${VPS_HOST}:${VPS_DEST}/"
 echo ""
+
+# ─── Push cloudflare-tunnels.json via scp ────────────────────────────────────
+# This file is excluded from rsync (sensitive tunnel tokens) but we push it
+# explicitly so the VPS always has the latest tunnel configuration.
+CF_TUNNELS="${PROJECT_DIR}/cloudflare-tunnels.json"
+if [[ -f "${CF_TUNNELS}" ]]; then
+  info "Pushing cloudflare-tunnels.json..."
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    info "(dry-run) Would copy ${CF_TUNNELS} → ${VPS_DEST}/cloudflare-tunnels.json"
+  else
+    SCP_OPTS="-i ${SSH_KEY} -P ${VPS_PORT} -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10"
+    scp ${SCP_OPTS} "${CF_TUNNELS}" \
+      "${VPS_USER}@${VPS_HOST}:${VPS_DEST}/cloudflare-tunnels.json"
+    ok "cloudflare-tunnels.json pushed successfully"
+  fi
+else
+  warn "cloudflare-tunnels.json not found locally — skipping"
+fi
+
+# ─── Push production env files (rename on VPS if not existing) ───────────────
+# Push .env.prod → .env, backend.env.prod → backend.env, deploy.env.prod → deploy.env
+# Only copies if the target file does NOT already exist on the VPS.
+ENV_MAPPINGS=(
+  ".env.prod:.env"
+  "backend.env.prod:backend.env"
+  "deploy.env.prod:deploy.env"
+)
+
+info "Pushing production env files..."
+SCP_OPTS="-i ${SSH_KEY} -P ${VPS_PORT} -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10"
+
+for mapping in "${ENV_MAPPINGS[@]}"; do
+  LOCAL_NAME="${mapping%%:*}"
+  REMOTE_NAME="${mapping##*:}"
+  LOCAL_PATH="${PROJECT_DIR}/${LOCAL_NAME}"
+
+  if [[ ! -f "${LOCAL_PATH}" ]]; then
+    warn "${LOCAL_NAME} not found locally — skipping"
+    continue
+  fi
+
+  # Check if target already exists on VPS
+  if ssh ${SSH_OPTS} "${VPS_USER}@${VPS_HOST}" \
+       "test -f ${VPS_DEST}/${REMOTE_NAME}" &>/dev/null; then
+    ok "${REMOTE_NAME} already exists on VPS — skipping (not overwriting)"
+  else
+    if [[ "${DRY_RUN}" == "true" ]]; then
+      info "(dry-run) Would copy ${LOCAL_NAME} → ${VPS_DEST}/${REMOTE_NAME}"
+    else
+      info "Copying ${LOCAL_NAME} → ${REMOTE_NAME}..."
+      scp ${SCP_OPTS} "${LOCAL_PATH}" \
+        "${VPS_USER}@${VPS_HOST}:${VPS_DEST}/${REMOTE_NAME}"
+      ok "${REMOTE_NAME} pushed successfully"
+    fi
+  fi
+done
 
 # ─── Post-sync: fix permissions on scripts ──────────────────────────────────
 if [[ "${DRY_RUN}" != "true" ]]; then
@@ -236,20 +295,36 @@ if [[ "${DRY_RUN}" != "true" ]]; then
     echo -e "${BOLD}╚═══════════════════════════════════════════════════════════╝${NC}"
     echo ""
   else
-    # ─── Initial deploy: remind about sensitive files ────────────────────────
+    # ─── Initial deploy: env files auto-provisioned ──────────────────────────
     echo -e "${BOLD}╔═══════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${BOLD}║  ⚠  Remember to set up these files on the VPS:          ║${NC}"
+    echo -e "${BOLD}║  ✓  Initial deploy complete — env files provisioned      ║${NC}"
     echo -e "${BOLD}╠═══════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${BOLD}║${NC}  ${YELLOW}1.${NC} ${VPS_DEST}/.env                                     ${BOLD}║${NC}"
-    echo -e "${BOLD}║${NC}     ${CYAN}cp .env.example .env && nano .env${NC}                ${BOLD}║${NC}"
-    echo -e "${BOLD}║${NC}  ${YELLOW}2.${NC} ${VPS_DEST}/backend.env                             ${BOLD}║${NC}"
-    echo -e "${BOLD}║${NC}     ${CYAN}cp backend.env.example backend.env && nano ...${NC}   ${BOLD}║${NC}"
-    echo -e "${BOLD}║${NC}  ${YELLOW}3.${NC} ${VPS_DEST}/cloudflare-tunnels.json                  ${BOLD}║${NC}"
-    echo -e "${BOLD}║${NC}     ${CYAN}Configure tunnel routes for production${NC}            ${BOLD}║${NC}"
-    echo -e "${BOLD}║${NC}  ${YELLOW}4.${NC} RabbitMQ private keys (if not auto-generated)       ${BOLD}║${NC}"
-    echo -e "${BOLD}║${NC}     ${CYAN}rabbitmq/certs/*_key.pem, *.p12${NC}                  ${BOLD}║${NC}"
+    echo -e "${BOLD}║${NC}  Production env files were pushed and renamed:           ${BOLD}║${NC}"
+    echo -e "${BOLD}║${NC}    .env.prod       → .env                               ${BOLD}║${NC}"
+    echo -e "${BOLD}║${NC}    backend.env.prod → backend.env                       ${BOLD}║${NC}"
+    echo -e "${BOLD}║${NC}    deploy.env.prod  → deploy.env                        ${BOLD}║${NC}"
+    echo -e "${BOLD}║${NC}                                                         ${BOLD}║${NC}"
+    echo -e "${BOLD}║${NC}  ${YELLOW}Note:${NC} Verify secrets are correct before starting.      ${BOLD}║${NC}"
+    echo -e "${BOLD}║${NC}  ${YELLOW}Note:${NC} RabbitMQ private keys may need manual setup.     ${BOLD}║${NC}"
     echo -e "${BOLD}╚═══════════════════════════════════════════════════════════╝${NC}"
     echo ""
+  fi
+
+  # ─── Auto-start Docker Compose if no containers are running ────────────────
+  info "Checking for running Docker containers on VPS..."
+  CONTAINER_COUNT=$(ssh ${SSH_OPTS} "${VPS_USER}@${VPS_HOST}" \
+    "cd ${VPS_DEST} && docker compose ps -q 2>/dev/null | wc -l | tr -d ' '" 2>/dev/null || echo "0")
+
+  if [[ "${CONTAINER_COUNT}" -eq 0 ]]; then
+    warn "No Docker containers found — starting services with prod + ci profiles..."
+    echo ""
+    ssh ${SSH_OPTS} "${VPS_USER}@${VPS_HOST}" \
+      "cd ${VPS_DEST} && docker compose --profile prod --profile ci up -d --build"
+    echo ""
+    ok "Docker Compose started with --profile prod --profile ci --build"
+  else
+    ok "${CONTAINER_COUNT} container(s) already running — skipping Docker Compose start"
+    info "To restart manually: cd ${VPS_DEST} && docker compose --profile prod --profile ci up -d --build"
   fi
 fi
 

@@ -24,3 +24,8 @@
 
 # --- Whitelist openapi package ---
 !admin_panel/openapi/
+
+# --- Whitelist additional workspace members needed by pub workspace resolution ---
+!user_app/pubspec.yaml
+!user_app/openapi/
+!employee_app/pubspec.yaml

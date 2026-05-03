@@ -119,6 +119,7 @@ services:
 
   backend:
     image: '${BACKEND_IMAGE:-nonameaaaa/healytics_backend}:${BACKEND_TAG:-latest}'
+    platform: linux/amd64
     container_name: healytics-backend
     profiles: ["backend-prod"]
     restart: unless-stopped
@@ -168,19 +169,18 @@ services:
 
   panel:
     image: '${PANEL_IMAGE:-nonameaaaa/healytics_panel}:${PANEL_TAG:-latest}'
+    platform: linux/amd64
     container_name: healytics-panel
     profiles: ["panel-prod"]
     restart: unless-stopped
-    ports:
-      - "${PANEL_PORT:-3000}:80"
     networks:
       - services
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost/index.html || exit 1"]
-      interval: 30s
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ > /dev/null"]
+      interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 10s
+      retries: 6
+      start_period: 5s
 
   kong-bootstrap:
     image: '${GW_IMAGE:-kong/kong-gateway:3.12.0.2}'
@@ -456,6 +456,7 @@ services:
       # Mount local Healytics repo directly as the job workspace.
       # This lets the pipeline skip git clone and work on the host source tree.
       - ${HEALYTICS_REPO_PATH:-/Volumes/WD850X/Users/workspace/datn/Healytics}:/home/jenkins/agent/workspace/healytics-backend
+      - ${HEALYTICS_REPO_PATH:-/Volumes/WD850X/Users/workspace/datn/Healytics}:/home/jenkins/agent/workspace/healytics-panel
       - ${HOME}/.healytics-jenkins-docker:/root/.docker
       - ${HOME}/.ssh:/root/.ssh:ro
     networks:

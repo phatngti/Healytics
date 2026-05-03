@@ -15,6 +15,13 @@
           }
         },
         {
+          "hostname": "admin.healytics.me",
+          "origin": "http://healytics-panel:80",
+          "originRequest": {
+            "noTLSVerify": true
+          }
+        },
+        {
           "hostname": "jenkins-webhook.healytics.me",
           "origin": "http://jenkins-controller:8080",
           "originRequest": {

@@ -73,10 +73,13 @@ COPY --from=prod-deps --chown=node:node /app/dist ./dist
 # Needed at runtime for package metadata
 COPY --chown=node:node package.json ./
 
+# Entrypoint script: optionally runs seed, then starts the app
+COPY --chown=node:node --chmod=755 docker-entrypoint.sh ./
+
 # Runtime configuration
 ENV NODE_ENV=production
 EXPOSE 8080
 
 # dumb-init ensures SIGTERM reaches the Node process
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "dist/src/main"]
+CMD ["./docker-entrypoint.sh"]

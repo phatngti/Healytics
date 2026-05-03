@@ -72,17 +72,38 @@ EOF
 
 wait_for_panel() {
   echo "Waiting for panel container health..."
-  for _ in $(seq 1 20); do
+  local max_attempts=30
+  for i in $(seq 1 "${max_attempts}"); do
     local status
-    status="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "${CONTAINER_NAME}" 2>/dev/null || true)"
+    status="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck:{{.State.Status}}{{end}}' "${CONTAINER_NAME}" 2>/dev/null || true)"
+
+    echo "  [$i/${max_attempts}] status=${status}"
 
     if [[ "${status}" == "healthy" ]]; then
+      echo "Panel is healthy."
       return 0
+    fi
+
+    # If container has no healthcheck, accept "running" as success
+    if [[ "${status}" == "no-healthcheck:running" ]]; then
+      echo "Panel is running (no healthcheck defined). Verifying with curl..."
+      if docker exec "${CONTAINER_NAME}" curl -fsS http://localhost/ >/dev/null 2>&1; then
+        echo "Panel responded OK."
+        return 0
+      fi
+    fi
+
+    # Bail early on terminal states
+    if [[ "${status}" =~ ^(unhealthy|exited|dead)$ || "${status}" == "no-healthcheck:exited" ]]; then
+      echo "Panel entered terminal state: ${status}" >&2
+      docker logs --tail=100 "${CONTAINER_NAME}" || true
+      return 1
     fi
 
     sleep 5
   done
 
+  echo "Timed out waiting for panel health (${max_attempts} × 5s)." >&2
   docker logs --tail=100 "${CONTAINER_NAME}" || true
   return 1
 }
@@ -90,14 +111,23 @@ wait_for_panel() {
 rollback() {
   local previous_tag="$1"
 
+  # Reject empty, same-as-current, or obvious placeholder tags
   if [[ -z "${previous_tag}" || "${previous_tag}" == "${TAG}" ]]; then
     echo "No previous panel tag available for rollback." >&2
     return 1
   fi
 
+  if [[ "${previous_tag}" == *"replace-with"* || "${previous_tag}" == "latest" ]]; then
+    echo "Previous tag '${previous_tag}' is a placeholder — skipping rollback." >&2
+    return 1
+  fi
+
   echo "Rolling back panel to ${previous_tag}..."
   write_deploy_env "${previous_tag}"
-  compose --profile panel-prod pull panel
+  if ! compose --profile panel-prod pull panel; then
+    echo "Failed to pull rollback image ${PANEL_IMAGE}:${previous_tag}." >&2
+    return 1
+  fi
   compose --profile panel-prod up -d --no-deps panel
   wait_for_panel
 }

@@ -6,7 +6,8 @@
 #
 # Credentials are resolved in order:
 #   1. Environment variables already set (e.g. by Jenkins withCredentials)
-#   2. .env file in the workspace root
+#   2. scripts/.env (local script-level config)
+#   3. .env file in the project root
 #
 # The script:
 #   1. Authenticates to Docker Hub via stdin (no CLI password exposure)
@@ -16,22 +17,32 @@
 
 set -euo pipefail
 
-# --- Resolve workspace root (.env lives at healytic_fe/) --------------------
+# --- Resolve candidate .env locations --------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORKSPACE_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-ENV_FILE="${WORKSPACE_ROOT}/.env"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+ENV_FILES=(
+  "${SCRIPT_DIR}/.env"
+  "${PROJECT_ROOT}/.env"
+)
 
-# --- Load .env (only sets vars that are NOT already exported) ---------------
-if [ -f "${ENV_FILE}" ]; then
-  while IFS='=' read -r key value; do
-    [[ -z "${key}" || "${key}" =~ ^# ]] && continue
-    value="${value%\"}"
-    value="${value#\"}"
-    if [ -z "${!key+x}" ]; then
-      export "${key}=${value}"
-    fi
-  done < "${ENV_FILE}"
-fi
+# --- Load .env files (only sets vars that are NOT already exported) ---------
+for env_file in "${ENV_FILES[@]}"; do
+  if [ -f "${env_file}" ]; then
+    while IFS='=' read -r key value || [ -n "${key:-}" ]; do
+      key="${key%$'\r'}"
+      value="${value%$'\r'}"
+      # skip blank lines and comments
+      [[ -z "${key}" || "${key}" =~ ^# ]] && continue
+      # strip surrounding quotes from value
+      value="${value%\"}"
+      value="${value#\"}"
+      # set if current env value is unset or empty
+      if [ -z "${!key:-}" ]; then
+        export "${key}=${value}"
+      fi
+    done < "${env_file}"
+  fi
+done
 
 # --- Validate inputs -------------------------------------------------------
 if [ $# -lt 2 ]; then

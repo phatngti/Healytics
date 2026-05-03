@@ -1,0 +1,68 @@
++ set -eu
++ docker build --target runtime -t nonameaaaa/healytics_backend:0f33a9cd9f7d .
+#1 [internal] load build definition from Dockerfile
+#1 sha256:c30111e0357dad25ae870c0867ce66d67ce29ea43bf869f9b51ca4739be3b847
+#1 transferring dockerfile: 3.31kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-alpine
+#2 sha256:0c7a5708f37084edbb676f20722dcd0923d3d48a7948f9f862ca6c31fb4fe999
+#2 DONE 1.3s
+
+#3 [internal] load .dockerignore
+#3 sha256:ab9d44b1559e610e6dc1323e7aa1b945a1dc091940a859d35b47ce3470a3d9dc
+#3 transferring context: 479B 0.0s done
+#3 DONE 0.0s
+
+#19 [build 1/8] FROM docker.io/library/node:22-alpine@sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f
+#19 sha256:14bb26e9818f120b1e9a6fe266e1237badf2dea3a5b08c42a5bc00b7b6b99415
+#19 resolve docker.io/library/node:22-alpine@sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f 0.1s done
+#19 DONE 0.1s
+
+#11 [internal] load build context
+#11 sha256:05187af3202024acd9eb1a8f4ed25fef7ad15727bac49220934fc374971d59b4
+#11 transferring context: 58.39kB 0.4s done
+#11 DONE 0.4s
+
+#12 [build 2/8] WORKDIR /app
+#12 sha256:9acacdeae2e86b8b511c4211655f6618a842c45d5c01626c4112aabc689db0f0
+#12 CACHED
+
+#17 [build 3/8] COPY package.json yarn.lock ./
+#17 sha256:c2187ed2cf039d6bdb2ce78691eaf749d47b2ace0ba5d280769f59c2eac72021
+#17 CACHED
+
+#7 [build 4/8] RUN yarn install --frozen-lockfile
+#7 sha256:92394dd6ed71ed4d67bdb5823e8220660e10f6815f469745f49ed4c8eec5e5e6
+#7 CACHED
+
+#6 [build 5/8] COPY tsconfig.json tsconfig.build.json nest-cli.json ./
+#6 sha256:dd68de2b636be4b3aa6bbb6524e083d9bee0bffff1f63e4d73423f7ac881ddbd
+#6 CACHED
+
+#20 [build 6/8] COPY src/ src/
+#20 sha256:b5152d9fc6320c2b4e24a17cf7cc79ffcf360df9ffd9ffd580890dc2f978252d
+#20 DONE 0.1s
+
+#18 [build 7/8] COPY migrations/ migrations/
+#18 sha256:cde63642ba4bf3cb861f14e0e34db1b9af1f8ffe470dbe8530dd91a8af078515
+#18 DONE 0.0s
+
+#5 [build 8/8] RUN yarn build
+#5 sha256:2bb04836de3aab80ad2b6ad50530738f9da2d5dc38c90eee5f72851bf2877e96
+#5 0.592 yarn run v1.22.22
+#5 0.629 $ nest build
+#5 18.56 Done in 17.97s.
+#5 DONE 18.7s
+
+#4 [prod-deps 1/2] RUN yarn install --production --frozen-lockfile     && yarn cache clean
+#4 sha256:9dc2f446fd5f199af55fb65913092eae7ae92e568f1a0443eb8db011bff52aa3
+#4 0.612 yarn install v1.22.22
+#4 0.685 [1/4] Resolving packages...
+#4 0.939 [2/4] Fetching packages...
+#4 1.579 [3/4] Linking dependencies...
+#4 1.584 warning " > @socket.io/redis-adapter@8.3.0" has unmet peer dependency "socket.io-adapter@^2.5.4".
+#4 1.587 warning " > ts-loader@9.5.4" has unmet peer dependency "webpack@^5.0.0".
+#4 1.637 warning Workspaces can only be enabled in private projects.
+#4 1.651 warning Workspaces can only be enabled in private projects.
+#4 5.695 [4/4] Building fresh packages...
