@@ -87,13 +87,18 @@ services:
     restart: always
     ports:
       - '${REDIS_PORT:-6379}:6379'
-    command: >
-      redis-server
-        --appendonly yes
-        --replica-read-only no
-        --save 20 1
-        --loglevel warning
-        --requirepass ${REDIS_PASSWORD}
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --replica-read-only
+      - "no"
+      - --save
+      - "20 1"
+      - --loglevel
+      - warning
+      - --requirepass
+      - ${REDIS_PASSWORD}
     volumes:
       - redisdata:/data
     environment:
@@ -101,24 +106,27 @@ services:
     networks:
       - services
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" ping | grep PONG"]
+      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" --no-auth-warning ping | grep PONG"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   # =============================================================================
   # Backend API (deployed by Jenkins via immutable registry image tags)
+  # Image and tag are supplied by deploy-backend.sh → deploy.env.
+  # Do NOT hardcode defaults here — deploy-backend.sh is the single source.
   # =============================================================================
 
   backend:
-    image: '${BACKEND_IMAGE:-giahung2111/healytics_backend}:${BACKEND_TAG:-unset}'
+    image: '${BACKEND_IMAGE:-nonameaaaa/healytics_backend}:${BACKEND_TAG:-latest}'
     container_name: healytics-backend
-    profiles: ["prod"]
+    profiles: ["backend-prod"]
     restart: unless-stopped
-    env_file:
-      - path: ./backend.env
-        required: false
+    env_file: backend.env
     environment:
+      # --- Infrastructure overrides (Docker-internal DNS / in-container paths) ---
+      # These MUST stay here because they reference Compose service names or
+      # container-local paths that cannot be known outside docker-compose.yml.
       NODE_ENV: production
       PORT: 8080
       POSTGRES_HOST: postgres
@@ -126,6 +134,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is required}
+      POSTGRES_SSL: ${POSTGRES_SSL:-false}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
@@ -138,15 +147,9 @@ services:
       - ./rabbitmq/certs:/app/certs:ro
     networks:
       - services
-    depends_on:
-      postgres-init:
-        condition: service_completed_successfully
-      redis:
-        condition: service_healthy
-      rabbitmq-init:
-        condition: service_completed_successfully
-      rabbitmq-haproxy:
-        condition: service_started
+    # NOTE: infrastructure services (postgres, redis, rabbitmq) run under
+    # profiles "dev"/"prod". Cross-profile depends_on is invalid in Compose.
+    # deploy-backend.sh already ensures infra is up before starting backend.
     healthcheck:
       test:
         [
@@ -157,6 +160,27 @@ services:
       timeout: 5s
       retries: 12
       start_period: 30s
+
+  # =============================================================================
+  # Admin Panel (Flutter web — served by Nginx)
+  # Image and tag are supplied by deploy-panel.sh → deploy-panel.env.
+  # =============================================================================
+
+  panel:
+    image: '${PANEL_IMAGE:-nonameaaaa/healytics_panel}:${PANEL_TAG:-latest}'
+    container_name: healytics-panel
+    profiles: ["panel-prod"]
+    restart: unless-stopped
+    ports:
+      - "${PANEL_PORT:-3000}:80"
+    networks:
+      - services
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/index.html || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   kong-bootstrap:
     image: '${GW_IMAGE:-kong/kong-gateway:3.12.0.2}'
@@ -383,6 +407,7 @@ services:
       # Shared secret to authenticate incoming GitHub webhooks.
       # NOT a GitHub credential — only authorizes webhook delivery.
       WEBHOOK_TOKEN: ${WEBHOOK_TOKEN:-changeme}
+      WEBHOOK_TOKEN_PANEL: ${WEBHOOK_TOKEN_PANEL:-changeme-panel}
     ports:
       - "${JENKINS_BIND_ADDR:-127.0.0.1}:${JENKINS_PORT:-8081}:8080"
       - "${JENKINS_BIND_ADDR:-127.0.0.1}:${JENKINS_JNLP_PORT:-50000}:50000"
@@ -423,11 +448,16 @@ services:
       AGENT_WORKDIR: /home/jenkins/agent
       HEALYTICS_VPS_HOST: ${HEALYTICS_VPS_HOST:-}
       HEALYTICS_VPS_SSH_USER: ${HEALYTICS_VPS_SSH_USER:-deploy}
+      # Host-side repo path — used by Jenkinsfile for docker-run volume mounts.
+      HEALYTICS_REPO_PATH: ${HEALYTICS_REPO_PATH:-/Volumes/WD850X/Users/workspace/datn/Healytics}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - jenkins_agent_workdir:/home/jenkins/agent
-      - ${HOME}/.healytics-jenkins-docker:/root/.docker:ro
-      - ${HOME}/.healytics-jenkins-ssh:/root/.ssh:ro
+      # Mount local Healytics repo directly as the job workspace.
+      # This lets the pipeline skip git clone and work on the host source tree.
+      - ${HEALYTICS_REPO_PATH:-/Volumes/WD850X/Users/workspace/datn/Healytics}:/home/jenkins/agent/workspace/healytics-backend
+      - ${HOME}/.healytics-jenkins-docker:/root/.docker
+      - ${HOME}/.ssh:/root/.ssh:ro
     networks:
       - services
     depends_on:

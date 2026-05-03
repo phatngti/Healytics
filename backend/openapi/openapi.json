@@ -224,6 +224,79 @@
         ]
       }
     },
+    "/auth/employee/login": {
+      "post": {
+        "operationId": "AuthController_loginEmployee",
+        "summary": "Login as an employee",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Employee login returns access and refresh tokens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials."
+          },
+          "403": {
+            "description": "Account not authorized for employee login."
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/employee/refresh": {
+      "post": {
+        "operationId": "AuthController_refreshEmployee",
+        "summary": "Refresh employee tokens",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "New pair of tokens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokensDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token."
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
@@ -1511,6 +1584,230 @@
         },
         "tags": [
           "User Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/profile": {
+      "get": {
+        "operationId": "EmployeeProfileController_getMyProfile",
+        "summary": "Get my employee profile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return the authenticated employee profile.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee profile linked to this account."
+          }
+        },
+        "tags": [
+          "Employee Profile"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "EmployeeProfileController_updateMyProfile",
+        "summary": "Update my employee profile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmployeeProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The profile has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee profile linked to this account."
+          }
+        },
+        "tags": [
+          "Employee Profile"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/revenue/summary": {
+      "get": {
+        "operationId": "EmployeeRevenueController_getSummary",
+        "summary": "Get revenue summary",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for revenue aggregation",
+            "schema": {
+              "$ref": "#/components/schemas/EmployeeRevenuePeriod"
+            }
+          },
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Reference date for the period (defaults to today)",
+            "schema": {
+              "example": "2026-05-01",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Revenue summary for the period.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeRevenueSummaryResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee profile linked to this account."
+          }
+        },
+        "tags": [
+          "Employee Revenue"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/revenue/trend": {
+      "get": {
+        "operationId": "EmployeeRevenueController_getTrend",
+        "summary": "Get revenue trend data",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for revenue aggregation",
+            "schema": {
+              "$ref": "#/components/schemas/EmployeeRevenuePeriod"
+            }
+          },
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Reference date for the period (defaults to today)",
+            "schema": {
+              "example": "2026-05-01",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of trend data points.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmployeeRevenueTrendPointDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee profile linked to this account."
+          }
+        },
+        "tags": [
+          "Employee Revenue"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/revenue/breakdown": {
+      "get": {
+        "operationId": "EmployeeRevenueController_getBreakdown",
+        "summary": "Get revenue breakdown by service",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "description": "Time period for revenue aggregation",
+            "schema": {
+              "$ref": "#/components/schemas/EmployeeRevenuePeriod"
+            }
+          },
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Reference date for the period (defaults to today)",
+            "schema": {
+              "example": "2026-05-01",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of breakdown items.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmployeeRevenueBreakdownItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No employee profile linked to this account."
+          }
+        },
+        "tags": [
+          "Employee Revenue"
         ],
         "security": [
           {
@@ -3389,6 +3686,231 @@
         },
         "tags": [
           "User Slots"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/appointments": {
+      "get": {
+        "operationId": "EmployeeAppointmentsController_listMyAppointments",
+        "summary": "List my appointments",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter appointments by status",
+            "schema": {
+              "$ref": "#/components/schemas/EmployeeBookingStatusFilter"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return paginated list of employee appointments."
+          }
+        },
+        "tags": [
+          "Employee Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/appointments/{id}": {
+      "get": {
+        "operationId": "EmployeeAppointmentsController_getAppointment",
+        "summary": "Get appointment detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return appointment details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeAppointmentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found."
+          }
+        },
+        "tags": [
+          "Employee Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/appointments/{id}/start": {
+      "patch": {
+        "operationId": "EmployeeAppointmentsController_startService",
+        "summary": "Start service for an appointment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service started, booking moved to IN_PROGRESS.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeAppointmentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found."
+          },
+          "409": {
+            "description": "Invalid status transition."
+          }
+        },
+        "tags": [
+          "Employee Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/appointments/{id}/complete": {
+      "patch": {
+        "operationId": "EmployeeAppointmentsController_completeService",
+        "summary": "Complete service for an appointment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeAppointmentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found."
+          },
+          "409": {
+            "description": "Invalid status transition."
+          }
+        },
+        "tags": [
+          "Employee Appointments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/appointments/{id}/cancel": {
+      "patch": {
+        "operationId": "EmployeeAppointmentsController_cancelAppointment",
+        "summary": "Cancel an appointment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelEmployeeAppointmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Appointment cancelled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeAppointmentResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found."
+          },
+          "409": {
+            "description": "Invalid status transition."
+          }
+        },
+        "tags": [
+          "Employee Appointments"
         ],
         "security": [
           {
@@ -6197,6 +6719,20 @@
           }
         ]
       }
+    },
+    "/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Backend liveness check."
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
     }
   },
   "info": {
@@ -6669,6 +7205,23 @@
           "password"
         ]
       },
+      "EmployeeLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "employee@clinic.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
       "LogoutResponseDto": {
         "type": "object",
         "properties": {
@@ -6856,7 +7409,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-01T15:47:58.377Z"
+              "submittedAt": "2026-05-03T07:43:59.130Z"
             }
           }
         },
@@ -10132,6 +10685,134 @@
           "title",
           "duration",
           "price"
+        ]
+      },
+      "UpdateEmployeeProfileDto": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "example": "0901234567"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "example": "https://cdn.example.com/avatar.jpg"
+          },
+          "description": {
+            "type": "string",
+            "example": "Experienced massage therapist with 5+ years..."
+          },
+          "emergencyContactName": {
+            "type": "string",
+            "example": "Jane Doe"
+          },
+          "emergencyContactPhone": {
+            "type": "string",
+            "example": "0987654321"
+          },
+          "schedule": {
+            "description": "Weekly work schedule",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
+          }
+        }
+      },
+      "EmployeeRevenuePeriod": {
+        "type": "string",
+        "description": "Period used for aggregation",
+        "enum": [
+          "day",
+          "month",
+          "year"
+        ]
+      },
+      "EmployeeRevenueSummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalRevenue": {
+            "type": "number",
+            "description": "Total revenue from completed appointments"
+          },
+          "totalCommission": {
+            "type": "number",
+            "description": "Total commission deducted"
+          },
+          "netEarnings": {
+            "type": "number",
+            "description": "Net earnings after commission"
+          },
+          "completedAppointments": {
+            "type": "number",
+            "description": "Number of completed appointments"
+          },
+          "canceledAppointments": {
+            "type": "number",
+            "description": "Number of canceled appointments"
+          },
+          "period": {
+            "$ref": "#/components/schemas/EmployeeRevenuePeriod"
+          },
+          "periodStart": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Start of the aggregation period"
+          },
+          "periodEnd": {
+            "format": "date-time",
+            "type": "string",
+            "description": "End of the aggregation period"
+          }
+        },
+        "required": [
+          "totalRevenue",
+          "totalCommission",
+          "netEarnings",
+          "completedAppointments",
+          "canceledAppointments",
+          "period",
+          "periodStart",
+          "periodEnd"
+        ]
+      },
+      "EmployeeRevenueTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "amount",
+          "label"
+        ]
+      },
+      "EmployeeRevenueBreakdownItemDto": {
+        "type": "object",
+        "properties": {
+          "serviceName": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          },
+          "totalAmount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "serviceName",
+          "count",
+          "totalAmount"
         ]
       },
       "CategorySummaryDto": {
@@ -13460,6 +14141,7 @@
         "enum": [
           "PENDING_PAYMENT",
           "CONFIRMED",
+          "IN_PROGRESS",
           "CANCELLED",
           "COMPLETED",
           "NO_SHOW"
@@ -13608,6 +14290,95 @@
         "required": [
           "isDuplicate"
         ]
+      },
+      "EmployeeBookingStatusFilter": {
+        "type": "string",
+        "enum": [
+          "upcoming",
+          "inProgress",
+          "completed",
+          "canceled"
+        ]
+      },
+      "EmployeeAppointmentResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "serviceName": {
+            "type": "string"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/EmployeeBookingStatusFilter"
+          },
+          "category": {
+            "type": "string"
+          },
+          "clinicName": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "checkInTime": {
+            "type": "string",
+            "example": "09:00 AM"
+          },
+          "checkOutTime": {
+            "type": "string",
+            "example": "10:00 AM"
+          },
+          "duration": {
+            "type": "string",
+            "example": "60 mins"
+          },
+          "price": {
+            "type": "number",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "serviceName",
+          "customerName",
+          "customerId",
+          "status",
+          "category",
+          "clinicName",
+          "address",
+          "date",
+          "checkInTime",
+          "checkOutTime",
+          "duration"
+        ]
+      },
+      "CancelEmployeeAppointmentDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "example": "Patient requested cancellation"
+          }
+        }
       },
       "CreateBroadcastDto": {
         "type": "object",

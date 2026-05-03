@@ -6,36 +6,48 @@ export class AddInProgressBookingStatus1776700100000
   name = 'AddInProgressBookingStatus1776700100000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Check if the booking status column uses a varchar or an enum type.
-    // Our entity uses varchar(30), so we just need to ensure existing
-    // check constraints (if any) allow the new value.
-    // If the column uses a Postgres ENUM type, we would need:
-    //   ALTER TYPE booking_status ADD VALUE 'IN_PROGRESS' BEFORE 'CANCELLED';
+    // The Booking entity defines `status` as varchar(30), so any string
+    // value is already accepted — no DDL change required.
+    // This migration exists purely as documentation that IN_PROGRESS
+    // is now a valid BookingStatus value.
     //
-    // Since our Booking entity defines status as varchar(30), no DDL is needed.
-    // This migration serves as documentation that IN_PROGRESS is now valid.
-    //
-    // Verify column type:
-    const table = await queryRunner.getTable('bookings');
-    const statusColumn = table?.columns.find((c) => c.name === 'status');
+    // Safety: query information_schema to confirm the column is varchar.
+    // If someone has changed it to a Postgres ENUM, handle that too.
+    const [{ data_type }] = await queryRunner.query(`
+      SELECT data_type
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name   = 'bookings'
+        AND column_name  = 'status'
+    `);
 
-    if (statusColumn && statusColumn.type === 'varchar') {
-      // varchar — no DDL needed, new values are already allowed
+    if (data_type !== 'USER-DEFINED') {
+      // varchar / text / etc. — no DDL needed
       return;
     }
 
-    // If it's an enum type, add the new value
-    // Note: PostgreSQL does not support IF NOT EXISTS for ADD VALUE in older versions,
-    // but v10+ supports it in a transaction-safe way when not inside a transaction block.
+    // Only runs if the column is actually a Postgres ENUM type
+    // Fetch the real enum type name from pg_attribute + pg_type
+    const [{ typname }] = await queryRunner.query(`
+      SELECT t.typname
+      FROM pg_attribute a
+      JOIN pg_type t ON a.atttypid = t.oid
+      JOIN pg_class c ON a.attrelid = c.oid
+      JOIN pg_namespace n ON c.relnamespace = n.oid
+      WHERE n.nspname = 'public'
+        AND c.relname  = 'bookings'
+        AND a.attname  = 'status'
+    `);
+
     await queryRunner.query(`
       DO $$
       BEGIN
         IF NOT EXISTS (
           SELECT 1 FROM pg_enum
           WHERE enumlabel = 'IN_PROGRESS'
-          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'bookings_status_enum')
+          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = '${typname}')
         ) THEN
-          ALTER TYPE bookings_status_enum ADD VALUE 'IN_PROGRESS' BEFORE 'CANCELLED';
+          ALTER TYPE "${typname}" ADD VALUE 'IN_PROGRESS';
         END IF;
       END
       $$;
