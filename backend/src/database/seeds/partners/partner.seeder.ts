@@ -314,7 +314,7 @@ const SEED_PARTNERS: SeedPartner[] = [
     ],
   },
 
-  // ── 5. ONBOARDING — Traditional Medicine ──
+  // ── 5. PENDING — Traditional Medicine ──
   {
     accountEmail: 'partner5@healytics.vn',
     taxCode: '6677889900',
@@ -323,7 +323,7 @@ const SEED_PARTNERS: SeedPartner[] = [
     businessType: [BusinessType.TRADITIONAL_MEDICINE],
     streetAddress: '88 Tran Quoc Toan',
     phoneNumber: '0285678901',
-    verificationStatus: PartnerVerificationStatus.ONBOARDING,
+    verificationStatus: PartnerVerificationStatus.PENDING,
     coordinates: '10.7800,106.6870',
     coverImageUrl:
       'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=1200',

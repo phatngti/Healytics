@@ -10,10 +10,12 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**authControllerLoginAdmin**](AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | Login as admin
+[**authControllerLoginEmployee**](AuthenticationApi.md#authcontrollerloginemployee) | **POST** /auth/employee/login | Login as an employee
 [**authControllerLoginPartner**](AuthenticationApi.md#authcontrollerloginpartner) | **POST** /auth/partner/login | Login as a partner
 [**authControllerLoginUser**](AuthenticationApi.md#authcontrollerloginuser) | **POST** /auth/user/login | Login as a user
 [**authControllerLogout**](AuthenticationApi.md#authcontrollerlogout) | **POST** /auth/logout | Logout current user
 [**authControllerRefresh**](AuthenticationApi.md#authcontrollerrefresh) | **POST** /auth/refresh | Refresh authentication tokens
+[**authControllerRefreshEmployee**](AuthenticationApi.md#authcontrollerrefreshemployee) | **POST** /auth/employee/refresh | Refresh employee tokens
 [**authControllerRefreshPartner**](AuthenticationApi.md#authcontrollerrefreshpartner) | **POST** /auth/partner/refresh | Refresh partner tokens with verification info
 [**authControllerRegisterPartner**](AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
 [**authControllerRegisterUser**](AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | Register a new user
@@ -44,6 +46,47 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **adminLoginDto** | [**AdminLoginDto**](AdminLoginDto.md)|  | 
+
+### Return type
+
+[**AuthTokensDto**](AuthTokensDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerLoginEmployee**
+> AuthTokensDto authControllerLoginEmployee(employeeLoginDto)
+
+Login as an employee
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+final employeeLoginDto = EmployeeLoginDto(); // EmployeeLoginDto | 
+
+try {
+    final result = api_instance.authControllerLoginEmployee(employeeLoginDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerLoginEmployee: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **employeeLoginDto** | [**EmployeeLoginDto**](EmployeeLoginDto.md)|  | 
 
 ### Return type
 
@@ -196,6 +239,47 @@ try {
     print(result);
 } catch (e) {
     print('Exception when calling AuthenticationApi->authControllerRefresh: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **refreshTokenRequestDto** | [**RefreshTokenRequestDto**](RefreshTokenRequestDto.md)|  | 
+
+### Return type
+
+[**AuthTokensDto**](AuthTokensDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerRefreshEmployee**
+> AuthTokensDto authControllerRefreshEmployee(refreshTokenRequestDto)
+
+Refresh employee tokens
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+final refreshTokenRequestDto = RefreshTokenRequestDto(); // RefreshTokenRequestDto | 
+
+try {
+    final result = api_instance.authControllerRefreshEmployee(refreshTokenRequestDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerRefreshEmployee: $e\n');
 }
 ```
 

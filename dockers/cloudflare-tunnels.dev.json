@@ -1,0 +1,27 @@
+{
+  "tunnels": [
+    {
+      "name": "healytics-dev-tunnel",
+      "token": "",
+      "routes": [
+        {
+          "hostname": "dev.healytics.me",
+          "origin": "http://kong-cp:8000",
+          "originRequest": {
+            "noTLSVerify": true,
+            "connectTimeout": 30,
+            "keepAliveTimeout": 3600,
+            "keepAliveConnections": 100
+          }
+        },
+        {
+          "hostname": "dev-admin.healytics.me",
+          "origin": "http://healytics-panel:80",
+          "originRequest": {
+            "noTLSVerify": true
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -67,10 +67,6 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
       response = await _authApi.authControllerLoginAdmin(
         AdminLoginDto(email: request.email, password: request.password),
       );
-    } else if (role == Role.user.value) {
-      response = await _authApi.authControllerLoginUser(
-        LoginDto(email: request.email, password: request.password),
-      );
     } else if (role == Role.health_partner.value) {
       response = await _authApi.authControllerLoginPartner(
         PartnerLoginDto(email: request.email, password: request.password),

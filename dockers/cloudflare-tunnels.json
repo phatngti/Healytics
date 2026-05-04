@@ -28,6 +28,20 @@
             "noTLSVerify": true,
             "connectTimeout": 10
           }
+        },
+        {
+          "hostname": "kong.healytics.me",
+          "origin": "http://kong-cp:8002",
+          "originRequest": {
+            "noTLSVerify": true
+          }
+        },
+        {
+          "hostname": "kong-api.healytics.me",
+          "origin": "http://kong-cp:8001",
+          "originRequest": {
+            "noTLSVerify": true
+          }
         }
       ]
     }
