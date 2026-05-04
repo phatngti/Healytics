@@ -228,7 +228,7 @@ export class PartnerChatGateway
       conversationId: payload.conversationId,
       userId: user.id,
       receiverId: payload.receiverId,
-      userName: user.userProfile?.fullName ?? user.username ?? user.email,
+      userName: user.userProfile?.fullName ?? user.email,
     });
   }
 

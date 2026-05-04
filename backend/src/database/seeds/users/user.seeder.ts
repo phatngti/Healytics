@@ -10,13 +10,11 @@ import { ISeeder } from '../seeder.interface';
 const SEED_USERS = [
   {
     email: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
-    username: 'admin',
     password: process.env.DEFAULT_ADMIN_PASSWORD || 'admin@123',
     role: Role.ADMIN,
   },
   {
     email: 'user@healytics.vn',
-    username: 'testuser',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Test',
@@ -25,7 +23,6 @@ const SEED_USERS = [
   },
   {
     email: 'nguyenvana@healytics.vn',
-    username: 'nguyenvana',
     password: 'user@123',
     role: Role.USER,
     firstName: 'An',
@@ -34,7 +31,6 @@ const SEED_USERS = [
   },
   {
     email: 'tranthib@healytics.vn',
-    username: 'tranthib',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Binh',
@@ -43,7 +39,6 @@ const SEED_USERS = [
   },
   {
     email: 'levanc@healytics.vn',
-    username: 'levanc',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Cuong',
@@ -52,7 +47,6 @@ const SEED_USERS = [
   },
   {
     email: 'phamthid@healytics.vn',
-    username: 'phamthid',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Dung',
@@ -61,7 +55,6 @@ const SEED_USERS = [
   },
   {
     email: 'hoangvane@healytics.vn',
-    username: 'hoangvane',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Em',
@@ -70,7 +63,6 @@ const SEED_USERS = [
   },
   {
     email: 'vuthif@healytics.vn',
-    username: 'vuthif',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Fang',
@@ -79,7 +71,6 @@ const SEED_USERS = [
   },
   {
     email: 'dangvang@healytics.vn',
-    username: 'dangvang',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Giang',
@@ -88,7 +79,6 @@ const SEED_USERS = [
   },
   {
     email: 'buithih@healytics.vn',
-    username: 'buithih',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Huong',
@@ -97,7 +87,6 @@ const SEED_USERS = [
   },
   {
     email: 'ngothii@healytics.vn',
-    username: 'ngothii',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Ich',
@@ -106,7 +95,6 @@ const SEED_USERS = [
   },
   {
     email: 'dovank@healytics.vn',
-    username: 'dovank',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Khoa',
@@ -115,7 +103,6 @@ const SEED_USERS = [
   },
   {
     email: 'nguyenminh@healytics.vn',
-    username: 'nguyenminh',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Minh',
@@ -124,7 +111,6 @@ const SEED_USERS = [
   },
   {
     email: 'lehoanglinh@healytics.vn',
-    username: 'lehoanglinh',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Linh',
@@ -133,7 +119,6 @@ const SEED_USERS = [
   },
   {
     email: 'phamquang@healytics.vn',
-    username: 'phamquang',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Quang',
@@ -142,7 +127,6 @@ const SEED_USERS = [
   },
   {
     email: 'trandangthao@healytics.vn',
-    username: 'trandangthao',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Thao',
@@ -151,7 +135,6 @@ const SEED_USERS = [
   },
   {
     email: 'maianh@healytics.vn',
-    username: 'maianh',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Anh',
@@ -160,7 +143,6 @@ const SEED_USERS = [
   },
   {
     email: 'votuankiet@healytics.vn',
-    username: 'votuankiet',
     password: 'user@123',
     role: Role.USER,
     firstName: 'Kiet',
@@ -169,49 +151,41 @@ const SEED_USERS = [
   },
   {
     email: 'ops.admin@healytics.vn',
-    username: 'ops_admin',
     password: 'admin@123',
     role: Role.ADMIN,
   },
   {
     email: 'employee.coordinator@healytics.vn',
-    username: 'clinic_coordinator',
     password: 'employee@123',
     role: Role.EMPLOYEE,
   },
   {
     email: 'partner@healytics.vn',
-    username: 'testpartner',
     password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
   {
     email: 'partner2@healytics.vn',
-    username: 'partner_dental',
     password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
   {
     email: 'partner3@healytics.vn',
-    username: 'partner_fitness',
     password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
   {
     email: 'partner4@healytics.vn',
-    username: 'partner_pharmacy',
     password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
   {
     email: 'partner5@healytics.vn',
-    username: 'partner_traditional',
     password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
   {
     email: 'partner6@healytics.vn',
-    username: 'partner_psychology',
     password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
@@ -247,7 +221,6 @@ export class UserSeeder implements ISeeder {
 
       const account = this.accountRepo.create({
         email: userData.email,
-        username: userData.username,
         passwordHash,
         role: userData.role,
         isActive: true,

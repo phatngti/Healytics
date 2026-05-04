@@ -51,11 +51,6 @@ void main() {
       // TODO
     });
 
-    // VerifiedField username
-    test('to test the property `username`', () async {
-      // TODO
-    });
-
 
   });
 

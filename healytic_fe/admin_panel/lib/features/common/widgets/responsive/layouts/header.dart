@@ -150,9 +150,6 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
       final full = '$first $last'.trim();
       if (full.isNotEmpty) return full;
     }
-    if (account.username != null && account.username!.isNotEmpty) {
-      return account.username!;
-    }
     return account.email;
   }
 

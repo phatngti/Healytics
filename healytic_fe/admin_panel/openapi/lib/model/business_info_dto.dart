@@ -20,7 +20,6 @@ class BusinessInfoDto {
     this.address,
     this.email,
     this.phoneNumber,
-    this.username,
   });
 
 
@@ -68,14 +67,6 @@ class BusinessInfoDto {
   ///
   VerifiedField? phoneNumber;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  VerifiedField? username;
-
   @override
   bool operator ==(Object other) => identical(this, other) || other is BusinessInfoDto &&
     other.brandName == brandName &&
@@ -84,8 +75,7 @@ class BusinessInfoDto {
     other.businessType == businessType &&
     other.address == address &&
     other.email == email &&
-    other.phoneNumber == phoneNumber &&
-    other.username == username;
+    other.phoneNumber == phoneNumber;
 
   @override
   int get hashCode =>
@@ -96,11 +86,10 @@ class BusinessInfoDto {
     (businessType.hashCode) +
     (address == null ? 0 : address!.hashCode) +
     (email == null ? 0 : email!.hashCode) +
-    (phoneNumber == null ? 0 : phoneNumber!.hashCode) +
-    (username == null ? 0 : username!.hashCode);
+    (phoneNumber == null ? 0 : phoneNumber!.hashCode);
 
   @override
-  String toString() => 'BusinessInfoDto[brandName=$brandName, legalName=$legalName, taxRegistrationCode=$taxRegistrationCode, businessType=$businessType, address=$address, email=$email, phoneNumber=$phoneNumber, username=$username]';
+  String toString() => 'BusinessInfoDto[brandName=$brandName, legalName=$legalName, taxRegistrationCode=$taxRegistrationCode, businessType=$businessType, address=$address, email=$email, phoneNumber=$phoneNumber]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -131,11 +120,6 @@ class BusinessInfoDto {
     } else {
       json[r'phoneNumber'] = null;
     }
-    if (this.username != null) {
-      json[r'username'] = this.username;
-    } else {
-      json[r'username'] = null;
-    }
     return json;
   }
 
@@ -165,7 +149,6 @@ class BusinessInfoDto {
         address: AddressInfoDto.fromJson(json[r'address']),
         email: VerifiedField.fromJson(json[r'email']),
         phoneNumber: VerifiedField.fromJson(json[r'phoneNumber']),
-        username: VerifiedField.fromJson(json[r'username']),
       );
     }
     return null;

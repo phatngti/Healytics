@@ -19,7 +19,6 @@ class PublicProfileBusinessInfoDto {
     this.businessType = const [],
     this.phoneNumber,
     this.email,
-    this.username,
   });
 
 
@@ -35,8 +34,6 @@ class PublicProfileBusinessInfoDto {
 
   Object? email;
 
-  Object? username;
-
   @override
   bool operator ==(Object other) => identical(this, other) || other is PublicProfileBusinessInfoDto &&
     other.brandName == brandName &&
@@ -44,8 +41,7 @@ class PublicProfileBusinessInfoDto {
     other.taxCode == taxCode &&
     _deepEquality.equals(other.businessType, businessType) &&
     other.phoneNumber == phoneNumber &&
-    other.email == email &&
-    other.username == username;
+    other.email == email;
 
   @override
   int get hashCode =>
@@ -55,11 +51,10 @@ class PublicProfileBusinessInfoDto {
     (taxCode.hashCode) +
     (businessType.hashCode) +
     (phoneNumber == null ? 0 : phoneNumber!.hashCode) +
-    (email == null ? 0 : email!.hashCode) +
-    (username == null ? 0 : username!.hashCode);
+    (email == null ? 0 : email!.hashCode);
 
   @override
-  String toString() => 'PublicProfileBusinessInfoDto[brandName=$brandName, legalName=$legalName, taxCode=$taxCode, businessType=$businessType, phoneNumber=$phoneNumber, email=$email, username=$username]';
+  String toString() => 'PublicProfileBusinessInfoDto[brandName=$brandName, legalName=$legalName, taxCode=$taxCode, businessType=$businessType, phoneNumber=$phoneNumber, email=$email]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -76,11 +71,6 @@ class PublicProfileBusinessInfoDto {
       json[r'email'] = this.email;
     } else {
       json[r'email'] = null;
-    }
-    if (this.username != null) {
-      json[r'username'] = this.username;
-    } else {
-      json[r'username'] = null;
     }
     return json;
   }
@@ -112,7 +102,6 @@ class PublicProfileBusinessInfoDto {
             : const [],
         phoneNumber: mapValueOfType<Object>(json, r'phoneNumber'),
         email: mapValueOfType<Object>(json, r'email'),
-        username: mapValueOfType<Object>(json, r'username'),
       );
     }
     return null;
