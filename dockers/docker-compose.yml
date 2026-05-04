@@ -135,6 +135,8 @@ services:
       RABBITMQ_CA_CERT: /app/certs/ca_certificate.pem
       RABBITMQ_CLIENT_CERT: /app/certs/client_localhost_certificate.pem
       RABBITMQ_CLIENT_KEY: /app/certs/client_localhost_key.pem
+      # Enable test report at /test-report (HTML test results)
+      SERVE_TEST_REPORT: '${SERVE_TEST_REPORT:-true}'
     volumes:
       - ./rabbitmq/certs:/app/certs:ro
     networks:

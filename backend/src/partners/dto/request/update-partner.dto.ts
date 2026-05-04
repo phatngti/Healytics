@@ -83,12 +83,7 @@ class BusinessInfo {
   @IsOptional()
   address?: AddressDto;
 
-  @ApiPropertyOptional({
-    type: UpdatedField,
-    example: { fieldKey: 'username', value: 'Username' },
-  })
-  @IsOptional()
-  username?: UpdatedField<string>;
+
 
   @ApiPropertyOptional({
     type: UpdatedField,
@@ -187,7 +182,6 @@ export class UpdatePartnerDto {
           city: { id: 'City ID', name: 'City Name' },
         },
       },
-      username: { fieldKey: 'username', value: 'Username' },
       email: { fieldKey: 'email', value: 'Email' },
       phoneNumber: { fieldKey: 'phoneNumber', value: 'Phone Number' },
     },

@@ -31,8 +31,6 @@ export class PublicProfileBusinessInfoDto {
   @ApiPropertyOptional({ example: 'clinic@example.com', nullable: true })
   email: string | null;
 
-  @ApiPropertyOptional({ example: 'healytics_clinic', nullable: true })
-  username: string | null;
 
   static fromPartner(partner: Partner): PublicProfileBusinessInfoDto {
     const dto = new PublicProfileBusinessInfoDto();
@@ -42,7 +40,6 @@ export class PublicProfileBusinessInfoDto {
     dto.businessType = partner.businessType;
     dto.phoneNumber = partner.phoneNumber;
     dto.email = partner.account?.email ?? null;
-    dto.username = partner.account?.username ?? null;
     return dto;
   }
 }

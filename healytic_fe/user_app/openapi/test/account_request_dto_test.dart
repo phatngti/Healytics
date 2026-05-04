@@ -16,12 +16,6 @@ void main() {
   // final instance = AccountRequestDto();
 
   group('test AccountRequestDto', () {
-    // Username
-    // String username
-    test('to test the property `username`', () async {
-      // TODO
-    });
-
     // Password (min 8 characters)
     // String password
     test('to test the property `password`', () async {

@@ -139,7 +139,6 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
     // Map domain entities to OpenAPI DTOs
     final dto = RegisterPartnerDto(
       account: AccountRequestDto(
-        username: request.account.username,
         email: request.account.email,
         password: request.account.password,
       ),

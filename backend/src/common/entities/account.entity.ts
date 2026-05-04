@@ -25,10 +25,6 @@ export class Account {
   @Column({ unique: true })
   email: string;
 
-  @Index()
-  @Column({ unique: true, nullable: true })
-  username: string;
-
   @Column({ name: 'password_hash', nullable: true })
   passwordHash?: string;
 
