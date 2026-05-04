@@ -64,7 +64,6 @@ abstract class VerifyOtpResponseEntity with _$VerifyOtpResponseEntity {
 @Freezed(toJson: true)
 abstract class AccountRequestEntity with _$AccountRequestEntity {
   const factory AccountRequestEntity({
-    required String username,
     required String email,
     required String password,
   }) = _AccountRequestEntity;

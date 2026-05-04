@@ -122,22 +122,6 @@ export class UpdatePartnerProfileHandler {
           where: { id: partner.accountId },
         });
         if (account) {
-          const newUsername = getValue(bizInfo.username);
-          if (
-            newUsername !== undefined &&
-            newUsername !== account.username
-          ) {
-            const existing = await queryRunner.manager.findOne(Account, {
-              where: { username: newUsername },
-            });
-            if (existing && existing.id !== account.id) {
-              throw new BadRequestException('Username already exists');
-            }
-            account.username = newUsername;
-            await queryRunner.manager.save(account);
-            isModified = true;
-          }
-
           const newEmail = getValue(bizInfo.email);
           if (newEmail !== undefined && newEmail !== account.email) {
             const existing = await queryRunner.manager.findOne(Account, {

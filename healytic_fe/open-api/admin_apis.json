@@ -7093,11 +7093,6 @@
       "AccountRequestDto": {
         "type": "object",
         "properties": {
-          "username": {
-            "type": "string",
-            "example": "spahanoi123",
-            "description": "Username"
-          },
           "password": {
             "type": "string",
             "example": "Password123",
@@ -7110,7 +7105,6 @@
           }
         },
         "required": [
-          "username",
           "password",
           "email"
         ]
@@ -7511,10 +7505,6 @@
             "type": "string",
             "description": "Email address"
           },
-          "username": {
-            "type": "string",
-            "description": "Username"
-          },
           "role": {
             "type": "string",
             "description": "Account role",
@@ -7637,7 +7627,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-04T10:56:13.939Z"
+              "submittedAt": "2026-05-04T15:50:43.251Z"
             }
           }
         },
@@ -7763,9 +7753,6 @@
             "$ref": "#/components/schemas/VerifiedField"
           },
           "phoneNumber": {
-            "$ref": "#/components/schemas/VerifiedField"
-          },
-          "username": {
             "$ref": "#/components/schemas/VerifiedField"
           }
         },
@@ -7978,17 +7965,6 @@
               }
             ]
           },
-          "username": {
-            "example": {
-              "fieldKey": "username",
-              "value": "Username"
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UpdatedField"
-              }
-            ]
-          },
           "email": {
             "example": {
               "fieldKey": "email",
@@ -8077,10 +8053,6 @@
                     "name": "City Name"
                   }
                 }
-              },
-              "username": {
-                "fieldKey": "username",
-                "value": "Username"
               },
               "email": {
                 "fieldKey": "email",
@@ -8440,11 +8412,6 @@
           "email": {
             "type": "object",
             "example": "clinic@example.com",
-            "nullable": true
-          },
-          "username": {
-            "type": "object",
-            "example": "healytics_clinic",
             "nullable": true
           }
         },

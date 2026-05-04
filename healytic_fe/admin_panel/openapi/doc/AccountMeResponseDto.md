@@ -10,7 +10,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** | Account ID | 
 **email** | **String** | Email address | 
-**username** | **String** | Username | [optional] 
 **role** | **String** | Account role | 
 **isActive** | **bool** | Whether the account is active | 
 **createdAt** | [**DateTime**](DateTime.md) | Account creation date | 

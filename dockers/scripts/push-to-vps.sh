@@ -307,6 +307,25 @@ if [[ "${DRY_RUN}" != "true" ]]; then
     echo ""
   fi
 
+  # ─── Run setup-vps.sh if Docker is not installed on VPS ──────────────────────
+  info "Checking if Docker is installed on VPS..."
+  if ssh ${SSH_OPTS} "${VPS_USER}@${VPS_HOST}" "command -v docker" &>/dev/null; then
+    REMOTE_DOCKER_VERSION=$(ssh ${SSH_OPTS} "${VPS_USER}@${VPS_HOST}" "docker --version 2>/dev/null" || echo "unknown")
+    ok "Docker already installed on VPS — skipping provisioning (${REMOTE_DOCKER_VERSION})"
+  else
+    warn "Docker not found on VPS — running setup-vps.sh to provision..."
+    SETUP_SCRIPT="${SCRIPT_DIR}/setup-vps.sh"
+    if [[ -f "${SETUP_SCRIPT}" ]]; then
+      info "Running setup-vps.sh on VPS (initial provisioning)..."
+      echo ""
+      ssh ${SSH_OPTS} "${VPS_USER}@${VPS_HOST}" "sudo bash -s" < "${SETUP_SCRIPT}"
+      echo ""
+      ok "VPS provisioning complete"
+    else
+      warn "setup-vps.sh not found at ${SETUP_SCRIPT} — skipping VPS provisioning"
+    fi
+  fi
+
   # ─── Auto-start Docker Compose if no containers are running ────────────────
   info "Checking for running Docker containers on VPS..."
   CONTAINER_COUNT=$(ssh ${SSH_OPTS} "${VPS_USER}@${VPS_HOST}" \

@@ -15,7 +15,6 @@ class AccountMeResponseDto {
   AccountMeResponseDto({
     required this.id,
     required this.email,
-    this.username,
     required this.role,
     required this.isActive,
     required this.createdAt,
@@ -29,15 +28,6 @@ class AccountMeResponseDto {
 
   /// Email address
   String email;
-
-  /// Username
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? username;
 
   /// Account role
   AccountMeResponseDtoRoleEnum role;
@@ -64,7 +54,6 @@ class AccountMeResponseDto {
   bool operator ==(Object other) => identical(this, other) || other is AccountMeResponseDto &&
     other.id == id &&
     other.email == email &&
-    other.username == username &&
     other.role == role &&
     other.isActive == isActive &&
     other.createdAt == createdAt &&
@@ -76,7 +65,6 @@ class AccountMeResponseDto {
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
     (email.hashCode) +
-    (username == null ? 0 : username!.hashCode) +
     (role.hashCode) +
     (isActive.hashCode) +
     (createdAt.hashCode) +
@@ -84,17 +72,12 @@ class AccountMeResponseDto {
     (userProfile == null ? 0 : userProfile!.hashCode);
 
   @override
-  String toString() => 'AccountMeResponseDto[id=$id, email=$email, username=$username, role=$role, isActive=$isActive, createdAt=$createdAt, updatedAt=$updatedAt, userProfile=$userProfile]';
+  String toString() => 'AccountMeResponseDto[id=$id, email=$email, role=$role, isActive=$isActive, createdAt=$createdAt, updatedAt=$updatedAt, userProfile=$userProfile]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
       json[r'email'] = this.email;
-    if (this.username != null) {
-      json[r'username'] = this.username;
-    } else {
-      json[r'username'] = null;
-    }
       json[r'role'] = this.role;
       json[r'isActive'] = this.isActive;
       json[r'createdAt'] = this.createdAt.toUtc().toIso8601String();
@@ -128,7 +111,6 @@ class AccountMeResponseDto {
       return AccountMeResponseDto(
         id: mapValueOfType<String>(json, r'id')!,
         email: mapValueOfType<String>(json, r'email')!,
-        username: mapValueOfType<String>(json, r'username'),
         role: AccountMeResponseDtoRoleEnum.fromJson(json[r'role'])!,
         isActive: mapValueOfType<bool>(json, r'isActive')!,
         createdAt: mapDateTime(json, r'createdAt', r'')!,

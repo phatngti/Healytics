@@ -212,7 +212,6 @@ export class ReviewPartnerHandler {
       [PartnerFieldKeys.streetAddress]: () => partner.streetAddress,
       [PartnerFieldKeys.phoneNumber]: () => partner.phoneNumber,
       [PartnerFieldKeys.email]: () => partner.account?.email ?? null,
-      [PartnerFieldKeys.username]: () => partner.account?.username ?? null,
       [PartnerFieldKeys.idType]: () =>
         partner.legalRepresentative?.idType ?? null,
       [PartnerFieldKeys.idNumber]: () =>

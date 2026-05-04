@@ -301,8 +301,6 @@ export class BusinessInfoDto {
   @ApiPropertyOptional({ type: AddressInfoDto })
   address?: AddressInfoDto;
 
-  @ApiPropertyOptional({ type: VerifiedField })
-  username?: VerifiedField<string>;
 
   @ApiPropertyOptional({ type: VerifiedField })
   email?: VerifiedField<string>;
@@ -351,16 +349,6 @@ export class BusinessInfoDto {
     );
 
     dto.address = AddressInfoDto.fromPartner(partner, feedbackMap);
-
-    if (partner.account?.username) {
-      const usernameFb = getFeedback(PartnerFieldKeys.username);
-      dto.username = VerifiedField.of(
-        PartnerFieldKeys.username,
-        partner.account.username,
-        usernameFb.isVerified,
-        usernameFb.reason,
-      );
-    }
 
     if (partner.account?.email) {
       const emailFb = getFeedback(PartnerFieldKeys.email);

@@ -88,7 +88,7 @@ export class ChatMessageResponseDto {
     if (entity.sender) {
       const profile = (entity.sender as any).userProfile;
       dto.senderName =
-        profile?.fullName ?? entity.sender.username ?? entity.sender.email;
+        profile?.fullName ?? entity.sender.email;
       dto.senderAvatar = profile?.avatarUrl ?? undefined;
     }
 

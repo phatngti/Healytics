@@ -133,7 +133,6 @@ class SignUpFormScreen extends HookConsumerWidget {
 
         // Build nested entities
         final accountRequest = AccountRequestEntity(
-          username: values['username'] ?? '',
           email: values['email'] ?? '',
           password: values['password'] ?? '',
         );
