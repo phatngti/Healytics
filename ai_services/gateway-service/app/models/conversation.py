@@ -6,16 +6,16 @@ This service does NOT manage the schema — read/write only.
 
 Table schema (production PostgreSQL / NestJS):
     id           UUID  PRIMARY KEY  DEFAULT uuid_generate_v4()
-    user_id      UUID  NULLABLE  (FK-style account id)
+    user_id      VARCHAR  NULLABLE  (UUID-formatted account id)
     title        VARCHAR(255)
     created_at   TIMESTAMPTZ  DEFAULT now()
     updated_at   TIMESTAMPTZ  DEFAULT now()
 """
 
-import uuid
 from datetime import datetime, timezone
+import uuid
 
-from sqlalchemy import DateTime, String, Uuid, text
+from sqlalchemy import DateTime, String, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -30,9 +30,9 @@ class Conversation(Base):
         primary_key=True,
         server_default=text("uuid_generate_v4()"),
     )
-    # Uuid (not only postgresql.UUID) so SQLite test DB reads/writes correctly.
-    user_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid(as_uuid=True),
+    # Production stores account ids as varchar even though values are UUID-formatted.
+    user_id: Mapped[str | None] = mapped_column(
+        String,
         nullable=True,
         index=True,
     )

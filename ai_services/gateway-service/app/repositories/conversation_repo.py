@@ -36,7 +36,7 @@ async def get_conversation_by_id(
 async def create_conversation(
     session: AsyncSession,
     conversation_id: str | uuid.UUID,
-    user_id: uuid.UUID | None,
+    user_id: str | uuid.UUID | None,
     title: str = "New conversation",
 ) -> Conversation:
     """
@@ -51,7 +51,7 @@ async def create_conversation(
     """
     conversation = Conversation(
         id=conversation_id,
-        user_id=user_id,
+        user_id=str(user_id) if user_id is not None else None,
         title=title,
         created_at=datetime.now(tz=timezone.utc),
         updated_at=datetime.now(tz=timezone.utc),
@@ -64,7 +64,7 @@ async def create_conversation(
 async def get_or_create_conversation(
     session: AsyncSession,
     conversation_id: str | uuid.UUID,
-    user_id: uuid.UUID | None,
+    user_id: str | uuid.UUID | None,
     title: str = "New conversation",
 ) -> Conversation:
     """
@@ -148,7 +148,7 @@ async def update_conversation_title(
 
 async def get_conversations_page(
     session: AsyncSession,
-    user_id: uuid.UUID,
+    user_id: str | uuid.UUID,
     page: int = 1,
     limit: int = 10,
 ) -> tuple[list[Conversation], int]:
@@ -170,10 +170,11 @@ async def get_conversations_page(
         (conversations, total) — ordered by updated_at DESC.
     """
     offset = (page - 1) * limit
+    user_id_value = str(user_id)
 
     base_q = (
         select(Conversation)
-        .where(Conversation.user_id == user_id)
+        .where(Conversation.user_id == user_id_value)
         .order_by(Conversation.updated_at.desc())
     )
 
@@ -181,7 +182,7 @@ async def get_conversations_page(
     total: int = (
         await session.execute(
             select(func.count(Conversation.id))
-            .where(Conversation.user_id == user_id)
+            .where(Conversation.user_id == user_id_value)
         )
     ).scalar_one()
 
