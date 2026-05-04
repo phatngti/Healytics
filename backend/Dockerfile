@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────────────────────
 # Stage 1 — Build the TypeScript application
 # ─────────────────────────────────────────────────────────────
-FROM --platform=linux/amd64 node:22-alpine AS build
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
@@ -55,7 +55,7 @@ RUN find node_modules \( \
 # ─────────────────────────────────────────────────────────────
 # Stage 2 — Production runtime (minimal)
 # ─────────────────────────────────────────────────────────────
-FROM --platform=linux/amd64 node:22-alpine AS runtime
+FROM node:22-alpine AS runtime
 
 # dumb-init: lightweight PID 1 for proper signal forwarding
 RUN apk add --no-cache dumb-init

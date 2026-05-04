@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 /// Account and contact information section
 class AccountContactSection extends StatelessWidget {
   const AccountContactSection({
-    this.username,
     this.email,
     this.isEmailVerified = false,
     this.phoneNumber,
@@ -15,7 +14,6 @@ class AccountContactSection extends StatelessWidget {
     super.key,
   });
 
-  final VerifiedFieldEntity<String?>? username;
   final VerifiedFieldEntity<String?>? email;
   final bool isEmailVerified;
   final VerifiedFieldEntity<String?>? phoneNumber;
@@ -54,15 +52,6 @@ class AccountContactSection extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: ReviewableField(
-                    readOnly: readOnly,
-                    title: 'Username',
-                    fieldId: username?.fieldKey ?? 'username',
-                    compactMode: true,
-                    child: _buildInfoItem(context, username?.value),
-                  ),
-                ),
                 Expanded(
                   child: ReviewableField(
                     readOnly: readOnly,

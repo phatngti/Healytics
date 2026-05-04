@@ -24,6 +24,13 @@ void main() {
       // TODO
     });
 
+    // Login as an employee
+    //
+    //Future<AuthTokensDto> authControllerLoginEmployee(EmployeeLoginDto employeeLoginDto) async
+    test('test authControllerLoginEmployee', () async {
+      // TODO
+    });
+
     // Login as a partner
     //
     //Future<AuthTokensDto> authControllerLoginPartner(PartnerLoginDto partnerLoginDto) async
@@ -49,6 +56,13 @@ void main() {
     //
     //Future<AuthTokensDto> authControllerRefresh(RefreshTokenRequestDto refreshTokenRequestDto) async
     test('test authControllerRefresh', () async {
+      // TODO
+    });
+
+    // Refresh employee tokens
+    //
+    //Future<AuthTokensDto> authControllerRefreshEmployee(RefreshTokenRequestDto refreshTokenRequestDto) async
+    test('test authControllerRefreshEmployee', () async {
       // TODO
     });
 

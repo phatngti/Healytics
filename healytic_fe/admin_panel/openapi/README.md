@@ -80,10 +80,12 @@ Class | Method | HTTP request | Description
 *AdminPartnersApi* | [**adminPartnersControllerGetTotalPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergettotalpartners) | **GET** /admin/partners/total | Get total number of partners
 *AdminPartnersApi* | [**adminPartnersControllerReviewPartner**](doc//AdminPartnersApi.md#adminpartnerscontrollerreviewpartner) | **PUT** /admin/partners/{id}/review | Review partner profile
 *AuthenticationApi* | [**authControllerLoginAdmin**](doc//AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | Login as admin
+*AuthenticationApi* | [**authControllerLoginEmployee**](doc//AuthenticationApi.md#authcontrollerloginemployee) | **POST** /auth/employee/login | Login as an employee
 *AuthenticationApi* | [**authControllerLoginPartner**](doc//AuthenticationApi.md#authcontrollerloginpartner) | **POST** /auth/partner/login | Login as a partner
 *AuthenticationApi* | [**authControllerLoginUser**](doc//AuthenticationApi.md#authcontrollerloginuser) | **POST** /auth/user/login | Login as a user
 *AuthenticationApi* | [**authControllerLogout**](doc//AuthenticationApi.md#authcontrollerlogout) | **POST** /auth/logout | Logout current user
 *AuthenticationApi* | [**authControllerRefresh**](doc//AuthenticationApi.md#authcontrollerrefresh) | **POST** /auth/refresh | Refresh authentication tokens
+*AuthenticationApi* | [**authControllerRefreshEmployee**](doc//AuthenticationApi.md#authcontrollerrefreshemployee) | **POST** /auth/employee/refresh | Refresh employee tokens
 *AuthenticationApi* | [**authControllerRefreshPartner**](doc//AuthenticationApi.md#authcontrollerrefreshpartner) | **POST** /auth/partner/refresh | Refresh partner tokens with verification info
 *AuthenticationApi* | [**authControllerRegisterPartner**](doc//AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
 *AuthenticationApi* | [**authControllerRegisterUser**](doc//AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | Register a new user
@@ -97,6 +99,16 @@ Class | Method | HTTP request | Description
 *ChatbotApi* | [**generativeAiStreamGenerativeAiStreamPost**](doc//ChatbotApi.md#generativeaistreamgenerativeaistreampost) | **POST** /generative_ai/stream | Generative Ai Stream
 *ChatbotApi* | [**getConversationsChatbotConversationsGet**](doc//ChatbotApi.md#getconversationschatbotconversationsget) | **GET** /chatbot/conversations | Get Conversations
 *ChatbotApi* | [**getMessagesChatbotConversationsConversationIdMessagesGet**](doc//ChatbotApi.md#getmessageschatbotconversationsconversationidmessagesget) | **GET** /chatbot/conversations/{conversation_id}/messages | Get Messages
+*EmployeeAppointmentsApi* | [**employeeAppointmentsControllerCancelAppointment**](doc//EmployeeAppointmentsApi.md#employeeappointmentscontrollercancelappointment) | **PATCH** /employee/appointments/{id}/cancel | Cancel an appointment
+*EmployeeAppointmentsApi* | [**employeeAppointmentsControllerCompleteService**](doc//EmployeeAppointmentsApi.md#employeeappointmentscontrollercompleteservice) | **PATCH** /employee/appointments/{id}/complete | Complete service for an appointment
+*EmployeeAppointmentsApi* | [**employeeAppointmentsControllerGetAppointment**](doc//EmployeeAppointmentsApi.md#employeeappointmentscontrollergetappointment) | **GET** /employee/appointments/{id} | Get appointment detail
+*EmployeeAppointmentsApi* | [**employeeAppointmentsControllerListMyAppointments**](doc//EmployeeAppointmentsApi.md#employeeappointmentscontrollerlistmyappointments) | **GET** /employee/appointments | List my appointments
+*EmployeeAppointmentsApi* | [**employeeAppointmentsControllerStartService**](doc//EmployeeAppointmentsApi.md#employeeappointmentscontrollerstartservice) | **PATCH** /employee/appointments/{id}/start | Start service for an appointment
+*EmployeeProfileApi* | [**employeeProfileControllerGetMyProfile**](doc//EmployeeProfileApi.md#employeeprofilecontrollergetmyprofile) | **GET** /employee/profile | Get my employee profile
+*EmployeeProfileApi* | [**employeeProfileControllerUpdateMyProfile**](doc//EmployeeProfileApi.md#employeeprofilecontrollerupdatemyprofile) | **PATCH** /employee/profile | Update my employee profile
+*EmployeeRevenueApi* | [**employeeRevenueControllerGetBreakdown**](doc//EmployeeRevenueApi.md#employeerevenuecontrollergetbreakdown) | **GET** /employee/revenue/breakdown | Get revenue breakdown by service
+*EmployeeRevenueApi* | [**employeeRevenueControllerGetSummary**](doc//EmployeeRevenueApi.md#employeerevenuecontrollergetsummary) | **GET** /employee/revenue/summary | Get revenue summary
+*EmployeeRevenueApi* | [**employeeRevenueControllerGetTrend**](doc//EmployeeRevenueApi.md#employeerevenuecontrollergettrend) | **GET** /employee/revenue/trend | Get revenue trend data
 *HealthApi* | [**healthHealthGet**](doc//HealthApi.md#healthhealthget) | **GET** /health | Health
 *LocationsApi* | [**locationsControllerGetDistricts**](doc//LocationsApi.md#locationscontrollergetdistricts) | **GET** /locations/provinces/{provinceId}/districts | Get all districts in a province
 *LocationsApi* | [**locationsControllerGetProvinces**](doc//LocationsApi.md#locationscontrollergetprovinces) | **GET** /locations/provinces | Get all provinces in Vietnam
@@ -254,6 +266,7 @@ Class | Method | HTTP request | Description
  - [BusinessServiceDto](doc//BusinessServiceDto.md)
  - [BusinessServicesResponseDto](doc//BusinessServicesResponseDto.md)
  - [BusinessType](doc//BusinessType.md)
+ - [CancelEmployeeAppointmentDto](doc//CancelEmployeeAppointmentDto.md)
  - [CartItemResponseDto](doc//CartItemResponseDto.md)
  - [CategoryInfoDto](doc//CategoryInfoDto.md)
  - [CategoryResponseDto](doc//CategoryResponseDto.md)
@@ -311,14 +324,21 @@ Class | Method | HTTP request | Description
  - [DistanceMatrixRowDto](doc//DistanceMatrixRowDto.md)
  - [DoctorProfileResponseDto](doc//DoctorProfileResponseDto.md)
  - [DocumentEntryDto](doc//DocumentEntryDto.md)
+ - [EmployeeAppointmentResponseDto](doc//EmployeeAppointmentResponseDto.md)
+ - [EmployeeBookingStatusFilter](doc//EmployeeBookingStatusFilter.md)
  - [EmployeeComplianceItemDto](doc//EmployeeComplianceItemDto.md)
  - [EmployeeDetailAnalyticsResponseDto](doc//EmployeeDetailAnalyticsResponseDto.md)
  - [EmployeeDistributionDto](doc//EmployeeDistributionDto.md)
+ - [EmployeeLoginDto](doc//EmployeeLoginDto.md)
  - [EmployeeMixMetricDto](doc//EmployeeMixMetricDto.md)
  - [EmployeeOverviewAnalyticsResponseDto](doc//EmployeeOverviewAnalyticsResponseDto.md)
  - [EmployeePerformanceSummaryDto](doc//EmployeePerformanceSummaryDto.md)
  - [EmployeeQualityMetricDto](doc//EmployeeQualityMetricDto.md)
  - [EmployeeResponseDto](doc//EmployeeResponseDto.md)
+ - [EmployeeRevenueBreakdownItemDto](doc//EmployeeRevenueBreakdownItemDto.md)
+ - [EmployeeRevenuePeriod](doc//EmployeeRevenuePeriod.md)
+ - [EmployeeRevenueSummaryResponseDto](doc//EmployeeRevenueSummaryResponseDto.md)
+ - [EmployeeRevenueTrendPointDto](doc//EmployeeRevenueTrendPointDto.md)
  - [EmployeeRoleDistributionDto](doc//EmployeeRoleDistributionDto.md)
  - [EmployeeScheduleLoadDto](doc//EmployeeScheduleLoadDto.md)
  - [EmployeeTimeSlotsResponseDto](doc//EmployeeTimeSlotsResponseDto.md)
@@ -471,6 +491,7 @@ Class | Method | HTTP request | Description
  - [UpcomingAppointmentDto](doc//UpcomingAppointmentDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)
  - [UpdateEmployeeDto](doc//UpdateEmployeeDto.md)
+ - [UpdateEmployeeProfileDto](doc//UpdateEmployeeProfileDto.md)
  - [UpdatePartnerCertificationDto](doc//UpdatePartnerCertificationDto.md)
  - [UpdatePartnerDto](doc//UpdatePartnerDto.md)
  - [UpdatePartnerHealthServiceDto](doc//UpdatePartnerHealthServiceDto.md)

@@ -73,6 +73,12 @@ String parameterToString(dynamic value) {
   if (value is DevicePlatform) {
     return DevicePlatformTypeTransformer().encode(value).toString();
   }
+  if (value is EmployeeBookingStatusFilter) {
+    return EmployeeBookingStatusFilterTypeTransformer().encode(value).toString();
+  }
+  if (value is EmployeeRevenuePeriod) {
+    return EmployeeRevenuePeriodTypeTransformer().encode(value).toString();
+  }
   if (value is HealthServiceStatus) {
     return HealthServiceStatusTypeTransformer().encode(value).toString();
   }

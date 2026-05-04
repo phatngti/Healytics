@@ -71,6 +71,8 @@ BUILD_ARGS=(
   --platform "${PLATFORM}"
   --tag "${FULL_TAG}"
   --load
+  --provenance=false
+  --sbom=false
   --file "${PROJECT_ROOT}/Dockerfile"
 )
 

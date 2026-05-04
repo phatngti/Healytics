@@ -3254,7 +3254,6 @@
             "schema": {
               "example": "PENDING",
               "enum": [
-                "ONBOARDING",
                 "PENDING",
                 "APPROVED",
                 "REJECTED",
@@ -7409,7 +7408,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-03T07:43:59.130Z"
+              "submittedAt": "2026-05-04T10:56:13.939Z"
             }
           }
         },
@@ -7575,7 +7574,6 @@
       "PartnerVerificationStatus": {
         "type": "string",
         "enum": [
-          "ONBOARDING",
           "PENDING",
           "APPROVED",
           "REJECTED",
@@ -8444,7 +8442,6 @@
           "verificationStatus": {
             "type": "string",
             "enum": [
-              "ONBOARDING",
               "PENDING",
               "APPROVED",
               "REJECTED",

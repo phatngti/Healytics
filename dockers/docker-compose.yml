@@ -80,36 +80,36 @@ services:
       POSTGRES_EXTRA_DATABASES: ${POSTGRES_EXTRA_DATABASES:-}
     entrypoint: ["bash", "/init-databases.sh"]
 
-  redis:
-    image: redis:latest
-    container_name: redis
-    profiles: ["dev", "prod"]
-    restart: always
-    ports:
-      - '${REDIS_PORT:-6379}:6379'
-    command:
-      - redis-server
-      - --appendonly
-      - "yes"
-      - --replica-read-only
-      - "no"
-      - --save
-      - "20 1"
-      - --loglevel
-      - warning
-      - --requirepass
-      - ${REDIS_PASSWORD}
-    volumes:
-      - redisdata:/data
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-    networks:
-      - services
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" --no-auth-warning ping | grep PONG"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   profiles: ["dev"]
+  #   restart: always
+  #   ports:
+  #     - '${REDIS_PORT:-6379}:6379'
+  #   command:
+  #     - redis-server
+  #     - --appendonly
+  #     - "yes"
+  #     - --replica-read-only
+  #     - "no"
+  #     - --save
+  #     - "20 1"
+  #     - --loglevel
+  #     - warning
+  #     - --requirepass
+  #     - ${REDIS_PASSWORD}
+  #   volumes:
+  #     - redisdata:/data
+  #   environment:
+  #     REDIS_PASSWORD: ${REDIS_PASSWORD}
+  #   networks:
+  #     - services
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" --no-auth-warning ping | grep PONG"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 10
 
   # =============================================================================
   # Backend API (deployed by Jenkins via immutable registry image tags)
@@ -129,16 +129,7 @@ services:
       # These MUST stay here because they reference Compose service names or
       # container-local paths that cannot be known outside docker-compose.yml.
       NODE_ENV: production
-      PORT: 8080
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
-      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is required}
-      POSTGRES_SSL: ${POSTGRES_SSL:-false}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+      PORT: 8080 
       RABBITMQ_URL: amqps://${RABBITMQ_BACKEND_USER:-backend}:${RABBITMQ_BACKEND_PASS_URLENCODED:-backend%40rmq123}@rabbitmq-haproxy:5671/${RABBITMQ_BACKEND_VHOST:-healytics}
       RABBITMQ_QUEUE_CHECKOUT: ${RABBITMQ_QUEUE_CHECKOUT:-checkout_queue}
       RABBITMQ_CA_CERT: /app/certs/ca_certificate.pem
@@ -207,7 +198,8 @@ services:
     environment:
       <<: [*kong-db-env, *kong-network-env]
       KONG_ADMIN_GUI_LISTEN: "0.0.0.0:8002, 0.0.0.0:8445 ssl"
-      KONG_ADMIN_GUI_URL: http://${GW_HOST:-localhost}:8002
+      KONG_ADMIN_GUI_URL: ${KONG_ADMIN_GUI_URL:-http://localhost:8002}
+      KONG_ADMIN_GUI_API_URL: ${KONG_ADMIN_GUI_API_URL:-http://localhost:8001}
       KONG_PASSWORD: ${KONG_ADMIN_PASSWORD}
     depends_on:
       kong-bootstrap:
@@ -225,15 +217,33 @@ services:
       - "8002:8002"
       - "8445:8445"
 
-  # This service runs ONCE to apply your config
-  kong-configurator:
+  # ── Kong Configurator (runs ONCE to apply gateway routes) ──────────────────
+  # Dev uses kong.dev.yml (backend on host.docker.internal for local dev).
+  # Prod uses kong.yml (backend on Docker-internal DNS).
+
+  kong-configurator-dev:
     image: kong/deck:latest
     container_name: kong-configurator
-    profiles: ["dev", "prod"]
+    profiles: ["dev"]
     networks:
       - services
     volumes:
-      - ./kong.yml:/kong.yml  # Mount your config file here
+      - ./kong.dev.yml:/kong.yml
+    environment:
+      DECK_KONG_ADDR: http://kong-cp:8001
+    command: ["gateway", "sync", "/kong.yml"]
+    depends_on:
+      kong-cp:
+        condition: service_healthy
+
+  kong-configurator:
+    image: kong/deck:latest
+    container_name: kong-configurator
+    profiles: ["prod"]
+    networks:
+      - services
+    volumes:
+      - ./kong.yml:/kong.yml
     environment:
       DECK_KONG_ADDR: http://kong-cp:8001
       # Use this if RBAC is enforced:
@@ -468,35 +478,96 @@ services:
 
   # =============================================================================
   # Cloudflare Tunnel (configurator + token-reader + cloudflared)
+  #   Profiles:
+  #     dev  — uses cloudflare-tunnels.dev.json  (dev.healytics.me hostnames)
+  #     prod — uses cloudflare-tunnels.json      (healytics.me hostnames)
   # =============================================================================
 
-  # This service runs ONCE to configure the Cloudflare Tunnel via API
-  cloudflare-configurator:
+  # ── DEV profile (cloudflare-tunnels.dev.json) ──────────────────────────────
+
+  cloudflare-configurator-dev:
     image: alpine:latest
     container_name: cloudflare-configurator
-    profiles: ["dev", "prod"]
+    profiles: ["dev"]
     networks:
       - services
     volumes:
       - ./cloudflare-tunnel-setup.sh:/setup.sh:ro
       - ./.env:/app/.env
-      - ./cloudflare-tunnels.json:/app/cloudflare-tunnels.json:ro
+      - ./cloudflare-tunnels.dev.json:/app/cloudflare-tunnels.json
+      - tunnel-token-dev:/tmp/tunnel-token
+    entrypoint: ["sh", "-c", "apk add --no-cache curl jq >/dev/null 2>&1 && sh /setup.sh"]
+    environment:
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
+      CLOUDFLARE_ZONE_ID: ${CLOUDFLARE_ZONE_ID}
+      CLOUDFLARE_TUNNELS_FILE: /app/cloudflare-tunnels.json
+    depends_on:
+      kong-cp:
+        condition: service_healthy
+
+  cloudflare-token-reader-dev:
+    image: alpine:latest
+    container_name: cloudflare-token-reader
+    profiles: ["dev"]
+    networks:
+      - services
+    volumes:
+      - tunnel-token-dev:/tmp/tunnel-token
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        if [ -f /tmp/tunnel-token/TUNNEL_TOKEN ] && [ -s /tmp/tunnel-token/TUNNEL_TOKEN ]; then
+          echo "Using tunnel token from shared volume"
+        else
+          echo "ERROR: No tunnel token found. Run cloudflare-configurator first."
+          exit 1
+        fi
+    depends_on:
+      cloudflare-configurator-dev:
+        condition: service_completed_successfully
+
+  cloudflared-dev:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    profiles: ["dev"]
+    restart: on-failure
+    networks:
+      - services
+    command: ["tunnel", "--no-autoupdate", "run", "--token-file", "/tmp/tunnel-token/TUNNEL_TOKEN"]
+    volumes:
+      - tunnel-token-dev:/tmp/tunnel-token:ro
+    depends_on:
+      cloudflare-token-reader-dev:
+        condition: service_completed_successfully
+
+  # ── PROD profile (cloudflare-tunnels.json) ─────────────────────────────────
+
+  cloudflare-configurator:
+    image: alpine:latest
+    container_name: cloudflare-configurator
+    profiles: ["prod"]
+    networks:
+      - services
+    volumes:
+      - ./cloudflare-tunnel-setup.sh:/setup.sh:ro
+      - ./.env:/app/.env
+      - ./cloudflare-tunnels.json:/app/cloudflare-tunnels.json
       - tunnel-token:/tmp/tunnel-token
     entrypoint: ["sh", "-c", "apk add --no-cache curl jq >/dev/null 2>&1 && sh /setup.sh"]
     environment:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
       CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
       CLOUDFLARE_ZONE_ID: ${CLOUDFLARE_ZONE_ID}
-      CLOUDFLARE_TUNNELS_FILE: ${CLOUDFLARE_TUNNELS_FILE:-/app/cloudflare-tunnels.json}
+      CLOUDFLARE_TUNNELS_FILE: /app/cloudflare-tunnels.json
     depends_on:
       kong-cp:
         condition: service_healthy
 
-  # Reads the tunnel token from the shared volume (written by cloudflare-configurator).
   cloudflare-token-reader:
     image: alpine:latest
     container_name: cloudflare-token-reader
-    profiles: ["dev", "prod"]
+    profiles: ["prod"]
     networks:
       - services
     volumes:
@@ -517,7 +588,7 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
-    profiles: ["dev", "prod"]
+    profiles: ["prod"]
     restart: on-failure
     networks:
       - services
@@ -540,3 +611,4 @@ volumes:
   jenkins_home:
   jenkins_agent_workdir:
   tunnel-token:
+  tunnel-token-dev:

@@ -132,9 +132,9 @@ class ProfileCompletionRemoteDataSourceImpl
     PartnerProfileCompletionUpdateRequest request,
   ) {
     return UpdatePartnerProfileCompletionDto(
-      coverImageUrl: request.coverImageUrl,
-      logoImageUrl: request.logoImageUrl,
-      description: request.description,
+      coverImageUrl: request.coverImageUrl!,
+      logoImageUrl: request.logoImageUrl!,
+      description: request.description!,
       gallery: request.gallery ?? const [],
       certifications: (request.certifications ?? const [])
           .map(_mapCertificationToDto)

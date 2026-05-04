@@ -97,10 +97,7 @@ backend.env.prod
 deploy.env.prod
 
 # ── Private keys and certificates ──
-rabbitmq/certs/ca_key.pem
-rabbitmq/certs/server_localhost_key.pem
-rabbitmq/certs/client_localhost_key.pem
-rabbitmq/certs/*.p12
+rabbitmq/certs/
 
 
 # ── Jenkins runtime data ──

@@ -16,25 +16,25 @@ void main() {
   // final instance = UpdatePartnerProfileCompletionDto();
 
   group('test UpdatePartnerProfileCompletionDto', () {
-    // Public clinic cover image URL
+    // Public clinic cover image URL (required to complete your profile)
     // String coverImageUrl
     test('to test the property `coverImageUrl`', () async {
       // TODO
     });
 
-    // Public clinic logo image URL
+    // Public clinic logo image URL (required to complete your profile)
     // String logoImageUrl
     test('to test the property `logoImageUrl`', () async {
       // TODO
     });
 
-    // Public clinic profile description
+    // Public clinic profile description (min 120 characters, required to complete your profile)
     // String description
     test('to test the property `description`', () async {
       // TODO
     });
 
-    // Gallery image URLs shown on the clinic profile
+    // Gallery image URLs shown on the clinic profile (min 3, required to complete your profile)
     // List<String> gallery (default value: const [])
     test('to test the property `gallery`', () async {
       // TODO

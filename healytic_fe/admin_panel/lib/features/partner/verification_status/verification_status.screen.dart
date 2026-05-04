@@ -83,7 +83,6 @@ class _VerificationStatusScreenState
     addField(businessInfo.brandName);
     addField(businessInfo.taxRegistrationCode);
     addField(businessInfo.serviceTags);
-    addField(businessInfo.username);
     addField(businessInfo.email);
     addField(businessInfo.phoneNumber);
 
@@ -111,6 +110,8 @@ class _VerificationStatusScreenState
     for (final doc in status.kycDocuments) {
       addField(doc);
     }
+
+    print('kycDocuments: ${status.kycDocuments}');
 
     return initialValues;
   }
