@@ -61,6 +61,7 @@ void main() {
       // TODO
     });
 
+    // Always true when returned from a successful profile-completion update, because the request DTO enforces all required checklist constraints.
     // bool isCompleted
     test('to test the property `isCompleted`', () async {
       // TODO

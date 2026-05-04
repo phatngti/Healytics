@@ -36,7 +36,7 @@ load_env_file() {
   done < "${file}"
 }
 
-load_env_file ".env"
+load_env_file "${APP_ENV_FILE:-backend.env}"
 
 BACKEND_IMAGE="${BACKEND_IMAGE:-nonameaaaa/healytics_backend}"
 BACKEND_MIGRATION_IMAGE="${BACKEND_MIGRATION_IMAGE:-nonameaaaa/healytics_backend-migrate}"
@@ -128,11 +128,6 @@ run_migrations() {
     --network "${COMPOSE_NETWORK_NAME}" \
     --env-file "${APP_ENV_FILE}" \
     -e NODE_ENV=production \
-    -e POSTGRES_HOST=postgres \
-    -e POSTGRES_PORT=5432 \
-    -e POSTGRES_USER="${POSTGRES_USER:?POSTGRES_USER is required}" \
-    -e POSTGRES_PASSWORD="${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}" \
-    -e POSTGRES_DB="${POSTGRES_DB:?POSTGRES_DB is required}" \
     "${BACKEND_MIGRATION_IMAGE}:${BACKEND_MIGRATION_TAG}"
 }
 

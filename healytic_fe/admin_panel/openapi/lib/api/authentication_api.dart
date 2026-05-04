@@ -68,6 +68,58 @@ class AuthenticationApi {
     return null;
   }
 
+  /// Login as an employee
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [EmployeeLoginDto] employeeLoginDto (required):
+  Future<Response> authControllerLoginEmployeeWithHttpInfo(EmployeeLoginDto employeeLoginDto,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/auth/employee/login';
+
+    // ignore: prefer_final_locals
+    Object? postBody = employeeLoginDto;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Login as an employee
+  ///
+  /// Parameters:
+  ///
+  /// * [EmployeeLoginDto] employeeLoginDto (required):
+  Future<AuthTokensDto?> authControllerLoginEmployee(EmployeeLoginDto employeeLoginDto,) async {
+    final response = await authControllerLoginEmployeeWithHttpInfo(employeeLoginDto,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
+    
+    }
+    return null;
+  }
+
   /// Login as a partner
   ///
   /// Note: This method returns the HTTP [Response].
@@ -255,6 +307,58 @@ class AuthenticationApi {
   /// * [RefreshTokenRequestDto] refreshTokenRequestDto (required):
   Future<AuthTokensDto?> authControllerRefresh(RefreshTokenRequestDto refreshTokenRequestDto,) async {
     final response = await authControllerRefreshWithHttpInfo(refreshTokenRequestDto,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
+    
+    }
+    return null;
+  }
+
+  /// Refresh employee tokens
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [RefreshTokenRequestDto] refreshTokenRequestDto (required):
+  Future<Response> authControllerRefreshEmployeeWithHttpInfo(RefreshTokenRequestDto refreshTokenRequestDto,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/auth/employee/refresh';
+
+    // ignore: prefer_final_locals
+    Object? postBody = refreshTokenRequestDto;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Refresh employee tokens
+  ///
+  /// Parameters:
+  ///
+  /// * [RefreshTokenRequestDto] refreshTokenRequestDto (required):
+  Future<AuthTokensDto?> authControllerRefreshEmployee(RefreshTokenRequestDto refreshTokenRequestDto,) async {
+    final response = await authControllerRefreshEmployeeWithHttpInfo(refreshTokenRequestDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

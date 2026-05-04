@@ -23,7 +23,6 @@ class PartnerVerificationStatus {
 
   String toJson() => value;
 
-  static const ONBOARDING = PartnerVerificationStatus._(r'ONBOARDING');
   static const PENDING = PartnerVerificationStatus._(r'PENDING');
   static const APPROVED = PartnerVerificationStatus._(r'APPROVED');
   static const REJECTED = PartnerVerificationStatus._(r'REJECTED');
@@ -31,7 +30,6 @@ class PartnerVerificationStatus {
 
   /// List of all possible values in this [enum][PartnerVerificationStatus].
   static const values = <PartnerVerificationStatus>[
-    ONBOARDING,
     PENDING,
     APPROVED,
     REJECTED,
@@ -74,7 +72,6 @@ class PartnerVerificationStatusTypeTransformer {
   PartnerVerificationStatus? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'ONBOARDING': return PartnerVerificationStatus.ONBOARDING;
         case r'PENDING': return PartnerVerificationStatus.PENDING;
         case r'APPROVED': return PartnerVerificationStatus.APPROVED;
         case r'REJECTED': return PartnerVerificationStatus.REJECTED;
