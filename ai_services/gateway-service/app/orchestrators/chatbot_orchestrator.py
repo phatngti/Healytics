@@ -15,6 +15,8 @@ from app.utils import formatters
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_CONVERSATION_TITLE = "New conversation"
+
 
 class ChatbotOrchestrator:
 
@@ -131,6 +133,12 @@ class ChatbotOrchestrator:
                 role="assistant",
                 content=full_response,
             )
+            await self._update_conversation_title_if_needed(
+                session=session,
+                conversation=conversation,
+                user_message=request.message,
+                assistant_message=full_response,
+            )
 
         # 9. Emit DONE
         yield SSEEvent(
@@ -181,6 +189,41 @@ class ChatbotOrchestrator:
     # ============================================
     # PRIVATE HELPERS
     # ============================================
+
+    async def _update_conversation_title_if_needed(
+        self,
+        session: Any,
+        conversation: Any,
+        user_message: str,
+        assistant_message: str,
+    ) -> None:
+        """
+        Cập nhật title bằng AI cho conversation mới, không làm hỏng luồng chat nếu lỗi.
+        """
+        if (conversation.title or "").strip() != DEFAULT_CONVERSATION_TITLE:
+            return
+
+        try:
+            title = await self.chatbot_client.generate_title(
+                {
+                    "user_message": user_message,
+                    "assistant_message": assistant_message,
+                }
+            )
+            if not title:
+                return
+
+            await conversation_repo.update_conversation_title(
+                session=session,
+                conversation_id=conversation.id,
+                new_title=title[:255],
+            )
+        except Exception as e:
+            logger.warning(
+                "Conversation title generation failed: %r",
+                e,
+                exc_info=True,
+            )
 
     async def _call_recommender_safe(self, request: Any) -> Optional[Dict[str, Any]]:
         try:
