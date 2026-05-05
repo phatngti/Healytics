@@ -51,7 +51,7 @@ async def get_messages(
             session=session,
             conversation_id=conversation_id,
         )
-        if conversation is None or conversation.user_id != user_id:
+        if conversation is None or str(conversation.user_id) != str(user_id):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Conversation not found",
