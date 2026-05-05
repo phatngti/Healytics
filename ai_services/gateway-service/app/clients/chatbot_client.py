@@ -42,3 +42,22 @@ class ChatbotClient(BaseClient):
             raise RuntimeError(
                 f"Chatbot service HTTP error at {self.base_url}/chat/stream: {e!r}"
             ) from e
+
+    async def generate_title(self, payload: Dict[str, Any]) -> str:
+        """
+        Sinh tiêu đề ngắn cho conversation bằng chatbot-service.
+        """
+        try:
+            async with self._client() as client:
+                response = await client.post("/chat/title", json=payload)
+                response.raise_for_status()
+                data = response.json()
+                return str(data.get("title", "")).strip()
+        except httpx.TimeoutException as e:
+            raise RuntimeError(
+                f"Chatbot title timeout at {self.base_url}/chat/title"
+            ) from e
+        except httpx.HTTPError as e:
+            raise RuntimeError(
+                f"Chatbot title HTTP error at {self.base_url}/chat/title: {e!r}"
+            ) from e
