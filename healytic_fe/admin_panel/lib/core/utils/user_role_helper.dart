@@ -47,13 +47,19 @@ class UserRoleHelper {
     return getRole() == Role.health_partner.value;
   }
 
-  /// Returns true if the user is logged in (has access token or in mock mode).
+  /// Returns true if the user is logged in.
+  ///
+  /// In mock mode, checks whether `mockRole` has been persisted
+  /// (set only after a successful sign-in via [SignInProvider]).
+  /// In production mode, checks for a non-empty access token.
   static bool isLoggedIn() {
     final isMockMode = Store.tryGet(StoreKey.mockFlag) ?? false;
     if (isMockMode) {
-      return true;
+      final mockRole = Store.tryGet(StoreKey.mockRole) ?? '';
+      return mockRole.isNotEmpty;
     }
-    final accessToken = Store.tryGet(StoreKey.accessToken) ?? '';
+    final accessToken =
+        Store.tryGet(StoreKey.accessToken) ?? '';
     return accessToken.isNotEmpty;
   }
 
@@ -110,8 +116,18 @@ class UserRoleHelper {
     }
   }
 
-  static Future<void> clearPartnerFlags() async {
+  /// Clears all session-specific flags so that
+  /// [isLoggedIn] returns `false` on next cold start.
+  ///
+  /// Includes `mockRole` (mock mode login marker) and
+  /// partner verification/completion flags.
+  static Future<void> clearSession() async {
+    await Store.delete(StoreKey.mockRole);
     await Store.delete(StoreKey.partnerVerified);
     await Store.delete(StoreKey.partnerProfileCompleted);
   }
+
+  /// Alias kept for backward compatibility.
+  @Deprecated('Use clearSession() instead')
+  static Future<void> clearPartnerFlags() => clearSession();
 }

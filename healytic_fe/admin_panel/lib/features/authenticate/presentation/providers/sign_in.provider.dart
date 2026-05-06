@@ -27,9 +27,25 @@ class SignInProvider extends _$SignInProvider {
       await Store.put(StoreKey.accessToken, response.accessToken);
       await Store.put(StoreKey.refreshToken, response.refreshToken);
 
-      // For health_partner role, determine verification status
+      // In mock mode, persist the selected role so
+      // `UserRoleHelper.isLoggedIn()` returns true.
+      final isMockMode =
+          Store.tryGet(StoreKey.mockFlag) ?? false;
+      if (isMockMode) {
+        await Store.put(StoreKey.mockRole, role);
+      }
+
+      // For health_partner role, sync verification flags.
       if (role == Role.health_partner.value) {
-        UserRoleHelper.syncPartnerFlagsFromAccessToken(response.accessToken);
+        if (!isMockMode) {
+          UserRoleHelper
+              .syncPartnerFlagsFromAccessToken(
+            response.accessToken,
+          );
+        }
+        // In mock mode, partnerVerified and
+        // partnerProfileCompleted are already loaded
+        // from store.dev.json — no sync needed.
       }
 
       return response;

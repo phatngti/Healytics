@@ -585,26 +585,27 @@ class VerificationStatusRemoteDataSourceImpl
   }
 
   bool _hasBusinessInfoUpdates(BusinessInfo info) {
-    return info.brandName.isVerified ||
-        (info.taxRegistrationCode?.isVerified ?? true) ||
-        info.serviceTags.isVerified ||
-        (info.phoneNumber?.isVerified ?? true);
+    return !(!info.brandName.isVerified ||
+        !(info.taxRegistrationCode?.isVerified ?? true) ||
+        !(info.serviceTags.isVerified) ||
+        !(info.phoneNumber?.isVerified ?? true) ||
+        !(info.email?.isVerified ?? true));
   }
 
   bool _hasAddressUpdates(AddressInfo address) {
-    return address.streetAddress.isVerified ||
-        (address.ward?.isVerified ?? true) ||
-        (address.district?.isVerified ?? true) ||
-        (address.city?.isVerified ?? true);
+    return !(!address.streetAddress.isVerified ||
+        !(address.ward?.isVerified ?? true) ||
+        !(address.district?.isVerified ?? true) ||
+        !(address.city?.isVerified ?? true));
   }
 
   bool _hasLegalRepresentativeUpdates(LegalRepresentativeInfo info) {
-    return info.fullName.isVerified ||
-        (info.position?.isVerified ?? true) ||
-        (info.phoneNumber?.isVerified ?? true) ||
-        (info.idType?.isVerified ?? true) ||
-        (info.idNumber?.isVerified ?? true) ||
-        (info.idIssueDate?.isVerified ?? true);
+    return !(!info.fullName.isVerified ||
+        !(info.position?.isVerified ?? true) ||
+        !(info.phoneNumber?.isVerified ?? true) ||
+        !(info.idType?.isVerified ?? true) ||
+        !(info.idNumber?.isVerified ?? true) ||
+        !(info.idIssueDate?.isVerified ?? true));
   }
 
   bool _hasKycDocumentUpdates(List<VerifiedField> documents) {
