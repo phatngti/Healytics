@@ -97,10 +97,10 @@ ProductRepository productRepository(Ref ref) {
 
 ## OpenAPI Client
 
-The generated client is at `./openapi` (package `user_openapi`):
+The generated client is at `./openapi` (package `employee_openapi`):
 
 ```dart
-import 'package:user_openapi/model/product_dto.dart';
+import 'package:employee_openapi/model/product_dto.dart';
 ```
 
 Map DTOs to domain entities in the data source implementation. Never expose DTOs to the domain or presentation layers.
