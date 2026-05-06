@@ -234,7 +234,7 @@ class SignUpFormScreen extends HookConsumerWidget {
                         // Section 1: Account Information
                         FormSectionCard(
                           sectionNumber: '1',
-                          title: 'Account Information',
+                          title: 'ACCOUNT INFORMATION'.toUpperCase(),
                           child: const AccountInformationSection(),
                         ),
                         AppDimens.verticalLarge,
@@ -242,7 +242,7 @@ class SignUpFormScreen extends HookConsumerWidget {
                         // Section 2: Business & Partner
                         FormSectionCard(
                           sectionNumber: '2',
-                          title: 'Business & Partner Information',
+                          title: 'Business & Partner Information'.toUpperCase(),
                           child: Column(
                             children: [
                               BusinessPartnerSection(
@@ -264,7 +264,7 @@ class SignUpFormScreen extends HookConsumerWidget {
                         // Section 3: Legal Representative
                         FormSectionCard(
                           sectionNumber: '3',
-                          title: 'Legal Representative',
+                          title: 'Legal Representative'.toUpperCase(),
                           child: LegalRepresentativeSectionV2(),
                         ),
                         AppDimens.verticalLarge,
@@ -281,7 +281,7 @@ class SignUpFormScreen extends HookConsumerWidget {
                                 : 'SPA_BEAUTY';
                             return FormSectionCard(
                               sectionNumber: '4',
-                              title: 'Document Verification',
+                              title: 'Document Verification'.toUpperCase(),
                               child: DocumentVerificationSection(scope: scope),
                             );
                           },

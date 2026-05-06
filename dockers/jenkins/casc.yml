@@ -167,6 +167,58 @@ jobs:
         }
       }
 
+  - script: |
+      pipelineJob('healytics-panel-dev') {
+        displayName('Healytics Admin Panel (Dev)')
+        description('CI/CD pipeline for admin panel DEV (Flutter web) — webhook-triggered, pipeline from jenkinfiles repo')
+
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/phatngti/jenkinfiles.git')
+                }
+                branches('*/main')
+              }
+            }
+            scriptPath('panel/Jenkinsfile.dev')
+            lightweight(true)
+          }
+        }
+
+        triggers {
+          genericTrigger {
+            genericVariables {
+              genericVariable {
+                key('GIT_REF')
+                value('\$.ref')
+              }
+            }
+
+            regexpFilterText('\$GIT_REF')
+            regexpFilterExpression('refs/heads/.*')
+
+            // Use a separate token so the panel-dev pipeline is independently triggerable.
+            // Webhook URL: POST <JENKINS_URL>/generic-webhook-trigger/invoke?token=<WEBHOOK_TOKEN_PANEL_DEV>
+            token("${WEBHOOK_TOKEN_PANEL_DEV}")
+
+            causeString('Webhook push to \$GIT_REF (panel-dev)')
+            printContributedVariables(false)
+            printPostContent(false)
+          }
+        }
+
+        parameters {
+          stringParam('BRANCH_TO_BUILD', 'main', 'Branch to build (auto-set by webhook)')
+          stringParam('GIT_REF', '', 'Raw git ref from webhook payload (e.g. refs/heads/main)')
+        }
+
+        properties {
+          disableConcurrentBuilds()
+        }
+      }
+
 unclassified:
   location:
     url: "${JENKINS_URL}"

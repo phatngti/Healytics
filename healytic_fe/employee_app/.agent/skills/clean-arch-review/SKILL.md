@@ -21,7 +21,7 @@ description: Reviews Flutter code for Clean Architecture compliance. Use when re
 - [ ] Contains ONLY entities and repository interfaces
 - [ ] Zero imports from `package:flutter/*`
 - [ ] Zero imports from `package:riverpod*`
-- [ ] Zero imports from `package:employee_openapi/*`
+- [ ] Zero imports from `package:user_openapi/*`
 - [ ] Zero imports from data or presentation layers
 - [ ] Entities use `@freezed` for immutability
 - [ ] Repository interfaces are abstract classes only (no implementation)
@@ -35,14 +35,14 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 // VIOLATION: Direct API client in domain
-import 'package:employee_openapi/model/user_dto.dart';
+import 'package:user_openapi/model/user_dto.dart';
 ```
 
 ### 2. Data Layer (lib/features/<name>/data/)
 
 - [ ] Implements domain repository interfaces
 - [ ] Remote data source has 3 parts: interface, impl, mock
-- [ ] DTOs from `employee_openapi` are mapped to domain entities HERE (not in domain or presentation)
+- [ ] DTOs from `user_openapi` are mapped to domain entities HERE (not in domain or presentation)
 - [ ] Mock class uses `Future.delayed` for realistic async behavior
 - [ ] Complex mock data in separate `*_mock_data.dart` files
 - [ ] Provider switches between real/mock via config flag

@@ -186,7 +186,7 @@ class LoggingClient extends BaseClient {
 
     // Reset partner-specific flags to prevent stale
     // redirect state on next login.
-    UserRoleHelper.clearPartnerFlags();
+    UserRoleHelper.clearSession();
   }
 
   /// Attempts to parse a human-readable error message

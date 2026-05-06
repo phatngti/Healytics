@@ -6,7 +6,7 @@ import '../../../../core/models/store.model.dart';
 import '../../../../core/utils/error_message_code.dart';
 import '../../data/repositories/authenticate_repository_impl.dart';
 import '../../domain/entities/authenticate.entity.dart';
-import 'package:employee_openapi/api.dart';
+import 'package:user_openapi/api.dart';
 
 part 'authenticate.provider.freezed.dart';
 part 'authenticate.provider.g.dart';
