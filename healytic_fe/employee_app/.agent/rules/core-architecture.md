@@ -81,7 +81,7 @@ Current features: `authenticate`, `home`, `onboarding`, `orders`, `profile`, `no
 - Implements domain repository interfaces.
 - Each remote data source file contains 3 parts:
   1. **Abstract interface** (contract)
-  2. **Implementation class** (real API via `user_openapi`)
+  2. **Implementation class** (real API via `employee_openapi`)
   3. **Mock class** (with `Future.delayed` and fake data)
 - Use a config flag in providers to switch real/mock.
 - Complex mock data goes in separate `*_mock_data.dart` files.
@@ -107,10 +107,10 @@ import 'package:common/utils/demensions.dart';
 
 ## OpenAPI Integration
 
-Generated client at `./openapi` (package `user_openapi`):
+Generated client at `./openapi` (package `employee_openapi`):
 
 ```dart
-import 'package:user_openapi/model/partner_request_dto.dart';
+import 'package:employee_openapi/model/partner_request_dto.dart';
 ```
 
 Regenerate when backend spec changes at `../../backend/openapi/openapi.json`.
