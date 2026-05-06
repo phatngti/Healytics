@@ -76,8 +76,8 @@ class UserRoleHelper {
   }
 
   // Set the partner verified status
-  static void setPartnerVerified(bool verified) {
-    Store.put(StoreKey.partnerVerified, verified);
+  static Future<void> setPartnerVerified(bool verified) {
+    return Store.put(StoreKey.partnerVerified, verified);
   }
 
   /// Returns true when the verified partner finished clinic profile completion.
@@ -92,11 +92,18 @@ class UserRoleHelper {
     return Store.tryGet(StoreKey.partnerProfileCompleted) ?? false;
   }
 
-  static void setPartnerProfileCompleted(bool completed) {
-    Store.put(StoreKey.partnerProfileCompleted, completed);
+  static Future<void> setPartnerProfileCompleted(
+    bool completed,
+  ) {
+    return Store.put(
+      StoreKey.partnerProfileCompleted,
+      completed,
+    );
   }
 
-  static void syncPartnerFlagsFromAccessToken(String accessToken) {
+  static Future<void> syncPartnerFlagsFromAccessToken(
+    String accessToken,
+  ) async {
     try {
       final decoded = JwtDecoder.decode(accessToken);
       final verificationStatus = decoded['verificationStatus']
@@ -105,14 +112,16 @@ class UserRoleHelper {
       final isVerified = verificationStatus == 'APPROVED';
       final isProfileCompleted =
           decoded['partnerProfileCompleted'] == true ||
-          decoded['partnerProfileCompleted']?.toString().toLowerCase() ==
+          decoded['partnerProfileCompleted']
+                  ?.toString()
+                  .toLowerCase() ==
               'true';
 
-      setPartnerVerified(isVerified);
-      setPartnerProfileCompleted(isProfileCompleted);
+      await setPartnerVerified(isVerified);
+      await setPartnerProfileCompleted(isProfileCompleted);
     } catch (_) {
-      setPartnerVerified(false);
-      setPartnerProfileCompleted(false);
+      await setPartnerVerified(false);
+      await setPartnerProfileCompleted(false);
     }
   }
 

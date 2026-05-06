@@ -14,12 +14,12 @@ class UpdatePartnerHealthServiceDto {
   /// Returns a new [UpdatePartnerHealthServiceDto] instance.
   UpdatePartnerHealthServiceDto({
     this.categoryId,
+    this.description,
+    this.salePrice,
     this.name,
     this.slug,
-    this.description,
     this.type,
     this.basePrice,
-    this.salePrice,
     this.currency,
     this.status,
     this.isVisibleOnline,
@@ -31,13 +31,11 @@ class UpdatePartnerHealthServiceDto {
   });
 
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? categoryId;
+
+  String? description;
+
+  num? salePrice;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -61,14 +59,6 @@ class UpdatePartnerHealthServiceDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? description;
-
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   HealthServiceType? type;
 
   ///
@@ -78,14 +68,6 @@ class UpdatePartnerHealthServiceDto {
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
   num? basePrice;
-
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  num? salePrice;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -105,41 +87,25 @@ class UpdatePartnerHealthServiceDto {
   ///
   bool? isVisibleOnline;
 
-  List<String> employeeIds;
+  List<String>? employeeIds;
 
-  /// Product media (images/videos)
-  List<CreatePartnerHealthServiceMediaDto> media;
+  List<CreatePartnerHealthServiceMediaDto>? media;
 
-  /// Product definition (required if type is service)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   CreatePartnerHealthServiceDefinitionDto? productDefinition;
 
-  /// Facility/clinic images
-  List<CreatePartnerHealthServiceFacilityImageDto> facilityImages;
+  List<CreatePartnerHealthServiceFacilityImageDto>? facilityImages;
 
-  /// Service manual (guidelines, rules, procedure steps)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   ServiceManualInputDto? serviceManual;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is UpdatePartnerHealthServiceDto &&
     other.categoryId == categoryId &&
+    other.description == description &&
+    other.salePrice == salePrice &&
     other.name == name &&
     other.slug == slug &&
-    other.description == description &&
     other.type == type &&
     other.basePrice == basePrice &&
-    other.salePrice == salePrice &&
     other.currency == currency &&
     other.status == status &&
     other.isVisibleOnline == isVisibleOnline &&
@@ -153,23 +119,23 @@ class UpdatePartnerHealthServiceDto {
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (categoryId == null ? 0 : categoryId!.hashCode) +
+    (description == null ? 0 : description!.hashCode) +
+    (salePrice == null ? 0 : salePrice!.hashCode) +
     (name == null ? 0 : name!.hashCode) +
     (slug == null ? 0 : slug!.hashCode) +
-    (description == null ? 0 : description!.hashCode) +
     (type == null ? 0 : type!.hashCode) +
     (basePrice == null ? 0 : basePrice!.hashCode) +
-    (salePrice == null ? 0 : salePrice!.hashCode) +
     (currency == null ? 0 : currency!.hashCode) +
     (status == null ? 0 : status!.hashCode) +
     (isVisibleOnline == null ? 0 : isVisibleOnline!.hashCode) +
-    (employeeIds.hashCode) +
-    (media.hashCode) +
+    (employeeIds == null ? 0 : employeeIds!.hashCode) +
+    (media == null ? 0 : media!.hashCode) +
     (productDefinition == null ? 0 : productDefinition!.hashCode) +
-    (facilityImages.hashCode) +
+    (facilityImages == null ? 0 : facilityImages!.hashCode) +
     (serviceManual == null ? 0 : serviceManual!.hashCode);
 
   @override
-  String toString() => 'UpdatePartnerHealthServiceDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, serviceManual=$serviceManual]';
+  String toString() => 'UpdatePartnerHealthServiceDto[categoryId=$categoryId, description=$description, salePrice=$salePrice, name=$name, slug=$slug, type=$type, basePrice=$basePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, serviceManual=$serviceManual]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -177,6 +143,16 @@ class UpdatePartnerHealthServiceDto {
       json[r'categoryId'] = this.categoryId;
     } else {
       json[r'categoryId'] = null;
+    }
+    if (this.description != null) {
+      json[r'description'] = this.description;
+    } else {
+      json[r'description'] = null;
+    }
+    if (this.salePrice != null) {
+      json[r'salePrice'] = this.salePrice;
+    } else {
+      json[r'salePrice'] = null;
     }
     if (this.name != null) {
       json[r'name'] = this.name;
@@ -188,11 +164,6 @@ class UpdatePartnerHealthServiceDto {
     } else {
       json[r'slug'] = null;
     }
-    if (this.description != null) {
-      json[r'description'] = this.description;
-    } else {
-      json[r'description'] = null;
-    }
     if (this.type != null) {
       json[r'type'] = this.type;
     } else {
@@ -202,11 +173,6 @@ class UpdatePartnerHealthServiceDto {
       json[r'basePrice'] = this.basePrice;
     } else {
       json[r'basePrice'] = null;
-    }
-    if (this.salePrice != null) {
-      json[r'salePrice'] = this.salePrice;
-    } else {
-      json[r'salePrice'] = null;
     }
     if (this.currency != null) {
       json[r'currency'] = this.currency;
@@ -223,14 +189,26 @@ class UpdatePartnerHealthServiceDto {
     } else {
       json[r'isVisibleOnline'] = null;
     }
+    if (this.employeeIds != null) {
       json[r'employeeIds'] = this.employeeIds;
+    } else {
+      json[r'employeeIds'] = null;
+    }
+    if (this.media != null) {
       json[r'media'] = this.media;
+    } else {
+      json[r'media'] = null;
+    }
     if (this.productDefinition != null) {
       json[r'productDefinition'] = this.productDefinition;
     } else {
       json[r'productDefinition'] = null;
     }
+    if (this.facilityImages != null) {
       json[r'facilityImages'] = this.facilityImages;
+    } else {
+      json[r'facilityImages'] = null;
+    }
     if (this.serviceManual != null) {
       json[r'serviceManual'] = this.serviceManual;
     } else {
@@ -259,12 +237,14 @@ class UpdatePartnerHealthServiceDto {
 
       return UpdatePartnerHealthServiceDto(
         categoryId: mapValueOfType<String>(json, r'categoryId'),
+        description: mapValueOfType<String>(json, r'description'),
+        salePrice: json[r'salePrice'] == null
+            ? null
+            : num.parse('${json[r'salePrice']}'),
         name: mapValueOfType<String>(json, r'name'),
         slug: mapValueOfType<String>(json, r'slug'),
-        description: mapValueOfType<String>(json, r'description'),
         type: HealthServiceType.fromJson(json[r'type']),
         basePrice: num.parse('${json[r'basePrice']}'),
-        salePrice: num.parse('${json[r'salePrice']}'),
         currency: mapValueOfType<String>(json, r'currency'),
         status: UpdatePartnerHealthServiceDtoStatusEnum.fromJson(json[r'status']),
         isVisibleOnline: mapValueOfType<bool>(json, r'isVisibleOnline'),

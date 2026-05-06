@@ -256,7 +256,9 @@ class _ProfileCompletionScreenState
       if (result.isCompleted) {
         // Sync local flag before checking so the
         // guard reflects the latest API response.
-        UserRoleHelper.setPartnerProfileCompleted(result.isCompleted);
+        await UserRoleHelper.setPartnerProfileCompleted(
+          result.isCompleted,
+        );
 
         const DashboardRoute().go(context);
         return;

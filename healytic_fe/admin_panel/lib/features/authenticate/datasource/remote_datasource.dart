@@ -6,6 +6,7 @@ import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
+import 'package:admin_panel/features/authenticate/datasource/auth_mock_data.dart';
 import 'package:admin_panel/features/authenticate/domain/authenticate.entity.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -257,11 +258,16 @@ class AuthenticateRemoteDatasourceMock implements AuthenticateRemoteDatasource {
     SignInRequestEntity request,
     String role,
   ) async {
-    await Future<void>.delayed(const Duration(seconds: 1));
-    return SignInResponseEntity(
-      accessToken: 'mock_access_token',
-      refreshToken: 'mock_refresh_token',
-      role: role,
+    await Future<void>.delayed(
+      const Duration(seconds: 1),
+    );
+
+    if (role == Role.admin.value) {
+      return DevMockAccounts.buildAdminResponse();
+    }
+
+    return DevMockAccounts.buildPartnerResponse(
+      request.email,
     );
   }
 

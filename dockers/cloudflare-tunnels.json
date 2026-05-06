@@ -23,7 +23,7 @@
         },
         {
           "hostname": "admin-dev.healytics.me",
-          "origin": "http://healytics-panel:80",
+          "origin": "http://healytics-panel-dev:80",
           "originRequest": {
             "noTLSVerify": true
           }
