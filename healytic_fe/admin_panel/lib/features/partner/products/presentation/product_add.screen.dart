@@ -38,6 +38,7 @@ class ProductAddScreen extends HookConsumerWidget {
       () => GlobalKey<ProductServiceManualCardState>(),
     );
     final isSubmitting = useState(false);
+    final isFormValid = useState(false);
 
     // Build initial values in debug mode only.
     // Triggered by URL param OR store config flag.
@@ -96,11 +97,24 @@ class ProductAddScreen extends HookConsumerWidget {
     return FormBuilder(
       key: formKey,
       initialValue: initialValue,
+      onChanged: () {
+        // Delay so fields finish updating before we check.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final state = formKey.currentState;
+          if (state == null) return;
+          isFormValid.value = state.fields.values.every(
+            (f) => f.isValid,
+          );
+        });
+      },
       child: ResponsiveWrapper(
         useLayout: true,
         desktop: ProductAddDesktop(
+          isFormValid: isFormValid.value,
           onCancel: handleCancel,
-          onSubmit: isSubmitting.value ? null : () => handleSubmit(),
+          onSubmit: isSubmitting.value
+              ? null
+              : () => handleSubmit(),
           initialStatus: shouldAutofill
               ? ProductAddAutofill.status
               : ProductStatus.draft.apiValue,

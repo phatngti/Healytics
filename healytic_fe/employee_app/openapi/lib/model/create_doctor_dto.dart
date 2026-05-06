@@ -126,7 +126,7 @@ class CreateDoctorDto {
   String? jobTitle;
 
   /// Medical credentials (titles + licenses)
-  List<String> medicalCredentials;
+  List<MedicalCredentialResponseDto> medicalCredentials;
 
   /// Years of experience
   ///
@@ -331,9 +331,7 @@ class CreateDoctorDto {
         status: CreateDoctorDtoStatusEnum.fromJson(json[r'status']),
         description: mapValueOfType<String>(json, r'description')!,
         jobTitle: mapValueOfType<String>(json, r'jobTitle'),
-        medicalCredentials: json[r'medicalCredentials'] is Iterable
-            ? (json[r'medicalCredentials'] as Iterable).cast<String>().toList(growable: false)
-            : const [],
+        medicalCredentials: MedicalCredentialResponseDto.listFromJson(json[r'medicalCredentials']),
         experienceYears: num.parse('${json[r'experienceYears']}'),
         consultationFee: num.parse('${json[r'consultationFee']}'),
         specializations: json[r'specializations'] is Iterable

@@ -7627,7 +7627,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-04T15:50:43.251Z"
+              "submittedAt": "2026-05-06T15:28:31.026Z"
             }
           }
         },
@@ -9464,6 +9464,19 @@
           "fieldKey"
         ]
       },
+      "MedicalCredentialResponseDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title"
+          },
+          "license": {
+            "type": "string",
+            "description": "License"
+          }
+        }
+      },
       "CreateDoctorDto": {
         "type": "object",
         "properties": {
@@ -9626,7 +9639,7 @@
             ],
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/MedicalCredentialResponseDto"
             }
           },
           "experienceYears": {
@@ -9679,19 +9692,6 @@
           "schedule",
           "description"
         ]
-      },
-      "MedicalCredentialResponseDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "description": "Title"
-          },
-          "license": {
-            "type": "string",
-            "description": "License"
-          }
-        }
       },
       "DoctorProfileResponseDto": {
         "type": "object",
