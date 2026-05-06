@@ -7627,7 +7627,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-06T15:28:31.026Z"
+              "submittedAt": "2026-05-06T16:01:30.666Z"
             }
           }
         },
@@ -12679,35 +12679,30 @@
           "categoryId": {
             "type": "string",
             "format": "uuid",
-            "example": "uuid-category-id"
-          },
-          "name": {
-            "type": "string",
-            "example": "Thai Massage"
-          },
-          "slug": {
-            "type": "string",
-            "example": "thai-massage"
+            "nullable": true
           },
           "description": {
             "type": "string",
-            "example": "A relaxing Thai massage service"
-          },
-          "type": {
-            "example": "service",
-            "$ref": "#/components/schemas/HealthServiceType"
-          },
-          "basePrice": {
-            "type": "number",
-            "example": 500000
+            "nullable": true
           },
           "salePrice": {
             "type": "number",
-            "example": 450000
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/HealthServiceType"
+          },
+          "basePrice": {
+            "type": "number"
           },
           "currency": {
-            "type": "string",
-            "example": "VND"
+            "type": "string"
           },
           "status": {
             "type": "string",
@@ -12715,32 +12710,27 @@
               "draft",
               "active",
               "archived"
-            ],
-            "example": "draft"
+            ]
           },
           "isVisibleOnline": {
-            "type": "boolean",
-            "example": false
+            "type": "boolean"
           },
           "employeeIds": {
-            "example": [
-              "uuid-1",
-              "uuid-2"
-            ],
+            "nullable": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "media": {
-            "description": "Product media (images/videos)",
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CreatePartnerHealthServiceMediaDto"
             }
           },
           "productDefinition": {
-            "description": "Product definition (required if type is service)",
+            "nullable": true,
             "allOf": [
               {
                 "$ref": "#/components/schemas/CreatePartnerHealthServiceDefinitionDto"
@@ -12748,14 +12738,14 @@
             ]
           },
           "facilityImages": {
-            "description": "Facility/clinic images",
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CreatePartnerHealthServiceFacilityImageDto"
             }
           },
           "serviceManual": {
-            "description": "Service manual (guidelines, rules, procedure steps)",
+            "nullable": true,
             "allOf": [
               {
                 "$ref": "#/components/schemas/ServiceManualInputDto"

@@ -150,7 +150,7 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
           displayName: fullName.isNotEmpty ? fullName : employee.displayName,
           avatar: values['avatar_url']?.toString() ?? employee.avatar,
           role:
-              (values['employee_role'] as EmployeeRole?)?.apiValue ??
+              values['employee_role']?.toString() ??
               employee.role,
           position: values['medical_title']?.toString() ?? employee.position,
           status: employee.status,

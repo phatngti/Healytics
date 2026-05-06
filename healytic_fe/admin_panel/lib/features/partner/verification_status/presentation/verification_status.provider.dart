@@ -28,7 +28,7 @@ class VerificationStatus extends _$VerificationStatus {
     // redirect away from this page when approved.
     final isVerified =
         status.verificationStatus == VerificationRevisionStatus.approved;
-    UserRoleHelper.setPartnerVerified(isVerified);
+    await UserRoleHelper.setPartnerVerified(isVerified);
 
     return status;
   }

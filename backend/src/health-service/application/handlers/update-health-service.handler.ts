@@ -40,8 +40,14 @@ export class UpdateHealthServiceHandler {
       const { media, productDefinition, serviceManual, ...updateData } =
         command;
 
-      if (Object.keys(updateData).length > 0) {
-        Object.assign(existingProduct, updateData);
+      // Strip null/undefined values so we never overwrite non-nullable DB columns
+      // (e.g. slug, name, type) with null when the client sends partial updates.
+      const sanitizedUpdate = Object.fromEntries(
+        Object.entries(updateData).filter(([, v]) => v !== null && v !== undefined),
+      );
+
+      if (Object.keys(sanitizedUpdate).length > 0) {
+        Object.assign(existingProduct, sanitizedUpdate);
       }
 
       // Update service manual (full replacement)
@@ -50,7 +56,7 @@ export class UpdateHealthServiceHandler {
       }
 
       // Save product if any fields changed
-      if (Object.keys(updateData).length > 0 || serviceManual !== undefined) {
+      if (Object.keys(sanitizedUpdate).length > 0 || serviceManual !== undefined) {
         await queryRunner.manager.save(Product, existingProduct);
       }
 
@@ -83,8 +89,8 @@ export class UpdateHealthServiceHandler {
         // Delete all existing media for this product
         await queryRunner.manager.delete(ProductMedia, { productId: id });
 
-        // Insert new
-        if (media.length > 0) {
+        // Insert new (media can be null to clear all)
+        if (media && media.length > 0) {
           const mediaEntities = media.map((m) =>
             queryRunner.manager.create(ProductMedia, {
               ...m,

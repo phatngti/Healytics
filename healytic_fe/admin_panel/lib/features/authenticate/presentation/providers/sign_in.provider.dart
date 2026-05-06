@@ -15,40 +15,71 @@ class SignInProvider extends _$SignInProvider {
     return null;
   }
 
-  Future<void> signIn(String email, String password, String role) async {
+  Future<void> signIn(
+    String email,
+    String password,
+    String role,
+  ) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final request = SignInRequestEntity(email: email, password: password);
+      final request = SignInRequestEntity(
+        email: email,
+        password: password,
+      );
       final response = await ref
           .read(authenticateRepositoryProvider)
           .login(request, role);
 
-      // Save access token to store
-      await Store.put(StoreKey.accessToken, response.accessToken);
-      await Store.put(StoreKey.refreshToken, response.refreshToken);
+      // Save tokens to store
+      await Store.put(
+        StoreKey.accessToken,
+        response.accessToken,
+      );
+      await Store.put(
+        StoreKey.refreshToken,
+        response.refreshToken,
+      );
 
-      // In mock mode, persist the selected role so
-      // `UserRoleHelper.isLoggedIn()` returns true.
       final isMockMode =
           Store.tryGet(StoreKey.mockFlag) ?? false;
+
+      // Persist role for mock mode so
+      // UserRoleHelper.getRole() works correctly.
       if (isMockMode) {
         await Store.put(StoreKey.mockRole, role);
       }
 
-      // For health_partner role, sync verification flags.
+      // For health_partner, sync verification flags.
       if (role == Role.health_partner.value) {
-        if (!isMockMode) {
-          UserRoleHelper
+        if (isMockMode) {
+          await _syncFlagsFromResponse(response);
+        } else {
+          await UserRoleHelper
               .syncPartnerFlagsFromAccessToken(
             response.accessToken,
           );
         }
-        // In mock mode, partnerVerified and
-        // partnerProfileCompleted are already loaded
-        // from store.dev.json — no sync needed.
       }
 
       return response;
     });
   }
+
+  /// Syncs partner flags from [SignInResponseEntity]
+  /// fields for mock mode (no JWT decoding needed).
+  Future<void> _syncFlagsFromResponse(
+    SignInResponseEntity response,
+  ) async {
+    final isVerified =
+        response.verificationStatus?.toUpperCase() ==
+            'APPROVED';
+    final isProfileCompleted =
+        response.verificationCompletedAt != null;
+
+    await UserRoleHelper.setPartnerVerified(isVerified);
+    await UserRoleHelper.setPartnerProfileCompleted(
+      isProfileCompleted,
+    );
+  }
 }
+

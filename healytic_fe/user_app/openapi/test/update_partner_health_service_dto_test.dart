@@ -21,6 +21,16 @@ void main() {
       // TODO
     });
 
+    // String description
+    test('to test the property `description`', () async {
+      // TODO
+    });
+
+    // num salePrice
+    test('to test the property `salePrice`', () async {
+      // TODO
+    });
+
     // String name
     test('to test the property `name`', () async {
       // TODO
@@ -31,11 +41,6 @@ void main() {
       // TODO
     });
 
-    // String description
-    test('to test the property `description`', () async {
-      // TODO
-    });
-
     // HealthServiceType type
     test('to test the property `type`', () async {
       // TODO
@@ -43,11 +48,6 @@ void main() {
 
     // num basePrice
     test('to test the property `basePrice`', () async {
-      // TODO
-    });
-
-    // num salePrice
-    test('to test the property `salePrice`', () async {
       // TODO
     });
 
@@ -71,25 +71,21 @@ void main() {
       // TODO
     });
 
-    // Product media (images/videos)
     // List<CreatePartnerHealthServiceMediaDto> media (default value: const [])
     test('to test the property `media`', () async {
       // TODO
     });
 
-    // Product definition (required if type is service)
     // CreatePartnerHealthServiceDefinitionDto productDefinition
     test('to test the property `productDefinition`', () async {
       // TODO
     });
 
-    // Facility/clinic images
     // List<CreatePartnerHealthServiceFacilityImageDto> facilityImages (default value: const [])
     test('to test the property `facilityImages`', () async {
       // TODO
     });
 
-    // Service manual (guidelines, rules, procedure steps)
     // ServiceManualInputDto serviceManual
     test('to test the property `serviceManual`', () async {
       // TODO
