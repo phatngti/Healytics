@@ -46,8 +46,18 @@ export class UpdateEmployeeHandler {
 
       const { doctorProfile, therapistProfile, ...employeeData } = command;
 
+      // Strip null/undefined values so we never overwrite non-nullable DB columns
+      // (e.g. employeeCode, fullName, email, role, status) with null.
+      const sanitizedData = Object.fromEntries(
+        Object.entries(employeeData).filter(
+          ([, v]) => v !== null && v !== undefined,
+        ),
+      );
+
       // 2. Domain Action: Update Employee entity
-      Object.assign(employee, employeeData);
+      if (Object.keys(sanitizedData).length > 0) {
+        Object.assign(employee, sanitizedData);
+      }
       await queryRunner.manager.save(Employee, employee);
 
       // 3. Domain Action: Update Doctor Profile if applicable

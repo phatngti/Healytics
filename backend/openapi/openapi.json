@@ -7398,7 +7398,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-06T15:38:36.753Z"
+              "submittedAt": "2026-05-06T16:19:37.380Z"
             }
           }
         },
@@ -10135,6 +10135,23 @@
           "description"
         ]
       },
+      "EmployeeRole": {
+        "type": "string",
+        "enum": [
+          "DOCTOR",
+          "THERAPIST",
+          "RECEPTIONIST",
+          "MANAGER"
+        ]
+      },
+      "EmployeeStatus": {
+        "type": "string",
+        "enum": [
+          "ACTIVE",
+          "INACTIVE",
+          "ON_LEAVE"
+        ]
+      },
       "CreateDoctorProfileDto": {
         "type": "object",
         "properties": {
@@ -10255,43 +10272,41 @@
         "properties": {
           "employeeCode": {
             "type": "string",
-            "example": "EMP001",
-            "description": "Unique employee code"
-          },
-          "firstName": {
-            "type": "string",
-            "example": "Nguyen",
-            "description": "First name"
-          },
-          "lastName": {
-            "type": "string",
-            "example": "Van A",
-            "description": "Last name"
+            "example": "EMP001"
           },
           "fullName": {
             "type": "string",
-            "example": "John Doe",
-            "description": "Full name of the employee"
+            "example": "John Doe"
           },
           "email": {
             "type": "string",
-            "example": "john.doe@example.com",
-            "description": "Email address"
+            "example": "john@example.com"
+          },
+          "role": {
+            "$ref": "#/components/schemas/EmployeeRole"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EmployeeStatus"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
           },
           "phone": {
             "type": "string",
-            "example": "+1234567890",
-            "description": "Phone number"
+            "nullable": true
           },
           "avatarUrl": {
             "type": "string",
-            "example": "https://example.com/avatar.jpg",
-            "description": "Avatar URL"
+            "nullable": true
           },
           "dob": {
             "type": "string",
-            "example": "1990-01-01",
-            "description": "Date of birth"
+            "nullable": true
           },
           "gender": {
             "type": "string",
@@ -10300,126 +10315,60 @@
               "FEMALE",
               "OTHER"
             ],
-            "example": "MALE",
-            "description": "Gender"
-          },
-          "role": {
-            "type": "string",
-            "enum": [
-              "DOCTOR",
-              "THERAPIST",
-              "RECEPTIONIST",
-              "MANAGER"
-            ],
-            "example": "DOCTOR",
-            "description": "Role of the employee"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE",
-              "ON_LEAVE"
-            ],
-            "example": "ACTIVE",
-            "description": "Status of the employee"
+            "nullable": true
           },
           "partnerId": {
             "type": "string",
-            "example": "uuid-partner-id",
-            "description": "Partner ID the employee belongs to"
+            "format": "uuid",
+            "nullable": true
           },
           "jobTitle": {
             "type": "string",
-            "description": "Job title"
+            "nullable": true
           },
           "startDate": {
             "type": "string",
-            "description": "Start date"
+            "nullable": true
           },
           "employmentType": {
             "type": "string",
-            "description": "Employment type"
+            "nullable": true
           },
           "emergencyContactName": {
             "type": "string",
-            "description": "Emergency contact name"
+            "nullable": true
           },
           "emergencyContactPhone": {
             "type": "string",
-            "description": "Emergency contact phone"
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
           },
           "verificationDocuments": {
-            "description": "Verification documents (ID card, licenses, etc.)",
-            "example": [
-              {
-                "fieldKey": "id_card",
-                "documents": [
-                  {
-                    "name": "ID Card",
-                    "url": "https://storage.example.com/id-card.jpg",
-                    "updatedTime": "2026-03-21T14:00:00.000Z"
-                  }
-                ]
-              },
-              {
-                "fieldKey": "other_documents",
-                "documents": [
-                  {
-                    "name": "Health Certificate",
-                    "url": "https://storage.example.com/health-cert.pdf",
-                    "updatedTime": "2026-03-21T14:00:00.000Z"
-                  }
-                ]
-              }
-            ],
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/VerificationDocumentEntryDto"
             }
           },
-          "description": {
-            "type": "string",
-            "description": "Bio / description"
-          },
           "schedule": {
-            "description": "Weekly work schedule",
-            "example": [
-              {
-                "day": "Monday",
-                "start": "09:00",
-                "end": "17:00",
-                "isWorking": true
-              },
-              {
-                "day": "Sunday",
-                "start": "",
-                "end": "",
-                "isWorking": false
-              }
-            ],
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WorkScheduleEntryDto"
             }
           },
           "workHistory": {
-            "description": "Work history entries",
-            "example": [
-              {
-                "facility": "Glow Saigon Spa Retreat",
-                "position": "Head of Dermatology",
-                "period": "2022–Present",
-                "isCurrent": true
-              }
-            ],
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/WorkHistoryEntryDto"
             }
           },
           "doctorProfile": {
-            "description": "Doctor profile data if role is DOCTOR",
+            "nullable": true,
             "allOf": [
               {
                 "$ref": "#/components/schemas/CreateDoctorProfileDto"
@@ -10427,7 +10376,7 @@
             ]
           },
           "therapistProfile": {
-            "description": "Therapist profile data if role is THERAPIST",
+            "nullable": true,
             "allOf": [
               {
                 "$ref": "#/components/schemas/CreateTherapistProfileDto"
@@ -12450,35 +12399,30 @@
           "categoryId": {
             "type": "string",
             "format": "uuid",
-            "example": "uuid-category-id"
-          },
-          "name": {
-            "type": "string",
-            "example": "Thai Massage"
-          },
-          "slug": {
-            "type": "string",
-            "example": "thai-massage"
+            "nullable": true
           },
           "description": {
             "type": "string",
-            "example": "A relaxing Thai massage service"
-          },
-          "type": {
-            "example": "service",
-            "$ref": "#/components/schemas/HealthServiceType"
-          },
-          "basePrice": {
-            "type": "number",
-            "example": 500000
+            "nullable": true
           },
           "salePrice": {
             "type": "number",
-            "example": 450000
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/HealthServiceType"
+          },
+          "basePrice": {
+            "type": "number"
           },
           "currency": {
-            "type": "string",
-            "example": "VND"
+            "type": "string"
           },
           "status": {
             "type": "string",
@@ -12486,32 +12430,27 @@
               "draft",
               "active",
               "archived"
-            ],
-            "example": "draft"
+            ]
           },
           "isVisibleOnline": {
-            "type": "boolean",
-            "example": false
+            "type": "boolean"
           },
           "employeeIds": {
-            "example": [
-              "uuid-1",
-              "uuid-2"
-            ],
+            "nullable": true,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "media": {
-            "description": "Product media (images/videos)",
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CreatePartnerHealthServiceMediaDto"
             }
           },
           "productDefinition": {
-            "description": "Product definition (required if type is service)",
+            "nullable": true,
             "allOf": [
               {
                 "$ref": "#/components/schemas/CreatePartnerHealthServiceDefinitionDto"
@@ -12519,14 +12458,14 @@
             ]
           },
           "facilityImages": {
-            "description": "Facility/clinic images",
+            "nullable": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CreatePartnerHealthServiceFacilityImageDto"
             }
           },
           "serviceManual": {
-            "description": "Service manual (guidelines, rules, procedure steps)",
+            "nullable": true,
             "allOf": [
               {
                 "$ref": "#/components/schemas/ServiceManualInputDto"
