@@ -524,7 +524,7 @@ Dữ liệu phục vụ các pipeline AI trong mã nguồn hiện tại được
 
 \begin{itemize}
     \item \textbf{RAG Chatbot:} Kho tri thức gồm các tài liệu PDF; khi khởi động dịch vụ, toàn bộ PDF trong thư mục tri thức được đọc song song, loại bỏ ký tự ngoài ASCII (UTF-8), sau đó chia nhỏ bằng \textit{Recursive Character Text Splitter} với độ dài đoạn 300 ký tự và không chồng lấp giữa các đoạn.
-    \item \textbf{Recommender (vector search):} MMỗi bản ghi được ghép thành một văn bản gồm tên và mô tả, gắn metadata \texttt{service\_id} và \texttt{category}, rồi được embedding và lưu vào Chroma persistent để truy vấn tương đồng.
+    \item \textbf{Recommender (vector search):} Mỗi bản ghi được ghép thành một văn bản gồm tên và mô tả, gắn metadata \texttt{service\_id} và \texttt{category}, rồi được embedding và lưu vào Chroma persistent để truy vấn tương đồng.
     \item \textbf{Recommender Home (hồ sơ người dùng):} Dịch vụ gợi ý trang chủ đọc PostgreSQL: khảo sát người dùng lưu trong trường JSON trên bảng tài khoản (chuẩn hóa thành ba nhóm \textit{goals}, \textit{interests}, \textit{health\_conditions}), đồng thời có thể đọc hồ sơ cá nhân (tên, ngày sinh suy ra tuổi, v.v.). Danh sách mã dịch vụ đã dùng được dự kiến lấy từ lịch sử đơn hàng nhưng trong triển khai hiện tại luôn trả về rỗng cho đến khi tích hợp bảng đơn hàng.
     \item \textbf{NER / PreFilter:} Dịch vụ tải cache địa điểm và dữ liệu phục vụ lọc từ cơ sở dữ liệu quan hệ khi khởi động; hỗ trợ truy vấn không gian (PostGIS) khi có ngữ cảnh khoảng cách hợp lệ.
 \end{itemize}
@@ -645,7 +645,7 @@ Hệ thống phục vụ hai luồng gợi ý độc lập:
 
 Mỗi dịch vụ trong cơ sở dữ liệu được biểu diễn dưới dạng một chuỗi văn bản kết hợp tên và mô tả. Chuỗi này được embedding bằng mô hình \textbf{sentence-transformers/paraphrase-multilingual-mpnet-base-v2} tạo ra vector 768 chiều. Metadata đi kèm mỗi vector gồm \texttt{service\_id} và \texttt{category}, phục vụ cho các truy vấn có lọc điều kiện.
 
-Vector store sử dụng \textbf{ChromaDB} ở chế độ persistent, lưu trữ cục bộ trên đĩa. Quá trình xây dựng chỉ mục được thực hiện offline theo hai phương thức: tải dữ liệu từ tệp JSON mẫu (môi trường phát triển) hoặc truy vấn trực tiếp bảng \texttt{products} trong PostgreSQL (môi trường production). Hệ thống hỗ trợ thao tác \textit{upsert} để cập nhật dịch vụ mà không cần rebuild toàn bộ chỉ mục.
+Vector store sử dụng \textbf{ChromaDB} ở chế độ persistent. Hệ thống hỗ trợ thao tác \textit{upsert} để cập nhật dịch vụ mà không cần rebuild toàn bộ chỉ mục.
 
 \subsubsection{Đồng bộ hoá dữ liệu thời gian thực}
 
