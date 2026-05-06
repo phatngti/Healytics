@@ -206,10 +206,10 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       verificationDocuments: _toVerificationDocumentDtos(
         request.verificationDocuments,
       ),
-      medicalCredentials: [
-        ...request.medicalTitles,
-        ...request.medicalLicenses,
-      ],
+      medicalCredentials: _toMedicalCredentials(
+        request.medicalTitles,
+        request.medicalLicenses,
+      ),
       experienceYears: request.experienceYears,
       consultationFee: request.consultationFee,
       specializations: request.specializations,
@@ -613,6 +613,29 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         ),
       )
       .toList();
+
+  /// Pairs medical titles and licenses into
+  /// [MedicalCredentialResponseDto] entries.
+  ///
+  /// Entries are paired by index. If the lists
+  /// differ in length the shorter side fills with
+  /// empty strings so no data is lost.
+  List<MedicalCredentialResponseDto> _toMedicalCredentials(
+    List<String> titles,
+    List<String> licenses,
+  ) {
+    final count = titles.length > licenses.length
+        ? titles.length
+        : licenses.length;
+    return List.generate(count, (i) {
+      return MedicalCredentialResponseDto(
+        title: i < titles.length ? titles[i] : '',
+        license: i < licenses.length
+            ? licenses[i]
+            : '',
+      );
+    });
+  }
 
   /// Maps [EmployeeGender] to [CreateDoctorDtoGenderEnum].
   CreateDoctorDtoGenderEnum? _toDoctorGender(EmployeeGender? gender) =>

@@ -246,6 +246,7 @@ class _EmployeeProfessionalRoleCardState
                       .map((e) => e.displayName)
                       .toList(),
                   initialValue: EmploymentType.fullTime.displayName,
+                  isRequired: true,
                 ),
               ),
               AppDimens.horizontalLarge,
@@ -255,6 +256,7 @@ class _EmployeeProfessionalRoleCardState
                   fieldKey: 'start_date',
                   label: 'Start Date',
                   hintText: 'Select Start Date',
+                  isRequired: true,
                 ),
               ),
             ],
