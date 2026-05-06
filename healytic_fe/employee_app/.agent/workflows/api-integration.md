@@ -6,15 +6,15 @@ Description: Connects a new API endpoint to the app following the data source pa
 - `<feature_name>`: Feature this API serves
 - `<endpoint>`: API endpoint path (e.g., `/api/v1/appointments`)
 - `<method>`: HTTP method (GET, POST, PUT, DELETE)
-- `<request_dto>`: Request DTO class (if any, from `user_openapi`)
-- `<response_dto>`: Response DTO class (from `user_openapi`)
+- `<request_dto>`: Request DTO class (if any, from `employee_openapi`)
+- `<response_dto>`: Response DTO class (from `employee_openapi`)
 - `<entity_name>`: Domain entity to map to
 
 ## Steps
 
 1. **Check OpenAPI client:** Verify the DTO exists in `./openapi`:
    ```dart
-   import 'package:user_openapi/model/<dto_name>.dart';
+   import 'package:employee_openapi/model/<dto_name>.dart';
    ```
    If the DTO doesn't exist, the backend OpenAPI spec may need updating and the client regenerated.
 

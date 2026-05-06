@@ -46,6 +46,16 @@ function admin_panel {
   generate_dart $BASE_DIR/admin_panel/openapi $BASE_DIR/open-api/admin_apis.json admin_openapi
 }
 
+function employee_app {
+  echo "Generating for employee_app..."
+
+  # Keep employee_app in sync with the same backend spec used by user_app.
+  echo "Merging ai_apis.json → user_apis.json..."
+  node $BASE_DIR/open-api/bin/merge-apis.js ai_apis.json user_apis.json
+
+  generate_dart $BASE_DIR/employee_app/openapi $BASE_DIR/open-api/user_apis.json employee_openapi
+}
+
 function ws_client {
   echo "Generating WebSocket client for user_app..."
   node $BASE_DIR/open-api/bin/generate-ws-client.js \
@@ -69,17 +79,21 @@ if [[ $1 == 'user' ]]; then
   user_app
 elif [[ $1 == 'admin' ]]; then
   admin_panel
+elif [[ $1 == 'employee' ]]; then
+  employee_app
 elif [[ $1 == 'ws' ]]; then
   ws_client
   ws_admin
 elif [[ $1 == 'all' ]]; then
   user_app
   admin_panel
+  employee_app
   ws_client
   ws_admin
 else
   user_app
   admin_panel
+  employee_app
   ws_client
   ws_admin
 fi

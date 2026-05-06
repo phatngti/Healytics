@@ -90,7 +90,7 @@ Beyond standard linting, verify:
 - File naming follows conventions (`.screen.dart`, `.widget.dart`, `.provider.dart`, `.entity.dart`).
 - Functions under 20 lines, line length under 80 chars.
 - Shared widgets imported from `package:common/...` (not re-implemented).
-- OpenAPI models from `package:user_openapi/...` (not hand-written DTOs).
+- OpenAPI models from `package:employee_openapi/...` (not hand-written DTOs).
 - Network images use `NetworkImageAuto` from `package:common/...` (not `Image.network`, `NetworkImage`, or `CachedNetworkImage` directly).
 
 ## Git Practices

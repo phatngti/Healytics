@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:user_openapi/api.dart';
+import 'package:employee_openapi/api.dart';
 
 part 'app_exception.freezed.dart';
 
