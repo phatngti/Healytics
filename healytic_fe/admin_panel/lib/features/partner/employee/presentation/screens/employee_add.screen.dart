@@ -33,7 +33,6 @@ class EmployeeAddScreen extends ConsumerStatefulWidget {
 
 class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   Future<void> _handleSubmit(Map<String, dynamic> values) async {
-    print('values: $values');
     final description = values[EmployeeFormField.description.key]?.toString();
     if (description == null || description.isEmpty) {
       if (mounted) {

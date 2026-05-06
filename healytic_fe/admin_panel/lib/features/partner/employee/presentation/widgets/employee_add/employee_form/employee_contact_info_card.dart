@@ -80,6 +80,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
             context,
             label: 'Phone Number',
             hintText: '+1 (555) 000-0000',
+            isRequired: true,
             prefixIcon: Icons.phone_outlined,
           ),
           const SizedBox(height: 20),
@@ -92,6 +93,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   label: 'Date of Birth',
                   fieldKey: 'date_of_birth',
                   hintText: 'MM/DD/YYYY',
+                  isRequired: true,
                 ),
               ),
               AppDimens.horizontalMedium,
@@ -102,6 +104,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   items: EmployeeGender.values
                       .map((e) => e.displayName)
                       .toList(),
+                  isRequired: true,
                 ),
               ),
             ],
@@ -131,6 +134,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   fieldKey: 'emergency_contact_name',
                   label: '',
                   hintText: 'Contact Name',
+                  isRequired: true,
                 ),
                 AppDimens.verticalMediumSmall,
                 FormFieldBuilders.buildTextField(
@@ -138,6 +142,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   fieldKey: 'emergency_contact_phone',
                   label: '',
                   hintText: 'Contact Phone',
+                  isRequired: true,
                   prefixIcon: Icons.phone_in_talk_outlined,
                 ),
               ],
