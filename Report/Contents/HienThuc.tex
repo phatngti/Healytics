@@ -1017,23 +1017,13 @@ Custom parser:
 
 \textbf{Server-Sent Events (SSE)} là cơ chế cho phép server gửi dữ liệu liên tục về client qua HTTP connection.
 
-Trong hệ thống này:
-
-\begin{itemize}
-    \item Chatbot service KHÔNG trực tiếp trả SSE
-    \item Chỉ trả \texttt{plain text stream}
-    \item Gateway chịu trách nhiệm wrap thành SSEEvent
-\end{itemize}
-
 \paragraph{Cách hiện thực streaming}
-
-Do pipeline RAG hiện tại (LangChain + HuggingFace Pipeline) không hỗ trợ streaming token trực tiếp từ mô hình một cách ổn định, hệ thống triển khai cơ chế \textbf{application-level streaming} nhằm mô phỏng luồng sinh văn bản liên tục.
 
 Cụ thể, quá trình được thực hiện theo các bước:
 
 \begin{enumerate}
-    \item Mô hình LLM sinh ra toàn bộ câu trả lời hoàn chỉnh (blocking inference).
-    \item Kết quả văn bản được phân tách thành các đơn vị nhỏ (chunk) theo số lượng từ cố định.
+    \item Mô hình LLM sinh ra từng token một theo câu trả lời.
+    \item Nối 3 token liên tiếp thành một chunk.
     \item Các chunk này được phát tuần tự thông qua một \texttt{async generator}, tạo thành luồng dữ liệu liên tục gửi về client.
 \end{enumerate}
 
@@ -1041,7 +1031,7 @@ Cách tiếp cận này đảm bảo:
 
 \begin{itemize}
     \item Trải nghiệm người dùng tương tự streaming token (hiển thị dần nội dung).
-    \item Không phụ thuộc vào khả năng streaming native của mô hình.
+    \item Câu trả lời xuất hiện nhanh chóng và liên tục.
     \item Tương thích hoàn toàn với \texttt{StreamingResponse} của FastAPI.
 \end{itemize}
 
@@ -1105,8 +1095,8 @@ Pipeline runtime:
     \item Build enriched input (history + services + question)
     \item Retriever truy xuất context từ Chroma
     \item Build prompt hoàn chỉnh
-    \item LLM generate full answer
-    \item Fake streaming từng chunk
+    \item LLM generate answer
+    \item Streaming từng chunk
     \item Gateway convert → SSE → client
 \end{enumerate}
 
