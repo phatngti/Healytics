@@ -8,7 +8,7 @@ import '../../../../../core/config/app_environment.dart';
 import '../../../../../core/providers/api.provider.dart';
 import '../../../../../core/services/api.service.dart';
 import '../../../domain/entities/authenticate.entity.dart';
-import 'package:employee_openapi/api.dart';
+import 'package:user_openapi/api.dart';
 
 part 'authenticate_remote_datasource.g.dart';
 

@@ -59,7 +59,7 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
                       fieldKey: 'representative_position',
                       label: 'Position',
                       hintText: 'e.g. Director',
-                      isRequired: false,
+                      isRequired: true,
                     ),
                   ),
                 ],
@@ -81,7 +81,7 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
                   fieldKey: 'representative_position',
                   label: 'Position',
                   hintText: 'e.g. Director',
-                  isRequired: false,
+                  isRequired: true,
                 ),
               ],
             );
@@ -226,6 +226,7 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
                       fieldKey: 'id_issue_date',
                       label: 'Date of Issue',
                       hintText: 'Select date',
+                      isRequired: true,
                     ),
                   ),
                 ],
@@ -264,6 +265,7 @@ class LegalRepresentativeSectionV2 extends StatelessWidget {
                   fieldKey: 'id_issue_date',
                   label: 'Date of Issue',
                   hintText: 'Select date',
+                  isRequired: true,
                 ),
               ],
             );

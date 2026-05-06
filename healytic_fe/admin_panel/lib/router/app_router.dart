@@ -82,15 +82,14 @@ GoRouter router(Ref ref) {
   final String initialLocation;
   if (!UserRoleHelper.isLoggedIn()) {
     initialLocation = '/';
-  } else if (Store.get(StoreKey.mockRole, Role.health_partner.value) ==
-      Role.health_partner.value) {
+  } else if (UserRoleHelper.isAdmin()) {
+    initialLocation = '/admin/dashboard';
+  } else {
     initialLocation = UserRoleHelper.isProviderVerified()
         ? (UserRoleHelper.isProviderProfileCompleted()
               ? '/provider/dashboard'
               : '/provider/profile-completion')
         : '/provider/verification-status';
-  } else {
-    initialLocation = '/admin/dashboard';
   }
 
   String? redirect(BuildContext context, GoRouterState state) {
@@ -132,17 +131,35 @@ GoRouter router(Ref ref) {
             : '/provider/profile-completion';
       }
 
+      // Admin on a provider route → redirect to admin dashboard.
+      if (role == Role.admin.value &&
+          path.startsWith('/provider/')) {
+        return '/admin/dashboard';
+      }
+
+      // Provider on an admin route → redirect to provider home.
+      if (role == Role.health_partner.value &&
+          path.startsWith('/admin/')) {
+        return isProviderVerified
+            ? (isProviderProfileCompleted
+                  ? '/provider/dashboard'
+                  : '/provider/profile-completion')
+            : '/provider/verification-status';
+      }
+
       // Unverified provider trying to access protected routes.
       if (role == Role.health_partner.value) {
         if (!isProviderVerified && !isVerificationRoute) {
           return '/provider/verification-status';
-        } else if (isProviderVerified && !isProviderProfileCompleted) {
+        } else if (isProviderVerified &&
+            !isProviderProfileCompleted) {
           if (!isProfileCompletionRoute) {
             return '/provider/profile-completion';
           }
         } else if (isProviderVerified &&
             isProviderProfileCompleted &&
-            (isVerificationRoute || isProfileCompletionRoute)) {
+            (isVerificationRoute ||
+                isProfileCompletionRoute)) {
           return '/provider/dashboard';
         }
       }
@@ -177,13 +194,16 @@ class RouterListenable extends _$RouterListenable implements Listenable {
 
   @override
   FutureOr<void> build() {
-    // Watch auth state
+    // Watch auth state changes to trigger redirects.
     final subscriptions = [
-      Store.watch(StoreKey.accessToken).listen((_) => _notifyListeners()),
-      Store.watch(StoreKey.partnerVerified).listen((_) => _notifyListeners()),
-      Store.watch(
-        StoreKey.partnerProfileCompleted,
-      ).listen((_) => _notifyListeners()),
+      Store.watch(StoreKey.accessToken)
+          .listen((_) => _notifyListeners()),
+      Store.watch(StoreKey.mockRole)
+          .listen((_) => _notifyListeners()),
+      Store.watch(StoreKey.partnerVerified)
+          .listen((_) => _notifyListeners()),
+      Store.watch(StoreKey.partnerProfileCompleted)
+          .listen((_) => _notifyListeners()),
     ];
     ref.onDispose(() {
       for (final subscription in subscriptions) {

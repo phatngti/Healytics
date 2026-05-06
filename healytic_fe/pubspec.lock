@@ -464,13 +464,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.2"
-  employee_openapi:
-    dependency: transitive
-    description:
-      path: "employee_app/openapi"
-      relative: true
-    source: path
-    version: "1.0.0"
   equatable:
     dependency: transitive
     description:

@@ -21,7 +21,7 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
     await ref.read(authenTokenProvider.notifier).removeToken();
     await Store.delete(StoreKey.accessToken);
     await Store.delete(StoreKey.refreshToken);
-    await UserRoleHelper.clearPartnerFlags();
+    await UserRoleHelper.clearSession();
     if (context.mounted) {
       context.go('/');
     }

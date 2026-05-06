@@ -1,94 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../domain/entities/employee_appointment.entity.dart';
-import '../providers/appointment_list.provider.dart';
-import '../widgets/appointments/appointment_card.widget.dart';
-import '../widgets/appointments/empty_appointments.widget.dart';
+import '../widgets/appointments/appointment_tab_view.widget.dart';
+import '../widgets/appointments/segmented_tab_control.widget.dart';
 
-class AppointmentsScreen extends ConsumerWidget {
+/// Main appointments screen with segmented tab
+/// control for Upcoming, Doing, Completed, Canceled.
+class AppointmentsScreen extends HookConsumerWidget {
   const AppointmentsScreen({super.key});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'My Appointments',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          centerTitle: false,
-          bottom: TabBar(
-            labelStyle: Theme.of(context).textTheme.labelLarge,
-            tabs: const [
-              Tab(text: 'Upcoming'),
-              Tab(text: 'Completed'),
-              Tab(text: 'Canceled'),
-            ],
-          ),
-        ),
-        body: const TabBarView(
-          children: [
-            _TabView(
-              status: EmployeeAppointmentStatus.upcoming,
-              label: 'upcoming',
-            ),
-            _TabView(
-              status: EmployeeAppointmentStatus.completed,
-              label: 'completed',
-            ),
-            _TabView(
-              status: EmployeeAppointmentStatus.canceled,
-              label: 'canceled',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TabView extends ConsumerWidget {
-  final EmployeeAppointmentStatus status;
-  final String label;
-  const _TabView({required this.status, required this.label});
+  static const _tabs = [
+    (
+      status: EmployeeAppointmentStatus.upcoming,
+      label: 'Upcoming',
+    ),
+    (
+      status: EmployeeAppointmentStatus.inProgress,
+      label: 'Doing',
+    ),
+    (
+      status: EmployeeAppointmentStatus.completed,
+      label: 'Completed',
+    ),
+    (
+      status: EmployeeAppointmentStatus.canceled,
+      label: 'Canceled',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final data = ref.watch(appointmentListProvider(status: status));
-    return data.when(
-      data: (list) {
-        if (list.isEmpty) return EmptyAppointments(statusLabel: label);
-        return RefreshIndicator(
-          onRefresh: () async =>
-              ref.invalidate(appointmentListProvider(status: status)),
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: list.length,
-            itemBuilder: (_, i) => AppointmentCard(appointment: list[i]),
-          ),
-        );
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(
+    final selectedIndex = useState(0);
+    final tt = Theme.of(context).textTheme;
+
+    return Scaffold(
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 48,
-              color: Theme.of(context).colorScheme.error,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                20, 24, 20, 0,
+              ),
+              child: Text(
+                'My Appointments',
+                style: tt.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Failed to load',
-              style: Theme.of(context).textTheme.bodyLarge,
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+              ),
+              child: SegmentedTabControl(
+                labels: _tabs
+                    .map((t) => t.label)
+                    .toList(),
+                selectedIndex: selectedIndex.value,
+                onChanged: (i) =>
+                    selectedIndex.value = i,
+              ),
             ),
-            TextButton(
-              onPressed: () =>
-                  ref.invalidate(appointmentListProvider(status: status)),
-              child: const Text('Retry'),
+            const SizedBox(height: 8),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(
+                  milliseconds: 250,
+                ),
+                child: AppointmentTabView(
+                  key: ValueKey(
+                    _tabs[selectedIndex.value].status,
+                  ),
+                  status:
+                      _tabs[selectedIndex.value].status,
+                  label:
+                      _tabs[selectedIndex.value].label,
+                ),
+              ),
             ),
           ],
         ),

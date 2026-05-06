@@ -175,6 +175,26 @@ services:
       retries: 6
       start_period: 5s
 
+  # =============================================================================
+  # Admin Panel — DEV (Flutter web built with ENV=dev, served by Nginx)
+  # Image and tag are supplied by deploy-panel-dev.sh → deploy-panel-dev.env.
+  # =============================================================================
+
+  panel-dev:
+    image: '${PANEL_DEV_IMAGE:-nonameaaaa/healytics_panel_dev}:${PANEL_DEV_TAG:-latest}'
+    platform: linux/amd64
+    container_name: healytics-panel-dev
+    profiles: ["panel-dev"]
+    restart: unless-stopped
+    networks:
+      - services
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+
   kong-bootstrap:
     image: '${GW_IMAGE:-kong/kong-gateway:3.12.0.2}'
     container_name: kong-bootstrap
@@ -420,6 +440,7 @@ services:
       # NOT a GitHub credential — only authorizes webhook delivery.
       WEBHOOK_TOKEN: ${WEBHOOK_TOKEN:-changeme}
       WEBHOOK_TOKEN_PANEL: ${WEBHOOK_TOKEN_PANEL:-changeme-panel}
+      WEBHOOK_TOKEN_PANEL_DEV: ${WEBHOOK_TOKEN_PANEL_DEV:-changeme-panel-dev}
     ports:
       - "${JENKINS_BIND_ADDR:-127.0.0.1}:${JENKINS_PORT:-8081}:8080"
       - "${JENKINS_BIND_ADDR:-127.0.0.1}:${JENKINS_JNLP_PORT:-50000}:50000"
@@ -469,6 +490,7 @@ services:
       # This lets the pipeline skip git clone and work on the host source tree.
       - ${HEALYTICS_REPO_PATH:-/Volumes/WD850X/Users/workspace/datn/Healytics}:/home/jenkins/agent/workspace/healytics-backend
       - ${HEALYTICS_REPO_PATH:-/Volumes/WD850X/Users/workspace/datn/Healytics}:/home/jenkins/agent/workspace/healytics-panel
+      - ${HEALYTICS_REPO_PATH:-/Volumes/WD850X/Users/workspace/datn/Healytics}:/home/jenkins/agent/workspace/healytics-panel-dev
       - ${HOME}/.healytics-jenkins-docker:/root/.docker
       - ${HOME}/.ssh:/root/.ssh:ro
     networks:
