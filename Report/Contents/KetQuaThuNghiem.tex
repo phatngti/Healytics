@@ -301,7 +301,7 @@ Context Relevance & 0.9310 \\
     \item Mô hình: \texttt{SentenceTransformer(all-MiniLM-L6-v2)} để mã hóa văn bản, \texttt{LogisticRegression} để phân lớp nhị phân.
     \item Ngưỡng đạt yêu cầu:
     \begin{itemize}
-        \item Accuracy, Macro F1: $\geq 0.85$.
+        \item Accuracy, F1-Score: $\geq 0.85$.
         \item Precision và Recall cho lớp 1: $\geq 0.83$.
     \end{itemize}
 \end{itemize}
@@ -333,7 +333,7 @@ Context Relevance & 0.9310 \\
 \hline
 Accuracy & 0.8930 & PASS ($\geq 0.85$) \\
 \hline
-Macro F1 & 0.8926 & PASS ($\geq 0.85$) \\
+F1 Score & 0.8926 & PASS ($\geq 0.85$) \\
 \hline
 Precision (label 1) & 0.9101 & PASS ($\geq 0.83$) \\
 \hline
@@ -347,7 +347,7 @@ Recall (label 1) & 0.8710 & PASS ($\geq 0.83$) \\
 \textbf{Các chỉ số thước đo chính:}
 \begin{itemize}
     \item Accuracy: tỷ lệ dự đoán đúng trên toàn bộ mẫu.
-    \item Macro F1: trung bình F1 giữa các lớp, phản ánh độ cân bằng.
+    \item F1 Score: trung bình Harmonic giữa Precision và Recall, phản ánh độ cân bằng.
     \item Precision (label 1): mức độ đúng khi hệ thống quyết định gợi ý dịch vụ.
     \item Recall (label 1): khả năng bắt đúng các câu thực sự cần gợi ý dịch vụ.
     \item Specificity = 0.9149 và MCC = 0.7868 cho thấy mô hình ổn định và ít thiên lệch.
