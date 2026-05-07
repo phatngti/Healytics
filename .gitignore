@@ -18,3 +18,6 @@ data/processed/
 ai_services/ner-service/.env
 /ai_services/ner-service/scripts
 /ai_services/ner-service/evaluation/archive
+ai_services/gateway-service/.env
+ai_services/recommender2/.env
+ai_services/recommender2/.env
