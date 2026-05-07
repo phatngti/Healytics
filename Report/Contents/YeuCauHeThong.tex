@@ -216,7 +216,6 @@ Các chức năng chính bao gồm:
         \item \textbf{Xác thực \& Phân quyền:} Sử dụng JWT (JSON Web Token) với thời gian hết hạn ngắn (access token \textbf{15 phút}, refresh token \textbf{7 ngày}). Áp dụng chặt chẽ cơ chế phân quyền theo vai trò (\textbf{RBAC}) với tối thiểu 4 vai trò: User, Partner, Staff, Admin.
         \item \textbf{Bảo vệ API:} Triển khai \textbf{rate limiting} (tối đa 100 requests/phút/user), \textbf{input validation} trên mọi endpoint, và bảo vệ chống các cuộc tấn công phổ biến (SQL Injection, XSS, CSRF).
         \item \textbf{Tuân thủ:} Hệ thống phải tuân thủ các tiêu chuẩn bảo mật \textbf{OWASP Top 10} và các quy định về bảo vệ dữ liệu cá nhân tại Việt Nam (Nghị định 13/2023/NĐ-CP).
-        \item \textbf{Audit Log:} Mọi hành động quan trọng (đăng nhập, thay đổi quyền, xác thực đối tác, giao dịch tài chính) phải được ghi nhận vào hệ thống nhật ký kiểm toán, lưu trữ tối thiểu \textbf{12 tháng}.
     \end{itemize}
     \item \textbf{Độ sẵn sàng (Availability):}
     \begin{itemize}

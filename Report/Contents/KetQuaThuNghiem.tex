@@ -13,8 +13,7 @@ Kiểm thử đơn vị nhằm đảm bảo từng thành phần nhỏ (Controll
 \begin{itemize}
     \item \texttt{auth}: Kiểm tra đăng ký, đăng nhập, làm mới token và xác thực JWT.
     \item \texttt{partners}: Kiểm tra đăng ký đối tác, cập nhật hồ sơ, chuyển đổi trạng thái xác minh.
-    \item \texttt{admin}: Kiểm tra quy trình xét duyệt, xác định kết quả duyệt, ghi nhận lịch sử.
-    \item \texttt{audit}: Kiểm tra ghi nhật ký kiểm toán tự động.
+    \item \texttt{admin}: Kiểm tra quy trình xét duyệt, xác định kết quả duyệt và ghi nhận lịch sử xét duyệt.
     \item \texttt{employees}, \texttt{products}, \texttt{categories}, \texttt{locations}, \texttt{service-tags}, \texttt{s3}: Kiểm tra các thao tác thêm/sửa/xóa và logic nghiệp vụ.
 \end{itemize}
 
@@ -75,21 +74,77 @@ Số người dùng đồng thời & $\geq$ 1.000 & \textit{(chưa đo)} & -- \\
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|l|}
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|p{0.16\textwidth}|}
 \hline
 \textbf{Tiêu chí} & \textbf{Hiện thực} & \textbf{Đạt/Không} \\
 \hline
-Mã hóa truyền tải (SSL/TLS) & \textit{(chưa kiểm tra)} & -- \\
+Mã hóa truyền tải (SSL/TLS) & API production tại \url{https://healytics.me/backend/health} trả về \texttt{HTTP/2 200} qua HTTPS, có header \texttt{strict-transport-security}. & Đạt \\
 \hline
-Xác thực JWT \& phân quyền RBAC & \textit{(chưa kiểm tra)} & -- \\
+Xác thực JWT \& phân quyền RBAC & Đăng nhập bằng \texttt{curl} trả về \texttt{access\_token} dạng JWT. Payload sau khi decode thể hiện đúng vai trò: \texttt{user}, \texttt{admin}, \texttt{health\_partner}. Thử truy cập chéo cho thấy user bị chặn ở API admin, partner bị chặn ở API user, admin truy cập được API admin. & Đạt \\
 \hline
-Bảo vệ HTTP headers (Helmet) & \textit{(chưa kiểm tra)} & -- \\
+Bảo vệ HTTP headers (Helmet) & Response có các header bảo vệ như \texttt{content-security-policy}, \texttt{x-frame-options}, \texttt{x-content-type-options}, \texttt{referrer-policy}. & Đạt \\
 \hline
-Kiểm tra OWASP Top 10 & \textit{(chưa kiểm tra)} & -- \\
+Bảo vệ API trước tấn công phổ biến & Có rate limiting trên endpoint public, validation DTO phía backend và truy vấn cơ sở dữ liệu theo hướng parameterized query/TypeORM. CSRF có mức rủi ro thấp vì token gửi qua header \texttt{Authorization: Bearer}, không dựa vào cookie phiên. & Đạt một phần \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{Kết quả kiểm thử bảo mật}
 \end{table}
+
+\paragraph{Flow kiểm thử xác thực và phân quyền}
+Mục tiêu của kiểm thử này là trả lời ba câu hỏi: (1) API đăng nhập có hoạt động thật trên server triển khai hay không; (2) token trả về có phải JWT hay không; (3) backend có thật sự dùng vai trò trong token để chặn truy cập trái quyền hay không. Toàn bộ kiểm thử được thực hiện trực tiếp trên server qua API Gateway. Lưu ý rằng backend production/dev được Kong expose dưới prefix \texttt{/backend}; vì vậy URL đúng có dạng \texttt{https://healytics.me/backend/...} hoặc \texttt{https://dev.healytics.me/backend/...}. Nếu gọi thiếu prefix, ví dụ \texttt{https://dev.healytics.me/auth/user/login}, Kong sẽ trả \texttt{HTTP 404} với thông báo \texttt{no Route matched with those values}; đây là lỗi định tuyến gateway, không phải lỗi xác thực của backend.
+
+\begin{enumerate}
+    \item \textbf{Kiểm tra server đang hoạt động:} gọi \texttt{GET https://healytics.me/backend/health}. Kết quả trả về \texttt{HTTP 200 OK} cùng body \texttt{\{"status":"ok","service":"healytics-backend",...\}}, chứng tỏ backend thật đang chạy sau gateway.
+    \item \textbf{Gọi API đăng nhập bằng curl:} gọi lần lượt ba endpoint \texttt{POST /backend/auth/user/login}, \texttt{POST /backend/auth/admin/login}, \texttt{POST /backend/auth/partner/login} với tài khoản seed tương ứng. Cả ba request đều trả về \texttt{HTTP 200} và body gồm \texttt{access\_token}, \texttt{refresh\_token}, \texttt{access\_expires\_in}, \texttt{refresh\_expires\_in}.
+    \item \textbf{Kiểm tra token có phải JWT hay không:} một JWT hợp lệ có dạng ba đoạn phân tách bởi dấu chấm: \texttt{header.payload.signature}. Token trả về từ API đều có đúng dạng này, ví dụ bắt đầu bằng \texttt{eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...}.
+    \item \textbf{Decode JWT để đọc vai trò:} lấy \texttt{access\_token} đưa vào jwt.io hoặc tự tách token theo dấu chấm rồi Base64URL-decode phần \texttt{header} và \texttt{payload}. Phần \texttt{header} cho biết thuật toán ký là \texttt{HS256}. Phần \texttt{payload} chứa các claim như \texttt{sub} (ID tài khoản), \texttt{email}, \texttt{role}, \texttt{iat} (thời điểm cấp), \texttt{exp} (thời điểm hết hạn).
+    \item \textbf{Kiểm tra RBAC bằng truy cập chéo:} dùng token của từng vai trò gọi API không thuộc quyền của vai trò đó. Nếu RBAC hoạt động đúng, backend phải trả \texttt{403 Forbidden} cho truy cập trái quyền và \texttt{200 OK} cho truy cập đúng quyền.
+\end{enumerate}
+
+Kết quả decode cho thấy token user có \texttt{role = user}; token admin có \texttt{role = admin}; token partner có \texttt{role = health\_partner}, đồng thời có thêm \texttt{verificationStatus = APPROVED} và \texttt{partnerProfileCompleted = true}. Điều này chứng minh token không chỉ là chuỗi ngẫu nhiên mà chứa thông tin định danh và phân quyền được backend ký lại.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.34\textwidth}|X|p{0.18\textwidth}|}
+\hline
+\textbf{Kiểm thử} & \textbf{Kỳ vọng} & \textbf{Kết quả} \\
+\hline
+User token gọi \texttt{GET /backend/account/me} & User được xem thông tin tài khoản của chính mình. & \texttt{HTTP 200} \\
+\hline
+User token gọi \texttt{GET /backend/admin/partners} & User không được truy cập API admin. & \texttt{HTTP 403} \\
+\hline
+Partner token gọi \texttt{GET /backend/partner/partners/me} & Partner được xem hồ sơ partner của chính mình. & \texttt{HTTP 200} \\
+\hline
+Partner token gọi \texttt{GET /backend/cart} & Partner không được truy cập API dành cho user. & \texttt{HTTP 403} \\
+\hline
+Admin token gọi \texttt{GET /backend/admin/partners} & Admin được truy cập danh sách partner. & \texttt{HTTP 200} \\
+\hline
+\end{tabularx}
+\caption{Kết quả kiểm thử phân quyền chéo bằng JWT}
+\end{table}
+
+Kết luận: cơ chế xác thực và phân quyền hoạt động đúng ở các luồng đại diện. API login trả về JWT thật; JWT chứa claim vai trò rõ ràng; backend chặn truy cập trái quyền bằng \texttt{401/403} và cho phép truy cập đúng quyền bằng \texttt{200}.
+
+\paragraph{Cách decode JWT khi giải thích trước hội đồng}
+Khi cần giải thích lại, có thể trình bày ngắn gọn như sau: JWT gồm ba phần \texttt{header.payload.signature}. \texttt{Header} mô tả thuật toán ký token, ví dụ \texttt{HS256}. \texttt{Payload} là dữ liệu đã mã hóa Base64URL, không phải dữ liệu bí mật, nên có thể decode để đọc các claim như \texttt{email} và \texttt{role}. \texttt{Signature} dùng secret phía server để đảm bảo token không bị sửa. Nếu attacker tự sửa \texttt{role} từ \texttt{user} thành \texttt{admin}, chữ ký sẽ không còn hợp lệ và backend phải từ chối token.
+
+Quy trình decode thủ công tương đương jwt.io:
+\begin{enumerate}
+    \item Copy \texttt{access\_token} từ response login.
+    \item Tách token thành ba phần theo dấu chấm.
+    \item Base64URL-decode phần thứ nhất để đọc \texttt{header}.
+    \item Base64URL-decode phần thứ hai để đọc \texttt{payload}.
+    \item Đọc trường \texttt{role} trong payload để xác định tài khoản là \texttt{user}, \texttt{admin} hay \texttt{health\_partner}.
+\end{enumerate}
+
+\paragraph{Đánh giá bảo vệ API trước SQL Injection, XSS và CSRF}
+\textbf{SQL Injection} là kỹ thuật chèn câu lệnh SQL độc hại vào input như email, tham số tìm kiếm hoặc ID để làm sai logic truy vấn database. Ví dụ trong màn hình đăng nhập, attacker có thể thử nhập email \texttt{' OR '1'='1} với mục tiêu làm điều kiện SQL luôn đúng và đăng nhập không cần mật khẩu thật. Trong kiểm thử này, payload trên được gửi trực tiếp đến \texttt{POST /backend/auth/user/login}; kết quả backend trả \texttt{HTTP 401 Unauthorized} với thông báo sai email hoặc mật khẩu. Như vậy, endpoint login không bị bypass bởi payload SQL Injection cơ bản.
+
+Ngoài kiểm thử bằng payload, việc đọc hiện thực backend cho thấy hệ thống dùng TypeORM repository/query builder với tham số ràng buộc như \texttt{:partnerId}, \texttt{:status}, \texttt{:currency}, thay vì nối trực tiếp chuỗi input vào SQL. Backend cũng bật \texttt{ValidationPipe} với \texttt{whitelist}, giúp loại bỏ field ngoài DTO. Kết luận thận trọng: hệ thống đang phòng SQL Injection tốt ở endpoint login và các truy vấn đại diện đã xem; tuy nhiên chưa thể khẳng định tuyệt đối cho toàn bộ hệ thống nếu chưa pentest toàn bộ các endpoint search, filter, sort và analytics có raw SQL.
+
+\textbf{XSS} là tấn công chèn HTML/JavaScript độc hại vào dữ liệu được hệ thống lưu và hiển thị lại cho người dùng khác. Các điểm có nguy cơ trong Healytics là tên/mô tả dịch vụ do partner nhập, nội dung review, tin nhắn chat, thông báo, hoặc thông tin hồ sơ phòng khám. Payload đại diện thường dùng là \texttt{<script>alert(1)</script>} hoặc \texttt{<img src=x onerror=alert(1)>}. Trong phạm vi kiểm thử hiện tại, chưa thực hiện stored XSS qua UI thật vì cần thao tác tạo dữ liệu và quan sát màn hình render lại. Tuy nhiên response từ server có header \texttt{content-security-policy} và các header Helmet khác, đây là lớp giảm thiểu XSS ở phía trình duyệt. Kết luận thận trọng: hệ thống có cơ chế giảm rủi ro XSS qua CSP/Helmet, nhưng cần kiểm thử bổ sung bằng cách nhập payload vào các form thật rồi kiểm tra dữ liệu có bị escape khi hiển thị hay không.
+
+\textbf{CSRF} là tấn công lợi dụng trình duyệt của người dùng đã đăng nhập để gửi request thay đổi trạng thái mà người dùng không chủ ý. CSRF thường nguy hiểm với hệ thống dùng cookie session, vì cookie tự động được trình duyệt gửi kèm request. Healytics sử dụng JWT qua header \texttt{Authorization: Bearer <token>}; website độc hại bên ngoài không thể tự gắn header này nếu không biết token. Trong kiểm thử phân quyền, các API protected đều yêu cầu Bearer token hợp lệ; token sai vai trò bị trả \texttt{403}. Vì vậy rủi ro CSRF trong kiến trúc hiện tại thấp hơn cookie session truyền thống. Kết luận thận trọng: cơ chế Bearer JWT giúp phòng CSRF hiệu quả ở mức thiết kế; nếu sau này chuyển sang lưu token trong cookie, cần bổ sung CSRF token và cấu hình cookie \texttt{SameSite}, \texttt{Secure}, \texttt{HttpOnly}.
 
 \subsubsection{Khả năng mở rộng \& Độ sẵn sàng}
 
