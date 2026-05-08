@@ -272,6 +272,10 @@ class ApiClient {
           return CheckDuplicateSlotDto.fromJson(value);
         case 'CheckDuplicateSlotResponseDto':
           return CheckDuplicateSlotResponseDto.fromJson(value);
+        case 'CheckEmailDto':
+          return CheckEmailDto.fromJson(value);
+        case 'CheckEmailResponseDto':
+          return CheckEmailResponseDto.fromJson(value);
         case 'CheckoutTicketResponseDto':
           return CheckoutTicketResponseDto.fromJson(value);
         case 'ClientKeyResponseDto':
@@ -398,10 +402,14 @@ class ApiClient {
           return EmployeeRevenueSummaryResponseDto.fromJson(value);
         case 'EmployeeRevenueTrendPointDto':
           return EmployeeRevenueTrendPointDto.fromJson(value);
+        case 'EmployeeRole':
+          return EmployeeRoleTypeTransformer().decode(value);
         case 'EmployeeRoleDistributionDto':
           return EmployeeRoleDistributionDto.fromJson(value);
         case 'EmployeeScheduleLoadDto':
           return EmployeeScheduleLoadDto.fromJson(value);
+        case 'EmployeeStatus':
+          return EmployeeStatusTypeTransformer().decode(value);
         case 'EmployeeTimeSlotsResponseDto':
           return EmployeeTimeSlotsResponseDto.fromJson(value);
         case 'EmployeeTrendPointDto':

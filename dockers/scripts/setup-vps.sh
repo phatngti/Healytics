@@ -13,9 +13,10 @@
 # What this script installs / configures:
 #   1. System updates + essential packages (curl, git, make, rsync, etc.)
 #   2. Docker Engine (CE) + Docker Compose v2 plugin
-#   3. UFW firewall with required port rules
-#   4. Docker daemon tuning (log rotation, overlay2)
-#   5. Project directory setup
+#   3. UFW firewall with required port rules (incl. SMTP 25/465/587)
+#   4. SMTP outbound connectivity verification
+#   5. Docker daemon tuning (log rotation, overlay2)
+#   6. Project directory setup
 # =============================================================================
 set -Eeuo pipefail
 
@@ -204,13 +205,93 @@ sudo ufw allow 8443/tcp comment "Kong Proxy HTTPS" >/dev/null 2>&1
 # Jenkins (if running ci profile)
 sudo ufw allow 8081/tcp comment "Jenkins Web UI" >/dev/null 2>&1
 
+# SMTP — required for sending emails (outbound)
+sudo ufw allow out 25/tcp comment "SMTP outbound" >/dev/null 2>&1
+sudo ufw allow out 465/tcp comment "SMTPS outbound" >/dev/null 2>&1
+sudo ufw allow out 587/tcp comment "SMTP submission outbound" >/dev/null 2>&1
+ok "SMTP outbound ports (25, 465, 587) allowed in UFW"
+
 # Enable UFW
 sudo ufw --force enable >/dev/null 2>&1
 ok "UFW enabled with the following rules:"
-sudo ufw status numbered 2>/dev/null | head -20
+sudo ufw status numbered 2>/dev/null | head -25
 
 # =============================================================================
-# 4. Docker Daemon Tuning
+# 3b. SMTP Outbound Connectivity Check
+# =============================================================================
+section "SMTP Outbound Connectivity Check"
+
+info "Testing outbound SMTP connectivity to smtp.gmail.com..."
+info "(Many VPS providers block SMTP at the network level to prevent spam)"
+
+SMTP_BLOCKED_PORTS=()
+SMTP_OK_PORTS=()
+
+for port in 25 465 587; do
+  if timeout 5 bash -c "echo >/dev/tcp/smtp.gmail.com/${port}" 2>/dev/null; then
+    SMTP_OK_PORTS+=("${port}")
+    ok "Port ${port} → smtp.gmail.com  ✅  REACHABLE"
+  else
+    SMTP_BLOCKED_PORTS+=("${port}")
+    err "Port ${port} → smtp.gmail.com  ❌  BLOCKED / UNREACHABLE"
+  fi
+done
+
+if [[ ${#SMTP_BLOCKED_PORTS[@]} -gt 0 ]]; then
+  echo ""
+  echo -e "${RED}${BOLD}╔═══════════════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${RED}${BOLD}║                                                                   ║${NC}"
+  echo -e "${RED}${BOLD}║   ⚠️  ⚠️  ⚠️   SMTP PORT(S) BLOCKED — EMAIL WILL NOT WORK   ⚠️  ⚠️  ⚠️    ║${NC}"
+  echo -e "${RED}${BOLD}║                                                                   ║${NC}"
+  echo -e "${RED}${BOLD}╠═══════════════════════════════════════════════════════════════════╣${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  ${RED}Blocked port(s): ${YELLOW}${BOLD}${SMTP_BLOCKED_PORTS[*]}${NC}                                        ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  Your VPS provider is likely blocking outbound SMTP traffic.      ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  This means your application ${RED}CANNOT send emails${NC} via direct SMTP.  ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  ${YELLOW}${BOLD}How to fix:${NC}                                                     ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  ${CYAN}Option 1:${NC} Contact your VPS provider and request them to         ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             unblock outbound SMTP ports (25, 465, 587).           ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             Common providers that block by default:               ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • AWS EC2 / Lightsail                                ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • Google Cloud                                      ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • Oracle Cloud                                      ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • Azure (new subscriptions)                          ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  ${CYAN}Option 2:${NC} Use an API-based email service instead of SMTP:       ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • ${GREEN}SendGrid${NC} (HTTP API)                                ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • ${GREEN}Mailgun${NC}  (HTTP API)                                ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • ${GREEN}AWS SES${NC}  (SDK/API)                                 ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • ${GREEN}Resend${NC}   (HTTP API)                                ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             These bypass SMTP entirely and are not affected       ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             by port-level blocks.                                ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  ${CYAN}Option 3:${NC} Use an SMTP relay that supports port ${GREEN}2525${NC}             ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             (Mailgun, Mailtrap, SendGrid all support 2525).       ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}╚═══════════════════════════════════════════════════════════════════╝${NC}"
+  echo ""
+  warn "Provisioning will continue, but email delivery WILL FAIL"
+  warn "until SMTP connectivity is resolved."
+  echo ""
+else
+  echo ""
+  echo -e "${GREEN}${BOLD}╔═══════════════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${GREEN}${BOLD}║            ✅  ALL SMTP PORTS ARE REACHABLE — EMAIL READY         ║${NC}"
+  echo -e "${GREEN}${BOLD}╠═══════════════════════════════════════════════════════════════════╣${NC}"
+  echo -e "${GREEN}${BOLD}║${NC}                                                                   ${GREEN}${BOLD}║${NC}"
+  echo -e "${GREEN}${BOLD}║${NC}  Reachable ports: ${GREEN}${BOLD}${SMTP_OK_PORTS[*]}${NC}                                    ${GREEN}${BOLD}║${NC}"
+  echo -e "${GREEN}${BOLD}║${NC}  Your VPS can send emails via SMTP.                               ${GREEN}${BOLD}║${NC}"
+  echo -e "${GREEN}${BOLD}║${NC}  Configure your SMTP host in ${CYAN}backend.env${NC} to start sending.       ${GREEN}${BOLD}║${NC}"
+  echo -e "${GREEN}${BOLD}║${NC}                                                                   ${GREEN}${BOLD}║${NC}"
+  echo -e "${GREEN}${BOLD}╚═══════════════════════════════════════════════════════════════════╝${NC}"
+  echo ""
+fi
+
+# =============================================================================
+# 5. Docker Daemon Tuning
 # =============================================================================
 section "Docker Daemon Configuration"
 
@@ -238,7 +319,7 @@ else
 fi
 
 # =============================================================================
-# 5. Prepare Project Directory
+# 6. Prepare Project Directory
 # =============================================================================
 section "Project Directory"
 
@@ -252,7 +333,7 @@ else
 fi
 
 # =============================================================================
-# 6. Verification
+# 7. Verification
 # =============================================================================
 section "Verification"
 

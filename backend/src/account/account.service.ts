@@ -142,6 +142,19 @@ export class AccountService {
   }
 
   /**
+   * Checks whether an account with the given email exists.
+   * Used for pre-registration validation (no auth required).
+   * @param email - The email to check
+   * @returns true if the email is already registered
+   */
+  async checkEmailExists(email: string): Promise<boolean> {
+    const count = await this.accountRepo.count({
+      where: { email },
+    });
+    return count > 0;
+  }
+
+  /**
    * Retrieves all accounts.
    * @returns Array of all accounts
    */

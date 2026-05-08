@@ -1,131 +1,53 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:common/widgets/button/button.dart';
-import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:common/widgets/toast.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/user_entity.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
+import 'package:user_app/features/onboarding/sign_up/presentation/widgets/finish_sign_up/legal_name_section.widget.dart';
+import 'package:user_app/features/onboarding/sign_up/presentation/widgets/finish_sign_up/date_of_birth_section.widget.dart';
+import 'package:user_app/features/onboarding/sign_up/presentation/widgets/finish_sign_up/password_section.widget.dart';
+import 'package:user_app/features/onboarding/sign_up/presentation/widgets/finish_sign_up/address_section.widget.dart';
+import 'package:user_app/features/onboarding/sign_up/presentation/widgets/finish_sign_up/terms_and_submit_section.widget.dart';
 import 'package:user_app/router/routes.dart';
-import 'package:common/utils/demensions.dart';
-import 'package:user_app/core/utils/form_validators.dart';
 import 'package:user_app/utils/device.dart';
 
+/// Final step of the sign-up flow where the user provides
+/// personal details (name, DOB, password, address) and
+/// agrees to the terms before completing registration.
 class FinishSignUpScreen extends HookConsumerWidget {
+  /// Creates a [FinishSignUpScreen].
   const FinishSignUpScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final minBodyHeight = DeviceUtils.getMinBodyHeight(context);
-    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
+    final minBodyHeight =
+        DeviceUtils.getMinBodyHeight(context);
+    final formKey = useMemoized(
+      () => GlobalKey<FormBuilderState>(),
+    );
     final isFilledAll = useState(false);
     final isSubmitLoading = useState(false);
-
-    // 1. Khởi tạo ScrollController để quản lý việc cuộn
     final scrollController = useScrollController();
 
     ref.listen(registerFlowProvider, (previous, next) {
-      if (next.hasError && !next.isLoading) {
-        AppToast.error(
-          context,
-          'Sign up failed. Please review your information.',
-        );
-      }
-
-      if (next.value?.isRegistrationCompleted == true &&
-          next.hasValue &&
-          !next.isLoading) {
-        if (context.mounted) {
-          AppToast.success(
-            context,
-            'Registration completed successfully.',
-          );
-          context.pushReplacementNamed(SurveyScreenRoute.name);
-        }
-      }
-      isSubmitLoading.value = false;
+      _handleRegistrationState(
+        context: context,
+        next: next,
+        isSubmitLoading: isSubmitLoading,
+      );
     });
-
-    // Hàm kiểm tra xem các field bắt buộc đã có giá trị chưa
-    void checkFormFilled() {
-      final formState = formKey.currentState;
-      if (formState == null) return;
-
-      // 1. Danh sách các trường bắt buộc kiểu chuỗi (Text)
-      const requiredTextKeys = [
-        'first_name',
-        'last_name',
-        'password',
-        'confirm_password',
-        'country',
-        'street_address',
-        'ward',
-        'district',
-        'city_or_province',
-      ];
-
-      // 2. Helper: Kiểm tra một key text có hợp lệ không (khác null và không rỗng)
-      bool isTextValid(String key) {
-        final value = formState.fields[key]?.value?.toString().trim();
-        return value != null && value.isNotEmpty;
-      }
-
-      // 3. Kiểm tra riêng trường Date (Object check)
-      final isDobValid = formState.fields['date_of_birth']?.value != null;
-
-      // 4. Tổng hợp kết quả: Date valid VÀ tất cả text keys đều valid
-      final isValid = isDobValid && requiredTextKeys.every(isTextValid);
-
-      if (isFilledAll.value != isValid) {
-        isFilledAll.value = isValid;
-      }
-    }
-
-    submit() {
-      isSubmitLoading.value = true;
-      if (formKey.currentState?.saveAndValidate() ?? false) {
-        final formData = formKey.currentState?.value ?? {};
-        if (formData.isNotEmpty) {
-          final firstName = formData['first_name'] as String;
-          final lastName = formData['last_name'] as String;
-          final dateOfBirth = formData['date_of_birth'] as String? ?? '';
-          final email = ref.read(registerFlowProvider).value?.user?.email ?? '';
-          final password = formData['password'] as String? ?? '';
-          ref
-              .read(registerFlowProvider.notifier)
-              .completeRegistration(
-                UserEntity(
-                  email: email,
-                  password: password,
-                  firstName: firstName,
-                  lastName: lastName,
-                  dateOfBirth: dateOfBirth,
-                  address: AddressEntity(
-                    street: formData['street_address'],
-                    ward: formData['ward'],
-                    district: formData['district'],
-                    cityOrProvince: formData['city_or_province'],
-                  ),
-                ),
-              );
-        }
-      } else {
-        isSubmitLoading.value = false;
-        AppToast.warning(
-          context,
-          'Please complete all required fields correctly.',
-        );
-      }
-    }
 
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
-          color: Theme.of(context).colorScheme.onSurface,
-          onPressed: () => {OnboardingRoute().push(context)},
+          color:
+              Theme.of(context).colorScheme.onSurface,
+          onPressed: () =>
+              {OnboardingRoute().push(context)},
         ),
         title: Text(
           'Finish Sign Up',
@@ -136,332 +58,41 @@ class FinishSignUpScreen extends HookConsumerWidget {
         padding: const EdgeInsets.all(16.0),
         controller: scrollController,
         child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: minBodyHeight),
+          constraints: BoxConstraints(
+            minHeight: minBodyHeight,
+          ),
           child: Container(
-            margin: EdgeInsets.only(top: AppDimens.paddingAllSmall.vertical),
+            margin: EdgeInsets.only(
+              top: AppDimens.paddingAllSmall.vertical,
+            ),
             child: FormBuilder(
               key: formKey,
-              onChanged: checkFormFilled,
+              onChanged: () => _checkFormFilled(
+                formKey: formKey,
+                isFilledAll: isFilledAll,
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    spacing: 1.0,
-                    children: [
-                      Text(
-                        'Legal name',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: Theme.of(
-                                context,
-                              ).textTheme.titleMedium?.color?.withAlpha(700),
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      AppDimens.verticalSmall,
-                      FormFieldBuilders.buildTextField(
-                        context,
-                        fieldKey: 'first_name',
-                        label: 'First name',
-                        uppercaseLabel: false,
-                        validator: (value) => FormValidators.fullName(
-                          value,
-                          fieldName: 'First name',
-                        ),
-                      ),
-                      AppDimens.verticalSmall,
-                      FormFieldBuilders.buildTextField(
-                        context,
-                        fieldKey: 'last_name',
-                        label: 'Last name',
-                        uppercaseLabel: false,
-                        validator: (value) => FormValidators.fullName(
-                          value,
-                          fieldName: 'Last name',
-                        ),
-                      ),
-                      AppDimens.verticalSmall,
-                      Text(
-                        'Make sure the matches the name on your government ID. This is required for identity verification.',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.color?.withAlpha(700),
-                        ),
-                      ),
-                    ],
-                  ),
+                  const LegalNameSection(),
                   AppDimens.verticalLarge,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    spacing: 1.0,
-                    children: [
-                      Text(
-                        'Date of Birth',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: Theme.of(
-                                context,
-                              ).textTheme.titleMedium?.color?.withAlpha(700),
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      AppDimens.verticalSmall,
-                      FormFieldBuilders.buildDateField(
-                        context,
-                        fieldKey: 'date_of_birth',
-                        label: 'Select your birthday',
-                      ),
-                      AppDimens.verticalSmall,
-                      Text(
-                        'To sign up, you must be at least 16 years. Your birthday won\'t be shared with others.',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.color?.withAlpha(700),
-                        ),
-                      ),
-                    ],
-                  ),
+                  const DateOfBirthSection(),
                   AppDimens.verticalLarge,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    spacing: 1.0,
-                    children: [
-                      Text(
-                        'Password',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: Theme.of(
-                                context,
-                              ).textTheme.titleMedium?.color?.withAlpha(700),
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      AppDimens.verticalSmall,
-                      FormFieldBuilders.buildTextField(
-                        context,
-                        fieldKey: 'password',
-                        label: 'Password',
-                        uppercaseLabel: false,
-                        obscureText: true,
-                        validator: FormValidators.password,
-                      ),
-                      AppDimens.verticalSmall,
-                      FormFieldBuilders.buildTextField(
-                        context,
-                        fieldKey: 'confirm_password',
-                        label: 'Confirm Password',
-                        uppercaseLabel: false,
-                        obscureText: true,
-                        validator: (value) =>
-                            FormValidators.confirmPassword(
-                          value,
-                          password:
-                              formKey.currentState
-                                  ?.fields['password']
-                                  ?.value
-                                  ?.toString() ??
-                              '',
-                        ),
-                      ),
-                      AppDimens.verticalSmall,
-                      Text(
-                        'Make sure your password is at least 8 characters long.',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.color?.withAlpha(700),
-                        ),
-                      ),
-                    ],
-                  ),
+                  PasswordSection(formKey: formKey),
                   AppDimens.verticalLarge,
-                  SizedBox(
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      spacing: 1.0,
-                      children: [
-                        Text(
-                          'Address',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.titleMedium?.color?.withAlpha(700),
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        AppDimens.verticalSmall,
-                        FormFieldBuilders.buildTextField(
-                          context,
-                          fieldKey: 'street_address',
-                          label: 'Street Address',
-                          uppercaseLabel: false,
-                          validator: (value) =>
-                              FormValidators.requiredField(
-                            value,
-                            fieldName: 'street address',
-                          ),
-                        ),
-
-                        AppDimens.verticalSmall,
-                        FormFieldBuilders.buildTextField(
-                          context,
-                          fieldKey: 'ward',
-                          label: 'Ward',
-                          uppercaseLabel: false,
-                          validator: (value) =>
-                              FormValidators.requiredField(
-                            value,
-                            fieldName: 'ward',
-                          ),
-                        ),
-                        AppDimens.verticalSmall,
-
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: FormFieldBuilders.buildTextField(
-                                context,
-                                fieldKey: 'district',
-                                label: 'District',
-                                uppercaseLabel: false,
-                                validator: (value) =>
-                                    FormValidators.requiredField(
-                                  value,
-                                  fieldName: 'district',
-                                ),
-                              ),
-                            ),
-                            AppDimens.horizontalSmall,
-                            Expanded(
-                              child: FormFieldBuilders.buildTextField(
-                                context,
-                                fieldKey: 'city_or_province',
-                                label: 'City or Province',
-                                uppercaseLabel: false,
-                                validator: (value) =>
-                                    FormValidators.requiredField(
-                                  value,
-                                  fieldName: 'city or province',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        AppDimens.verticalSmall,
-                        FormFieldBuilders.buildTextField(
-                          context,
-                          fieldKey: 'country',
-                          label: 'Country',
-                          uppercaseLabel: false,
-                          enabled: false,
-                          initialValue: 'Vietnam',
-                        ),
-                        AppDimens.verticalSmall,
-                        Text(
-                          'Please provide your correct address for direction purposes.',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.color?.withAlpha(700),
-                              ),
-                        ),
-                      ],
+                  const AddressSection(),
+                  AppDimens.verticalLarge,
+                  TermsAndSubmitSection(
+                    isEnabled: isFilledAll.value,
+                    isLoading: isSubmitLoading.value,
+                    onSubmit: () => _submit(
+                      context: context,
+                      ref: ref,
+                      formKey: formKey,
+                      isSubmitLoading:
+                          isSubmitLoading,
                     ),
-                  ),
-                  AppDimens.verticalLarge,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    spacing: 1.0,
-                    children: [
-                      Text.rich(
-                        textAlign: TextAlign.left,
-                        TextSpan(
-                          text:
-                              'By selecting "Agree & Continue", I agree to Healytic',
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.bodyMedium?.color?.withAlpha(200),
-                              ),
-                          children: [
-                            TextSpan(
-                              text:
-                                  'Terms of Service, Payment Terms of Service ',
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withAlpha(700),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  // Handle Terms of Service tap
-                                },
-                            ),
-
-                            TextSpan(
-                              text: 'and acknowledge the ',
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.color
-                                        ?.withAlpha(200),
-                                  ),
-                            ),
-                            TextSpan(
-                              text: 'Privacy Policy.',
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withAlpha(700),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  debugPrint('Privacy Policy tapped');
-                                },
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      AppDimens.verticalMedium,
-                      SizedBox(
-                        width: double.infinity,
-
-                        child: AppButton(
-                          buttonType: ButtonType.elevated,
-                          onPressed: isFilledAll.value ? submit : null,
-                          isLoading: isSubmitLoading.value,
-                          customStyle: ElevatedButton.styleFrom(
-                            padding: AppDimens.paddingAllMedium,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: AppDimens.radiusSmall,
-                            ),
-                            textStyle: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          child: const Text('Agree & Continue'),
-                        ),
-                      ),
-                    ],
                   ),
                   AppDimens.verticalExtraLarge,
                 ],
@@ -471,5 +102,130 @@ class FinishSignUpScreen extends HookConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Listens for registration state changes and shows
+  /// appropriate toasts or navigates on success.
+  void _handleRegistrationState({
+    required BuildContext context,
+    required AsyncValue<RegisterStateData> next,
+    required ValueNotifier<bool> isSubmitLoading,
+  }) {
+    if (next.hasError && !next.isLoading) {
+      AppToast.error(
+        context,
+        'Sign up failed. '
+        'Please review your information.',
+      );
+    }
+
+    if (next.value?.isRegistrationCompleted == true &&
+        next.hasValue &&
+        !next.isLoading) {
+      if (context.mounted) {
+        AppToast.success(
+          context,
+          'Registration completed successfully.',
+        );
+        context.pushReplacementNamed(
+          SurveyScreenRoute.name,
+        );
+      }
+    }
+    isSubmitLoading.value = false;
+  }
+
+  /// Checks whether all required form fields are filled
+  /// and updates [isFilledAll] accordingly.
+  void _checkFormFilled({
+    required GlobalKey<FormBuilderState> formKey,
+    required ValueNotifier<bool> isFilledAll,
+  }) {
+    final formState = formKey.currentState;
+    if (formState == null) return;
+
+    const requiredTextKeys = [
+      'first_name',
+      'last_name',
+      'password',
+      'confirm_password',
+      'country',
+      'street_address',
+      'ward',
+      'district',
+      'city_or_province',
+    ];
+
+    bool isTextValid(String key) {
+      final value =
+          formState.fields[key]?.value?.toString().trim();
+      return value != null && value.isNotEmpty;
+    }
+
+    final isDobValid =
+        formState.fields['date_of_birth']?.value != null;
+    final isValid =
+        isDobValid && requiredTextKeys.every(isTextValid);
+
+    if (isFilledAll.value != isValid) {
+      isFilledAll.value = isValid;
+    }
+  }
+
+  /// Validates and submits the sign-up form by calling
+  /// [completeRegistration] on the register flow provider.
+  void _submit({
+    required BuildContext context,
+    required WidgetRef ref,
+    required GlobalKey<FormBuilderState> formKey,
+    required ValueNotifier<bool> isSubmitLoading,
+  }) {
+    isSubmitLoading.value = true;
+    if (formKey.currentState?.saveAndValidate() ??
+        false) {
+      final formData =
+          formKey.currentState?.value ?? {};
+      if (formData.isNotEmpty) {
+        final email = ref
+                .read(registerFlowProvider)
+                .value
+                ?.user
+                ?.email ??
+            '';
+        ref
+            .read(registerFlowProvider.notifier)
+            .completeRegistration(
+              UserEntity(
+                email: email,
+                password:
+                    formData['password'] as String? ??
+                        '',
+                firstName:
+                    formData['first_name'] as String,
+                lastName:
+                    formData['last_name'] as String,
+                dateOfBirth:
+                    formData['date_of_birth']
+                        as String? ??
+                    '',
+                address: AddressEntity(
+                  street:
+                      formData['street_address'],
+                  ward: formData['ward'],
+                  district: formData['district'],
+                  cityOrProvince:
+                      formData['city_or_province'],
+                ),
+              ),
+            );
+      }
+    } else {
+      isSubmitLoading.value = false;
+      AppToast.warning(
+        context,
+        'Please complete all required '
+        'fields correctly.',
+      );
+    }
   }
 }

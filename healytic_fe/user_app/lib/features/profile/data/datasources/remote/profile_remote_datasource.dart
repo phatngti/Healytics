@@ -42,7 +42,7 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
     return UserAccountEntity(
       id: dto.id,
       email: dto.email,
-      username: dto.username,
+
       firstName: dto.userProfile?.firstName,
       lastName: dto.userProfile?.lastName,
       phone: dto.userProfile?.phone,
@@ -63,7 +63,7 @@ class ProfileRemoteDatasourceMock implements ProfileRemoteDatasource {
     return const UserAccountEntity(
       id: 'mock-user-123',
       email: 'mockuser@healytics.io',
-      username: 'mock_guest',
+
       firstName: 'Mock',
       lastName: 'User',
       phone: '+84123456789',

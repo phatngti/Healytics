@@ -44,7 +44,7 @@ class EmployeeAddDesktop extends StatefulWidget {
 
 class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
   var _formKey = GlobalKey<FormBuilderState>();
-  EmployeeRole _selectedRole = EmployeeRole.therapist;
+  EmployeeRoleType _selectedRole = EmployeeRoleType.therapist;
   TherapistType _selectedTherapistType = TherapistType.massage;
   bool _isFormValid = false;
 
@@ -64,7 +64,7 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
     }
   }
 
-  void _handleRoleChanged(EmployeeRole role) {
+  void _handleRoleChanged(EmployeeRoleType role) {
     setState(() {
       _selectedRole = role;
       // Reset therapist type to default

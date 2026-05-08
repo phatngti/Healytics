@@ -9,6 +9,7 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**authControllerCheckEmail**](AuthenticationApi.md#authcontrollercheckemail) | **POST** /auth/check-email | Check if email is already registered
 [**authControllerLoginAdmin**](AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | Login as admin
 [**authControllerLoginEmployee**](AuthenticationApi.md#authcontrollerloginemployee) | **POST** /auth/employee/login | Login as an employee
 [**authControllerLoginPartner**](AuthenticationApi.md#authcontrollerloginpartner) | **POST** /auth/partner/login | Login as a partner
@@ -20,6 +21,49 @@ Method | HTTP request | Description
 [**authControllerRegisterPartner**](AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
 [**authControllerRegisterUser**](AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | Register a new user
 
+
+# **authControllerCheckEmail**
+> CheckEmailResponseDto authControllerCheckEmail(checkEmailDto)
+
+Check if email is already registered
+
+Public endpoint for pre-registration email uniqueness validation.
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+final checkEmailDto = CheckEmailDto(); // CheckEmailDto | 
+
+try {
+    final result = api_instance.authControllerCheckEmail(checkEmailDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerCheckEmail: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **checkEmailDto** | [**CheckEmailDto**](CheckEmailDto.md)|  | 
+
+### Return type
+
+[**CheckEmailResponseDto**](CheckEmailResponseDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authControllerLoginAdmin**
 > AuthTokensDto authControllerLoginAdmin(adminLoginDto)

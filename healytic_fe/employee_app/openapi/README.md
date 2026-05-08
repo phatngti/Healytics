@@ -79,6 +79,7 @@ Class | Method | HTTP request | Description
 *AdminPartnersApi* | [**adminPartnersControllerGetPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartners) | **GET** /admin/partners | List all partners
 *AdminPartnersApi* | [**adminPartnersControllerGetTotalPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergettotalpartners) | **GET** /admin/partners/total | Get total number of partners
 *AdminPartnersApi* | [**adminPartnersControllerReviewPartner**](doc//AdminPartnersApi.md#adminpartnerscontrollerreviewpartner) | **PUT** /admin/partners/{id}/review | Review partner profile
+*AuthenticationApi* | [**authControllerCheckEmail**](doc//AuthenticationApi.md#authcontrollercheckemail) | **POST** /auth/check-email | Check if email is already registered
 *AuthenticationApi* | [**authControllerLoginAdmin**](doc//AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | Login as admin
 *AuthenticationApi* | [**authControllerLoginEmployee**](doc//AuthenticationApi.md#authcontrollerloginemployee) | **POST** /auth/employee/login | Login as an employee
 *AuthenticationApi* | [**authControllerLoginPartner**](doc//AuthenticationApi.md#authcontrollerloginpartner) | **POST** /auth/partner/login | Login as a partner
@@ -276,6 +277,8 @@ Class | Method | HTTP request | Description
  - [ChatbotRequest](doc//ChatbotRequest.md)
  - [CheckDuplicateSlotDto](doc//CheckDuplicateSlotDto.md)
  - [CheckDuplicateSlotResponseDto](doc//CheckDuplicateSlotResponseDto.md)
+ - [CheckEmailDto](doc//CheckEmailDto.md)
+ - [CheckEmailResponseDto](doc//CheckEmailResponseDto.md)
  - [CheckoutTicketResponseDto](doc//CheckoutTicketResponseDto.md)
  - [ClientKeyResponseDto](doc//ClientKeyResponseDto.md)
  - [ClinicCertificationDto](doc//ClinicCertificationDto.md)
@@ -339,8 +342,10 @@ Class | Method | HTTP request | Description
  - [EmployeeRevenuePeriod](doc//EmployeeRevenuePeriod.md)
  - [EmployeeRevenueSummaryResponseDto](doc//EmployeeRevenueSummaryResponseDto.md)
  - [EmployeeRevenueTrendPointDto](doc//EmployeeRevenueTrendPointDto.md)
+ - [EmployeeRole](doc//EmployeeRole.md)
  - [EmployeeRoleDistributionDto](doc//EmployeeRoleDistributionDto.md)
  - [EmployeeScheduleLoadDto](doc//EmployeeScheduleLoadDto.md)
+ - [EmployeeStatus](doc//EmployeeStatus.md)
  - [EmployeeTimeSlotsResponseDto](doc//EmployeeTimeSlotsResponseDto.md)
  - [EmployeeTrendPointDto](doc//EmployeeTrendPointDto.md)
  - [FacilityDto](doc//FacilityDto.md)
