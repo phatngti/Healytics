@@ -60,7 +60,7 @@ const SEED_PARTNER_REVIEW_LOGS: SeedPartnerReviewLog[] = [
     reviewerEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
     generalComment: seedKey(
       SEED_MARKERS.partnerReviewComment,
-      'ONBOARDING_001',
+      'PENDING_002',
     ),
   },
 ];

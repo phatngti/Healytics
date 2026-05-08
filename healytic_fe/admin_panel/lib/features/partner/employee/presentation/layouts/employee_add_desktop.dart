@@ -44,8 +44,9 @@ class EmployeeAddDesktop extends StatefulWidget {
 
 class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
   var _formKey = GlobalKey<FormBuilderState>();
-  EmployeeRole _selectedRole = EmployeeRole.therapist;
+  EmployeeRoleType _selectedRole = EmployeeRoleType.therapist;
   TherapistType _selectedTherapistType = TherapistType.massage;
+  bool _isFormValid = false;
 
   /// Tracks the current form initial values.
   /// Updated when role changes during autofill.
@@ -63,7 +64,7 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
     }
   }
 
-  void _handleRoleChanged(EmployeeRole role) {
+  void _handleRoleChanged(EmployeeRoleType role) {
     setState(() {
       _selectedRole = role;
       // Reset therapist type to default
@@ -105,6 +106,18 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
     return FormBuilder(
       key: _formKey,
       initialValue: _formInitialValue,
+      onChanged: () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final state = _formKey.currentState;
+          if (state == null) return;
+          final isValid = state.fields.values.every(
+            (f) => f.isValid,
+          );
+          if (isValid != _isFormValid) {
+            setState(() => _isFormValid = isValid);
+          }
+        });
+      },
       child: Stack(
         children: [
           // Scrollable content
@@ -183,6 +196,7 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
                     ],
                   ),
                   EmployeeFormActions(
+                    isFormValid: _isFormValid,
                     onCancel: widget.onCancel,
                     onSubmit: _handleSubmit,
                     submitLabel: 'Create ${_selectedRole.displayName}',

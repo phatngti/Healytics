@@ -1,6 +1,7 @@
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/features/authenticate/presentation/autofill/sign_in.autofill.dart';
+import 'package:admin_panel/features/authenticate/presentation/widgets/dev_account_picker.dart';
 import 'package:admin_panel/features/authenticate/presentation/widgets/logo.dart';
 import 'package:admin_panel/features/authenticate/presentation/providers/sign_in.provider.dart';
 import 'package:common/widgets/button/button.dart';
@@ -41,6 +42,10 @@ class SignInScreen extends HookConsumerWidget {
     final isPasswordVisible = useState(false);
     final scrollController = useScrollController();
     final signInState = ref.watch(signInProviderProvider);
+    final selectedRole = useState(Role.admin.value);
+    final isMockMode = useMemoized(
+      () => Store.get(StoreKey.mockFlag, false),
+    );
 
     // Pre-fill credentials in debug builds when ?autofill=true
     // or store config autoFill flag is true.
@@ -134,9 +139,26 @@ class SignInScreen extends HookConsumerWidget {
                       children: [
                         SelectorSwitch(
                           controller: roleController,
-                          onChanged: (value) {},
+                          onChanged: (index) {
+                            selectedRole.value =
+                                roles[index].value;
+                          },
                           options: roles,
                         ),
+                        if (isMockMode) ...[
+                          AppDimens.verticalSmall,
+                          DevAccountPicker(
+                            currentRole:
+                                selectedRole.value,
+                            onAccountSelected:
+                                (email, password) {
+                              emailController.text =
+                                  email;
+                              passwordController.text =
+                                  password;
+                            },
+                          ),
+                        ],
                         AppDimens.verticalExtraLarge,
                         FormFieldBuilders.buildTextField(
                           context,

@@ -10,7 +10,6 @@ export const PartnerFieldKeys = {
   serviceTags: 'serviceTags',
   phoneNumber: 'phoneNumber',
   email: 'email',
-  username: 'username',
 
   // Address Fields (matching /partners/me API keys)
   streetAddress: 'streetAddress',

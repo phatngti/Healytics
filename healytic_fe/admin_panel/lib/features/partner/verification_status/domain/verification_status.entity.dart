@@ -4,11 +4,8 @@ part 'verification_status.entity.freezed.dart';
 part 'verification_status.entity.g.dart';
 
 /// Status of the overall verification revision process.
-/// Aligned with `MyProfileResponseDtoVerificationStatusEnum` from API.
+/// Aligned with `PartnerVerificationStatus` enum from API.
 enum VerificationRevisionStatus {
-  /// Partner is in initial onboarding phase, registration form not submitted.
-  onboarding,
-
   /// Application is pending review by admin.
   pending,
 

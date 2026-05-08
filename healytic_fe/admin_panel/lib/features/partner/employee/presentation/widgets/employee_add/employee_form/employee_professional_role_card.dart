@@ -10,15 +10,15 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:uuid/uuid.dart';
 
 class EmployeeProfessionalRoleCard extends StatefulWidget {
-  final ValueChanged<EmployeeRole>? onRoleChanged;
-  final EmployeeRole initialRole;
+  final ValueChanged<EmployeeRoleType>? onRoleChanged;
+  final EmployeeRoleType initialRole;
   final bool readOnly;
   final EmployeeEntity? employee;
 
   const EmployeeProfessionalRoleCard({
     super.key,
     this.onRoleChanged,
-    this.initialRole = EmployeeRole.therapist,
+    this.initialRole = EmployeeRoleType.therapist,
     this.readOnly = false,
     this.employee,
   });
@@ -33,7 +33,7 @@ class _EmployeeProfessionalRoleCardState
   late final TextEditingController _employeeIdController;
 
   bool _isExpanded = true;
-  late EmployeeRole _selectedRole;
+  late EmployeeRoleType _selectedRole;
 
   @override
   void initState() {
@@ -63,7 +63,7 @@ class _EmployeeProfessionalRoleCardState
     super.dispose();
   }
 
-  void _handleRoleChanged(EmployeeRole role) {
+  void _handleRoleChanged(EmployeeRoleType role) {
     setState(() {
       _selectedRole = role;
     });
@@ -209,7 +209,7 @@ class _EmployeeProfessionalRoleCardState
                 child: _buildTextField(
                   context,
                   label: 'Job Title',
-                  placeholder: _selectedRole == EmployeeRole.doctor
+                  placeholder: _selectedRole == EmployeeRoleType.doctor
                       ? 'e.g. Senior Dermatologist'
                       : 'e.g. Senior Massage Therapist',
                   isRequired: true,
@@ -246,6 +246,7 @@ class _EmployeeProfessionalRoleCardState
                       .map((e) => e.displayName)
                       .toList(),
                   initialValue: EmploymentType.fullTime.displayName,
+                  isRequired: true,
                 ),
               ),
               AppDimens.horizontalLarge,
@@ -255,6 +256,7 @@ class _EmployeeProfessionalRoleCardState
                   fieldKey: 'start_date',
                   label: 'Start Date',
                   hintText: 'Select Start Date',
+                  isRequired: true,
                 ),
               ),
             ],

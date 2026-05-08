@@ -19,7 +19,7 @@ class ProductOperationsCard extends ConsumerStatefulWidget {
 
 class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
   String _staffAllocation = StaffAllocation.any.apiValue;
-  String _staffRole = EmployeeRole.doctor.apiValue;
+  String _staffRole = EmployeeRoleType.doctor.apiValue;
   List<EmployeeEntity> _selectedStaff = [];
   List<EmployeeEntity> _allStaff = [];
   bool _isLoadingStaff = true;
@@ -247,14 +247,14 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
           children: [
             _buildRoleChip(
               context,
-              EmployeeRole.doctor.displayName,
-              EmployeeRole.doctor.apiValue,
+              EmployeeRoleType.doctor.displayName,
+              EmployeeRoleType.doctor.apiValue,
             ),
             AppDimens.horizontalSmall,
             _buildRoleChip(
               context,
-              EmployeeRole.therapist.displayName,
-              EmployeeRole.therapist.apiValue,
+              EmployeeRoleType.therapist.displayName,
+              EmployeeRoleType.therapist.apiValue,
             ),
           ],
         ),

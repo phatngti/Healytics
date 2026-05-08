@@ -64,6 +64,7 @@ export class PartnerSelfController {
   constructor(private readonly partnersService: PartnersService) {}
 
   @Get('me')
+  @LogResponse()
   @ApiOperation({
     summary: 'Get own business profile',
     description: 'Partner gets their own business entity information',

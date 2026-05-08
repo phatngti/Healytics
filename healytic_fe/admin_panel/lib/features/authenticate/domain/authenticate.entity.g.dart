@@ -67,18 +67,13 @@ Map<String, dynamic> _$VerifyOtpResponseEntityToJson(
 _AccountRequestEntity _$AccountRequestEntityFromJson(
   Map<String, dynamic> json,
 ) => _AccountRequestEntity(
-  username: json['username'] as String,
   email: json['email'] as String,
   password: json['password'] as String,
 );
 
 Map<String, dynamic> _$AccountRequestEntityToJson(
   _AccountRequestEntity instance,
-) => <String, dynamic>{
-  'username': instance.username,
-  'email': instance.email,
-  'password': instance.password,
-};
+) => <String, dynamic>{'email': instance.email, 'password': instance.password};
 
 _PartnerRequestEntity _$PartnerRequestEntityFromJson(
   Map<String, dynamic> json,

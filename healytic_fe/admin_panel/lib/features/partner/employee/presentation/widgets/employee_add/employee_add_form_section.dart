@@ -11,8 +11,8 @@ import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeAddFormSection extends StatelessWidget {
-  final EmployeeRole selectedRole;
-  final ValueChanged<EmployeeRole> onRoleChanged;
+  final EmployeeRoleType selectedRole;
+  final ValueChanged<EmployeeRoleType> onRoleChanged;
 
   /// The currently selected therapist type.
   final TherapistType selectedTherapistType;
@@ -40,7 +40,7 @@ class EmployeeAddFormSection extends StatelessWidget {
         // Conditionally show role-specific fields
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
-          child: selectedRole == EmployeeRole.therapist
+          child: selectedRole == EmployeeRoleType.therapist
               ? TherapistFieldsCard(
                   key: const ValueKey('therapist'),
                   initialTherapistType: selectedTherapistType,

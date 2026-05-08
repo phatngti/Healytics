@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from '@/common/filters/all-exceptions.filter';
@@ -8,9 +9,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import fs from 'fs';
 import path from 'path';
 import { RedisIoAdapter } from '@/common/adapters/redis-io.adapter';
+import { config } from 'dotenv';
+
+// Load .env BEFORE anything else so process.env is populated
+config();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
     rawBody: true, // Required for Stripe webhook signature verification
   });
@@ -37,6 +42,18 @@ async function bootstrap() {
 
   app.enableCors();
   app.use(helmet());
+
+  // ── Serve the Jest HTML test report at /test-report (opt-in) ───
+  if (process.env.SERVE_TEST_REPORT === 'true') {
+    const reportPath = path.resolve(process.cwd(), 'test-report');
+    console.log(`[test-report] __dirname=${__dirname} cwd=${process.cwd()} reportPath=${reportPath} exists=${fs.existsSync(reportPath)}`);
+    if (fs.existsSync(reportPath)) {
+      // Get the underlying Express instance and mount static middleware
+      const httpAdapter = app.getHttpAdapter();
+      httpAdapter.use('/test-report', require('express').static(reportPath));
+      // console.log(`Test report: http://localhost:${process.env.PORT ?? 8080}/test-report/`);
+    }
+  }
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalFilters(new AllExceptionsFilter());

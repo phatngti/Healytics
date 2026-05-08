@@ -8,7 +8,6 @@ import 'package:admin_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**username** | **String** | Username | 
 **password** | **String** | Password (min 8 characters) | 
 **email** | **String** | Email address | 
 

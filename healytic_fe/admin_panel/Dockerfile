@@ -4,7 +4,7 @@
 ################################################################################
 FROM --platform=$BUILDPLATFORM debian:bookworm-slim AS build
 
-ARG FLUTTER_VERSION=3.35.4
+ARG FLUTTER_VERSION=3.35.5
 ARG APT_MIRROR=http://ftp.sg.debian.org/debian
 ARG APT_SECURITY_MIRROR=http://security.debian.org/debian-security
 

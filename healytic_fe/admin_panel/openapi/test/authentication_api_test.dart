@@ -17,10 +17,26 @@ void main() {
   // final instance = AuthenticationApi();
 
   group('tests for AuthenticationApi', () {
+    // Check if email is already registered
+    //
+    // Public endpoint for pre-registration email uniqueness validation.
+    //
+    //Future<CheckEmailResponseDto> authControllerCheckEmail(CheckEmailDto checkEmailDto) async
+    test('test authControllerCheckEmail', () async {
+      // TODO
+    });
+
     // Login as admin
     //
     //Future<AuthTokensDto> authControllerLoginAdmin(AdminLoginDto adminLoginDto) async
     test('test authControllerLoginAdmin', () async {
+      // TODO
+    });
+
+    // Login as an employee
+    //
+    //Future<AuthTokensDto> authControllerLoginEmployee(EmployeeLoginDto employeeLoginDto) async
+    test('test authControllerLoginEmployee', () async {
       // TODO
     });
 
@@ -49,6 +65,13 @@ void main() {
     //
     //Future<AuthTokensDto> authControllerRefresh(RefreshTokenRequestDto refreshTokenRequestDto) async
     test('test authControllerRefresh', () async {
+      // TODO
+    });
+
+    // Refresh employee tokens
+    //
+    //Future<AuthTokensDto> authControllerRefreshEmployee(RefreshTokenRequestDto refreshTokenRequestDto) async
+    test('test authControllerRefreshEmployee', () async {
       // TODO
     });
 
