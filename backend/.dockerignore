@@ -22,9 +22,8 @@ openapi
 *.md
 !README.md
 
-# Tests & reports
+# Test infrastructure & coverage (not needed in Docker)
 test
-test-report
 jest-html-reporters-attach
 coverage
 

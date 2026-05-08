@@ -25,7 +25,7 @@ import { PartnerFieldKeys } from '@/common/constants/partner-form-keys';
  * Extracted from AdminPartnersService per enterprise handler pattern (§5).
  *
  * Follows the domain handler pattern:
- * 1. Invariant Check — partner must be PENDING
+ * 1. Invariant Check — partner must be PENDING or REQUIRED_RESUBMIT
  * 2. Domain Action — process field/document reviews
  * 3. Persistence — update statuses and create review log
  * 4. Commit/Rollback with proper finally { release }
@@ -66,9 +66,13 @@ export class ReviewPartnerHandler {
         throw new NotFoundException('Partner not found');
       }
 
-      if (partner.verificationStatus !== PartnerVerificationStatus.PENDING) {
+      const reviewableStatuses = [
+        PartnerVerificationStatus.PENDING,
+        PartnerVerificationStatus.REQUIRED_RESUBMIT,
+      ];
+      if (!reviewableStatuses.includes(partner.verificationStatus)) {
         throw new BadRequestException(
-          `Partner is not in PENDING state (Current: ${partner.verificationStatus}). Cannot review.`,
+          `Partner is not in a reviewable state (Current: ${partner.verificationStatus}). Cannot review.`,
         );
       }
 
@@ -212,7 +216,6 @@ export class ReviewPartnerHandler {
       [PartnerFieldKeys.streetAddress]: () => partner.streetAddress,
       [PartnerFieldKeys.phoneNumber]: () => partner.phoneNumber,
       [PartnerFieldKeys.email]: () => partner.account?.email ?? null,
-      [PartnerFieldKeys.username]: () => partner.account?.username ?? null,
       [PartnerFieldKeys.idType]: () =>
         partner.legalRepresentative?.idType ?? null,
       [PartnerFieldKeys.idNumber]: () =>

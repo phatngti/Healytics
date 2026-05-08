@@ -59,7 +59,6 @@ class PartnerRefundCaseType(str, Enum):
 
 
 class PartnerVerificationStatus(str, Enum):
-    ONBOARDING = 'ONBOARDING'
     PENDING = 'PENDING'
     APPROVED = 'APPROVED'
     REJECTED = 'REJECTED'

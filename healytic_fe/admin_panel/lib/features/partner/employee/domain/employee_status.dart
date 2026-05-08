@@ -2,7 +2,10 @@
 ///
 /// Used to track whether an employee is currently active,
 /// inactive, or on leave.
-enum EmployeeStatus {
+///
+/// Named [EmployeeStatusType] to avoid conflict with the
+/// OpenAPI-generated [EmployeeStatus] class.
+enum EmployeeStatusType {
   /// Currently working and available.
   active,
 
@@ -14,27 +17,27 @@ enum EmployeeStatus {
 
   /// Returns the user-friendly display name.
   String get displayName => switch (this) {
-    EmployeeStatus.active => 'Active',
-    EmployeeStatus.inactive => 'Inactive',
-    EmployeeStatus.onLeave => 'On Leave',
+    EmployeeStatusType.active => 'Active',
+    EmployeeStatusType.inactive => 'Inactive',
+    EmployeeStatusType.onLeave => 'On Leave',
   };
 
   /// Returns the API value for backend communication.
   String get apiValue => switch (this) {
-    EmployeeStatus.active => 'ACTIVE',
-    EmployeeStatus.inactive => 'INACTIVE',
-    EmployeeStatus.onLeave => 'ON_LEAVE',
+    EmployeeStatusType.active => 'ACTIVE',
+    EmployeeStatusType.inactive => 'INACTIVE',
+    EmployeeStatusType.onLeave => 'ON_LEAVE',
   };
 
-  /// Returns the [EmployeeStatus] for the given API [value].
+  /// Returns the [EmployeeStatusType] for the given API [value].
   ///
   /// Returns `null` if no matching status is found.
-  static EmployeeStatus? fromApiValue(String? value) {
+  static EmployeeStatusType? fromApiValue(String? value) {
     if (value == null) return null;
     return switch (value.toUpperCase()) {
-      'ACTIVE' => EmployeeStatus.active,
-      'INACTIVE' => EmployeeStatus.inactive,
-      'ON_LEAVE' => EmployeeStatus.onLeave,
+      'ACTIVE' => EmployeeStatusType.active,
+      'INACTIVE' => EmployeeStatusType.inactive,
+      'ON_LEAVE' => EmployeeStatusType.onLeave,
       _ => null,
     };
   }

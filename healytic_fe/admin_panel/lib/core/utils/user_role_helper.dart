@@ -47,13 +47,19 @@ class UserRoleHelper {
     return getRole() == Role.health_partner.value;
   }
 
-  /// Returns true if the user is logged in (has access token or in mock mode).
+  /// Returns true if the user is logged in.
+  ///
+  /// In mock mode, checks whether `mockRole` has been persisted
+  /// (set only after a successful sign-in via [SignInProvider]).
+  /// In production mode, checks for a non-empty access token.
   static bool isLoggedIn() {
     final isMockMode = Store.tryGet(StoreKey.mockFlag) ?? false;
     if (isMockMode) {
-      return true;
+      final mockRole = Store.tryGet(StoreKey.mockRole) ?? '';
+      return mockRole.isNotEmpty;
     }
-    final accessToken = Store.tryGet(StoreKey.accessToken) ?? '';
+    final accessToken =
+        Store.tryGet(StoreKey.accessToken) ?? '';
     return accessToken.isNotEmpty;
   }
 
@@ -70,8 +76,8 @@ class UserRoleHelper {
   }
 
   // Set the partner verified status
-  static void setPartnerVerified(bool verified) {
-    Store.put(StoreKey.partnerVerified, verified);
+  static Future<void> setPartnerVerified(bool verified) {
+    return Store.put(StoreKey.partnerVerified, verified);
   }
 
   /// Returns true when the verified partner finished clinic profile completion.
@@ -86,11 +92,18 @@ class UserRoleHelper {
     return Store.tryGet(StoreKey.partnerProfileCompleted) ?? false;
   }
 
-  static void setPartnerProfileCompleted(bool completed) {
-    Store.put(StoreKey.partnerProfileCompleted, completed);
+  static Future<void> setPartnerProfileCompleted(
+    bool completed,
+  ) {
+    return Store.put(
+      StoreKey.partnerProfileCompleted,
+      completed,
+    );
   }
 
-  static void syncPartnerFlagsFromAccessToken(String accessToken) {
+  static Future<void> syncPartnerFlagsFromAccessToken(
+    String accessToken,
+  ) async {
     try {
       final decoded = JwtDecoder.decode(accessToken);
       final verificationStatus = decoded['verificationStatus']
@@ -99,19 +112,31 @@ class UserRoleHelper {
       final isVerified = verificationStatus == 'APPROVED';
       final isProfileCompleted =
           decoded['partnerProfileCompleted'] == true ||
-          decoded['partnerProfileCompleted']?.toString().toLowerCase() ==
+          decoded['partnerProfileCompleted']
+                  ?.toString()
+                  .toLowerCase() ==
               'true';
 
-      setPartnerVerified(isVerified);
-      setPartnerProfileCompleted(isProfileCompleted);
+      await setPartnerVerified(isVerified);
+      await setPartnerProfileCompleted(isProfileCompleted);
     } catch (_) {
-      setPartnerVerified(false);
-      setPartnerProfileCompleted(false);
+      await setPartnerVerified(false);
+      await setPartnerProfileCompleted(false);
     }
   }
 
-  static Future<void> clearPartnerFlags() async {
+  /// Clears all session-specific flags so that
+  /// [isLoggedIn] returns `false` on next cold start.
+  ///
+  /// Includes `mockRole` (mock mode login marker) and
+  /// partner verification/completion flags.
+  static Future<void> clearSession() async {
+    await Store.delete(StoreKey.mockRole);
     await Store.delete(StoreKey.partnerVerified);
     await Store.delete(StoreKey.partnerProfileCompleted);
   }
+
+  /// Alias kept for backward compatibility.
+  @Deprecated('Use clearSession() instead')
+  static Future<void> clearPartnerFlags() => clearSession();
 }

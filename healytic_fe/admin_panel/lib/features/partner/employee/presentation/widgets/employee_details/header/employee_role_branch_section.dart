@@ -74,17 +74,17 @@ class _RoleBadge extends StatelessWidget {
     SemanticColors semanticColors,
   ) {
     try {
-      final roleEnum = EmployeeRole.values.firstWhere(
+      final roleEnum = EmployeeRoleType.values.firstWhere(
         (e) => e.apiValue == role.toUpperCase(),
       );
       switch (roleEnum) {
-        case EmployeeRole.doctor:
+        case EmployeeRoleType.doctor:
           return (icon: Icons.medical_services, color: semanticColors.info!);
-        case EmployeeRole.therapist:
+        case EmployeeRoleType.therapist:
           return (icon: Icons.spa, color: semanticColors.success!);
-        case EmployeeRole.receptionist:
+        case EmployeeRoleType.receptionist:
           return (icon: Icons.person, color: semanticColors.warning!);
-        case EmployeeRole.manager:
+        case EmployeeRoleType.manager:
           return (
             icon: Icons.admin_panel_settings,
             color: colorScheme.tertiary,

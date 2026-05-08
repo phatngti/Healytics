@@ -125,7 +125,7 @@ void main() {
     });
 
     // Medical credentials (titles + licenses)
-    // List<String> medicalCredentials (default value: const [])
+    // List<MedicalCredentialResponseDto> medicalCredentials (default value: const [])
     test('to test the property `medicalCredentials`', () async {
       // TODO
     });

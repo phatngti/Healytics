@@ -77,7 +77,6 @@ class PublicProfileRemoteDataSourceImpl
       businessType: dto.businessType,
       phoneNumber: dto.phoneNumber?.toString(),
       email: dto.email?.toString(),
-      username: dto.username?.toString(),
     );
   }
 

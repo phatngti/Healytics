@@ -12,6 +12,7 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
+import { CheckEmailDto } from './dto/request/check-email.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import {
   ApiBody,
@@ -26,6 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
+import { CheckEmailResponseDto } from './dto/response/check-email-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from '../common/decorators/auth/public.decorator';
@@ -36,6 +38,7 @@ import { EmployeeLoginDto } from './dto/request/employee-login.dto';
 import { PartnersService } from '@/partners/partners.service';
 import { RegisterPartnerDto } from '@/partners/dto/request/register-partner.dto';
 import { RegisterPartnerResponseDto } from '@/partners/dto/response/register-partner-response.dto';
+import { AccountService } from '@/account/account.service';
 
 /**
  * Controller for authentication endpoints.
@@ -52,7 +55,41 @@ export class AuthController {
     private authService: AuthService,
     @Inject(forwardRef(() => PartnersService))
     private partnersService: PartnersService,
+    private readonly accountService: AccountService,
   ) {}
+
+  // ============================================================================
+  // Pre-Registration Validation
+  // ============================================================================
+
+  /**
+   * Checks whether an email is already registered.
+   * Used by the sign-up form to validate before submission.
+   */
+  @Post('check-email')
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Check if email is already registered',
+    description:
+      'Public endpoint for pre-registration email uniqueness validation.',
+  })
+  @ApiOkResponse({
+    description: 'Email existence check result.',
+    type: CheckEmailResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid email format.' })
+  async checkEmail(
+    @Body() dto: CheckEmailDto,
+  ): Promise<CheckEmailResponseDto> {
+    const exists = await this.accountService.checkEmailExists(
+      dto.email,
+    );
+    const response = new CheckEmailResponseDto();
+    response.exists = exists;
+    return response;
+  }
 
   // ============================================================================
   // User Authentication (Mobile App / End Users)
