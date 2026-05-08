@@ -38,24 +38,16 @@ class SegmentedTabControl extends StatelessWidget {
             child: GestureDetector(
               onTap: () => onChanged(i),
               child: AnimatedContainer(
-                duration: const Duration(
-                  milliseconds: 200,
-                ),
+                duration: const Duration(milliseconds: 0),
                 curve: Curves.easeInOut,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: isActive
-                      ? cs.surface
-                      : Colors.transparent,
+                  color: isActive ? cs.surface : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: isActive
                       ? [
                           BoxShadow(
-                            color: cs.shadow.withValues(
-                              alpha: 0.08,
-                            ),
+                            color: cs.shadow.withValues(alpha: 0.08),
                             blurRadius: 4,
                             offset: const Offset(0, 1),
                           ),
@@ -65,17 +57,10 @@ class SegmentedTabControl extends StatelessWidget {
                 child: Center(
                   child: Text(
                     labels[i],
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelMedium
-                        ?.copyWith(
-                          fontWeight: isActive
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                          color: isActive
-                              ? cs.onSurface
-                              : cs.onSurfaceVariant,
-                        ),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                      color: isActive ? cs.onSurface : cs.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ),

@@ -6,7 +6,7 @@ import 'package:user_app/core/providers/api.provider.dart';
 import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/employee/domain/entities/employee_detail.entity.dart';
 import 'package:user_app/features/employee/domain/entities/medical_credential.entity.dart';
-import 'package:user_openapi/api.dart';
+import 'package:user_openapi/api.dart' hide EmployeeRole, EmployeeStatus;
 
 import 'employee_mock_data.dart';
 

@@ -7,7 +7,7 @@ import 'package:user_app/theme/app_theme.dart';
 
 /// Fixed bottom summary bar for the cart screen.
 ///
-/// Displays subtotal, coupon discount, service fee,
+/// Displays subtotal, discount,
 /// total amount, and a "Checkout Now" CTA button.
 class CartSummaryFooter extends StatelessWidget {
   /// Cart state containing pricing calculations.
@@ -82,7 +82,7 @@ class _SummaryRows extends StatelessWidget {
           value: _formatCurrency(cartState.subtotal),
         ),
         SizedBox(height: AppDimens.spaceSmMd),
-        // Coupon Discount
+        // Discount
         if (cartState.totalDiscount > 0) ...[
           _DiscountRow(
             discount: cartState.totalDiscount,
@@ -90,13 +90,6 @@ class _SummaryRows extends StatelessWidget {
           ),
           SizedBox(height: AppDimens.spaceSmMd),
         ],
-        // Service Fee
-        _PriceRow(
-          label: 'Service Fee',
-          value: 'Free',
-          valueColor: successColor,
-          valueBold: true,
-        ),
         // Divider
         Padding(
           padding: const EdgeInsets.only(top: AppDimens.spaceMd),
@@ -171,7 +164,7 @@ class _PriceRow extends StatelessWidget {
   }
 }
 
-/// Coupon discount row with a percentage badge.
+/// Discount row showing the savings amount.
 class _DiscountRow extends StatelessWidget {
   final int discount;
   final Color successColor;
@@ -188,7 +181,7 @@ class _DiscountRow extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Coupon Discount',
+              'Discount',
               style: textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),

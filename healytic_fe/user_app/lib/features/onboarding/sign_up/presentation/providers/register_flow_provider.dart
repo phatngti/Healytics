@@ -7,10 +7,23 @@ import 'package:user_app/features/onboarding/sign_up/domain/entities/user_entity
 import 'package:user_app/features/onboarding/sign_up/domain/usecases/otp.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/usecases/persistence.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/usecases/survey.dart';
+import 'package:user_app/features/onboarding/sign_up/data/repositories/register_repository_impl.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_usecases.provider.dart';
 
 part 'register_flow_provider.freezed.dart';
 part 'register_flow_provider.g.dart';
+
+/// Thrown when a user attempts to register with an
+/// email that is already in the system.
+class EmailAlreadyExistsException implements Exception {
+  EmailAlreadyExistsException(this.email);
+
+  final String email;
+
+  @override
+  String toString() =>
+      'EmailAlreadyExistsException: $email is already registered.';
+}
 
 @freezed
 abstract class RegisterStateData with _$RegisterStateData {
@@ -89,13 +102,30 @@ class RegisterFlowNotifier extends _$RegisterFlowNotifier {
     state = AsyncData(RegisterStateData());
   }
 
+  /// Checks whether an email is already registered.
+  ///
+  /// Returns `true` if the email already exists.
+  Future<bool> checkEmailExists(String email) async {
+    final repository = ref.read(registerRepositoryProvider);
+    return repository.checkEmailExists(email: email);
+  }
+
   Future<void> sendCode(String email) async {
     // 1. Update Email vào state trước
 
     try {
       _updateState((current) {
-        return current.copyWith(user: current.user?.copyWith(email: email));
+        return current.copyWith(
+          user: current.user?.copyWith(email: email),
+        );
       });
+
+      // 2. Check if email already exists before sending OTP
+      final exists = await checkEmailExists(email);
+      if (exists) {
+        throw EmailAlreadyExistsException(email);
+      }
+
       await ref.read(otpUseCaseProvider).sendOTP(email: email);
       await saveProgress();
     } catch (e, stack) {

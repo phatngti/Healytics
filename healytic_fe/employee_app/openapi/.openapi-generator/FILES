@@ -56,6 +56,8 @@ doc/ChatbotRecommenderRequest.md
 doc/ChatbotRequest.md
 doc/CheckDuplicateSlotDto.md
 doc/CheckDuplicateSlotResponseDto.md
+doc/CheckEmailDto.md
+doc/CheckEmailResponseDto.md
 doc/CheckoutTicketResponseDto.md
 doc/ClientKeyResponseDto.md
 doc/ClinicCertificationDto.md
@@ -122,8 +124,10 @@ doc/EmployeeRevenueBreakdownItemDto.md
 doc/EmployeeRevenuePeriod.md
 doc/EmployeeRevenueSummaryResponseDto.md
 doc/EmployeeRevenueTrendPointDto.md
+doc/EmployeeRole.md
 doc/EmployeeRoleDistributionDto.md
 doc/EmployeeScheduleLoadDto.md
+doc/EmployeeStatus.md
 doc/EmployeeTimeSlotsResponseDto.md
 doc/EmployeeTrendPointDto.md
 doc/FacilityDto.md
@@ -411,6 +415,8 @@ lib/model/chatbot_recommender_request.dart
 lib/model/chatbot_request.dart
 lib/model/check_duplicate_slot_dto.dart
 lib/model/check_duplicate_slot_response_dto.dart
+lib/model/check_email_dto.dart
+lib/model/check_email_response_dto.dart
 lib/model/checkout_ticket_response_dto.dart
 lib/model/client_key_response_dto.dart
 lib/model/clinic_certification_dto.dart
@@ -474,8 +480,10 @@ lib/model/employee_revenue_breakdown_item_dto.dart
 lib/model/employee_revenue_period.dart
 lib/model/employee_revenue_summary_response_dto.dart
 lib/model/employee_revenue_trend_point_dto.dart
+lib/model/employee_role.dart
 lib/model/employee_role_distribution_dto.dart
 lib/model/employee_schedule_load_dto.dart
+lib/model/employee_status.dart
 lib/model/employee_time_slots_response_dto.dart
 lib/model/employee_trend_point_dto.dart
 lib/model/facility_dto.dart
@@ -693,6 +701,8 @@ test/chatbot_recommender_request_test.dart
 test/chatbot_request_test.dart
 test/check_duplicate_slot_dto_test.dart
 test/check_duplicate_slot_response_dto_test.dart
+test/check_email_dto_test.dart
+test/check_email_response_dto_test.dart
 test/checkout_ticket_response_dto_test.dart
 test/client_key_response_dto_test.dart
 test/clinic_certification_dto_test.dart
@@ -760,7 +770,9 @@ test/employee_revenue_period_test.dart
 test/employee_revenue_summary_response_dto_test.dart
 test/employee_revenue_trend_point_dto_test.dart
 test/employee_role_distribution_dto_test.dart
+test/employee_role_test.dart
 test/employee_schedule_load_dto_test.dart
+test/employee_status_test.dart
 test/employee_time_slots_response_dto_test.dart
 test/employee_trend_point_dto_test.dart
 test/facility_dto_test.dart
