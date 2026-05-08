@@ -53,16 +53,16 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
           values[EmployeeFormField.employeeRole.key]
               ?.toString()
               .toUpperCase() ??
-          EmployeeRole.therapist.apiValue;
+          EmployeeRoleType.therapist.apiValue;
 
-      if (role == EmployeeRole.doctor.apiValue) {
+      if (role == EmployeeRoleType.doctor.apiValue) {
         await _createDoctor(values);
       } else {
         await _createTherapist(values);
       }
 
       if (mounted) {
-        final roleEnum = EmployeeRole.fromApiValue(role);
+        final roleEnum = EmployeeRoleType.fromApiValue(role);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -125,7 +125,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
       verificationDocuments: _collectVerificationDocs(values),
       jobTitle: _str(values, EmployeeFormField.jobTitle).isNotEmpty
           ? _str(values, EmployeeFormField.jobTitle)
-          : EmployeeRole.doctor.displayName,
+          : EmployeeRoleType.doctor.displayName,
       medicalTitles: medicalTitles,
       medicalLicenses: medicalLicenses,
       experienceYears: int.tryParse(
@@ -202,7 +202,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
     final jobTitle = _str(values, EmployeeFormField.jobTitle);
     final commonJobTitle = jobTitle.isNotEmpty
         ? jobTitle
-        : EmployeeRole.therapist.displayName;
+        : EmployeeRoleType.therapist.displayName;
     final commonDescription = values[EmployeeFormField.description.key]
         ?.toString();
 
@@ -398,7 +398,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
     String? role,
     String? therapistType,
   ]) => EmployeeAddAutofill.forRole(
-    role ?? EmployeeRole.therapist.apiValue,
+    role ?? EmployeeRoleType.therapist.apiValue,
     therapistType,
   );
 

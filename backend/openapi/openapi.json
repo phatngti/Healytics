@@ -1,6 +1,42 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/auth/check-email": {
+      "post": {
+        "operationId": "AuthController_checkEmail",
+        "summary": "Check if email is already registered",
+        "description": "Public endpoint for pre-registration email uniqueness validation.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email existence check result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckEmailResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email format."
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/auth/user/register": {
       "post": {
         "operationId": "AuthController_registerUser",
@@ -6757,6 +6793,33 @@
       }
     },
     "schemas": {
+      "CheckEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "The email address to check for existence",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "CheckEmailResponseDto": {
+        "type": "object",
+        "properties": {
+          "exists": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the email is already registered"
+          }
+        },
+        "required": [
+          "exists"
+        ]
+      },
       "RegisterProfileDto": {
         "type": "object",
         "properties": {
@@ -7398,7 +7461,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-07T04:48:40.838Z"
+              "submittedAt": "2026-05-08T03:46:50.990Z"
             }
           }
         },

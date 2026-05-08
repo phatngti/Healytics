@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 /// A segmented toggle button to switch between Doctor and Therapist roles
 class RoleToggleSelector extends StatelessWidget {
-  final EmployeeRole selectedRole;
-  final ValueChanged<EmployeeRole> onRoleChanged;
+  final EmployeeRoleType selectedRole;
+  final ValueChanged<EmployeeRoleType> onRoleChanged;
 
   const RoleToggleSelector({
     super.key,
@@ -33,17 +33,17 @@ class RoleToggleSelector extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _RoleButton(
-            role: EmployeeRole.therapist,
-            isSelected: selectedRole == EmployeeRole.therapist,
+            role: EmployeeRoleType.therapist,
+            isSelected: selectedRole == EmployeeRoleType.therapist,
             icon: Icons.spa_outlined,
-            onTap: () => onRoleChanged(EmployeeRole.therapist),
+            onTap: () => onRoleChanged(EmployeeRoleType.therapist),
           ),
           AppDimens.horizontalExtraSmall,
           _RoleButton(
-            role: EmployeeRole.doctor,
-            isSelected: selectedRole == EmployeeRole.doctor,
+            role: EmployeeRoleType.doctor,
+            isSelected: selectedRole == EmployeeRoleType.doctor,
             icon: Icons.medical_services_outlined,
-            onTap: () => onRoleChanged(EmployeeRole.doctor),
+            onTap: () => onRoleChanged(EmployeeRoleType.doctor),
           ),
         ],
       ),
@@ -52,7 +52,7 @@ class RoleToggleSelector extends StatelessWidget {
 }
 
 class _RoleButton extends StatelessWidget {
-  final EmployeeRole role;
+  final EmployeeRoleType role;
   final bool isSelected;
   final IconData icon;
   final VoidCallback onTap;

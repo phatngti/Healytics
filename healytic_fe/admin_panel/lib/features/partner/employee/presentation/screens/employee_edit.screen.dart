@@ -22,18 +22,18 @@ class EmployeeEditScreen extends ConsumerStatefulWidget {
 
 class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
-  late EmployeeRole _selectedRole;
+  late EmployeeRoleType _selectedRole;
   bool _isEditing = false;
   bool _isInitialized = false;
 
-  EmployeeRole _getRoleFromEntity(EmployeeEntity employee) {
+  EmployeeRoleType _getRoleFromEntity(EmployeeEntity employee) {
     try {
-      return EmployeeRole.values.firstWhere(
+      return EmployeeRoleType.values.firstWhere(
         (e) => e.name.toUpperCase() == employee.role.toUpperCase(),
-        orElse: () => EmployeeRole.therapist,
+        orElse: () => EmployeeRoleType.therapist,
       );
     } catch (_) {
-      return EmployeeRole.therapist;
+      return EmployeeRoleType.therapist;
     }
   }
 
@@ -191,7 +191,7 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
     }
   }
 
-  void _handleRoleChanged(EmployeeRole role) {
+  void _handleRoleChanged(EmployeeRoleType role) {
     if (!_isEditing) return; // Prevent role change in view mode
     setState(() {
       _selectedRole = role;
