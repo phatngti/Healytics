@@ -98,7 +98,7 @@ class FormFieldBuilders {
     BuildContext context, {
     required String label,
     String? hintText,
-    bool isRequired = false,
+    bool? isRequired,
     IconData? prefixIcon,
     String? fieldKey,
     Widget? suffixIcon,
@@ -193,6 +193,7 @@ class FormFieldBuilders {
     String? hintText,
     String? fieldKey,
     bool enabled = true,
+    bool isRequired = false,
     Key? widgetKey,
   }) {
     return _AppDatePickField(
@@ -208,6 +209,7 @@ class FormFieldBuilders {
       hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
+      isRequired: isRequired,
     );
   }
 
@@ -520,10 +522,7 @@ class FormFieldBuilders {
     );
 
     if (widgetKey != null) {
-      return KeyedSubtree(
-        key: widgetKey,
-        child: child,
-      );
+      return KeyedSubtree(key: widgetKey, child: child);
     }
     return child;
   }
@@ -601,10 +600,7 @@ class FormFieldBuilders {
     );
 
     if (widgetKey != null) {
-      return KeyedSubtree(
-        key: widgetKey,
-        child: widget,
-      );
+      return KeyedSubtree(key: widgetKey, child: widget);
     }
     return widget;
   }

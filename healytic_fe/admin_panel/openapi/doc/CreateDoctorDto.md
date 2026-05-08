@@ -26,7 +26,7 @@ Name | Type | Description | Notes
 **status** | **String** | Employee status | [optional] 
 **description** | **String** | Bio / description | 
 **jobTitle** | **String** | Job title | [optional] 
-**medicalCredentials** | **List<String>** | Medical credentials (titles + licenses) | [optional] [default to const []]
+**medicalCredentials** | [**List<MedicalCredentialResponseDto>**](MedicalCredentialResponseDto.md) | Medical credentials (titles + licenses) | [optional] [default to const []]
 **experienceYears** | **num** | Years of experience | [optional] 
 **consultationFee** | **num** | Consultation fee | [optional] 
 **specializations** | **List<String>** | Specializations | [optional] [default to const []]

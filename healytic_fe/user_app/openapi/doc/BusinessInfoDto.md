@@ -15,7 +15,6 @@ Name | Type | Description | Notes
 **address** | [**AddressInfoDto**](AddressInfoDto.md) |  | [optional] 
 **email** | [**VerifiedField**](VerifiedField.md) |  | [optional] 
 **phoneNumber** | [**VerifiedField**](VerifiedField.md) |  | [optional] 
-**username** | [**VerifiedField**](VerifiedField.md) |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

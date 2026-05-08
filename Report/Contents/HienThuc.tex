@@ -456,41 +456,91 @@ Các cơ chế xuyên suốt (cross-cutting concerns):
 
 Phân hệ này hiện thực toàn bộ trải nghiệm của người bệnh trên ứng dụng di động, từ lúc đăng ký tài khoản đến khi hoàn thành dịch vụ và đánh giá. Luồng trải nghiệm xuyên suốt bao gồm: tạo tài khoản và khảo sát sức khỏe $\rightarrow$ khám phá phòng khám/dịch vụ theo vị trí $\rightarrow$ tương tác với Chatbot AI $\rightarrow$ chọn dịch vụ vào giỏ hàng $\rightarrow$ đặt lịch với cơ chế khóa slot phân tán $\rightarrow$ thanh toán qua MoMo $\rightarrow$ đánh giá chuyên gia và dịch vụ.
 
-\subsubsection{Đăng ký Tài khoản và Khảo sát Sức khỏe}
+\subsubsection{Đăng nhập và Đăng ký Tài khoản}
 
-Khi mở ứng dụng lần đầu, người dùng thực hiện quy trình đăng ký gồm các bước:
+Luồng khởi tạo tài khoản của ứng dụng người bệnh được tổ chức theo mô hình tách riêng \textbf{đăng nhập} và \textbf{đăng ký}, giúp người dùng quay lại đăng nhập nhanh, đồng thời buộc người dùng mới hoàn thiện đủ thông tin định danh trước khi sử dụng các chức năng đặt lịch và thanh toán.
 
 \begin{enumerate}
-    \item \textbf{Đăng nhập / Đăng ký:} Người dùng nhập email và mật khẩu. Hệ thống băm mật khẩu bằng \texttt{bcrypt} trước khi lưu, đồng thời cấp cặp token (\texttt{access\_token} ngắn hạn + \texttt{refresh\_token} dài hạn với Rotation \& Hashing).
+    \item \textbf{Màn hình vào cổng xác thực:} Người dùng chọn giữa hai nhánh thao tác chính là \texttt{Sign In} hoặc \texttt{Create an account}. Cách tổ chức này giảm nhầm lẫn giữa người dùng mới và người dùng đã có tài khoản.
 
-    \item \textbf{Hoàn thiện hồ sơ:} Nhập thông tin cá nhân (tên, ngày sinh, giới tính, avatar) lưu vào \texttt{UserProfile}.
+    \item \textbf{Đăng nhập tài khoản hiện có:} Người dùng nhập email và mật khẩu, có thể sử dụng liên kết \texttt{Forgot Password?} khi quên mật khẩu. Giao diện đồng thời hỗ trợ đăng nhập nhanh bằng Google và Facebook cho các trường hợp không muốn dùng mật khẩu cục bộ.
 
-    \item \textbf{Khảo sát sức khỏe (Health Survey):} Trả lời các câu hỏi về tình trạng sức khỏe, mục tiêu chăm sóc, tiền sử bệnh. Dữ liệu lưu dạng \texttt{jsonb} trong \texttt{Account.survey}, phục vụ AI gợi ý dịch vụ cá nhân hóa.
+    \item \textbf{Khởi tạo đăng ký bằng email:} Với người dùng mới, hệ thống yêu cầu nhập email trước, đồng thời hiển thị điều khoản sử dụng và chính sách riêng tư ngay ở bước đầu để ràng buộc sự đồng thuận trước khi tạo tài khoản.
+
+    \item \textbf{Xác thực email bằng OTP:} Sau bước nhập email, người dùng nhập mã xác thực được gửi qua email để chứng minh quyền sở hữu địa chỉ đăng ký và giảm nguy cơ tạo tài khoản giả mạo.
+
+    \item \textbf{Hoàn thiện hồ sơ đăng ký:} Sau khi xác thực OTP, người dùng tiếp tục nhập họ tên pháp lý, ngày sinh, mật khẩu, xác nhận mật khẩu và địa chỉ liên hệ. Đây là tập dữ liệu nền để tạo \texttt{Account} và \texttt{UserProfile} ban đầu.
+
+    \item \textbf{Xác nhận và kích hoạt:} Khi người dùng nhấn \texttt{Agree \& Continue}, backend thực hiện kiểm tra hợp lệ dữ liệu, băm mật khẩu bằng \texttt{bcrypt}, lưu hồ sơ và cấp token truy cập để người dùng đi tiếp sang các bước cá nhân hóa tiếp theo.
 \end{enumerate}
 
-% Placeholder: Uncomment khi có ảnh chụp màn hình đăng ký/đăng nhập
-% \begin{figure}[H]
-%     \centering
-%     \begin{subfigure}[t]{0.3\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{Images/Hiện thực/fig_user_login.png}
-%         \caption{Màn hình đăng nhập}
-%     \end{subfigure}
-%     \hfill
-%     \begin{subfigure}[t]{0.3\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{Images/Hiện thực/fig_user_register.png}
-%         \caption{Màn hình đăng ký}
-%     \end{subfigure}
-%     \hfill
-%     \begin{subfigure}[t]{0.3\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{Images/Hiện thực/fig_user_survey.png}
-%         \caption{Khảo sát sức khỏe}
-%     \end{subfigure}
-%     \caption{Quy trình đăng ký tài khoản và khảo sát sức khỏe trên ứng dụng di động}
-%     \label{fig:user_register_flow}
-% \end{figure}
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_entry.png}
+    \caption{Chọn \texttt{Sign In} hoặc \texttt{Create an account}}
+    \label{fig:user_auth_entry}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_signin.png}
+    \caption{Đăng nhập bằng email, mật khẩu hoặc social login}
+    \label{fig:user_auth_signin}
+\end{subfigure}
+\par\medskip
+\caption{Luồng Sign In của người dùng trên ứng dụng di động}
+\label{fig:user_auth_signin_flow}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_email.png}
+    \caption{Nhập email đăng ký}
+    \label{fig:user_auth_email}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_otp.png}
+    \caption{Xác thực email bằng mã OTP}
+    \label{fig:user_auth_otp}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_signup_profile.png}
+    \caption{Điền thông tin cá nhân và ngày sinh}
+    \label{fig:user_auth_signup_profile}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_signup_address.png}
+    \caption{Địa chỉ, điều khoản và xác nhận đăng ký}
+    \label{fig:user_auth_signup_address}
+\end{subfigure}
+\par\medskip
+\caption{Luồng Sign Up của người dùng trên ứng dụng di động}
+\label{fig:user_auth_signup_flow}
+\end{figure}
+
+\paragraph{Mô tả dữ liệu và ràng buộc giao diện}
+
+\begin{itemize}
+    \item \textbf{Email:} Là định danh đăng nhập chính, được thu thập ngay từ đầu để kiểm tra định dạng và tránh trùng lặp tài khoản.
+    \item \textbf{Mật khẩu:} Giao diện yêu cầu tối thiểu 8 ký tự và có trường \texttt{Confirm Password} để giảm lỗi nhập sai trước khi gửi request lên server.
+    \item \textbf{Ngày sinh:} Hệ thống hiển thị ràng buộc độ tuổi tối thiểu 16 tuổi, phù hợp với yêu cầu sử dụng dịch vụ và xác minh danh tính cơ bản.
+    \item \textbf{Họ tên pháp lý và địa chỉ:} Bao gồm tên thật, địa chỉ đường, phường/xã, quận/huyện, tỉnh/thành và quốc gia; đây là nhóm dữ liệu cần thiết cho nhận diện hồ sơ người dùng và các tác vụ điều hướng, đặt lịch, thanh toán.
+    \item \textbf{Điều khoản sử dụng:} Trước khi hoàn tất đăng ký, người dùng phải đồng ý với \texttt{Terms of Service}, \texttt{Payment Terms of Service} và \texttt{Privacy Policy}, tạo cơ sở pháp lý cho toàn bộ giao dịch phát sinh sau đó.
+\end{itemize}
 
 \subsubsection{Khám phá Dịch vụ và Phòng khám}
 
@@ -541,29 +591,41 @@ Module cung cấp trang thông tin chi tiết phòng khám cho người dùng th
     \item \textbf{\texttt{GET /clinics/:id/reviews} --- Tab ``Đánh giá'':} Đánh giá phân trang, lọc theo số sao (\texttt{starCount}) hoặc chỉ hiển thị đánh giá có ảnh (\texttt{hasMedia}).
 \end{itemize}
 
-% Placeholder: Uncomment khi có ảnh chụp màn hình phòng khám
-% \begin{figure}[H]
-%     \centering
-%     \begin{subfigure}[t]{0.3\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{Images/Hiện thực/fig_user_clinic_info.png}
-%         \caption{Tab Cửa hàng -- thông tin tổng quan}
-%     \end{subfigure}
-%     \hfill
-%     \begin{subfigure}[t]{0.3\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{Images/Hiện thực/fig_user_clinic_services.png}
-%         \caption{Tab Dịch vụ -- danh sách dịch vụ}
-%     \end{subfigure}
-%     \hfill
-%     \begin{subfigure}[t]{0.3\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{Images/Hiện thực/fig_user_clinic_reviews.png}
-%         \caption{Tab Đánh giá}
-%     \end{subfigure}
-%     \caption{Trang chi tiết phòng khám với 3 tab: Cửa hàng, Dịch vụ, Đánh giá}
-%     \label{fig:user_clinic_detail}
-% \end{figure}
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{Images/Hiện thực/user_app/clinic_info/fig_clinic_info_1.png}
+    \caption{Tab Cửa hàng -- phần tổng quan}
+    \label{fig:clinic_info_overview}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{Images/Hiện thực/user_app/clinic_info/fig_clinic_info_2.png}
+    \caption{Tab Cửa hàng -- cơ sở vật chất}
+    \label{fig:clinic_info_facility}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{Images/Hiện thực/user_app/clinic_info/fig_clinic_info_3.png}
+    \caption{Tab Dịch vụ -- danh sách dịch vụ}
+    \label{fig:clinic_info_services}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{Images/Hiện thực/user_app/clinic_info/fig_clinic_info_4.png}
+    \caption{Tab Đánh giá}
+    \label{fig:clinic_info_reviews}
+\end{subfigure}
+\par\medskip
+\caption{Trang chi tiết phòng khám với 3 tab: Cửa hàng, Dịch vụ, Đánh giá}
+\label{fig:user_clinic_detail}
+\end{figure}
 
 \paragraph{Module Danh mục (\texttt{CategoriesModule})}
 
@@ -620,7 +682,50 @@ Nhắn tin thời gian thực giữa người dùng và đối tác, kết hợp
 
 \subsubsection{Đánh giá dịch vụ (\texttt{ReviewModule})}
 
-Cho phép đánh giá sau khi sử dụng dịch vụ. Hai loại: \texttt{SpecialistReview} (đánh giá chuyên gia về chuyên môn, thái độ) và \texttt{TreatmentReview} (đánh giá trải nghiệm điều trị, cơ sở vật chất, kèm ảnh qua \texttt{photo\_urls} jsonb). Điểm trung bình được tổng hợp và hiển thị trên trang chi tiết phòng khám.
+Phân hệ đánh giá cho phép người dùng để lại nhận xét và điểm số sau khi trải nghiệm dịch vụ. Quy trình được thiết kế theo dạng từng bước (step-by-step) nhằm tối ưu tỷ lệ hoàn thành khảo sát. Hệ thống thu thập hai luồng dữ liệu chính: \texttt{SpecialistReview} (đánh giá chuyên gia về chuyên môn, thái độ) và \texttt{TreatmentReview} (đánh giá trải nghiệm điều trị, không gian, kèm ảnh chụp thực tế qua \texttt{photo\_urls} jsonb). Điểm trung bình được tổng hợp và hiển thị trực tiếp trên trang chi tiết phòng khám.
+
+\begin{enumerate}
+    \item \textbf{Đánh giá dịch vụ:} Người dùng chấm điểm mức độ hài lòng về dịch vụ tổng thể.
+    \item \textbf{Đánh giá chuyên gia \& cơ sở:} Hệ thống yêu cầu đánh giá chi tiết cho chuyên gia phụ trách và cơ sở vật chất.
+    \item \textbf{Nhận xét và hình ảnh:} Người dùng nhập bình luận và có thể tải lên hình ảnh đính kèm (ảnh sau điều trị, hóa đơn).
+    \item \textbf{Hoàn tất:} Sau khi gửi, hệ thống ghi nhận đánh giá và hiển thị màn hình thông báo thành công.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.35\textheight,keepaspectratio]{Images/Hiện thực/user_app/reviews/fig_review_step1.png}
+    \caption{Bắt đầu đánh giá dịch vụ}
+    \label{fig:review_step1}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.35\textheight,keepaspectratio]{Images/Hiện thực/user_app/reviews/fig_review_step2.png}
+    \caption{Đánh giá chuyên gia}
+    \label{fig:review_step2}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.35\textheight,keepaspectratio]{Images/Hiện thực/user_app/reviews/fig_review_step3.png}
+    \caption{Nhận xét chi tiết và đính kèm ảnh}
+    \label{fig:review_step3}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.35\textheight,keepaspectratio]{Images/Hiện thực/user_app/reviews/fig_review_step4.png}
+    \caption{Hoàn tất đánh giá}
+    \label{fig:review_step4}
+\end{subfigure}
+\par\medskip
+\caption{Luồng Đánh giá dịch vụ (Service Review) trên ứng dụng người bệnh}
+\label{fig:user_review_flow}
+\end{figure}
 
 \subsubsection{Quản lý Đặt lịch, Giỏ hàng và Thanh toán}
 
@@ -643,16 +748,20 @@ Màn hình chính là điểm khởi đầu của người dùng, cung cấp tru
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.48\linewidth}
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_home.jpg}
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user/fig_user_home.jpg}
     \caption{Giao diện chế độ sáng với Quick Actions và Recommend For You}
+    \label{fig:user_home_home}
 \end{subfigure}
 \hfill
-\begin{subfigure}[b]{0.48\linewidth}
+\begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_service_detail.jpg}
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user/fig_user_service_detail.jpg}
     \caption{Chi tiết dịch vụ được đề xuất}
+    \label{fig:user_home_service_detail}
 \end{subfigure}
 \par\medskip
 \caption{Màn hình Home - Trung tâm của User Portal}
@@ -683,87 +792,182 @@ Màn hình chính là điểm khởi đầu của người dùng, cung cấp tru
 
 \paragraph{Quản lý lịch hẹn (Appointments)}
 
-Màn hình Appointments phân loại thành bốn tab: Pending, Upcoming, Completed, Canceled.
+Màn hình Appointments cho phép người dùng theo dõi toàn bộ lịch sử hẹn được phân loại thành bốn tab: Pending (chờ thanh toán), Upcoming (sắp tới), Completed (hoàn thành), và Canceled (đã hủy). Mỗi lịch hẹn được hiển thị dưới dạng card chứa thông tin dịch vụ, cơ sở y tế, chuyên gia, thời gian check-in, và trạng thái thanh toán. Người dùng có thể nhấn nút \textit{Details} để xem chi tiết đầy đủ hoặc thực hiện các hành động bổ sung.
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.48\linewidth}
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_appointments.jpg}
-    \caption{Tab Upcoming - Lịch hẹn sắp tới}
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appoinment/fig_appointment_pending.png}
+    \caption{Tab Pending -- chờ thanh toán}
+    \label{fig:appointment_pending}
 \end{subfigure}
 \hfill
-\begin{subfigure}[b]{0.48\linewidth}
+\begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_appointments_2.jpg}
-    \caption{Danh sách dịch vụ từ Healytics Dental}
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appoinment/fig_appointment_upcoming.png}
+    \caption{Tab Upcoming -- lịch hẹn sắp tới}
+    \label{fig:appointment_upcoming}
 \end{subfigure}
 \par\medskip
-\caption{Màn hình Appointments - Quản lý lịch hẹn}
-\label{fig:user_appointments}
+\caption{Quản lý lịch hẹn -- danh sách hẹn theo trạng thái}
+\label{fig:appointments_list}
 \end{figure}
-
-\begin{itemize}
-    \item \textbf{Thao tác lọc trạng thái:} Người dùng chuyển giữa các tab Pending, Upcoming, Completed, Canceled để theo dõi lịch hẹn.
-    \item \textbf{Thao tác xử lý lịch hẹn:} Nhấn \textit{Details} để xem chi tiết, check-in hoặc thực hiện hành động tiếp theo.
-\end{itemize}
 
 \textbf{Tính năng kỹ thuật:}
 
 \begin{itemize}
-    \item \textbf{Real-time Status Sync:} Cập nhật qua WebSocket.
-    \item \textbf{Push Notification:} Reminder 1 giờ trước hẹn.
-    \item \textbf{Lazy Loading:} Load từng batch 10 item.
+    \item \textbf{Phân loại theo trạng thái:} Bốn tab (Pending, Upcoming, Completed, Canceled) với lazy loading 10 item/batch.
+    \item \textbf{Real-time Status Sync:} WebSocket cập nhật trạng thái lịch hẹn khi có thay đổi từ phía partner.
+    \item \textbf{Push Notification:} Nhắc nhở 1 giờ trước lịch hẹn qua FCM.
 \end{itemize}
 
-\paragraph{Chọn chuyên gia và lịch (Select Specialist)}
+\paragraph{Xem chi tiết lịch hẹn và Hướng dẫn dịch vụ}
+
+Khi người dùng nhấn nút \textit{Details} từ danh sách hẹn, màn hình Appointment Details hiển thị thông tin đầy đủ về lịch hẹn: hình ảnh dịch vụ, tên dịch vụ, cơ sở y tế, chuyên gia phụ trách, thời gian check-in/check-out, và các tùy chọn liên quan (xem hướng dẫn dịch vụ, nhắn tin với cơ sở). Người dùng có thể nhấn \textit{Service manual} để truy cập hướng dẫn chi tiết về dịch vụ, bao gồm: guidelines trước dịch vụ (Pre-Service Guidelines), các bước thực hiện dịch vụ, hình ảnh cơ sở vật chất (Facilities), và lịch sử đánh giá về dịch vụ đó. Tính năng này giúp người dùng chuẩn bị tốt trước cuộc hẹn và giao tiếp trực tiếp với nhân viên qua chat.
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.48\linewidth}
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_booking_select.jpg}
-    \caption{Chọn chuyên gia, ngày và giờ}
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appoinment/fig_appointment_details.png}
+    \caption{Chi tiết lịch hẹn}
+    \label{fig:appointment_details}
 \end{subfigure}
 \hfill
-\begin{subfigure}[b]{0.48\linewidth}
+\begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_booking_select.jpg}
-    \caption{Hiển thị các slot thời gian khả dụng}
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appoinment/fig_appointment_manual_1.png}
+    \caption{Hướng dẫn dịch vụ -- phần 1}
+    \label{fig:appointment_manual_part1}
 \end{subfigure}
 \par\medskip
-\caption{Màn hình Select Specialist - Chọn chuyên gia và thời gian}
-\label{fig:user_select_specialist}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appoinment/fig_appointment_manual_2.png}
+    \caption{Hướng dẫn dịch vụ -- phần 2}
+    \label{fig:appointment_manual_part2}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appoinment/fig_appointment_chat.png}
+    \caption{Chat với cơ sở y tế}
+    \label{fig:appointment_chat}
+\end{subfigure}
+\par\medskip
+\caption{Chi tiết lịch hẹn, hướng dẫn dịch vụ, và liên hệ với cơ sở}
+\label{fig:appointment_details_flow}
 \end{figure}
 
+\textbf{Thành phần chính của Service Manual:}
+
 \begin{itemize}
-    \item \textbf{Thao tác chọn chuyên gia:} Người dùng chạm vào card chuyên gia để đánh dấu lựa chọn.
-    \item \textbf{Thao tác đặt lịch:} Người dùng chọn ngày, khung giờ khả dụng và nhấn \textit{Continue} để sang bước xác nhận.
+    \item \textbf{Pre-Service Guidelines:} Hướng dẫn chuẩn bị trước dịch vụ (ví dụ: chải răng trước khi tẩy trắng, tránh cà phê 24 giờ trước).
+    \item \textbf{Service Rules:} Quy tắc thực hiện dịch vụ từng bước (bao gồm numbered steps, icons minh họa).
+    \item \textbf{Facilities:} Hình ảnh gallery các cơ sở vật chất, thiết bị sử dụng.
+    \item \textbf{Review:} Tổng hợp đánh giá (số sao trung bình, danh sách feedback từ khách hàng trước).
 \end{itemize}
 
-\paragraph{Xác nhận đặt lịch (Confirm Booking)}
+\paragraph{Luồng đặt lịch hẹn (Book Appointment)}
+
+Quy trình đặt lịch được tổ chức theo mô hình wizard 3 bước, mỗi bước hiển thị thanh tiến trình (progress bar) giúp người dùng nắm rõ vị trí hiện tại trong luồng:
+
+\begin{enumerate}
+    \item \textbf{Bước 1 -- Chọn danh mục và dịch vụ:} Người dùng tìm kiếm hoặc chọn danh mục sức khỏe (Dental Care, Dermatology, Fitness \& Yoga, v.v.) từ lưới biểu tượng. Sau khi chọn danh mục, danh sách dịch vụ thuộc danh mục đó hiển thị bên dưới kèm thông tin hình ảnh, thời lượng, giá và phòng khám cung cấp. Người dùng đánh dấu dịch vụ mong muốn rồi nhấn \textit{Continue}.
+
+    \item \textbf{Bước 2 -- Chọn chuyên gia và lịch hẹn:} Hệ thống hiển thị danh sách chuyên gia đủ điều kiện (ảnh, tên, chuyên ngành). Người dùng chọn chuyên gia, sau đó chọn ngày từ dải lịch ngang và khung giờ khả dụng (Morning, Afternoon) được tải từ API slot. Các slot đã bị khóa phân tán (Redis Redlock) sẽ không xuất hiện.
+
+    \item \textbf{Bước 3 -- Xác nhận đặt lịch:} Màn hình tổng hợp hiển thị thông tin chuyên gia, ngày giờ, danh mục và dịch vụ, địa chỉ phòng khám, cùng bảng chi phí (Subtotal, Discount, Total Amount). Người dùng nhấn \textit{Confirm \& Pay} để chuyển sang bước thanh toán.
+\end{enumerate}
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.48\linewidth}
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_booking_confirm.jpg}
-    \caption{Chi tiết dịch vụ và chuyên gia}
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_step1_category.png}
+    \caption{Chọn danh mục dịch vụ}
+    \label{fig:booking_step1_category}
 \end{subfigure}
 \hfill
-\begin{subfigure}[b]{0.48\linewidth}
+\begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_booking_total.jpg}
-    \caption{Chi phí, địa chỉ và thanh toán}
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_step1_service.png}
+    \caption{Chọn dịch vụ sau khi lọc danh mục}
+    \label{fig:booking_step1_service}
 \end{subfigure}
 \par\medskip
-\caption{Màn hình Confirm Booking - Xác nhận chi tiết}
-\label{fig:user_confirm_booking}
+\caption{Bước 1 -- Chọn danh mục và dịch vụ trong luồng Book Appointment}
+\label{fig:booking_step1}
 \end{figure}
 
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_step2_schedule.png}
+    \caption{Chọn chuyên gia, ngày và khung giờ}
+    \label{fig:booking_step2_schedule}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_step3_confirm.png}
+    \caption{Xác nhận thông tin và bảng giá}
+    \label{fig:booking_step3_confirm}
+\end{subfigure}
+\par\medskip
+\caption{Bước 2 \& 3 -- Chọn lịch hẹn và xác nhận đặt lịch}
+\label{fig:booking_step2_step3}
+\end{figure}
+
+\paragraph{Thanh toán (Checkout \& Payment)}
+
+Sau khi xác nhận đặt lịch, người dùng được chuyển sang màn hình Checkout hiển thị tóm tắt đơn hàng (phòng khám, dịch vụ, chuyên gia, giá) kèm tùy chọn quy đổi xu (Redeem Coins). Hệ thống hỗ trợ ba phương thức thanh toán:
+
 \begin{itemize}
-    \item \textbf{Thao tác rà soát đơn hẹn:} Người dùng kiểm tra chuyên gia, dịch vụ, địa chỉ và bảng giá trước khi thanh toán.
-    \item \textbf{Thao tác xác nhận:} Nhấn \textit{Confirm \& Pay} để chuyển sang bước checkout.
+    \item \textbf{Credit/Debit Card:} Thanh toán quốc tế qua cổng Stripe.
+    \item \textbf{E-Wallet (MoMo/ZaloPay):} Thanh toán nội địa qua ví điện tử MoMo. Khi chọn phương thức này, ứng dụng mở WebView đến cổng \texttt{test-payment.momo.vn}, hiển thị mã đơn hàng và số tiền để người dùng xác nhận bằng ví MoMo.
+    \item \textbf{Pay Later:} Cho phép đặt lịch trước, thanh toán sau tại phòng khám.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_checkout.png}
+    \caption{Chọn phương thức thanh toán}
+    \label{fig:booking_checkout}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_momo_payment.png}
+    \caption{Cổng thanh toán MoMo}
+    \label{fig:booking_momo_payment}
+\end{subfigure}
+\par\medskip
+\caption{Luồng Checkout và thanh toán qua ví điện tử MoMo}
+\label{fig:booking_checkout_flow}
+\end{figure}
+
+\textbf{Tính năng kỹ thuật:}
+
+\begin{itemize}
+    \item \textbf{Payment Gateway Integration:} Stripe (quốc tế) và MoMo (nội địa), với luồng IPN/Webhook server-to-server xác nhận giao dịch.
+    \item \textbf{Redeem Coins:} Người dùng có thể quy đổi xu tích lũy để giảm giá trực tiếp trên tổng đơn hàng.
+    \item \textbf{Idempotency:} Sử dụng mã đơn hàng duy nhất (\texttt{BK-*}) ngăn double charge khi retry.
+    \item \textbf{Distributed Lock:} Redis Redlock khóa slot trong 10 phút (TTL) từ lúc tạo draft order đến khi thanh toán hoàn tất.
 \end{itemize}
 
 \paragraph{Trò chuyện với trợ lý AI (Chat with Dr. AI)}
@@ -772,14 +976,14 @@ Màn hình Appointments phân loại thành bốn tab: Pending, Upcoming, Comple
 \centering
 \begin{subfigure}[b]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_chat_history.jpg}
-    \caption{Lịch sử chat AI Session}
+    \includegraphics[width=\linewidth,height=0.42\textheight,keepaspectratio,trim=30 40 30 40,clip]{Images/Hiện thực/user/fig_user_chat_history.jpg}
+    \caption{Lịch sử chat AI Session (zoom)}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_chat_ask_2.jpg}
-    \caption{Cuộc trò chuyện chi tiết}
+    \includegraphics[width=\linewidth,height=0.42\textheight,keepaspectratio,trim=30 40 30 40,clip]{Images/Hiện thực/user/fig_user_chat_ask_2.jpg}
+    \caption{Cuộc trò chuyện chi tiết (zoom)}
 \end{subfigure}
 \par\medskip
 \caption{Màn hình Chat History - Tư vấn AI}
@@ -800,63 +1004,62 @@ Màn hình Appointments phân loại thành bốn tab: Pending, Upcoming, Comple
     \item \textbf{Service Recommendation:} Gợi ý dịch vụ phù hợp.
 \end{itemize}
 
-\paragraph{Thanh toán (Checkout \& Payment)}
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[b]{0.48\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_checkout_payment.jpg}
-    \caption{Màn hình Checkout với các phương thức thanh toán}
-\end{subfigure}
-\hfill
-\begin{subfigure}[b]{0.48\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_checkout_success.jpg}
-    \caption{Xác nhận thanh toán thành công}
-\end{subfigure}
-\par\medskip
-\caption{Màn hình Checkout \& Payment Confirmation}
-\label{fig:user_checkout}
-\end{figure}
-
-\begin{itemize}
-    \item \textbf{Thao tác chọn phương thức:} Người dùng chọn thẻ, ví điện tử hoặc trả sau trước khi xác nhận giao dịch.
-    \item \textbf{Thao tác hoàn tất:} Sau khi thanh toán thành công, người dùng nhấn \textit{Done} để quay lại luồng quản lý lịch hẹn.
-\end{itemize}
-
-\textbf{Tính năng kỹ thuật:}
-
-\begin{itemize}
-    \item \textbf{Payment Gateway Integration:} Stripe, Momo, PayLater.
-    \item \textbf{Webhook Handling:} Xử lý callback từ gateway.
-    \item \textbf{PCI Compliance:} Không lưu số thẻ trên server.
-    \item \textbf{Idempotency:} Tránh double charge.
-\end{itemize}
-
 \paragraph{Chi tiết dịch vụ (Service Detail)}
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.48\linewidth}
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_service_detail.jpg}
-    \caption{Thông tin cơ bản và đánh giá}
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/service_details/Simulator Screenshot - iPhone 16 - 2026-05-07 at 23.55.30.png}
+    \caption{Tổng quan dịch vụ}
+    \label{fig:service_detail_overview}
 \end{subfigure}
 \hfill
-\begin{subfigure}[b]{0.48\linewidth}
+\begin{subfigure}[t]{0.48\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/user/fig_user_service_detail.jpg}
-    \caption{Mô tả dịch vụ, Gallery và Booking}
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/service_details/Simulator Screenshot - iPhone 16 - 2026-05-07 at 23.55.38.png}
+    \caption{Phần đánh giá và nhận xét}
+    \label{fig:service_detail_reviews}
 \end{subfigure}
 \par\medskip
-\caption{Màn hình Service Detail - Chi tiết dịch vụ}
-\label{fig:user_service_detail}
+\caption{Luồng Service Detail trên ứng dụng người dùng}
+\label{fig:user_service_detail_flow}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/service_details/Simulator Screenshot - iPhone 16 - 2026-05-07 at 23.56.00.png}
+    \caption{Bảng xếp hạng chi tiết}
+    \label{fig:service_detail_ratings}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/service_details/Simulator Screenshot - iPhone 16 - 2026-05-07 at 23.56.18.png}
+    \caption{Chọn chuyên gia và khung giờ}
+    \label{fig:service_detail_select_specialist}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/service_details/Simulator Screenshot - iPhone 16 - 2026-05-07 at 23.56.31.png}
+    \caption{Xác nhận đặt lịch}
+    \label{fig:service_detail_confirm}
+\end{subfigure}
+\par\medskip
+\caption{Luồng đặt lịch dịch vụ trên ứng dụng người dùng}
+\label{fig:user_service_booking_flow}
 \end{figure}
 
 \begin{itemize}
-    \item \textbf{Thao tác xem thông tin:} Người dùng xem mô tả, đánh giá, gallery và giá dịch vụ trước khi ra quyết định.
-    \item \textbf{Thao tác bắt đầu đặt lịch:} Nhấn \textit{Select Specialist} để đi vào quy trình đặt lịch.
+    \item \textbf{Thao tác xem thông tin:} Người dùng xem ảnh bìa, nhãn dịch vụ, giá, mô tả ngắn và các đánh giá để đánh giá nhanh chất lượng dịch vụ.
+    \item \textbf{Thao tác đặt lịch:} Người dùng kéo xuống phần đánh giá, chọn chuyên gia, chọn ngày giờ phù hợp rồi chuyển sang màn hình xác nhận đặt lịch.
 \end{itemize}
 
 \subsubsection{Kiến trúc dữ liệu và API}
@@ -2236,5 +2439,3 @@ Kiến trúc triển khai tách biệt thành hai cụm độc lập giao tiếp
 \end{itemize}
 
 Thiết kế này cho phép scale từng phần linh hoạt: tăng GPU khi lượng truy vấn AI tăng mà không ảnh hưởng đến Backend, hoặc mở rộng Backend khi lượng booking tăng mà không tốn thêm chi phí GPU. Đồng thời, quy trình CI/CD tự động hóa hoàn toàn đảm bảo mọi thay đổi được kiểm thử kỹ lưỡng trước khi lên production, giảm thiểu rủi ro và tăng tốc chu kỳ phát triển.
-
-

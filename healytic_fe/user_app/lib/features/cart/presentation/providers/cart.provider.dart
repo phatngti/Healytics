@@ -48,11 +48,8 @@ class CartState {
     (sum, item) => sum + (item.couponDiscountAmount ?? 0),
   );
 
-  /// Service fee (zero for V1).
-  int get serviceFee => 0;
-
   /// Final payable total after discounts.
-  int get total => subtotal - totalDiscount + serviceFee;
+  int get total => subtotal - totalDiscount;
 
   /// Creates a copy with overridden fields.
   CartState copyWith({List<CartItemEntity>? items, Set<String>? selectedIds}) {

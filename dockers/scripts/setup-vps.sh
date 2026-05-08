@@ -13,10 +13,10 @@
 # What this script installs / configures:
 #   1. System updates + essential packages (curl, git, make, rsync, etc.)
 #   2. Docker Engine (CE) + Docker Compose v2 plugin
-#   3. A 'deploy' user with passwordless sudo + Docker group membership
-#   4. UFW firewall with required port rules
-#   5. Swap space (2 GB) for low-memory VPS
-#   6. System tuning (vm.overcommit_memory for Redis, fs.inotify for file watches)
+#   3. UFW firewall with required port rules (incl. SMTP 25/465/587)
+#   4. SMTP outbound connectivity verification
+#   5. Docker daemon tuning (log rotation, overlay2)
+#   6. Project directory setup
 # =============================================================================
 set -Eeuo pipefail
 
@@ -35,8 +35,8 @@ err()     { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 section() { echo ""; echo -e "${BOLD}── $* ──${NC}"; }
 
 # ─── Pre-flight checks ──────────────────────────────────────────────────────
-if [[ $EUID -ne 0 ]]; then
-  err "This script must be run as root (or with sudo)."
+if [[ $EUID -ne 0 ]] && ! sudo -n true 2>/dev/null; then
+  err "This script must be run as root or with sudo privileges."
   exit 1
 fi
 
@@ -55,16 +55,11 @@ fi
 
 info "Detected OS: ${PRETTY_NAME}"
 
-# ─── Configuration ──────────────────────────────────────────────────────────
-DEPLOY_USER="${DEPLOY_USER:-deploy}"
-SWAP_SIZE="${SWAP_SIZE:-2G}"
-
 echo ""
 echo -e "${BOLD}╔═══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BOLD}║        Healytics VPS Provisioning Script                 ║${NC}"
 echo -e "${BOLD}╠═══════════════════════════════════════════════════════════╣${NC}"
-echo -e "${BOLD}║${NC}  Deploy user:  ${CYAN}${DEPLOY_USER}${NC}                                   ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  Swap size:    ${CYAN}${SWAP_SIZE}${NC}                                       ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  Deploy as:    ${CYAN}root${NC}                                       ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}  Target OS:    ${CYAN}${PRETTY_NAME}${NC}"
 echo -e "${BOLD}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo ""
@@ -75,15 +70,38 @@ echo ""
 section "System Update & Essential Packages"
 
 export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
+# ── Wait for any boot-time apt/dpkg locks to release ─────────────────────────
+# Fresh Ubuntu VPS instances often run unattended-upgrades on first boot,
+# which holds the dpkg lock and causes apt-get to hang indefinitely.
+info "Waiting for any existing apt/dpkg locks to release..."
+while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 || \
+      fuser /var/lib/apt/lists/lock >/dev/null 2>&1 || \
+      fuser /var/cache/apt/archives/lock >/dev/null 2>&1; do
+  warn "Another apt/dpkg process is running — waiting 5s..."
+  sleep 5
+done
+ok "No apt/dpkg locks held"
+
+# ── Disable needrestart interactive prompts ──────────────────────────────────
+# Ubuntu 22.04+ ships needrestart which pops up TUI dialogs even with
+# DEBIAN_FRONTEND=noninteractive. Setting it to auto-restart mode (a)
+# via config ensures zero prompts.
+if [[ -d /etc/needrestart ]]; then
+  sudo mkdir -p /etc/needrestart/conf.d
+  echo '$nrconf{restart} = "a";' | sudo tee /etc/needrestart/conf.d/50-autorestart.conf > /dev/null
+  ok "needrestart set to auto-restart mode"
+fi
+
+# Common dpkg options to suppress all interactive prompts
+APT_OPTS=(-o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold")
 
 info "Updating package index..."
-apt-get update -qq
-
-info "Upgrading installed packages..."
-apt-get upgrade -y -qq
+sudo apt-get update -qq
 
 info "Installing essential packages..."
-apt-get install -y -qq --no-install-recommends \
+sudo apt-get install -y -qq "${APT_OPTS[@]}" --no-install-recommends \
   apt-transport-https \
   bash-completion \
   ca-certificates \
@@ -117,22 +135,22 @@ if command -v docker &>/dev/null; then
   warn "Docker is already installed: $(docker --version)"
 else
   info "Adding Docker's official GPG key..."
-  install -m 0755 -d /etc/apt/keyrings
+  sudo install -m 0755 -d /etc/apt/keyrings
   curl -fsSL "https://download.docker.com/linux/${ID}/gpg" \
-    -o /etc/apt/keyrings/docker.asc
-  chmod a+r /etc/apt/keyrings/docker.asc
+    | sudo tee /etc/apt/keyrings/docker.asc > /dev/null
+  sudo chmod a+r /etc/apt/keyrings/docker.asc
 
   info "Adding Docker repository..."
   echo \
     "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
     https://download.docker.com/linux/${ID} \
     $(. /etc/os-release && echo "${VERSION_CODENAME}") stable" \
-    > /etc/apt/sources.list.d/docker.list
+    | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-  apt-get update -qq
+  sudo apt-get update -qq
 
   info "Installing Docker Engine, CLI, and plugins..."
-  apt-get install -y -qq --no-install-recommends \
+  sudo apt-get install -y -qq "${APT_OPTS[@]}" --no-install-recommends \
     docker-ce \
     docker-ce-cli \
     containerd.io \
@@ -151,153 +169,136 @@ else
 fi
 
 # Enable and start Docker
-systemctl enable docker
-systemctl start docker
+sudo systemctl enable docker
+sudo systemctl start docker
 ok "Docker service is running"
 
 # =============================================================================
-# 3. Deploy User Setup
-# =============================================================================
-section "Deploy User: ${DEPLOY_USER}"
-
-if id "${DEPLOY_USER}" &>/dev/null; then
-  warn "User '${DEPLOY_USER}' already exists"
-else
-  info "Creating user '${DEPLOY_USER}'..."
-  useradd -m -s /bin/bash "${DEPLOY_USER}"
-  ok "User '${DEPLOY_USER}' created"
-fi
-
-# Add to docker and sudo groups
-usermod -aG docker "${DEPLOY_USER}"
-usermod -aG sudo "${DEPLOY_USER}"
-ok "User '${DEPLOY_USER}' added to docker and sudo groups"
-
-# Passwordless sudo
-SUDOERS_FILE="/etc/sudoers.d/${DEPLOY_USER}"
-if [[ ! -f "${SUDOERS_FILE}" ]]; then
-  echo "${DEPLOY_USER} ALL=(ALL) NOPASSWD:ALL" > "${SUDOERS_FILE}"
-  chmod 440 "${SUDOERS_FILE}"
-  ok "Passwordless sudo configured for '${DEPLOY_USER}'"
-fi
-
-# Copy authorized_keys from root if deploy user has none
-DEPLOY_SSH_DIR="/home/${DEPLOY_USER}/.ssh"
-if [[ -f /root/.ssh/authorized_keys ]] && [[ ! -f "${DEPLOY_SSH_DIR}/authorized_keys" ]]; then
-  info "Copying root's authorized_keys to '${DEPLOY_USER}'..."
-  mkdir -p "${DEPLOY_SSH_DIR}"
-  cp /root/.ssh/authorized_keys "${DEPLOY_SSH_DIR}/authorized_keys"
-  chown -R "${DEPLOY_USER}:${DEPLOY_USER}" "${DEPLOY_SSH_DIR}"
-  chmod 700 "${DEPLOY_SSH_DIR}"
-  chmod 600 "${DEPLOY_SSH_DIR}/authorized_keys"
-  ok "SSH keys copied to '${DEPLOY_USER}'"
-fi
-
-# =============================================================================
-# 4. UFW Firewall
+# 3. UFW Firewall
 # =============================================================================
 section "Firewall (UFW)"
 
 if ! command -v ufw &>/dev/null; then
   info "Installing UFW..."
-  apt-get install -y -qq ufw
+  sudo apt-get install -y -qq ufw
 fi
 
 # Reset UFW to clean state (non-interactive)
 info "Configuring firewall rules..."
-ufw --force reset >/dev/null 2>&1
+sudo ufw --force reset >/dev/null 2>&1
 
 # Default policies
-ufw default deny incoming >/dev/null 2>&1
-ufw default allow outgoing >/dev/null 2>&1
+sudo ufw default deny incoming >/dev/null 2>&1
+sudo ufw default allow outgoing >/dev/null 2>&1
 
 # SSH — always required
-ufw allow 22/tcp comment "SSH" >/dev/null 2>&1
+sudo ufw allow 22/tcp comment "SSH" >/dev/null 2>&1
 
 # Kong Gateway ports
-ufw allow 8000/tcp comment "Kong Proxy HTTP" >/dev/null 2>&1
-ufw allow 8443/tcp comment "Kong Proxy HTTPS" >/dev/null 2>&1
+sudo ufw allow 8000/tcp comment "Kong Proxy HTTP" >/dev/null 2>&1
+sudo ufw allow 8443/tcp comment "Kong Proxy HTTPS" >/dev/null 2>&1
 
 # Optional: Kong Admin API — restrict to trusted IPs in production
-# ufw allow 8001/tcp comment "Kong Admin API"
-# ufw allow 8002/tcp comment "Kong Manager GUI"
+# sudo ufw allow 8001/tcp comment "Kong Admin API"
+# sudo ufw allow 8002/tcp comment "Kong Manager GUI"
 
 # Jenkins (if running ci profile)
-ufw allow 8081/tcp comment "Jenkins Web UI" >/dev/null 2>&1
+sudo ufw allow 8081/tcp comment "Jenkins Web UI" >/dev/null 2>&1
+
+# SMTP — required for sending emails (outbound)
+sudo ufw allow out 25/tcp comment "SMTP outbound" >/dev/null 2>&1
+sudo ufw allow out 465/tcp comment "SMTPS outbound" >/dev/null 2>&1
+sudo ufw allow out 587/tcp comment "SMTP submission outbound" >/dev/null 2>&1
+ok "SMTP outbound ports (25, 465, 587) allowed in UFW"
 
 # Enable UFW
-ufw --force enable >/dev/null 2>&1
+sudo ufw --force enable >/dev/null 2>&1
 ok "UFW enabled with the following rules:"
-ufw status numbered 2>/dev/null | head -20
+sudo ufw status numbered 2>/dev/null | head -25
 
 # =============================================================================
-# 5. Swap Space
+# 3b. SMTP Outbound Connectivity Check
 # =============================================================================
-section "Swap Space"
+section "SMTP Outbound Connectivity Check"
 
-if swapon --show | grep -q '/swapfile'; then
-  warn "Swap already configured:"
-  swapon --show
-else
-  info "Creating ${SWAP_SIZE} swap file..."
-  fallocate -l "${SWAP_SIZE}" /swapfile
-  chmod 600 /swapfile
-  mkswap /swapfile >/dev/null
-  swapon /swapfile
+info "Testing outbound SMTP connectivity to smtp.gmail.com..."
+info "(Many VPS providers block SMTP at the network level to prevent spam)"
 
-  # Persist across reboots
-  if ! grep -q '/swapfile' /etc/fstab; then
-    echo '/swapfile none swap sw 0 0' >> /etc/fstab
+SMTP_BLOCKED_PORTS=()
+SMTP_OK_PORTS=()
+
+for port in 25 465 587; do
+  if timeout 5 bash -c "echo >/dev/tcp/smtp.gmail.com/${port}" 2>/dev/null; then
+    SMTP_OK_PORTS+=("${port}")
+    ok "Port ${port} → smtp.gmail.com  ✅  REACHABLE"
+  else
+    SMTP_BLOCKED_PORTS+=("${port}")
+    err "Port ${port} → smtp.gmail.com  ❌  BLOCKED / UNREACHABLE"
   fi
+done
 
-  ok "Swap configured: ${SWAP_SIZE}"
-  swapon --show
+if [[ ${#SMTP_BLOCKED_PORTS[@]} -gt 0 ]]; then
+  echo ""
+  echo -e "${RED}${BOLD}╔═══════════════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${RED}${BOLD}║                                                                   ║${NC}"
+  echo -e "${RED}${BOLD}║   ⚠️  ⚠️  ⚠️   SMTP PORT(S) BLOCKED — EMAIL WILL NOT WORK   ⚠️  ⚠️  ⚠️    ║${NC}"
+  echo -e "${RED}${BOLD}║                                                                   ║${NC}"
+  echo -e "${RED}${BOLD}╠═══════════════════════════════════════════════════════════════════╣${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  ${RED}Blocked port(s): ${YELLOW}${BOLD}${SMTP_BLOCKED_PORTS[*]}${NC}                                        ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  Your VPS provider is likely blocking outbound SMTP traffic.      ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  This means your application ${RED}CANNOT send emails${NC} via direct SMTP.  ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  ${YELLOW}${BOLD}How to fix:${NC}                                                     ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  ${CYAN}Option 1:${NC} Contact your VPS provider and request them to         ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             unblock outbound SMTP ports (25, 465, 587).           ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             Common providers that block by default:               ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • AWS EC2 / Lightsail                                ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • Google Cloud                                      ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • Oracle Cloud                                      ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • Azure (new subscriptions)                          ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  ${CYAN}Option 2:${NC} Use an API-based email service instead of SMTP:       ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • ${GREEN}SendGrid${NC} (HTTP API)                                ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • ${GREEN}Mailgun${NC}  (HTTP API)                                ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • ${GREEN}AWS SES${NC}  (SDK/API)                                 ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             • ${GREEN}Resend${NC}   (HTTP API)                                ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             These bypass SMTP entirely and are not affected       ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             by port-level blocks.                                ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}  ${CYAN}Option 3:${NC} Use an SMTP relay that supports port ${GREEN}2525${NC}             ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}             (Mailgun, Mailtrap, SendGrid all support 2525).       ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}║${NC}                                                                   ${RED}${BOLD}║${NC}"
+  echo -e "${RED}${BOLD}╚═══════════════════════════════════════════════════════════════════╝${NC}"
+  echo ""
+  warn "Provisioning will continue, but email delivery WILL FAIL"
+  warn "until SMTP connectivity is resolved."
+  echo ""
+else
+  echo ""
+  echo -e "${GREEN}${BOLD}╔═══════════════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${GREEN}${BOLD}║            ✅  ALL SMTP PORTS ARE REACHABLE — EMAIL READY         ║${NC}"
+  echo -e "${GREEN}${BOLD}╠═══════════════════════════════════════════════════════════════════╣${NC}"
+  echo -e "${GREEN}${BOLD}║${NC}                                                                   ${GREEN}${BOLD}║${NC}"
+  echo -e "${GREEN}${BOLD}║${NC}  Reachable ports: ${GREEN}${BOLD}${SMTP_OK_PORTS[*]}${NC}                                    ${GREEN}${BOLD}║${NC}"
+  echo -e "${GREEN}${BOLD}║${NC}  Your VPS can send emails via SMTP.                               ${GREEN}${BOLD}║${NC}"
+  echo -e "${GREEN}${BOLD}║${NC}  Configure your SMTP host in ${CYAN}backend.env${NC} to start sending.       ${GREEN}${BOLD}║${NC}"
+  echo -e "${GREEN}${BOLD}║${NC}                                                                   ${GREEN}${BOLD}║${NC}"
+  echo -e "${GREEN}${BOLD}╚═══════════════════════════════════════════════════════════════════╝${NC}"
+  echo ""
 fi
 
 # =============================================================================
-# 6. System Tuning (sysctl)
-# =============================================================================
-section "System Tuning"
-
-SYSCTL_CONF="/etc/sysctl.d/99-healytics.conf"
-
-cat > "${SYSCTL_CONF}" <<'SYSCTL'
-# ── Healytics Docker Stack Tuning ──
-
-# Redis: disable THP warning + allow overcommit
-vm.overcommit_memory = 1
-
-# Increase inotify watches (for file-watching services like Jenkins, Node.js)
-fs.inotify.max_user_watches = 524288
-fs.inotify.max_user_instances = 1024
-
-# Network: increase connection tracking for many containers
-net.netfilter.nf_conntrack_max = 131072
-
-# Network: allow more TIME_WAIT sockets for high-throughput services
-net.ipv4.tcp_tw_reuse = 1
-net.core.somaxconn = 65535
-SYSCTL
-
-sysctl --system >/dev/null 2>&1
-ok "sysctl tuning applied"
-
-# Disable Transparent Huge Pages (Redis requirement)
-if [[ -f /sys/kernel/mm/transparent_hugepage/enabled ]]; then
-  echo never > /sys/kernel/mm/transparent_hugepage/enabled 2>/dev/null || true
-  echo never > /sys/kernel/mm/transparent_hugepage/defrag 2>/dev/null || true
-  ok "Transparent Huge Pages disabled (Redis optimization)"
-fi
-
-# =============================================================================
-# 7. Docker Daemon Tuning
+# 5. Docker Daemon Tuning
 # =============================================================================
 section "Docker Daemon Configuration"
 
 DOCKER_DAEMON_JSON="/etc/docker/daemon.json"
 
 if [[ ! -f "${DOCKER_DAEMON_JSON}" ]]; then
-  cat > "${DOCKER_DAEMON_JSON}" <<'DAEMON'
+  sudo tee "${DOCKER_DAEMON_JSON}" > /dev/null <<'DAEMON'
 {
   "log-driver": "json-file",
   "log-opts": {
@@ -311,29 +312,28 @@ if [[ ! -f "${DOCKER_DAEMON_JSON}" ]]; then
 }
 DAEMON
 
-  systemctl restart docker
+  sudo systemctl restart docker
   ok "Docker daemon configured with log rotation + overlay2"
 else
   warn "Docker daemon.json already exists — skipping"
 fi
 
 # =============================================================================
-# 8. Prepare Project Directory
+# 6. Prepare Project Directory
 # =============================================================================
 section "Project Directory"
 
-PROJECT_DIR="/home/${DEPLOY_USER}/dockers"
+PROJECT_DIR="/root/dockers"
 
 if [[ ! -d "${PROJECT_DIR}" ]]; then
-  mkdir -p "${PROJECT_DIR}"
-  chown "${DEPLOY_USER}:${DEPLOY_USER}" "${PROJECT_DIR}"
+  sudo mkdir -p "${PROJECT_DIR}"
   ok "Created ${PROJECT_DIR}"
 else
   warn "${PROJECT_DIR} already exists"
 fi
 
 # =============================================================================
-# 9. Verification
+# 7. Verification
 # =============================================================================
 section "Verification"
 
@@ -351,8 +351,7 @@ echo -e "  rsync:           ${GREEN}$(rsync --version 2>/dev/null | head -1 || e
 echo ""
 
 echo -e "${BOLD}System:${NC}"
-echo -e "  Swap:            ${GREEN}$(swapon --show --noheadings 2>/dev/null | awk '{print $3}' || echo 'None')${NC}"
-echo -e "  Deploy User:     ${GREEN}${DEPLOY_USER} (groups: $(id -nG ${DEPLOY_USER} 2>/dev/null))${NC}"
+echo -e "  Deploy as:       ${GREEN}root${NC}"
 echo -e "  Project Dir:     ${GREEN}${PROJECT_DIR}${NC}"
 echo ""
 
@@ -370,7 +369,7 @@ echo -e "${BOLD}║${NC}  ${CYAN}1.${NC} Push project files from your local mach
 echo -e "${BOLD}║${NC}     ${CYAN}./scripts/push-to-vps.sh <vps-ip>${NC}                    ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}                                                           ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}  ${CYAN}2.${NC} SSH into VPS and create env files:                   ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}     ${CYAN}ssh ${DEPLOY_USER}@<vps-ip>${NC}                                  ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}     ${CYAN}ssh root@<vps-ip>${NC}                                    ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     ${CYAN}cd ~/dockers${NC}                                         ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     ${CYAN}cp .env.example .env && nano .env${NC}                    ${BOLD}║${NC}"
 echo -e "${BOLD}║${NC}     ${CYAN}cp backend.env.example backend.env${NC}                   ${BOLD}║${NC}"

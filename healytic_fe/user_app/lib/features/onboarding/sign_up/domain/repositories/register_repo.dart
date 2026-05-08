@@ -2,6 +2,9 @@ import 'package:user_app/features/onboarding/sign_up/domain/entities/survey_enti
 import 'package:user_app/features/onboarding/sign_up/domain/entities/user_entity.dart';
 
 abstract class RegisterRepository {
+  /// Checks whether an email is already registered.
+  Future<bool> checkEmailExists({required String email});
+
   Future<void> sendVerificationCode({required String email});
 
   Future<void> verifyCode({required String email, required String code});

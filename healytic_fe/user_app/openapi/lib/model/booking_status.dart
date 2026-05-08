@@ -25,6 +25,7 @@ class BookingStatus {
 
   static const PENDING_PAYMENT = BookingStatus._(r'PENDING_PAYMENT');
   static const CONFIRMED = BookingStatus._(r'CONFIRMED');
+  static const IN_PROGRESS = BookingStatus._(r'IN_PROGRESS');
   static const CANCELLED = BookingStatus._(r'CANCELLED');
   static const COMPLETED = BookingStatus._(r'COMPLETED');
   static const NO_SHOW = BookingStatus._(r'NO_SHOW');
@@ -33,6 +34,7 @@ class BookingStatus {
   static const values = <BookingStatus>[
     PENDING_PAYMENT,
     CONFIRMED,
+    IN_PROGRESS,
     CANCELLED,
     COMPLETED,
     NO_SHOW,
@@ -76,6 +78,7 @@ class BookingStatusTypeTransformer {
       switch (data) {
         case r'PENDING_PAYMENT': return BookingStatus.PENDING_PAYMENT;
         case r'CONFIRMED': return BookingStatus.CONFIRMED;
+        case r'IN_PROGRESS': return BookingStatus.IN_PROGRESS;
         case r'CANCELLED': return BookingStatus.CANCELLED;
         case r'COMPLETED': return BookingStatus.COMPLETED;
         case r'NO_SHOW': return BookingStatus.NO_SHOW;

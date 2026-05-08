@@ -176,27 +176,37 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  Future<void> updateProduct(UpdateProductRequest request) async {
+  Future<void> updateProduct(
+    UpdateProductRequest request,
+  ) async {
     final dto = UpdatePartnerHealthServiceDto(
       name: request.name,
       basePrice: request.basePrice,
       description: request.description,
       categoryId: request.category,
-      employeeIds: request.staffIds ?? [],
-      media:
-          request.images?.asMap().entries.map((entry) {
-            return CreatePartnerHealthServiceMediaDto(
+      employeeIds: request.staffIds,
+      media: request.images
+          ?.asMap()
+          .entries
+          .map(
+            (entry) =>
+                CreatePartnerHealthServiceMediaDto(
               url: entry.value,
-              mediaType: CreatePartnerHealthServiceMediaDtoMediaTypeEnum.image,
+              mediaType:
+                  CreatePartnerHealthServiceMediaDtoMediaTypeEnum
+                      .image,
               isThumbnail: entry.key == 0,
               sortOrder: entry.key,
-            );
-          }).toList() ??
-          [],
-      serviceManual: _mapServiceManual(request.serviceManual),
+            ),
+          )
+          .toList(),
+      serviceManual: _mapServiceManual(
+        request.serviceManual,
+      ),
     );
 
-    await _partnerHealthServicesApi.partnerHealthServiceControllerUpdate(
+    await _partnerHealthServicesApi
+        .partnerHealthServiceControllerUpdate(
       request.id.value.toString(),
       dto,
     );

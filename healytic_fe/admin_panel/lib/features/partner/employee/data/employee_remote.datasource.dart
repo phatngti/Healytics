@@ -158,8 +158,8 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       email: request.email,
       phone: request.phone,
       avatarUrl: request.avatar,
-      role: _toUpdateRole(EmployeeRole.fromApiValue(request.role)),
-      status: _toUpdateStatus(EmployeeStatus.fromApiValue(request.status)),
+      role: _toUpdateRole(EmployeeRoleType.fromApiValue(request.role)),
+      status: _toUpdateStatus(EmployeeStatusType.fromApiValue(request.status)),
       verificationDocuments: _toVerificationDocumentDtos(
         request.verificationDocuments,
       ),
@@ -206,10 +206,10 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       verificationDocuments: _toVerificationDocumentDtos(
         request.verificationDocuments,
       ),
-      medicalCredentials: [
-        ...request.medicalTitles,
-        ...request.medicalLicenses,
-      ],
+      medicalCredentials: _toMedicalCredentials(
+        request.medicalTitles,
+        request.medicalLicenses,
+      ),
       experienceYears: request.experienceYears,
       consultationFee: request.consultationFee,
       specializations: request.specializations,
@@ -374,12 +374,12 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   /// Maps an [EmployeeResponseDto] to [EmployeeEntity].
   EmployeeEntity _mapToEmployeeEntity(EmployeeResponseDto dto) {
     final roleStr = dto.role.value.toUpperCase();
-    final role = EmployeeRole.fromApiValue(roleStr);
+    final role = EmployeeRoleType.fromApiValue(roleStr);
     final id = EmployeeId(dto.id);
     final common = _mapCommonFields(dto);
     final schedule = _mapSchedule(dto.schedule);
 
-    if (role == EmployeeRole.doctor && dto.doctorProfile != null) {
+    if (role == EmployeeRoleType.doctor && dto.doctorProfile != null) {
       final profile = dto.doctorProfile!;
       return DoctorEntity(
         id: id,
@@ -426,7 +426,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         education: profile.education,
         certifications: [],
       );
-    } else if (role == EmployeeRole.therapist && dto.therapistProfile != null) {
+    } else if (role == EmployeeRoleType.therapist && dto.therapistProfile != null) {
       final profile = dto.therapistProfile!;
       final therapistType = TherapistType.fromApiValue(profile.type);
 
@@ -562,22 +562,27 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     );
   }
 
-  /// Maps [EmployeeRole] to [UpdateEmployeeDtoRoleEnum].
-  UpdateEmployeeDtoRoleEnum? _toUpdateRole(EmployeeRole? role) =>
+  /// Maps [EmployeeRoleType] to OpenAPI [EmployeeRole].
+  EmployeeRole? _toUpdateRole(EmployeeRoleType? role) =>
       switch (role) {
-        EmployeeRole.doctor => UpdateEmployeeDtoRoleEnum.DOCTOR,
-        EmployeeRole.therapist => UpdateEmployeeDtoRoleEnum.THERAPIST,
-        EmployeeRole.receptionist => UpdateEmployeeDtoRoleEnum.RECEPTIONIST,
-        EmployeeRole.manager => UpdateEmployeeDtoRoleEnum.MANAGER,
+        EmployeeRoleType.doctor => EmployeeRole.DOCTOR,
+        EmployeeRoleType.therapist => EmployeeRole.THERAPIST,
+        EmployeeRoleType.receptionist =>
+          EmployeeRole.RECEPTIONIST,
+        EmployeeRoleType.manager => EmployeeRole.MANAGER,
         null => null,
       };
 
-  /// Maps [EmployeeStatus] to [UpdateEmployeeDtoStatusEnum].
-  UpdateEmployeeDtoStatusEnum? _toUpdateStatus(EmployeeStatus? status) =>
+  /// Maps [EmployeeStatusType] to OpenAPI [EmployeeStatus].
+  EmployeeStatus? _toUpdateStatus(
+    EmployeeStatusType? status,
+  ) =>
       switch (status) {
-        EmployeeStatus.active => UpdateEmployeeDtoStatusEnum.ACTIVE,
-        EmployeeStatus.inactive => UpdateEmployeeDtoStatusEnum.INACTIVE,
-        EmployeeStatus.onLeave => UpdateEmployeeDtoStatusEnum.ON_LEAVE,
+        EmployeeStatusType.active => EmployeeStatus.ACTIVE,
+        EmployeeStatusType.inactive =>
+          EmployeeStatus.INACTIVE,
+        EmployeeStatusType.onLeave =>
+          EmployeeStatus.ON_LEAVE,
         null => null,
       };
 
@@ -613,6 +618,27 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         ),
       )
       .toList();
+
+  /// Pairs medical titles and licenses into
+  /// [MedicalCredentialResponseDto] entries.
+  ///
+  /// Entries are paired by index. If the lists
+  /// differ in length the shorter side fills with
+  /// empty strings so no data is lost.
+  List<MedicalCredentialResponseDto> _toMedicalCredentials(
+    List<String> titles,
+    List<String> licenses,
+  ) {
+    final count = titles.length > licenses.length
+        ? titles.length
+        : licenses.length;
+    return List.generate(count, (i) {
+      return MedicalCredentialResponseDto(
+        title: i < titles.length ? titles[i] : '',
+        license: i < licenses.length ? licenses[i] : '',
+      );
+    });
+  }
 
   /// Maps [EmployeeGender] to [CreateDoctorDtoGenderEnum].
   CreateDoctorDtoGenderEnum? _toDoctorGender(EmployeeGender? gender) =>
@@ -877,11 +903,11 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       fullName: '${request.firstName} ${request.lastName}',
       displayName: '${request.firstName} ${request.lastName}',
       avatar: request.avatar ?? '',
-      role: EmployeeRole.doctor.apiValue,
-      position: EmployeeRole.doctor.displayName,
+      role: EmployeeRoleType.doctor.apiValue,
+      position: EmployeeRoleType.doctor.displayName,
       rating: 0.0,
       reviewCount: 0,
-      status: EmployeeStatus.active.apiValue,
+      status: EmployeeStatusType.active.apiValue,
       email: request.email,
       phone: request.phone,
       address: '',
@@ -922,11 +948,11 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       fullName: '${request.firstName} ${request.lastName}',
       displayName: '${request.firstName} ${request.lastName}',
       avatar: request.avatar ?? '',
-      role: EmployeeRole.therapist.apiValue,
+      role: EmployeeRoleType.therapist.apiValue,
       position: TherapistType.spa.displayName,
       rating: 0.0,
       reviewCount: 0,
-      status: EmployeeStatus.active.apiValue,
+      status: EmployeeStatusType.active.apiValue,
       email: request.email,
       phone: request.phone,
       address: '',
@@ -965,11 +991,11 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       fullName: '${request.firstName} ${request.lastName}',
       displayName: '${request.firstName} ${request.lastName}',
       avatar: request.avatar ?? '',
-      role: EmployeeRole.therapist.apiValue,
+      role: EmployeeRoleType.therapist.apiValue,
       position: TherapistType.massage.displayName,
       rating: 0.0,
       reviewCount: 0,
-      status: EmployeeStatus.active.apiValue,
+      status: EmployeeStatusType.active.apiValue,
       email: request.email,
       phone: request.phone,
       address: '',
@@ -1018,8 +1044,8 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
     await Future<void>.delayed(const Duration(seconds: 1));
     final count = limit ?? 10;
 
-    final parsedRole = EmployeeRole.fromApiValue(role);
-    if (parsedRole == EmployeeRole.doctor) {
+    final parsedRole = EmployeeRoleType.fromApiValue(role);
+    if (parsedRole == EmployeeRoleType.doctor) {
       return List.generate(
         count,
         (index) => createMockDoctor(EmployeeId('mock-doc-$index')),

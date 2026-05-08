@@ -45,9 +45,6 @@ export class AccountMeResponseDto {
   @Expose()
   email: string;
 
-  @ApiPropertyOptional({ description: 'Username' })
-  @Expose()
-  username?: string;
 
   @ApiProperty({ description: 'Account role', enum: Role, example: Role.USER })
   @Expose()

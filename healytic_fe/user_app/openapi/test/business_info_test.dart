@@ -36,11 +36,6 @@ void main() {
       // TODO
     });
 
-    // Object username
-    test('to test the property `username`', () async {
-      // TODO
-    });
-
     // Object email
     test('to test the property `email`', () async {
       // TODO

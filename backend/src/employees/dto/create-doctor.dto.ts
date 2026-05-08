@@ -186,6 +186,7 @@ export class CreateDoctorDto {
   // ── Doctor-specific fields ─────────────────────────────────
 
   @ApiPropertyOptional({
+    type: [MedicalCredentialResponseDto],
     description: 'Medical credentials (titles + licenses)',
     example: [{ title: 'MD', license: 'LIC-2024-001' }],
   })

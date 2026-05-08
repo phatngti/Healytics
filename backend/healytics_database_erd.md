@@ -89,7 +89,7 @@ erDiagram
         varchar street_address
         varchar phone_number
         uuid account_id FK UK
-        enum verification_status "ONBOARDING | PENDING | APPROVED | REJECTED | REQUIRED_RESUBMIT"
+        enum verification_status "PENDING | APPROVED | REJECTED | REQUIRED_RESUBMIT"
         timestamptz verification_completed_at
         text coordinates "lat,lng text"
         geography location "PostGIS Point(4326)"
@@ -862,7 +862,7 @@ Core entity for **health service clinics/spas**. Contains business registration,
 | `street_address` | VARCHAR(300) | Physical street address |
 | `phone_number` | VARCHAR(20) | Business phone |
 | `account_id` | UUID, FK → account, UNIQUE | One-to-one ownership by an account |
-| `verification_status` | ENUM | `ONBOARDING` → `PENDING` → `APPROVED` / `REJECTED` / `REQUIRED_RESUBMIT` |
+| `verification_status` | ENUM | `PENDING` → `APPROVED` / `REJECTED` / `REQUIRED_RESUBMIT` |
 | `verification_completed_at` | TIMESTAMPTZ | When verification was finalized |
 | `coordinates` | TEXT | Latitude,longitude as text |
 | `location` | GEOGRAPHY(Point, 4326) | PostGIS point for spatial queries (distance search) |

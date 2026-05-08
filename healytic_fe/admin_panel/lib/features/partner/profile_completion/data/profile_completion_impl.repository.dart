@@ -43,7 +43,9 @@ class ProfileCompletionRepositoryImpl implements ProfileCompletionRepository {
     if (tokens != null) {
       await _syncPartnerSession(tokens);
     } else {
-      UserRoleHelper.setPartnerProfileCompleted(result.isCompleted);
+      await UserRoleHelper.setPartnerProfileCompleted(
+        result.isCompleted,
+      );
     }
 
     return result;
@@ -55,7 +57,9 @@ class ProfileCompletionRepositoryImpl implements ProfileCompletionRepository {
     final apiService = apiServiceProvider.call();
     await apiService.setAccessToken(tokens.accessToken);
     await Store.put(StoreKey.refreshToken, tokens.refreshToken);
-    UserRoleHelper.syncPartnerFlagsFromAccessToken(tokens.accessToken);
+    await UserRoleHelper.syncPartnerFlagsFromAccessToken(
+      tokens.accessToken,
+    );
   }
 }
 

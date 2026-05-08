@@ -2,7 +2,10 @@
 ///
 /// Each role has specific permissions and responsibilities
 /// within the organization.
-enum EmployeeRole {
+///
+/// Named [EmployeeRoleType] to avoid conflict with the
+/// OpenAPI-generated [EmployeeRole] class.
+enum EmployeeRoleType {
   /// Therapist role for spa and massage services.
   therapist,
 
@@ -17,30 +20,30 @@ enum EmployeeRole {
 
   /// Returns the user-friendly display name for the role.
   String get displayName => switch (this) {
-    EmployeeRole.therapist => 'Therapist',
-    EmployeeRole.doctor => 'Doctor',
-    EmployeeRole.receptionist => 'Receptionist',
-    EmployeeRole.manager => 'Manager',
+    EmployeeRoleType.therapist => 'Therapist',
+    EmployeeRoleType.doctor => 'Doctor',
+    EmployeeRoleType.receptionist => 'Receptionist',
+    EmployeeRoleType.manager => 'Manager',
   };
 
   /// Returns the API value used for backend communication.
   String get apiValue => switch (this) {
-    EmployeeRole.therapist => 'THERAPIST',
-    EmployeeRole.doctor => 'DOCTOR',
-    EmployeeRole.receptionist => 'RECEPTIONIST',
-    EmployeeRole.manager => 'MANAGER',
+    EmployeeRoleType.therapist => 'THERAPIST',
+    EmployeeRoleType.doctor => 'DOCTOR',
+    EmployeeRoleType.receptionist => 'RECEPTIONIST',
+    EmployeeRoleType.manager => 'MANAGER',
   };
 
-  /// Returns the [EmployeeRole] for the given API [value].
+  /// Returns the [EmployeeRoleType] for the given API [value].
   ///
   /// Returns `null` if no matching role is found.
-  static EmployeeRole? fromApiValue(String? value) {
+  static EmployeeRoleType? fromApiValue(String? value) {
     if (value == null) return null;
     return switch (value.toUpperCase()) {
-      'THERAPIST' => EmployeeRole.therapist,
-      'DOCTOR' => EmployeeRole.doctor,
-      'RECEPTIONIST' => EmployeeRole.receptionist,
-      'MANAGER' => EmployeeRole.manager,
+      'THERAPIST' => EmployeeRoleType.therapist,
+      'DOCTOR' => EmployeeRoleType.doctor,
+      'RECEPTIONIST' => EmployeeRoleType.receptionist,
+      'MANAGER' => EmployeeRoleType.manager,
       _ => null,
     };
   }

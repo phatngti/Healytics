@@ -80,8 +80,7 @@ class _BusinessLocationSectionState
             'BUSINESS LOCATION',
             style: textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-              color: colorScheme.onSurfaceVariant,
+              fontSize: AppDimens.fontSizeLarge,
             ),
           ),
         ),
@@ -147,6 +146,7 @@ class _BusinessLocationSectionState
                       fieldKey: 'street_address',
                       hintText: 'e.g. 123 Nguyen Hue Street',
                       initialValue: widget.initialStreetAddress,
+                      isRequired: true,
                     ),
                   ),
                   AppDimens.horizontalMedium,
@@ -157,6 +157,7 @@ class _BusinessLocationSectionState
                       label: 'Clinic Phone',
                       hintText: '028 1234 5678',
                       keyboardType: TextInputType.phone,
+                      isRequired: true,
                     ),
                   ),
                 ],
@@ -171,6 +172,7 @@ class _BusinessLocationSectionState
                   fieldKey: 'street_address',
                   hintText: 'e.g. 123 Nguyen Hue Street',
                   initialValue: widget.initialStreetAddress,
+                  isRequired: true,
                 ),
                 AppDimens.verticalMedium,
                 FormFieldBuilders.buildTextField(
@@ -179,6 +181,7 @@ class _BusinessLocationSectionState
                   label: 'Clinic Phone',
                   hintText: '028 1234 5678',
                   keyboardType: TextInputType.phone,
+                  isRequired: true,
                 ),
               ],
             );
@@ -207,6 +210,7 @@ class _BusinessLocationSectionState
           _selectedWardId = null;
         });
       },
+      isRequired: true,
     );
   }
 
@@ -262,19 +266,32 @@ class _BusinessLocationSectionState
     required String? selectedId,
     String? hintText,
     bool enabled = true,
+    bool isRequired = true,
     ValueChanged<String?>? onChanged,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w500,
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: label.toUpperCase(),
+                style: textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (isRequired)
+                const TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+            ],
           ),
         ),
         const SizedBox(height: 6),
@@ -306,7 +323,7 @@ class _BusinessLocationSectionState
                 onChanged?.call(id);
               },
               uppercaseLabel: false,
-              isRequired: true,
+              isRequired: isRequired,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please select a $label';
@@ -402,19 +419,16 @@ class _BusinessLocationSectionState
     required String fieldKey,
     String? hintText,
     String? initialValue,
+    bool? isRequired,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
-          style: textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w500,
-          ),
+          label.toUpperCase(),
+          style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 6),
         FormFieldBuilders.buildTextField(
@@ -423,7 +437,8 @@ class _BusinessLocationSectionState
           label: '',
           hintText: hintText,
           initialValue: initialValue,
-          uppercaseLabel: false,
+          uppercaseLabel: true,
+          isRequired: isRequired,
         ),
       ],
     );
