@@ -7,6 +7,8 @@ import 'package:admin_panel/features/partner/products/presentation/widgets/produ
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product_details.provider.dart';
 import 'package:admin_panel/router/partner_routes.dart';
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
 import 'package:common/widgets/card/error_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -76,26 +78,14 @@ class _ProductEditContent extends HookConsumerWidget {
 
     Future<void> handleSave() async {
       final state = formKey.currentState;
-      if (state == null || !state.saveAndValidate()) return;
+      if (state == null || !state.saveAndValidate()) {
+        return;
+      }
 
       isSubmitting.value = true;
       try {
         final data = state.value;
-
-        final request = UpdateProductRequest(
-          id: product.id,
-          name: data['product_name'] as String?,
-          basePrice: double.tryParse(data['base_price']?.toString() ?? ''),
-          description: data['product_description'] as String?,
-          category: data['category'] as String?,
-          images: (data['product_images'] as List?)
-              ?.map((e) => e.toString())
-              .toList(),
-          staffIds: (data['selected_staff_ids'] as List?)
-              ?.map((e) => e.toString())
-              .toList(),
-          serviceManual: _extractServiceManual(serviceManualKey),
-        );
+        final request = _buildDeltaRequest(product, data, serviceManualKey);
 
         await ref.read(productProvider.notifier).updateProduct(request);
 
@@ -149,6 +139,46 @@ class _ProductEditContent extends HookConsumerWidget {
                 .toList() ??
             [],
       ),
+    );
+  }
+
+  /// Builds an [UpdateProductRequest] containing only
+  /// fields that differ from the original [product].
+  ///
+  /// Unchanged fields remain null so the backend
+  /// skips them during the partial update.
+  static UpdateProductRequest _buildDeltaRequest(
+    Product product,
+    Map<String, dynamic> data,
+    GlobalKey<ProductServiceManualCardState> manualKey,
+  ) {
+    final newName = data['product_name'] as String?;
+    final newDescription = data['product_description'] as String?;
+    final newCategory = data['category'] as String?;
+    final newBasePrice = double.tryParse(data['base_price']?.toString() ?? '');
+    final newImages = (data['product_images'] as List?)
+        ?.map((e) => e.toString())
+        .toList();
+    final newStaffIds = (data['selected_staff_ids'] as List?)
+        ?.map((e) => e.toString())
+        .toList();
+    final newManual = _extractServiceManual(manualKey);
+
+    const listEq = DeepCollectionEquality();
+
+    return UpdateProductRequest(
+      id: product.id,
+      name: newName != product.name ? newName : null,
+      basePrice: newBasePrice != product.basePrice ? newBasePrice : null,
+      description: newDescription != product.description
+          ? newDescription
+          : null,
+      category: newCategory != product.category.id ? newCategory : null,
+      images: !listEq.equals(newImages, product.images) ? newImages : null,
+      staffIds: !listEq.equals(newStaffIds, product.staffIds)
+          ? newStaffIds
+          : null,
+      serviceManual: newManual != product.serviceManual ? newManual : null,
     );
   }
 

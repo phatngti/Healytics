@@ -20,7 +20,7 @@ part 'verification_status.provider.g.dart';
 class VerificationStatus extends _$VerificationStatus {
   @override
   Future<ProviderVerificationStatusEntity> build() async {
-    await _refreshAuthTokens();
+    // await _refreshAuthTokens();
     final repository = ref.watch(verificationStatusRepositoryProvider);
     final status = await repository.getVerificationStatus();
 
@@ -28,32 +28,32 @@ class VerificationStatus extends _$VerificationStatus {
     // redirect away from this page when approved.
     final isVerified =
         status.verificationStatus == VerificationRevisionStatus.approved;
-    UserRoleHelper.setPartnerVerified(isVerified);
+    await UserRoleHelper.setPartnerVerified(isVerified);
 
     return status;
   }
 
   /// Calls `POST /auth/partner/refresh` to obtain fresh
   /// tokens before fetching the verification status.
-  Future<void> _refreshAuthTokens() async {
-    final refreshToken = Store.tryGet(StoreKey.refreshToken);
-    if (refreshToken == null) return;
+  // Future<void> _refreshAuthTokens() async {
+  //   final refreshToken = Store.tryGet(StoreKey.refreshToken);
+  //   if (refreshToken == null) return;
 
-    try {
-      final apiService = ref.read(apiServiceProvider);
-      final response = await apiService.authenticateApi
-          .authControllerRefreshPartner(
-            RefreshTokenRequestDto(refreshToken: refreshToken),
-          );
-      if (response != null) {
-        await apiService.setAccessToken(response.accessToken);
-        await Store.put(StoreKey.refreshToken, response.refreshToken);
-        UserRoleHelper.syncPartnerFlagsFromAccessToken(response.accessToken);
-      }
-    } catch (e) {
-      developer.log('Token refresh failed: $e', name: 'VerificationStatus');
-    }
-  }
+  //   try {
+  //     final apiService = ref.read(apiServiceProvider);
+  //     final response = await apiService.authenticateApi
+  //         .authControllerRefreshPartner(
+  //           RefreshTokenRequestDto(refreshToken: refreshToken),
+  //         );
+  //     if (response != null) {
+  //       await apiService.setAccessToken(response.accessToken);
+  //       await Store.put(StoreKey.refreshToken, response.refreshToken);
+  //       UserRoleHelper.syncPartnerFlagsFromAccessToken(response.accessToken);
+  //     }
+  //   } catch (e) {
+  //     developer.log('Token refresh failed: $e', name: 'VerificationStatus');
+  //   }
+  // }
 
   /// Resubmits the application after making requested revisions.
   ///

@@ -19,8 +19,8 @@ import 'package:go_router/go_router.dart';
 class EmployeeEditDesktop extends StatelessWidget {
   final EmployeeEntity employee;
   final bool isEditing;
-  final EmployeeRole selectedRole;
-  final ValueChanged<EmployeeRole> onRoleChanged;
+  final EmployeeRoleType selectedRole;
+  final ValueChanged<EmployeeRoleType> onRoleChanged;
   final VoidCallback onToggleEdit;
   final VoidCallback onSave;
 
@@ -173,8 +173,8 @@ class EmployeeEditDesktop extends StatelessWidget {
 
 class _RightColumn extends StatelessWidget {
   final EmployeeEntity employee;
-  final EmployeeRole selectedRole;
-  final ValueChanged<EmployeeRole> onRoleChanged;
+  final EmployeeRoleType selectedRole;
+  final ValueChanged<EmployeeRoleType> onRoleChanged;
   final bool isEditing;
 
   const _RightColumn({
@@ -200,12 +200,12 @@ class _RightColumn extends StatelessWidget {
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           child: switch (selectedRole) {
-            EmployeeRole.therapist => TherapistFieldsCard(
+            EmployeeRoleType.therapist => TherapistFieldsCard(
               key: const ValueKey('therapist'),
               initialTherapistType: _getTherapistType(employee),
               initialStrengthLevel: _getStrengthLevel(employee),
             ),
-            EmployeeRole.doctor => Column(
+            EmployeeRoleType.doctor => Column(
               key: const ValueKey('doctor'),
               children: [
                 DoctorFieldsCard(

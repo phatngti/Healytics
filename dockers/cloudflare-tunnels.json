@@ -22,11 +22,32 @@
           }
         },
         {
+          "hostname": "admin-dev.healytics.me",
+          "origin": "http://healytics-panel-dev:80",
+          "originRequest": {
+            "noTLSVerify": true
+          }
+        },
+        {
           "hostname": "jenkins-webhook.healytics.me",
           "origin": "http://jenkins-controller:8080",
           "originRequest": {
             "noTLSVerify": true,
             "connectTimeout": 10
+          }
+        },
+        {
+          "hostname": "kong.healytics.me",
+          "origin": "http://kong-cp:8002",
+          "originRequest": {
+            "noTLSVerify": true
+          }
+        },
+        {
+          "hostname": "kong-api.healytics.me",
+          "origin": "http://kong-cp:8001",
+          "originRequest": {
+            "noTLSVerify": true
           }
         }
       ]

@@ -19,6 +19,15 @@ class RegisterRepositoryImpl implements RegisterRepository {
        _localDatasource = localDatasource;
 
   @override
+  Future<bool> checkEmailExists({required String email}) async {
+    try {
+      return await _remoteDatasource.checkEmail(email: email);
+    } catch (e) {
+      throw Exception('Failed to check email existence');
+    }
+  }
+
+  @override
   Future<void> savePartialData(Map<String, dynamic> data) async {
     // Implementation for saving partial data
     // This could involve local storage or caching

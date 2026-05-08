@@ -21,7 +21,7 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
     await ref.read(authenTokenProvider.notifier).removeToken();
     await Store.delete(StoreKey.accessToken);
     await Store.delete(StoreKey.refreshToken);
-    await UserRoleHelper.clearPartnerFlags();
+    await UserRoleHelper.clearSession();
     if (context.mounted) {
       context.go('/');
     }
@@ -149,9 +149,6 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
       final last = profile.lastName ?? '';
       final full = '$first $last'.trim();
       if (full.isNotEmpty) return full;
-    }
-    if (account.username != null && account.username!.isNotEmpty) {
-      return account.username!;
     }
     return account.email;
   }

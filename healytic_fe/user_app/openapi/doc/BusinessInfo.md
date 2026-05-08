@@ -12,7 +12,6 @@ Name | Type | Description | Notes
 **taxRegistrationCode** | [**Object**](.md) |  | [optional] 
 **serviceTags** | [**Object**](.md) |  | [optional] 
 **address** | [**AddressDto**](AddressDto.md) |  | [optional] 
-**username** | [**Object**](.md) |  | [optional] 
 **email** | [**Object**](.md) |  | [optional] 
 **phoneNumber** | [**Object**](.md) |  | [optional] 
 

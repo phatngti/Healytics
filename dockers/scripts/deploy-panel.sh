@@ -154,7 +154,7 @@ if docker inspect "${CONTAINER_NAME}" >/dev/null 2>&1; then
   OLD_IMAGE_ID="$(docker inspect --format '{{.Image}}' "${CONTAINER_NAME}" 2>/dev/null || true)"
 fi
 
-# --- Stop old container and start new one -----------------------------------
+# --- Kill and remove old container before starting new one -----------------
 echo "Stopping old panel container..."
 compose --profile panel-prod stop panel 2>/dev/null || true
 compose --profile panel-prod rm -f panel 2>/dev/null || true

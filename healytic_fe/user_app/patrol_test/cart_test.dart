@@ -79,6 +79,6 @@ void main() {
     await $.pump(const Duration(seconds: 2));
 
     expect($('RELAX10'), findsOneWidget);
-    expect($('Coupon Discount'), findsOneWidget);
+    expect($('Discount'), findsOneWidget);
   });
 }

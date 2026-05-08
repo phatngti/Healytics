@@ -28,12 +28,6 @@ void main() {
       // TODO
     });
 
-    // Username
-    // String username
-    test('to test the property `username`', () async {
-      // TODO
-    });
-
     // Account role
     // String role
     test('to test the property `role`', () async {

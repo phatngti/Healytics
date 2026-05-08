@@ -377,7 +377,7 @@ class _SummaryBody extends StatelessWidget {
             // Price breakdown (API data)
             PriceBreakdownCard(
               subtotal: detail.priceBreakdown.formattedSubTotal,
-              serviceFee: detail.priceBreakdown.formattedDiscount,
+              discount: detail.priceBreakdown.formattedDiscount,
               totalAmount: detail.priceBreakdown.formattedTotal,
             ),
             SizedBox(height: sectionGap),

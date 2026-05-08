@@ -7,7 +7,7 @@ abstract class UserAccountEntity with _$UserAccountEntity {
   const factory UserAccountEntity({
     required String id,
     required String email,
-    String? username,
+
     String? firstName,
     String? lastName,
     String? phone,
@@ -17,15 +17,21 @@ abstract class UserAccountEntity with _$UserAccountEntity {
 
   const UserAccountEntity._();
 
-  /// Computes a display name prioritizing full name,
-  /// then username, and finally falling back to email.
+  /// Computes a display name prioritising full name,
+  /// then falling back to email.
   String get displayName {
-    if (firstName != null && firstName!.isNotEmpty && lastName != null && lastName!.isNotEmpty) {
+    if (firstName != null &&
+        firstName!.isNotEmpty &&
+        lastName != null &&
+        lastName!.isNotEmpty) {
       return '$firstName $lastName';
     }
-    if (firstName != null && firstName!.isNotEmpty) return firstName!;
-    if (lastName != null && lastName!.isNotEmpty) return lastName!;
-    if (username != null && username!.isNotEmpty) return username!;
+    if (firstName != null && firstName!.isNotEmpty) {
+      return firstName!;
+    }
+    if (lastName != null && lastName!.isNotEmpty) {
+      return lastName!;
+    }
     return email;
   }
 }
