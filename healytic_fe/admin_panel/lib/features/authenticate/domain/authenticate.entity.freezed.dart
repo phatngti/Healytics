@@ -1088,7 +1088,7 @@ as String,
 /// @nodoc
 mixin _$AccountRequestEntity {
 
- String get username; String get email; String get password;
+ String get email; String get password;
 /// Create a copy of AccountRequestEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1101,16 +1101,16 @@ $AccountRequestEntityCopyWith<AccountRequestEntity> get copyWith => _$AccountReq
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AccountRequestEntity&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AccountRequestEntity&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,username,email,password);
+int get hashCode => Object.hash(runtimeType,email,password);
 
 @override
 String toString() {
-  return 'AccountRequestEntity(username: $username, email: $email, password: $password)';
+  return 'AccountRequestEntity(email: $email, password: $password)';
 }
 
 
@@ -1121,7 +1121,7 @@ abstract mixin class $AccountRequestEntityCopyWith<$Res>  {
   factory $AccountRequestEntityCopyWith(AccountRequestEntity value, $Res Function(AccountRequestEntity) _then) = _$AccountRequestEntityCopyWithImpl;
 @useResult
 $Res call({
- String username, String email, String password
+ String email, String password
 });
 
 
@@ -1138,10 +1138,9 @@ class _$AccountRequestEntityCopyWithImpl<$Res>
 
 /// Create a copy of AccountRequestEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? email = null,Object? password = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? email = null,Object? password = null,}) {
   return _then(_self.copyWith(
-username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
-as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -1228,10 +1227,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String username,  String email,  String password)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String email,  String password)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AccountRequestEntity() when $default != null:
-return $default(_that.username,_that.email,_that.password);case _:
+return $default(_that.email,_that.password);case _:
   return orElse();
 
 }
@@ -1249,10 +1248,10 @@ return $default(_that.username,_that.email,_that.password);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String username,  String email,  String password)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String email,  String password)  $default,) {final _that = this;
 switch (_that) {
 case _AccountRequestEntity():
-return $default(_that.username,_that.email,_that.password);case _:
+return $default(_that.email,_that.password);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1269,10 +1268,10 @@ return $default(_that.username,_that.email,_that.password);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String username,  String email,  String password)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String email,  String password)?  $default,) {final _that = this;
 switch (_that) {
 case _AccountRequestEntity() when $default != null:
-return $default(_that.username,_that.email,_that.password);case _:
+return $default(_that.email,_that.password);case _:
   return null;
 
 }
@@ -1284,10 +1283,9 @@ return $default(_that.username,_that.email,_that.password);case _:
 @JsonSerializable()
 
 class _AccountRequestEntity implements AccountRequestEntity {
-  const _AccountRequestEntity({required this.username, required this.email, required this.password});
+  const _AccountRequestEntity({required this.email, required this.password});
   factory _AccountRequestEntity.fromJson(Map<String, dynamic> json) => _$AccountRequestEntityFromJson(json);
 
-@override final  String username;
 @override final  String email;
 @override final  String password;
 
@@ -1304,16 +1302,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AccountRequestEntity&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AccountRequestEntity&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,username,email,password);
+int get hashCode => Object.hash(runtimeType,email,password);
 
 @override
 String toString() {
-  return 'AccountRequestEntity(username: $username, email: $email, password: $password)';
+  return 'AccountRequestEntity(email: $email, password: $password)';
 }
 
 
@@ -1324,7 +1322,7 @@ abstract mixin class _$AccountRequestEntityCopyWith<$Res> implements $AccountReq
   factory _$AccountRequestEntityCopyWith(_AccountRequestEntity value, $Res Function(_AccountRequestEntity) _then) = __$AccountRequestEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String username, String email, String password
+ String email, String password
 });
 
 
@@ -1341,10 +1339,9 @@ class __$AccountRequestEntityCopyWithImpl<$Res>
 
 /// Create a copy of AccountRequestEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? username = null,Object? email = null,Object? password = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? email = null,Object? password = null,}) {
   return _then(_AccountRequestEntity(
-username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
-as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,
   ));

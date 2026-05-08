@@ -9,12 +9,6 @@ import {
 } from 'class-validator';
 
 class AccountRequestDto {
-  @ApiProperty({ example: 'spahanoi123', description: 'Username' })
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(50)
-  username: string;
 
   @ApiProperty({
     example: 'Password123',

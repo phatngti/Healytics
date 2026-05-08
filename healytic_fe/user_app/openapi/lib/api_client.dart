@@ -252,6 +252,8 @@ class ApiClient {
           return BusinessServicesResponseDto.fromJson(value);
         case 'BusinessType':
           return BusinessTypeTypeTransformer().decode(value);
+        case 'CancelEmployeeAppointmentDto':
+          return CancelEmployeeAppointmentDto.fromJson(value);
         case 'CartItemResponseDto':
           return CartItemResponseDto.fromJson(value);
         case 'CategoryInfoDto':
@@ -270,6 +272,10 @@ class ApiClient {
           return CheckDuplicateSlotDto.fromJson(value);
         case 'CheckDuplicateSlotResponseDto':
           return CheckDuplicateSlotResponseDto.fromJson(value);
+        case 'CheckEmailDto':
+          return CheckEmailDto.fromJson(value);
+        case 'CheckEmailResponseDto':
+          return CheckEmailResponseDto.fromJson(value);
         case 'CheckoutTicketResponseDto':
           return CheckoutTicketResponseDto.fromJson(value);
         case 'ClientKeyResponseDto':
@@ -366,12 +372,18 @@ class ApiClient {
           return DoctorProfileResponseDto.fromJson(value);
         case 'DocumentEntryDto':
           return DocumentEntryDto.fromJson(value);
+        case 'EmployeeAppointmentResponseDto':
+          return EmployeeAppointmentResponseDto.fromJson(value);
+        case 'EmployeeBookingStatusFilter':
+          return EmployeeBookingStatusFilterTypeTransformer().decode(value);
         case 'EmployeeComplianceItemDto':
           return EmployeeComplianceItemDto.fromJson(value);
         case 'EmployeeDetailAnalyticsResponseDto':
           return EmployeeDetailAnalyticsResponseDto.fromJson(value);
         case 'EmployeeDistributionDto':
           return EmployeeDistributionDto.fromJson(value);
+        case 'EmployeeLoginDto':
+          return EmployeeLoginDto.fromJson(value);
         case 'EmployeeMixMetricDto':
           return EmployeeMixMetricDto.fromJson(value);
         case 'EmployeeOverviewAnalyticsResponseDto':
@@ -382,10 +394,22 @@ class ApiClient {
           return EmployeeQualityMetricDto.fromJson(value);
         case 'EmployeeResponseDto':
           return EmployeeResponseDto.fromJson(value);
+        case 'EmployeeRevenueBreakdownItemDto':
+          return EmployeeRevenueBreakdownItemDto.fromJson(value);
+        case 'EmployeeRevenuePeriod':
+          return EmployeeRevenuePeriodTypeTransformer().decode(value);
+        case 'EmployeeRevenueSummaryResponseDto':
+          return EmployeeRevenueSummaryResponseDto.fromJson(value);
+        case 'EmployeeRevenueTrendPointDto':
+          return EmployeeRevenueTrendPointDto.fromJson(value);
+        case 'EmployeeRole':
+          return EmployeeRoleTypeTransformer().decode(value);
         case 'EmployeeRoleDistributionDto':
           return EmployeeRoleDistributionDto.fromJson(value);
         case 'EmployeeScheduleLoadDto':
           return EmployeeScheduleLoadDto.fromJson(value);
+        case 'EmployeeStatus':
+          return EmployeeStatusTypeTransformer().decode(value);
         case 'EmployeeTimeSlotsResponseDto':
           return EmployeeTimeSlotsResponseDto.fromJson(value);
         case 'EmployeeTrendPointDto':
@@ -686,6 +710,8 @@ class ApiClient {
           return UpdateCategoryDto.fromJson(value);
         case 'UpdateEmployeeDto':
           return UpdateEmployeeDto.fromJson(value);
+        case 'UpdateEmployeeProfileDto':
+          return UpdateEmployeeProfileDto.fromJson(value);
         case 'UpdatePartnerCertificationDto':
           return UpdatePartnerCertificationDto.fromJson(value);
         case 'UpdatePartnerDto':

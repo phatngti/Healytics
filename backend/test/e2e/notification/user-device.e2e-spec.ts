@@ -48,7 +48,6 @@ describe('User Device API (e2e)', () => {
           id: input.id ?? randomUUID(),
           email: input.email ?? null,
           role: input.role ?? Role.USER,
-          username: input.username ?? null,
           passwordHash: input.passwordHash,
           refreshTokenHash: input.refreshTokenHash ?? null,
           survey: input.survey ?? null,

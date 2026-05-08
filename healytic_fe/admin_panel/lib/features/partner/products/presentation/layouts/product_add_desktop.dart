@@ -15,6 +15,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class ProductAddDesktop extends ConsumerStatefulWidget {
   const ProductAddDesktop({
     super.key,
+    this.isFormValid = false,
     this.onSubmit,
     required this.onCancel,
     this.initialStatus = 'draft',
@@ -22,6 +23,9 @@ class ProductAddDesktop extends ConsumerStatefulWidget {
     this.initialDescription,
     this.serviceManualKey,
   });
+
+  /// Whether all form fields are currently valid.
+  final bool isFormValid;
 
   final VoidCallback? onSubmit;
   final VoidCallback onCancel;
@@ -176,22 +180,33 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                       onPressed: widget.onCancel,
                       child: const Text('Cancel'),
                     ),
-                    AppDimens.horizontalSmall,
-                    AppButton(
-                      buttonType: ButtonType.elevated,
-                      onPressed: widget.onSubmit,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.save_outlined,
-                            size: 18,
-                            color: colorScheme.onPrimary,
-                          ),
-                          AppDimens.horizontalSmall,
-                          const Text('Save & Publish'),
-                        ],
-                      ),
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeInOut,
+                      child: widget.isFormValid
+                          ? Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AppDimens.horizontalSmall,
+                                AppButton(
+                                  buttonType: ButtonType.elevated,
+                                  onPressed: widget.onSubmit,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.save_outlined,
+                                        size: 18,
+                                        color: colorScheme.onPrimary,
+                                      ),
+                                      AppDimens.horizontalSmall,
+                                      const Text('Save & Publish'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
                     ),
                   ],
                 ),

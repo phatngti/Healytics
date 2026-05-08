@@ -1,0 +1,16 @@
+# employee_openapi.model.HomeRecommenderRequest
+
+## Load the model package
+```dart
+import 'package:employee_openapi/api.dart';
+```
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**userId** | **String** |  | 
+**topK** | **int** |  | [optional] [default to 5]
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

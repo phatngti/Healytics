@@ -200,7 +200,7 @@ class _ProfileCompletionScreenState
     await ref.read(authenTokenProvider.notifier).removeToken();
     await Store.delete(StoreKey.accessToken);
     await Store.delete(StoreKey.refreshToken);
-    await UserRoleHelper.clearPartnerFlags();
+    await UserRoleHelper.clearSession();
     if (mounted) context.go('/');
   }
 
@@ -256,7 +256,9 @@ class _ProfileCompletionScreenState
       if (result.isCompleted) {
         // Sync local flag before checking so the
         // guard reflects the latest API response.
-        UserRoleHelper.setPartnerProfileCompleted(result.isCompleted);
+        await UserRoleHelper.setPartnerProfileCompleted(
+          result.isCompleted,
+        );
 
         const DashboardRoute().go(context);
         return;

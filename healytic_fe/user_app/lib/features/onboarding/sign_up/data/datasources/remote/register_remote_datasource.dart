@@ -11,6 +11,9 @@ import 'package:user_openapi/api.dart';
 part 'register_remote_datasource.g.dart';
 
 abstract class RegisterRemoteDatasource {
+  /// Checks whether the given email already exists.
+  Future<bool> checkEmail({required String email});
+
   Future<void> sendOtp({required String email});
 
   Future<void> verifyCode({required String email, required String code});
@@ -24,6 +27,15 @@ class RegisterRemoteDatasourceImpl implements RegisterRemoteDatasource {
   final ApiService apiService;
 
   RegisterRemoteDatasourceImpl({required this.apiService});
+
+  @override
+  Future<bool> checkEmail({required String email}) async {
+    final response = await apiService.authenticateApi
+        .authControllerCheckEmail(
+          CheckEmailDto(email: email),
+        );
+    return response?.exists ?? false;
+  }
 
   @override
   Future<void> sendOtp({required String email}) async {
