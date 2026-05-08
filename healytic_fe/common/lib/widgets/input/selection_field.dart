@@ -96,6 +96,20 @@ class _AppSelectionField<T> extends StatelessWidget {
   /// Whether to uppercase the label text.
   final bool uppercaseLabel;
 
+  /// Composes the effective validator by prepending a
+  /// required-check when [isRequired] is true.
+  String? Function(T?)? get _effectiveValidator {
+    if (!isRequired && validator == null) return null;
+
+    return (T? value) {
+      if (isRequired && value == null) {
+        final fieldLabel = label ?? fieldKey;
+        return '$fieldLabel is required';
+      }
+      return validator?.call(value);
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -107,7 +121,7 @@ class _AppSelectionField<T> extends StatelessWidget {
       height: height,
       child: FormBuilderField<T>(
         key: key,
-        validator: validator,
+        validator: _effectiveValidator,
         name: fieldKey,
         initialValue: initialValue,
         autovalidateMode: AutovalidateMode.onUserInteraction,

@@ -422,19 +422,16 @@ class VerificationStatusRemoteDataSourceImpl
   VerificationRevisionStatus _mapVerificationStatus(
     api.PartnerVerificationStatus status,
   ) {
-    if (status == api.PartnerVerificationStatus.ONBOARDING) {
-      return VerificationRevisionStatus.onboarding;
-    } else if (status == api.PartnerVerificationStatus.PENDING) {
+    if (status == api.PartnerVerificationStatus.PENDING) {
       return VerificationRevisionStatus.pending;
     } else if (status == api.PartnerVerificationStatus.APPROVED) {
       return VerificationRevisionStatus.approved;
     } else if (status == api.PartnerVerificationStatus.REJECTED) {
       return VerificationRevisionStatus.rejected;
-    } else if (status ==
-        api.PartnerVerificationStatus.REQUIRED_RESUBMIT) {
+    } else if (status == api.PartnerVerificationStatus.REQUIRED_RESUBMIT) {
       return VerificationRevisionStatus.requiredResubmit;
     }
-    return VerificationRevisionStatus.onboarding;
+    return VerificationRevisionStatus.pending;
   }
 
   BusinessInfo _mapBusinessInfo(api.BusinessInfoDto dto) {
@@ -572,49 +569,46 @@ class VerificationStatusRemoteDataSourceImpl
     required bool hasUpdates,
     required api.PartnerVerificationStatus verificationStatus,
   }) {
-    if (hasUpdates) return SectionStatus.revisionRequired;
+    if (hasUpdates) return SectionStatus.completed;
 
-    if (verificationStatus ==
-        api.PartnerVerificationStatus.APPROVED) {
+    print('ver status: ${verificationStatus}');
+
+    if (verificationStatus == api.PartnerVerificationStatus.APPROVED) {
       return SectionStatus.completed;
-    } else if (verificationStatus ==
-            api.PartnerVerificationStatus.ONBOARDING ||
-        verificationStatus ==
-            api.PartnerVerificationStatus.PENDING) {
+    } else if (verificationStatus == api.PartnerVerificationStatus.PENDING) {
       return SectionStatus.inProgress;
-    } else if (verificationStatus ==
-            api.PartnerVerificationStatus.REJECTED ||
-        verificationStatus ==
-            api.PartnerVerificationStatus.REQUIRED_RESUBMIT) {
+    } else if (verificationStatus == api.PartnerVerificationStatus.REJECTED ||
+        verificationStatus == api.PartnerVerificationStatus.REQUIRED_RESUBMIT) {
       return SectionStatus.revisionRequired;
     }
     return SectionStatus.completed;
   }
 
   bool _hasBusinessInfoUpdates(BusinessInfo info) {
-    return !info.brandName.isVerified ||
+    return !(!info.brandName.isVerified ||
         !(info.taxRegistrationCode?.isVerified ?? true) ||
-        !info.serviceTags.isVerified ||
-        !(info.phoneNumber?.isVerified ?? true);
+        !(info.serviceTags.isVerified) ||
+        !(info.phoneNumber?.isVerified ?? true) ||
+        !(info.email?.isVerified ?? true));
   }
 
   bool _hasAddressUpdates(AddressInfo address) {
-    return !address.streetAddress.isVerified ||
+    return !(!address.streetAddress.isVerified ||
         !(address.ward?.isVerified ?? true) ||
         !(address.district?.isVerified ?? true) ||
-        !(address.city?.isVerified ?? true);
+        !(address.city?.isVerified ?? true));
   }
 
   bool _hasLegalRepresentativeUpdates(LegalRepresentativeInfo info) {
-    return !info.fullName.isVerified ||
+    return !(!info.fullName.isVerified ||
         !(info.position?.isVerified ?? true) ||
         !(info.phoneNumber?.isVerified ?? true) ||
         !(info.idType?.isVerified ?? true) ||
         !(info.idNumber?.isVerified ?? true) ||
-        !(info.idIssueDate?.isVerified ?? true);
+        !(info.idIssueDate?.isVerified ?? true));
   }
 
   bool _hasKycDocumentUpdates(List<VerifiedField> documents) {
-    return documents.any((doc) => !doc.isVerified);
+    return documents.any((doc) => doc.isVerified);
   }
 }

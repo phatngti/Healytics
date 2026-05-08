@@ -14,6 +14,7 @@ import 'package:user_app/router/routes.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/utils/device.dart';
 
+
 class EmailFormScreen extends HookConsumerWidget {
   const EmailFormScreen({super.key});
 
@@ -76,7 +77,9 @@ class EmailFormScreen extends HookConsumerWidget {
       submitLoading.value = true;
       try {
         final email = emailController.text.trim();
-        await ref.read(registerFlowProvider.notifier).sendCode(email);
+        await ref
+            .read(registerFlowProvider.notifier)
+            .sendCode(email);
         if (context.mounted) {
           AppToast.success(
             context,
@@ -86,6 +89,16 @@ class EmailFormScreen extends HookConsumerWidget {
             EmailCodeConfirmationRoute.name,
           );
         }
+      } on EmailAlreadyExistsException {
+        if (context.mounted) {
+          AppToast.error(
+            context,
+            'This email is already registered.'
+                ' Please sign in instead.',
+          );
+        }
+      } catch (_) {
+        // Other errors are handled by ref.listen
       } finally {
         if (context.mounted) {
           submitLoading.value = false;

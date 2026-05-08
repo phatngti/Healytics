@@ -33,8 +33,8 @@ abstract final class EmployeeAddAutofill {
   /// `SPA`, `MASSAGE` (default).
   static Map<String, dynamic> forRole([String? role, String? therapistType]) {
     final effectiveRole =
-        role?.toUpperCase() ?? EmployeeRole.therapist.apiValue;
-    if (effectiveRole == EmployeeRole.doctor.apiValue) {
+        role?.toUpperCase() ?? EmployeeRoleType.therapist.apiValue;
+    if (effectiveRole == EmployeeRoleType.doctor.apiValue) {
       return _doctorValues();
     }
     final effectiveType =
@@ -50,7 +50,7 @@ abstract final class EmployeeAddAutofill {
   // ────────────────────────────────────────────
 
   static Map<String, dynamic> _spaTherapistValues() => {
-    EmployeeFormField.employeeRole.key: EmployeeRole.therapist.apiValue,
+    EmployeeFormField.employeeRole.key: EmployeeRoleType.therapist.apiValue,
     EmployeeFormField.therapistType.key: TherapistType.spa.apiValue,
     // Personal Info
     EmployeeFormField.firstName.key: 'Nguyen',
@@ -116,7 +116,7 @@ abstract final class EmployeeAddAutofill {
   // ────────────────────────────────────────────
 
   static Map<String, dynamic> _massageTherapistValues() => {
-    EmployeeFormField.employeeRole.key: EmployeeRole.therapist.apiValue,
+    EmployeeFormField.employeeRole.key: EmployeeRoleType.therapist.apiValue,
     EmployeeFormField.therapistType.key: TherapistType.massage.apiValue,
     // Personal Info
     EmployeeFormField.firstName.key: 'Le',
@@ -186,7 +186,7 @@ abstract final class EmployeeAddAutofill {
   // ────────────────────────────────────────────
 
   static Map<String, dynamic> _doctorValues() => {
-    EmployeeFormField.employeeRole.key: EmployeeRole.doctor.apiValue,
+    EmployeeFormField.employeeRole.key: EmployeeRoleType.doctor.apiValue,
     // Personal Info
     EmployeeFormField.firstName.key: 'Tran',
     EmployeeFormField.lastName.key: 'Minh Duc',

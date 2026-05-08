@@ -414,7 +414,7 @@ class _SummaryBody extends StatelessWidget {
             PriceBreakdownCard(
               subtotal: detail.priceBreakdown
                   .formattedSubTotal,
-              serviceFee: detail.priceBreakdown
+              discount: detail.priceBreakdown
                   .formattedDiscount,
               totalAmount: detail.priceBreakdown
                   .formattedTotal,

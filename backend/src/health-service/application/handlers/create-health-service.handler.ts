@@ -12,6 +12,7 @@ import { HealthServiceType } from '../../enums/health-service-type.enum';
 import { ProductMedia } from '@/common/entities/product-media.entity';
 import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
+import { StaffAssignmentType } from '@/health-service/enums/staff-assignment-type.enum';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 
 @Injectable()
@@ -72,8 +73,13 @@ export class CreateHealthServiceHandler {
       // Handle Product Definition - Relation Management
       if (baseData.type === HealthServiceType.SERVICE && productDefinition) {
         const definitionEntity = queryRunner.manager.create(ProductDefinition, {
-          ...productDefinition,
           productId: savedProduct.id,
+          durationMinutes: productDefinition.durationMinutes,
+          bufferMinutes: productDefinition.bufferMinutes ?? 0,
+          maxCapacity: productDefinition.maxCapacity ?? 1,
+          minLeadTimeHours: productDefinition.minLeadTimeHours ?? 0,
+          staffAssignmentType:
+            productDefinition.staffAssignmentType ?? StaffAssignmentType.ANY,
         });
         await queryRunner.manager.save(ProductDefinition, definitionEntity);
       }

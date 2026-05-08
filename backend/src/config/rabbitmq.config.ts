@@ -1,6 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import path from 'path';
 
+
 export default registerAs('rabbitmq', () => ({
   url:
     process.env.RABBITMQ_URL ||

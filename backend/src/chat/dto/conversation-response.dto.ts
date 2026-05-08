@@ -99,7 +99,6 @@ export class ConversationResponseDto {
         otherAccount?.id ?? (isUser ? entity.partnerAccountId : entity.userId),
       name:
         (otherAccount as any)?.userProfile?.fullName ??
-        otherAccount?.username ??
         otherAccount?.email ??
         'Unknown',
       avatar: (otherAccount as any)?.userProfile?.avatarUrl ?? undefined,

@@ -3,7 +3,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
 /// Price breakdown card showing subtotal,
-/// service fee, total amount, and a cancellation
+/// discount, total amount, and a cancellation
 /// policy notice.
 ///
 /// Displays placeholder values until real pricing
@@ -12,15 +12,15 @@ class PriceBreakdownCard extends StatelessWidget {
   const PriceBreakdownCard({
     super.key,
     this.subtotal = 'See at checkout',
-    this.serviceFee = '—',
+    this.discount = '—',
     this.totalAmount = 'See at checkout',
   });
 
   /// Formatted subtotal string.
   final String subtotal;
 
-  /// Formatted service fee string.
-  final String serviceFee;
+  /// Formatted discount string.
+  final String discount;
 
   /// Formatted total amount string.
   final String totalAmount;
@@ -58,8 +58,8 @@ class PriceBreakdownCard extends StatelessWidget {
           ),
           SizedBox(height: AppDimens.spaceMd),
           _PriceRow(
-            label: 'Service Fee',
-            value: serviceFee,
+            label: 'Discount',
+            value: discount,
           ),
           SizedBox(height: AppDimens.spaceMd),
           _DashedDivider(),
