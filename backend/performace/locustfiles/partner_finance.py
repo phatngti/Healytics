@@ -51,9 +51,16 @@ class PartnerFinanceStressUser(HttpUser):
     wait_time = between(MIN_WAIT, MAX_WAIT)
 
     def on_start(self):
-        token, _ = login_partner(self.client)
+        token = None
+        for attempt in range(3):
+            token, _ = login_partner(self.client)
+            if token:
+                break
+            import time
+            time.sleep(2 * (attempt + 1))
+
         if not token:
-            raise StopUser("Partner login failed")
+            raise StopUser("Partner login failed after retries")
 
         self.headers = auth_headers(token)
         partner_discovery.ensure_discovered(self.client, self.headers)
@@ -122,9 +129,16 @@ class PartnerFinanceMutationUser(HttpUser):
         if not PERF_ENABLE_MUTATIONS:
             raise StopUser("Set PERF_ENABLE_MUTATIONS=1 to run finance mutations")
 
-        token, _ = login_partner(self.client)
+        token = None
+        for attempt in range(3):
+            token, _ = login_partner(self.client)
+            if token:
+                break
+            import time
+            time.sleep(2 * (attempt + 1))
+
         if not token:
-            raise StopUser("Partner login failed")
+            raise StopUser("Partner login failed after retries")
 
         self.headers = auth_headers(token)
         partner_discovery.ensure_discovered(self.client, self.headers)

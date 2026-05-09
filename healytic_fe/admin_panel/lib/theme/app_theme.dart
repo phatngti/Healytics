@@ -252,9 +252,9 @@ class AppTheme {
       ).copyWith(
         extensions: <ThemeExtension<dynamic>>[
           SemanticColors(
-            success: const Color.fromARGB(255, 130, 226, 196),
+            success: Colors.green,
             onSuccess: Colors.white,
-            onSuccessContainer: const Color.fromARGB(255, 81, 223, 88),
+            onSuccessContainer: Colors.green.shade300,
             warning: Colors.orange,
             onWarning: Colors.white,
             onWarningContainer: Colors.orange.shade300,
@@ -293,10 +293,18 @@ class AppTheme {
       ).copyWith(
         extensions: <ThemeExtension<dynamic>>[
           SemanticColors(
-            success: Colors.green, // Green
-            warning: Colors.orange, // Orange
-            info: Colors.blue, // Light Blue
+            success: Colors.green,
+            onSuccess: Colors.white,
+            onSuccessContainer: Colors.green.shade300,
+            warning: Colors.orange,
+            onWarning: Colors.white,
+            onWarningContainer: Colors.orange.shade300,
+            info: Colors.blue,
+            onInfo: Colors.white,
+            onInfoContainer: Colors.blue.shade300,
             error: Colors.red,
+            onError: Colors.white,
+            onErrorContainer: Colors.red.shade300,
           ),
         ],
       );

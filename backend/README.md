@@ -57,6 +57,24 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Test reports
+
+The test scripts generate the latest HTML report at `test-report/index.html`.
+Each completed run is also archived under `test-report/runs/<run-id>/`, and
+the global metrics history is regenerated at `test-report/history.html` with
+machine-readable data in `test-report/history.json`.
+
+```bash
+# unit report with history
+$ npm run test:report
+
+# coverage report with history
+$ npm run test:report:cov
+
+# e2e report with history
+$ npm run test:e2e
+```
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.

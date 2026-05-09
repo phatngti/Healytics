@@ -13,6 +13,8 @@ import 'package:user_app/features/home/'
     'domain/entities/home.entity.dart';
 import 'package:user_app/features/home/'
     'presentation/providers/home.provider.dart';
+import 'package:user_app/features/home/presentation/widgets/'
+    'home_section_header.widget.dart';
 import 'package:user_app/router/routes.dart';
 
 /// Horizontally-scrollable list of featured
@@ -22,49 +24,18 @@ class SpecialistsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final specialistsAsync = ref.watch(
-      featuredSpecialistsProvider,
-    );
+    final specialistsAsync = ref.watch(featuredSpecialistsProvider);
     final titleGap = AppDimens.titleGap(context);
-    final cardWidth = AppDimens.widthFraction(
-      context,
-      fraction: 0.4,
-    );
+    final cardWidth = AppDimens.widthFraction(context, fraction: 0.4);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section header
-        Row(
-          mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Flexible(
-              child: Text(
-                'Our Specialists',
-                style: theme.textTheme.titleLarge
-                    ?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {},
-              child: Text(
-                'See All',
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
+        HomeSectionHeader(
+          title: 'Our Specialists',
+          onViewAll: () {
+            const HomeSpecialistsRoute().push(context);
+          },
         ),
         SizedBox(height: titleGap),
 
@@ -72,13 +43,9 @@ class SpecialistsSection extends ConsumerWidget {
         SizedBox(
           height: cardWidth * 1.55,
           child: specialistsAsync.when(
-            data: (specialists) => _SpecialistList(
-              specialists: specialists,
-              cardWidth: cardWidth,
-            ),
-            loading: () => _LoadingList(
-              cardWidth: cardWidth,
-            ),
+            data: (specialists) =>
+                _SpecialistList(specialists: specialists, cardWidth: cardWidth),
+            loading: () => _LoadingList(cardWidth: cardWidth),
             error: (_, __) => const SizedBox.shrink(),
           ),
         ),
@@ -95,10 +62,7 @@ class _SpecialistList extends StatelessWidget {
   final List<HomeSpecialist> specialists;
   final double cardWidth;
 
-  const _SpecialistList({
-    required this.specialists,
-    required this.cardWidth,
-  });
+  const _SpecialistList({required this.specialists, required this.cardWidth});
 
   @override
   Widget build(BuildContext context) {
@@ -110,13 +74,9 @@ class _SpecialistList extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.none,
       itemCount: specialists.length,
-      separatorBuilder: (_, __) => SizedBox(
-        width: AppDimens.spaceMd,
-      ),
-      itemBuilder: (_, index) => _SpecialistCard(
-        specialist: specialists[index],
-        width: cardWidth,
-      ),
+      separatorBuilder: (_, __) => SizedBox(width: AppDimens.spaceMd),
+      itemBuilder: (_, index) =>
+          _SpecialistCard(specialist: specialists[index], width: cardWidth),
     );
   }
 }
@@ -133,16 +93,13 @@ class _LoadingList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final shimmerColor =
-        theme.colorScheme.surfaceContainerHighest;
+    final shimmerColor = theme.colorScheme.surfaceContainerHighest;
 
     return ListView.separated(
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.none,
       itemCount: 3,
-      separatorBuilder: (_, __) => SizedBox(
-        width: AppDimens.spaceMd,
-      ),
+      separatorBuilder: (_, __) => SizedBox(width: AppDimens.spaceMd),
       itemBuilder: (_, __) => Container(
         width: cardWidth,
         padding: EdgeInsets.all(AppDimens.spaceMd),
@@ -155,8 +112,7 @@ class _LoadingList extends StatelessWidget {
           ),
         ),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Avatar placeholder
             AspectRatio(
@@ -164,8 +120,7 @@ class _LoadingList extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   color: shimmerColor,
-                  borderRadius:
-                      AppDimens.radiusMediumSmall,
+                  borderRadius: AppDimens.radiusMediumSmall,
                 ),
               ),
             ),
@@ -176,8 +131,7 @@ class _LoadingList extends StatelessWidget {
               width: cardWidth * 0.7,
               decoration: BoxDecoration(
                 color: shimmerColor,
-                borderRadius:
-                    AppDimens.radiusExtraSmall,
+                borderRadius: AppDimens.radiusExtraSmall,
               ),
             ),
             SizedBox(height: AppDimens.spaceXs),
@@ -187,8 +141,7 @@ class _LoadingList extends StatelessWidget {
               width: cardWidth * 0.5,
               decoration: BoxDecoration(
                 color: shimmerColor,
-                borderRadius:
-                    AppDimens.radiusExtraSmall,
+                borderRadius: AppDimens.radiusExtraSmall,
               ),
             ),
           ],
@@ -206,10 +159,7 @@ class _SpecialistCard extends ConsumerWidget {
   final HomeSpecialist specialist;
   final double width;
 
-  const _SpecialistCard({
-    required this.specialist,
-    required this.width,
-  });
+  const _SpecialistCard({required this.specialist, required this.width});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -219,10 +169,7 @@ class _SpecialistCard extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         ref
-            .read(
-              employeePreviewCacheProvider
-                  .notifier,
-            )
+            .read(employeePreviewCacheProvider.notifier)
             .seed(
               EmployeePreview(
                 id: specialist.id,
@@ -233,86 +180,79 @@ class _SpecialistCard extends ConsumerWidget {
                 reviewCount: specialist.soldCount,
               ),
             );
-        EmployeeDetailRoute(
-          employeeId: specialist.id,
-        ).push<void>(context);
+        EmployeeDetailRoute(employeeId: specialist.id).push<void>(context);
       },
       child: Container(
-      width: width,
-      padding: EdgeInsets.all(AppDimens.spaceMd),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: AppDimens.radiusMedium,
-        border: Border.all(
-          color: colorScheme.outlineVariant,
-          width: AppDimens.borderWidth,
+        width: width,
+        padding: EdgeInsets.all(AppDimens.spaceMd),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: AppDimens.radiusMedium,
+          border: Border.all(
+            color: colorScheme.outlineVariant,
+            width: AppDimens.borderWidth,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.shadow.withValues(alpha: 0.05),
+              blurRadius: AppDimens.spaceXs,
+              offset: Offset(0, AppDimens.spaceXxs),
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow
-                .withValues(alpha: 0.05),
-            blurRadius: AppDimens.spaceXs,
-            offset: Offset(0, AppDimens.spaceXxs),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
-          // Avatar image / fallback
-          AspectRatio(
-            aspectRatio: 1,
-            child: _SpecialistAvatar(
-              avatarUrl: specialist.avatarUrl,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Avatar image / fallback
+            AspectRatio(
+              aspectRatio: 1,
+              child: _SpecialistAvatar(avatarUrl: specialist.avatarUrl),
             ),
-          ),
-          SizedBox(height: AppDimens.spaceSm),
+            SizedBox(height: AppDimens.spaceSm),
 
-          // Name
-          Text(
-            specialist.name,
-            style:
-                theme.textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
+            // Name
+            Text(
+              specialist.name,
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: AppDimens.spaceXxs),
+            SizedBox(height: AppDimens.spaceXxs),
 
-          // Specialty
-          Text(
-            specialist.specialty,
-            style:
-                theme.textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
+            // Specialty
+            Text(
+              specialist.specialty,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const Spacer(),
+            const Spacer(),
 
-          // Rating + sold row
-          _InfoRow(
-            icon: Symbols.star,
-            iconColor: colorScheme.primary,
-            text: '${specialist.rating}'
-                ' · ${specialist.soldCount} sold',
-          ),
-          SizedBox(height: AppDimens.spaceXxs),
-
-          // Clinic info
-          if (specialist.clinicName.isNotEmpty)
+            // Rating + sold row
             _InfoRow(
-              icon: Symbols.location_on,
-              iconColor: colorScheme.onSurfaceVariant,
-              text: specialist.clinicName,
+              icon: Symbols.star,
+              iconColor: colorScheme.primary,
+              text:
+                  '${specialist.rating}'
+                  ' · ${specialist.soldCount} sold',
             ),
-        ],
-      ),
+            SizedBox(height: AppDimens.spaceXxs),
+
+            // Clinic info
+            if (specialist.clinicName.isNotEmpty)
+              _InfoRow(
+                icon: Symbols.location_on,
+                iconColor: colorScheme.onSurfaceVariant,
+                text: specialist.clinicName,
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -329,16 +269,12 @@ class _SpecialistAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final hasUrl =
-        avatarUrl != null && avatarUrl!.isNotEmpty;
+    final colorScheme = Theme.of(context).colorScheme;
+    final hasUrl = avatarUrl != null && avatarUrl!.isNotEmpty;
 
     return Container(
       decoration: BoxDecoration(
-        color:
-            colorScheme.surfaceContainerHighest
-                .withValues(alpha: 0.7),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
         borderRadius: AppDimens.radiusMediumSmall,
       ),
       clipBehavior: Clip.antiAlias,
@@ -346,10 +282,8 @@ class _SpecialistAvatar extends StatelessWidget {
           ? NetworkImageAuto(
               imageUrl: avatarUrl!,
               fit: BoxFit.cover,
-              placeholder: (_) =>
-                  const _AvatarFallback(),
-              errorWidget: (_) =>
-                  const _AvatarFallback(),
+              placeholder: (_) => const _AvatarFallback(),
+              errorWidget: (_) => const _AvatarFallback(),
             )
           : const _AvatarFallback(),
     );
@@ -362,15 +296,13 @@ class _AvatarFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Center(
       child: Icon(
         Symbols.person,
         size: AppDimens.iconXxl,
-        color: colorScheme.onSurfaceVariant
-            .withValues(alpha: 0.5),
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
       ),
     );
   }
@@ -397,19 +329,13 @@ class _InfoRow extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(
-          icon,
-          size: AppDimens.iconSm,
-          color: iconColor,
-        ),
+        Icon(icon, size: AppDimens.iconSm, color: iconColor),
         SizedBox(width: AppDimens.spaceXs),
         Expanded(
           child: Text(
             text,
-            style:
-                theme.textTheme.labelSmall?.copyWith(
-              color:
-                  theme.colorScheme.onSurfaceVariant,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
