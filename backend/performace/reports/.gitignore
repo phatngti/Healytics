@@ -2,6 +2,7 @@
 *.html
 *.csv
 *.json
+*.md
 
 # But keep the directory itself
 !.gitkeep

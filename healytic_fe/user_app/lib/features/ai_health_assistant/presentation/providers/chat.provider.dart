@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:logging/logging.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/providers/location.provider.dart';
 import 'package:user_app/core/services/location.service.dart';
 import 'package:user_app/features/ai_health_assistant/domain/repositories/chat.repository.dart';
@@ -44,8 +45,7 @@ class ChatState {
       isLoading: isLoading ?? this.isLoading,
       error: error,
       messages: messages ?? this.messages,
-      activeConversationId: activeConversationId ??
-          this.activeConversationId,
+      activeConversationId: activeConversationId ?? this.activeConversationId,
     );
   }
 }
@@ -86,8 +86,7 @@ class Chat extends _$Chat {
   @override
   ChatState build(String? conversationId) {
     _repository = ref.read(chatRepositoryProvider);
-    _locationService =
-        ref.read(locationServiceProvider);
+    _locationService = ref.read(locationServiceProvider);
 
     // Cancel SSE subscription when provider is
     // disposed.
@@ -97,38 +96,22 @@ class Chat extends _$Chat {
 
     // Load messages if we have a valid
     // conversationId.
-    if (conversationId != null &&
-        conversationId.isNotEmpty) {
-      Future.microtask(
-        () => loadMessages(conversationId),
-      );
+    if (conversationId != null && conversationId.isNotEmpty) {
+      Future.microtask(() => loadMessages(conversationId));
     }
-    return ChatState(
-      activeConversationId: conversationId,
-    );
+    return ChatState(activeConversationId: conversationId);
   }
 
   /// Fetches messages for [conversationId] from the
   /// repository.
-  Future<void> loadMessages(
-    String conversationId,
-  ) async {
+  Future<void> loadMessages(String conversationId) async {
     state = state.copyWith(isLoading: true);
 
     try {
-      final messages = await _repository.getMessages(
-        conversationId,
-      );
-      state = state.copyWith(
-        isLoading: false,
-        messages: messages,
-      );
+      final messages = await _repository.getMessages(conversationId);
+      state = state.copyWith(isLoading: false, messages: messages);
     } catch (e, st) {
-      _log.severe(
-        'Error loading chat messages',
-        e,
-        st,
-      );
+      _log.severe('Error loading chat messages', e, st);
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to load messages.',
@@ -149,14 +132,11 @@ class Chat extends _$Chat {
     // Cancel any previous stream.
     await _sseSubscription?.cancel();
 
-    final convId =
-        state.activeConversationId ?? conversationId;
+    final convId = state.activeConversationId ?? conversationId;
 
     // Add user message optimistically.
     final userMessage = ChatMessage(
-      id: DateTime.now()
-          .millisecondsSinceEpoch
-          .toString(),
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       text: text,
       timestamp: DateTime.now(),
       isUser: true,
@@ -171,31 +151,27 @@ class Chat extends _$Chat {
       // Best-effort location resolution.
       double? lat;
       double? lng;
-      try {
-        final coord = await _locationService
-            .getCurrentCoordinate();
-        lat = coord.latitude;
-        lng = coord.longitude;
-      } on LocationServiceException catch (e) {
-        _log.warning(
-          'Location unavailable: $e',
-        );
+      if (!AppEnvironment.current.useMock) {
+        try {
+          final coord = await _locationService.getCurrentCoordinate();
+          lat = coord.latitude;
+          lng = coord.longitude;
+        } on LocationServiceException catch (e) {
+          _log.warning('Location unavailable: $e');
+        }
       }
 
-      final stream =
-          _repository.sendMessageAndStream(
-            convId,
-            text,
-            currentLat: lat,
-            currentLng: lng,
-          );
+      final stream = _repository.sendMessageAndStream(
+        convId,
+        text,
+        currentLat: lat,
+        currentLng: lng,
+      );
 
       // Initialise sentence-splitting state.
-      _segmentBaseId =
-          'bot-${DateTime.now().millisecondsSinceEpoch}';
+      _segmentBaseId = 'bot-${DateTime.now().millisecondsSinceEpoch}';
       _sentenceCounter = 0;
-      _currentPendingId =
-          '$_segmentBaseId-s$_sentenceCounter';
+      _currentPendingId = '$_segmentBaseId-s$_sentenceCounter';
       _pendingBuffer.clear();
 
       _sseSubscription = stream.listen(
@@ -204,8 +180,7 @@ class Chat extends _$Chat {
           _log.severe('SSE stream error', error);
           state = state.copyWith(
             isLoading: false,
-            error:
-                'Connection lost. Please retry.',
+            error: 'Connection lost. Please retry.',
           );
         },
         onDone: () {
@@ -213,10 +188,7 @@ class Chat extends _$Chat {
           // loading.
           if (state.isLoading) {
             _finaliseStream(
-              const ChatSseEvent(
-                type: ChatSseEventType.done,
-                data: {},
-              ),
+              const ChatSseEvent(type: ChatSseEventType.done, data: {}),
             );
           }
         },
@@ -247,11 +219,7 @@ class Chat extends _$Chat {
         break;
 
       case ChatSseEventType.nerLocation:
-        _handleRichEvent(
-          event,
-          _segmentBaseId,
-          ChatMessageType.nerLocation,
-        );
+        _handleRichEvent(event, _segmentBaseId, ChatMessageType.nerLocation);
         break;
 
       case ChatSseEventType.done:
@@ -276,10 +244,7 @@ class Chat extends _$Chat {
   /// sentence boundary is found, the completed
   /// sentence is frozen as its own [ChatMessage] and
   /// a new pending message begins.
-  void _appendToken(
-    ChatSseEvent event,
-    String segmentBaseId,
-  ) {
+  void _appendToken(ChatSseEvent event, String segmentBaseId) {
     // Space between word-level tokens.
     if (_pendingBuffer.isNotEmpty) {
       _pendingBuffer.write(' ');
@@ -290,24 +255,19 @@ class Chat extends _$Chat {
     final messages = [...state.messages];
 
     // Check for sentence-ending punctuation.
-    final matches =
-        _sentenceEndRegex.allMatches(raw).toList();
+    final matches = _sentenceEndRegex.allMatches(raw).toList();
 
     if (matches.isNotEmpty) {
       // Split at the last sentence boundary.
       final lastMatch = matches.last;
       final splitPos = lastMatch.start + 1;
-      final completed =
-          raw.substring(0, splitPos).trim();
-      final remainder =
-          raw.substring(splitPos).trim();
+      final completed = raw.substring(0, splitPos).trim();
+      final remainder = raw.substring(splitPos).trim();
 
       // Freeze the completed sentence(s).
       if (completed.isNotEmpty) {
         final frozenId = _currentPendingId;
-        final idx = messages.indexWhere(
-          (m) => m.id == frozenId,
-        );
+        final idx = messages.indexWhere((m) => m.id == frozenId);
         final frozen = ChatMessage(
           id: frozenId,
           text: completed,
@@ -322,8 +282,7 @@ class Chat extends _$Chat {
         // Start a new pending message for
         // remainder.
         _sentenceCounter++;
-        _currentPendingId =
-            '$segmentBaseId-s$_sentenceCounter';
+        _currentPendingId = '$segmentBaseId-s$_sentenceCounter';
         _pendingBuffer
           ..clear()
           ..write(remainder);
@@ -348,9 +307,7 @@ class Chat extends _$Chat {
       }
     } else {
       // No sentence break yet — update live bubble.
-      final idx = messages.indexWhere(
-        (m) => m.id == _currentPendingId,
-      );
+      final idx = messages.indexWhere((m) => m.id == _currentPendingId);
       final pending = ChatMessage(
         id: _currentPendingId,
         text: raw,
@@ -382,8 +339,7 @@ class Chat extends _$Chat {
     _flushPendingBuffer(messages);
 
     // Create a rich-content message.
-    final richId =
-        'rich-${DateTime.now().millisecondsSinceEpoch}';
+    final richId = 'rich-${DateTime.now().millisecondsSinceEpoch}';
     final richMessage = ChatMessage(
       id: richId,
       text: _labelForType(messageType),
@@ -396,8 +352,7 @@ class Chat extends _$Chat {
     // Reset pending for tokens after this rich
     // event.
     _sentenceCounter++;
-    _currentPendingId =
-        '$segmentBaseId-s$_sentenceCounter';
+    _currentPendingId = '$segmentBaseId-s$_sentenceCounter';
     _pendingBuffer.clear();
 
     state = state.copyWith(messages: messages);
@@ -407,27 +362,21 @@ class Chat extends _$Chat {
   /// types.
   String _labelForType(ChatMessageType type) {
     return switch (type) {
-      ChatMessageType.serviceRecommendation =>
-        'Service Recommendations',
-      ChatMessageType.nerLocation =>
-        'Detected Locations',
+      ChatMessageType.serviceRecommendation => 'Service Recommendations',
+      ChatMessageType.nerLocation => 'Detected Locations',
       ChatMessageType.text => '',
     };
   }
 
   /// Flushes any remaining text in [_pendingBuffer]
   /// into [messages] as a frozen message.
-  void _flushPendingBuffer(
-    List<ChatMessage> messages,
-  ) {
+  void _flushPendingBuffer(List<ChatMessage> messages) {
     if (_pendingBuffer.isEmpty) return;
 
     final text = _pendingBuffer.toString().trim();
     if (text.isEmpty) return;
 
-    final idx = messages.indexWhere(
-      (m) => m.id == _currentPendingId,
-    );
+    final idx = messages.indexWhere((m) => m.id == _currentPendingId);
     final frozen = ChatMessage(
       id: _currentPendingId,
       text: text,
@@ -442,8 +391,7 @@ class Chat extends _$Chat {
 
     // Reset for next potential segment.
     _sentenceCounter++;
-    _currentPendingId =
-        '$_segmentBaseId-s$_sentenceCounter';
+    _currentPendingId = '$_segmentBaseId-s$_sentenceCounter';
     _pendingBuffer.clear();
   }
 
@@ -458,8 +406,7 @@ class Chat extends _$Chat {
     state = state.copyWith(
       isLoading: false,
       messages: messages,
-      activeConversationId:
-          newConvId ?? state.activeConversationId,
+      activeConversationId: newConvId ?? state.activeConversationId,
     );
   }
 }

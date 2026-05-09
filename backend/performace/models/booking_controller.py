@@ -12,6 +12,7 @@ from .base import DtoModel, dto_field
 class BookingStatus(str, Enum):
     PENDING_PAYMENT = 'PENDING_PAYMENT'
     CONFIRMED = 'CONFIRMED'
+    IN_PROGRESS = 'IN_PROGRESS'
     CANCELLED = 'CANCELLED'
     COMPLETED = 'COMPLETED'
     NO_SHOW = 'NO_SHOW'

@@ -3,6 +3,8 @@
 	perf-test-locations perf-test-ws perf-test-chat \
 	perf-test-updated-stress perf-test-partner-finance-stress \
 	perf-test-employee-analytics-stress perf-test-updated-mutations \
+	perf-test-new-apis perf-test-health perf-test-employee \
+	perf-test-targets perf-test-employee-mutations \
 	perf-test-booking-race perf-test-booking-race-spike \
 	generate-dtos \
 	_setup _teardown
@@ -11,6 +13,11 @@ VENV       = .venv
 VENV_BIN   = $(VENV)/bin
 REPORT_DIR = reports
 TIMESTAMP  = $(shell date +%Y-%m-%d_%H-%M-%S)
+LOCUST_STDOUT_LOG = $(REPORT_DIR)/locust_$(TIMESTAMP).stdout.log
+PERF_TARGET_USERS ?= 1000
+PERF_TARGET_SPAWN_RATE ?= 100
+PERF_RUN_TIME ?= 300s
+export PERF_TARGET_USERS
 
 # locust >=2.39 requires Python >=3.10; find a suitable interpreter.
 PYTHON     = $(shell command -v python3.13 2>/dev/null \
@@ -57,8 +64,9 @@ define run_locust
 	@echo "══════════════════════════════════════════"
 	@cleanup() { $(MAKE) --no-print-directory _teardown; }; \
 	trap cleanup EXIT; \
-	$(VENV_BIN)/locust --headless $(1) \
-		--html $(REPORT_DIR)/report_$(TIMESTAMP).html; \
+	$(VENV_BIN)/locust --headless --only-summary --loglevel ERROR $(1) \
+		--html $(REPORT_DIR)/report_$(TIMESTAMP).html \
+		> $(LOCUST_STDOUT_LOG); \
 	exit $$?
 endef
 
@@ -115,6 +123,26 @@ perf-test-employee-analytics-stress:
 perf-test-updated-mutations:
 	@test "$(PERF_ENABLE_MUTATIONS)" = "1" || { echo "ERROR: Set PERF_ENABLE_MUTATIONS=1 to run finance mutation tests."; exit 1; }
 	$(call run_locust,--tags finance-mutation -u 2 -r 1 --run-time 60s)
+
+# ──────────────────────────────────────────────
+# Current/new API test runners
+# ──────────────────────────────────────────────
+
+perf-test-new-apis:
+	$(call run_locust,--tags new-api -u 20 -r 4 --run-time 120s)
+
+perf-test-health:
+	$(call run_locust,--tags health -u 10 -r 2 --run-time 60s)
+
+perf-test-employee:
+	$(call run_locust,--tags employee -u 20 -r 4 --run-time 120s)
+
+perf-test-targets:
+	$(call run_locust,--tags target -u $(PERF_TARGET_USERS) -r $(PERF_TARGET_SPAWN_RATE) --run-time $(PERF_RUN_TIME))
+
+perf-test-employee-mutations:
+	@test "$(PERF_ENABLE_EMPLOYEE_MUTATIONS)" = "1" || { echo "ERROR: Set PERF_ENABLE_EMPLOYEE_MUTATIONS=1 to run employee mutation tests."; exit 1; }
+	$(call run_locust,--tags employee-mutation -u 2 -r 1 --run-time 60s)
 
 # ──────────────────────────────────────────────
 # Booking race condition test runners
