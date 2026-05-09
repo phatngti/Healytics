@@ -10,10 +10,15 @@ Run:
 Add imports here as test modules are implemented in locustfiles/.
 """
 
+# Registers English target report listeners for every Locust run.
+import common.targets  # noqa: F401
+
 # ── Auth ──────────────────────────────────────────────────────────────────────
 # from locustfiles.auth_user import AuthEndUser
 # from locustfiles.auth_partner import AuthPartnerUser
 # from locustfiles.auth_admin import AuthAdminUser
+from locustfiles.auth_api import AuthApiUser
+from locustfiles.health_api import HealthApiUser
 
 # ── User domain ───────────────────────────────────────────────────────────────
 # from locustfiles.account_user import AccountUser
@@ -29,6 +34,7 @@ Add imports here as test modules are implemented in locustfiles/.
 # from locustfiles.service_tags import ServiceTagManager
 from locustfiles.partner_employee_analytics import PartnerEmployeeAnalyticsUser
 from locustfiles.partner_finance import PartnerFinanceStressUser, PartnerFinanceMutationUser
+from locustfiles.employee_api import EmployeeApiUser, EmployeeAppointmentMutationUser
 
 # ── Public ────────────────────────────────────────────────────────────────────
 # from locustfiles.locations import LocationBrowser

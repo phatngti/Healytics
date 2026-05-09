@@ -1,9 +1,5 @@
 {
-  "moduleFileExtensions": [
-    "js",
-    "json",
-    "ts"
-  ],
+  "moduleFileExtensions": ["js", "json", "ts"],
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".*\\.e2e-spec\\.ts$",
@@ -13,12 +9,22 @@
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/../src/$1"
   },
-  "testPathIgnorePatterns": [
-    "/node_modules/"
-  ],
-  "collectCoverageFrom": [
-    "../src/**/*.ts",
-    "!../src/main.ts"
-  ],
-  "coverageDirectory": "../coverage/e2e"
+  "testPathIgnorePatterns": ["/node_modules/"],
+  "collectCoverageFrom": ["../src/**/*.ts", "!../src/main.ts"],
+  "coverageDirectory": "../coverage/e2e",
+  "coverageReporters": ["json", "json-summary", "text", "lcov", "clover"],
+  "reporters": [
+    "default",
+    [
+      "jest-html-reporters",
+      {
+        "publicPath": "./test-report",
+        "filename": "index.html",
+        "pageTitle": "Healytics E2E Test Report",
+        "expand": true,
+        "openReport": false,
+        "enableMergeData": true
+      }
+    ]
+  ]
 }

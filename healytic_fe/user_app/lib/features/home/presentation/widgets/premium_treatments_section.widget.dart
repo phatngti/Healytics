@@ -9,8 +9,11 @@ import 'package:user_app/features/home/domain/entities/'
     'home.entity.dart';
 import 'package:user_app/features/home/presentation/'
     'providers/home.provider.dart';
+import 'package:user_app/features/home/presentation/widgets/'
+    'home_section_header.widget.dart';
 import 'package:user_app/features/home/presentation/'
     'widgets/treatment_card.widget.dart';
+import 'package:user_app/router/routes.dart';
 
 /// Displays a 2-column grid of premium treatment cards
 /// fetched via [productsProvider].
@@ -19,44 +22,17 @@ class PremiumTreatmentsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final titleGap = AppDimens.titleGap(context);
     final contentPad = AppDimens.contentPadding(context);
     final productsAsync = ref.watch(premiumTreatmentsProvider);
 
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Flexible(
-              child: Text(
-                'Premium Treatments',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            TextButton(
-              onPressed: () {},
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceSm),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                'See All',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
+        HomeSectionHeader(
+          title: 'Premium Treatments',
+          onViewAll: () {
+            const HomePremiumTreatmentsRoute().push(context);
+          },
         ),
         SizedBox(height: titleGap),
         productsAsync.when(

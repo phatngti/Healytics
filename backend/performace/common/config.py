@@ -28,6 +28,10 @@ PARTNER_PASSWORD = os.getenv("TEST_PARTNER_PASSWORD", "partner@123")
 ADMIN_EMAIL = os.getenv("TEST_ADMIN_EMAIL", "admin@healytics.vn")
 ADMIN_PASSWORD = os.getenv("TEST_ADMIN_PASSWORD", "admin@123")
 
+# Employee (role: EMPLOYEE)
+EMPLOYEE_EMAIL = os.getenv("TEST_EMPLOYEE_EMAIL", "employee.coordinator@healytics.vn")
+EMPLOYEE_PASSWORD = os.getenv("TEST_EMPLOYEE_PASSWORD", "employee@123")
+
 # ── Multi-user pool (role: USER) ─────────────────────────────────────────────
 # Mirror of SEED_USERS from src/database/seeds/users/user.seeder.ts
 # All share the default password "user@123".
@@ -68,9 +72,36 @@ FINANCE_STRESS_PERIODS = [
     if period.strip()
 ]
 
+# ── Employee-app mutation settings ───────────────────────────────────────────
+PERF_ENABLE_EMPLOYEE_MUTATIONS = os.getenv(
+    "PERF_ENABLE_EMPLOYEE_MUTATIONS", "0"
+).strip().lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
+
+# ── Performance target thresholds ────────────────────────────────────────────
+PERF_API_P95_MS = float(os.getenv("PERF_API_P95_MS", "200"))
+PERF_TARGET_USERS = int(os.getenv("PERF_TARGET_USERS", "1000"))
+PERF_TARGET_TPS = float(os.getenv("PERF_TARGET_TPS", "500"))
+PERF_MAX_ERROR_RATE_PERCENT = float(os.getenv("PERF_MAX_ERROR_RATE_PERCENT", "0.01"))
+PERF_APP_LOAD_MS = float(os.getenv("PERF_APP_LOAD_MS", "2000"))
+PERF_MAX_CPU_PERCENT = float(os.getenv("PERF_MAX_CPU_PERCENT", "80"))
+PERF_MAX_RAM_PERCENT = float(os.getenv("PERF_MAX_RAM_PERCENT", "80"))
+PERF_MAX_NETWORK_LATENCY_MS = float(os.getenv("PERF_MAX_NETWORK_LATENCY_MS", "100"))
+
+PERF_APP_LOAD_RESULT_MS = os.getenv("PERF_APP_LOAD_RESULT_MS")
+PERF_CPU_RESULT_PERCENT = os.getenv("PERF_CPU_RESULT_PERCENT")
+PERF_RAM_RESULT_PERCENT = os.getenv("PERF_RAM_RESULT_PERCENT")
+PERF_NETWORK_LATENCY_RESULT_MS = os.getenv("PERF_NETWORK_LATENCY_RESULT_MS")
+
 # ── Report Settings ──────────────────────────────────────────────────────────
 REPORT_HTML = str(REPORTS_DIR / "report.html")
 REPORT_CSV_PREFIX = str(REPORTS_DIR / "stats")
+TARGET_REPORT_MARKDOWN = str(REPORTS_DIR / "target_report.md")
+TARGET_REPORT_CSV = str(REPORTS_DIR / "target_report.csv")
 
 
 def get_timestamped_report_path(prefix: str = "report") -> str:

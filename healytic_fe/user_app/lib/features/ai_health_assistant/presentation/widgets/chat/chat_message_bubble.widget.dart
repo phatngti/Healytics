@@ -20,21 +20,7 @@ import 'package:user_app/router/routes.dart';
 class ChatMessageBubble extends StatelessWidget {
   final ChatMessage message;
 
-  /// Small avatar URL shown beside AI messages.
-  static const String botAvatarUrl =
-      'https://lh3.googleusercontent.com/aida-public/'
-      'AB6AXuC8GfSYKLidcI6WkfSjR9kq2CSeJJBNIN_Hsarp'
-      '_MgZcaIVmyjsCO8m1dILd3Fzk_Kc7RO-zBbIsr2biiY3'
-      'sRXO8X6nbbmeaxdbxQqOylWGdPsPhtiycvRSp1EMfwjsl'
-      'vHeb_GSvUgWJpMqhvTONsLtcbSPTqPmDAJgAcrQ_w4hAj'
-      'GKN2x-pq53vY5DQUtagO9cyliTTYNRQVDJUqwiYbkGaAc'
-      'ISV5S05iYIlsBmDiTdZN4j2pBQs3hocgvSMCGLgLHIw8M'
-      'o9USy6o';
-
-  const ChatMessageBubble({
-    super.key,
-    required this.message,
-  });
+  const ChatMessageBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -54,42 +40,30 @@ class _AiBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final timeStr =
-        DateFormat.jm().format(message.timestamp);
+    final colorScheme = Theme.of(context).colorScheme;
+    final timeStr = DateFormat.jm().format(message.timestamp);
 
     return Align(
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: AppDimens.widthFraction(
-            context,
-            fraction: 0.78,
-          ),
+          maxWidth: AppDimens.widthFraction(context, fraction: 0.78),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // Bot avatar — hardcoded Google-hosted
-            // raster asset (not a backend URL).
+            // Bot avatar intentionally uses a local
+            // icon so tests do not depend on external
+            // image availability.
             Padding(
-              padding: EdgeInsets.only(
-                bottom: AppDimens.spaceMd,
-              ),
+              padding: EdgeInsets.only(bottom: AppDimens.spaceMd),
               child: CircleAvatar(
                 radius: 16,
-                backgroundColor:
-                    colorScheme.primaryContainer,
-                backgroundImage: const NetworkImage(
-                  ChatMessageBubble.botAvatarUrl,
-                ),
-                onBackgroundImageError: (_, __) {},
+                backgroundColor: colorScheme.primaryContainer,
                 child: Icon(
                   Icons.smart_toy_outlined,
                   size: 14,
-                  color:
-                      colorScheme.onPrimaryContainer,
+                  color: colorScheme.onPrimaryContainer,
                 ),
               ),
             ),
@@ -98,8 +72,7 @@ class _AiBubble extends StatelessWidget {
             // Bubble + time
             Flexible(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildBubbleContent(context),
                   _buildTimestamp(context, timeStr),
@@ -116,26 +89,18 @@ class _AiBubble extends StatelessWidget {
   /// on [ChatMessageType].
   Widget _buildBubbleContent(BuildContext context) {
     return switch (message.messageType) {
-      ChatMessageType.text => _TextBubbleContent(
-        text: message.text,
+      ChatMessageType.text => _TextBubbleContent(text: message.text),
+      ChatMessageType.serviceRecommendation => _ServiceRecommendationContent(
+        metadata: message.metadata,
       ),
-      ChatMessageType.serviceRecommendation =>
-        _ServiceRecommendationContent(
-          metadata: message.metadata,
-        ),
-      ChatMessageType.nerLocation =>
-        _NerLocationContent(
-          metadata: message.metadata,
-        ),
+      ChatMessageType.nerLocation => _NerLocationContent(
+        metadata: message.metadata,
+      ),
     };
   }
 
-  Widget _buildTimestamp(
-    BuildContext context,
-    String timeStr,
-  ) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+  Widget _buildTimestamp(BuildContext context, String timeStr) {
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Padding(
@@ -146,8 +111,7 @@ class _AiBubble extends StatelessWidget {
       child: Text(
         timeStr,
         style: textTheme.labelSmall?.copyWith(
-          color: colorScheme.onSurfaceVariant
-              .withValues(alpha: 0.5),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
         ),
       ),
     );
@@ -158,6 +122,51 @@ class _AiBubble extends StatelessWidget {
 // Text bubble content (default)
 // ──────────────────────────────────────────────────────
 
+/// Regex matching markdown-style bold markers
+/// (`**text**`). Captures the inner content.
+final _boldPattern = RegExp(r'\*\*(.+?)\*\*');
+
+/// Parses [raw] text, converting `**bold**` segments
+/// into bold [TextSpan]s while keeping the rest normal.
+List<TextSpan> _parseFormattedText(
+  String raw,
+  TextStyle? baseStyle,
+) {
+  final spans = <TextSpan>[];
+  final matches = _boldPattern.allMatches(raw);
+  var lastEnd = 0;
+
+  for (final match in matches) {
+    // Normal text before this bold segment.
+    if (match.start > lastEnd) {
+      spans.add(
+        TextSpan(
+          text: raw.substring(lastEnd, match.start),
+        ),
+      );
+    }
+
+    // Bold segment (group 1 = inner content).
+    spans.add(
+      TextSpan(
+        text: match.group(1),
+        style: baseStyle?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+
+    lastEnd = match.end;
+  }
+
+  // Remaining normal text after the last match.
+  if (lastEnd < raw.length) {
+    spans.add(TextSpan(text: raw.substring(lastEnd)));
+  }
+
+  return spans;
+}
+
 class _TextBubbleContent extends StatelessWidget {
   final String text;
   const _TextBubbleContent({required this.text});
@@ -167,6 +176,10 @@ class _TextBubbleContent extends StatelessWidget {
     final colorScheme =
         Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final baseStyle = textTheme.bodyMedium?.copyWith(
+      color: colorScheme.onSurface,
+      height: 1.4,
+    );
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -183,11 +196,13 @@ class _TextBubbleContent extends StatelessWidget {
           bottomRight: Radius.circular(18),
         ),
       ),
-      child: Text(
-        text,
-        style: textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurface,
-          height: 1.4,
+      child: Text.rich(
+        TextSpan(
+          style: baseStyle,
+          children: _parseFormattedText(
+            text,
+            baseStyle,
+          ),
         ),
       ),
     );
@@ -198,29 +213,22 @@ class _TextBubbleContent extends StatelessWidget {
 // Service recommendation content
 // ──────────────────────────────────────────────────────
 
-class _ServiceRecommendationContent
-    extends StatelessWidget {
+class _ServiceRecommendationContent extends StatelessWidget {
   final Map<String, dynamic>? metadata;
 
-  const _ServiceRecommendationContent({
-    this.metadata,
-  });
+  const _ServiceRecommendationContent({this.metadata});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     final recommendations =
-        (metadata?['recommendations'] as List?)
-                ?.cast<Map<String, dynamic>>() ??
-            [];
+        (metadata?['recommendations'] as List?)?.cast<Map<String, dynamic>>() ??
+        [];
 
     if (recommendations.isEmpty) {
-      return _TextBubbleContent(
-        text: 'No recommendations available.',
-      );
+      return _TextBubbleContent(text: 'No recommendations available.');
     }
 
     return Column(
@@ -229,9 +237,7 @@ class _ServiceRecommendationContent
         _buildHeader(textTheme, colorScheme),
         ...recommendations.map(
           (rec) => Padding(
-            padding: EdgeInsets.only(
-              top: AppDimens.spaceXs,
-            ),
+            padding: EdgeInsets.only(top: AppDimens.spaceXs),
             child: _ServiceCard(data: rec),
           ),
         ),
@@ -240,10 +246,7 @@ class _ServiceRecommendationContent
   }
 
   /// Section header with icon and title.
-  Widget _buildHeader(
-    TextTheme textTheme,
-    ColorScheme colorScheme,
-  ) {
+  Widget _buildHeader(TextTheme textTheme, ColorScheme colorScheme) {
     return Padding(
       padding: EdgeInsets.only(
         left: AppDimens.spaceXs,
@@ -270,30 +273,78 @@ class _ServiceRecommendationContent
   }
 }
 
+String? _stringValue(Map<String, dynamic> data, String key) {
+  final value = data[key];
+  if (value is String && value.trim().isNotEmpty) {
+    return value.trim();
+  }
+  if (value is num) {
+    return value.toString();
+  }
+  return null;
+}
+
+String _priceText(Object? value) {
+  if (value is String) return value;
+  if (value is num) return value.toString();
+  if (value is Map) {
+    final amount = value['amount'];
+    final currency = value['currency'];
+    if (amount is num) {
+      final formatted = NumberFormat.decimalPattern().format(amount);
+      return currency is String && currency.isNotEmpty
+          ? '$formatted $currency'
+          : formatted;
+    }
+  }
+  return '';
+}
+
+String _ratingText(Object? value) {
+  if (value is String) return value;
+  if (value is num) return value.toString();
+  if (value is Map) {
+    final average = value['average'];
+    if (average is num) {
+      return average.toStringAsFixed(1);
+    }
+  }
+  return '';
+}
+
+String _locationText(Object? value) {
+  if (value is String) return value;
+  if (value is Map) {
+    final parts = [value['address'], value['district'], value['city']]
+        .whereType<String>()
+        .where((part) => part.trim().isNotEmpty)
+        .map((part) => part.trim())
+        .toList();
+    return parts.join(', ');
+  }
+  return '';
+}
+
 // ──────────────────────────────────────────────────────
-// Service card — flat AiRecommendationItemDto shape
+// Service card — flat or nested recommendation shape
 // ──────────────────────────────────────────────────────
 
-/// Rich service card reading flat fields from
-/// [AiRecommendationItemDto]: `service_id`, `name`,
-/// `imageUrl`, `category`, `duration`, `price`,
-/// `rating`, `vendorName`, `location`.
+/// Rich service card reading either flat
+/// [AiRecommendationItemDto] fields or nested
+/// backend/mock SSE payload fields.
 class _ServiceCard extends StatelessWidget {
   final Map<String, dynamic> data;
   const _ServiceCard({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final serviceId =
-        data['service_id'] as String? ?? '';
+    final colorScheme = Theme.of(context).colorScheme;
+    final serviceId = data['service_id'] as String? ?? '';
 
     return GestureDetector(
       onTap: () {
         if (serviceId.isNotEmpty) {
-          ServiceDetailsRoute(serviceId: serviceId)
-              .push(context);
+          ServiceDetailsRoute(serviceId: serviceId).push(context);
         }
       },
       child: Container(
@@ -302,21 +353,18 @@ class _ServiceCard extends StatelessWidget {
           color: colorScheme.surface,
           borderRadius: AppDimens.radiusMediumSmall,
           border: Border.all(
-            color: colorScheme.outlineVariant
-                .withValues(alpha: 0.3),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.shadow
-                  .withValues(alpha: 0.05),
+              color: colorScheme.shadow.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _ServiceCardImage(data: data),
             _ServiceCardBody(data: data),
@@ -334,12 +382,13 @@ class _ServiceCardImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final imageUrl = data['imageUrl'] as String?;
-    final category = data['category'] as String?;
-    final rating = data['rating'] as String?;
+    final imageUrl =
+        _stringValue(data, 'imageUrl') ?? _stringValue(data, 'image_url');
+    final category =
+        _stringValue(data, 'category') ?? _stringValue(data, 'badge');
+    final rating = _ratingText(data['rating']);
 
     return SizedBox(
       height: 100,
@@ -348,8 +397,7 @@ class _ServiceCardImage extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           _buildImage(colorScheme, imageUrl),
-          if (category != null &&
-              category.isNotEmpty)
+          if (category != null && category.isNotEmpty)
             Positioned(
               top: AppDimens.spaceSm,
               left: AppDimens.spaceSm,
@@ -359,22 +407,19 @@ class _ServiceCardImage extends StatelessWidget {
                   vertical: AppDimens.spaceXxs,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.surface
-                      .withValues(alpha: 0.92),
-                  borderRadius:
-                      AppDimens.radiusPill,
+                  color: colorScheme.surface.withValues(alpha: 0.92),
+                  borderRadius: AppDimens.radiusPill,
                 ),
                 child: Text(
                   category,
-                  style: textTheme.labelSmall
-                      ?.copyWith(
+                  style: textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface,
                   ),
                 ),
               ),
             ),
-          if (rating != null && rating.isNotEmpty)
+          if (rating.isNotEmpty)
             Positioned(
               top: AppDimens.spaceSm,
               right: AppDimens.spaceSm,
@@ -384,10 +429,8 @@ class _ServiceCardImage extends StatelessWidget {
                   vertical: AppDimens.spaceXxs,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.scrim
-                      .withValues(alpha: 0.6),
-                  borderRadius:
-                      AppDimens.radiusMediumSmall,
+                  color: colorScheme.scrim.withValues(alpha: 0.6),
+                  borderRadius: AppDimens.radiusMediumSmall,
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -398,15 +441,11 @@ class _ServiceCardImage extends StatelessWidget {
                       color: colorScheme.tertiary,
                       fill: 1.0,
                     ),
-                    SizedBox(
-                      width: AppDimens.spaceXxs,
-                    ),
+                    SizedBox(width: AppDimens.spaceXxs),
                     Text(
                       rating,
-                      style: textTheme.labelSmall
-                          ?.copyWith(
-                        color: colorScheme
-                            .onInverseSurface,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onInverseSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -419,67 +458,53 @@ class _ServiceCardImage extends StatelessWidget {
     );
   }
 
-  Widget _buildImage(
-    ColorScheme colorScheme,
-    String? url,
-  ) {
+  Widget _buildImage(ColorScheme colorScheme, String? url) {
     if (url != null && url.isNotEmpty) {
       return NetworkImageAuto(
         imageUrl: url,
         fit: BoxFit.cover,
-        errorWidget: (_) =>
-            _buildPlaceholder(colorScheme),
+        errorWidget: (_) => _buildPlaceholder(colorScheme),
       );
     }
     return _buildPlaceholder(colorScheme);
   }
 
-  Widget _buildPlaceholder(
-    ColorScheme colorScheme,
-  ) {
+  Widget _buildPlaceholder(ColorScheme colorScheme) {
     return Container(
-      color: colorScheme.primaryContainer
-          .withValues(alpha: 0.3),
+      color: colorScheme.primaryContainer.withValues(alpha: 0.3),
       child: Icon(
         Symbols.medical_services,
         size: AppDimens.iconXxl,
-        color: colorScheme.onPrimaryContainer
-            .withValues(alpha: 0.4),
+        color: colorScheme.onPrimaryContainer.withValues(alpha: 0.4),
       ),
     );
   }
 }
 
 /// Body: title, duration, location, vendor, price.
-///
-/// All fields are flat strings matching the
-/// [AiRecommendationItemDto] contract.
 class _ServiceCardBody extends StatelessWidget {
   final Map<String, dynamic> data;
   const _ServiceCardBody({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final name = data['name'] as String? ?? '';
-    final duration =
-        data['duration'] as String? ?? '';
-    final location =
-        data['location'] as String? ?? '';
+    final name = _stringValue(data, 'name') ?? '';
+    final duration = _stringValue(data, 'duration') ?? '';
+    final location = _locationText(data['location']);
     final vendorName =
-        data['vendorName'] as String? ?? '';
-    final price = data['price'] as String? ?? '';
-    final serviceId =
-        data['service_id'] as String? ?? '';
+        _stringValue(data, 'vendorName') ??
+        _stringValue(data, 'staff_name') ??
+        '';
+    final price = _priceText(data['price']);
+    final serviceId = _stringValue(data, 'service_id') ?? '';
 
     return Padding(
       padding: EdgeInsets.all(AppDimens.spaceSm),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Title
           Text(
@@ -495,27 +520,18 @@ class _ServiceCardBody extends StatelessWidget {
 
           // Duration
           if (duration.isNotEmpty)
-            _InfoRow(
-              icon: Symbols.schedule,
-              text: duration,
-            ),
+            _InfoRow(icon: Symbols.schedule, text: duration),
 
           // Location
           if (location.isNotEmpty) ...[
             SizedBox(height: AppDimens.spaceXxs),
-            _InfoRow(
-              icon: Symbols.location_on,
-              text: location,
-            ),
+            _InfoRow(icon: Symbols.location_on, text: location),
           ],
 
           // Vendor name
           if (vendorName.isNotEmpty) ...[
             SizedBox(height: AppDimens.spaceXxs),
-            _InfoRow(
-              icon: Symbols.storefront,
-              text: vendorName,
-            ),
+            _InfoRow(icon: Symbols.storefront, text: vendorName),
           ],
 
           SizedBox(height: AppDimens.spaceSm),
@@ -523,19 +539,16 @@ class _ServiceCardBody extends StatelessWidget {
           // Divider + price footer
           Divider(
             height: 1,
-            color: colorScheme.outlineVariant
-                .withValues(alpha: 0.3),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
           SizedBox(height: AppDimens.spaceSm),
           Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Flexible(
                 child: Text(
                   price,
-                  style: textTheme.labelMedium
-                      ?.copyWith(
+                  style: textTheme.labelMedium?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.w700,
                   ),
@@ -558,10 +571,7 @@ class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const _InfoRow({
-    required this.icon,
-    required this.text,
-  });
+  const _InfoRow({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -578,10 +588,8 @@ class _InfoRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style:
-                theme.textTheme.bodySmall?.copyWith(
-              color: theme
-                  .colorScheme.onSurfaceVariant,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -608,9 +616,7 @@ class _ViewButton extends StatelessWidget {
         borderRadius: AppDimens.radiusSmall,
         onTap: () {
           if (serviceId.isNotEmpty) {
-            ServiceDetailsRoute(
-              serviceId: serviceId,
-            ).push(context);
+            ServiceDetailsRoute(serviceId: serviceId).push(context);
           }
         },
         child: Padding(
@@ -623,19 +629,16 @@ class _ViewButton extends StatelessWidget {
             children: [
               Text(
                 'View',
-                style: theme.textTheme.labelSmall
-                    ?.copyWith(
+                style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: theme
-                      .colorScheme.onPrimary,
+                  color: theme.colorScheme.onPrimary,
                 ),
               ),
               SizedBox(width: AppDimens.spaceXxs),
               Icon(
                 Symbols.arrow_forward,
                 size: AppDimens.iconXs,
-                color:
-                    theme.colorScheme.onPrimary,
+                color: theme.colorScheme.onPrimary,
               ),
             ],
           ),
@@ -655,26 +658,20 @@ class _NerLocationContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final entities = (metadata?['entities']
-                as List?)
-            ?.cast<Map<String, dynamic>>() ??
-        [];
+    final entities =
+        (metadata?['entities'] as List?)?.cast<Map<String, dynamic>>() ?? [];
 
     if (entities.isEmpty) {
-      return _TextBubbleContent(
-        text: 'No locations detected.',
-      );
+      return _TextBubbleContent(text: 'No locations detected.');
     }
 
     return Container(
       padding: EdgeInsets.all(AppDimens.spaceSm),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest
-            .withValues(alpha: 0.5),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(18),
           topRight: Radius.circular(18),
@@ -683,8 +680,7 @@ class _NerLocationContent extends StatelessWidget {
         ),
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
           Padding(
@@ -702,8 +698,7 @@ class _NerLocationContent extends StatelessWidget {
                 SizedBox(width: AppDimens.spaceXxs),
                 Text(
                   'Detected Locations',
-                  style: textTheme.labelMedium
-                      ?.copyWith(
+                  style: textTheme.labelMedium?.copyWith(
                     color: colorScheme.tertiary,
                     fontWeight: FontWeight.w600,
                   ),
@@ -717,13 +712,11 @@ class _NerLocationContent extends StatelessWidget {
             spacing: AppDimens.spaceXs,
             runSpacing: AppDimens.spaceXxs,
             children: entities.map((entity) {
-              final value =
-                  entity['value'] as String? ?? '';
+              final value = entity['value'] as String? ?? '';
               return Chip(
                 label: Text(
                   value,
-                  style: textTheme.labelSmall
-                      ?.copyWith(
+                  style: textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurface,
                   ),
                 ),
@@ -732,17 +725,12 @@ class _NerLocationContent extends StatelessWidget {
                   size: 14,
                   color: colorScheme.tertiary,
                 ),
-                backgroundColor:
-                    colorScheme.surface,
+                backgroundColor: colorScheme.surface,
                 side: BorderSide(
-                  color: colorScheme.outlineVariant
-                      .withValues(alpha: 0.3),
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
                 ),
-                materialTapTargetSize:
-                    MaterialTapTargetSize
-                        .shrinkWrap,
-                visualDensity:
-                    VisualDensity.compact,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
               );
             }).toList(),
           ),
@@ -762,24 +750,18 @@ class _UserBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final timeStr =
-        DateFormat.jm().format(message.timestamp);
+    final timeStr = DateFormat.jm().format(message.timestamp);
 
     return Align(
       alignment: Alignment.centerRight,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: AppDimens.widthFraction(
-            context,
-            fraction: 0.78,
-          ),
+          maxWidth: AppDimens.widthFraction(context, fraction: 0.78),
         ),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Container(
               padding: EdgeInsets.symmetric(
@@ -788,19 +770,16 @@ class _UserBubble extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: colorScheme.primary,
-                borderRadius:
-                    const BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(18),
                   topRight: Radius.circular(18),
                   bottomLeft: Radius.circular(18),
-                  bottomRight:
-                      Radius.circular(4),
+                  bottomRight: Radius.circular(4),
                 ),
               ),
               child: Text(
                 message.text,
-                style:
-                    textTheme.bodyMedium?.copyWith(
+                style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onPrimary,
                   height: 1.4,
                 ),
@@ -816,17 +795,14 @@ class _UserBubble extends StatelessWidget {
                 children: [
                   Text(
                     timeStr,
-                    style: textTheme.labelSmall
-                        ?.copyWith(
-                      color: colorScheme
-                          .onSurfaceVariant
-                          .withValues(alpha: 0.5),
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.5,
+                      ),
                     ),
                   ),
                   if (message.isRead) ...[
-                    SizedBox(
-                      width: AppDimens.spaceXxs,
-                    ),
+                    SizedBox(width: AppDimens.spaceXxs),
                     Icon(
                       Icons.done_all_rounded,
                       size: 14,
