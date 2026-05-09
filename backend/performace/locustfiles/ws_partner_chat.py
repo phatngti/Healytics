@@ -65,9 +65,9 @@ class WsPartnerChatUser(HealyticsSocketIOUser):
 
     @task(5)
     def send_message(self):
-        """Send a chat message with ack measurement."""
+        """Send a chat message with emit latency measurement."""
         payload = generate_send_message()
-        self.ws_call("send_message", payload)
+        self.ws_emit_measured("send_message", payload)
 
     @task(3)
     def typing_flow(self):

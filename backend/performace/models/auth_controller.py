@@ -9,7 +9,6 @@ from .shared import BusinessType
 
 @dataclass(slots=True)
 class AccountRequestDto(DtoModel):
-    username: str
     password: str
     email: str
 
@@ -26,6 +25,22 @@ class AuthTokensDto(DtoModel):
     refresh_token: str
     access_expires_in: str
     refresh_expires_in: str
+
+
+@dataclass(slots=True)
+class CheckEmailDto(DtoModel):
+    email: str
+
+
+@dataclass(slots=True)
+class CheckEmailResponseDto(DtoModel):
+    exists: bool
+
+
+@dataclass(slots=True)
+class EmployeeLoginDto(DtoModel):
+    email: str
+    password: str
 
 
 @dataclass(slots=True)
@@ -121,6 +136,9 @@ __all__ = [
     "AccountRequestDto",
     "AdminLoginDto",
     "AuthTokensDto",
+    "CheckEmailDto",
+    "CheckEmailResponseDto",
+    "EmployeeLoginDto",
     "LegalRepresentativeRequestDto",
     "LoginDto",
     "LogoutResponseDto",

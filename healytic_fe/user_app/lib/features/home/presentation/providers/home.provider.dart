@@ -27,6 +27,15 @@ Future<List<AiRecommendation>> recommendedProducts(Ref ref) async {
   return list;
 }
 
+/// Provider for the full recommendations list.
+@riverpod
+Future<List<AiRecommendation>> allRecommendedProducts(Ref ref) async {
+  final repository = ref.read(homeRepositoryProvider);
+  final userId = ref.read(currentUserIdProvider);
+  if (userId == null) return [];
+  return repository.getRecommendedProducts(userId: userId, topK: 20);
+}
+
 /// Provider for fetching premium treatments.
 @riverpod
 Future<List<HomeProduct>> premiumTreatments(Ref ref) async {
@@ -54,4 +63,11 @@ Future<List<HomeSpecialist>> featuredSpecialists(Ref ref) async {
 Future<List<AppointmentEntity>> recentActivity(Ref ref) async {
   final repository = ref.read(homeRepositoryProvider);
   return repository.getRecentActivity(limit: 5);
+}
+
+/// Provider for the full recent activity list.
+@riverpod
+Future<List<AppointmentEntity>> allRecentActivity(Ref ref) async {
+  final repository = ref.read(homeRepositoryProvider);
+  return repository.getRecentActivity(limit: 20);
 }

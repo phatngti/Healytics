@@ -74,16 +74,15 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: colorScheme.tertiaryContainer,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: colorScheme.tertiary.withAlpha(75),
+                        color: colorScheme.primary.withAlpha(75),
                       ),
                     ),
                     child: Icon(
                       Icons.verified_outlined,
                       size: 18,
-                      color: colorScheme.tertiary,
+                      color: colorScheme.primary,
                     ),
                   ),
                   AppDimens.horizontalMediumSmall,

@@ -84,11 +84,11 @@ class WsUserChatUser(HealyticsSocketIOUser):
     @task(5)
     def send_message(self):
         """
-        Send a chat message and measure the round-trip time.
-        Uses sio.call() which waits for the server acknowledgement (WsMessageSentAck).
+        Send a chat message and measure the emit latency.
+        Uses fire-and-forget since test conversations may not exist.
         """
         payload = generate_send_message()
-        self.ws_call("send_message", payload)
+        self.ws_emit_measured("send_message", payload)
 
     @task(3)
     def typing_flow(self):
