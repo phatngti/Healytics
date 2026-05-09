@@ -171,7 +171,7 @@ class _EmployeeProfessionalRoleCardState
         children: [
           // Role Toggle Selector
           Text(
-            'Select Role Type',
+            'Select Role Type'.toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.onSurfaceVariant,

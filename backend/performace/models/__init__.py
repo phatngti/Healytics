@@ -22,6 +22,12 @@ from .cart_controller import *
 from .cart_controller import __all__ as _cart_controller_all
 from .categories_controller import *
 from .categories_controller import __all__ as _categories_controller_all
+from .employee_appointments_controller import *
+from .employee_appointments_controller import __all__ as _employee_appointments_controller_all
+from .employee_profile_controller import *
+from .employee_profile_controller import __all__ as _employee_profile_controller_all
+from .employee_revenue_controller import *
+from .employee_revenue_controller import __all__ as _employee_revenue_controller_all
 from .locations_controller import *
 from .locations_controller import __all__ as _locations_controller_all
 from .mapbox_controller import *
@@ -82,6 +88,9 @@ __all__ = [
     *_booking_controller_all,
     *_cart_controller_all,
     *_categories_controller_all,
+    *_employee_appointments_controller_all,
+    *_employee_profile_controller_all,
+    *_employee_revenue_controller_all,
     *_locations_controller_all,
     *_mapbox_controller_all,
     *_mo_mo_controller_all,
