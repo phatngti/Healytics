@@ -152,18 +152,31 @@ class EmployeeRemoteDatasourceImpl implements EmployeeRemoteDatasource {
     );
   }
 
-  /// Defensively parses credential strings that
-  /// may be raw `toString()` of map objects
-  /// (e.g. `{title: M.D., license: ML-2024-001}`)
-  /// or plain strings.
+  /// Defensively maps credential DTOs whose
+  /// required API fields may still arrive as null.
   List<MedicalCredentialEntity> _mapCredentials(
     List<MedicalCredentialResponseDto> raw,
   ) {
-    return raw
-        .map(
-          (e) => MedicalCredentialEntity(title: e.title!, license: e.license),
-        )
-        .toList();
+    final credentials = <MedicalCredentialEntity>[];
+
+    for (final dto in raw) {
+      final title = dto.title?.trim();
+      final license = dto.license?.trim();
+
+      if ((title == null || title.isEmpty) &&
+          (license == null || license.isEmpty)) {
+        continue;
+      }
+
+      credentials.add(
+        MedicalCredentialEntity(
+          title: title?.isNotEmpty == true ? title! : license!,
+          license: license,
+        ),
+      );
+    }
+
+    return credentials;
   }
 
   TherapistProfileEntity? _mapTherapistProfile(

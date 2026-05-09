@@ -104,6 +104,53 @@ final class RecommendedProductsProvider
 String _$recommendedProductsHash() =>
     r'4dd8a35b6af9b8c7a1523324df05055fcd9d8dcd';
 
+/// Provider for the full recommendations list.
+
+@ProviderFor(allRecommendedProducts)
+const allRecommendedProductsProvider = AllRecommendedProductsProvider._();
+
+/// Provider for the full recommendations list.
+
+final class AllRecommendedProductsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<AiRecommendation>>,
+          List<AiRecommendation>,
+          FutureOr<List<AiRecommendation>>
+        >
+    with
+        $FutureModifier<List<AiRecommendation>>,
+        $FutureProvider<List<AiRecommendation>> {
+  /// Provider for the full recommendations list.
+  const AllRecommendedProductsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allRecommendedProductsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$allRecommendedProductsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<AiRecommendation>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<AiRecommendation>> create(Ref ref) {
+    return allRecommendedProducts(ref);
+  }
+}
+
+String _$allRecommendedProductsHash() =>
+    r'ced9649efdf86a115d8aacabfa86f695170bef36';
+
 /// Provider for fetching premium treatments.
 
 @ProviderFor(premiumTreatments)
@@ -289,3 +336,49 @@ final class RecentActivityProvider
 }
 
 String _$recentActivityHash() => r'146baa436822fe074bfaa51a047da657d64224e4';
+
+/// Provider for the full recent activity list.
+
+@ProviderFor(allRecentActivity)
+const allRecentActivityProvider = AllRecentActivityProvider._();
+
+/// Provider for the full recent activity list.
+
+final class AllRecentActivityProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<AppointmentEntity>>,
+          List<AppointmentEntity>,
+          FutureOr<List<AppointmentEntity>>
+        >
+    with
+        $FutureModifier<List<AppointmentEntity>>,
+        $FutureProvider<List<AppointmentEntity>> {
+  /// Provider for the full recent activity list.
+  const AllRecentActivityProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allRecentActivityProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$allRecentActivityHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<AppointmentEntity>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<AppointmentEntity>> create(Ref ref) {
+    return allRecentActivity(ref);
+  }
+}
+
+String _$allRecentActivityHash() => r'fc7e0a36a444a2d49ecdaaaa47c4ece1deb3dbe3';

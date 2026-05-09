@@ -361,12 +361,12 @@ class ServiceRuleInputDto(DtoModel):
 @dataclass(slots=True)
 class UpdatePartnerHealthServiceDto(DtoModel):
     categoryId: str | None = None
+    description: str | None = None
+    salePrice: float | None = None
     name: str | None = None
     slug: str | None = None
-    description: str | None = None
     type: HealthServiceType | None = None
     basePrice: float | None = None
-    salePrice: float | None = None
     currency: str | None = None
     status: str | None = None
     isVisibleOnline: bool | None = None

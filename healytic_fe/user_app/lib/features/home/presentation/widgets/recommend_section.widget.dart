@@ -8,6 +8,9 @@ import 'package:user_app/features/home/domain/entities/'
     'ai_recommendation.entity.dart';
 import 'package:user_app/features/home/presentation/'
     'providers/home.provider.dart';
+import 'package:user_app/features/home/presentation/widgets/'
+    'home_section_header.widget.dart';
+import 'package:user_app/router/routes.dart';
 
 /// Displays a horizontally-scrollable list of
 /// AI-recommended services fetched via
@@ -17,7 +20,6 @@ class RecommendSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final aiAsync = ref.watch(recommendedProductsProvider);
     final titleGap = AppDimens.titleGap(context);
 
@@ -30,32 +32,11 @@ class RecommendSection extends ConsumerWidget {
 
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Flexible(
-              child: Text(
-                'Recommend For You',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {},
-              child: Text(
-                'See All',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
+        HomeSectionHeader(
+          title: 'Recommend For You',
+          onViewAll: () {
+            const HomeRecommendationsRoute().push(context);
+          },
         ),
         SizedBox(height: titleGap),
         SizedBox(
