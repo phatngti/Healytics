@@ -1,4 +1,4 @@
-\chapter{Hiện thực}
+﻿\chapter{Hiện thực}
 \section{Các công nghệ liên quan}
 
 \subsection{Mobile App Development (iOS/Android, Flutter)}
@@ -1463,140 +1463,127 @@ Hình~\ref{fig:partner_create_svc3} hiển thị phần cuối của form:
 % ---------------------------------------------------------------------------
 \subsubsection{Quản lý Nhân viên (Employee)}
 
-Module Employee cho phép đối tác quản lý hồ sơ nhân sự (Therapist, Doctor\ldots), xem trạng thái và tạo mới nhân viên với thông tin chuyên môn đầy đủ.
+Module Employee cho phép đối tác quản lý hồ sơ nhân sự (Therapist, Doctor\ldots), theo dõi hiệu suất đội ngũ và tạo mới nhân viên với thông tin chuyên môn đầy đủ.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_1.png}
     \vspace{0.5em}
-    \caption{Employee -- danh sách nhân viên dạng lưới thẻ}
+    \caption{Employee Dashboard -- tổng quan nhân sự: Team Performance, Role Distribution và Workload Efficiency}
     \label{fig:partner_emp1}
 \end{figure}
 
-Hình~\ref{fig:partner_emp1} hiển thị danh sách nhân viên dạng card grid:
+Hình~\ref{fig:partner_emp1} hiển thị trang tổng quan Employee Dashboard:
 \begin{itemize}
-    \item Mỗi thẻ (Card): ảnh đại diện, tên, vai trò (Therapist/Doctor), badge trạng thái, nút xem chi tiết.
-    \item Hỗ trợ tìm kiếm và lọc theo vai trò hoặc trạng thái.
+    \item \textbf{Team Performance:} Tổng nhân sự (Total Staff), tỷ lệ Active/On Leave, Utilization (tỷ lệ lấp đầy lịch làm) và Quality Signal (điểm đánh giá trung bình).
+    \item \textbf{Role Distribution:} Biểu đồ tròn phân bổ theo loại nhân viên (Doctor, Spa Therapist, Massage Therapist).
+    \item \textbf{Workload Efficiency:} Biểu đồ cột thể hiện số buổi, doanh thu và năng suất theo tháng.
 \end{itemize}
+
+
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_2.png}
     \vspace{0.5em}
-    \caption{Employee -- danh sách nhân viên dạng bảng với ID, vai trò, giờ làm và thao tác}
+    \caption{Employee Dashboard -- Top Performers và Compliance Posture}
     \label{fig:partner_emp2}
 \end{figure}
 
-Hình~\ref{fig:partner_emp2} hiển thị danh sách nhân viên dạng bảng:
+Hình~\ref{fig:partner_emp2} hiển thị phần dưới của Dashboard:
 \begin{itemize}
-    \item Cột: Employee ID (Mã nhân viên), Name (Tên), Role (Vai trò), Working Hours (Giờ làm việc), Status (Trạng thái), 3 nút thao tác (xem/sửa/xóa).
-    \item Thuận tiện cho thao tác hàng loạt.
+    \item \textbf{Top Performers:} Xếp hạng nhân viên theo Utilization (tỷ lệ lấp lịch), Rating (đánh giá) và Contribution (doanh thu đóng góp).
+    \item \textbf{Compliance Posture:} Trạng thái tuân thủ -- Verification Coverage (hồ sơ cần tải tài liệu xác minh) và Emergency Readiness (thông tin liên hệ khẩn cấp đầy đủ).
 \end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_2_b.png}
-    \vspace{0.5em}
-    \caption{Employee -- bộ lọc nâng cao theo vai trò, trạng thái và từ khóa}
-    \label{fig:partner_emp2b}
-\end{figure}
-
-Hình~\ref{fig:partner_emp2b} cho thấy bộ lọc nâng cao:
-\begin{itemize}
-    \item Lọc theo Role (Vai trò), Status (Trạng thái: Active -- Đang làm/Inactive -- Ngừng hoạt động/On Leave -- Nghỉ phép) và từ khóa tìm kiếm.
-    \item Kết quả cập nhật realtime.
-\end{itemize}
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_3.png}
     \vspace{0.5em}
-    \caption{Chi tiết nhân viên -- hồ sơ đầy đủ tổ chức theo nhiều tab}
+    \caption{Employee Management -- danh sách nhân viên dạng bảng với ID, vị trí, đánh giá và trạng thái}
     \label{fig:partner_emp3}
 \end{figure}
 
-Hình~\ref{fig:partner_emp3} hiển thị trang chi tiết nhân viên:
+Hình~\ref{fig:partner_emp3} hiển thị bảng quản lý nhân viên:
 \begin{itemize}
-    \item Các tab: Contact \& Basic Info, Professional Role, Skills \& Services, Work Schedule, Work History, Documents.
-    \item Mỗi tab có thể cập nhật độc lập.
+    \item Cột: ID, Avatar, Full Name (Họ tên), Position (Vị trí: Senior Doctor/Spa Therapist/Massage Therapist), Rating (Đánh giá), Review Count (Số lượt đánh giá), Status (Trạng thái), Actions (Xem/Sửa/Xóa).
+    \item Nút \textbf{Add Employee} (thêm nhân viên mới) và \textbf{Delete All} (xóa toàn bộ); hỗ trợ tìm kiếm, lọc và sắp xếp.
 \end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_4.png}
-    \vspace{0.5em}
-    \caption{Chi tiết nhân viên -- tab Work Schedule: ca làm việc theo từng ngày trong tuần}
-    \label{fig:partner_emp4}
-\end{figure}
-
-Hình~\ref{fig:partner_emp4} là tab Work Schedule:
-\begin{itemize}
-    \item Cấu hình ca theo từng ngày (Mon--Sun): giờ bắt đầu/kết thúc và toggle bật/tắt.
-    \item Dữ liệu dùng bởi BookingModule để kiểm tra khả dụng khi đặt lịch.
-\end{itemize}
-
 \paragraph{Tạo nhân viên mới}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_1.png}
     \vspace{0.5em}
-    \caption{Tạo nhân viên -- Contact \& Basic Info và chọn Employee Type}
+    \caption{Tạo nhân viên -- Contact \& Basic Info và Professional Role}
     \label{fig:partner_create_emp1}
 \end{figure}
 
 Hình~\ref{fig:partner_create_emp1} hiển thị bước đầu của form tạo nhân viên:
 \begin{itemize}
-    \item Tab chọn loại: \textbf{Therapist} hoặc \textbf{Doctor} -- ảnh hưởng đến các trường chuyên môn hiển thị.
-    \item \textbf{Contact \& Basic Info} (Thông tin liên hệ cơ bản): First Name (Tên), Last Name (Họ), Email, Phone (Số điện thoại), Date of Birth (Ngày sinh), Gender (Giới tính).
+    \item \textbf{Contact \& Basic Info:} First Name (Tên), Last Name (Họ), Email, Phone (Số điện thoại), Date of Birth (Ngày sinh), Gender (Giới tính), Emergency Contact (Liên hệ khẩn cấp).
+    \item \textbf{Professional Role:} Chọn loại (\textbf{Therapist} hoặc \textbf{Doctor}), Job Title (Chức danh), Employee ID (tự sinh -- Auto-Generate), Employment Type (Full-Time/Part-Time), Start Date (Ngày bắt đầu) và Description (Mô tả công việc, hỗ trợ rich text).
 \end{itemize}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_2_a.png}
     \vspace{0.5em}
-    \caption{Tạo nhân viên -- Skills \& Services: cấp bậc, hoa hồng và kỹ năng chuyên môn}
+    \caption{Tạo Doctor -- Education \& Qualifications và Experience \& Qualifications}
     \label{fig:partner_create_emp2}
 \end{figure}
 
-    Hình~\ref{fig:partner_create_emp2} hiển thị mục \textbf{Skills \& Services} cho Doctor:
+Hình~\ref{fig:partner_create_emp2} hiển thị các mục thông tin chuyên môn dành cho Doctor:
 \begin{itemize}
-    \item \textbf{Doctor Level:} Cấp bậc chuyên môn (Junior/Senior/Expert); \textbf{Commission Rate:} Tỷ lệ hoa hồng (\%).
-    \item \textbf{Specialization:} Chuyên môn chính của bác sĩ.
+    \item \textbf{Education \& Qualifications:} Medical Title (Chức danh y tế), Medical License ID (Mã chứng chỉ hành nghề -- bắt buộc), Education (Bằng cấp -- đa chọn), Certifications (Chứng chỉ chuyên môn).
+    \item \textbf{Experience \& Qualifications:} Years of Experience (Số năm kinh nghiệm), Consultation Fee (Phí tư vấn \%), Specializations (Chuyên khoa -- đa chọn).
 \end{itemize}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_2_b.png}
     \vspace{0.5em}
-    \caption{Tạo nhân viên -- Skills \& Services: chọn Therapist Type}
+    \caption{Tạo Therapist -- Skills \& Services: loại trị liệu, cấp bậc và kỹ năng chuyên môn}
     \label{fig:partner_create_emp2b}
 \end{figure}
 
-Hình~\ref{fig:partner_create_emp2b} hiển thị mục \textbf{Skills \& Services}  cho Therapist:
+Hình~\ref{fig:partner_create_emp2b} hiển thị mục \textbf{Skills \& Services} dành cho Therapist:
 \begin{itemize}
-    \item \textbf{Therapist Type:} Chọn loại trị liệu viên -- Spa Therapist (wellness tổng quát) hoặc Massage Therapist (deep tissue).
-    \item \textbf{Last Health Check:} Ngày kiểm tra sức khoẻ gần nhất.
-    \item \textbf{Skill Set:} Tìm kiếm và gắn các kỹ năng chuyên môn (đa chọn).
+    \item \textbf{Therapist Type:} Spa Therapist (General wellness) hoặc Massage Therapist (Deep tissue).
+    \item \textbf{Therapist Level} (Cấp bậc) và \textbf{Commission Rate} (Tỷ lệ hoa hồng \%).
+    \item \textbf{Massage Strength:} Mức lực massage -- Soft / Medium / Strong (chỉ hiện khi chọn Massage Therapist).
+    \item \textbf{Last Health Check} (Ngày kiểm tra sức khoẻ gần nhất) và \textbf{Skill Set} (Kỹ năng chuyên môn -- đa chọn).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_3.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Work History và Documents \& Certifications}
+    \label{fig:partner_create_emp3}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp3} hiển thị phần tài liệu và lịch sử công tác:
+\begin{itemize}
+    \item \textbf{Work History:} Thêm nhiều mục lịch sử công tác qua nút \textbf{Add Work History}.
+    \item \textbf{Documents \& Certifications -- Required:} Giấy phép hành nghề (License/Permit) và Chứng minh nhân thân (Identity Card) -- bắt buộc; hỗ trợ xem (View) và thay thế (Replace).
+    \item \textbf{Other Documents:} Khu vực tải lên tự do (PDF, JPG, PNG -- tối đa 10MB).
 \end{itemize}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_4.png}
     \vspace{0.5em}
-    \caption{Tạo nhân viên -- Work History, Documents \& Certifications và Work Schedule}
-    \label{fig:partner_create_emp3}
+    \caption{Tạo nhân viên -- Work Schedule: ca làm việc theo từng ngày trong tuần}
+    \label{fig:partner_create_emp4}
 \end{figure}
 
-Hình~\ref{fig:partner_create_emp3} hiển thị phần cuối của form tạo nhân viên:
+Hình~\ref{fig:partner_create_emp4} hiển thị phần \textbf{Work Schedule}:
 \begin{itemize}
-    \item \textbf{Work History:} Thêm nhiều mục lịch sử công tác qua nút \textbf{Add Work History}.
-    \item \textbf{Documents \& Certifications -- Required:} Giấy phép hành nghề (License/Permit) và Chứng minh nhân thân (Identity Card) -- bắt buộc.
-    \item \textbf{Other Documents:} Khu vực tải lên tự do (PDF, JPG, PNG, tối đa 10MB).
-    \item \textbf{Work Schedule:} Cấu hình ca làm việc theo từng ngày trong tuần; nhấn \textbf{Create Employee/Doctor} để lưu và hệ thống sinh Employee ID tự động.
+    \item Cấu hình ca theo từng ngày (Mon--Sun): toggle bật/tắt và giờ bắt đầu/kết thúc (Shift Hours).
+    \item Nút \textbf{Apply Preset} áp dụng mẫu ca mặc định (Full-Time Morning: Mon--Fri 09:00--17:00).
+    \item Nhấn \textbf{Create Employee/Doctor} để lưu; hệ thống tự sinh Employee ID.
 \end{itemize}
 
-% ---------------------------------------------------------------------------
 % 6.3.3.5  SERVICE TAGS
 % ---------------------------------------------------------------------------
 \subsubsection{Quản lý Service Tags}
