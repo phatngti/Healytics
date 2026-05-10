@@ -27,20 +27,7 @@ Hình~\ref{fig:unit_test_result} thể hiện kết quả chạy toàn bộ bộ
 
 \subsubsection{Cấu trúc và quy ước kiểm thử}
 
-Mỗi bài kiểm thử tuân theo mô hình \textbf{Arrange -- Act -- Assert} (AAA):
-\begin{itemize}
-    \item \textbf{Arrange:} Khởi tạo mock repository/service thay thế phụ thuộc thực (\texttt{jest.fn()}, \texttt{createMockRepository()}).
-    \item \textbf{Act:} Gọi hàm/phương thức cần kiểm tra với dữ liệu đầu vào đã chuẩn bị.
-    \item \textbf{Assert:} Xác nhận giá trị trả về, ngoại lệ ném ra, hoặc số lần mock được gọi bằng \texttt{expect().toEqual()}, \texttt{rejects.toThrow()}, \texttt{toHaveBeenCalledWith()}.
-\end{itemize}
-
-Hệ thống cung cấp các tiện ích dùng chung trong \texttt{test/mocks/mock-types.ts}:
-\begin{itemize}
-    \item \texttt{createMockRepository<T>()}: Tạo mock TypeORM repository với đầy đủ phương thức (\texttt{findOne}, \texttt{save}, \texttt{create}, \texttt{find}, v.v.).
-    \item \texttt{createMockQueryRunner()}: Tạo mock \texttt{QueryRunner} cho kiểm thử transaction.
-    \item \texttt{createMockDataSource()}: Tạo mock \texttt{DataSource} phục vụ các handler dùng transaction.
-    \item \texttt{createMockHandler()}: Tạo mock Command Handler cho Service-layer delegation tests.
-\end{itemize}
+Bài kiểm thử tuân theo mô hình Arrange-Act-Assert: khởi tạo mock, gọi hàm, xác nhận kết quả. Hệ thống dùng Jest với các tiện ích mock (createMockRepository, createMockQueryRunner, createMockDataSource, createMockHandler) trong test/mocks/mock-types.ts.
 
 \subsubsection{Phạm vi bao phủ theo module}
 
@@ -82,8 +69,6 @@ Các module khác & 23 & \texttt{cart}, \texttt{health-service}, \texttt{locatio
 \end{table}
 
 \subsubsection{Thống kê số lượng test case theo module}
-
-Bảng~\ref{tab:unittest_stats} thống kê số file spec, số test case và kết quả thực thi của từng module, dựa trên lần chạy ngày 09/05/2026:
 
 \begin{table}[H]
 \centering
@@ -146,47 +131,19 @@ Bảng~\ref{tab:unittest_stats} thống kê số file spec, số test case và k
 
 \subsubsection{Kiểm thử race condition trong Booking}
 
-Module \texttt{booking} có nhóm kiểm thử chuyên biệt về race condition (thư mục \texttt{handlers/\_\_tests\_\_/}) nhằm đảm bảo tính đúng đắn khi nhiều người dùng đặt cùng một khung giờ đồng thời. Các kịch bản chính bao gồm:
-
-\begin{itemize}
-    \item \textbf{Slot đã bị đặt trong DB:} \texttt{CheckSlotAvailabilityHandler} trả về \texttt{false} ngay khi tìm thấy booking ở trạng thái không phải \texttt{CANCELLED} trong cơ sở dữ liệu, không kiểm tra Redis.
-    \item \textbf{Redis checkout lock đang hoạt động:} Nếu \texttt{getLockTTL()} trả về giá trị dương, slot cũng bị coi là không khả dụng, ngăn chặn đặt trùng trong giai đoạn chờ xử lý thanh toán.
-    \item \textbf{Tranh chấp Redis intent lock:} \texttt{AcquireMicroLockHandler} kiểm tra khi hai request cùng cố gắng acquire lock cho cùng một \texttt{(staffId, startTime)}; bên không giành được lock bị từ chối ngay lập tức.
-    \item \textbf{Xử lý checkout song song:} \texttt{ProcessCheckoutHandler} dùng transaction (\texttt{QueryRunner}) để đảm bảo chỉ một booking được tạo ngay cả khi hai ticket được xử lý đồng thời.
-\end{itemize}
+Kiểm thử race condition: slot đặt trong DB trả về false, Redis checkout lock ngăn chặn trùng, acquire-lock fail khi conflict, transaction đảm bảo một booking được tạo.
 
 \subsubsection{Kết luận kiểm thử đơn vị}
 
-Bộ kiểm thử đơn vị của hệ thống Healytics đạt kết quả \textbf{100\% test case thành công}: toàn bộ 408 test case phân bổ trên 63 test suite đều PASS, không có test case thất bại hay ở trạng thái pending. Module \texttt{booking} có mức độ kiểm thử cao nhất với 59 test case (chiếm ~14,5\%), phản ánh tính phức tạp của nghiệp vụ đặt lịch, race condition và tích hợp thanh toán. Các module cốt lõi như \texttt{payment-gateway}, \texttt{notification} và \texttt{employees} đều được phủ kiểm thử đầy đủ. Kết quả này khẳng định rằng từng thành phần của hệ thống (Controller, Service, Command Handler) hoạt động đúng theo đặc tả trong môi trường độc lập, không phụ thuộc cơ sở dữ liệu hay dịch vụ ngoài.
+100\% test case thành công: 408 case, 63 suite, 0 fail. Booking module 59 case (14.5\%), phản ánh độ phức tạp. Các module cốt lõi đều được phủ kiểm thử đầy đủ.
 
 \subsection{Kiểm thử tích hợp (End-to-End Tests)}
 
-Kiểm thử tích hợp mô phỏng hành vi thực tế của người dùng bằng cách gửi các yêu cầu HTTP đến hệ thống đang chạy đầy đủ. Các bài kiểm thử được tổ chức trong thư mục \texttt{test/e2e/}, sử dụng thư viện \texttt{Supertest}:
+E2E tests mô phỏng hành vi thực tế: đăng ký→đăng nhập→làm mới token (auth), cập nhật hồ sơ (account), CRUD danh mục/nhân viên. Dùng Supertest, tổ chức trong test/e2e/. Tiện ích: factories tạo dữ liệu, fixtures cố định, mocks dùng chung, helpers dọn dẹp.
 
-\begin{itemize}
-    \item \texttt{auth/}: Kiểm tra luồng hoàn chỉnh từ đăng ký $\rightarrow$ đăng nhập $\rightarrow$ làm mới token.
-    \item \texttt{account/}: Kiểm tra cập nhật hồ sơ cá nhân.
-    \item \texttt{categories/}, \texttt{employees/}, \texttt{products/}: Kiểm tra các API thêm/sửa/xóa từ đầu đến cuối.
-\end{itemize}
+\subsection{Công cụ kiểm thử}
 
-Để hỗ trợ việc viết kiểm thử nhanh và nhất quán, hệ thống cung cấp các thư mục tiện ích:
-
-\begin{itemize}
-    \item \texttt{test/factories/}: Tạo dữ liệu mẫu tự động cho các bài kiểm thử.
-    \item \texttt{test/fixtures/}: Dữ liệu cố định dùng chung.
-    \item \texttt{test/mocks/}: Các đối tượng giả lập dùng chung giữa nhiều bài kiểm thử.
-    \item \texttt{test/helpers/}: Các hàm tiện ích hỗ trợ khởi tạo và dọn dẹp môi trường kiểm thử.
-\end{itemize}
-
-\subsection{Công cụ và lệnh kiểm thử}
-
-\begin{itemize}
-    \item \textbf{Chạy kiểm thử đơn vị:} \texttt{npm test}
-    \item \textbf{Chạy kiểm thử tích hợp:} \texttt{npm run test:e2e}
-    \item \textbf{Xem độ bao phủ mã nguồn:} \texttt{npm run test:cov}
-    \item \textbf{Kiểm tra chất lượng mã:} \texttt{npx eslint src/}
-    \item \textbf{Định dạng mã nguồn:} \texttt{npx prettier --write src/}
-\end{itemize}
+Chạy kiểm thử đơn vị: \texttt{npm test}; E2E: \texttt{npm run test:e2e}; Độ bao phủ: \texttt{npm run test:cov}; Chất lượng mã: \texttt{npx eslint}; Định dạng: \texttt{npx prettier --write}
 
 \section{Kiểm thử phi chức năng (Performance, Load, Security)}
 
@@ -249,7 +206,7 @@ Bảng~\ref{tab:perf_run_timeline} trình bày chi tiết toàn bộ 19 lần ch
 \begin{table}[H]
 \centering
 \footnotesize
-\begin{tabularx}{\textwidth}{|c|p{0.11\textwidth}|p{0.16\textwidth}|r|r|r|r|r|r|r|}
+\begin{tabular}{|c|p{0.11\textwidth}|p{0.16\textwidth}|r|r|r|r|r|r|r|}
 \hline
 \textbf{\#} & \textbf{Ngày} & \textbf{Suite} & \textbf{T (s)} & \textbf{Users} & \textbf{Reqs} & \textbf{Fails} & \textbf{Err\%} & \textbf{Avg RT} & \textbf{RPS} \\
 \hline
@@ -291,7 +248,7 @@ Bảng~\ref{tab:perf_run_timeline} trình bày chi tiết toàn bộ 19 lần ch
 \hline
 19 & 05-10 & all\_modules & 1 & 0 & 1 & 1 & 100.0 & 7 & 119.1 \\
 \hline
-\end{tabularx}
+\end{tabular}
 \caption{Lịch sử toàn bộ 19 lần chạy kiểm thử hiệu suất (Avg RT tính theo ms)}
 \label{tab:perf_run_timeline}
 \end{table}
