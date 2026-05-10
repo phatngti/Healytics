@@ -4,12 +4,13 @@ import {
   ConflictException,
   UnauthorizedException,
   ForbiddenException,
+  Optional,
 } from '@nestjs/common';
 import { AccountService } from '@/account/account.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { createHash } from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@/account/enum/role.enum';
@@ -17,6 +18,7 @@ import { UserProfile } from '@/common/entities/user-profile.entity';
 import { Account } from '@/common/entities/account.entity';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { PartnersService } from '@/partners/partners.service';
+import { RedisService } from '@/redis/redis.service';
 
 /** Roles allowed for admin/partner login */
 const ADMIN_ROLES: Role[] = [Role.ADMIN, Role.HEALTH_PARTNER, Role.EMPLOYEE];
@@ -44,6 +46,24 @@ interface AuthJwtPayload {
   partnerProfileCompleted?: boolean;
 }
 
+interface RefreshSessionRecord extends AuthJwtPayload {
+  hash: string;
+  issuedAt: string;
+  expiresAt: string;
+}
+
+interface ValidatedRefreshToken {
+  user: Account;
+  payload: AuthJwtPayload;
+  oldHash: string;
+  source: 'redis' | 'db';
+  session?: RefreshSessionRecord;
+}
+
+interface CreateTokenOptions {
+  persistRefreshSession?: boolean;
+}
+
 /** Validated user from authentication */
 export interface ValidatedUser {
   id: string;
@@ -55,16 +75,46 @@ export interface ValidatedUser {
 
 /**
  * Authentication service handling registration, login, and token management.
+ *
+ * Performance notes (1000 CCU / 100 UPS target):
+ * - User passwords use native bcrypt to avoid pure-JS event-loop pressure.
+ * - Refresh token hashes use SHA-256 because refresh JWTs are high entropy.
+ * - Refresh sessions are stored in Redis with DB fallback for migration.
  */
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
+  /** Pre-parsed token expiry values — avoids repeated env reads */
+  private readonly accessExpires: string;
+  private readonly refreshExpires: string;
+  private readonly refreshTtlSeconds: number;
+  private readonly refreshSessionStore: 'redis' | 'db';
+  private readonly refreshDbFallback: boolean;
+  private readonly refreshDualWrite: boolean;
+  private readonly partnerVerificationCacheTtlSeconds: number;
+
   constructor(
     private readonly accountService: AccountService,
     private readonly jwtService: JwtService,
     private readonly partnerService: PartnersService,
-  ) {}
+    @Optional()
+    private readonly redisService?: RedisService,
+  ) {
+    this.accessExpires = process.env.JWT_EXPIRES_IN || '3600s';
+    this.refreshExpires = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+    this.refreshTtlSeconds = this.parseDurationSeconds(
+      this.refreshExpires,
+      7 * 24 * 60 * 60,
+    );
+    this.refreshSessionStore =
+      process.env.AUTH_REFRESH_SESSION_STORE === 'db' ? 'db' : 'redis';
+    this.refreshDbFallback = process.env.AUTH_REFRESH_DB_FALLBACK !== 'false';
+    this.refreshDualWrite = process.env.AUTH_REFRESH_DUAL_WRITE === 'true';
+    this.partnerVerificationCacheTtlSeconds = Number(
+      process.env.PARTNER_VERIFICATION_CACHE_TTL_SECONDS || 300,
+    );
+  }
 
   /**
    * Creates access and refresh tokens for a user.
@@ -81,41 +131,30 @@ export class AuthService {
     role?: Role,
     profile?: UserProfile,
     partnerVerification?: PartnerVerificationInfo,
+    options: CreateTokenOptions = {},
   ): Promise<AuthTokensDto> {
-    const payload: AuthJwtPayload = { sub: userId, email, role };
-    if (profile) {
-      payload.firstName = profile.firstName;
-      payload.lastName = profile.lastName;
-      payload.profileCompleted = profile.profileCompleted;
+    const payload = this.buildJwtPayload(
+      userId,
+      email,
+      role,
+      profile,
+      partnerVerification,
+    );
+
+    const [access_token, refresh_token] = await Promise.all([
+      this.signJwt(payload, this.accessExpires),
+      this.signJwt(payload, this.refreshExpires),
+    ]);
+
+    if (options.persistRefreshSession !== false) {
+      await this.persistRefreshSession(userId, refresh_token, payload);
     }
 
-    this.logger.debug(
-      `Partner verification info: ${JSON.stringify(partnerVerification)}`,
-    );
-    if (partnerVerification) {
-      payload.verificationStatus = partnerVerification.verificationStatus;
-      payload.verificationCompletedAt =
-        partnerVerification.verificationCompletedAt?.toISOString() ?? null;
-      payload.partnerProfileCompleted =
-        partnerVerification.partnerProfileCompleted;
-    }
-    const accessExpires = process.env.JWT_EXPIRES_IN || '3600s';
-    const refreshExpires = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
-    const access_token = this.jwtService.sign(payload, {
-      expiresIn: accessExpires as any,
-    });
-    const refresh_token = this.jwtService.sign(payload, {
-      expiresIn: refreshExpires as any,
-    });
-    // SHA-256 for refresh tokens: they are high-entropy JWTs, not user passwords.
-    // bcrypt cost-10 blocked the event loop ~300ms per call — SHA-256 is ~0.01ms.
-    const refreshHash = createHash('sha256').update(refresh_token).digest('hex');
-    await this.accountService.setRefreshTokenHash(userId, refreshHash);
     return {
       access_token,
-      access_expires_in: accessExpires,
+      access_expires_in: this.accessExpires,
       refresh_token,
-      refresh_expires_in: refreshExpires,
+      refresh_expires_in: this.refreshExpires,
     } as AuthTokensDto;
   }
 
@@ -125,13 +164,14 @@ export class AuthService {
    * @returns Authentication tokens
    */
   async register(dto: RegisterDto): Promise<AuthTokensDto> {
-    const existing = await this.accountService.findByEmail(dto.email);
-    if (existing) {
+    const email = dto.email.trim().toLowerCase();
+    const emailExists = await this.accountService.checkEmailExists(email);
+    if (emailExists) {
       throw new ConflictException('Email already in use');
     }
     const hash = await bcrypt.hash(dto.password, 10);
     const createData: Partial<Account> = {
-      email: dto.email,
+      email,
       passwordHash: hash,
       role: Role.USER,
     };
@@ -163,8 +203,9 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<ValidatedUser | null> {
-    const user = await this.accountService.findByEmail(email);
+    const user = await this.accountService.findAuthByEmail(email);
     if (!user) return null;
+    if (!user.isActive) return null;
 
     const isMatch = await bcrypt.compare(password, user.passwordHash || '');
     if (!isMatch) return null;
@@ -302,8 +343,9 @@ export class AuthService {
       );
     }
 
-    const partnerProfile = await this.partnerService.getPartnerProfile(userId);
-    if (!partnerProfile) {
+    const partnerVerification =
+      await this.getPartnerVerificationInfo(userId);
+    if (!partnerVerification) {
       throw new ForbiddenException(
         'This account is not authorized for partner login.',
       );
@@ -315,13 +357,76 @@ export class AuthService {
       userEmail,
       userRole,
       user.userProfile,
-      {
-        verificationCompletedAt: partnerProfile.verificationCompletedAt,
-        verificationStatus: partnerProfile.verificationStatus,
-        partnerProfileCompleted:
-          this.partnerService.isPartnerProfileCompleted(partnerProfile),
-      },
+      partnerVerification,
     );
+  }
+
+  // ============================================================================
+  // Token Refresh
+  // ============================================================================
+
+  /**
+   * Validates a refresh token and returns the associated account.
+   * Extracted from refresh() and refreshPartner() to eliminate code duplication.
+   *
+   * @param refreshToken - The refresh token to validate
+   * @returns The validated account
+   * @throws UnauthorizedException if the token is invalid, expired, or revoked
+   */
+  private async _validateRefreshToken(
+    refreshToken: string,
+  ): Promise<ValidatedRefreshToken> {
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
+
+    let payload: AuthJwtPayload;
+    try {
+      payload = this.jwtService.verify(refreshToken);
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const userId = payload?.sub;
+    if (!userId) {
+      throw new UnauthorizedException('Invalid token payload');
+    }
+
+    const incomingHash = createHash('sha256')
+      .update(refreshToken)
+      .digest('hex');
+
+    const redisSession = await this.validateRedisRefreshSession(
+      userId,
+      incomingHash,
+      payload,
+    );
+    if (redisSession) {
+      return redisSession;
+    }
+
+    if (!this.refreshDbFallback) {
+      throw new UnauthorizedException('Refresh token revoked');
+    }
+
+    const user = await this.accountService.findOneWithRefreshHash(userId);
+    if (!user || !user.refreshTokenHash || !user.isActive) {
+      throw new UnauthorizedException('Refresh token revoked');
+    }
+
+    if (incomingHash !== user.refreshTokenHash) {
+      // Hash mismatch — possible token reuse attack or race condition.
+      // Revoke the stored token to force re-authentication.
+      await this.accountService.removeRefreshToken(userId).catch(() => {});
+      throw new UnauthorizedException('Refresh token does not match');
+    }
+
+    return {
+      user,
+      payload,
+      oldHash: incomingHash,
+      source: 'db',
+    };
   }
 
   /**
@@ -330,30 +435,8 @@ export class AuthService {
    * @returns New authentication tokens with partner verification data
    */
   async refreshPartner(refreshToken: string): Promise<AuthTokensDto> {
-    if (!refreshToken) {
-      throw new UnauthorizedException('No refresh token provided');
-    }
-    let payload: AuthJwtPayload;
-    try {
-      payload = this.jwtService.verify(refreshToken);
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-    const userId = payload?.sub;
-    if (!userId) {
-      throw new UnauthorizedException('Invalid token payload');
-    }
-    const user = await this.accountService.findOneWithRefreshHash(userId);
-    if (!user || !user.refreshTokenHash) {
-      throw new UnauthorizedException('Refresh token revoked');
-    }
-    const match =
-      createHash('sha256').update(refreshToken).digest('hex') ===
-      user.refreshTokenHash;
-    if (!match) {
-      await this.accountService.removeRefreshToken(userId).catch(() => {});
-      throw new UnauthorizedException('Refresh token does not match');
-    }
+    const validation = await this._validateRefreshToken(refreshToken);
+    const { user } = validation;
 
     // Ensure the user is a partner
     if (user.role !== Role.HEALTH_PARTNER) {
@@ -363,28 +446,36 @@ export class AuthService {
     // Fetch partner profile for verification info
     let partnerVerification: PartnerVerificationInfo | undefined;
     try {
-      const partnerProfile =
-        await this.partnerService.getPartnerProfile(userId);
-      if (partnerProfile) {
-        partnerVerification = {
-          verificationStatus: partnerProfile.verificationStatus,
-          verificationCompletedAt: partnerProfile.verificationCompletedAt,
-          partnerProfileCompleted:
-            this.partnerService.isPartnerProfileCompleted(partnerProfile),
-        };
-      }
+      partnerVerification =
+        (await this.getPartnerVerificationInfo(user.id)) ?? undefined;
     } catch {
       // Partner profile may not exist yet — continue without verification info
     }
 
-    this.logger.log(`Partner token refreshed for user: ${userId}`);
-    return this.createTokensForUser(
-      userId,
+    this.logger.log(`Partner token refreshed for user: ${user.id}`);
+    const profile =
+      user.userProfile ??
+      this.userProfileFromClaims(validation.session ?? validation.payload);
+    const tokens = await this.createTokensForUser(
+      user.id,
       user.email,
       user.role,
-      user.userProfile,
+      profile,
       partnerVerification,
+      { persistRefreshSession: false },
     );
+    await this.rotateRefreshSession(
+      validation,
+      tokens.refresh_token,
+      this.buildJwtPayload(
+        user.id,
+        user.email,
+        user.role,
+        profile,
+        partnerVerification,
+      ),
+    );
+    return tokens;
   }
 
   /**
@@ -393,38 +484,369 @@ export class AuthService {
    * @returns New authentication tokens
    */
   async refresh(refreshToken: string): Promise<AuthTokensDto> {
-    if (!refreshToken) {
-      throw new UnauthorizedException('No refresh token provided');
-    }
-    let payload: AuthJwtPayload;
-    try {
-      payload = this.jwtService.verify(refreshToken);
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-    const userId = payload?.sub;
-    if (!userId) {
-      throw new UnauthorizedException('Invalid token payload');
-    }
-    const user = await this.accountService.findOneWithRefreshHash(userId);
-    if (!user || !user.refreshTokenHash) {
-      throw new UnauthorizedException('Refresh token revoked');
-    }
-    const match =
-      createHash('sha256').update(refreshToken).digest('hex') ===
-      user.refreshTokenHash;
-    if (!match) {
-      await this.accountService.removeRefreshToken(userId).catch(() => {});
-      throw new UnauthorizedException('Refresh token does not match');
-    }
-    this.logger.log(`Token refreshed for user: ${userId}`);
+    const validation = await this._validateRefreshToken(refreshToken);
+    const { user } = validation;
+
+    this.logger.log(`Token refreshed for user: ${user.id}`);
+    const profile =
+      user.userProfile ??
+      this.userProfileFromClaims(validation.session ?? validation.payload);
     const tokens = await this.createTokensForUser(
-      userId,
+      user.id,
       user.email,
       user.role,
-      user.userProfile,
+      profile,
+      undefined,
+      { persistRefreshSession: false },
+    );
+    await this.rotateRefreshSession(
+      validation,
+      tokens.refresh_token,
+      this.buildJwtPayload(user.id, user.email, user.role, profile),
     );
     return tokens;
+  }
+
+  private buildJwtPayload(
+    userId: string,
+    email?: string,
+    role?: Role,
+    profile?: UserProfile,
+    partnerVerification?: PartnerVerificationInfo,
+  ): AuthJwtPayload {
+    const payload: AuthJwtPayload = { sub: userId, email, role };
+    if (profile) {
+      payload.firstName = profile.firstName;
+      payload.lastName = profile.lastName;
+      payload.profileCompleted = profile.profileCompleted;
+    }
+
+    if (partnerVerification) {
+      payload.verificationStatus = partnerVerification.verificationStatus;
+      payload.verificationCompletedAt =
+        partnerVerification.verificationCompletedAt?.toISOString() ?? null;
+      payload.partnerProfileCompleted =
+        partnerVerification.partnerProfileCompleted;
+    }
+
+    return payload;
+  }
+
+  private async signJwt(
+    payload: AuthJwtPayload,
+    expiresIn: string,
+  ): Promise<string> {
+    if (typeof this.jwtService.signAsync === 'function') {
+      return this.jwtService.signAsync(payload, {
+        expiresIn: expiresIn as any,
+      });
+    }
+
+    return this.jwtService.sign(payload, {
+      expiresIn: expiresIn as any,
+    });
+  }
+
+  private async validateRedisRefreshSession(
+    userId: string,
+    incomingHash: string,
+    payload: AuthJwtPayload,
+  ): Promise<ValidatedRefreshToken | null> {
+    if (!this.shouldUseRedisRefreshSessions()) {
+      return null;
+    }
+
+    const key = this.refreshSessionKey(userId);
+
+    try {
+      const session = await this.redisService!.getJson<RefreshSessionRecord>(
+        key,
+      );
+      if (!session) {
+        return null;
+      }
+
+      if (session.hash !== incomingHash) {
+        await this.redisService!.del(key).catch(() => undefined);
+        await this.accountService.removeRefreshToken(userId).catch(() => {});
+        throw new UnauthorizedException('Refresh token does not match');
+      }
+
+      return {
+        user: this.accountFromRefreshClaims(userId, session, payload),
+        payload,
+        oldHash: incomingHash,
+        source: 'redis',
+        session,
+      };
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+
+      this.logger.warn(
+        `Redis refresh validation skipped for user ${userId}: ${(error as Error).message}`,
+      );
+      return null;
+    }
+  }
+
+  private async getPartnerVerificationInfo(
+    accountId: string,
+  ): Promise<PartnerVerificationInfo | null> {
+    const cacheKey = `cache:partner:verification:v1:${accountId}`;
+    if (this.redisService && this.partnerVerificationCacheTtlSeconds > 0) {
+      try {
+        const cached =
+          await this.redisService.getJson<PartnerVerificationInfo>(cacheKey);
+        if (cached) {
+          return this.hydratePartnerVerificationInfo(cached);
+        }
+      } catch (error) {
+        this.logger.warn(
+          `Partner verification cache read skipped for ${accountId}: ${(error as Error).message}`,
+        );
+      }
+    }
+
+    const partnerProfile = await this.partnerService.getPartnerProfile(
+      accountId,
+    );
+    if (!partnerProfile) {
+      return null;
+    }
+
+    const info: PartnerVerificationInfo = {
+      verificationStatus: partnerProfile.verificationStatus,
+      verificationCompletedAt: partnerProfile.verificationCompletedAt,
+      partnerProfileCompleted:
+        this.partnerService.isPartnerProfileCompleted(partnerProfile),
+    };
+
+    if (this.redisService && this.partnerVerificationCacheTtlSeconds > 0) {
+      await this.redisService
+        .setJson(cacheKey, info, this.partnerVerificationCacheTtlSeconds)
+        .catch((error) => {
+          this.logger.warn(
+            `Partner verification cache write skipped for ${accountId}: ${(error as Error).message}`,
+          );
+        });
+    }
+
+    return info;
+  }
+
+  private hydratePartnerVerificationInfo(
+    value: PartnerVerificationInfo,
+  ): PartnerVerificationInfo {
+    return {
+      ...value,
+      verificationCompletedAt: value.verificationCompletedAt
+        ? new Date(value.verificationCompletedAt)
+        : null,
+    };
+  }
+
+  private async persistRefreshSession(
+    userId: string,
+    refreshToken: string,
+    payload: AuthJwtPayload,
+  ): Promise<void> {
+    const refreshHash = this.hashRefreshToken(refreshToken);
+
+    if (this.shouldUseRedisRefreshSessions()) {
+      try {
+        await this.redisService!.setJson(
+          this.refreshSessionKey(userId),
+          this.buildRefreshSessionRecord(refreshHash, payload),
+          this.refreshTtlSeconds,
+        );
+
+        if (this.refreshDualWrite) {
+          await this.accountService.setRefreshTokenHash(userId, refreshHash);
+        }
+        return;
+      } catch (error) {
+        this.logger.warn(
+          `Redis refresh session write failed for user ${userId}: ${(error as Error).message}`,
+        );
+
+        if (!this.refreshDbFallback) {
+          throw error;
+        }
+      }
+    }
+
+    await this.accountService.setRefreshTokenHash(userId, refreshHash);
+  }
+
+  private async rotateRefreshSession(
+    validation: ValidatedRefreshToken,
+    newRefreshToken: string,
+    nextPayload: AuthJwtPayload,
+  ): Promise<void> {
+    const newHash = this.hashRefreshToken(newRefreshToken);
+
+    if (validation.source === 'redis') {
+      if (!this.shouldUseRedisRefreshSessions()) {
+        throw new UnauthorizedException('Refresh token rotation unavailable');
+      }
+
+      try {
+        const result = await this.redisService!.compareJsonHashAndSet(
+          this.refreshSessionKey(validation.user.id),
+          validation.oldHash,
+          this.buildRefreshSessionRecord(newHash, nextPayload),
+          this.refreshTtlSeconds,
+        );
+
+        if (result === 'ok') {
+          if (this.refreshDualWrite) {
+            await this.accountService.setRefreshTokenHash(
+              validation.user.id,
+              newHash,
+            );
+          }
+          return;
+        }
+
+        if (result === 'missing') {
+          throw new UnauthorizedException('Refresh token revoked');
+        }
+
+        await this.deleteRedisRefreshSession(validation.user.id);
+        await this.accountService
+          .removeRefreshToken(validation.user.id)
+          .catch(() => {});
+        throw new UnauthorizedException('Refresh token does not match');
+      } catch (error) {
+        if (error instanceof UnauthorizedException) {
+          throw error;
+        }
+
+        this.logger.warn(
+          `Redis refresh rotation failed for user ${validation.user.id}: ${(error as Error).message}`,
+        );
+        throw new UnauthorizedException('Refresh token rotation failed');
+      }
+    }
+
+    await this.persistRefreshSession(
+      validation.user.id,
+      newRefreshToken,
+      nextPayload,
+    );
+  }
+
+  private async deleteRedisRefreshSession(userId: string): Promise<void> {
+    if (!this.shouldUseRedisRefreshSessions()) {
+      return;
+    }
+
+    try {
+      await this.redisService!.del(this.refreshSessionKey(userId));
+    } catch (error) {
+      this.logger.warn(
+        `Redis refresh session delete failed for user ${userId}: ${(error as Error).message}`,
+      );
+    }
+  }
+
+  private accountFromRefreshClaims(
+    userId: string,
+    session: RefreshSessionRecord,
+    payload: AuthJwtPayload,
+  ): Account {
+    const email = session.email ?? payload.email;
+    const role = session.role ?? payload.role;
+
+    if (!email || !role) {
+      throw new UnauthorizedException('Invalid token payload');
+    }
+
+    return {
+      id: userId,
+      email,
+      role,
+      isActive: true,
+      userProfile: this.userProfileFromClaims(session),
+    } as Account;
+  }
+
+  private userProfileFromClaims(
+    claims: Pick<
+      AuthJwtPayload,
+      'firstName' | 'lastName' | 'profileCompleted'
+    >,
+  ): UserProfile | undefined {
+    const hasProfileClaims =
+      claims.firstName !== undefined ||
+      claims.lastName !== undefined ||
+      claims.profileCompleted !== undefined;
+
+    if (!hasProfileClaims) {
+      return undefined;
+    }
+
+    return {
+      firstName: claims.firstName,
+      lastName: claims.lastName,
+      profileCompleted: claims.profileCompleted ?? false,
+    } as UserProfile;
+  }
+
+  private buildRefreshSessionRecord(
+    refreshHash: string,
+    payload: AuthJwtPayload,
+  ): RefreshSessionRecord {
+    const issuedAt = new Date();
+    const expiresAt = new Date(
+      issuedAt.getTime() + this.refreshTtlSeconds * 1000,
+    );
+
+    return {
+      ...payload,
+      hash: refreshHash,
+      issuedAt: issuedAt.toISOString(),
+      expiresAt: expiresAt.toISOString(),
+    };
+  }
+
+  private shouldUseRedisRefreshSessions(): boolean {
+    return this.refreshSessionStore === 'redis' && !!this.redisService;
+  }
+
+  private refreshSessionKey(userId: string): string {
+    return `auth:refresh:v1:${userId}`;
+  }
+
+  private hashRefreshToken(refreshToken: string): string {
+    return createHash('sha256').update(refreshToken).digest('hex');
+  }
+
+  private parseDurationSeconds(value: string, fallbackSeconds: number): number {
+    const trimmed = value.trim();
+    const numeric = Number(trimmed);
+    if (Number.isFinite(numeric) && numeric > 0) {
+      return numeric;
+    }
+
+    const match = /^(\d+)\s*([smhdw])$/i.exec(trimmed);
+    if (!match) {
+      return fallbackSeconds;
+    }
+
+    const amount = Number(match[1]);
+    const unit = match[2].toLowerCase();
+    const multipliers: Record<string, number> = {
+      s: 1,
+      m: 60,
+      h: 60 * 60,
+      d: 24 * 60 * 60,
+      w: 7 * 24 * 60 * 60,
+    };
+
+    return amount * multipliers[unit];
   }
 
   /**
@@ -436,6 +858,7 @@ export class AuthService {
   async logout(userId?: string): Promise<LogoutResponseDto> {
     try {
       if (userId) {
+        await this.deleteRedisRefreshSession(userId);
         await this.accountService.removeRefreshToken(userId);
         this.logger.log(`User logged out: ${userId}`);
       }

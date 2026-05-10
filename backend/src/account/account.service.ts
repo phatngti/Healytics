@@ -3,17 +3,19 @@ import {
   Logger,
   NotFoundException,
   ConflictException,
+  Optional,
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { Account } from '@/common/entities/account.entity';
 import { CreateAccountHandler } from './application/handlers/create-account.handler';
 import { SetSurveyHandler } from './application/handlers/set-survey.handler';
 import { SetRefreshTokenHandler } from './application/handlers/set-refresh-token.handler';
 import { SurveyResponseDto } from './dto/response/survey-response.dto';
 import { AccountMeResponseDto } from './dto/response/account-me-response.dto';
-import { plainToInstance } from 'class-transformer';
+import { RedisService } from '@/redis/redis.service';
+import { createHash } from 'crypto';
 
 /**
  * Service facade for managing user accounts.
@@ -23,6 +25,15 @@ import { plainToInstance } from 'class-transformer';
 @Injectable()
 export class AccountService {
   private readonly logger = new Logger(AccountService.name);
+  private readonly accountMeCacheTtlSeconds = Number(
+    process.env.ACCOUNT_ME_CACHE_TTL_SECONDS || 300,
+  );
+  private readonly emailExistsTrueTtlSeconds = Number(
+    process.env.AUTH_EMAIL_EXISTS_TRUE_TTL_SECONDS || 1800,
+  );
+  private readonly emailExistsFalseTtlSeconds = Number(
+    process.env.AUTH_EMAIL_EXISTS_FALSE_TTL_SECONDS || 60,
+  );
 
   constructor(
     @InjectRepository(Account)
@@ -30,6 +41,8 @@ export class AccountService {
     private readonly createAccountHandler: CreateAccountHandler,
     private readonly setSurveyHandler: SetSurveyHandler,
     private readonly setRefreshTokenHandler: SetRefreshTokenHandler,
+    @Optional()
+    private readonly redisService?: RedisService,
   ) {}
 
   /**
@@ -38,18 +51,42 @@ export class AccountService {
    * @returns AccountMeResponseDto with full account data
    */
   async getMe(accountId: string): Promise<AccountMeResponseDto> {
+    const cacheKey = this.accountMeCacheKey(accountId);
+    const cached = await this.getCache<AccountMeResponseDto>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const account = await this.accountRepo.findOne({
       where: { id: accountId },
-      relations: ['userProfile'],
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+        userProfile: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          bio: true,
+          dateOfBirth: true,
+          profileCompleted: true,
+        },
+      } as any,
+      relations: { userProfile: true } as any,
+      loadEagerRelations: false,
     });
 
     if (!account) {
       throw new NotFoundException('Account not found');
     }
 
-    return plainToInstance(AccountMeResponseDto, account, {
-      excludeExtraneousValues: true,
-    });
+    const response = this.toAccountMeResponse(account);
+    await this.setCache(cacheKey, response, this.accountMeCacheTtlSeconds);
+    return response;
   }
 
   /**
@@ -58,7 +95,11 @@ export class AccountService {
    * @returns The created account
    */
   async create(data: Partial<Account>): Promise<Account> {
-    return this.createAccountHandler.execute(data);
+    const account = await this.createAccountHandler.execute(data);
+    if (account.email) {
+      await this.markEmailExists(account.email);
+    }
+    return account;
   }
 
   /**
@@ -120,7 +161,9 @@ export class AccountService {
     accountId: string,
     survey: Record<string, unknown> | null,
   ): Promise<Account> {
-    return this.setSurveyHandler.execute(accountId, survey);
+    const account = await this.setSurveyHandler.execute(accountId, survey);
+    await this.invalidateAccountMeCache(accountId);
+    return account;
   }
 
   /**
@@ -129,6 +172,7 @@ export class AccountService {
    */
   async clearSurvey(accountId: string): Promise<void> {
     await this.accountRepo.update(accountId, { survey: null });
+    await this.invalidateAccountMeCache(accountId);
     this.logger.log(`Survey cleared for account: ${accountId}`);
   }
 
@@ -138,7 +182,36 @@ export class AccountService {
    * @returns The account or null if not found
    */
   async findByEmail(email: string): Promise<Account | null> {
-    return this.accountRepo.findOneBy({ email });
+    const normalizedEmail = this.normalizeEmail(email);
+    return this.accountRepo.findOne({
+      where: { email: this.emailEquals(normalizedEmail) },
+    });
+  }
+
+  /**
+   * Retrieves only the columns needed for password validation and token claims.
+   * Avoids eager Address loading from the Account -> UserProfile graph.
+   */
+  async findAuthByEmail(email: string): Promise<Account | null> {
+    const normalizedEmail = this.normalizeEmail(email);
+    return this.accountRepo.findOne({
+      where: { email: this.emailEquals(normalizedEmail) },
+      select: {
+        id: true,
+        email: true,
+        passwordHash: true,
+        role: true,
+        isActive: true,
+        userProfile: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profileCompleted: true,
+        },
+      } as any,
+      relations: { userProfile: true } as any,
+      loadEagerRelations: false,
+    });
   }
 
   /**
@@ -148,10 +221,34 @@ export class AccountService {
    * @returns true if the email is already registered
    */
   async checkEmailExists(email: string): Promise<boolean> {
-    const count = await this.accountRepo.count({
-      where: { email },
+    const normalizedEmail = this.normalizeEmail(email);
+    const cacheKey = this.emailExistsCacheKey(normalizedEmail);
+    const cached = await this.getCache<boolean>(cacheKey);
+    if (cached !== null) {
+      return cached;
+    }
+
+    const exists = await this.accountRepo.exist({
+      where: { email: this.emailEquals(normalizedEmail) },
     });
-    return count > 0;
+
+    await this.setCache(
+      cacheKey,
+      exists,
+      exists
+        ? this.emailExistsTrueTtlSeconds
+        : this.emailExistsFalseTtlSeconds,
+    );
+    return exists;
+  }
+
+  async markEmailExists(email: string): Promise<void> {
+    const normalizedEmail = this.normalizeEmail(email);
+    await this.setCache(
+      this.emailExistsCacheKey(normalizedEmail),
+      true,
+      this.emailExistsTrueTtlSeconds,
+    );
   }
 
   /**
@@ -184,13 +281,10 @@ export class AccountService {
         'id',
         'email',
         'role',
-        'passwordHash',
         'refreshTokenHash',
         'isActive',
-        'createdAt',
-        'updatedAt',
       ],
-      relations: ['userProfile'],
+      loadEagerRelations: false,
     });
   }
 
@@ -213,6 +307,106 @@ export class AccountService {
    */
   async removeRefreshToken(id: string): Promise<void> {
     await this.accountRepo.update(id, { refreshTokenHash: null });
+    await this.invalidateAccountMeCache(id);
     this.logger.log(`Refresh token removed for account: ${id}`);
+  }
+
+  async invalidateAccountMeCache(accountId: string): Promise<void> {
+    await this.delCache(this.accountMeCacheKey(accountId));
+  }
+
+  private toAccountMeResponse(account: Account): AccountMeResponseDto {
+    const response = new AccountMeResponseDto();
+    response.id = account.id;
+    response.email = account.email;
+    response.role = account.role;
+    response.isActive = account.isActive;
+    response.createdAt = account.createdAt;
+    response.updatedAt = account.updatedAt;
+
+    if (account.userProfile) {
+      response.userProfile = {
+        id: account.userProfile.id,
+        firstName: account.userProfile.firstName,
+        lastName: account.userProfile.lastName,
+        phone: account.userProfile.phone,
+        bio: account.userProfile.bio,
+        dateOfBirth: account.userProfile.dateOfBirth,
+        profileCompleted: account.userProfile.profileCompleted,
+      };
+    } else {
+      response.userProfile = null;
+    }
+
+    return response;
+  }
+
+  private normalizeEmail(email: string): string {
+    return email.trim().toLowerCase();
+  }
+
+  private emailEquals(normalizedEmail: string) {
+    return Raw((alias) => `lower(${alias}) = :email`, {
+      email: normalizedEmail,
+    });
+  }
+
+  private emailExistsCacheKey(normalizedEmail: string): string {
+    return `cache:auth:email-exists:v1:${this.sha256(normalizedEmail)}`;
+  }
+
+  private accountMeCacheKey(accountId: string): string {
+    return `cache:account:me:v1:${accountId}`;
+  }
+
+  private sha256(value: string): string {
+    return createHash('sha256').update(value).digest('hex');
+  }
+
+  private async getCache<T>(key: string): Promise<T | null> {
+    if (!this.redisService) {
+      return null;
+    }
+
+    try {
+      return await this.redisService.getJson<T>(key);
+    } catch (error) {
+      this.logger.warn(
+        `Redis cache read skipped for "${key}": ${(error as Error).message}`,
+      );
+      return null;
+    }
+  }
+
+  private async setCache(
+    key: string,
+    value: unknown,
+    ttlSeconds: number,
+  ): Promise<void> {
+    if (!this.redisService || ttlSeconds <= 0) {
+      return;
+    }
+
+    try {
+      await this.redisService.setJson(key, value, ttlSeconds);
+    } catch (error) {
+      this.logger.warn(
+        `Redis cache write skipped for "${key}": ${(error as Error).message}`,
+      );
+    }
+  }
+
+  private async delCache(key: string): Promise<void> {
+    if (!this.redisService) {
+      return;
+    }
+
+    try {
+      await this.redisService.del(key);
+    } catch (error) {
+      this.logger.warn(
+        `Redis cache delete skipped for "${key}": ${(error as Error).message}`,
+      );
+    }
   }
 }
