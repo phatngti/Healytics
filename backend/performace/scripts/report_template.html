@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance Analysis Report — Healytics</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--surface:#1a1d27;--card:#22253a;--border:#2d3148;--text:#e2e4ed;--muted:#8b8fa3;--accent:#6c5ce7;--accent2:#a29bfe;--green:#00b894;--red:#ff6b6b;--yellow:#ffd93d;--blue:#74b9ff;--gradient:linear-gradient(135deg,#6c5ce7,#a29bfe)}
+body{font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:0}
+.container{max-width:1200px;margin:0 auto;padding:24px}
+header{background:var(--gradient);padding:48px 40px;border-radius:0 0 24px 24px;margin-bottom:32px;position:relative;overflow:hidden}
+header::after{content:'';position:absolute;top:0;right:0;width:300px;height:100%;background:radial-gradient(circle at 80% 50%,rgba(255,255,255,.1),transparent);pointer-events:none}
+header h1{font-size:2rem;font-weight:800;color:#fff;margin-bottom:8px;letter-spacing:-.5px}
+header p{color:rgba(255,255,255,.8);font-size:.9rem}
+.meta-bar{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px}
+.meta-item{background:rgba(255,255,255,.15);backdrop-filter:blur(10px);padding:6px 16px;border-radius:20px;font-size:.8rem;color:#fff;font-weight:500}
+h2{font-size:1.4rem;font-weight:700;margin:32px 0 16px;padding-bottom:8px;border-bottom:2px solid var(--border);color:var(--accent2)}
+h3{font-size:1.1rem;font-weight:600;margin:24px 0 12px;color:var(--text)}
+.score-ring{display:flex;align-items:center;gap:20px;background:var(--card);border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid var(--border)}
+.ring{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;flex-shrink:0}
+.ring-pass{background:conic-gradient(var(--green) calc(var(--pct)*3.6deg),var(--border) 0);color:var(--green)}
+.ring-fail{background:conic-gradient(var(--red) calc(var(--pct)*3.6deg),var(--border) 0);color:var(--red)}
+.ring-inner{width:76px;height:76px;background:var(--card);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.score-info h3{margin:0 0 4px;font-size:1.1rem}.score-info p{color:var(--muted);font-size:.85rem}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.kpi{background:var(--card);border-radius:12px;padding:20px;border:1px solid var(--border);transition:transform .2s,box-shadow .2s}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.kpi-label{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px}
+.kpi-value{font-size:1.6rem;font-weight:700}
+.kpi-sub{font-size:.75rem;margin-top:4px}
+.pass{color:var(--green)}.fail{color:var(--red)}.warn{color:var(--yellow)}
+.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.badge-pass{background:rgba(0,184,148,.15);color:var(--green);border:1px solid rgba(0,184,148,.3)}
+.badge-fail{background:rgba(255,107,107,.15);color:var(--red);border:1px solid rgba(255,107,107,.3)}
+.badge-warn{background:rgba(255,217,61,.14);color:var(--yellow);border:1px solid rgba(255,217,61,.3)}
+.badge-suite{background:rgba(108,92,231,.15);color:var(--accent2);border:1px solid rgba(108,92,231,.3)}
+table{width:100%;border-collapse:separate;border-spacing:0;margin:12px 0 24px;font-size:.82rem;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+th{background:var(--surface);color:var(--accent2);font-weight:600;text-transform:uppercase;font-size:.7rem;letter-spacing:.8px;padding:12px 14px;text-align:left;position:sticky;top:0}
+td{padding:10px 14px;border-top:1px solid var(--border)}
+tr:hover td{background:rgba(108,92,231,.05)}
+td.num{text-align:right;font-variant-numeric:tabular-nums;font-family:'SF Mono','Cascadia Code','Fira Code',monospace;font-size:.8rem}
+.trend-up{color:var(--green)}.trend-down{color:var(--red)}.trend-stable{color:var(--muted)}
+.trend-bad-up{color:var(--red)}.trend-good-down{color:var(--green)}
+.bar-cell{position:relative;min-width:120px}
+.bar{height:6px;border-radius:3px;background:var(--accent);opacity:.7;transition:width .5s ease}
+.bar-danger{background:var(--red)}.bar-warn{background:var(--yellow)}.bar-ok{background:var(--green)}
+.section-card{background:var(--card);border-radius:12px;padding:24px;margin:16px 0;border:1px solid var(--border)}
+.notice{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:8px;padding:12px 14px;margin:12px 0;font-size:.85rem;color:var(--text)}
+.notice-warn{border-left-color:var(--yellow)}
+.rec-list{list-style:none;padding:0}.rec-list li{padding:12px 16px;border-left:3px solid var(--accent);margin-bottom:8px;background:var(--surface);border-radius:0 8px 8px 0;font-size:.85rem}
+.rec-list li strong{color:var(--accent2)}
+.chart-container{position:relative;height:200px;margin:16px 0 24px;background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px 16px 32px 48px;overflow:hidden}
+.chart-container .y-labels{position:absolute;left:8px;top:16px;bottom:32px;display:flex;flex-direction:column;justify-content:space-between;font-size:.65rem;color:var(--muted);font-family:monospace}
+.chart-container .x-labels{position:absolute;bottom:8px;left:48px;right:16px;display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted)}
+.sparkline{display:flex;align-items:flex-end;gap:2px;height:100%}
+.spark-bar{flex:1;min-width:4px;border-radius:2px 2px 0 0;transition:height .4s ease;position:relative}
+.spark-bar:hover{opacity:1!important;filter:brightness(1.3)}
+.spark-bar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:2px 8px;border-radius:4px;font-size:.65rem;white-space:nowrap;pointer-events:none;z-index:9}
+.tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:500;cursor:pointer;background:var(--surface);color:var(--muted);border:1px solid var(--border);transition:all .2s}
+.tab.active,.tab:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab-content{display:none}.tab-content.active{display:block}
+footer{text-align:center;padding:32px;color:var(--muted);font-size:.75rem;border-top:1px solid var(--border);margin-top:40px}
+@media(max-width:768px){.container{padding:12px}.kpi-grid{grid-template-columns:1fr 1fr}.meta-bar{gap:8px}header{padding:24px 20px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>📊 Performance Test Analysis Report</h1>
+  <p>Healytics Backend — Consolidated Performance Evaluation</p>
+  <div class="meta-bar">
+    <span class="meta-item">🕐 {{GENERATED}}</span>
+    <span class="meta-item">📄 {{REPORT_COUNT}} reports</span>
+    <span class="meta-item">📅 {{DATE_RANGE}}</span>
+    <span class="meta-item">🧪 {{SUITE_COUNT}} suites</span>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- Score Ring -->
+<div class="score-ring">
+  <div class="ring {{RING_CLASS}}" style="--pct:{{SCORE_PCT}}">
+    <div class="ring-inner">{{SCORE}}/5</div>
+  </div>
+  <div class="score-info">
+    <h3>Overall Score</h3>
+    <p>{{SCORE}} of 5 performance criteria passed against target thresholds.</p>
+    {{SCORE_CONTEXT}}
+  </div>
+</div>
+
+{{RUN_SCOPE_NOTICE}}
+
+<!-- KPI Cards -->
+<h2>Executive Summary</h2>
+<div class="kpi-grid">
+{{KPI_CARDS}}
+</div>
+
+<!-- Trend Chart -->
+<h2>Historical Trends</h2>
+{{TREND_TABLE}}
+
+{{CHART_AVG_RT}}
+{{CHART_RPS}}
+
+<!-- Run Timeline -->
+<h2>Run-by-Run Timeline</h2>
+{{TIMELINE_TABLE}}
+
+<!-- Per-Suite -->
+<h2>Per-Suite Breakdown</h2>
+<div class="tabs" id="suite-tabs">{{SUITE_TABS}}</div>
+{{SUITE_CONTENTS}}
+
+<!-- Endpoint Ranking -->
+<h2>Endpoint Performance Ranking</h2>
+{{ENDPOINT_RANKING}}
+
+<!-- Recommendations -->
+<h2>Recommendations</h2>
+{{RECOMMENDATIONS}}
+
+</div>
+
+<footer>
+  Report generated by <code>scripts/analyze_reports.js</code> · {{GENERATED}}
+</footer>
+
+<script>
+document.querySelectorAll('.tabs').forEach(tabGroup=>{
+  const tabs=tabGroup.querySelectorAll('.tab');
+  tabs.forEach(tab=>tab.addEventListener('click',()=>{
+    const target=tab.dataset.target;
+    tabs.forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    tabGroup.parentElement.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    document.getElementById(target)?.classList.add('active');
+  }));
+});
+</script>
+</body>
+</html>

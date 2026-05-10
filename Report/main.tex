@@ -10,15 +10,6 @@
 \usepackage{titlesec}
 
 %\usepackage{soul}
-\usepackage[style=ieee,sorting=none]{biblatex} %Imports biblatex package
-\AtEveryBibitem{%
-  \clearfield{issn} % Remove issn
-  \clearfield{doi} % Remove doi
-  \ifentrytype{online}{}{% Remove url except for @online
-    \clearfield{url}
-  }
-}
-\addbibresource{refs.bib}
 \usepackage[makeroom]{cancel}
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -344,5 +335,4 @@ morekeywords={}
 \newpage
 \input{Outro/PhuLuc}
 \end{document}
-
 

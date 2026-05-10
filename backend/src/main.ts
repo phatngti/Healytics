@@ -3,11 +3,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from '@/common/filters/all-exceptions.filter';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe, Logger, LogLevel } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import fs from 'fs';
 import path from 'path';
+import express, { Request, Response } from 'express';
 import { RedisIoAdapter } from '@/common/adapters/redis-io.adapter';
 import { config } from 'dotenv';
 
@@ -15,9 +16,14 @@ import { config } from 'dotenv';
 config();
 
 async function bootstrap() {
+  const logLevels: LogLevel[] =
+    process.env.PERF_MODE === 'true' || process.env.NODE_ENV === 'production'
+      ? ['error', 'warn', 'log']
+      : ['log', 'error', 'warn', 'debug', 'verbose'];
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
-    rawBody: true, // Required for Stripe webhook signature verification
+    logger: logLevels,
+    bodyParser: false,
   });
 
   // app.use(
@@ -42,6 +48,7 @@ async function bootstrap() {
 
   app.enableCors();
   app.use(helmet());
+  configureBodyParsers(app);
 
   // ── Serve the Jest HTML test report at /test-report (opt-in) ───
   if (process.env.SERVE_TEST_REPORT === 'true') {
@@ -50,7 +57,7 @@ async function bootstrap() {
     if (fs.existsSync(reportPath)) {
       // Get the underlying Express instance and mount static middleware
       const httpAdapter = app.getHttpAdapter();
-      httpAdapter.use('/test-report', require('express').static(reportPath));
+      httpAdapter.use('/test-report', express.static(reportPath) as any);
       // console.log(`Test report: http://localhost:${process.env.PORT ?? 8080}/test-report/`);
     }
   }
@@ -140,6 +147,30 @@ async function bootstrap() {
   logger.log(`RabbitMQ consumer started on queue: ${rmqQueue}`);
 
   await app.listen(process.env.PORT ?? 8080);
+}
+
+function configureBodyParsers(app: NestExpressApplication) {
+  const captureRawBody = (
+    req: Request & { rawBody?: Buffer },
+    _res: Response,
+    buffer: Buffer,
+  ) => {
+    if (buffer?.length) {
+      req.rawBody = buffer;
+    }
+  };
+
+  const stripeRawParser = express.raw({
+    type: 'application/json',
+    limit: process.env.STRIPE_WEBHOOK_BODY_LIMIT || '2mb',
+    verify: captureRawBody,
+  });
+
+  // Keep raw body capture scoped to Stripe signature verification.
+  app.use('/stripe/webhook', stripeRawParser);
+  app.use('/v1/stripe/webhook', stripeRawParser);
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 }
 
 bootstrap();

@@ -37,6 +37,7 @@ import mapboxConfig from './config/mapbox.config';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { PerformanceMetricsInterceptor } from './common/interceptors/performance-metrics.interceptor';
 import { PublicThrottlerGuard } from './common/guards';
 import { WsContractBootstrapService } from './common/services/ws-contract-bootstrap.service';
 
@@ -48,14 +49,15 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
       envFilePath: '.env',
       load: [databaseConfig, redisConfig, rabbitmqConfig, mapboxConfig],
     }),
-    // Rate limiting: 100 requests per 60 seconds for public routes
+    // Rate limiting: 1000 requests per 60 seconds per tracker for public routes
     // Uses Redis storage for distributed state across instances
+    // Target: 1000 CCU / 100 UPS — per-tracker bucket needs headroom
     ThrottlerModule.forRootAsync({
       useFactory: (redisClient) => ({
         throttlers: [
           {
             ttl: 60000,
-            limit: 100,
+            limit: 1000,
           },
         ],
         storage: new ThrottlerRedisStorage(redisClient),
@@ -67,7 +69,6 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const db = configService.get('database') as Record<string, any>;
-        console.log('DB Config', db);
         return {
           type: 'postgres',
           host: db.host,
@@ -78,6 +79,13 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
           entities: db.entities,
           synchronize: db.synchronize || false,
           ssl: db.ssl ? { rejectUnauthorized: false } : false,
+          // Connection pool: sized for the auth-heavy perf profile.
+          // Revisit per-process max before scaling API workers horizontally.
+          extra: {
+            max: 50,                  // max pool connections (default: 10)
+            idleTimeoutMillis: 30000, // close idle connections after 30s
+            connectionTimeoutMillis: 5000, // fail fast if pool exhausted
+          },
         } as const;
       },
     }),
@@ -115,6 +123,10 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
     {
       provide: 'APP_GUARD',
       useClass: PublicThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: PerformanceMetricsInterceptor,
     },
     {
       provide: APP_INTERCEPTOR,
