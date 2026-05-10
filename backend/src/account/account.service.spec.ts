@@ -17,6 +17,7 @@ describe('AccountService', () => {
     find: jest.fn(),
     findOne: jest.fn(),
     findOneBy: jest.fn(),
+    exist: jest.fn(),
     update: jest.fn(),
   };
 
@@ -86,21 +87,25 @@ describe('AccountService', () => {
     it('should return an account when found', async () => {
       // Arrange
       const expectedAccount = { id: 'uuid-1', email: 'test@example.com' };
-      mockAccountRepository.findOneBy.mockResolvedValue(expectedAccount);
+      mockAccountRepository.findOne.mockResolvedValue(expectedAccount);
 
       // Act
       const result = await service.findByEmail('test@example.com');
 
       // Assert
       expect(result).toEqual(expectedAccount);
-      expect(mockAccountRepository.findOneBy).toHaveBeenCalledWith({
-        email: 'test@example.com',
-      });
+      expect(mockAccountRepository.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            email: expect.any(Object),
+          }),
+        }),
+      );
     });
 
     it('should return null when not found', async () => {
       // Arrange
-      mockAccountRepository.findOneBy.mockResolvedValue(null);
+      mockAccountRepository.findOne.mockResolvedValue(null);
 
       // Act
       const result = await service.findByEmail('notfound@example.com');

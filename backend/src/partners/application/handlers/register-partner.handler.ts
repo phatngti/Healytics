@@ -8,7 +8,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { Account } from '@/common/entities/account.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { LegalRepresentative } from '@/common/entities/legal-representative.entity';
@@ -49,14 +49,15 @@ export class RegisterPartnerHandler {
   ) {}
 
   async execute(dto: RegisterPartnerDto): Promise<RegisterPartnerResponseDto> {
-    this.logger.log(`Registering partner with email: ${dto.account.email}`);
+    const email = dto.account.email.trim().toLowerCase();
+    this.logger.log(`Registering partner with email: ${email}`);
 
     // 1. Pre-transaction invariant checks (read-only, no lock needed)
     const accountRepo = this.dataSource.getRepository(Account);
     const partnerRepo = this.dataSource.getRepository(Partner);
 
     const existingAccount = await accountRepo.findOne({
-      where: { email: dto.account.email },
+      where: { email },
     });
 
     if (existingAccount) {
@@ -116,7 +117,7 @@ export class RegisterPartnerHandler {
       // Create Account
       const passwordHash = await bcrypt.hash(dto.account.password, 10);
       const account = queryRunner.manager.create(Account, {
-        email: dto.account.email,
+        email,
         passwordHash,
         role: Role.HEALTH_PARTNER,
         isActive: true,

@@ -68,7 +68,7 @@ export class AuthController {
    */
   @Post('check-email')
   @Public()
-  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Throttle({ default: { limit: 1000, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Check if email is already registered',
@@ -100,7 +100,7 @@ export class AuthController {
    */
   @Post('user/register')
   @Public()
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: 1000, ttl: 60000 } })
   @ApiOperation({ summary: 'Register a new user' })
   @ApiCreatedResponse({
     description: 'Registration returns access and refresh tokens.',
@@ -141,7 +141,7 @@ export class AuthController {
    */
   @Post('partner/register')
   @Public()
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: 1000, ttl: 60000 } })
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Register a new business partner',
@@ -168,7 +168,7 @@ export class AuthController {
   @Post('partner/login')
   @Public()
   @UseGuards(LocalAuthGuard)
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: 1000, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login as a partner' })
   @ApiBody({ type: PartnerLoginDto })
@@ -208,7 +208,7 @@ export class AuthController {
   @Post('admin/login')
   @Public()
   @UseGuards(LocalAuthGuard)
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: 1000, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login as admin' })
   @ApiBody({ type: AdminLoginDto })
@@ -234,7 +234,7 @@ export class AuthController {
   @Post('employee/login')
   @Public()
   @UseGuards(LocalAuthGuard)
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: 1000, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login as an employee' })
   @ApiBody({ type: EmployeeLoginDto })
