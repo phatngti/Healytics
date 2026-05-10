@@ -73,41 +73,44 @@ export class ThrottlerRedisStorage implements ThrottlerStorage {
     const redisKey = `throttle:${throttlerName}:${key}`;
     const blockedKey = `${redisKey}:blocked`;
 
-    // Check if currently blocked
-    const blockedTtl = await this.redis.pttl(blockedKey);
-    if (blockedTtl > 0) {
-      return {
-        totalHits: limit + 1,
-        timeToExpire: await this.safeGetPttl(redisKey, ttl),
-        isBlocked: true,
-        timeToBlockExpire: blockedTtl,
-      };
-    }
-
-    // Lua script: INCR + conditional PEXPIRE (atomic)
+    // One Redis round-trip for block check + increment + TTL/block updates.
     const luaScript = `
+      local blockedTtl = redis.call('PTTL', KEYS[2])
+      if blockedTtl > 0 then
+        local hitTtl = redis.call('PTTL', KEYS[1])
+        if hitTtl < 0 then
+          hitTtl = tonumber(ARGV[1])
+        end
+        return {tonumber(ARGV[2]) + 1, hitTtl, 1, blockedTtl}
+      end
+
       local current = redis.call('INCR', KEYS[1])
       if current == 1 then
         redis.call('PEXPIRE', KEYS[1], ARGV[1])
       end
       local pttl = redis.call('PTTL', KEYS[1])
-      return {current, pttl}
+
+      if current > tonumber(ARGV[2]) then
+        redis.call('SET', KEYS[2], '1', 'PX', ARGV[3])
+        return {current, pttl, 1, tonumber(ARGV[3])}
+      end
+
+      return {current, pttl, 0, 0}
     `;
 
-    const [totalHits, timeToExpire] = (await this.redis.eval(
-      luaScript,
-      1,
-      redisKey,
-      ttl,
-    )) as [number, number];
+    const [totalHits, timeToExpire, blockedFlag, timeToBlockExpire] =
+      (await this.redis.eval(
+        luaScript,
+        2,
+        redisKey,
+        blockedKey,
+        ttl,
+        limit,
+        blockDuration,
+      )) as [number, number, number, number];
 
-    // If limit exceeded, set a block key
-    const isBlocked = totalHits > limit;
-    let timeToBlockExpire = 0;
-
-    if (isBlocked) {
-      await this.redis.set(blockedKey, '1', 'PX', blockDuration);
-      timeToBlockExpire = blockDuration;
+    const isBlocked = blockedFlag === 1;
+    if (isBlocked && totalHits === limit + 1) {
       this.logger.warn(
         `Rate limit exceeded for key "${redisKey}" — blocked for ${blockDuration}ms`,
       );
@@ -120,11 +123,4 @@ export class ThrottlerRedisStorage implements ThrottlerStorage {
       timeToBlockExpire,
     };
   }
-
-  /** Safely get PTTL, returning the default TTL if the key doesn't exist. */
-  private async safeGetPttl(key: string, defaultTtl: number): Promise<number> {
-    const pttl = await this.redis.pttl(key);
-    return pttl > 0 ? pttl : defaultTtl;
-  }
 }
-

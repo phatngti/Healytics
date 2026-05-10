@@ -1,4 +1,4 @@
-.PHONY: perf-ui perf-headless \
+.PHONY: perf-ui perf-headless perf-headless-all perf-headless-full perf-test-all-modules \
 	perf-test-auth perf-test-admin perf-test-products \
 	perf-test-locations perf-test-ws perf-test-chat \
 	perf-test-updated-stress perf-test-partner-finance-stress \
@@ -6,6 +6,8 @@
 	perf-test-new-apis perf-test-health perf-test-employee \
 	perf-test-targets perf-test-employee-mutations \
 	perf-test-booking-race perf-test-booking-race-spike \
+	perf-accounts-create perf-accounts-clean perf-accounts-status \
+	perf-analyze \
 	generate-dtos \
 	_setup _teardown
 
@@ -14,10 +16,23 @@ VENV_BIN   = $(VENV)/bin
 REPORT_DIR = reports
 TIMESTAMP  = $(shell date +%Y-%m-%d_%H-%M-%S)
 LOCUST_STDOUT_LOG = $(REPORT_DIR)/locust_$(TIMESTAMP).stdout.log
+TARGET_HOST ?= http://localhost:8080
 PERF_TARGET_USERS ?= 1000
 PERF_TARGET_SPAWN_RATE ?= 100
 PERF_RUN_TIME ?= 300s
-export PERF_TARGET_USERS
+export TARGET_HOST PERF_TARGET_USERS
+
+# ── Headless quick-run CCU config (override from CLI) ──────────────────────
+# Example: make perf-headless PERF_CCU=100 PERF_SPAWN_RATE=20 PERF_RUN_TIME_HEADLESS=120s
+PERF_CCU ?= 10
+PERF_SPAWN_RATE ?= 2
+PERF_RUN_TIME_HEADLESS ?= 60s
+export PERF_CCU PERF_SPAWN_RATE PERF_RUN_TIME_HEADLESS
+
+# ── Dedicated performance USER account pool ─────────────────────────────────
+PERF_ACCOUNT_COUNT ?= 1200
+PERF_ACCOUNT_SCRIPT = scripts/register_perf_accounts.js
+PERF_ALL_MODULES_LOCUSTFILE = locustfiles/all_modules.py
 
 # locust >=2.39 requires Python >=3.10; find a suitable interpreter.
 PYTHON     = $(shell command -v python3.13 2>/dev/null \
@@ -64,7 +79,49 @@ define run_locust
 	@echo "══════════════════════════════════════════"
 	@cleanup() { $(MAKE) --no-print-directory _teardown; }; \
 	trap cleanup EXIT; \
-	$(VENV_BIN)/locust --headless --only-summary --loglevel ERROR $(1) \
+	$(VENV_BIN)/locust --headless --only-summary --loglevel ERROR --host $(TARGET_HOST) $(1) \
+		--html $(REPORT_DIR)/report_$(TIMESTAMP).html \
+		> $(LOCUST_STDOUT_LOG); \
+	exit $$?
+endef
+
+# Helper: create generated USER accounts → run Locust → delete generated USER accounts.
+define run_locust_with_perf_accounts
+	@$(MAKE) --no-print-directory _setup
+	@echo "══════════════════════════════════════════"
+	@echo "  Creating performance USER accounts..."
+	@echo "══════════════════════════════════════════"
+	@cleanup() { node $(PERF_ACCOUNT_SCRIPT) cleanup || true; $(MAKE) --no-print-directory _teardown; }; \
+	trap cleanup EXIT; \
+	node $(PERF_ACCOUNT_SCRIPT) reset --count $(PERF_ACCOUNT_COUNT); \
+	echo ""; \
+	echo "══════════════════════════════════════════"; \
+	echo "  Running tests..."; \
+	echo "══════════════════════════════════════════"; \
+	set -a; . $(REPORT_DIR)/perf_user_pool.env; set +a; \
+	$(VENV_BIN)/locust --headless --only-summary --loglevel ERROR --host $(TARGET_HOST) $(1) \
+		--html $(REPORT_DIR)/report_$(TIMESTAMP).html \
+		> $(LOCUST_STDOUT_LOG); \
+	exit $$?
+endef
+
+# Helper: create generated USER pool + support admin/partner/employee accounts.
+# Use this for the all-modules suite so every auth role has valid perf-only
+# credentials without depending on stale seed passwords.
+define run_locust_with_all_perf_accounts
+	@$(MAKE) --no-print-directory _setup
+	@echo "══════════════════════════════════════════"
+	@echo "  Creating all-module performance accounts..."
+	@echo "══════════════════════════════════════════"
+	@cleanup() { node $(PERF_ACCOUNT_SCRIPT) cleanup --with-support-accounts || true; $(MAKE) --no-print-directory _teardown; }; \
+	trap cleanup EXIT; \
+	node $(PERF_ACCOUNT_SCRIPT) reset --count $(PERF_ACCOUNT_COUNT) --with-support-accounts; \
+	echo ""; \
+	echo "══════════════════════════════════════════"; \
+	echo "  Running all test modules..."; \
+	echo "══════════════════════════════════════════"; \
+	set -a; . $(REPORT_DIR)/perf_user_pool.env; set +a; \
+	$(VENV_BIN)/locust --headless --only-summary --loglevel ERROR --host $(TARGET_HOST) $(1) \
 		--html $(REPORT_DIR)/report_$(TIMESTAMP).html \
 		> $(LOCUST_STDOUT_LOG); \
 	exit $$?
@@ -85,11 +142,20 @@ perf-ui:
 	exit $$?
 
 # ──────────────────────────────────────────────
-# Headless full suite
+# Headless generated-USER suite
 # ──────────────────────────────────────────────
 
-perf-headless:
-	$(call run_locust,-u 10 -r 2 --run-time 60s)
+perf-headless: ## Run generated USER-account headless suite. Override: PERF_CCU=<n> PERF_SPAWN_RATE=<n> PERF_RUN_TIME_HEADLESS=<duration>
+	@echo "  CCU=$(PERF_CCU)  spawn-rate=$(PERF_SPAWN_RATE)  run-time=$(PERF_RUN_TIME_HEADLESS)"
+	$(call run_locust_with_perf_accounts,-f locustfiles/perf_headless_user.py -u $(PERF_CCU) -r $(PERF_SPAWN_RATE) --run-time $(PERF_RUN_TIME_HEADLESS))
+
+perf-headless-all: ## Run every locustfiles module with generated perf-only credentials.
+	@echo "  CCU=$(PERF_CCU)  spawn-rate=$(PERF_SPAWN_RATE)  run-time=$(PERF_RUN_TIME_HEADLESS)"
+	$(call run_locust_with_all_perf_accounts,-f $(PERF_ALL_MODULES_LOCUSTFILE) -u $(PERF_CCU) -r $(PERF_SPAWN_RATE) --run-time $(PERF_RUN_TIME_HEADLESS))
+
+perf-headless-full: perf-headless-all
+
+perf-test-all-modules: perf-headless-all
 
 # ──────────────────────────────────────────────
 # HTTP API test runners
@@ -155,6 +221,19 @@ perf-test-booking-race-spike:
 	$(call run_locust,-f locustfiles/booking_race_condition.py -u 200 -r 30 --run-time 180s)
 
 # ──────────────────────────────────────────────
+# Dedicated performance test accounts
+# ──────────────────────────────────────────────
+
+perf-accounts-create:
+	node $(PERF_ACCOUNT_SCRIPT) create --count $(PERF_ACCOUNT_COUNT)
+
+perf-accounts-clean:
+	node $(PERF_ACCOUNT_SCRIPT) cleanup
+
+perf-accounts-status:
+	node $(PERF_ACCOUNT_SCRIPT) status
+
+# ──────────────────────────────────────────────
 # WebSocket test runners
 # ──────────────────────────────────────────────
 
@@ -163,6 +242,27 @@ perf-test-ws:
 
 perf-test-chat:
 	$(call run_locust,--tags chat -u 10 -r 2 --run-time 60s)
+
+# ──────────────────────────────────────────────
+# Report analysis
+# ──────────────────────────────────────────────
+
+NODE = $(shell for p in /opt/homebrew/bin/node /usr/local/bin/node \
+        /Applications/Cursor.app/Contents/Resources/app/resources/helpers/node \
+        /Applications/Codex.app/Contents/Resources/node; do \
+        test -x "$$p" && echo "$$p" && break; done)
+
+perf-analyze: ## Analyze all HTML reports and generate a consolidated trend report
+	@echo "══════════════════════════════════════════"
+	@echo "  Analyzing performance reports..."
+	@echo "══════════════════════════════════════════"
+	@$(NODE) scripts/analyze_reports.js --out $(REPORT_DIR)/analysis_report.html; \
+	rc=$$?; \
+	echo ""; \
+	if [ $$rc -eq 0 ]; then echo "  ✅ All performance targets met!"; \
+	else echo "  ⚠️  Some performance targets not met (see report)."; fi; \
+	echo "  Report: $(REPORT_DIR)/analysis_report.html"; \
+	echo "══════════════════════════════════════════"
 
 # ──────────────────────────────────────────────
 # DTO generation

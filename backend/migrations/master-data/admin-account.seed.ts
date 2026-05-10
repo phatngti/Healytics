@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { config } from 'dotenv';
 
 // Ensure .env is loaded when running via TypeORM CLI
@@ -40,7 +40,7 @@ export class SeedAdminAccount1770100000002 implements MigrationInterface {
             return;
         }
 
-        // Hash the password using bcryptjs (same as UserSeeder)
+        // Hash the password using native bcrypt (same format as previous bcryptjs hashes)
         const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
 
         await queryRunner.query(

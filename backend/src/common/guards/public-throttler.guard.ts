@@ -1,6 +1,9 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
-import { ThrottlerGuard, ThrottlerException } from '@nestjs/throttler';
-import { Reflector } from '@nestjs/core';
+import {
+  ThrottlerException,
+  ThrottlerGuard,
+  ThrottlerLimitDetail,
+} from '@nestjs/throttler';
 import { IS_PUBLIC_KEY } from '@/common/decorators/auth/public.decorator';
 
 /**
@@ -19,8 +22,7 @@ export class PublicThrottlerGuard extends ThrottlerGuard {
    * Only applies rate limiting to routes marked with @Public() decorator.
    */
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const reflector = new Reflector();
-    const isPublic = reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -51,7 +53,10 @@ export class PublicThrottlerGuard extends ThrottlerGuard {
   /**
    * Custom error handler for rate limit exceeded.
    */
-  protected throwThrottlingException(): Promise<void> {
+  protected throwThrottlingException(
+    _context: ExecutionContext,
+    _throttlerLimitDetail: ThrottlerLimitDetail,
+  ): Promise<void> {
     throw new ThrottlerException('Too many requests. Please try again later.');
   }
 }
