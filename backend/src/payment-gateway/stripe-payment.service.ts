@@ -43,7 +43,7 @@ export class StripePaymentService {
     this.currency = this.configService.get<string>('STRIPE_CURRENCY', 'vnd');
 
     this.stripe = new Stripe(secretKey, {
-      apiVersion: '2026-03-25.dahlia',
+      apiVersion: '2026-04-22.dahlia',
     });
   }
 

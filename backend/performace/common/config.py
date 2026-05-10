@@ -3,41 +3,32 @@ Centralized configuration for Locust performance tests.
 All credentials and URLs are loaded from environment variables with sensible defaults.
 """
 
+import json
 import os
 from pathlib import Path
 from datetime import datetime
+
+from dotenv import load_dotenv
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 REPORTS_DIR = PROJECT_ROOT / "reports"
 
+# Load .env from the performance test root (won't override existing env vars)
+_ENV_FILE = PROJECT_ROOT / ".env"
+if _ENV_FILE.exists():
+    load_dotenv(_ENV_FILE, override=False)
+
 # ── Base URL ──────────────────────────────────────────────────────────────────
 BASE_URL = os.getenv("TARGET_HOST", "http://localhost:8080")
 API_PREFIX = ""
-
-# ── Test Credentials ──────────────────────────────────────────────────────────
-# End-user (role: USER)
-USER_EMAIL = os.getenv("TEST_USER_EMAIL", "user@healytics.vn")
-USER_PASSWORD = os.getenv("TEST_USER_PASSWORD", "user@123")
-
-# Partner (role: PARTNER)
-PARTNER_EMAIL = os.getenv("TEST_PARTNER_EMAIL", "partner@healytics.vn")
-PARTNER_PASSWORD = os.getenv("TEST_PARTNER_PASSWORD", "partner@123")
-
-# Admin (role: ADMIN)
-ADMIN_EMAIL = os.getenv("TEST_ADMIN_EMAIL", "admin@healytics.vn")
-ADMIN_PASSWORD = os.getenv("TEST_ADMIN_PASSWORD", "admin@123")
-
-# Employee (role: EMPLOYEE)
-EMPLOYEE_EMAIL = os.getenv("TEST_EMPLOYEE_EMAIL", "employee.coordinator@healytics.vn")
-EMPLOYEE_PASSWORD = os.getenv("TEST_EMPLOYEE_PASSWORD", "employee@123")
 
 # ── Multi-user pool (role: USER) ─────────────────────────────────────────────
 # Mirror of SEED_USERS from src/database/seeds/users/user.seeder.ts
 # All share the default password "user@123".
 _DEFAULT_USER_PASSWORD = "user@123"
 
-USER_POOL = [
+_DEFAULT_USER_POOL = [
     {"email": "user@healytics.vn",       "password": _DEFAULT_USER_PASSWORD},
     {"email": "nguyenvana@healytics.vn",  "password": _DEFAULT_USER_PASSWORD},
     {"email": "tranthib@healytics.vn",    "password": _DEFAULT_USER_PASSWORD},
@@ -50,6 +41,53 @@ USER_POOL = [
     {"email": "ngothii@healytics.vn",     "password": _DEFAULT_USER_PASSWORD},
     {"email": "dovank@healytics.vn",      "password": _DEFAULT_USER_PASSWORD},
 ]
+
+
+def _load_perf_user_pool() -> list[dict[str, str]]:
+    """Load generated performance users created by scripts/register_perf_accounts.js."""
+    raw_path = os.getenv("PERF_USER_POOL_FILE")
+    path = Path(raw_path).expanduser() if raw_path else REPORTS_DIR / "perf_user_pool.json"
+    if not path.exists():
+        return []
+
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+
+    raw_users = payload.get("users", payload) if isinstance(payload, dict) else payload
+    if not isinstance(raw_users, list):
+        return []
+
+    users: list[dict[str, str]] = []
+    for item in raw_users:
+        if not isinstance(item, dict):
+            continue
+        email = str(item.get("email", "")).strip()
+        password = str(item.get("password", "")).strip()
+        if email and password:
+            users.append({"email": email, "password": password})
+    return users
+
+
+USER_POOL = _load_perf_user_pool() or _DEFAULT_USER_POOL
+
+# ── Test Credentials ──────────────────────────────────────────────────────────
+# End-user (role: USER)
+USER_EMAIL = os.getenv("TEST_USER_EMAIL", USER_POOL[0]["email"])
+USER_PASSWORD = os.getenv("TEST_USER_PASSWORD", USER_POOL[0]["password"])
+
+# Partner (role: PARTNER)
+PARTNER_EMAIL = os.getenv("TEST_PARTNER_EMAIL", "partner@healytics.vn")
+PARTNER_PASSWORD = os.getenv("TEST_PARTNER_PASSWORD", "partner@123")
+
+# Admin (role: ADMIN)
+ADMIN_EMAIL = os.getenv("TEST_ADMIN_EMAIL", "admin@healytics.vn")
+ADMIN_PASSWORD = os.getenv("TEST_ADMIN_PASSWORD", "admin@123")
+
+# Employee (role: EMPLOYEE)
+EMPLOYEE_EMAIL = os.getenv("TEST_EMPLOYEE_EMAIL", "employee.coordinator@healytics.vn")
+EMPLOYEE_PASSWORD = os.getenv("TEST_EMPLOYEE_PASSWORD", "employee@123")
 
 # ── Timing defaults ──────────────────────────────────────────────────────────
 MIN_WAIT = float(os.getenv("MIN_WAIT", "1"))
