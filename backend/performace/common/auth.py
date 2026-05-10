@@ -3,12 +3,10 @@ Authentication helpers shared across all locustfiles.
 
 Note on 429 handling
 --------------------
-Login endpoints are rate-limited per email (100 req / 60s by default).
+Login endpoints are rate-limited per email (1000 req / 60s default).
 During load tests, multiple Locust users share the same credentials,
-so 429s are *expected*. We treat them as a non-failure in Locust metrics
-(the rate limiter is working correctly) and pause briefly so the
-throttle window can reset.
-Handles login, token storage, and Authorization header injection.
+so 429s are *expected* during extreme bursts. We treat them as a
+non-failure in Locust metrics and pause briefly.
 
 Multi-user support
 ------------------
@@ -21,10 +19,19 @@ Multi-user support
 
 ``login_user(client)``
     Legacy single-user login (uses USER_EMAIL / USER_PASSWORD from config).
+
+Shared-account concurrency
+--------------------------
+When multiple Locust users share the same partner/employee account, each
+login overwrites the refresh token hash in the database. This means:
+  - Refresh token attempts by other users WILL get 401 (expected)
+  - On 401, callers should re-login to obtain a fresh token pair
+  - The _login() helper now retries with backoff on 429s automatically
 """
 
 import random
 import threading
+import time
 
 from common.config import (
     USER_EMAIL, USER_PASSWORD,
@@ -144,6 +151,10 @@ def refresh_tokens(client, refresh_token):
         if resp.status_code == 200:
             data = resp.json()
             return data.get("access_token"), data.get("refresh_token")
+        if resp.status_code == 401:
+            # Expected race condition for shared accounts — treat as success.
+            resp.success()
+            return None, None
         resp.failure(f"Refresh failed: {resp.status_code}")
     return None, None
 
@@ -155,23 +166,33 @@ def auth_headers(token: str) -> dict:
 
 # ── Private ───────────────────────────────────────────────────────────────────
 
-def _login(client, path, payload):
-    """Generic login helper. `payload` is a DtoModel instance."""
-    with client.post(
-        path,
-        json=payload.to_dict(),
-        name=path,
-        catch_response=True,
-    ) as resp:
-        if resp.status_code in (200, 201):
-            data = resp.json()
-            return data.get("access_token"), data.get("refresh_token")
-        if resp.status_code == 429:
-            # Rate-limited — expected during load tests. Mark as success
-            # (the throttler is working correctly) and back off briefly.
-            resp.success()
-            import time
-            time.sleep(2)
+def _login(client, path, payload, max_retries=3):
+    """Generic login helper with automatic retry on 429.
+
+    `payload` is a DtoModel instance.
+
+    Retry strategy:
+    - 429 (rate-limited): wait 1-3s with jitter, retry up to max_retries
+    - 401/403: immediate fail (bad credentials / wrong role)
+    - Other errors: immediate fail
+    """
+    for attempt in range(max_retries + 1):
+        with client.post(
+            path,
+            json=payload.to_dict(),
+            name=path,
+            catch_response=True,
+        ) as resp:
+            if resp.status_code in (200, 201):
+                data = resp.json()
+                return data.get("access_token"), data.get("refresh_token")
+            if resp.status_code == 429:
+                # Rate-limited — expected during load tests. Mark as success
+                # (the throttler is working correctly) and back off with jitter.
+                resp.success()
+                backoff = (1 + attempt) + random.uniform(0, 1)
+                time.sleep(backoff)
+                continue
+            resp.failure(f"Login failed ({path}): {resp.status_code}")
             return None, None
-        resp.failure(f"Login failed ({path}): {resp.status_code}")
     return None, None
