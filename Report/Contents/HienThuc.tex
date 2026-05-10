@@ -1104,904 +1104,844 @@ Sau khi lịch hẹn chuyển sang trạng thái hoàn thành, người dùng đ
 % ===========================================================================
 \subsection{Hiện thực Phân hệ Cổng Đối tác (Partner Portal)}
 
-Phân hệ Cổng Đối tác hỗ trợ nhà cung cấp quản lý toàn bộ vòng đời vận hành: từ đăng ký và xét duyệt hồ sơ pháp lý, hoàn thiện hồ sơ công khai, quản trị dịch vụ và nhân sự, đến xử lý lịch hẹn và theo dõi chỉ số kinh doanh.
+Phân hệ Cổng Đối tác được xây dựng bằng Flutter Web, hỗ trợ nhà cung cấp quản lý toàn bộ vòng đời vận hành: từ đăng ký và xác minh hồ sơ KYC, hoàn thiện hồ sơ công khai phòng khám, quản trị dịch vụ, nhân sự và tài chính, đến giao tiếp với khách hàng và theo dõi chỉ số kinh doanh. Menu điều hướng gồm 6 mục: Dashboard, Services, Employee, Service Tags, Finance, Messages.
 
-\paragraph{Xử lý phía Backend khi đăng ký}
+% ---------------------------------------------------------------------------
+% 6.3.3.1  ĐĂNG KÝ VÀ XÁC MINH HỒ SƠ
+% ---------------------------------------------------------------------------
+\subsubsection{Đăng ký và Xác minh Hồ sơ Đối tác}
 
-Khi đối tác nhấn \textbf{``Complete Registration''}, hệ thống thực hiện các bước sau trong cùng một giao dịch (transaction) để đảm bảo tính toàn vẹn dữ liệu:
-
-\begin{enumerate}
-    \item \textbf{Kiểm tra trùng lặp:} Đảm bảo email và mã số thuế chưa có trong hệ thống.
-    \item \textbf{Kiểm tra địa chỉ:} Xác nhận thông tin tỉnh/huyện/xã hợp lệ thông qua \texttt{LocationsService}.
-    \item \textbf{Khởi tạo dữ liệu:} Khởi tạo thông tin tài khoản, thông tin doanh nghiệp, người đại diện pháp lý, và các giấy tờ KYC ban đầu.
-    \item \textbf{Cấp quyền truy cập:} Tạo token truy cập để đối tác có thể đăng nhập ngay.
-\end{enumerate}
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[b]{0.48\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/partner/fig_partner_reg_account.png}
-    \caption{Bước tạo tài khoản đối tác}
-    \label{fig:partner_reg_account}
-\end{subfigure}
-\hfill
-\begin{subfigure}[b]{0.48\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/partner/fig_partner_reg_legal.png}
-    \caption{Khai báo đại diện pháp lý}
-    \label{fig:partner_reg_legal}
-\end{subfigure}
-\par\medskip
-\caption{Luồng đăng ký đối tác -- giai đoạn tài khoản và pháp lý}
-\end{figure}
-
-\begin{itemize}
-    \item \textbf{Thao tác tạo tài khoản:} Đối tác nhập thông tin đăng nhập và dữ liệu liên hệ cơ bản.
-    \item \textbf{Thao tác khai báo pháp lý:} Đối tác điền thông tin đại diện pháp luật và giấy tờ định danh bắt buộc.
-\end{itemize}
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[b]{0.48\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/partner/fig_partner_reg_filled_business.png}
-    \caption{Thông tin doanh nghiệp}
-    \label{fig:partner_reg_business}
-\end{subfigure}
-\hfill
-\begin{subfigure}[b]{0.48\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/partner/fig_partner_reg_doc_uploaded.png}
-    \caption{Tải giấy tờ KYC}
-    \label{fig:partner_reg_docs}
-\end{subfigure}
-\par\medskip
-\caption{Luồng đăng ký đối tác -- giai đoạn doanh nghiệp và hồ sơ}
-\end{figure}
-
-\begin{itemize}
-    \item \textbf{Thao tác khai báo doanh nghiệp:} Đối tác điền tên pháp nhân, mã số thuế, địa chỉ và loại hình kinh doanh.
-    \item \textbf{Thao tác nộp hồ sơ:} Đối tác tải lên bộ KYC và kiểm tra trạng thái upload trước khi gửi xét duyệt.
-\end{itemize}
+Luồng đăng ký đối tác diễn ra theo trình tự: (1)~đối tác điền form đăng ký trực tuyến; (2)~hệ thống chuyển hồ sơ sang trạng thái \texttt{PENDING} và gửi về Admin Portal để xét duyệt; (3)~nếu admin yêu cầu chỉnh sửa, đối tác nhận thông báo và cập nhật đúng các trường bị đánh dấu rồi nộp lại; (4)~sau khi được phê duyệt (\texttt{APPROVED}), đối tác hoàn thiện hồ sơ công khai phòng khám để mở khóa Dashboard.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{Images/Hiện thực/partner/fig_partner_01_revision_business_entity.png}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_register_1.png}
     \vspace{0.5em}
-    \caption{Xác nhận đăng ký đối tác thành công -- hồ sơ đang chờ xét duyệt}
-    \label{fig:partner_reg_success}
+    \caption{Form đăng ký đối tác -- Bước 1: Thông tin tài khoản và doanh nghiệp}
+    \label{fig:partner_reg1}
 \end{figure}
 
+Hình~\ref{fig:partner_reg1} hiển thị màn hình Partner Registration:
 \begin{itemize}
-    \item \textbf{Kết quả nộp hồ sơ:} Trang ``Registration Successful!'' xác nhận hồ sơ đã tiếp nhận thành công và đang chờ admin xét duyệt trong vòng 1--2 ngày làm việc.
-    \item \textbf{Thông báo email:} Hệ thống tự động gửi email xác nhận đến địa chỉ đã đăng ký, nút ``Back to Login'' đưa đối tác quay lại màn hình đăng nhập.
-\end{itemize}
-
-Khi đối tác chỉnh sửa hồ sơ (đặc biệt sau khi bị yêu cầu bổ sung), hệ thống áp dụng cơ chế cập nhật thông minh (Smart Update): nhận diện thay đổi qua \texttt{fieldKey}, phân loại mức độ nhạy cảm (mã số thuế, địa chỉ vs. số điện thoại), và tự động chuyển trạng thái phù hợp --- từ \texttt{REQUIRED\_RESUBMIT} về \texttt{PENDING} khi sửa xong lỗi, hoặc thu hồi \texttt{APPROVED} khi sửa thông tin nhạy cảm.
-
-\subsubsection{Quy trình Chỉnh sửa Hồ sơ (Application Revision)}
-
-Khi admin đánh giá hồ sơ có lỗi và chuyển trạng thái thành \texttt{REQUIRED\_RESUBMIT}, hệ thống gửi thông báo và đối tác được chuyển đến trang Application Revision. Trang này liệt kê rõ từng mục cần cập nhật kèm Revision Note cụ thể từ admin.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_02_revision_legal_rep.png}
-    \vspace{1em}
-    \caption{Application Revision -- phần Business Entity với trường Phone Number cần sửa}
-    \label{fig:partner_revision_business}
-\end{figure}
-
-Hình~\ref{fig:partner_revision_business} hiển thị trang Application Revision phần Business Entity:
-\begin{itemize}
-    \item \textbf{Trường hợp lệ:} Brand Name (Tam Binh Spa) và Tax Code đã đúng, hiển thị biểu tượng \checkmark{} màu xanh.
-    \item \textbf{Trường cần sửa:} Phone Number bị đánh dấu viền đỏ kèm badge ``UPDATE'' và thông báo lỗi ``Wrong number'' từ admin.
-    \item \textbf{Mục đã duyệt:} Location Details (mục 2) có tick xanh và được thu gọn, không cần chỉnh sửa.
-    \item \textbf{Thanh trạng thái:} STATUS ``Awaiting Revision'' (màu cam) và nút ``Resubmit Application'' cố định ở cuối trang.
+    \item \textbf{Account Information:} Email và mật khẩu đăng nhập.
+    \item \textbf{Business \& Partner Information} (Thông tin doanh nghiệp): Brand Name (Tên thương hiệu), Legal Company Name (Tên công ty pháp lý), Tax Code (Mã số thuế), Business Types (Loại hình kinh doanh, đa chọn), địa chỉ cơ sở (dropdown 3 cấp tỉnh--huyện--xã).
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_03_revision_summary.png}
-    \vspace{1em}
-    \caption{Application Revision -- phần Legal Representative với trường Full Name cần sửa}
-    \label{fig:partner_revision_legal}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_register_2.png}
+    \vspace{0.5em}
+    \caption{Form đăng ký đối tác -- Bước 2: Thông tin người đại diện pháp lý và CCCD}
+    \label{fig:partner_reg2}
 \end{figure}
 
-Hình~\ref{fig:partner_revision_legal} hiển thị phần Legal Representative trong cùng trang:
+Hình~\ref{fig:partner_reg2} hiển thị bước khai báo đại diện pháp lý:
 \begin{itemize}
-    \item \textbf{Full Name:} Bị đánh dấu đỏ với Revision Note ``wrong name based on id'' -- admin xác nhận tên khai báo không khớp với CCCD.
-    \item \textbf{Các trường hợp lệ:} Position, ID Type, ID Number, Date of Issue đều có tick xanh.
-    \item \textbf{Identity Verification:} ID Card Front và ID Card Back hiển thị badge ``Verified'' -- đã xác thực qua OCR.
-    \item \textbf{Mục Documents (4):} Đã được chấp thuận, thu gọn với tick xanh.
-\end{itemize}
-
-\subsubsection{Hoàn thiện Hồ sơ Công khai (Post-Verification)}
-
-Sau khi được Admin phê duyệt (\texttt{APPROVED}), đối tác được chuyển đến trang ``Complete Clinic Profile'' để hoàn thiện thông tin công khai. Giao diện gồm 4 mục bắt buộc và 1 mục tùy chọn, thanh trạng thái cố định ở dưới theo dõi tiến độ (Required completion: X/4).
-
-\paragraph{Trạng thái ban đầu -- Chưa điền thông tin}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_04_clinic_profile_branding.png}
-    \vspace{1em}
-    \caption{Complete Clinic Profile -- phần Clinic Branding trống (Cover Image và Logo chưa tải)}
-    \label{fig:partner_clinic_branding_empty}
-\end{figure}
-
-Hình~\ref{fig:partner_clinic_branding_empty} hiển thị mục Clinic Branding khi chưa có ảnh:
-\begin{itemize}
-    \item \textbf{Cover image (16:9):} Vùng tải ảnh bìa, hiển thị ở đầu trang phòng khám trên ứng dụng di động.
-    \item \textbf{Logo image (vuông):} Vùng tải logo, hiển thị trong các thẻ tìm kiếm, chat, và danh sách booking.
-    \item \textbf{Cảnh báo:} ``Complete the required fields to unlock the dashboard. Required completion: 0/4'' hiển thị cố định dưới cùng.
+    \item \textbf{Legal Representative:} Họ tên, chức danh, số điện thoại, loại và số giấy tờ định danh, ngày cấp.
+    \item \textbf{Identity Verification Images:} Tải ảnh mặt trước và mặt sau CCCD; hệ thống hiển thị preview và gắn badge ``Verified'' khi đạt chất lượng.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_05_clinic_profile_about.png}
-    \vspace{1em}
-    \caption{Complete Clinic Profile -- phần About Clinic và Clinic Gallery chưa điền}
-    \label{fig:partner_clinic_about_empty}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_register_3.png}
+    \vspace{0.5em}
+    \caption{Form đăng ký đối tác -- Bước 3: Tải lên Giấy phép bắt buộc}
+    \label{fig:partner_reg3}
 \end{figure}
 
-Hình~\ref{fig:partner_clinic_about_empty} hiển thị các mục bắt buộc khác ở trạng thái rỗng:
+Hình~\ref{fig:partner_reg3} hiển thị bước tải tài liệu cuối:
 \begin{itemize}
-    \item \textbf{About clinic:} ``No clinic description added yet.'' -- Yêu cầu tối thiểu 120 ký tự mô tả chuyên môn, kinh nghiệm và phương pháp.
-    \item \textbf{Clinic gallery:} ``No gallery images uploaded yet.'' -- Yêu cầu 3--8 ảnh (exterior, treatment rooms, equipment).
-    \item \textbf{Trust badges and certifications:} Mục tùy chọn (``optional in v1''), cho phép thêm chứng nhận, tiêu chuẩn chất lượng.
-\end{itemize}
-
-\paragraph{Hoàn thiện Thông tin Phòng khám}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_07_clinic_profile_filled.png}
-    \vspace{1em}
-    \caption{Complete Clinic Profile -- phần Clinic Branding đã tải ảnh bìa và logo}
-    \label{fig:partner_clinic_branding_filled}
-\end{figure}
-
-Hình~\ref{fig:partner_clinic_branding_filled} hiển thị Clinic Branding sau khi hoàn thiện:
-\begin{itemize}
-    \item \textbf{Cover image:} Ảnh bìa cơ sở (ảnh thực spa/clinic, tỷ lệ 16:9) đã được tải lên, có nút Change và Delete.
-    \item \textbf{Logo image:} Logo vuông của phòng khám đã được tải lên.
-    \item \textbf{Trạng thái:} ``All required sections are ready. Required completion: 4/4'' -- nút ``Complete profile'' được kích hoạt.
+    \item \textbf{Document Verification:} Tải bản scan các giấy phép bắt buộc, bao gồm Giấy phép kinh doanh (PDF/ảnh, tối đa 10MB),...
+    \item Sau khi tải thành công, hệ thống hiển thị tên tệp, kích thước và badge ``Uploaded successfully''.
+    \item Nút \textbf{Complete Registration} được kích hoạt sau khi hoàn tất bước này.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_08_clinic_gallery_filled.png}
-    \vspace{1em}
-    \caption{Complete Clinic Profile -- About Clinic đã điền mô tả và Gallery với 3 ảnh}
-    \label{fig:partner_clinic_gallery_filled}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_register_done.png}
+    \vspace{0.5em}
+    \caption{Màn hình xác nhận đăng ký thành công -- hồ sơ chuyển trạng thái PENDING}
+    \label{fig:partner_reg_done}
 \end{figure}
 
-Hình~\ref{fig:partner_clinic_gallery_filled} hiển thị About Clinic và Clinic Gallery đã hoàn thiện:
+Hình~\ref{fig:partner_reg_done} xác nhận đăng ký hoàn tất:
 \begin{itemize}
-    \item \textbf{About clinic:} Mô tả tổng quan đã được nhập, xuất hiện nút ``Edit description'' để chỉnh sửa.
-    \item \textbf{Clinic gallery:} 3 ảnh (Image 1/2/3 of 3) đã tải lên -- phòng trị liệu, phòng thư giãn nhóm, và sảnh đón tiếp. Mỗi ảnh có nút mũi tên trái/phải (điều chỉnh thứ tự) và nút xóa.
+    \item Hệ thống gán Application ID và chuyển hồ sơ sang trạng thái \texttt{PENDING}.
+    \item Email xác nhận gửi tự động; nút \textbf{Back to Login} đưa đối tác về màn hình chờ duyệt.
+\end{itemize}
+
+\paragraph{Luồng chỉnh sửa hồ sơ theo yêu cầu của Admin (Application Revision)}
+
+Khi admin đánh giá hồ sơ có lỗi và chuyển trạng thái thành \texttt{REQUIRED\_RESUBMIT}, hệ thống gửi thông báo và đối tác thấy trang Application Revision với danh sách các mục cần cập nhật. Luồng diễn ra theo 3 bước: xem tóm tắt $\rightarrow$ mở rộng trường cần sửa $\rightarrow$ cập nhật và nộp lại.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_revision_info.png}
+    \vspace{0.5em}
+    \caption{Application Revision -- tổng quan các mục cần chỉnh sửa và mục đã chấp thuận}
+    \label{fig:partner_revision_info}
+\end{figure}
+
+Hình~\ref{fig:partner_revision_info} hiển thị trang Application Revision sau khi đối tác nhận thông báo:
+\begin{itemize}
+    \item \textbf{ACTION REQUIRED} (cam): Business Entity, Legal Representative -- cần chỉnh sửa.
+    \item \textbf{Approved} (tick xanh): Location Details, Documents -- không cần sửa.
+    \item Thanh trạng thái: \textit{``Awaiting Revision''} và nút \textbf{Resubmit Application}.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_09_clinic_certification_modal.png}
-    \vspace{1em}
-    \caption{Modal ``Add certification'' -- thêm chứng nhận cho Trust Badges}
-    \label{fig:partner_clinic_add_badge}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_revision_required_update_fields.png}
+    \vspace{0.5em}
+    \caption{Application Revision -- mục Business Entity mở rộng với các trường cần sửa}
+    \label{fig:partner_revision_fields}
 \end{figure}
 
-Hình~\ref{fig:partner_clinic_add_badge} hiển thị modal thêm chứng nhận:
+Hình~\ref{fig:partner_revision_fields} cho thấy mục Business Entity sau khi mở rộng:
 \begin{itemize}
-    \item \textbf{Title:} Tên chứng nhận (ví dụ: ``ISO 9001:2015''), tối đa 200 ký tự.
-    \item \textbf{Subtitle:} Mô tả phụ (tùy chọn), tối đa 200 ký tự.
-    \item \textbf{Badge icon:} Dropdown chọn biểu tượng từ thư viện Material Icons (ví dụ: ``Workspace Premium'').
-    \item \textbf{Hành động:} Nút Save lưu badge vào danh sách; Cancel đóng modal.
+    \item Trường lỗi (Tax Code, Phone Number): viền đỏ, badge \textbf{UPDATE} cam kèm lý do admin.
+    \item Trường hợp lệ (Brand Name, Business Types): tick xanh, read-only.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_10_clinic_badges_complete.png}
-    \vspace{1em}
-    \caption{Complete Clinic Profile -- Gallery và Trust Badges hoàn tất, sẵn sàng đăng}
-    \label{fig:partner_clinic_complete}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_revision_updated_field.png}
+    \vspace{0.5em}
+    \caption{Application Revision -- badge EDITED (xanh) xác nhận trường đã được cập nhật}
+    \label{fig:partner_revision_updated}
 \end{figure}
 
-Hình~\ref{fig:partner_clinic_complete} hiển thị trạng thái hoàn tất toàn bộ hồ sơ công khai:
+Hình~\ref{fig:partner_revision_updated} hiển thị trạng thái sau khi nhập lại:
 \begin{itemize}
-    \item \textbf{Clinic gallery:} 3 ảnh đã được sắp xếp với nút mũi tên lên/xuống và xóa.
-    \item \textbf{Trust badges:} Badge ``Spa\_trust\_bagde -- Quality Management'' đã được thêm, kèm nút sắp xếp và chỉnh sửa.
-    \item \textbf{Nút Complete profile:} ``All required sections are ready. Required completion: 4/4'' -- đối tác nhấn ``Complete profile'' để công khai trang phòng khám.
+    \item Badge \textbf{UPDATE} (cam) chuyển sang \textbf{EDITED} (xanh) -- thay đổi được ghi nhận cục bộ.
+    \item Nhấn \textbf{Resubmit Application} để gửi hồ sơ cập nhật về Admin Portal xét duyệt lại.
 \end{itemize}
 
-Dữ liệu từ quy trình này được tổng hợp và hiển thị trên trang chi tiết phòng khám phía người dùng (\texttt{GET /clinics/:id/info}).
+\paragraph{Hoàn thiện hồ sơ công khai phòng khám (Complete Clinic Profile)}
 
-\subsubsection{Quản lý Dịch vụ phía Đối tác}
-
-\texttt{PartnerHealthServiceController} (prefix: \texttt{@PartnerApi('health-services')}) cho phép đối tác quản lý dịch vụ của mình:
-
-\begin{itemize}
-    \item \textbf{CRUD dịch vụ:} Tạo mới, cập nhật, xóa mềm dịch vụ (Product). Mỗi dịch vụ bao gồm thông tin cơ bản (tên, mô tả, giá gốc, giá khuyến mãi), định nghĩa chi tiết (\texttt{ProductDefinition}: thời lượng phút), và cấu hình hiển thị (\texttt{is\_visible\_online}).
-    \item \textbf{Đa phương tiện:} Upload hình ảnh/video qua \texttt{ProductMedia}, hình ảnh cơ sở vật chất qua \texttt{ProductFacilityImage}.
-    \item \textbf{Phân công chuyên gia:} Gán nhân viên đủ điều kiện thực hiện dịch vụ qua \texttt{ProductEmployeeEligibility} (quan hệ n-n giữa Product và Employee).
-    \item \textbf{Phạm vi truy cập:} Đối tác chỉ được thao tác trên dịch vụ thuộc tổ chức mình. Guard kiểm tra \texttt{partnerId} từ JWT token.
-\end{itemize}
-
-Khi dịch vụ được tạo/cập nhật/xóa, hệ thống tự động publish event qua Redis Pub/Sub (\texttt{service:created}, \texttt{service:updated}, \texttt{service:deleted}) để Recommender Service đồng bộ vector store trong thời gian thực.
-
-\subsubsection{Quản lý Nhân sự và Cơ sở}
-
-\paragraph{Module Nhân viên (\texttt{EmployeesModule})}
-
-Quản lý nhân viên, bác sĩ và chuyên gia trên nền tảng:
-
-\begin{itemize}
-    \item \texttt{PartnerEmployeesController}: Đối tác CRUD nhân viên, cập nhật lịch làm việc, chuyên môn và trạng thái hoạt động.
-    \item \texttt{UserEmployeesController}: Người dùng xem thông tin, tìm kiếm theo chuyên khoa, xem lịch trống.
-    \item \textbf{Hồ sơ chuyên biệt:} Mở rộng từ \texttt{Employee} thành \texttt{DoctorProfile} (chuyên khoa, giấy phép hành nghề, \texttt{experience\_years}) và \texttt{TherapistProfile} (phương pháp trị liệu, kinh nghiệm).
-\end{itemize}
-
-Giao diện tạo nhân sự hỗ trợ hai loại hồ sơ chuyên biệt: \textbf{Therapist} (nhà trị liệu) và \textbf{Doctor} (bác sĩ), mỗi loại có các trường thông tin riêng.
-
-\subparagraph{Tạo hồ sơ Nhà trị liệu (Therapist)}
+Sau khi hồ sơ được Admin phê duyệt (\texttt{APPROVED}), đối tác được chuyển sang trang \textbf{Complete Clinic Profile} để điền thông tin hiển thị công khai. Phải hoàn tất 4 mục bắt buộc mới mở khóa Partner Dashboard.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_11_create_therapist_basic.png}
-    \vspace{1em}
-    \caption{Tạo nhân sự -- Contact \& Basic Info và Professional Role (Therapist)}
-    \label{fig:partner_therapist_basic}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_complete_profile_1.png}
+    \vspace{0.5em}
+    \caption{Complete Clinic Profile -- trạng thái ban đầu (0\% hoàn thành), 4 mục bắt buộc chưa điền}
+    \label{fig:partner_profile1}
 \end{figure}
 
-Hình~\ref{fig:partner_therapist_basic} hiển thị phần đầu form tạo Therapist:
+Hình~\ref{fig:partner_profile1} là màn hình đầu tiên sau phê duyệt:
 \begin{itemize}
-    \item \textbf{Contact \& Basic Info:} First Name, Last Name, Email, Phone Number, Date of Birth, Gender, Emergency Contact.
-    \item \textbf{Professional Role:} Loại hợp đồng (Full-time/Part-time), ngày bắt đầu, mô tả công việc.
-    \item \textbf{Skills \& Services:} Chọn Therapist Type (Spa Therapist / Massage Therapist).
+    \item Thanh tiến độ: \textit{``Profile 0\% complete''} với 4 mục cần điền: Cover Image (Ảnh bìa), Logo Image (Logo), Description (Mô tả), Gallery (Bộ ảnh phòng khám).
+    \item \textbf{Verified clinic identity} hiển thị read-only thông tin đã xác minh từ hồ sơ KYC.
+    \item Cảnh báo: \textit{``Complete the required fields to unlock the dashboard.''}.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_12_create_therapist_skills.png}
-    \vspace{1em}
-    \caption{Tạo nhân sự -- Skills \& Services chi tiết (Therapist)}
-    \label{fig:partner_therapist_skills}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_complete_profile_2.png}
+    \vspace{0.5em}
+    \caption{Complete Clinic Profile -- Clinic Branding đã tải ảnh bìa và logo}
+    \label{fig:partner_profile2}
 \end{figure}
 
-Hình~\ref{fig:partner_therapist_skills} hiển thị các trường chuyên môn của Therapist:
+Hình~\ref{fig:partner_profile2} nhấn nút Upload để tải ảnh lên, sau khi đối tác tải ảnh lên:
 \begin{itemize}
-    \item \textbf{Therapist Level:} Cấp độ chuyên môn (Junior/Senior/Expert).
-    \item \textbf{Commission Rate:} Tỷ lệ hoa hồng (\%).
-    \item \textbf{Massage Strength:} Mức lực (Soft / Medium / Strong).
-    \item \textbf{Last Health Check:} Ngày kiểm tra sức khỏe gần nhất; Skill Set: danh sách kỹ năng cụ thể.
+    \item \textbf{Cover Image} (Ảnh bìa, tỷ lệ 16:9): xem preview trực tiếp.
+    \item \textbf{Logo Image} (Logo thương hiệu): nút Change (Thay ảnh)/Delete (Xóa) để thay thế.
+    \item \textbf{About Clinic} (Giới thiệu phòng khám): nhập mô tả qua nút \textbf{Edit Description} (Chỉnh sửa mô tả).
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_13_create_therapist_history.png}
-    \vspace{1em}
-    \caption{Tạo nhân sự -- Work History và Documents \& Certifications (Therapist)}
-    \label{fig:partner_therapist_history}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_complete_profile_3.png}
+    \vspace{0.5em}
+    \caption{Complete Clinic Profile -- hoàn thiện 4/4 mục}
+    \label{fig:partner_profile3}
 \end{figure}
 
-Hình~\ref{fig:partner_therapist_history} hiển thị phần hồ sơ lịch sử và giấy tờ:
+Hình~\ref{fig:partner_profile3} là trạng thái hoàn tất:
 \begin{itemize}
-    \item \textbf{Work History:} Thêm lịch sử công tác qua nút ``+ Add Work History''.
-    \item \textbf{Documents \& Certifications:} Tải lên Professional License/Practice Permit (bắt buộc), Identity Card/Passport (bắt buộc), và Other Documents (tùy chọn).
+    \item Nhấn nút upload để tải lên từ 3-8 ảnh ở mục gallery, nhằm mô tả cơ sở vật chất của doanh nghiệp.
+    \item Trust badge là huy hiệu chứng nhận giúp tăng ưu tín của doanh nghiệp, hiện tại là optional.
+    \item Thanh tiến độ cập nhật thành \textit{``Profile 100\% complete''} với tất cả mục bắt buộc đã hoàn thiện.
+    \item Nhấn \textbf{Complete profile} để công khai hồ sơ và mở khóa Partner Dashboard.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.3.2  DASHBOARD ĐỐI TÁC
+% ---------------------------------------------------------------------------
+\subsubsection{Dashboard Đối tác}
+
+Dashboard là trang chủ của Partner Portal, hiển thị tổng quan kinh doanh theo kỳ (Today / This Week / This Month / This Quarter / This Year) và các Quick Actions để truy cập nhanh các chức năng thường dùng.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/dashboard/fig_partner_dashboard_1.png}
+    \vspace{0.5em}
+    \caption{Partner Dashboard -- KPI tổng hợp, Revenue Overview, Quick Actions và biểu đồ phân tích}
+    \label{fig:partner_dash1}
+\end{figure}
+
+Hình~\ref{fig:partner_dash1} hiển thị màn hình Dashboard chính:
+\begin{itemize}
+    \item \textbf{KPI:} Doanh thu, số lịch hẹn, dịch vụ đang hoạt động và đánh giá trung bình theo kỳ (dữ liệu minh hoạ).
+    \item \textbf{Revenue Overview} (Tổng quan doanh thu): Biểu đồ doanh thu hàng ngày; 
+    \item \textbf{Thao tác nhanh (Quick Actions):} Thêm dịch vụ (Add Service), Thêm nhân viên (Add Employee), Quản lý dịch vụ (Manage Services), Tin nhắn (Messages).
+    \item \textbf{Hiệu suất Dịch vụ (Service Performance):} Biểu đồ cột (bar chart) lượt đặt theo dịch vụ; 
+    \item \textbf{Employee Overview} (Tổng quan nhân viên): Biểu đồ vành khuyên (Donut Chart) phân bổ vai trò nhân sự.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_14_create_therapist_schedule.png}
-    \vspace{1em}
-    \caption{Tạo nhân sự -- Work Schedule (Therapist)}
-    \label{fig:partner_therapist_schedule}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/dashboard/fig_partner_dashboard_2.png}
+    \vspace{0.5em}
+    \caption{Partner Dashboard -- chế độ Services: KPI dịch vụ và biểu đồ Booking and revenue trend}
+    \label{fig:partner_dash2}
 \end{figure}
 
-Hình~\ref{fig:partner_therapist_schedule} hiển thị phần lịch làm việc:
+Hình~\ref{fig:partner_dash2} hiển thị chế độ \textbf{Services} trong Dashboard:
 \begin{itemize}
-    \item \textbf{Work Schedule:} Thiết lập ca làm việc theo từng ngày trong tuần (Mon--Sun), giờ bắt đầu/kết thúc ca.
-    \item \textbf{Default Shift Pattern:} Chọn mẫu ca mặc định (Full-Time Morning/Afternoon/Full, hoặc Part-Time).
+    \item \textbf{KPI:} Số dịch vụ đang hoạt động, tổng lượt đặt, doanh thu và đánh giá trung bình theo kỳ (dữ liệu minh hoạ).
+    \item \textbf{Booking and revenue trend:} Hai đường booking và doanh thu trên cùng trục thời gian.
 \end{itemize}
-
-\subparagraph{Tạo hồ sơ Bác sĩ (Doctor)}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/partner/fig_partner_15_create_doctor_education.png}
-    \vspace{1em}
-    \caption{Tạo nhân sự -- Education \& Qualifications và Experience (Doctor)}
-    \label{fig:partner_doctor_edu}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/dashboard/fig_partner_dashboard_3.png}
+    \vspace{0.5em}
+    \caption{Partner Dashboard -- Category/service leaders và tổng quan Booking operations}
+    \label{fig:partner_dash3}
 \end{figure}
 
-Hình~\ref{fig:partner_doctor_edu} hiển thị các trường đặc thù của Doctor (ngoài Contact \& Basic Info giống Therapist):
+Hình~\ref{fig:partner_dash3} hiển thị hai widget phân tích:
 \begin{itemize}
-    \item \textbf{Education \& Qualifications:} Medical Title (học hàm/học vị), Medical License ID (số giấy phép hành nghề), Education (bằng cấp), Certifications (chứng chỉ chuyên môn).
-    \item \textbf{Experience \& Qualifications:} Years of Experience, Consultation Fee (\%), Specializations (chuyên khoa).
+    \item \textbf{Category \& service leaders:} Top dịch vụ và danh mục dẫn đầu theo doanh thu (dữ liệu minh hoạ).
+    \item \textbf{Booking operations:} Tổng số booking và phân bố theo mức độ khẩn cấp (trễ, chờ xác nhận, hoàn thành).
 \end{itemize}
-
-\subparagraph{Hồ sơ Nhân sự đã hoàn thiện}
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[t]{0.48\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/partner/fig_partner_17_therapist_form_filled.png}
-    \caption{Hồ sơ Therapist đã điền đầy đủ}
-    \label{fig:partner_therapist_filled}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{Images/Hiện thực/partner/fig_partner_18_doctor_form_filled.png}
-    \caption{Hồ sơ Doctor đã điền đầy đủ}
-    \label{fig:partner_doctor_filled}
-\end{subfigure}
-\par\medskip
-\caption{Form tạo nhân sự hoàn chỉnh -- Therapist và Doctor}
-\label{fig:partner_staff_filled}
-\end{figure}
-
-Hình~\ref{fig:partner_staff_filled} minh họa form nhân sự đã điền đủ thông tin:
-\begin{itemize}
-    \item \textbf{Profile image:} Ảnh đại diện của nhân sự (hình vuông) đã tải lên.
-    \item \textbf{Tab phân loại:} Tab ``Therapist'' hoặc ``Doctor'' được chọn, xác định loại hồ sơ và các trường đặc thù.
-    \item \textbf{Thông tin liên hệ:} Họ tên, email, số điện thoại, loại hợp đồng.
-    \item \textbf{Employee ID:} Mã nhân viên tự động sinh (ví dụ: \texttt{C0CA87AE}).
-    \item \textbf{Nút lưu:} ``Create Therapist'' hoặc ``Create Doctor'' để lưu hồ sơ vào hệ thống.
-\end{itemize}
-
-\paragraph{Module Phòng khám (\texttt{ClinicModule} --- phía Đối tác)}
-
-Quản lý phòng khám và cơ sở dịch vụ: tên, mô tả, hình ảnh, giờ hoạt động. Liên kết \texttt{Address} và tọa độ địa lý (PostGIS) phục vụ tìm kiếm theo vị trí.
-
-\subsubsection{Tiếp nhận Lịch hẹn và Giao tiếp với Khách hàng}
-
-Đối tác tiếp nhận và xử lý lịch hẹn từ khách hàng thông qua giao diện Partner Portal. Khi có booking mới, hệ thống tự động gửi thông báo qua \texttt{NotificationModule}. Đối tác có thể xác nhận hoặc từ chối lịch hẹn, với mọi thay đổi trạng thái được ghi nhận trong \texttt{BookingStatusLog}.
-
-\paragraph{Chat phía Đối tác}
-
-Đối xứng với phía người dùng, đối tác có hệ thống chat riêng:
-
-\begin{itemize}
-    \item \textbf{\texttt{PartnerChatController}:} REST API quản lý danh sách cuộc trò chuyện, lịch sử tin nhắn (phân trang), đánh dấu đã đọc, và hỗ trợ tệp đính kèm (\texttt{PartnerChatAttachment}).
-    \item \textbf{\texttt{PartnerChatGateway}:} WebSocket Gateway xử lý nhắn tin thời gian thực phía đối tác. Tích hợp \texttt{ChatNotificationGateway} để đẩy thông báo tin nhắn mới khi đối tác không ở trong màn hình chat.
-    \item \textbf{Xác thực:} Sử dụng chung middleware \texttt{ws-jwt-auth} với phía người dùng, phân biệt role qua JWT payload.
-\end{itemize}
-
-\subsubsection{Dashboard Đối tác (\texttt{DashboardPartnerModule})}
-
-Cung cấp bảng điều khiển phân tích nghiệp vụ cho đối tác thông qua \texttt{PartnerDashboardController}, bao gồm các endpoint:
-
-\begin{itemize}
-    \item \textbf{\texttt{GET /stats}:} Thống kê KPI tổng hợp (doanh thu, số booking, tỷ lệ hoàn thành) theo kỳ tuần/tháng/quý.
-    \item \textbf{\texttt{GET /revenue}:} Dữ liệu doanh thu time-series phục vụ vẽ biểu đồ xu hướng.
-    \item \textbf{\texttt{GET /appointments/upcoming}:} Danh sách lịch hẹn sắp tới cần xử lý.
-    \item \textbf{\texttt{GET /services/performance}:} Xếp hạng hiệu suất dịch vụ theo doanh thu và lượt đặt.
-    \item \textbf{\texttt{GET /employees/distribution}:} Thống kê phân bố nhân sự theo vai trò.
-    \item \textbf{\texttt{GET /reviews/recent}:} Đánh giá gần nhất từ khách hàng.
-    \item \textbf{\texttt{GET /staff/schedule}:} Lịch nhân viên theo ngày cụ thể.
-    \item \textbf{\texttt{GET /notifications}:} Thông báo và cảnh báo cho đối tác.
-    \item \textbf{\texttt{GET /inventory/alerts}:} Cảnh báo về thiết bị hoặc vật tư cần bổ sung.
-\end{itemize}
-
-Toàn bộ endpoint bảo vệ bởi \texttt{@PartnerApi} decorator, đảm bảo đối tác chỉ xem dữ liệu thuộc tổ chức mình. Giao diện Dashboard (Hình~\ref{fig:partner_dashboard}) hiển thị tổng quan kinh doanh gồm: (1)~Doanh thu tổng, (2)~Số lịch hẹn, (3)~Dịch vụ đang hoạt động, (4)~Đánh giá trung bình, cùng biểu đồ doanh thu theo thời gian và các thao tác nhanh (Quick Actions) để thêm dịch vụ, nhân viên, hoặc quản lý tin nhắn.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{Images/Hiện thực/partner/fig_partner_dashboard.png}
-    \vspace{1em}
-    \caption{Dashboard Đối tác -- tổng quan kinh doanh}
-    \label{fig:partner_dashboard}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/dashboard/fig_partner_dashboar_4.png}
+    \vspace{0.5em}
+    \caption{Partner Dashboard -- chi tiết Booking operations: phân bố trạng thái và cảnh báo}
+    \label{fig:partner_dash4}
 \end{figure}
 
+Hình~\ref{fig:partner_dash4} phóng to phần \textbf{Booking operations}:
 \begin{itemize}
-    \item \textbf{KPI tổng hợp:} Bao gồm (1)~Doanh thu tổng, (2)~Số lịch hẹn, (3)~Dịch vụ đang hoạt động, và (4)~Đánh giá trung bình.
-    \item \textbf{Biểu đồ phân tích:} Cung cấp biểu đồ trực quan hóa xu hướng doanh thu theo thời gian.
-    \item \textbf{Quick Actions (Thao tác nhanh):} Cho phép truy cập nhanh để thêm dịch vụ, quản lý nhân viên, hoặc kiểm tra tin nhắn khách hàng.
+    \item \textbf{Trạng thái:} Phân bố booking theo từng trạng thái vận hành (dữ liệu minh hoạ).
+    \item \textbf{Cảnh báo:} Xử lý booking trễ, xác nhận booking đang chờ và rà soát quy trình nhắc nhở.
 \end{itemize}
 
+% ---------------------------------------------------------------------------
+% 6.3.3.3  QUẢN LÝ DỊCH VỤ
+% ---------------------------------------------------------------------------
+
+\subsubsection{Quản lý Dịch vụ (Services)}
+
+Module Services cho phép đối tác quản lý toàn bộ danh mục dịch vụ (Product) và theo dõi hiệu suất kinh doanh theo dịch vụ. Giao diện gồm hai phần chính: trang Services Dashboard (KPI tổng hợp, xu hướng, xếp hạng, vận hành đặt lịch) và trang quản lý sản phẩm chi tiết.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/service/fig_partner_service_dashboard_1.png}
+    \vspace{0.5em}
+    \caption{Services Dashboard -- KPI tổng hợp và biểu đồ xu hướng doanh thu theo tuần}
+    \label{fig:partner_svc_dash1}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_dash1} hiển thị phần đầu của Services Dashboard:
+\begin{itemize}
+    \item \textbf{KPI:} Số dịch vụ đang hoạt động, tổng lượt đặt, doanh thu và đánh giá trung bình theo kỳ.
+    \item \textbf{Booking and revenue trend:} Biểu đồ đường booking và doanh thu song song theo tuần.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/service/fig_partner_service_dashboard_2.png}
+    \vspace{0.5em}
+    \caption{Services Dashboard -- top dịch vụ/danh mục theo doanh thu và tổng quan Booking operations}
+    \label{fig:partner_svc_dash2}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_dash2} hiển thị phần giữa của Dashboard:
+\begin{itemize}
+    \item \textbf{Category and service leaders:} Top dịch vụ và danh mục dẫn đầu theo doanh thu (dữ liệu minh hoạ).
+    \item \textbf{Booking operations:} Tổng số booking và phân bố theo mức độ khẩn cấp (trễ, chờ xác nhận, hoàn thành).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/service/fig_partner_service_dashboard_3.png}
+    \vspace{0.5em}
+    \caption{Services Dashboard -- chi tiết Booking operations: phân bố trạng thái và cảnh báo vận hành}
+    \label{fig:partner_svc_dash3}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_dash3} là Booking operations:
+\begin{itemize}
+    \item \textbf{Phân bố trạng thái (Status):} Confirmed (Đã xác nhận), Cancelled (Đã hủy), No-show (Khách vắng), Rescheduled (Đổi lịch) với số lượng minh hoạ tương ứng.
+    \item \textbf{Cảnh báo:} Xử lý booking trễ, xác nhận booking chờ, rà soát quy trình nhắc nhở.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/service/fig_partner_service_dashboard_4.png}
+    \vspace{0.5em}
+    \caption{Services Dashboard -- bảng Product Management: danh sách dịch vụ với tên, giá và thao tác}
+    \label{fig:partner_svc_dash4}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_dash4} hiển thị bảng \textbf{Product Management}:
+\begin{itemize}
+    \item Mỗi hàng: ID, thumbnail, danh mục, tên dịch vụ, giá, 3 nút thao tác (xem/sửa/xóa).
+    \item Thanh công cụ: Search (Tìm kiếm), Sort (Sắp xếp), Filter (Lọc), nút \textbf{Add Product} (Thêm sản phẩm) và \textbf{Delete All} (Xóa tất cả).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/service/fig_partner_service_dashboard_5.png}
+    \vspace{0.5em}
+    \caption{Services Dashboard -- chế độ Website Layout: xem trước giao diện dịch vụ phía khách hàng}
+    \label{fig:partner_svc_dash5}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_dash5} hiển thị chế độ \textbf{Website Layout}:
+\begin{itemize}
+    \item Chuyển đổi giữa chế độ bảng (quản lý) và lưới (xem trước giao diện khách hàng).
+\end{itemize}
+
+\paragraph{Tạo dịch vụ mới (Create Product)}
+
+Luồng tạo dịch vụ mới gồm 3 phần chính điền trên cùng một form dài: thông tin cơ bản, hướng dẫn dịch vụ (Service Manual), và đa phương tiện (Media Gallery).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/service/fig_partner_create_service_1.png}
+    \vspace{0.5em}
+    \caption{Create Product -- General Information: tên, mô tả, phân loại và cài đặt lịch đặt}
+    \label{fig:partner_create_svc1}
+\end{figure}
+
+Hình~\ref{fig:partner_create_svc1} hiển thị mục \textbf{General Information}:
+\begin{itemize}
+    \item \textbf{Thông tin chính (trái):} Tên sản phẩm (Product Name), Mô tả (Description, rich text), Hướng dẫn dịch vụ (Service Manual).
+    \item \textbf{Thanh bên (phải):} Hiển thị (Visibility), Bật/tắt cửa hàng trực tuyến (Online Store toggle), Danh mục (Category), Thẻ nhãn (Tags), Phân công nhân viên (Staff Assignment), Thời lượng/Thời gian đệm (Duration/Buffer), Sức chứa (Capacity), Quy tắc đặt lịch (Booking Rules).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/service/fig_parter_create_service_2.png}
+    \vspace{0.5em}
+    \caption{Create Product -- Service Manual: Pre-Service Guidelines, Service Rules và Procedure Steps}
+    \label{fig:partner_create_svc2}
+\end{figure}
+
+Hình~\ref{fig:partner_create_svc2} hiển thị mục \textbf{Service Manual}:
+\begin{itemize}
+    \item \textbf{Pre-Service Guidelines:} Hướng dẫn chuẩn bị trước khi đến.
+    \item \textbf{Service Rules:} Mỗi quy tắc gồm icon slug, tiêu đề và mô tả.
+    \item \textbf{Procedure Steps:} Các bước quy trình tuần tự (Step 1, 2, ...).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/service/fig_partner_create_service_3.png}
+    \vspace{0.5em}
+    \caption{Create Product -- Service Pricing và Media Gallery}
+    \label{fig:partner_create_svc3}
+\end{figure}
+
+Hình~\ref{fig:partner_create_svc3} hiển thị phần cuối của form:
+\begin{itemize}
+    \item \textbf{Service Pricing:} Base Price và Sale Price.
+    \item \textbf{Media Gallery:} Product Images và Facility Images (tải ảnh hoặc thêm từ URL).
+    \item Nút \textbf{Save \& Publish} lưu và công khai dịch vụ.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.3.4  QUẢN LÝ NHÂN VIÊN
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Nhân viên (Employee)}
+
+Module Employee cho phép đối tác quản lý hồ sơ nhân sự (Therapist, Doctor\ldots), xem trạng thái và tạo mới nhân viên với thông tin chuyên môn đầy đủ.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_1.png}
+    \vspace{0.5em}
+    \caption{Employee -- danh sách nhân viên dạng lưới thẻ}
+    \label{fig:partner_emp1}
+\end{figure}
+
+Hình~\ref{fig:partner_emp1} hiển thị danh sách nhân viên dạng card grid:
+\begin{itemize}
+    \item Mỗi thẻ (Card): ảnh đại diện, tên, vai trò (Therapist/Doctor), badge trạng thái, nút xem chi tiết.
+    \item Hỗ trợ tìm kiếm và lọc theo vai trò hoặc trạng thái.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_2.png}
+    \vspace{0.5em}
+    \caption{Employee -- danh sách nhân viên dạng bảng với ID, vai trò, giờ làm và thao tác}
+    \label{fig:partner_emp2}
+\end{figure}
+
+Hình~\ref{fig:partner_emp2} hiển thị danh sách nhân viên dạng bảng:
+\begin{itemize}
+    \item Cột: Employee ID (Mã nhân viên), Name (Tên), Role (Vai trò), Working Hours (Giờ làm việc), Status (Trạng thái), 3 nút thao tác (xem/sửa/xóa).
+    \item Thuận tiện cho thao tác hàng loạt.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_2_b.png}
+    \vspace{0.5em}
+    \caption{Employee -- bộ lọc nâng cao theo vai trò, trạng thái và từ khóa}
+    \label{fig:partner_emp2b}
+\end{figure}
+
+Hình~\ref{fig:partner_emp2b} cho thấy bộ lọc nâng cao:
+\begin{itemize}
+    \item Lọc theo Role (Vai trò), Status (Trạng thái: Active -- Đang làm/Inactive -- Ngừng hoạt động/On Leave -- Nghỉ phép) và từ khóa tìm kiếm.
+    \item Kết quả cập nhật realtime.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_3.png}
+    \vspace{0.5em}
+    \caption{Chi tiết nhân viên -- hồ sơ đầy đủ tổ chức theo nhiều tab}
+    \label{fig:partner_emp3}
+\end{figure}
+
+Hình~\ref{fig:partner_emp3} hiển thị trang chi tiết nhân viên:
+\begin{itemize}
+    \item Các tab: Contact \& Basic Info, Professional Role, Skills \& Services, Work Schedule, Work History, Documents.
+    \item Mỗi tab có thể cập nhật độc lập.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_4.png}
+    \vspace{0.5em}
+    \caption{Chi tiết nhân viên -- tab Work Schedule: ca làm việc theo từng ngày trong tuần}
+    \label{fig:partner_emp4}
+\end{figure}
+
+Hình~\ref{fig:partner_emp4} là tab Work Schedule:
+\begin{itemize}
+    \item Cấu hình ca theo từng ngày (Mon--Sun): giờ bắt đầu/kết thúc và toggle bật/tắt.
+    \item Dữ liệu dùng bởi BookingModule để kiểm tra khả dụng khi đặt lịch.
+\end{itemize}
+
+\paragraph{Tạo nhân viên mới}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_1.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Contact \& Basic Info và chọn Employee Type}
+    \label{fig:partner_create_emp1}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp1} hiển thị bước đầu của form tạo nhân viên:
+\begin{itemize}
+    \item Tab chọn loại: \textbf{Therapist} hoặc \textbf{Doctor} -- ảnh hưởng đến các trường chuyên môn hiển thị.
+    \item \textbf{Contact \& Basic Info} (Thông tin liên hệ cơ bản): First Name (Tên), Last Name (Họ), Email, Phone (Số điện thoại), Date of Birth (Ngày sinh), Gender (Giới tính).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_2_a.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Skills \& Services: cấp bậc, hoa hồng và kỹ năng chuyên môn}
+    \label{fig:partner_create_emp2}
+\end{figure}
+
+    Hình~\ref{fig:partner_create_emp2} hiển thị mục \textbf{Skills \& Services} cho Doctor:
+\begin{itemize}
+    \item \textbf{Doctor Level:} Cấp bậc chuyên môn (Junior/Senior/Expert); \textbf{Commission Rate:} Tỷ lệ hoa hồng (\%).
+    \item \textbf{Specialization:} Chuyên môn chính của bác sĩ.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_2_b.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Skills \& Services: chọn Therapist Type}
+    \label{fig:partner_create_emp2b}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp2b} hiển thị mục \textbf{Skills \& Services}  cho Therapist:
+\begin{itemize}
+    \item \textbf{Therapist Type:} Chọn loại trị liệu viên -- Spa Therapist (wellness tổng quát) hoặc Massage Therapist (deep tissue).
+    \item \textbf{Last Health Check:} Ngày kiểm tra sức khoẻ gần nhất.
+    \item \textbf{Skill Set:} Tìm kiếm và gắn các kỹ năng chuyên môn (đa chọn).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_4.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Work History, Documents \& Certifications và Work Schedule}
+    \label{fig:partner_create_emp3}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp3} hiển thị phần cuối của form tạo nhân viên:
+\begin{itemize}
+    \item \textbf{Work History:} Thêm nhiều mục lịch sử công tác qua nút \textbf{Add Work History}.
+    \item \textbf{Documents \& Certifications -- Required:} Giấy phép hành nghề (License/Permit) và Chứng minh nhân thân (Identity Card) -- bắt buộc.
+    \item \textbf{Other Documents:} Khu vực tải lên tự do (PDF, JPG, PNG, tối đa 10MB).
+    \item \textbf{Work Schedule:} Cấu hình ca làm việc theo từng ngày trong tuần; nhấn \textbf{Create Employee/Doctor} để lưu và hệ thống sinh Employee ID tự động.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.3.5  SERVICE TAGS
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Service Tags}
+
+Service Tags là nhãn phân loại do đối tác tự định nghĩa, dùng để tổ chức và lọc dịch vụ trong nội bộ phòng khám.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/service_tag/fig_service_tags_dashboard.png}
+    \vspace{0.5em}
+    \caption{Service Tags Management -- danh sách nhãn dịch vụ với tên, màu, lượng sử dụng và trạng thái}
+    \label{fig:partner_svc_tags_dash}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_tags_dash} hiển thị danh sách Service Tags:
+\begin{itemize}
+    \item Mỗi tag: tên, mô tả, nhãn màu, số dịch vụ sử dụng (Usage) và trạng thái Active/Inactive.
+    \item Nút \textbf{Add New Tag} mở modal tạo mới; \textbf{Delete All} xóa toàn bộ.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/service_tag/fig_service_tags_create_new_service_tag.png}
+    \vspace{0.5em}
+    \caption{Modal Create New Tag -- nhập tên, mô tả, chọn màu, thứ tự và trạng thái}
+    \label{fig:partner_svc_tags_create}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_tags_create} tạo tag mới:
+\begin{itemize}
+    \item Nhập Name (Tên), Description (Mô tả), chọn Color (Màu sắc, 10 màu preset), Sort Order (Thứ tự sắp xếp) và toggle Active (Đang hoạt động).
+    \item Nút \textbf{Create} để lưu và đóng; tag mới xuất hiện ngay trong danh sách.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.3.6  TÀI CHÍNH ĐỐI TÁC
+% ---------------------------------------------------------------------------
+\subsubsection{Tài chính Đối tác (Finance)}
+
+Module Finance cung cấp cho đối tác bức tranh tài chính từ góc nhìn phòng khám: doanh thu, giao dịch thành công, và trạng thái thanh toán theo kỳ.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_finance/fig_partner_finance_1.png}
+    \vspace{0.5em}
+    \caption{Finance -- KPI tài chính và biểu đồ xu hướng doanh thu}
+    \label{fig:partner_finance1}
+\end{figure}
+
+Hình~\ref{fig:partner_finance1} hiển thị tổng quan tài chính đối tác:
+\begin{itemize}
+    \item \textbf{KPI:} Doanh thu gộp, số giao dịch thành công, tỷ lệ hoàn tiền.
+    \item \textbf{Biểu đồ:} Xu hướng doanh thu theo ngày/tuần -- xác định cao điểm, thấp điểm.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/partner_finance/fig_partner_finance_2.png}
+    \vspace{0.5em}
+    \caption{Finance -- bảng chi tiết giao dịch theo mã booking, số tiền và trạng thái}
+    \label{fig:partner_finance2}
+\end{figure}
+
+Hình~\ref{fig:partner_finance2} hiển thị bảng giao dịch chi tiết:
+\begin{itemize}
+    \item Mỗi dòng: mã booking, dịch vụ, khách hàng, số tiền, trạng thái (Paid/Pending/Refunded).
+    \item Hỗ trợ lọc theo thời gian và xuất dữ liệu đối soát nội bộ.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.3.7  NHẮN TIN
+% ---------------------------------------------------------------------------
+\subsubsection{Nhắn tin với Khách hàng (Messages)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/partner/message/fig_partner_user_message.png}
+    \vspace{0.5em}
+    \caption{Messages -- giao diện chat thời gian thực giữa đối tác và khách hàng}
+    \label{fig:partner_message}
+\end{figure}
+
+Hình~\ref{fig:partner_message} hiển thị module Messages:
+\begin{itemize}
+    \item \textbf{Cột trái:} Danh sách hội thoại (avatar, tên, tin nhắn gần nhất, thời gian).
+    \item \textbf{Cột phải:} Khung chat với lịch sử, ô nhập và nút tải tệp đính kèm.
+    \item Truyền tin qua WebSocket (\texttt{PartnerChatGateway}); tự động đẩy thông báo khi ngoài màn hình.
+\end{itemize}
 
 % ===========================================================================
 % 6.3.4  PHÂN HỆ TRANG QUẢN TRỊ (ADMIN PORTAL)
 % ===========================================================================
 \subsection{Hiện thực Phân hệ Trang Quản trị (Admin Portal)}
 
-Phân hệ Quản trị cung cấp cho quản trị viên công cụ giám sát và kiểm duyệt toàn bộ hệ thống với 5 module chính: Dashboard, Finance, Category, Provider, và Notifications. Để hiểu rõ vòng đời của một đối tác, phần này trình bày đồng thời luồng đăng ký từ phía đối tác (Partner Registration) và các màn hình quản trị tương ứng.
+Admin Portal được xây dựng bằng Flutter Web, cung cấp cho quản trị viên công cụ giám sát và kiểm duyệt toàn bộ hệ thống với 5 module chính trên menu trái: Dashboard, Finance, Category, Provider, và Notifications. Mỗi module tương ứng với một nhóm nghiệp vụ quản trị độc lập.
 
-\subsubsection{Quy trình Đăng ký Đối tác (Partner Registration)}
+% ---------------------------------------------------------------------------
+% 6.3.4.1  PROVIDER MANAGEMENT
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Hồ sơ Đối tác (Provider Management)}
 
-Trước khi admin có thể xét duyệt, đối tác phải hoàn thành biểu mẫu đăng ký gồm 4 bước bắt buộc. Toàn bộ dữ liệu này sẽ được hiển thị và đánh giá trong module Provider của Admin Portal.
-
-\paragraph{Bước 1 -- Thông tin Doanh nghiệp (Business Entity)}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_01_partner_reg_form_part1.png}
-    \vspace{1em}
-    \caption{Form đăng ký đối tác -- Bước 1: Thông tin Doanh nghiệp}
-    \label{fig:admin_login}
-\end{figure}
-
-Hình~\ref{fig:admin_login} hiển thị bước đầu tiên của quy trình đăng ký:
+Module Provider là trung tâm xét duyệt đối tác của Admin Portal. Luồng nghiệp vụ gồm 4 bước: (1)~quản trị viên xem hàng đợi hồ sơ chờ duyệt; (2)~mở chi tiết hồ sơ, xem thông tin kinh doanh, địa chỉ, KYC và tài liệu; (3)~đánh dấu từng trường hợp lệ/lỗi kèm Revision Note nếu cần; (4)~nhấn Approve, Request Revision hoặc Reject để hoàn tất xét duyệt.
 \begin{itemize}
-    \item \textbf{Thông tin định danh:} Đối tác nhập Brand Name (tên thương hiệu), Tax Code (mã số thuế), và chọn Business Type (loại hình kinh doanh, ví dụ: Spa, Clinic, Gym).
-    \item \textbf{Địa chỉ đăng ký:} Nhập địa chỉ đầy đủ với hỗ trợ tự động điền (autocomplete) từ Google Places API.
-    \item \textbf{URL thân thiện:} Hệ thống tự động gợi ý Slug URL từ tên thương hiệu, đối tác có thể tùy chỉnh trước khi gửi.
-\end{itemize}
-
-\paragraph{Bước 2 -- Thông tin Địa chỉ và Vị trí (Location Details)}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_02_partner_reg_form_part2.png}
-    \vspace{1em}
-    \caption{Form đăng ký đối tác -- Bước 2: Thông tin Địa chỉ và Vị trí}
-    \label{fig:admin_dashboard_top}
-\end{figure}
-
-Hình~\ref{fig:admin_dashboard_top} hiển thị bước nhập thông tin địa chỉ chi tiết:
-\begin{itemize}
-    \item \textbf{Bản đồ tương tác:} Đối tác xác nhận vị trí cơ sở trực tiếp trên Google Maps bằng cách kéo thả pin hoặc nhập địa chỉ để geocode tự động.
-    \item \textbf{Tọa độ GPS:} Hệ thống tự động trích xuất và lưu tọa độ (latitude/longitude) từ vị trí được chọn, phục vụ tính năng tìm kiếm theo vị trí (PostGIS).
-    \item \textbf{Chi tiết địa chỉ:} Điền đầy đủ tỉnh/thành, quận/huyện, phường/xã và số nhà để hiển thị trên hồ sơ công khai của phòng khám.
-\end{itemize}
-
-\paragraph{Bước 3 -- Người đại diện pháp lý (Legal Representative)}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_03_partner_reg_form_part3.png}
-    \vspace{1em}
-    \caption{Form đăng ký đối tác -- Bước 3: Người đại diện pháp lý}
-    \label{fig:admin_dashboard_bottom}
-\end{figure}
-
-Hình~\ref{fig:admin_dashboard_bottom} hiển thị bước khai báo người đại diện pháp lý:
-\begin{itemize}
-    \item \textbf{Thông tin cá nhân:} Họ tên đầy đủ, chức danh (Position), và số điện thoại liên hệ của người đại diện.
-    \item \textbf{Giấy tờ tùy thân:} Chọn loại giấy tờ (CCCD/Hộ chiếu), nhập số giấy tờ và ngày cấp.
-    \item \textbf{Xác thực thời gian thực:} Dữ liệu được validate real-time -- các trường bắt buộc được đánh dấu rõ ràng, hệ thống chặn chuyển bước nếu dữ liệu chưa đủ hoặc sai định dạng.
-\end{itemize}
-
-\paragraph{Bước 4 -- Tải lên Tài liệu KYC (Documents)}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_04_partner_reg_form_part4.png}
-    \vspace{1em}
-    \caption{Form đăng ký đối tác -- Bước 4: Tải lên Tài liệu KYC}
-    \label{fig:admin_dashboard_notifications}
-\end{figure}
-
-Hình~\ref{fig:admin_dashboard_notifications} hiển thị bước tải lên tài liệu xác minh danh tính:
-\begin{itemize}
-    \item \textbf{CCCD (Căn cước công dân):} Tải lên ảnh mặt trước và mặt sau của CCCD người đại diện pháp lý.
-    \item \textbf{Giấy phép kinh doanh:} Tải lên bản scan Giấy phép đăng ký kinh doanh hợp lệ.
-    \item \textbf{Kiểm tra tệp:} Hệ thống chỉ chấp nhận ảnh JPG/PNG hoặc PDF, kích thước tối đa 10MB mỗi tệp; preview ảnh hiển thị ngay sau khi tải lên để đối tác kiểm tra chất lượng.
-\end{itemize}
-
-\paragraph{Xác nhận Đăng ký Thành công}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_05_partner_reg_success.png}
-    \vspace{1em}
-    \caption{Xác nhận đăng ký đối tác thành công -- Hồ sơ đang chờ xét duyệt}
-    \label{fig:admin_partner_reg_success}
-\end{figure}
-
-Hình~\ref{fig:admin_partner_reg_success} hiển thị trang xác nhận sau khi đối tác nộp đầy đủ hồ sơ:
-\begin{itemize}
-    \item \textbf{Trạng thái hồ sơ:} Hệ thống xác nhận hồ sơ đã được tiếp nhận thành công và chuyển sang trạng thái \texttt{PENDING}, tức là đang chờ xét duyệt bởi quản trị viên.
-    \item \textbf{Application ID:} Một mã định danh duy nhất được cấp tự động, cho phép đối tác theo dõi tiến trình xét duyệt.
-    \item \textbf{Thông báo email:} Hệ thống tự động gửi email xác nhận kèm Application ID và hướng dẫn các bước tiếp theo.
-\end{itemize}
-
-\subsubsection{Quy trình Kiểm duyệt Đối tác}
-
-Đây là quy trình nghiệp vụ quan trọng nhất của Admin Portal. Quản trị viên thực hiện các bước sau:
-
-\paragraph{Bước 1 -- Xem danh sách đối tác chờ duyệt}
-
-Tại module ``Provider'', quản trị viên thấy toàn bộ hồ sơ kèm trạng thái (Pending/Active/Rejected/Changes~Required) và có thể truy cập nhanh vào từng hồ sơ để bắt đầu xét duyệt (Hình~\ref{fig:admin_provider_list}).
-
-Trước khi xét duyệt hồ sơ đối tác, Admin Portal cho phép quản trị viên tổng quan danh mục dịch vụ hiện có trên hệ thống -- đây là thông tin tham chiếu khi đánh giá loại hình kinh doanh của đối tác:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_06_category_management.png}
-    \vspace{1em}
-    \caption{Admin Portal -- Tổng quan Danh mục dịch vụ hiện có}
-    \label{fig:admin_provider_list}
-\end{figure}
-
-Hình~\ref{fig:admin_provider_list} hiển thị danh sách các danh mục dịch vụ đang hoạt động trên nền tảng:
-\begin{itemize}
-    \item \textbf{Danh mục dịch vụ:} Các nhóm dịch vụ chính như Massage Therapy, Diagnostics, Aesthetics, Physical Therapy, Wellness Coaching cùng số lượng dịch vụ đã được ánh xạ vào mỗi danh mục.
-    \item \textbf{Sử dụng trong xét duyệt:} Khi kiểm tra Business Type của đối tác, quản trị viên có thể đối chiếu với danh mục hiện có để đảm bảo hồ sơ được phân loại đúng.
-\end{itemize}
-
-\paragraph{Bước 2 -- Xem danh sách và chi tiết hồ sơ chờ duyệt}
-
-Khi nhấn ``Review Application'', quản trị viên được chuyển đến trang chi tiết hồ sơ. Trước tiên, module Provider hiển thị hàng đợi xét duyệt tổng quan (Hình~\ref{fig:admin_detail_top}).
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_07_partner_verification_queue.png}
-    \vspace{1em}
-    \caption{Hàng đợi xét duyệt đối tác trong Admin Portal}
-    \label{fig:admin_detail_top}
-\end{figure}
-
-Hình~\ref{fig:admin_detail_top} hiển thị danh sách hàng đợi xét duyệt đối tác:
-\begin{itemize}
-    \item \textbf{Thông tin tóm tắt:} Tên đối tác, ID, loại hình kinh doanh, ngày nộp hồ sơ, và trạng thái hiện tại (Pending/Active/Rejected).
-    \item \textbf{Cột Actions:} Nút biểu tượng chỉnh sửa cho phép quản trị viên truy cập trực tiếp vào hồ sơ đang chờ duyệt (Pending), hoặc nút mắt để xem lại hồ sơ đã xử lý (Active/Rejected).
-    \item \textbf{Màu sắc trạng thái:} Các hồ sơ Pending được tô màu cam, Active màu xanh lá, Rejected màu đỏ để quản trị viên dễ phân biệt.
-\end{itemize}
-
-Sau khi nhấn vào một hồ sơ Pending, quản trị viên xem được toàn bộ thông tin Business Overview, thông tin địa chỉ và vị trí trên bản đồ:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_08_provider_detail_overview.png}
-    \vspace{1em}
-    \caption{Chi tiết xét duyệt đối tác -- Business Overview và KYC Documents}
-    \label{fig:admin_detail_bottom}
-\end{figure}
-
-Hình~\ref{fig:admin_detail_bottom} hiển thị phần Business Overview của trang chi tiết xét duyệt:
-\begin{itemize}
-    \item \textbf{Thông tin kinh doanh:} Brand Name, Tax Code, Business Types, Registered Address và đường dẫn URL công khai.
-    \item \textbf{KYC Documents (cột phải):} Hiển thị ảnh CCCD mặt trước/sau (có tính năng phóng to) và Giấy phép kinh doanh (có tính năng tải xuống).
-    \item \textbf{Công cụ đánh giá:} Mỗi trường thông tin đều kèm biểu tượng \checkmark{} (đánh dấu hợp lệ) và biểu tượng bút chỉnh sửa (đánh dấu cần sửa kèm Revision Note).
+    \item (1)~quản trị viên xem hàng đợi hồ sơ chờ duyệt; 
+    \item (2)~mở chi tiết hồ sơ, xem thông tin kinh doanh, địa chỉ, KYC và tài liệu; 
+    \item (3)~đánh dấu từng trường hợp lệ/lỗi kèm Revision Note nếu cần; 
+    \item (4)~nhấn Approve, Request Revision hoặc Reject để hoàn tất xét duyệt.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_09_provider_detail_location.png}
-    \vspace{1em}
-    \caption{Chi tiết xét duyệt đối tác -- Vị trí kinh doanh trên bản đồ}
-    \label{fig:admin_revision_note}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/provider_management/fig_admin_provider_dashboard.png}
+    \vspace{0.5em}
+    \caption{Provider Requests -- hàng đợi xét duyệt và bảng danh sách đối tác}
+    \label{fig:admin_provider_dash}
 \end{figure}
 
-Hình~\ref{fig:admin_revision_note} hiển thị tab vị trí địa lý của hồ sơ đối tác:
+Hình~\ref{fig:admin_provider_dash} hiển thị màn hình chính module Provider:
 \begin{itemize}
-    \item \textbf{Bản đồ tích hợp:} Vị trí kinh doanh được hiển thị trực quan trên Google Maps, giúp quản trị viên xác minh địa chỉ đã khai báo có khớp với thực tế không.
-    \item \textbf{Tọa độ GPS:} Hiển thị tọa độ latitude/longitude đã được geocode và lưu vào PostGIS, phục vụ tính năng tìm kiếm theo vị trí.
-    \item \textbf{Đánh dấu lỗi:} Nếu địa chỉ không hợp lệ, quản trị viên nhấn biểu tượng bút để mở Revision Note và yêu cầu đối tác cập nhật lại.
-\end{itemize}
-
-\paragraph{Logic xét duyệt phía Backend}
-
-Khi quản trị viên xét duyệt một hồ sơ đối tác, hệ thống xử lý theo các bước:
-
-\begin{enumerate}
-    \item \textbf{Kiểm tra điều kiện:} Chỉ cho phép xét duyệt khi đối tác đang ở trạng thái \texttt{PENDING}. Nếu không, hệ thống trả về lỗi.
-
-    \item \textbf{Phân loại đánh giá:} Quản trị viên gửi danh sách các mục cần đánh giá, mỗi mục gồm \texttt{fieldKey} và \texttt{feedback}. Hệ thống tự động phân loại thành đánh giá trường hồ sơ hoặc đánh giá tài liệu dựa trên danh sách trường đã biết.
-
-    \item \textbf{Lưu ảnh chụp dữ liệu (Snapshot):} Với mỗi mục được đánh giá, hệ thống lưu lại giá trị hiện tại kèm kết quả hợp lệ hay không và phản hồi chi tiết, giúp truy vết chính xác dữ liệu tại thời điểm xét duyệt.
-
-    \item \textbf{Xác định kết quả cuối cùng:} Hệ thống áp dụng quy tắc ưu tiên:
-    \begin{itemize}
-        \item Nếu quản trị viên chọn từ chối $\rightarrow$ \texttt{REJECTED} (ưu tiên cao nhất, không thể đảo ngược).
-        \item Nếu có bất kỳ mục nào bị đánh dấu lỗi $\rightarrow$ \texttt{REQUIRED\_RESUBMIT} (yêu cầu sửa lại).
-        \item Nếu tất cả hợp lệ và đủ tài liệu bắt buộc $\rightarrow$ \texttt{APPROVED}.
-    \end{itemize}
-
-    \item \textbf{Ghi nhận lịch sử:} Toàn bộ kết quả xét duyệt được lưu vào bảng \texttt{PartnerReviewLog} dưới dạng bản ghi bất biến (immutable), bao gồm: kết quả, người duyệt, nhận xét chung, và chi tiết đánh giá từng trường/tài liệu.
-\end{enumerate}
-
-\subsubsection{Quản lý Danh mục và Thông báo}
-
-Module Category cho phép quản trị viên duy trì cây phân loại dịch vụ trên nền tảng. Giao diện đầy đủ bao gồm bộ lọc nâng cao và thao tác hàng loạt (xem chi tiết tại Hình~\ref{fig:admin_category_mgmt} và Hình~\ref{fig:admin_notif_campaign_center} trong phần \ref{sec:category_notif_mgmt}). Phần này trình bày thêm view tổng hợp danh mục:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_11_category_mgmt_full.png}
-    \vspace{1em}
-    \caption{Giao diện Quản lý Danh mục -- phiên bản đầy đủ}
-    \label{fig:admin_category_full}
-\end{figure}
-
-Hình~\ref{fig:admin_category_full} minh họa giao diện quản lý danh mục nâng cao:
-\begin{itemize}
-    \item \textbf{Bộ lọc đa chiều:} Cho phép tìm kiếm theo tên danh mục, trạng thái, hoặc ngày tạo.
-    \item \textbf{Thao tác hàng loạt:} Hỗ trợ chọn nhiều danh mục cùng lúc để cập nhật trạng thái hoặc xóa.
-    \item \textbf{Chi tiết chi phí:} Hiển thị số lượng dịch vụ liên kết và thống kê sử dụng từng danh mục.
-\end{itemize}
-
-\subsubsection{Quản lý Yêu cầu Nhà cung cấp (Provider Requests)}
-
-Hệ thống cung cấp giao diện tổng quan và quản lý chi tiết các yêu cầu xét duyệt của nhà cung cấp:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_12_provider_requests_overview.png}
-    \vspace{1em}
-    \caption{Tổng quan Danh sách Yêu cầu Nhà cung cấp}
-    \label{fig:admin_provider_requests}
-\end{figure}
-
-Hình~\ref{fig:admin_provider_requests} hiển thị danh sách các yêu cầu từ nhà cung cấp:
-\begin{itemize}
-    \item \textbf{Thống kê trạng thái:} Hiển thị tổng số yêu cầu, số chờ xét duyệt, số cấp phép, số từ chối.
-    \item \textbf{Tìm kiếm nâng cao:} Bộ lọc theo loại hình kinh doanh, ngày nộp, và trạng thái hiện tại.
-    \item \textbf{Hành động nhanh:} Nút xem chi tiết, phê duyệt, hoặc từ chối trực tiếp từ danh sách.
-\end{itemize}
-
-\paragraph{Chi tiết Hồ sơ Nhà cung cấp}
-
-Các trang chi tiết hồ sơ được chia thành nhiều tab để dễ quản lý:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_13_provider_detail_business.png}
-    \vspace{1em}
-    \caption{Chi tiết Hồ sơ -- Tab Thông tin Kinh doanh}
-    \label{fig:admin_provider_business}
-\end{figure}
-
-Hình~\ref{fig:admin_provider_business} hiển thị tab Thông tin Kinh doanh:
-\begin{itemize}
-    \item \textbf{Thông tin cơ bản:} Brand Name, Tax Code, Business Types, và Registered Address trên bản đồ.
-    \item \textbf{Công cụ đánh giá:} Biểu tượng xác nhận và nút chỉnh sửa cho từng trường.
-    \item \textbf{Lịch sử thay đổi:} Theo dõi các lần sửa đổi và ai thực hiện thay đổi.
+    \item \textbf{KPI:} Số hồ sơ chờ duyệt, ưu tiên cao, đang hoạt động và thời gian chờ trung bình (dữ liệu minh hoạ).
+    \item \textbf{Bảng danh sách:} Tên/ID đối tác, ngày nộp, badge trạng thái (Pending/Active), nút thao tác.
+    \item Hai tab: \textbf{Verification Queue} và \textbf{All Providers}.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_14_provider_detail_kyc.png}
-    \vspace{1em}
-    \caption{Chi tiết Hồ sơ -- Tab KYC (Know Your Customer)}
-    \label{fig:admin_provider_kyc}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/provider_management/fig_admin_provider_revisions.png}
+    \vspace{0.5em}
+    \caption{Chi tiết xét duyệt đối tác -- Business Overview, KYC Documents và panel hành động}
+    \label{fig:admin_provider_revisions}
 \end{figure}
 
-Hình~\ref{fig:admin_provider_kyc} hiển thị tab KYC:
+Hình~\ref{fig:admin_provider_revisions} hiển thị trang chi tiết xét duyệt:
 \begin{itemize}
-    \item \textbf{Thông tin pháp lý:} Họ tên người đại diện, chức vụ, loại giấy tờ, số giấy tờ, ngày cấp.
-    \item \textbf{Tài liệu đính kèm:} Danh sách các giấy chứng thực bắt buộc và tùy chọn.
-    \item \textbf{Trạng thái xác thực:} Hiển thị từng giấy tờ đã được xác minh hay còn chờ xử lý.
+    \item \textbf{Business Overview (trái):} Brand Name, Tax Code, Business Types, địa chỉ và bản đồ; mỗi trường có tick xanh/bút cam.
+    \item \textbf{KYC Documents (phải):} CCCD mặt trước/sau (phóng to), giấy phép kinh doanh PDF (tải về).
+    \item \textbf{Hành động:} Approve Provider (xanh), Request Revision (cam), Reject Application (đỏ).
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_15_provider_detail_id_scan.png}
-    \vspace{1em}
-    \caption{Chi tiết Hồ sơ -- Xem Chi tiết Scan Giấy tờ}
-    \label{fig:admin_provider_id_scan}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/provider_management/fig_admin_provider_request_revision_by_field.png}
+    \vspace{0.5em}
+    \caption{Chi tiết xét duyệt -- popover Revision Note cho từng trường bị lỗi}
+    \label{fig:admin_provider_request_revision}
 \end{figure}
 
-Hình~\ref{fig:admin_provider_id_scan} minh họa khả năng xem chi tiết giấy tờ:
+Hình~\ref{fig:admin_provider_request_revision} minh họa ghi Revision Note theo từng trường:
 \begin{itemize}
-    \item \textbf{Phóng to ảnh:} Cho phép phóng to ảnh giấy tờ để kiểm tra chi tiết.
-    \item \textbf{Tải về:} Hỗ trợ tải giấy tờ về máy tính để phân tích ngoài.
-    \item \textbf{Ghi chú OCR:} Tự động trích xuất thông tin từ giấy tờ bằng OCR nếu có.
+    \item Nhấn bút cam trên trường Tax Code $\rightarrow$ popover nhập Revision Note và nút \textbf{Save Feedback}.
+    \item Có thể đánh dấu nhiều trường lỗi liên tiếp mà không mất dữ liệu đang xem.
+    \item Panel phải cập nhật tức thì số trường đã được đánh dấu để chỉnh sửa.
+    \item Sau khi admin nhấn nút \textbf{Request Revision} thì trạng thái hồ sơ chuyển thành \texttt{REQUIRED\_RESUBMIT}.
+    \item Trường lỗi (Tax Code, Phone Number): viền đỏ, badge UPDATE cam kèm lý do từ admin.
+    \item Vòng lặp: Đối tác sửa $\rightarrow$ Resubmit $\rightarrow$ Admin xét duyệt lại.
 \end{itemize}
 
-\paragraph{Quy trình Phê duyệt và Phản hồi}
+% ---------------------------------------------------------------------------
+% 6.3.4.2  DASHBOARD ADMIN
+% ---------------------------------------------------------------------------
+\subsubsection{Dashboard Quản trị (Admin Dashboard)}
 
-Hệ thống hỗ trợ các hành động phê duyệt và phản hồi chi tiết:
-
-\paragraph{Phản hồi chỉnh sửa từ phía Đối tác (Application Revision)}
-
-Khi quản trị viên kết luận \texttt{REQUIRED\_RESUBMIT}, hệ thống tự động gửi thông báo và đối tác nhìn thấy trang Application Revision:
+Admin Dashboard tổng hợp toàn bộ chỉ số vận hành nền tảng trong một không gian làm việc duy nhất, với bộ lọc thời gian 7D / 30D / 90D (7 ngày / 30 ngày / 90 ngày) và nút Refresh hiển thị timestamp cập nhật lần cuối.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_16_revision_note_feedback.png}
-    \vspace{1em}
-    \caption{Trang Application Revision -- giao diện phía đối tác khi hồ sơ cần chỉnh sửa}
-    \label{fig:admin_revision_feedback}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/dashboard/fig_admin_dashboard_1.png}
+    \vspace{0.5em}
+    \caption{Admin Dashboard -- phần 1: 8 KPI nền tảng và biểu đồ Finance Trend 30 ngày}
+    \label{fig:admin_dash1}
 \end{figure}
 
-Hình~\ref{fig:admin_revision_feedback} hiển thị trang ``Application Revision'' mà đối tác nhìn thấy sau khi nhận phản hồi từ admin:
+Hình~\ref{fig:admin_dash1} hiển thị phần đầu Admin Dashboard:
 \begin{itemize}
-    \item \textbf{Danh sách phần cần chỉnh sửa:} Mỗi bước trong 4 bước đăng ký được liệt kê kèm badge \textbf{ACTION REQUIRED} (màu cam, ví dụ: Business Entity và Legal Representative) hoặc dấu tick xanh (đã chấp thuận, ví dụ: Location Details và Documents).
-    \item \textbf{Trạng thái hồ sơ:} Thanh trạng thái ở cuối hiển thị \textit{``Awaiting Revision''} màu cam, nhắc nhở đối tác hoàn thiện trước khi nộp lại.
-    \item \textbf{Nút Resubmit:} Sau khi cập nhật các mục bị đánh dấu, đối tác nhấn ``Resubmit Application'' để gửi lại hồ sơ cho admin xét duyệt lần tiếp theo.
-\end{itemize}
-
-\paragraph{Hoàn thiện Hồ sơ Phòng khám sau khi được Phê duyệt}
-
-Khi quản trị viên phê duyệt (\texttt{APPROVED}), hệ thống chuyển đối tác sang bước hoàn thiện hồ sơ công khai:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_17_approval_reject_action.png}
-    \vspace{1em}
-    \caption{Trang Complete Clinic Profile -- đối tác hoàn thiện hồ sơ công khai sau phê duyệt}
-    \label{fig:admin_approval_action}
-\end{figure}
-
-Hình~\ref{fig:admin_approval_action} hiển thị trang ``Complete Clinic Profile'' phía đối tác ngay sau khi được phê duyệt:
-\begin{itemize}
-    \item \textbf{Thanh tiến trình:} Hiển thị ``Profile 0\% complete'' và danh sách 4 mục cần hoàn thiện: Clinic cover image, Clinic logo image, Clinic description, Clinic gallery (và Trust badges tùy chọn).
-    \item \textbf{Verified clinic identity:} Phần thông tin đã được xác minh (Brand name, Legal name, Phone number, Address, Business type) được hiển thị dạng read-only làm tham chiếu, không thể chỉnh sửa tại đây.
-    \item \textbf{Yêu cầu hoàn thiện:} Thanh cảnh báo ở dưới nhắc ``Complete the required fields to unlock the dashboard'' -- đối tác phải điền đủ 4 mục bắt buộc mới được truy cập Partner Dashboard.
-\end{itemize}
-
-\paragraph{Dashboard Nâng cao}
-
-Sau khi hoàn thành quy trình kiểm duyệt, quản trị viên quay lại Admin Dashboard để theo dõi tổng quan hoạt động nền tảng. Dashboard gồm 3 phần chính được cuộn liên tiếp:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_18_dashboard_kpi_overview.png}
-    \vspace{1em}
-    \caption{Admin Dashboard -- Phần 1: KPI Cards và Finance Trend}
-    \label{fig:admin_dashboard_kpi_alt}
-\end{figure}
-
-Hình~\ref{fig:admin_dashboard_kpi_alt} hiển thị phần đầu của Admin Dashboard:
-\begin{itemize}
-    \item \textbf{Bộ lọc thời gian:} Quản trị viên chọn khoảng xem 7D / 30D / 90D, mặc định là 30 ngày với timestamp cập nhật lần cuối.
-    \item \textbf{8 KPI Cards (2 hàng):} Hàng trên -- Gross Revenue (1,64 T VND), Successful Transactions (5541, 121 pending), Total Partners (428, 24 pending reviews), Booking Success Rate (91.47\%). Hàng dưới -- Booking Failed Rate (2.50\%), Booking Canceled Rate (6.03\%), Average Booking Value (307 N VND), Notification Volume (18 tín hiệu vận hành).
-    \item \textbf{Finance Trend:} Biểu đồ đường doanh thu hàng ngày (Gross Revenue, Net Revenue, Refund Pressure) trong 30 ngày, kèm bảng Finance Summary tổng hợp Net Revenue, Refund Volume, Failed Payment Volume và Average Booking Value.
+    \item \textbf{KPI hàng trên (quy mô):} Gross Revenue, tổng giao dịch, số đối tác và tỷ lệ thành công (dữ liệu minh hoạ).
+    \item \textbf{KPI hàng dưới (rủi ro):} Tỷ lệ thất bại, hủy, giá trị booking trung bình và số thông báo chờ xử lý.
+    \item \textbf{Finance Trend:} Ba đường Gross/Net Revenue và Refund Pressure theo ngày.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_19_dashboard_outcomes_partners.png}
-    \vspace{1em}
-    \caption{Admin Dashboard -- Phần 2: Booking Outcomes, Transaction Health và Top Revenue}
-    \label{fig:admin_dashboard_outcomes}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/dashboard/fig_admin_dashboard_2.png}
+    \vspace{0.5em}
+    \caption{Admin Dashboard -- phần 2: Booking Outcomes, Transaction Health và top doanh thu}
+    \label{fig:admin_dash2}
 \end{figure}
 
-Hình~\ref{fig:admin_dashboard_outcomes} hiển thị phần giữa của Admin Dashboard:
+Hình~\ref{fig:admin_dash2} hiển thị phần giữa Dashboard:
 \begin{itemize}
-    \item \textbf{Booking Outcomes:} Biểu đồ thanh ngang với 5840 tổng booking -- Successful 5342 (91.47\%), Failed 146 (2.50\%), Canceled 352 (6.03\%).
-    \item \textbf{Transaction Health:} Thống kê 6018 giao dịch -- Paid 5541, Pending 121, Refunded 132, Failed 74, Canceled 150, Failed Amount 19,1 Tr VND.
-    \item \textbf{Top Revenue Partners \& Services:} Xếp hạng 5 đối tác (Calm Lotus Clinic, VitaWell Rehab, Sora Aesthetic House...) và 5 dịch vụ (Deep Relief Massage, Recovery Rehab Plan...) theo doanh thu, kèm số booking và tỷ lệ thành công.
+    \item \textbf{Booking Outcomes:} Phân bố tỷ lệ thành công, thất bại và hủy theo kỳ (dữ liệu minh hoạ).
+    \item \textbf{Transaction Health:} Phân bố giao dịch theo trạng thái Paid/Pending/Refunded/Failed.
+    \item \textbf{Top Revenue Partners \& Services:} Danh sách đối tác và dịch vụ dẫn đầu theo doanh thu.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_20_dashboard_notifications_category.png}
-    \vspace{1em}
-    \caption{Admin Dashboard -- Phần 3: Notifications Summary và Category Health}
-    \label{fig:admin_dashboard_notif_category}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/dashboard/fig_admin_dashboard_3.png}
+    \vspace{0.5em}
+    \caption{Admin Dashboard -- phần 3: Notifications Summary và Category Health}
+    \label{fig:admin_dash3}
 \end{figure}
 
-Hình~\ref{fig:admin_dashboard_notif_category} hiển thị phần cuối của Admin Dashboard:
+Hình~\ref{fig:admin_dash3} hiển thị phần cuối Dashboard:
 \begin{itemize}
-    \item \textbf{Notifications Summary:} Danh sách cảnh báo vận hành theo mức ưu tiên -- High: ``Payment failures trending above baseline'' (card và bank transfer retries tăng 18\%); Critical: ``24 partner applications awaiting review'' (SLA đang bị đe dọa); Medium: chiến dịch wellness tháng 4 đã gửi; Medium: ``Diagnostics category has inactive mapped services''.
-    \item \textbf{Category Health:} Tổng quan 32 danh mục (27 Active, 5 Inactive, 3 Empty, 186 Mapped Services) với breakdown theo từng danh mục: Massage Therapy (28), Diagnostics (24), Aesthetics (22), Physical Therapy (20), Wellness Coaching (17).
+    \item \textbf{Notifications Summary:} Tóm tắt cảnh báo theo mức độ Critical/High/Medium cần xử lý (dữ liệu minh hoạ).
+    \item \textbf{Category Health:} Phân bố danh mục Active/Inactive/Empty và top danh mục theo số lượng dịch vụ.
 \end{itemize}
 
-\subsubsection{Finance Manager}
+% ---------------------------------------------------------------------------
+% 6.3.4.3  FINANCE MANAGER
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Tài chính (Finance Manager)}
 
-Module Finance Manager (menu Finance) cho phép quản trị viên giám sát toàn bộ dòng tiền của nền tảng. Giao diện có các tab: Overview, Ledger, Payouts, Refunds, Reconciliation, Partner Exposure, Exports.
+Module Finance cho phép quản trị viên giám sát toàn bộ dòng tiền của nền tảng qua nhiều tab chuyên biệt: Overview, Ledger, Payouts, Refunds, Reconciliation, Partner Exposure, Exports.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_21_finance_manager_overview.png}
-    \vspace{1em}
-    \caption{Finance Manager -- Tab Overview: 8 KPI tài chính và Revenue Trend}
-    \label{fig:admin_finance_overview_new}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/finance/fig_admin_finance_1.png}
+    \vspace{0.5em}
+    \caption{Finance Manager -- Tab Overview: bộ lọc đa chiều, 8 KPI tài chính và Revenue Trend}
+    \label{fig:admin_finance1}
 \end{figure}
 
-Hình~\ref{fig:admin_finance_overview_new} hiển thị tab Overview của Finance Manager:
+Hình~\ref{fig:admin_finance1} hiển thị tab Overview của Finance Manager:
 \begin{itemize}
-    \item \textbf{Bộ lọc thời gian \& bộ lọc đa chiều:} Chọn khoảng 7D/30D/90D/This Month/Last Month/Custom; lọc thêm theo đối tác, trạng thái giao dịch, cờ Flagged hoặc SLA Breached.
-    \item \textbf{8 KPI Cards:} Gross Volume (2.5B VND, +12.3\%), Net Revenue (2.2B, +8.7\%), Platform Fees (246.7M, +10.1\%), Refund Exposure (38.4M, -2.4\%), Failed Payments (12.6M, -15.0\%), Pending Payouts (184.2M, +5.2\%), Held Payouts (42.0M), Unreconciled (8.9M, -3.1\%).
-    \item \textbf{Revenue Trend Table:} Bảng dữ liệu chi tiết theo ngày gồm Gross, Net, Refunds, Payouts; nút Export để tải báo cáo CSV/Excel.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_22_finance_revenue_alerts.png}
-    \vspace{1em}
-    \caption{Finance Manager -- Revenue Trend chi tiết và Finance Alerts}
-    \label{fig:admin_finance_revenue_new}
-\end{figure}
-
-Hình~\ref{fig:admin_finance_revenue_new} hiển thị phần dưới của tab Overview:
-\begin{itemize}
-    \item \textbf{Revenue Trend Table (tiếp):} Danh sách ngày từ 22~Apr đến 28~Apr 2026 với các cột Gross, Net, Refunds, Payouts giúp quản trị viên đối soát từng ngày.
-    \item \textbf{Finance Alerts (cảnh báo tài chính):} Danh sách 4 cảnh báo tự động -- ``High refund volume detected'' (Refunds vượt 5\% Gross trong 7 ngày), ``3 payouts held for review'' (Wellness Spa, Zen Yoga Studio, NutriLife), ``Reconciliation exceptions rising'' (10 exceptions chưa xử lý), ``Platform fee revenue on track'' (+12\% so dự báo).
-    \item \textbf{Partner Exposure (bắt đầu):} Bảng phơi nhiễm rủi ro tài chính theo từng đối tác xuất hiện ngay bên dưới.
+    \item \textbf{Bộ lọc:} Khoảng thời gian (7D/30D/90D/Custom), đối tác, trạng thái, Flagged, SLA Breached.
+    \item \textbf{KPI:} Gross/Net Revenue, Platform Fees, Refund, Failed, Pending Payouts, Held và Unreconciled theo kỳ lọc (dữ liệu minh hoạ).
+    \item \textbf{Revenue Trend Table:} Chi tiết từng ngày theo Gross/Net/Refunds/Payouts.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_23_finance_alerts_exposure.png}
-    \vspace{1em}
-    \caption{Finance Manager -- Finance Alerts và bảng Partner Exposure}
-    \label{fig:admin_finance_alerts}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/finance/fig_admin_finance_2.png}
+    \vspace{0.5em}
+    \caption{Finance Manager -- Finance Alerts và bảng Partner Exposure với chỉ số rủi ro}
+    \label{fig:admin_finance2}
 \end{figure}
 
-Hình~\ref{fig:admin_finance_alerts} hiển thị toàn bộ bảng Partner Exposure:
+Hình~\ref{fig:admin_finance2} hiển thị hai phần phía dưới tab Overview:
 \begin{itemize}
-    \item \textbf{Finance Alerts (lặp lại):} Phần trên vẫn hiển thị 4 cảnh báo để dễ theo dõi khi cuộn trang.
-    \item \textbf{Bảng Partner Exposure:} Liệt kê 8 đối tác với Volume, Pending, Refunds, Failed, Held và cột Risk (màu chấm đỏ/cam/xám) -- ví dụ Wellness Spa (300M, Held 6M, Risk đỏ), Zen Yoga Studio (270M, Risk đỏ), NutriLife Clinic (240M, Risk cam).
-    \item \textbf{Ý nghĩa nghiệp vụ:} Màu Risk giúp quản trị viên ưu tiên xử lý các đối tác có tỷ lệ Refund/Failed cao hoặc Held Payout chưa giải phóng.
+    \item \textbf{Finance Alerts:} Cảnh báo refund cao, payouts bị giữ, reconciliation exceptions tăng và trạng thái platform fee (dữ liệu minh hoạ).
+    \item \textbf{Partner Exposure:} Danh sách đối tác với Volume/Pending/Refunds/Failed/Held và mức độ rủi ro (Risk) tương ứng.
 \end{itemize}
 
-\subsubsection{Category và Notification Management}
-\label{sec:category_notif_mgmt}
+% ---------------------------------------------------------------------------
+% 6.3.4.4  CATEGORY MANAGEMENT
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Danh mục (Category Management)}
 
-\paragraph{Quản lý Danh mục (Category Management)}
+Module Category cho phép quản trị viên duy trì cây phân loại dịch vụ trên toàn nền tảng. Danh mục này được đối tác sử dụng khi tạo dịch vụ mới và là tiêu chí phân loại khi xét duyệt Business Type của hồ sơ đăng ký.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_24_category_management.png}
-    \vspace{1em}
-    \caption{Giao diện Category Management -- danh sách danh mục dịch vụ}
-    \label{fig:admin_category_mgmt}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/category/fig_admin_category_dashboard.png}
+    \vspace{0.5em}
+    \caption{Category Management -- danh sách danh mục với tên, số dịch vụ, trạng thái và thao tác}
+    \label{fig:admin_category_dash}
 \end{figure}
 
-Hình~\ref{fig:admin_category_mgmt} hiển thị giao diện quản lý danh mục:
+Hình~\ref{fig:admin_category_dash} hiển thị danh sách danh mục:
 \begin{itemize}
-    \item \textbf{Bảng danh mục:} Mỗi hàng gồm Icon (ảnh màu đặc trưng), Category Name, Description, số dịch vụ liên kết (Total Services), Status (Visible/Hidden), và cột Actions (chỉnh sửa / xóa).
-    \item \textbf{Ví dụ dữ liệu:} Home Cleaning (15 Services, Visible), Plumbing (8 Services, Hidden), Electrical (22 Services, Visible), Painting (5 Services, Visible), Gardening (9 Services, Hidden), Spa \& Wellness (18 Services, Visible).
-    \item \textbf{Thao tác:} Nút Sort và Filter để sắp xếp/lọc; nút \textbf{``+ Add Category''} (xanh, góc phải) để tạo danh mục mới; checkbox để chọn nhiều hàng cùng lúc.
+    \item Mỗi hàng: icon màu, tên, mô tả, Total Services, trạng thái Visible/Hidden, nút sửa/xóa.
+    \item Checkbox cho thao tác hàng loạt; thanh công cụ: Sort, Filter, \textbf{Add Category}, \textbf{Delete All}.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_25_create_category_form.png}
-    \vspace{1em}
-    \caption{Form Tạo Danh mục Mới -- Category Information và Category Settings}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/category/fig_admin_create_new_category.png}
+    \vspace{0.5em}
+    \caption{Form tạo danh mục mới -- thông tin, cài đặt và nút Create Category}
     \label{fig:admin_create_category}
 \end{figure}
 
-Hình~\ref{fig:admin_create_category} hiển thị form tạo danh mục mới:
+Hình~\ref{fig:admin_create_category} hiển thị form tạo danh mục:
 \begin{itemize}
-    \item \textbf{Category Information:} Nhập Category Name (bắt buộc, có icon gợi ý) và Description (tùy chọn, textarea nhiều dòng).
-    \item \textbf{Category Settings:} Chọn Status (Active/Inactive), Sort Order (số thứ tự hiển thị), Icon Name (tên icon Material, ví dụ: spa, category), và Color Hex (mã màu icon, ví dụ: \#1A7B99).
-    \item \textbf{Hành động:} Nút \textbf{``Create Category''} (xanh, góc phải) lưu và quay về danh sách; nút ``Cancel'' bỏ qua.
+    \item \textbf{Category Information:} Name (bắt buộc), Description (textarea).
+    \item \textbf{Category Settings:} Status Active/Inactive, Sort Order, Icon Name, Color Hex.
+    \item Nút \textbf{Create Category} lưu; \textbf{Cancel} bỏ qua.
 \end{itemize}
 
-\paragraph{Hàng đợi Xét duyệt Đối tác (Provider Requests)}
+% ---------------------------------------------------------------------------
+% 6.3.4.5  NOTIFICATION MANAGEMENT
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Thông báo (Notification Management)}
+
+Module Notifications cho phép quản trị viên tạo và quản lý chiến dịch thông báo đến các nhóm đối tượng khác nhau (đối tác, khách hàng, admin).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_26_provider_verification_queue.png}
-    \vspace{1em}
-    \caption{Provider Requests -- Hàng đợi xét duyệt với thống kê tổng quan}
-    \label{fig:admin_verification_queue}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_dashboard_1.png}
+    \vspace{0.5em}
+    \caption{Notification Control Center -- KPI chiến dịch và bộ lọc Campaign Activity}
+    \label{fig:admin_notif_dash1}
 \end{figure}
 
-Hình~\ref{fig:admin_verification_queue} hiển thị màn hình Provider Requests với hai tab: Verification Queue và All Providers:
+Hình~\ref{fig:admin_notif_dash1} hiển thị Notification Control Center:
 \begin{itemize}
-    \item \textbf{4 KPI Cards đầu trang:} Pending Review (24), High Priority (5, nền đỏ nhạc cảnh báo), Active Today (128), Avg. Wait Time (4h 12m) -- giúp quản trị viên nắm nhanh tải công việc.
-    \item \textbf{Bảng danh sách:} Mỗi hàng gồm avatar + tên + ID đối tác, Business Type (tag pill), ngày nộp kèm thời gian tương đối (``2 hours ago''), Status badge (Pending/Active/Rejected), và nút action (bút chỉnh sửa cho Pending, mắt xem cho đã xử lý).
-    \item \textbf{Màu sắc cảnh báo:} Các hàng Pending có ngày nộp bị tô màu cam (quá hạn SLA) để ưu tiên xử lý trước.
-\end{itemize}
-
-\paragraph{Notification Control Center}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_27_notification_campaign_center.png}
-    \vspace{1em}
-    \caption{System Notification Control Center -- Tổng quan và Bộ lọc Chiến dịch}
-    \label{fig:admin_notif_campaign_center}
-\end{figure}
-
-Hình~\ref{fig:admin_notif_campaign_center} hiển thị System Notification Control Center:
-\begin{itemize}
-    \item \textbf{4 KPI Cards:} Sent Today (0), Scheduled (1 -- queued campaigns awaiting delivery), Drafts (1 -- work in progress), Active Segments (4 -- audience groups available).
-    \item \textbf{Bộ lọc Campaign Activity:} Tabs lọc All / Draft / Scheduled / Sent / Failed; bộ lọc chi tiết theo Search, Channel (All channels), Audience (All audiences), Created by (All admins), Start date, End date; nút Reset.
-    \item \textbf{Nút Create Campaign:} Góc phải trên mở wizard tạo chiến dịch mới gồm soạn nội dung, chọn đối tượng mục tiêu và đặt lịch gửi.
+    \item \textbf{KPI:} Sent Today, Scheduled, Drafts, Active Segments.
+    \item \textbf{Bộ lọc:} Tab All/Draft/Scheduled/Sent/Failed và 6 bộ lọc (nội dung, kênh, đối tượng, người tạo, thời gian).
+    \item Nút \textbf{Create Campaign} mở wizard tạo chiến dịch mới.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{Images/Hiện thực/admin/fig_admin_28_campaign_activity_list.png}
-    \vspace{1em}
-    \caption{Notification Control Center -- Bảng Campaign Activity}
-    \label{fig:admin_campaign_activity}
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_dashboard_2.png}
+    \vspace{0.5em}
+    \caption{Notification Control Center -- bảng Campaign Activity: danh sách chiến dịch và trạng thái}
+    \label{fig:admin_notif_dash2}
 \end{figure}
 
-Hình~\ref{fig:admin_campaign_activity} hiển thị bảng Campaign Activity với lịch sử chiến dịch:
+Hình~\ref{fig:admin_notif_dash2} hiển thị bảng Campaign Activity:
 \begin{itemize}
-    \item \textbf{Các cột thông tin:} Campaign (tên + mô tả ngắn), Channel (In-App / Push / Email), Audience (Verified Partners / Active Customers / All Users / Admin Operations), Status badge (Scheduled/Sent/Draft/Failed), Scheduled/Sent time, Updated time, Actions (ba chấm mở menu).
-    \item \textbf{Ví dụ dữ liệu:} ``Partner Operations Refresh'' (Scheduled, 12 Apr), ``Golden Week Service Reminder'' (Sent), ``Policy Refresh Draft'' (Draft), ``Admin SLA Escalation'' (Failed), ``Spring Weekend Promo'' (Sent).
-    \item \textbf{Phân trang:} Hiển thị 1--10 of 5 với điều hướng trang; cho phép clone chiến dịch cũ để tái sử dụng nội dung.
+    \item Mỗi hàng: Campaign, Channel, Audience, Status badge (Scheduled/Sent/Draft/Failed), thời gian, menu Actions.
+    \item Phân trang 10 hàng/trang.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_detail.png}
+    \vspace{0.5em}
+    \caption{Chi tiết chiến dịch thông báo -- nội dung, đối tượng, trạng thái và lịch gửi}
+    \label{fig:admin_notif_detail}
+\end{figure}
+
+Hình~\ref{fig:admin_notif_detail} hiển thị chi tiết chiến dịch:
+\begin{itemize}
+    \item Nội dung đầy đủ: tiêu đề, thông điệp, kênh gửi (In-App/Push/Email).
+    \item Đối tượng, trạng thái và thời gian đặt lịch.
+    \item Chỉnh sửa chiến dịch Draft/Scheduled hoặc clone chiến dịch đã gửi.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_create_new_campain.png}
+    \vspace{0.5em}
+    \caption{Tạo chiến dịch thông báo -- wizard soạn nội dung, chọn kênh, đối tượng và lịch gửi}
+    \label{fig:admin_create_campaign}
+\end{figure}
+
+Hình~\ref{fig:admin_create_campaign} hiển thị wizard tạo chiến dịch:
+\begin{itemize}
+    \item \textbf{Nội dung:} Campaign Name, Title, Message body.
+    \item \textbf{Kênh gửi:} In-App, Push Notification, Email (chọn một hoặc nhiều).
+    \item \textbf{Đối tượng:} Verified Partners, Active Customers, All Users, Admin Operations.
+    \item \textbf{Lịch gửi:} Send Now hoặc Schedule (picker ngày giờ).
 \end{itemize}
 
 \subsubsection{Nhật ký Kiểm toán (Audit Logging)}
